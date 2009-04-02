@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://xml.netbeans.org/schema/ExperimentSchema"
+            xmlns:tns="http://xml.netbeans.org/schema/ExperimentSchema"
+            elementFormDefault="qualified">
+    <xsd:element name="Experiment" type="tns:ExperimentType"></xsd:element>
+    <xsd:complexType name="ExperimentType">
+        <xsd:sequence>
+            <xsd:element name="Variable" type="tns:VariableType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="LocalVariable" type="tns:LocalVariableType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="SolutionSpec" type="tns:SolutionSpecType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="VariableType">
+        <xsd:attribute name="Name" type="xsd:ID"/>
+        <xsd:attribute name="NodeName" type="xsd:string"/>
+        <xsd:attribute name="AttributeToChange" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:complexType name="LocalVariableType">
+        <xsd:attribute name="Name" type="xsd:ID" use="required"/>
+        <xsd:attribute name="InitialValue" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+        <xsd:complexType name="SolutionSpecType">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="Assign" type="tns:AssignType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="Iteration" type="tns:IterationType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="Alt" type="tns:AltType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="OutputSpec" type="tns:OutputSpecType"></xsd:element>
+            <xsd:element name="Solve" type="tns:SolveType" minOccurs="0"/>
+        </xsd:choice>
+    </xsd:complexType>
+    <xsd:complexType name="IterationType">
+        <xsd:sequence>
+            <xsd:element name="Range" type="tns:RangeType" maxOccurs="unbounded"></xsd:element>
+            <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="Assign" type="tns:AssignType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+                <xsd:element name="Iteration" type="tns:IterationType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+                <xsd:element name="Alt" type="tns:AltType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+                <xsd:element name="Solve" type="tns:SolveType" minOccurs="0"/>
+		<xsd:element name="StopWhen" type="tns:StopWhenType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+        <xsd:complexType name="AssignType">
+        <xsd:attribute name="VariableName" type="xsd:IDREF"/>
+        <xsd:attribute name="Value" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:complexType name="RangeType">
+        <xsd:attribute name="VariableName" type="xsd:IDREF" use="required"/>
+        <xsd:attribute name="Start" type="xsd:string" use="required"/>
+        <xsd:attribute name="End" type="xsd:string" use="required"/>
+        <xsd:attribute name="Step" type="xsd:float" use="optional"/>
+        <xsd:attribute name="StepPercent" type="xsd:float" use="optional"/>
+    </xsd:complexType>
+    <xsd:complexType name="AltType">
+        <xsd:sequence>
+            <xsd:element name="Guard" type="xsd:string" maxOccurs="unbounded"></xsd:element>
+            <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="Assign" type="tns:AssignType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                <xsd:element name="Iteration" type="tns:IterationType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+                <xsd:element name="Alt" type="tns:AltType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+                <xsd:element name="Solve" type="tns:SolveType" minOccurs="0"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="SolveType"><xsd:choice>
+            <xsd:element name="SolutionAnalytic" type="tns:AnalyticType"/>
+            <xsd:element name="SolutionSimulation" type="tns:SimulationType"/>
+            <xsd:element name="InvariantAnalysis" type="tns:InvariantType"/>
+            <xsd:element name="MinimalSiphons" type="tns:MinimalSiphonsType"/>
+            <xsd:element name="MinimalTraps" type="tns:MinimalTrapsType"/>
+            <xsd:element name="StructuralPropertiesCheck" type="tns:StructuralPropertiesCheckType"/>
+            <!-- 13/08/07 Preliminar version-->
+        </xsd:choice>
+        <xsd:attribute name="SolutionID" type="xsd:ID" use="required"/>
+		<xsd:attribute name="Description" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+    <xsd:complexType name="AnalyticType">
+        <xsd:complexContent>
+            <xsd:extension base="tns:SolutionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="InvariantType">
+        <xsd:complexContent>
+            <xsd:extension base="tns:SolutionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="MinimalSiphonsType">
+        <xsd:complexContent>
+            <xsd:extension base="tns:SolutionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="MinimalTrapsType">
+        <xsd:complexContent>
+            <xsd:extension base="tns:SolutionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="StructuralPropertiesCheckType">
+        <xsd:complexContent>
+            <xsd:extension base="tns:SolutionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="SolutionType">
+        <xsd:sequence>
+            <xsd:element name="ToolCommand" type="tns:BlobType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="SimulationType">
+        <xsd:sequence>
+            <xsd:element name="ToolCommand" type="tns:BlobType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="StartInterval" type="tns:nonNegativeFloat" use="optional"/>
+        <xsd:attribute name="StopTime" type="tns:nonNegativeFloat" use="optional"/>
+        <xsd:attribute name="RandomSeed" type="xsd:nonNegativeInteger" use="optional"/>
+    </xsd:complexType>
+    <xsd:complexType name="BlobType">
+        <xsd:attribute name="Tool" type="xsd:string" use="required"/>
+        <xsd:attribute name="Commands" type="xsd:string" use="required"/>
+	</xsd:complexType>
+    <xsd:complexType name="StopWhenType">
+        <xsd:attribute name="Test" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:simpleType name="TestType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="EQ"/>
+            <xsd:enumeration value="NE"/>
+            <xsd:enumeration value="LT"/>
+            <xsd:enumeration value="LE"/>
+            <xsd:enumeration value="GT"/>
+            <xsd:enumeration value="GE"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="GuardType">
+        <xsd:attribute name="variableName" type="xsd:IDREF" use="required"/>
+        <xsd:attribute name="test" type="tns:TestType" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="required"/>
+    </xsd:complexType>
+    <xsd:complexType name="OutputSpecType">
+        <xsd:sequence>
+            <xsd:element name="WriteVariable" type="tns:WriteVariableType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="WriteOutput" type="tns:WriteOutputType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="WriteVariableType">
+        <xsd:attribute name="VariableName" type="xsd:IDREF"/>
+    </xsd:complexType>
+    <xsd:complexType name="WriteOutputType">
+        <xsd:attribute name="Metric" type="tns:MetricType"/>
+    </xsd:complexType>
+    <xsd:simpleType name="MetricType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ResponseTime"/>
+            <xsd:enumeration value="MeanNumberTokens"/>
+            <xsd:enumeration value="NumberTokensDensity"/>
+            <xsd:enumeration value="Throughput"/>
+            <xsd:enumeration value="Utilization"/>
+            <xsd:enumeration value="ServiceTime"/>
+            <xsd:enumeration value="TimeUnits"/>
+            <!-- Throughput means by transition -->
+        </xsd:restriction>
+	</xsd:simpleType>
+    <xsd:simpleType name="GlobalAnalysisType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="StateSpace"/>
+            <xsd:enumeration value="Invariant"/>
+            <xsd:enumeration value="Syphons"/>
+            <xsd:enumeration value="Traps"/>
+            <xsd:enumeration value="Classification"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="nonNegativeFloat">
+        <xsd:restriction base="xsd:float">
+            <xsd:minInclusive value="0.0"/>
+        </xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>
