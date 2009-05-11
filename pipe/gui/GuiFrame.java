@@ -209,8 +209,8 @@ implements ActionListener, Observer {
 		addMenuItem(fileMenu, closeAction  =
 			new FileAction("Close",  "Close the current tab","ctrl W"));
 		fileMenu.addSeparator();
-		addMenuItem(fileMenu, importAction  =
-			new FileAction("Import",  "Import from Timenet",""));
+		/*addMenuItem(fileMenu, importAction  =
+			new FileAction("Import",  "Import from Timenet",""));*/
 		addMenuItem(fileMenu, saveAction   =
 			new FileAction("Save",   "Save","ctrl S"));
 		addMenuItem(fileMenu, saveAsAction =
@@ -763,7 +763,9 @@ EOC */
 
 		JOptionPane.showMessageDialog(this,
 				"TAPAAL \n\n" +
-				"Joakim Byg and Kenneth Yrke Joergensen 2009\n\n" + 
+				"Joakim Byg,  Kenneth Yrke Joergensen and Jiri Srba \n" +
+				"Aalborg University 2009 \n\n" +
+				"Read more at: www.tapaal.net \n\n"+ 
 				"Based on PIPE2:\n"+
 				"Imperial College DoC MSc Group And MSc Individual Project\n\n" +
 				"Original version PIPE(c)\n2003 by Jamie Bloom, Clare Clark, Camilla Clifford, Alex Duncan, Haroun Khan and Manos Papantoniou\n\n" +
@@ -773,7 +775,7 @@ EOC */
 				"Matthew Worthington\n\n" +
 				"PIPE 2.5 by Pere Bonet (Universitat de les Illes Balears)\n\n" +              
 				"http://pipe2.sourceforge.net/",
-				"About PIPE2",
+				"About TAPAAL",
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -1095,6 +1097,10 @@ EOC */
 //         CreateGui.removeAnimationHistory();
 //         CreateGui.removeAnimationControler();
          enableActions(true); //renables all non-animation buttons
+         
+         //If abstract animation pane is shown, remove it when 
+         // Gowing out of animation mode.
+         CreateGui.removeAbstractAnimationPane();
          
          CreateGui.setLeftPaneToQueries();
       }

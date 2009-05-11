@@ -1,5 +1,6 @@
 package pipe.dataLayer;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,24 +8,22 @@ import java.util.List;
 public class DiscreetFiringAction implements FiringAction {
 
 	Transition firedtransition;
-	HashMap<Place, ArrayList<Float>> consumedTokens = new HashMap<Place, ArrayList<Float>>();
+	HashMap<Place, ArrayList<BigDecimal>> consumedTokens = new HashMap<Place, ArrayList<BigDecimal>>();
 	
 	public DiscreetFiringAction(Transition transition) {
 		firedtransition= transition;
 	}
-
 	
-	
-	public void addConsumedToken(Place p, Float token){
+	public void addConsumedToken(Place p, BigDecimal token){
 		
 		//XXX  - This will break if two tokens from the same place is consumed
-		ArrayList<Float> tmp = new ArrayList<Float>();
+		ArrayList<BigDecimal> tmp = new ArrayList<BigDecimal>();
 		tmp.add(token);
 		consumedTokens.put(p, tmp);
 		
 	}
 	
-	public HashMap<Place, ArrayList<Float>> getConsumedTokensList(){
+	public HashMap<Place, ArrayList<BigDecimal>> getConsumedTokensList(){
 		return consumedTokens;
 	}
 

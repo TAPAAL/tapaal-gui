@@ -1,5 +1,6 @@
 package pipe.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -7,17 +8,26 @@ import java.awt.GridBagLayout;
 import java.awt.ScrollPane;
 import java.awt.event.AdjustmentListener;
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
          
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.text.BadLocationException;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -51,9 +61,9 @@ public class CreateGui {
    private static JScrollPane scrollerQueries;
    private static JPanel queries;
    private static JPanel leftBottomPanel;
-   
+   private static JSplitPane pane;
+   private static AnimationHistory abstractAnimationPane=null;
    public static void init() {
-      
       imgPath = "Images" + System.getProperty("file.separator");
       
       // make the initial dir for browsing be My Documents (win), ~ (*nix), etc
@@ -80,12 +90,13 @@ public class CreateGui {
       queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
       scrollerQueries = new JScrollPane(queries);
       leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollerQueries, leftBottomPanel);
+      
       ((JScrollPane)leftPane.getTopComponent()).setViewportView(queries);
       
       leftPane.setContinuousLayout(true);
       leftPane.setDividerSize(0);
       
-      JSplitPane pane = 
+       pane = 
               new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
 
       pane.setContinuousLayout(true);
@@ -206,10 +217,49 @@ public class CreateGui {
          leftPane.setBottomComponent(scroller);
          
 //         leftPane.setDividerLocation(0.5);
+         leftPane.setResizeWeight(0.05f);
+         	
          leftPane.setDividerSize(8);
       } catch (javax.swing.text.BadLocationException be) {
          be.printStackTrace();
       }
+   }
+   
+   public static AnimationHistory getAbstractAnimationPane(){
+	   return abstractAnimationPane;
+   }
+   
+   public static void addAbstractAnimationPane() {
+	// TODO Auto-generated method stub
+	   	
+	   try {
+		   abstractAnimationPane=new AnimationHistory("Untimed Trace\n");
+	   } catch (BadLocationException e) {
+		   // TODO Auto-generated catch block
+		   e.printStackTrace();
+	   }
+	   //abstractAnimationPane.setVerticalAlignment(SwingConstants.TOP);
+
+	   
+	   JSplitPane pane2 = 
+              new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,animBox,abstractAnimationPane);
+
+      pane2.setContinuousLayout(true);
+      pane2.setOneTouchExpandable(true);
+      pane2.setBorder(null); // avoid multiple borders
+      
+      pane2.setDividerSize(8);
+      
+	  leftPane.setBottomComponent(pane2);
+	  abstractAnimationPane.setBorder(new LineBorder(Color.black));
+	
+   }
+   
+   public static void removeAbstractAnimationPane() {
+	      abstractAnimationPane=null;
+	      scroller = new JScrollPane(animBox);
+	      scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+	      leftPane.setBottomComponent(scroller);
    }
    
    public static void addAnimationControler() {
@@ -276,4 +326,25 @@ public class CreateGui {
 //	   }
 	   leftPane.resetToPreferredSizes();
    }
+
+
+
+
+
+//   public static BigDecimal newBigDecimal(Long i) {
+//	   DecimalFormat df = new DecimalFormat();
+//	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
+//	   df.setRoundingMode(RoundingMode.DOWN);
+//	   String toReturnFrom = df.format(i);
+//	   return new BigDecimal(toReturnFrom, new MathContext(Pipe.AGE_PRECISION));
+//   }
+
+
+//   public static BigDecimal newBigDecimal(String i) {
+////	   DecimalFormat df = new DecimalFormat();
+////	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
+////	   df.setRoundingMode(RoundingMode.DOWN);
+////	   String toReturnFrom = df.format(i);
+//	   return new BigDecimal(i, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
+//   }
 }

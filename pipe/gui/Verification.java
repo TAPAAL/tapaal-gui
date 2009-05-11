@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import javax.management.Query;
@@ -25,16 +27,22 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Transition;
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
+import pipe.dataLayer.TAPNQuery.HashTableSize;
+import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
+import dk.aau.cs.TA.AbstractMarking;
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
+import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UppaalTrace;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
@@ -54,17 +62,126 @@ import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 public class Verification {
 	private static String verifytapath="";
 
-	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean saveUppaal) {
-		//Setup
-
+	public static boolean setupVerifyta(){
 		String verifyta = System.getenv("verifyta");
 
-		if (verifytapath.equals("")){
+		if (verifytapath.equals("")){			
 			verifytapath = verifyta;
 		}
+		
+		// if not set
+		if (verifytapath == null || verifytapath.equals("")){
+			
+			
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"TAPAAL needs to know the location of the file verifyta.\n\n"+
+					"Verifyta is a part of the UPPAAL distribution and it is\n" +
+					"normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n" +
+					"depending on your operating system.", 
+					"Locate UPPAAL Verifyta",
+					JOptionPane.INFORMATION_MESSAGE);
+			
+			try {
+				File verifytaf = new FileBrowser("Uppaal Verifyta","",verifyta).openFile();
+				verifyta=verifytaf.getAbsolutePath();
+				verifytapath=verifyta;
+			} catch (Exception e) {
+				// There was some problem with the action
+				if (verifyta == null){
+					//JOptionPane.showMessageDialog(CreateGui.getApp(), "No verifyta specified: The verification is cancelled");
+					verifytapath = "";
+					return false;
+				}else{
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							"There were errors performing the requested action:\n" + e,
+							"Error", JOptionPane.INFORMATION_MESSAGE
+					);	
+					verifytapath = "";
+					return false;
+				}
+			}
+		}
+		
+		return true;
+		
+	}
+	
+	//Check if verifyta is present and if it is the right version
+	public static boolean checkVerifyta(){
+		
+		if (verifytapath == ""){
+			
+			
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"No verifyta specified: The verification is cancelled",
+					"Verification Error",
+					JOptionPane.ERROR_MESSAGE);
+			verifytapath = "";
+			
+			return false;
+		}
+		
+		String[] commands;
 
-		verifyta = verifytapath; 
+		commands = new String[]{verifytapath, "-v"};
 
+		Process child=null;
+		
+		try {
+			child = Runtime.getRuntime().exec(commands);
+			child.waitFor();
+		} catch (IOException e) {
+			return false;
+		} catch (InterruptedException e) {
+			return false;
+		}
+		
+		BufferedReader bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));
+		
+		String versioninfo = null;
+		try {
+			versioninfo = bufferedReaderStdout.readLine();
+		} catch (IOException e) {
+			return false;
+		}
+		
+		String[] stringarray = null;
+		stringarray = versioninfo.split("\\(rev\\.");
+		String versiontmp = stringarray[1];
+		
+		stringarray = versiontmp.split("\\)");
+		
+		versiontmp = stringarray[0];
+		
+		int version = Integer.parseInt(versiontmp.trim());
+		
+		if (version < Pipe.verifytaMinRev){
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"The specified version of the file verifyta is to old.\n\n" +
+					"Get the latest development version of UPPAAL from \n" +
+					"www.uppaal.com.",
+					"Verification Error",
+					JOptionPane.ERROR_MESSAGE);
+			verifytapath="";
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public static void analyseKBounded(DataLayer appModel, int k){
+		
+		setupVerifyta();
+		
+		if (!checkVerifyta()){
+			System.err.println("Verifyta not found, or you are running an old version of verifyta.\n" +
+					"Update to the latest development version.");
+			return;
+		}
+		String verifyta = verifytapath;
+		
+		
+		//Tmp files
 		File xmlfile=null, qfile=null;
 		try {
 			xmlfile = File.createTempFile("verifyta", ".xml");
@@ -74,21 +191,191 @@ public class Verification {
 			e2.printStackTrace();
 		}
 		xmlfile.deleteOnExit();qfile.deleteOnExit();
-
-		// if not set
-		if (verifyta == null || verifyta.equals("")){
-			try {
-				File verifytaf = new FileBrowser("Uppaal Verifyta","",verifyta).openFile();
-				verifyta=verifytaf.getAbsolutePath();
-				verifytapath=verifyta;
-			} catch (Exception e) {
-				// There was some problem with the action
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						"There were errors performing the requested action:\n" + e,
-						"Error", JOptionPane.ERROR_MESSAGE
-				);
-			}
+		
+//		Create transformer and create uppaal model
+		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		TAPN model=null;
+		try {
+			model = transformer.getAAUTAPN();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		String inputQuery = "A[] P_capacity >= 1";
+		AdvancedUppaalSym te = new AdvancedUppaalSym();
+		try {
+			
+			try {
+				model.convertToConservative();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				System.err.println("Error converting model to conservative");
+				e1.printStackTrace();
+			}
+			
+			TAPN model2 = te.transform(model);
+			te.transformToUppaal(model2, new PrintStream(xmlfile), k+1);
+			
+			//We can not auto transform as query is not having lock==1
+			//te.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, k+1);
+			
+			PrintStream stream = new PrintStream(qfile);
+			
+			stream.println("// Autogenerated by the TAPAAL (www.tapaal.net)");
+			stream.println("");
+
+			stream.println("/*");
+			stream.println(" " + inputQuery + " " );
+			stream.println("*/");
+			
+			//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
+			stream.println("E<>((sum(i:pid_t) P(i).P_capacity)== 0) and (Control.finish == 1)");
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+//		 Do verifta 
+		PetriNetObject.ignoreSelection(false);
+		CreateGui.getApp().repaint();
+
+		
+		RunningVerificationWidgets t = (new Verification()).new RunningVerificationWidgets();
+		t.createDialog();
+		
+		//Run the verifucation thread 	
+		RunUppaalVerification a = (new Verification()).new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
+		a.start();
+		
+		t.show();
+		
+		if (t.interrupted){
+			a.verifyStop();
+			a.interrupt();
+			a.stop();
+			a.destroy();
+			
+			try {
+				a.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			a=null;
+			//Stop ther verification!
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"Verification was interupted by the user. No result found!",
+					"Verification Result",
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+			
+		}
+			
+		boolean property=false; 
+		boolean error=true;
+		BufferedReader bufferedReaderStderr = a.bufferedReaderStderr;
+		BufferedReader bufferedReaderStdout = a.bufferedReaderStdout;
+		
+		// Show the verification result dialog
+		
+		String resultmessage = "";
+		
+		
+		//Parse result
+		String line=null;
+		
+	
+
+		try {
+			while ( (line = bufferedReaderStdout.readLine()) != null){
+		
+				if (line.contains("Property is satisfied")) {
+					property = true;
+
+					//Print trace,
+					ArrayList<String> tmp=null;
+					
+					error=false;
+					//break;
+
+				}else if (line.contains("Property is NOT satisfied.")){
+					property=false;
+					error=false;
+				}
+
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			error=true;
+		}
+		
+		if (error){
+			System.err.println("There was an error verifying the model.");
+			return;
+		}
+
+		
+		String answerNetIsBounded =
+		//	"The net is "+ k +" bounded.\n\n" + 
+			"The net with the specified extra number of tokens is bounded.\n\n" +
+			"This means that the analysis using the currently selected number\n" +
+			"of extra tokens will be exact and always give the correct answer.\n";
+		//	"be exact. In fact, the analysis will be exact even \n" +
+		//	"with k-1 number of extra tokens\n";
+		
+		String answerNetIsNotBounded =
+		//	"The net is not "+ k +" bounded.\n\n" + 
+			"The net with the speficied extra number of tokens is either unbounded or\n" +
+			"more extra tokens have to be added in order to achieve an exact analysis.\n\n" +
+			"This means that the analysis using the currently selected number \n" +
+			"of extra tokens provides only an underapproximation of the net behaviour.\n" +
+			"If you think that the net is bounded, try to add more extra tokens in order\n" +
+			"to achieve exact verification analysis.\n";
+		
+		
+		
+		//Display Answer
+		resultmessage = property ? answerNetIsNotBounded : answerNetIsBounded; 
+		resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
+		
+		JOptionPane.showMessageDialog(CreateGui.getApp(),
+				resultmessage,
+				"Boundness Analyses Result",
+				JOptionPane.INFORMATION_MESSAGE);
+		
+		
+	}
+	
+	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean saveUppaal) {
+		runUppaalVerification(appModel, input, saveUppaal, false);
+	}
+	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean saveUppaal, boolean untimedTrace) {
+		//Setup
+
+		setupVerifyta();
+		if (verifytapath == ""){
+			return;
+		}
+		if (!checkVerifyta()){
+			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n" +
+			"Update to the latest development version.");
+			return;
+		}
+
+		String verifyta = verifytapath;
+		
+		File xmlfile=null, qfile=null;
+		try {
+			xmlfile = File.createTempFile("verifyta", ".xml");
+			qfile = File.createTempFile("verifyta", ".q");
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		xmlfile.deleteOnExit();qfile.deleteOnExit();
 
 		// Save the model
 		// Get export file
@@ -130,15 +417,23 @@ public class Verification {
 		String inputQuery = input.query;
 		TraceOption traceOption = input.traceOption;
 		SearchOption searchOption = input.searchOption;
+		HashTableSize hashTableSize = input.hashTableSize;
+		ExtrapolationOption extrapolationOption = input.extrapolationOption;
 		String verifytaOptions = "";
 
-		if (traceOption == TraceOption.SOME){
-			verifytaOptions = "-t0";
-		}else if (traceOption == TraceOption.FASTEST){
-			verifytaOptions = "-t2";
-		}else if (traceOption == TraceOption.NONE){
-			verifytaOptions = "";
+		if (untimedTrace){
+			verifytaOptions+="-Y";
 		}
+		
+		if (traceOption == TraceOption.SOME){
+			verifytaOptions += "-t0";
+		}else if (traceOption == TraceOption.FASTEST){
+			verifytaOptions += "-t2";
+		}else if (traceOption == TraceOption.NONE){
+			verifytaOptions += "";
+		}
+		
+		
 
 		if (searchOption == SearchOption.BFS){
 			verifytaOptions += "-o0";
@@ -149,10 +444,38 @@ public class Verification {
 		}else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
 			verifytaOptions += "-o6";
 		}
+				
 
 		if (inputQuery == null) {return;}
 
-
+		//Handle problems with liveness checking 
+		if (inputQuery.contains("E[]") || inputQuery.contains("A<>") ) {
+			
+			//If selected wrong method for checking
+			if (!(input.reductionOption == ReductionOption.ADV_NOSYM || input.reductionOption == ReductionOption.ADV_UPPAAL_SYM)){
+				//Error
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"Verification of liveness properties (EG,AF) is not possible with the selected reduction option.",
+						"Verification Error",
+						JOptionPane.ERROR_MESSAGE);
+				// XXX - Srba
+				return;
+			}
+			
+			//Check if degree-2 or give an error
+			if (!model.isDegree2()){
+				//Error
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"The net cannot be verified for liveness properties (EG,AF) because there is\n"+
+						"a transition with either more that two input places or more than two output places.\n"+
+                        "You may try to modify the model so that the net does not contain any such transition\n"+
+                        "and then run the verification process again.",
+						"Liveness Verification Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+		}
 
 
 		// Select the model based on selected export option.
@@ -176,6 +499,16 @@ public class Verification {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_NOSYM){
+			System.out.println("Using ADV_NOSYMQ");
+			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
+			try {
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+			
 		} else {
 
 			try {
@@ -236,7 +569,7 @@ public class Verification {
 			a.destroy();
 			
 			try {
-				a.wait();
+				a.join();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -251,12 +584,14 @@ public class Verification {
 			
 		}
 		
+		//Close ther verification running dialog, (bug for possible racecondition)
+		t.close();
 		
 		
 		
 		
 		boolean property=false; 
-		boolean error=false;
+		boolean error=true;
 		BufferedReader bufferedReaderStderr = a.bufferedReaderStderr;
 		BufferedReader bufferedReaderStdout = a.bufferedReaderStdout;
 		
@@ -298,8 +633,8 @@ public class Verification {
 
 	
 		//Display Answer
-		resultmessage = property ? "Property Satisfied" : "Property Not Satisfied"; 
-		resultmessage+= "\n Verification Time is estimated to: " + (a.verificationtime/1000.0) + "s";
+		resultmessage = property ? "Property Satisfied.": "Property Not Satisfied."; 
+		resultmessage+= "\nVerification time is estimated to: " + (a.verificationtime/1000.0) + "s";
 		
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				resultmessage,
@@ -307,7 +642,21 @@ public class Verification {
 				JOptionPane.INFORMATION_MESSAGE);
 
 
-		if (input.traceOption != TAPNQuery.TraceOption.NONE && property && input.reductionOption == TAPNQuery.ReductionOption.NAIVE){
+		
+		// Show simulator is selected and reduction is the right method
+		if ((input.traceOption != TAPNQuery.TraceOption.NONE && (input.reductionOption == TAPNQuery.ReductionOption.NAIVE || input.reductionOption == ReductionOption.ADV_NOSYM) )&&
+				//and Only view the trace, if a trace is generated based on property
+				((inputQuery.contains("E<>") && property) || (inputQuery.contains("A[]") && !property) ||
+						(inputQuery.contains("E[]") && property) || (inputQuery.contains("A<>") && !property))){
+			
+			
+			
+			PetriNetObject.ignoreSelection(false);
+		CreateGui.getApp().repaint();
+
+			//Select to display concreet trace
+			if ((inputQuery.contains("E<>") || inputQuery.contains("A[]")) && !untimedTrace){
+				
 			
 			
 			//Show the trace
@@ -318,11 +667,26 @@ public class Verification {
 				ArrayList<FiringAction> tmp2 = null;
 				tmp2 = UppaalTrace.parseUppaalTraceAdvanced(bufferedReaderStderr);
 
+				// Handeling of the UPPAAL verifyta error in generating traces
+				if (tmp2 == null){
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							"Generation of a concrete trace in UPPAAL failed.\n\n" +
+							"TAPAAL will re-run the verification process\n" +
+							"in order to obtain at least an untimed trace.",				
+							"Concrete Trace Generation Error",
+							JOptionPane.INFORMATION_MESSAGE);
+					//XXX - Srba
+					
+					runUppaalVerification(appModel, input, saveUppaal, true);
+					return;
+					
+				}
+				
 				for (FiringAction f : tmp2){
 
 					if (f instanceof TimeDelayFiringAction){
 
-						float time = ((TimeDelayFiringAction)f).getDealy();
+						BigDecimal time = new BigDecimal(""+((TimeDelayFiringAction)f).getDealy());
 						CreateGui.getAnimator().manipulatehistory(time);
 
 					} else if (f instanceof DiscreetFiringAction){
@@ -334,18 +698,60 @@ public class Verification {
 						for (String s : stringdfa.getConsumedTokensList().keySet()){
 
 							Place p = CreateGui.currentPNMLData().getPlaceByName(s);
-							Float token = stringdfa.getConsumedTokensList().get(s).get(0); // XXX - just getting the first, guess that we dont support more tokens from smae place any wway :( (for now)
+							BigDecimal token = new BigDecimal(""+stringdfa.getConsumedTokensList().get(s).get(0)); // XXX - just getting the first, guess that we dont support more tokens from smae place any wway :( (for now)
 
 							realdfa.addConsumedToken(p, token);
 						}
 						CreateGui.getAnimator().manipulatehistory(realdfa);
 					}
-
+					
 				}
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			
+			} else {
+				// Display abstract trace
+				try {
+					ArrayList<AbstractMarking> tmp2 = null;
+					tmp2 = SymbolicUppaalTrace.parseUppaalAbstractTrace(bufferedReaderStderr);
+
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							"The verification process returned an untimed trace.\n\n"+
+							"This means that with appropriate time delays the displayed\n"+
+							"sequence of discrete transitions can become a concrete trace.\n"+
+							"In case of liveness properties (EG, AF) the untimed trace\n"+
+							"either ends in a deadlock, or time divergent computation without\n" +
+							"any discrete transitions, or it loops back to some earlier configuration.\n"+
+							"The user may experiment in the simulator with different time delays\n"+
+							"in order to realize the suggested untimed trace in the model.",
+							"Verification Information",
+							JOptionPane.INFORMATION_MESSAGE);
+					//XXX - Srba
+					
+					PetriNetObject.ignoreSelection(false);
+					CreateGui.getApp().repaint();
+					CreateGui.getApp().setAnimationMode(true);
+					CreateGui.addAbstractAnimationPane();
+					
+					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+
+					
+					for (AbstractMarking am : tmp2){
+						untimedAnimationHistory.addHistoryItemDontChange(am.getFiredTranstiion().trim());
+					}
+					
+					
+
+					
+					
+				} catch (Exception e){
+//					 TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 
 			
@@ -369,7 +775,7 @@ public class Verification {
 			this.verification = verification;
 				
 			setLayout(new GridLayout(2,1));
-			add(new Label("Verification is running \n " +
+			add(new Label("Verification is running ...\n" +
 					"Please wait!")
 			);
 			
@@ -474,11 +880,26 @@ public class Verification {
 				
 				startTimeMs = System.currentTimeMillis();
 				child = Runtime.getRuntime().exec(commands);
+				
+				//Start drain for buffers
+				
+				BufferDrain stdout = new BufferDrain(new BufferedReader(new InputStreamReader(child.getInputStream())));
+				BufferDrain stderr = new BufferDrain(new BufferedReader(new InputStreamReader(child.getErrorStream())));
+				
+				stdout.start();
+				stderr.start();
+				
 				child.waitFor();
 				endTimeMs  = System.currentTimeMillis();
+				
+				//Wait for the buffers to be drained3
+				// XXX - kyrke - are thise subprocess killed right when 
+				// mother process is killed?, or do we have to handle them better?
+				stdout.join();
+				stderr.join();
 
-				bufferedReaderStderr = new BufferedReader(new InputStreamReader(child.getErrorStream()));
-				bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));
+				bufferedReaderStdout = new BufferedReader(new StringReader(stdout.getString().toString()));
+				bufferedReaderStderr = new BufferedReader(new StringReader(stderr.getString().toString()));
 
 				/*for (String s : commands){
 					System.out.print(s + " ");
@@ -488,7 +909,7 @@ public class Verification {
 				
 				verificationtime = endTimeMs-startTimeMs;
 				
-				dialog.finished();
+				dialog.close();
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -497,7 +918,51 @@ public class Verification {
 
 		
 	
-	
+
+	}
+
+	public class BufferDrain extends Thread{
+
+		BufferedReader drain=null;
+		StringBuffer string=null;
+		boolean running;
+
+		public BufferDrain(BufferedReader drain) {
+			this.drain = drain;
+			string = new StringBuffer();
+		}
+
+		public void run() {
+
+			try {
+				running = true;
+
+				int c;
+				while (running){
+
+
+					c=drain.read();
+
+					if (c!=-1){
+						string.append((char)c);
+					} else {
+						running = false;
+					}
+				}
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+				running=false;
+			}
+
+
+		}
+		
+		public StringBuffer getString(){
+			return string;
+		}
+
 	}
 	
 }

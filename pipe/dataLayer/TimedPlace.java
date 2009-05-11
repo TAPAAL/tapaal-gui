@@ -13,6 +13,9 @@ import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.font.TextAttribute;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,7 +47,7 @@ public class TimedPlace extends Place {
 	private static final long serialVersionUID = 1L;
 
 	private String invariant;
-	private ArrayList<Float> myTokens;
+	private ArrayList<BigDecimal> myTokens;
 	private Window ageOfTokensWindow;
 	
 	public TimedPlace(Place place, String invariant){		
@@ -58,13 +61,18 @@ public class TimedPlace extends Place {
 		this.invariant = invariant;
 		attributesVisible = true;
 
-		this.myTokens = new ArrayList<Float>();
+		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<place.getInitialMarking(); i++){
-			this.myTokens.add(new Float(0));
+			this.myTokens.add(newToken());
 		}
 		ageOfTokensWindow = new Window(new Frame());
 	}
 	
+	private BigDecimal newToken() {
+		
+		return new BigDecimal(0, new MathContext(Pipe.AGE_PRECISION));
+	}
+
 	public TimedPlace(double positionXInput,  double positionYInput, 
             String idInput, 
             String nameInput, 
@@ -86,9 +94,9 @@ public class TimedPlace extends Place {
 			this.invariant="<inf";
 		}
 		
-		this.myTokens = new ArrayList<Float>();
+		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
-			this.myTokens.add(new Float(0));
+			this.myTokens.add(newToken());
 		}
 		ageOfTokensWindow = new Window(new Frame());
 	}
@@ -110,9 +118,9 @@ public class TimedPlace extends Place {
 			this.invariant="<inf";
 		}
 	
-		this.myTokens = new ArrayList<Float>();
+		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
-			this.myTokens.add(new Float(0));
+			this.myTokens.add(newToken());
 		}
 		ageOfTokensWindow = new Window(new Frame());
 	}
@@ -129,7 +137,7 @@ public class TimedPlace extends Place {
 //		update();
 //		repaint();
 
-		this.myTokens = new ArrayList<Float>();
+		this.myTokens = new ArrayList<BigDecimal>();
 		ageOfTokensWindow = new Window(new Frame());
 	}
 	
@@ -180,7 +188,6 @@ public class TimedPlace extends Place {
 		updateConnected();
 
 		repaint();
-		
 	}
 
 
@@ -264,12 +271,12 @@ public class TimedPlace extends Place {
 
 	public String getStringOfTokens() {
 		String stringArrayOfTokens = "{";
-		Iterator<Float> iterator = myTokens.iterator();
+		Iterator<BigDecimal> iterator = myTokens.iterator();
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(4);
+		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		int i = 0;
 		while (iterator.hasNext()){
-			Float intToInsert = iterator.next();
+			BigDecimal intToInsert = iterator.next();
 			if (myTokens.size()<20){
 				if (i-((i/4)*4) == 3){
 					if ( ! iterator.hasNext() ){
@@ -321,7 +328,7 @@ public class TimedPlace extends Place {
 		return stringArrayOfTokens;
 	}
 
-	public ArrayList<Float> getTokens(){
+	public ArrayList<BigDecimal> getTokens(){
 		return myTokens;
 	}
 	
@@ -346,7 +353,9 @@ public class TimedPlace extends Place {
 	//overide method
 	public void paintComponent(Graphics g) {
 		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(2);
+		df.setMinimumFractionDigits(1);
+		df.setMaximumFractionDigits(1);
+		df.setRoundingMode(RoundingMode.DOWN);
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 
@@ -395,7 +404,7 @@ public class TimedPlace extends Place {
 //			g.fillOval(x + 6, y + 20, tWidth, tHeight);
 			/* falls through */
 		case 2: 
-			if (myTokens.get(1)>9f){
+			if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
 				g2.setFont(new Font("new font", Font.PLAIN, 11));
 				g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
 			}else{
@@ -404,7 +413,7 @@ public class TimedPlace extends Place {
 //			g.fillOval(x + 18, y + 6, tWidth, tHeight);
 			/* falls through */
 		case 1:
-			if (myTokens.get(0)>9f){
+			if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
 				g2.setFont(new Font("new font", Font.PLAIN, 11));
 				g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
 			}else{
@@ -434,7 +443,7 @@ public class TimedPlace extends Place {
 		int toAddToMyTokens = currentMarkingInput - currentMarking;
 		if (toAddToMyTokens >= 0 ){
 			for (int i=0; i<toAddToMyTokens; i++){
-				myTokens.add(new Float(0));
+				myTokens.add(newToken());
 			}
 		}else {
 			int size = myTokens.size();
@@ -447,10 +456,10 @@ public class TimedPlace extends Place {
 		}
 	}
 
-	public UndoableEdit setAgeOfTokens(ArrayList<Float> newAgeOfTokens) {
+	public UndoableEdit setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
 		
 		if (newAgeOfTokens.size() == myTokens.size()){
-			ArrayList<Float> oldAgeOfTokens = this.myTokens;
+			ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
 			this.myTokens = newAgeOfTokens;
 
 			update();
@@ -459,11 +468,11 @@ public class TimedPlace extends Place {
 		} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
 	}
 	
-	public UndoableEdit setTokensAndAgeOfTokens(ArrayList<Float> newAgeOfTokens) {
+	public UndoableEdit setTokensAndAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
 		
 		//if (newAgeOfTokens.size() == myTokens.size()){
 			this.setCurrentMarking(newAgeOfTokens.size());
-		    ArrayList<Float> oldAgeOfTokens = this.myTokens;
+		    ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
 			this.myTokens = newAgeOfTokens;
 
 			update();
@@ -473,32 +482,45 @@ public class TimedPlace extends Place {
 	}
 
 
-	public void removeToken(int indexOfTokenToBeRemoved) {
-		myTokens.remove(indexOfTokenToBeRemoved);
-		Collections.sort(myTokens);
-		myTokens.trimToSize();
-		currentMarking--;
-	}
+//	public void removeToken(int indexOfTokenToBeRemoved) {
+//		myTokens.remove(indexOfTokenToBeRemoved);
+//		Collections.sort(myTokens);
+//		myTokens.trimToSize();
+//		currentMarking--;
+//	}
 	
-	public void removeTokenofAge(float tokenage) {
-		//XXX - fails if token age is wrong
-		myTokens.remove(tokenage);
-		Collections.sort(myTokens);
-		myTokens.trimToSize();
-		currentMarking--;
+	
+	public void removeTokenofAge(BigDecimal tokenage) {
+		boolean ableToRemoveToken = false;
+		BigDecimal tokenToRemove = null;
+		for (BigDecimal bd : myTokens){
+			if (tokenage.compareTo(bd) == 0){
+				ableToRemoveToken = true;
+				tokenToRemove = bd;
+				break;
+			}
+		}
+		if (ableToRemoveToken){
+			myTokens.remove(tokenToRemove);
+			Collections.sort(myTokens);
+			myTokens.trimToSize();
+			currentMarking--;	
+		}else {
+			System.err.println(getName() + " has no token with that age");
+		}
 	}
 
-	public boolean satisfiesInvariant(Float token) {
+	public boolean satisfiesInvariant(BigDecimal token) {
 		if (invariant.contains("inf")){
 			return true;
-		}else if (invariant.contains("=")){
+		}else if (invariant.contains("<=")){
 			String upperBound = invariant.split("=")[1];
-			if (token <= Integer.parseInt(upperBound)){
+			if (token.compareTo(BigDecimal.valueOf(Long.parseLong(upperBound))) <= 0){
 				return true;
 			}else return false;
 		}else{
 			String upperBound = invariant.split("<")[1];
-			if (token < Integer.parseInt(upperBound)){
+			if (token.compareTo(BigDecimal.valueOf(Long.parseLong(upperBound))) < 0){
 				return true;
 			}else return false;
 		}
@@ -510,6 +532,7 @@ public class TimedPlace extends Place {
 			ageOfTokensWindow.setVisible(show);
 		}else{
 			ageOfTokensWindow.removeAll();
+			ageOfTokensWindow = new Window(new Frame());
 			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);
 

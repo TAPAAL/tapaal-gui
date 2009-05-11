@@ -74,8 +74,7 @@ public class HelpBox
       dialog.setLocationRelativeTo(CreateGui.getApp());
       dialog.setVisible(true);
       try {
-         setPage(new URL("file://" + new File("src" + 
-                 System.getProperty("file.separator") +"Docs" + 
+         setPage(new URL("file://" + new File("Docs" + 
                  System.getProperty("file.separator") +
                  filename).getAbsolutePath()),true);
       } catch (MalformedURLException e) {

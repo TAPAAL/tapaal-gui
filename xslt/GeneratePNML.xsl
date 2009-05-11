@@ -84,6 +84,12 @@
          <xsl:attribute name="searchOption">
             <xsl:value-of select="@searchOption"/>
          </xsl:attribute>
+         <xsl:attribute name="hashTableSize">
+            <xsl:value-of select="@hashTableSize"/>
+         </xsl:attribute>
+         <xsl:attribute name="extrapolationOption">
+            <xsl:value-of select="@extrapolationOption"/>
+         </xsl:attribute>
          <xsl:attribute name="reductionOption">
             <xsl:value-of select="@reductionOption"/>
          </xsl:attribute>

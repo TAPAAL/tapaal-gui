@@ -88,6 +88,7 @@ public class LeftQueryPane extends JPanel {
 	private JPanel createQuery(TAPNQuery queryFromModel) {
 		JPanel toReturn = createNewQuery();
 		((JTextField) toReturn.getComponent(1)).setText(queryFromModel.name);
+		((JTextField) toReturn.getComponent(1)).setCaretPosition(0);
 		toReturn.getComponent(3).setEnabled(true);
 		queryMap.put(toReturn, queryFromModel);
 		queries.add(toReturn);

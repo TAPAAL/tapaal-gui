@@ -2,6 +2,7 @@ package pipe.dataLayer;
 
 import java.awt.Component;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +26,8 @@ import org.w3c.dom.NodeList;
 
 import dk.aau.cs.petrinet.TAPN;
 
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
+import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -178,7 +181,7 @@ implements Cloneable {
 
 	private HashMap<Transition, HashMap<TransportArc, TransportArc> > transportArcMap;
 
-	private HashMap<TimedPlace, ArrayList<Float>> placeMarkingStorageMap = null;
+	private HashMap<TimedPlace, ArrayList<BigDecimal>> placeMarkingStorageMap = null;
 
 	private ArrayList<TAPNQuery> queries = null;
 
@@ -320,6 +323,18 @@ implements Cloneable {
 
 				if (id != null) {
 					placeInput.setId(id);
+					if (getPlaceByName(placeInput.getName()) != null){
+						boolean hasUniqueName = false;
+						int nameID = 0;
+						while (!hasUniqueName){
+							if (getPlaceByName("P"+nameID) == null){
+								placeInput.setName("P"+nameID);
+								hasUniqueName = true;
+							}else{
+								nameID++;
+							}
+						}
+					}
 				} else {
 					placeInput.setId("error");
 				}
@@ -413,6 +428,18 @@ implements Cloneable {
 
 				if(id != null) {
 					transitionInput.setId(id);
+					if (getTransitionByName(transitionInput.getName()) != null){
+						boolean hasUniqueName = false;
+						int nameID = 0;
+						while (!hasUniqueName){
+							if (getTransitionByName("T"+nameID) == null){
+								transitionInput.setName("T"+nameID);
+								hasUniqueName = true;
+							}else{
+								nameID++;
+							}
+						}
+					}
 				} else {
 					transitionInput.setId("error");
 				}
@@ -1783,9 +1810,9 @@ implements Cloneable {
 	public void storeState(){
 		boolean isTAPN = true;
 		if (isTAPN){
-			placeMarkingStorageMap = new HashMap<TimedPlace, ArrayList<Float>>();
+			placeMarkingStorageMap = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
 			for (Place p : getPlaces()){
-				placeMarkingStorageMap.put( (TimedPlace)p, (ArrayList<Float>)((TimedPlace)p).getTokens().clone() );
+				placeMarkingStorageMap.put( (TimedPlace)p, (ArrayList<BigDecimal>)((TimedPlace)p).getTokens().clone() );
 			}
 		}else {
 			int placeSize = placesArray.size();
@@ -1797,13 +1824,13 @@ implements Cloneable {
 		}
 	}
 
-	public HashMap<TimedPlace, ArrayList<Float>> getCurrentMarking(){
+	public HashMap<TimedPlace, ArrayList<BigDecimal>> getCurrentMarking(){
 		boolean isTAPN = true;
 
-		HashMap<TimedPlace, ArrayList<Float>> toReturn = new HashMap<TimedPlace, ArrayList<Float>>();
+		HashMap<TimedPlace, ArrayList<BigDecimal>> toReturn = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
 		if (isTAPN){
 			for (Place p : getPlaces()){
-				toReturn.put( (TimedPlace)p, (ArrayList<Float>)((TimedPlace)p).getTokens().clone() );
+				toReturn.put( (TimedPlace)p, (ArrayList<BigDecimal>)((TimedPlace)p).getTokens().clone() );
 			}
 		}
 		return toReturn;
@@ -1818,7 +1845,7 @@ implements Cloneable {
 		if(isTAPN){
 			if (placeMarkingStorageMap!=null){
 				for (Place p : getPlaces()){
-					ArrayList<Float> markingOfP = placeMarkingStorageMap.get((TimedPlace)p);
+					ArrayList<BigDecimal> markingOfP = placeMarkingStorageMap.get((TimedPlace)p);
 					p.setCurrentMarking( markingOfP.size() );
 					((TimedPlace)p).setAgeOfTokens(markingOfP);
 					setChanged();
@@ -1869,7 +1896,7 @@ implements Cloneable {
 
 				if (transition.isEnabled()){
 					boolean hadTransportArc = false;
-					HashMap<Integer, Float> tokensConsumedByTransportArcs = new HashMap<Integer, Float>();
+					HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
 
 					for (Arc a : (LinkedList<Arc>)transition.getPreset() ){
 
@@ -1877,12 +1904,12 @@ implements Cloneable {
 
 						hadTransportArc = true;
 						if (a instanceof TransportArc){
-							ArrayList<Float> eligableToken = new ArrayList<Float>();
+							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 							
 
 						   TimedPlace p = (TimedPlace)a.getSource();
 						   
-						   ArrayList<Float> tokensOfPlace = p.getTokens();					
+						   ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 						   
 						   TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
 						   
@@ -1891,7 +1918,7 @@ implements Cloneable {
 									eligableToken.add(tokensOfPlace.get(i));
 								}
 							}	
-							float tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
+							BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
 							
 //							XXX  - This will break if two tokens from the same place is consumed
 							toReturn.addConsumedToken(p, tokenToRemove);
@@ -1903,12 +1930,12 @@ implements Cloneable {
 						   p.removeTokenofAge(tokenToRemove);
 
 						}else if (a instanceof TimedArc){
-							ArrayList<Float> eligableToken = new ArrayList<Float>();
+							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 							//int indexOfOldestEligebleToken = 0;
 
 							TimedPlace p = (TimedPlace)a.getSource();
 
-							ArrayList<Float> tokensOfPlace = p.getTokens();						   
+							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 							for (int i=0; i< tokensOfPlace.size(); i++){
 								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
 									eligableToken.add(tokensOfPlace.get(i));
@@ -1916,7 +1943,7 @@ implements Cloneable {
 							}						   
 
 							//Select torken to remove based on firing mode
-							float tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
+							BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
 							
 //							XXX  - This will break if two tokens from the same place is consumed
 							toReturn.addConsumedToken(p, tokenToRemove);
@@ -1937,8 +1964,8 @@ implements Cloneable {
 							TimedPlace p = (TimedPlace)a.getTarget();
 							int newNumberOfTokens = p.getTokens().size()+1;
 							p.setCurrentMarking(newNumberOfTokens);
-							ArrayList<Float> markingToBeSet = p.getTokens();
-							Float ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
+							ArrayList<BigDecimal> markingToBeSet = p.getTokens();
+							BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
 							markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
 
 							p.setAgeOfTokens(markingToBeSet);
@@ -1980,13 +2007,12 @@ implements Cloneable {
 	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk> Changed to handeling
 	 * firing modes when working with TAPN.
 	 */
-	public void fireTransition(Transition transition, HashMap<Place, ArrayList<Float>> consumedTokens) {
+	public void fireTransition(Transition transition, HashMap<Place, ArrayList<BigDecimal>> consumedTokens) {
 		
 		
 		// If it is a TAPN
 		if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
-			
-			
+						
 			if (transition != null){
 				setEnabledTransitions();
 
@@ -1999,46 +2025,40 @@ implements Cloneable {
 
 				if (transition.isEnabled()){
 					boolean hadTransportArc = false;
-					HashMap<Integer, Float> tokensConsumedByTransportArcs = new HashMap<Integer, Float>();
+					HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
 
-					for (Arc a : (LinkedList<Arc>)transition.getPreset() ){
+					for ( Arc a : (LinkedList<Arc>)transition.getPreset() ){
 
-
-
-						hadTransportArc = true;
 						if (a instanceof TransportArc){
-							ArrayList<Float> eligableToken = new ArrayList<Float>();
-							
+							hadTransportArc = true;
+							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 
-						   TimedPlace p = (TimedPlace)a.getSource();
-						   
-						   ArrayList<Float> tokensOfPlace = p.getTokens();					
-						   
-							   TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
-						   
+							TimedPlace p = (TimedPlace)a.getSource();
+
+							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
+
+							TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
+
 							for (int i=0; i< tokensOfPlace.size(); i++){
 								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
 									eligableToken.add(tokensOfPlace.get(i));
 								}
 							}	
-							float tokenToRemove = consumedTokens.get(p).get(0);
-							
-//							XXX  - This will break if two tokens from the same place is consumed
-							
-												   
-						    tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
-						   
-					
-						   
-						    p.removeTokenofAge(tokenToRemove);
+							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
+
+							//XXX  - This will break if two tokens from the same place is consumed
+
+							tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
+
+							p.removeTokenofAge(tokenToRemove);
 
 						}else if (a instanceof TimedArc){
-							ArrayList<Float> eligableToken = new ArrayList<Float>();
+							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 							//int indexOfOldestEligebleToken = 0;
 
 							TimedPlace p = (TimedPlace)a.getSource();
 
-							ArrayList<Float> tokensOfPlace = p.getTokens();						   
+							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 							for (int i=0; i< tokensOfPlace.size(); i++){
 								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
 									eligableToken.add(tokensOfPlace.get(i));
@@ -2046,18 +2066,14 @@ implements Cloneable {
 							}						   
 
 							//Select torken to remove based on firing mode
-							
-							float tokenToRemove = consumedTokens.get(p).get(0);
-							
-//							XXX  - This will break if two tokens from the same place is consumed
-							
-							
+							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
+
+							//XXX  - This will break if two tokens from the same place is consumed
+
 							p.removeTokenofAge(tokenToRemove);
-							
-							
 
 						}else {
-							//Should not be possible
+							System.out.println("not a timed or transport arc");
 						}
 					}
 
@@ -2068,8 +2084,8 @@ implements Cloneable {
 							TimedPlace p = (TimedPlace)a.getTarget();
 							int newNumberOfTokens = p.getTokens().size()+1;
 							p.setCurrentMarking(newNumberOfTokens);
-							ArrayList<Float> markingToBeSet = p.getTokens();
-							Float ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
+							ArrayList<BigDecimal> markingToBeSet = p.getTokens();
+							BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
 							markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
 
 							p.setAgeOfTokens(markingToBeSet);
@@ -2238,8 +2254,8 @@ implements Cloneable {
   }     // end of method fireRandomTransition */
 
 
-	public void fireTimedTransitionBackwards(HashMap<TimedPlace, ArrayList<Float>> presetMarking, 
-			HashMap<TimedPlace, ArrayList<Float>> postsetMarking, 
+	public void fireTimedTransitionBackwards(HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking, 
+			HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking, 
 			TAPNTransition transition){
 		for (Arc a : (LinkedList<TimedArc>)transition.getPreset()){
 			if (! presetMarking.containsKey(a.getSource()) )
@@ -2452,7 +2468,7 @@ implements Cloneable {
 
 					if (p.currentMarking > 0){
 
-						for ( Float token : ((TimedPlace)p).getTokens() ){
+						for ( BigDecimal token : ((TimedPlace)p).getTokens() ){
 							if ( ((TimedArc)a).satisfiesGuard(token) ){
 
 								//make sure no invariants are violated
@@ -3342,6 +3358,20 @@ implements Cloneable {
 			searchOption = SearchOption.BFS;
 		}
 		
+		HashTableSize hashTableSize;
+		try{
+			hashTableSize = HashTableSize.valueOf(queryElement.getAttribute("hashTableSize"));		
+		}catch (Exception e) {
+			hashTableSize = HashTableSize.MB_16;
+		}
+		
+		ExtrapolationOption extrapolationOption;
+		try{
+			extrapolationOption = ExtrapolationOption.valueOf(queryElement.getAttribute("extrapolationOption"));		
+		}catch (Exception e) {
+			extrapolationOption = ExtrapolationOption.AUTOMATIC;
+		}
+		
 		ReductionOption reductionOption;
 		try{
 			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
@@ -3358,7 +3388,7 @@ implements Cloneable {
 		String query;
 		try{
 			query = queryElement.getAttribute("query");
-			return new TAPNQuery(comment, Integer.parseInt(capacity), query, traceOption, searchOption, reductionOption);
+			return new TAPNQuery(comment, Integer.parseInt(capacity), query, traceOption, searchOption, reductionOption, hashTableSize, extrapolationOption);
 		}catch (Exception e) {
 			System.err.println("No query was specified: " + e.getStackTrace());
 			return null;
@@ -3512,7 +3542,7 @@ implements Cloneable {
 		return transportArcMap;
 	}
 
-	public void letTimePass(float timeToPass) throws InvariantViolatedAnimationException{
+	public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
 
 		//	 Can we do time delay
 		for (Place p : getPlaces()){
@@ -3522,12 +3552,11 @@ implements Cloneable {
 				int sizeOfArray = ((TimedPlace)p).getTokens().size();
 
 				for (int i=0; i< sizeOfArray; i++ ){
-					float tokensAge = ((TimedPlace)p).getTokens().get(i);
+					BigDecimal tokensAge = ((TimedPlace)p).getTokens().get(i);
 
-					if (!((TimedPlace)p).satisfiesInvariant(tokensAge+timeToPass)){   
-						throw new InvariantViolatedAnimationException(p, tokensAge + timeToPass);
+					if (!((TimedPlace)p).satisfiesInvariant(tokensAge.add(timeToPass))){   
+						throw new InvariantViolatedAnimationException(p, tokensAge.add(timeToPass));
 					}
-
 
 				}
 
@@ -3543,8 +3572,8 @@ implements Cloneable {
 
 
 				for (int i=0; i< sizeOfArray; i++ ){
-					float tokensAge = ((TimedPlace)p).getTokens().get(i);
-					((TimedPlace)p).getTokens().set(i, tokensAge + timeToPass);	   
+					BigDecimal tokensAge = ((TimedPlace)p).getTokens().get(i);
+					((TimedPlace)p).getTokens().set(i, tokensAge.add(timeToPass));	   
 				}
 
 			}
@@ -3555,7 +3584,7 @@ implements Cloneable {
 	}
 
 
-	public boolean canTimePass(float timeToPass) throws InvariantViolatedAnimationException{
+	public boolean canTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
 
 		//	 Can we do time delay
 		for (Place p : getPlaces()){
@@ -3565,9 +3594,9 @@ implements Cloneable {
 				int sizeOfArray = ((TimedPlace)p).getTokens().size();
 
 				for (int i=0; i< sizeOfArray; i++ ){
-					float tokensAge = ((TimedPlace)p).getTokens().get(i);
+					BigDecimal tokensAge = ((TimedPlace)p).getTokens().get(i);
 
-					if (!((TimedPlace)p).satisfiesInvariant(tokensAge+timeToPass)){   
+					if (!((TimedPlace)p).satisfiesInvariant(tokensAge.add(timeToPass))){   
 						return false;
 					}
 

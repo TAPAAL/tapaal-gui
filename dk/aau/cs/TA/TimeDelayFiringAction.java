@@ -1,4 +1,7 @@
 package dk.aau.cs.TA;
+
+import java.math.BigDecimal;
+
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
 
@@ -18,7 +21,7 @@ public class TimeDelayFiringAction implements FiringAction{
 		this.timedelay = delay;
 	}
 
-	public Float getDealy() {
+	public float getDealy() {
 		return timedelay;
 	}
 	

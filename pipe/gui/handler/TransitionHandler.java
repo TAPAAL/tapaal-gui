@@ -83,28 +83,38 @@ public class TransitionHandler
    
    
    public void mouseClicked(MouseEvent e) {   
-      if (SwingUtilities.isLeftMouseButton(e)){    
-         if (e.getClickCount() == 2 &&
-                 CreateGui.getApp().isEditionAllowed() && 
-                 (CreateGui.getApp().getMode() == Pipe.TIMEDTRANS || 
-                 CreateGui.getApp().getMode() == Pipe.IMMTRANS ||
-                 CreateGui.getApp().getMode() == Pipe.SELECT)) {
-            ((Transition)myObject).showEditor();
-         } 
-      }  else if (SwingUtilities.isRightMouseButton(e)){
-         if (CreateGui.getApp().isEditionAllowed() && enablePopup) { 
-            JPopupMenu m = getPopup(e);
-            if (m != null) {           
-               int x = Zoomer.getZoomedValue(
-                       ((Transition)myObject).getNameOffsetXObject().intValue(),
-                       myObject.getZoom());
-               int y = Zoomer.getZoomedValue(
-                       ((Transition)myObject).getNameOffsetYObject().intValue(),
-                       myObject.getZoom());
-               m.show(myObject, x, y);
-            }
-         }
-      }
+	   if (SwingUtilities.isLeftMouseButton(e)){
+		   if (CreateGui.getApp().isEditionAllowed()){
+			   if (e.getClickCount() == 2 &&
+					   (CreateGui.getApp().getMode() == Pipe.TIMEDTRANS || 
+							   CreateGui.getApp().getMode() == Pipe.IMMTRANS ||
+							   CreateGui.getApp().getMode() == Pipe.SELECT)) {
+				   ((Transition)myObject).showEditor();
+			   }
+		   }else{
+			   //do nothing except the things that one do in the simulator (handled somewhere else)
+		   }
+	   } else if (SwingUtilities.isRightMouseButton(e)){
+		   if (CreateGui.getApp().isEditionAllowed() && enablePopup) { 
+			   JPopupMenu m = getPopup(e);
+			   if (m != null) {           
+				   int x = Zoomer.getZoomedValue(
+						   ((Transition)myObject).getNameOffsetXObject().intValue(),
+						   myObject.getZoom());
+				   int y = Zoomer.getZoomedValue(
+						   ((Transition)myObject).getNameOffsetYObject().intValue(),
+						   myObject.getZoom());
+				   m.show(myObject, x, y);
+			   }
+		   }
+	   }
    }
-   
+   //Override
+   public void mousePressed(MouseEvent e) {
+	   if (CreateGui.getApp().isEditionAllowed()){
+		   super.mousePressed(e);
+	   }else{
+		   //do nothing except the things that one do in the simulator (handled somewhere else).
+	   }
+   }
 }

@@ -158,6 +158,21 @@ public class TAPN extends PetriNet {
 
 	}
 
+	public boolean isDegree2(){
+		boolean isDegree2=true;
+		
+		for (Transition t : getTransitions()){
+			
+			if (t.getPostset().size() > 2 || t.getPreset().size() > 2){
+				isDegree2 = false;
+				break;
+			}
+			
+		}
+		
+		return isDegree2;
+		
+	}
 
 	public void addObject(TAPNPlace p){
 		places.add(p); 								  							

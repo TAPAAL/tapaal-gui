@@ -3,6 +3,7 @@ package pipe.gui.widgets;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +23,7 @@ import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.AnimationHistory;
-import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
 
 public class AnimationSelectmodeDialog extends JPanel{
 
@@ -89,14 +90,15 @@ public class AnimationSelectmodeDialog extends JPanel{
 			ArrayList<String> eligableToken = null;
 
 			DecimalFormat df = new DecimalFormat();
-			df.setMaximumFractionDigits(4);
+			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+			df.setMinimumFractionDigits(1);
 			if (a instanceof TransportArc){
 				eligableToken= new ArrayList<String>();
 				
 
 			   TimedPlace p = (TimedPlace)a.getSource();
 			   
-			   ArrayList<Float> tokensOfPlace = p.getTokens();					
+			   ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 			   
 			   TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getconnectedTo().getTarget();
 
@@ -112,7 +114,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 				TimedPlace p = (TimedPlace)a.getSource();
 
-				ArrayList<Float> tokensOfPlace = p.getTokens();						   
+				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 				for (int i=0; i< tokensOfPlace.size(); i++){
 					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
 						eligableToken.add(df.format(tokensOfPlace.get(i)));
@@ -121,7 +123,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 			}
 			
 			
-			ArrayList<Float> tokens = ((TimedPlace)a.getSource()).getTokens();
+			ArrayList<BigDecimal> tokens = ((TimedPlace)a.getSource()).getTokens();
 
 			selectTokenBox = new JComboBox(eligableToken.toArray());
 

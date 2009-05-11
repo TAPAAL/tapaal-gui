@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
+import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNPlace;
@@ -262,7 +263,7 @@ public class tester {
 		
 
 	*/
-		
+		/*
 	    float f = 1;
 	    float a;
 		System.out.println(f);
@@ -275,7 +276,24 @@ public class tester {
 		//f = f+0.0001f;
 		System.out.println(f);
 		//f = f+0.0001f;
+		System.out.println(a);*/
+		
+		
+		
+		/*File f = new File("/home/kyrke/1.trace");
+		Reader fileReader = new FileReader(f);
+		BufferedReader traceReader = new BufferedReader(fileReader);
+		
+		SymbolicUppaalTrace sut = new SymbolicUppaalTrace();
+		sut.parseUppaalAbstractTrace(traceReader);*/
+		
+		
+		float a = 1.3f;
+		
 		System.out.println(a);
+		
+		
+		
 	}
 
 }

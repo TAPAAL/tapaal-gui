@@ -5,7 +5,7 @@ import java.awt.MouseInfo;
 public class Pipe {
    
    public static final String TOOL = "TAPAAL";
-   public static final String VERSION = "1.0.0.0";
+   public static final String VERSION = "1.1";
    
    public static String getProgramName(){
 	   return "" + Pipe.TOOL + " " + Pipe.VERSION;
@@ -154,7 +154,9 @@ public class Pipe {
    public static final int TIMEPASS = 700;
 
 
-
+   public static final int verifytaMinRev=4240;
+   public static final int AGE_DECIMAL_PRECISION = 5;
+   public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION+4;
    
    //public static final int NUMBER_OF_BUTTONS = MouseInfo.getNumberOfButtons();
    

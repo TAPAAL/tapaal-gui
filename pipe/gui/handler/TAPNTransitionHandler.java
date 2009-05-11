@@ -1,6 +1,7 @@
 package pipe.gui.handler;
 
 import java.awt.Container;
+import java.awt.MenuComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -22,26 +23,9 @@ public class TAPNTransitionHandler extends TransitionHandler {
 	    * component 
 	    */
 	   public JPopupMenu getPopup(MouseEvent e) {
-	      int index = 0;
 	      JPopupMenu popup = super.getPopup(e);
+	      popup.remove(1); // the show attributes menu point
 	      
-	      JMenuItem menuItem = new JMenuItem("Edit Transition");      
-	      menuItem.addActionListener(new ActionListener(){
-	         public void actionPerformed(ActionEvent e) {
-	            ((Transition)myObject).showEditor();
-	         }
-	      });       
-	      popup.insert(menuItem, index++);             
-	      
-	      menuItem = new JMenuItem(new ShowHideInfoAction((Transition)myObject));
-	      if (((Transition)myObject).getAttributesVisible() == true){
-	         menuItem.setText("Hide Attributes");
-	      } else {
-	         menuItem.setText("Show Attributes");
-	      }
-	      popup.insert(menuItem, index++);      
-	      popup.insert(new JPopupMenu.Separator(), index);
-
 	      return popup;
 	   }
 

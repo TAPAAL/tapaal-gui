@@ -68,7 +68,6 @@ public class PlaceTransitionObjectHandler
       PlaceTransitionObject currentObject = (PlaceTransitionObject)myObject;
       switch (CreateGui.getApp().getMode()) {
 
-
       case Pipe.FAST_TAPNPLACE:
       case Pipe.FAST_TAPNTRANSITION:
       case Pipe.TAPNARC:

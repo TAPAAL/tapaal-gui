@@ -1,21 +1,22 @@
 package pipe.gui.undo;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import pipe.dataLayer.TimedPlace;
 
 
 public class TimedPlaceTokenEdit extends UndoableEdit {
-	private ArrayList<Float> oldValue;
-	private ArrayList<Float> newValue;
+	private ArrayList<BigDecimal> oldValue;
+	private ArrayList<BigDecimal> newValue;
 	private TimedPlace place;
 	
 	public TimedPlaceTokenEdit(	TimedPlace place, 
-								ArrayList<Float> oldValue, 
-								ArrayList<Float> newValue){
+								ArrayList<BigDecimal> oldAgeOfTokens, 
+								ArrayList<BigDecimal> arrayList){
 		this.place = place;
-		this.oldValue = oldValue;
-		this.newValue = newValue;
+		this.oldValue = oldAgeOfTokens;
+		this.newValue = arrayList;
 	}
 	
 	@Override

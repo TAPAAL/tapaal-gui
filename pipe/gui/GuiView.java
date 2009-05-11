@@ -49,6 +49,7 @@ import pipe.gui.handler.ArcHandler;
 import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.ParameterHandler;
 import pipe.gui.handler.PlaceHandler;
+import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
@@ -168,8 +169,15 @@ public class GuiView
 	               
             	}
             } else if (newObject instanceof Transition) {
-               TransitionHandler transitionHandler =
-                       new TransitionHandler(this, (Transition)newObject);
+            	TransitionHandler transitionHandler;
+            	if (newObject instanceof TAPNTransition){
+            		transitionHandler =
+                        new TAPNTransitionHandler(this, (Transition)newObject);
+            	}else {
+            		transitionHandler =
+                        new TransitionHandler(this, (Transition)newObject);	
+            	}
+               
                LabelHandler labelHandler =
                        new LabelHandler(((Transition)newObject).getNameLabel(),
                        (Transition)newObject);

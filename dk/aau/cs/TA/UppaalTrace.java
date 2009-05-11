@@ -106,8 +106,12 @@ public class UppaalTrace {
 		int turn = 0;
 		DiscreetFiringAction dfa = new DiscreetFiringAction();
 		while ((line = traceReader.readLine()) != null){
+			System.out.println(line);
 
-			if (line.contains("Delay:")){
+			if (line.contains("EXCEPTION: Clock valuation.")){
+				System.err.println("Uppaal can not generate the trace.");
+				return null;
+			}else if (line.contains("Delay:")){
 				trace.add(new TimeDelayFiringAction(Float.parseFloat(line.replace("Delay:", "").trim())));
 			}else if (line.contains("Transitions:")){
 				collect = true;
@@ -142,9 +146,7 @@ public class UppaalTrace {
 			}else{
 				if (collect && turn <= 1){
 					if (!line.equals("") && !line.contains("tau")){
-						
-						
-						
+												
 						String tmp = line.trim();
 
 						//Get the transition fired
@@ -168,38 +170,41 @@ public class UppaalTrace {
 						
 						tmp = tmp2[0].replace("Token", "");
 						
-						int tokenConsumed = Integer.parseInt(tmp);
-						String placename = tmp2[1].split("->")[0];
-						
-						
-						
-						
-						dfa.setTrasition(transitionname.trim());
-						dfa.addConsumedToken(placename, tmpAgeOfTokens.get(tokenConsumed));
-						
-						
+						if (tmp.equals("Control")){
+							collect = false;
+							turn=0;
+							continue;
+						}
+
+						if (!tmp.equals("Lock") && !tmp.equals("")){
+							int tokenConsumed = Integer.parseInt(tmp.replace("P(", "").replace(")", ""));
+							String placename = tmp2[1].split("->")[0];
+
+							dfa.setTrasition(transitionname.trim());
+							dfa.addConsumedToken(placename, tmpAgeOfTokens.get(tokenConsumed));
+						}
 						//Add the tokens consumed
-			
-						
-						
-						
-						
-			 
-						
-						
-						
+
 						turn++;
-						
+
 						if (turn==2){
 							turn=0;
-							
+
 							collect=false;
+
 							trace.add(dfa);
 							dfa = new DiscreetFiringAction();
-							
+
 						}
 						
 						
+					} else {
+						turn=0;
+
+						collect=false;
+
+						trace.add(dfa);
+						dfa = new DiscreetFiringAction();
 					}
 				}
 			}
@@ -221,13 +226,12 @@ public class UppaalTrace {
 				//Do stuff
 				
 				DiscreetFiringAction dfa1 = (DiscreetFiringAction)fa;
-								
 				String tmp2[] = dfa1.getTransition().split("_");
-				
+				int tmp2length = tmp2.length; 
 				
 				int tmp=0;
 				try {
-				 tmp = Integer.parseInt(tmp2[1].replace("T", ""));
+				 tmp = Integer.parseInt(tmp2[tmp2length-1].replace("T", ""));
 				} catch (Exception e) {
 					tmp=0;
 				}
@@ -235,7 +239,8 @@ public class UppaalTrace {
 				if ((!tmp2[0].equals(last)) ||  tmp <= lastnumber){
 					
 					dfatmp = new DiscreetFiringAction();
-					dfatmp.setTrasition(tmp2[0].trim());
+					
+					dfatmp.setTrasition(dfa1.getTransition().replace("_T"+tmp, ""));
 					trace2.add(dfatmp);
 					
 					
@@ -254,9 +259,11 @@ public class UppaalTrace {
 					
 					//Only add the consumed token if it is consumed from one of
 					//the original places
-					if (!(s.contains("_"))){
+					if (!((s.contains("P_lock")) || (s.contains("P_capacity")) || (s.contains("_im")) || (s.contains("_hp_"))) ){
+						System.out.println("Added consumed token " + s + " - "+ tmpConsumedTokens.get(s).get(0));
 						dfatmp.addConsumedToken(s, tmpConsumedTokens.get(s).get(0)); // XXX - only takes first token
 					}
+					
 					
 				}
 				

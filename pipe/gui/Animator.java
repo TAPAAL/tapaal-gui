@@ -3,7 +3,10 @@ package pipe.gui;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,6 +32,7 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.LeftQueryPane;
 import pipe.gui.widgets.QueryDialogue;
 
 
@@ -67,7 +71,7 @@ public class Animator {
 	int numberSequences;   
 	private ArrayList actionHistory;
 	private int currentAction;
-	private ArrayList<HashMap<TimedPlace, ArrayList<Float>>> markingHistory;
+	private ArrayList<HashMap<TimedPlace, ArrayList<BigDecimal>>> markingHistory;
 	
 	public Firingmode firingmode = new RandomFiringmode();
 
@@ -87,7 +91,7 @@ public class Animator {
 			}
 		});
 		currentAction = -1;
-		markingHistory = new ArrayList<HashMap<TimedPlace,ArrayList<Float>>>();
+		markingHistory = new ArrayList<HashMap<TimedPlace,ArrayList<BigDecimal>>>();
 		
 	}
 
@@ -228,34 +232,46 @@ public class Animator {
 			 
 			 if (actionHistory.get(currentAction) instanceof DiscreetFiringAction){
 				 TAPNTransition transition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast
-				 HashMap<TimedPlace, ArrayList<Float>> markingToGoBackTo = markingHistory.get(currentAction);
+				 HashMap<TimedPlace, ArrayList<BigDecimal>> markingToGoBackTo = markingHistory.get(currentAction);
 
 				 if (markingToGoBackTo == null){
 					 System.err.println("No marking to go back to, ERROR!");
 				 }
 				 
-				 HashMap<TimedPlace, ArrayList<Float>> presetMarking = new HashMap<TimedPlace, ArrayList<Float>>();
+				 HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
 				 for (Arc a : (LinkedList<Arc>) transition.getPreset() ){
 					 TimedPlace place = (TimedPlace)a.getSource();
-					 presetMarking.put(place, (ArrayList<Float>)markingToGoBackTo.get(place).clone());
+					 presetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
 				 }
 
-				 HashMap<TimedPlace, ArrayList<Float>> postsetMarking = new HashMap<TimedPlace, ArrayList<Float>>();
+				 HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
 				 for (Arc a : (LinkedList<Arc>) transition.getPostset() ){
 					 TimedPlace place = (TimedPlace)a.getTarget();
-					 postsetMarking.put(place, (ArrayList<Float>)markingToGoBackTo.get(place).clone());
+					 postsetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
 				 }
 
 				 CreateGui.currentPNMLData().fireTimedTransitionBackwards(presetMarking, postsetMarking, transition);
+				 
+				//If untimed simulation
+				 if (CreateGui.getAbstractAnimationPane() != null){
+					 
+					 AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+					 int current = untimedAnimationHistory.getCurrentItem();
+					 if ((untimedAnimationHistory.getElement(current-1)).trim().equals(transition.getName())){ //Possible null pointer exception
+						 //It is fired
+						 untimedAnimationHistory.stepBackwards();	 
+					 }
+					 
+				 }
 
 			 }else if (actionHistory.get(currentAction) instanceof Transition ){
 				 Transition lastTransitionFired = (Transition)actionHistory.get(currentAction); 
 				 CreateGui.currentPNMLData().fireTransitionBackwards(lastTransitionFired);
 
 			 }else if ( actionHistory.get(currentAction) instanceof TimeDelayFiringAction){
-				 Float timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction)).getDealy();
+				 BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction)).getDealy();
 				 try {
-					 CreateGui.getModel().letTimePass(-timeDelay);
+					 CreateGui.getModel().letTimePass(timeDelay.negate());
 				 } catch (InvariantViolatedAnimationException e) {
 //					 XXX - kyrke, An error can not come here as this is valid states stored in animator
 					 e.printStackTrace();
@@ -282,68 +298,76 @@ public class Animator {
 	 public void stepForward(){
 		 if ( currentAction < actionHistory.size()-1 ) {
 
-			 
-				 //Marking history did not contain anything, so we must calculate the next marking
-				 //We do this using hacked firingmode. 
 
-				 if ( actionHistory.get(currentAction+1) instanceof DiscreetFiringAction){
-					 TAPNTransition nextTransition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
-					 
-					 // Before we firer the transition we need to setup Select firing mode, and 
-					 // firer the transition with the same tokens as in the DiscreetFiringAction
-					 // IT IS A HACK TO USE FIRING MODEL SELECT TO THIS !!! -- kyrke
-					 
-					 //Setup firingmode
-					 
-					 //If this marking is not saved in marking history (e.g. its a uppaal trace)
-					 
-					 if (markingHistory.get(currentAction+1)==null){
-						 System.out.println("Marking is null, we will fix it");
-						 
-						 HashMap<TimedPlace, ArrayList<Float>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
-						 markingHistory.set(currentAction+1, currentmakring);
-					 }
-					 
-					 HashMap<Place, ArrayList<Float>> consumedTokens = ((DiscreetFiringAction)actionHistory.get(currentAction+1)).getConsumedTokensList();
-					 
-					 CreateGui.currentPNMLData().fireTransition(nextTransition, consumedTokens);
-					 
-					 CreateGui.currentPNMLData().setEnabledTransitions();
-					 unhighlightDisabledTransitions();
-					 highlightEnabledTransitions();
-					 currentAction++;
-					 
-					 
-				 }else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
-					 Float timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
+			 //Marking history did not contain anything, so we must calculate the next marking
+			 //We do this using hacked firingmode. 
 
-					 //If this marking is not saved in marking history (e.g. its a uppaal trace)
-					 
-					 if (markingHistory.get(currentAction+1)==null){
-						 System.out.println("Marking is null, we will fix it");
-						 
-						 HashMap<TimedPlace, ArrayList<Float>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
-						 markingHistory.set(currentAction+1, currentmakring);
-					 }
-					 
-					 try {
-						 CreateGui.getModel().letTimePass(timeDelay);
-					 } catch (InvariantViolatedAnimationException e) {
-						 // XXX - kyrke, An error can con come here as this is valid states stored in animator 
-						 e.printStackTrace();
-					 }
-					 CreateGui.currentPNMLData().setEnabledTransitions();
-					 unhighlightDisabledTransitions();
-					 highlightEnabledTransitions();
-					 currentAction++;
+			 if ( actionHistory.get(currentAction+1) instanceof DiscreetFiringAction){
+				 TAPNTransition nextTransition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
+
+				 // Before we firer the transition we need to setup Select firing mode, and 
+				 // firer the transition with the same tokens as in the DiscreetFiringAction
+				 // IT IS A HACK TO USE FIRING MODEL SELECT TO THIS !!! -- kyrke
+
+				 //Setup firingmode
+
+				 //If this marking is not saved in marking history (e.g. its a uppaal trace)
+
+				 if (markingHistory.get(currentAction+1)==null){
+					 System.out.println("Marking is null, we will fix it");
+
+					 HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+					 markingHistory.set(currentAction+1, currentmakring);
 				 }
 
+				 HashMap<Place, ArrayList<BigDecimal>> consumedTokens = ((DiscreetFiringAction)actionHistory.get(currentAction+1)).getConsumedTokensList();
+
+				 CreateGui.currentPNMLData().fireTransition(nextTransition, consumedTokens);
+
+				 CreateGui.currentPNMLData().setEnabledTransitions();
+				 unhighlightDisabledTransitions();
+				 highlightEnabledTransitions();
+				 currentAction++;
+
+				 //If untimed simulation
+				 if (CreateGui.getAbstractAnimationPane() != null){
+
+					 AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+					 int current = untimedAnimationHistory.getCurrentItem();
+					 if ((untimedAnimationHistory.getElement(current)).trim().equals(nextTransition.getName())){ //Possible null pointer exception
+						 //It is fired
+						 untimedAnimationHistory.stepForward();
+					 }
+
+				 }
+
+
+			 }else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
+				 BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
+
+				 //If this marking is not saved in marking history (e.g. its a uppaal trace)
+
+				 if (markingHistory.get(currentAction+1)==null){
+					 System.out.println("Marking is null, we will fix it");
+
+					 HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+					 markingHistory.set(currentAction+1, currentmakring);
+				 }
+
+				 try {
+					 CreateGui.getModel().letTimePass(timeDelay);
+				 } catch (InvariantViolatedAnimationException e) {
+					 // XXX - kyrke, An error can con come here as this is valid states stored in animator 
+					 e.printStackTrace();
+				 }
+				 CreateGui.currentPNMLData().setEnabledTransitions();
+				 unhighlightDisabledTransitions();
+				 highlightEnabledTransitions();
+				 currentAction++;
 			 }
 
+		 }
 
-
-
-		 
 	 }
 
 	 /** This method keeps track of a fired transition in the AnimationHistory 
@@ -366,8 +390,30 @@ public class Animator {
 
 		 Animator animator = CreateGui.getAnimator();
 		 
-		 HashMap<TimedPlace, ArrayList<Float>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
-		 
+		 HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+
+		//If untimed simulation
+		 if (CreateGui.getAbstractAnimationPane() != null){
+			 
+			 AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+			 int current = untimedAnimationHistory.getCurrentItem();
+			 if ((untimedAnimationHistory.getElement(current)).trim().equals(transition.getName())){ //Possible null pointer exception
+				 //It is fired
+				 untimedAnimationHistory.stepForward();	 
+			 }else{
+				 int fireTransition = JOptionPane.showConfirmDialog( CreateGui.getApp().getRootPane(),
+						 											 "Are you sure you want to fire a transition which does not follow the untimed trace?\n" +
+						 											 "Firing this transition will discard the untimed trace and revert to standard simulation.",
+						 											 "Discrading Untimed Trace",
+						 											 JOptionPane.YES_NO_OPTION );
+				 if (fireTransition > 0){
+					 return;
+				 }else{
+					 CreateGui.removeAbstractAnimationPane();
+					 CreateGui.updateLeftPanel();
+				 }
+			 }
+		 }
 		 
 		 CreateGui.getAnimationHistory().addHistoryItem(transition.getName());
 		 DiscreetFiringAction fired;
@@ -384,10 +430,10 @@ public class Animator {
 		 CreateGui.currentPNMLData().setEnabledTransitions();
 		 animator.highlightEnabledTransitions();
 		 animator.unhighlightDisabledTransitions();
-
+		 
 	 }
 
-	 public void letTimePass(float timeToPass) throws InvariantViolatedAnimationException{
+	 public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
 		 Animator animator = CreateGui.getAnimator();
 
 		 if (CreateGui.currentPNMLData().canTimePass(timeToPass)){
@@ -403,15 +449,25 @@ public class Animator {
 
 				 //Catch exception and dont add history, throw exception again 
 				 // to alow handling further on. 
-				 CreateGui.currentPNMLData().letTimePass(timeToPass);
+				 //Stripping too long decimals
+				 
+				 //This is a trick to get locals (, vs .) right in the text box.
 				 DecimalFormat df = new DecimalFormat();
-				 df.setMaximumFractionDigits(4);
-				 CreateGui.getAnimationHistory().addHistoryItem("Time delay: "+ df.format(timeToPass));
+				 df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+				 df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+				 
+				 BigDecimal strippedTimeDelay = new BigDecimal(timeToPass.toString(), new MathContext(Pipe.AGE_PRECISION));
+				 
+				 CreateGui.currentPNMLData().letTimePass(strippedTimeDelay);
+				 
+				 CreateGui.getAnimationHistory().addHistoryItem("Time delay: "+ df.format(strippedTimeDelay));
 
 
 			 } catch (InvariantViolatedAnimationException e) {
 				 throw e;
-			 }   
+			 } 
+
+			 
 
 			 for (Place p : CreateGui.getModel().getPlaces()){
 				 p.repaint();
@@ -443,7 +499,7 @@ public class Animator {
 		 
 		 CreateGui.animControlerBox.setAnimationButtonsEnabled();
 	 }
-	 public void manipulatehistory(Float delay){
+	 public void manipulatehistory(BigDecimal delay){
 		 markingHistory.add(null); 
 		 actionHistory.add(new TimeDelayFiringAction(delay)); 
 	 
@@ -473,7 +529,7 @@ public class Animator {
 		 this.numberSequences = numberSequences;
 	 }
 
-	 private void addToHistory(Object newAction, HashMap<TimedPlace, ArrayList<Float>> currentMarking){
+	 private void addToHistory(Object newAction, HashMap<TimedPlace, ArrayList<BigDecimal>> currentMarking){
 		 actionHistory.add(newAction);
 		 markingHistory.add(currentMarking);
 		 currentAction++;
@@ -504,17 +560,17 @@ public class Animator {
 	 
 	 public interface Firingmode {
 		 
-		 public float fire(ArrayList<Float> tokens);
+		 public BigDecimal fire(ArrayList<BigDecimal> tokens);
 		 public String getName();
 		 
 	 }
 	 
 	 public class OldestFiringmode implements Firingmode {
 
-		public float fire(ArrayList<Float> tokens) {
-			float max=tokens.get(0);
-			for (float a : tokens){
-				if (a > max){
+		public BigDecimal fire(ArrayList<BigDecimal> tokens) {
+			BigDecimal max=tokens.get(0);
+			for (BigDecimal a : tokens){
+				if (a.compareTo(max) > 0){
 					max = a;
 				}
 			}
@@ -529,10 +585,10 @@ public class Animator {
 	 
 	 public class YoungestFiringmode implements Firingmode {
 
-			public float fire(ArrayList<Float> tokens) {
-				float min=tokens.get(0);
-				for (float a : tokens){
-					if (a < min){
+			public BigDecimal fire(ArrayList<BigDecimal> tokens) {
+				BigDecimal min=tokens.get(0);
+				for (BigDecimal a : tokens){
+					if (a.compareTo(min) < 0){
 						min = a;
 					}
 				}
@@ -549,7 +605,7 @@ public class Animator {
 	 
 	 public class RandomFiringmode implements Firingmode {
 
-			public float fire(ArrayList<Float> tokens) {
+			public BigDecimal fire(ArrayList<BigDecimal> tokens) {
 				Random generator = new Random();
 				
 				int random = generator.nextInt(tokens.size());
@@ -574,9 +630,9 @@ public class Animator {
 		 	}
 		 
 			
-			public float fire(ArrayList<Float> tokens) {
+			public BigDecimal fire(ArrayList<BigDecimal> tokens) {
 				
-				float toReturn = tokens.get(tokensToFire.get(0));
+				BigDecimal toReturn = tokens.get(tokensToFire.get(0));
 				tokensToFire.remove(0);
 				
 				return toReturn;

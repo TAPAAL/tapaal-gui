@@ -2,6 +2,8 @@ package pipe.dataLayer;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,33 +117,33 @@ public class TimedArc extends NormalArc{
 
 	}
 
-	public boolean satisfiesGuard(Float token) {
+	public boolean satisfiesGuard(BigDecimal token) {
 		boolean satisfies = true;
 		String[] partedTimeInteval = timeInterval.split(",");
 		if ((""+partedTimeInteval[0].charAt(0)).contains("[") ){
-			if ( Integer.parseInt( partedTimeInteval[0].substring(1) ) > token ){
+			if (token.compareTo(BigDecimal.valueOf(Long.parseLong( partedTimeInteval[0].substring(1) ))) < 0){
 				return false;
 			}
 		}else {
-			if ( Integer.parseInt( partedTimeInteval[0].substring(1) ) >= token ){
+			if ( token.compareTo(BigDecimal.valueOf(Long.parseLong( partedTimeInteval[0].substring(1) )))  <= 0){
 				return false;
 			}
 		}
-		float guardMaxValue = 0;
+		int guardMaxValue = 0;
 		
 		int lastIndexOfNumber = partedTimeInteval[1].length()-1;
 		if ( partedTimeInteval[1].substring(0, lastIndexOfNumber).contains("inf") ){
-			guardMaxValue = Float.MAX_VALUE;
+			guardMaxValue = Integer.MAX_VALUE;
 		} else {
 			guardMaxValue = Integer.parseInt( partedTimeInteval[1].substring(0, lastIndexOfNumber) );
 		}
 		
 		if ((""+partedTimeInteval[1].charAt(lastIndexOfNumber)).contains("]") ){
-			if ( guardMaxValue < token ){
+			if ( token.compareTo(BigDecimal.valueOf((Long.parseLong(""+guardMaxValue)))) > 0 ){
 				return false;
 			}
 		}else {
-			if ( guardMaxValue <= token ){
+			if ( token.compareTo(BigDecimal.valueOf((Long.parseLong(""+guardMaxValue)))) >= 0){
 				return false;
 			}
 		}

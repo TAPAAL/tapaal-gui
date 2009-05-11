@@ -25,7 +25,7 @@ public class AnimationHistory
         extends JTextPane {
    
    /** Holds all the transitions in the sequence */
-   public Vector fSeq;
+   public Vector<String> fSeq;
    private String initText;
    private Document doc;
    private Style emph;
@@ -125,5 +125,16 @@ public class AnimationHistory
    
    public boolean isStepBackAllowed(){
       return currentItem > 1;
+   }
+   
+   public int getCurrentItem(){
+	   return currentItem;
+   }
+   
+   public String getElement(int i){
+	   if (i >= fSeq.size()){
+		   return "";
+	   }
+	   return fSeq.get(i);    
    }
 }

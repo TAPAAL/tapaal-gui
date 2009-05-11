@@ -1,14 +1,16 @@
 package pipe.dataLayer;
 
+import java.math.BigDecimal;
+
 public class TimeDelayFiringAction implements FiringAction{
 
-	float timedelay;
+	BigDecimal timedelay;
 	
-	public TimeDelayFiringAction(float delay) {
+	public TimeDelayFiringAction(BigDecimal delay) {
 		this.timedelay = delay;
 	}
 
-	public Float getDealy() {
+	public BigDecimal getDealy() {
 		return timedelay;
 	}
 	

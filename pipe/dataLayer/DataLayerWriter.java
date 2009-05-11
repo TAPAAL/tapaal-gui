@@ -162,7 +162,6 @@ public class DataLayerWriter {
          
          ArrayList<TAPNQuery> queries = netModel.getQueries();
          for (TAPNQuery query : queries){
-        	 System.out.println(""+query.reductionOption);
         	 Element newQuery = createQueryElement(query, pnDOM);
         	 NET.appendChild(newQuery);
          }
@@ -228,6 +227,8 @@ public class DataLayerWriter {
 		   queryElement.setAttribute("query", query.query);
 		   queryElement.setAttribute("traceOption", ""+query.traceOption);
 		   queryElement.setAttribute("searchOption", ""+query.searchOption);
+		   queryElement.setAttribute("hashTableSize", ""+query.hashTableSize);
+		   queryElement.setAttribute("extrapolationOption", ""+query.extrapolationOption);
 		   queryElement.setAttribute("reductionOption", ""+query.reductionOption);
 		   
 	   }

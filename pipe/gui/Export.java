@@ -34,6 +34,9 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import dk.aau.cs.TAPN.transformer.TapnConservativeTransformer;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
+import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
@@ -53,6 +56,8 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
 
 
 
@@ -827,6 +832,146 @@ public class Export {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		
+	}
+
+
+	public static void exportUppaalXMLFromQuery(DataLayer appModel, TAPNQuery input) {
+		File xmlfile=null, qfile=null;
+		try {
+			xmlfile = File.createTempFile("verifyta", ".xml");
+			qfile = File.createTempFile("verifyta", ".q");
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		xmlfile.deleteOnExit();qfile.deleteOnExit();
+		String filename = null;
+		try {
+			filename = new FileBrowser("Uppaal XML","xml",filename).saveFile();
+			xmlfile=new File(filename);
+			String[] a = filename.split(".xml");
+			qfile=new File(a[0]+".q");
+
+		} catch (Exception e) {
+			// There was some problem with the action
+			if (filename == null){
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "No Uppaal XML file saved.");
+				return;
+			}else{
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"There were errors performing the requested action:\n" + e,
+						"Error", JOptionPane.ERROR_MESSAGE
+				);				
+			}
+		}
+		
+		//Create transformer
+		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		TAPN model=null;
+		try {
+			model = transformer.getAAUTAPN();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (CreateGui.getApp().getComponentCount() == 0) {
+			return;
+		}
+
+
+		int capacity;
+		String currentQuery = "";
+		capacity = input.capacity;
+		String inputQuery = input.query;
+		TraceOption traceOption = input.traceOption;
+		SearchOption searchOption = input.searchOption;
+		String verifytaOptions = "";
+
+		if (traceOption == TraceOption.SOME){
+			verifytaOptions = "-t0";
+		}else if (traceOption == TraceOption.FASTEST){
+			verifytaOptions = "-t2";
+		}else if (traceOption == TraceOption.NONE){
+			verifytaOptions = "";
+		}
+
+		if (searchOption == SearchOption.BFS){
+			verifytaOptions += "-o0";
+		}else if (searchOption == SearchOption.DFS ){
+			verifytaOptions += "-o1";
+		}else if (searchOption == SearchOption.RDFS ){
+			verifytaOptions += "-o2";
+		}else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
+			verifytaOptions += "-o6";
+		}
+
+		if (inputQuery == null) {return;}
+		
+		// Select the model based on selected export option.
+		if (input.reductionOption == TAPNQuery.ReductionOption.NAIVE_UPPAAL_SYM){
+			
+			NaiveUppaalSym t = new NaiveUppaalSym();
+			try {
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_UPPAAL_SYM){
+			
+			AdvancedUppaalSym t = new AdvancedUppaalSym();
+			try {
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_NOSYM){
+			System.out.println("Using ADV_NOSYMQ");
+			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
+			try {
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+			
+		} else {
+
+			try {
+				model.convertToConservative();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			try {
+				model = model.convertToDegree2();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+
+
+			//Create uppaal xml file
+			try {
+				TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer(model, new PrintStream(xmlfile), capacity);
+				t2.transform();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			try {
+				model.transformQueriesToUppaal(capacity, inputQuery, new PrintStream(qfile));
+			} catch (Exception e) {
+				System.err.println("We had an error translating the query");
+			}
+
+		}
 		
 	}
 	

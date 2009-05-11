@@ -114,22 +114,24 @@ public class PlaceHandler
       
       UndoManager undoManager = CreateGui.getView().getUndoManager();
       if (e.isShiftDown()) {
-         int oldCapacity = ((Place)myObject).getCapacity();
-         int oldMarking = ((Place)myObject).getCurrentMarking();
-         
-         int newCapacity = oldCapacity - e.getWheelRotation();
-         if (newCapacity < 0) {
-            newCapacity = 0;
-         }
-         
-         undoManager.newEdit(); // new "transaction""
-         if ((newCapacity > 0) && (oldMarking > newCapacity)){
-            if (((Place)myObject).getMarkingParameter() != null) {
-               undoManager.addEdit(((Place)myObject).clearMarkingParameter());
-            }
-            undoManager.addEdit(((Place)myObject).setCurrentMarking(newCapacity));
-         }
-         undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
+    	  if ((myObject instanceof TimedPlace)==false){
+    		  int oldCapacity = ((Place)myObject).getCapacity();
+    		  int oldMarking = ((Place)myObject).getCurrentMarking();
+
+    		  int newCapacity = oldCapacity - e.getWheelRotation();
+    		  if (newCapacity < 0) {
+    			  newCapacity = 0;
+    		  }
+
+    		  undoManager.newEdit(); // new "transaction""
+    		  if ((newCapacity > 0) && (oldMarking > newCapacity)){
+    			  if (((Place)myObject).getMarkingParameter() != null) {
+    				  undoManager.addEdit(((Place)myObject).clearMarkingParameter());
+    			  }
+    			  undoManager.addEdit(((Place)myObject).setCurrentMarking(newCapacity));
+    		  }
+    		  undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
+    	  }
       } else {
          int oldMarking = ((Place)myObject).getCurrentMarking();
          int newMarking = oldMarking - e.getWheelRotation();
@@ -157,6 +159,15 @@ public class PlaceHandler
 		  ((TimedPlace) myObject).showAgeOfTokens(false);
 	   }else {
 		   //do something else;
+	   }
+   }
+   
+   //Override
+   public void mousePressed(MouseEvent e) {
+	   if (CreateGui.getApp().isEditionAllowed()){
+		   super.mousePressed(e);
+	   }else{
+		   //do nothing except the things that one do in the simulator (handled somewhere else).
 	   }
    }
 }

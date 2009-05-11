@@ -211,6 +211,13 @@ public class TAPNTransitionEditor
       				"Error",
       				JOptionPane.INFORMATION_MESSAGE);
     		  return;
+    	  }else if ( (pnmlData.getPlaceByName(newName) != null) || (pnmlData.getTransitionByName(newName) != null) ){
+    		  System.err.println("Transitions cannot be called the same as an other Place or Transition.");
+    		  JOptionPane.showMessageDialog(CreateGui.getApp(),
+    				"Transitions cannot be called the same as an other Place or Transition.",
+      				"Error",
+      				JOptionPane.INFORMATION_MESSAGE);
+    		  return;
     	  }else {
     		  view.getUndoManager().addEdit(transition.setPNObjectName(newName));
     	  }
