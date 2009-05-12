@@ -242,94 +242,99 @@ implements ActionListener, Observer {
 		fileMenu.addSeparator();
 
 		// Example files menu
-//		try {
-//			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
-//			getResource("Example nets" + System.getProperty("file.separator"));
-//
-//			if (JarUtilities.isJarFile(examplesDirURL)){
-//
-//				JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
-//
-//				ArrayList <JarEntry> nets =
-//					JarUtilities.getJarEntries(jarFile, "Example nets");
-//
-//				Arrays.sort(nets.toArray(), new Comparator(){
-//					public int compare(Object one, Object two) {
-//						return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
-//					}
-//				});
-//
-//				if (nets.size() > 0) {
-//					JMenu exampleMenu=new JMenu("Example nets");
-//					exampleMenu.setIcon(
-//							new ImageIcon(Thread.currentThread().getContextClassLoader().
-//									getResource(CreateGui.imgPath + "Example.png")));
-//					int index = 0;
-//					for (int i = 0; i < nets.size(); i++){
-//						if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
-//							addMenuItem(exampleMenu,
-//									new ExampleFileAction(nets.get(i),
-//											(index < 10) ?("ctrl " + index) :null));
-//							index++;
-//						}
-//					}
-//					fileMenu.add(exampleMenu);
-//					fileMenu.addSeparator();
-//				}
-//			} else {
-//				File examplesDir = new File(examplesDirURL.toURI());
-//				/**
-//				 * The next block fixes a problem that surfaced on Mac OSX with
-//				 * PIPE 2.4. In that environment (and not in Windows) any blanks
-//				 * in the project name in Eclipse are property converted to '%20'
-//				 * but the blank in "Example nets" is not. The following code
-//				 * will do nothing on a Windows machine or if the logic on OSX
-//				 * changess. I also added a stack trace so if the problem
-//				 * occurs for another environment (perhaps multiple blanks need
-//				 * to be manually changed) it can be easily fixed.  DP
-//				 */
-//				// examplesDir = new File(new URI(examplesDirURL.toString()));
-//				String dirURLString = examplesDirURL.toString();
-//				int index = dirURLString.indexOf( " " );
-//				if ( index > 0 ) {
-//					StringBuffer sb = new StringBuffer( dirURLString );
-//					sb.replace( index, index + 1, "%20" );
-//					dirURLString = sb.toString();
-//				}
-//
-//				examplesDir = new File( new URI(dirURLString ) );
-//
-//				File[] nets = examplesDir.listFiles();
-//
-//				Arrays.sort(nets,new Comparator(){
-//					public int compare(Object one, Object two) {
-//						return ((File)one).getName().compareTo(((File)two).getName());
-//					}
-//				});
-//
-//				// Oliver Haggarty - fixed code here so that if folder contains non
-//				// .xml file the Example x counter is not incremented when that file
-//				// is ignored
-//				/*if (nets.length > 0) {
-//					JMenu exampleMenu=new JMenu("Example nets");
-//					exampleMenu.setIcon(
-//							new ImageIcon(Thread.currentThread().getContextClassLoader().
-//									getResource(CreateGui.imgPath + "Example.png")));
-//					int k = 0;
-//					for (int i = 0; i < nets.length; i++){
-//						if(nets[i].getName().toLower().endsWith(".xml")){
-//							addMenuItem(exampleMenu,
-//									new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
-//						}
-//					}
-//					fileMenu.add(exampleMenu);
-//					fileMenu.addSeparator();
-//				}*/
-//			}
-//		} catch (Exception e) {
-//			System.err.println("Error getting example files:" + e);
-//			e.printStackTrace();
-//		}
+		try {
+			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
+			getResource("Example nets" + System.getProperty("file.separator"));
+
+			if (JarUtilities.isJarFile(examplesDirURL)){
+
+				JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
+
+				ArrayList <JarEntry> nets =
+					JarUtilities.getJarEntries(jarFile, "Example nets");
+
+				Arrays.sort(nets.toArray(), new Comparator(){
+					public int compare(Object one, Object two) {
+						return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
+					}
+				});
+
+				if (nets.size() > 0) {
+					JMenu exampleMenu=new JMenu("Example nets");
+					exampleMenu.setIcon(
+							new ImageIcon(Thread.currentThread().getContextClassLoader().
+									getResource(CreateGui.imgPath + "Example.png")));
+					int index = 0;
+					for (int i = 0; i < nets.size(); i++){
+						if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
+							addMenuItem(exampleMenu,
+									new ExampleFileAction(nets.get(i),
+											(index < 10) ?("ctrl " + index) :null));
+							index++;
+						}
+					}
+					fileMenu.add(exampleMenu);
+					fileMenu.addSeparator();
+				}
+			} else {
+				File examplesDir = new File(examplesDirURL.toURI());
+				/**
+				 * The next block fixes a problem that surfaced on Mac OSX with
+				 * PIPE 2.4. In that environment (and not in Windows) any blanks
+				 * in the project name in Eclipse are property converted to '%20'
+				 * but the blank in "Example nets" is not. The following code
+				 * will do nothing on a Windows machine or if the logic on OSX
+				 * changess. I also added a stack trace so if the problem
+				 * occurs for another environment (perhaps multiple blanks need
+				 * to be manually changed) it can be easily fixed.  DP
+				 */
+				// examplesDir = new File(new URI(examplesDirURL.toString()));
+				String dirURLString = examplesDirURL.toString();
+				int index = dirURLString.indexOf( " " );
+				if ( index > 0 ) {
+					StringBuffer sb = new StringBuffer( dirURLString );
+					sb.replace( index, index + 1, "%20" );
+					dirURLString = sb.toString();
+				}
+
+				examplesDir = new File( new URI(dirURLString ) );
+
+				File[] nets = examplesDir.listFiles();
+
+				Arrays.sort(nets,new Comparator(){
+					public int compare(Object one, Object two) {
+						
+						int toReturn=((File)one).getName().compareTo(((File)two).getName());
+						//Special hack to get intro-example first
+						if (((File)one).getName().equals("intro-example.xml")){toReturn=-1;}
+						if (((File)two).getName().equals("intro-example.xml")){toReturn=1;}
+						return toReturn;
+					}
+				});
+
+				// Oliver Haggarty - fixed code here so that if folder contains non
+				// .xml file the Example x counter is not incremented when that file
+				// is ignored
+				if (nets.length > 0) {
+					JMenu exampleMenu=new JMenu("Example nets");
+					exampleMenu.setIcon(
+							new ImageIcon(Thread.currentThread().getContextClassLoader().
+									getResource(CreateGui.imgPath + "Example.png")));
+					int k = 0;
+					for (int i = 0; i < nets.length; i++){
+						if(nets[i].getName().toLowerCase().endsWith(".xml")){
+							addMenuItem(exampleMenu,
+									new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
+						}
+					}
+					fileMenu.add(exampleMenu);
+					fileMenu.addSeparator();
+				}
+			}
+		} catch (Exception e) {
+			System.err.println("Error getting example files:" + e);
+			e.printStackTrace();
+		}
 		addMenuItem(fileMenu, exitAction =
 			new FileAction("Exit", "Close the program", "ctrl Q"));
 
@@ -1388,7 +1393,7 @@ EOC */
 
 
 		ExampleFileAction(File file, String keyStroke) {
-			super(file.getName(), "Open example file \"" + file.getName() +
+			super(file.getName().replace(".xml", ""), "Open example file \"" + file.getName().replace(".xml", "") +
 					"\"", keyStroke);
 			filename = file;//.getAbsolutePath();
 			putValue(SMALL_ICON,

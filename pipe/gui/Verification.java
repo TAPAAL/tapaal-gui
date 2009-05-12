@@ -157,7 +157,7 @@ public class Verification {
 		
 		if (version < Pipe.verifytaMinRev){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"The specified version of the file verifyta is to old.\n\n" +
+					"The specified version of the file verifyta is too old.\n\n" +
 					"Get the latest development version of UPPAAL from \n" +
 					"www.uppaal.com.",
 					"Verification Error",
@@ -651,17 +651,21 @@ public class Verification {
 			
 			
 			
-			PetriNetObject.ignoreSelection(false);
-		CreateGui.getApp().repaint();
 
+			
 			//Select to display concreet trace
 			if ((inputQuery.contains("E<>") || inputQuery.contains("A[]")) && !untimedTrace){
 				
 			
-			
-			//Show the trace
+
+		    //Set to animation mode   
 			CreateGui.getApp().setAnimationMode(true);
+			CreateGui.getApp().setMode(Pipe.START);
+            PetriNetObject.ignoreSelection(true);
+			CreateGui.getView().getSelectionObject().clearSelection();
+			
 			CreateGui.getAnimator().resethistory();
+			
 			
 			try {
 				ArrayList<FiringAction> tmp2 = null;
@@ -681,6 +685,8 @@ public class Verification {
 					return;
 					
 				}
+				
+				CreateGui.getAnimator().resethistory();
 				
 				for (FiringAction f : tmp2){
 
@@ -729,11 +735,9 @@ public class Verification {
 							"in order to realize the suggested untimed trace in the model.",
 							"Verification Information",
 							JOptionPane.INFORMATION_MESSAGE);
-					//XXX - Srba
 					
-					PetriNetObject.ignoreSelection(false);
-					CreateGui.getApp().repaint();
-					CreateGui.getApp().setAnimationMode(true);
+					CreateGui.getAnimator().resethistory();
+					
 					CreateGui.addAbstractAnimationPane();
 					
 					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();

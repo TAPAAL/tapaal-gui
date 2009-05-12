@@ -4,8 +4,8 @@ import java.awt.MouseInfo;
 
 public class Pipe {
    
-   public static final String TOOL = "TAPAAL";
-   public static final String VERSION = "1.1";
+   public static final String TOOL = "TAPAAL DEV";
+   public static final String VERSION = "1.2";
    
    public static String getProgramName(){
 	   return "" + Pipe.TOOL + " " + Pipe.VERSION;
