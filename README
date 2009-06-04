@@ -1,0 +1,3 @@
+To get eclipse and bzr plugin to work we need to install xmloutput, 
+efter installing bzr and the bzr-eclipse pluing run:
+bzr branch lp:bzr-xmloutput $HOME/.bazaar/plugins/xmloutput
