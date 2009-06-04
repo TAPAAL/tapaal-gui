@@ -1,0 +1,10 @@
+tapaal (1.2.0.2) hardy; urgency=low
+
+  * Build fix.
+
+ -- Kenneth Yrke Joergensen (yrke) <mail@yrke.dk>  Wed, 03 Jun 2009 14:45:00 +0100
+tapaal (1.2.0.1) hardy; urgency=low
+
+  * Initial testing of PPA building.
+
+ -- Kenneth Yrke Joergensen (yrke) <mail@yrke.dk>  Wed, 03 Jun 2009 14:45:00 +0100

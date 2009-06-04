@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -cp /usr/lib/tapaal/ RunGui
