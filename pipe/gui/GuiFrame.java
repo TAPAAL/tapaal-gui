@@ -403,14 +403,14 @@ EOC */
 		addMenuItem(drawMenu, deleteTokenAction =
 			new TypeAction("Delete token", Pipe.DELTOKEN, "Delete a token",
 					"SUBTRACT",true));
-		drawMenu.addSeparator();
+		/*drawMenu.addSeparator();*/
 		/*		addMenuItem(drawMenu, rateAction =
 			new TypeAction("Rate Parameter", Pipe.RATE, "Rate Parameter",
 					"R",true));
 		 */					
-		addMenuItem(drawMenu, markingAction =
+		/*addMenuItem(drawMenu, markingAction =
 			new TypeAction("Marking Parameter", Pipe.MARKING, "Marking Parameter",
-					"M",true));
+					"M",true));*/
 
 		JMenu viewMenu = new JMenu("View");
 		viewMenu.setMnemonic('V');
@@ -667,7 +667,7 @@ EOC */
 		selectAction.setEnabled(status);
 		deleteTokenAction.setEnabled(status);
 //		rateAction.setEnabled(status);
-		markingAction.setEnabled(status);
+//		markingAction.setEnabled(status);
 
 		//      toggleGrid.setEnabled(status);
 
@@ -1179,7 +1179,7 @@ EOC */
 			rateAction.setSelected(mode == Pipe.RATE);
 
 		if (markingAction != null) 
-			markingAction.setSelected(mode == Pipe.MARKING);
+			//markingAction.setSelected(mode == Pipe.MARKING);
 
 		if (selectAction != null) 
 			selectAction.setSelected(mode == Pipe.SELECT);
@@ -1508,7 +1508,7 @@ EOC */
 	}
 			 */	
 			if (this != markingAction) {
-				markingAction.setSelected(false);
+				//markingAction.setSelected(false);
 			}
 			if (this != selectAction) {
 				selectAction.setSelected(false);
