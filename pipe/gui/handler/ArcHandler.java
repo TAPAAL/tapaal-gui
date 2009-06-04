@@ -146,7 +146,7 @@ public class ArcHandler
                menuItem = new JMenuItem(new EditWeightAction(contentPane, 
                                                           (Arc)myObject));
                menuItem.setText("Edit Weight");
-               popup.insert(menuItem, popupIndex++);
+               //popup.insert(menuItem, popupIndex++);
 //            }
             
 //            menuItem = new JMenuItem(
@@ -250,7 +250,7 @@ public class ArcHandler
 //            }
 //            return;
 //         }
-         
+      /*   
          if (((NormalArc)arc).hasInvisibleInverse()) {
             if (arc.getSource() instanceof Place){
                if (e.isShiftDown()) {
@@ -261,9 +261,9 @@ public class ArcHandler
                   arc = ((NormalArc)arc).getInverse();                  
                }
             }
-         }
+         }*/
       }      
-      
+      /*
       int oldWeight = arc.getWeight();
       int newWeight = oldWeight - e.getWheelRotation();
       if (newWeight < 1) {
@@ -273,7 +273,7 @@ public class ArcHandler
          CreateGui.getView().getUndoManager().addNewEdit(
                arc.setWeight(newWeight));
          arc.repaint();
-      }
+      }*/
    }
    
 
