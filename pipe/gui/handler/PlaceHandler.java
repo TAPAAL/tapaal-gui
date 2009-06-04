@@ -114,7 +114,7 @@ public class PlaceHandler
       
       UndoManager undoManager = CreateGui.getView().getUndoManager();
       if (e.isShiftDown()) {
-    	  if ((myObject instanceof TimedPlace)==false){
+    	 /* if ((myObject instanceof TimedPlace)==false){
     		  int oldCapacity = ((Place)myObject).getCapacity();
     		  int oldMarking = ((Place)myObject).getCurrentMarking();
 
@@ -131,7 +131,7 @@ public class PlaceHandler
     			  undoManager.addEdit(((Place)myObject).setCurrentMarking(newCapacity));
     		  }
     		  undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
-    	  }
+    	  }*/
       } else {
          int oldMarking = ((Place)myObject).getCurrentMarking();
          int newMarking = oldMarking - e.getWheelRotation();
