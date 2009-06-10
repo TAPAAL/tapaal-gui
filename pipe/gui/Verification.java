@@ -77,7 +77,7 @@ public class Verification {
 					"TAPAAL needs to know the location of the file verifyta.\n\n"+
 					"Verifyta is a part of the UPPAAL distribution and it is\n" +
 					"normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n" +
-					"depending on your operating system.", 
+					"depending on the operating system used.", 
 					"Locate UPPAAL Verifyta",
 					JOptionPane.INFORMATION_MESSAGE);
 			
