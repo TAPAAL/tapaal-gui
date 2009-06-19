@@ -2268,7 +2268,7 @@ implements Cloneable {
 			if (! presetMarking.containsKey(a.getSource()) )
 				throw new IllegalArgumentException("Incorrect Preset for transition argument!");
 		}
-		for (Arc a : (LinkedList<TimedArc>)transition.getPostset()){
+		for (Arc a : (LinkedList<Arc>)transition.getPostset()){
 			if (! postsetMarking.containsKey(a.getTarget()) )
 				throw new IllegalArgumentException("Incorrect Postset for transition argument!");
 		}
@@ -2284,7 +2284,7 @@ implements Cloneable {
 			// But the dont... So we will just use this function for now instead
 			place.setTokensAndAgeOfTokens(presetMarking.get(place));
 		}
-		for (Arc a : (LinkedList<TimedArc>)transition.getPostset()){
+		for (Arc a : (LinkedList<Arc>)transition.getPostset()){
 			TimedPlace place = (TimedPlace)a.getTarget();
 			//place.setCurrentMarking( ((ArrayList<Float>)postsetMarking.get(place)).size() );
 			//place.setAgeOfTokens(postsetMarking.get(place));
