@@ -6,6 +6,9 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.petrinet.TAPNPlace;
+import dk.aau.cs.petrinet.TAPNTransition;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
@@ -158,6 +161,8 @@ public class PlaceTransitionObjectHandler
    public void mouseReleased(MouseEvent e) {
       boolean isNewArc = true; // true if we have to add a new arc to the Petri Net
       boolean fastMode = false;
+      
+      
       
       GuiView view = CreateGui.getView();
       DataLayer model = CreateGui.getModel();
@@ -374,6 +379,10 @@ public class PlaceTransitionObjectHandler
         	 Arc transportArcToCreate = view.createArc;
         	 if (transportArcToCreate != null){
         		 if (currentObject != transportArcToCreate.getSource()) {
+        			 //Remove the reference to createArc to avoid racecondision with gui  
+        			 view.createArc = null;
+        			 
+        			 
         			 transportArcToCreate.setSelectable(true);
 
         			 // This is the first step
@@ -384,6 +393,12 @@ public class PlaceTransitionObjectHandler
     					 PlaceTransitionObject target = transportArcToCreate.getTarget();
     					 boolean existsArc = false;
     					 
+    					 //Check if arc has leagal target
+    					 if (!(target instanceof Transition && target!=null)){
+    						 System.err.println("Error creating transport arc, invalid target");
+    						 transportArcToCreate.delete();
+    						 break;
+    					 }
     					 
     					 for (Object o : source.getPostset()){
     						 
@@ -454,6 +469,14 @@ public class PlaceTransitionObjectHandler
         					 break;
         				 }
 
+        				 		 //Check if arc has leagal target
+    					 if (!(transportArcToCreate.getTarget() instanceof TimedPlace && transportArcToCreate.getTarget() !=null)){
+    						 System.err.println("Error creating transport arc, invalid target");
+    						 transportArcToCreate.delete();
+    						 view.transportArcPart1.delete();
+    						 break;
+    					 }
+        				 
         				 currentObject.addConnectTo(transportArcToCreate);
 
         				 // Evil hack to prevent the arc being added to GuiView twice
@@ -494,14 +517,17 @@ public class PlaceTransitionObjectHandler
          case Pipe.FAST_TAPNTRANSITION:
          case Pipe.TAPNARC:
         	 
-        	 Arc timedArcToCreate = view.createArc;
-
+	         Arc timedArcToCreate = view.createArc;
+	    
         	 if (timedArcToCreate != null){
         		 if (currentObject != timedArcToCreate.getSource()) {
+        			 //Remove the reference to createArc to avoid racecondision with gui  
+        			 view.createArc = null;
+        			 
         			 timedArcToCreate.setSelectable(true);
         			 //we create NormalArcs when source of arc is Transition ...except if the arc is a TransportArc
-        			 if (timedArcToCreate.getSource() instanceof Transition){
-
+//        			 if (timedArcToCreate.getSource() instanceof Transition){
+        			 if (!(timedArcToCreate instanceof TimedArc)){
         				 boolean toDrawNewArc = true;
         				 Iterator arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
         				 Arc someArc = null;
@@ -539,7 +565,6 @@ public class PlaceTransitionObjectHandler
         					 someArc.getTransition().removeArcCompareObject(timedArcToCreate);
         					 someArc.getTransition().updateConnected();
         				 }else {
-
         					
 
         					 currentObject.addConnectTo(timedArcToCreate);
@@ -560,11 +585,21 @@ public class PlaceTransitionObjectHandler
 
         				 //else source is a place (not transition)
         			 } else{
-
-        				 
+     				 
         				 //Dont allow more than one arc from place to transition
     					 PlaceTransitionObject source = timedArcToCreate.getSource();
     					 PlaceTransitionObject target = timedArcToCreate.getTarget();
+    					 
+    					 // XXX  -- kyrke hack to precent some race condisions in pipe gui   					 
+    					 if ((timedArcToCreate.getTarget()) == null || (!(timedArcToCreate.getTransition() instanceof Transition))) {
+    						 timedArcToCreate.delete();
+    						 timedArcToCreate.removeKeyListener(keyHandler);
+    	        			 keyHandler = null;
+    	        			 
+    	        			 view.createArc = null;
+    	        			 break;
+    					 }
+    					 
     					 boolean existsArc = false;
     					 
     					 
@@ -576,7 +611,6 @@ public class PlaceTransitionObjectHandler
     							 existsArc = true;
     						 }
     						 
-    						 
     					 }
     					 
     					 if (existsArc){
@@ -587,7 +621,7 @@ public class PlaceTransitionObjectHandler
         				 
         				 currentObject.addConnectTo(timedArcToCreate);
         				 timedArcToCreate.getTransition().updateConnected();
-
+        				 
         				 // Evil hack to prevent the arc being added to GuiView twice        				 
         				 contentPane.remove(timedArcToCreate);
         				 model.addArc((NormalArc)timedArcToCreate);
@@ -599,7 +633,7 @@ public class PlaceTransitionObjectHandler
         				 }
         				 undoManager.addEdit(
         						 new AddPetriNetObjectEdit(timedArcToCreate, view, model));
-
+ 
         			 }
         			 //arc is drawn, remove handler:
         			 timedArcToCreate.removeKeyListener(keyHandler);
@@ -635,6 +669,7 @@ public class PlaceTransitionObjectHandler
              		}
              	}
              }
+        	 break;
         	 /*EOC*/
          default:
         	 break;

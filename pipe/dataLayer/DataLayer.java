@@ -461,6 +461,13 @@ implements Cloneable {
 	public void addArc(NormalArc arcInput) {
 		boolean unique = true;
 
+		//Check if the arcs have a valid source and target
+		if (arcInput.getSource() == null || arcInput.getTarget() == null){
+			System.err.println(("Cant add arc" + arcInput + " where source: " + 
+					arcInput.getSource() + " or target: " + arcInput.getTarget() + " is null"));
+			return;
+		}
+		
 		if (arcInput != null) {
 			if (arcInput.getId() != null && arcInput.getId().length() > 0) {
 				for (int i = 0 ; i < arcsArray.size() ; i++) {
