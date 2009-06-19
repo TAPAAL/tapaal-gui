@@ -46,10 +46,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxUI.KeyHandler;
 import javax.swing.text.JTextComponent.KeyBinding;
 
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
-import com.sun.org.apache.xml.internal.security.keys.content.KeyName;
-import com.sun.org.apache.xml.internal.security.keys.content.KeyValue;
-
 import dk.aau.cs.petrinet.TAPN;
 
 import pipe.dataLayer.DataLayer;

@@ -11,7 +11,6 @@ import java.util.List;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import sun.security.util.PendingException;
 
 /**
  * <b>PlaceTransitionObject</b> - Petri-Net PLace or Transition SuperClass<b> - <i>Abstract</i></b>

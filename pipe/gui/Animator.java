@@ -18,8 +18,6 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DiscreetFiringAction;
@@ -227,8 +225,6 @@ public class Animator {
 	 public void stepBack(){
 
 		 if ( ! actionHistory.isEmpty() ){
-			 
-			 
 			 
 			 if (actionHistory.get(currentAction) instanceof DiscreetFiringAction){
 				 TAPNTransition transition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast

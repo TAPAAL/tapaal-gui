@@ -28,7 +28,6 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 // but we need to move this to a now save file when pipe gets modes
 // for different types of PN
 
-import com.sun.org.apache.bcel.internal.classfile.Attribute;
 
 /**
  * Create DataLayerWriter object

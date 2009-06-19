@@ -46,8 +46,6 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
-
 import dk.aau.cs.petrinet.Place;
 
 import jpowergraph.PIPEInitialState;

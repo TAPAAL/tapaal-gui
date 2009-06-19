@@ -20,8 +20,6 @@ import java.util.regex.Pattern;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.io.NewTransitionRecord;
 
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
-
 import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.degree2minimal;

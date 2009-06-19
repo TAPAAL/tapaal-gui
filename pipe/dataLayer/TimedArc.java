@@ -17,8 +17,6 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
 import pipe.gui.widgets.PlaceEditorPanel;
 
-import com.sun.org.apache.xerces.internal.impl.dv.ValidatedInfo;
-
 public class TimedArc extends NormalArc{
 
 	protected String timeInterval; 

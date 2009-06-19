@@ -29,8 +29,6 @@ import javax.swing.event.ChangeListener;
 
 import jpowergraph.PIPEInitialState;
 
-import com.sun.xml.internal.ws.api.server.Container;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.Place;

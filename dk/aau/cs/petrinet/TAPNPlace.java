@@ -1,6 +1,5 @@
 package dk.aau.cs.petrinet;
 
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
