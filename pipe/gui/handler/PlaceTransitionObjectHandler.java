@@ -477,6 +477,28 @@ public class PlaceTransitionObjectHandler
     						 break;
     					 }
         				 
+    					 //Check that there is not an other normal arc
+    					 boolean existsArc=false;
+    					  for (Object o : transportArcToCreate.getSource().getPostset()){
+    						 
+    						 Arc a = (Arc)o; // XXX - usafe case
+    						 if (a.getTarget() == transportArcToCreate.getTarget() && a != transportArcToCreate){
+    							 //Arc already exists, bah
+    							 existsArc = true;
+    						 }
+    						 
+    						 
+    					 }
+    					 
+    					 if (existsArc){
+    						 System.out.println("We dont allow more than one arc from place to transition or transition to place!");
+    						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+    									"We dont allow more than one arc from place to transition or transition to place!",
+    									"Error",
+    									JOptionPane.ERROR_MESSAGE);
+    						 transportArcToCreate.delete();
+    						 break;
+    					 }
         				 currentObject.addConnectTo(transportArcToCreate);
 
         				 // Evil hack to prevent the arc being added to GuiView twice
