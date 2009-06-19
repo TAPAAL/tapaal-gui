@@ -770,15 +770,10 @@ EOC */
 				"TAPAAL \n\n" +
 				"Joakim Byg,  Kenneth Yrke Joergensen and Jiri Srba \n" +
 				"Aalborg University 2009 \n\n" +
-				"Read more at: www.tapaal.net \n\n"+ 
+				"Read more at: www.tapaal.net \n\n"+
+				"Using verifyta version:  "+ Verification.getVerifytaVersion() +"\n" +
+				"                     Located: "+Verification.verifytapath +"  \n\n" + 
 				"Based on PIPE2:\n"+
-				"Imperial College DoC MSc Group And MSc Individual Project\n\n" +
-				"Original version PIPE(c)\n2003 by Jamie Bloom, Clare Clark, Camilla Clifford, Alex Duncan, Haroun Khan and Manos Papantoniou\n\n" +
-				"MLS(tm) Edition PIPE2(c)\n2004 by Tom Barnwell, Michael Camacho, Matthew Cook, Maxim Gready, Peter Kyme and Michail Tsouchlaris\n" +
-				"2005 by Nadeem Akharware\n\n" +
-				"PIPE 2.4 by Tim Kimber, Ben Kirby, Thomas Master, " +
-				"Matthew Worthington\n\n" +
-				"PIPE 2.5 by Pere Bonet (Universitat de les Illes Balears)\n\n" +              
 				"http://pipe2.sourceforge.net/",
 				"About TAPAAL",
 				JOptionPane.INFORMATION_MESSAGE);

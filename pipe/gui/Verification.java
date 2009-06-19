@@ -60,7 +60,7 @@ import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 
 
 public class Verification {
-	private static String verifytapath="";
+	static String verifytapath="";
 
 	public static boolean setupVerifyta(){
 		String verifyta = System.getenv("verifyta");
@@ -105,7 +105,49 @@ public class Verification {
 		return true;
 		
 	}
-	
+	//Check if verifyta is present and if it is the right version
+	public static String getVerifytaVersion(){
+		
+		if (verifytapath == ""){
+			return "None";
+		}
+		
+		String[] commands;
+
+		commands = new String[]{verifytapath, "-v"};
+
+		Process child=null;
+		
+		try {
+			child = Runtime.getRuntime().exec(commands);
+			child.waitFor();
+		} catch (IOException e) {
+			return "Error";
+		} catch (InterruptedException e) {
+			return "Error";
+		}
+		
+		BufferedReader bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));
+		
+		String versioninfo = null;
+		try {
+			versioninfo = bufferedReaderStdout.readLine();
+		} catch (IOException e) {
+			return "Error";
+		}
+		
+		String[] stringarray = null;
+		stringarray = versioninfo.split("\\(rev\\.");
+		String versiontmp = stringarray[1];
+		
+		stringarray = versiontmp.split("\\)");
+		
+		versiontmp = stringarray[0];
+		
+		int version = Integer.parseInt(versiontmp.trim());
+		
+		return ""+version;
+	}
 	//Check if verifyta is present and if it is the right version
 	public static boolean checkVerifyta(){
 		
