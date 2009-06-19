@@ -3583,9 +3583,12 @@ implements Cloneable {
 					((TimedPlace)p).getTokens().set(i, tokensAge.add(timeToPass));	   
 				}
 
+				setChanged();
+				notifyObservers(p);
 			}
 		}
-
+		
+		
 		setEnabledTransitions();
 		setMatrixChanged();
 	}
