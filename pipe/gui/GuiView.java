@@ -878,9 +878,8 @@ EOC*/
                 		   getUndoManager().addNewEdit(
                            	        new AddPetriNetObjectEdit(createPTO, view, model));
                 		   
-                		   
+                		  //XXX - Race condistion!!!! 
                            pnObject.getMouseListeners()[0].mouseReleased(e);
-                           
                            pnObject.getMouseListeners()[0].mousePressed(e);
                                                       
                            // kyrke search point
@@ -903,6 +902,8 @@ EOC*/
 
             			   app.setMode(Pipe.TRANSPORTARC);
             			   
+            			   //Continue drawing transport arcs
+            			   pnObject.getMouseListeners()[0].mousePressed(e);
 
             		   }
             		   break;

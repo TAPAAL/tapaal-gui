@@ -528,6 +528,7 @@ public class PlaceTransitionObjectHandler
         					 ((TransportArc)transportArcToCreate).setConnectedTo(view.transportArcPart1);
         					 view.transportArcPart1 = null;
 
+        					 
         			 }
 
         		 }
