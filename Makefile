@@ -8,7 +8,7 @@ VERSION_NUMBER := 1.0
 DESTDIR=/
 BUILDIR=$(CURDIR)/debian/tapaal
 PROJECT=TAPAAL
-VERSION=1.2.0.2
+VERSION=1.2.0.3
 DEPEND=jpowergraph-0.2-common.jar:jpowergraph-0.2-swing.jar:/usr/lib/jvm/java-6-sun/lib
 
 

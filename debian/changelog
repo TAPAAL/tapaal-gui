@@ -1,3 +1,8 @@
+tapaal (1.2.0.3) hardy; urgency=low
+
+  * Fixses a number of open bugs, se bug tracker on launchpad for detailes
+
+ -- Kenneth Yrke Joergensen (yrke) <mail@yrke.dk>  Wed, 19 Jun 2009 15:40:00 +0100
 tapaal (1.2.0.2) hardy; urgency=low
 
   * Build fix.
