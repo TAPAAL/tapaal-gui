@@ -445,13 +445,19 @@ EOC */
       
       addMenuItem(animateMenu, timeAction = new AnimateAction("Time", Pipe.TIMEPASS, "Let time pass", "_"));
       
-      addMenuItem(animateMenu, randomAction =
+      /*addMenuItem(animateMenu, randomAction =
               new AnimateAction("Random", Pipe.RANDOM,
               "Randomly fire a transition", "typed 5"));
       addMenuItem(animateMenu, randomAnimateAction =
               new AnimateAction("Simulate", Pipe.ANIMATE,
-              "Randomly fire a number of transitions", "typed 7",true));      
-      
+              "Randomly fire a number of transitions", "typed 7",true));*/
+      randomAction =
+    	  new AnimateAction("Random", Pipe.RANDOM,
+    			  "Randomly fire a transition", "typed 5");
+      randomAnimateAction =
+    	  new AnimateAction("Simulate", Pipe.ANIMATE,
+    			  "Randomly fire a number of transitions", "typed 7",true);      
+
       // XXX - kyrke - by some reason the animation actions started to be enabled when 
       //starting TAPAAL, so for now de just disable them here :s
       stepbackwardAction.setEnabled(false);

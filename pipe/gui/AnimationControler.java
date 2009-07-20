@@ -202,8 +202,9 @@ public class AnimationControler extends JPanel {
 
 		//addButton(animationToolBar, timeAction);
 
-		addButton(animationToolBar, randomAction);
-		addButton(animationToolBar, randomAnimateAction);
+		// kyrke - removed random firing until it works  
+		//addButton(animationToolBar, randomAction);
+		//addButton(animationToolBar, randomAnimateAction);
 
 
 		animationToolBar.setVisible(true);
