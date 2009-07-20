@@ -35,7 +35,7 @@
             <xsl:sort select="@id" data-type="text"/>
          </xsl:apply-templates>
          <xsl:apply-templates select="net/queries">
-            <xsl:sort select="@name" data-type="text"/>
+            <!-- <xsl:sort select="@name" data-type="text"/> -->
          </xsl:apply-templates>
       </xsl:element>
    </xsl:template>
