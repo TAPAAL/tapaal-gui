@@ -8,7 +8,7 @@ VERSION_NUMBER := 1.0
 DESTDIR=/
 BUILDIR=$(CURDIR)/debian/tapaal
 PROJECT=TAPAAL
-VERSION=1.2.0.3
+VERSION=1.2.0.7
 DEPEND=jpowergraph-0.2-common.jar:jpowergraph-0.2-swing.jar:/usr/lib/jvm/java-6-sun/lib
 
 
@@ -263,7 +263,7 @@ builddeb:
 	DESTDIR=$(BUILDIR) dpkg-buildpackage -rfakeroot
 
 buildsrc:
-	tar czf tapaal_$(VERSION).orig.tar.gz debian Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/ classes/ xslt/
+	tar czf tapaal_$(VERSION).orig.tar.gz debian Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/ classes/ xslt/ RunGui.java
 	mkdir build
 	tar -C build -xzf tapaal_$(VERSION).orig.tar.gz
 	cd $(CURDIR)/build; debuild -S
