@@ -1,3 +1,8 @@
+tapaal (1.2.0.8) hardy; urgency=low
+
+  * Updated to prerelease version of TAPAAL
+ 
+ -- Kenneth Yrke Joergensen (yrke) <mail@yrke.dk>  Wed, 27 Jul 2009 23:53:00 +0100
 tapaal (1.2.0.7) hardy; urgency=low
 
   * Fixes problems with missing included file RunGui.java
