@@ -16,6 +16,9 @@ public class StatusBar
    public String textforPlace =
            "Place Mode: Right click on a Place to see menu options " +
            "[Mouse wheel -> marking; Shift + Mouse wheel -> capacity]";
+   public String textforTAPNPlace =
+       "Place Mode: Right click on a Place to see menu options " +
+       "[Mouse wheel -> marking]";
    public String textforTrans = 
            "Transition Mode: Right click on a Transition to see menu " +
            "options [Mouse wheel -> rotate]";
@@ -32,6 +35,9 @@ public class StatusBar
    public String textforArc =
            "Arc Mode: Right-Click on an Arc to see menu options " +
            "[Mouse wheel -> rotate]";
+   public String textforTransportArc =
+       "Transport Arc Mode: Right-Click on an Arc to see menu options " +
+       "[Mouse wheel -> rotate]";
    public String textforInhibArc =
            "Inhibitor Mode: Right-Click on an Arc to see menu options " +
            "[Mouse wheel -> rotate]";            
@@ -68,7 +74,9 @@ public class StatusBar
          case Pipe.PLACE:
             changeText(textforPlace);
             break;
-            
+         case Pipe.TAPNPLACE:
+        	 changeText(textforTAPNPlace);
+             break;  
          case Pipe.IMMTRANS:
             changeText(textforTrans);
             break;
@@ -76,11 +84,18 @@ public class StatusBar
          case Pipe.TIMEDTRANS:
             changeText(textforTimedTrans);
             break;
-            
+         case Pipe.TAPNTRANS:
+             changeText(textforTrans);
+             break;
          case Pipe.ARC:
             changeText(textforArc);
             break;
-            
+         case Pipe.TAPNARC:
+             changeText(textforArc);
+             break;
+         case Pipe.TRANSPORTARC:
+             changeText(textforTransportArc);
+             break;   
          case Pipe.INHIBARC:
             changeText(textforInhibArc);
             break;            
@@ -115,8 +130,7 @@ public class StatusBar
 
          case Pipe.RATE:
             changeText(textforRate);
-            break;            
-            
+            break;  
          default:
             changeText("To-do (textfor" + type);
             break;
