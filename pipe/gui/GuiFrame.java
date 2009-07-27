@@ -769,7 +769,7 @@ EOC */
 	public void actionPerformed(ActionEvent e){
 
 		JOptionPane.showMessageDialog(this,
-				"TAPAAL \n\n" +
+				Pipe.getProgramName() + "\n\n" +
 				"Joakim Byg,  Kenneth Yrke Joergensen and Jiri Srba \n" +
 				"Aalborg University 2009 \n\n" +
 				"Read more at: www.tapaal.net \n\n"+
