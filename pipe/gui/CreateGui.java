@@ -239,7 +239,9 @@ public class CreateGui {
 		   e.printStackTrace();
 	   }
 	   //abstractAnimationPane.setVerticalAlignment(SwingConstants.TOP);
-
+	   
+	   //Create a new empty animBox
+	   addAnimationHistory();
 	   
 	   JSplitPane pane2 = 
               new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,animBox,abstractAnimationPane);
