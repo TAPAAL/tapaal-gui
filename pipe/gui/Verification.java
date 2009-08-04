@@ -778,6 +778,13 @@ public class Verification {
 							"Verification Information",
 							JOptionPane.INFORMATION_MESSAGE);
 					
+					//Set to animation mode   
+					CreateGui.getApp().setAnimationMode(true);
+					CreateGui.getApp().setMode(Pipe.START);
+		            PetriNetObject.ignoreSelection(true);
+					CreateGui.getView().getSelectionObject().clearSelection();
+					
+			
 					CreateGui.getAnimator().resethistory();
 					
 					CreateGui.addAbstractAnimationPane();
