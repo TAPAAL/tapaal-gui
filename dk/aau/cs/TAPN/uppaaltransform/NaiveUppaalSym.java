@@ -160,7 +160,7 @@ public class NaiveUppaalSym implements UppaalTransformer {
 			tmp.append("<transition>\n");
 			tmp.append("<source ref=\"b"+ i +"\"/>\n");
 			tmp.append("<target ref=\"b"+ (i+1) +"\"/>\n");	
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">c"+i+"!</label>\n");
+			tmp.append("<label kind=\"synchronisation\">c"+i+"!</label>\n");
 			tmp.append("</transition>\n");
 			
 		}
@@ -216,7 +216,7 @@ public class NaiveUppaalSym implements UppaalTransformer {
 			tmp.append("<name x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">"+ p.getName() +"</name>\n");
 
 			if (!((TAPNPlace)p).getInvariant().equals("<inf")){
-				tmp.append("<label kind=\"invariant\" x=\"-66\" y=\"263\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
+				tmp.append("<label kind=\"invariant\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
 			}
 
 
@@ -245,7 +245,7 @@ public class NaiveUppaalSym implements UppaalTransformer {
 					tmp.append("<transition>\n");
 					tmp.append("<source ref=\"b0\"/>\n");
 					tmp.append("<target ref=\"a"+ tokens.get(i).getID() +"\"/>\n");
-					tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">c"+ i +  "?</label>\n");
+					tmp.append("<label kind=\"synchronisation\">c"+ i +  "?</label>\n");
 					tmp.append("</transition>\n");
 				
 			}
@@ -288,9 +288,9 @@ public class NaiveUppaalSym implements UppaalTransformer {
 			tmp.append("<transition>\n");
 			tmp.append("<source ref=\"a"+ presetPlaceOne.getSource().getID() +"\"/>\n");
 			tmp.append("<target ref=\"a"+ postsetPlaceOne.getTarget().getID() +"\"/>\n");
-			tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\"></label>\n");				
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() +  "!</label>\n");
-			tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">x:=0</label>\n");
+			tmp.append("<label kind=\"guard\"></label>\n");				
+			tmp.append("<label kind=\"synchronisation\">"+ t.getName() +  "!</label>\n");
+			tmp.append("<label kind=\"assignment\">x:=0</label>\n");
 			tmp.append("</transition>\n");
 
 			//The second arc
@@ -327,18 +327,18 @@ public class NaiveUppaalSym implements UppaalTransformer {
 			if (presetPlaceTwo instanceof TAPNTransportArc){
 				tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");	
 
-				tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
+				tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
 
-				tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() + "?</label>\n");
-				tmp.append("<label kind=\"assignment\" x=\"64\" y=\"160\"></label>\n"); // No reset of clock
+				tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
+				tmp.append("<label kind=\"assignment\"></label>\n"); // No reset of clock
 			}else {
 
 				tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");
-				tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
-				tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() + "?</label>\n");
+				tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
+				tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
 
 				
-				tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">x:=0</label>\n");
+				tmp.append("<label kind=\"assignment\">x:=0</label>\n");
 				
 
 			}

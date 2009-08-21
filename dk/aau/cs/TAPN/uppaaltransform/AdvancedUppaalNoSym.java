@@ -185,7 +185,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 			tmp.append("<transition>\n");
 			tmp.append("<source ref=\"b"+ i +"\"/>\n");
 			tmp.append("<target ref=\"b"+ (i+1) +"\"/>\n");	
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">c"+i+"!</label>\n");
+			tmp.append("<label kind=\"synchronisation\">c"+i+"!</label>\n");
 			tmp.append("</transition>\n");
 			
 		}
@@ -206,7 +206,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 
 		//Name
 		if (lock){
-			tmp.append("<name x=\"5\" y=\"5\">Lock</name>\n");
+			tmp.append("<name  x=\"5\" y=\"5\">Lock</name>\n");
 		} else{
 			tmp.append("<name x=\"5\" y=\"5\">P</name>\n");	
 			tmp.append("<parameter>const pid_t pid</parameter>\n");
@@ -243,7 +243,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 				tmp.append("<name x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">"+ p.getName() +"</name>\n");
 
 				if (!((TAPNPlace)p).getInvariant().equals("<inf") && !lock){
-					tmp.append("<label kind=\"invariant\" x=\"-66\" y=\"263\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
+					tmp.append("<label kind=\"invariant\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
 				}
 
 				if (((TAPNPlace)p).isUrgent()) {
@@ -273,7 +273,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 					tmp.append("<transition>\n");
 					tmp.append("<source ref=\"b0\"/>\n");
 					tmp.append("<target ref=\"a"+ tokens.get(i).getID() +"\"/>\n");
-					tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">c"+ i +  "?</label>\n");
+					tmp.append("<label kind=\"synchronisation\">c"+ i +  "?</label>\n");
 					tmp.append("</transition>\n");
 				
 			}
@@ -357,18 +357,18 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 						tmp.append("<target ref=\"a"+ postsetPlaceOne.getTarget().getID() +"\"/>\n");
 						
 						if (presetPlaceOne.getSource().getName().equals("P_lock")){
-							tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">lock==0</label>\n");	
+							tmp.append("<label kind=\"guard\">lock==0</label>\n");	
 						} else{
-							tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\"></label>\n");
+							tmp.append("<label kind=\"guard\"></label>\n");
 						}
 										
-						tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() +  "!</label>\n");
+						tmp.append("<label kind=\"synchronisation\">"+ t.getName() +  "!</label>\n");
 						if (presetPlaceOne.getSource().getName().equals("P_lock")){
-							tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">lock=1</label>\n");
+							tmp.append("<label kind=\"assignment\">lock=1</label>\n");
 						}else if (postsetPlaceOne.getTarget().getName().equals("P_lock")){
-							tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">lock=0</label>\n");
+							tmp.append("<label kind=\"assignment\">lock=0</label>\n");
 						}   else {
-							tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\"></label>\n");	
+							tmp.append("<label kind=\"assignment\"></label>\n");	
 						}
 						tmp.append("</transition>\n");
 
@@ -406,17 +406,17 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 						if (presetPlaceTwo instanceof TAPNTransportArc){
 							tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");	
 
-							tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
+							tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
 
-							tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() + "?</label>\n");
-							tmp.append("<label kind=\"assignment\" x=\"64\" y=\"160\"></label>\n"); // No reset of clock
+							tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
+							tmp.append("<label kind=\"assignment\"></label>\n"); // No reset of clock
 						}else {
 
 							tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");
-							tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
-							tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() + "?</label>\n");
+							tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
+							tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
 
-							tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">x:=0</label>\n");
+							tmp.append("<label kind=\"assignment\">x:=0</label>\n");
 						
 
 
@@ -481,17 +481,17 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 		if (arc instanceof TAPNTransportArc){
 			tmp.append("<target ref=\"a"+ arc2.getTarget().getID() +"\"/>\n");	
 
-			tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
+			tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
 
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ name + syncchar + "</label>\n");
-			tmp.append("<label kind=\"assignment\" x=\"64\" y=\"160\"></label>\n"); // No reset of clock
+			tmp.append("<label kind=\"synchronisation\">"+ name + syncchar + "</label>\n");
+			tmp.append("<label kind=\"assignment\"></label>\n"); // No reset of clock
 		}else {
 
 			tmp.append("<target ref=\"a"+ arc2.getTarget().getID() +"\"/>\n");
-			tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ name + syncchar + "</label>\n");
+			tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
+			tmp.append("<label kind=\"synchronisation\">"+ name + syncchar + "</label>\n");
 
-			tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">x:=0</label>\n");
+			tmp.append("<label kind=\"assignment\">x:=0</label>\n");
 			
 
 
@@ -544,19 +544,19 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 
 
 		tmp.append("<target ref=\"a"+ arc2.getTarget().getID() +"\"/>\n");
-		tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\">"+ guard +"</label>\n");
+		tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
 
 		if (arc instanceof TAPNTransportArc){
 
-			//tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ name + syncchar + "</label>\n");
-			tmp.append("<label kind=\"assignment\" x=\"64\" y=\"160\"></label>\n"); // No reset of clock
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ name +"!</label>\n");
+			//tmp.append("<label kind=\"synchronisation\">"+ name + syncchar + "</label>\n");
+			tmp.append("<label kind=\"assignment\"></label>\n"); // No reset of clock
+			tmp.append("<label kind=\"synchronisation\">"+ name +"!</label>\n");
 		}else {
 
-			tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ name +"!</label>\n");
+			tmp.append("<label kind=\"synchronisation\">"+ name +"!</label>\n");
 
 			
-			tmp.append("<label kind=\"assignment\" x=\"10\" y=\"160\">x:=0</label>\n");
+			tmp.append("<label kind=\"assignment\">x:=0</label>\n");
 			
 
 
