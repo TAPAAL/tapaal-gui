@@ -168,24 +168,20 @@ public class Verification {
 		commands = new String[]{verifytapath, "-v"};
 
 		Process child=null;
-		
 		try {
+		
 			child = Runtime.getRuntime().exec(commands);
 			child.waitFor();
-		} catch (IOException e) {
-			return false;
-		} catch (InterruptedException e) {
-			return false;
-		}
+		
+		int version;
+		
+		//Try to see if this program is recognised as verifyta
 		
 		BufferedReader bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));
 		
 		String versioninfo = null;
-		try {
-			versioninfo = bufferedReaderStdout.readLine();
-		} catch (IOException e) {
-			return false;
-		}
+		
+		versioninfo = bufferedReaderStdout.readLine();
 		
 		String[] stringarray = null;
 		stringarray = versioninfo.split("\\(rev\\.");
@@ -195,18 +191,32 @@ public class Verification {
 		
 		versiontmp = stringarray[0];
 		
-		int version = Integer.parseInt(versiontmp.trim());
+		version = Integer.parseInt(versiontmp.trim());
 		
-		if (version < Pipe.verifytaMinRev){
+				if (version < Pipe.verifytaMinRev){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"The specified version of the file verifyta is too old.\n\n" +
 					"Get the latest development version of UPPAAL from \n" +
 					"www.uppaal.com.",
-					"Verification Error",
+					"Verifyta Error",
 					JOptionPane.ERROR_MESSAGE);
 			verifytapath="";
 			return false;
 		}
+				
+		} catch (Exception e) {
+		
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"This porgram can not be verifyed as beeing Verifyta.\n\n" +
+					"",
+					"Verifyta Error",
+					JOptionPane.ERROR_MESSAGE);
+			verifytapath="";
+			return false;
+		}
+		
+
+				
 		
 		return true;
 	}
