@@ -65,6 +65,172 @@ public class AdvancedUppaalSym implements UppaalTransformer {
 	public void transformToUppaal(TAPN model, PrintStream uppaalXML,
 			int numberOfEkstraTokens) {
 		
+		ArrayList<Place> tokens = getTokens(model, numberOfEkstraTokens);
+		
+		uppaalXML.println("<nta>");
+		
+		uppaalXML.println("<declaration>");
+		createGlobalDeclarations(model, uppaalXML, tokens.size());
+		uppaalXML.println("</declaration>");
+		
+		StringBuffer a;
+		
+		a = createTemplateControl(tokens);
+		uppaalXML.append(a);
+		
+		System.out.println("Finished Control token");
+		
+		a = createLockTemplate(model, tokens);
+		//a = createTemplateByModel(model,tokens, true);
+		uppaalXML.append(a);
+		
+		a = createTemplateByModel(model, tokens);
+		//a = createTemplateByModel(model,tokens, false);
+		uppaalXML.append(a);
+		
+		
+		//System
+		uppaalXML.println("<system>");
+		uppaalXML.append("system Control, Lock, P;");
+		uppaalXML.println("</system>");
+		
+		uppaalXML.println("</nta>");
+
+		
+	}
+
+	private StringBuffer createTemplateByModel(TAPN model,
+			ArrayList<Place> tokens) {
+		StringBuffer tmp = new StringBuffer();
+		
+		System.out.println("Creating stuff");
+		// Create the xml for the model
+		tmp.append("<template>\n");
+
+		tmp.append("<name x=\"5\" y=\"5\">P</name>\n");	
+		tmp.append("<parameter>const pid_t pid</parameter>\n");
+
+		tmp.append("<declaration>\n");
+		tmp.append("clock x; \n");
+		tmp.append("</declaration>\n");
+
+		tmp.append("<location id=\"b0\" x=\"10\" y=\"10\">\n");
+		tmp.append("<name x=\"10\" y=\"10\"></name>\n");
+		tmp.append("<committed/>");
+		tmp.append("</location>\n");
+
+		for (Place p : model.getPlaces()){
+
+			int xcord = 0, ycord = 0;
+
+			Location a=null;
+			if ((a = model.locations.get(p)) != null){
+				xcord= (int)(a.getX());
+				ycord=  (int)(a.getY());
+			}
+
+			if (!(p.getName().contains("_im") || p.getName().contains("P_lock"))){
+				tmp.append("<location id=\"a"+p.getID()+"\" x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">\n");
+				tmp.append("<name x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">"+ p.getName() +"</name>\n");
+
+				if (!((TAPNPlace)p).getInvariant().equals("<inf")){
+					tmp.append("<label kind=\"invariant\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
+				}
+
+				if (((TAPNPlace)p).isUrgent()) {
+					tmp.append("<urgent/>");
+				}
+		
+				tmp.append("</location>\n");
+			}
+		}
+
+		//Init 
+		tmp.append("<init ref=\"b0\"/>\n");
+
+		//transitions
+		
+		//Setup
+		
+		for (int i = 0; i < tokens.size(); i++){
+			tmp.append("<transition>\n");
+			tmp.append("<source ref=\"b0\"/>\n");
+			tmp.append("<target ref=\"a"+ tokens.get(i).getID() +"\"/>\n");
+			tmp.append("<label kind=\"synchronisation\">c"+ i +  "?</label>\n");
+			tmp.append("</transition>\n");	
+		}
+		
+		for (Transition t : model.getTransitions()){
+			createTemplateForTransition(t, tmp, false);
+		} 
+
+		tmp.append("</template>");
+
+		return tmp;
+	}
+
+	private StringBuffer createLockTemplate(TAPN model, ArrayList<Place> tokens) {
+		StringBuffer tmp = new StringBuffer();
+
+		System.out.println("Creating stuff");
+		// Create the xml for the model
+		tmp.append("<template>\n");
+		tmp.append("<name x=\"5\" y=\"5\">Lock</name>\n");
+		
+		for (Place p : model.getPlaces()){
+			int xcord = 0, ycord = 0;
+			Location a=null;
+
+			if ((a = model.locations.get(p)) != null){
+				xcord= (int)(a.getX());
+				ycord=  (int)(a.getY());
+			}
+
+			if (p.getName().contains("_im") || p.getName().contains("P_lock")){
+				tmp.append("<location id=\"a"+p.getID()+"\" x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">\n");
+				tmp.append("<name x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">"+ p.getName() +"</name>\n");
+
+
+				if (((TAPNPlace)p).isUrgent()) {
+					tmp.append("<urgent/>");
+				}
+				if (!p.getName().equals("P_lock")){
+					tmp.append("<committed/>");
+				}
+				
+				tmp.append("</location>\n");
+			}
+		}
+		tmp.append("<init ref=\"a"+model.getPlaceByName("P_lock").getID()+"\"/>\n");	
+
+		for (Transition t : model.getTransitions()){
+			createTemplateForTransition(t, tmp, true);
+		} 
+		
+		tmp.append("</template>");
+
+		return tmp;
+
+	}
+
+	protected void createGlobalDeclarations(TAPN model, PrintStream uppaalXML,
+			int tokens) {
+		uppaalXML.println("const int N = "+ tokens +";");
+		uppaalXML.println("typedef scalar[N] pid_t;");
+		
+		uppaalXML.println("bool lock = false;");
+		
+		for (Transition t : model.getTransitions()){	
+			uppaalXML.println("chan " + t.getName() + ";");
+		}
+		
+		for (int i = 0; i < tokens; i++){
+			//Create the control chans
+			uppaalXML.println("chan c" + i + ";");
+		}
+	}
+
+	private ArrayList<Place> getTokens(TAPN model, int numberOfEkstraTokens) {
 		ArrayList<Place> tokens = new ArrayList<Place>();
 		// Copy from the model
 
@@ -80,50 +246,7 @@ public class AdvancedUppaalSym implements UppaalTransformer {
 		for (int j=0; j < numberOfEkstraTokens;j++){
 			tokens.add(capacity);
 		}
-		
-		uppaalXML.println("<nta>");
-		
-		
-		uppaalXML.println("<declaration>");
-		
-		uppaalXML.println("const int N = "+ tokens.size() +";");
-		uppaalXML.println("typedef scalar[N] pid_t;");
-		
-		uppaalXML.println("bool lock = false;");
-		
-		for (Transition t : model.getTransitions()){	
-			uppaalXML.println("chan " + t.getName() + ";");
-		}
-		
-		for (int i = 0; i < tokens.size(); i++){
-			//Create the control chans
-			uppaalXML.println("chan c" + i + ";");
-		}
-		
-		uppaalXML.println("</declaration>");
-		
-		StringBuffer a;
-		
-		a = createTemplateControl(tokens);
-		uppaalXML.append(a);
-		
-		System.out.println("Finished Control token");
-		
-		a = createTemplateByModel(model,tokens, true);
-		uppaalXML.append(a);
-		
-		a = createTemplateByModel(model,tokens, false);
-		uppaalXML.append(a);
-		
-		
-		//System
-		uppaalXML.println("<system>");
-		uppaalXML.append("system Control, Lock, P;");
-		uppaalXML.println("</system>");
-		
-		uppaalXML.println("</nta>");
-
-		
+		return tokens;
 	}
 
 	public TAPN transform(TAPN model) {
@@ -193,243 +316,257 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 		
 	}
 	
-	private StringBuffer createTemplateByModel(TAPN model, ArrayList<Place> tokens, boolean lock) {
-		StringBuffer tmp = new StringBuffer();
+//	private StringBuffer createTemplateByModel(TAPN model, ArrayList<Place> tokens, boolean lock) {
+//		StringBuffer tmp = new StringBuffer();
+//
+//		System.out.println("Creating stuff");
+//		// Create the xml for the model
+//		tmp.append("<template>\n");
+//
+//		//Name
+//		if (lock){
+//			tmp.append("<name x=\"5\" y=\"5\">Lock</name>\n");
+//		} else{
+//			tmp.append("<name x=\"5\" y=\"5\">P</name>\n");	
+//			tmp.append("<parameter>const pid_t pid</parameter>\n");
+//		}
+//
+//		//Declaration
+//		if (!lock){
+//			tmp.append("<declaration>\n");
+//			tmp.append("clock x; \n");
+//			tmp.append("</declaration>\n");
+//		}
+//		
+//		//Locations
+//		if (!lock){
+//			tmp.append("<location id=\"b0\" x=\"10\" y=\"10\">\n");
+//			tmp.append("<name x=\"10\" y=\"10\"></name>\n");
+//			tmp.append("<committed/>");
+//			tmp.append("</location>\n");
+//		}
+//
+//
+//		for (Place p : model.getPlaces()){
+//
+//			int xcord = 0, ycord = 0;
+//
+//			Location a=null;
+//			if ((a = model.locations.get(p)) != null){
+//				xcord= (int)(a.getX());
+//				ycord=  (int)(a.getY());
+//			}
+//
+//			if ((lock && (p.getName().contains("_im") || p.getName().contains("P_lock")) || (!lock && !(p.getName().contains("_im") || p.getName().contains("P_lock"))))){
+//				tmp.append("<location id=\"a"+p.getID()+"\" x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">\n");
+//				tmp.append("<name x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">"+ p.getName() +"</name>\n");
+//
+//				if (!((TAPNPlace)p).getInvariant().equals("<inf") && !lock){
+//					tmp.append("<label kind=\"invariant\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
+//				}
+//
+//				if (((TAPNPlace)p).isUrgent()) {
+//					tmp.append("<urgent/>");
+//				}
+//				if (lock && !p.getName().equals("P_lock")){
+//					tmp.append("<committed/>");
+//				}
+//				tmp.append("</location>\n");
+//			}
+//		}
+//
+//		//Init 
+//		if (!lock){
+//			tmp.append("<init ref=\"b0\"/>\n");
+//		} else {
+//			tmp.append("<init ref=\"a"+model.getPlaceByName("P_lock").getID()+"\"/>\n");	
+//		}
+//
+//		//transitions
+//		
+//		//Setup
+//		
+//		if (!lock){
+//			
+//			for (int i = 0; i < tokens.size(); i++){
+//					tmp.append("<transition>\n");
+//					tmp.append("<source ref=\"b0\"/>\n");
+//					tmp.append("<target ref=\"a"+ tokens.get(i).getID() +"\"/>\n");
+//					tmp.append("<label kind=\"synchronisation\">c"+ i +  "?</label>\n");
+//					tmp.append("</transition>\n");
+//				
+//			}
+//		}
+//		
+//		for (Transition t : model.getTransitions()){
+//			createTemplateForTransition(t, tmp, lock);
+//		} 
+//
+//		tmp.append("</template>");
+//
+//		return tmp;
+//
+//	}
 
-		System.out.println("Creating stuff");
-		// Create the xml for the model
-		tmp.append("<template>\n");
-
-		//Name
-		if (lock){
-			tmp.append("<name x=\"5\" y=\"5\">Lock</name>\n");
-		} else{
-			tmp.append("<name x=\"5\" y=\"5\">P</name>\n");	
-			tmp.append("<parameter>const pid_t pid</parameter>\n");
+	protected void createTemplateForTransition(Transition t, StringBuffer tmp,
+			boolean lock) {
+		if (t.getPreset().size()==1 && t.getPostset().size()==1 && !lock){
+			System.out.println("The new way 1!! " +t);
+			tmp.append(createTransition(t.getPreset().get(0), t.getPostset().get(0), t.getName(),lock));
 		}
 
-		//Declaration
-		if (!lock){
-			tmp.append("<declaration>\n");
-			tmp.append("clock x; \n");
-			tmp.append("</declaration>\n");
-		}
-		
-		//Locations
-		if (!lock){
-			tmp.append("<location id=\"b0\" x=\"10\" y=\"10\">\n");
-			tmp.append("<name x=\"10\" y=\"10\"></name>\n");
-			tmp.append("<committed/>");
-			tmp.append("</location>\n");
-		}
-
-
-		for (Place p : model.getPlaces()){
-
-			int xcord = 0, ycord = 0;
-
-			Location a=null;
-			if ((a = model.locations.get(p)) != null){
-				xcord= (int)(a.getX());
-				ycord=  (int)(a.getY());
-			}
-
-			if ((lock && (p.getName().contains("_im") || p.getName().contains("P_lock")) || (!lock && !(p.getName().contains("_im") || p.getName().contains("P_lock"))))){
-				tmp.append("<location id=\"a"+p.getID()+"\" x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">\n");
-				tmp.append("<name x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">"+ p.getName() +"</name>\n");
-
-				if (!((TAPNPlace)p).getInvariant().equals("<inf") && !lock){
-					tmp.append("<label kind=\"invariant\"> x "+ ((TAPNPlace)p).getInvariant().replace("<", "&lt;")+ "</label>");
-				}
-
-				if (((TAPNPlace)p).isUrgent()) {
-					tmp.append("<urgent/>");
-				}
-				if (lock && !p.getName().equals("P_lock")){
-					tmp.append("<committed/>");
-				}
-				tmp.append("</location>\n");
-			}
-		}
-
-		//Init 
-		if (!lock){
-			tmp.append("<init ref=\"b0\"/>\n");
-		} else {
-			tmp.append("<init ref=\"a"+model.getPlaceByName("P_lock").getID()+"\"/>\n");	
-		}
-
-		//transitions
-		
-		//Setup
-		
-		if (!lock){
+		if (t.getPreset().size()>=2 || t.getPostset().size() >=2){
 			
-			for (int i = 0; i < tokens.size(); i++){
-					tmp.append("<transition>\n");
-					tmp.append("<source ref=\"b0\"/>\n");
-					tmp.append("<target ref=\"a"+ tokens.get(i).getID() +"\"/>\n");
-					tmp.append("<label kind=\"synchronisation\">c"+ i +  "?</label>\n");
-					tmp.append("</transition>\n");
-				
-			}
-		}
-		
-		for (Transition t : model.getTransitions()){
+			Arc presetPlaceOne = t.getPreset().get(0);
+			Arc presetPlaceTwo = t.getPreset().get(1);
+			
+			Arc postsetPlaceOne = t.getPostset().get(0);
+			Arc postsetPlaceTwo = t.getPostset().get(1);
 
 			
-			if (t.getPreset().size()==1 && t.getPostset().size()==1 && !lock){
-				System.out.println("The new way 1!! " +t);
-				tmp.append(createTransition(t.getPreset().get(0), t.getPostset().get(0), t.getName(),lock));
+			//Order the transportarcs to point to the right targets
+			if (presetPlaceOne instanceof TAPNTransportArc){ 
+				if (!(presetPlaceOne == postsetPlaceOne)){
+					Arc swap = postsetPlaceOne;
+					postsetPlaceOne = postsetPlaceTwo;
+					postsetPlaceTwo = swap;
+				}
 			}
-
-			if (t.getPreset().size()>=2 || t.getPostset().size() >=2){
-				
-				Arc presetPlaceOne = t.getPreset().get(0);
-				Arc presetPlaceTwo = t.getPreset().get(1);
-				
-				Arc postsetPlaceOne = t.getPostset().get(0);
-				Arc postsetPlaceTwo = t.getPostset().get(1);
-
-				
-				//Order the transportarcs to point to the right targets
-				if (presetPlaceOne instanceof TAPNTransportArc){ 
-					if (!(presetPlaceOne == postsetPlaceOne)){
-						Arc swap = postsetPlaceOne;
-						postsetPlaceOne = postsetPlaceTwo;
-						postsetPlaceTwo = swap;
-					}
-				}
-				if (presetPlaceTwo instanceof TAPNTransportArc){ 
-					if (!(presetPlaceTwo == postsetPlaceTwo)){
-						Arc swap = postsetPlaceTwo;
-						postsetPlaceTwo = postsetPlaceOne;
-						postsetPlaceOne = swap;
-						
-					}
-				}
-
-				
-//				We let presetPlaceOne and postsetPlaceTwo be the locking chanin.
-				if ( !((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ){
-					//Swap them
-
-					Arc swap = presetPlaceTwo;
-					presetPlaceTwo = presetPlaceOne;
-					presetPlaceOne = swap;
-				}
-
-				if (!((postsetPlaceOne.getTarget().getName().contains("_im")) || (postsetPlaceOne.getTarget().getName().equals("P_lock")))){
-					//Swap them
-
+			if (presetPlaceTwo instanceof TAPNTransportArc){ 
+				if (!(presetPlaceTwo == postsetPlaceTwo)){
 					Arc swap = postsetPlaceTwo;
 					postsetPlaceTwo = postsetPlaceOne;
 					postsetPlaceOne = swap;
-				}
-				System.out.println("" + presetPlaceTwo + postsetPlaceTwo);
-				
-				/*if ( !lock && (!((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ||
-						!((presetPlaceTwo.getSource().getName().contains("_im")) || (presetPlaceTwo.getSource().getName().equals("P_lock"))))){
-					*/
-				if ((!((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))))){
-					if (!lock){
-						System.out.println("The new way 2" + t);
-
-						//It the new way 
-						tmp.append(createTransition(presetPlaceOne, postsetPlaceOne, t.getName(), lock, '!'));
-						tmp.append(createTransition(presetPlaceTwo, postsetPlaceTwo, t.getName(), lock, '?'));
-					}	
-				} else {
-					//Its the old way
-
-					System.out.println("The old way!! " + t);
 					
-					
-
-					if (lock){
-						// Add first arc, we know this is in the chain. 
-						tmp.append("<transition>\n");
-						tmp.append("<source ref=\"a"+ presetPlaceOne.getSource().getID() +"\"/>\n");
-						tmp.append("<target ref=\"a"+ postsetPlaceOne.getTarget().getID() +"\"/>\n");
-						
-						if (presetPlaceOne.getSource().getName().equals("P_lock")){
-							tmp.append("<label kind=\"guard\">lock==0</label>\n");	
-						} else{
-							tmp.append("<label kind=\"guard\"></label>\n");
-						}
-										
-						tmp.append("<label kind=\"synchronisation\">"+ t.getName() +  "!</label>\n");
-						if (presetPlaceOne.getSource().getName().equals("P_lock")){
-							tmp.append("<label kind=\"assignment\">lock=1</label>\n");
-						}else if (postsetPlaceOne.getTarget().getName().equals("P_lock")){
-							tmp.append("<label kind=\"assignment\">lock=0</label>\n");
-						}   else {
-							tmp.append("<label kind=\"assignment\"></label>\n");	
-						}
-						tmp.append("</transition>\n");
-
-					} else {
-						//The second arc
-						String guard="";
-						String tmp2[] = ((TAPNArc)presetPlaceTwo).getGuard().split(",");
-
-						// XXX TODO what if there is no guard? kyrke
-
-						if (tmp2.length > 1){
-							if (!(tmp2[0].equals("[0"))) { // not [0
-								if (tmp2[0].charAt(0) == '('){
-									guard += "x &gt; " + tmp2[0].substring(1, tmp2[0].length());
-								} else {
-									guard += "x &gt;=" + tmp2[0].substring(1, tmp2[0].length());
-								}
-							}
-							if (!(tmp2[0].equals("[0")) && !(tmp2[1].equals("inf)"))){
-								guard += " &amp;&amp; ";
-							}
-							if (!(tmp2[1].equals("inf)"))) { // not inf
-								if (tmp2[1].charAt(tmp2[1].length()-1) == ')'){
-									guard += "x &lt;" + tmp2[1].substring(0, tmp2[1].length()-1);
-								} else {
-									guard += " x &lt;=" +  tmp2[1].substring(0, tmp2[1].length()-1);
-								}
-							}
-						}
-
-						
-						tmp.append("<transition>\n");
-						tmp.append("<source ref=\"a"+ presetPlaceTwo.getSource().getID() +"\"/>\n");
-
-						if (presetPlaceTwo instanceof TAPNTransportArc){
-							tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");	
-
-							tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
-
-							tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
-							tmp.append("<label kind=\"assignment\"></label>\n"); // No reset of clock
-						}else {
-
-							tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");
-							tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
-							tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
-
-							tmp.append("<label kind=\"assignment\">x:=0</label>\n");
-						
-
-
-						}
-						tmp.append("</transition>\n");
-					}
 				}
-
 			}
-		} 
 
-		tmp.append("</template>");
+			
+//				We let presetPlaceOne and postsetPlaceTwo be the locking chanin.
+			if ( !((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ){
+				//Swap them
 
-		return tmp;
+				Arc swap = presetPlaceTwo;
+				presetPlaceTwo = presetPlaceOne;
+				presetPlaceOne = swap;
+			}
 
+			if (!((postsetPlaceOne.getTarget().getName().contains("_im")) || (postsetPlaceOne.getTarget().getName().equals("P_lock")))){
+				//Swap them
+
+				Arc swap = postsetPlaceTwo;
+				postsetPlaceTwo = postsetPlaceOne;
+				postsetPlaceOne = swap;
+			}
+			System.out.println("" + presetPlaceTwo + postsetPlaceTwo);
+			
+			/*if ( !lock && (!((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ||
+					!((presetPlaceTwo.getSource().getName().contains("_im")) || (presetPlaceTwo.getSource().getName().equals("P_lock"))))){
+				*/
+			if ((!((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))))){
+				if (!lock){
+					System.out.println("The new way 2" + t);
+
+					//It the new way 
+					tmp.append(createTransition(presetPlaceOne, postsetPlaceOne, t.getName(), lock, '!'));
+					tmp.append(createTransition(presetPlaceTwo, postsetPlaceTwo, t.getName(), lock, '?'));
+				}	
+			} else {
+				//Its the old way
+
+				System.out.println("The old way!! " + t);
+				
+				
+
+				if (lock){
+					// Add first arc, we know this is in the chain. 
+					tmp.append("<transition>\n");
+					tmp.append("<source ref=\"a"+ presetPlaceOne.getSource().getID() +"\"/>\n");
+					tmp.append("<target ref=\"a"+ postsetPlaceOne.getTarget().getID() +"\"/>\n");
+					
+					if (presetPlaceOne.getSource().getName().equals("P_lock")){
+						tmp.append("<label kind=\"guard\">lock==0</label>\n");	
+					} else{
+						tmp.append("<label kind=\"guard\"></label>\n");
+					}
+									
+					tmp.append("<label kind=\"synchronisation\">"+ t.getName() +  "!</label>\n");
+					
+					
+					if (presetPlaceOne.getSource().getName().equals("P_lock")){
+						String assignments = getAssignments("lock=1", presetPlaceOne, postsetPlaceOne);
+						tmp.append("<label kind=\"assignment\">" + assignments + "</label>\n");
+						
+					}else if (postsetPlaceOne.getTarget().getName().equals("P_lock")){
+						String assignments = getAssignments("lock=0", presetPlaceOne, postsetPlaceOne);
+						tmp.append("<label kind=\"assignment\">" + assignments + "</label>\n");
+					}   else {
+						String assignments = getAssignments("", presetPlaceOne, postsetPlaceOne);
+						tmp.append("<label kind=\"assignment\">" + assignments + "</label>\n");
+					}
+					
+					
+					tmp.append("</transition>\n");
+
+				} else {
+					//The second arc
+					String guard="";
+					String tmp2[] = ((TAPNArc)presetPlaceTwo).getGuard().split(",");
+
+					// XXX TODO what if there is no guard? kyrke
+
+					if (tmp2.length > 1){
+						if (!(tmp2[0].equals("[0"))) { // not [0
+							if (tmp2[0].charAt(0) == '('){
+								guard += "x &gt; " + tmp2[0].substring(1, tmp2[0].length());
+							} else {
+								guard += "x &gt;=" + tmp2[0].substring(1, tmp2[0].length());
+							}
+						}
+						if (!(tmp2[0].equals("[0")) && !(tmp2[1].equals("inf)"))){
+							guard += " &amp;&amp; ";
+						}
+						if (!(tmp2[1].equals("inf)"))) { // not inf
+							if (tmp2[1].charAt(tmp2[1].length()-1) == ')'){
+								guard += "x &lt;" + tmp2[1].substring(0, tmp2[1].length()-1);
+							} else {
+								guard += " x &lt;=" +  tmp2[1].substring(0, tmp2[1].length()-1);
+							}
+						}
+					}
+
+					
+					tmp.append("<transition>\n");
+					tmp.append("<source ref=\"a"+ presetPlaceTwo.getSource().getID() +"\"/>\n");
+
+					if (presetPlaceTwo instanceof TAPNTransportArc){
+						tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");	
+
+						tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
+
+						tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
+						tmp.append("<label kind=\"assignment\"></label>\n"); // No reset of clock
+					}else {
+
+						tmp.append("<target ref=\"a"+ postsetPlaceTwo.getTarget().getID() +"\"/>\n");
+						tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
+						tmp.append("<label kind=\"synchronisation\">"+ t.getName() + "?</label>\n");
+
+						String assignments = getAssignments("x:=0", presetPlaceTwo, postsetPlaceTwo);
+						tmp.append("<label kind=\"assignment\">" + assignments + "</label>\n");
+					}
+					tmp.append("</transition>\n");
+				}
+			}
+
+		}
 	}
 
+	protected String getAssignments(String initialAssignment, Arc source, Arc destination)
+	{
+		return initialAssignment;
+	}
+	
 	private StringBuffer createTransition(Arc arc, Arc arc2, String name, boolean lock, char syncchar) {
 
 		StringBuffer tmp = new StringBuffer();

@@ -44,6 +44,7 @@ import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UppaalTrace;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
@@ -223,6 +224,7 @@ public class Verification {
 	
 	public static void analyseKBounded(DataLayer appModel, int k){
 		
+
 		setupVerifyta();
 		
 		if (!checkVerifyta()){
@@ -254,7 +256,7 @@ public class Verification {
 		}
 		
 		String inputQuery = "A[] P_capacity >= 1";
-		AdvancedUppaalSym te = new AdvancedUppaalSym();
+		AdvancedUppaalSym te = new AdvancedUppaalSymKBound();
 		try {
 			
 			try {
@@ -282,6 +284,11 @@ public class Verification {
 			
 			//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
 			stream.println("E<>((sum(i:pid_t) P(i).P_capacity)== 0) and (Control.finish == 1)");
+			
+			stream.println("/*");
+			stream.println(" boundedness query ");
+			stream.println("*/");
+			stream.println("sup: usedExtraTokens");
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -339,24 +346,29 @@ public class Verification {
 		String line=null;
 		
 	
-
+		boolean readingPropertyOneResult = false;
+		int extraTokensNeeded = 0;
 		try {
 			while ( (line = bufferedReaderStdout.readLine()) != null){
 		
-				if (line.contains("Property is satisfied")) {
+				if(line.contains("property 1"))
+					readingPropertyOneResult = true;
+				
+				if (readingPropertyOneResult && line.contains("Property is satisfied")) {
 					property = true;
-
-					//Print trace,
-					ArrayList<String> tmp=null;
-					
 					error=false;
-					//break;
-
-				}else if (line.contains("Property is NOT satisfied.")){
+					readingPropertyOneResult = false;
+				}else if (readingPropertyOneResult && line.contains("Property is NOT satisfied.")){
 					property=false;
 					error=false;
+					readingPropertyOneResult = false;
 				}
-
+				
+				if(!property && line.contains("usedExtraTokens"))
+				{
+					String number = line.substring(line.lastIndexOf(" ")+1, line.length());
+					extraTokensNeeded = Integer.parseInt(number);
+				}
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -374,9 +386,11 @@ public class Verification {
 		//	"The net is "+ k +" bounded.\n\n" + 
 			"The net with the specified extra number of tokens is bounded.\n\n" +
 			"This means that the analysis using the currently selected number\n" +
-			"of extra tokens will be exact and always give the correct answer.\n";
-		//	"be exact. In fact, the analysis will be exact even \n" +
-		//	"with k-1 number of extra tokens\n";
+			"of extra tokens will be exact and always give the correct answer.\n\n";
+		if(extraTokensNeeded == k)
+			answerNetIsBounded += extraTokensNeeded + " is the minimum number of extra tokens needed to make the analysis exact.\n";
+		else
+			answerNetIsBounded += "In fact, the analysis will be exact even with " + extraTokensNeeded + " extra tokens.\n";
 		
 		String answerNetIsNotBounded =
 		//	"The net is not "+ k +" bounded.\n\n" + 
@@ -386,7 +400,6 @@ public class Verification {
 			"of extra tokens provides only an underapproximation of the net behaviour.\n" +
 			"If you think that the net is bounded, try to add more extra tokens in order\n" +
 			"to achieve exact verification analysis.\n";
-		
 		
 		
 		//Display Answer
@@ -528,7 +541,6 @@ public class Verification {
 			}
 			
 		}
-
 
 		// Select the model based on selected export option.
 
@@ -683,6 +695,7 @@ public class Verification {
 			return;
 		}
 
+		
 	
 		//Display Answer
 		resultmessage = property ? "Property Satisfied.": "Property Not Satisfied."; 
