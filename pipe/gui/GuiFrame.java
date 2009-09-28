@@ -350,7 +350,12 @@ implements ActionListener, Observer {
 			new EditAction("Paste", "Paste (Ctrl-V)","ctrl V"));
 */		addMenuItem(editMenu, deleteAction =
 			new DeleteAction("Delete", "Delete selection","DELETE"));
+		
+		// Bind delete to backspace also
+		editMenu.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),"Delete");
+		editMenu.getActionMap().put("Delete", deleteAction);
 
+		
 		JMenu drawMenu = new JMenu("Draw");
 		drawMenu.setMnemonic('D');
 		addMenuItem(drawMenu, selectAction =
