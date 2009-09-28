@@ -284,12 +284,13 @@ public class Verification {
 			
 			//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
 			stream.println("E<>((sum(i:pid_t) P(i).P_capacity)== 0) and (Control.finish == 1)");
-			
+
+		
 			stream.println("/*");
 			stream.println(" boundedness query ");
 			stream.println("*/");
 			stream.println("sup: usedExtraTokens");
-			
+					
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -386,12 +387,13 @@ public class Verification {
 		//	"The net is "+ k +" bounded.\n\n" + 
 			"The net with the specified extra number of tokens is bounded.\n\n" +
 			"This means that the analysis using the currently selected number\n" +
-			"of extra tokens will be exact and always give the correct answer.\n\n";
+			"of extra tokens will be exact and always give the correct answer.\n";
+
 		if(extraTokensNeeded == k)
-			answerNetIsBounded += extraTokensNeeded + " is the minimum number of extra tokens needed to make the analysis exact.\n";
+			answerNetIsBounded += "\n" + extraTokensNeeded + " is the minimum number of extra tokens needed to make the analysis exact.\n";
 		else
-			answerNetIsBounded += "In fact, the analysis will be exact even with " + extraTokensNeeded + " extra tokens.\n";
-		
+			answerNetIsBounded += "\nIn fact, the analysis will be exact even with " + extraTokensNeeded + " extra tokens.\n";
+
 		String answerNetIsNotBounded =
 		//	"The net is not "+ k +" bounded.\n\n" + 
 			"The net with the speficied extra number of tokens is either unbounded or\n" +
