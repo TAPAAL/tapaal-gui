@@ -101,7 +101,10 @@ public class QueryDialogue extends JPanel{
 	
 	private JPanel reductionOptions;
 	private JComboBox reductionOption;
-
+	
+	private JSpinner numberOfExtraTokensInNet;
+	private JButton kbounded;
+	private JButton kboundedOptimize;
 //XXX shortest can be quite hard to guarantee, because, it might not be the shortest in UPPAAL
 //	private JRadioButtonMenuItem shortest;
 	
@@ -112,7 +115,7 @@ public class QueryDialogue extends JPanel{
 	private HashMap<JPanel, ActionListener> andActionListenerMap;
 	private ArrayList<JPanel> disjunctionGroups;
 	private int disjunctionsUsed;
-	private JButton kbounded;
+	
 	private String name_ADVNOSYM = "Optimised Standard";
 	private String name_NAIVE = "Standard";
 	private String name_NAIVESYM = "Symmetry Reduction";
@@ -156,7 +159,7 @@ public class QueryDialogue extends JPanel{
 //Capacity number field starts here:
 		capacityPanel = new JPanel(new FlowLayout());
 		capacityPanel.add(new JLabel("Extra number of tokens: "));
-		JSpinner numberOfExtraTokensInNet;
+		
 		if (queryToCreateFrom == null){
 			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3,0,Integer.MAX_VALUE, 1));
 		}else{
@@ -170,15 +173,24 @@ public class QueryDialogue extends JPanel{
 //Capacity boundness starts here
 		
 		kbounded = new JButton("Check Boundedness");
-		
 		kbounded.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						Verification.analyseKBounded(CreateGui.getModel(), getCapacity());
 					}
 				}
-		);
+		);		
 		capacityPanel.add(kbounded);
+		
+		kboundedOptimize = new JButton("Optimize Number of Tokens");
+		kboundedOptimize.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent evt){
+						Verification.analyzeAndOptimizeKBound(CreateGui.getModel(), getCapacity(), numberOfExtraTokensInNet);
+					}
+				}
+		);
+		capacityPanel.add(kboundedOptimize);
 		
 		
 		gridBagConstraints = new GridBagConstraints();
