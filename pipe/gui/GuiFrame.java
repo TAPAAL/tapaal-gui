@@ -116,7 +116,7 @@ implements ActionListener, Observer {
 	private GridAction toggleGrid;
 	private ZoomAction zoomOutAction, zoomInAction, zoomAction;
 	private DeleteAction deleteAction;
-	private TypeAction annotationAction, arcAction, /*inhibarcAction,*/ placeAction,
+	private TypeAction annotationAction, arcAction, inhibarcAction, placeAction,
 	transAction, timedtransAction, tokenAction, selectAction, rateAction,
 	markingAction, deleteTokenAction, dragAction, timedPlaceAction;
 	/* CB Joakim Byg - tries both */   
@@ -390,11 +390,9 @@ EOC */
 
 		addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
 		/*EOC*/
-		/* CB Joakim Byg - Inhibitor arcs are not needed
       addMenuItem(drawMenu, inhibarcAction =
               new TypeAction("Inhibitor Arc", Pipe.INHIBARC,
-              "Add an inhibitor arc", "H",true));
-EOC */              
+              "Add an inhibitor arc", "H",true));              
 		addMenuItem(drawMenu, annotationAction =
 			new TypeAction("Annotation", Pipe.ANNOTATION,
 					"Add an annotation","N",true));
@@ -554,13 +552,14 @@ EOC */
 		/* CB Jiri Srba - Not part of the model
       addButton(drawingToolBar,arcAction);
 EOC */
-		addButton(drawingToolBar, transportArcAction);
+		
 		/*CB Joakim Byg - adding timed arcs to the menu*/
 		addButton(drawingToolBar,timedArcAction);
+		addButton(drawingToolBar, transportArcAction);
 		/*EOC*/      
-		/* CB Joakim Byg - inhibitor arcs are not needed      
-      addButton(drawingToolBar,inhibarcAction);
-EOC */      
+     
+		addButton(drawingToolBar,inhibarcAction);
+ 
 		addButton(drawingToolBar,annotationAction);
 		drawingToolBar.addSeparator();
 		addButton(drawingToolBar,tokenAction);
@@ -665,7 +664,7 @@ EOC */
 		
 //		placeAction.setEnabled(status);
 //		arcAction.setEnabled(status);
-//		inhibarcAction.setEnabled(status);
+		inhibarcAction.setEnabled(status);
 		annotationAction.setEnabled(status);
 		transAction.setEnabled(status);
 //		timedtransAction.setEnabled(status);
@@ -1167,10 +1166,10 @@ EOC */
 
 		if (timedPlaceAction != null) 
 			timedPlaceAction.setSelected(mode == Pipe.TAPNPLACE);
-/*
+
 		if (inhibarcAction != null) 
 			inhibarcAction.setSelected(mode == Pipe.INHIBARC);
-*/
+
 		if (tokenAction != null) 
 			tokenAction.setSelected(mode == Pipe.ADDTOKEN);
 
