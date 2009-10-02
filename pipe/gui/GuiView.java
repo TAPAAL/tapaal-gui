@@ -908,6 +908,12 @@ EOC*/
             		   }
             		   break;
             	   }
+               case Pipe.TAPNINHIBITOR_ARC:
+               	// Add point to arc in creation
+                      if (createArc != null) {
+                         addPoint(createArc, e);
+                      }
+                      break;
                case Pipe.DRAG:
                   dragStart = new Point(start);
                   break;

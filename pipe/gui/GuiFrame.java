@@ -391,7 +391,7 @@ EOC */
 		addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
 		/*EOC*/
       addMenuItem(drawMenu, inhibarcAction =
-              new TypeAction("Inhibitor Arc", Pipe.INHIBARC,
+              new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
               "Add an inhibitor arc", "H",true));              
 		addMenuItem(drawMenu, annotationAction =
 			new TypeAction("Annotation", Pipe.ANNOTATION,
@@ -1168,7 +1168,7 @@ EOC */
 			timedPlaceAction.setSelected(mode == Pipe.TAPNPLACE);
 
 		if (inhibarcAction != null) 
-			inhibarcAction.setSelected(mode == Pipe.INHIBARC);
+			inhibarcAction.setSelected(mode == Pipe.TAPNINHIBITOR_ARC);
 
 		if (tokenAction != null) 
 			tokenAction.setSelected(mode == Pipe.ADDTOKEN);
@@ -1492,11 +1492,9 @@ EOC */
 			if (this != transportArcAction) {
 				transportArcAction.setSelected(false);
 			}
-			/*CB - Joakim Byg - Is not instansiated, since it is not needed
-         if (this != inhibarcAction) {
-            inhibarcAction.setSelected(false);
-         }
-EOC */         
+			if (this != inhibarcAction) {
+				inhibarcAction.setSelected(false);
+			}     
 			if (this != tokenAction) {
 				tokenAction.setSelected(false);
 			}

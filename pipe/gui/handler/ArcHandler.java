@@ -13,6 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
+import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
@@ -63,9 +64,21 @@ public class ArcHandler
          menuItem.setText("Split Arc Segment");
          popup.insert(menuItem, popupIndex++);
 
-         popup.insert(new JPopupMenu.Separator(), popupIndex++);
-/*CB Joakim Byg - timed arcs should not be handled here*/         
-      } else if (myObject instanceof NormalArc && !(myObject instanceof TimedArc) && !(myObject instanceof TransportArc)) {
+         popup.insert(new JPopupMenu.Separator(), popupIndex++);         
+      }if (myObject instanceof TAPNInhibitorArc) {
+          menuItem = new JMenuItem(new EditWeightAction(contentPane,
+                  (Arc)myObject));
+          menuItem.setText("Edit Weight");
+          popup.insert(menuItem, popupIndex++);
+
+          menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
+                                                       e.getPoint()));
+          menuItem.setText("Split Arc Segment");
+          popup.insert(menuItem, popupIndex++);
+
+          popup.insert(new JPopupMenu.Separator(), popupIndex++);
+ /*CB Joakim Byg - timed arcs should not be handled here*/         
+       }  else if (myObject instanceof NormalArc && !(myObject instanceof TimedArc) && !(myObject instanceof TransportArc)) {
 /*EOC*/
          if (((NormalArc)myObject).isJoined()){
             NormalArc PTArc;

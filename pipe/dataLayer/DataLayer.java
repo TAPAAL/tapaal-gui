@@ -112,7 +112,8 @@ implements Cloneable {
 	private ArrayList arcsArray = null;
 
 	/** ArrayList containing all the Arc objects in the Petri-Net */
-	private ArrayList inhibitorsArray = null;   
+	private ArrayList inhibitorsArray = null; 
+	private ArrayList tapnInhibitorsArray = null; 
 
 	/** ArrayList for net-level label objects (as opposed to element-level labels).*/
 	private ArrayList labelsArray = null;
@@ -149,6 +150,7 @@ implements Cloneable {
 
 	/** Inhibition Matrix */
 	private PNMatrix inhibitionMatrix = null;
+	private PNMatrix tapnInhibitionMatrix = null;
 
 	/** Used to determine whether the matrixes have been modified */
 	static boolean initialMarkingVectorChanged = true;
@@ -170,6 +172,7 @@ implements Cloneable {
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
 	private Hashtable inhibitorsMap = null;
+	private Hashtable tapnInhibitorsMap = null;
 
 	/** An ArrayList used store the source / destination state groups associated 
 	 * with this Petri-Net */
@@ -233,6 +236,7 @@ implements Cloneable {
 			newClone.transitionsArray = deepCopy(transitionsArray);
 			newClone.arcsArray = deepCopy(arcsArray);
 			newClone.inhibitorsArray = deepCopy(inhibitorsArray);
+			newClone.tapnInhibitorsArray = deepCopy(tapnInhibitorsArray);
 			//newClone.tokensArray = deepCopy(tokensArray);
 			newClone.labelsArray = deepCopy(labelsArray);
 		} catch(CloneNotSupportedException e) {
@@ -266,6 +270,7 @@ implements Cloneable {
 		transitionsArray = new ArrayList();
 		arcsArray = new ArrayList();
 		inhibitorsArray = new ArrayList();
+		tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList();
 		stateGroups = new ArrayList();
 		markingParametersArray = new ArrayList();
@@ -275,10 +280,12 @@ implements Cloneable {
 		backwardsIncidenceMatrix = null;
 		incidenceMatrix = null;
 		inhibitionMatrix = null;
+		tapnInhibitionMatrix = null;
 
 		// may as well do the hashtable here as well
 		arcsMap = new Hashtable();
 		inhibitorsMap = new Hashtable();
+		tapnInhibitorsMap = new Hashtable();
 	}
 
 
@@ -561,6 +568,53 @@ implements Cloneable {
 		}
 	}
 
+	public void addArc(TAPNInhibitorArc inhibitorArcInput) {
+		boolean unique = true;
+
+		if (inhibitorArcInput != null) {
+			if (inhibitorArcInput.getId() != null &&
+					inhibitorArcInput.getId().length() > 0) {
+				for (int i = 0 ; i < tapnInhibitorsArray.size() ; i++) {
+					if (inhibitorArcInput.getId().equals(
+							((Arc)tapnInhibitorsArray.get(i)).getId())) {
+						unique = false;
+					}
+				}
+			} else {
+				String id = null;
+				if (tapnInhibitorsArray != null && tapnInhibitorsArray.size() > 0) {
+					int no = tapnInhibitorsArray.size();
+					do {
+						for (int i = 0; i < tapnInhibitorsArray.size(); i++) {
+							id = "I" + no;
+							if (tapnInhibitorsArray.get(i) != null) {
+								if (id.equals(((Arc)tapnInhibitorsArray.get(i)).getId())) {
+									unique = false;
+									no++;
+								} else {
+									unique = true;
+								}
+							}
+						}
+					} while (!unique);
+				} else {
+					id = "I0";
+				}
+				if(id != null) {
+					inhibitorArcInput.setId(id);
+				} else {
+					inhibitorArcInput.setId("error");
+				}
+			}
+			tapnInhibitorsArray.add(inhibitorArcInput);
+			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
+
+			setChanged();
+			setMatrixChanged();
+			//notifyObservers(arcInput.getBounds());
+			notifyObservers(inhibitorArcInput);
+		}
+	}
 	/**
 	 * Add inhibitorArcInput to back of the InhibitorArc ArrayList
 	 * All observers are notified of this change (Model-View Architecture)
@@ -653,7 +707,39 @@ implements Cloneable {
 //		System.out.println("arcsMap size: " + arcsMap.size());
 	}
 
+	/** 
+	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
+	 * @param arcInput New Arc
+	 */
+	private void addInhibitorArcToInhibitorsMap(TAPNInhibitorArc inhibitorArcInput) {
+		// now we want to add the inhibitor arc to the list of inhibitor arcs for
+		// it's source and target
+		PlaceTransitionObject source = inhibitorArcInput.getSource();
+		PlaceTransitionObject target = inhibitorArcInput.getTarget();
+		ArrayList newList = null;
 
+		if (source != null) {
+			if (tapnInhibitorsMap.get(source) != null) {
+				((ArrayList)tapnInhibitorsMap.get(source)).add(inhibitorArcInput);
+			} else {
+				newList = new ArrayList();
+				newList.add(inhibitorArcInput);
+				tapnInhibitorsMap.put(source, newList);
+			}
+		}
+
+		if (target != null) {
+			if (tapnInhibitorsMap.get(target) != null) {
+				((ArrayList)tapnInhibitorsMap.get(target)).add(inhibitorArcInput);
+			} else {
+				newList = new ArrayList();
+				newList.add(inhibitorArcInput);
+				tapnInhibitorsMap.put(target, newList);
+			} 
+		}
+//		System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
+	}
+	
 	/** 
 	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
 	 * @param arcInput New Arc
@@ -737,6 +823,9 @@ implements Cloneable {
 			} else if (pnObject instanceof InhibitorArc) {
 				addInhibitorArcToInhibitorsMap((InhibitorArc)pnObject);
 				addArc((InhibitorArc)pnObject);
+			} else if (pnObject instanceof TAPNInhibitorArc) {
+				addInhibitorArcToInhibitorsMap((TAPNInhibitorArc)pnObject);
+				addArc((TAPNInhibitorArc)pnObject);
 			} else if (pnObject instanceof Place) {
 				addPlace((Place)pnObject);
 //			} else if (pnObject instanceof TAPNTransition){
@@ -880,7 +969,20 @@ implements Cloneable {
 							((Arc)attachedArcs.get(i)).delete();
 						}
 						inhibitorsMap.remove(pnObject);
-					}            
+					}
+					if ( (ArrayList)tapnInhibitorsMap.get(pnObject) != null) {
+
+						// get the list of attached arcs for the object we are removing
+						attachedArcs = ((ArrayList)tapnInhibitorsMap.get(pnObject));
+
+						// iterate over all the attached arcs, removing them all
+						// Pere: in inverse order!
+						//for (int i=0; i < attachedArcs.size(); i++){
+						for (int i = attachedArcs.size() - 1; i >= 0; i--){
+							((Arc)attachedArcs.get(i)).delete();
+						}
+						tapnInhibitorsMap.remove(pnObject);
+					}
 				} else if (pnObject instanceof NormalArc) {
 
 					// get source and target of the arc
@@ -930,12 +1032,45 @@ implements Cloneable {
 						}
 						//attached.updateConnected(); //causing null pointer exceptions (?)
 					}
+					
 
 					attached = ((Arc)pnObject).getTarget();
 
 					if (attached != null) {
 						if (inhibitorsMap.get(attached) != null) { //causing null pointer exceptions (!)
 							((ArrayList)inhibitorsMap.get(attached)).remove(pnObject);
+						}
+
+						attached.removeToArc((Arc)pnObject);
+						if (attached instanceof Transition) {
+							((Transition)attached).removeArcCompareObject((Arc)pnObject);
+						}
+//						attached.updateConnected(); //causing null pointer exceptions (?)
+					}
+				}else if (pnObject instanceof TAPNInhibitorArc) {
+
+					// get source and target of the arc
+					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
+
+					if (attached != null) {
+						ArrayList a=(ArrayList)tapnInhibitorsMap.get(attached);
+						if (a!=null) {
+							a.remove(pnObject);
+						}
+
+						attached.removeFromArc((Arc)pnObject);
+						if (attached instanceof Transition){
+							((Transition)attached).removeArcCompareObject((Arc)pnObject);
+						}
+						//attached.updateConnected(); //causing null pointer exceptions (?)
+					}
+					
+
+					attached = ((Arc)pnObject).getTarget();
+
+					if (attached != null) {
+						if (tapnInhibitorsMap.get(attached) != null) { //causing null pointer exceptions (!)
+							((ArrayList)tapnInhibitorsMap.get(attached)).remove(pnObject);
 						}
 
 						attached.removeToArc((Arc)pnObject);
@@ -1021,6 +1156,10 @@ implements Cloneable {
 			return true;
 		} else if (pnObject instanceof InhibitorArc) {
 			changeArrayList = inhibitorsArray;
+			return true;
+		}
+		else if (pnObject instanceof TAPNInhibitorArc) {
+			changeArrayList = tapnInhibitorsArray;
 			return true;
 		} else if(pnObject instanceof AnnotationNote) {
 			changeArrayList = labelsArray;
@@ -1525,6 +1664,8 @@ implements Cloneable {
 					Integer.valueOf(inscriptionTempStorage),
 					/*EOC*/                                    
 					idInput);
+		} else if (type.equals("tapnInhibitor")){
+			tempArc = new TAPNInhibitorArc(new TimedArc(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
 		} else {
 
 
@@ -1535,7 +1676,7 @@ implements Cloneable {
 						_endx, _endy,
 						sourceIn,
 						targetIn,
-						1,
+						Integer.valueOf(inscriptionTempStorage),
 						idInput,
 						taggedArc), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
 			}else if (type.equals("transport")){
@@ -1809,6 +1950,39 @@ implements Cloneable {
 			}
 		}
 	}
+	private void createTAPNInhibitionMatrix(){
+		int placeSize = placesArray.size();
+		int transitionSize = transitionsArray.size();
+		tapnInhibitionMatrix = new PNMatrix(placeSize, transitionSize);
+
+		for (int i = 0; i < tapnInhibitorsArray.size(); i++) {
+			TAPNInhibitorArc inhibitorArc = (TAPNInhibitorArc)tapnInhibitorsArray.get(i);
+			if (inhibitorArc != null) {
+				PetriNetObject pnObject = inhibitorArc.getSource();
+				if (pnObject != null) {
+					if (pnObject instanceof Place) {
+						Place place = (Place)pnObject;
+						pnObject = inhibitorArc.getTarget();
+						if (pnObject != null) {
+							if (pnObject instanceof Transition) {
+								Transition transition = (Transition)pnObject;
+								int transitionNo = getListPosition(transition);
+								int placeNo = getListPosition(place);
+								try {
+									tapnInhibitionMatrix.set(
+											placeNo, transitionNo, inhibitorArc.getWeight());
+								} catch (Exception e) {
+									JOptionPane.showMessageDialog(null, 
+											"Problema a inhibitionMatrix");                          
+									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
+								}                        
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 
 	/**
@@ -1935,8 +2109,13 @@ implements Cloneable {
 					
 						   
 						   p.removeTokenofAge(tokenToRemove);
-
-						}else if (a instanceof TimedArc){
+						}
+						// if arc is an inhibitor arc then do nothing.
+						else if(a instanceof TAPNInhibitorArc)
+						{
+						
+						}
+						else if (a instanceof TimedArc){
 							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 							//int indexOfOldestEligebleToken = 0;
 
@@ -1959,7 +2138,8 @@ implements Cloneable {
 							
 							
 
-						}else {
+						} 
+						else {
 							//Should not be possible
 						}
 					}
@@ -2059,7 +2239,13 @@ implements Cloneable {
 
 							p.removeTokenofAge(tokenToRemove);
 
-						}else if (a instanceof TimedArc){
+						}
+						// if arc is an inhibitor arc then do nothing
+						else if(a instanceof TAPNInhibitorArc)
+						{
+						
+						}
+						else if (a instanceof TimedArc){
 							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 							//int indexOfOldestEligebleToken = 0;
 
@@ -2471,29 +2657,48 @@ implements Cloneable {
 				Place p = (Place)a.getSource();
 				if (p instanceof TimedPlace){
 
-					boolean ageIsSatisfied = false;
+					boolean ageIsSatisfied;
+					
+					if(a instanceof TAPNInhibitorArc)
+						ageIsSatisfied = true;
+					else
+						ageIsSatisfied = false;
 
+					
 					if (p.currentMarking > 0){
 
 						for ( BigDecimal token : ((TimedPlace)p).getTokens() ){
-							if ( ((TimedArc)a).satisfiesGuard(token) ){
-
-								//make sure no invariants are violated
-								if (a instanceof TransportArc){
-									for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
-										if (postsetArc instanceof TransportArc){
-											if ( ((TransportArc) postsetArc).getGroupNr() == ((TransportArc)a).getGroupNr()){
-												if ( ((TimedPlace)postsetArc.getTarget()).satisfiesInvariant(token) ){
-													ageIsSatisfied = true;
-													break;
+							if(a instanceof TAPNInhibitorArc)
+							{
+								if(!((TimedArc)a).satisfiesGuard(token))
+								{
+									ageIsSatisfied = false;
+									break;
+								}
+								
+									
+							}
+							else
+							{
+								if ( ((TimedArc)a).satisfiesGuard(token) ){
+	
+									//make sure no invariants are violated
+									if (a instanceof TransportArc){
+										for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
+											if (postsetArc instanceof TransportArc){
+												if ( ((TransportArc) postsetArc).getGroupNr() == ((TransportArc)a).getGroupNr()){
+													if ( ((TimedPlace)postsetArc.getTarget()).satisfiesInvariant(token) ){
+														ageIsSatisfied = true;
+														break;
+													}
 												}
 											}
 										}
+										//invariants are not violated, if it is not a transport arc
+									}else {
+										ageIsSatisfied = true;
+										break;
 									}
-									//invariants are not violated, if it is not a transport arc
-								}else {
-									ageIsSatisfied = true;
-									break;
 								}
 							}
 						}
@@ -2501,7 +2706,7 @@ implements Cloneable {
 
 					isEnabled = ageIsSatisfied;
 
-					if (! isEnabled){
+					if (!isEnabled){
 						break;
 					}
 
@@ -2617,6 +2822,7 @@ implements Cloneable {
 		backwardsIncidenceMatrix = null;
 		incidenceMatrix = null;
 		inhibitionMatrix = null;
+		tapnInhibitionMatrix = null;
 		arcsMap = null;
 		initializeMatrices();
 	}
@@ -2765,6 +2971,15 @@ implements Cloneable {
 
 		for (int i = 0; i < inhibitorsArray.size(); i++){
 			returnArray[i] = (InhibitorArc)inhibitorsArray.get(i);
+		}
+		return returnArray;
+	}
+	
+	public TAPNInhibitorArc[] getTAPNInhibitors() {
+		TAPNInhibitorArc[] returnArray = new TAPNInhibitorArc[inhibitorsArray.size()];
+
+		for (int i = 0; i < tapnInhibitorsArray.size(); i++){
+			returnArray[i] = (TAPNInhibitorArc)tapnInhibitorsArray.get(i);
 		}
 		return returnArray;
 	}   
@@ -2960,6 +3175,12 @@ implements Cloneable {
 			createInhibitionMatrix();
 		}
 		return (inhibitionMatrix != null ? inhibitionMatrix.getArrayCopy() : null);
+	}
+	public int[][] getTAPNInhibitionMatrix() {
+		if (tapnInhibitionMatrix == null || tapnInhibitionMatrix.matrixChanged) {
+			createInhibitionMatrix();
+		}
+		return (tapnInhibitionMatrix != null ? tapnInhibitionMatrix.getArrayCopy() : null);
 	}   
 
 	/**
@@ -3028,7 +3249,10 @@ implements Cloneable {
 		}
 		if (inhibitionMatrix != null) {
 			inhibitionMatrix.matrixChanged = true;
-		}      
+		}
+		if (tapnInhibitionMatrix != null) {
+			tapnInhibitionMatrix.matrixChanged = true;
+		}   
 		initialMarkingVectorChanged = true;
 		currentMarkingVectorChanged = true;
 	}
@@ -3123,7 +3347,10 @@ implements Cloneable {
 						Arc newArc = createArc(element);
 						if (newArc instanceof InhibitorArc) {
 							addArc((InhibitorArc) newArc);
-						} else {
+						} else if (newArc instanceof TAPNInhibitorArc) {
+							addArc((TAPNInhibitorArc) newArc);
+						}
+						else {
 							addArc((NormalArc) newArc);
 							checkForInverseArc((NormalArc) newArc); 
 						}
@@ -3318,6 +3545,8 @@ implements Cloneable {
 						Arc newArc = createArc(element);
 						if (newArc instanceof InhibitorArc) {
 							addArc((InhibitorArc) newArc);
+						} else if (newArc instanceof TAPNInhibitorArc) {
+							addArc((TAPNInhibitorArc) newArc);
 						} else {
 							addArc((NormalArc) newArc);
 							checkForInverseArc((NormalArc) newArc);

@@ -15,6 +15,7 @@ import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
+import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
@@ -116,6 +117,7 @@ public class PlaceTransitionObjectHandler
                   CreateGui.getApp().setFastMode(Pipe.FAST_PLACE);
                }
             }
+      	 case Pipe.TAPNINHIBITOR_ARC:
          case Pipe.INHIBARC:
          case Pipe.FAST_PLACE:
          case Pipe.FAST_TRANSITION:
@@ -123,6 +125,10 @@ public class PlaceTransitionObjectHandler
         		 if (CreateGui.getApp().getMode() == Pipe.INHIBARC){
         			 if (currentObject instanceof Place) {
         				 createArc(new InhibitorArc(currentObject), currentObject);
+        			 }
+        		 } else if (CreateGui.getApp().getMode() == Pipe.TAPNINHIBITOR_ARC) {
+        			 if (currentObject instanceof Place) {
+        				 createArc(new TAPNInhibitorArc(new TimedArc(new NormalArc(currentObject))), currentObject);
         			 }
         		 } else if (CreateGui.getApp().getMode() == Pipe.TAPNARC){
         			 // XXX - kyrke - create only a TimedArc if source is not at TimedPlace
@@ -174,6 +180,63 @@ public class PlaceTransitionObjectHandler
       PlaceTransitionObject currentObject = (PlaceTransitionObject)myObject;
       
       switch (app.getMode()) {
+      	 case Pipe.TAPNINHIBITOR_ARC:
+      		TAPNInhibitorArc createTAPNInhibitorArc = (TAPNInhibitorArc) view.createArc;
+            if (createTAPNInhibitorArc != null) {
+               if (!currentObject.getClass().equals(
+            		   createTAPNInhibitorArc.getSource().getClass())) {
+                  
+                  Iterator arcsFrom =
+                	  createTAPNInhibitorArc.getSource().getConnectFromIterator();
+                  // search for pre-existent arcs from createInhibitorArc's 
+                  // source to createInhibitorArc's target
+                  while(arcsFrom.hasNext()) {
+                     Arc someArc = ((Arc)arcsFrom.next());
+                     if (someArc == createTAPNInhibitorArc) {
+                        break;
+                     } else if (someArc.getTarget() == currentObject &&
+                             someArc.getSource() == createTAPNInhibitorArc.getSource()) {
+                        isNewArc = false;
+                        if (someArc instanceof NormalArc){
+                           // user has drawn an inhibitor arc where there is 
+                           // a normal arc already - nothing to do
+                        } else if (someArc instanceof TAPNInhibitorArc) {
+                           // user has drawn an inhibitor arc where there is 
+                           // an inhibitor arc already - we increment arc's 
+                           // weight
+                           int weight = someArc.getWeight();
+                           undoManager.addNewEdit(someArc.setWeight(++weight));
+                        } else {
+                           // This is not supposed to happen
+                        }
+                        createTAPNInhibitorArc.delete();
+                        someArc.getTransition().removeArcCompareObject(
+                        		createTAPNInhibitorArc);
+                        someArc.getTransition().updateConnected();
+                        break;
+                     }
+                  }
+                  
+                  if (isNewArc == true) {
+                	  createTAPNInhibitorArc.setSelectable(true);
+                	  createTAPNInhibitorArc.setTarget(currentObject);
+                     currentObject.addConnectTo(createTAPNInhibitorArc);
+                     // Evil hack to prevent the arc being added to GuiView twice
+                     contentPane.remove(createTAPNInhibitorArc);
+                     model.addArc(createTAPNInhibitorArc);
+                     view.addNewPetriNetObject(createTAPNInhibitorArc);
+                     undoManager.addNewEdit(
+                             new AddPetriNetObjectEdit(createTAPNInhibitorArc,
+                             view, model));
+                  }
+                  
+                  // arc is drawn, remove handler:
+                  createTAPNInhibitorArc.removeKeyListener(keyHandler);
+                  keyHandler = null;
+                  view.createArc = null;
+               }
+            }
+            break;
          case Pipe.INHIBARC:
             InhibitorArc createInhibitorArc = (InhibitorArc) view.createArc;
             if (createInhibitorArc != null) {

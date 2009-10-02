@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import pipe.dataLayer.Arc;
+import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
@@ -108,7 +109,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 					}
 				}	
 
-			}else if (a instanceof TimedArc){
+			}else if (a instanceof TimedArc || a instanceof TAPNInhibitorArc){
 				eligableToken = new ArrayList<String>();
 				//int indexOfOldestEligebleToken = 0;
 

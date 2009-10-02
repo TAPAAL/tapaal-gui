@@ -95,7 +95,8 @@ public class StatusBar
              break;
          case Pipe.TRANSPORTARC:
              changeText(textforTransportArc);
-             break;   
+             break;
+         case Pipe.TAPNINHIBITOR_ARC:
          case Pipe.INHIBARC:
             changeText(textforInhibArc);
             break;            

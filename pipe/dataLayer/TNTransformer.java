@@ -41,6 +41,7 @@ import org.w3c.dom.Element;
 public class TNTransformer {
     
     private static int inhibit = 0;
+    private static int tapnInhibit = 2;
     private static int normal = 1;
     /** Creates a new instance of TNTransformer*/
     public TNTransformer() {
@@ -125,13 +126,19 @@ public class TNTransformer {
 			}
 			arcs = null;
                         
-                        InhibitorArc [] inhibitorArcs = netModel.getInhibitors();
+			InhibitorArc[] inhibitorArcs = netModel.getInhibitors();
                         for (i = 0; i < inhibitorArcs.length; i++) {
                             Element newArc = createTNArcElement(inhibitorArcs[i],pnDOM,inhibit);
                             TN.appendChild(newArc);
                         }
                         inhibitorArcs=null;
 
+            TAPNInhibitorArc[] tapnInhibitorArcs = netModel.getTAPNInhibitors();
+                        for (i = 0; i < tapnInhibitorArcs.length; i++) {
+                            Element newArc = createTNArcElement(tapnInhibitorArcs[i],pnDOM,tapnInhibit);
+                            TN.appendChild(newArc);
+                        }
+                        tapnInhibitorArcs=null;
 			pnDOM.normalize();
 		
                         
@@ -277,6 +284,8 @@ public class TNTransformer {
 		if(document != null) {
                         if(type == inhibit)
                             arcElement = document.createElement("inhibit");
+                        else if (type == tapnInhibit)
+                        	arcElement = document.createElement("tapnInhibit");
                         else
                             arcElement = document.createElement("arc");
 		}   

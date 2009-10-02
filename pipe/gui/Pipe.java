@@ -63,6 +63,7 @@ public class Pipe {
    
    public static final int FAST_TAPNPLACE      = 705;
    public static final int FAST_TAPNTRANSITION = 706;
+   public static final int TAPNINHIBITOR_ARC = 707; 
    
    
    // Other
