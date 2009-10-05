@@ -154,7 +154,7 @@ public class Pipe {
    public static final int TIMEPASS = 700;
 
 
-   public static final int verifytaMinRev=4409;
+   public static final int verifytaMinRev=4243; //4409;
    public static final int AGE_DECIMAL_PRECISION = 5;
    public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION+4;
    

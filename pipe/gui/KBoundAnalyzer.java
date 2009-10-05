@@ -21,7 +21,7 @@ public class KBoundAnalyzer
 {
 	private DataLayer appModel;
 	private int k;
-	private boolean notBounded = false;
+	private boolean notBounded = true;
 	
 	private boolean error=true;
 	private boolean readingPropertyOneResult = false;
