@@ -1151,17 +1151,19 @@ implements Cloneable {
 		} else if (pnObject instanceof Place){
 			changeArrayList = placesArray;
 			return true;
-		} else if (pnObject instanceof NormalArc) {
+		}
+		else if (pnObject instanceof TAPNInhibitorArc) {
+			changeArrayList = tapnInhibitorsArray;
+			return true;
+		}
+		else if (pnObject instanceof NormalArc) {
 			changeArrayList = arcsArray;
 			return true;
 		} else if (pnObject instanceof InhibitorArc) {
 			changeArrayList = inhibitorsArray;
 			return true;
 		}
-		else if (pnObject instanceof TAPNInhibitorArc) {
-			changeArrayList = tapnInhibitorsArray;
-			return true;
-		} else if(pnObject instanceof AnnotationNote) {
+		 else if(pnObject instanceof AnnotationNote) {
 			changeArrayList = labelsArray;
 			return true;
 		} else if(pnObject instanceof MarkingParameter) {
