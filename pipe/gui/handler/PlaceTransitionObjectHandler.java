@@ -197,21 +197,34 @@ public class PlaceTransitionObjectHandler
                      } else if (someArc.getTarget() == currentObject &&
                              someArc.getSource() == createTAPNInhibitorArc.getSource()) {
                         isNewArc = false;
-                        if (someArc instanceof NormalArc){
+                        
+                        if (someArc instanceof TAPNInhibitorArc) {
+                            // user has drawn an inhibitor arc where there is 
+                            // an inhibitor arc already - 
+                        	isNewArc = true;
+                        } 
+                        else if (someArc instanceof TransportArc){
+                        	// user has drawn an inhibitor arc where there is 
+                            // a transport arc already - mikael: this does not make sense
+                        	System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+  							 JOptionPane.showMessageDialog(CreateGui.getApp(),
+  									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+  									 "Error",
+  									 JOptionPane.ERROR_MESSAGE);
+                        }
+                        else if (someArc instanceof NormalArc){
                            // user has drawn an inhibitor arc where there is 
-                           // a normal arc already - nothing to do
-                        } else if (someArc instanceof TAPNInhibitorArc) {
-                           // user has drawn an inhibitor arc where there is 
-                           // an inhibitor arc already - we increment arc's 
-                           // weight
-                           int weight = someArc.getWeight();
-                           undoManager.addNewEdit(someArc.setWeight(++weight));
-                        } else {
+                           // a normal arc already - mikael: this does not make sense
+       						 System.out.println("It does not make sense to have both a normal arc and an inhibitor arc from a place to a transition.");
+   							 JOptionPane.showMessageDialog(CreateGui.getApp(),
+   									 "It does not make sense to have both a normal arc and an inhibitor arc from a place to a transition.",
+   									 "Error",
+   									 JOptionPane.ERROR_MESSAGE);
+       					} else  {
                            // This is not supposed to happen
                         }
                         createTAPNInhibitorArc.delete();
-                        someArc.getTransition().removeArcCompareObject(
-                        		createTAPNInhibitorArc);
+                        someArc.getTransition().removeArcCompareObject(createTAPNInhibitorArc);
                         someArc.getTransition().updateConnected();
                         break;
                      }
@@ -323,11 +336,11 @@ public class PlaceTransitionObjectHandler
         							 undoManager.addNewEdit(
         									 someArc.setWeight(++weight));
         						 }else{
-        							 System.out.println("We dont allow more than one arc from place to transition or transition to place");
-        							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-        									 "We dont allow more than one arc from place to transition or transition to place!",
-        									 "Error",
-        									 JOptionPane.ERROR_MESSAGE);
+        							 //System.out.println("We dont allow more than one arc from place to transition or transition to place");
+        							 //JOptionPane.showMessageDialog(CreateGui.getApp(),
+        								//	 "We dont allow more than one arc from place to transition or transition to place!",
+        								//	 "Error",
+        								//	 JOptionPane.ERROR_MESSAGE);
         						 }
         					 } else{
         						 // user has drawn a normal arc where there is 
@@ -356,8 +369,11 @@ public class PlaceTransitionObjectHandler
         							 // inverse arc found
         							 if (inverse.hasInverse()){
         								 // if inverse arc has an inverse arc, it means
-        								 // that createArc is equal to inverse's inverse
-        								 // arc so we only have to increment its weight
+        								 System.out.println("We dont allow more than one arc from place to transition or transition to place!");
+        	    						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+        	    									"We dont allow more than one arc from place to transition or transition to place!",
+        	    									"Error",
+        	    									JOptionPane.ERROR_MESSAGE);
         								 isNewArc = false;
         								 int weightInverse =
         									 inverse.getInverse().getWeight();
@@ -451,35 +467,62 @@ public class PlaceTransitionObjectHandler
         			 // This is the first step
         			 if (transportArcToCreate.getSource() instanceof Place){
 
-        				 //Dont allow more than one arc from place to transition
-    					 PlaceTransitionObject source = transportArcToCreate.getSource();
-    					 PlaceTransitionObject target = transportArcToCreate.getTarget();
+        				 //mikaelhm - Dont allow a transport arc from place to transition if there is another arc. 
     					 boolean existsArc = false;
     					 
     					 //Check if arc has leagal target
+    					 PlaceTransitionObject target = transportArcToCreate.getTarget();
     					 if (!(target instanceof Transition && target!=null)){
     						 System.err.println("Error creating transport arc, invalid target");
     						 transportArcToCreate.delete();
     						 break;
     					 }
     					 
-    					 for (Object o : source.getPostset()){
-    						 
-    						 Arc a = (Arc)o; // XXX - usafe case
-    						 if (a.getTarget() == target && a != transportArcToCreate){
-    							 //Arc already exists, bah
-    							 existsArc = true;
-    						 }
-    						 
-    						 
-    					 }
-    					 
-    					 if (existsArc){
-    						 System.out.println("We dont allow more than one arc from place to transition or transition to place!");
-    						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-    									"We dont allow more than one arc from place to transition or transition to place!",
-    									"Error",
-    									JOptionPane.ERROR_MESSAGE);
+    					 Iterator arcsFrom = transportArcToCreate.getSource().getConnectFromIterator();
+            			 // search for pre-existent arcs from transportArcToCreate's source to 
+            			 // transportArcToCreate's target                  
+            			 while(arcsFrom.hasNext()) {
+            				 Arc someArc = ((Arc)arcsFrom.next());
+            				 if (someArc == transportArcToCreate) {
+            					 break;
+            				 } else if (someArc.getSource() == transportArcToCreate.getSource() &&
+            						 someArc.getTarget() == currentObject) {
+            					 existsArc = true;
+
+            					 if (someArc instanceof TAPNInhibitorArc) {
+            						 // user has drawn a transport arc where there is 
+            						 // a TAPNInhibitorArc arc already - This does not make sense.
+            						 System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+          							 JOptionPane.showMessageDialog(CreateGui.getApp(),
+          									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+          									 "Error",
+          									 JOptionPane.ERROR_MESSAGE);
+            						 
+            					 } else if (someArc instanceof TransportArc) {
+            						 // user has drawn a transport arc where there is 
+            						 // a transport arc already - We do not allow that.
+            						 System.out.println("We dont allow more than one transport arc from a place to a transition.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            									"We dont allow more than one transport arc from a place to a transition.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 
+            					 } else if (someArc instanceof NormalArc) {
+            						 // user has drawn a transport arc where there is 
+            						 // a normal arc already - we increment arc's weight
+            						 System.out.println("We dont allow both a transport arc and a normal arc from place to transition.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            									"We dont allow both a transport arc and a normal arc from place to transition.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 
+            					 } else{
+            						 //This should not happen - since all types of arcs are listed above.
+            					 }
+            					 break; 
+            				 }
+            			 }
+            			 if (existsArc){
     						 transportArcToCreate.delete();
     						 break;
     					 }
@@ -519,8 +562,6 @@ public class PlaceTransitionObjectHandler
         				 //Create the next arc
         				 createArc(new TransportArc(currentObject, 1, false), currentObject);
 
-
-
         			 } else if (transportArcToCreate.getSource() instanceof Transition) {
         				 //Step 2 
         				 if (view.transportArcPart1 == null ){
@@ -540,26 +581,56 @@ public class PlaceTransitionObjectHandler
     						 break;
     					 }
         				 
-    					 //Check that there is not an other normal arc
-    					 boolean existsArc=false;
-    					  for (Object o : transportArcToCreate.getSource().getPostset()){
-    						 
-    						 Arc a = (Arc)o; // XXX - usafe case
-    						 if (a.getTarget() == transportArcToCreate.getTarget() && a != transportArcToCreate){
-    							 //Arc already exists, bah
+    					 //Check that there is not an other arc
+    					 boolean existsArc = false;
+        				 Iterator arcsFromTranasition = transportArcToCreate.getSource().getConnectFromIterator();
+        				 Arc someArc = null;
+
+        				 while ( arcsFromTranasition.hasNext() ){        					 
+        					 someArc = (Arc)arcsFromTranasition.next();
+        					 if (someArc == transportArcToCreate){
+        						 break;
+        						 //continue;
+        					 }
+    						 if( someArc.getSource() == transportArcToCreate.getSource()
+    								 && someArc.getTarget() == currentObject) {
     							 existsArc = true;
+    							 
+    							 if (someArc instanceof TAPNInhibitorArc) {
+            						 //mikaelhm - This can never be the case, since the user is trying to draw the 2. step of an transport arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
+            					 } else if (someArc instanceof TransportArc) {
+            						 // user has drawn a transport arc where there is 
+            						 // a transport arc already - We do not allow that.
+            						 System.out.println("We dont allow more than one transport arc from transition to place.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            								 "We dont allow more than one transport arc from transition to place.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 
+            					 } else if (someArc instanceof NormalArc) {
+            						 // user htransportas drawn a transport arc where there is 
+            						 // a normal arc already - we increment arc's weight
+            						 if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
+        								 int weightToInsert = someArc.getWeight()+1;
+            							 someArc.setWeight(weightToInsert);
+        		                      }
+            						 else{
+            						 System.out.println("We dont allow more than one transport arc from a transition to a place.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            									"We dont allow more than one transport arc from a transition to a place.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 }
+            						 
+            					 } else{
+            						 //This should not happen - since all types of arcs are listed above.
+            					 }    	
+
+    							 break;
     						 }
-    						 
-    						 
-    					 }
-    					 
+        				 }
     					 if (existsArc){
-    						 System.out.println("We dont allow more than one arc from place to transition or transition to place!");
-    						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-    									"We dont allow more than one arc from place to transition or transition to place!",
-    									"Error",
-    									JOptionPane.ERROR_MESSAGE);
-    						 transportArcToCreate.delete();
+							 transportArcToCreate.delete();
     						 break;
     					 }
         				 currentObject.addConnectTo(transportArcToCreate);
@@ -611,8 +682,8 @@ public class PlaceTransitionObjectHandler
         			 view.createArc = null;
         			 
         			 timedArcToCreate.setSelectable(true);
-        			 //we create NormalArcs when source of arc is Transition ...except if the arc is a TransportArc
-//        			 if (timedArcToCreate.getSource() instanceof Transition){
+        			 
+        			 //We create NormalArcs when source of arc is Transition( since there are no intervals on output arcs.) ...except if the arc is a TransportArc
         			 if (!(timedArcToCreate instanceof TimedArc)){
         				 boolean toDrawNewArc = true;
         				 Iterator arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
@@ -621,29 +692,44 @@ public class PlaceTransitionObjectHandler
         				 while ( arcsFromTranasition.hasNext() ){        					 
         					 someArc = (Arc)arcsFromTranasition.next();
         					 if (someArc == timedArcToCreate){
-        						 //break;
-        						 continue;
+        						 break;
+        						 //continue;
         					 }
-        					 //handle NormalArc weights
-        					 if ( ! (timedArcToCreate instanceof TimedArc) ) {
-        						 if( someArc.getSource() == timedArcToCreate.getSource()
-        								 && someArc.getTarget() == currentObject) {
-
-        							 toDrawNewArc = false;
-        							 if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
+    						 if( someArc.getSource() == timedArcToCreate.getSource()
+    								 && someArc.getTarget() == currentObject) {
+    							 toDrawNewArc = false;
+    							 
+    							 if (someArc instanceof TAPNInhibitorArc) {
+            						 //mikaelhm - This can never be the case, since the user is trying to draw a normal arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
+            					 } else if (someArc instanceof TransportArc) {
+            						 // user has drawn a normal arc where there is 
+            						 // a transport arc already - We do not allow that.
+            						 System.out.println("We dont allow both a transport arc and a normal arc from transition to place");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            								 "We dont allow both a transport arc and a normal arc from transition to place.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 
+            					 } else if (someArc instanceof NormalArc) {
+            						 // user has drawn a normal arc where there is 
+            						 // a normal arc already - we increment arc's weight
+            						 if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
         								 int weightToInsert = someArc.getWeight()+1;
             							 someArc.setWeight(weightToInsert);
-        		                      }else{
-        		                      	   System.out.println("We dont allow more than one arc from place to transition or transition to place!");
-        		                      	 JOptionPane.showMessageDialog(CreateGui.getApp(),
-        	    									"We dont allow more than one arc from place to transition or transition to place!",
-        	    									"Error",
-        	    									JOptionPane.ERROR_MESSAGE);
         		                      }
-        							 
-        							 break;
-        						 }
-        					 }
+            						 else{
+            						 System.out.println("We dont allow more than one normal arc from a transition to a place.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            									"We dont allow more than one normal arc from a transition to a place.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 }
+            						 
+            					 } else{
+            						 //This should not happen - since all types of arcs are listed above.
+            					 }    							 
+    							 break;
+    						 }
 
         				 }
         				 if( ! toDrawNewArc) {
@@ -672,10 +758,7 @@ public class PlaceTransitionObjectHandler
         				 //else source is a place (not transition)
         			 } else{
      				 
-        				 //Dont allow more than one arc from place to transition
-    					 PlaceTransitionObject source = timedArcToCreate.getSource();
-    					 PlaceTransitionObject target = timedArcToCreate.getTarget();
-    					 
+					 
     					 // XXX  -- kyrke hack to precent some race condisions in pipe gui   					 
     					 if ((timedArcToCreate.getTarget()) == null || (!(timedArcToCreate.getTransition() instanceof Transition))) {
     						 timedArcToCreate.delete();
@@ -687,21 +770,61 @@ public class PlaceTransitionObjectHandler
     					 }
     					 
     					 boolean existsArc = false;
+        				 Iterator arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
+        				 Arc someArc = null;
     					 
-    					 
-    					 for (Object o : source.getPostset()){
-    						 
-    						 Arc a = (Arc)o; // XXX - usafe case
-    						 if (a.getTarget() == target && a != timedArcToCreate){
-    							 //Arc already exists, bah
+    					 while ( arcsFromTranasition.hasNext() ){        					 
+        					 someArc = (Arc)arcsFromTranasition.next();
+        					 if (someArc == timedArcToCreate){
+        						 //break;
+        						 continue;
+        					 }
+    						 if( someArc.getSource() == timedArcToCreate.getSource()
+    								 && someArc.getTarget() == currentObject) {
     							 existsArc = true;
+    							 
+    							 if (someArc instanceof TAPNInhibitorArc) {
+    								 //user has drawn a timed arc where there is 
+            						 //an inhibitor arc already - this does not make sense
+    								 System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+    	  							 JOptionPane.showMessageDialog(CreateGui.getApp(),
+    	  									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+    	  									 "Error",
+    	  									 JOptionPane.ERROR_MESSAGE);
+            					 } else if (someArc instanceof TransportArc) {
+            						 // user has drawn a timed arc where there is 
+            						 // a transport arc already - We do not allow that.
+            						 System.out.println("We dont allow both a transport arc and a normal arc from a place to a transition.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            								 "We dont allow both a transport arc and a normal arc from a place to a transition.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 
+            					 } else if (someArc instanceof NormalArc) {
+            						 // user has drawn a normal arc where there is 
+            						 // a normal arc already - we increment arc's weight
+            						 if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
+        								 int weightToInsert = someArc.getWeight()+1;
+            							 someArc.setWeight(weightToInsert);
+        		                      }
+            						 else{
+            						 System.out.println("We dont allow more than one normal arc from a place to a transition.");
+            						 JOptionPane.showMessageDialog(CreateGui.getApp(),
+            									"We dont allow more than one normal arc from a place to a t.",
+            									"Error",
+            									JOptionPane.ERROR_MESSAGE);
+            						 }
+            						 
+            					 } else{
+            						 //This should not happen - since all types of arcs are listed above.
+            					 }
+    							 timedArcToCreate.delete();
+    							 break;
     						 }
-    						 
-    					 }
+
+        				 }
     					 
-    					 if (existsArc){
-    						 System.out.println("We dont allow more than one arc from place to transition or transition to place!");
-    						 timedArcToCreate.delete();
+    					 if (existsArc){    						 
     						 break;
     					 }
         				 

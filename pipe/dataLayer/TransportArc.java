@@ -84,7 +84,7 @@ public class TransportArc extends TimedArc {
 		
 		// kyrke - do ekstra suff when deleting a transport arc
 		
-		super.delete();
+ 		super.delete();
 		
 		// xxx - hack to awoid delete loop
 		

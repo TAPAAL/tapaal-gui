@@ -1155,7 +1155,7 @@ implements Cloneable {
 		else if (pnObject instanceof TAPNInhibitorArc) {
 			changeArrayList = tapnInhibitorsArray;
 			return true;
-		}
+		}	
 		else if (pnObject instanceof NormalArc) {
 			changeArrayList = arcsArray;
 			return true;
