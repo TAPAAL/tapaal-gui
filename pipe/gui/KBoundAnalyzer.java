@@ -13,7 +13,6 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.gui.Verification.RunUppaalVerification;
 import pipe.gui.Verification.RunningVerificationWidgets;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 
@@ -21,7 +20,7 @@ public class KBoundAnalyzer
 {
 	private DataLayer appModel;
 	private int k;
-	private boolean notBounded = false;
+	private boolean notBounded = true;
 	
 	private boolean error=true;
 	private boolean readingPropertyOneResult = false;

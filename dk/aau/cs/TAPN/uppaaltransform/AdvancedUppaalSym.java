@@ -624,7 +624,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 			tmp.append("<label kind=\"guard\">"+ guard +"</label>\n");
 			tmp.append("<label kind=\"synchronisation\">"+ name + syncchar + "</label>\n");
 
-			tmp.append("<label kind=\"assignment\">x:=0</label>\n");
+			tmp.append("<label kind=\"assignment\">" + getAssignments("x:=0", arc, arc2) + "</label>\n");
 			
 
 
@@ -688,7 +688,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 			//tmp.append("<label kind=\"synchronisation\">"+ name + syncchar + "</label>\n");
 
 			
-			tmp.append("<label kind=\"assignment\">x:=0</label>\n");
+			tmp.append("<label kind=\"assignment\">" + getAssignments("x:=0", arc, arc2) + "</label>\n");
 			
 
 

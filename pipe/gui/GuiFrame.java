@@ -7,7 +7,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -16,11 +15,11 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.ArrayList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -33,7 +32,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -43,27 +41,22 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicComboBoxUI.KeyHandler;
-import javax.swing.text.JTextComponent.KeyBinding;
-
-import dk.aau.cs.petrinet.TAPN;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.TimedPlace;
-import pipe.dataLayer.Transition;
-import pipe.experiment.editor.gui.ExperimentEditor;
 import pipe.experiment.Experiment;
+import pipe.experiment.editor.gui.ExperimentEditor;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import pipe.io.JarUtilities;
+import dk.aau.cs.petrinet.TAPN;
 
 
 /**
