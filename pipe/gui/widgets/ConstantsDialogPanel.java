@@ -1,4 +1,4 @@
-package bin.pipe.gui.widgets;
+package pipe.gui.widgets;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -14,10 +14,10 @@ package bin.pipe.gui.widgets;
  *
  * @author Morten Jacobsen
  */
-public class LeftConstantsPane extends javax.swing.JPanel {
+public class ConstantsDialogPanel extends javax.swing.JPanel {
 
     /** Creates new form LeftConstantsPane */
-    public LeftConstantsPane() {
+    public ConstantsDialogPanel() {
         initComponents();
     }
 
