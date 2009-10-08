@@ -1178,7 +1178,7 @@ public class QueryDialogue extends JPanel{
 		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent); 
 		contentPane.add( queryDialogue );
 		
-		guiDialog.setResizable(true);     
+		guiDialog.setResizable(false);     
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
@@ -1189,6 +1189,7 @@ public class QueryDialogue extends JPanel{
 		
 		return  queryDialogue.getQuery();
 	}
+
 	
 	public String getQuantificationSelection() {
 		if (existsDiamond.isSelected()){

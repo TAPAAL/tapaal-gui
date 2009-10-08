@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 
 import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.ArcWeightEdit;
 import pipe.gui.undo.UndoableEdit;
@@ -94,7 +95,7 @@ public class TimedArc extends NormalArc{
 
 	public void showTimeIntervalEditor() {
 		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), "TAPAAL 0.3", true);
+			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
 
 		Container contentPane = guiDialog.getContentPane();
 

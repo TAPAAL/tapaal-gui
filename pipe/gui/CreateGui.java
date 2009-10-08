@@ -6,7 +6,9 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.ScrollPane;
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -14,6 +16,8 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
          
+import javax.swing.BorderFactory;
+import javax.swing.DebugGraphics;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -25,18 +29,24 @@ import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.metal.MetalBorders;
 import javax.swing.text.BadLocationException;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftQueryPane;
+import pipe.gui.widgets.ParameterPanel;
 
 
 public class CreateGui {
    
-   public static GuiFrame appGui;
+   private static final double DIVIDER_LOCATION = 0.5;
+public static GuiFrame appGui;
    private static Animator animator;
    private static JTabbedPane appTab;
    private static int freeSpace;
@@ -89,12 +99,13 @@ public class CreateGui {
       leftBottomPanel = new JPanel();
       queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
       scrollerQueries = new JScrollPane(queries);
-      leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollerQueries, leftBottomPanel);
-      
+      leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, scrollerQueries, leftBottomPanel);
       ((JScrollPane)leftPane.getTopComponent()).setViewportView(queries);
       
       leftPane.setContinuousLayout(true);
       leftPane.setDividerSize(0);
+      leftPane.setDividerLocation(DIVIDER_LOCATION);
+      leftPane.setResizeWeight(0.5);
       
        pane = 
               new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
@@ -294,14 +305,14 @@ public class CreateGui {
    public static void removeAnimationHistory() {
       if (scroller != null) {
          leftPane.remove(scroller);
-         leftPane.setDividerLocation(0);
+         leftPane.setDividerLocation(DIVIDER_LOCATION);
          leftPane.setDividerSize(0);
       }
    }
    public static void removeAnimationControler() {
 	   if (scroller != null) {
 		   leftPane.remove(scroller2);
-		   leftPane.setDividerLocation(0);
+		   leftPane.setDividerLocation(DIVIDER_LOCATION);
 		   leftPane.setDividerSize(0);
 	   }
    }
@@ -312,16 +323,16 @@ public class CreateGui {
    }
    
    public static void setLeftPaneToQueries(){
-	   
 	   leftBottomPanel = new JPanel();
+	   leftBottomPanel.add(new JLabel("test"));
 	   queries = new LeftQueryPane(getModel().getQueries());
 	   scrollerQueries.setViewportView(queries);
+	   leftPane.setDividerLocation(DIVIDER_LOCATION);
 	   leftPane.setTopComponent(scrollerQueries);
 	   leftPane.setBottomComponent(leftBottomPanel);
-	   
 	   leftPane.setContinuousLayout(true);
 	   leftPane.setDividerSize(0);
-	   leftPane.resetToPreferredSizes();
+	   leftPane.validate();
    }
    
    public static void updateLeftPanel() {
@@ -333,7 +344,7 @@ public class CreateGui {
 //			   leftBottomPanel = new JPanel();
 //		   }
 //	   }
-	   leftPane.resetToPreferredSizes();
+	   leftPane.validate();
    }
 
 
