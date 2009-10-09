@@ -1,8 +1,12 @@
 package pipe.gui.widgets;
+
+import javax.swing.JRootPane;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
+import pipe.dataLayer.Constant;
 
 /*
  * LeftConstantsPane.java
@@ -15,11 +19,21 @@ package pipe.gui.widgets;
  * @author Morten Jacobsen
  */
 public class ConstantsDialogPanel extends javax.swing.JPanel {
+	private JRootPane rootPane;
+	private Constant constant;
 
-    /** Creates new form LeftConstantsPane */
+	/** Creates new form LeftConstantsPane */
     public ConstantsDialogPanel() {
         initComponents();
     }
+    
+    public ConstantsDialogPanel(JRootPane pane, Constant constant) {
+        initComponents();
+        
+        rootPane = pane;
+        this.constant = constant;
+    }
+
 
     /** This method is called from within the constructor to
      * initialize the form.

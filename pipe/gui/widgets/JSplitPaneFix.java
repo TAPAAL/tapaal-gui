@@ -18,6 +18,10 @@ public class JSplitPaneFix extends JSplitPane {
 		// TODO Auto-generated constructor stub
 	}
 
+	public JSplitPaneFix(int verticalSplit) {
+		super(verticalSplit);
+	}
+
 	public void setDividerLocation(double proportionalLocation) {
         if (!isPainted) {       
             hasProportionalLocation = true;

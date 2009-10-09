@@ -39,6 +39,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.JSplitPaneFix;
+import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
 import pipe.gui.widgets.ParameterPanel;
 
@@ -96,16 +97,18 @@ public static GuiFrame appGui;
 //      ModuleManager moduleManager = new ModuleManager();
       
 //      JTree moduleTree = moduleManager.getModuleTree();
-      leftBottomPanel = new JPanel();
+      
+//      leftBottomPanel = new LeftConstantsPane();
       queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
       scrollerQueries = new JScrollPane(queries);
-      leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, scrollerQueries, leftBottomPanel);
-      ((JScrollPane)leftPane.getTopComponent()).setViewportView(queries);
-      
-      leftPane.setContinuousLayout(true);
-      leftPane.setDividerSize(0);
-      leftPane.setDividerLocation(DIVIDER_LOCATION);
-      leftPane.setResizeWeight(0.5);
+      leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+      setLeftPaneToQueries();
+//      ((JScrollPane)leftPane.getTopComponent()).setViewportView(queries);
+//      
+//      leftPane.setContinuousLayout(true);
+//      leftPane.setDividerSize(0);
+//      leftPane.setDividerLocation(DIVIDER_LOCATION);
+//      leftPane.setResizeWeight(0.5);
       
        pane = 
               new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
@@ -323,9 +326,10 @@ public static GuiFrame appGui;
    }
    
    public static void setLeftPaneToQueries(){
-	   leftBottomPanel = new JPanel();
-	   leftBottomPanel.add(new JLabel("test"));
-	   queries = new LeftQueryPane(getModel().getQueries());
+	   leftBottomPanel = new LeftConstantsPane();
+	   queries = new LeftQueryPane(
+			   getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
+			   );
 	   scrollerQueries.setViewportView(queries);
 	   leftPane.setDividerLocation(DIVIDER_LOCATION);
 	   leftPane.setTopComponent(scrollerQueries);
