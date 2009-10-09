@@ -1,5 +1,12 @@
 package pipe.gui.widgets;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 /*
  * To change this template, choose Tools | Templates
@@ -7,6 +14,14 @@ import javax.swing.JRootPane;
  */
 
 import pipe.dataLayer.Constant;
+import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
+
+import javax.swing.SpinnerNumberModel;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.AttributeSet;
 
 /*
  * LeftConstantsPane.java
@@ -20,18 +35,82 @@ import pipe.dataLayer.Constant;
  */
 public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private JRootPane rootPane;
-	private Constant constant;
+	private DataLayer model;
+	
+	private String name;
 
 	/** Creates new form LeftConstantsPane */
     public ConstantsDialogPanel() {
         initComponents();
     }
     
-    public ConstantsDialogPanel(JRootPane pane, Constant constant) {
+    public ConstantsDialogPanel(JRootPane pane, DataLayer model, String name, int value) {
         initComponents();
         
         rootPane = pane;
-        this.constant = constant;
+        this.model = model;
+ 
+        this.name = name;
+        
+        // Set up initial values
+       SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
+    		   value, 0,	Integer.MAX_VALUE, 1);
+       valueSpinner.setModel(spinnerModel);
+       nameTextField.setText(name);
+       nameTextField.addKeyListener(new KeyAdapter(){
+    	   private static final int MAX_CHARS = 15;
+    	   public void keyTyped(KeyEvent e){
+    		   char c = e.getKeyChar();
+    		   if(!Character.isLetter(c) && !Character.isISOControl(c))
+    			   e.consume();
+    		   
+    		   if(Character.isLetter(c) && nameTextField.getText().length() == MAX_CHARS)
+    			   e.consume();
+    	   }
+       });
+
+       // wire up buttons
+       okButton.addActionListener(new ActionListener(){
+
+    	   public void actionPerformed(ActionEvent e){
+    		   onOK();
+    	   }
+       });
+
+       cancelButton.addActionListener(new ActionListener(){
+    	   public void actionPerformed(ActionEvent e){
+    		   exit();
+    	   }
+       });
+    }
+    
+    public void onOK()
+    {
+    	String newName = nameTextField.getText();
+    	
+    	if(newName.trim().isEmpty())
+    	{
+    		JOptionPane.showMessageDialog(CreateGui.getApp(), 
+    				"You must specify a name.", 
+    				"Missing name", 
+    				JOptionPane.ERROR_MESSAGE);
+    	}
+    	else
+    	{
+    		int val = (Integer)valueSpinner.getValue();
+       		
+    		if(name != "")
+    			model.updateConstant(name, new Constant(newName, val));
+    		else
+    			model.addConstant(newName, val);
+    	}    	
+    	
+   	   	exit();
+    }
+    
+    public void exit()
+    {
+    	rootPane.getParent().setVisible(false);
     }
 
 

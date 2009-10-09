@@ -14,19 +14,23 @@ public class Constant {
 		this.value = value;
 	}
 
-	private void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	private String getName() {
+	public String getName() {
 		return name;
 	}
 
-	private void setValue(int value) {
+	public void setValue(int value) {
 		this.value = value;
 	}
 
-	private int getValue() {
+	public int getValue() {
 		return value;
+	}
+	
+	public String toString(){
+		return name + " = " + value;
 	}
 }

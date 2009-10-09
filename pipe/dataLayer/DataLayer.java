@@ -187,7 +187,7 @@ implements Cloneable {
 	private HashMap<TimedPlace, ArrayList<BigDecimal>> placeMarkingStorageMap = null;
 
 	private ArrayList<TAPNQuery> queries = null;
-
+	private HashMap<String, Constant> constants = new HashMap<String, Constant>();
 
 	/**
 	 * Create Petri-Net object from PNML file with URI pnmlFileName
@@ -3857,4 +3857,33 @@ implements Cloneable {
 		return queries;
 	}
 
+	public Collection<Constant> getConstants()
+	{
+		return constants.values();
+	}
+	
+	public void updateConstant(String oldName, Constant constant)
+	{
+		if(constants.containsKey(oldName))
+		{
+			constants.put(oldName, constant);
+		}
+	}
+
+	public void addConstant(String name, int value) {	
+		if(!constants.containsKey(name))
+			constants.put(name, new Constant(name, value));
+		else
+		{
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"A constant with the specified name already exists.",
+					"Constant exists",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void removeConstant(String name){
+		if(constants.containsKey(name))
+			constants.remove(name);
+	}
 }
