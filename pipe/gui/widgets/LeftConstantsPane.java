@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
@@ -24,12 +27,14 @@ public class LeftConstantsPane extends JPanel {
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
 	private JPanel addConstantPanel;
+	private JLabel constantsLabel;
 		
 	public LeftConstantsPane(){
 		constantsPanel = new JPanel();
 		addConstantPanel = new JPanel(new BorderLayout());
 		
-		constantsPanel.setLayout(new BoxLayout(constantsPanel, BoxLayout.Y_AXIS));		
+		constantsPanel.setLayout(new GridBagLayout());		
+		constantsLabel = new JLabel("Constants:");
 		
 		JButton addConstantButton = new JButton("Add Constant..");
 		addConstantButton.addActionListener(new ActionListener(){
@@ -59,12 +64,33 @@ public class LeftConstantsPane extends JPanel {
 		if(model == null) return;
 		
 		constantsPanel.removeAll();
+		addConstantsLabel();
+		addConstantsToPanel(model);
+		constantsPanel.validate();
+	}
+
+	private void addConstantsToPanel(DataLayer model) {
+		int i = 1;
 		for(Constant constant : model.getConstants())
 		{
 			JPanel panel = createConstantPanel(constant);
-			constantsPanel.add(panel);
+		
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = i;
+			gbc.anchor = GridBagConstraints.NORTHWEST;
+			
+			constantsPanel.add(panel, gbc);
+			i++;
 		}
-		constantsPanel.validate();
+	}
+
+	private void addConstantsLabel() {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		constantsPanel.add(constantsLabel, gbc);
 	}
 	
 	private void showEditConstantDialog(String name, int value) {
@@ -95,7 +121,9 @@ public class LeftConstantsPane extends JPanel {
 	{
 		JPanel panel = new JPanel(new FlowLayout());
 		
-		JLabel constantLabel = new JLabel(constant.toString());
+		JTextField constantTextField = new JTextField(constant.toString(), 11);
+		constantTextField.setEditable(false);
+		constantTextField.setFocusable(false);
 		JButton editButton = new JButton("Edit");
 		editButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -110,7 +138,7 @@ public class LeftConstantsPane extends JPanel {
 			}
 		});
 		
-		panel.add(constantLabel);
+		panel.add(constantTextField);
 		panel.add(editButton);
 		panel.add(removeButton);
 		

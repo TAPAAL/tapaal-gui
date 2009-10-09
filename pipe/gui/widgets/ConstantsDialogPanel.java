@@ -82,6 +82,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     		   exit();
     	   }
        });
+       
+       rootPane.setDefaultButton(okButton);
     }
     
     public void onOK()
