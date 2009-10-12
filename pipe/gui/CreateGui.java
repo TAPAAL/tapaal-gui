@@ -332,11 +332,12 @@ public static GuiFrame appGui;
 			   );
 	   scrollerQueries.setViewportView(queries);
 	   leftPane.setDividerLocation(DIVIDER_LOCATION);
+	   leftPane.setResizeWeight(0.5);
 	   leftPane.setTopComponent(scrollerQueries);
 	   leftPane.setBottomComponent(leftBottomPanel);
 	   leftPane.setContinuousLayout(true);
 	   leftPane.setDividerSize(0);
-	   leftPane.validate();
+	   updateLeftPanel();
    }
    
    public static void updateLeftPanel() {

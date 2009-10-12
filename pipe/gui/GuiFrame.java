@@ -623,7 +623,7 @@ EOC */
 	 * @param action the action that the ZoomComboBox performs
 	 */
 	private void addZoomComboBox(JToolBar toolBar, Action action) {
-		Dimension zoomComboBoxDimension = new Dimension(65,28);
+		Dimension zoomComboBoxDimension = new Dimension(75,28);
 		zoomComboBox = new JComboBox(zoomExamples);
 		zoomComboBox.setEditable(true);
 		zoomComboBox.setSelectedItem("100%");

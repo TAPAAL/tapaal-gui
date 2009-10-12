@@ -1678,7 +1678,7 @@ implements Cloneable {
 						_endx, _endy,
 						sourceIn,
 						targetIn,
-						Integer.valueOf(inscriptionTempStorage),
+						1,
 						idInput,
 						taggedArc), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
 			}else if (type.equals("transport")){
@@ -3885,5 +3885,11 @@ implements Cloneable {
 	public void removeConstant(String name){
 		if(constants.containsKey(name))
 			constants.remove(name);
+	}
+
+
+	public void addQuery(TAPNQuery query) {
+		queries.add(query);
+		
 	}
 }

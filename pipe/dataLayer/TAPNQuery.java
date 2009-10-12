@@ -28,4 +28,20 @@ public class TAPNQuery {
 		this.hashTableSize = hashTabelSize;
 		this.extrapolationOption = extrapolationOption;
 	}
+	
+	public String toString()
+	{
+		return name;
+	}
+
+	public void set(TAPNQuery newQuery) {
+		this.name = newQuery.name;
+		this.capacity = newQuery.capacity;
+		this.query = newQuery.query;
+		this.traceOption = newQuery.traceOption;
+		this.searchOption = newQuery.searchOption;
+		this.reductionOption = newQuery.reductionOption;
+		this.hashTableSize = newQuery.hashTableSize;
+		this.extrapolationOption = newQuery.extrapolationOption;		
+	}
 }
