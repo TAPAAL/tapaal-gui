@@ -3,16 +3,8 @@ package pipe.dataLayer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
-import java.util.Collection;
-import java.util.HashMap;
 
-import dk.aau.cs.petrinet.Arc;
-
-import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.GuiView;
-import pipe.gui.Pipe;
-import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.TransportArcGroupEdit;
 import pipe.gui.undo.UndoableEdit;
 

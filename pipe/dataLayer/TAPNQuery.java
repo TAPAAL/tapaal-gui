@@ -1,6 +1,5 @@
 package pipe.dataLayer;
 
-import java.util.Enumeration;
 
 public class TAPNQuery {
 	public enum TraceOption {SOME, FASTEST, NONE};

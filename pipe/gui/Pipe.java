@@ -1,6 +1,5 @@
 package pipe.gui;
 import java.awt.Color;
-import java.awt.MouseInfo;
 
 public class Pipe {
    

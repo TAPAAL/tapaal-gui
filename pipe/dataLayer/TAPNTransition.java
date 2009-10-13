@@ -1,27 +1,15 @@
 package pipe.dataLayer;
 
 import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.BoxLayout;
 
-import pipe.gui.CopyPasteable;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.GuiView;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.undo.AddPetriNetObjectEdit;
-import pipe.gui.undo.UndoManager;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.GuardDialogue;
 import pipe.gui.widgets.TAPNTransitionEditor;
-import pipe.gui.widgets.TransitionEditor;
 
 public class TAPNTransition extends Transition {
 

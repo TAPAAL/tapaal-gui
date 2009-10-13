@@ -1,10 +1,7 @@
 package pipe.dataLayer;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
@@ -12,11 +9,9 @@ import javax.swing.BoxLayout;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import pipe.gui.undo.ArcWeightEdit;
 import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
-import pipe.gui.widgets.PlaceEditorPanel;
 
 public class TimedArc extends NormalArc{
 

@@ -1,6 +1,5 @@
 package pipe.dataLayer;
 
-import java.awt.Component;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,14 +16,11 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import dk.aau.cs.petrinet.TAPN;
 
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
@@ -36,6 +32,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.ProgressBar;
+import dk.aau.cs.petrinet.TAPN;
 
 
 /**
@@ -187,8 +184,7 @@ implements Cloneable {
 	private HashMap<TimedPlace, ArrayList<BigDecimal>> placeMarkingStorageMap = null;
 
 	private ArrayList<TAPNQuery> queries = null;
-	private HashMap<String, Constant> constants = new HashMap<String, Constant>();
-
+	private ConstantStore constants = new ConstantStore();
 	/**
 	 * Create Petri-Net object from PNML file with URI pnmlFileName
 	 * @param pnmlFileName Name of PNML File
@@ -310,12 +306,12 @@ implements Cloneable {
 					int no = placesArray.size();
 					//          id = "P" + no;
 					do {
-//						System.out.println("in while loop"); //DBG
+						//						System.out.println("in while loop"); //DBG
 						for (int i = 0; i < placesArray.size(); i++) {
 							id = "P" + no;
 							if (placesArray.get(i) != null) {
 								if (id.equals(((Place)placesArray.get(i)).getId())) {
-//									System.out.println("testing id: " + id); //DBG
+									//									System.out.println("testing id: " + id); //DBG
 									unique = false;
 									no++;
 								} else {
@@ -474,7 +470,7 @@ implements Cloneable {
 					arcInput.getSource() + " or target: " + arcInput.getTarget() + " is null"));
 			return;
 		}
-		
+
 		if (arcInput != null) {
 			if (arcInput.getId() != null && arcInput.getId().length() > 0) {
 				for (int i = 0 ; i < arcsArray.size() ; i++) {
@@ -508,7 +504,7 @@ implements Cloneable {
 					arcInput.setId("error");
 				}
 			}
-			
+
 			//Transportarc fix boddy
 			if (arcInput instanceof TransportArc){
 				TransportArc tmp = (TransportArc)arcInput;
@@ -525,7 +521,7 @@ implements Cloneable {
 
 									tmp.connectedTo = ((TransportArc)o);
 									((TransportArc)o).connectedTo = tmp; 
-									
+
 									break;
 								}
 							}
@@ -544,7 +540,7 @@ implements Cloneable {
 
 									tmp.connectedTo = ((TransportArc)o);
 									((TransportArc)o).connectedTo = tmp; 
-									
+
 									break;
 								}
 							}
@@ -554,10 +550,10 @@ implements Cloneable {
 
 					}
 				}
-				
-				
+
+
 			}
-			
+
 			arcsArray.add(arcInput);
 			addArcToArcsMap(arcInput);
 
@@ -678,13 +674,13 @@ implements Cloneable {
 		ArrayList newList = null;
 
 		if (source != null) {
-//			Pete: Place/Transitions now always moveable
-//			source.setMovable(false);
+			//			Pete: Place/Transitions now always moveable
+			//			source.setMovable(false);
 			if (arcsMap.get(source)!=null) {
-//				System.out.println("adding arc to existing list");
+				//				System.out.println("adding arc to existing list");
 				((ArrayList)arcsMap.get(source)).add(arcInput);
 			} else {
-//				System.out.println("creating new arc list");
+				//				System.out.println("creating new arc list");
 				newList = new ArrayList();
 				newList.add(arcInput);
 				arcsMap.put(source,newList);
@@ -692,19 +688,19 @@ implements Cloneable {
 		}
 
 		if (target != null) {
-//			Pete: Place/Transitions now always moveable
-//			target.setMovable(false);
+			//			Pete: Place/Transitions now always moveable
+			//			target.setMovable(false);
 			if (arcsMap.get(target)!=null) {
-//				System.out.println("adding arc to existing list2");
+				//				System.out.println("adding arc to existing list2");
 				((ArrayList)arcsMap.get(target)).add(arcInput);
 			} else {
-//				System.out.println("creating new arc list2");
+				//				System.out.println("creating new arc list2");
 				newList = new ArrayList();
 				newList.add(arcInput);
 				arcsMap.put(target,newList);
 			}
 		}
-//		System.out.println("arcsMap size: " + arcsMap.size());
+		//		System.out.println("arcsMap size: " + arcsMap.size());
 	}
 
 	/** 
@@ -737,9 +733,9 @@ implements Cloneable {
 				tapnInhibitorsMap.put(target, newList);
 			} 
 		}
-//		System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
+		//		System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
 	}
-	
+
 	/** 
 	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
 	 * @param arcInput New Arc
@@ -770,7 +766,7 @@ implements Cloneable {
 				inhibitorsMap.put(target, newList);
 			} 
 		}
-//		System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
+		//		System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
 	}
 
 
@@ -828,8 +824,8 @@ implements Cloneable {
 				addArc((TAPNInhibitorArc)pnObject);
 			} else if (pnObject instanceof Place) {
 				addPlace((Place)pnObject);
-//			} else if (pnObject instanceof TAPNTransition){
-//				addTAPNTransition((TAPNTransition)pnObject);
+				//			} else if (pnObject instanceof TAPNTransition){
+				//				addTAPNTransition((TAPNTransition)pnObject);
 			}else if (pnObject instanceof Transition) {
 				addTransition((Transition)pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
@@ -842,63 +838,63 @@ implements Cloneable {
 				markingParameterHashSet.add(pnObject.getName());
 			} else { // arrows, other labels.
 				changeArrayList.add(pnObject);
-			setChanged();
-			setMatrixChanged();
-			notifyObservers(pnObject);
+				setChanged();
+				setMatrixChanged();
+				notifyObservers(pnObject);
 			}
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
 	}
 
-//	private void addTAPNTransition(TAPNTransition transitionInput) {
-//		boolean unique = true;
-//
-//		if (transitionInput != null) {
-//			if (transitionInput.getId() != null
-//					&& transitionInput.getId().length() > 0) {
-//				for (int i = 0; i < transitionsArray.size(); i++) {
-//					if (transitionInput.getId().equals(
-//							((Transition)transitionsArray.get(i)).getId())) {
-//						unique = false;
-//					}
-//				}
-//			} else {
-//				String id = null;
-//				if (transitionsArray != null && transitionsArray.size() > 0) {
-//					int no = transitionsArray.size();
-//					do {
-//						// System.out.println("transition while loop");
-//						for (int i = 0; i < transitionsArray.size(); i++) {
-//							id = "T" + no;
-//							if (transitionsArray.get(i) != null) {
-//								if (id.equals(
-//										((TAPNTransition)transitionsArray.get(i)).getId())) {
-//									unique = false;
-//									no++;
-//								} else {
-//									unique = true;
-//								}
-//							}
-//						}
-//					} while(!unique);
-//				} else {
-//					id = "T0";
-//				}
-//
-//				if(id != null) {
-//					transitionInput.setId(id);
-//				} else {
-//					transitionInput.setId("error");
-//				}
-//			}
-//			transitionsArray.add(transitionInput);
-//			setChanged();
-//			setMatrixChanged();
-//			//    notifyObservers(transitionInput.getBounds());
-//			notifyObservers(transitionInput);
-//		}
-//	}
+	//	private void addTAPNTransition(TAPNTransition transitionInput) {
+	//		boolean unique = true;
+	//
+	//		if (transitionInput != null) {
+	//			if (transitionInput.getId() != null
+	//					&& transitionInput.getId().length() > 0) {
+	//				for (int i = 0; i < transitionsArray.size(); i++) {
+	//					if (transitionInput.getId().equals(
+	//							((Transition)transitionsArray.get(i)).getId())) {
+	//						unique = false;
+	//					}
+	//				}
+	//			} else {
+	//				String id = null;
+	//				if (transitionsArray != null && transitionsArray.size() > 0) {
+	//					int no = transitionsArray.size();
+	//					do {
+	//						// System.out.println("transition while loop");
+	//						for (int i = 0; i < transitionsArray.size(); i++) {
+	//							id = "T" + no;
+	//							if (transitionsArray.get(i) != null) {
+	//								if (id.equals(
+	//										((TAPNTransition)transitionsArray.get(i)).getId())) {
+	//									unique = false;
+	//									no++;
+	//								} else {
+	//									unique = true;
+	//								}
+	//							}
+	//						}
+	//					} while(!unique);
+	//				} else {
+	//					id = "T0";
+	//				}
+	//
+	//				if(id != null) {
+	//					transitionInput.setId(id);
+	//				} else {
+	//					transitionInput.setId("error");
+	//				}
+	//			}
+	//			transitionsArray.add(transitionInput);
+	//			setChanged();
+	//			setMatrixChanged();
+	//			//    notifyObservers(transitionInput.getBounds());
+	//			notifyObservers(transitionInput);
+	//		}
+	//	}
 
 
 	// XXX - kyrke 
@@ -1013,7 +1009,7 @@ implements Cloneable {
 							((Transition)attached).removeArcCompareObject((Arc)pnObject);
 							attached.updateConnected();
 						}
-//						attached.updateConnected(); //causing null pointer exceptions (?)
+						//						attached.updateConnected(); //causing null pointer exceptions (?)
 					}
 				} else if (pnObject instanceof InhibitorArc) {
 
@@ -1032,7 +1028,7 @@ implements Cloneable {
 						}
 						//attached.updateConnected(); //causing null pointer exceptions (?)
 					}
-					
+
 
 					attached = ((Arc)pnObject).getTarget();
 
@@ -1045,7 +1041,7 @@ implements Cloneable {
 						if (attached instanceof Transition) {
 							((Transition)attached).removeArcCompareObject((Arc)pnObject);
 						}
-//						attached.updateConnected(); //causing null pointer exceptions (?)
+						//						attached.updateConnected(); //causing null pointer exceptions (?)
 					}
 				}else if (pnObject instanceof TAPNInhibitorArc) {
 
@@ -1064,7 +1060,7 @@ implements Cloneable {
 						}
 						//attached.updateConnected(); //causing null pointer exceptions (?)
 					}
-					
+
 
 					attached = ((Arc)pnObject).getTarget();
 
@@ -1077,7 +1073,7 @@ implements Cloneable {
 						if (attached instanceof Transition) {
 							((Transition)attached).removeArcCompareObject((Arc)pnObject);
 						}
-//						attached.updateConnected(); //causing null pointer exceptions (?)
+						//						attached.updateConnected(); //causing null pointer exceptions (?)
 					}
 				} else if (pnObject instanceof MarkingParameter) {
 					markingParameterHashSet.remove(pnObject.getName());
@@ -1163,7 +1159,7 @@ implements Cloneable {
 			changeArrayList = inhibitorsArray;
 			return true;
 		}
-		 else if(pnObject instanceof AnnotationNote) {
+		else if(pnObject instanceof AnnotationNote) {
 			changeArrayList = labelsArray;
 			return true;
 		} else if(pnObject instanceof MarkingParameter) {
@@ -1595,8 +1591,8 @@ implements Cloneable {
 		String inscriptionTempStorage = inputArcElement.getAttribute("inscription");
 
 		String taggedTempStorage = inputArcElement.getAttribute("tagged");
-//		String inscriptionOffsetXTempStorage = inputArcElement.getAttribute("inscriptionOffsetX");
-//		String inscriptionOffsetYTempStorage = inputArcElement.getAttribute("inscriptionOffsetY");
+		//		String inscriptionOffsetXTempStorage = inputArcElement.getAttribute("inscriptionOffsetX");
+		//		String inscriptionOffsetYTempStorage = inputArcElement.getAttribute("inscriptionOffsetY");
 
 		taggedArc = !(taggedTempStorage.length() == 0 ||
 				taggedTempStorage.length() == 5);
@@ -1614,7 +1610,7 @@ implements Cloneable {
 
 		if (sourceInput.length() > 0) {
 			if (getPlaceTransitionObject(sourceInput) != null) {
-//				System.out.println("PNMLDATA: sourceInput is not null");
+				//				System.out.println("PNMLDATA: sourceInput is not null");
 				startX = getPlaceTransitionObject(sourceInput).getPositionX();
 				startX += getPlaceTransitionObject(sourceInput).centreOffsetLeft();
 				startY = getPlaceTransitionObject(sourceInput).getPositionY();
@@ -1623,7 +1619,7 @@ implements Cloneable {
 		}
 		if (targetInput.length() > 0) {
 			if (getPlaceTransitionObject(targetInput) != null) {
-//				System.out.println("PNMLDATA: targetInput is not null");
+				//				System.out.println("PNMLDATA: targetInput is not null");
 				endX = getPlaceTransitionObject(targetInput).getPositionX();
 				endY = getPlaceTransitionObject(targetInput).getPositionY();
 			}
@@ -1713,8 +1709,8 @@ implements Cloneable {
 		getPlaceTransitionObject(sourceInput).addConnectFrom(tempArc);
 		getPlaceTransitionObject(targetInput).addConnectTo(tempArc);
 
-//		**********************************************************************************
-//		The following section attempts to load and display arcpath details****************
+		//		**********************************************************************************
+		//		The following section attempts to load and display arcpath details****************
 
 		//NodeList nodelist = inputArcElement.getChildNodes();
 		NodeList nodelist = inputArcElement.getElementsByTagName("arcpath");
@@ -1740,8 +1736,8 @@ implements Cloneable {
 			}
 		}
 
-//		Arc path creation ends here***************************************************************
-//		******************************************************************************************
+		//		Arc path creation ends here***************************************************************
+		//		******************************************************************************************
 		return tempArc;
 	}
 
@@ -1784,7 +1780,7 @@ implements Cloneable {
 											placeNo, transitionNo, arc.getWeight());
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
-											"Problem in forwardsIncidenceMatrix");
+									"Problem in forwardsIncidenceMatrix");
 									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
 								}
 							}
@@ -1823,7 +1819,7 @@ implements Cloneable {
 											placeNo, transitionNo, arc.getWeight());
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
-											"Problem in backwardsIncidenceMatrix");                            
+									"Problem in backwardsIncidenceMatrix");                            
 									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
 								}
 							}
@@ -1942,7 +1938,7 @@ implements Cloneable {
 											placeNo, transitionNo, inhibitorArc.getWeight());
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
-											"Problema a inhibitionMatrix");                          
+									"Problema a inhibitionMatrix");                          
 									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
 								}                        
 							}
@@ -1975,7 +1971,7 @@ implements Cloneable {
 											placeNo, transitionNo, inhibitorArc.getWeight());
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
-											"Problema a inhibitionMatrix");                          
+									"Problema a inhibitionMatrix");                          
 									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
 								}                        
 							}
@@ -2062,11 +2058,11 @@ implements Cloneable {
 	 */
 	public DiscreetFiringAction fireTransition(Transition transition) {
 		DiscreetFiringAction toReturn = null;
-		
+
 		// If it is a TAPN
 		if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
 			toReturn = new DiscreetFiringAction(transition);
-			
+
 			if (transition != null){
 				setEnabledTransitions();
 
@@ -2088,34 +2084,34 @@ implements Cloneable {
 						hadTransportArc = true;
 						if (a instanceof TransportArc){
 							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-							
 
-						   TimedPlace p = (TimedPlace)a.getSource();
-						   
-						   ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-						   
-						   TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
-						   
+
+							TimedPlace p = (TimedPlace)a.getSource();
+
+							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
+
+							TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
+
 							for (int i=0; i< tokensOfPlace.size(); i++){
 								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
 									eligableToken.add(tokensOfPlace.get(i));
 								}
 							}	
 							BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
-							
-//							XXX  - This will break if two tokens from the same place is consumed
+
+							//							XXX  - This will break if two tokens from the same place is consumed
 							toReturn.addConsumedToken(p, tokenToRemove);
-												   
-						    tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
-						   
-					
-						   
-						   p.removeTokenofAge(tokenToRemove);
+
+							tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
+
+
+
+							p.removeTokenofAge(tokenToRemove);
 						}
 						// if arc is an inhibitor arc then do nothing.
 						else if(a instanceof TAPNInhibitorArc)
 						{
-						
+
 						}
 						else if (a instanceof TimedArc){
 							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
@@ -2132,13 +2128,13 @@ implements Cloneable {
 
 							//Select torken to remove based on firing mode
 							BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
-							
-//							XXX  - This will break if two tokens from the same place is consumed
+
+							//							XXX  - This will break if two tokens from the same place is consumed
 							toReturn.addConsumedToken(p, tokenToRemove);
-							
+
 							p.removeTokenofAge(tokenToRemove);
-							
-							
+
+
 
 						} 
 						else {
@@ -2184,11 +2180,11 @@ implements Cloneable {
 			}
 		}
 		setMatrixChanged();
-		
+
 		return toReturn;
 	}
-	
-	
+
+
 	/**
 	 * Fire a specified transition and specific tokens, no affect if transtions not enabled
 	 * @param transition Reference of specifiec Transition
@@ -2197,11 +2193,11 @@ implements Cloneable {
 	 * firing modes when working with TAPN.
 	 */
 	public void fireTransition(Transition transition, HashMap<Place, ArrayList<BigDecimal>> consumedTokens) {
-		
-		
+
+
 		// If it is a TAPN
 		if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
-						
+
 			if (transition != null){
 				setEnabledTransitions();
 
@@ -2245,7 +2241,7 @@ implements Cloneable {
 						// if arc is an inhibitor arc then do nothing
 						else if(a instanceof TAPNInhibitorArc)
 						{
-						
+
 						}
 						else if (a instanceof TimedArc){
 							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
@@ -2295,11 +2291,11 @@ implements Cloneable {
 
 				}
 			}		   
-		
+
 		}
 		setMatrixChanged();
 	}
-	
+
 
 
 	/**
@@ -2467,7 +2463,7 @@ implements Cloneable {
 			TimedPlace place = (TimedPlace)a.getSource();
 			//place.setCurrentMarking( (presetMarking.get(place)).size() );
 			//place.setAgeOfTokens(presetMarking.get(place));
-			
+
 			// XXX - kyrke Hav now idea on why the two above functions do net do the work, 
 			// But the dont... So we will just use this function for now instead
 			place.setTokensAndAgeOfTokens(presetMarking.get(place));
@@ -2476,16 +2472,16 @@ implements Cloneable {
 			TimedPlace place = (TimedPlace)a.getTarget();
 			//place.setCurrentMarking( ((ArrayList<Float>)postsetMarking.get(place)).size() );
 			//place.setAgeOfTokens(postsetMarking.get(place));
-			
+
 			// XXX - kyrke Hav now idea on why the two above functions do net do the work, 
 			// But the dont... So we will just use this function for now instead
 			place.setTokensAndAgeOfTokens(postsetMarking.get(place));
 		}
 		setMatrixChanged(); 
 	}
-	
-	
-	
+
+
+
 	public void fireTransitionBackwards(Transition transition) {
 		if (transition != null) {
 			setEnabledTransitionsBackwards();
@@ -2619,7 +2615,7 @@ implements Cloneable {
 	 * Determines whether all transitions are enabled and sets
 	 * the correct value of the enabled boolean
 	 */
-//	Joakim Byg - Used other less obscure method implemented right below   
+	//	Joakim Byg - Used other less obscure method implemented right below   
 	/*   public void setEnabledTransitions() {
 
       if (currentMarkingVectorChanged) {
@@ -2646,7 +2642,7 @@ implements Cloneable {
       }
    }
 	 */  
-//	Joakim Byg - new less obscure global update for enabled transitions
+	//	Joakim Byg - new less obscure global update for enabled transitions
 	public void setEnabledTransitions(){
 		createMatrixes();
 
@@ -2660,13 +2656,13 @@ implements Cloneable {
 				if (p instanceof TimedPlace){
 
 					boolean ageIsSatisfied;
-					
+
 					if(a instanceof TAPNInhibitorArc)
 						ageIsSatisfied = true;
 					else
 						ageIsSatisfied = false;
 
-					
+
 					if (p.currentMarking > 0){
 
 						for ( BigDecimal token : ((TimedPlace)p).getTokens() ){
@@ -2677,13 +2673,13 @@ implements Cloneable {
 									ageIsSatisfied = false;
 									break;
 								}
-								
-									
+
+
 							}
 							else
 							{
 								if ( ((TimedArc)a).satisfiesGuard(token) ){
-	
+
 									//make sure no invariants are violated
 									if (a instanceof TransportArc){
 										for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
@@ -2976,7 +2972,7 @@ implements Cloneable {
 		}
 		return returnArray;
 	}
-	
+
 	public TAPNInhibitorArc[] getTAPNInhibitors() {
 		TAPNInhibitorArc[] returnArray = new TAPNInhibitorArc[inhibitorsArray.size()];
 
@@ -3340,7 +3336,7 @@ implements Cloneable {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * Create model from transformed PNML file
 	 */
@@ -3350,7 +3346,7 @@ implements Cloneable {
 		Node node = null;
 		NodeList nodeList = null;
 		ArrayList<TAPNQuery> queriesArrayList = new ArrayList<TAPNQuery>();
-		
+
 		try {
 			nodeList = PNMLDoc.getDocumentElement().getChildNodes();
 			if (CreateGui.getApp()!=null) {
@@ -3548,49 +3544,49 @@ implements Cloneable {
 
 
 	private TAPNQuery createQuery(Element queryElement) {
-		
+
 		String comment;
 		try{
 			comment = queryElement.getAttribute("name");
 		}catch (Exception e) {
 			comment = "No comment specified";
 		}
-		
+
 		TraceOption traceOption;
 		try{
 			traceOption = TraceOption.valueOf(queryElement.getAttribute("traceOption"));
 		}catch (Exception e) {
 			traceOption = TraceOption.NONE;
 		}
-		
+
 		SearchOption searchOption;
 		try{
 			searchOption = SearchOption.valueOf(queryElement.getAttribute("searchOption"));
 		}catch (Exception e) {
 			searchOption = SearchOption.BFS;
 		}
-		
+
 		HashTableSize hashTableSize;
 		try{
 			hashTableSize = HashTableSize.valueOf(queryElement.getAttribute("hashTableSize"));		
 		}catch (Exception e) {
 			hashTableSize = HashTableSize.MB_16;
 		}
-		
+
 		ExtrapolationOption extrapolationOption;
 		try{
 			extrapolationOption = ExtrapolationOption.valueOf(queryElement.getAttribute("extrapolationOption"));		
 		}catch (Exception e) {
 			extrapolationOption = ExtrapolationOption.AUTOMATIC;
 		}
-		
+
 		ReductionOption reductionOption;
 		try{
 			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
 		}catch (Exception e) {
 			reductionOption = ReductionOption.NAIVE;
 		}
-		
+
 		String capacity;
 		try{
 			capacity =  queryElement.getAttribute("capacity");		
@@ -3605,8 +3601,8 @@ implements Cloneable {
 			System.err.println("No query was specified: " + e.getStackTrace());
 			return null;
 		}
-		
-		
+
+
 	}
 
 
@@ -3792,8 +3788,8 @@ implements Cloneable {
 				notifyObservers(p);
 			}
 		}
-		
-		
+
+
 		setEnabledTransitions();
 		setMatrixChanged();
 	}
@@ -3822,10 +3818,10 @@ implements Cloneable {
 		}
 		return true;
 	}
-	
+
 	public void setQueries(ArrayList<TAPNQuery> queries) {
 		this.queries = queries;
-		
+
 	}
 	public ArrayList<TAPNQuery> getQueries(){
 		return queries;
@@ -3833,37 +3829,45 @@ implements Cloneable {
 
 	public Collection<Constant> getConstants()
 	{
-		return constants.values();
+		return constants.getConstants();
 	}
-	
+
 	public void updateConstant(String oldName, Constant constant)
 	{
-		if(constants.containsKey(oldName))
-		{
-			constants.put(oldName, constant);
+		boolean success = constants.updateConstant(oldName, constant);
+		if(!success){
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"The specified value is invalid for the current net.\n" +
+					"Updating the constant to the specified value invalidates the guard\n" + 
+					"on one or more ars.",
+					"Constant value invalid for current net",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	public void addConstant(String name, int value) {	
-		if(!constants.containsKey(name))
-			constants.put(name, new Constant(name, value));
-		else
-		{
+		boolean success = constants.addConstant(name, value);
+		if(!success){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"A constant with the specified name already exists.",
 					"Constant exists",
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
-	public void removeConstant(String name){
-		if(constants.containsKey(name))
-			constants.remove(name);
-	}
 
+	public void removeConstant(String name){
+		boolean success = constants.removeConstant(name);
+		if(!success){
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"You cannot remove a constant that is used in the net.\nRemove all references " +
+					"to the constant in the net and try again.",
+					"Constant in use",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
 	public void addQuery(TAPNQuery query) {
 		queries.add(query);
-		
+
 	}
 }

@@ -1,15 +1,13 @@
 package pipe.gui;
 
-import java.io.BufferedReader;
 import java.io.PrintStream;
 
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
-
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Verification.RunUppaalVerification;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 
