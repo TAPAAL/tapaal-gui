@@ -12,8 +12,93 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 public class Edge {
 
-	String gard = "";
-	String sync = "";
-	String update = "";
+	private String guard = "";
+	private String sync = "";
+	private String update = "";
 	
+	private Location source;
+	private Location dest;
+	
+	
+	public Edge(Location source, Location dest, String guard, String sync, String update)
+	{
+		this.source = source;
+		this.dest = dest;
+		this.guard = guard;
+		this.sync = sync;
+		this.update = update;
+	}
+	
+	public Location getSource()
+	{
+		return source;
+	}
+	
+	public void setSource(Location source)
+	{
+		this.source = source;
+	}
+	
+	public Location getDestination()
+	{
+		return dest;
+	}
+	
+	public void setDestination(Location dest)
+	{
+		this.dest = dest;
+	}
+	
+	public String getGuard()
+	{
+		return guard;
+	}
+	
+	public void setGuard(String guard)
+	{
+		// TODO: check guard conforms to what is allowed
+		this.guard = guard;
+	}
+	
+	public String getSync()
+	{
+		return sync;
+	}
+	
+	public void setSync(String sync)
+	{
+		// TODO: check sync conforms to what is allowed in uppaal
+		this.sync = sync;
+	}
+	
+	public String getUpdate()
+	{
+		return update;
+	}
+	
+	public void setUpdate(String update)
+	{
+		//TODO: check update conforms to what is allowed in uppaal
+		this.update = update;
+	}
+	
+	public StringBuffer toXML()
+	{
+		StringBuffer res = new StringBuffer();
+		
+		res.append("<transition>\n");
+		res.append("<source ref=\"a" + source.getID() + "\" />\n");
+		res.append("<target ref=\"a" + dest.getID() + "\" />\n");
+		
+		// replace "<" and ">" in guard with "&lt;" and "&gt;" respectively and replace "&&" with "&amp;&amp;"
+		String tmp = guard.replace("<", "&lt;").replace(">", "&gt;");
+		tmp = tmp.replace("&&", "&amp;&amp;");
+		
+		res.append("<label kind=\"guard\" x=\"432\" y=\"64\">" + tmp + "</label>\n");
+		res.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">" + sync + "</label>\n");
+		res.append("<label kind=\"assignment\" x=\"10\" y=\"160\">" + update + "</label>\n");
+		
+		res.append("</transition>\n");
+		return res;
+	}
 }
