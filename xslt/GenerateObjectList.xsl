@@ -33,6 +33,7 @@
       <xsl:apply-templates select="page"/>
       <xsl:apply-templates select="module"/>
       <xsl:apply-templates select="queries"/>
+      <xsl:apply-templates select="constant"/>
    </xsl:template>
    
    <xsl:template match="page">
@@ -314,6 +315,17 @@
          </xsl:attribute>
          <xsl:attribute name="query">
             <xsl:value-of select="query/value"/>
+         </xsl:attribute>
+      </xsl:element>
+   </xsl:template>
+
+   <xsl:template match="constant">
+      <xsl:element name="constant">
+         <xsl:attribute name="name">
+            <xsl:value-of select="@name"/>
+         </xsl:attribute>
+         <xsl:attribute name="value">
+            <xsl:value-of select="@value"/>
          </xsl:attribute>
       </xsl:element>
    </xsl:template>

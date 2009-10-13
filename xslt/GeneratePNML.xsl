@@ -37,6 +37,9 @@
          <xsl:apply-templates select="net/queries">
             <!-- <xsl:sort select="@name" data-type="text"/> -->
          </xsl:apply-templates>
+	 <xsl:apply-templates select="net/constant">
+            <!-- <xsl:sort select="@name" data-type="text"/> -->
+         </xsl:apply-templates>
       </xsl:element>
    </xsl:template>
    
@@ -103,6 +106,17 @@
          		<xsl:value-of select="@query"/>
          	</xsl:element>
          </xsl:element>
+      </xsl:element>
+   </xsl:template>
+
+   <xsl:template match="net/constant">
+      <xsl:element name="constant">
+         <xsl:attribute name="name">
+            <xsl:value-of select="@name"/>
+         </xsl:attribute>
+         <xsl:attribute name="value">
+            <xsl:value-of select="@value"/>
+         </xsl:attribute>
       </xsl:element>
    </xsl:template>
 

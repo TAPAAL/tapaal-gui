@@ -198,12 +198,12 @@ public class DataLayerWriter {
 					getContextClassLoader().getResourceAsStream("xslt" + 
 							System.getProperty("file.separator") + "GeneratePNML.xsl"));
 
+			
 			transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
 			// Write file and do XSLT transformation to generate correct PNML
 			File outputObjectArrayList = file;//new File(filename); // Output for XSLT Transformation
 			DOMSource source = new DOMSource(pnDOM);
-
-
+			
 			StreamResult result = new StreamResult(outputObjectArrayList);
 			transformer.transform(source, result);
 		} catch (ParserConfigurationException e) {
@@ -243,7 +243,7 @@ public class DataLayerWriter {
 		Element constantElement = null;
 		
 		if(document != null){
-			constantElement = document.createElement("declaration");
+			constantElement = document.createElement("constant");
 		}
 		
 		if(constant != null){

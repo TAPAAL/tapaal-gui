@@ -3329,44 +3329,8 @@ implements Cloneable {
 			for(int i = 0 ; i < nodeList.getLength() ; i++) {
 				node = nodeList.item(i);
 
-				if(node instanceof Element) {
-					element = (Element)node;
-					if ("labels".equals(element.getNodeName())){
-						addAnnotation(createAnnotation(element));
-					} else if ("definition".equals(element.getNodeName())){
-						Note note = createParameter(element);
-						if (note instanceof MarkingParameter) {
-							addAnnotation((MarkingParameter)note);
-						} else if (note instanceof RateParameter) {
-							addAnnotation((RateParameter)note);
-						}
-					} else if("place".equals(element.getNodeName())){
-						addPlace(createPlace(element));
-					} else if ("transition".equals(element.getNodeName())){
-						addTransition(createTransition(element));
-					} else if ("arc".equals(element.getNodeName())) {
-
-						Arc newArc = createArc(element);
-						if (newArc instanceof InhibitorArc) {
-							addArc((InhibitorArc) newArc);
-						} else if (newArc instanceof TAPNInhibitorArc) {
-							addArc((TAPNInhibitorArc) newArc);
-						}
-						else {
-							addArc((NormalArc) newArc);
-							checkForInverseArc((NormalArc) newArc); 
-						}
-					} else if ("stategroup".equals(element.getNodeName())) {
-						addStateGroup(createStateGroup(element));
-					} else if ("queries".equals(element.getNodeName())){
-						queries.add(createQuery(element));
-					} else {
-						System.out.println("!" + element.getNodeName());
-					}
-				}
+				parseElement(node);
 			}
-
-
 
 			if (CreateGui.getApp()!=null) {
 				CreateGui.getApp().restoreMode();
@@ -3376,6 +3340,81 @@ implements Cloneable {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 * Create model from transformed PNML file
+	 */
+	public void createFromPNML(Document PNMLDoc, ProgressBar progressBar) {
+		emptyPNML();
+		Element element = null;
+		Node node = null;
+		NodeList nodeList = null;
+		ArrayList<TAPNQuery> queriesArrayList = new ArrayList<TAPNQuery>();
+		
+		try {
+			nodeList = PNMLDoc.getDocumentElement().getChildNodes();
+			if (CreateGui.getApp()!=null) {
+				// Notifies used to indicate new instances.
+				CreateGui.getApp().setMode(Pipe.CREATING); 
+			}
+			progressBar.setProgressBar(nodeList.getLength());
+			for(int i = 0 ; i < nodeList.getLength() ; i++) {
+				node = nodeList.item(i);
+
+				parseElement(node);
+				progressBar.step();
+			}
+
+			if (CreateGui.getApp()!=null) {
+				CreateGui.getApp().restoreMode();
+			}
+			CreateGui.getModel().setQueries(queries);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+
+	private void parseElement(Node node) {
+		Element element;
+		if(node instanceof Element) {
+			element = (Element)node;
+			if ("labels".equals(element.getNodeName())){
+				addAnnotation(createAnnotation(element));
+			} else if ("definition".equals(element.getNodeName())){
+				Note note = createParameter(element);
+				if (note instanceof MarkingParameter) {
+					addAnnotation((MarkingParameter)note);
+				} else if (note instanceof RateParameter) {
+					addAnnotation((RateParameter)note);
+				}
+			} else if("place".equals(element.getNodeName())){
+				addPlace(createPlace(element));
+			} else if ("transition".equals(element.getNodeName())){
+				addTransition(createTransition(element));
+			} else if ("arc".equals(element.getNodeName())) {
+				Arc newArc = createArc(element);
+				if (newArc instanceof InhibitorArc) {
+					addArc((InhibitorArc) newArc);
+				} else if (newArc instanceof TAPNInhibitorArc) {
+					addArc((TAPNInhibitorArc) newArc);
+				} else {
+					addArc((NormalArc) newArc);
+					checkForInverseArc((NormalArc) newArc);
+				}                  
+			} else if( "queries".equals(element.getNodeName()) ){
+				TAPNQuery query = createQuery(element);
+				queries.add(query);
+			} else if ("constant".equals(element.getNodeName())){
+				String name = element.getAttribute("name");
+				int value = Integer.parseInt(element.getAttribute("value"));
+				if(!name.isEmpty() && value >= 0)
+					addConstant(name, value);
+			} else {
+				System.out.println("!" + element.getNodeName());
+			}
+		}
+	}   
 
 
 	/**  
@@ -3505,71 +3544,6 @@ implements Cloneable {
 			returnArray[i] = (StateGroup)stateGroups.get(i);
 		}
 		return returnArray;
-	}   
-
-
-	/**
-	 * Create model from transformed PNML file
-	 */
-	public void createFromPNML(Document PNMLDoc, ProgressBar progressBar) {
-		emptyPNML();
-		Element element = null;
-		Node node = null;
-		NodeList nodeList = null;
-		ArrayList<TAPNQuery> queriesArrayList = new ArrayList<TAPNQuery>();
-		
-		try {
-			nodeList = PNMLDoc.getDocumentElement().getChildNodes();
-			if (CreateGui.getApp()!=null) {
-				// Notifies used to indicate new instances.
-				CreateGui.getApp().setMode(Pipe.CREATING); 
-			}
-			progressBar.setProgressBar(nodeList.getLength());
-			for(int i = 0 ; i < nodeList.getLength() ; i++) {
-				node = nodeList.item(i);
-
-				if(node instanceof Element) {
-					element = (Element)node;
-					if ("labels".equals(element.getNodeName())){
-						addAnnotation(createAnnotation(element));
-					} else if ("definition".equals(element.getNodeName())){
-						Note note = createParameter(element);
-						if (note instanceof MarkingParameter) {
-							addAnnotation((MarkingParameter)note);
-						} else if (note instanceof RateParameter) {
-							addAnnotation((RateParameter)note);
-						}
-					} else if("place".equals(element.getNodeName())){
-						addPlace(createPlace(element));
-					} else if ("transition".equals(element.getNodeName())){
-						addTransition(createTransition(element));
-					} else if ("arc".equals(element.getNodeName())) {
-						Arc newArc = createArc(element);
-						if (newArc instanceof InhibitorArc) {
-							addArc((InhibitorArc) newArc);
-						} else if (newArc instanceof TAPNInhibitorArc) {
-							addArc((TAPNInhibitorArc) newArc);
-						} else {
-							addArc((NormalArc) newArc);
-							checkForInverseArc((NormalArc) newArc);
-						}                  
-					} else if( "queries".equals(element.getNodeName()) ){
-						TAPNQuery query = createQuery(element);
-						queries.add(query);
-					} else {
-						System.out.println("!" + element.getNodeName());
-					}
-				}
-				progressBar.step();
-			}
-
-			if (CreateGui.getApp()!=null) {
-				CreateGui.getApp().restoreMode();
-			}
-			CreateGui.getModel().setQueries(queries);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}   
 
 
