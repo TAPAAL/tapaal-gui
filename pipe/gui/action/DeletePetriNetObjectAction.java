@@ -33,11 +33,19 @@ public class DeletePetriNetObjectAction
    /* (non-Javadoc)
     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
     */
-   public void actionPerformed(ActionEvent e) {
+   public void actionPerformed(ActionEvent e) 
+   {
       CreateGui.getView().getUndoManager().newEdit(); // new "transaction""
-      CreateGui.getView().getUndoManager().deleteSelection(selected);      
-      selected.delete();
-      
+      if(CreateGui.getView().getSelectionObject().getSelectionCount() <= 1)
+      {
+    	  CreateGui.getView().getUndoManager().deleteSelection(selected);
+    	  selected.delete();
+      }
+      else
+      {
+    	  CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());
+    	  CreateGui.getView().getSelectionObject().deleteSelection();
+      }
    }
 
 }

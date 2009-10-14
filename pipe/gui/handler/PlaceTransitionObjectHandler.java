@@ -631,6 +631,9 @@ public class PlaceTransitionObjectHandler
         				 }
     					 if (existsArc){
 							 transportArcToCreate.delete();
+							 
+							 // remove first part of transport arc
+							 view.transportArcPart1.delete();
     						 break;
     					 }
         				 currentObject.addConnectTo(transportArcToCreate);

@@ -166,8 +166,8 @@ public class SelectionManager
    }
 
    
-   public ArrayList getSelection() {
-      ArrayList selection = new ArrayList();
+   public ArrayList<PetriNetObject> getSelection() {
+      ArrayList<PetriNetObject> selection = new ArrayList<PetriNetObject>();
 
       // Get all the objects in the current window
       ArrayList <PetriNetObject> pnObjects = view.getPNObjects();
