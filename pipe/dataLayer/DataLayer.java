@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -27,6 +28,7 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.constraints.GuardConstraint;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -164,19 +166,19 @@ implements Cloneable {
 	private final int DISPLAY_SHIFT_FACTORY = 120; // Scale factors for loading other Petri-Nets (not yet implemented)
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
-	private Hashtable arcsMap = null;
+	private Hashtable<PlaceTransitionObject, ArrayList<NormalArc>> arcsMap = null;
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
-	private Hashtable inhibitorsMap = null;
-	private Hashtable tapnInhibitorsMap = null;
+	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
+	private Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>> tapnInhibitorsMap = null;
 
 	/** An ArrayList used store the source / destination state groups associated 
 	 * with this Petri-Net */
-	private ArrayList stateGroups = null;   
+	private ArrayList<StateGroup> stateGroups = null;   
 
-	private HashSet markingParameterHashSet = new HashSet();
+	private HashSet<String> markingParameterHashSet = new HashSet<String>();
 
-	private HashSet rateParameterHashSet = new HashSet();
+	private HashSet<String> rateParameterHashSet = new HashSet<String>();
 
 	private HashMap<Transition, HashMap<TransportArc, TransportArc> > transportArcMap;
 
@@ -261,13 +263,14 @@ implements Cloneable {
 	 * Initialize Arrays
 	 */
 	private void initializeMatrices() {
+
 		placesArray = new ArrayList<Place>();
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
 		inhibitorsArray = new ArrayList();
 		//tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList();
-		stateGroups = new ArrayList();
+		stateGroups = new ArrayList<StateGroup>();
 		markingParametersArray = new ArrayList();
 		rateParametersArray = new ArrayList();
 		initialMarkingVector = null;
@@ -278,9 +281,9 @@ implements Cloneable {
 		tapnInhibitionMatrix = null;
 
 		// may as well do the hashtable here as well
-		arcsMap = new Hashtable();
-		inhibitorsMap = new Hashtable();
-		tapnInhibitorsMap = new Hashtable();
+		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<NormalArc>>();
+		inhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>>();
+		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>>();
 	}
 
 
@@ -670,17 +673,17 @@ implements Cloneable {
 		// now we want to add the arc to the list of arcs for it's source and target
 		PlaceTransitionObject source = arcInput.getSource();
 		PlaceTransitionObject target = arcInput.getTarget();
-		ArrayList newList = null;
+		ArrayList<NormalArc> newList = null;
 
 		if (source != null) {
 			//			Pete: Place/Transitions now always moveable
 			//			source.setMovable(false);
 			if (arcsMap.get(source)!=null) {
 				//				System.out.println("adding arc to existing list");
-				((ArrayList)arcsMap.get(source)).add(arcInput);
+				arcsMap.get(source).add(arcInput);
 			} else {
 				//				System.out.println("creating new arc list");
-				newList = new ArrayList();
+				newList = new ArrayList<NormalArc>();
 				newList.add(arcInput);
 				arcsMap.put(source,newList);
 			}
@@ -691,10 +694,10 @@ implements Cloneable {
 			//			target.setMovable(false);
 			if (arcsMap.get(target)!=null) {
 				//				System.out.println("adding arc to existing list2");
-				((ArrayList)arcsMap.get(target)).add(arcInput);
+				arcsMap.get(target).add(arcInput);
 			} else {
 				//				System.out.println("creating new arc list2");
-				newList = new ArrayList();
+				newList = new ArrayList<NormalArc>();
 				newList.add(arcInput);
 				arcsMap.put(target,newList);
 			}
@@ -711,13 +714,13 @@ implements Cloneable {
 		// it's source and target
 		PlaceTransitionObject source = inhibitorArcInput.getSource();
 		PlaceTransitionObject target = inhibitorArcInput.getTarget();
-		ArrayList newList = null;
+		ArrayList<TAPNInhibitorArc> newList = null;
 
 		if (source != null) {
 			if (tapnInhibitorsMap.get(source) != null) {
-				((ArrayList)tapnInhibitorsMap.get(source)).add(inhibitorArcInput);
+				tapnInhibitorsMap.get(source).add(inhibitorArcInput);
 			} else {
-				newList = new ArrayList();
+				newList = new ArrayList<TAPNInhibitorArc>();
 				newList.add(inhibitorArcInput);
 				tapnInhibitorsMap.put(source, newList);
 			}
@@ -725,9 +728,9 @@ implements Cloneable {
 
 		if (target != null) {
 			if (tapnInhibitorsMap.get(target) != null) {
-				((ArrayList)tapnInhibitorsMap.get(target)).add(inhibitorArcInput);
+				tapnInhibitorsMap.get(target).add(inhibitorArcInput);
 			} else {
-				newList = new ArrayList();
+				newList = new ArrayList<TAPNInhibitorArc>();
 				newList.add(inhibitorArcInput);
 				tapnInhibitorsMap.put(target, newList);
 			} 
@@ -744,13 +747,13 @@ implements Cloneable {
 		// it's source and target
 		PlaceTransitionObject source = inhibitorArcInput.getSource();
 		PlaceTransitionObject target = inhibitorArcInput.getTarget();
-		ArrayList newList = null;
+		ArrayList<InhibitorArc> newList = null;
 
 		if (source != null) {
 			if (inhibitorsMap.get(source) != null) {
-				((ArrayList)inhibitorsMap.get(source)).add(inhibitorArcInput);
+				inhibitorsMap.get(source).add(inhibitorArcInput);
 			} else {
-				newList = new ArrayList();
+				newList = new ArrayList<InhibitorArc>();
 				newList.add(inhibitorArcInput);
 				inhibitorsMap.put(source, newList);
 			}
@@ -758,9 +761,9 @@ implements Cloneable {
 
 		if (target != null) {
 			if (inhibitorsMap.get(target) != null) {
-				((ArrayList)inhibitorsMap.get(target)).add(inhibitorArcInput);
+				inhibitorsMap.get(target).add(inhibitorArcInput);
 			} else {
-				newList = new ArrayList();
+				newList = new ArrayList<InhibitorArc>();
 				newList.add(inhibitorArcInput);
 				inhibitorsMap.put(target, newList);
 			} 
@@ -781,7 +784,7 @@ implements Cloneable {
 
 			// Check if ID is unique
 			for (int i = 0; i < stateGroups.size(); i++) {
-				if(id.equals(((StateGroup)stateGroups.get(i)).getId())) {
+				if(id.equals(stateGroups.get(i).getId())) {
 					unique = false;
 				}
 			}
@@ -794,7 +797,7 @@ implements Cloneable {
 			id = "SG" + no;
 			for (int i = 0; i < stateGroups.size(); i++) {
 				// If a matching ID is found, increment id and reset loop
-				if (id.equals(((StateGroup)stateGroups.get(i)).getId())) {
+				if (id.equals(stateGroups.get(i).getId())) {
 					id = "SG" + ++no;
 					i = 0;
 				}
@@ -929,10 +932,10 @@ implements Cloneable {
 				// we want to remove all attached arcs also
 				if (pnObject instanceof PlaceTransitionObject) {
 
-					if ( (ArrayList)arcsMap.get(pnObject) != null) {
+					if ( arcsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are removing
-						attachedArcs = ((ArrayList)arcsMap.get(pnObject));
+						attachedArcs = arcsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all
 						// Pere: in inverse order!
@@ -952,10 +955,10 @@ implements Cloneable {
 						arcsMap.remove(pnObject);
 					}
 
-					if ( (ArrayList)inhibitorsMap.get(pnObject) != null) {
+					if ( inhibitorsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are removing
-						attachedArcs = ((ArrayList)inhibitorsMap.get(pnObject));
+						attachedArcs = inhibitorsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all
 						// Pere: in inverse order!
@@ -965,10 +968,10 @@ implements Cloneable {
 						}
 						inhibitorsMap.remove(pnObject);
 					}
-					if ( (ArrayList)tapnInhibitorsMap.get(pnObject) != null) {
+					if ( tapnInhibitorsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are removing
-						attachedArcs = ((ArrayList)tapnInhibitorsMap.get(pnObject));
+						attachedArcs = tapnInhibitorsMap.get(pnObject);
 
 						// iterate over all the attached arcs, removing them all
 						// Pere: in inverse order!
@@ -984,7 +987,7 @@ implements Cloneable {
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList a = (ArrayList)arcsMap.get(attached);
+						ArrayList a = arcsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -1000,7 +1003,7 @@ implements Cloneable {
 					attached = ((Arc)pnObject).getTarget();           
 					if (attached != null) {
 						if (arcsMap.get(attached) != null) { //causing null pointer exceptions (!)
-							((ArrayList)arcsMap.get(attached)).remove(pnObject);
+							arcsMap.get(attached).remove(pnObject);
 						}
 
 						attached.removeToArc((Arc)pnObject);
@@ -1016,7 +1019,7 @@ implements Cloneable {
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList a=(ArrayList)inhibitorsMap.get(attached);
+						ArrayList a=inhibitorsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -1033,7 +1036,7 @@ implements Cloneable {
 
 					if (attached != null) {
 						if (inhibitorsMap.get(attached) != null) { //causing null pointer exceptions (!)
-							((ArrayList)inhibitorsMap.get(attached)).remove(pnObject);
+							inhibitorsMap.get(attached).remove(pnObject);
 						}
 
 						attached.removeToArc((Arc)pnObject);
@@ -1048,7 +1051,7 @@ implements Cloneable {
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList a=(ArrayList)tapnInhibitorsMap.get(attached);
+						ArrayList a=tapnInhibitorsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -1065,7 +1068,7 @@ implements Cloneable {
 
 					if (attached != null) {
 						if (tapnInhibitorsMap.get(attached) != null) { //causing null pointer exceptions (!)
-							((ArrayList)tapnInhibitorsMap.get(attached)).remove(pnObject);
+							tapnInhibitorsMap.get(attached).remove(pnObject);
 						}
 
 						attached.removeToArc((Arc)pnObject);
@@ -2312,7 +2315,7 @@ implements Cloneable {
 		// a) all are immediate transitions; or 
 		// b) all are timed transitions.
 
-		ArrayList enabledTransitions = new ArrayList();
+		ArrayList<Transition> enabledTransitions = new ArrayList<Transition>();
 		double rate = 0;
 		for (int i = 0; i < transitionsArray.size(); i++) {
 			Transition transition = (Transition)transitionsArray.get(i);
@@ -2324,13 +2327,13 @@ implements Cloneable {
 
 		// if there is only one enabled transition, return this transition
 		if (enabledTransitions.size() == 1) {
-			return (Transition)enabledTransitions.get(0);
+			return enabledTransitions.get(0);
 		}      
 
 		double random = randomNumber.nextDouble();
 		double x = 0;
 		for (int i = 0; i < enabledTransitions.size(); i++) {
-			Transition t = (Transition)enabledTransitions.get(i);
+			Transition t = enabledTransitions.get(i);
 
 			x += t.getRate() / rate;
 
@@ -3347,6 +3350,7 @@ implements Cloneable {
 			if (CreateGui.getApp()!=null) {
 				CreateGui.getApp().restoreMode();
 			}
+			buildConstraints();
 		} catch (Exception e) {
 			System.out.println("runtime except");
 			throw new RuntimeException(e);
@@ -3553,7 +3557,7 @@ implements Cloneable {
 	public StateGroup[] getStateGroups() {
 		StateGroup[] returnArray = new StateGroup[stateGroups.size()];
 		for(int i = 0; i < stateGroups.size(); i++) {
-			returnArray[i] = (StateGroup)stateGroups.get(i);
+			returnArray[i] = stateGroups.get(i);
 		}
 		return returnArray;
 	}   
@@ -3886,4 +3890,56 @@ implements Cloneable {
 		queries.add(query);
 
 	}
+
+
+	public Set<String> getConstantNames() {
+		return constants.getConstantNames();
+	}
+
+
+	public void incrementConstantUsage(String constantName) {
+		constants.incrementConstantUsage(constantName);
+	}
+
+
+	public void decrementConstantUsage(String constantName) {
+		constants.decrementConstantUsage(constantName);
+	}
+
+
+	public int getConstantValue(String constantName) {
+		return constants.getConstant(constantName).getValue();
+	}
+
+
+	public int getLargestConstantValue() {
+		return constants.getLargestConstantValue();
+	}
+
+
+	public void addConstraint(TimedArc arc, String constantName, GuardConstraint gc) {
+		constants.addConstraint(arc, constantName, gc);
+		
+	}
+	
+	public void removeConstraintsFor(TimedArc arc){
+		constants.removeConstraintsFor(arc);
+	}
+	
+	public boolean containsConstraintsFor(TimedArc arc){
+		return constants.containsConstraintsFor(arc);
+	}
+
+
+	public void buildConstraints() {
+		constants.buildConstraints(arcsArray);
+		
+	}
+
+
+	public void buildConstraint(TimedArc arc) {
+		constants.buildConstraint(arc);
+		
+	}
+	
 }

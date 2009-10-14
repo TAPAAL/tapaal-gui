@@ -1,47 +1,22 @@
 package pipe.gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.ScrollPane;
-import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.ComponentListener;
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-         
-import javax.swing.BorderFactory;
-import javax.swing.DebugGraphics;
-import javax.swing.JLabel;
+
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.JTree;
-import javax.swing.JViewport;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.plaf.metal.MetalBorders;
 import javax.swing.text.BadLocationException;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
-import pipe.gui.widgets.ParameterPanel;
 
 
 public class CreateGui {

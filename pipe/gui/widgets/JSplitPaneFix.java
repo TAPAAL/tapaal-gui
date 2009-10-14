@@ -8,6 +8,10 @@ import javax.swing.JSplitPane;
 
 public class JSplitPaneFix extends JSplitPane {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4493433117542095206L;
 	private boolean isPainted;
 	private boolean hasProportionalLocation;
 	private double proportionalLocation;

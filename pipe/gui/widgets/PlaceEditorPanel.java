@@ -18,7 +18,11 @@ import pipe.gui.GuiView;
 public class PlaceEditorPanel 
         extends javax.swing.JPanel {
    
-   Place place;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -375052740110512870L;
+Place place;
    Boolean attributesVisible;
    Integer capacity;
    Integer marking;
@@ -79,15 +83,15 @@ public class PlaceEditorPanel
       nameLabel = new javax.swing.JLabel();
       nameTextField = new javax.swing.JTextField();
       markingLabel = new javax.swing.JLabel();
-      //capacityLabel = new javax.swing.JLabel();
+      capacityLabel = new javax.swing.JLabel();
       markingSpinner = new javax.swing.JSpinner();
       markingSpinner.setModel(new SpinnerNumberModel(place.getCurrentMarking(),0,Integer.MAX_VALUE,1));
 
-      //capacitySpinner = new javax.swing.JSpinner();
-      //capacitySpinner.setModel(new SpinnerNumberModel(place.getCapacity(),0,Integer.MAX_VALUE,1));
+      capacitySpinner = new javax.swing.JSpinner();
+      capacitySpinner.setModel(new SpinnerNumberModel(place.getCapacity(),0,Integer.MAX_VALUE,1));
       attributesCheckBox = new javax.swing.JCheckBox();
       markingComboBox = new javax.swing.JComboBox();
-      //capacity0Label = new javax.swing.JLabel();
+      capacity0Label = new javax.swing.JLabel();
       buttonPanel = new javax.swing.JPanel();
       okButton = new javax.swing.JButton();
       cancelButton = new javax.swing.JButton();
@@ -120,13 +124,13 @@ public class PlaceEditorPanel
       gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
       placeEditorPanel.add(markingLabel, gridBagConstraints);
 
-//      capacityLabel.setText("Capacity:");
-//      gridBagConstraints = new java.awt.GridBagConstraints();
-//      gridBagConstraints.gridx = 0;
-//      gridBagConstraints.gridy = 2;
-//      gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-//      gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-//      placeEditorPanel.add(capacityLabel, gridBagConstraints);
+      capacityLabel.setText("Capacity:");
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 0;
+      gridBagConstraints.gridy = 2;
+      gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+      gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+      placeEditorPanel.add(capacityLabel, gridBagConstraints);
 
       markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
       markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
@@ -143,20 +147,20 @@ public class PlaceEditorPanel
       gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
       placeEditorPanel.add(markingSpinner, gridBagConstraints);
 
-//      capacitySpinner.setMinimumSize(new java.awt.Dimension(50, 20));
-//      capacitySpinner.setPreferredSize(new java.awt.Dimension(50, 20));
-//      capacitySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-//         public void stateChanged(javax.swing.event.ChangeEvent evt) {
-//            capacitySpinnerStateChanged(evt);
-//         }
-//      });
-//
-//      gridBagConstraints = new java.awt.GridBagConstraints();
-//      gridBagConstraints.gridx = 1;
-//      gridBagConstraints.gridy = 2;
-//      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-//      gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-//      placeEditorPanel.add(capacitySpinner, gridBagConstraints);
+      capacitySpinner.setMinimumSize(new java.awt.Dimension(50, 20));
+      capacitySpinner.setPreferredSize(new java.awt.Dimension(50, 20));
+      capacitySpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+         public void stateChanged(javax.swing.event.ChangeEvent evt) {
+            capacitySpinnerStateChanged(evt);
+         }
+      });
+
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 1;
+      gridBagConstraints.gridy = 2;
+      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+      gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+      placeEditorPanel.add(capacitySpinner, gridBagConstraints);
 
       attributesCheckBox.setSelected(place.getAttributesVisible());
       attributesCheckBox.setText("Show place attributes");
@@ -186,12 +190,12 @@ public class PlaceEditorPanel
       gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
       placeEditorPanel.add(markingComboBox, gridBagConstraints);
 
-//      capacity0Label.setText("(no capacity restriction)    ");
-//      gridBagConstraints = new java.awt.GridBagConstraints();
-//      gridBagConstraints.gridx = 2;
-//      gridBagConstraints.gridy = 2;
-//      gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-//      placeEditorPanel.add(capacity0Label, gridBagConstraints);
+      capacity0Label.setText("(no capacity restriction)    ");
+      gridBagConstraints = new java.awt.GridBagConstraints();
+      gridBagConstraints.gridx = 2;
+      gridBagConstraints.gridy = 2;
+      gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+      placeEditorPanel.add(capacity0Label, gridBagConstraints);
 
       gridBagConstraints = new java.awt.GridBagConstraints();
       gridBagConstraints.gridwidth = 2;
@@ -243,7 +247,7 @@ public class PlaceEditorPanel
       gridBagConstraints.gridy = 1;
       gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
       add(buttonPanel, gridBagConstraints);
-
+      
    }// </editor-fold>//GEN-END:initComponents
 
    private void markingSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_markingSpinnerStateChanged

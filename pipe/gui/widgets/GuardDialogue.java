@@ -1,44 +1,41 @@
 package pipe.gui.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Collection;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import pipe.dataLayer.MarkingParameter;
+import pipe.dataLayer.Constant;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
 import pipe.gui.CreateGui;
 
 public class GuardDialogue extends JPanel /*implements ActionListener, PropertyChangeListener*/
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4582651236913407101L;
 	private JRootPane myRootPane;
 	private JPanel guardEditPanel;
 	private JPanel buttonPanel;
@@ -55,7 +52,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	private JComboBox leftDelimiter;
 	private JComboBox rightDelimiter;
 
-	
+	private JCheckBox leftUseConstant;
+	private JComboBox leftConstantsComboBox;
+	private JCheckBox rightUseConstant;
+	private JComboBox rightConstantsComboBox;
+
 	public GuardDialogue (JRootPane rootPane, final PetriNetObject objectToBeEdited){
 		myRootPane = rootPane;
 		setLayout(new GridBagLayout());
@@ -67,72 +68,45 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 		String[] left = {"[","("};
 		leftDelimiter = new JComboBox();
+		Dimension dims = new Dimension(35,25);
+		leftDelimiter.setPreferredSize(dims);
+		leftDelimiter.setMinimumSize(dims);
+		leftDelimiter.setMaximumSize(dims);
 		leftDelimiter.setModel(new DefaultComboBoxModel(left));
 		
 		String[] right = {"]",")"};
 		rightDelimiter = new JComboBox();
+		rightDelimiter.setPreferredSize(dims);
+		rightDelimiter.setMinimumSize(dims);
+		rightDelimiter.setMaximumSize(dims);
 		rightDelimiter.setModel(new DefaultComboBoxModel(right));
 		
-		String timeInterval = ( (TimedArc) objectToBeEdited).getGuard();
-		if ( timeInterval.contains("[") ){
-			leftDelimiter.setSelectedItem("[");
-		} else {
-			leftDelimiter.setSelectedItem("(");
-		}
-		if ( timeInterval.contains("]") ){
-			rightDelimiter.setSelectedItem("]");
-		}else {
-			rightDelimiter.setSelectedItem(")");
-		}
 
 		inf = new JCheckBox("inf", true);
 		
 		firstIntervalNumber = new JSpinner();
 		secondIntervalNumber = new JSpinner();
 		
-		String[] partedTimeInterval = timeInterval.split(",");
-		String firstNumber = partedTimeInterval[0].substring(1, partedTimeInterval[0].length() );
-		String secondNumber = partedTimeInterval[1].substring(0, partedTimeInterval[1].length()-1);
-		
-		SpinnerNumberModel spinnerModelForFirstNumber = new SpinnerNumberModel(
-				Integer.parseInt( firstNumber ), 0,	Integer.MAX_VALUE, 1);
-		
-		SpinnerNumberModel spinnerModelForSecondNumber = new SpinnerNumberModel(
-				Integer.MAX_VALUE, 0,	Integer.MAX_VALUE, 1);
-		if (secondNumber.equals("inf")){
-			inf.setSelected(true);
-			secondIntervalNumber.setEnabled(false);
-			rightDelimiter.setEnabled(false);
-			spinnerModelForSecondNumber = new SpinnerNumberModel(
-					0, 0,	Integer.MAX_VALUE, 1);
-		}else{
-			inf.setSelected(false);
-			spinnerModelForSecondNumber = new SpinnerNumberModel(
-					Integer.parseInt( secondNumber ), 0,	Integer.MAX_VALUE, 1);
-		}
-		
-		firstIntervalNumber.setModel(spinnerModelForFirstNumber);
-		secondIntervalNumber.setModel(spinnerModelForSecondNumber);		
-
 		okButton = new JButton("OK");
 		cancelButton = new JButton("Cancel");
 		
 		label = new JLabel("Time Interval:");
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
 		guardEditPanel.add(label, gridBagConstraints);
 		
 		
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(leftDelimiter, gridBagConstraints);
 		
-		firstIntervalNumber.setMaximumSize(new Dimension(50,30));
-		firstIntervalNumber.setMinimumSize(new Dimension(50,30));
-		firstIntervalNumber.setPreferredSize(new Dimension(50,30));
+		Dimension intervalBoxDims = new Dimension(80,25);
+		firstIntervalNumber.setMaximumSize(intervalBoxDims);
+		firstIntervalNumber.setMinimumSize(intervalBoxDims);
+		firstIntervalNumber.setPreferredSize(intervalBoxDims);
 		firstIntervalNumber.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
 				firstSpinnerStateChanged(evt);
@@ -140,16 +114,16 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		});
 		
 		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		guardEditPanel.add( firstIntervalNumber, gridBagConstraints);
 		
 		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		guardEditPanel.add( new JLabel(" , "), gridBagConstraints);
 
-		secondIntervalNumber.setMaximumSize(new Dimension(50,30));
-		secondIntervalNumber.setMinimumSize(new Dimension(50,30));
-		secondIntervalNumber.setPreferredSize(new Dimension(50,30));
+		secondIntervalNumber.setMaximumSize(intervalBoxDims);
+		secondIntervalNumber.setMinimumSize(intervalBoxDims);
+		secondIntervalNumber.setPreferredSize(intervalBoxDims);
 		secondIntervalNumber.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
 				secondSpinnerStateChanged(evt);
@@ -157,52 +131,188 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		});
 		
 		gridBagConstraints.gridx = 4;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		guardEditPanel.add( secondIntervalNumber, gridBagConstraints);
 		
 		gridBagConstraints.gridx = 5;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(rightDelimiter, gridBagConstraints);
 		
 		gridBagConstraints.gridx = 6;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(inf, gridBagConstraints);
 		
 		inf.addActionListener(
 				new ActionListener(){
 					public void actionPerformed(ActionEvent evt){
-						setDelimiterModels();
-						if ( ((JCheckBox)inf).isSelected() ){
+						if (inf.isSelected() ){
 							secondIntervalNumber.setEnabled(false);
-							rightDelimiter.setSelectedItem(")");
 							rightDelimiter.setEnabled(false);
 						}else {
 							secondIntervalNumber.setEnabled(true);
-							rightDelimiter.setSelectedItem("]");
 							rightDelimiter.setEnabled(true);
 						}
+						setDelimiterModels();
 					}
 
 				});
 
+		Set<String> constants = CreateGui.getModel().getConstantNames();
+		boolean enableConstantsCheckBoxes = !constants.isEmpty();
+		leftUseConstant = new JCheckBox("Use Constant");
+		leftUseConstant.setEnabled(enableConstantsCheckBoxes);
+		leftUseConstant.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				updateLeftComponents();
+				updateRightConstantComboBox();
+				setDelimiterModels();
+			}
+		});
+				
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		guardEditPanel.add(leftUseConstant, gridBagConstraints);
+		
+		
+		leftConstantsComboBox = new JComboBox(constants.toArray());
+		leftConstantsComboBox.setVisible(false);
+		leftConstantsComboBox.setMaximumSize(intervalBoxDims);
+		leftConstantsComboBox.setMinimumSize(intervalBoxDims);
+		leftConstantsComboBox.setPreferredSize(intervalBoxDims);
+		leftConstantsComboBox.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e){
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					updateRightConstantComboBox();
+					setDelimiterModels();
+				}
+			}
+		});
+		
+		
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
+		guardEditPanel.add(leftConstantsComboBox, gridBagConstraints);
+		
+		rightUseConstant = new JCheckBox("Use Constant");
+		rightUseConstant.setEnabled(enableConstantsCheckBoxes);
+		rightUseConstant.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				updateRightComponents();
+				updateRightConstantComboBox();
+				setDelimiterModels();
+			}
+		});
+				
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 4;
+		gridBagConstraints.gridy = 0;
+		guardEditPanel.add(rightUseConstant, gridBagConstraints);
+		
+		
+		rightConstantsComboBox = new JComboBox(constants.toArray());
+		rightConstantsComboBox.setVisible(false);
+		rightConstantsComboBox.setMaximumSize(intervalBoxDims);
+		rightConstantsComboBox.setMinimumSize(intervalBoxDims);
+		rightConstantsComboBox.setPreferredSize(intervalBoxDims);
+		gridBagConstraints = new GridBagConstraints();
+		rightConstantsComboBox.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e){
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					setDelimiterModels();
+				}
+			}
+		});
+		
+		gridBagConstraints.gridx = 4;
+		gridBagConstraints.gridy = 1;
+		guardEditPanel.add(rightConstantsComboBox, gridBagConstraints);
+		
+		
 		okButton.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						CreateGui.getView().getUndoManager().addNewEdit( ((TimedArc) objectToBeEdited).setGuard(composeGuard(((TimedArc) objectToBeEdited).getGuard())) );
+						TimedArc arc = (TimedArc) objectToBeEdited;
+						String guard = composeGuard(arc.getGuard());
+						CreateGui.getView().getUndoManager().addNewEdit( arc.setGuard(guard) );
+					
+						updateConstraintsForArc(arc);
+						
+						
 						exit();
 					}
 
+					private void updateConstraintsForArc(TimedArc arc) {
+						if(CreateGui.getModel().containsConstraintsFor(arc))
+							CreateGui.getModel().removeConstraintsFor(arc);
+						
+						CreateGui.getModel().buildConstraint(arc);
+						
+//						GuardConstraint gc = null;
+//						
+//						boolean leftIsConstant = leftUseConstant.isSelected();
+//						boolean rightIsConstant = rightUseConstant.isSelected();
+//						
+//						ConstraintComparison operator = ConstraintComparison.getOperatorForConstraint(
+//								leftDelimiter.getSelectedItem().toString(),
+//								rightDelimiter.getSelectedItem().toString());
+//										
+//						if(leftIsConstant && rightIsConstant){
+//							String left = leftConstantsComboBox.getSelectedItem().toString();
+//							String right = rightConstantsComboBox.getSelectedItem().toString();
+//							gc = new ConstantConstantConstraint(
+//									left,
+//									right,
+//									operator);
+//							
+//							CreateGui.getModel().addConstraint(arc, left, gc);
+//							CreateGui.getModel().addConstraint(arc, right,gc);
+//						}
+//						else if(leftIsConstant){
+//							String left = leftConstantsComboBox.getSelectedItem().toString();
+//							
+//							gc = new ConstantIntegerConstraint(
+//									leftConstantsComboBox.getSelectedItem().toString(),
+//									getSecondValue(),
+//									operator);
+//							CreateGui.getModel().addConstraint(arc, left, gc);
+//						}else if(rightIsConstant){
+//							String right = rightConstantsComboBox.getSelectedItem().toString();
+//							gc = new ConstantIntegerConstraint(
+//									rightConstantsComboBox.getSelectedItem().toString(),
+//									getFirstValue(),
+//									ConstraintComparison.invertOperator(operator));
+//							CreateGui.getModel().addConstraint(arc, right, gc);
+//						}
+					}
+
+					
+
 					private String composeGuard(String oldGuard) {
-						String guard = "";
-						if ( ((JCheckBox)inf).getSelectedObjects() != null){
-							guard = guard + leftDelimiter.getSelectedItem() + firstIntervalNumber.getValue() + ",inf)";	
-						}else {
-							guard = guard + leftDelimiter.getSelectedItem() + firstIntervalNumber.getValue() + ","
-							+ secondIntervalNumber.getValue() + rightDelimiter.getSelectedItem();
-						}
-						if (TimedArc.validateTimeInterval(guard)){
+						boolean useConstantLeft = leftUseConstant.isSelected();
+						boolean useConstantRight = rightUseConstant.isSelected();
+						
+						String leftDelim = leftDelimiter.getSelectedItem().toString();
+						String rightDelim = rightDelimiter.getSelectedItem().toString();
+						String leftInterval = null;
+						String rightInterval = null;
+						
+						if(useConstantLeft)
+							leftInterval = leftConstantsComboBox.getSelectedItem().toString();
+						else
+							leftInterval = firstIntervalNumber.getValue().toString();
+						
+						if(useConstantRight)
+							rightInterval = rightConstantsComboBox.getSelectedItem().toString();
+						else if ( inf.isSelected())
+							rightInterval = "inf";
+						else
+							rightInterval = secondIntervalNumber.getValue().toString();
+						
+						if (TimedArc.validateTimeInterval(leftDelim, leftInterval, rightInterval, rightDelim)){
 							//XXX send error messsage
-							return guard;
+							return leftDelim + leftInterval + "," + rightInterval + rightDelim;
 						}else {
 							return oldGuard;
 						}
@@ -241,54 +351,191 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		add(buttonPanel, gridBagConstraints);
 		
 		myRootPane.setDefaultButton(okButton);
+		
+		setInitialState((TimedArc)objectToBeEdited);	
+	}
+
+	
+
+	private void setInitialState(TimedArc arc) {
+		String timeInterval = arc.getGuard();
+			
+		String[] partedTimeInterval = timeInterval.split(",");
+		String firstNumber = partedTimeInterval[0].substring(1, partedTimeInterval[0].length() );
+		String secondNumber = partedTimeInterval[1].substring(0, partedTimeInterval[1].length()-1);
+		int first = 0, 
+			second = 0;
+		boolean firstIsNumber = true, 
+				secondIsNumber = true;
+		
+		try{
+			first = Integer.parseInt(firstNumber);
+		}
+		catch(NumberFormatException e){
+			firstIsNumber = false;
+		}
+		
+		try{
+			second = Integer.parseInt(secondNumber);
+		}
+		catch(NumberFormatException e){
+			secondIsNumber = false;
+		}
+		
+		SpinnerNumberModel spinnerModelForFirstNumber = new SpinnerNumberModel(
+				first, 0,	Integer.MAX_VALUE, 1);
+		
+		SpinnerNumberModel spinnerModelForSecondNumber = null;
+		boolean isInf = secondNumber.equals("inf");
+		if (isInf){
+			inf.setSelected(true);
+			secondIntervalNumber.setEnabled(false);
+			rightDelimiter.setEnabled(false);
+			spinnerModelForSecondNumber = new SpinnerNumberModel(
+					0, 0,	Integer.MAX_VALUE, 1);
+		}else{
+			inf.setSelected(false);
+			spinnerModelForSecondNumber = new SpinnerNumberModel(
+					second, 0,	Integer.MAX_VALUE, 1);
+		}
+		firstIntervalNumber.setModel(spinnerModelForFirstNumber);
+		secondIntervalNumber.setModel(spinnerModelForSecondNumber);
+		
+		if(!firstIsNumber){
+			leftUseConstant.setSelected(true);
+			leftConstantsComboBox.setSelectedItem(firstNumber);
+			updateLeftComponents();
+		}
+		
+		if(!secondIsNumber && !isInf){
+			rightUseConstant.setSelected(true);
+			rightConstantsComboBox.setSelectedItem(secondNumber);
+			updateRightComponents();
+		}
+		
+		setDelimiterModels();
+		if ( timeInterval.contains("[") ){
+			leftDelimiter.setSelectedItem("[");
+		} else {
+			leftDelimiter.setSelectedItem("(");
+		}
+		if ( timeInterval.contains("]") ){
+			rightDelimiter.setSelectedItem("]");
+		}else {
+			rightDelimiter.setSelectedItem(")");
+		}
 	}
 	
+	private void updateLeftComponents() {
+		boolean value = leftUseConstant.isSelected();
+		firstIntervalNumber.setVisible(!value);
+		leftConstantsComboBox.setVisible(value);	
+		setDelimiterModels();
+	}
+	
+	private void updateRightComponents() {
+		boolean value = rightUseConstant.isSelected();
+		inf.setVisible(!value);
+		if(value)
+			rightDelimiter.setEnabled(true);
+		else
+			rightDelimiter.setEnabled(!inf.isSelected());
+		secondIntervalNumber.setVisible(!value);
+		rightConstantsComboBox.setVisible(value);	
+		
+		((JDialog)myRootPane.getParent()).pack();
+		setDelimiterModels();
+	}
+
 	public void exit(){
 		myRootPane.getParent().setVisible(false);
 	}
 
 	private void setDelimiterModels(){
-		if (((Integer) firstIntervalNumber.getValue()) >= ((Integer) secondIntervalNumber.getValue())){
-			secondIntervalNumber.setValue(firstIntervalNumber.getValue());
-			if (inf.isSelected()){
-				if (rightDelimiter.getModel().getSize()==1){
-					rightDelimiter.setModel(new DefaultComboBoxModel(new String[]{"]",")"}));
-				}
-				if (leftDelimiter.getModel().getSize()==1){
-					leftDelimiter.setModel(new DefaultComboBoxModel(new String[]{"[","("}));
-					leftDelimiter.setSelectedItem("[");
-				}
-				rightDelimiter.setSelectedItem(")");
-			}else{
-				rightDelimiter.setModel(new DefaultComboBoxModel(new String[]{"]"}));
-				leftDelimiter.setModel(new DefaultComboBoxModel(new String[]{"["}));
-				rightDelimiter.setSelectedItem("]");
-				leftDelimiter.setSelectedItem("[");
-			}
+		int firstValue = getFirstValue();
+		int secondValue = getSecondValue();
+		
+		DefaultComboBoxModel modelRightIncludedOnly = new DefaultComboBoxModel(new String[]{"]"});
+		DefaultComboBoxModel modelLeftIncludedOnly = new DefaultComboBoxModel(new String[]{"["});
+		DefaultComboBoxModel modelRightBoth = new DefaultComboBoxModel(new String[]{"]", ")"});
+		DefaultComboBoxModel modelLeftBoth = new DefaultComboBoxModel(new String[]{"[", "("});
+		DefaultComboBoxModel modelRightExcludedOnly = new DefaultComboBoxModel(new String[]{")"});
+		
+		if(firstValue > secondValue){
+			secondIntervalNumber.setValue(firstValue);
+			secondValue = firstValue;
+		}
+				
+		if(firstValue==secondValue){
+			rightDelimiter.setModel(modelRightIncludedOnly);
+			leftDelimiter.setModel(modelLeftIncludedOnly);
+		}else {
+			leftDelimiter.setModel(modelLeftBoth);
+		
+			if(inf.isSelected() && !rightUseConstant.isSelected())
+				rightDelimiter.setModel(modelRightExcludedOnly);
+			else
+				rightDelimiter.setModel(modelRightBoth);
+		}
+		
+		if(firstValue == 0) leftDelimiter.setModel(modelLeftIncludedOnly);
+		if(secondValue == 0) rightDelimiter.setModel(modelRightIncludedOnly);
+	}
+
+	private int getSecondValue() {
+		int secondValue;
+		if(rightUseConstant.isSelected()){
+			secondValue = CreateGui.getModel().getConstantValue(
+					rightConstantsComboBox.getSelectedItem().toString());
+		}
+		else if(inf.isSelected()){
+			secondValue = Integer.MAX_VALUE;
 		}else{
-			if (inf.isSelected()){
-				if (rightDelimiter.getModel().getSize()==1){
-					rightDelimiter.setModel(new DefaultComboBoxModel(new String[]{"]",")"}));
-				}
-				if (leftDelimiter.getModel().getSize()==1){
-					leftDelimiter.setModel(new DefaultComboBoxModel(new String[]{"[","("}));
-					leftDelimiter.setSelectedItem("[");
-				}
-				rightDelimiter.setSelectedItem(")");
-			}else {
-				if (rightDelimiter.getModel().getSize()==1){
-					rightDelimiter.setModel(new DefaultComboBoxModel(new String[]{"]",")"}));
-					rightDelimiter.setSelectedItem("]");
-				}
-				if (leftDelimiter.getModel().getSize()==1){
-					leftDelimiter.setModel(new DefaultComboBoxModel(new String[]{"[","("}));
-					leftDelimiter.setSelectedItem("[");
-				} 
+			secondValue = Integer.parseInt(String.valueOf(secondIntervalNumber.getValue()));
+		}
+		return secondValue;
+	}
+
+	private int getFirstValue() {
+		int firstValue;
+		if(leftUseConstant.isSelected()){
+			firstValue = CreateGui.getModel().getConstantValue(
+					leftConstantsComboBox.getSelectedItem().toString());
+		}
+		else{
+			firstValue = Integer.parseInt(String.valueOf(firstIntervalNumber.getValue()));
+		}
+		return firstValue;
+	}
+	
+	private void updateRightConstantComboBox() {
+		int value = getFirstValue();
+		
+		String oldRight = rightConstantsComboBox.getSelectedItem().toString();
+		rightConstantsComboBox.removeAllItems();
+		Collection<Constant> constants = CreateGui.getModel().getConstants();
+		for(Constant c : constants){
+			if(c.getValue() >= value){
+				rightConstantsComboBox.addItem(c.getName());
 			}
 		}
+		
+		rightConstantsComboBox.setSelectedItem(oldRight);	
 	}
 	
 	private void firstSpinnerStateChanged(ChangeEvent evt) {
+		int firstValue = getFirstValue();
+		int secondValue = getSecondValue();
+		if(rightUseConstant.isSelected() && firstValue > secondValue){
+			rightUseConstant.setSelected(false);
+			updateRightComponents();
+		}
+		if(firstValue > CreateGui.getModel().getLargestConstantValue())
+			rightUseConstant.setEnabled(false);
+		else{
+			rightUseConstant.setEnabled(true);
+			updateRightConstantComboBox();
+		}
 		setDelimiterModels();
 	}
 	private void secondSpinnerStateChanged(ChangeEvent evt) {

@@ -48,7 +48,9 @@ import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TNTransformer;
+import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TransportArc;
 import pipe.experiment.Experiment;
 import pipe.experiment.editor.gui.ExperimentEditor;
 import pipe.gui.action.GuiAction;
@@ -81,6 +83,10 @@ public class GuiFrame
 extends JFrame
 implements ActionListener, Observer {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
 	private final String[] zoomExamples = {"40%","60%","80%","100%","120%",
 			"140%","160%","180%","200%","300%"};
@@ -1430,9 +1436,15 @@ EOC */
 
 		public void actionPerformed(ActionEvent e){
 			appView.getUndoManager().newEdit(); // new "transaction""
+			for(Object pno : appView.getSelectionObject().getSelection()){
+				if(pno instanceof TimedArc || pno instanceof TransportArc){
+					CreateGui.getModel().removeConstraintsFor((TimedArc)pno);
+				}
+			}
+			
 			appView.getUndoManager().deleteSelection(
 					appView.getSelectionObject().getSelection());
-			appView.getSelectionObject().deleteSelection();
+			appView.getSelectionObject().deleteSelection();			
 		}
 
 	}
@@ -1800,8 +1812,10 @@ EOC */
 					appGui.getCopyPasteManager().startPaste(appView);
 				} else*/ if (this == undoAction) {
 					appView.getUndoManager().undo();
+					CreateGui.getModel().buildConstraints();
 				} else if (this == redoAction) {
 					appView.getUndoManager().redo();
+					CreateGui.getModel().buildConstraints();
 				}
 			}
 		}
