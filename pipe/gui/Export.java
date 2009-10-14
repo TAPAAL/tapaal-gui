@@ -11,8 +11,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -50,12 +55,20 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.GuardDialogue;
 import pipe.gui.widgets.QueryDialogue;
+import pipe.dataLayer.Arc;
+import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayerWriter;
+import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
+import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
+import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 
@@ -71,6 +84,7 @@ public class Export {
 	public static final int POSTSCRIPT = 2;
 	public static final int PRINTER = 3;
 	public static final int TN = 4;
+	public static final int TIKZ = 5;
 
 
 	public static void toPostScript(Object g,String filename) 
@@ -184,7 +198,9 @@ public class Export {
 					break;
 				case TN:
 					filename += "xml";
-					break;                  
+					break;             
+				case TIKZ:
+					filename += "tex";
 				}
 			}
 		}
@@ -218,7 +234,12 @@ public class Export {
 				if (filename!=null) {
 					toTN(model,filename);
 				}
-				break;               
+				break;  
+			case TIKZ:
+				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
+				if (filename!=null) {
+					ExportToTIKZ(model,filename);
+				}
 			}
 		} catch (Exception e) {
 			// There was some problem with the action
@@ -973,6 +994,80 @@ public class Export {
 
 		}
 		
+	}
+	public static void ExportToTIKZ(DataLayer net, String fullpath){
+		try{
+			FileWriter outFile = new FileWriter(fullpath);
+			PrintWriter out = new PrintWriter(outFile);
+			out.println("\\begin{tikzpicture}");
+			double scale = 1.0/60.0;
+			
+			Place[] places = net.getPlaces();
+			for(Place place:places){
+				out.print("\\node[place,label=above:"+place.getName()+",label=below:inv: "+replaceWithMathLatex(((TimedPlace)place).getInvariant())+"] at ("+place.getPositionX()*scale+","+place.getPositionY()*scale*(-1)+") ("+safeLaTeXName(place.getName())+") {}");
+				
+				ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
+				if(tokens.size() > 0)
+				{
+					out.print("\n[children are tokens]");
+					for (BigDecimal token : tokens) {
+					out.print("\n   child {node [token] {$"+token.setScale(1)+"$}}");	
+					}
+				}
+				out.print(";\n");
+			}
+			
+			Transition[] transitions = net.getTransitions();
+			for(Transition trans:transitions){
+				out.println("\\node[transition,label=above:"+trans.getName()+"] at ("+trans.getPositionX()*scale+","+trans.getPositionY()*scale*(-1)+") ("+safeLaTeXName(trans.getName())+") {};");
+			}
+			
+			Arc[] arcs = net.getArcs();
+			for(Arc arc:arcs){
+				String arcPoints = "";
+				for (int i = 1; i < arc.getArcPath().getEndIndex(); i++) {
+					ArcPathPoint point = arc.getArcPath().getArcPathPoint(i);
+					arcPoints += "-- ("+point.getX()*scale+","+point.getY()*scale*(-1)+") ";
+				}
+				String arrowTip ="";
+				if(arc instanceof TAPNInhibitorArc){
+					arrowTip = "-o";
+				}
+				else if(arc instanceof TransportArc){
+					arrowTip = "->,>=diamond";
+				}
+				else if(arc instanceof TimedArc){
+					arrowTip = "->";
+				}
+				else{
+					arrowTip = "->";
+				}
+				
+				String guard = "{}";
+				if(arc instanceof TimedArc)
+				{
+					guard = "node[midway] {"+replaceWithMathLatex(((TimedArc)arc).getGuard())+"}";
+				}
+				out.println("\\draw["+arrowTip+"] (" + safeLaTeXName(arc.getSource().getName())+") "+arcPoints+"-- ("+ safeLaTeXName(arc.getTarget().getName()) +") "+guard+";");
+			}
+			out.println("\\end{tikzpicture}");
+			out.close();
+			outFile.close();
+		}
+		catch (IOException e)
+		{
+			
+		}
+	}
+	
+	private static String replaceWithMathLatex(String text)
+	{
+		return "$"+text.replace("inf", "\\infty")+"$";
+	}
+	
+	private static String safeLaTeXName(String name){
+		//FIX - We need to remove illegal charactors from the string.
+		return name;
 	}
 	
 }

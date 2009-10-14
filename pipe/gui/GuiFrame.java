@@ -101,7 +101,7 @@ implements ActionListener, Observer {
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
 	exportTNAction, exportPSAction, importAction, exportToUppaal,
-	exportToUppaalAdvanced,exportToUppaalSymetric,  exportToTest;
+	exportToUppaalAdvanced,exportToUppaalSymetric,  exportToTest,exportToTikZAction;
 
 	private VerificationAction runUppaalVerification;
 	
@@ -216,6 +216,8 @@ implements ActionListener, Observer {
 			new FileAction("PNG", "Export the net to PNG format","ctrl G"));
 		addMenuItem(exportMenu, exportPSAction  =
 			new FileAction("PostScript", "Export the net to PostScript format","ctrl T"));
+		addMenuItem(exportMenu, exportToTikZAction  =
+			new FileAction("TikZ", "Export the net to PNG format","ctrl G"));
 /*		addMenuItem(exportMenu, exportTNAction =
 			new FileAction("Timenet","Export the net to Timenet format",""));
 		addMenuItem(exportMenu, exportToUppaal =
@@ -1749,6 +1751,8 @@ EOC */
 				appTab.remove(appTab.getSelectedIndex());
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);
+			} else if (this == exportToTikZAction) {
+				Export.exportGuiView(appView, Export.TIKZ, appModel);
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
 			} else if (this == exportTNAction){
