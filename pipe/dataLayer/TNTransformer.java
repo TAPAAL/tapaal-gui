@@ -133,12 +133,6 @@ public class TNTransformer {
                         }
                         inhibitorArcs=null;
 
-            TAPNInhibitorArc[] tapnInhibitorArcs = netModel.getTAPNInhibitors();
-                        for (i = 0; i < tapnInhibitorArcs.length; i++) {
-                            Element newArc = createTNArcElement(tapnInhibitorArcs[i],pnDOM,tapnInhibit);
-                            TN.appendChild(newArc);
-                        }
-                        tapnInhibitorArcs=null;
 			pnDOM.normalize();
 		
                         

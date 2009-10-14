@@ -106,11 +106,10 @@ implements Cloneable {
 	// kyrke -  this is java >1.4 use generics!!!
 	private ArrayList<Transition> transitionsArray = null;
 	/** ArrayList containing all the Arc objects in the Petri-Net */
-	private ArrayList arcsArray = null;
+	private ArrayList<Arc> arcsArray = null;
 
 	/** ArrayList containing all the Arc objects in the Petri-Net */
-	private ArrayList inhibitorsArray = null; 
-	private ArrayList tapnInhibitorsArray = null; 
+	private ArrayList inhibitorsArray = null;  
 
 	/** ArrayList for net-level label objects (as opposed to element-level labels).*/
 	private ArrayList labelsArray = null;
@@ -232,7 +231,7 @@ implements Cloneable {
 			newClone.transitionsArray = deepCopy(transitionsArray);
 			newClone.arcsArray = deepCopy(arcsArray);
 			newClone.inhibitorsArray = deepCopy(inhibitorsArray);
-			newClone.tapnInhibitorsArray = deepCopy(tapnInhibitorsArray);
+			//newClone.tapnInhibitorsArray = deepCopy(tapnInhibitorsArray);
 			//newClone.tokensArray = deepCopy(tokensArray);
 			newClone.labelsArray = deepCopy(labelsArray);
 		} catch(CloneNotSupportedException e) {
@@ -262,11 +261,11 @@ implements Cloneable {
 	 * Initialize Arrays
 	 */
 	private void initializeMatrices() {
-		placesArray = new ArrayList();
-		transitionsArray = new ArrayList();
-		arcsArray = new ArrayList();
+		placesArray = new ArrayList<Place>();
+		transitionsArray = new ArrayList<Transition>();
+		arcsArray = new ArrayList<Arc>();
 		inhibitorsArray = new ArrayList();
-		tapnInhibitorsArray = new ArrayList();
+		//tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList();
 		stateGroups = new ArrayList();
 		markingParametersArray = new ArrayList();
@@ -570,21 +569,21 @@ implements Cloneable {
 		if (inhibitorArcInput != null) {
 			if (inhibitorArcInput.getId() != null &&
 					inhibitorArcInput.getId().length() > 0) {
-				for (int i = 0 ; i < tapnInhibitorsArray.size() ; i++) {
+				for (int i = 0 ; i < arcsArray.size() ; i++) {
 					if (inhibitorArcInput.getId().equals(
-							((Arc)tapnInhibitorsArray.get(i)).getId())) {
+							((Arc)arcsArray.get(i)).getId())) {
 						unique = false;
 					}
 				}
 			} else {
 				String id = null;
-				if (tapnInhibitorsArray != null && tapnInhibitorsArray.size() > 0) {
-					int no = tapnInhibitorsArray.size();
+				if (arcsArray != null && arcsArray.size() > 0) {
+					int no = arcsArray.size();
 					do {
-						for (int i = 0; i < tapnInhibitorsArray.size(); i++) {
+						for (int i = 0; i < arcsArray.size(); i++) {
 							id = "I" + no;
-							if (tapnInhibitorsArray.get(i) != null) {
-								if (id.equals(((Arc)tapnInhibitorsArray.get(i)).getId())) {
+							if (arcsArray.get(i) != null) {
+								if (id.equals(((Arc)arcsArray.get(i)).getId())) {
 									unique = false;
 									no++;
 								} else {
@@ -602,7 +601,7 @@ implements Cloneable {
 					inhibitorArcInput.setId("error");
 				}
 			}
-			tapnInhibitorsArray.add(inhibitorArcInput);
+			arcsArray.add(inhibitorArcInput);
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
 
 			setChanged();
@@ -1149,7 +1148,7 @@ implements Cloneable {
 			return true;
 		}
 		else if (pnObject instanceof TAPNInhibitorArc) {
-			changeArrayList = tapnInhibitorsArray;
+			changeArrayList = arcsArray;
 			return true;
 		}	
 		else if (pnObject instanceof NormalArc) {
@@ -1750,6 +1749,7 @@ implements Cloneable {
 		createInitialMarkingVector();
 		createCurrentMarkingVector();
 		createInhibitionMatrix();
+		createTAPNInhibitionMatrix();
 	}
 
 
@@ -1953,27 +1953,31 @@ implements Cloneable {
 		int transitionSize = transitionsArray.size();
 		tapnInhibitionMatrix = new PNMatrix(placeSize, transitionSize);
 
-		for (int i = 0; i < tapnInhibitorsArray.size(); i++) {
-			TAPNInhibitorArc inhibitorArc = (TAPNInhibitorArc)tapnInhibitorsArray.get(i);
-			if (inhibitorArc != null) {
-				PetriNetObject pnObject = inhibitorArc.getSource();
-				if (pnObject != null) {
-					if (pnObject instanceof Place) {
-						Place place = (Place)pnObject;
-						pnObject = inhibitorArc.getTarget();
-						if (pnObject != null) {
-							if (pnObject instanceof Transition) {
-								Transition transition = (Transition)pnObject;
-								int transitionNo = getListPosition(transition);
-								int placeNo = getListPosition(place);
-								try {
-									tapnInhibitionMatrix.set(
-											placeNo, transitionNo, inhibitorArc.getWeight());
-								} catch (Exception e) {
-									JOptionPane.showMessageDialog(null, 
-									"Problema a inhibitionMatrix");                          
-									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
-								}                        
+		for (int i = 0; i < arcsArray.size(); i++) 
+		{
+			if(arcsArray.get(i) instanceof TAPNInhibitorArc)
+			{
+				TAPNInhibitorArc inhibitorArc = (TAPNInhibitorArc)arcsArray.get(i);
+				if (inhibitorArc != null) {
+					PetriNetObject pnObject = inhibitorArc.getSource();
+					if (pnObject != null) {
+						if (pnObject instanceof Place) {
+							Place place = (Place)pnObject;
+							pnObject = inhibitorArc.getTarget();
+							if (pnObject != null) {
+								if (pnObject instanceof Transition) {
+									Transition transition = (Transition)pnObject;
+									int transitionNo = getListPosition(transition);
+									int placeNo = getListPosition(place);
+									try {
+										tapnInhibitionMatrix.set(
+												placeNo, transitionNo, inhibitorArc.getWeight());
+									} catch (Exception e) {
+										JOptionPane.showMessageDialog(null, 
+										"Problema a inhibitionMatrix");                          
+										System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
+									}                        
+								}
 							}
 						}
 					}
@@ -2974,11 +2978,23 @@ implements Cloneable {
 	}
 
 	public TAPNInhibitorArc[] getTAPNInhibitors() {
-		TAPNInhibitorArc[] returnArray = new TAPNInhibitorArc[inhibitorsArray.size()];
-
-		for (int i = 0; i < tapnInhibitorsArray.size(); i++){
-			returnArray[i] = (TAPNInhibitorArc)tapnInhibitorsArray.get(i);
+		int numInhibArcs = 0;
+		for (int i = 0; i < arcsArray.size(); i++){
+			if(arcsArray.get(i) instanceof TAPNInhibitorArc)
+				numInhibArcs++;
 		}
+		
+		TAPNInhibitorArc[] returnArray = new TAPNInhibitorArc[numInhibArcs];
+
+		for(int i = 0; i < numInhibArcs; i++)
+		{
+			for (int j = 0; j < arcsArray.size(); j++)
+			{
+				if(arcsArray.get(j) instanceof TAPNInhibitorArc)
+					returnArray[i] = (TAPNInhibitorArc)arcsArray.get(j);
+			}
+		}
+			
 		return returnArray;
 	}   
 

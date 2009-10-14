@@ -150,21 +150,6 @@ public class DataLayerWriter {
 				NET.appendChild(newArc);
 			}
 
-			TAPNInhibitorArc[] tapnInhibitorArcs = netModel.getTAPNInhibitors();
-			for (int i = 0; i < tapnInhibitorArcs.length; i++) {
-				Element newArc = createArcElement(tapnInhibitorArcs[i],pnDOM);
-
-				int arcPoints = tapnInhibitorArcs[i].getArcPath().getArcPathDetails().length;
-				String[][] point = tapnInhibitorArcs[i].getArcPath().getArcPathDetails();
-				for (int j = 0; j < arcPoints; j++) {
-					newArc.appendChild(createArcPoint(point[j][0],
-							point[j][1],
-							point[j][2],
-							pnDOM,j));
-				}
-				NET.appendChild(newArc);
-			}
-
 			StateGroup[] stateGroups = netModel.getStateGroups();
 			for(int i = 0; i< stateGroups.length; i++) {
 				Element newStateGroup = createStateGroupElement(stateGroups[i], pnDOM);
@@ -467,7 +452,18 @@ public class DataLayerWriter {
 							arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
 						}
 						//it is not a TransportArc
-					}else{
+					
+					}
+					else if (inputArc instanceof TAPNInhibitorArc)
+					{
+						arcElement.setAttribute("type", "tapnInhibitor");
+						if (inputArc.getSource() instanceof Place)
+							arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
+						else
+							System.err.println("There is an TAPNInhibitorArc coming from a transition");
+					}
+					else
+					{
 						arcElement.setAttribute("type", "timed");
 						if (inputArc.getSource() instanceof Place){
 							arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
@@ -483,9 +479,7 @@ public class DataLayerWriter {
 				}
 			} else if (inputArc instanceof InhibitorArc){
 				arcElement.setAttribute("type", "inhibitor");
-			} else if (inputArc instanceof TAPNInhibitorArc){
-				arcElement.setAttribute("type", "tapnInhibitor");
-			}
+			} 
 			/*EOC*/           
 			// arcElement.setAttribute("inscriptionOffsetX", (inscriptionPositionXInput != null ? String.valueOf(inscriptionPositionXInput) : ""));
 			// arcElement.setAttribute("inscriptionOffsetY", (inscriptionPositionYInput != null ? String.valueOf(inscriptionPositionYInput) : ""));
