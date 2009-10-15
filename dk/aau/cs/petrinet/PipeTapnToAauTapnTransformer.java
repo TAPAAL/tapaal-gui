@@ -36,7 +36,7 @@ public class PipeTapnToAauTapnTransformer {
 	}
 	public TAPN getAAUTAPN() throws Exception{
 		for ( Place place : appModel.getPlaces() ) {
-			TAPNPlace aAUTimedPlace = new TAPNPlace(place.getName(),((TimedPlace)place).getInvariant(), capacity);
+			TAPNPlace aAUTimedPlace = new TAPNPlace(place.getName(),getInvariant(place), capacity);
 			PlaceTransitionObjectBookKeeper.put(place, aAUTimedPlace);
 			aAUPetriNet.addObject(aAUTimedPlace);
 			
@@ -58,6 +58,7 @@ public class PipeTapnToAauTapnTransformer {
 		
 		for ( Arc arc : appModel.getArcs() ){
 			dk.aau.cs.petrinet.Arc aAUArc = null;
+			
 			if (arc instanceof TransportArc){
 				TransportArc tmp = (TransportArc)arc;
 				TransportArc end=null;
@@ -84,7 +85,7 @@ public class PipeTapnToAauTapnTransformer {
 								(TAPNPlace)(dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( tmp.getSource() ),
 								(TAPNTransition)(dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( end.getSource() ) ,
 								(TAPNPlace)(dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( end.getTarget()),
-								tmp.getGuard());
+								getGuard(tmp));
 						
 						
 						aAUPetriNet.addObject(aAUArc);
@@ -95,7 +96,7 @@ public class PipeTapnToAauTapnTransformer {
 				
 				
 			}else if (arc instanceof TimedArc){
-				aAUArc = new TAPNArc(((TimedArc)arc).getGuard());
+				aAUArc = new TAPNArc(getGuard((TimedArc)arc));
 			}else if (arc instanceof NormalArc){
 				aAUArc = new dk.aau.cs.petrinet.Arc();
 			}
@@ -108,4 +109,57 @@ public class PipeTapnToAauTapnTransformer {
 		}
 		return aAUPetriNet;
 	}
+	
+	private String getGuard(TimedArc arc) {
+		String guard = arc.getGuard();
+		String leftDelim = guard.substring(0,1);
+		String rightDelim = guard.substring(guard.length()-1, guard.length());
+		String first = guard.substring(1, guard.indexOf(","));
+		String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
+		
+		boolean isFirstConstant = false;
+		boolean isSecondConstant = false;
+		
+		try{
+			Integer.parseInt(first);
+		}catch(NumberFormatException e){
+			isFirstConstant = true;
+		}
+		
+		try{
+			Integer.parseInt(second);
+		}catch(NumberFormatException e){
+			if(!second.equals("inf")) isSecondConstant = true;
+		}
+		
+		if(isFirstConstant){
+			first = String.valueOf(appModel.getConstantValue(first));
+		}
+		
+		if(isSecondConstant){
+			second = String.valueOf(appModel.getConstantValue(second));
+		}
+		
+		return leftDelim + first + "," + second + rightDelim;
+	}
+	private String getInvariant(Place place) {
+		String inv = ((TimedPlace)place).getInvariant();
+		String operator = inv.contains("<=") ? "<=" : "<";
+		
+		String bound = inv.substring(operator.length());
+		
+		boolean isConstant = false;
+		try{
+			Integer.parseInt(bound);
+		}catch(NumberFormatException e){
+			if(!bound.equals("inf")) isConstant = true;
+		}
+		
+		if(isConstant)
+			bound = String.valueOf(appModel.getConstantValue(bound));
+		
+		return operator + bound;
+	}
+	
+	
 }
