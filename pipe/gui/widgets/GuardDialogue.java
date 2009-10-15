@@ -248,43 +248,6 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 							CreateGui.getModel().removeConstraintsFor(arc);
 						
 						CreateGui.getModel().buildConstraint(arc);
-						
-//						GuardConstraint gc = null;
-//						
-//						boolean leftIsConstant = leftUseConstant.isSelected();
-//						boolean rightIsConstant = rightUseConstant.isSelected();
-//						
-//						ConstraintComparison operator = ConstraintComparison.getOperatorForConstraint(
-//								leftDelimiter.getSelectedItem().toString(),
-//								rightDelimiter.getSelectedItem().toString());
-//										
-//						if(leftIsConstant && rightIsConstant){
-//							String left = leftConstantsComboBox.getSelectedItem().toString();
-//							String right = rightConstantsComboBox.getSelectedItem().toString();
-//							gc = new ConstantConstantConstraint(
-//									left,
-//									right,
-//									operator);
-//							
-//							CreateGui.getModel().addConstraint(arc, left, gc);
-//							CreateGui.getModel().addConstraint(arc, right,gc);
-//						}
-//						else if(leftIsConstant){
-//							String left = leftConstantsComboBox.getSelectedItem().toString();
-//							
-//							gc = new ConstantIntegerConstraint(
-//									leftConstantsComboBox.getSelectedItem().toString(),
-//									getSecondValue(),
-//									operator);
-//							CreateGui.getModel().addConstraint(arc, left, gc);
-//						}else if(rightIsConstant){
-//							String right = rightConstantsComboBox.getSelectedItem().toString();
-//							gc = new ConstantIntegerConstraint(
-//									rightConstantsComboBox.getSelectedItem().toString(),
-//									getFirstValue(),
-//									ConstraintComparison.invertOperator(operator));
-//							CreateGui.getModel().addConstraint(arc, right, gc);
-//						}
 					}
 
 					
@@ -465,6 +428,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			secondIntervalNumber.setValue(firstValue);
 			secondValue = firstValue;
 		}
+		
+		String leftOldDelim = leftDelimiter.getSelectedItem().toString();
+		String rightOldDelim = rightDelimiter.getSelectedItem().toString();
+		
 				
 		if(firstValue==secondValue){
 			rightDelimiter.setModel(modelRightIncludedOnly);
@@ -480,6 +447,9 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		
 		if(firstValue == 0) leftDelimiter.setModel(modelLeftIncludedOnly);
 		if(secondValue == 0) rightDelimiter.setModel(modelRightIncludedOnly);
+		
+		leftDelimiter.setSelectedItem(leftOldDelim);
+		rightDelimiter.setSelectedItem(rightOldDelim);
 	}
 
 	private int getSecondValue() {

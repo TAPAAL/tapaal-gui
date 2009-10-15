@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -303,6 +305,9 @@ extends javax.swing.JPanel {
 					if ((Integer)invariantSpinner.getValue() < 1){
 						invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<="}));
 					}
+					else{
+						invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<=", "<"}));
+					}
 				}else {
 					invariantSpinner.setEnabled(false);
 					invRelationNormal.setSelectedItem("<");
@@ -321,6 +326,14 @@ extends javax.swing.JPanel {
 		invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMinimumSize(new Dimension(80,30));
 		invConstantsComboBox.setPreferredSize(new Dimension(80,30));
+		invConstantsComboBox.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e){
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					setRelationModelForConstants();
+				}
+			}
+		});
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
@@ -382,6 +395,7 @@ extends javax.swing.JPanel {
 			substringStart = 1;
 			if (isInf){
 				invariantSpinner.setEnabled(false);
+				invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<"}));
 			}
 		}
 		if(!isInf)
@@ -404,6 +418,7 @@ extends javax.swing.JPanel {
 			enableConstantInvariantComponents();
 			constantInvRadioButton.setSelected(true);
 			invConstantsComboBox.setSelectedItem(constantName);
+			//setRelationModelForConstants();
 		}
 		else{
 			enableNormalInvariantComponents();
@@ -416,9 +431,23 @@ extends javax.swing.JPanel {
 		}
 	}
 
+	private void setRelationModelForConstants() {
+		int value = CreateGui.getModel().getConstantValue(
+				invConstantsComboBox.getSelectedItem().toString());
+		
+		String selected = invRelationConstant.getSelectedItem().toString();
+		if(value == 0){
+			invRelationConstant.setModel(new DefaultComboBoxModel(new String[]{"<="}));
+		}else{
+			invRelationConstant.setModel(new DefaultComboBoxModel(new String[]{"<=", "<"}));
+		}
+		invRelationConstant.setSelectedItem(selected);
+	}
+	
 	protected void enableConstantInvariantComponents() {
 		invRelationConstant.setEnabled(true);
 		invConstantsComboBox.setEnabled(true);
+		setRelationModelForConstants();
 	}
 
 	protected void enableNormalInvariantComponents() {

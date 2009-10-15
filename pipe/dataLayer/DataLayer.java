@@ -3863,7 +3863,54 @@ implements Cloneable {
 					"Constant value invalid for current net",
 					JOptionPane.ERROR_MESSAGE);
 		}
+		else{
+			correctGuards(oldName, constant.getName());
+		}
 	}
+
+	private void correctGuards(String oldName, String newName) {
+		updateArcGuards(oldName, newName);
+		for(Place p : placesArray){
+			if(p instanceof TimedPlace){
+				TimedPlace tp = (TimedPlace)p;
+				String inv = tp.getInvariant();
+				
+				String operator = inv.contains("<=") ? "<=" : "<";
+				String first = inv.substring(operator.length());
+				
+				if(first.equals(oldName)){
+					first = newName;
+				}
+				
+				tp.setInvariant(operator + first);
+			}
+		}
+		
+	}
+
+
+	private void updateArcGuards(String oldName, String newName) {
+		for(Arc arc : arcsArray){
+			if(arc instanceof TimedArc || arc instanceof TransportArc){
+				TimedArc tarc = (TimedArc)arc;
+				String guard = tarc.getGuard();
+				String leftDelim = guard.substring(0,1);
+				String rightDelim = guard.substring(guard.length()-1, guard.length());
+				String first = guard.substring(1, guard.indexOf(","));
+				String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
+				
+				if(first.equals(oldName)){
+					first = newName;
+				}
+				if(second.equals(oldName)){
+					second = newName;
+				}
+				
+				tarc.setGuard(leftDelim + first + "," + second + rightDelim);
+			}
+		}
+	}
+
 
 	public void addConstant(String name, int value) {	
 		boolean success = constants.addConstant(name, value);

@@ -41,6 +41,7 @@ public class GuardValidator {
 			constraints.put(constantName, new ArrayList<GuardConstraint>());
 		
 		constraints.get(constantName).add(gc);	
+		constants.incrementConstantUsage(constantName);
 		
 		if(!arcToConstraints.containsKey(arc))
 			arcToConstraints.put(arc, new ArrayList<ConstraintPair>());
@@ -52,6 +53,7 @@ public class GuardValidator {
 		ArrayList<ConstraintPair> gcs = arcToConstraints.get(arc);
 		for(ConstraintPair cp : gcs){
 			constraints.get(cp.getConstantName()).remove(cp.getConstraint());
+			constants.decrementConstantUsage(cp.getConstantName());
 		}
 		
 		arcToConstraints.remove(arc);

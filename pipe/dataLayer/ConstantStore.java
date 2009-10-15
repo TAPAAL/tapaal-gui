@@ -28,11 +28,12 @@ public class ConstantStore {
 	{
 		if(isUpdateAllowed(oldName, constant)){
 			if(constants.containsKey(oldName)){
-				findLargestValue();
-				constants.put(oldName, constant);
-				inUse.put(constant.getName(), inUse.get(oldName));
+				constants.remove(oldName);
+				constants.put(constant.getName(), constant);
+				int count = inUse.get(oldName);
 				inUse.remove(oldName);
-				
+				inUse.put(constant.getName(), count);
+				findLargestValue();
 				return true;
 			}
 		}
@@ -109,17 +110,15 @@ public class ConstantStore {
 	}
 	
 	public int getLargestConstantValue(){
-		return largest ;
+		return largest;
 	}
 
 	public void addConstraint(TimedArc arc, String constantName, GuardConstraint gc) {
-		guards.AddConstraint(arc, constantName, gc);
-		
+		guards.AddConstraint(arc, constantName, gc);		
 	}
 
 	public void removeConstraintsFor(TimedArc arc) {
-		guards.removeConstraintsFor(arc);
-		
+		guards.removeConstraintsFor(arc);		
 	}
 
 	public boolean containsConstraintsFor(TimedArc arc) {
@@ -156,7 +155,12 @@ public class ConstantStore {
 		try{
 			secondValue = Integer.parseInt(second);
 		}catch(NumberFormatException e){
-			isSecondNumber = false;
+			if(second.equals("inf")){
+				secondValue = Integer.MAX_VALUE;
+			}
+			else{
+				isSecondNumber = false;
+			}
 		}
 		
 		ConstraintComparison operator = 
