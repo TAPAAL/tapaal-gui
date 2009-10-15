@@ -48,8 +48,8 @@ public class TapnConservativeTransformer {
 		for (Transition t : transitions){
 			
 			// Get size of pre and post set
-			Collection postset = t.getPostset();
-			Collection preset = t.getPreset();
+			Collection<Arc> postset = t.getPostset();
+			Collection<Arc> preset = t.getPreset();
 			
 		    int sizePreset = preset.size();
 		    int sizePostset = postset.size();

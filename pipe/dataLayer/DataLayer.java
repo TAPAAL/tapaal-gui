@@ -236,6 +236,7 @@ implements Cloneable {
 			//newClone.tapnInhibitorsArray = deepCopy(tapnInhibitorsArray);
 			//newClone.tokensArray = deepCopy(tokensArray);
 			newClone.labelsArray = deepCopy(labelsArray);
+						
 		} catch(CloneNotSupportedException e) {
 			throw new Error(e);
 		}
@@ -2455,7 +2456,7 @@ implements Cloneable {
 	public void fireTimedTransitionBackwards(HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking, 
 			HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking, 
 			TAPNTransition transition){
-		for (Arc a : (LinkedList<TimedArc>)transition.getPreset()){
+		for (Arc a : (LinkedList<Arc>)transition.getPreset()){
 			if (! presetMarking.containsKey(a.getSource()) )
 				throw new IllegalArgumentException("Incorrect Preset for transition argument!");
 		}
@@ -2466,7 +2467,7 @@ implements Cloneable {
 
 		fireTransitionBackwards(transition);
 
-		for (Arc a : (LinkedList<TimedArc>)transition.getPreset()){
+		for (Arc a : (LinkedList<Arc>)transition.getPreset()){
 			TimedPlace place = (TimedPlace)a.getSource();
 			//place.setCurrentMarking( (presetMarking.get(place)).size() );
 			//place.setAgeOfTokens(presetMarking.get(place));

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,11 +26,8 @@ import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.exception.InvariantViolatedAnimationException;
-import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.LeftQueryPane;
-import pipe.gui.widgets.QueryDialogue;
 
 
 /**
@@ -100,7 +96,7 @@ public class Animator {
 	 public void highlightEnabledTransitions(){
 		/* rewritten by wjk 03/10/2007 */
 		 DataLayer current = CreateGui.currentPNMLData();
-
+		
 		 //current.setEnabledTransitions();      
 
 		 Iterator transitionIterator = current.returnTransitions();
@@ -153,6 +149,7 @@ public class Animator {
 	  * Stores model at start of animation
 	  */
 	 public void storeModel(){
+		 CreateGui.setupModelForSimulation();
 		 CreateGui.currentPNMLData().storeState();
 	 }
 
@@ -162,6 +159,7 @@ public class Animator {
 	  * unhighlighted
 	  */
 	 public void restoreModel(){
+		 CreateGui.restoreModelForEditing();
 		 CreateGui.currentPNMLData().restoreState();
 		 disableTransitions();
 		 currentAction = -1;
