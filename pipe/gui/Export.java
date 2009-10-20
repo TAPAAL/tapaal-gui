@@ -1047,7 +1047,7 @@ public class Export {
 				if(!((TimedPlace)place).getInvariant().contains("inf"))
 					invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant());
 				
-				out.print("\\node[place,label=above:"+place.getName()+","+invariant+"] at ("+place.getPositionX()*scale+","+place.getPositionY()*scale*(-1)+") ("+place.getId()+") {}");
+				out.print("\\node[place,label=above:$"+place.getName()+"$,"+invariant+"] at ("+place.getPositionX()*scale+","+place.getPositionY()*scale*(-1)+") ("+place.getId()+") {}");
 				
 				ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
 				if(tokens.size() > 0)
@@ -1065,7 +1065,7 @@ public class Export {
 				String angle ="";
 				if(trans.getAngle() != 0)
 					angle = "rotate="+String.valueOf(trans.getAngle())+","; 
-				out.println("\\node[transition,"+angle+"label=above:"+trans.getName()+"] at ("+trans.getPositionX()*scale+","+trans.getPositionY()*scale*(-1)+") ("+trans.getId()+") {};");
+				out.println("\\node[transition,"+angle+"label=above:$"+trans.getName()+"$] at ("+trans.getPositionX()*scale+","+trans.getPositionY()*scale*(-1)+") ("+trans.getId()+") {};");
 			}
 			
 			Arc[] arcs = net.getArcs();
