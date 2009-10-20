@@ -85,6 +85,7 @@ public class Export {
 	public static final int PRINTER = 3;
 	public static final int TN = 4;
 	public static final int TIKZ = 5;
+	public enum TikZOutputOption { FIGURE_ONLY, FULL_LATEX }
 
 
 	public static void toPostScript(Object g,String filename) 
@@ -236,9 +237,27 @@ public class Export {
 				}
 				break;  
 			case TIKZ:
+				Object[] possibilities = {"Only the TikZ figure", "Full compilable LaTex including your figure"};
+				String figureOptions = (String)JOptionPane.showInputDialog(
+									CreateGui.getApp(),
+				                    "Choose how you would like your TikZ figure outputted: \n",
+				                    "Customized Dialog",
+				                    JOptionPane.PLAIN_MESSAGE,
+				                    null,
+				                    possibilities,
+				                    "Only the TikZ figure");
+				Export.TikZOutputOption tikZOption  = Export.TikZOutputOption.FIGURE_ONLY;
+				if(figureOptions != null)
+				{
+					if(figureOptions == possibilities[0])
+						tikZOption = Export.TikZOutputOption.FIGURE_ONLY;
+					if(figureOptions == possibilities[1])
+						tikZOption = Export.TikZOutputOption.FULL_LATEX;
+				}
+				
 				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
 				if (filename!=null) {
-					ExportToTIKZ(model,filename);
+					ExportToTIKZ(model,filename,tikZOption);
 				}
 			}
 		} catch (Exception e) {
@@ -995,16 +1014,40 @@ public class Export {
 		}
 		
 	}
-	public static void ExportToTIKZ(DataLayer net, String fullpath){
+	
+	public static void ExportToTIKZ(DataLayer net, String fullpath, TikZOutputOption option){
 		try{
 			FileWriter outFile = new FileWriter(fullpath);
 			PrintWriter out = new PrintWriter(outFile);
+			
+			double scale = 1.0/55.0;
+			
+			if(option == TikZOutputOption.FULL_LATEX)
+			{
+				out.println("\\documentclass[a4paper]{article}");
+				out.println("\\usepackage{tikz}");
+				out.println("\\usetikzlibrary{petri,arrows}");
+				out.println("\\tikzset{");
+				out.println("font=\\scriptsize,");
+				out.println("every place/.style={minimum size=4mm},");
+				out.println("every transition/.style={fill=black,minimum width=2mm,minimum height=5mm},");
+				out.println("every token/.style={fill=white,text=black}");
+				out.println("}");
+				out.println("");
+				out.println("\\begin{document}");
+				out.println("");
+				out.println("");
+			}
+			
 			out.println("\\begin{tikzpicture}");
-			double scale = 1.0/60.0;
 			
 			Place[] places = net.getPlaces();
 			for(Place place:places){
-				out.print("\\node[place,label=above:"+place.getName()+",label=below:inv: "+replaceWithMathLatex(((TimedPlace)place).getInvariant())+"] at ("+place.getPositionX()*scale+","+place.getPositionY()*scale*(-1)+") ("+safeLaTeXName(place.getName())+") {}");
+				String invariant = "";
+				if(!((TimedPlace)place).getInvariant().contains("inf"))
+					invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant());
+				
+				out.print("\\node[place,label=above:"+place.getName()+","+invariant+"] at ("+place.getPositionX()*scale+","+place.getPositionY()*scale*(-1)+") ("+place.getId()+") {}");
 				
 				ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
 				if(tokens.size() > 0)
@@ -1019,7 +1062,10 @@ public class Export {
 			
 			Transition[] transitions = net.getTransitions();
 			for(Transition trans:transitions){
-				out.println("\\node[transition,label=above:"+trans.getName()+"] at ("+trans.getPositionX()*scale+","+trans.getPositionY()*scale*(-1)+") ("+safeLaTeXName(trans.getName())+") {};");
+				String angle ="";
+				if(trans.getAngle() != 0)
+					angle = "rotate="+String.valueOf(trans.getAngle())+","; 
+				out.println("\\node[transition,"+angle+"label=above:"+trans.getName()+"] at ("+trans.getPositionX()*scale+","+trans.getPositionY()*scale*(-1)+") ("+trans.getId()+") {};");
 			}
 			
 			Arc[] arcs = net.getArcs();
@@ -1030,11 +1076,13 @@ public class Export {
 					arcPoints += "-- ("+point.getX()*scale+","+point.getY()*scale*(-1)+") ";
 				}
 				String arrowTip ="";
+				String arcNo = "";
 				if(arc instanceof TAPNInhibitorArc){
 					arrowTip = "-o";
 				}
 				else if(arc instanceof TransportArc){
 					arrowTip = "->,>=diamond";
+					arcNo = String.valueOf(((TransportArc)arc).getGroupNr());
 				}
 				else if(arc instanceof TimedArc){
 					arrowTip = "->";
@@ -1043,14 +1091,32 @@ public class Export {
 					arrowTip = "->";
 				}
 				
-				String guard = "{}";
+				
+				String arcLabel ="";
 				if(arc instanceof TimedArc)
 				{
-					guard = "node[midway] {"+replaceWithMathLatex(((TimedArc)arc).getGuard())+"}";
+					if(!(arc.getSource() instanceof TAPNTransition)){
+						arcLabel = "node[midway] {";
+						arcLabel += replaceWithMathLatex(((TimedArc)arc).getGuard());
+						
+						if(arcNo != "")
+							arcLabel += ":"+arcNo;
+						
+						arcLabel += "}";
+					}
+					else{
+						if(arcNo != "")
+							arcLabel = "node[midway] {"+arcNo+"}";
+					}
 				}
-				out.println("\\draw["+arrowTip+"] (" + safeLaTeXName(arc.getSource().getName())+") "+arcPoints+"-- ("+ safeLaTeXName(arc.getTarget().getName()) +") "+guard+";");
+				out.println("\\draw["+arrowTip+"] (" + arc.getSource().getId()+") "+arcPoints+"-- ("+ arc.getTarget().getId() +") "+arcLabel+" {};");
 			}
 			out.println("\\end{tikzpicture}");
+			if(option == TikZOutputOption.FULL_LATEX)
+			{
+				out.println("\\end{document}");
+
+			}
 			out.close();
 			outFile.close();
 		}
@@ -1062,12 +1128,7 @@ public class Export {
 	
 	private static String replaceWithMathLatex(String text)
 	{
-		return "$"+text.replace("inf", "\\infty")+"$";
-	}
-	
-	private static String safeLaTeXName(String name){
-		//FIX - We need to remove illegal charactors from the string.
-		return name;
+		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq")+"$";
 	}
 	
 }

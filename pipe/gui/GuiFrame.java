@@ -223,7 +223,7 @@ implements ActionListener, Observer {
 		addMenuItem(exportMenu, exportPSAction  =
 			new FileAction("PostScript", "Export the net to PostScript format","ctrl T"));
 		addMenuItem(exportMenu, exportToTikZAction  =
-			new FileAction("TikZ", "Export the net to PNG format","ctrl G"));
+			new FileAction("TikZ", "Export the net to PNG format","ctrl L"));
 /*		addMenuItem(exportMenu, exportTNAction =
 			new FileAction("Timenet","Export the net to Timenet format",""));
 		addMenuItem(exportMenu, exportToUppaal =
