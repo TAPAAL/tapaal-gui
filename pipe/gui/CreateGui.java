@@ -50,8 +50,7 @@ public class CreateGui {
 	static AnimationControler animControlerBox;
 	private static JScrollPane scroller;
 	private static JScrollPane scroller2;
-	private static JScrollPane scrollerQueries;
-	private static JPanel queries;
+	private static LeftQueryPane queries;
 	private static JPanel leftBottomPanel;
 	private static JSplitPane pane;
 	private static AnimationHistory abstractAnimationPane=null;
@@ -75,7 +74,6 @@ public class CreateGui {
 
 
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
-		scrollerQueries = new JScrollPane(queries);
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
 		setLeftPaneToQueries();
 
@@ -412,10 +410,9 @@ public class CreateGui {
 		 queries = new LeftQueryPane(
 				 getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
 		 );
-		 scrollerQueries.setViewportView(queries);
 		 leftPane.setDividerLocation(DIVIDER_LOCATION);
 		 leftPane.setResizeWeight(0.5);
-		 leftPane.setTopComponent(scrollerQueries);
+		 leftPane.setTopComponent(queries);
 		 leftPane.setBottomComponent(leftBottomPanel);
 		 leftPane.setContinuousLayout(true);
 		 leftPane.setDividerSize(0);

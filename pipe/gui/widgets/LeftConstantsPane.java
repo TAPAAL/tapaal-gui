@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -14,6 +16,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -33,17 +36,17 @@ public class LeftConstantsPane extends JPanel {
 	private JScrollPane constantsScroller;
 	private JPanel addConstantPanel;
 	private JLabel constantsLabel;
-	
+
 	private JList constantsList;
 	private DefaultListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
-	
-		
+
+
 	public LeftConstantsPane(){
 		constantsPanel = new JPanel(new BorderLayout());
 		addConstantPanel = new JPanel();
-		
+
 		listModel = new DefaultListModel();
 		constantsList = new JList(listModel);
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -66,18 +69,36 @@ public class LeftConstantsPane extends JPanel {
 			}
 		});
 		
+		constantsList.addMouseListener(new MouseAdapter(){
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(!constantsList.isSelectionEmpty()){
+					if(arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2){
+						int index = constantsList.locationToIndex(arg0.getPoint());
+					    ListModel dlm = constantsList.getModel();
+					    Constant c = (Constant)dlm.getElementAt(index);;
+					    constantsList.ensureIndexIsVisible(index);						
+						
+						showEditConstantDialog(c.getName(), c.getValue());
+					}	
+				}
+			}
+		});
+
+
 		addConstantsComponents();
 		addConstantsButtons();
-		
+
 		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, constantsPanel, addConstantPanel);
 		setLayout(new BorderLayout());
-				
+
 		splitPane.setContinuousLayout(true);
 		splitPane.setDividerSize(0);
 		splitPane.setDividerLocation(0.9);
 		splitPane.setResizeWeight(1.0);
 		this.add(splitPane);
-		
+
 		showConstants();
 	}
 
@@ -91,7 +112,7 @@ public class LeftConstantsPane extends JPanel {
 			}
 		});
 		addConstantPanel.add(editBtn);
-		
+
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
 		removeBtn.addActionListener(new ActionListener(){
@@ -101,8 +122,8 @@ public class LeftConstantsPane extends JPanel {
 			}
 		});
 		addConstantPanel.add(removeBtn);
-		
-		JButton addConstantButton = new JButton("Add Constant..");
+
+		JButton addConstantButton = new JButton("Add..");
 		addConstantButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				showEditConstantDialog("", 0);
@@ -110,12 +131,12 @@ public class LeftConstantsPane extends JPanel {
 		});
 		addConstantPanel.add(addConstantButton);
 	}
-	
+
 	private void showConstants()
 	{
 		DataLayer model = CreateGui.getModel();
 		if(model == null) return;
-		
+
 		listModel.removeAllElements();
 		addConstantsToPanel(model);
 		constantsList.validate();
@@ -135,14 +156,14 @@ public class LeftConstantsPane extends JPanel {
 		constantsScroller = new JScrollPane(constantsList);
 		constantsPanel.add(constantsScroller, BorderLayout.CENTER);
 	}
-	
+
 	private void addConstantsLabel() {
 		constantsLabel = new JLabel("Constants:");
 		constantsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		constantsLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 		constantsPanel.add(constantsLabel, BorderLayout.PAGE_START);
 	}
-	
+
 	private void showEditConstantDialog(String name, int value) {
 		EscapableDialog guiDialog = 
 			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
@@ -163,14 +184,14 @@ public class LeftConstantsPane extends JPanel {
 		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
-		
+
 		showConstants();
 	}
-	
+
 	protected void removeConstant(String name) {
 		DataLayer model = CreateGui.getModel();
 		model.removeConstant(name);
 		showConstants();
 	}
-	
+
 }
