@@ -68,7 +68,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 		String[] left = {"[","("};
 		leftDelimiter = new JComboBox();
-		Dimension dims = new Dimension(35,25);
+		Dimension dims = new Dimension(45,25);
 		leftDelimiter.setPreferredSize(dims);
 		leftDelimiter.setMinimumSize(dims);
 		leftDelimiter.setMaximumSize(dims);
@@ -103,7 +103,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(leftDelimiter, gridBagConstraints);
 		
-		Dimension intervalBoxDims = new Dimension(80,25);
+		Dimension intervalBoxDims = new Dimension(90,25);
 		firstIntervalNumber.setMaximumSize(intervalBoxDims);
 		firstIntervalNumber.setMinimumSize(intervalBoxDims);
 		firstIntervalNumber.setPreferredSize(intervalBoxDims);
@@ -375,6 +375,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			rightConstantsComboBox.setSelectedItem(secondNumber);
 			updateRightComponents();
 		}
+		
+		boolean b = rightUseConstant.isEnabled();
+		if(b)
+			updateRightConstantComboBox();
 		
 		setDelimiterModels();
 		if ( timeInterval.contains("[") ){

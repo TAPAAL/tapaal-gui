@@ -104,7 +104,7 @@ public class TimedArc extends NormalArc{
 		// 2 Add Place editor
 		contentPane.add( new GuardDialogue(guiDialog.getRootPane(), this) );
 
-		guiDialog.setResizable(true);     
+		guiDialog.setResizable(false);     
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
