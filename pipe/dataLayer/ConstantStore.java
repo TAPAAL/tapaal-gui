@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 import pipe.dataLayer.constraints.ConstantConstantConstraint;
 import pipe.dataLayer.constraints.ConstantIntegerConstraint;
 import pipe.dataLayer.constraints.ConstraintComparison;
 import pipe.dataLayer.constraints.GuardConstraint;
 public class ConstantStore {
-	private HashMap<String, Constant> constants = new HashMap<String, Constant>();
+	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
 	private HashMap<String, Integer> inUse = new HashMap<String, Integer>();
 	private GuardValidator guards;
 	private int largest = 0;

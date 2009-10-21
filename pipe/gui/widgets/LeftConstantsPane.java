@@ -148,6 +148,7 @@ public class LeftConstantsPane extends JPanel {
 		{
 			listModel.addElement(constant);
 		}
+		
 	}
 
 	private void addConstantsComponents()

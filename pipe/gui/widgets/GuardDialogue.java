@@ -376,9 +376,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			updateRightComponents();
 		}
 		
-		boolean b = rightUseConstant.isEnabled();
-		if(b)
+		boolean canUseConstants = rightUseConstant.isEnabled();
+		if(canUseConstants){
 			updateRightConstantComboBox();
+		}
 		
 		setDelimiterModels();
 		if ( timeInterval.contains("[") ){
