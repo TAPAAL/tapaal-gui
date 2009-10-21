@@ -247,13 +247,13 @@ public class Export {
 				                    possibilities,
 				                    "Only the TikZ figure");
 				Export.TikZOutputOption tikZOption  = Export.TikZOutputOption.FIGURE_ONLY;
-				if(figureOptions != null)
-				{
-					if(figureOptions == possibilities[0])
-						tikZOption = Export.TikZOutputOption.FIGURE_ONLY;
-					if(figureOptions == possibilities[1])
-						tikZOption = Export.TikZOutputOption.FULL_LATEX;
-				}
+				if(figureOptions == null)
+					return;
+				
+				if(figureOptions == possibilities[0])
+					tikZOption = Export.TikZOutputOption.FIGURE_ONLY;
+				if(figureOptions == possibilities[1])
+					tikZOption = Export.TikZOutputOption.FULL_LATEX;
 				
 				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
 				if (filename!=null) {
