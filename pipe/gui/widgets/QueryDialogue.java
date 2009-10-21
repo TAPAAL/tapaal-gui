@@ -589,7 +589,7 @@ public class QueryDialogue extends JPanel{
 						public void actionPerformed(ActionEvent evt) {
 							
 							datalayer.getQueries().remove(queryToCreateFrom);
-							CreateGui.setLeftPaneToQueries();
+							CreateGui.createLeftPane();
 							exit();
 						}
 					}

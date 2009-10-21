@@ -1,12 +1,8 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,12 +17,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
@@ -95,7 +88,7 @@ public class LeftQueryPane extends JPanel {
 			}
 		});
 	
-		addConstantsComponents();
+		addQueriesComponents();
 		addButtons();
 		
 		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, queryCollectionPanel, buttonsPanel);
@@ -106,9 +99,11 @@ public class LeftQueryPane extends JPanel {
 		splitPane.setDividerLocation(0.8);
 		splitPane.setResizeWeight(1.0);
 		this.add(splitPane);
+		
+		showQueries();
 	}
 
-	private void addConstantsComponents() {
+	private void addQueriesComponents() {
 		verifyLabel = new JLabel("Queries:");
 		verifyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		verifyLabel.setAlignmentY(Component.TOP_ALIGNMENT);

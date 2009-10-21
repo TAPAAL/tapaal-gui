@@ -916,6 +916,7 @@ EOC */
 		appTab.setSelectedIndex(freeSpace);
 
 		appView.updatePreferredSize();
+		
 		//appView.add( new ViewExpansionComponent(appView.getWidth(),
 		//        appView.getHeight());
 
@@ -1111,7 +1112,7 @@ EOC */
          // Gowing out of animation mode.
          CreateGui.removeAbstractAnimationPane();
          
-         CreateGui.setLeftPaneToQueries();
+         CreateGui.createLeftPane();
       }
    }
    
@@ -1742,7 +1743,7 @@ EOC */
 					createNewTab(filePath, false);
 
 					//TODO make update leftPane work better
-					CreateGui.setLeftPaneToQueries();
+					CreateGui.createLeftPane();
 				}
 			} else if (this == importAction) {
 				File filePath = new FileBrowser(CreateGui.userPath).openFile();

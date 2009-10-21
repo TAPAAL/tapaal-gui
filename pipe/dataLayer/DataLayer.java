@@ -3332,7 +3332,6 @@ implements Cloneable {
 	public void createFromPNML(Document PNMLDoc)	{
 		// XXX - kyrke debug
 		emptyPNML();
-		Element element = null;
 		Node node = null;
 		NodeList nodeList = null;
 
@@ -3363,11 +3362,8 @@ implements Cloneable {
 	 */
 	public void createFromPNML(Document PNMLDoc, ProgressBar progressBar) {
 		emptyPNML();
-		Element element = null;
 		Node node = null;
 		NodeList nodeList = null;
-		ArrayList<TAPNQuery> queriesArrayList = new ArrayList<TAPNQuery>();
-
 		try {
 			nodeList = PNMLDoc.getDocumentElement().getChildNodes();
 			if (CreateGui.getApp()!=null) {

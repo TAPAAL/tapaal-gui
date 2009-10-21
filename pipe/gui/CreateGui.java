@@ -75,7 +75,7 @@ public class CreateGui {
 
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		setLeftPaneToQueries();
+		createLeftPane();
 
 
 		pane = 
@@ -164,6 +164,9 @@ public class CreateGui {
 
 	public static void removeTab(int index) {
 		tabs.remove(index);
+		if(tabs.isEmpty()){
+			createEmptyLeftPane();
+		}
 	}
 
 
@@ -405,7 +408,7 @@ public class CreateGui {
 		 return animBox;
 	 }
 
-	 public static void setLeftPaneToQueries(){
+	 public static void createLeftPane(){
 		 leftBottomPanel = new LeftConstantsPane();
 		 queries = new LeftQueryPane(
 				 getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
@@ -417,6 +420,11 @@ public class CreateGui {
 		 leftPane.setContinuousLayout(true);
 		 leftPane.setDividerSize(0);
 		 updateLeftPanel();
+	 }
+	 
+	 public static void createEmptyLeftPane(){
+		 leftPane.setTopComponent(null);
+		 leftPane.setBottomComponent(null);
 	 }
 
 	 public static void updateLeftPanel() {
