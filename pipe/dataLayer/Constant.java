@@ -3,9 +3,9 @@ package pipe.dataLayer;
 public class Constant {
 	private String name;
 	private int value;
-	private int lowerBound = 0;
-	private int upperBound = Integer.MAX_VALUE;
-	private boolean isUsed = false;
+	private int lowerBound;
+	private int upperBound;
+	private boolean isUsed;
 	
 	public Constant()
 	{
@@ -15,6 +15,7 @@ public class Constant {
 	public Constant(String name, int value){
 		this.name = name;
 		this.value = value;
+		reset();
 	}
 
 	public void setName(String name) {
@@ -59,5 +60,11 @@ public class Constant {
 	
 	public boolean getIsUsed(){
 		return isUsed;
+	}
+
+	public void reset() {
+		isUsed = false;
+		lowerBound = 0;
+		upperBound = Integer.MAX_VALUE;
 	}
 }

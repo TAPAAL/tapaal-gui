@@ -90,7 +90,7 @@ public class ConstantStore {
 
 	public void buildConstraints(ArrayList<Place> places, ArrayList<Arc> arcs) {
 		for(Constant c : constants.values()){
-			c.setIsUsed(false);
+			c.reset();
 		}
 		
 		for(Place place : places){
@@ -151,6 +151,9 @@ public class ConstantStore {
 			Constant left = getConstant(first);
 			Constant right = getConstant(second);
 			
+			left.setIsUsed(true);
+			right.setIsUsed(true);
+			
 			if(left.getValue()+diff > right.getLowerBound()){
 				right.setLowerBound(left.getValue()+diff);				
 			}
@@ -159,11 +162,12 @@ public class ConstantStore {
 				left.setUpperBound(right.getValue()-diff);
 			}
 			
-			left.setIsUsed(true);
-			right.setIsUsed(true);
+			
 		}
 		else if(!isFirstNumber){
 			Constant left = getConstant(first);
+			left.setIsUsed(true);
+			
 			if(secondValue-diff < left.getUpperBound()){
 				left.setUpperBound(secondValue-diff);
 			}
@@ -171,15 +175,16 @@ public class ConstantStore {
 			if(diff == 1 && left.getLowerBound() == 0){
 				left.setLowerBound(1);
 			}
-			left.setIsUsed(true);
+			
 		}else if(!isSecondNumber){
 			Constant right = getConstant(second);
+			right.setIsUsed(true);
 			
 			if(firstValue+diff > right.getLowerBound()){
 				right.setLowerBound(firstValue+diff);				
 			}
 			
-			right.setIsUsed(true);
+			
 		}
 	}
 	
