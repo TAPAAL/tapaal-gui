@@ -5,6 +5,11 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeMap;
 
+import pipe.gui.undo.AddConstantEdit;
+import pipe.gui.undo.RemoveConstantEdit;
+import pipe.gui.undo.UndoableEdit;
+import pipe.gui.undo.UpdateConstantEdit;
+
 public class ConstantStore {
 	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
 	private int largest = 0;
@@ -17,7 +22,7 @@ public class ConstantStore {
 		return constants.values();
 	}
 	
-	public boolean updateConstant(String oldName, Constant constant)
+	public UndoableEdit updateConstant(String oldName, Constant constant, DataLayer model)
 	{
 			if(constants.containsKey(oldName)){
 				Constant old = constants.get(oldName);
@@ -30,9 +35,9 @@ public class ConstantStore {
 				constants.remove(oldName);
 				constants.put(constant.getName(), constant);
 				findLargestValue();
-				return true;
+				return new UpdateConstantEdit(old, constant, this, model);
 			}
-		return false;
+		return null;
 	}
 
 	private void findLargestValue() {
@@ -48,27 +53,27 @@ public class ConstantStore {
 		return name.toLowerCase().equals("inf");
 	}
 
-	public boolean addConstant(String name, int value) {	
-		if(isNamedInf(name)) return false;
+	public UndoableEdit addConstant(String name, int value) {	
+		if(isNamedInf(name)) return null;
 		
 		if(!constants.containsKey(name)){
-			constants.put(name, new Constant(name, value));
-			if(value > largest) largest = value;
-			
-			return true;
+			Constant constant = new Constant(name, value);
+			add(constant);
+			return new AddConstantEdit(constant, this);
 		}
-		return false;
+		return null;
 	}
 
-	public boolean removeConstant(String name){
+	public UndoableEdit removeConstant(String name){
 		if(!isConstantInUse(name)){
 			if(constants.containsKey(name)){
+				Constant constant = constants.get(name);
 				constants.remove(name);
 				findLargestValue();
-				return true;
+				return new RemoveConstantEdit(constant, this);
 			}
 		}
-		return false;
+		return null;
 	}
 
 
@@ -193,5 +198,16 @@ public class ConstantStore {
 			return 0;
 		else 
 			return 1;
+	}
+
+	public void add(Constant constant) {
+		constants.put(constant.getName(), constant);
+		if(constant.getValue() > largest) largest = constant.getValue();
+		
+	}
+
+	public void remove(Constant constant) {
+		constants.remove(constant.getName());
+		findLargestValue();		
 	}
 }

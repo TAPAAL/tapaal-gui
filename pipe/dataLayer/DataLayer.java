@@ -32,6 +32,8 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
+import pipe.gui.undo.UndoManager;
+import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.ProgressBar;
 import dk.aau.cs.petrinet.TAPN;
 
@@ -3848,23 +3850,17 @@ implements Cloneable {
 		return constants.getConstants();
 	}
 
-	public void updateConstant(String oldName, Constant constant)
+	public UndoableEdit updateConstant(String oldName, Constant constant)
 	{
-		boolean success = constants.updateConstant(oldName, constant);
-		if(!success){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"The specified value is invalid for the current net.\n" +
-					"Updating the constant to the specified value invalidates the guard\n" + 
-					"on one or more ars.",
-					"Constant value invalid for current net",
-					JOptionPane.ERROR_MESSAGE);
-		}
-		else{
+		UndoableEdit edit = constants.updateConstant(oldName, constant, this);
+		if(edit != null){
 			correctGuards(oldName, constant.getName());
 		}
+		
+		return edit;
 	}
 
-	private void correctGuards(String oldName, String newName) {
+	public void correctGuards(String oldName, String newName) {
 		updateArcGuards(oldName, newName);
 		for(Place p : placesArray){
 			if(p instanceof TimedPlace){
@@ -3908,25 +3904,12 @@ implements Cloneable {
 	}
 
 
-	public void addConstant(String name, int value) {	
-		boolean success = constants.addConstant(name, value);
-		if(!success){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"A constant with the specified name already exists.",
-					"Constant exists",
-					JOptionPane.ERROR_MESSAGE);
-		}
+	public UndoableEdit addConstant(String name, int value) {	
+		return constants.addConstant(name, value);
 	}
 
-	public void removeConstant(String name){
-		boolean success = constants.removeConstant(name);
-		if(!success){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"You cannot remove a constant that is used in the net.\nRemove all references " +
-					"to the constant in the net and try again.",
-					"Constant in use",
-					JOptionPane.ERROR_MESSAGE);
-		}
+	public UndoableEdit removeConstant(String name){
+		return constants.removeConstant(name);		
 	}
 
 	public void addQuery(TAPNQuery query) {

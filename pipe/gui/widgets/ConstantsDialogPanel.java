@@ -12,6 +12,7 @@ import javax.swing.SpinnerNumberModel;
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
+import pipe.gui.undo.UndoableEdit;
 
 /*
  * LeftConstantsPane.java
@@ -95,10 +96,30 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     	{
     		int val = (Integer)valueSpinner.getValue();
        		
-    		if(name != "")
-    			model.updateConstant(name, new Constant(newName, val));
-    		else
-    			model.addConstant(newName, val);
+    		if(name != ""){
+    			UndoableEdit edit = model.updateConstant(name, new Constant(newName, val));
+    			if(edit == null){
+    				JOptionPane.showMessageDialog(CreateGui.getApp(),
+    						"The specified value is invalid for the current net.\n" +
+    						"Updating the constant to the specified value invalidates the guard\n" + 
+    						"on one or more ars.",
+    						"Constant value invalid for current net",
+    						JOptionPane.ERROR_MESSAGE);
+    			}else{
+    				CreateGui.getView().getUndoManager().addNewEdit(edit);
+    			}
+    		}
+    		else{
+    			UndoableEdit edit = model.addConstant(newName, val);
+    			if(edit == null){
+    				JOptionPane.showMessageDialog(CreateGui.getApp(),
+    						"A constant with the specified name already exists.",
+    						"Constant exists",
+    						JOptionPane.ERROR_MESSAGE);
+    			}
+    			else
+    				CreateGui.getView().getUndoManager().addNewEdit(edit);
+    		}
     	}    	
     	
    	   	exit();

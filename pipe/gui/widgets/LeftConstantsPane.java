@@ -13,6 +13,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -25,6 +26,7 @@ import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.undo.UndoableEdit;
 
 public class LeftConstantsPane extends JPanel {
 	/**
@@ -132,7 +134,7 @@ public class LeftConstantsPane extends JPanel {
 		addConstantPanel.add(addConstantButton);
 	}
 
-	private void showConstants()
+	public void showConstants()
 	{
 		DataLayer model = CreateGui.getModel();
 		if(model == null) return;
@@ -191,7 +193,17 @@ public class LeftConstantsPane extends JPanel {
 
 	protected void removeConstant(String name) {
 		DataLayer model = CreateGui.getModel();
-		model.removeConstant(name);
+		UndoableEdit edit = model.removeConstant(name);
+		if(edit == null){
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"You cannot remove a constant that is used in the net.\nRemove all references " +
+					"to the constant in the net and try again.",
+					"Constant in use",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		else
+			CreateGui.getView().getUndoManager().addNewEdit(edit);
+		
 		showConstants();
 	}
 

@@ -51,7 +51,7 @@ public class CreateGui {
 	private static JScrollPane scroller;
 	private static JScrollPane scroller2;
 	private static LeftQueryPane queries;
-	private static JPanel leftBottomPanel;
+	private static LeftConstantsPane leftBottomPanel;
 	private static JSplitPane pane;
 	private static AnimationHistory abstractAnimationPane=null;
 	public static void init() {
@@ -421,10 +421,14 @@ public class CreateGui {
 		 leftPane.setDividerSize(0);
 		 updateLeftPanel();
 	 }
-	 
+	 	 
 	 public static void createEmptyLeftPane(){
 		 leftPane.setTopComponent(null);
 		 leftPane.setBottomComponent(null);
+	 }
+	 
+	 public static void updateConstantsList(){
+		 leftBottomPanel.showConstants();
 	 }
 
 	 public static void updateLeftPanel() {
