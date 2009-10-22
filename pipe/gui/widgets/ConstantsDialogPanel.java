@@ -38,17 +38,17 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         initComponents();
     }
     
-    public ConstantsDialogPanel(JRootPane pane, DataLayer model, String name, int value) {
+    public ConstantsDialogPanel(JRootPane pane, DataLayer model, Constant constant) {
         initComponents();
         
         rootPane = pane;
         this.model = model;
  
-        this.name = name;
+        this.name = constant.getName();
         
         // Set up initial values
        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
-    		   value, 0,	Integer.MAX_VALUE, 1);
+    		   constant.getValue(), constant.getLowerBound(),	constant.getUpperBound(), 1);
        valueSpinner.setModel(spinnerModel);
        nameTextField.setText(name);
        nameTextField.addKeyListener(new KeyAdapter(){

@@ -80,7 +80,7 @@ public class LeftConstantsPane extends JPanel {
 					    Constant c = (Constant)dlm.getElementAt(index);;
 					    constantsList.ensureIndexIsVisible(index);						
 						
-						showEditConstantDialog(c.getName(), c.getValue());
+						showEditConstantDialog(c);
 					}	
 				}
 			}
@@ -108,7 +108,7 @@ public class LeftConstantsPane extends JPanel {
 		editBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				Constant c = (Constant)constantsList.getSelectedValue();
-				showEditConstantDialog(c.getName(), c.getValue());
+				showEditConstantDialog(c);
 			}
 		});
 		addConstantPanel.add(editBtn);
@@ -126,7 +126,7 @@ public class LeftConstantsPane extends JPanel {
 		JButton addConstantButton = new JButton("Add..");
 		addConstantButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				showEditConstantDialog("", 0);
+				showEditConstantDialog(new Constant());
 			}
 		});
 		addConstantPanel.add(addConstantButton);
@@ -165,7 +165,7 @@ public class LeftConstantsPane extends JPanel {
 		constantsPanel.add(constantsLabel, BorderLayout.PAGE_START);
 	}
 
-	private void showEditConstantDialog(String name, int value) {
+	private void showEditConstantDialog(Constant constant) {
 		EscapableDialog guiDialog = 
 			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
 
@@ -175,7 +175,7 @@ public class LeftConstantsPane extends JPanel {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
 
 		// 2 Add Place editor
-		contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), CreateGui.getModel(), name, value) );
+		contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), CreateGui.getModel(), constant) );
 
 		guiDialog.setResizable(false);     
 

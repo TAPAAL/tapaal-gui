@@ -237,20 +237,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 						String guard = composeGuard(arc.getGuard());
 						CreateGui.getView().getUndoManager().addNewEdit( arc.setGuard(guard) );
 					
-						updateConstraintsForArc(arc);
-						
-						
+						CreateGui.getModel().buildConstraints();
+											
 						exit();
 					}
-
-					private void updateConstraintsForArc(TimedArc arc) {
-						if(CreateGui.getModel().containsConstraintsFor(arc))
-							CreateGui.getModel().removeConstraintsFor(arc);
-						
-						CreateGui.getModel().buildConstraint(arc);
-					}
-
-					
+				
 
 					private String composeGuard(String oldGuard) {
 						boolean useConstantLeft = leftUseConstant.isSelected();
@@ -486,7 +477,8 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	private void updateRightConstantComboBox() {
 		int value = getFirstValue();
 		
-		String oldRight = rightConstantsComboBox.getSelectedItem().toString();
+		String oldRight = rightConstantsComboBox.getSelectedItem() != null ? 
+				rightConstantsComboBox.getSelectedItem().toString() : null;
 		rightConstantsComboBox.removeAllItems();
 		Collection<Constant> constants = CreateGui.getModel().getConstants();
 		for(Constant c : constants){
@@ -495,7 +487,12 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			}
 		}
 		
-		rightConstantsComboBox.setSelectedItem(oldRight);	
+		//if(rightConstantsComboBox.getItemCount() == 0){
+		//	rightUseConstant.setEnabled(false);
+		//}
+		
+		if(oldRight != null)
+			rightConstantsComboBox.setSelectedItem(oldRight);	
 	}
 	
 	private void firstSpinnerStateChanged(ChangeEvent evt) {

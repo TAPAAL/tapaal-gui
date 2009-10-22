@@ -3763,7 +3763,7 @@ implements Cloneable {
 	}
 
 
-	public HashMap getTransportArcMap() {
+	public HashMap<Transition, HashMap<TransportArc, TransportArc> > getTransportArcMap() {
 		return transportArcMap;
 	}
 
@@ -3961,29 +3961,8 @@ implements Cloneable {
 	}
 
 
-	public void addConstraint(TimedArc arc, String constantName, GuardConstraint gc) {
-		constants.addConstraint(arc, constantName, gc);
-		
-	}
-	
-	public void removeConstraintsFor(TimedArc arc){
-		constants.removeConstraintsFor(arc);
-	}
-	
-	public boolean containsConstraintsFor(TimedArc arc){
-		return constants.containsConstraintsFor(arc);
-	}
-
-
 	public void buildConstraints() {
 		constants.buildConstraints(arcsArray);
 		
-	}
-
-
-	public void buildConstraint(TimedArc arc) {
-		constants.buildConstraint(arc);
-		
-	}
-	
+	}	
 }

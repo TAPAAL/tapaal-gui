@@ -6,18 +6,12 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import pipe.dataLayer.constraints.ConstantConstantConstraint;
-import pipe.dataLayer.constraints.ConstantIntegerConstraint;
-import pipe.dataLayer.constraints.ConstraintComparison;
-import pipe.dataLayer.constraints.GuardConstraint;
 public class ConstantStore {
 	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
 	private HashMap<String, Integer> inUse = new HashMap<String, Integer>();
-	private GuardValidator guards;
 	private int largest = 0;
 	
 	public ConstantStore(){
-		guards = new GuardValidator(this);
 	}
 	
 	public Collection<Constant> getConstants()
@@ -27,7 +21,6 @@ public class ConstantStore {
 	
 	public boolean updateConstant(String oldName, Constant constant)
 	{
-		if(isUpdateAllowed(oldName, constant)){
 			if(constants.containsKey(oldName)){
 				constants.remove(oldName);
 				constants.put(constant.getName(), constant);
@@ -37,7 +30,6 @@ public class ConstantStore {
 				findLargestValue();
 				return true;
 			}
-		}
 		return false;
 	}
 
@@ -49,16 +41,6 @@ public class ConstantStore {
 		}
 		
 	}
-
-	private boolean isUpdateAllowed(String oldName, Constant constant) {
-		boolean guardsValidWithNewValue = guards.allowUpdate(oldName, constant); 
-		boolean sameName = oldName.equals(constant.getName());
-		boolean nameNotAlreadyDeclared = !constants.containsKey(constant.getName());
-		boolean isNotNamedInf = !isNamedInf(constant.getName());
-		
-		return guardsValidWithNewValue && isNotNamedInf && (sameName || nameNotAlreadyDeclared);
-	}
-
 
 	private boolean isNamedInf(String name) {
 		return name.toLowerCase().equals("inf");
@@ -114,21 +96,8 @@ public class ConstantStore {
 		return largest;
 	}
 
-	public void addConstraint(TimedArc arc, String constantName, GuardConstraint gc) {
-		guards.AddConstraint(arc, constantName, gc);		
-	}
-
-	public void removeConstraintsFor(TimedArc arc) {
-		guards.removeConstraintsFor(arc);		
-	}
-
-	public boolean containsConstraintsFor(TimedArc arc) {
-		return guards.containsConstraintsFor(arc);
-	}
-
-	public void buildConstraints(ArrayList arcsArray) {
-		guards.clearAll();
-		for(Object arc : arcsArray){
+	public void buildConstraints(ArrayList<Arc> arcsArray) {
+		for(Arc arc : arcsArray){
 			if(arc instanceof TimedArc || arc instanceof TransportArc)
 				buildConstraint((TimedArc)arc);
 		}
@@ -164,30 +133,63 @@ public class ConstantStore {
 			}
 		}
 		
-		ConstraintComparison operator = 
-			ConstraintComparison.getOperatorForConstraint(leftDelim, rightDelim);
-		
+	//	ConstraintComparison operator = 
+	//		ConstraintComparison.getOperatorForConstraint(leftDelim, rightDelim);
+		int diff = getDiffForConstraint(leftDelim, rightDelim);
 		if(!isFirstNumber && !isSecondNumber){
-			GuardConstraint gc = new ConstantConstantConstraint(
-					first,
-					second,
-					operator);
+			Constant left = getConstant(first);
+			Constant right = getConstant(second);
 			
-			addConstraint(arc, first, gc);
-			addConstraint(arc, second,gc);
+			if(left.getValue()+diff > right.getLowerBound()){
+				right.setLowerBound(left.getValue()+diff);				
+			}
+			
+			if(right.getValue()-diff < left.getUpperBound()){
+				left.setUpperBound(right.getValue()-diff);
+			}
+			
+//			GuardConstraint gc = new ConstantConstantConstraint(
+//					first,
+//					second,
+//					operator);
+//			
+//			addConstraint(arc, first, gc);
+//			addConstraint(arc, second,gc);
 		}
 		else if(!isFirstNumber){
-			GuardConstraint gc = new ConstantIntegerConstraint(
-					first,
-					secondValue,
-					operator);
-			addConstraint(arc, first, gc);
+			Constant left = getConstant(first);
+			if(secondValue-diff < left.getUpperBound()){
+				left.setUpperBound(secondValue-diff);
+			}
+			
+			if(diff == 1 && left.getLowerBound() == 0){
+				left.setLowerBound(1);
+			}
+			
+			
+//			GuardConstraint gc = new ConstantIntegerConstraint(
+//					first,
+//					secondValue,
+//					operator);
+//			addConstraint(arc, first, gc);
 		}else if(!isSecondNumber){
-			GuardConstraint gc = new ConstantIntegerConstraint(
-					second,
-					firstValue,
-					ConstraintComparison.invertOperator(operator));
-			addConstraint(arc, second, gc);
+			Constant right = getConstant(second);
+			
+			if(firstValue+diff > right.getLowerBound()){
+				right.setLowerBound(firstValue+diff);				
+			}
+//			GuardConstraint gc = new ConstantIntegerConstraint(
+//					second,
+//					firstValue,
+//					ConstraintComparison.invertOperator(operator));
+//			addConstraint(arc, second, gc);
 		}
+	}
+	
+	public int getDiffForConstraint(String leftDelimiter, String rightDelimiter) {
+		if(leftDelimiter.equals("[") && rightDelimiter.equals("]"))
+			return 0;
+		else 
+			return 1;
 	}
 }

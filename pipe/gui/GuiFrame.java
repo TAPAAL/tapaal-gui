@@ -48,9 +48,7 @@ import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TNTransformer;
-import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
-import pipe.dataLayer.TransportArc;
 import pipe.experiment.Experiment;
 import pipe.experiment.editor.gui.ExperimentEditor;
 import pipe.gui.action.GuiAction;
@@ -1437,15 +1435,11 @@ EOC */
 
 		public void actionPerformed(ActionEvent e){
 			appView.getUndoManager().newEdit(); // new "transaction""
-			for(Object pno : appView.getSelectionObject().getSelection()){
-				if(pno instanceof TimedArc || pno instanceof TransportArc){
-					CreateGui.getModel().removeConstraintsFor((TimedArc)pno);
-				}
-			}
-			
+						
 			appView.getUndoManager().deleteSelection(
 					appView.getSelectionObject().getSelection());
 			appView.getSelectionObject().deleteSelection();			
+			CreateGui.getModel().buildConstraints();
 		}
 
 	}
