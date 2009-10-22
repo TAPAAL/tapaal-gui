@@ -28,7 +28,6 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.dataLayer.constraints.GuardConstraint;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -3941,15 +3940,6 @@ implements Cloneable {
 	}
 
 
-	public void incrementConstantUsage(String constantName) {
-		constants.incrementConstantUsage(constantName);
-	}
-
-
-	public void decrementConstantUsage(String constantName) {
-		constants.decrementConstantUsage(constantName);
-	}
-
 
 	public int getConstantValue(String constantName) {
 		return constants.getConstant(constantName).getValue();
@@ -3962,7 +3952,7 @@ implements Cloneable {
 
 
 	public void buildConstraints() {
-		constants.buildConstraints(arcsArray);
+		constants.buildConstraints(placesArray,arcsArray);
 		
 	}	
 }

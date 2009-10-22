@@ -2,13 +2,11 @@ package pipe.dataLayer;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
 public class ConstantStore {
 	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
-	private HashMap<String, Integer> inUse = new HashMap<String, Integer>();
 	private int largest = 0;
 	
 	public ConstantStore(){
@@ -22,11 +20,15 @@ public class ConstantStore {
 	public boolean updateConstant(String oldName, Constant constant)
 	{
 			if(constants.containsKey(oldName)){
+				Constant old = constants.get(oldName);
+				boolean isUsed = old.getIsUsed();
+				int lower = old.getLowerBound();
+				int upper = old.getUpperBound();
+				constant.setIsUsed(isUsed);
+				constant.setLowerBound(lower);
+				constant.setUpperBound(upper);
 				constants.remove(oldName);
 				constants.put(constant.getName(), constant);
-				int count = inUse.get(oldName);
-				inUse.remove(oldName);
-				inUse.put(constant.getName(), count);
 				findLargestValue();
 				return true;
 			}
@@ -51,7 +53,6 @@ public class ConstantStore {
 		
 		if(!constants.containsKey(name)){
 			constants.put(name, new Constant(name, value));
-			inUse.put(name, 0);
 			if(value > largest) largest = value;
 			
 			return true;
@@ -63,7 +64,6 @@ public class ConstantStore {
 		if(!isConstantInUse(name)){
 			if(constants.containsKey(name)){
 				constants.remove(name);
-				inUse.remove(name);
 				findLargestValue();
 				return true;
 			}
@@ -73,19 +73,11 @@ public class ConstantStore {
 
 
 	private boolean isConstantInUse(String name) {
-		return inUse.get(name).intValue() > 0;
+		return constants.get(name).getIsUsed();
 	}
 
 	public Set<String> getConstantNames() {
 		return constants.keySet();
-	}
-
-	public void incrementConstantUsage(String constantName) {
-		inUse.put(constantName, inUse.get(constantName)+1);
-	}
-
-	public void decrementConstantUsage(String constantName) {
-		inUse.put(constantName, inUse.get(constantName)-1);
 	}
 
 	public Constant getConstant(String constantName) {
@@ -96,8 +88,29 @@ public class ConstantStore {
 		return largest;
 	}
 
-	public void buildConstraints(ArrayList<Arc> arcsArray) {
-		for(Arc arc : arcsArray){
+	public void buildConstraints(ArrayList<Place> places, ArrayList<Arc> arcs) {
+		for(Constant c : constants.values()){
+			c.setIsUsed(false);
+		}
+		
+		for(Place place : places){
+			if(place instanceof TimedPlace){
+				TimedPlace tp = (TimedPlace)place;
+				String inv = tp.getInvariant();
+				int substringStart = 0;
+				if (inv.contains("<=")){
+					substringStart = 2;
+				}else {
+					substringStart = 1;
+				}
+				String val = inv.substring(substringStart);
+				if(constants.containsKey(val)){
+					constants.get(val).setIsUsed(true);
+				}
+			}
+		}
+		
+		for(Arc arc : arcs){
 			if(arc instanceof TimedArc || arc instanceof TransportArc)
 				buildConstraint((TimedArc)arc);
 		}
@@ -133,8 +146,6 @@ public class ConstantStore {
 			}
 		}
 		
-	//	ConstraintComparison operator = 
-	//		ConstraintComparison.getOperatorForConstraint(leftDelim, rightDelim);
 		int diff = getDiffForConstraint(leftDelim, rightDelim);
 		if(!isFirstNumber && !isSecondNumber){
 			Constant left = getConstant(first);
@@ -148,13 +159,8 @@ public class ConstantStore {
 				left.setUpperBound(right.getValue()-diff);
 			}
 			
-//			GuardConstraint gc = new ConstantConstantConstraint(
-//					first,
-//					second,
-//					operator);
-//			
-//			addConstraint(arc, first, gc);
-//			addConstraint(arc, second,gc);
+			left.setIsUsed(true);
+			right.setIsUsed(true);
 		}
 		else if(!isFirstNumber){
 			Constant left = getConstant(first);
@@ -165,24 +171,15 @@ public class ConstantStore {
 			if(diff == 1 && left.getLowerBound() == 0){
 				left.setLowerBound(1);
 			}
-			
-			
-//			GuardConstraint gc = new ConstantIntegerConstraint(
-//					first,
-//					secondValue,
-//					operator);
-//			addConstraint(arc, first, gc);
+			left.setIsUsed(true);
 		}else if(!isSecondNumber){
 			Constant right = getConstant(second);
 			
 			if(firstValue+diff > right.getLowerBound()){
 				right.setLowerBound(firstValue+diff);				
 			}
-//			GuardConstraint gc = new ConstantIntegerConstraint(
-//					second,
-//					firstValue,
-//					ConstraintComparison.invertOperator(operator));
-//			addConstraint(arc, second, gc);
+			
+			right.setIsUsed(true);
 		}
 	}
 	

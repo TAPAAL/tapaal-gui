@@ -5,6 +5,7 @@ public class Constant {
 	private int value;
 	private int lowerBound = 0;
 	private int upperBound = Integer.MAX_VALUE;
+	private boolean isUsed = false;
 	
 	public Constant()
 	{
@@ -37,7 +38,7 @@ public class Constant {
 	}
 	
 	public int getLowerBound(){
-		return lowerBound;
+		return isUsed ? lowerBound : 0;
 	}
 	
 	public void setLowerBound(int value){
@@ -45,10 +46,18 @@ public class Constant {
 	}
 	
 	public int getUpperBound(){
-		return upperBound;
+		return isUsed ? upperBound : Integer.MAX_VALUE;
 	}
 	
 	public void setUpperBound(int value){
 		upperBound = value;
+	}
+	
+	public void setIsUsed(boolean value){
+		isUsed = value;
+	}
+	
+	public boolean getIsUsed(){
+		return isUsed;
 	}
 }

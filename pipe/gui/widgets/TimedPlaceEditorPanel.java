@@ -52,8 +52,6 @@ extends javax.swing.JPanel {
 	JRootPane rootPane;
 
 
-	private String constantInUse = "";
-
 	/**
 	 * Creates new form PlaceEditor
 	 */
@@ -381,23 +379,24 @@ extends javax.swing.JPanel {
 		int substringStart = 0;
 		
 		String constantName ="";
-		boolean isInf = false;
-		if (invariantToSet.contains("inf")){
-			isInf = true;
-			invariantInf.setSelected(true);
-			invRelationNormal.setSelectedItem("<");
-		}
+		
 		if (invariantToSet.contains("<=")){
 			invRelationNormal.setSelectedItem("<=");
 			substringStart = 2;
 		}else {
 			invRelationNormal.setSelectedItem("<");
 			substringStart = 1;
-			if (isInf){
-				invariantSpinner.setEnabled(false);
-				invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<"}));
-			}
 		}
+		
+		boolean isInf = false;
+		if (invariantToSet.substring(substringStart).equals("inf")){
+			isInf = true;
+			invariantSpinner.setEnabled(false);
+			invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<"}));
+			invariantInf.setSelected(true);
+			invRelationNormal.setSelectedItem("<");
+		}
+		
 		if(!isInf)
 		{
 			boolean isNumber = true;
@@ -414,7 +413,6 @@ extends javax.swing.JPanel {
 		
 		disableInvariantComponents();
 		if(!constantName.isEmpty()){
-			constantInUse = constantName;
 			enableConstantInvariantComponents();
 			constantInvRadioButton.setSelected(true);
 			invConstantsComboBox.setSelectedItem(constantName);
@@ -561,11 +559,8 @@ extends javax.swing.JPanel {
 		}
 		else{
 			String constantName = (String)invConstantsComboBox.getSelectedItem();
-			CreateGui.getModel().incrementConstantUsage(constantName);
 			newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
 		}
-		
-		if(!constantInUse.isEmpty()) CreateGui.getModel().decrementConstantUsage(constantInUse);
 		
 		//if ()  -  TODO do some check if it has canged and if value is ok
 		view.getUndoManager().addEdit(place.setInvariant(newInvariant));
@@ -610,6 +605,8 @@ extends javax.swing.JPanel {
 			place.toggleAttributesVisible();
 		}    
 		place.repaint();
+		
+		CreateGui.getModel().buildConstraints();
 		exit();
 	}
 
