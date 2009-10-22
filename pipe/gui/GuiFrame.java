@@ -26,6 +26,7 @@ import java.util.jar.JarFile;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -353,7 +354,7 @@ implements ActionListener, Observer {
 			new DeleteAction("Delete", "Delete selection","DELETE"));
 		
 		// Bind delete to backspace also
-		editMenu.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),"Delete");
+		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"),"Delete");
 		editMenu.getActionMap().put("Delete", deleteAction);
 
 		
