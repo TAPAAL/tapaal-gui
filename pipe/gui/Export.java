@@ -6,18 +6,12 @@
  */
 package pipe.gui;
 
-import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -34,43 +28,24 @@ import javax.print.attribute.DocAttributeSet;
 import javax.print.attribute.HashDocAttributeSet;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.TAPN.transformer.TapnConservativeTransformer;
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PetriNetObject;
+import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TNTransformer;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.QueryDialogue;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
-import dk.aau.cs.petrinet.degree2converters.Kyrketest;
 import dk.aau.cs.petrinet.degree2converters.KyrketestUppaalSym;
-import dk.aau.cs.petrinet.degree2converters.degree2minimal;
-
-import pipe.dataLayer.PetriNetObject;
-import pipe.gui.action.ShowHideInfoAction;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
-import pipe.gui.widgets.GuardDialogue;
-import pipe.gui.widgets.QueryDialogue;
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPathPoint;
-import pipe.dataLayer.DataLayerWriter;
-import pipe.dataLayer.NormalArc;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNTransition;
-import pipe.dataLayer.TNTransformer;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
 
 
 
@@ -85,8 +60,7 @@ public class Export {
 	public static final int PRINTER = 3;
 	public static final int TN = 4;
 	public static final int TIKZ = 5;
-	public enum TikZOutputOption { FIGURE_ONLY, FULL_LATEX }
-
+	
 
 	public static void toPostScript(Object g,String filename) 
 	throws PrintException, IOException {
@@ -246,18 +220,19 @@ public class Export {
 				                    null,
 				                    possibilities,
 				                    "Only the TikZ figure");
-				Export.TikZOutputOption tikZOption  = Export.TikZOutputOption.FIGURE_ONLY;
+				TikZExporter.TikZOutputOption tikZOption  = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if(figureOptions == null)
 					return;
 				
 				if(figureOptions == possibilities[0])
-					tikZOption = Export.TikZOutputOption.FIGURE_ONLY;
+					tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if(figureOptions == possibilities[1])
-					tikZOption = Export.TikZOutputOption.FULL_LATEX;
+					tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
 				
 				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
 				if (filename!=null) {
-					ExportToTIKZ(model,filename,tikZOption);
+					TikZExporter output = new TikZExporter(model,filename,tikZOption);
+					output.ExportToTikZ();
 				}
 			}
 		} catch (Exception e) {
@@ -369,7 +344,6 @@ public class Export {
 		
 		boolean drawnice=false, symred = false;
 		boolean minialmodel = false;
-		boolean minialmodelalt = false;
 		boolean capacityminial = false;
 		boolean capacityreset = false;
 		boolean removeun = false;
@@ -386,7 +360,6 @@ public class Export {
 		} 
 		
 		if (input.contains("-z")) {
-			minialmodelalt = true;
 		}
 		if (input.contains("-o")) {
 			orderpreset = true;
@@ -819,7 +792,7 @@ public class Export {
 			e1.printStackTrace();
 		}
 		
-		TAPN model1=null, model2=null, model3 = null, model4=null;
+		TAPN model1=null, model2=null, model3 = null;
 		try {
 			model1 = model.convertToDegree2();
 			model2 = model.convertToDegree2capacity();
@@ -921,7 +894,6 @@ public class Export {
 
 
 		int capacity;
-		String currentQuery = "";
 		capacity = input.capacity;
 		String inputQuery = input.query;
 		TraceOption traceOption = input.traceOption;
@@ -1013,122 +985,5 @@ public class Export {
 
 		}
 		
-	}
-	
-	public static void ExportToTIKZ(DataLayer net, String fullpath, TikZOutputOption option){
-		try{
-			FileWriter outFile = new FileWriter(fullpath);
-			PrintWriter out = new PrintWriter(outFile);
-			
-			double scale = 1.0/55.0;
-			
-			if(option == TikZOutputOption.FULL_LATEX)
-			{
-				out.println("\\documentclass[a4paper]{article}");
-				out.println("\\usepackage{tikz}");
-				out.println("\\usetikzlibrary{petri,arrows}");
-				out.println("\\tikzset{");
-				out.println("font=\\scriptsize,");
-				out.println("every place/.style={minimum size=4mm},");
-				out.println("every transition/.style={fill=black,minimum width=2mm,minimum height=5mm},");
-				out.println("every token/.style={fill=white,text=black}");
-				out.println("}");
-				out.println("");
-				out.println("\\begin{document}");
-				out.println("");
-				out.println("");
-			}
-			
-			out.println("\\begin{tikzpicture}");
-			
-			Place[] places = net.getPlaces();
-			for(Place place:places){
-				String invariant = "";
-				if(!((TimedPlace)place).getInvariant().contains("inf"))
-					invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant());
-				
-				out.print("\\node[place,label=above:$"+place.getName()+"$,"+invariant+"] at ("+place.getPositionX()*scale+","+place.getPositionY()*scale*(-1)+") ("+place.getId()+") {}");
-				
-				ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
-				if(tokens.size() > 0)
-				{
-					out.print("\n[children are tokens]");
-					for (BigDecimal token : tokens) {
-					out.print("\n   child {node [token] {$"+token.setScale(1)+"$}}");	
-					}
-				}
-				out.print(";\n");
-			}
-			
-			Transition[] transitions = net.getTransitions();
-			for(Transition trans:transitions){
-				String angle ="";
-				if(trans.getAngle() != 0)
-					angle = "rotate="+String.valueOf(trans.getAngle())+","; 
-				out.println("\\node[transition,"+angle+"label=above:$"+trans.getName()+"$] at ("+trans.getPositionX()*scale+","+trans.getPositionY()*scale*(-1)+") ("+trans.getId()+") {};");
-			}
-			
-			Arc[] arcs = net.getArcs();
-			for(Arc arc:arcs){
-				String arcPoints = "";
-				for (int i = 1; i < arc.getArcPath().getEndIndex(); i++) {
-					ArcPathPoint point = arc.getArcPath().getArcPathPoint(i);
-					arcPoints += "-- ("+point.getX()*scale+","+point.getY()*scale*(-1)+") ";
-				}
-				String arrowTip ="";
-				String arcNo = "";
-				if(arc instanceof TAPNInhibitorArc){
-					arrowTip = "-o";
-				}
-				else if(arc instanceof TransportArc){
-					arrowTip = "->,>=diamond";
-					arcNo = String.valueOf(((TransportArc)arc).getGroupNr());
-				}
-				else if(arc instanceof TimedArc){
-					arrowTip = "->";
-				}
-				else{
-					arrowTip = "->";
-				}
-				
-				
-				String arcLabel ="";
-				if(arc instanceof TimedArc)
-				{
-					if(!(arc.getSource() instanceof TAPNTransition)){
-						arcLabel = "node[midway] {";
-						arcLabel += replaceWithMathLatex(((TimedArc)arc).getGuard());
-						
-						if(arcNo != "")
-							arcLabel += ":"+arcNo;
-						
-						arcLabel += "}";
-					}
-					else{
-						if(arcNo != "")
-							arcLabel = "node[midway] {"+arcNo+"}";
-					}
-				}
-				out.println("\\draw["+arrowTip+"] (" + arc.getSource().getId()+") "+arcPoints+"-- ("+ arc.getTarget().getId() +") "+arcLabel+" {};");
-			}
-			out.println("\\end{tikzpicture}");
-			if(option == TikZOutputOption.FULL_LATEX)
-			{
-				out.println("\\end{document}");
-
-			}
-			out.close();
-			outFile.close();
-		}
-		catch (IOException e)
-		{
-			
-		}
-	}
-	
-	private static String replaceWithMathLatex(String text)
-	{
-		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq")+"$";
-	}
-	
+	}	
 }
