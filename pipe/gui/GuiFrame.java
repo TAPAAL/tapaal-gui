@@ -392,9 +392,9 @@ EOC */
 
 		addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
 		/*EOC*/
-      addMenuItem(drawMenu, inhibarcAction =
-              new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
-              "Add an inhibitor arc", "H",true));              
+        //addMenuItem(drawMenu, inhibarcAction =
+        //      new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
+        //      "Add an inhibitor arc", "H",true));              
 		addMenuItem(drawMenu, annotationAction =
 			new TypeAction("Annotation", Pipe.ANNOTATION,
 					"Add an annotation","N",true));
@@ -560,7 +560,7 @@ EOC */
 		addButton(drawingToolBar, transportArcAction);
 		/*EOC*/      
      
-		addButton(drawingToolBar,inhibarcAction);
+		//addButton(drawingToolBar,inhibarcAction);
  
 		addButton(drawingToolBar,annotationAction);
 		drawingToolBar.addSeparator();
@@ -666,7 +666,7 @@ EOC */
 		
 //		placeAction.setEnabled(status);
 //		arcAction.setEnabled(status);
-		inhibarcAction.setEnabled(status);
+		//inhibarcAction.setEnabled(status);
 		annotationAction.setEnabled(status);
 		transAction.setEnabled(status);
 //		timedtransAction.setEnabled(status);
@@ -776,7 +776,8 @@ EOC */
 
 		JOptionPane.showMessageDialog(this,
 				Pipe.getProgramName() + "\n\n" +
-				"Joakim Byg,  Kenneth Yrke Joergensen and Jiri Srba \n" +
+				"Joakim Byg, Kenneth Yrke Joergensen, \n" + 
+				"Lasse Jacobsen, Morten Jacobsen, Mikael H. Møller and Jiri Srba \n" +
 				"Aalborg University 2009 \n\n" +
 				"Read more at: www.tapaal.net \n\n"+
 				"Using verifyta version:  "+ Verification.getVerifytaVersion() +"\n" +
@@ -1170,8 +1171,8 @@ EOC */
 		if (timedPlaceAction != null) 
 			timedPlaceAction.setSelected(mode == Pipe.TAPNPLACE);
 
-		if (inhibarcAction != null) 
-			inhibarcAction.setSelected(mode == Pipe.TAPNINHIBITOR_ARC);
+//		if (inhibarcAction != null) 
+//			inhibarcAction.setSelected(mode == Pipe.TAPNINHIBITOR_ARC);
 
 		if (tokenAction != null) 
 			tokenAction.setSelected(mode == Pipe.ADDTOKEN);
@@ -1497,9 +1498,9 @@ EOC */
 			if (this != transportArcAction) {
 				transportArcAction.setSelected(false);
 			}
-			if (this != inhibarcAction) {
-				inhibarcAction.setSelected(false);
-			}     
+//			if (this != inhibarcAction) {
+//				inhibarcAction.setSelected(false);
+//			}     
 			if (this != tokenAction) {
 				tokenAction.setSelected(false);
 			}
