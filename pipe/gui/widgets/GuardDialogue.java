@@ -441,9 +441,6 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 				rightDelimiter.setModel(modelRightBoth);
 		}
 		
-		if(firstValue == 0) leftDelimiter.setModel(modelLeftIncludedOnly);
-		if(secondValue == 0) rightDelimiter.setModel(modelRightIncludedOnly);
-		
 		leftDelimiter.setSelectedItem(leftOldDelim);
 		rightDelimiter.setSelectedItem(rightOldDelim);
 	}

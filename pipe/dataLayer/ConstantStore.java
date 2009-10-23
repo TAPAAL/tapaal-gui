@@ -12,7 +12,7 @@ import pipe.gui.undo.UpdateConstantEdit;
 
 public class ConstantStore {
 	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
-	private int largest = 0;
+	private int largest = -1;
 	
 	public ConstantStore(){
 	}
@@ -41,7 +41,7 @@ public class ConstantStore {
 	}
 
 	private void findLargestValue() {
-		largest = 0;
+		largest = -1;
 		for(Constant c : constants.values()){
 			if(c.getValue() > largest)
 				largest = c.getValue();
@@ -119,7 +119,6 @@ public class ConstantStore {
 			if(arc instanceof TimedArc || arc instanceof TransportArc)
 				buildConstraint((TimedArc)arc);
 		}
-		
 	}
 
 	public void buildConstraint(TimedArc arc) {
@@ -175,12 +174,7 @@ public class ConstantStore {
 			
 			if(secondValue-diff < left.getUpperBound()){
 				left.setUpperBound(secondValue-diff);
-			}
-			
-			if(diff == 1 && left.getLowerBound() == 0){
-				left.setLowerBound(1);
-			}
-			
+			}			
 		}else if(!isSecondNumber){
 			Constant right = getConstant(second);
 			right.setIsUsed(true);
@@ -188,8 +182,6 @@ public class ConstantStore {
 			if(firstValue+diff > right.getLowerBound()){
 				right.setLowerBound(firstValue+diff);				
 			}
-			
-			
 		}
 	}
 	
