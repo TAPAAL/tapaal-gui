@@ -776,8 +776,8 @@ EOC */
 
 		JOptionPane.showMessageDialog(this,
 				Pipe.getProgramName() + "\n\n" +
-				"Joakim Byg, Kenneth Yrke Joergensen, \n" + 
-				"Lasse Jacobsen, Morten Jacobsen, Mikael H. Møller and Jiri Srba \n" +
+				"Joakim Byg, Kenneth Yrke Joergensen, Lasse Jacobsen, \n" +
+				"Morten Jacobsen, Mikael H. Moeller and Jiri Srba \n" +
 				"Aalborg University 2009 \n\n" +
 				"Read more at: www.tapaal.net \n\n"+
 				"Using verifyta version:  "+ Verification.getVerifytaVersion() +"\n" +

@@ -68,7 +68,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 		String[] left = {"[","("};
 		leftDelimiter = new JComboBox();
-		Dimension dims = new Dimension(45,25);
+		Dimension dims = new Dimension(55,25);
 		leftDelimiter.setPreferredSize(dims);
 		leftDelimiter.setMinimumSize(dims);
 		leftDelimiter.setMaximumSize(dims);
