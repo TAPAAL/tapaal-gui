@@ -1,7 +1,6 @@
 package pipe.gui;
 
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
@@ -16,7 +15,6 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import javax.management.Query;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -35,8 +33,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
-import pipe.gui.widgets.QueryDialogue;
-import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import dk.aau.cs.TA.AbstractMarking;
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
@@ -45,7 +41,6 @@ import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UppaalTrace;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
@@ -65,12 +60,6 @@ public class Verification {
 	static String verifytapath="";
 
 	public static boolean setupVerifyta(){
-		String verifyta = System.getenv("verifyta");
-
-		if (verifytapath.equals("")){			
-			verifytapath = verifyta;
-		}
-		
 		// if not set
 		if (verifytapath == null || verifytapath.equals("")){
 			
@@ -84,12 +73,11 @@ public class Verification {
 					JOptionPane.INFORMATION_MESSAGE);
 			
 			try {
-				File verifytaf = new FileBrowser("Uppaal Verifyta","",verifyta).openFile();
-				verifyta=verifytaf.getAbsolutePath();
-				verifytapath=verifyta;
+				File verifytaf = new FileBrowser("Uppaal Verifyta","",verifytapath).openFile();
+				verifytapath=verifytaf.getAbsolutePath();
 			} catch (Exception e) {
 				// There was some problem with the action
-				if (verifyta == null){
+				if (verifytapath == null){
 					//JOptionPane.showMessageDialog(CreateGui.getApp(), "No verifyta specified: The verification is cancelled");
 					verifytapath = "";
 					return false;
@@ -106,6 +94,14 @@ public class Verification {
 		
 		return true;
 		
+	}
+	public static String setupVerifytaPath() {
+		String verifyta = System.getenv("verifyta");
+
+		if (verifytapath.equals("")){			
+			verifytapath = verifyta == null ? "" : verifyta;
+		}
+		return verifyta;
 	}
 	//Check if verifyta is present and if it is the right version
 	public static String getVerifytaVersion(){

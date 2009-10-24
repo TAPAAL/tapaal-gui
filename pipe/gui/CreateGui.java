@@ -94,6 +94,7 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 		appGui.init();
+		Verification.setupVerifytaPath();
 	}
 
 
