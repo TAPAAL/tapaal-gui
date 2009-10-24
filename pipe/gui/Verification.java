@@ -205,8 +205,7 @@ public class Verification {
 		} catch (Exception e) {
 		
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"This porgram can not be verifyed as being Verifyta.\n\n" +
-					"",
+					"The program can not be verified as being verifyta. \nThe verifyta path will be reset. Please try again, to manually set the verifyta path.",
 					"Verifyta Error",
 					JOptionPane.ERROR_MESSAGE);
 			verifytapath="";
