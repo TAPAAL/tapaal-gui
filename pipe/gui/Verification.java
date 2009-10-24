@@ -107,7 +107,7 @@ public class Verification {
 	public static String getVerifytaVersion(){
 		
 		if (verifytapath == ""){
-			return "None";
+			return "N/A";
 		}
 		
 		String[] commands;
@@ -120,9 +120,9 @@ public class Verification {
 			child = Runtime.getRuntime().exec(commands);
 			child.waitFor();
 		} catch (IOException e) {
-			return "Error";
+			return "N/A";
 		} catch (InterruptedException e) {
-			return "Error";
+			return "N/A";
 		}
 		
 		BufferedReader bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));

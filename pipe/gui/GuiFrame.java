@@ -773,17 +773,30 @@ EOC */
 
 	// Less sucky yet far, far simpler to code About dialogue
 	public void actionPerformed(ActionEvent e){
-
+		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
+		buffer.append("\n\n");
+		buffer.append("Joakim Byg, Kenneth Yrke Joergensen, Lasse Jacobsen, \n");
+		buffer.append("Morten Jacobsen, Mikael H. Moeller and Jiri Srba \n");
+		buffer.append("Aalborg University 2009 \n\n");
+		buffer.append("Read more at: www.tapaal.net \n\n");
+		buffer.append("verifyta:\n");
+		buffer.append("   Version: ");
+		buffer.append(Verification.getVerifytaVersion());
+		buffer.append("\n");
+		buffer.append("   Located: ");
+		
+		if(Verification.verifytapath == null || Verification.verifytapath.equals(""))
+			buffer.append("N/A");
+		else
+			buffer.append(Verification.verifytapath);
+		
+		buffer.append("  \n\n"); 
+		buffer.append("Based on PIPE2:\n");
+		buffer.append("http://pipe2.sourceforge.net/");
+		
+		
 		JOptionPane.showMessageDialog(this,
-				Pipe.getProgramName() + "\n\n" +
-				"Joakim Byg, Kenneth Yrke Joergensen, Lasse Jacobsen, \n" +
-				"Morten Jacobsen, Mikael H. Moeller and Jiri Srba \n" +
-				"Aalborg University 2009 \n\n" +
-				"Read more at: www.tapaal.net \n\n"+
-				"Using verifyta version:  "+ Verification.getVerifytaVersion() +"\n" +
-				"                     Located: "+Verification.verifytapath +"  \n\n" + 
-				"Based on PIPE2:\n"+
-				"http://pipe2.sourceforge.net/",
+				buffer.toString(),
 				"About TAPAAL",
 				JOptionPane.INFORMATION_MESSAGE);
 	}
