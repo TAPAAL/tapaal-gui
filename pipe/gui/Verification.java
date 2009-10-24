@@ -205,7 +205,7 @@ public class Verification {
 		} catch (Exception e) {
 		
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"This porgram can not be verifyed as beeing Verifyta.\n\n" +
+					"This porgram can not be verifyed as being Verifyta.\n\n" +
 					"",
 					"Verifyta Error",
 					JOptionPane.ERROR_MESSAGE);
