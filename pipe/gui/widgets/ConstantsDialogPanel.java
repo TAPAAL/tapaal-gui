@@ -120,6 +120,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     			else
     				CreateGui.getView().getUndoManager().addNewEdit(edit);
     		}
+    		
+    		model.buildConstraints();
     	}    	
     	
    	   	exit();
