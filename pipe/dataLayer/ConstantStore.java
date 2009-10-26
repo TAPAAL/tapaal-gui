@@ -24,6 +24,7 @@ public class ConstantStore {
 	
 	public UndoableEdit updateConstant(String oldName, Constant constant, DataLayer model)
 	{
+		if(oldName.equals(constant.getName()) || !constants.containsKey(constant.getName()))
 			if(constants.containsKey(oldName)){
 				Constant old = constants.get(oldName);
 				boolean isUsed = old.getIsUsed();
