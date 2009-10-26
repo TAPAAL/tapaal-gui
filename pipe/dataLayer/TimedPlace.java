@@ -194,7 +194,7 @@ public class TimedPlace extends Place {
 	public void showEditor(){
 		// Build interface
 		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), "TAPAAL", true);
+			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
 
 		Container contentPane = guiDialog.getContentPane();
 

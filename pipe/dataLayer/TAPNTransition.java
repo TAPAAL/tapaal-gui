@@ -41,7 +41,7 @@ public class TAPNTransition extends Transition {
 	public void showEditor(){
 	      // Build interface
 	      EscapableDialog guiDialog = 
-	              new EscapableDialog(CreateGui.getApp(),"TAPAAL 0.3",true);
+	              new EscapableDialog(CreateGui.getApp(),Pipe.getProgramName(),true);
 	      
 	      Container contentPane = guiDialog.getContentPane();
 

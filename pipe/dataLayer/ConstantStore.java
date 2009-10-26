@@ -13,15 +13,15 @@ import pipe.gui.undo.UpdateConstantEdit;
 public class ConstantStore {
 	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
 	private int largest = -1;
-	
+
 	public ConstantStore(){
 	}
-	
+
 	public Collection<Constant> getConstants()
 	{
 		return constants.values();
 	}
-	
+
 	public UndoableEdit updateConstant(String oldName, Constant constant, DataLayer model)
 	{
 		if(oldName.equals(constant.getName()) || !constants.containsKey(constant.getName())){
@@ -48,7 +48,7 @@ public class ConstantStore {
 			if(c.getValue() > largest)
 				largest = c.getValue();
 		}
-		
+
 	}
 
 	private boolean isNamedInf(String name) {
@@ -57,7 +57,7 @@ public class ConstantStore {
 
 	public UndoableEdit addConstant(String name, int value) {	
 		if(isNamedInf(name)) return null;
-		
+
 		if(!constants.containsKey(name)){
 			Constant constant = new Constant(name, value);
 			add(constant);
@@ -90,7 +90,7 @@ public class ConstantStore {
 	public Constant getConstant(String constantName) {
 		return constants.get(constantName);
 	}
-	
+
 	public int getLargestConstantValue(){
 		return largest;
 	}
@@ -99,7 +99,7 @@ public class ConstantStore {
 		for(Constant c : constants.values()){
 			c.reset();
 		}
-		
+
 		for(Place place : places){
 			if(place instanceof TimedPlace){
 				TimedPlace tp = (TimedPlace)place;
@@ -116,7 +116,7 @@ public class ConstantStore {
 				}
 			}
 		}
-		
+
 		for(Arc arc : arcs){
 			if(arc instanceof TimedArc || arc instanceof TransportArc)
 				buildConstraint((TimedArc)arc);
@@ -125,7 +125,7 @@ public class ConstantStore {
 
 	public void buildConstraint(TimedArc arc) {
 		String guard = arc.getGuard();
-		
+
 		boolean isFirstNumber = true;
 		boolean isSecondNumber = true;
 		int firstValue = 0;
@@ -134,13 +134,13 @@ public class ConstantStore {
 		String rightDelim = guard.substring(guard.length()-1, guard.length());
 		String first = guard.substring(1, guard.indexOf(","));
 		String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
-		
+
 		try{
 			firstValue = Integer.parseInt(first);
 		}catch(NumberFormatException e){
 			isFirstNumber = false;
 		}
-		
+
 		try{
 			secondValue = Integer.parseInt(second);
 		}catch(NumberFormatException e){
@@ -151,42 +151,43 @@ public class ConstantStore {
 				isSecondNumber = false;
 			}
 		}
-		
+
 		int diff = getDiffForConstraint(leftDelim, rightDelim);
 		if(!isFirstNumber && !isSecondNumber){
 			Constant left = getConstant(first);
 			Constant right = getConstant(second);
-			
+
 			left.setIsUsed(true);
 			right.setIsUsed(true);
-			
-			if(left.getValue()+diff > right.getLowerBound()){
-				right.setLowerBound(left.getValue()+diff);				
+
+			if(!first.equals(second)){
+				if(left.getValue()+diff > right.getLowerBound()){
+					right.setLowerBound(left.getValue()+diff);				
+				}
+
+				if(right.getValue()-diff < left.getUpperBound()){
+					left.setUpperBound(right.getValue()-diff);
+				}
 			}
-			
-			if(right.getValue()-diff < left.getUpperBound()){
-				left.setUpperBound(right.getValue()-diff);
-			}
-			
-			
+
 		}
 		else if(!isFirstNumber){
 			Constant left = getConstant(first);
 			left.setIsUsed(true);
-			
+
 			if(secondValue-diff < left.getUpperBound()){
 				left.setUpperBound(secondValue-diff);
 			}			
 		}else if(!isSecondNumber){
 			Constant right = getConstant(second);
 			right.setIsUsed(true);
-			
+
 			if(firstValue+diff > right.getLowerBound()){
 				right.setLowerBound(firstValue+diff);				
 			}
 		}
 	}
-	
+
 	public int getDiffForConstraint(String leftDelimiter, String rightDelimiter) {
 		if(leftDelimiter.equals("[") && rightDelimiter.equals("]"))
 			return 0;
@@ -197,7 +198,7 @@ public class ConstantStore {
 	public void add(Constant constant) {
 		constants.put(constant.getName(), constant);
 		if(constant.getValue() > largest) largest = constant.getValue();
-		
+
 	}
 
 	public void remove(Constant constant) {

@@ -32,7 +32,6 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.undo.UndoManager;
 import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.ProgressBar;
 import dk.aau.cs.petrinet.TAPN;
