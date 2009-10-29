@@ -168,7 +168,7 @@ public class PlaceTransitionObjectHandler
       boolean isNewArc = true; // true if we have to add a new arc to the Petri Net
       boolean fastMode = false;
       
-      
+      String error_message_two_arcs = "We do not allow two arcs from a place to a transition or a transition to a place.";
       
       GuiView view = CreateGui.getView();
       DataLayer model = CreateGui.getModel();
@@ -369,9 +369,9 @@ public class PlaceTransitionObjectHandler
         							 // inverse arc found
         							 if (inverse.hasInverse()){
         								 // if inverse arc has an inverse arc, it means
-        								 System.out.println("We dont allow more than one arc from place to transition or transition to place!");
+        								 System.out.println(error_message_two_arcs);
         	    						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-        	    									"We dont allow more than one arc from place to transition or transition to place!",
+        	    								 	error_message_two_arcs,
         	    									"Error",
         	    									JOptionPane.ERROR_MESSAGE);
         								 isNewArc = false;
@@ -501,18 +501,18 @@ public class PlaceTransitionObjectHandler
             					 } else if (someArc instanceof TransportArc) {
             						 // user has drawn a transport arc where there is 
             						 // a transport arc already - We do not allow that.
-            						 System.out.println("We dont allow more than one transport arc from a place to a transition.");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            									"We dont allow more than one transport arc from a place to a transition.",
+            								 	error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 
             					 } else if (someArc instanceof NormalArc) {
             						 // user has drawn a transport arc where there is 
             						 // a normal arc already - we increment arc's weight
-            						 System.out.println("We dont allow both a transport arc and a normal arc from place to transition.");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            									"We dont allow both a transport arc and a normal arc from place to transition.",
+            								    error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 
@@ -601,9 +601,9 @@ public class PlaceTransitionObjectHandler
             					 } else if (someArc instanceof TransportArc) {
             						 // user has drawn a transport arc where there is 
             						 // a transport arc already - We do not allow that.
-            						 System.out.println("We dont allow more than one transport arc from transition to place.");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            								 "We dont allow more than one transport arc from transition to place.",
+            								     error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 
@@ -707,9 +707,9 @@ public class PlaceTransitionObjectHandler
             					 } else if (someArc instanceof TransportArc) {
             						 // user has drawn a normal arc where there is 
             						 // a transport arc already - We do not allow that.
-            						 System.out.println("We dont allow both a transport arc and a normal arc from transition to place");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            								 "We dont allow both a transport arc and a normal arc from transition to place.",
+            								    error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 
@@ -721,9 +721,9 @@ public class PlaceTransitionObjectHandler
             							 someArc.setWeight(weightToInsert);
         		                      }
             						 else{
-            						 System.out.println("We dont allow more than one normal arc from a transition to a place.");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            									"We dont allow more than one normal arc from a transition to a place.",
+            								    error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 }
@@ -797,9 +797,9 @@ public class PlaceTransitionObjectHandler
             					 } else if (someArc instanceof TransportArc) {
             						 // user has drawn a timed arc where there is 
             						 // a transport arc already - We do not allow that.
-            						 System.out.println("We dont allow both a transport arc and a normal arc from a place to a transition.");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            								 "We dont allow both a transport arc and a normal arc from a place to a transition.",
+            								    error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 
@@ -811,9 +811,9 @@ public class PlaceTransitionObjectHandler
             							 someArc.setWeight(weightToInsert);
         		                      }
             						 else{
-            						 System.out.println("We dont allow more than one normal arc from a place to a transition.");
+            						 System.out.println(error_message_two_arcs);
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            									"We dont allow more than one normal arc from a place to a t.",
+            								    error_message_two_arcs,
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 }
