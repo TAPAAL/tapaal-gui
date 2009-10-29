@@ -5,7 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -95,6 +95,21 @@ public class CreateGui {
 		appGui.setVisible(true);
 		appGui.init();
 		Verification.setupVerifytaPath();
+		
+		VersionChecker versionChecker = new VersionChecker();
+		if(versionChecker.checkForNewVersion()){
+			StringBuffer message = new StringBuffer(
+					"There is a new version of TAPAAL available at www.tapaal.net.");
+			message.append("\n\nCurrent version: ");
+			message.append(Pipe.VERSION);
+			message.append("\nNew version: ");
+			message.append(versionChecker.getNewVersionNumber());			
+			
+			JOptionPane.showMessageDialog(appGui, 
+					message .toString(),
+					"New version available!",
+					JOptionPane.INFORMATION_MESSAGE);			
+		}
 	}
 
 

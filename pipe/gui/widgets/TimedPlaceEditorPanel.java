@@ -453,6 +453,7 @@ extends javax.swing.JPanel {
 		invariantInf.setEnabled(true);
 		invariantSpinner.setValue(0);
 		invariantInf.setSelected(true);
+		invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<"}));
 	}
 
 	protected void disableInvariantComponents() {

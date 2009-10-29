@@ -106,7 +106,7 @@ public class Verification {
 	//Check if verifyta is present and if it is the right version
 	public static String getVerifytaVersion(){
 		
-		if (verifytapath == ""){
+		if (verifytapath.equals("")){
 			return "N/A";
 		}
 		
