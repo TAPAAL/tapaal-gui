@@ -422,8 +422,16 @@ extends javax.swing.JPanel {
 			enableNormalInvariantComponents();
 			normalInvRadioButton.setSelected(true);
 			if(!isInf){ 
+				if ((Integer)invariantSpinner.getValue() < 1){
+					invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<="}));
+				}
+				else{
+					invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<=", "<"}));
+				}
 				invariantSpinner.setValue(invariantValue);
 				invariantSpinner.setEnabled(true);
+				invRelationNormal.setSelectedItem(invariantToSet.substring(0, substringStart));
+				
 				invariantInf.setSelected(false);
 			}
 		}
