@@ -5,6 +5,7 @@
 package pipe.dataLayer;
    
 import java.awt.BasicStroke;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -12,6 +13,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+
+import javax.swing.JDialog;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -135,24 +138,27 @@ public class AnnotationNote
    
    public void enableEditMode() {
       String oldText = note.getText();  
-
+      JDialog.setDefaultLookAndFeelDecorated(true);
       // Build interface
       EscapableDialog guiDialog =
-              new EscapableDialog(CreateGui.getApp(), "PIPE2", true);
+              new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
 
       guiDialog.add(new AnnotationPanel(this));
-
+      guiDialog.setMinimumSize(new Dimension(300,200));
       // Make window fit contents' preferred size
       guiDialog.pack();
       
       // Move window to the middle of the screen
       guiDialog.setLocationRelativeTo(null);
       
-      guiDialog.setResizable(false);
+      guiDialog.setResizable(true);
       guiDialog.setVisible(true);
+    
       
       guiDialog.dispose();  
       
+     
+            
       String newText = note.getText();
       if (oldText != null && !newText.equals(oldText)) {
          // Text has been changed

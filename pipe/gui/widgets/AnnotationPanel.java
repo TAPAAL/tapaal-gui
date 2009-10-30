@@ -1,5 +1,15 @@
 package pipe.gui.widgets;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+
+import javax.swing.JRootPane;
+import javax.swing.JSplitPane;
+
 import pipe.dataLayer.AnnotationNote;
 
 /*
@@ -14,7 +24,6 @@ import pipe.dataLayer.AnnotationNote;
 public class AnnotationPanel extends javax.swing.JPanel {
    
    private AnnotationNote annotation;
-   
    
    /**
     * Creates new form ParameterPanel
@@ -41,10 +50,8 @@ public class AnnotationPanel extends javax.swing.JPanel {
       okButton = new javax.swing.JButton();
       cancelButton = new javax.swing.JButton();
 
-      setLayout(new java.awt.GridBagLayout());
+      setLayout(new BorderLayout());
 
-      setMaximumSize(new java.awt.Dimension(239, 208));
-      setMinimumSize(new java.awt.Dimension(239, 208));
       panel.setLayout(new java.awt.GridLayout(1, 0));
 
       panel.setBorder(javax.swing.BorderFactory.createTitledBorder("Edit Annotation"));
@@ -57,8 +64,6 @@ public class AnnotationPanel extends javax.swing.JPanel {
       gridBagConstraints = new java.awt.GridBagConstraints();
       gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
       gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-      add(panel, gridBagConstraints);
-
       buttonPanel.setLayout(new java.awt.GridBagLayout());
 
       okButton.setText("OK");
@@ -79,6 +84,9 @@ public class AnnotationPanel extends javax.swing.JPanel {
       buttonPanel.add(okButton, gridBagConstraints);
 
       cancelButton.setText("Cancel");
+      cancelButton.setMaximumSize(new java.awt.Dimension(75, 25));
+      cancelButton.setMinimumSize(new java.awt.Dimension(75, 25));
+      cancelButton.setPreferredSize(new java.awt.Dimension(75, 25));
       cancelButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             cancelButtonActionPerformed(evt);
@@ -89,13 +97,24 @@ public class AnnotationPanel extends javax.swing.JPanel {
       gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
       gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 6);
       buttonPanel.add(cancelButton, gridBagConstraints);
+      
+      JSplitPaneFix split = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, panel, buttonPanel){
+    	  @Override
+    	  public int getMinimumDividerLocation(){
+    		  return this.lastDividerLocation;
+    	  }
 
-      gridBagConstraints = new java.awt.GridBagConstraints();
-      gridBagConstraints.gridx = 0;
-      gridBagConstraints.gridy = 1;
-      gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-      add(buttonPanel, gridBagConstraints);
-
+    	  @Override
+    	  public int getMaximumDividerLocation(){
+    		  return this.lastDividerLocation;
+    	  }
+      };
+      split.setResizeWeight(1.0);
+      split.setDividerLocation(0.88);
+      split.setContinuousLayout(true);
+      split.setDividerSize(0);
+      add(split);
+      this.setPreferredSize(new Dimension(400, 300));
    }// </editor-fold>//GEN-END:initComponents
 
    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
