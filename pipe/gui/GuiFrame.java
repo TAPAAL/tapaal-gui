@@ -47,6 +47,7 @@ import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
+import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.TimedPlace;
 import pipe.experiment.Experiment;
@@ -1448,12 +1449,38 @@ EOC */
 
 
 		public void actionPerformed(ActionEvent e){
-			appView.getUndoManager().newEdit(); // new "transaction""
-						
-			appView.getUndoManager().deleteSelection(
-					appView.getSelectionObject().getSelection());
-			appView.getSelectionObject().deleteSelection();			
-			CreateGui.getModel().buildConstraints();
+			// check if queries need to be removed
+			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
+			ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+			ArrayList<TAPNQuery> queriesToDelete = new ArrayList<TAPNQuery>();
+			
+			boolean queriesAffected = false;
+			for (PetriNetObject pn : selection) {
+				if(pn instanceof TimedPlace)
+				{
+					for (TAPNQuery q : queries) {
+						if(q.query.matches(".*" + pn.getName() + "[^\\_a-zA-Z0-9].*")){
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
+					}
+				}
+			}
+			int choice = queriesAffected ? JOptionPane.showConfirmDialog(CreateGui.getApp(), "All queries associated with the currently selected objects will also be removed.\n\n Are you sure you want to remove the current selection and all associated queries?", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) : JOptionPane.YES_OPTION;
+
+			if(choice == JOptionPane.YES_OPTION)
+			{
+				appView.getUndoManager().newEdit(); // new "transaction""
+				
+				if(queriesAffected){
+					CreateGui.getModel().getQueries().removeAll(queriesToDelete);
+					CreateGui.createLeftPane();	
+				}
+				
+				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+				appView.getSelectionObject().deleteSelection();			
+				CreateGui.getModel().buildConstraints();
+			}
 		}
 
 	}

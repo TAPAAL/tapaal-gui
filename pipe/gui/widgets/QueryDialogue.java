@@ -769,27 +769,42 @@ public class QueryDialogue extends JPanel{
 		String[] toReturn = {"","",""};
 		if (comparison.contains("<=")){
 			toReturn[1] = "<=";
-			String[] placeAndSize = comparison.split(" \\<\\= ");
+			String[] placeAndSize = comparison.split("\\<\\=");
+			for (int i = 0; i < placeAndSize.length; i++) {
+				placeAndSize[i] = placeAndSize[i].trim();
+			}
 			toReturn[0] = placeAndSize[0];
 			toReturn[2] = placeAndSize[1];
 		}else if (comparison.contains(">=")){
 			toReturn[1] = ">=";
-			String[] placeAndSize = comparison.split(" \\>\\= ");
+			String[] placeAndSize = comparison.split("\\>\\=");
+			for (int i = 0; i < placeAndSize.length; i++) {
+				placeAndSize[i] = placeAndSize[i].trim();
+			}
 			toReturn[0] = placeAndSize[0];
 			toReturn[2] = placeAndSize[1];
 		}else if (comparison.contains("=")){
 			toReturn[1] = "=";
-			String[] placeAndSize = comparison.split(" \\=\\= ");
+			String[] placeAndSize = comparison.split("\\=\\=");
+			for (int i = 0; i < placeAndSize.length; i++) {
+				placeAndSize[i] = placeAndSize[i].trim();
+			}
 			toReturn[0] = placeAndSize[0];
 			toReturn[2] = placeAndSize[1];
 		}else if (comparison.contains("<")){
 			toReturn[1] = "<";
-			String[] placeAndSize = comparison.split(" \\< ");
+			String[] placeAndSize = comparison.split("\\<");
+			for (int i = 0; i < placeAndSize.length; i++) {
+				placeAndSize[i] = placeAndSize[i].trim();
+			}
 			toReturn[0] = placeAndSize[0];
 			toReturn[2] = placeAndSize[1];
 		}else if (comparison.contains(">")){
 			toReturn[1] = ">";
-			String[] placeAndSize = comparison.split(" \\> ");
+			String[] placeAndSize = comparison.split("\\>");
+			for (int i = 0; i < placeAndSize.length; i++) {
+				placeAndSize[i] = placeAndSize[i].trim();
+			}
 			toReturn[0] = placeAndSize[0];
 			toReturn[2] = placeAndSize[1];
 		}		

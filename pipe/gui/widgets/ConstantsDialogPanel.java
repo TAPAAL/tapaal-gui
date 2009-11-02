@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
@@ -32,7 +33,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private JRootPane rootPane;
 	private DataLayer model;
 	
-	private String name;
+	private String oldName;
 
 	/** Creates new form LeftConstantsPane */
     public ConstantsDialogPanel() {
@@ -45,24 +46,14 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         rootPane = pane;
         this.model = model;
  
-        this.name = constant.getName();
+        this.oldName = constant.getName();
         
         // Set up initial values
        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
     		   constant.getValue(), constant.getLowerBound(),	constant.getUpperBound(), 1);
        valueSpinner.setModel(spinnerModel);
-       nameTextField.setText(name);
-       nameTextField.addKeyListener(new KeyAdapter(){
-    	   private static final int MAX_CHARS = 15;
-    	   public void keyTyped(KeyEvent e){
-    		   char c = e.getKeyChar();
-    		   if(!Character.isLetter(c) && !Character.isISOControl(c))
-    			   e.consume();
-    		   
-    		   if(Character.isLetter(c) && nameTextField.getText().length() == MAX_CHARS)
-    			   e.consume();
-    	   }
-       });
+       nameTextField.setText(oldName);
+      
 
        // wire up buttons
        okButton.addActionListener(new ActionListener(){
@@ -85,6 +76,17 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     {
     	String newName = nameTextField.getText();
     	
+    	if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName))
+		{
+				
+				System.err.println("Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+						"Error",
+						JOptionPane.INFORMATION_MESSAGE);
+				return;
+		}
+    	
     	if(newName.trim().isEmpty())
     	{
     		JOptionPane.showMessageDialog(CreateGui.getApp(), 
@@ -96,8 +98,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     	{
     		int val = (Integer)valueSpinner.getValue();
        		
-    		if(name != ""){
-    			UndoableEdit edit = model.updateConstant(name, new Constant(newName, val));
+    		if(oldName != "")
+    		{
+  				UndoableEdit edit = model.updateConstant(oldName, new Constant(newName, val));
     			if(edit == null){
     				JOptionPane.showMessageDialog(CreateGui.getApp(),
     						"The specified value is invalid for the current net.\n" +

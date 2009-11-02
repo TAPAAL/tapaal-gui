@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -27,6 +28,7 @@ import javax.swing.event.ChangeListener;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.MarkingParameter;
+import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
@@ -531,7 +533,15 @@ extends javax.swing.JPanel {
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			} else {
+							
 				view.getUndoManager().addEdit(place.setPNObjectName(newName));
+				
+				ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+				
+				for (TAPNQuery q : queries) {
+					q.query = q.query.replaceAll(name + "[^\\_a-zA-Z0-9]", newName); 
+				}
+				//CreateGui.createLeftPane();
 			}
 			//    	  if (!(newName.charAt(0)=='#')){
 			//    		  if(newName.contains("*") || newName.contains("+")){

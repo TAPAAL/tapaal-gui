@@ -3,7 +3,11 @@
  */
 package pipe.gui.undo;
 
+import java.util.ArrayList;
+
 import pipe.dataLayer.PetriNetObject;
+import pipe.dataLayer.TAPNQuery;
+import pipe.gui.CreateGui;
 
 
 /**
@@ -30,12 +34,24 @@ public class PetriNetObjectNameEdit
    /** */
    public void undo() {
       pno.setName(oldName);
+      
+      ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+		
+      for (TAPNQuery q : queries) {
+    	  q.query = q.query.replaceAll(newName + "[^\\_a-zA-Z0-9]", oldName); 
+      }
    }
 
    
    /** */
    public void redo() {
       pno.setName(newName);
+      
+      ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+		
+      for (TAPNQuery q : queries) {
+    	  q.query = q.query.replaceAll(oldName + "[^\\_a-zA-Z0-9]", newName); 
+      }
    }
    
 }

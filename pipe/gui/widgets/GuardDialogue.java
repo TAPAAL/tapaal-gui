@@ -442,7 +442,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		}
 		
 		leftDelimiter.setSelectedItem(leftOldDelim);
-		rightDelimiter.setSelectedItem(rightOldDelim);
+		if(rightUseConstant.isSelected())
+			rightDelimiter.setSelectedItem("]");
+		else
+			rightDelimiter.setSelectedItem(rightOldDelim);
 	}
 
 	private int getSecondValue() {

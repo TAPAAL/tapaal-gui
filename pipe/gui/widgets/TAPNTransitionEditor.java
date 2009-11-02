@@ -120,9 +120,9 @@ extends javax.swing.JPanel {
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
 		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
-		rotationComboBox.setMaximumSize(new java.awt.Dimension(70, 20));
-		rotationComboBox.setMinimumSize(new java.awt.Dimension(70, 20));
-		rotationComboBox.setPreferredSize(new java.awt.Dimension(70, 20));
+		rotationComboBox.setMaximumSize(new java.awt.Dimension(90, 20));
+		rotationComboBox.setMinimumSize(new java.awt.Dimension(90, 20));
+		rotationComboBox.setPreferredSize(new java.awt.Dimension(90, 20));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 5;

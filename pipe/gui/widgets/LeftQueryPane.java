@@ -117,7 +117,7 @@ public class LeftQueryPane extends JPanel {
 		JPanel p1 = new JPanel();
 		editQueryButton = new JButton("Edit");
 		editQueryButton.setEnabled(false);
-		Dimension dimension = new Dimension(72,23);
+		Dimension dimension = new Dimension(82,23);
 		editQueryButton.setPreferredSize(dimension);
 		editQueryButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -168,7 +168,10 @@ public class LeftQueryPane extends JPanel {
 	private void showEditDialog() {
 		TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
 		TAPNQuery newQuery = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, q);
-		updateQuery(q, newQuery);
+		
+		if(newQuery != null)
+			updateQuery(q, newQuery);
+		
 		showQueries();
 	}
 	
