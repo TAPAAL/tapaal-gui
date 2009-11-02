@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<pnml>
+<net id="Net-One" type="P/T net">
+<labels x="537" y="371" width="365" height="245" border="true">
+<text>This example represents a simple webserver which can process only one request at a time.
+
+There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
+
+The user of the tool can now experiments with different values of the periods and deadlines to check whether e.g. five requests can be served without dropping any of them. Note that if the deadline is set e.g. to 4 this query is not satisfiable anymore.</text>
+</labels>
+<place id="P0">
+<graphics>
+<position x="270.0" y="270.0"/>
+</graphics>
+<name>
+<value>Requests</value>
+<graphics>
+<offset x="-17.0" y="8.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;=deadline</value>
+</invariant>
+</place>
+<place id="P10">
+<graphics>
+<position x="135.0" y="105.0"/>
+</graphics>
+<name>
+<value>Dropped</value>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;inf</value>
+</invariant>
+</place>
+<place id="P11">
+<graphics>
+<position x="735.0" y="180.0"/>
+</graphics>
+<name>
+<value>Processing</value>
+<graphics>
+<offset x="127.0" y="17.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;=deadline</value>
+</invariant>
+</place>
+<place id="P3">
+<graphics>
+<position x="270.0" y="105.0"/>
+</graphics>
+<name>
+<value>Responses</value>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;inf</value>
+</invariant>
+</place>
+<place id="P4">
+<graphics>
+<position x="405.0" y="180.0"/>
+</graphics>
+<name>
+<value>Webserver</value>
+<graphics>
+<offset x="-6.0" y="16.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;inf</value>
+</invariant>
+</place>
+<place id="P6">
+<graphics>
+<position x="135.0" y="510.0"/>
+</graphics>
+<name>
+<value>UserA</value>
+<graphics>
+<offset x="37.0" y="40.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;=periodA</value>
+</invariant>
+</place>
+<place id="P7">
+<graphics>
+<position x="390.0" y="510.0"/>
+</graphics>
+<name>
+<value>UserB</value>
+<graphics>
+<offset x="42.0" y="44.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;=periodB</value>
+</invariant>
+</place>
+<place id="P8">
+<graphics>
+<position x="585.0" y="180.0"/>
+</graphics>
+<name>
+<value>Working</value>
+<graphics>
+<offset x="81.0" y="21.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+<invariant>
+<value>&lt;inf</value>
+</invariant>
+</place>
+<transition id="T0">
+<graphics>
+<position x="495.0" y="270.0"/>
+</graphics>
+<name>
+<value>Process</value>
+<graphics>
+<offset x="36.0" y="44.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="T2">
+<graphics>
+<position x="495.0" y="105.0"/>
+</graphics>
+<name>
+<value>SendReply</value>
+<graphics>
+<offset x="42.0" y="-9.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="T3">
+<graphics>
+<position x="135.0" y="390.0"/>
+</graphics>
+<name>
+<value>SendRequestA</value>
+<graphics>
+<offset x="2.0" y="1.0"/>
+</graphics>
+</name>
+<orientation>
+<value>270</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="T4">
+<graphics>
+<position x="390.0" y="390.0"/>
+</graphics>
+<name>
+<value>SendRequestB</value>
+<graphics>
+<offset x="107.0" y="-2.0"/>
+</graphics>
+</name>
+<orientation>
+<value>90</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="T7">
+<graphics>
+<position x="135.0" y="210.0"/>
+</graphics>
+<name>
+<value>Drop</value>
+<graphics>
+<offset x="-13.0" y="18.0"/>
+</graphics>
+</name>
+<orientation>
+<value>90</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<arc id="P0 to T0" source="P0" target="T0">
+<graphics/>
+<inscription>
+<value>[0,deadline):1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="296" y="282" curvePoint="false"/>
+<arcpath id="001" x="501" y="287" curvePoint="false"/>
+<type value="transport"/>
+</arc>
+<arc id="P0 to T7" source="P0" target="T7">
+<graphics/>
+<inscription>
+<value>[deadline,deadline]</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="268" y="275" curvePoint="false"/>
+<arcpath id="001" x="161" y="222" curvePoint="false"/>
+<type value="timed"/>
+</arc>
+<arc id="P11 to T2" source="P11" target="T2">
+<graphics/>
+<inscription>
+<value>[0,deadline]:1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="735" y="182" curvePoint="false"/>
+<arcpath id="001" x="661" y="121" curvePoint="false"/>
+<arcpath id="002" x="512" y="112" curvePoint="false"/>
+<type value="transport"/>
+</arc>
+<arc id="P4 to T0" source="P4" target="T0">
+<graphics/>
+<inscription>
+<value>[0,inf)</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="427" y="202" curvePoint="false"/>
+<arcpath id="001" x="502" y="277" curvePoint="false"/>
+<type value="timed"/>
+</arc>
+<arc id="P6 to T3" source="P6" target="T3">
+<graphics/>
+<inscription>
+<value>[periodA,periodA]</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="146" y="507" curvePoint="false"/>
+<arcpath id="001" x="142" y="406" curvePoint="false"/>
+<type value="timed"/>
+</arc>
+<arc id="P7 to T4" source="P7" target="T4">
+<graphics/>
+<inscription>
+<value>[periodB,periodB]</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="401" y="507" curvePoint="false"/>
+<arcpath id="001" x="396" y="406" curvePoint="false"/>
+<type value="timed"/>
+</arc>
+<arc id="P8 to T2" source="P8" target="T2">
+<graphics/>
+<inscription>
+<value>[min,inf)</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="585" y="182" curvePoint="false"/>
+<arcpath id="001" x="511" y="122" curvePoint="false"/>
+<type value="timed"/>
+</arc>
+<arc id="T0 to P11" source="T0" target="P11">
+<graphics/>
+<inscription>
+<value>[0,inf):1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="511" y="287" curvePoint="false"/>
+<arcpath id="001" x="668" y="289" curvePoint="false"/>
+<arcpath id="002" x="737" y="203" curvePoint="false"/>
+<type value="transport"/>
+</arc>
+<arc id="T0 to P8" source="T0" target="P8">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="512" y="277" curvePoint="false"/>
+<arcpath id="001" x="586" y="202" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T2 to P3" source="T2" target="P3">
+<graphics/>
+<inscription>
+<value>[0,inf):1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="502" y="112" curvePoint="false"/>
+<arcpath id="001" x="296" y="116" curvePoint="false"/>
+<type value="transport"/>
+</arc>
+<arc id="T2 to P4" source="T2" target="P4">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="501" y="122" curvePoint="false"/>
+<arcpath id="001" x="428" y="182" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T3 to P0" source="T3" target="P0">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="147" y="397" curvePoint="false"/>
+<arcpath id="001" x="270" y="291" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T3 to P6" source="T3" target="P6">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="152" y="407" curvePoint="false"/>
+<arcpath id="001" x="226" y="466" curvePoint="false"/>
+<arcpath id="002" x="159" y="513" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T4 to P0" source="T4" target="P0">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="401" y="396" curvePoint="false"/>
+<arcpath id="001" x="292" y="292" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T4 to P7" source="T4" target="P7">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="406" y="407" curvePoint="false"/>
+<arcpath id="001" x="481" y="466" curvePoint="false"/>
+<arcpath id="002" x="414" y="513" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T7 to P10" source="T7" target="P10">
+<graphics/>
+<inscription>
+<value>1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="146" y="216" curvePoint="false"/>
+<arcpath id="001" x="146" y="131" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<queries name="5 responses, no drops" traceOption="NONE" searchOption="DFS" hashTableSize="null" extrapolationOption="null" reductionOption="ADV_UPPAAL_SYM">
+<capacity>
+<value>6</value>
+</capacity>
+<query>
+<value>E&lt;&gt;(( Responses == 5 ) &amp;&amp; ( Dropped == 0 ))</value>
+</query>
+</queries>
+<constant name="deadline" value="5"/>
+<constant name="min" value="3"/>
+<constant name="periodA" value="7"/>
+<constant name="periodB" value="5"/>
+</net>
+</pnml>
