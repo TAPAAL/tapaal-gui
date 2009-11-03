@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <pnml>
 <net id="Net-One" type="P/T net">
-<labels x="537" y="371" width="365" height="245" border="true">
+<labels x="535" y="369" width="363" height="196" border="true">
 <text>This example represents a simple webserver which can process only one request at a time.
 
 There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
@@ -358,7 +358,7 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="735" y="182" curvePoint="false"/>
-<arcpath id="001" x="661" y="121" curvePoint="false"/>
+<arcpath id="001" x="659" y="119" curvePoint="false"/>
 <arcpath id="002" x="512" y="112" curvePoint="false"/>
 <type value="transport"/>
 </arc>
@@ -384,7 +384,7 @@ The user of the tool can now experiments with different values of the periods an
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="146" y="507" curvePoint="false"/>
+<arcpath id="000" x="147" y="507" curvePoint="false"/>
 <arcpath id="001" x="142" y="406" curvePoint="false"/>
 <type value="timed"/>
 </arc>
@@ -424,7 +424,7 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="511" y="287" curvePoint="false"/>
-<arcpath id="001" x="668" y="289" curvePoint="false"/>
+<arcpath id="001" x="666" y="287" curvePoint="false"/>
 <arcpath id="002" x="737" y="203" curvePoint="false"/>
 <type value="transport"/>
 </arc>
@@ -451,7 +451,7 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="502" y="112" curvePoint="false"/>
-<arcpath id="001" x="296" y="116" curvePoint="false"/>
+<arcpath id="001" x="296" y="117" curvePoint="false"/>
 <type value="transport"/>
 </arc>
 <arc id="T2 to P4" source="T2" target="P4">
@@ -490,8 +490,8 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="152" y="407" curvePoint="false"/>
-<arcpath id="001" x="226" y="466" curvePoint="false"/>
-<arcpath id="002" x="159" y="513" curvePoint="false"/>
+<arcpath id="001" x="224" y="464" curvePoint="false"/>
+<arcpath id="002" x="158" y="512" curvePoint="false"/>
 <type value="normal"/>
 </arc>
 <arc id="T4 to P0" source="T4" target="P0">
@@ -517,8 +517,8 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="406" y="407" curvePoint="false"/>
-<arcpath id="001" x="481" y="466" curvePoint="false"/>
-<arcpath id="002" x="414" y="513" curvePoint="false"/>
+<arcpath id="001" x="479" y="464" curvePoint="false"/>
+<arcpath id="002" x="413" y="512" curvePoint="false"/>
 <type value="normal"/>
 </arc>
 <arc id="T7 to P10" source="T7" target="P10">
@@ -534,7 +534,7 @@ The user of the tool can now experiments with different values of the periods an
 <arcpath id="001" x="146" y="131" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="5 responses, no drops" traceOption="NONE" searchOption="DFS" hashTableSize="null" extrapolationOption="null" reductionOption="ADV_UPPAAL_SYM">
+<queries name="5 responses, no drops" traceOption="SOME" searchOption="DFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE">
 <capacity>
 <value>6</value>
 </capacity>
