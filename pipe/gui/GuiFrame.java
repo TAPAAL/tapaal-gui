@@ -775,8 +775,8 @@ EOC */
 	public void actionPerformed(ActionEvent e){
 		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
 		buffer.append("\n\n");
-		buffer.append("Joakim Byg, Kenneth Yrke Joergensen, Lasse Jacobsen, \n");
-		buffer.append("Morten Jacobsen, Mikael H. Moeller and Jiri Srba \n");
+		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
+		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
 		buffer.append("Aalborg University 2009 \n\n");
 		buffer.append("Read more at: www.tapaal.net \n\n");
 		buffer.append("verifyta:\n");

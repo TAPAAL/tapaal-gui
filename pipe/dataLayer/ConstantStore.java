@@ -82,6 +82,10 @@ public class ConstantStore {
 	private boolean isConstantInUse(String name) {
 		return constants.get(name).getIsUsed();
 	}
+	
+	public boolean isConstantNameUsed(String name){
+		return constants.containsKey(name);
+	}
 
 	public Set<String> getConstantNames() {
 		return constants.keySet();

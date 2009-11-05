@@ -1136,6 +1136,9 @@ implements Cloneable {
 	}
 
 
+	public boolean isConstantNameUsed(String name){
+		return constants.isConstantNameUsed(name);
+	}
 	/**
 	 * Sets an internal ArrayList according to the class of the object passed in.
 	 * @param pnObject The pnObject in question.

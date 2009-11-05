@@ -79,9 +79,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     	if(!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName))
 		{
 				
-				System.err.println("Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+				System.err.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						"Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+						"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 						"Error",
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
@@ -100,12 +100,22 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
        		
     		if(oldName != "")
     		{
+    			if(!oldName.equals(newName) && model.isConstantNameUsed(newName))
+    			{
+    				JOptionPane.showMessageDialog(CreateGui.getApp(),
+    						"There is already another constant with the same name.\n\n" +
+    						"Please choose a different name for the constant.",
+    						"Error",
+    						JOptionPane.INFORMATION_MESSAGE);
+    				nameTextField.setText(oldName);
+    				return;
+    			}
   				UndoableEdit edit = model.updateConstant(oldName, new Constant(newName, val));
     			if(edit == null){
     				JOptionPane.showMessageDialog(CreateGui.getApp(),
     						"The specified value is invalid for the current net.\n" +
     						"Updating the constant to the specified value invalidates the guard\n" + 
-    						"on one or more ars.",
+    						"on one or more arcs.",
     						"Constant value invalid for current net",
     						JOptionPane.ERROR_MESSAGE);
     			}else{
