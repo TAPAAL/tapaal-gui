@@ -111,7 +111,7 @@ extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(nameTextField, gridBagConstraints);
 
-		rotationLabel.setText("Rotation:");
+		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 5;
@@ -119,7 +119,7 @@ extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
+		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		rotationComboBox.setMaximumSize(new java.awt.Dimension(120, 20));
 		rotationComboBox.setMinimumSize(new java.awt.Dimension(120, 20));
 		rotationComboBox.setPreferredSize(new java.awt.Dimension(120, 20));
