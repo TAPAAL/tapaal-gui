@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <pnml>
 <net id="Net-One" type="P/T net">
-<labels x="535" y="369" width="363" height="196" border="true">
+<labels x="536" y="370" width="364" height="272" border="true">
 <text>This example represents a simple webserver which can process only one request at a time.
 
 There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
@@ -33,7 +33,7 @@ The user of the tool can now experiments with different values of the periods an
 </place>
 <place id="P10">
 <graphics>
-<position x="135.0" y="105.0"/>
+<position x="135.0" y="98.0"/>
 </graphics>
 <name>
 <value>Dropped</value>
@@ -56,7 +56,7 @@ The user of the tool can now experiments with different values of the periods an
 </place>
 <place id="P11">
 <graphics>
-<position x="735.0" y="180.0"/>
+<position x="742.0" y="180.0"/>
 </graphics>
 <name>
 <value>Processing</value>
@@ -79,7 +79,7 @@ The user of the tool can now experiments with different values of the periods an
 </place>
 <place id="P3">
 <graphics>
-<position x="270.0" y="105.0"/>
+<position x="277.0" y="98.0"/>
 </graphics>
 <name>
 <value>Responses</value>
@@ -125,7 +125,7 @@ The user of the tool can now experiments with different values of the periods an
 </place>
 <place id="P6">
 <graphics>
-<position x="135.0" y="510.0"/>
+<position x="130.0" y="520.0"/>
 </graphics>
 <name>
 <value>UserA</value>
@@ -148,7 +148,7 @@ The user of the tool can now experiments with different values of the periods an
 </place>
 <place id="P7">
 <graphics>
-<position x="390.0" y="510.0"/>
+<position x="385.0" y="517.0"/>
 </graphics>
 <name>
 <value>UserB</value>
@@ -298,7 +298,7 @@ The user of the tool can now experiments with different values of the periods an
 </transition>
 <transition id="T7">
 <graphics>
-<position x="135.0" y="210.0"/>
+<position x="135.0" y="182.0"/>
 </graphics>
 <name>
 <value>Drop</value>
@@ -344,8 +344,8 @@ The user of the tool can now experiments with different values of the periods an
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="268" y="275" curvePoint="false"/>
-<arcpath id="001" x="161" y="222" curvePoint="false"/>
+<arcpath id="000" x="269" y="274" curvePoint="false"/>
+<arcpath id="001" x="146" y="198" curvePoint="false"/>
 <type value="timed"/>
 </arc>
 <arc id="P11 to T2" source="P11" target="T2">
@@ -357,8 +357,8 @@ The user of the tool can now experiments with different values of the periods an
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="735" y="182" curvePoint="false"/>
-<arcpath id="001" x="659" y="119" curvePoint="false"/>
+<arcpath id="000" x="742" y="182" curvePoint="false"/>
+<arcpath id="001" x="663" y="113" curvePoint="false"/>
 <arcpath id="002" x="512" y="112" curvePoint="false"/>
 <type value="transport"/>
 </arc>
@@ -384,7 +384,7 @@ The user of the tool can now experiments with different values of the periods an
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="147" y="507" curvePoint="false"/>
+<arcpath id="000" x="142" y="517" curvePoint="false"/>
 <arcpath id="001" x="142" y="406" curvePoint="false"/>
 <type value="timed"/>
 </arc>
@@ -397,7 +397,7 @@ The user of the tool can now experiments with different values of the periods an
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="401" y="507" curvePoint="false"/>
+<arcpath id="000" x="396" y="514" curvePoint="false"/>
 <arcpath id="001" x="396" y="406" curvePoint="false"/>
 <type value="timed"/>
 </arc>
@@ -424,8 +424,8 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="511" y="287" curvePoint="false"/>
-<arcpath id="001" x="666" y="287" curvePoint="false"/>
-<arcpath id="002" x="737" y="203" curvePoint="false"/>
+<arcpath id="001" x="667" y="288" curvePoint="false"/>
+<arcpath id="002" x="743" y="203" curvePoint="false"/>
 <type value="transport"/>
 </arc>
 <arc id="T0 to P8" source="T0" target="P8">
@@ -451,7 +451,7 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="502" y="112" curvePoint="false"/>
-<arcpath id="001" x="296" y="117" curvePoint="false"/>
+<arcpath id="001" x="303" y="110" curvePoint="false"/>
 <type value="transport"/>
 </arc>
 <arc id="T2 to P4" source="T2" target="P4">
@@ -490,8 +490,8 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="152" y="407" curvePoint="false"/>
-<arcpath id="001" x="224" y="464" curvePoint="false"/>
-<arcpath id="002" x="158" y="512" curvePoint="false"/>
+<arcpath id="001" x="225" y="465" curvePoint="false"/>
+<arcpath id="002" x="153" y="522" curvePoint="false"/>
 <type value="normal"/>
 </arc>
 <arc id="T4 to P0" source="T4" target="P0">
@@ -517,8 +517,8 @@ The user of the tool can now experiments with different values of the periods an
 <value>false</value>
 </tagged>
 <arcpath id="000" x="406" y="407" curvePoint="false"/>
-<arcpath id="001" x="479" y="464" curvePoint="false"/>
-<arcpath id="002" x="413" y="512" curvePoint="false"/>
+<arcpath id="001" x="480" y="465" curvePoint="false"/>
+<arcpath id="002" x="408" y="519" curvePoint="false"/>
 <type value="normal"/>
 </arc>
 <arc id="T7 to P10" source="T7" target="P10">
@@ -530,8 +530,8 @@ The user of the tool can now experiments with different values of the periods an
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="146" y="216" curvePoint="false"/>
-<arcpath id="001" x="146" y="131" curvePoint="false"/>
+<arcpath id="000" x="146" y="188" curvePoint="false"/>
+<arcpath id="001" x="146" y="124" curvePoint="false"/>
 <type value="normal"/>
 </arc>
 <queries name="5 responses, no drops" traceOption="SOME" searchOption="DFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE">

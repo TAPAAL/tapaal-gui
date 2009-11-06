@@ -233,7 +233,7 @@ public class TikZExporter {
 	}
 
 	private String replaceWithMathLatex(String text){
-		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq")+"$";
+		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq ")+"$";
 	}
 
 	private String exportMathName(String name){
