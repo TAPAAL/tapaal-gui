@@ -19,6 +19,8 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
 
+import dk.aau.cs.debug.Logger;
+
 public class UppaalTrace {
 
 	public static ArrayList<String> parseUppaalTrace(BufferedReader traceReader) throws Exception{
@@ -62,7 +64,7 @@ public class UppaalTrace {
 		String last = null;
 		int lastnumber = 0;
 		for (String s : trace){
-			System.out.println(s);
+			Logger.log(s);
 			String tmp2[] = s.split("_");
 			
 			int tmp=0;
@@ -71,7 +73,7 @@ public class UppaalTrace {
 			} catch (Exception e) {
 				tmp=0;
 			}
-			System.out.println(lastnumber + " " + tmp);
+			Logger.log(lastnumber + " " + tmp);
 			if ((!tmp2[0].equals(last)) ||  tmp <= lastnumber){
 				trace2.add(tmp2[0]);
 				last = tmp2[0];
@@ -106,7 +108,7 @@ public class UppaalTrace {
 		int turn = 0;
 		DiscreetFiringAction dfa = new DiscreetFiringAction();
 		while ((line = traceReader.readLine()) != null){
-			System.out.println(line);
+			Logger.log(line);
 
 			if (line.contains("EXCEPTION: Clock valuation.")){
 				System.err.println("Uppaal can not generate the trace.");
@@ -235,7 +237,7 @@ public class UppaalTrace {
 				} catch (Exception e) {
 					tmp=0;
 				}
-				//System.out.println(lastnumber + " " + tmp);
+				//Logger.log(lastnumber + " " + tmp);
 				if ((!tmp2[0].equals(last)) ||  tmp <= lastnumber){
 					
 					dfatmp = new DiscreetFiringAction();
@@ -260,7 +262,7 @@ public class UppaalTrace {
 					//Only add the consumed token if it is consumed from one of
 					//the original places
 					if (!((s.contains("P_lock")) || (s.contains("P_capacity")) || (s.contains("_im")) || (s.contains("_hp_"))) ){
-						System.out.println("Added consumed token " + s + " - "+ tmpConsumedTokens.get(s).get(0));
+						Logger.log("Added consumed token " + s + " - "+ tmpConsumedTokens.get(s).get(0));
 						dfatmp.addConsumedToken(s, tmpConsumedTokens.get(s).get(0)); // XXX - only takes first token
 					}
 					

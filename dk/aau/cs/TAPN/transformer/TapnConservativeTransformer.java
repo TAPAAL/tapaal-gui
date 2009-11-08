@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.xml.crypto.Data;
 
+import dk.aau.cs.debug.Logger;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
@@ -32,7 +34,7 @@ public class TapnConservativeTransformer {
 	public static DataLayer transform(DataLayer input) {
 		
 		//Make the net bounded and conservative
-		System.out.println("lalal");
+		Logger.log("lalal");
 		DataLayer toReturn = new DataLayer();
 		
 		// Add p_lock and p_capasity

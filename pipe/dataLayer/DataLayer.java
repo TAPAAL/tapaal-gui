@@ -34,6 +34,7 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.ProgressBar;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.TAPN;
 
 
@@ -909,7 +910,7 @@ implements Cloneable {
 
 
 		for(Transition t : getTransitions()){
-			System.out.println("lalal" + t.id);
+			Logger.log("lalal" + t.id);
 			notifyObservers(t);   
 
 		}
@@ -1788,7 +1789,7 @@ implements Cloneable {
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
 									"Problem in forwardsIncidenceMatrix");
-									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
+									Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
 								}
 							}
 						}
@@ -1827,7 +1828,7 @@ implements Cloneable {
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
 									"Problem in backwardsIncidenceMatrix");                            
-									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
+									Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
 								}
 							}
 						}
@@ -1946,7 +1947,7 @@ implements Cloneable {
 								} catch (Exception e) {
 									JOptionPane.showMessageDialog(null, 
 									"Problema a inhibitionMatrix");                          
-									System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
+									Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
 								}                        
 							}
 						}
@@ -1982,7 +1983,7 @@ implements Cloneable {
 									} catch (Exception e) {
 										JOptionPane.showMessageDialog(null, 
 										"Problema a inhibitionMatrix");                          
-										System.out.println("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
+										Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
 									}                        
 								}
 							}

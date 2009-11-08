@@ -17,6 +17,8 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
+import dk.aau.cs.debug.Logger;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DiscreetFiringAction;
@@ -308,7 +310,7 @@ public class Animator {
 				 //If this marking is not saved in marking history (e.g. its a uppaal trace)
 
 				 if (markingHistory.get(currentAction+1)==null){
-					 System.out.println("Marking is null, we will fix it");
+					Logger.log("Marking is null, we will fix it");
 
 					 HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
 					 markingHistory.set(currentAction+1, currentmakring);
@@ -342,7 +344,7 @@ public class Animator {
 				 //If this marking is not saved in marking history (e.g. its a uppaal trace)
 
 				 if (markingHistory.get(currentAction+1)==null){
-					 System.out.println("Marking is null, we will fix it");
+					 Logger.log("Marking is null, we will fix it");
 
 					 HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
 					 markingHistory.set(currentAction+1, currentmakring);
@@ -676,7 +678,8 @@ public class Animator {
 				((SelectFiringmode)firingmode).setTokensToFire(intlist);
 				
 			}else {
-				System.out.println("ATTTHHHHTHHTHTH HOW CAN THIS FUNCTINO BE CALLED WHEN NOT IN SELECT FIRING MODE??");
+				Logger.log("ATTTHHHHTHHTHTH HOW CAN THIS FUNCTINO BE CALLED WHEN NOT IN SELECT FIRING MODE??");
+				assert false;
 			}
 			
 			

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.io.NewTransitionRecord;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.degree2minimal;
@@ -536,7 +537,7 @@ public class TAPN extends PetriNet {
 				output.println("<type value=\"timed\" />");
 				output.println("</arc>");
 			} else {
-				System.out.println("kyrke: Printing transport ARC");
+				Logger.log("kyrke: Printing transport ARC");
 
 
 				output.println("<arc id=\""+ a.getSource().getID()  +" to "+ ((TAPNTransportArc)a).getIntermediate().getID() +"\" source=\""+ a.getSource().getID() +"\" target=\""+ ((TAPNTransportArc)a).getIntermediate().getID() +"\">");
@@ -632,7 +633,7 @@ public class TAPN extends PetriNet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("lal");
+		Logger.log("lal");
 	}
 
 	public Place getPlaceByName(String string) {

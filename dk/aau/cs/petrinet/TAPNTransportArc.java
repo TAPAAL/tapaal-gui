@@ -1,4 +1,7 @@
 package dk.aau.cs.petrinet;
+
+import dk.aau.cs.debug.Logger;
+
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 
@@ -27,11 +30,11 @@ public class TAPNTransportArc extends TAPNArc{
 		this.intermediateTransition = intermediateTransition;
 		
 		if (target==null){
-			System.out.println("kyrke!!! error" );
+			Logger.log("kyrke!!! error" );
 		}
 		this.target=target;
 		if (this.target==null){
-			System.out.println("kyrke2!!! error" );
+			Logger.log("kyrke2!!! error" );
 		}
 	}
 
@@ -41,7 +44,7 @@ public class TAPNTransportArc extends TAPNArc{
 
 	public TAPNPlace getTarget() {
 		if (this.target==null){
-			System.out.println("kyrke3!!! error" );
+			Logger.log("kyrke3!!! error" );
 		}
 		return target;
 	}

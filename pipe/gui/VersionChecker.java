@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import dk.aau.cs.debug.Logger;
+
 public class VersionChecker {
 	private final static String versionURL = "http://www.tapaal.net/fileadmin/version.txt";
 	private static final int timeoutMs = 6000;
@@ -73,7 +75,7 @@ public class VersionChecker {
 			in.close();
 		}
 		catch(Exception e){
-			System.out.println("Could not check for new version.");
+			Logger.log("Could not check for new version.");
 		}
 	}
 

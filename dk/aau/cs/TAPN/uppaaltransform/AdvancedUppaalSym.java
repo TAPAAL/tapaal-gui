@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
@@ -78,7 +79,7 @@ public class AdvancedUppaalSym implements UppaalTransformer {
 		a = createTemplateControl(tokens);
 		uppaalXML.append(a);
 		
-		System.out.println("Finished Control token");
+		Logger.log("Finished Control token");
 		
 		a = createLockTemplate(model, tokens);
 		//a = createTemplateByModel(model,tokens, true);
@@ -103,7 +104,7 @@ public class AdvancedUppaalSym implements UppaalTransformer {
 			ArrayList<Place> tokens) {
 		StringBuffer tmp = new StringBuffer();
 		
-		System.out.println("Creating stuff");
+		Logger.log("Creating stuff");
 		// Create the xml for the model
 		tmp.append("<template>\n");
 
@@ -172,7 +173,7 @@ public class AdvancedUppaalSym implements UppaalTransformer {
 	private StringBuffer createLockTemplate(TAPN model, ArrayList<Place> tokens) {
 		StringBuffer tmp = new StringBuffer();
 
-		System.out.println("Creating stuff");
+		Logger.log("Creating stuff");
 		// Create the xml for the model
 		tmp.append("<template>\n");
 		tmp.append("<name x=\"5\" y=\"5\">Lock</name>\n");
@@ -411,7 +412,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 	protected void createTemplateForTransition(Transition t, StringBuffer tmp,
 			boolean lock) {
 		if (t.getPreset().size()==1 && t.getPostset().size()==1 && !lock){
-			System.out.println("The new way 1!! " +t);
+			Logger.log("The new way 1!! " +t);
 			tmp.append(createTransition(t.getPreset().get(0), t.getPostset().get(0), t.getName(),lock));
 		}
 
@@ -458,14 +459,14 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 				postsetPlaceTwo = postsetPlaceOne;
 				postsetPlaceOne = swap;
 			}
-			System.out.println("" + presetPlaceTwo + postsetPlaceTwo);
+			Logger.log("" + presetPlaceTwo + postsetPlaceTwo);
 			
 			/*if ( !lock && (!((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ||
 					!((presetPlaceTwo.getSource().getName().contains("_im")) || (presetPlaceTwo.getSource().getName().equals("P_lock"))))){
 				*/
 			if ((!((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))))){
 				if (!lock){
-					System.out.println("The new way 2" + t);
+					Logger.log("The new way 2" + t);
 
 					//It the new way 
 					tmp.append(createTransition(presetPlaceOne, postsetPlaceOne, t.getName(), lock, '!'));
@@ -474,7 +475,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 			} else {
 				//Its the old way
 
-				System.out.println("The old way!! " + t);
+				Logger.log("The old way!! " + t);
 				
 				
 

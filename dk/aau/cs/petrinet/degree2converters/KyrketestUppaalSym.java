@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import pipe.dataLayer.TransportArc;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.PlaceTransitionObject;
@@ -98,7 +99,7 @@ public class KyrketestUppaalSym {
 			} else{
 				// The normal way
 
-				System.out.println("Making normal degree-2 reduction");
+				Logger.log("Making normal degree-2 reduction");
 				
 				// Counter for new places names 
 				int j=0;
@@ -544,7 +545,7 @@ public class KyrketestUppaalSym {
 	private StringBuffer createTemplateReduction(PrintStream uppaalXML2, Place initialPlace, int templatenumber) {
 		StringBuffer tmp = new StringBuffer();
 
-		System.out.println("Creating stuff");
+		Logger.log("Creating stuff");
 		// Create the xml for the model
 		tmp.append("<template>\n");
 
@@ -612,7 +613,7 @@ public class KyrketestUppaalSym {
 						!((presetPlaceTwo.getSource().getName().contains("_im")) || (presetPlaceTwo.getSource().getName().equals("P_lock")))) && 
 						templatenumber!=0){
 
-					System.out.println("Hmm the new way " + templatenumber );
+					Logger.log("Hmm the new way " + templatenumber );
 					//It the new way 
 					tmp.append(createTransition(t.getPreset().get(0), t.getPostset().get(0), t.getName(), templatenumber, '!'));
 					tmp.append(createTransition(t.getPreset().get(1), t.getPostset().get(1), t.getName(),templatenumber, '?'));
@@ -620,7 +621,7 @@ public class KyrketestUppaalSym {
 				} else {
 					//Its the old way
 
-					System.out.println("The old way!!");
+					Logger.log("The old way!!");
 					
 					//We let presetPlaceOne and postsetPlaceTwo be the locking chanin.
 					if ( !((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ){
