@@ -24,6 +24,10 @@ public class TimedAutomata {
 	
 	private Location initialLocation;
 	
+	public TimedAutomata(){
+		
+	}
+	
 	public TimedAutomata(String name, ArrayList<Edge> transitions, ArrayList<Location> locations, Location initLocation, String parameters)
 	{
 		this(name, transitions, locations, initLocation);

@@ -3289,8 +3289,8 @@ implements Cloneable {
 		double xcord = 10;
 		double ycord = 10;
 
-		List<dk.aau.cs.petrinet.Place> places = model.getPlaces(); 
-		List<dk.aau.cs.petrinet.Transition> transitions = model.getTransitions();
+		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
+		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
 		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
 
 		// Add places

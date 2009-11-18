@@ -6,19 +6,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import pipe.gui.undo.AddPetriNetObjectEdit;
-import pipe.io.NewTransitionRecord;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
@@ -37,10 +31,10 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */ 
 
-public class TAPN extends PetriNet {
+public class TAPN extends PetriNet implements TimedArcPetriNet {
 
-	LinkedList<Place> places = new LinkedList<Place>();
-	LinkedList<Transition> transitions = new LinkedList<Transition>();
+	LinkedList<TAPNPlace> places = new LinkedList<TAPNPlace>();
+	LinkedList<TAPNTransition> transitions = new LinkedList<TAPNTransition>();
 
 	LinkedList<Arc> arcs = new LinkedList<Arc>();
 	
@@ -308,15 +302,25 @@ public class TAPN extends PetriNet {
 
 		return arcs.remove(a);
 	}
-
-
-
-	public List<Place> getPlaces(){
-		return (List<Place>) places.clone();
+	
+	public List<Token> getTokens(){
+		ArrayList<Token> toReturn = new ArrayList<Token>();
+		
+		for(Place p : tokens){
+			toReturn.add(new Token(p));
+		}
+		
+		return toReturn;
 	}
 
-	public List<Transition> getTransitions(){
-		return (List<Transition>) transitions.clone();
+
+
+	public List<TAPNPlace> getPlaces(){
+		return (List<TAPNPlace>)places.clone();
+	}
+
+	public List<TAPNTransition> getTransitions(){
+		return (List<TAPNTransition>) transitions.clone();
 	}
 
 	public List<Arc> getArcs(){
@@ -336,7 +340,7 @@ public class TAPN extends PetriNet {
 
 		//For all trantions add arcs to capacity 
 
-		List<Transition> transitions = getTransitions();
+		List<TAPNTransition> transitions = getTransitions();
 
 		for (Transition t : transitions) {
 
@@ -636,8 +640,8 @@ public class TAPN extends PetriNet {
 		Logger.log("lal");
 	}
 
-	public Place getPlaceByName(String string) {
-		for (Place p : places){
+	public TAPNPlace getPlaceByName(String string) {
+		for (TAPNPlace p : places){
 			if (p.name.equals(string)){
 				return p;
 			}
