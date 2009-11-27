@@ -1,10 +1,13 @@
 package dk.aau.cs.TAPN;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
+import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.TimedAutomata;
+import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
@@ -36,15 +39,26 @@ public class TAPNToNTATransformer implements ModelTransformer<TimedArcPetriNet, 
 
 	private TimedAutomata createTimedAutomata(Token token, TimedArcPetriNet model) {
 		TimedAutomata ta = new TimedAutomata();
+		Hashtable<TAPNPlace, Location> placesToLocations = new Hashtable<TAPNPlace, Location>();
 		
 		for(TAPNPlace p : model.getPlaces()){
 			Location l = new Location(p.getName(), convertInvariant(p.getInvariant()));
 			l.setUrgent(p.isUrgent());
+			
 			ta.addLocation(l);
+			placesToLocations.put(p, l);
 		}
 		
-		for(TAPNTransition t : model.getTransitions()){
+		for(TAPNArc arc : model.getArcs()){
+			Location source = placesToLocations.get(arc.getSource());
+			Location destination = placesToLocations.get(arc.getTarget());
 			
+			String guard = "";
+			String sync = "";
+			String update = "";
+			
+			Edge e = new Edge(source, destination, guard, sync, update);
+			ta.addTransition(e);
 		}
 		
 		return ta;

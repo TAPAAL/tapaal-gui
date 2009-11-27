@@ -3291,7 +3291,7 @@ implements Cloneable {
 
 		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
 		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
-		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
+		List<dk.aau.cs.petrinet.TAPNArc> arcs = model.getArcs();
 
 		// Add places
 		for (dk.aau.cs.petrinet.Place p : places){

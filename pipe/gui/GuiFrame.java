@@ -392,9 +392,9 @@ EOC */
 
 		addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
 		/*EOC*/
-        //addMenuItem(drawMenu, inhibarcAction =
-        //      new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
-        //      "Add an inhibitor arc", "H",true));              
+        addMenuItem(drawMenu, inhibarcAction =
+              new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
+              "Add an inhibitor arc", "H",true));              
 		addMenuItem(drawMenu, annotationAction =
 			new TypeAction("Annotation", Pipe.ANNOTATION,
 					"Add an annotation","N",true));
@@ -560,7 +560,7 @@ EOC */
 		addButton(drawingToolBar, transportArcAction);
 		/*EOC*/      
      
-		//addButton(drawingToolBar,inhibarcAction);
+		addButton(drawingToolBar,inhibarcAction);
  
 		addButton(drawingToolBar,annotationAction);
 		drawingToolBar.addSeparator();

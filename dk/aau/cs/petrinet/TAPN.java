@@ -323,8 +323,8 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		return (List<TAPNTransition>) transitions.clone();
 	}
 
-	public List<Arc> getArcs(){
-		return (List<Arc>) arcs.clone();
+	public List<TAPNArc> getArcs(){
+		return (List<TAPNArc>) arcs.clone();
 	}
 
 
