@@ -56,12 +56,12 @@ public class Kyrketest {
 			TAPNPlace tmp = new TAPNPlace(p.getName(), ((TAPNPlace)p).getInvariant(), p.getCapacity());
 
 			oldToNewPlacesMap.put((TAPNPlace)p, tmp);
-			toReturn.addObject(tmp);
+			toReturn.addPlace(tmp);
 		}
 
 //		Create the P_lock place.
 		TAPNPlace lock = new TAPNPlace("P_lock", "", 0);
-		toReturn.addObject(lock);	
+		toReturn.addPlace(lock);	
 
 		//TAPNPlace capacity = new TAPNPlace("P_capacity", "", 0);
 		//toReturn.addObject(capacity);	
@@ -77,14 +77,14 @@ public class Kyrketest {
 
 
 				TAPNTransition transition = new TAPNTransition(t.getName());
-				toReturn.addObject(transition);
+				toReturn.addTransition(transition);
 
 				for (Arc a : t.getPreset()){
-					toReturn.addObject(cloneArc(a,transition));
+					toReturn.add(cloneArc(a,transition));
 				}
 
 				for (Arc a : t.getPostset()){			
-					toReturn.addObject(cloneArc(a, transition));	
+					toReturn.add(cloneArc(a, transition));	
 				}
 				continue;
 			} else{
@@ -151,7 +151,7 @@ public class Kyrketest {
 
 		for (Transition t : model.getTransitions()){
 
-			if (((TAPNTransition)t).getisUrgens()){
+			if (((TAPNTransition)t).isUrgent()){
 				uppaalXML.println("urgent chan " + t.getName() + ";\n");
 			} else {
 				uppaalXML.println("chan " + t.getName() + ";\n");

@@ -1,17 +1,18 @@
 package dk.aau.cs.TA;
 
-import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import dk.aau.cs.petrinet.Transition;
-
 public class NTA 
 {
-	private ArrayList<TimedAutomata> automata = new ArrayList<TimedAutomata>();
+	private ArrayList<TimedAutomata> automata;
 	
 	private String globalDeclarations = "";
 	private String systemDeclarations = "";
+	
+	public NTA(){
+		automata = new ArrayList<TimedAutomata>();
+	}
 	
 	public NTA(ArrayList<TimedAutomata> automata)
 	{
@@ -54,6 +55,10 @@ public class NTA
 	public void setSystemDeclarations(String systemDecl)
 	{
 		systemDeclarations = systemDecl;
+	}
+	
+	public void addTimedAutomata(TimedAutomata ta){
+		automata.add(ta);
 	}
 	
 	public void outputToUPPAALXML(PrintStream xmlFile)

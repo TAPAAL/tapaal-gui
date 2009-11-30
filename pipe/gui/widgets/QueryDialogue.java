@@ -41,7 +41,7 @@ public class QueryDialogue extends JPanel{
 	 */
 	private static final long serialVersionUID = 7852107237344005546L;
 	public enum QueryDialogueOption {VerifyNow, Save, Export}
-	
+
 	private boolean querySaved=false;
 	private JRootPane myRootPane;
 	private JPanel queryPanel;
@@ -56,7 +56,7 @@ public class QueryDialogue extends JPanel{
 	private JPanel hashTableOptions;
 	private JPanel extrapolationOptions;
 	private JToggleButton showAdvancedUppaalOptions;
-	
+
 	private JButton okButton;
 	private JButton verifyButton;
 	private JButton cancelButton;
@@ -74,34 +74,34 @@ public class QueryDialogue extends JPanel{
 	private JRadioButtonMenuItem dFS;
 	private JRadioButtonMenuItem rDFS;
 	private JRadioButtonMenuItem closestToTargetFirst;
-	
+
 	private ButtonGroup traceRadioButtonGroup;
 	private JRadioButtonMenuItem none;
 	private JRadioButtonMenuItem some;
 	private JRadioButtonMenuItem fastest;
-	
+
 	private ButtonGroup hashTableSizeButtonGroup;
 	private JRadioButtonMenuItem size4;
 	private JRadioButtonMenuItem size16;
 	private JRadioButtonMenuItem size64;
 	private JRadioButtonMenuItem size256;
 	private JRadioButtonMenuItem size512;
-	
+
 	private ButtonGroup extrapolationButtonGroup;
 	private JRadioButtonMenuItem automaticExtr;
 	private JRadioButtonMenuItem difExtr;
 	private JRadioButtonMenuItem locBasedExtr;
 	private JRadioButtonMenuItem lowUpExtr;
-	
+
 	private JPanel reductionOptions;
 	private JComboBox reductionOption;
-	
+
 	private JSpinner numberOfExtraTokensInNet;
 	private JButton kbounded;
 	private JButton kboundedOptimize;
-//XXX shortest can be quite hard to guarantee, because, it might not be the shortest in UPPAAL
-//	private JRadioButtonMenuItem shortest;
-	
+	//XXX shortest can be quite hard to guarantee, because, it might not be the shortest in UPPAAL
+	//	private JRadioButtonMenuItem shortest;
+
 	private DataLayer datalayer;
 	private EscapableDialog me;
 	private ArrayList<ArrayList<JPanel>> conjunctionGroups;
@@ -109,12 +109,14 @@ public class QueryDialogue extends JPanel{
 	private HashMap<JPanel, ActionListener> andActionListenerMap;
 	private ArrayList<JPanel> disjunctionGroups;
 	private int disjunctionsUsed;
-	
+
 	private String name_ADVNOSYM = "Optimised Standard";
 	private String name_NAIVE = "Standard";
 	private String name_NAIVESYM = "Symmetry Reduction";
 	private String name_ADVSYM = "Optimised Symmetry Reduction";
-	
+	private String name_INHIBSTANDARD = "Standard (with inhibitor arcs)";
+	private String name_INHIBSYM = "Symmetry Reduction (with inhibitor arcs)";
+
 	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
 		this.datalayer = datalayer;
@@ -129,7 +131,7 @@ public class QueryDialogue extends JPanel{
 
 		init(option, queryToCreateFrom);
 	}
-	
+
 
 	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
 		// Query comment field starts here:		
@@ -141,7 +143,7 @@ public class QueryDialogue extends JPanel{
 		}else{
 			queryComment = new JTextField(queryToCreateFrom.name,25);	
 		}
-		
+
 		namePanel.add(queryComment);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();		
@@ -149,11 +151,11 @@ public class QueryDialogue extends JPanel{
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(namePanel, gridBagConstraints);
-		
-//Capacity number field starts here:
+
+		//Capacity number field starts here:
 		capacityPanel = new JPanel(new FlowLayout());
 		capacityPanel.add(new JLabel("Extra number of tokens: "));
-		
+
 		if (queryToCreateFrom == null){
 			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3,0,Integer.MAX_VALUE, 1));
 		}else{
@@ -164,8 +166,8 @@ public class QueryDialogue extends JPanel{
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(50,30));
 		capacityPanel.add(numberOfExtraTokensInNet);
 
-//Capacity boundness starts here
-		
+		//Capacity boundness starts here
+
 		kbounded = new JButton("Check Boundedness");
 		kbounded.addActionListener(	
 				new ActionListener() {
@@ -175,7 +177,7 @@ public class QueryDialogue extends JPanel{
 				}
 		);		
 		capacityPanel.add(kbounded);
-		
+
 		kboundedOptimize = new JButton("Optimize Number of Tokens");
 		kboundedOptimize.addActionListener(
 				new ActionListener() {
@@ -185,19 +187,19 @@ public class QueryDialogue extends JPanel{
 				}
 		);
 		capacityPanel.add(kboundedOptimize);
-		
-		
+
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(capacityPanel, gridBagConstraints);
-		
 
-		
-		
 
-// Query field starts here: 		
+
+
+
+		// Query field starts here: 		
 		queryPanel = new JPanel(new GridBagLayout());
 		queryPanel.setBorder(BorderFactory.createTitledBorder("Query"));
 
@@ -206,12 +208,12 @@ public class QueryDialogue extends JPanel{
 		existsBox = new JRadioButtonMenuItem("(EG) There exists a trace on which every marking satisfies:");
 		forAllDiamond = new JRadioButtonMenuItem("(AF) On all traces there is eventually a marking that satisfies:");
 		forAllBox = new JRadioButtonMenuItem("(AG) All reachable markings satisfy:");
-		
+
 		quantificationRadioButtonGroup.add(existsDiamond);
 		quantificationRadioButtonGroup.add(existsBox);
 		quantificationRadioButtonGroup.add(forAllDiamond);
 		quantificationRadioButtonGroup.add(forAllBox);
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -230,22 +232,22 @@ public class QueryDialogue extends JPanel{
 				forAllBox.setSelected(true);
 			}
 		}
-		
-		
-		
+
+
+
 		gridBagConstraints.gridy = 1;
 		queryPanel.add(existsBox, gridBagConstraints);
-		
+
 		gridBagConstraints.gridy = 2;
 		queryPanel.add(forAllDiamond, gridBagConstraints);
-		
+
 		gridBagConstraints.gridy = 3;
 		queryPanel.add(forAllBox, gridBagConstraints);
-		
+
 		//Add action listeners to the query options
 		for (Object radioButton : queryPanel.getComponents()){
 			if( (radioButton instanceof JRadioButtonMenuItem)){
-				
+
 
 				((JRadioButtonMenuItem)radioButton).addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent arg0) {
@@ -256,9 +258,9 @@ public class QueryDialogue extends JPanel{
 				});
 			}
 		}
-		
-		
-		
+
+
+
 		markingSpecificsPanel = new JPanel(new GridBagLayout());
 
 		if (queryToCreateFrom==null){
@@ -266,19 +268,19 @@ public class QueryDialogue extends JPanel{
 		}else {
 			addQuery(queryToCreateFrom);	
 		}
-		
+
 		gridBagConstraints.gridy = 4;
 		queryPanel.add( markingSpecificsPanel , gridBagConstraints);
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(queryPanel, gridBagConstraints);
-		
-//verification option-radio buttons starts here:		
+
+		//verification option-radio buttons starts here:		
 		uppaalOptions = new JPanel(new GridBagLayout());
-		
+
 		searchOptions = new JPanel(new GridBagLayout());
 		searchOptions.setBorder(BorderFactory.createTitledBorder("Analysis Options"));
 		searchRadioButtonGroup = new ButtonGroup();
@@ -290,7 +292,7 @@ public class QueryDialogue extends JPanel{
 		searchRadioButtonGroup.add(dFS);
 		searchRadioButtonGroup.add(rDFS);
 		searchRadioButtonGroup.add(closestToTargetFirst);
-		
+
 		if (queryToCreateFrom==null){
 			bFS.setSelected(true);
 		}else{
@@ -304,7 +306,7 @@ public class QueryDialogue extends JPanel{
 				closestToTargetFirst.setSelected(true);
 			}	
 		}
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridy = 0;
@@ -319,7 +321,7 @@ public class QueryDialogue extends JPanel{
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		uppaalOptions.add(searchOptions, gridBagConstraints);
-		
+
 		traceOptions = new JPanel(new GridBagLayout());
 		traceOptions.setBorder(BorderFactory.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
@@ -341,7 +343,7 @@ public class QueryDialogue extends JPanel{
 				none.setSelected(true);
 			}	
 		}
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridy = 0;
@@ -350,19 +352,19 @@ public class QueryDialogue extends JPanel{
 		traceOptions.add(fastest,gridBagConstraints);
 		gridBagConstraints.gridy = 2;
 		traceOptions.add(none,gridBagConstraints);
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		uppaalOptions.add(traceOptions, gridBagConstraints);
 
-//Advanced Uppaal options from here - We do not currently use these options since our queries does not demand them yet		
-/*
+		//Advanced Uppaal options from here - We do not currently use these options since our queries does not demand them yet		
+		/*
 		advancedUppaalOptions = new JPanel(new GridBagLayout());
 		advancedUppaalOptions.setVisible(false);
-		
+
 		showAdvancedUppaalOptions = new JToggleButton();
-		
+
 		URL unPressedIconURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "smallRightArrow.png");
 		URL pressedIconURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "smallDownArrow.png");
 		URL rollOverURL = Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "smallRightBlackArrow.png");
@@ -388,10 +390,10 @@ public class QueryDialogue extends JPanel{
 							me.pack();
 						}
 					}
-				
+
 				}
 		);
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -419,7 +421,7 @@ public class QueryDialogue extends JPanel{
 		hashTableSizeButtonGroup.add(size64);
 		hashTableSizeButtonGroup.add(size256);
 		hashTableSizeButtonGroup.add(size512);
-		
+
 		if (queryToCreateFrom==null){
 			size16.setSelected(true);
 		}else{			
@@ -451,12 +453,12 @@ public class QueryDialogue extends JPanel{
 		hashTableOptions.add(size256,gridBagConstraints);
 		gridBagConstraints.gridy = 4;
 		hashTableOptions.add(size512,gridBagConstraints);
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		advancedUppaalOptions.add(hashTableOptions, gridBagConstraints);
-		
+
 		extrapolationOptions = new JPanel(new GridBagLayout());
 		extrapolationOptions.setBorder(BorderFactory.createTitledBorder("Extrapolation Options"));
 		extrapolationButtonGroup = new ButtonGroup();
@@ -468,7 +470,7 @@ public class QueryDialogue extends JPanel{
 		extrapolationButtonGroup.add(difExtr);
 		extrapolationButtonGroup.add(locBasedExtr);
 		extrapolationButtonGroup.add(lowUpExtr);
-		
+
 		if (queryToCreateFrom==null){
 			automaticExtr.setSelected(true);
 		}else{
@@ -501,48 +503,52 @@ public class QueryDialogue extends JPanel{
 		extrapolationOptions.add(locBasedExtr,gridBagConstraints);
 		gridBagConstraints.gridy = 3;
 		extrapolationOptions.add(lowUpExtr,gridBagConstraints);
-		
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		advancedUppaalOptions.add(extrapolationOptions, gridBagConstraints);
-*/		
+		 */		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
 		add(uppaalOptions, gridBagConstraints);
 
-//ReductionOptions starts here:
+		//ReductionOptions starts here:
 		this.reductionOptions = new JPanel(new FlowLayout());
 		this.reductionOptions.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
 		String[] reductionOptions = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM};
 		reductionOption = new JComboBox(reductionOptions);
 		reductionOption.setSelectedIndex(3);
 		disableTraceOptions();
-		
+
 		reductionOption.addActionListener(new ActionListener(){
-			
+
 			public void actionPerformed(ActionEvent arg0) {
 				if (reductionOption.getSelectedItem() != null){
-					if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVESYM) || ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM) ){
+					if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVESYM) 
+						|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM) 
+						|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) ){
 						none.setSelected(true);
 						disableTraceOptions();
-					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) || ((String) reductionOption.getSelectedItem()).equals(name_ADVNOSYM) ){
+					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) 
+							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVNOSYM)
+							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSTANDARD)){
 						enableTraceOptions();
 					}
 				}
 			}
-			
+
 		});
-		
+
 		this.reductionOptions.add(new JLabel("  Choose reduction method:"));
 		this.reductionOptions.add(reductionOption);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 4;
 		add(this.reductionOptions, gridBagConstraints);
-		
-//add save and verify buttons starts here:
+
+		//add save and verify buttons starts here:
 		buttonPanel = new JPanel(new FlowLayout());
 		if (option == QueryDialogueOption.Save){
 			okButton = new JButton("Save");
@@ -573,7 +579,7 @@ public class QueryDialogue extends JPanel{
 			cancelButton.addActionListener(	
 					new ActionListener() {
 						public void actionPerformed(ActionEvent evt) {
-							
+
 							exit();
 						}
 					}
@@ -581,7 +587,7 @@ public class QueryDialogue extends JPanel{
 			removeButton.addActionListener(
 					new ActionListener(){
 						public void actionPerformed(ActionEvent evt) {
-							
+
 							datalayer.getQueries().remove(queryToCreateFrom);
 							CreateGui.createLeftPane();
 							exit();
@@ -619,22 +625,22 @@ public class QueryDialogue extends JPanel{
 		}
 		if (option == QueryDialogueOption.Save){
 			buttonPanel.add(cancelButton);
-			
+
 			if (queryToCreateFrom!=null){
 				buttonPanel.add(removeButton);	
 			}
-			
+
 			buttonPanel.add(okButton);
 
 			buttonPanel.add(verifyButton);
-			
+
 			buttonPanel.add(saveUppaalXMLButton);
 		}else {
 			buttonPanel.add(cancelButton);
-			
+
 			buttonPanel.add(okButton);
-			
-//			buttonPanel.add(saveUppaalXMLButton);
+
+			//			buttonPanel.add(saveUppaalXMLButton);
 		}
 
 
@@ -643,36 +649,36 @@ public class QueryDialogue extends JPanel{
 		gridBagConstraints.gridy = 5;
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		add(buttonPanel, gridBagConstraints);
-	
+
 		myRootPane.setDefaultButton(okButton);
-		
+
 		quantificationRadioButtonChanged(null);
-		
+
 		//Update the selected reduction
 		if (queryToCreateFrom!=null){
-		if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-			if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
-				 reductionOption.setSelectedIndex(0);
-				enableTraceOptions();
-			} else if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE_UPPAAL_SYM){
-				reductionOption.setSelectedIndex(2);
-				disableTraceOptions();
-			} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
-				reductionOption.setSelectedIndex(3);
-				disableTraceOptions();
-			} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
-				reductionOption.setSelectedIndex(1);
-				enableTraceOptions();
+			if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
+				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
+					reductionOption.setSelectedIndex(0);
+					enableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE_UPPAAL_SYM){
+					reductionOption.setSelectedIndex(2);
+					disableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
+					reductionOption.setSelectedIndex(3);
+					disableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
+					reductionOption.setSelectedIndex(1);
+					enableTraceOptions();
+				}
+			} else {
+				if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
+					reductionOption.setSelectedIndex(1);
+					disableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
+					reductionOption.setSelectedIndex(0);
+					enableTraceOptions();
+				}
 			}
-		} else {
-			if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
-				reductionOption.setSelectedIndex(1);
-				disableTraceOptions();
-			} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
-				reductionOption.setSelectedIndex(0);
-				enableTraceOptions();
-			}
-		}
 		}
 	}
 
@@ -680,25 +686,30 @@ public class QueryDialogue extends JPanel{
 		some.setEnabled(false);
 		fastest.setEnabled(false);
 	}
-	
+
 	private void disableLivenessReductionOptions(){
 		String[] options = {name_ADVNOSYM, name_ADVSYM};
 		reductionOption.removeAllItems();
-		
+
 		for (String s : options){
 			reductionOption.addItem(s);
 		}
 	}
 
 	private void enableAllReductionOptions(){
-		String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM};
 		reductionOption.removeAllItems();
-		
-		for (String s : options){
-			reductionOption.addItem(s);
+		if(!this.datalayer.hasTAPNInhibitorArcs()){
+			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM};
+			
+			for (String s : options){
+				reductionOption.addItem(s);
+			}
+		}else {
+			reductionOption.addItem(name_INHIBSTANDARD);
+			reductionOption.addItem(name_INHIBSYM);
 		}
 	}
-	
+
 	private void enableTraceOptions() {
 		some.setEnabled(true);
 		fastest.setEnabled(true);
@@ -706,24 +717,24 @@ public class QueryDialogue extends JPanel{
 
 	private void addQuery(TAPNQuery queryToCreateFrom) {
 		String[] disjunctions = queryToCreateFrom.query.subSequence(3, queryToCreateFrom.query.length()).toString().split(" \\|\\| ") ;
-//		System.out.println(queryToCreateFrom.query);
-//		for (String s : disjunctions){
-//			System.out.println(s);
-//		}
-		
+		//		System.out.println(queryToCreateFrom.query);
+		//		for (String s : disjunctions){
+		//			System.out.println(s);
+		//		}
+
 		for (int i=0; i < disjunctions.length; i++){			
 			addNewDisjunction();
 			if (i>0){
 				((JButton)disjunctionGroups.get(i-1).getComponent(1)).setSelected(true);
 			}
-			
+
 			String strippedDisjunction = "";
-			
+
 			for (int j=3; j < disjunctions[i].length()-3; j++){
 				strippedDisjunction = strippedDisjunction + disjunctions[i].charAt(j);
 			}
-//			System.out.println(strippedDisjunction);
-			
+			//			System.out.println(strippedDisjunction);
+
 			if (disjunctions[i].contains("&&")){
 				String[] conjunctions = strippedDisjunction.split(" \\) \\&\\& \\( ");
 				for (int j=0; j < conjunctions.length-1; j++){
@@ -731,40 +742,40 @@ public class QueryDialogue extends JPanel{
 				}
 				for (int j=0; j < conjunctions.length; j++){
 					String[] partedConjunction = partedComparison(conjunctions[j]);
-//					for (String s : partedConjunction){
-//						System.out.println(s);
-//					}
-					
+					//					for (String s : partedConjunction){
+					//						System.out.println(s);
+					//					}
+
 					//set the placeDropdown to the correct place
 					((JComboBox)conjunctionGroups.get(i).get(j).getComponent(0)).setSelectedItem(partedConjunction[0]);					
 
 					//set the relational symbol
 					((JComboBox)conjunctionGroups.get(i).get(j).getComponent(1)).setSelectedItem(partedConjunction[1]);
-					
+
 					//set the size
 					((JSpinner)conjunctionGroups.get(i).get(j).getComponent(2)).setValue(Integer.parseInt(partedConjunction[2]));
-					
+
 					//set andButton to pressed
 					if (j<conjunctions.length-1){
 						((JButton)conjunctionGroups.get(i).get(j).getComponent(3)).setSelected(true);
 					}
 				}
-				
+
 			}else{
 				String[] partedConjunction = partedComparison(strippedDisjunction);
-				
+
 				//set the placeDropdown to the correct place
 				((JComboBox)conjunctionGroups.get(i).get(0).getComponent(0)).setSelectedItem(partedConjunction[0]);					
 
 				//set the relational symbol
 				((JComboBox)conjunctionGroups.get(i).get(0).getComponent(1)).setSelectedItem(partedConjunction[1]);
-				
+
 				//set the size
 				((JSpinner)conjunctionGroups.get(i).get(0).getComponent(2)).setValue(Integer.parseInt(partedConjunction[2]));
 			}
 		}
 	}
-	
+
 	private String[] partedComparison(String comparison){
 		String[] toReturn = {"","",""};
 		if (comparison.contains("<=")){
@@ -818,10 +829,10 @@ public class QueryDialogue extends JPanel{
 		String name = getQueryComment();
 		int capacity = getCapacity();
 		String query = composeQuery();
-		
+
 		TAPNQuery.TraceOption traceOption = null;
 		String traceOptionString = getTraceOptions();
-		
+
 		if (traceOptionString.toLowerCase().contains("some")){
 			traceOption = TraceOption.SOME;
 		}else if (traceOptionString.toLowerCase().contains("fastest")){
@@ -829,10 +840,10 @@ public class QueryDialogue extends JPanel{
 		}else if (traceOptionString.toLowerCase().contains("no")){
 			traceOption = TraceOption.NONE;
 		}
-		
+
 		TAPNQuery.SearchOption searchOption = null;
 		String searchOptionString = getSearchOptions();
-		
+
 		if (searchOptionString.toLowerCase().contains("breadth")){
 			searchOption = SearchOption.BFS;
 		}else if (searchOptionString.toLowerCase().contains("depth") && (! searchOptionString.toLowerCase().contains("random")) ){
@@ -843,7 +854,7 @@ public class QueryDialogue extends JPanel{
 			searchOption = SearchOption.CLOSE_TO_TARGET_FIRST;
 		}
 
-/* these options are not yet supported		
+		/* these options are not yet supported		
 		TAPNQuery.HashTableSize hashTableSizeToSet = null;
 		String hashTableOptionString = getHashTableSize();
 		if (hashTableOptionString.equals("4 MB")){
@@ -857,7 +868,7 @@ public class QueryDialogue extends JPanel{
 		}else if (hashTableOptionString.equals("512 MB")){
 			hashTableSizeToSet = HashTableSize.MB_512;
 		}
-		
+
 		TAPNQuery.ExtrapolationOption extrapolationOptionToSet = null;
 		String extrapolationOptionString = getExtrapolationOption();
 		if (extrapolationOptionString.toLowerCase().equals("automatic")){
@@ -869,22 +880,26 @@ public class QueryDialogue extends JPanel{
 		}else if (extrapolationOptionString.toLowerCase().equals("use lower/upper extrapolation")){
 			extrapolationOptionToSet = ExtrapolationOption.LOW_UP;
 		}
-*/		
+		 */		
 		TAPNQuery.ReductionOption reductionOptionToSet = null;
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
-		
-		if (reductionOptionString.toLowerCase().equals("symmetry reduction")){
+
+		if (reductionOptionString.equals(name_NAIVESYM)){
 			reductionOptionToSet = ReductionOption.NAIVE_UPPAAL_SYM;
 		} else if (reductionOptionString.equals(name_ADVNOSYM)){
 			reductionOptionToSet = ReductionOption.ADV_NOSYM;
-		}else if (reductionOptionString.toLowerCase().contains("standard")){
+		}else if (reductionOptionString.equals(name_NAIVE)){
 			reductionOptionToSet = ReductionOption.NAIVE;
-		}else if (reductionOptionString.toLowerCase().contains("optimised symmetry reduction")){
+		}else if (reductionOptionString.equals(name_ADVSYM)){
 			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
+		}else if(reductionOptionString.equals(name_INHIBSTANDARD)){
+			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_STANDARD;
+		}else if(reductionOptionString.equals(name_INHIBSYM)){
+			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
 		}
-		
+
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
-		
+
 	}
 
 	private String getExtrapolationOption() {
@@ -892,7 +907,7 @@ public class QueryDialogue extends JPanel{
 		for (Object radioButton : extrapolationOptions.getComponents()){
 			if( (radioButton instanceof JRadioButtonMenuItem)){
 				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-			
+
 					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
 					break;
 				}
@@ -907,7 +922,7 @@ public class QueryDialogue extends JPanel{
 		for (Object radioButton : hashTableOptions.getComponents()){
 			if( (radioButton instanceof JRadioButtonMenuItem)){
 				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-			
+
 					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
 					break;
 				}
@@ -920,7 +935,7 @@ public class QueryDialogue extends JPanel{
 	private int getCapacity(){
 		return (Integer) ((JSpinner)capacityPanel.getComponent(1)).getValue();
 	}
-	
+
 	private String getQueryComment() {
 		return ((JTextField)namePanel.getComponent(1)).getText();
 	}
@@ -930,7 +945,7 @@ public class QueryDialogue extends JPanel{
 		for (Object radioButton : traceOptions.getComponents()){
 			if( (radioButton instanceof JRadioButtonMenuItem)){
 				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-			
+
 					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
 					break;
 				}
@@ -944,7 +959,7 @@ public class QueryDialogue extends JPanel{
 		for (Object radioButton : searchOptions.getComponents()){
 			if( (radioButton instanceof JRadioButtonMenuItem)){
 				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-			
+
 					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
 					break;
 				}
@@ -955,7 +970,7 @@ public class QueryDialogue extends JPanel{
 
 	private String composeQuery() {
 		String toReturn = "";
-		
+
 		if (existsDiamond.isSelected()){
 			toReturn = "E<>";
 		}else if (existsBox.isSelected()){
@@ -965,11 +980,11 @@ public class QueryDialogue extends JPanel{
 		}else if (forAllBox.isSelected()){
 			toReturn = "A[]";
 		}
-		
+
 		for (int i=0; i < conjunctionGroups.size(); i++){
 			toReturn = toReturn + "(";
 			for (int j=0; j < conjunctionGroups.get(i).size(); j++){
-				
+
 				toReturn = toReturn + "( " + ((JComboBox)conjunctionGroups.get(i).get(j).getComponent(0)).getSelectedItem() + " ";
 				if (((String)((JComboBox)conjunctionGroups.get(i).get(j).getComponent(1)).getSelectedItem()).equals("=")){
 					toReturn = toReturn + "== ";	
@@ -989,10 +1004,10 @@ public class QueryDialogue extends JPanel{
 				toReturn = toReturn + ")";
 			}
 		}
-		
+
 		return toReturn;
 	}
-	
+
 	private void exit(){
 		myRootPane.getParent().setVisible(false);
 	}
@@ -1000,7 +1015,7 @@ public class QueryDialogue extends JPanel{
 	private void addNewDisjunction() {
 		JPanel disjunctionGroup = newDisjunction();
 		disjunctionGroups.add(disjunctionGroup);
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = disjunctionsUsed;
@@ -1009,7 +1024,7 @@ public class QueryDialogue extends JPanel{
 
 		conjunctionsUsed.add(new Integer(0));
 		disjunctionsUsed++;
-		
+
 		me.pack();
 	}
 
@@ -1020,25 +1035,25 @@ public class QueryDialogue extends JPanel{
 		conjunctionGroups.remove(number+1);
 		disjunctionGroupToRemove.removeNotify();
 		disjunctionGroups.trimToSize();
-		
+
 		me.pack();
 	}
 
 	private void createNewConjunction(int inDisjunction){
 
 		JPanel conjunctionGroup = newConjunction(new Integer(inDisjunction));
-		
+
 		conjunctionGroups.get(inDisjunction).add(conjunctionGroup);
-		
+
 		conjunctionsUsed.set(inDisjunction, conjunctionsUsed.get(inDisjunction) + 1);
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		
+
 		gbc.gridx = conjunctionsUsed.get(inDisjunction);
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		((JPanel)markingSpecificsPanel.getComponent(inDisjunction)).add(conjunctionGroup, gbc);
-		
+
 		me.pack();
 	}
 	private void removeConjunction(JPanel conjunctionGroupToRemove){		
@@ -1048,33 +1063,33 @@ public class QueryDialogue extends JPanel{
 				disjunctionGroup.remove(conjunctionGroupToRemove);
 				conjunctionGroupToRemove.removeNotify();
 				disjunctionGroup.trimToSize();
-				
+
 				me.pack();
 			}
 		}
 	}
-	
+
 	private JPanel newDisjunction(){
 		JPanel disjunctionGroup = new JPanel(new GridBagLayout());
-		
+
 		JPanel conjunctionGroup = newConjunction(disjunctionsUsed);
-		
+
 		ArrayList<JPanel> conjunctionToInsert = new ArrayList<JPanel>();
 		conjunctionToInsert.add(conjunctionGroup);
 		conjunctionGroups.add(conjunctionToInsert);
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		disjunctionGroup.add(conjunctionGroup, gbc);
 
 		final JButton orButton = new JButton("OR");
-		
+
 		orButton.addActionListener(
 				new ActionListener(){
 					public void actionPerformed(ActionEvent evt) {
 						for (int i=0; i < disjunctionGroups.size(); i++) {
 							//component 1 is a button, with "OR" on it
 							if (disjunctionGroups.get(i).getComponent(1) == orButton){
-								
+
 								if ( ! orButton.isSelected() ){
 									orButton.setSelected(true);
 									//add a new disjunctionGroup.
@@ -1093,74 +1108,74 @@ public class QueryDialogue extends JPanel{
 						}
 					}
 				});
-		
+
 		//XXX - hacks
 		gbc.gridy = 10;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		disjunctionGroup.add(orButton, gbc);
-		
+
 		return disjunctionGroup;
 	}
-		
+
 	private JPanel newConjunction(final int disjunctionIndex){
-		
+
 		final JPanel conjunctionGroup = new JPanel(new FlowLayout());
-		
+
 		String[] relationalSymbols= {"=","<=","<",">=",">"};
 		int currentValue = 0;
 		int min = 0;
 		int step = 1;		
-		
+
 		String[] places = new String[datalayer.getPlaces().length];
 		for (int i=0; i< places.length; i++){
 			places[i] = datalayer.getPlaces()[i].getName();
 		}
 		JComboBox placesBox = new JComboBox(new DefaultComboBoxModel(places));
 		conjunctionGroup.add( placesBox );
-		
+
 		JComboBox relationalBox = new JComboBox(new DefaultComboBoxModel(relationalSymbols));
 		conjunctionGroup.add(relationalBox);
-		
+
 		JSpinner placeMarking = new JSpinner(new SpinnerNumberModel(currentValue, min, Integer.MAX_VALUE, step));
 		placeMarking.setMaximumSize(new Dimension(50,30));
 		placeMarking.setMinimumSize(new Dimension(50,30));
 		placeMarking.setPreferredSize(new Dimension(50,30));
-//		placeMarking.setVisible(visibility);
-		
+		//		placeMarking.setVisible(visibility);
+
 		conjunctionGroup.add(placeMarking);
 
 		final JButton andButton = new JButton("AND");
-//		andButton.setVisible(visibility);
-		
+		//		andButton.setVisible(visibility);
+
 		andActionListenerMap.put(conjunctionGroup, 
-				
+
 				new ActionListener() {
-					final int thisDisjunctionIndex = disjunctionIndex;
-					final JPanel thisConjunctionGroup = conjunctionGroup;
-					
-					public void actionPerformed(ActionEvent evt) {
+			final int thisDisjunctionIndex = disjunctionIndex;
+			final JPanel thisConjunctionGroup = conjunctionGroup;
 
-						JButton and = (JButton) thisConjunctionGroup.getComponent(3);
+			public void actionPerformed(ActionEvent evt) {
 
-						if ( ! and.isSelected() ){
-							and.setSelected(true);
-							//add a new conjunction in the orGroupIndex'th disjunction.
-							createNewConjunction(thisDisjunctionIndex);
-						}else {
-							removeConjunction( nextConjunctionGroup(thisConjunctionGroup) );
-							if ( conjunctionGroups.get(thisDisjunctionIndex).indexOf(thisConjunctionGroup)+1 == conjunctionGroups.get(thisDisjunctionIndex).size() ){
-								and.setSelected(false);
-							}
-						}								
+				JButton and = (JButton) thisConjunctionGroup.getComponent(3);
+
+				if ( ! and.isSelected() ){
+					and.setSelected(true);
+					//add a new conjunction in the orGroupIndex'th disjunction.
+					createNewConjunction(thisDisjunctionIndex);
+				}else {
+					removeConjunction( nextConjunctionGroup(thisConjunctionGroup) );
+					if ( conjunctionGroups.get(thisDisjunctionIndex).indexOf(thisConjunctionGroup)+1 == conjunctionGroups.get(thisDisjunctionIndex).size() ){
+						and.setSelected(false);
 					}
-				}
-				
+				}								
+			}
+		}
+
 		);
-		
+
 		andButton.addActionListener(andActionListenerMap.get(conjunctionGroup));
-		
+
 		conjunctionGroup.add(andButton);
-		
+
 		return conjunctionGroup;
 	}
 
@@ -1173,7 +1188,7 @@ public class QueryDialogue extends JPanel{
 		}
 		return null;
 	}
-	
+
 	public static TAPNQuery ShowUppaalQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent){
 		EscapableDialog guiDialog = 
 			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
@@ -1186,7 +1201,7 @@ public class QueryDialogue extends JPanel{
 		// 2 Add query editor
 		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent); 
 		contentPane.add( queryDialogue );
-		
+
 		guiDialog.setResizable(false);     
 
 		// Make window fit contents' preferred size
@@ -1195,11 +1210,11 @@ public class QueryDialogue extends JPanel{
 		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
-		
+
 		return  queryDialogue.getQuery();
 	}
 
-	
+
 	public String getQuantificationSelection() {
 		if (existsDiamond.isSelected()){
 			return "E<>";
@@ -1213,7 +1228,7 @@ public class QueryDialogue extends JPanel{
 			return "";
 		}
 	}
-	
+
 	private void quantificationRadioButtonChanged(ActionEvent arg0) {
 		// 
 		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
@@ -1221,7 +1236,7 @@ public class QueryDialogue extends JPanel{
 		} else {
 			enableAllReductionOptions();
 		}
-		
+
 	}
-	
+
 }

@@ -375,7 +375,7 @@ public class Verification {
 			}
 
 		} else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_UPPAAL_SYM){
-			
+					
 			AdvancedUppaalSym t = new AdvancedUppaalSym();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
@@ -392,6 +392,20 @@ public class Verification {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}		
+		
+		}else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_STANDARD){
+			dk.aau.cs.TAPN.ModelTransformer<dk.aau.cs.petrinet.TimedArcPetriNet, dk.aau.cs.TA.NTA> trans = 
+				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer();
+			
+			try{
+				dk.aau.cs.TA.NTA nta = trans.transform(model);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		} else {
 

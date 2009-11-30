@@ -41,12 +41,12 @@ public class NaiveDegree2Converter implements Degree2Converter {
 			TAPNPlace tmp = new TAPNPlace(p.getName(), ((TAPNPlace)p).getInvariant(), p.getCapacity());
 
 			oldToNewPlacesMap.put((TAPNPlace)p, tmp);
-			toReturn.addObject(tmp);
+			toReturn.addPlace(tmp);
 		}
 
 //		Create the P_lock place.
 		TAPNPlace lock = new TAPNPlace("P_lock", "", 0);
-		toReturn.addObject(lock);	
+		toReturn.addPlace(lock);	
 
 		// Add a tonek to the lock place 
 		toReturn.tokens.add(lock);
@@ -125,18 +125,18 @@ public class NaiveDegree2Converter implements Degree2Converter {
 			if (presetTransportArcs.size() > 0){
 
 				lastTransition = new TAPNTransition(t.getName() + "_T0");
-				toReturn.addObject(lastTransition);
+				toReturn.addTransition(lastTransition);
 				//Style the place
 				toReturn.locations.put(lastTransition, new Location(x, y));
 
-				toReturn.addObject(new TAPNArc(lock, lastTransition, ""));
+				toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
 //				Special attension if the preset only has cone
 				if (t.preset.size() == 1){
 
-					toReturn.addObject(new Arc(lastTransition, lock));
+					toReturn.add(new Arc(lastTransition, lock));
 
-					toReturn.addObject(new TAPNTransportArc(oldToNewPlacesMap.get(presetTransportArcs.get(0).getSource()), 
+					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap.get(presetTransportArcs.get(0).getSource()), 
 							lastTransition, 
 							oldToNewPlacesMap.get(t.getPostset().get(0).getTarget()),
 							((TAPNArc)t.getPreset().get(0)).getGuard()
@@ -149,7 +149,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 
 				holdingplace = new TAPNPlace(t.getName() +"_hp_0","",0);
-				toReturn.addObject(holdingplace);
+				toReturn.addPlace(holdingplace);
 
 //				//Do some styling of the places 
 				toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
@@ -157,7 +157,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 				holdingplacesTransport.add(holdingplace);
 
-				toReturn.addObject(new TAPNTransportArc(
+				toReturn.add(new TAPNTransportArc(
 						oldToNewPlacesMap.get((TAPNPlace)presetTransportArcs.get(0).getSource()), 
 						lastTransition, 
 						holdingplace,
@@ -171,7 +171,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					TAPNPlace orgplace = (TAPNPlace)presetTransportArcs.get(i).getSource();
 
 					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
-					toReturn.addObject(newtrans);
+					toReturn.addTransition(newtrans);
 
 					//Special handling if it is the last arc and there are no 
 					// arcs in the normal preset
@@ -179,18 +179,18 @@ public class NaiveDegree2Converter implements Degree2Converter {
 						holdingplace = oldToNewPlacesMap.get(presetTransportArcs.get(i).getTarget());
 					} else {
 						holdingplace = new TAPNPlace(t.getName() + "_hp"+j, "",0);
-						toReturn.addObject(holdingplace);
+						toReturn.addPlace(holdingplace);
 						holdingplacesTransport.add(holdingplace);
 					}
 
-					toReturn.addObject(new TAPNTransportArc(oldToNewPlacesMap.get(orgplace), newtrans, holdingplace, presetTransportArcs.get(i).getGuard()));
+					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap.get(orgplace), newtrans, holdingplace, presetTransportArcs.get(i).getGuard()));
 					connectTo.put(holdingplace, oldToNewPlacesMap.get((TAPNPlace)presetTransportArcs.get(i).getTarget()));
 
 					//The im places
 					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
-					toReturn.addObject(imPlace);
-					toReturn.addObject(new Arc(lastTransition,imPlace));
-					toReturn.addObject(new TAPNArc(imPlace, newtrans,""));
+					toReturn.addPlace(imPlace);
+					toReturn.add(new Arc(lastTransition,imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans,""));
 
 					lastTransition=newtrans;
 
@@ -208,8 +208,8 @@ public class NaiveDegree2Converter implements Degree2Converter {
 			} else {
 				//No transport arcs setup for normal arcs
 				lastTransition = new TAPNTransition(t.getName() + "_T0");
-				toReturn.addObject(lastTransition);
-				toReturn.addObject(new TAPNArc(lock, lastTransition, ""));
+				toReturn.addTransition(lastTransition);
+				toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
 				//Styling
 				toReturn.locations.put(lastTransition, new Location(x, y));
@@ -217,10 +217,10 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				//Special attension if the preset only has cone
 				if (t.preset.size() == 1){
 
-					toReturn.addObject(new Arc(lastTransition, lock));
+					toReturn.add(new Arc(lastTransition, lock));
 
-					toReturn.addObject(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
-					toReturn.addObject(new Arc(lastTransition, oldToNewPlacesMap.get(t.getPostset().get(0).getTarget())));
+					toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
+					toReturn.add(new Arc(lastTransition, oldToNewPlacesMap.get(t.getPostset().get(0).getTarget())));
 					continue;
 				}
 
@@ -228,7 +228,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 
 				holdingplace = new TAPNPlace(t.getName() +"_hp_0","",0);
-				toReturn.addObject(holdingplace);
+				toReturn.addPlace(holdingplace);
 
 //				//Do some styling of the places 
 
@@ -236,8 +236,8 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				x=x+transitionSizeX;
 
 				holdingplacesNormal.add(holdingplace);
-				toReturn.addObject(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
-				toReturn.addObject(new Arc(lastTransition, holdingplace));
+				toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
+				toReturn.add(new Arc(lastTransition, holdingplace));
 
 			}
 
@@ -256,21 +256,21 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					TAPNPlace orgplace = (TAPNPlace)oldToNewPlacesMap.get((TAPNPlace)presetNormalArcs.get(i).getSource());
 
 					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
-					toReturn.addObject(newtrans);
+					toReturn.addTransition(newtrans);
 
 
 					holdingplace = new TAPNPlace(t.getName() + "_hp"+j, "",0);
-					toReturn.addObject(holdingplace);
+					toReturn.addPlace(holdingplace);
 					holdingplacesNormal.add(holdingplace);
 
-					toReturn.addObject(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
-					toReturn.addObject(new Arc(newtrans, holdingplace));
+					toReturn.add(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
+					toReturn.add(new Arc(newtrans, holdingplace));
 
 					//The im places
 					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
-					toReturn.addObject(imPlace);
-					toReturn.addObject(new Arc(lastTransition,imPlace));
-					toReturn.addObject(new TAPNArc(imPlace, newtrans, ""));
+					toReturn.addPlace(imPlace);
+					toReturn.add(new Arc(lastTransition,imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
 					lastTransition=newtrans;
 
@@ -301,18 +301,18 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				orgplace = (TAPNPlace)oldToNewPlacesMap.get((TAPNPlace)presetNormalArcs.get(i).getSource());
 				j++;
 				newtrans = new TAPNTransition(t.getName() + "_T"+j);
-				toReturn.addObject(newtrans);
+				toReturn.addTransition(newtrans);
 
 				holdingplace = oldToNewPlacesMap.get((TAPNPlace)postsetNormalArcs.get(0).getTarget());
 
-				toReturn.addObject(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
-				toReturn.addObject(new Arc(newtrans, holdingplace));
+				toReturn.add(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
+				toReturn.add(new Arc(newtrans, holdingplace));
 
 				//The im places
 				imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
-				toReturn.addObject(imPlace);
-				toReturn.addObject(new Arc(lastTransition,imPlace));
-				toReturn.addObject(new TAPNArc(imPlace, newtrans, ""));
+				toReturn.addPlace(imPlace);
+				toReturn.add(new Arc(lastTransition,imPlace));
+				toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
 				lastTransition=newtrans;
 
@@ -327,16 +327,16 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					orgplace = (TAPNPlace)oldToNewPlacesMap.get((TAPNPlace)postsetNormalArcs.get(i+1).getTarget()); // Use 1 one as we have connected place 0 above
 
 					newtrans = new TAPNTransition(t.getName() + "_T"+j);
-					toReturn.addObject(newtrans);
+					toReturn.addTransition(newtrans);
 
-					toReturn.addObject(new TAPNArc(holdingplace, newtrans,""));
-					toReturn.addObject(new Arc(newtrans, orgplace));
+					toReturn.add(new TAPNArc(holdingplace, newtrans,""));
+					toReturn.add(new Arc(newtrans, orgplace));
 
 					//The im places
 					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
-					toReturn.addObject(imPlace);
-					toReturn.addObject(new Arc(lastTransition,imPlace));
-					toReturn.addObject(new TAPNArc(imPlace, newtrans,""));
+					toReturn.addPlace(imPlace);
+					toReturn.add(new Arc(lastTransition,imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans,""));
 
 					lastTransition=newtrans;
 
@@ -366,15 +366,15 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					TAPNPlace target = connectTo.get(holdingplace);
 
 					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
-					toReturn.addObject(newtrans);
+					toReturn.addTransition(newtrans);
 
-					toReturn.addObject(new TAPNTransportArc(holdingplace, newtrans,target));
+					toReturn.add(new TAPNTransportArc(holdingplace, newtrans,target));
 
 					//The im places
 					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
-					toReturn.addObject(imPlace);
-					toReturn.addObject(new Arc(lastTransition,imPlace));
-					toReturn.addObject(new TAPNArc(imPlace, newtrans,""));
+					toReturn.addPlace(imPlace);
+					toReturn.add(new Arc(lastTransition,imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans,""));
 					lastTransition=newtrans;
 
 //					Do some styling of the places 
@@ -384,7 +384,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				}
 
 			}
-			toReturn.addObject(new Arc(lastTransition,lock));
+			toReturn.add(new Arc(lastTransition,lock));
 
 
 		}
@@ -399,8 +399,8 @@ public class NaiveDegree2Converter implements Degree2Converter {
 		for (Map.Entry entry : oldToNewPlacesMap.entrySet()){
 			// XXX - Unsafe cast but ok by assumption
 			toReturn.addLocation((PlaceTransitionObject)entry.getValue(), model.locations.get(entry.getKey()));
-		}	
-
+		}		
+		
 		return toReturn;
 	}
 

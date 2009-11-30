@@ -38,7 +38,7 @@ public class PipeTapnToAauTapnTransformer {
 		for ( Place place : appModel.getPlaces() ) {
 			TAPNPlace aAUTimedPlace = new TAPNPlace(place.getName(),getInvariant(place), capacity);
 			PlaceTransitionObjectBookKeeper.put(place, aAUTimedPlace);
-			aAUPetriNet.addObject(aAUTimedPlace);
+			aAUPetriNet.addPlace(aAUTimedPlace);
 			
 			aAUPetriNet.addLocation(aAUTimedPlace, place.getX(), place.getY());
 			
@@ -50,7 +50,7 @@ public class PipeTapnToAauTapnTransformer {
 		for( Transition transition : appModel.getTransitions() ){
 			TAPNTransition aAUTransition = new TAPNTransition(transition.getName());
 			PlaceTransitionObjectBookKeeper.put(transition, aAUTransition);
-			aAUPetriNet.addObject(aAUTransition);
+			aAUPetriNet.addTransition(aAUTransition);
 			
 			aAUPetriNet.addLocation(aAUTransition, transition.getX(), transition.getY());
 			
@@ -88,7 +88,7 @@ public class PipeTapnToAauTapnTransformer {
 								getGuard(tmp));
 						
 						
-						aAUPetriNet.addObject(aAUArc);
+						aAUPetriNet.add(aAUArc);
 						aAUArc = null;
 					}
 				}
@@ -104,7 +104,7 @@ public class PipeTapnToAauTapnTransformer {
 			if (aAUArc != null){
 				aAUArc.setSource( (dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
 				aAUArc.setTarget( (dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
-				aAUPetriNet.addObject(aAUArc);
+				aAUPetriNet.add(aAUArc);
 			}
 		}
 		return aAUPetriNet;

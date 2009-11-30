@@ -12,9 +12,7 @@ import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
-import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
-import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.Transition;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.

@@ -233,7 +233,7 @@ implements ActionListener, Observer {
 			new FileAction("Export to Uppaal, Symetric","Export the to Uppaal format, with symetricreduction",""));
 		addMenuItem(exportMenu, exportToTest =
 			new FileAction("Export a Degree-2 net","Export the to Uppaal format",""));
-*/		fileMenu.add(exportMenu);
+	*/	fileMenu.add(exportMenu);
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction  =
 			new FileAction("Print",  "Print","ctrl P"));

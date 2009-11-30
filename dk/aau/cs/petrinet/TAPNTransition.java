@@ -39,7 +39,7 @@ public class TAPNTransition extends Transition {
 		this.isUrgens = urgent;
 	}
 
-	public boolean getisUrgens() {
+	public boolean isUrgent() {
 		return isUrgens;
 	}
 

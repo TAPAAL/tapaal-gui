@@ -3291,7 +3291,7 @@ implements Cloneable {
 
 		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
 		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
-		List<dk.aau.cs.petrinet.TAPNArc> arcs = model.getArcs();
+		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
 
 		// Add places
 		for (dk.aau.cs.petrinet.Place p : places){
@@ -3939,6 +3939,14 @@ implements Cloneable {
 
 	public void buildConstraints() {
 		constants.buildConstraints(placesArray,arcsArray);
-		
 	}	
+	
+	public boolean hasTAPNInhibitorArcs(){ // TODO: Fix this to make it faster
+		for(Arc arc : arcsArray){
+			if(arc instanceof TAPNInhibitorArc){
+				return true;
+			}
+		}
+		return false;
+	}
 }

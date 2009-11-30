@@ -37,7 +37,7 @@ public class TAPNTransportArc extends TAPNArc{
 			Logger.log("kyrke2!!! error" );
 		}
 	}
-
+	
 	public TAPNPlace getSource() {
 		return source;
 	}

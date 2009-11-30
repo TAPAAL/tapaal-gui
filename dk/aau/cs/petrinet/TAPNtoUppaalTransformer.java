@@ -67,7 +67,7 @@ public class TAPNtoUppaalTransformer {
 		
 		for (Transition t : model.getTransitions()){
 			
-			if (((TAPNTransition)t).getisUrgens()){
+			if (((TAPNTransition)t).isUrgent()){
 				uppaalXML.println("urgent chan " + t.getName() + ";\n");
 			} else {
 				uppaalXML.println("chan " + t.getName() + ";\n");
@@ -268,7 +268,7 @@ public class TAPNtoUppaalTransformer {
 				if (a instanceof TAPNTransportArc){
 					tmp.append("<target ref=\"a"+ transportarcplace.getID() +"\"/>\n");	
 					
-					if (((TAPNTransition)t).getisUrgens()){
+					if (((TAPNTransition)t).isUrgent()){
 						// Dont write guard if urgent transition... (uppaal cant handel it)
 						tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\"></label>\n");
 					} else {
@@ -278,7 +278,7 @@ public class TAPNtoUppaalTransformer {
 					tmp.append("<label kind=\"assignment\" x=\"64\" y=\"160\"></label>\n"); // No reset of clock
 				}else {
 					tmp.append("<target ref=\"a"+ nontransportplaces.get(0).getID() +"\"/>\n");
-					if (((TAPNTransition)t).getisUrgens()){
+					if (((TAPNTransition)t).isUrgent()){
 						// Dont write guard if urgent transition... (uppaal cant handel it)
 						tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\"></label>\n");
 					} else {
@@ -410,7 +410,7 @@ public class TAPNtoUppaalTransformer {
 				if (a instanceof TAPNTransportArc){
 					tmp.append("<target ref=\"a"+ transportarcplace.getID() +"\"/>\n");	
 					
-					if (((TAPNTransition)t).getisUrgens()){
+					if (((TAPNTransition)t).isUrgent()){
 						// Dont write guard if urgent transition... (uppaal cant handel it)
 						tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\"></label>\n");
 					} else {
@@ -420,7 +420,7 @@ public class TAPNtoUppaalTransformer {
 					tmp.append("<label kind=\"assignment\" x=\"64\" y=\"160\"></label>\n"); // No reset of clock
 				}else {
 					tmp.append("<target ref=\"a"+ nontransportplaces.get(0).getID() +"\"/>\n");
-					if (((TAPNTransition)t).getisUrgens()){
+					if (((TAPNTransition)t).isUrgent()){
 						// Dont write guard if urgent transition... (uppaal cant handel it)
 						tmp.append("<label kind=\"guard\" x=\"432\" y=\"64\"></label>\n");
 					} else {

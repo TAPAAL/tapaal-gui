@@ -33,10 +33,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 public class TAPN extends PetriNet implements TimedArcPetriNet {
 
-	LinkedList<TAPNPlace> places = new LinkedList<TAPNPlace>();
-	LinkedList<TAPNTransition> transitions = new LinkedList<TAPNTransition>();
+	List<TAPNPlace> places = new ArrayList<TAPNPlace>();
+	List<TAPNTransition> transitions = new ArrayList<TAPNTransition>();
 
-	LinkedList<Arc> arcs = new LinkedList<Arc>();
+	List<TAPNTransportArc> transportArcs = new ArrayList<TAPNTransportArc>();
+	List<TAPNInhibitorArc> inhibitorArcs = new ArrayList<TAPNInhibitorArc>();
+	List<TAPNArc> tapnArcs = new ArrayList<TAPNArc>();
+	List<Arc> normalArcs = new ArrayList<Arc>();
 	
 	public LinkedList<Place> tokens = new LinkedList<Place>();//Add each place for each token it has.
 
@@ -167,11 +170,11 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		
 	}
 
-	public void addObject(TAPNPlace p){
+	public void addPlace(TAPNPlace p){
 		places.add(p); 								  							
 	}
 
-	public void addObject(TAPNTransition t){
+	public void addTransition(TAPNTransition t){
 		transitions.add(t); 
 	}
 
@@ -184,72 +187,109 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 
 	}
 
+	private void updatePreAndPostSets(Arc a, PlaceTransitionObject source,
+			PlaceTransitionObject target) {
+		// Update model (places and transitions)
+		source.addPostset(a);
+		target.addPreset(a);
+	}
 
-	public void addObject(Arc a) throws Exception{
-
-		PlaceTransitionObject source = a.getSource();
-		PlaceTransitionObject target = a.getTarget();
-
+	private void checkArc(Arc a) {
+		if(!isArcValid(a)){
+			throw new IllegalArgumentException("The specified arc is not valid. Either it is missing a source or target, or the source or target could not be found.");
+		}
+	}
+	
+	private boolean isArcValid(Arc arc) {
+		PlaceTransitionObject source = arc.getSource();
+		PlaceTransitionObject target = arc.getTarget();
+		
 		if (source == null || target== null){
-			throw new Exception("Source or tageet cant be null");
+			return false;
 		}
 		
 		// Check that source and target exist
 		if (!(places.contains(source) || transitions.contains(source))){
-			throw new Exception("Source not found");
+			return false;
 		}
 
 		if (!(places.contains(target) || transitions.contains(target))){
-			throw new Exception("Target not found");	
+			return false;
 		}
-
-
-		if (a instanceof TAPNTransportArc) {
-
-			// TODO - check intermediate
-			TAPNTransportArc tmp = (TAPNTransportArc)a;
-
-			TAPNTransition tmp2 = tmp.getIntermediate();
-
-			tmp2.addPreset(a);
-			tmp2.addPostset(a);
-
-			arcs.add(tmp);
-
-
-		} else if (a instanceof TAPNArc) {
-
-			// Is arc consistent and valid?
-
-			if (!(source instanceof Place && target instanceof Transition)){
-				throw new Exception("Invalid source and target for this arc type");
-			}
-
-			TAPNArc temp = new TAPNArc((TAPNArc)a);
-
-			arcs.add(temp);			
-
-		} else if (a instanceof Arc ) {
-			if (!(source instanceof Transition && target instanceof Place)){
-				throw new Exception("Invalid source and target for this arc type");
-			}
-
-			Arc temp = new Arc(a);
-
-			arcs.add(temp);
-
-
-		} else {
-			throw new Exception("Arc type not supported");
-		}
-
-		// Update model (places and transitions)
-		source.addPostset(a);
-		target.addPreset(a);
-
-
+		
+		return true;
 	}
+	
+	// For backward compatibility with rest of code
+	public void add(Arc a) throws Exception{
+		if(a instanceof TAPNTransportArc){
+			addArc((TAPNTransportArc)a);
+		}else if(a instanceof TAPNInhibitorArc){
+			addArc((TAPNInhibitorArc)a);
+		}else if(a instanceof TAPNArc){
+			addArc((TAPNArc)a);
+		}else{
+			addArc(a);
+		}
+	}
+	
+	public void addArc(Arc a) throws Exception{
+		checkArc(a);
+		
+		PlaceTransitionObject source = a.getSource();
+		PlaceTransitionObject target = a.getTarget();
+		if (!(source instanceof Transition && target instanceof Place)){
+			throw new Exception("Invalid source and target for this arc type");
+		}
 
+		//Arc temp = new Arc(a); // Morten: Not sure why they copy it.. Shouldn't be necessary
+
+		normalArcs.add(a);
+
+		updatePreAndPostSets(a, source, target);
+	}
+	
+	public void addArc(TAPNTransportArc a) throws Exception{
+		checkArc(a);
+		
+		// TODO - check intermediate
+		TAPNTransition intermediate = a.getIntermediate();
+		intermediate.addPreset(a);
+		intermediate.addPostset(a);
+
+		transportArcs.add(a);
+		
+		updatePreAndPostSets(a, a.getSource(), a.getTarget());
+	}
+	
+	public void addArc(TAPNArc a) throws Exception{
+		// Is arc consistent and valid?
+		PlaceTransitionObject source = a.getSource();
+		PlaceTransitionObject target = a.getTarget();
+		if (!(source instanceof Place && target instanceof Transition)){
+			throw new IllegalArgumentException("Invalid source and target for this arc type");
+		}
+
+		//TAPNArc temp = new TAPNArc((TAPNArc)a); // Morten: Not sure why they copy it? Shouldn't be necessary
+
+		tapnArcs.add(a);
+		
+		updatePreAndPostSets(a, source, target);
+	}
+	
+	public void addArc(TAPNInhibitorArc a) throws Exception{
+		checkArc(a);
+		
+		PlaceTransitionObject source = a.getSource();
+		PlaceTransitionObject target = a.getTarget();
+		if(!(source instanceof Place && target instanceof Transition)){
+			throw new IllegalArgumentException("Invalid source and target for this arc type");
+		}
+		
+		inhibitorArcs.add(a);
+		
+		updatePreAndPostSets(a, source, target);
+	}
 
 
 	public void removeObject(PlaceTransitionObject pt) throws Exception{
@@ -299,8 +339,15 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 			tmp2.removeArc(a);
 			tmp2.removeArc(a);
 		}
-
-		return arcs.remove(a);
+		
+		if(a instanceof TAPNTransportArc){
+			return transportArcs.remove(a);
+		}else if(a instanceof TAPNInhibitorArc){
+			return inhibitorArcs.remove(a);
+		}else if(a instanceof TAPNArc){
+			return tapnArcs.remove(a);
+		}else
+			return normalArcs.remove(a);
 	}
 	
 	public List<Token> getTokens(){
@@ -316,15 +363,21 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 
 
 	public List<TAPNPlace> getPlaces(){
-		return (List<TAPNPlace>)places.clone();
+		return new ArrayList<TAPNPlace>(places);
 	}
 
 	public List<TAPNTransition> getTransitions(){
-		return (List<TAPNTransition>) transitions.clone();
+		return new ArrayList<TAPNTransition>(transitions);
 	}
 
-	public List<TAPNArc> getArcs(){
-		return (List<TAPNArc>) arcs.clone();
+	public List<Arc> getArcs(){
+		ArrayList<Arc> arcs = new ArrayList<Arc>(normalArcs);
+		
+		arcs.addAll(tapnArcs);
+		arcs.addAll(transportArcs);
+		arcs.addAll(inhibitorArcs);
+		
+		return arcs;
 	}
 
 
@@ -333,7 +386,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		// Add capacity place
 
 		TAPNPlace capacity = new TAPNPlace("P_capacity", "", 0);
-		addObject(capacity);
+		addPlace(capacity);
 
 		//Some styling
 		locations.put(capacity, new Location(100,400));
@@ -355,7 +408,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 					tmp.setSource(t);
 					tmp.setTarget(capacity);
 
-					addObject(tmp);
+					add(tmp);
 
 				}
 
@@ -370,7 +423,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 					tmp.setSource(capacity);
 					tmp.setTarget(t);
 
-					addObject(tmp);
+					add(tmp);
 
 				}
 
@@ -500,7 +553,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 			output.println("</rate>");
 			output.println("<timed>");
 			
-			if (((TAPNTransition)t).getisUrgens()){
+			if (((TAPNTransition)t).isUrgent()){
 				output.println("<value>true</value>"); // XXX - just a havck until PIPE/TAPN supports urgent transitions
 			} else {
 				output.println("<value>false</value>");
@@ -629,7 +682,6 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String command = "/tmp/script.sh";
 		try {
 			throw new IOException("dasd");
 			//	Process child = Runtime.getRuntime().exec(command);
@@ -709,4 +761,18 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		
 	}
 
+	@Override
+	public List<TAPNInhibitorArc> getInhibitorArcs() {
+		return inhibitorArcs;
+	}
+
+	@Override
+	public List<TAPNArc> getTAPNArcs() {
+		return tapnArcs;
+	}
+
+	@Override
+	public List<TAPNTransportArc> getTransportArcs() {
+		return transportArcs;
+	}
 }
