@@ -26,7 +26,9 @@ public interface TimedArcPetriNet {
 	List<TAPNTransportArc> getTransportArcs();
 	List<TAPNInhibitorArc> getInhibitorArcs();
 	List<TAPNArc>		   getTAPNArcs();
-	List<Arc> 			   getArcs();
+	List<Arc> 			   getNormalArcs();
 	
 	boolean isDegree2();
+	void convertToConservative() throws Exception;
+	TimedArcPetriNet toDegree2() throws Exception;
 }

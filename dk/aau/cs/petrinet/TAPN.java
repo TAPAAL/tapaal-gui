@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
+import dk.aau.cs.petrinet.degree2converters.InhibitorToPrioritiesDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.degree2minimal;
 
@@ -287,8 +288,6 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		}
 		
 		inhibitorArcs.add(a);
-		
-		updatePreAndPostSets(a, source, target);
 	}
 
 
@@ -437,6 +436,9 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	
 	public TAPN convertToDegree2() throws Exception{
 		
+		if(inhibitorArcs.size() > 0){
+			degree2converter = new InhibitorToPrioritiesDegree2Converter();
+		}
 		return degree2converter.transform(this);
 		
 	}
@@ -774,5 +776,15 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	@Override
 	public List<TAPNTransportArc> getTransportArcs() {
 		return transportArcs;
+	}
+	
+	@Override
+	public List<Arc> getNormalArcs(){
+		return normalArcs;
+	}
+
+	@Override
+	public TimedArcPetriNet toDegree2() throws Exception {
+		return convertToDegree2();
 	}
 }

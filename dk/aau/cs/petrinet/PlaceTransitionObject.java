@@ -69,10 +69,16 @@ ArrayList<Place> toReturn = new ArrayList<Place>();
 
 
 	protected void addPreset(Arc a){
+		if(a instanceof TAPNInhibitorArc){
+			throw new IllegalArgumentException("Inhibitor arcs should not be part of preset!");
+		}
 		preset.add(a);
 	}
 	
 	protected void addPostset(Arc a){
+		if(a instanceof TAPNInhibitorArc){
+			throw new IllegalArgumentException("Inhibitor arcs should not be part of preset!");
+		}
 		postset.add(a);
 	}
 

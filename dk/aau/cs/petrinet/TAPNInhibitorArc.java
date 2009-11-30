@@ -7,5 +7,8 @@ public class TAPNInhibitorArc extends TAPNArc {
 		super(source, target, guard);
 		
 	}
-
+	
+	public TAPNInhibitorArc(String guard){
+		super(guard);
+	}
 }

@@ -24,8 +24,18 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 
 
 	public NTA transform(TimedArcPetriNet model) throws Exception {
-		if(!model.isDegree2()) throw new IllegalArgumentException("model must be degree 2.");
+		try{
+			model.convertToConservative();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		TimedArcPetriNet degree2Model = model.toDegree2();
+		return transformToNTA(degree2Model);
+	}
 
+
+	private NTA transformToNTA(TimedArcPetriNet model) {
 		ArrayList<TimedAutomata> tas = new ArrayList<TimedAutomata>();
 
 		for(Token token : model.getTokens()){
@@ -47,7 +57,9 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 		createLocations(model, ta);
 		createTransitions(model, ta);
 		createPriorities(model, ta);
-
+		
+		ta.setDeclarations("clock x;");
+		ta.setInitLocation(placesToLocations.get(token.getPlace()));
 		return ta;
 	}
 

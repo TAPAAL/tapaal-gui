@@ -92,9 +92,8 @@ public class PipeTapnToAauTapnTransformer {
 						aAUArc = null;
 					}
 				}
-				
-				
-				
+			}else if(arc instanceof pipe.dataLayer.TAPNInhibitorArc){
+					aAUArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(getGuard((TimedArc)arc));	
 			}else if (arc instanceof TimedArc){
 				aAUArc = new TAPNArc(getGuard((TimedArc)arc));
 			}else if (arc instanceof NormalArc){
