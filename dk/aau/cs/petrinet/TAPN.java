@@ -288,6 +288,8 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		}
 		
 		inhibitorArcs.add(a);
+		
+		((TAPNTransition)target).addToInhibitorSet(a);
 	}
 
 

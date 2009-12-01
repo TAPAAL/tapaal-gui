@@ -3286,40 +3286,40 @@ implements Cloneable {
 	 */
 	public void createFromTAPN(TAPN model) {
 
-		double xcord = 10;
-		double ycord = 10;
-
-		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
-		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
-		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
-
-		// Add places
-		for (dk.aau.cs.petrinet.Place p : places){
-			Place tmp = new Place(xcord, ycord, ""+p.getID(), p.getName(), 10.0, 10.0, 0, 0, 0, 0);
-
-			addPlace(tmp);
-
-			xcord = xcord + 10;
-			ycord = ycord + 10;
-		}
-
-		// Add transitions
-		for (dk.aau.cs.petrinet.Transition t : transitions){
-			addTransition(new Transition(xcord, ycord, ""+t.getID(), t.getName(), 10.0, 10.0, 10.0, false, false, 1, 1));
-			xcord = xcord + 10;
-			ycord = ycord + 10;
-		}
-
-		// Add arcs
-		for (dk.aau.cs.petrinet.Arc a : arcs){
-
-
-
-		}
-
-		if (CreateGui.getApp()!=null) {
-			CreateGui.getApp().restoreMode();
-		}
+//		double xcord = 10;
+//		double ycord = 10;
+//
+//		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
+//		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
+//		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
+//
+//		// Add places
+//		for (dk.aau.cs.petrinet.TAPNPlace p : places){
+//			Place tmp = new Place(xcord, ycord, ""+p.getID(), p.getName(), 10.0, 10.0, 0, 0, 0, 0);
+//			TimedPlace tp = new TimedPlace(tmp, p.getInvariant());
+//			
+//			addPlace(tp);
+//
+//			xcord = xcord + 10;
+//			ycord = ycord + 10;
+//		}
+//
+//		// Add transitions
+//		for (dk.aau.cs.petrinet.TAPNTransition t : transitions){
+//			Transition trans = new Transition(xcord, ycord, ""+t.getID(), t.getName(), 10.0, 10.0, 10.0, false, false, 1, 1);
+//			addTransition(new TAPNTransition(trans));
+//			xcord = xcord + 10;
+//			ycord = ycord + 10;
+//		}
+//
+//		// Add arcs
+//		for (dk.aau.cs.petrinet.Arc a : arcs){
+//			
+//		}
+//
+//		if (CreateGui.getApp()!=null) {
+//			CreateGui.getApp().restoreMode();
+//		}
 
 	}
 

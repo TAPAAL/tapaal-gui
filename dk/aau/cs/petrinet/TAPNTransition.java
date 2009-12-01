@@ -1,4 +1,8 @@
 package dk.aau.cs.petrinet;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 
@@ -13,6 +17,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 public class TAPNTransition extends Transition {
 
 	boolean isUrgens = false;
+	private List<TAPNInhibitorArc> inhibs = new ArrayList<TAPNInhibitorArc>();
 	
 	public TAPNTransition(TAPNTransition t) {
 		// TODO Auto-generated constructor stub
@@ -47,6 +52,20 @@ public class TAPNTransition extends Transition {
 		this.isUrgens = urgens;
 	}
 	
+	public boolean hasInhibitorArcs(){
+		return inhibs.size() > 0;
+	}
 	
+	public void addToInhibitorSet(TAPNInhibitorArc a){
+		inhibs.add(a);
+	}
+	
+	public boolean removeFromInhibitorSet(TAPNInhibitorArc a){
+		return inhibs.remove(a);
+	}
+
+	public List<TAPNInhibitorArc> getInhibitorArcs() {
+		return inhibs;
+	}
 
 }
