@@ -8,6 +8,7 @@ import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.TimedAutomata;
 import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.PrioritizedTAPNTransition;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
@@ -17,9 +18,14 @@ import dk.aau.cs.petrinet.Token;
 
 public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPetriNet, NTA> {
 
+	private static final String TANAME = "Token";
 	private Hashtable<TAPNPlace, Location> placesToLocations = new Hashtable<TAPNPlace, Location>();
-	public TAPNToNTAStandardTransformer(){
+	private int extraTokens = 0;
+	private int taCount = 0;
+	private boolean usesPriorities = false;
 
+	public TAPNToNTAStandardTransformer(int extraNumberOfTokens){
+		extraTokens = extraNumberOfTokens;
 	}
 
 
@@ -29,8 +35,15 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
+
+		usesPriorities = model.getInhibitorArcs().size() != 0;
 		TimedArcPetriNet degree2Model = model.toDegree2();
+
+		for(int i = 0; i < extraTokens; i++){
+			Token token = new Token(model.getPlaceByName("P_capacity"));
+			degree2Model.addToken(token);
+		}
+
 		return transformToNTA(degree2Model);
 	}
 
@@ -44,10 +57,73 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 			tas.add(ta);
 		}
 
-		String systemDeclarations = "";
-		String globalDeclarations = "";
+		String systemDeclarations = createSystemDeclaration();
+		String globalDeclarations = createGlobalDeclarations(model);
 
+		taCount = 0;
+		placesToLocations.clear();
 		return new NTA(tas, systemDeclarations, globalDeclarations);
+	}
+
+
+	private String createSystemDeclaration() {
+		StringBuilder builder = new StringBuilder("system ");
+		for(int i = 0; i < taCount; i++){
+			builder.append(TANAME);
+			builder.append(i);
+
+			if(i != taCount-1){
+				builder.append(",");
+			}
+		}
+		builder.append(";");
+
+		return builder.toString();
+	}
+
+
+	private String createGlobalDeclarations(TimedArcPetriNet model) {
+		StringBuilder builder = new StringBuilder();
+
+		for(TAPNTransition t : model.getTransitions()){
+			if (t.isUrgent()){
+				builder.append("urgent ");
+			} 
+			
+			builder.append("chan ");
+			builder.append(t.getName());
+			builder.append(";\n");
+		}
+
+		if(usesPriorities){ // Make this work generally
+			StringBuilder low = new StringBuilder("chan priority ");
+			StringBuilder high = new StringBuilder();
+			
+			boolean highAddComma = false;
+			boolean lowAddComma = false;
+			for(TAPNTransition t : model.getTransitions()){
+				if(((PrioritizedTAPNTransition)t).getPriority() == 2){
+					high.append(t.getName());
+					if(highAddComma){
+						high.append(",");
+					}
+					highAddComma = true;
+				}else{
+					low.append(t.getName());
+					if(lowAddComma){
+						low.append(",");
+					}
+					lowAddComma = true;
+				}
+			}
+			
+			builder.append(low);
+			builder.append("<");
+			builder.append(high);
+			builder.append(";");
+		}
+		
+		return builder.toString();
 	}
 
 
@@ -56,53 +132,52 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 
 		createLocations(model, ta);
 		createTransitions(model, ta);
-		createPriorities(model, ta);
-		
+
 		ta.setDeclarations("clock x;");
+		ta.setName(TANAME + taCount);
 		ta.setInitLocation(placesToLocations.get(token.getPlace()));
+		taCount++;
 		return ta;
-	}
-
-
-	private void createPriorities(TimedArcPetriNet model, TimedAutomata ta) {
-		// TODO Auto-generated method stub
-
 	}
 
 
 	private void createTransitions(TimedArcPetriNet model, TimedAutomata ta) {
 		for(TAPNTransition transition : model.getTransitions()){
-			for(Arc presetArc : transition.getPreset()){
-				Arc usedPostSetArc = null;
-
-				for(Arc postsetArc : transition.getPostset()){
-					if(presetArc instanceof TAPNTransportArc){
-						if(postsetArc instanceof TAPNTransportArc && !(usedPostSetArc == postsetArc)){
-							Edge e = createEdge(transition,(TAPNArc)presetArc, postsetArc);
-							ta.addTransition(e);
-							usedPostSetArc = postsetArc;
-							break;
-						}
-					}else{
-						if(postsetArc != usedPostSetArc){
-							Edge e = createEdge(transition,(TAPNArc)presetArc, postsetArc);
-							ta.addTransition(e);
-							usedPostSetArc = postsetArc;
-							break;
-						}
-					}
-				}
-			}	
+			
 		}
+		
+		//		for(TAPNTransition transition : model.getTransitions()){
+//			for(Arc presetArc : transition.getPreset()){
+//				Arc usedPostSetArc = null;
+//
+//				for(Arc postsetArc : transition.getPostset()){
+//					if(presetArc instanceof TAPNTransportArc){
+//						if(postsetArc instanceof TAPNTransportArc && !(usedPostSetArc == postsetArc)){
+//							Edge e = createEdge(transition,(TAPNArc)presetArc, postsetArc, '!');
+//							ta.addTransition(e);
+//							usedPostSetArc = postsetArc;
+//							break;
+//						}
+//					}else{
+//						if(postsetArc != usedPostSetArc){
+//							Edge e = createEdge(transition,(TAPNArc)presetArc, postsetArc);
+//							ta.addTransition(e);
+//							usedPostSetArc = postsetArc;
+//							break;
+//						}
+//					}
+//				}
+//			}	
+//		}
 	}
 
 
-	private Edge createEdge(TAPNTransition transition, TAPNArc sourceArc, Arc destinationArc) {
+	private Edge createEdge(TAPNTransition transition, TAPNArc sourceArc, Arc destinationArc, char symbol) {
 		Location source = placesToLocations.get(sourceArc.getSource());
 		Location destination = placesToLocations.get(destinationArc.getSource());
 
 		String guard = createTransitionGuard(sourceArc.getGuard());
-		String sync = createSyncExpression(transition);
+		String sync = transition.getName() + symbol;
 		String update = createUpdateExpression(sourceArc);
 
 		Edge e = new Edge(source, destination, guard, sync, update);
@@ -116,10 +191,6 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 		}else{
 			return "";
 		}
-	}
-
-	private String createSyncExpression(TAPNTransition transition) {
-		return transition.getName() + "?";
 	}
 
 	private String createTransitionGuard(String guard) {
@@ -140,7 +211,7 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 
 		if(!splitGuard[1].equals("inf")){
 			builder.append(" && x ");
-			
+
 			if(secondDelim == ')'){
 				builder.append("<");
 			}else {
@@ -148,7 +219,7 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 			}
 			builder.append(splitGuard[1]);
 		}
-		
+
 		return builder.toString();
 	}
 

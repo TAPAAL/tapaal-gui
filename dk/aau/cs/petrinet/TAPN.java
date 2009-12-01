@@ -789,4 +789,9 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	public TimedArcPetriNet toDegree2() throws Exception {
 		return convertToDegree2();
 	}
+
+	@Override
+	public void addToken(Token token) {
+		tokens.add(token.getPlace());
+	}
 }
