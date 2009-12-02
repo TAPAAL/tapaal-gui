@@ -3,6 +3,7 @@ package dk.aau.cs.petrinet;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 

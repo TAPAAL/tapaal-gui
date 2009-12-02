@@ -1,4 +1,6 @@
 package dk.aau.cs.petrinet;
+
+
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 

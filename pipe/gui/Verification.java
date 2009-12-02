@@ -254,8 +254,8 @@ public class Verification {
 		
 		File xmlfile=null, qfile=null;
 		try {
-			xmlfile = File.createTempFile("verifyta", ".xml");
-			qfile = File.createTempFile("verifyta", ".q");
+			xmlfile = File.createTempFile( "verifyta", "test.xml", new File("C:\\Documents and Settings\\Morten Jacobsen\\Desktop"));
+			qfile = File.createTempFile("verifyta", ".q",new File("C:\\Documents and Settings\\Morten Jacobsen\\Desktop"));
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -394,12 +394,14 @@ public class Verification {
 			}		
 		
 		}else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_STANDARD){
-			dk.aau.cs.TAPN.ModelTransformer<dk.aau.cs.petrinet.TimedArcPetriNet, dk.aau.cs.TA.NTA> trans = 
+			dk.aau.cs.TAPN.TAPNToNTAStandardTransformer trans = 
 				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
 			
 			try{
-				dk.aau.cs.TA.NTA nta = trans.transform(model);
+				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
+				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
 			} catch (Exception e) {

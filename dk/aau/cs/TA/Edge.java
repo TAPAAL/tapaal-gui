@@ -101,4 +101,8 @@ public class Edge {
 		res.append("</transition>\n");
 		return res;
 	}
+	
+	public String toString(){
+		return "Edge from " + source.getID() + " to " + dest.getID() + ". Guard: " + guard + ", Sync: " + sync + ", Update: " + update;
+	}
 }

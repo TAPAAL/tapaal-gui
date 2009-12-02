@@ -2,21 +2,28 @@ package dk.aau.cs.TAPN;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
+import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomata;
+import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.PrioritizedTAPNTransition;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
+import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 
-public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPetriNet, NTA> {
+public class TAPNToNTAStandardTransformer 
+	implements ModelTransformer<TimedArcPetriNet, NTA>,
+			   QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	private static final String TANAME = "Token";
 	private Hashtable<TAPNPlace, Location> placesToLocations = new Hashtable<TAPNPlace, Location>();
@@ -29,7 +36,7 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 	}
 
 
-	public NTA transform(TimedArcPetriNet model) throws Exception {
+	public NTA transformModel(TimedArcPetriNet model) throws Exception {
 		try{
 			model.convertToConservative();
 		}catch(Exception e){
@@ -40,7 +47,7 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 		TimedArcPetriNet degree2Model = model.toDegree2();
 
 		for(int i = 0; i < extraTokens; i++){
-			Token token = new Token(model.getPlaceByName("P_capacity"));
+			Token token = new Token(degree2Model.getPlaceByName("P_capacity"));
 			degree2Model.addToken(token);
 		}
 
@@ -89,7 +96,7 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 			if (t.isUrgent()){
 				builder.append("urgent ");
 			} 
-			
+
 			builder.append("chan ");
 			builder.append(t.getName());
 			builder.append(";\n");
@@ -98,31 +105,33 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 		if(usesPriorities){ // Make this work generally
 			StringBuilder low = new StringBuilder("chan priority ");
 			StringBuilder high = new StringBuilder();
-			
-			boolean highAddComma = false;
-			boolean lowAddComma = false;
-			for(TAPNTransition t : model.getTransitions()){
-				if(((PrioritizedTAPNTransition)t).getPriority() == 2){
-					high.append(t.getName());
-					if(highAddComma){
+
+			boolean highHasElement = false;
+			boolean lowHasElement = false;
+			int size = model.getTransitions().size();
+			for(int i = 0; i < size; i++){
+				PrioritizedTAPNTransition t = (PrioritizedTAPNTransition)model.getTransitions().get(i);
+				if(t.getPriority() == 2){
+					if(highHasElement){
 						high.append(",");
 					}
-					highAddComma = true;
+					high.append(t.getName());
+					highHasElement = true;
 				}else{
-					low.append(t.getName());
-					if(lowAddComma){
+					if(lowHasElement){
 						low.append(",");
 					}
-					lowAddComma = true;
+					low.append(t.getName());
+					lowHasElement = true;
 				}
 			}
-			
+
 			builder.append(low);
-			builder.append("<");
+			builder.append("&lt;");
 			builder.append(high);
 			builder.append(";");
 		}
-		
+
 		return builder.toString();
 	}
 
@@ -143,45 +152,54 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 
 	private void createTransitions(TimedArcPetriNet model, TimedAutomata ta) {
 		for(TAPNTransition transition : model.getTransitions()){
+			char symbol = '!';
+			Arc usedPostSetArc = null;
 			
+			for(Arc presetArc : transition.getPreset()){ // at most two
+				for(Arc postsetArc : transition.getPostset()){
+					if(presetArc instanceof TAPNTransportArc){
+						if(postsetArc instanceof TAPNTransportArc && postsetArc != usedPostSetArc){
+							Edge e = createEdge(transition, (TAPNArc)presetArc, postsetArc, symbol);
+							ta.addTransition(e);
+							usedPostSetArc = postsetArc;
+							symbol = '?';
+							break;
+						}
+					}else{
+						if(!(postsetArc instanceof TAPNTransportArc) && postsetArc != usedPostSetArc){
+							Edge e = createEdge(transition, (TAPNArc)presetArc, postsetArc, symbol);
+							ta.addTransition(e);
+							usedPostSetArc = postsetArc;
+							symbol = '?'; // Makes next edge a ? edge
+							break;
+						}
+					}
+				}
+			}
 		}
-		
-		//		for(TAPNTransition transition : model.getTransitions()){
-//			for(Arc presetArc : transition.getPreset()){
-//				Arc usedPostSetArc = null;
-//
-//				for(Arc postsetArc : transition.getPostset()){
-//					if(presetArc instanceof TAPNTransportArc){
-//						if(postsetArc instanceof TAPNTransportArc && !(usedPostSetArc == postsetArc)){
-//							Edge e = createEdge(transition,(TAPNArc)presetArc, postsetArc, '!');
-//							ta.addTransition(e);
-//							usedPostSetArc = postsetArc;
-//							break;
-//						}
-//					}else{
-//						if(postsetArc != usedPostSetArc){
-//							Edge e = createEdge(transition,(TAPNArc)presetArc, postsetArc);
-//							ta.addTransition(e);
-//							usedPostSetArc = postsetArc;
-//							break;
-//						}
-//					}
-//				}
-//			}	
-//		}
 	}
 
 
 	private Edge createEdge(TAPNTransition transition, TAPNArc sourceArc, Arc destinationArc, char symbol) {
 		Location source = placesToLocations.get(sourceArc.getSource());
-		Location destination = placesToLocations.get(destinationArc.getSource());
+		Location destination = placesToLocations.get(destinationArc.getTarget());
 
 		String guard = createTransitionGuard(sourceArc.getGuard());
-		String sync = transition.getName() + symbol;
+		String sync = createSyncExpression(transition, symbol);
 		String update = createUpdateExpression(sourceArc);
 
 		Edge e = new Edge(source, destination, guard, sync, update);
 		return e;
+	}
+
+
+	private String createSyncExpression(TAPNTransition transition, char symbol) throws IllegalArgumentException {
+		if(transition.getPreset().size() == 1 && transition.getPostset().size() == 1){
+			return "";
+		}else if (transition.getPreset().size() == 2 && transition.getPostset().size() == 2) {
+			return transition.getName() + symbol;
+		}else
+			throw new IllegalArgumentException("The size of the transition's preset and postset does not match!");
 	}
 
 
@@ -194,7 +212,9 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 	}
 
 	private String createTransitionGuard(String guard) {
-		String[] splitGuard = guard.substring(1, guard.length()-2).split(",");
+		if(guard.equals("[0,inf)")) return "";
+		
+		String[] splitGuard = guard.substring(1, guard.length()-1).split(",");
 		char firstDelim = guard.charAt(0);
 		char secondDelim = guard.charAt(guard.length()-1);
 
@@ -242,6 +262,27 @@ public class TAPNToNTAStandardTransformer implements ModelTransformer<TimedArcPe
 		}
 
 		return inv;
+	}
+
+
+	@Override
+	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
+		String query = tapnQuery.toString();
+		
+		Pattern pattern = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*");
+		Matcher matcher = pattern.matcher(query);
+		
+		StringBuilder builder = new StringBuilder("(");
+		for(int i = 0; i < tapnQuery.getTotalTokens(); i++){
+			if(i > 0){
+				builder.append(" + ");
+			}
+			builder.append(TANAME);
+			builder.append(i);
+			builder.append(".$1");
+		}
+		builder.append(") $2 $3");
+		return new StandardUPPAALQuery(matcher.replaceAll(String.format(builder.toString())));
 	}
 
 }

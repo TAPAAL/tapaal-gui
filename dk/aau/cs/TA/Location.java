@@ -1,6 +1,5 @@
 package dk.aau.cs.TA;
 
-import dk.aau.cs.petrinet.TAPNPlace;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
@@ -95,5 +94,9 @@ public class Location {
 		res.append("</location>\n");
 		
 		return res;
+	}
+	
+	public String toString(){
+		return "Location " + name +". Invariant: " + invariant + ", Committed: " + isCommitted + ", Urgent: " + isUrgent;
 	}
 }

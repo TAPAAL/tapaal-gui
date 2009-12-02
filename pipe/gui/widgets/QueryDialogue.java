@@ -527,8 +527,8 @@ public class QueryDialogue extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				if (reductionOption.getSelectedItem() != null){
 					if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVESYM) 
-						|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM) 
-						|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) ){
+						|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM)){
+						//|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) ){
 						none.setSelected(true);
 						disableTraceOptions();
 					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) 
@@ -706,7 +706,7 @@ public class QueryDialogue extends JPanel{
 			}
 		}else {
 			reductionOption.addItem(name_INHIBSTANDARD);
-			reductionOption.addItem(name_INHIBSYM);
+			//reductionOption.addItem(name_INHIBSYM);
 		}
 	}
 
@@ -894,9 +894,10 @@ public class QueryDialogue extends JPanel{
 			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
 		}else if(reductionOptionString.equals(name_INHIBSTANDARD)){
 			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_STANDARD;
-		}else if(reductionOptionString.equals(name_INHIBSYM)){
-			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
 		}
+//			else if(reductionOptionString.equals(name_INHIBSYM)){
+//			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
+//		}
 
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
 

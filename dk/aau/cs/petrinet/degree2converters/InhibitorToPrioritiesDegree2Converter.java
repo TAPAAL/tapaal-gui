@@ -14,6 +14,7 @@ import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.petrinet.Token;
 
 public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 
@@ -26,7 +27,8 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 	private static final String HOLDING_PLACE_FORMAT = "P_hp_%1$s_%2$d";
 	private static final String P_T_IN_FORMAT = "P_" + T_I_IN_FORMAT;
 	private static final String P_T_OUT_FORMAT = "P_" + T_I_OUT_FORMAT;
-	private final String PLOCK = "P_lock";
+	private static final String PLOCK = "P_lock";
+	private static final String PCAPACITY = "P_capacity";
 
 	private static final int LOW = 1;
 	private static final int HIGH = 2;
@@ -49,9 +51,11 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 			createSimulationOfTransition(transition, tapn);
 		}
 		
-		for(Place p : model.getPlaces()){
-			tapn.tokens.add((Place)nameToPTO.get(p.getName()));
+		for(Token token : model.getTokens()){
+			tapn.addToken(new Token((Place)nameToPTO.get(token.getPlace().getName())));
 		}
+		
+		tapn.addToken(new Token((Place)nameToPTO.get(PLOCK)));
 
 		nameToPTO.clear();
 		return tapn;
@@ -92,7 +96,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 			lastPTO = pt;
 
 			String holdingPlace = String.format(HOLDING_PLACE_FORMAT, transitionName,i);
-			addPlace(degree2Net, holdingPlace, LTEQ_ZERO, 0);
+			addPlace(degree2Net, holdingPlace, LT_INF, 0);
 		}
 
 
@@ -198,7 +202,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 				addTransition(degree2Net, zerotest, HIGH);
 
 				addTAPNArc(degree2Net, pcheck, zerotest, ZERO_INF_GUARD);
-
+				addNormalArc(degree2Net, zerotest, PCAPACITY);
 				addTransportArc(degree2Net, inhib.getSource().getName(), zerotest, inhib.getSource().getName(), inhib.getGuard());
 			}			
 		}else{
