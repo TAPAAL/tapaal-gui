@@ -1,5 +1,6 @@
 package dk.aau.cs.petrinet.degree2converters;
 
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -41,8 +42,15 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 
 	@Override
 	public TAPN transform(TAPN model) throws Exception { // TODO: use interface instead of TAPN
-		if(model.isDegree2()) return model;
+		if(model.isDegree2() && model.getInhibitorArcs().size() == 0) return model;
 
+		try{
+			model.convertToConservative();
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
+		
 		TAPN tapn = new TAPN(); 
 
 		createInitialPlaces(model, tapn);
@@ -50,12 +58,12 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 		for(TAPNTransition transition : model.getTransitions()){
 			createSimulationOfTransition(transition, tapn);
 		}
-		
+
 		List<Token> tokens = model.getTokens();
 		for(Token token : tokens){
 			tapn.addToken(new Token((TAPNPlace) nameToPTO.get(token.getPlace().getName())));
 		}
-		
+
 		tapn.addToken(new Token((TAPNPlace)nameToPTO.get(PLOCK)));
 
 		nameToPTO.clear();
@@ -73,15 +81,14 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 	private void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 		createRingStructure(transition, degree2Net);
 		createInhibitorArcSimulation(transition, degree2Net);
-		createArcsForPreset(transition, degree2Net);
-		createArcsForPostset(transition, degree2Net);
+		createArcs(transition, degree2Net);
 	}
 
 	private void createRingStructure(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 		String transitionName = transition.getName();
 		int transitionsToCreate = 2 * transition.getPreset().size() - 1;
 		String lastPTO = null;		
-		
+
 		// create t^i_in (with corresponding places)
 		for(int i = 1; i <= (transitionsToCreate-1)/2; i++){
 			String tiin = String.format(T_I_IN_FORMAT, transitionName, i);
@@ -125,66 +132,94 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 		addNormalArc(degree2Net, lastPTO, PLOCK);
 	}
 
-	private void createArcsForPostset(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
+	private void createArcs(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception{
+		HashSet<Arc> usedFromPostSet = new HashSet<Arc>();
+
+		for(int i = 1; i <= transition.getPreset().size(); i++){
+			Arc presetArc = transition.getPreset().get(i-1);
+
+			if(presetArc instanceof TAPNTransportArc){
+				addSimulationOfPresetPostsetPairing(degree2Net, transition, i, (TAPNTransportArc)presetArc);
+				usedFromPostSet.add(presetArc);
+			}else{
+				for(Arc postsetArc : transition.getPostset()){
+					if(!usedFromPostSet.contains(postsetArc)){
+						addSimulationOfPresetPostsetPairing(degree2Net, transition, i, (TAPNArc)presetArc, postsetArc);
+						usedFromPostSet.add(postsetArc);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	private void addSimulationOfPresetPostsetPairing(TimedArcPetriNet degree2Net, TAPNTransition transition, int i,
+			TAPNArc presetArc, Arc postsetArc) throws Exception {
 		String transitionName = transition.getName();
 		
-		for(int i = 0; i < transition.getPostset().size(); i++){
-			Arc arc = transition.getPostset().get(i);
+		if(i == transition.getPreset().size()){
+			addTAPNArc(degree2Net, 
+					presetArc.getSource().getName(),
+					String.format(T_MAX_FORMAT, transitionName, i),
+					presetArc.getGuard());
+			addNormalArc(degree2Net, 
+					String.format(T_MAX_FORMAT, transitionName, i),
+					postsetArc.getTarget().getName());
+		}else{
+			String trans = String.format(T_I_IN_FORMAT, transitionName, i);
+			String pholding = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
 
-			if(!(arc instanceof TAPNTransportArc)){
-				String tiout = i == transition.getPostset().size() - 1 ? String.format(T_MAX_FORMAT, transitionName, i+1)
-						: String.format(T_I_OUT_FORMAT, transitionName, i+1);
-				if(i < transition.getPostset().size()-1){
-					addTAPNArc(degree2Net, 
-							String.format(HOLDING_PLACE_FORMAT, transitionName, i+1),
-							tiout, 
-							ZERO_INF_GUARD);
-				}
-				addNormalArc(degree2Net, 
-						tiout,
-						arc.getTarget().getName());				
-			}
+			addTAPNArc(degree2Net, 
+					presetArc.getSource().getName(),
+					trans,
+					presetArc.getGuard());
+			addNormalArc(degree2Net,
+					trans,
+					pholding);
+			
+			trans = String.format(T_I_OUT_FORMAT, transitionName, i);
+			addTAPNArc(degree2Net, 
+					pholding,
+					trans,
+					ZERO_INF_GUARD);
+			addNormalArc(degree2Net,
+					trans,
+					postsetArc.getTarget().getName());
 		}
 	}
 
-	private void createArcsForPreset(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
+	private void addSimulationOfPresetPostsetPairing(TimedArcPetriNet degree2Net, TAPNTransition transition, int i,
+			TAPNTransportArc presetArc) throws Exception {
 		String transitionName = transition.getName();
-		for(int i = 0; i < transition.getPreset().size(); i++){
-			Arc arc = transition.getPreset().get(i);
+		if(i == transition.getPreset().size()){
+			addTransportArc(degree2Net, 
+					presetArc.getSource().getName(),
+					String.format(T_MAX_FORMAT, transitionName, i),
+					presetArc.getTarget().getName(),
+					presetArc.getGuard());
+		}else{
+			String trans = String.format(T_I_IN_FORMAT, transitionName, i);
+			String pholding = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
 
-			String tiin = i == transition.getPreset().size()-1 ? String.format(T_MAX_FORMAT, transitionName, i+1) 
-					: String.format(T_I_IN_FORMAT, transitionName, i+1);
-			String pholding = String.format(HOLDING_PLACE_FORMAT, transitionName, i+1);
+			addTransportArc(degree2Net, 
+					presetArc.getSource().getName(),
+					trans,
+					pholding,
+					presetArc.getGuard());
 
-			if(arc instanceof TAPNTransportArc){
-				addTransportArc(degree2Net, 
-						arc.getSource().getName(),
-						tiin,
-						pholding,
-						((TAPNTransportArc)arc).getGuard());
-				addTransportArc(degree2Net, 
-						pholding,
-						String.format(T_I_OUT_FORMAT, transitionName, i+1),
-						arc.getTarget().getName(),
-						ZERO_INF_GUARD);
-			}else{
-				addTAPNArc(degree2Net, 
-						arc.getSource().getName(),
-						tiin, 
-						((TAPNArc)arc).getGuard());
-
-				if(i < transition.getPreset().size()-1){
-					addNormalArc(degree2Net, 
-							tiin,
-							pholding);
-				}
-			}
+			trans = String.format(T_I_OUT_FORMAT, transitionName, i);
+			addTransportArc(degree2Net, 
+					pholding,
+					trans,
+					presetArc.getTarget().getName(),
+					presetArc.getGuard());
 		}
 	}
+
 
 	private void createInhibitorArcSimulation(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 		String transitionName = transition.getName();
-		
+
 		if(transition.hasInhibitorArcs()){
 			String pcheck = String.format(P_CHECK_FORMAT,transitionName);
 			addPlace(degree2Net, pcheck, LTEQ_ZERO, 0);
@@ -211,8 +246,8 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 			addTAPNArc(degree2Net, PLOCK, tiin, ZERO_INF_GUARD);
 		}
 	}
-	
-	
+
+
 	/*
 	 * Helper methods to create arcs, places and transitions from parameters
 	 */

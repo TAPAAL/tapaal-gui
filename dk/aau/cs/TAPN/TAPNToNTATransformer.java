@@ -47,11 +47,6 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	public NTA transformModel(TimedArcPetriNet model) throws Exception{
-		try{
-			model.convertToConservative();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 		usesPriorities = model.getInhibitorArcs().size() != 0;
 		TimedArcPetriNet degree2Model = model.toDegree2();
 
