@@ -100,4 +100,12 @@ public class Location {
 	public String toString(){
 		return "Location " + name +". Invariant: " + invariant + ", Committed: " + isCommitted + ", Urgent: " + isUrgent;
 	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
 }

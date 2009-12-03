@@ -39,6 +39,7 @@ import dk.aau.cs.TA.FiringAction;
 import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UppaalTrace;
+import dk.aau.cs.TAPN.TAPNToNTATransformer;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
@@ -394,7 +395,7 @@ public class Verification {
 			}		
 		
 		}else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_STANDARD){
-			dk.aau.cs.TAPN.TAPNToNTAStandardTransformer trans = 
+			TAPNToNTATransformer trans = 
 				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
 			
 			try{

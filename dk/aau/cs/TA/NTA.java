@@ -2,10 +2,11 @@ package dk.aau.cs.TA;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class NTA 
 {
-	private ArrayList<TimedAutomata> automata;
+	private List<TimedAutomata> automata;
 	
 	private String globalDeclarations = "";
 	private String systemDeclarations = "";
@@ -14,12 +15,12 @@ public class NTA
 		automata = new ArrayList<TimedAutomata>();
 	}
 	
-	public NTA(ArrayList<TimedAutomata> automata)
+	public NTA(List<TimedAutomata> automata)
 	{
 		this.automata = automata;	
 	}
 	
-	public NTA(ArrayList<TimedAutomata> automata, String systemDeclarations, String globalDeclarations)
+	public NTA(List<TimedAutomata> automata, String systemDeclarations, String globalDeclarations)
 	{
 		this(automata);
 		
@@ -27,7 +28,7 @@ public class NTA
 		this.globalDeclarations = globalDeclarations;
 	}
 	
-	public ArrayList<TimedAutomata> getTimedAutomata()
+	public List<TimedAutomata> getTimedAutomata()
 	{
 		return automata;
 	}

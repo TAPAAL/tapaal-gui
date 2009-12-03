@@ -2,6 +2,7 @@ package dk.aau.cs.TAPN;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
@@ -61,7 +62,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	private NTA transformToNTA(TimedArcPetriNet model) {
-		ArrayList<TimedAutomata> tas = createAutomata(model);
+		List<TimedAutomata> tas = createAutomata(model);
 		String system = createSystemDeclaration();
 		String decl = createGlobalDeclarations(model);
 
@@ -119,8 +120,17 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	protected abstract ArrayList<TimedAutomata> createAutomata(TimedArcPetriNet model);
+	protected abstract List<TimedAutomata> createAutomata(TimedArcPetriNet model);
 	protected abstract String createSystemDeclaration();
+
+	protected String convertInvariant(String invariant) {
+		String inv = "";
+		if(!invariant.equals("<inf")){
+			inv = invariant.replace("<", "&lt;");
+		}
+	
+		return inv;
+	}
 
 
 }

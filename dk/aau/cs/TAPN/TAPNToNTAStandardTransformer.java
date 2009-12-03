@@ -30,7 +30,7 @@ extends TAPNToNTATransformer{
 	}
 
 	@Override
-	protected ArrayList<TimedAutomata> createAutomata(TimedArcPetriNet model) {
+	protected List<TimedAutomata> createAutomata(TimedArcPetriNet model) {
 		ArrayList<TimedAutomata> tas = new ArrayList<TimedAutomata>();
 
 		List<Token> tokens = model.getTokens();
@@ -187,16 +187,6 @@ extends TAPNToNTATransformer{
 			ta.addLocation(l);
 			addLocationMapping(p.getName(), l);
 		}
-	}
-
-
-	private String convertInvariant(String invariant) {
-		String inv = "";
-		if(!invariant.equals("<inf")){
-			inv = invariant.replace("<", "&lt;");
-		}
-
-		return inv;
 	}
 
 
