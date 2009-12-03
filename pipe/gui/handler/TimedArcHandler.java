@@ -10,11 +10,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TransportArc;
 import pipe.gui.CreateGui;
-import pipe.gui.action.EditTimeIntervalAction;
 import pipe.gui.action.SplitArcAction;
 
 public class TimedArcHandler extends ArcHandler{
@@ -23,6 +21,7 @@ public class TimedArcHandler extends ArcHandler{
 		super(contentpane, obj);
 		enablePopup = true;
 	}
+	@Override
 	public JPopupMenu getPopup(MouseEvent e) {
 		int popupIndex = 0;
 		JMenuItem menuItem;

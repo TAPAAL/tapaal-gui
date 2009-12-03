@@ -158,7 +158,8 @@ public abstract class  Arc
     * Get id
     * @return String value for Arc id;
     */
-   public String getId() {
+   @Override
+public String getId() {
       if(id != null) {
          return id;
       } else {
@@ -170,7 +171,8 @@ public abstract class  Arc
    }
    
    
-   public String getName() {
+   @Override
+public String getName() {
       return getId();
    }
    
@@ -272,7 +274,8 @@ public abstract class  Arc
    }
    
    
-   public boolean contains(int x, int y) {
+   @Override
+public boolean contains(int x, int y) {
       point = new Point2D.Double(
                x + myPath.getBounds().getX() - COMPONENT_DRAW_OFFSET - zoomGrow,
                y + myPath.getBounds().getY() - COMPONENT_DRAW_OFFSET - zoomGrow);
@@ -288,7 +291,8 @@ public abstract class  Arc
    }
 
    
-   public void addedToGui() {
+   @Override
+public void addedToGui() {
       // called by GuiView / State viewer when adding component.
       deleted = false;    
       markedAsDeleted = false;
@@ -305,7 +309,8 @@ public abstract class  Arc
    }
 
    
-   public void delete() {
+   @Override
+public void delete() {
       if (!deleted) {
          if (getParent() != null) {
             getParent().remove(weightLabel);
@@ -371,7 +376,8 @@ EOC*/
    }
    
 
-   public int getLayerOffset() {
+   @Override
+public int getLayerOffset() {
       return Pipe.ARC_LAYER_OFFSET;
    }   
    
@@ -394,7 +400,8 @@ EOC*/
    }
    
    
-   public void undelete(DataLayer model, GuiView view) {
+   @Override
+public void undelete(DataLayer model, GuiView view) {
       if (this.isDeleted()) {
          model.addPetriNetObject(this);
          view.add(this);
@@ -407,8 +414,9 @@ EOC*/
    /**
     * Method to clone an Arc object
     */
-   public PetriNetObject clone() { 
-      return (Arc) super.clone();
+   @Override
+public PetriNetObject clone() { 
+      return super.clone();
    }   
 
 }

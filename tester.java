@@ -1,17 +1,4 @@
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-
-
-import dk.aau.cs.TA.DiscreetFiringAction;
-import dk.aau.cs.TA.FiringAction;
-import dk.aau.cs.TA.SymbolicUppaalTrace;
-import dk.aau.cs.TA.TimeDelayFiringAction;
-import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.TAPNPlace;
 
 
 public class tester {

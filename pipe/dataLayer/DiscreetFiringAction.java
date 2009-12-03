@@ -3,7 +3,6 @@ package pipe.dataLayer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class DiscreetFiringAction implements FiringAction {
 

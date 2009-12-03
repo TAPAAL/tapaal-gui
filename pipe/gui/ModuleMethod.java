@@ -39,7 +39,8 @@ public class ModuleMethod {
    
    
    /** Returns the name of the modMeth */
-   public String toString() {
+   @Override
+public String toString() {
       return name;
    }
    

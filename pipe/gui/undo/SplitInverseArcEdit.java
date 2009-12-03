@@ -23,13 +23,15 @@ public class SplitInverseArcEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arc.join();
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       arc.split();
    }
    

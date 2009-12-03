@@ -167,7 +167,8 @@ EOC*/
    }
  EOC*/  
       
-   public UndoableEdit setWeight(int weightInput){
+   @Override
+public UndoableEdit setWeight(int weightInput){
       int oldWeight = weight;
 
       weight = weightInput;
@@ -347,7 +348,8 @@ EOC*/
    }
   
 
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2 = (Graphics2D)g;   
 
@@ -397,7 +399,8 @@ EOC*/
       g2.transform(reset);   
    }   
 
-   public NormalArc clone(){
+   @Override
+public NormalArc clone(){
 
 	   NormalArc toReturn = (NormalArc)super.clone();
 	   toReturn.setTagged(tagged);

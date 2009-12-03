@@ -23,13 +23,15 @@ public class TransitionTimingEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.setTimed(!transition.isTimed());
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.setTimed(!transition.isTimed());
    }
    

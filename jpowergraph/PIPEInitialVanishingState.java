@@ -31,7 +31,8 @@ public class PIPEInitialVanishingState
     }
    
    
-   public String getNodeType() {
+   @Override
+public String getNodeType() {
       return "Vanishing State (Initial State)";
     }      
    

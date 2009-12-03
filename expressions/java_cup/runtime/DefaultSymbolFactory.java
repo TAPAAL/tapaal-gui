@@ -26,7 +26,8 @@ public class DefaultSymbolFactory implements SymbolFactory{
      * replaced by the new java_cup.runtime.ComplexSymbolFactory
      */
     //@deprecated 
-    public DefaultSymbolFactory(){
+    @Deprecated
+	public DefaultSymbolFactory(){
     }
     public Symbol newSymbol(String name ,int id, Symbol left, Symbol right, Object value){
         return new Symbol(id,left,right,value);

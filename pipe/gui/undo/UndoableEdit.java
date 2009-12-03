@@ -16,7 +16,8 @@ public abstract class UndoableEdit {
 
    
    // used for debug purposes
-   public String toString(){
+   @Override
+public String toString(){
       return this.getClass().toString();
    }
    

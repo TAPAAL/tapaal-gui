@@ -69,6 +69,7 @@ public class TimedArc extends NormalArc{
 		return new ArcTimeIntervalEdit(this, oldTimeInterval, this.timeInterval);
 	}
 	//hacks - I use the weight to display the TimeInterval
+	@Override
 	public void updateWeightLabel(){   
 		weightLabel.setText(timeInterval);
 
@@ -76,6 +77,7 @@ public class TimedArc extends NormalArc{
 	}
 	
 	
+	@Override
 	public TimedArc copy(){
 		NormalArc copy = new NormalArc(this);
 		copy.setSource(this.getSource());
@@ -84,6 +86,7 @@ public class TimedArc extends NormalArc{
 		return timedCopy;
 	}
 	
+	@Override
 	public TimedArc paste(double despX, double despY, boolean toAnotherView){
 		NormalArc copy = new NormalArc(this);
 		copy.setSource(this.getSource());
@@ -149,6 +152,7 @@ public class TimedArc extends NormalArc{
 		return satisfies;
 	}
 	
+	@Override
 	public void setWeightLabelPosition() {
 		weightLabel.setPosition(
 				(int)(myPath.midPoint.x) + weightLabel.getWidth()/2 - 4, 

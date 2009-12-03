@@ -28,7 +28,7 @@ public class TransportArc extends TimedArc {
 		updateWeightLabel();
 	}
 	public TransportArc(TimedArc timedArc, int group, boolean isInPreSet) {
-		super((NormalArc) timedArc, timedArc.getGuard());
+		super(timedArc, timedArc.getGuard());
 		this.isInPreSet = isInPreSet;
 		setHead();
 		this.group = group;
@@ -56,6 +56,7 @@ public class TransportArc extends TimedArc {
 		return group;
 	}
 	
+	@Override
 	public void updateWeightLabel(){   
 		if (isInPreSet){
 		weightLabel.setText(timeInterval+" : "+group);
@@ -65,6 +66,7 @@ public class TransportArc extends TimedArc {
 		this.setWeightLabelPosition();
 	}
 	
+	@Override
 	public TransportArc copy() {
 		// TODO Auto-generated method stub
 		return null;
@@ -103,6 +105,7 @@ public class TransportArc extends TimedArc {
 		connectedTo = a;
 	}
 
+	@Override
 	public TransportArc paste(double despX, double despY, boolean toAnotherView) {
 		// TODO Auto-generated method stub
 		return null;
@@ -138,6 +141,7 @@ public class TransportArc extends TimedArc {
 		this.connectedTo = connectedTo;
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 	}

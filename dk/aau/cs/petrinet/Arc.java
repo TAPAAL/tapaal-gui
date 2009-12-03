@@ -71,6 +71,7 @@ public class Arc implements Comparable<Arc> {
 		return isPartOfTransportArc;
 	}
 	
+	@Override
 	public String toString() {
 		
 		return "Arc from " + source.getName() +  " to " + target.getName();

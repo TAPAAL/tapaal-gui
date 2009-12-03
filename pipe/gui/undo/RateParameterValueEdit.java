@@ -28,7 +28,8 @@ public class RateParameterValueEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       rateParameter.setValue(oldValue);
       rateParameter.update();
       rateParameter.updateBounds();
@@ -36,7 +37,8 @@ public class RateParameterValueEdit
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       rateParameter.setValue(newValue);
       rateParameter.update();
       rateParameter.updateBounds();

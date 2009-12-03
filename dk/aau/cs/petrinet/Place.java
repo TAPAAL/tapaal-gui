@@ -1,6 +1,4 @@
 package dk.aau.cs.petrinet;
-
-import java.util.List;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 
@@ -28,6 +26,7 @@ public class Place extends PlaceTransitionObject{
 		this.capacity =  capacity;
 	}
 	
+	@Override
 	public String toString() {
 		
 		return "Place " + getName();

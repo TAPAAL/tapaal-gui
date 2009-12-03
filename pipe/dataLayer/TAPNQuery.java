@@ -28,6 +28,7 @@ public class TAPNQuery {
 		this.extrapolationOption = extrapolationOption;
 	}
 	
+	@Override
 	public String toString()
 	{
 		return name;

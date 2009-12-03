@@ -116,7 +116,8 @@ public class ResultsHTMLPane
    
    
    //<pere>
-   public void setEnabled(boolean b) {
+   @Override
+public void setEnabled(boolean b) {
       copyAndSaveButtons.setEnabled(b);
       // provisional
       ((ButtonBar) this.getComponent(1)).getComponent(0).setEnabled(b);

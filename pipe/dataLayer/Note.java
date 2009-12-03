@@ -99,8 +99,8 @@ public abstract class Note
       note.setLocation((int)noteRect.getX() + (rectWidth - note.getWidth())/2,
                        (int)noteRect.getY() + (rectHeight - note.getHeight())/2);
 
-      bounds.setBounds((int)Zoomer.getZoomedValue(originalX, zoom) - 20,
-                       (int)Zoomer.getZoomedValue(originalY, zoom) - 20,
+      bounds.setBounds(Zoomer.getZoomedValue(originalX, zoom) - 20,
+                       Zoomer.getZoomedValue(originalY, zoom) - 20,
                        (int)((rectWidth + Pipe.RESERVED_BORDER
                               + Pipe.ANNOTATION_SIZE_OFFSET)
                               * Zoomer.getScaleFactor(zoom)) + 20,
@@ -186,14 +186,16 @@ public abstract class Note
    }
 
    
-   public boolean contains(int x, int y) {
+   @Override
+public boolean contains(int x, int y) {
       return noteRect.contains(x / Zoomer.getScaleFactor(zoom), 
                                y / Zoomer.getScaleFactor(zoom));
    }
 
 
    // 
-   public void addedToGui(){
+   @Override
+public void addedToGui(){
       if (CreateGui.getView() != null){
          markedAsDeleted = false;
          deleted = false;
@@ -214,13 +216,15 @@ public abstract class Note
    }   
    
    
-   public void delete() {
+   @Override
+public void delete() {
       CreateGui.getModel().removePetriNetObject(this);
       CreateGui.getView().remove(this);
    }   
    
    
-   public int getLayerOffset() {
+   @Override
+public int getLayerOffset() {
       return Pipe.NOTE_LAYER_OFFSET;
    }   
    

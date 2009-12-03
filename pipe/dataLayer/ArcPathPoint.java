@@ -138,7 +138,8 @@ public class ArcPathPoint
    }
 
    
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       if (!ignoreSelection) {
          Graphics2D g2 = (Graphics2D)g;
@@ -210,7 +211,8 @@ public class ArcPathPoint
    }
    
    
-   public void delete() {// Won't delete if only two points left. General delete.
+   @Override
+public void delete() {// Won't delete if only two points left. General delete.
       if(isDeleteable()) {
          if (getArcPath().getArc().isSelected()) {
             return;
@@ -266,7 +268,8 @@ public class ArcPathPoint
    }
    
    
-   public void addedToGui() {
+   @Override
+public void addedToGui() {
       ;
    }    
 
@@ -286,7 +289,8 @@ public class ArcPathPoint
    }
 
    
-   public int getLayerOffset() {
+   @Override
+public int getLayerOffset() {
       return Pipe.ARC_POINT_LAYER_OFFSET;
    }
 
@@ -297,12 +301,14 @@ public class ArcPathPoint
    }
 
    
-   public void undelete(DataLayer model, GuiView view) {
+   @Override
+public void undelete(DataLayer model, GuiView view) {
       ;
    }
    
    
-   public String getName() {
+   @Override
+public String getName() {
       return this.getArcPath().getArc().getName() + " - Point " + this.getIndex();
    }
    

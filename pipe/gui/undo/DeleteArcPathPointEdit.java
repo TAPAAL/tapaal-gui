@@ -28,14 +28,16 @@ public class DeleteArcPathPointEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arcPath.insertPoint(index, point);
       arcPath.updateArc();      
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       point.delete();
    }
    

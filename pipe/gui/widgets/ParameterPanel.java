@@ -86,10 +86,12 @@ public class ParameterPanel
 
       labelTextField.setMinimumSize(new java.awt.Dimension(60, 19));
       labelTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-         public void focusGained(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusGained(java.awt.event.FocusEvent evt) {
             labelTextFieldFocusGained(evt);
          }
-         public void focusLost(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusLost(java.awt.event.FocusEvent evt) {
             labelTextFieldFocusLost(evt);
          }
       });
@@ -101,10 +103,12 @@ public class ParameterPanel
       panel.add(labelTextField, gridBagConstraints);
 
       valueTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-         public void focusGained(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusGained(java.awt.event.FocusEvent evt) {
             valueTextFieldFocusGained(evt);
          }
-         public void focusLost(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusLost(java.awt.event.FocusEvent evt) {
             valueTextFieldFocusLost(evt);
          }
       });

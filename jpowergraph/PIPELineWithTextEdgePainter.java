@@ -33,7 +33,8 @@ public class PIPELineWithTextEdgePainter <T extends TextEdge>
    }
    
    
-   public void paintEdge(JGraphPane graphPane, JPowerGraphGraphics g, T edge,
+   @Override
+public void paintEdge(JGraphPane graphPane, JPowerGraphGraphics g, T edge,
            SubGraphHighlighter theSubGraphHighlighter) {
       
       JPowerGraphPoint from = graphPane.getScreenPointForNode(edge.getFrom());

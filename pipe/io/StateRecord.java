@@ -86,7 +86,8 @@ public class StateRecord {
    }   
    
    
-   public String toString(){
+   @Override
+public String toString(){
       String s = String.valueOf(stateid) + " - ";
       
       for (int i = 0; i < state.length; i++) {

@@ -16,13 +16,9 @@ import pipe.dataLayer.calculations.TreeTooBigException;
 import pipe.modules.EmptyNetException;
 import pipe.dataLayer.PNMatrix;
 import pipe.modules.invariantAnalysis.InvariantAnalysis;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
 import pipe.modules.gspn.GSPNNew;
 
 import pipe.dataLayer.calculations.StateList;
-
-import pipe.dataLayer.DataLayer;
 
 /**
  *

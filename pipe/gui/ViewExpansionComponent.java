@@ -31,7 +31,8 @@ public class ViewExpansionComponent
    }   
 
    
-   public void addedToGui() {
+   @Override
+public void addedToGui() {
       ;
    }
 
@@ -46,7 +47,8 @@ public class ViewExpansionComponent
    }
 
    
-   public int getLayerOffset() {
+   @Override
+public int getLayerOffset() {
       return 0;
    }
 

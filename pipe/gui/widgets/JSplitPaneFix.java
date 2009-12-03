@@ -32,6 +32,7 @@ public class JSplitPaneFix extends JSplitPane {
 		super(verticalSplit);
 	}
 
+	@Override
 	public void setDividerLocation(double proportionalLocation) {
         if (!isPainted) {       
             hasProportionalLocation = true;
@@ -41,7 +42,8 @@ public class JSplitPaneFix extends JSplitPane {
             super.setDividerLocation(proportionalLocation);
     }
 
-    public void paint(Graphics g) {
+    @Override
+	public void paint(Graphics g) {
         if (!isPainted) {       
             if (hasProportionalLocation)
                 super.setDividerLocation(proportionalLocation);

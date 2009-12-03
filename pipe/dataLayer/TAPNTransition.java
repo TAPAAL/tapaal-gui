@@ -38,6 +38,7 @@ public class TAPNTransition extends Transition {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public void showEditor(){
 	      // Build interface
 	      EscapableDialog guiDialog = 
@@ -62,7 +63,8 @@ public class TAPNTransition extends Transition {
 			guiDialog.setVisible(true);
 	   }      
 	 
-	   public TAPNTransition copy(){
+	   @Override
+	public TAPNTransition copy(){
 
 		   TAPNTransition copy = new TAPNTransition(Zoomer.getUnzoomedValue(this.getX(), zoom),
 				   									Zoomer.getUnzoomedValue(this.getY(), zoom));      
@@ -76,7 +78,8 @@ public class TAPNTransition extends Transition {
 //		   return copy;
 	   }
 	   
-	   public TAPNTransition paste(double x, double y, boolean fromAnotherView){
+	   @Override
+	public TAPNTransition paste(double x, double y, boolean fromAnotherView){
 		   this.incrementCopyNumber();
 	      TAPNTransition copy = new TAPNTransition (
 	              Grid.getModifiedX(x + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
@@ -100,7 +103,8 @@ public class TAPNTransition extends Transition {
 	   }
 
 	   //Override by jokke
-	   public boolean isEnabled(boolean animationStatus){
+	   @Override
+	public boolean isEnabled(boolean animationStatus){
 		   if (animationStatus) {
 			   if (enabled) {
 				   if (isEnabledByDelay()){					   

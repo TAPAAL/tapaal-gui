@@ -83,7 +83,8 @@ public class SelectionManager
    }
 
    
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2d = (Graphics2D) g;
       g2d.setPaint(selectionColor);
@@ -184,7 +185,7 @@ public class SelectionManager
     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
     */
    public void mousePressed(MouseEvent e) {
-      if (e.getButton() == e.BUTTON1 && !(e.isControlDown())) {
+      if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
          isSelecting = true;
          view.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
          startPoint = e.getPoint();

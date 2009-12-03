@@ -355,7 +355,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		ArrayList<Token> toReturn = new ArrayList<Token>();
 		
 		for(Place p : tokens){
-			toReturn.add(new Token(p));
+			toReturn.add(new Token((TAPNPlace)p));
 		}
 		
 		return toReturn;

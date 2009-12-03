@@ -1,60 +1,26 @@
 package pipe.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.Format;
-import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Enumeration;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.swing.Action;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-
-import dk.aau.cs.petrinet.Place;
-
-import jpowergraph.PIPEInitialState;
-
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.TimedPlace;
 import pipe.exception.InvariantViolatedAnimationException;
-import pipe.gui.GuiFrame.AnimateAction;
-import pipe.gui.GuiFrame.ToggleButton;
 import pipe.gui.action.GuiAction;
 
 /**

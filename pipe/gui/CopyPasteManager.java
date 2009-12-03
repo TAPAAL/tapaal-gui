@@ -176,8 +176,7 @@ public class CopyPasteManager
       //First, we deal with Places, Transitions & Annotations
       ArrayList <PetriNetObject>ptaToPaste = objectsToPaste.get(0);
       for (int i = 0; i < ptaToPaste.size(); i++) {
-         PetriNetObject pnObject = (PetriNetObject)
-                 ptaToPaste.get(i).paste(despX, despY, sourceView != view);
+         PetriNetObject pnObject = ptaToPaste.get(i).paste(despX, despY, sourceView != view);
          
          if (pnObject != null) {
         	 if ((pnObject instanceof TAPNTransition) && (sourceView != view)) {
@@ -319,7 +318,8 @@ public class CopyPasteManager
    }
    
    
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2d = (Graphics2D) g;
       g2d.setPaint(PASTE_COLOR);

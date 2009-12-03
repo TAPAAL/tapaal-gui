@@ -630,7 +630,7 @@ public class ArcPath
             }
             
             if (pathPoint.getMouseWheelListeners().length == 0) {
-               pathPoint.addMouseWheelListener((MouseWheelListener)pointHandler);
+               pathPoint.addMouseWheelListener(pointHandler);
             }              
             pathPoint.updatePointLocation();
          }
@@ -668,7 +668,7 @@ public class ArcPath
             }
             
             if (pathPoint.getMouseWheelListeners().length == 0) {
-               pathPoint.addMouseWheelListener((MouseWheelListener)pointHandler);
+               pathPoint.addMouseWheelListener(pointHandler);
             }            
             pathPoint.updatePointLocation();
          }

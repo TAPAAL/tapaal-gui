@@ -6,15 +6,11 @@ import java.awt.GridBagLayout;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNTransition;
@@ -22,8 +18,6 @@ import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
-import pipe.exception.InvariantViolatedAnimationException;
-import pipe.gui.AnimationHistory;
 import pipe.gui.Pipe;
 
 public class AnimationSelectmodeDialog extends JPanel{

@@ -95,9 +95,11 @@ extends javax.swing.JPanel {
 
 		nameTextField.setText(transition.getName());
 		nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+			@Override
 			public void focusGained(java.awt.event.FocusEvent evt) {
 				nameTextFieldFocusGained(evt);
 			}
+			@Override
 			public void focusLost(java.awt.event.FocusEvent evt) {
 				nameTextFieldFocusLost(evt);
 			}

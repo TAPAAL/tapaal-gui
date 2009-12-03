@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
-import java.sql.Time;
-
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -20,11 +18,9 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TransportArc;
 import pipe.gui.CreateGui;
-import pipe.gui.action.EditTaggedAction;
 import pipe.gui.Grid;
 import pipe.gui.GuiView;
 import pipe.gui.Pipe;
-import pipe.gui.action.EditTimeIntervalAction;
 import pipe.gui.action.EditWeightAction;
 import pipe.gui.action.InsertPointAction;
 import pipe.gui.action.SplitArcAction;
@@ -48,7 +44,8 @@ public class ArcHandler
     * Creates the popup menu that the user will see when they right click on a 
     * component 
     */
-   public JPopupMenu getPopup(MouseEvent e) {
+   @Override
+public JPopupMenu getPopup(MouseEvent e) {
       int popupIndex = 0;
       JMenuItem menuItem;
       JPopupMenu popup = super.getPopup(e);
@@ -195,7 +192,8 @@ public class ArcHandler
    }
 
    
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
       super.mousePressed(e);
       if (CreateGui.getApp().isEditionAllowed() == false){
          return;
@@ -216,7 +214,8 @@ public class ArcHandler
    }
 
    
-   public void mouseDragged(MouseEvent e) {
+   @Override
+public void mouseDragged(MouseEvent e) {
       switch (CreateGui.getApp().getMode()) {
          case Pipe.SELECT:
             if (!isDragging){
@@ -225,8 +224,8 @@ public class ArcHandler
             Arc currentObject = (Arc)myObject;
             Point oldLocation = currentObject.getLocation();
             // Calculate translation in mouse
-            int transX = (int)(Grid.getModifiedX(e.getX() - dragInit.x));
-            int transY = (int)(Grid.getModifiedY(e.getY() - dragInit.y));
+            int transX = (Grid.getModifiedX(e.getX() - dragInit.x));
+            int transY = (Grid.getModifiedY(e.getY() - dragInit.y));
             ((GuiView)contentPane).getSelectionObject().translateSelection(
                      transX, transY);
             dragInit.translate(
@@ -236,7 +235,8 @@ public class ArcHandler
    }
 
    
-   public void mouseWheelMoved (MouseWheelEvent e) {
+   @Override
+public void mouseWheelMoved (MouseWheelEvent e) {
       
       if (CreateGui.getApp().isEditionAllowed() == false){
          return;

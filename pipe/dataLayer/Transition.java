@@ -250,7 +250,8 @@ public class Transition
    }      
    
    
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2 = (Graphics2D)g;
 
@@ -372,7 +373,8 @@ public class Transition
     * Determines whether Transition is enabled
     * @return True if enabled
     */
-   public boolean isEnabled(){
+   @Override
+public boolean isEnabled(){
       return enabled;
    }
    
@@ -398,7 +400,8 @@ public class Transition
     * Sets whether Transition is enabled
     * @return enabled if True
     */
-   public void setEnabled(boolean status){
+   @Override
+public void setEnabled(boolean status){
       if ( enabled && !status ) {       // going from enabled to disabled
          delayValid = false;            // mark that delay is not valid
       }      
@@ -545,7 +548,8 @@ public class Transition
    }
 
            
-   public boolean contains(int x, int y) {   
+   @Override
+public boolean contains(int x, int y) {   
       int zoomPercentage = zoom;
       
       double unZoomedX = (x - COMPONENT_DRAW_OFFSET)/(zoomPercentage/100.0);
@@ -589,7 +593,8 @@ public class Transition
    /* (non-Javadoc)
     * @see pipe.dataLayer.PlaceTransitionObject#updateEndPoint(pipe.dataLayer.Arc)
     */
-   public void updateEndPoint(Arc arc) {
+   @Override
+public void updateEndPoint(Arc arc) {
       boolean match = false;
       
       Iterator arcIterator = arcAngleList.iterator();
@@ -716,7 +721,8 @@ public class Transition
    }
 
    
-   public void addedToGui(){
+   @Override
+public void addedToGui(){
       super.addedToGui();
       update();
    }
@@ -742,19 +748,22 @@ public class Transition
    }
    
    
-   public void setCentre(double x,double y) {
+   @Override
+public void setCentre(double x,double y) {
       super.setCentre(x,y);
       update();
    }
 
    
-   public void toggleAttributesVisible(){
+   @Override
+public void toggleAttributesVisible(){
       attributesVisible = !attributesVisible;
       pnName.setText(getText());
    }   
 
 
-   public void showEditor(){
+   @Override
+public void showEditor(){
       // Build interface
       EscapableDialog guiDialog = 
               new EscapableDialog(CreateGui.getApp(),"PIPE2",true);
@@ -815,7 +824,8 @@ public class Transition
    }            
 
    
-   public void update() {
+   @Override
+public void update() {
       pnName.setText(getText());
       pnName.zoomUpdate(zoom);    
       super.update();
@@ -823,7 +833,8 @@ public class Transition
    }   
    
    
-   public void delete() {
+   @Override
+public void delete() {
       if (rateParameter != null) {
          rateParameter.remove(this);
          rateParameter = null;
@@ -895,7 +906,8 @@ public class Transition
       
    }
    
-   public Transition clone() {
+   @Override
+public Transition clone() {
  	  Transition toReturn=null;
 	  toReturn = (Transition)super.clone();
  	  

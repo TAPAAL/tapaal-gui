@@ -27,18 +27,21 @@ public class ArcWeightEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arc.setWeight(oldWeight);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       arc.setWeight(newWeight);
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString() + " " + arc.getName() + 
               "oldWeight: " + oldWeight + "newWeight: " + newWeight;
    }   

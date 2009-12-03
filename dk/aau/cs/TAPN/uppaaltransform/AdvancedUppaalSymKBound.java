@@ -1,21 +1,20 @@
 package dk.aau.cs.TAPN.uppaaltransform;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-
 import dk.aau.cs.petrinet.Arc;
-import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.TAPN;
 
 public class AdvancedUppaalSymKBound extends AdvancedUppaalSym {
 	private final String usedExtraTokens = "usedExtraTokens";
 	
+	@Override
 	protected void createGlobalDeclarations(TAPN model, PrintStream uppaalXML,
 			int tokens) {
 		super.createGlobalDeclarations(model, uppaalXML, tokens);
 		uppaalXML.println("int[" + (-tokens) + "," + tokens + "] " + usedExtraTokens + " = 0;");
 	}
 	
+	@Override
 	protected String getAssignments(String initialAssignment, Arc source, Arc destination)
 	{
 		String additional = null;

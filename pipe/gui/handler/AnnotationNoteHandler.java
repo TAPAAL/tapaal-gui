@@ -31,7 +31,8 @@ public class AnnotationNoteHandler
    /** 
     * Creates the popup menu that the user will see when they right click on a 
     * component */
-   public JPopupMenu getPopup(MouseEvent e) {
+   @Override
+public JPopupMenu getPopup(MouseEvent e) {
       int popupIndex = 0;
       JPopupMenu popup = super.getPopup(e);
       
@@ -63,7 +64,8 @@ public class AnnotationNoteHandler
    }
 
    
-   public void mouseClicked(MouseEvent e) {
+   @Override
+public void mouseClicked(MouseEvent e) {
       if ((e.getComponent() == myObject || !e.getComponent().isEnabled()) && 
               (SwingUtilities.isLeftMouseButton(e))) { 
          if (e.getClickCount() == 2){

@@ -30,14 +30,16 @@ public class SetMarkingParameterEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       place.clearMarkingParameter();
       place.setCurrentMarking(oldMarking);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       place.setMarkingParameter(newMarkingParameter);
    }
    

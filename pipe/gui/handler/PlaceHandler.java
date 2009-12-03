@@ -35,7 +35,8 @@ public class PlaceHandler
     * Creates the popup menu that the user will see when they right click on a 
     * component 
     */
-   public JPopupMenu getPopup(MouseEvent e) {
+   @Override
+public JPopupMenu getPopup(MouseEvent e) {
       int index = 0;
       JPopupMenu popup = super.getPopup(e);      
      
@@ -60,7 +61,8 @@ public class PlaceHandler
    }
    
    
-   public void mouseClicked(MouseEvent e) {
+   @Override
+public void mouseClicked(MouseEvent e) {
       if (SwingUtilities.isLeftMouseButton(e)){
          if (e.getClickCount() == 2 &&
                  CreateGui.getApp().isEditionAllowed() &&
@@ -105,7 +107,8 @@ public class PlaceHandler
    }
 
 
-   public void mouseWheelMoved(MouseWheelEvent e) {
+   @Override
+public void mouseWheelMoved(MouseWheelEvent e) {
       // 
       if (CreateGui.getApp().isEditionAllowed() == false || 
               e.isControlDown()) {
@@ -147,14 +150,16 @@ public class PlaceHandler
          }         
       }
    }
-   public void mouseEntered(MouseEvent e){
+   @Override
+public void mouseEntered(MouseEvent e){
 	   if ((myObject instanceof TimedPlace) && CreateGui.getView().isInAnimationMode()){		   
 		  ((TimedPlace) myObject).showAgeOfTokens(true);
 	   }else {
 		   //do something else;
 	   }
    }
-   public void mouseExited(MouseEvent e){
+   @Override
+public void mouseExited(MouseEvent e){
 	   if ((myObject instanceof TimedPlace) && CreateGui.getView().isInAnimationMode()){
 		  ((TimedPlace) myObject).showAgeOfTokens(false);
 	   }else {
@@ -163,7 +168,8 @@ public class PlaceHandler
    }
    
    //Override
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
 	   if (CreateGui.getApp().isEditionAllowed()){
 		   super.mousePressed(e);
 	   }else{

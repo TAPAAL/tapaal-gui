@@ -1,17 +1,11 @@
 package dk.aau.cs.TAPN.transformer;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.crypto.Data;
-
 import dk.aau.cs.debug.Logger;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;

@@ -45,7 +45,8 @@ public class GSPNNew
    
    private static final String MODULE_NAME = "GSPN Analysis";
    
-   public void run(DataLayer pnmlData) {
+   @Override
+public void run(DataLayer pnmlData) {
       // Build interface
       EscapableDialog guiDialog = 
               new EscapableDialog(CreateGui.getApp(),MODULE_NAME,true);
@@ -537,7 +538,7 @@ public class GSPNNew
             }
             if (current[p] > (((double[])counter.get(p)).length-1)) {
                copy = new double[current[p]+1];
-               System.arraycopy((double[])counter.get(p), 0, copy, 0, 
+               System.arraycopy(counter.get(p), 0, copy, 0, 
                        ((double[])counter.get(p)).length);
                // Zero all the remainder of the array
                for (int i = ((double[])counter.get(p)).length; i < copy.length; i++){
@@ -562,7 +563,7 @@ public class GSPNNew
       // Now put together our results array
       result = new double[numplaces][highestnumberoftokens+1];
       for (int p = 0; p < numplaces; p++) {
-         System.arraycopy((double[])counter.get(p), 0, (double[])result[p], 0,
+         System.arraycopy(counter.get(p), 0, result[p], 0,
                  ((double[])counter.get(p)).length);
          if (((double[])counter.get(p)).length < highestnumberoftokens) {
             for (int i = ((double[])counter.get(p)).length; i < highestnumberoftokens; i++) {
@@ -687,7 +688,8 @@ public class GSPNNew
    }
    
    
-   public String getName() {
+   @Override
+public String getName() {
       return MODULE_NAME;
    }
    

@@ -23,13 +23,15 @@ public class TransitionServerSemanticEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.setInfiniteServer(!transition.isInfiniteServer());
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.setInfiniteServer(!transition.isInfiniteServer());
    }
    

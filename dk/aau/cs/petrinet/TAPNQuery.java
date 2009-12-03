@@ -20,6 +20,7 @@ public class TAPNQuery {
 		remQuery = query.substring(3, query.length());
 	}
 	
+	@Override
 	public String toString(){
 		return pathQuantifier + nodeQuantifier + remQuery;
 	}

@@ -1,10 +1,6 @@
 package pipe.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
@@ -20,28 +16,17 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.ScrollPaneLayout;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.widgets.LeftQueryPane;
 import pipe.io.JarUtilities;
 
 
@@ -71,7 +56,7 @@ public class ModuleManager {
 
    
    public ModuleManager() {
-      parent = (Component)CreateGui.getApp();
+      parent = CreateGui.getApp();
       installedModules = new HashSet();
    }
    
@@ -310,21 +295,24 @@ public class ModuleManager {
       }
       
       
-      public void mouseReleased(MouseEvent e) {
+      @Override
+	public void mouseReleased(MouseEvent e) {
          if (e.isPopupTrigger()){
             showPopupMenu(e);
          }
       }
       
       
-      public void mousePressed(MouseEvent e) {
+      @Override
+	public void mousePressed(MouseEvent e) {
          if (e.isPopupTrigger()){
             showPopupMenu(e);
          }
       }
       
       
-      public void mouseClicked(MouseEvent e) {
+      @Override
+	public void mouseClicked(MouseEvent e) {
          int selRow = moduleTree.getRowForLocation(e.getX(), e.getY());
          TreePath selPath = moduleTree.getPathForLocation(e.getX(), e.getY());
          

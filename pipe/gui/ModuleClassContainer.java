@@ -43,7 +43,8 @@ public class ModuleClassContainer {
    /** 
     * Overides the object method in order to provide the correct display name 
     */
-   public String toString() {
+   @Override
+public String toString() {
       return displayName;
    }
    

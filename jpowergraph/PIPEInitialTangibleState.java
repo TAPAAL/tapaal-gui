@@ -32,7 +32,8 @@ public class PIPEInitialTangibleState
    }
    
    
-   public String getNodeType(){
+   @Override
+public String getNodeType(){
       return "Tangible State (Initial State)";
    }   
 

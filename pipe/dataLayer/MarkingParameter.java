@@ -38,7 +38,8 @@ public class MarkingParameter
    }   
    
    
-   public void enableEditMode(){
+   @Override
+public void enableEditMode(){
       // Build interface
       EscapableDialog guiDialog = 
               new EscapableDialog(CreateGui.getApp(),"PIPE2",true);
@@ -71,7 +72,8 @@ public class MarkingParameter
 
    
    // updates each place in placeHashSet to current parameter value
-   public void update() {
+   @Override
+public void update() {
       if (valueChanged == true) {
          valueChanged = false;
          Iterator<Place> iterator = placesHashSet.iterator();
@@ -86,7 +88,8 @@ public class MarkingParameter
    }
    
    
-   public void delete() {
+   @Override
+public void delete() {
       Object[] places = placesHashSet.toArray();
       if (places.length > 0) {
          UndoManager undoManager = CreateGui.getView().getUndoManager();
@@ -120,14 +123,14 @@ public class MarkingParameter
    
    public Parameter copy() {
       return new MarkingParameter(name, value, 
-                                  (int)this.getX(), (int)this.getY());
+                                  this.getX(), this.getY());
    }
 
    
    public Parameter paste(double x, double y, boolean fromAnotherView) {
       return new MarkingParameter(name, value,
-                                  (int)this.getX() + Grid.getModifiedX(x),
-                                  (int)this.getY() + Grid.getModifiedY(y));
+                                  this.getX() + Grid.getModifiedX(x),
+                                  this.getY() + Grid.getModifiedY(y));
    }
 
    

@@ -3,11 +3,8 @@ package pipe.dataLayer;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -144,6 +141,7 @@ implements Cloneable {
 	 * Set name
 	 * @param nameInput String value for Place name;
 	 */
+	@Override
 	public void setName(String nameInput) {
 		//sets the text within the label
 		//System.out.println("setting name to: " + nameInput);
@@ -191,6 +189,7 @@ implements Cloneable {
 	 * Set id
 	 * @param idInput String value for Place id;
 	 */
+	@Override
 	public void setId(String idInput) {
 		id = idInput;
 		setName(id);
@@ -202,6 +201,7 @@ implements Cloneable {
 	 * Get id
 	 * @return String value for Place id;
 	 */
+	@Override
 	public String getId() {
 		return (id!=null) ? id : pnName.getName();
 	}
@@ -211,6 +211,7 @@ implements Cloneable {
 	 * Get name
 	 * @return String value for Place name;
 	 */
+	@Override
 	public String getName() {
 		return (pnName!=null) ? pnName.getName() : id;
 	}
@@ -267,6 +268,7 @@ implements Cloneable {
 	/** Implemented in subclasses as involves some tailoring according to the shape
 	 * @param e Mouse Event
 	 */
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -402,6 +404,7 @@ implements Cloneable {
 	}  
 
 
+	@Override
 	public void delete() {
 		if (getParent() != null) {
 			getParent().remove(pnName);
@@ -411,6 +414,7 @@ implements Cloneable {
 
 
 	/** Handles selection for Place/Transitions */
+	@Override
 	public void select() {
 		if (selectable && !selected) {
 			selected = true;
@@ -429,6 +433,7 @@ implements Cloneable {
 	}
 
 
+	@Override
 	public void addedToGui() {
 		deleted = false;
 		markedAsDeleted = false;
@@ -520,6 +525,7 @@ implements Cloneable {
 	}   
 
 
+	@Override
 	public int getLayerOffset() {
 		return Pipe.PLACE_TRANSITION_LAYER_OFFSET;
 	}   
@@ -536,6 +542,7 @@ implements Cloneable {
 
 	// XXX - kyrke now also clones arcs
 	// Clone object and deep copy the pnNames
+	@Override
 	public PlaceTransitionObject clone() {
 		PlaceTransitionObject toReturn = (PlaceTransitionObject)super.clone();
 		toReturn.pnName = (NameLabel) pnName.clone();

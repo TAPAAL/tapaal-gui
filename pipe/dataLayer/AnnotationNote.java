@@ -76,7 +76,8 @@ public class AnnotationNote
    }
    
 
-   public void updateBounds() {
+   @Override
+public void updateBounds() {
       super.updateBounds();
       if (dragPoints != null) {
          // TOP-LEFT
@@ -123,7 +124,8 @@ public class AnnotationNote
    }   
    
    
-   public boolean contains(int x, int y) {
+   @Override
+public boolean contains(int x, int y) {
       boolean pointContains = false;
       
       for (int i = 0; i < 8; i++) {
@@ -136,7 +138,8 @@ public class AnnotationNote
    
    
    
-   public void enableEditMode() {
+   @Override
+public void enableEditMode() {
       String oldText = note.getText();  
       JDialog.setDefaultLookAndFeelDecorated(true);
       // Build interface
@@ -189,7 +192,8 @@ public class AnnotationNote
    }         
 
    
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);      
       
       Graphics2D g2 = (Graphics2D)g;
@@ -228,7 +232,8 @@ public class AnnotationNote
    }
 
    
-   public int getLayerOffset() {
+   @Override
+public int getLayerOffset() {
       return Pipe.NOTE_LAYER_OFFSET;
    }
 
@@ -257,7 +262,8 @@ public class AnnotationNote
       }
       
       
-      public void mousePressed(MouseEvent e) {
+      @Override
+	public void mousePressed(MouseEvent e) {
          myPoint.myNote.setDraggable(false);
          myPoint.isPressed = true;
          myPoint.repaint();
@@ -265,7 +271,8 @@ public class AnnotationNote
       }
 
       
-      public void mouseDragged(MouseEvent e) {
+      @Override
+	public void mouseDragged(MouseEvent e) {
          myPoint.drag(Grid.getModifiedX(e.getX() - start.x), 
                       Grid.getModifiedY(e.getY() - start.y));
          myPoint.myNote.updateBounds();
@@ -273,7 +280,8 @@ public class AnnotationNote
       }
 
       
-      public void mouseReleased(MouseEvent e) {
+      @Override
+	public void mouseReleased(MouseEvent e) {
          myPoint.myNote.setDraggable(true);
          myPoint.isPressed = false;
          myPoint.myNote.updateBounds();

@@ -1,10 +1,10 @@
 package dk.aau.cs.petrinet.degree2converters;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
-import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.PlaceTransitionObject;
 import dk.aau.cs.petrinet.PrioritizedTAPNTransition;
 import dk.aau.cs.petrinet.TAPN;
@@ -51,11 +51,12 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 			createSimulationOfTransition(transition, tapn);
 		}
 		
-		for(Token token : model.getTokens()){
-			tapn.addToken(new Token((Place)nameToPTO.get(token.getPlace().getName())));
+		List<Token> tokens = model.getTokens();
+		for(Token token : tokens){
+			tapn.addToken(new Token((TAPNPlace) nameToPTO.get(token.getPlace().getName())));
 		}
 		
-		tapn.addToken(new Token((Place)nameToPTO.get(PLOCK)));
+		tapn.addToken(new Token((TAPNPlace)nameToPTO.get(PLOCK)));
 
 		nameToPTO.clear();
 		return tapn;

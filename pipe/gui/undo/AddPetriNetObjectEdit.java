@@ -31,18 +31,21 @@ public class AddPetriNetObjectEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       pnObject.delete();
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       pnObject.undelete(model, view);
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString() + " \"" + pnObject.getName() + "\"";
    }
    

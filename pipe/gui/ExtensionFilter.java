@@ -19,13 +19,15 @@ public class ExtensionFilter
    }
 
    
-   public boolean accept(File f) {
+   @Override
+public boolean accept(File f) {
       return f.isDirectory() 
              || f.getName().toLowerCase().endsWith(myExtensionString);
    }	// Don't want directories, especially ones which end with the desired extension!
 
    
-   public String getDescription() {
+   @Override
+public String getDescription() {
       return myExtensionDesc;
    }
 

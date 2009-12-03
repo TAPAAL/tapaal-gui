@@ -207,7 +207,8 @@ public abstract class PetriNetObject
    }
 
 
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
    }
    
@@ -226,7 +227,8 @@ public abstract class PetriNetObject
    }
 
    
-   public PetriNetObject clone() {
+   @Override
+public PetriNetObject clone() {
       try {
          PetriNetObject pnObjectCopy = (PetriNetObject) super.clone();
 

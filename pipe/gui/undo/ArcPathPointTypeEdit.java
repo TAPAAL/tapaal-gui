@@ -23,19 +23,22 @@ public class ArcPathPointTypeEdit
    
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arcPathPoint.togglePointType();
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       arcPathPoint.togglePointType();
    }
 
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString() + " " + arcPathPoint.getName();
    }
       

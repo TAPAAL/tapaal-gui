@@ -41,12 +41,14 @@ public abstract class PIPENode
    }
    
    
-   public String getLabel() {
+   @Override
+public String getLabel() {
       return label;
    }
    
    
-   public String getNodeType(){
+   @Override
+public String getNodeType(){
       return "PIPENode";
    }
    

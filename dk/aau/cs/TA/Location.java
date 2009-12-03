@@ -96,6 +96,7 @@ public class Location {
 		return res;
 	}
 	
+	@Override
 	public String toString(){
 		return "Location " + name +". Invariant: " + invariant + ", Committed: " + isCommitted + ", Urgent: " + isUrgent;
 	}

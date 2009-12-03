@@ -26,7 +26,8 @@ import net.sourceforge.jpowergraph.swing.manipulator.DefaultSwingToolTipListener
 public class PIPESwingToolTipListener 
         extends DefaultSwingToolTipListener {
    
-   public boolean addNodeToolTipItems(Node theNode, JComponent theJComponent,
+   @Override
+public boolean addNodeToolTipItems(Node theNode, JComponent theJComponent,
            Color backgroundColor) {
       Edge edge;
       

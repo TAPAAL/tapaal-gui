@@ -29,7 +29,8 @@ public class TransitionHandler
    }
 
    
-   public void mouseWheelMoved (MouseWheelEvent e) {
+   @Override
+public void mouseWheelMoved (MouseWheelEvent e) {
 
       if (CreateGui.getApp().isEditionAllowed() == false || 
               e.isControlDown()) {
@@ -57,7 +58,8 @@ public class TransitionHandler
     * Creates the popup menu that the user will see when they right click on a 
     * component 
     */
-   public JPopupMenu getPopup(MouseEvent e) {
+   @Override
+public JPopupMenu getPopup(MouseEvent e) {
       int index = 0;
       JPopupMenu popup = super.getPopup(e);
       
@@ -82,7 +84,8 @@ public class TransitionHandler
    }
    
    
-   public void mouseClicked(MouseEvent e) {   
+   @Override
+public void mouseClicked(MouseEvent e) {   
 	   if (SwingUtilities.isLeftMouseButton(e)){
 		   if (CreateGui.getApp().isEditionAllowed()){
 			   if (e.getClickCount() == 2 &&
@@ -110,7 +113,8 @@ public class TransitionHandler
 	   }
    }
    //Override
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
 	   if (CreateGui.getApp().isEditionAllowed()){
 		   super.mousePressed(e);
 	   }else{

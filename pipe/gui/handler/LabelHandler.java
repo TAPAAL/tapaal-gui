@@ -21,24 +21,27 @@ public class LabelHandler
    
    
    public LabelHandler(NameLabel _nl, PlaceTransitionObject _obj) {
-      obj = (PlaceTransitionObject)_obj;
+      obj = _obj;
       nl = _nl;
    }
    
    
-   public void mouseClicked(MouseEvent e) {
+   @Override
+public void mouseClicked(MouseEvent e) {
       obj.dispatchEvent(e);
    }
    
    
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
       dragInit = e.getPoint(); //
       //dragInit = e.getLocationOnScreen();  //causes exception in Windows!
       dragInit = javax.swing.SwingUtilities.convertPoint(nl, dragInit, obj);
    }
   
 
-   public void mouseDragged(MouseEvent e){
+   @Override
+public void mouseDragged(MouseEvent e){
       // 
       if (!SwingUtilities.isLeftMouseButton(e)){
          return;
@@ -54,7 +57,8 @@ public class LabelHandler
       obj.update();
    }   
    
-   public void mouseWheelMoved(MouseWheelEvent e) {
+   @Override
+public void mouseWheelMoved(MouseWheelEvent e) {
       obj.dispatchEvent(e);
    }
    

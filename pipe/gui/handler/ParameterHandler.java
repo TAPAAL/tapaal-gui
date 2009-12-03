@@ -25,7 +25,8 @@ public class ParameterHandler
    
    /** Creates the popup menu that the user will see when they right click on a
     * component */
-   public JPopupMenu getPopup(MouseEvent e) {
+   @Override
+public JPopupMenu getPopup(MouseEvent e) {
       int index = 0;
       JPopupMenu popup = super.getPopup(e);
       JMenuItem menuItem = 
@@ -39,7 +40,8 @@ public class ParameterHandler
    }
    
    
-   public void mouseClicked(MouseEvent e) {
+   @Override
+public void mouseClicked(MouseEvent e) {
       if ((e.getComponent() == myObject) || !e.getComponent().isEnabled()){
          if ((SwingUtilities.isLeftMouseButton(e)) && (e.getClickCount() == 2)){
             ((Parameter)myObject).enableEditMode();

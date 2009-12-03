@@ -30,13 +30,15 @@ public class ChangeMarkingParameterEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       place.changeMarkingParameter(oldMarkingParameter);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       place.changeMarkingParameter(newMarkingParameter);
    }
    

@@ -30,14 +30,16 @@ public class SetRateParameterEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.clearRateParameter();
       transition.setRate(oldRate);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.setRateParameter(newRateParameter);
    }
    

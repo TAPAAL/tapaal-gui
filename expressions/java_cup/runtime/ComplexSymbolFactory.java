@@ -26,7 +26,8 @@ public class ComplexSymbolFactory implements SymbolFactory{
             this.line=line;
             this.column=column;
         }
-        public String toString(){
+        @Override
+		public String toString(){
             return unit+":"+line+"/"+column;
         }
         public int getColumn(){
@@ -53,7 +54,8 @@ public class ComplexSymbolFactory implements SymbolFactory{
             super(id,value);
             this.name=name;
         }
-        public String toString(){
+        @Override
+		public String toString(){
             if (xleft==null || xright==null) return "Symbol: "+name;
             return "Symbol: "+name+" ("+xleft+" - "+xright+")";
         }

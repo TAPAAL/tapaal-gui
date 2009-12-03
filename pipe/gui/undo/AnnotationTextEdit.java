@@ -28,18 +28,21 @@ public final class AnnotationTextEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       annotationNote.setText(oldText);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       annotationNote.setText(newText);
    }
 
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString() + " " + annotationNote.getClass().getSimpleName() +
               "oldText: " + oldText + "newText: " + newText;
    }

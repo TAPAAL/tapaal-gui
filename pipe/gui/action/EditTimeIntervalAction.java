@@ -1,23 +1,11 @@
 package pipe.gui.action;
 
-import java.awt.Checkbox;
 import java.awt.Container;
-import java.awt.Scrollbar;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
-
 import javax.swing.AbstractAction;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.plaf.ComboBoxUI;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 
 public class EditTimeIntervalAction extends AbstractAction {

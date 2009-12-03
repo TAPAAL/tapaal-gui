@@ -52,7 +52,8 @@ public class PIPELoopWithTextEdgePainter <T extends LoopEdge>
 
    
    // 
-   public void paintEdge(JGraphPane graphPane, JPowerGraphGraphics g, T edge, 
+   @Override
+public void paintEdge(JGraphPane graphPane, JPowerGraphGraphics g, T edge, 
            SubGraphHighlighter theSubGraphHighlighter) {
       JPowerGraphRectangle r = new JPowerGraphRectangle(0, 0, 0, 0);
       getEdgeScreenBounds(graphPane, edge, r);

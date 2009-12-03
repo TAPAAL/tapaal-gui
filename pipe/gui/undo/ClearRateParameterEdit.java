@@ -27,13 +27,15 @@ public class ClearRateParameterEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.setRateParameter(oldRateParameter);      
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.clearRateParameter();
    }
    

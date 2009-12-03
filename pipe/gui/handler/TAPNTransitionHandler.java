@@ -1,18 +1,13 @@
 package pipe.gui.handler;
 
 import java.awt.Container;
-import java.awt.MenuComponent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
-import pipe.gui.action.ShowHideInfoAction;
 
 public class TAPNTransitionHandler extends TransitionHandler {
 
@@ -22,6 +17,7 @@ public class TAPNTransitionHandler extends TransitionHandler {
 	}
 	
 	//overwrite to remove shift behaviour
+	@Override
 	public void mouseWheelMoved (MouseWheelEvent e) {
 
       if (CreateGui.getApp().isEditionAllowed() == false || 
@@ -49,7 +45,8 @@ public class TAPNTransitionHandler extends TransitionHandler {
 	    * Creates the popup menu that the user will see when they right click on a 
 	    * component 
 	    */
-	   public JPopupMenu getPopup(MouseEvent e) {
+	   @Override
+	public JPopupMenu getPopup(MouseEvent e) {
 	      JPopupMenu popup = super.getPopup(e);
 	      popup.remove(1); // the show attributes menu point
 	      

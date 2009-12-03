@@ -41,7 +41,8 @@ public class PIPETangibleState
    }
 
    
-   public String getNodeType(){
+   @Override
+public String getNodeType(){
       return "Tangible State";
    }   
    

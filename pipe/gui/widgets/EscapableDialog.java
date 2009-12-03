@@ -32,7 +32,8 @@ public class EscapableDialog
       super(frame, string, modal);
    }
    
-   protected JRootPane createRootPane() {
+   @Override
+protected JRootPane createRootPane() {
       JRootPane rootPane = new JRootPane();
       KeyStroke stroke = KeyStroke.getKeyStroke("ESCAPE");
       Action actionListener = new AbstractAction() {

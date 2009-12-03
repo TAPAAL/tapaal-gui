@@ -39,7 +39,8 @@ public class PIPEVanishingState
    }
    
    
-   public String getNodeType(){
+   @Override
+public String getNodeType(){
       return "Vanishing State";
    }
    

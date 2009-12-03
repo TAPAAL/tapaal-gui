@@ -30,13 +30,15 @@ public class PlaceCapacityEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       place.setCapacity(oldCapacity);
    }
    
 
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       place.setCapacity(newCapacity);
    }
    

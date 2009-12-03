@@ -154,7 +154,7 @@ public class StateList {
          return false;
       } else {
          for (int i = 0; i < m1; i++) {
-            if ((int)(mark1[i]) !=  (int)(mark2[i])) {
+            if ((mark1[i]) !=  (mark2[i])) {
                //System.out.println (mark1[i] +" ");
                return false;
             }

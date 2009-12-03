@@ -64,7 +64,8 @@ public class State {
     * hashCode()
     * This overrides the Object.hashCode() method.
     */
-   public int hashCode(){
+   @Override
+public int hashCode(){
       int total = 0;
       
       for (int offset = 0; offset < state.length; offset++) {
@@ -103,7 +104,8 @@ public class State {
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       int length = state.length;
       String output = state[0] + ", ";
       

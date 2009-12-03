@@ -28,13 +28,15 @@ public class PlaceMarkingEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       place.setCurrentMarking(oldMarking);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       place.setCurrentMarking(newMarking);
    }
    

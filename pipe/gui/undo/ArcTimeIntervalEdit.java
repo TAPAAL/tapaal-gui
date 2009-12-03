@@ -23,6 +23,7 @@ public class ArcTimeIntervalEdit extends UndoableEdit {
 		arc.setGuard(oldTimeInterval);
 	}
 	
+	@Override
 	public String toString(){
 		return super.toString() + " " + arc.getName() + ", oldTimeInterval: " 
 		+ oldTimeInterval + ", newTimeInterval: " + newTimeInterval;   		

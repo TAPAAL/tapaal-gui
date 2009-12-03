@@ -43,7 +43,8 @@ public class PIPEInitialState
    }
    
    
-   public String getNodeType(){
+   @Override
+public String getNodeType(){
       return "Initial State";
    }      
    

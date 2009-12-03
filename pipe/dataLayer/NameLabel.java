@@ -97,14 +97,16 @@ public class NameLabel
    }
    
    
-   public void setName(String nameInput){
+   @Override
+public void setName(String nameInput){
       name = nameInput;
       setText(text);
       updateSize();
    }
    
    
-   public void setText(String s) {
+   @Override
+public void setText(String s) {
       text = s;
       if (name != null) {
          super.setText(name + s);
@@ -115,12 +117,14 @@ public class NameLabel
    }
    
    
-   public String getName(){
+   @Override
+public String getName(){
       return name;
    }
    
 
-   public String getText(){
+   @Override
+public String getText(){
       return text;
    }   
 
@@ -132,7 +136,8 @@ public class NameLabel
    }
    
    
-   public Object clone() {
+   @Override
+public Object clone() {
       try {
          return super.clone();
       } catch (CloneNotSupportedException e){

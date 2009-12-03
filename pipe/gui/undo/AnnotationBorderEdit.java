@@ -23,18 +23,21 @@ public class AnnotationBorderEdit
    
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       note.showBorder(!note.isShowingBorder());
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       note.showBorder(!note.isShowingBorder());
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString() + " " + note.getClass().getSimpleName();
    }
    

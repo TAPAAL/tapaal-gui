@@ -215,7 +215,8 @@ Place place;
          }
       });
       okButton.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyPressed(java.awt.event.KeyEvent evt) {
+         @Override
+		public void keyPressed(java.awt.event.KeyEvent evt) {
             okButtonKeyPressed(evt);
          }
       });

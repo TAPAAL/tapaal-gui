@@ -32,7 +32,8 @@ public class PetriNetObjectNameEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       pno.setName(oldName);
       
       ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
@@ -44,7 +45,8 @@ public class PetriNetObjectNameEdit
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       pno.setName(newName);
       
       ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();

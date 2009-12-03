@@ -29,7 +29,8 @@ public class ArcPathPointHandler
    
    
    /** Creates the popup menu that the user will see when they right click on a component */
-   public JPopupMenu getPopup(MouseEvent e) {
+   @Override
+public JPopupMenu getPopup(MouseEvent e) {
       JPopupMenu popup = super.getPopup(e);
       
       if (!((ArcPathPoint)myObject).isDeleteable()) {
@@ -68,7 +69,8 @@ public class ArcPathPointHandler
    }
    
    
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
       if (myObject.isEnabled()) {
          ((ArcPathPoint)e.getComponent()).setVisibilityLock(true);
          super.mousePressed(e);
@@ -76,18 +78,21 @@ public class ArcPathPointHandler
    }
    
    
-   public void mouseDragged(MouseEvent e) {
+   @Override
+public void mouseDragged(MouseEvent e) {
       super.mouseDragged(e);
    }
    
    
-   public void mouseReleased(MouseEvent e) {
+   @Override
+public void mouseReleased(MouseEvent e) {
       ((ArcPathPoint)e.getComponent()).setVisibilityLock(false);
       super.mouseReleased(e);
    }
    
    
-   public void mouseWheelMoved (MouseWheelEvent e) { 
+   @Override
+public void mouseWheelMoved (MouseWheelEvent e) { 
       if (e.isShiftDown()) {
          CreateGui.getView().getUndoManager().addNewEdit(
                  ((ArcPathPoint)myObject).togglePointType());

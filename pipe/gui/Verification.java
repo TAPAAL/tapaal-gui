@@ -254,8 +254,8 @@ public class Verification {
 		
 		File xmlfile=null, qfile=null;
 		try {
-			xmlfile = File.createTempFile( "verifyta", "test.xml", new File("C:\\Documents and Settings\\Morten Jacobsen\\Desktop"));
-			qfile = File.createTempFile("verifyta", ".q",new File("C:\\Documents and Settings\\Morten Jacobsen\\Desktop"));
+			xmlfile = File.createTempFile( "verifyta", "test.xml");
+			qfile = File.createTempFile("verifyta", ".q");
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();

@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.dataLayer.TransportArc;
-
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;

@@ -27,13 +27,15 @@ public class SetInverseArcEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arc.clearInverse();
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       inverse.setInverse(arc, junts);
    }
    

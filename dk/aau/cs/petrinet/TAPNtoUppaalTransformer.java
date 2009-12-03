@@ -1,12 +1,7 @@
 package dk.aau.cs.petrinet;
 
-import java.io.File;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import dk.aau.cs.debug.Logger;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.

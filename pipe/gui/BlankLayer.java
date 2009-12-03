@@ -19,11 +19,12 @@ public class BlankLayer extends JComponent {
 
    
    public BlankLayer(GuiFrame f){
-      this.f = f;
+      BlankLayer.f = f;
    }
    
    
-   public void paint(Graphics g) {
+   @Override
+public void paint(Graphics g) {
       super.paint(g);
       Graphics2D g2d = (Graphics2D) g;
       g2d.setPaint(gridColor);

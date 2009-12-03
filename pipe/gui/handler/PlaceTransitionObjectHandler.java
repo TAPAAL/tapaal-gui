@@ -6,9 +6,6 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.petrinet.TAPNPlace;
-import dk.aau.cs.petrinet.TAPNTransition;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
@@ -52,17 +49,18 @@ public class PlaceTransitionObjectHandler
       newArc.setZoom(CreateGui.getView().getZoom());
       contentPane.add(newArc);
       currentObject.addConnectFrom(newArc);
-      CreateGui.getView().createArc = (Arc)newArc;
+      CreateGui.getView().createArc = newArc;
       // addPetriNetObject a handler for shift & esc actions drawing arc
       // this is removed when the arc is finished drawing:
-      keyHandler = new ArcKeyboardEventHandler((Arc)newArc);
+      keyHandler = new ArcKeyboardEventHandler(newArc);
       newArc.addKeyListener(keyHandler);
       newArc.requestFocusInWindow();
       newArc.setSelectable(false);
    }
    
    
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
       super.mousePressed(e);
       // Prevent creating arcs with a right-click or a middle-click
       if (e.getButton() != MouseEvent.BUTTON1) {
@@ -164,7 +162,8 @@ public class PlaceTransitionObjectHandler
    }
    
    
-   public void mouseReleased(MouseEvent e) {
+   @Override
+public void mouseReleased(MouseEvent e) {
       boolean isNewArc = true; // true if we have to add a new arc to the Petri Net
       boolean fastMode = false;
       
@@ -312,7 +311,7 @@ public class PlaceTransitionObjectHandler
          case Pipe.FAST_PLACE:
             fastMode = true;
          case Pipe.ARC:
-        	 Arc createArc = (NormalArc) view.createArc;
+        	 Arc createArc = view.createArc;
         	 if (createArc != null) {
         		 if (currentObject != createArc.getSource()) {
         			 createArc.setSelectable(true);

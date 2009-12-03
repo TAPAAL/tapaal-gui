@@ -16,12 +16,10 @@ import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
-import pipe.gui.CreateGui;
 
 public class PipeTapnToAauTapnTransformer {
 	private DataLayer appModel;
@@ -82,9 +80,9 @@ public class PipeTapnToAauTapnTransformer {
 					} else {
 						
 						aAUArc = new dk.aau.cs.petrinet.TAPNTransportArc(
-								(TAPNPlace)(dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( tmp.getSource() ),
-								(TAPNTransition)(dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( end.getSource() ) ,
-								(TAPNPlace)(dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( end.getTarget()),
+								(TAPNPlace)PlaceTransitionObjectBookKeeper.get( tmp.getSource() ),
+								(TAPNTransition)PlaceTransitionObjectBookKeeper.get( end.getSource() ) ,
+								(TAPNPlace)PlaceTransitionObjectBookKeeper.get( end.getTarget()),
 								getGuard(tmp));
 						
 						
@@ -101,8 +99,8 @@ public class PipeTapnToAauTapnTransformer {
 			}
 			
 			if (aAUArc != null){
-				aAUArc.setSource( (dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
-				aAUArc.setTarget( (dk.aau.cs.petrinet.PlaceTransitionObject)PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
+				aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
+				aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
 				aAUPetriNet.add(aAUArc);
 			}
 		}

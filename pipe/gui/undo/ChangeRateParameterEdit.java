@@ -30,13 +30,15 @@ public class ChangeRateParameterEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.changeRateParameter(oldRateParameter);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.changeRateParameter(newRateParameter);
    }
    

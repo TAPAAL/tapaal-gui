@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import javax.swing.AbstractButton;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import pipe.dataLayer.DataLayer;
@@ -186,10 +187,12 @@ public class TransitionEditor
 
       nameTextField.setText(transition.getName());
       nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-         public void focusGained(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusGained(java.awt.event.FocusEvent evt) {
             nameTextFieldFocusGained(evt);
          }
-         public void focusLost(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusLost(java.awt.event.FocusEvent evt) {
             nameTextFieldFocusLost(evt);
          }
       });
@@ -338,10 +341,12 @@ public class TransitionEditor
          }
       });
       rateTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-         public void focusGained(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusGained(java.awt.event.FocusEvent evt) {
             rateTextFieldFocusGained(evt);
          }
-         public void focusLost(java.awt.event.FocusEvent evt) {
+         @Override
+		public void focusLost(java.awt.event.FocusEvent evt) {
             rateTextFieldFocusLost(evt);
          }
       });
@@ -386,7 +391,7 @@ public class TransitionEditor
 
       //prova
       priorityTextField.setEditable(false);
-      priorityTextField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+      priorityTextField.setHorizontalAlignment(SwingConstants.RIGHT);
       priorityTextField.setText("1");
       priorityTextField.setMaximumSize(new java.awt.Dimension(36, 19));
       priorityTextField.setMinimumSize(new java.awt.Dimension(36, 19));
@@ -430,7 +435,8 @@ public class TransitionEditor
          }
       });
       okButton.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyPressed(java.awt.event.KeyEvent evt) {
+         @Override
+		public void keyPressed(java.awt.event.KeyEvent evt) {
             okButtonKeyPressed(evt);
          }
       });

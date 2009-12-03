@@ -28,13 +28,15 @@ public class TransitionPriorityEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.setPriority(oldPriority);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.setPriority(newPriority);
    }
    

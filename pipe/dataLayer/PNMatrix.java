@@ -361,7 +361,8 @@ public class PNMatrix {
     * Clone the IntMatrix object.
     * @return  The clone of the current matrix.
     */
-   public Object clone() {
+   @Override
+public Object clone() {
       return this.copy();
    }
 

@@ -285,7 +285,8 @@ class MatrixElement{
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return "Row: " + row + " Rate: " + rate;
    }
    

@@ -74,7 +74,8 @@ public class PetriNetObjectHandler
    }
    
    
-   public void mousePressed(MouseEvent e) {
+   @Override
+public void mousePressed(MouseEvent e) {
       
       if (CreateGui.getApp().isEditionAllowed() && enablePopup) { 
          checkForPopup(e);
@@ -101,7 +102,8 @@ public class PetriNetObjectHandler
     * Event handler for when the user releases the mouse, used in conjunction 
     * with mouseDragged and mouseReleased to implement the moving action 
     */
-   public void mouseReleased(MouseEvent e) {
+   @Override
+public void mouseReleased(MouseEvent e) {
 
       // Have to check for popup here as well as on pressed for crossplatform!!
       if (CreateGui.getApp().isEditionAllowed() && enablePopup){ 
@@ -139,7 +141,8 @@ public class PetriNetObjectHandler
    /** 
     * Handler for dragging PlaceTransitionObjects around 
     */
-   public void mouseDragged(MouseEvent e) {
+   @Override
+public void mouseDragged(MouseEvent e) {
      
       if (!SwingUtilities.isLeftMouseButton(e)){ 
          return;
@@ -163,7 +166,8 @@ public class PetriNetObjectHandler
    }
    
    
-   public void mouseWheelMoved (MouseWheelEvent e) {
+   @Override
+public void mouseWheelMoved (MouseWheelEvent e) {
       ;
    }
    

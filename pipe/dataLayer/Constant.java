@@ -34,6 +34,7 @@ public class Constant {
 		return value;
 	}
 	
+	@Override
 	public String toString(){
 		return name + " = " + value;
 	}

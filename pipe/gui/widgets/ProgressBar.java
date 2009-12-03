@@ -24,7 +24,8 @@ public class ProgressBar
       initComponents();
       setLocation(500, 500);
       addMouseListener(new MouseAdapter() {
-         public void mousePressed(MouseEvent e) {
+         @Override
+		public void mousePressed(MouseEvent e) {
             setVisible(false);
             dispose();
             end = true;
@@ -126,7 +127,8 @@ public class ProgressBar
       } while (!end);
         System.out.println("fora");
       try {
-         Thread.currentThread().sleep(300);      
+         Thread.currentThread();
+		Thread.sleep(300);      
       } catch (InterruptedException ex) {
          ex.printStackTrace();
       }      

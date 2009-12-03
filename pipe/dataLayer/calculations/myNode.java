@@ -3,15 +3,9 @@
  */
 package pipe.dataLayer.calculations;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import pipe.dataLayer.calculations.myNode;
 
 import pipe.gui.Pipe;
-import pipe.io.ImmediateAbortException;
-import pipe.io.StateRecord;
-import pipe.io.TransitionRecord;
 
 
 /**

@@ -42,7 +42,8 @@ public class PIPEState
    }
    
    
-   public String getNodeType(){
+   @Override
+public String getNodeType(){
       return "State";
    }   
 

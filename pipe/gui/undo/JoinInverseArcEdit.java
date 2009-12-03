@@ -22,13 +22,15 @@ public class JoinInverseArcEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arc.split();
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       arc.join();
    }
    

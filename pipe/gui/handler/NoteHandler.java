@@ -21,21 +21,24 @@ public class NoteHandler
    }
 
    
-   public void mousePressed(MouseEvent e) {      
+   @Override
+public void mousePressed(MouseEvent e) {      
       if ((e.getComponent() == myObject) || !e.getComponent().isEnabled()){
          super.mousePressed(e);
       }
    }
 
    
-   public void mouseDragged(MouseEvent e) {
+   @Override
+public void mouseDragged(MouseEvent e) {
       if ((e.getComponent() == myObject) || !e.getComponent().isEnabled()){
          super.mouseDragged(e);
       }
    }
 
    
-   public void mouseReleased(MouseEvent e) {
+   @Override
+public void mouseReleased(MouseEvent e) {
       if ((e.getComponent() == myObject) || !e.getComponent().isEnabled()){
          super.mouseReleased(e);
       }

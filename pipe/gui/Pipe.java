@@ -1,8 +1,6 @@
 package pipe.gui;
 import java.awt.Color;
 
-import dk.aau.cs.debug.Logger;
-
 public class Pipe {
    
    public static final String TOOL = "TAPAAL";

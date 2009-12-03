@@ -38,10 +38,12 @@ public class TAPNTransportArc extends TAPNArc{
 		}
 	}
 	
+	@Override
 	public TAPNPlace getSource() {
 		return source;
 	}
 
+	@Override
 	public TAPNPlace getTarget() {
 		if (this.target==null){
 			Logger.log("kyrke3!!! error" );
@@ -53,6 +55,7 @@ public class TAPNTransportArc extends TAPNArc{
 		return intermediateTransition;
 	}
 	
+	@Override
 	public PlaceTransitionObject get(String s){
 		
 		if (s.equalsIgnoreCase("source")){

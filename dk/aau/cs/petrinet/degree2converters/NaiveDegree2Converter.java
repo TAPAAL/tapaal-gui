@@ -105,7 +105,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 			for (Arc a:t.getPostset()){
 				if (!(a instanceof TAPNTransportArc)){ // If not a transport arc
-					postsetNormalArcs.add((Arc)a);
+					postsetNormalArcs.add(a);
 				}
 			}
 			Collections.reverse(postsetNormalArcs); // Revers the list of these places
@@ -158,17 +158,17 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				holdingplacesTransport.add(holdingplace);
 
 				toReturn.add(new TAPNTransportArc(
-						oldToNewPlacesMap.get((TAPNPlace)presetTransportArcs.get(0).getSource()), 
+						oldToNewPlacesMap.get(presetTransportArcs.get(0).getSource()), 
 						lastTransition, 
 						holdingplace,
 						((TAPNArc)presetTransportArcs.get(0)).getGuard()
 				));
 
-				connectTo.put(holdingplace, oldToNewPlacesMap.get((TAPNPlace)presetTransportArcs.get(0).getTarget()));
+				connectTo.put(holdingplace, oldToNewPlacesMap.get(presetTransportArcs.get(0).getTarget()));
 
 				for (i=1;i<presetTransportArcs.size();i++){
 					j++;
-					TAPNPlace orgplace = (TAPNPlace)presetTransportArcs.get(i).getSource();
+					TAPNPlace orgplace = presetTransportArcs.get(i).getSource();
 
 					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
 					toReturn.addTransition(newtrans);
@@ -184,7 +184,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					}
 
 					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap.get(orgplace), newtrans, holdingplace, presetTransportArcs.get(i).getGuard()));
-					connectTo.put(holdingplace, oldToNewPlacesMap.get((TAPNPlace)presetTransportArcs.get(i).getTarget()));
+					connectTo.put(holdingplace, oldToNewPlacesMap.get(presetTransportArcs.get(i).getTarget()));
 
 					//The im places
 					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
@@ -253,7 +253,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				for (; i < presetNormalArcs.size()-1;i++){
 					j++;
 
-					TAPNPlace orgplace = (TAPNPlace)oldToNewPlacesMap.get((TAPNPlace)presetNormalArcs.get(i).getSource());
+					TAPNPlace orgplace = oldToNewPlacesMap.get(presetNormalArcs.get(i).getSource());
 
 					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
 					toReturn.addTransition(newtrans);
@@ -298,12 +298,12 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				/*	if (i > 0){
 				--i;
 			}*/
-				orgplace = (TAPNPlace)oldToNewPlacesMap.get((TAPNPlace)presetNormalArcs.get(i).getSource());
+				orgplace = oldToNewPlacesMap.get(presetNormalArcs.get(i).getSource());
 				j++;
 				newtrans = new TAPNTransition(t.getName() + "_T"+j);
 				toReturn.addTransition(newtrans);
 
-				holdingplace = oldToNewPlacesMap.get((TAPNPlace)postsetNormalArcs.get(0).getTarget());
+				holdingplace = oldToNewPlacesMap.get(postsetNormalArcs.get(0).getTarget());
 
 				toReturn.add(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
 				toReturn.add(new Arc(newtrans, holdingplace));
@@ -323,8 +323,8 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				//Go backwared to each holdingplaces
 				for (i=0;i<holdingplacesNormal.size();i++){ // One holding place is skiped as we use and direct connection above
 					j++;
-					holdingplace = (TAPNPlace)holdingplacesNormal.get(i);
-					orgplace = (TAPNPlace)oldToNewPlacesMap.get((TAPNPlace)postsetNormalArcs.get(i+1).getTarget()); // Use 1 one as we have connected place 0 above
+					holdingplace = holdingplacesNormal.get(i);
+					orgplace = oldToNewPlacesMap.get(postsetNormalArcs.get(i+1).getTarget()); // Use 1 one as we have connected place 0 above
 
 					newtrans = new TAPNTransition(t.getName() + "_T"+j);
 					toReturn.addTransition(newtrans);
@@ -362,7 +362,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					j++;
 
 
-					holdingplace = (TAPNPlace)holdingplacesTransport.get(i);
+					holdingplace = holdingplacesTransport.get(i);
 					TAPNPlace target = connectTo.get(holdingplace);
 
 					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);

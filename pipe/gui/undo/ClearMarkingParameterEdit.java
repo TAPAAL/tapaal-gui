@@ -27,13 +27,15 @@ public class ClearMarkingParameterEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       place.setMarkingParameter(oldMarkingParameter);      
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       place.clearMarkingParameter();
    }
    

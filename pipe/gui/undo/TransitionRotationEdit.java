@@ -25,13 +25,15 @@ public class TransitionRotationEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.rotate(-angle);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.rotate(angle);
    }
    

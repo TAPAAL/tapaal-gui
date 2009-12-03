@@ -189,7 +189,8 @@ public Place paste(double x, double y, boolean fromAnotherView){
     * the currentMarking
     * @param g The Graphics object onto which the Place is drawn.
     */
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2 = (Graphics2D)g;
 
@@ -365,11 +366,12 @@ public Place paste(double x, double y, boolean fromAnotherView){
     * Returns the diameter of this Place at the current zoom
     */
    private int getDiameter() {
-      return (int)(Zoomer.getZoomedValue(DIAMETER, zoom));
+      return (Zoomer.getZoomedValue(DIAMETER, zoom));
    }   
    
    
-   public boolean contains(int x, int y) {
+   @Override
+public boolean contains(int x, int y) {
       double unZoomedX = 
               Zoomer.getUnzoomedValue(x - COMPONENT_DRAW_OFFSET, zoom);
       double unZoomedY = 
@@ -402,7 +404,8 @@ public Place paste(double x, double y, boolean fromAnotherView){
    /* (non-Javadoc)
     * @see pipe.dataLayer.PlaceTransitionObject#updateEndPoint(pipe.dataLayer.Arc)
     */
-   public void updateEndPoint(Arc arc) {
+   @Override
+public void updateEndPoint(Arc arc) {
       if (arc.getSource()==this) {
          // Make it calculate the angle from the centre of the place rather than
          // the current start point
@@ -426,7 +429,8 @@ public Place paste(double x, double y, boolean fromAnotherView){
    }
 
 
-   public void toggleAttributesVisible(){
+   @Override
+public void toggleAttributesVisible(){
       attributesVisible = !attributesVisible;
       update();  
    }
@@ -437,13 +441,15 @@ public Place paste(double x, double y, boolean fromAnotherView){
    }
    
 
-   public void addedToGui(){
+   @Override
+public void addedToGui(){
       super.addedToGui();
       update();
    }   
    
    
-   public void showEditor(){
+   @Override
+public void showEditor(){
       // Build interface
       EscapableDialog guiDialog = 
               new EscapableDialog(CreateGui.getApp(), "PIPE2", true);
@@ -468,7 +474,8 @@ public Place paste(double x, double y, boolean fromAnotherView){
    }
 
    
-   public void update() {
+   @Override
+public void update() {
       if (attributesVisible == true){
          pnName.setText("\nk=" + (capacity > 0 ? capacity :"\u221E") +
             (markingParameter != null ? "\nm=" + markingParameter.toString() : ""));
@@ -482,7 +489,8 @@ public Place paste(double x, double y, boolean fromAnotherView){
    }
    
    
-   public void delete() {
+   @Override
+public void delete() {
       if (markingParameter != null) {
          markingParameter.remove(this);
          markingParameter = null;
@@ -529,7 +537,8 @@ public Place paste(double x, double y, boolean fromAnotherView){
       return markingParameter;
    }
    
-   public Place clone(){
+   @Override
+public Place clone(){
 	
 	   Place toReturn = (Place) super.clone();
 	   

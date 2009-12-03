@@ -11,7 +11,6 @@ package pipe.experiment.editor.gui;
 
 import pipe.gui.CreateGui;
 import javax.swing.JDialog;
-import javax.swing.JComboBox;
 import java.awt.Container;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -19,17 +18,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.GridLayout;
-import pipe.gui.action.GuiAction;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Dimension;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.Box;
 import javax.swing.JTextField;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Place;
-
 import java.util.Vector;
 
 

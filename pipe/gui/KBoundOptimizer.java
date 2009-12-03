@@ -22,6 +22,7 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		super(appModel, k);
 	}
 	
+	@Override
 	protected void printQuery(PrintStream stream) {
 		super.printQuery(stream);
 		stream.println("/*");
@@ -30,11 +31,13 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		stream.println("sup: usedExtraTokens");
 	}
 	
+	@Override
 	protected AdvancedUppaalSym getReductionStrategy()
 	{
 		return new AdvancedUppaalSymKBound();
 	}
 	
+	@Override
 	protected void parseLine(String line) {
 		super.parseLine(line);
 		
@@ -45,6 +48,7 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		}
 	}
 	
+	@Override
 	protected void showResult(RunUppaalVerification a) {
 		String resultmessage = "";
 		

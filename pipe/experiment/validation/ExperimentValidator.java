@@ -9,28 +9,19 @@
 
 package pipe.experiment.validation;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import pipe.dataLayer.DataLayer;
 import javax.xml.XMLConstants;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import javax.xml.transform.dom.DOMSource;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.transform.stream.StreamSource;
 import java.net.URI;
-
-import javax.swing.JOptionPane;
 
  /**
   * This class handles the validation of the experiment file. This validation

@@ -23,6 +23,7 @@ public class TAPNInhibitorArc extends TimedArc {
 	}
 	
 	
+	@Override
 	public boolean satisfiesGuard(BigDecimal token)
 	{
 		return !super.satisfiesGuard(token);
@@ -33,6 +34,7 @@ public class TAPNInhibitorArc extends TimedArc {
 	 * @version 1.0
 	 * @author Pere Bonet
 	 */
+	@Override
 	public void paintComponent(Graphics g) {
 	      //super.paintComponent(g);
 	      Graphics2D g2 = (Graphics2D)g;   

@@ -12,10 +12,7 @@ import pipe.dataLayer.Arc;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
-import pipe.gui.action.EditGroupAction;
-import pipe.gui.action.EditTimeIntervalAction;
 import pipe.gui.action.SplitArcAction;
-import pipe.gui.handler.ArcHandler.SplitArcsAction;
 
 public class TransportArcHandler extends TimedArcHandler {
 
@@ -23,6 +20,7 @@ public class TransportArcHandler extends TimedArcHandler {
 		super(contentpane, obj);
 		enablePopup = true;
 	}
+	@Override
 	public JPopupMenu getPopup(MouseEvent e) {
 		int popupIndex = 0;
 		JMenuItem menuItem;

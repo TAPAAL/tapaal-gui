@@ -2,12 +2,6 @@ package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
-
-import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
 
 import pipe.dataLayer.AnnotationNote;

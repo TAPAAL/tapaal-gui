@@ -8,7 +8,6 @@
  */
 
 package pipe.experiment;
-import java.util.Vector;
 
 /**
  *

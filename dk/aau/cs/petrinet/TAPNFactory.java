@@ -1,17 +1,4 @@
 package dk.aau.cs.petrinet;
-
-import java.util.HashMap;
-
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NormalArc;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
-import pipe.gui.CreateGui;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 

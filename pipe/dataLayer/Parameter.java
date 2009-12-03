@@ -31,7 +31,8 @@ public abstract class Parameter
    }
    
 
-   public String getName() {
+   @Override
+public String getName() {
       return name;
    }
 
@@ -44,18 +45,21 @@ public abstract class Parameter
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return name;
    }
    
    
-   public abstract void enableEditMode();
+   @Override
+public abstract void enableEditMode();
 
    
    public abstract void update();
 
    
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       //updateBounds();
       super.paintComponent(g);
       Graphics2D g2 = (Graphics2D)g;

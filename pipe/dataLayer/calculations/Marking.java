@@ -66,7 +66,7 @@ public class Marking
    
    
    public boolean equals (Marking m1){
-      return (this.equals((State)m1) && (this.isTangible == m1.isTangible));
+      return (this.equals((State)m1) && (Marking.isTangible == Marking.isTangible));
    }   
    
 }

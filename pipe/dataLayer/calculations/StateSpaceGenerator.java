@@ -278,7 +278,7 @@ public class StateSpaceGenerator {
          numtangiblestates++;
       } else {
          int attempts = 0; // This is a counter used to detect timeless traps
-         vanishingStates.push(new VanishingState(currentMarking, (double)1.0));
+         vanishingStates.push(new VanishingState(currentMarking, 1.0));
          while ((!vanishingStates.isEmpty()) && (attempts != MAX_TRIES)) {
             attempts++;
             v = (VanishingState)vanishingStates.pop();
@@ -307,7 +307,7 @@ public class StateSpaceGenerator {
                   pprime = p * prob(pnmlData, v, vprime, transition);
                   if (pprime > epsilon) {
                      vanishingStates.push(
-                              new VanishingState(vprime,(double)pprime));
+                              new VanishingState(vprime,pprime));
                   }
                }
                transition = 
@@ -404,7 +404,7 @@ public class StateSpaceGenerator {
                      } else {
                         if (pprime > epsilon) {
                            vanishingStates.push(
-                                    new VanishingState(vprime,(double)pprime));
+                                    new VanishingState(vprime,pprime));
                         }
                      }
                      
@@ -703,8 +703,8 @@ public class StateSpaceGenerator {
          for (int k = 0; k < markSize; k++) {
             // if the sum of the incidence matrix and marking 1 doesn't equal
             // marking 2, set that candidate transition possibility to be false
-            if (((int)marking1[k] + (int)incidenceMatrix[k][i]) !=
-                     (int)marking2[k]) {
+            if ((marking1[k] + incidenceMatrix[k][i]) !=
+                     marking2[k]) {
                matchingTransition[i] = false;
                break; 
             }
@@ -779,8 +779,8 @@ public class StateSpaceGenerator {
          for (int k = 0; k < markSize; k++) {
             // if the sum of the incidence matrix and marking 1 doesn't equal
             // marking 2, set that candidate transition possibility to be false
-            if (((int)marking1[k] + (int)incidenceMatrix[k][i]) !=
-                     (int)marking2[k]) {
+            if ((marking1[k] + incidenceMatrix[k][i]) !=
+                     marking2[k]) {
                matchingTransition[i] = false;
                break; 
             }

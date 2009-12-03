@@ -64,7 +64,8 @@ public class GraphFrame
       setLocation(100, 100);
       
       addWindowListener(new WindowAdapter() {
-         public void windowClosing(WindowEvent wev) {
+         @Override
+		public void windowClosing(WindowEvent wev) {
             Window w = wev.getWindow();
             w.setVisible(false);
             w.dispose();

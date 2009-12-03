@@ -14,27 +14,6 @@
  */
 package pipe.modules.gspn;
 
-import jama.Matrix;
-
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.util.Date;
-
-import javax.swing.BoxLayout;
-import javax.swing.JDialog;
-
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.calculations.StateList;
-import pipe.dataLayer.calculations.TreeTooBigException;
-import pipe.gui.CreateGui;
-import pipe.gui.widgets.ButtonBar;
-import pipe.gui.widgets.PetriNetChooserPanel;
-import pipe.gui.widgets.ResultsHTMLPane;
-import pipe.modules.Module;
-
 
 /**
  * @author Matthew Cook

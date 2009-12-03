@@ -1,17 +1,17 @@
 package dk.aau.cs.petrinet;
 
 public class Token {
-	private Place place;
+	private TAPNPlace place;
 	
-	public Token(Place place){
+	public Token(TAPNPlace place){
 		this.place = place;
 	}
 	
-	public Place getPlace(){
+	public TAPNPlace getPlace(){
 		return place;
 	}
 	
-	public void setPlace(Place newPlace){
+	public void setPlace(TAPNPlace newPlace){
 		this.place = newPlace;
 	}
 }

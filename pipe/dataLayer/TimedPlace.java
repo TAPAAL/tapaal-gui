@@ -10,36 +10,25 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Window;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.font.TextAttribute;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.Iterator;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet.FontAttribute;
-
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.PlaceMarkingEdit;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.undo.TimedPlaceTokenEdit;
 import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.PlaceEditorPanel;
 import pipe.gui.widgets.TimedPlaceEditorPanel;
 
 public class TimedPlace extends Place {
@@ -164,6 +153,7 @@ public class TimedPlace extends Place {
 		return new TimedPlaceInvariantEdit(this, oldinvariant, this.invariant);
 	}
 
+	@Override
 	public void update() {
 		if (attributesVisible == true){
 			String value = "";
@@ -191,6 +181,7 @@ public class TimedPlace extends Place {
 	}
 
 
+	@Override
 	public void showEditor(){
 		// Build interface
 		EscapableDialog guiDialog = 
@@ -215,6 +206,7 @@ public class TimedPlace extends Place {
 		guiDialog.setVisible(true);
 	}
 	
+	@Override
 	public TimedPlace copy(){
 		//TimedPlace copy = new TimedPlace(super.copy(), this.invariant);
 //		copy.setOriginal(this);
@@ -235,6 +227,7 @@ public class TimedPlace extends Place {
 		return copy; 
 	}
 	
+	@Override
 	public TimedPlace paste(double despX, double despY, boolean toAnotherView){
 		//TimedPlace copy = new TimedPlace (super.paste(despX, despY, toAnotherView), this.invariant );
 //		copy.setOriginal(this);
@@ -261,6 +254,7 @@ public class TimedPlace extends Place {
 		return copy;
 	}
 	
+	@Override
 	public TimedPlace clone(){
 		TimedPlace toReturn = (TimedPlace)super.clone();
 		
@@ -333,6 +327,7 @@ public class TimedPlace extends Place {
 	}
 	
 	//overide, so that we can take care of the age of the tokens
+	@Override
 	public UndoableEdit setCurrentMarking(int currentMarkingInput) {
 		int oldMarking = currentMarking;
 		if (capacity == 0){
@@ -351,6 +346,7 @@ public class TimedPlace extends Place {
 	}
 	
 	//overide method
+	@Override
 	public void paintComponent(Graphics g) {
 		DecimalFormat df = new DecimalFormat();
 		df.setMinimumFractionDigits(1);

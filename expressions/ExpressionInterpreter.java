@@ -13,7 +13,6 @@ package expressions;
 import expressions.java_cup.runtime.ComplexSymbolFactory;
 import expressions.java_cup.runtime.SymbolFactory;
 import java.util.Hashtable;
-import java.io.StringReader;
 
 /**
  *
@@ -55,7 +54,7 @@ public class ExpressionInterpreter {
      * @throws VariableNotInitializedException
      */
     public Double getValue(String vName) throws VariableNotInitializedException{
-        Double value = (Double) variables.get(vName);
+        Double value = variables.get(vName);
         if (value == null) throw new VariableNotInitializedException(vName);
         return value;
     }

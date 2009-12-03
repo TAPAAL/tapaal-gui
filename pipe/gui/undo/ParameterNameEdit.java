@@ -28,14 +28,16 @@ public class ParameterNameEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       parameter.setParameterName(oldName);
       parameter.update();
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       parameter.setParameterName(newName);
       parameter.update();
    }

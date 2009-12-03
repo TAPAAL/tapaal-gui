@@ -4,9 +4,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.Transition;
-import pipe.gui.Animator;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 
 
 /**
@@ -27,7 +25,8 @@ public class AnimationHandler
         extends javax.swing.event.MouseInputAdapter {
    
    
-   public void mouseClicked(MouseEvent e){      
+   @Override
+public void mouseClicked(MouseEvent e){      
       if (e.getComponent() instanceof Transition) {
          Transition transition = (Transition)e.getComponent();
 //Edited by Joakim Byg - It seems enough to check if it is enabled 

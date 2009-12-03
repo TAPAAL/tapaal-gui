@@ -23,13 +23,15 @@ public class TagArcEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       arc.setTagged(!arc.isTagged());
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       arc.setTagged(!arc.isTagged());
    }
    

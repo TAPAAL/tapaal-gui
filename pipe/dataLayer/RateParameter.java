@@ -38,7 +38,8 @@ public class RateParameter
    }
    
    
-   public void enableEditMode(){
+   @Override
+public void enableEditMode(){
       // Build interface
       EscapableDialog guiDialog = 
               new EscapableDialog(CreateGui.getApp(),"PIPE2",true);
@@ -91,7 +92,8 @@ public class RateParameter
    
    
    // updates each transition in transitionsHashSet to current parameter value
-   public void update() {
+   @Override
+public void update() {
       if (valueChanged){
          valueChanged = false;
          Iterator<Transition> iterator = transitionsHashSet.iterator();
@@ -107,18 +109,19 @@ public class RateParameter
 
    
    public Parameter copy() {
-      return new RateParameter(name, value, (int)this.getX(), (int)this.getY());      
+      return new RateParameter(name, value, this.getX(), this.getY());      
    }
 
    
    public Parameter paste(double x, double y, boolean fromAnotherView) {
       return new RateParameter(name, value,
-                               (int)this.getX() + Grid.getModifiedX(x),
-                               (int)this.getY() + Grid.getModifiedY(y));            
+                               this.getX() + Grid.getModifiedX(x),
+                               this.getY() + Grid.getModifiedY(y));            
    }
 
    
-   public void delete(){
+   @Override
+public void delete(){
       Object[] transitions = transitionsHashSet.toArray();
       if (transitions.length > 0) {
          UndoManager undoManager = CreateGui.getView().getUndoManager();

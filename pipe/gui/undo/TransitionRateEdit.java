@@ -28,13 +28,15 @@ public class TransitionRateEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       transition.setRate(oldRate);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       transition.setRate(newRate);
    }
    

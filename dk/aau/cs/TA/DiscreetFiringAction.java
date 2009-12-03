@@ -2,8 +2,6 @@ package dk.aau.cs.TA;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import dk.aau.cs.debug.Logger;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
@@ -58,6 +56,7 @@ public class DiscreetFiringAction implements FiringAction {
 	}
 	
 	
+	@Override
 	public String toString() {
 	
 		return "Transition " + firedtransition +" is fired ("+  consumedTokens.keySet()  + " Size:"+  consumedTokens.size() + ") Tokens age " + consumedTokens;

@@ -54,18 +54,21 @@ public class DeletePetriNetObjectEdit
 
      
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       pnObject.delete();
    }
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       pnObject.undelete(model,view);
    }
    
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString() + " " + pnObject.getClass().getSimpleName() 
              + " [" +  pnObject.getId() + "]";
    }   

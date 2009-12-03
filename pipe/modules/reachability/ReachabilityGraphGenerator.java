@@ -327,14 +327,14 @@ public class ReachabilityGraphGenerator
                     (DefaultNode)(nodes.get(to)),
                     dataLayer.getTransitionName(transitions.getTransitionNo())));
          } else {
-            if (loopEdges.contains((DefaultNode)(nodes.get(from)))) {
-               int i = loopEdges.indexOf((DefaultNode)(nodes.get(from)));
+            if (loopEdges.contains((nodes.get(from)))) {
+               int i = loopEdges.indexOf((nodes.get(from)));
                
                loopEdgesTransitions.set(i, 
                        (String)loopEdgesTransitions.get(i) + ", " +
                        dataLayer.getTransitionName(transitions.getTransitionNo()));
             } else {
-               loopEdges.add((DefaultNode)(nodes.get(from)));
+               loopEdges.add((nodes.get(from)));
                loopEdgesTransitions.add(
                        dataLayer.getTransitionName(transitions.getTransitionNo()));
             }

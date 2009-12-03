@@ -235,13 +235,13 @@ public class Animator {
 				 }
 				 
 				 HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
-				 for (Arc a : (LinkedList<Arc>) transition.getPreset() ){
+				 for (Arc a : transition.getPreset() ){
 					 TimedPlace place = (TimedPlace)a.getSource();
 					 presetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
 				 }
 
 				 HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
-				 for (Arc a : (LinkedList<Arc>) transition.getPostset() ){
+				 for (Arc a : transition.getPostset() ){
 					 TimedPlace place = (TimedPlace)a.getTarget();
 					 postsetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
 				 }

@@ -212,6 +212,7 @@ extends javax.swing.JPanel {
 			}
 		});
 		okButton.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
 			public void keyPressed(java.awt.event.KeyEvent evt) {
 				okButtonKeyPressed(evt);
 			}

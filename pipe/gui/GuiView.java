@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.print.PageFormat;
@@ -120,7 +119,7 @@ public class GuiView
       addMouseListener(handler);
       addMouseMotionListener(handler);
       try {
-         addMouseWheelListener((MouseWheelListener)handler);
+         addMouseWheelListener(handler);
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -274,7 +273,8 @@ public class GuiView
     * TODO: write a better description than this since it is now totally 
     * not happening.
     */
-   public void paintComponent(Graphics g) {
+   @Override
+public void paintComponent(Graphics g) {
       super.paintComponent(g);
       if (Grid.isEnabled()) {
          Grid.updateSize(this);
@@ -406,7 +406,8 @@ EOC*/
    }
    
    
-   public void remove(Component comp) {
+   @Override
+public void remove(Component comp) {
       boolean result = petriNetObjects.remove(comp);
       //if (result) {
       //   System.out.println("DEBUG: remove PNO from view");
@@ -595,7 +596,8 @@ EOC*/
           return (PlaceTransitionObject)pnObject;
       }
       
-      public void mousePressed(MouseEvent e){
+      @Override
+	public void mousePressed(MouseEvent e){
          Point start = e.getPoint();
          Point p;
          if (SwingUtilities.isLeftMouseButton(e)) {
@@ -938,12 +940,14 @@ EOC*/
       }
       
       
-      public void mouseReleased(MouseEvent e){
+      @Override
+	public void mouseReleased(MouseEvent e){
          setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
       }
       
       
-      public void mouseMoved(MouseEvent e) {
+      @Override
+	public void mouseMoved(MouseEvent e) {
          if (createArc != null) {
             createArc.setEndPoint(Grid.getModifiedX(e.getX()),
                     Grid.getModifiedY(e.getY()),
@@ -954,14 +958,16 @@ EOC*/
       /**
        * @see javax.swing.event.MouseInputAdapter#mouseDragged(java.awt.event.MouseEvent)
        */
-      public void mouseDragged(MouseEvent e) {
+      @Override
+	public void mouseDragged(MouseEvent e) {
          //if (CreateGui.getApp().getMode() == Pipe.DRAG){
          view.drag(dragStart, e.getPoint());
          // }
       }
       
       
-      public void mouseWheelMoved(MouseWheelEvent e) {
+      @Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
          if (!e.isControlDown()) {
             return;
          } else {

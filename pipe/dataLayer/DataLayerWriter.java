@@ -23,12 +23,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-//kyrke XXX - function for saving a timedPlace has been added here 
-//but we need to move this to a now save file when pipe gets modes
-//for different types of PN
-
 
 /**
  * Create DataLayerWriter object

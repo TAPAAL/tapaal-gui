@@ -29,18 +29,21 @@ public class TranslatePetriNetObjectEdit
 
    
    /** */
-   public void undo() {
+   @Override
+public void undo() {
       pnObject.translate(-transX, -transY);
    }
 
    
    /** */
-   public void redo() {
+   @Override
+public void redo() {
       pnObject.translate(transX, transY);
    }
 
    
-   public String toString(){
+   @Override
+public String toString(){
       return super.toString()  + " " + pnObject.getName() + 
               " (" + transX + "," + transY + ")";
    }

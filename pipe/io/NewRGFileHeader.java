@@ -93,27 +93,32 @@ public class NewRGFileHeader
    }
    
    
-   public int getNumStates(){
+   @Override
+public int getNumStates(){
       return numstates;
    }
    
    
-   public int getStateArraySize(){
+   @Override
+public int getStateArraySize(){
       return statearraysize;
    }
    
    
-   public int getNumTransitions(){
+   @Override
+public int getNumTransitions(){
       return numtransitions;
    }
    
    
-   public int getTransitionRecordSize(){
+   @Override
+public int getTransitionRecordSize(){
       return transitionrecordsize;
    }
    
    
-   public long getOffsetToTransitions(){
+   @Override
+public long getOffsetToTransitions(){
       return offsettotransitions;
    }
    

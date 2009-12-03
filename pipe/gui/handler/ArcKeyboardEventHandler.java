@@ -26,7 +26,8 @@ public class ArcKeyboardEventHandler
    }
    
 
-   public void keyPressed(KeyEvent e) {
+   @Override
+public void keyPressed(KeyEvent e) {
       switch (e.getKeyCode()) {
          case KeyEvent.VK_META:
          case KeyEvent.VK_WINDOWS:
@@ -64,7 +65,8 @@ public class ArcKeyboardEventHandler
    }
    
    
-   public void keyReleased(KeyEvent e) {   
+   @Override
+public void keyReleased(KeyEvent e) {   
       switch (e.getKeyCode()) {
          case KeyEvent.VK_META:
          case KeyEvent.VK_WINDOWS:
