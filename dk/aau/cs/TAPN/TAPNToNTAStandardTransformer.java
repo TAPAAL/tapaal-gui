@@ -118,67 +118,6 @@ extends TAPNToNTATransformer{
 	}
 	
 
-	private String createSyncExpression(TAPNTransition transition, char symbol) throws IllegalArgumentException {
-		if(isDegree1(transition)){
-			return "";
-		}else if (isDegree2(transition)) {
-			return transition.getName() + symbol;
-		}else
-			throw new IllegalArgumentException("The size of the transition's preset and postset does not match!");
-	}
-
-
-	private boolean isDegree2(TAPNTransition transition) {
-		return transition.getPreset().size() == 2 && transition.getPostset().size() == 2;
-	}
-
-
-	private boolean isDegree1(TAPNTransition transition) {
-		return transition.getPreset().size() == 1 && transition.getPostset().size() == 1;
-	}
-
-
-	private String createUpdateExpression(TAPNArc sourceArc) {
-		if(!(sourceArc instanceof TAPNTransportArc)){
-			return "x := 0"; //TODO: lock boolean?
-		}else{
-			return "";
-		}
-	}
-
-	private String createTransitionGuard(String guard) {
-		if(guard.equals("[0,inf)")) return "";
-
-		String[] splitGuard = guard.substring(1, guard.length()-1).split(",");
-		char firstDelim = guard.charAt(0);
-		char secondDelim = guard.charAt(guard.length()-1);
-
-		StringBuilder builder = new StringBuilder();
-		builder.append("x ");
-
-		if(firstDelim == '('){
-			builder.append(">");
-		} else {
-			builder.append(">=");
-		}
-
-		builder.append(splitGuard[0]);
-
-		if(!splitGuard[1].equals("inf")){
-			builder.append(" && x ");
-
-			if(secondDelim == ')'){
-				builder.append("<");
-			}else {
-				builder.append("<=");
-			}
-			builder.append(splitGuard[1]);
-		}
-
-		return builder.toString();
-	}
-
-
 	private void createLocations(TimedArcPetriNet model, TimedAutomata ta) {
 		for(TAPNPlace p : model.getPlaces()){
 			Location l = new Location(p.getName(), convertInvariant(p.getInvariant()));
@@ -194,7 +133,7 @@ extends TAPNToNTATransformer{
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		String query = tapnQuery.toString();
 
-		Pattern pattern = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*");
+		Pattern pattern = Pattern.compile(QUERY_PATTERN);
 		Matcher matcher = pattern.matcher(query);
 
 		StringBuilder builder = new StringBuilder("(");
@@ -207,6 +146,6 @@ extends TAPNToNTATransformer{
 			builder.append(".$1");
 		}
 		builder.append(") $2 $3");
-		return new StandardUPPAALQuery(matcher.replaceAll(String.format(builder.toString())));
+		return new StandardUPPAALQuery(matcher.replaceAll(builder.toString()));
 	}
 }

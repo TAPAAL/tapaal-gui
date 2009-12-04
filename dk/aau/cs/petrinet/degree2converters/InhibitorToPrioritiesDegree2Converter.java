@@ -29,7 +29,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 	private static final String P_T_IN_FORMAT = "P_" + T_I_IN_FORMAT;
 	private static final String P_T_OUT_FORMAT = "P_" + T_I_OUT_FORMAT;
 	private static final String PLOCK = "P_lock";
-	private static final String PCAPACITY = "P_capacity";
+	private static final String PDEADLOCK = "P_deadlock";
 
 	private static final int LOW = 1;
 	private static final int HIGH = 2;
@@ -76,6 +76,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 		}
 
 		addPlace(degree2Net, PLOCK, LT_INF, 0);
+		addPlace(degree2Net, PDEADLOCK, LTEQ_ZERO, 0);
 	}
 
 	private void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
@@ -238,7 +239,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 				addTransition(degree2Net, zerotest, HIGH);
 
 				addTAPNArc(degree2Net, pcheck, zerotest, ZERO_INF_GUARD);
-				addNormalArc(degree2Net, zerotest, PCAPACITY);
+				addNormalArc(degree2Net, zerotest, PDEADLOCK);
 				addTransportArc(degree2Net, inhib.getSource().getName(), zerotest, inhib.getSource().getName(), inhib.getGuard());
 			}			
 		}else{
