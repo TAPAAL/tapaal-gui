@@ -311,12 +311,19 @@ public class Verification {
 			verifytaOptions+="-Y";
 		}
 		
+		boolean traceRequested = false;
 		if (traceOption == TraceOption.SOME){
 			verifytaOptions += "-t0";
+			traceRequested = true;
 		}else if (traceOption == TraceOption.FASTEST){
 			verifytaOptions += "-t2";
+			traceRequested = true;
 		}else if (traceOption == TraceOption.NONE){
 			verifytaOptions += "";
+		}
+		
+		if(traceRequested && model.getInhibitorArcs().size() > 0){
+			verifytaOptions = "-y " + verifytaOptions; // to support traces with priorities
 		}
 		
 		
