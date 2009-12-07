@@ -322,12 +322,6 @@ public class Verification {
 			verifytaOptions += "";
 		}
 		
-		if(traceRequested && model.getInhibitorArcs().size() > 0){
-			verifytaOptions = "-y " + verifytaOptions; // to support traces with priorities
-		}
-		
-		
-
 		if (searchOption == SearchOption.BFS){
 			verifytaOptions += "-o0";
 		}else if (searchOption == SearchOption.DFS ){
