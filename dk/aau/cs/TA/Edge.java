@@ -94,9 +94,9 @@ public class Edge {
 		String tmp = guard.replace("<", "&lt;").replace(">", "&gt;");
 		tmp = tmp.replace("&&", "&amp;&amp;");
 		
-		res.append("<label kind=\"guard\" x=\"432\" y=\"64\">" + tmp + "</label>\n");
-		res.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">" + sync + "</label>\n");
-		res.append("<label kind=\"assignment\" x=\"10\" y=\"160\">" + update + "</label>\n");
+		res.append("<label kind=\"guard\">" + tmp + "</label>\n");
+		res.append("<label kind=\"synchronisation\">" + sync + "</label>\n");
+		res.append("<label kind=\"assignment\">" + update + "</label>\n");
 		
 		res.append("</transition>\n");
 		return res;

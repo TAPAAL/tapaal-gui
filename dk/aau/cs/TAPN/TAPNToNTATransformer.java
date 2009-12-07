@@ -201,7 +201,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		String taGuard = createTransitionGuard(guard);
 	
 		if(fromOriginalNet){
-			taGuard = "lock == 0 && " + taGuard;
+			if(taGuard.length() != 0)
+				taGuard = "lock == 0 && " + taGuard;
+			else
+				taGuard = "lock == 0";
 		}
 	
 		return taGuard;

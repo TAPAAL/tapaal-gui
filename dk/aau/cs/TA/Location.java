@@ -79,9 +79,9 @@ public class Location {
 	{
 		StringBuffer res = new StringBuffer();
 		
-		res.append("<location id=\"a" + id + "\" x = \"" + x + "\" y=\"" + y + "\">\n");
+		res.append("<location id=\"a" + id + "\" >\n");
 	
-		res.append("<name x=\"" + x + "\" y=\"" + y + "\">" + name + "</name>\n");
+		res.append("<name>" + name + "</name>\n");
 
 		if(!invariant.equals("<inf"))
 			res.append("<label kind=\"invariant\"> x " + invariant.replace("<", "&lt;") + "</label>\n");

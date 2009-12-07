@@ -1,6 +1,7 @@
 package dk.aau.cs.TAPN;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +66,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 			TimedAutomata lock) {
 		for(TAPNTransition transition : model.getTransitions()){
 			boolean changeSymbol = false;
+			HashSet<Arc> usedFromPostset= new HashSet<Arc>();
 			
 			for(Arc presetArc : transition.getPreset()){
 				for(Arc postsetArc : transition.getPostset()){
@@ -72,7 +74,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 					String targetName = postsetArc.getTarget().getName();
 
 					if(isPartOfLockTemplate(sourceName)){
-						if(isPartOfLockTemplate(targetName)){
+						if(isPartOfLockTemplate(targetName) && !usedFromPostset.contains(postsetArc)){
 							String update = "";
 
 							if(sourceName.equals(PLOCK)){
@@ -87,11 +89,12 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 									createSyncExpression(transition, '!'),
 									update);
 							lock.addTransition(e);
+							usedFromPostset.add(postsetArc);
 							break;
 						}
 					}else{
 						if(!isPartOfLockTemplate(targetName)){
-							if(isMatchingArcs(presetArc, postsetArc)){
+							if(isMatchingArcs(presetArc, postsetArc) && !usedFromPostset.contains(postsetArc)){
 								char symbol = '?';
 								
 								if(transition.isFromOriginalNet()){
@@ -109,6 +112,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 										createSyncExpression(transition, symbol),
 										createUpdateExpression((TAPNArc)presetArc));
 								token.addTransition(e);
+								usedFromPostset.add(postsetArc);
 								break;
 							}
 						}
