@@ -32,5 +32,4 @@ public interface TimedArcPetriNet {
 	
 	boolean isDegree2();
 	void convertToConservative() throws Exception;
-	TimedArcPetriNet toDegree2() throws Exception;
 }

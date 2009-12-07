@@ -18,6 +18,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.InhibitorToPrioritiesDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
+import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.degree2minimal;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
@@ -439,7 +440,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	public TAPN convertToDegree2() throws Exception{
 		
 		if(inhibitorArcs.size() > 0){
-			degree2converter = new InhibitorToPrioritiesDegree2Converter();
+			degree2converter = new OptimizedInhibitorToPrioritiesDegree2Converter();
 		}
 		return degree2converter.transform(this);
 		
@@ -783,11 +784,6 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	@Override
 	public List<Arc> getNormalArcs(){
 		return normalArcs;
-	}
-
-	@Override
-	public TimedArcPetriNet toDegree2() throws Exception {
-		return convertToDegree2();
 	}
 
 	@Override

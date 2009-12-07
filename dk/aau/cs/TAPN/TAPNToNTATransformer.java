@@ -7,7 +7,9 @@ import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.TimedAutomata;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PrioritizedTAPNTransition;
+import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNQuery;
@@ -15,6 +17,7 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
+import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
 
 public abstract class TAPNToNTATransformer implements 
 ModelTransformer<TimedArcPetriNet, NTA>,
@@ -24,7 +27,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private int extraTokens;
 	private boolean usesPriorities;
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-
+	private Degree2Converter degree2Converter = new OptimizedInhibitorToPrioritiesDegree2Converter();
 	protected TAPNToNTATransformer(int extraTokens){
 		this.extraTokens = extraTokens;
 	}
@@ -51,7 +54,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	public NTA transformModel(TimedArcPetriNet model) throws Exception{
 		usesPriorities = model.getInhibitorArcs().size() != 0;
-		TimedArcPetriNet degree2Model = model.toDegree2();
+		TimedArcPetriNet degree2Model = getDegree2Converter().transform((TAPN)model); // fix this cast
 
 		TAPNPlace pcapacity = degree2Model.getPlaceByName("P_capacity");
 		for(int i = 0; i < extraTokens; i++){
@@ -86,7 +89,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			}
 		}
 
-		if(usesPriorities){ // Make this work generally
+		if(usesPriorities && model.getTransitions().size() > 0){ // Make this work generally
 			StringBuilder low = new StringBuilder("chan priority ");
 			StringBuilder high = new StringBuilder();
 
@@ -116,8 +119,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			builder.append(low);
 			builder.append("&lt;");
 			builder.append(high);
-			builder.append(";");
+			builder.append(";\n");
 		}
+		
+		builder.append("bool lock = 0;");
 
 		return builder.toString();
 	}
@@ -190,6 +195,24 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}else{
 			return "";
 		}
+	}
+
+	protected String createTransitionGuard(String guard, boolean fromOriginalNet) {
+		String taGuard = createTransitionGuard(guard);
+	
+		if(fromOriginalNet){
+			taGuard = "lock == 0 && " + taGuard;
+		}
+	
+		return taGuard;
+	}
+
+	public void setDegree2Converter(Degree2Converter degree2Converter) {
+		this.degree2Converter = degree2Converter;
+	}
+
+	public Degree2Converter getDegree2Converter() {
+		return degree2Converter;
 	}
 
 

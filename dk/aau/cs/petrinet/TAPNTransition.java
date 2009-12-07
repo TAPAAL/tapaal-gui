@@ -19,6 +19,7 @@ public class TAPNTransition extends Transition {
 
 	boolean isUrgens = false;
 	private List<TAPNInhibitorArc> inhibs = new ArrayList<TAPNInhibitorArc>();
+	private boolean fromOriginalNet = false;
 	
 	public TAPNTransition(TAPNTransition t) {
 		// TODO Auto-generated constructor stub
@@ -69,4 +70,16 @@ public class TAPNTransition extends Transition {
 		return inhibs;
 	}
 
+	public void setFromOriginalNet(boolean fromOriginalNet) {
+		this.fromOriginalNet = fromOriginalNet;
+	}
+
+	public boolean isFromOriginalNet() {
+		return fromOriginalNet;
+	}
+	
+	public boolean isDegree2()
+	{
+		return preset.size() <= 2 && postset.size() <= 2;
+	}
 }
