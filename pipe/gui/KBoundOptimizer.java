@@ -6,10 +6,10 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Verification.RunUppaalVerification;
-import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
+import dk.aau.cs.TA.SupQuery;
+import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TAPN.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 
@@ -30,13 +30,14 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		stream.println("/*");
 		stream.println(" boundedness query ");
 		stream.println("*/");
-		stream.println("sup: usedExtraTokens");
+		UPPAALQuery query = new SupQuery("usedExtraTokens");
+		query.output(stream);
 	}
 	
 	@Override
 	protected TAPNToNTATransformer getReductionStrategy()
 	{
-		return new TAPNToNTASymmetryTransformer(k+1);
+		return new TAPNToNTASymmetryKBoundOptimizeTransformer(k+1);
 	}
 	
 	@Override

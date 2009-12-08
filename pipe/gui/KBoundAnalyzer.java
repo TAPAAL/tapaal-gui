@@ -15,10 +15,8 @@ import pipe.gui.Verification.RunningVerificationWidgets;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
 
 public class KBoundAnalyzer 
 {
