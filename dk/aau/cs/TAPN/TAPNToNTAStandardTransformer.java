@@ -46,23 +46,6 @@ extends TAPNToNTATransformer{
 		return tas;
 	}
 
-
-	@Override
-	protected String createSystemDeclaration() {
-		StringBuilder builder = new StringBuilder("system ");
-		for(int i = 0; i < taCount; i++){
-			builder.append(TANAME);
-			builder.append(i);
-
-			if(i != taCount-1){
-				builder.append(",");
-			}
-		}
-		builder.append(";");
-
-		return builder.toString();
-	}
-
 	private TimedAutomata createTimedAutomata(TimedArcPetriNet model) {
 		TimedAutomata ta = new TimedAutomata();
 

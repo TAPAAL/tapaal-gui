@@ -6,6 +6,8 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Verification.RunUppaalVerification;
+import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
+import dk.aau.cs.TAPN.TAPNToNTATransformer;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSymKBound;
 
@@ -32,9 +34,9 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 	}
 	
 	@Override
-	protected AdvancedUppaalSym getReductionStrategy()
+	protected TAPNToNTATransformer getReductionStrategy()
 	{
-		return new AdvancedUppaalSymKBound();
+		return new TAPNToNTASymmetryTransformer(k+1);
 	}
 	
 	@Override

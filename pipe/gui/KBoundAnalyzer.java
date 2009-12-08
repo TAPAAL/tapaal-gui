@@ -12,14 +12,18 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.gui.Verification.RunUppaalVerification;
 import pipe.gui.Verification.RunningVerificationWidgets;
+import dk.aau.cs.TA.NTA;
+import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
+import dk.aau.cs.TAPN.TAPNToNTATransformer;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
 
 public class KBoundAnalyzer 
 {
 	private DataLayer appModel;
-	private int k;
+	protected int k;
 	private boolean notBounded = true;
 	
 	private boolean error=true;
@@ -68,19 +72,17 @@ public class KBoundAnalyzer
 			e.printStackTrace();
 		}
 		
-		AdvancedUppaalSym te = getReductionStrategy();
+		TAPNToNTATransformer te = getReductionStrategy();
 		try {
-			
+			NTA nta = null;
 			try {
-				model.convertToConservative();
-			} catch (Exception e1) {
+				nta = te.transformModel(model);
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				System.err.println("Error converting model to conservative");
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
-			
-			TAPN model2 = te.transform(model);
-			te.transformToUppaal(model2, new PrintStream(xmlfile), k+1);
+			nta.outputToUPPAALXML(new PrintStream(xmlfile));
+			//te.transformToUppaal(model2, new PrintStream(xmlfile), k+1);
 			
 			//We can not auto transform as query is not having lock==1
 			//te.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, k+1);
@@ -143,9 +145,8 @@ public class KBoundAnalyzer
 		showResult(a);	
 	}
 
-	protected AdvancedUppaalSym getReductionStrategy() {
-		AdvancedUppaalSym te = new AdvancedUppaalSym();
-		return te;
+	protected TAPNToNTATransformer getReductionStrategy() {
+		return new TAPNToNTASymmetryTransformer(k+1);
 	}
 
 	protected void showResult(RunUppaalVerification a) {
@@ -211,7 +212,7 @@ public class KBoundAnalyzer
 		stream.println("*/");
 		
 		//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
-		stream.println("E<>((sum(i:pid_t) P(i).P_capacity)== 0) and (Control.finish == 1)");
+		stream.println("E<>((sum(i:pid_t) Token(i).P_capacity)== 0) and (Control.finish == 1)");
 	}
 
 	protected String getAnswerNotBoundedString() {

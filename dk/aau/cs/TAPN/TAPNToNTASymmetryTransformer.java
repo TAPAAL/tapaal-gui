@@ -58,7 +58,9 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 
 		ArrayList<TimedAutomata> tas = new ArrayList<TimedAutomata>();
 		tas.add(token);
-		tas.add(lock);
+		if(lock.getLocations().size() > 0){
+			tas.add(lock);
+		}
 		return tas;
 	}
 
@@ -159,7 +161,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 	@Override
 	protected String createGlobalDeclarations(TimedArcPetriNet model) {
 		StringBuilder builder = new StringBuilder("const int N = ");
-		builder.append(model.getTokens().size());
+		builder.append(model.getTokens().size()-1);
 		builder.append(";\ntypedef scalar[N] pid_t;\n");
 
 
@@ -172,12 +174,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		builder.append(super.createGlobalDeclarations(model));
 		return builder.toString();
 	}
-
-	@Override
-	protected String createSystemDeclaration() {
-		return "system Control, Token, Lock;";
-	}
-
+	
 	private void addSymmetricInitialization(TimedAutomata ta, TimedArcPetriNet model){
 		numberOfInitChannels = 0;
 		Location pcapacity = getLocationByName("P_capacity");

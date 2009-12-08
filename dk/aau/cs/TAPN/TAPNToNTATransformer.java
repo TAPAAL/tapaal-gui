@@ -68,7 +68,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	private NTA transformToNTA(TimedArcPetriNet model) {
 		List<TimedAutomata> tas = createAutomata(model);
-		String system = createSystemDeclaration();
+		String system = createSystemDeclaration(tas);
 		String decl = createGlobalDeclarations(model);
 
 		return new NTA(tas, system, decl);
@@ -128,7 +128,20 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	protected abstract List<TimedAutomata> createAutomata(TimedArcPetriNet model);
-	protected abstract String createSystemDeclaration();
+	
+	
+	protected String createSystemDeclaration(List<TimedAutomata> tas) {
+		StringBuilder builder = new StringBuilder("system ");
+		builder.append(tas.get(0).getName());
+		
+		for(int i = 1; i < tas.size(); i++){
+			builder.append(",");
+			builder.append(tas.get(i).getName());
+		}
+		
+		builder.append(";");
+		return builder.toString();
+	}
 
 	protected String convertInvariant(String invariant) {
 		String inv = "";

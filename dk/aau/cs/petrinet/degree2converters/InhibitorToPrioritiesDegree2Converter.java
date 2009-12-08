@@ -42,15 +42,15 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 
 	@Override
 	public TAPN transform(TAPN model) throws Exception { // TODO: use interface instead of TAPN
-		if(model.isDegree2() && model.getInhibitorArcs().size() == 0) return model;
-
 		try{
 			model.convertToConservative();
 		}catch(Exception e){
 			e.printStackTrace();
 			return null;
 		}
-
+		
+		//if(model.isDegree2() && model.getInhibitorArcs().size() == 0) return model;
+		
 		TAPN tapn = new TAPN(); 
 
 		createInitialPlaces(model, tapn);
