@@ -605,6 +605,7 @@ implements Cloneable {
 					inhibitorArcInput.setId("error");
 				}
 			}
+				
 			arcsArray.add(inhibitorArcInput);
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
 

@@ -1537,9 +1537,9 @@ EOC */
 			if (this != transportArcAction) {
 				transportArcAction.setSelected(false);
 			}
-//			if (this != inhibarcAction) {
-//				inhibarcAction.setSelected(false);
-//			}     
+			if (this != inhibarcAction) {
+				inhibarcAction.setSelected(false);
+			}     
 			if (this != tokenAction) {
 				tokenAction.setSelected(false);
 			}

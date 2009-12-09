@@ -120,7 +120,7 @@ public abstract class  Arc
     * @param targetInput PlaceTransitionObject value for Arc target;
     */
    public void setTarget(PlaceTransitionObject targetInput) {
-      target = targetInput;
+	   target = targetInput;
 //      if (CreateGui.getApp() != null) {
 //         updateArcPosition();
 //      }

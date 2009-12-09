@@ -232,15 +232,27 @@ public void mouseReleased(MouseEvent e) {
                   if (isNewArc == true) {
                 	  createTAPNInhibitorArc.setSelectable(true);
                 	  createTAPNInhibitorArc.setTarget(currentObject);
+                     
                      currentObject.addConnectTo(createTAPNInhibitorArc);
+                    
                      // Evil hack to prevent the arc being added to GuiView twice
                      contentPane.remove(createTAPNInhibitorArc);
+                     
                      model.addArc(createTAPNInhibitorArc);
+                     
                      view.addNewPetriNetObject(createTAPNInhibitorArc);
+
                      undoManager.addNewEdit(
                              new AddPetriNetObjectEdit(createTAPNInhibitorArc,
                              view, model));
+                     if(createTAPNInhibitorArc.getTarget() == null)
+                    	 JOptionPane.showMessageDialog(CreateGui.getApp(),
+									 "Whooops, target was not set on last arc, please redraw. DEBUG",
+									 "Error",
+									 JOptionPane.ERROR_MESSAGE);
+						 	 
                   }
+                  
                   
                   // arc is drawn, remove handler:
                   createTAPNInhibitorArc.removeKeyListener(keyHandler);

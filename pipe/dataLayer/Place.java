@@ -384,7 +384,7 @@ public boolean contains(int x, int y) {
                  && areNotSameType(someArc.getSource())){
             // assume we are only snapping the target...
             if (someArc.getTarget() != this){
-               someArc.setTarget(this);
+            	someArc.setTarget(this);
             }
             someArc.updateArcPosition();
             return true;

@@ -568,6 +568,7 @@ public boolean contains(int x, int y) {
             return true;
          } else {
             if (someArc.getTarget() == this) {
+
                someArc.setTarget(null);
                removeArcCompareObject(someArc);
                updateConnected();
