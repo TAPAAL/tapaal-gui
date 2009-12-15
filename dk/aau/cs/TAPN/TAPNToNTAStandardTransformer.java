@@ -134,15 +134,26 @@ extends TAPNToNTATransformer{
 		Matcher matcher = pattern.matcher(query);
 
 		StringBuilder builder = new StringBuilder("(");
+		StringBuilder lock = new StringBuilder("(");
 		for(int i = 0; i < tapnQuery.getTotalTokens(); i++){
 			if(i > 0){
 				builder.append(" + ");
+				lock.append(" + ");
 			}
 			builder.append(TANAME);
 			builder.append(i);
 			builder.append(".$1");
+			
+			lock.append(TANAME);
+			lock.append(i);
+			lock.append(".");
+			lock.append(PLOCK);
 		}
 		builder.append(") $2 $3");
-		return new StandardUPPAALQuery(matcher.replaceAll(builder.toString()));
+		lock.append(") == 1");
+		String transformedQuery = matcher.replaceAll(builder.toString());
+	
+		transformedQuery = transformedQuery.substring(0, transformedQuery.length()-2) + " && " + lock.toString() + "))";
+		return new StandardUPPAALQuery(transformedQuery);
 	}
 }
