@@ -245,7 +245,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 
 		StringBuilder uppaalQuery = new StringBuilder();
 		uppaalQuery.append(matcher.replaceAll(builder.toString()));
-		uppaalQuery.append(" and ( Lock.P_lock == 1  && Control.finish == 1)");
+		uppaalQuery.append(" and ( Lock.P_lock == 1  && Control.finish == 1 && lock == 0)");
 		return new StandardUPPAALQuery(uppaalQuery.toString());
 	}
 }
