@@ -15,7 +15,7 @@ public class StandardUPPAALQuery implements UPPAALQuery {
 		this.query = query.substring(3, query.length());
 	}
 		
-	@Override
+	
 	public void output(PrintStream file) {
 		file.append(pathQuantifier);
 		file.append(nodeQuantifier);

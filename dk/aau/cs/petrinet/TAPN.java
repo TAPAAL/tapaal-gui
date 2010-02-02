@@ -771,27 +771,27 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		
 	}
 
-	@Override
+
 	public List<TAPNInhibitorArc> getInhibitorArcs() {
 		return inhibitorArcs;
 	}
 
-	@Override
+
 	public List<TAPNArc> getTAPNArcs() {
 		return tapnArcs;
 	}
 
-	@Override
+
 	public List<TAPNTransportArc> getTransportArcs() {
 		return transportArcs;
 	}
 	
-	@Override
+
 	public List<Arc> getNormalArcs(){
 		return normalArcs;
 	}
 
-	@Override
+
 	public void addToken(Token token) {
 		tokens.add(token.getPlace());
 	}

@@ -126,7 +126,7 @@ extends TAPNToNTATransformer{
 	}
 
 
-	@Override
+	
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		String query = tapnQuery.toString();
 

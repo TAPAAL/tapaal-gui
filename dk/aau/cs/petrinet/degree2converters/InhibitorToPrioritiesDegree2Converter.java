@@ -40,7 +40,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 
 	private Hashtable<String, PlaceTransitionObject> nameToPTO = new Hashtable<String, PlaceTransitionObject>();
 
-	@Override
+	
 	public TAPN transform(TAPN model) throws Exception { // TODO: use interface instead of TAPN
 		try{
 			model.convertToConservative();

@@ -58,7 +58,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		this.useSymmetry = useSymmetry;
 	}
 
-	@Override
+	
 	public NTA transformModel(TimedArcPetriNet model) throws Exception {
 		clearLocationMappings();
 		arcsToCounters.clear();
@@ -472,7 +472,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		namesToLocations.clear();
 	}
 
-	@Override
+	
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		String query = tapnQuery.toString();
 		Pattern pattern = Pattern.compile(QUERY_PATTERN);

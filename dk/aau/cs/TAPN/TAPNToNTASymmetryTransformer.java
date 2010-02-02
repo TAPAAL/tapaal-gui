@@ -233,7 +233,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		return matcher.find();
 	}
 
-	@Override
+	
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		String query = tapnQuery.toString();
 		Pattern pattern = Pattern.compile(QUERY_PATTERN);
