@@ -5,7 +5,7 @@ import java.util.List;
 
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.TimedAutomata;
+import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PrioritizedTAPNTransition;
@@ -67,7 +67,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	private NTA transformToNTA(TimedArcPetriNet model) {
-		List<TimedAutomata> tas = createAutomata(model);
+		List<TimedAutomaton> tas = createAutomata(model);
 		String system = createSystemDeclaration(tas);
 		String decl = createGlobalDeclarations(model);
 
@@ -127,10 +127,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	protected abstract List<TimedAutomata> createAutomata(TimedArcPetriNet model);
+	protected abstract List<TimedAutomaton> createAutomata(TimedArcPetriNet model);
 	
 	
-	protected String createSystemDeclaration(List<TimedAutomata> tas) {
+	protected String createSystemDeclaration(List<TimedAutomaton> tas) {
 		StringBuilder builder = new StringBuilder("system ");
 		builder.append(tas.get(0).getName());
 		

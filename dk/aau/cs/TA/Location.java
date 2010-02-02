@@ -84,7 +84,7 @@ public class Location {
 		res.append("<name>" + name + "</name>\n");
 
 		if(!invariant.equals("<inf"))
-			res.append("<label kind=\"invariant\"> x " + invariant.replace("<", "&lt;") + "</label>\n");
+			res.append("<label kind=\"invariant\">" + invariant.replace("&&", "&amp;&amp;").replace("<", "&lt;") + "</label>\n");
 
 		if(isCommitted)
 			res.append("<committed/>\n");

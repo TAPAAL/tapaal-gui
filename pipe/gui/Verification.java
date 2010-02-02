@@ -39,6 +39,7 @@ import dk.aau.cs.TA.FiringAction;
 import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UppaalTrace;
+import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
@@ -427,7 +428,23 @@ public class Verification {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else {
+		}else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_STANDARD || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM){
+			TAPNToNTABroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		else {
 
 			try {
 				model.convertToConservative();
@@ -461,6 +478,8 @@ public class Verification {
 			}
 
 		}
+		
+
 
 
 		

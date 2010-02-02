@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.StandardUPPAALQuery;
-import dk.aau.cs.TA.TimedAutomata;
+import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -31,14 +31,14 @@ extends TAPNToNTATransformer{
 	}
 
 	@Override
-	protected List<TimedAutomata> createAutomata(TimedArcPetriNet model) {
-		ArrayList<TimedAutomata> tas = new ArrayList<TimedAutomata>();
+	protected List<TimedAutomaton> createAutomata(TimedArcPetriNet model) {
+		ArrayList<TimedAutomaton> tas = new ArrayList<TimedAutomaton>();
 
 		List<Token> tokens = model.getTokens();
 		for(Token token : tokens){
 			clearLocationMappings();
 			
-			TimedAutomata ta = createTimedAutomata(model);
+			TimedAutomaton ta = createTimedAutomata(model);
 			ta.setInitLocation(getLocationByName(token.getPlace().getName()));
 
 			tas.add(ta);
@@ -46,8 +46,8 @@ extends TAPNToNTATransformer{
 		return tas;
 	}
 
-	private TimedAutomata createTimedAutomata(TimedArcPetriNet model) {
-		TimedAutomata ta = new TimedAutomata();
+	private TimedAutomaton createTimedAutomata(TimedArcPetriNet model) {
+		TimedAutomaton ta = new TimedAutomaton();
 
 		createLocations(model, ta);
 		createTransitions(model, ta);
@@ -59,7 +59,7 @@ extends TAPNToNTATransformer{
 	}
 
 
-	private void createTransitions(TimedArcPetriNet model, TimedAutomata ta) {
+	private void createTransitions(TimedArcPetriNet model, TimedAutomaton ta) {
 		for(TAPNTransition transition : model.getTransitions()){
 			char symbol = '!';
 			Arc usedPostSetArc = null;
@@ -115,7 +115,7 @@ extends TAPNToNTATransformer{
 	}
 	
 
-	private void createLocations(TimedArcPetriNet model, TimedAutomata ta) {
+	private void createLocations(TimedArcPetriNet model, TimedAutomaton ta) {
 		for(TAPNPlace p : model.getPlaces()){
 			Location l = new Location(p.getName(), convertInvariant(p.getInvariant()));
 			l.setUrgent(p.isUrgent());

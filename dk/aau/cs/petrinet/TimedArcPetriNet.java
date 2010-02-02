@@ -30,6 +30,8 @@ public interface TimedArcPetriNet {
 	List<TAPNArc>		   getTAPNArcs();
 	List<Arc> 			   getNormalArcs();
 	
+	int getNumberOfTokens();
+	
 	boolean isDegree2();
 	void convertToConservative() throws Exception;
 }

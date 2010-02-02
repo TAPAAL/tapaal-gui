@@ -29,4 +29,12 @@ public class TAPNQuery {
 		return totalTokens;
 	}
 	
+	public String getPathQuantifier(){
+		return pathQuantifier;
+	}
+	
+	public String getNodeQuantifier(){
+		return nodeQuantifier;
+	}
+	
 }

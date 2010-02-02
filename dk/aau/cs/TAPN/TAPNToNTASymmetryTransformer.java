@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.StandardUPPAALQuery;
-import dk.aau.cs.TA.TimedAutomata;
+import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -31,18 +31,18 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 
 
 	@Override
-	protected List<TimedAutomata> createAutomata(TimedArcPetriNet model){
-		List<TimedAutomata> tas = createTokenAutomata(model);
+	protected List<TimedAutomaton> createAutomata(TimedArcPetriNet model){
+		List<TimedAutomaton> tas = createTokenAutomata(model);
 
-		TimedAutomata control = createControlTemplate(model);
+		TimedAutomaton control = createControlTemplate(model);
 		tas.add(control);
 
 		return tas;
 	}
 
-	private List<TimedAutomata> createTokenAutomata(TimedArcPetriNet model) {
-		TimedAutomata token = new TimedAutomata();
-		TimedAutomata lock = new TimedAutomata();
+	private List<TimedAutomaton> createTokenAutomata(TimedArcPetriNet model) {
+		TimedAutomaton token = new TimedAutomaton();
+		TimedAutomaton lock = new TimedAutomaton();
 
 		createLocations(model, token, lock);
 		token.setName("Token");
@@ -56,7 +56,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		createTransitions(model, token, lock);
 		addSymmetricInitialization(token, model);
 
-		ArrayList<TimedAutomata> tas = new ArrayList<TimedAutomata>();
+		ArrayList<TimedAutomaton> tas = new ArrayList<TimedAutomaton>();
 		tas.add(token);
 		if(lock.getLocations().size() > 0){
 			tas.add(lock);
@@ -64,8 +64,8 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		return tas;
 	}
 
-	private void createTransitions(TimedArcPetriNet model, TimedAutomata token,
-			TimedAutomata lock) {
+	private void createTransitions(TimedArcPetriNet model, TimedAutomaton token,
+			TimedAutomaton lock) {
 		for(TAPNTransition transition : model.getTransitions()){
 			boolean changeSymbol = false;
 			HashSet<Arc> usedFromPostset= new HashSet<Arc>();
@@ -138,8 +138,8 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 	}
 
 
-	private void createLocations(TimedArcPetriNet model, TimedAutomata token,
-			TimedAutomata lock) {
+	private void createLocations(TimedArcPetriNet model, TimedAutomaton token,
+			TimedAutomaton lock) {
 
 		for(TAPNPlace place : model.getPlaces()){
 			if(isPartOfLockTemplate(place.getName())){
@@ -175,7 +175,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		return builder.toString();
 	}
 	
-	private void addSymmetricInitialization(TimedAutomata ta, TimedArcPetriNet model){
+	private void addSymmetricInitialization(TimedAutomaton ta, TimedArcPetriNet model){
 		numberOfInitChannels = 0;
 		Location pcapacity = getLocationByName("P_capacity");
 		Location plock = getLocationByName("P_lock");
@@ -196,8 +196,8 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		}
 	}
 
-	private TimedAutomata createControlTemplate(TimedArcPetriNet model) {
-		TimedAutomata control = new TimedAutomata();
+	private TimedAutomaton createControlTemplate(TimedArcPetriNet model) {
+		TimedAutomaton control = new TimedAutomaton();
 
 		Location lastLocation = new Location("","");
 		lastLocation.setCommitted(true);

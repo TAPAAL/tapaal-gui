@@ -352,6 +352,11 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 			return normalArcs.remove(a);
 	}
 	
+	public int getNumberOfTokens()
+	{
+		return tokens.size();
+	}
+	
 	public List<Token> getTokens(){
 		ArrayList<Token> toReturn = new ArrayList<Token>();
 		

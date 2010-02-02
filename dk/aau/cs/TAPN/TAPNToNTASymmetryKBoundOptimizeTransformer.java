@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
-import dk.aau.cs.TA.TimedAutomata;
+import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
@@ -20,11 +20,11 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		super(extraNumberOfTokens);
 	}
 
-	protected List<TimedAutomata> createAutomata(TimedArcPetriNet model){
-		List<TimedAutomata> tas = super.createAutomata(model);
+	protected List<TimedAutomaton> createAutomata(TimedArcPetriNet model){
+		List<TimedAutomaton> tas = super.createAutomata(model);
 		tokens = model.getTokens().size();
 		
-		for(TimedAutomata ta : tas){
+		for(TimedAutomaton ta : tas){
 			if(ta.getName().equals("Token")){
 				addKBoundUpdates(ta);
 				break;
@@ -34,7 +34,7 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		return tas;
 	}
 	
-	private void addKBoundUpdates(TimedAutomata ta) {
+	private void addKBoundUpdates(TimedAutomaton ta) {
 		Location pcapacity = getLocationByName("P_capacity");
 		
 		for(Edge e : ta.getTransitions()){
