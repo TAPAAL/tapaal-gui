@@ -340,7 +340,7 @@ public class Verification {
 		if (inputQuery.contains("E[]") || inputQuery.contains("A<>") ) {
 			
 			//If selected wrong method for checking
-			if (!(input.reductionOption == ReductionOption.ADV_NOSYM || input.reductionOption == ReductionOption.ADV_UPPAAL_SYM)){
+			if (!(input.reductionOption == ReductionOption.ADV_NOSYM || input.reductionOption == ReductionOption.ADV_UPPAAL_SYM || input.reductionOption == ReductionOption.BROADCAST_STANDARD || input.reductionOption == ReductionOption.BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"Verification of liveness properties (EG,AF) is not possible with the selected reduction option.",
@@ -351,7 +351,7 @@ public class Verification {
 			}
 			
 			//Check if degree-2 or give an error
-			if (!model.isDegree2()){
+			if (!model.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD || input.reductionOption == ReductionOption.BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"The net cannot be verified for liveness properties (EG,AF) because there is\n"+

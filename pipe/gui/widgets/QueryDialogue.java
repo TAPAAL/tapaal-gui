@@ -661,7 +661,10 @@ public class QueryDialogue extends JPanel{
 
 		//Update the selected reduction
 		if (queryToCreateFrom!=null){
-			if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
+			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD || queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
+				String reduction = queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD ? name_BROADCAST : name_BROADCASTSYM;
+				reductionOption.setSelectedItem(reduction);
+			}else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
 				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
 					reductionOption.setSelectedIndex(0);
 					enableTraceOptions();
@@ -901,8 +904,7 @@ public class QueryDialogue extends JPanel{
 			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
 		}else if(reductionOptionString.equals(name_INHIBSTANDARD)){
 			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_STANDARD;
-		}
-		else if(reductionOptionString.equals(name_INHIBSYM)){
+		}else if(reductionOptionString.equals(name_INHIBSYM)){
 			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
 		}else if(reductionOptionString.equals(name_BROADCAST)){
 			reductionOptionToSet = ReductionOption.BROADCAST_STANDARD;

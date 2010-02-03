@@ -486,11 +486,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 		StringBuilder uppaalQuery = new StringBuilder();
 		uppaalQuery.append(matcher.replaceAll(builder.toString()));
-				
-		if(tapnQuery.getPathQuantifier().equals("E")){
+			
+		if(tapnQuery.isEFQuery() || tapnQuery.isAFQuery()){
 			uppaalQuery.append(" and ");
 		}else{
-			uppaalQuery.append(" or ");
+			uppaalQuery.append(" or !");
 		}
 		uppaalQuery.append("Control.");
 		uppaalQuery.append(PLOCK);
