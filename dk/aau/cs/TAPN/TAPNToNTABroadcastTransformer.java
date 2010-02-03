@@ -311,7 +311,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 				String inputPlaceName = pair.getInput().getName();
 				String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.getName(), i);
 
-				Location intermediate = new Location(locationName,"");
+				Location intermediate = new Location(locationName, convertInvariant(pair.getOutput().getInvariant()));
 				intermediate.setCommitted(true);
 				ta.addLocation(intermediate);
 				addLocationMapping(locationName, intermediate);
