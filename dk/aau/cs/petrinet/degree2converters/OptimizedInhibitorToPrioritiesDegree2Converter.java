@@ -9,14 +9,18 @@ import dk.aau.cs.petrinet.TimedArcPetriNet;
 public class OptimizedInhibitorToPrioritiesDegree2Converter extends
 		InhibitorToPrioritiesDegree2Converter {
 	protected void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
-		if(transition.isDegree2() && transition.getInhibitorArcs().size() == 0){
+		createSimulationOfTransition(transition, degree2Net, true);
+	}
+	
+	protected void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net, boolean optimize) throws Exception {
+		if(optimize && transition.isDegree2() && transition.getInhibitorArcs().size() == 0){
 			createOptimizedSimulation(transition, degree2Net);
 		}else{
 			super.createSimulationOfTransition(transition, degree2Net);
 		}
-}
+	}
 
-	private void createOptimizedSimulation(TAPNTransition transition,
+	protected void createOptimizedSimulation(TAPNTransition transition,
 			TimedArcPetriNet degree2Net) throws Exception {
 		addTransition(degree2Net, transition.getName(), LOW);
 		TAPNTransition newTransition = (TAPNTransition)getByName(transition.getName());

@@ -795,4 +795,18 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	public void addToken(Token token) {
 		tokens.add(token.getPlace());
 	}
+	
+	public void removePlaceByName(String place){
+		Place toRemove = null;
+		for(Place p : places){
+			if(p.getName().equals(place)){
+				toRemove = p;
+				break;
+			}
+		}
+		
+		if(toRemove != null){
+			places.remove(toRemove);
+		}
+	}
 }

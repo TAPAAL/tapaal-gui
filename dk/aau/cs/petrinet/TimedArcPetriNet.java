@@ -34,4 +34,5 @@ public interface TimedArcPetriNet {
 	
 	boolean isDegree2();
 	void convertToConservative() throws Exception;
+	void removePlaceByName(String place);
 }

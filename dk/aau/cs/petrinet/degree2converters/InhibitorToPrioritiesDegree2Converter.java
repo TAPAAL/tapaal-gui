@@ -19,24 +19,24 @@ import dk.aau.cs.petrinet.Token;
 
 public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 
-	private static final String T_ZEROTEST_FORMAT = "%1$s_%2$s_zerotest";
-	private static final String T_CHECK_FORMAT = "%1$s_check";
-	private static final String P_CHECK_FORMAT = "P_%1$s_check";
-	private static final String T_I_OUT_FORMAT = "%1$s_%2$d_out";
-	private static final String T_I_IN_FORMAT = "%1$s_%2$d_in";
-	private static final String T_MAX_FORMAT = "%1$s_%2$d";
-	private static final String HOLDING_PLACE_FORMAT = "P_hp_%1$s_%2$d";
-	private static final String P_T_IN_FORMAT = "P_" + T_I_IN_FORMAT;
-	private static final String P_T_OUT_FORMAT = "P_" + T_I_OUT_FORMAT;
-	private static final String PLOCK = "P_lock";
-	private static final String PDEADLOCK = "P_deadlock";
+	protected static final String T_ZEROTEST_FORMAT = "%1$s_%2$s_zerotest";
+	protected static final String T_CHECK_FORMAT = "%1$s_check";
+	protected static final String P_CHECK_FORMAT = "P_%1$s_check";
+	protected static final String T_MAX_FORMAT = "%1$s_%2$d";
+	protected static final String T_I_OUT_FORMAT = "%1$s_%2$d_out";
+	protected static final String T_I_IN_FORMAT = "%1$s_%2$d_in";
+	protected static final String HOLDING_PLACE_FORMAT = "P_hp_%1$s_%2$d";
+	protected static final String P_T_IN_FORMAT = "P_" + T_I_IN_FORMAT;
+	protected static final String P_T_OUT_FORMAT = "P_" + T_I_OUT_FORMAT;
+	protected static final String PLOCK = "P_lock";
+	protected static final String PDEADLOCK = "P_deadlock";
 
 	protected static final int LOW = 1;
 	protected static final int HIGH = 2;
 
-	private static final String LT_INF = "<inf";
-	private static final String LTEQ_ZERO = "<=0";
-	private static final String ZERO_INF_GUARD = "[0,inf)";
+	protected static final String LT_INF = "<inf";
+	protected static final String LTEQ_ZERO = "<=0";
+	protected static final String ZERO_INF_GUARD = "[0,inf)";
 
 	private Hashtable<String, PlaceTransitionObject> nameToPTO = new Hashtable<String, PlaceTransitionObject>();
 
@@ -70,7 +70,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 		return tapn;
 	}
 
-	private void createInitialPlaces(TimedArcPetriNet model, TimedArcPetriNet degree2Net) {
+	protected void createInitialPlaces(TimedArcPetriNet model, TimedArcPetriNet degree2Net) {
 		for(TAPNPlace p : model.getPlaces()){
 			addPlace(degree2Net, p.getName(), p.getInvariant(), p.getCapacity());			
 		}
@@ -253,7 +253,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 	}
 
 
-	private void createInhibitorArcSimulation(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
+	protected void createInhibitorArcSimulation(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 		String transitionName = transition.getName();
 
 		if(transition.hasInhibitorArcs()){

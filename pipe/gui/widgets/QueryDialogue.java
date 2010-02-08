@@ -118,8 +118,8 @@ public class QueryDialogue extends JPanel{
 	private String name_INHIBSYM = "Symmetry Reduction (with inhibitor arcs)";
 	private String name_BROADCAST = "Broadcast Reduction";
 	private String name_BROADCASTSYM = "Symmetric Broadcast Reduction";
-	
-	
+	private String name_BROADCASTDEG2SYM = "Sym. Broadcast Degree 2 Reduction";
+
 	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
 		this.datalayer = datalayer;
@@ -520,7 +520,7 @@ public class QueryDialogue extends JPanel{
 		//ReductionOptions starts here:
 		this.reductionOptions = new JPanel(new FlowLayout());
 		this.reductionOptions.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
-		String[] reductionOptions = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM};
+		String[] reductionOptions = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2SYM};
 		reductionOption = new JComboBox(reductionOptions);
 		reductionOption.setSelectedIndex(3);
 		disableTraceOptions();
@@ -530,9 +530,10 @@ public class QueryDialogue extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				if (reductionOption.getSelectedItem() != null){
 					if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVESYM) 
-						|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM)
-						|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) 
-						|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTSYM)){
+							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM)
+							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) 
+							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTSYM)
+							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2SYM)){
 						none.setSelected(true);
 						disableTraceOptions();
 					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) 
@@ -661,10 +662,16 @@ public class QueryDialogue extends JPanel{
 
 		//Update the selected reduction
 		if (queryToCreateFrom!=null){
-			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD || queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
-				String reduction = queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD ? name_BROADCAST : name_BROADCASTSYM;
-				reductionOption.setSelectedItem(reduction);
-			}else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
+			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD){
+				reductionOption.setSelectedItem(name_BROADCAST);
+				enableTraceOptions();
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
+				reductionOption.setSelectedItem(name_BROADCASTSYM);
+				disableTraceOptions();
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2_SYM){
+				reductionOption.setSelectedItem(name_BROADCASTDEG2SYM);
+				disableTraceOptions();
+			} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
 				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
 					reductionOption.setSelectedIndex(0);
 					enableTraceOptions();
@@ -696,7 +703,7 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void disableLivenessReductionOptions(){
-		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM};
+		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2SYM};
 		reductionOption.removeAllItems();
 
 		for (String s : options){
@@ -707,8 +714,8 @@ public class QueryDialogue extends JPanel{
 	private void enableAllReductionOptions(){
 		reductionOption.removeAllItems();
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM};
-			
+			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM,name_BROADCASTDEG2SYM};
+
 			for (String s : options){
 				reductionOption.addItem(s);
 			}
@@ -717,6 +724,7 @@ public class QueryDialogue extends JPanel{
 			reductionOption.addItem(name_INHIBSYM);
 			reductionOption.addItem(name_BROADCAST);
 			reductionOption.addItem(name_BROADCASTSYM);
+			reductionOption.addItem(name_BROADCASTDEG2SYM);
 		}
 	}
 
@@ -910,6 +918,8 @@ public class QueryDialogue extends JPanel{
 			reductionOptionToSet = ReductionOption.BROADCAST_STANDARD;
 		}else if(reductionOptionString.equals(name_BROADCASTSYM)){
 			reductionOptionToSet = ReductionOption.BROADCAST_SYM;
+		}else if(reductionOptionString.equals(name_BROADCASTDEG2SYM)){
+			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
 		}
 
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
