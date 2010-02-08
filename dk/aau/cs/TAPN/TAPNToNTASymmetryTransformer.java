@@ -47,7 +47,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		createLocations(model, token, lock);
 		token.setName("Token");
 		token.setParameters("const pid_t id");
-		token.setDeclarations("clock x;");
+		token.setDeclarations("clock " + CLOCK_NAME + ";");
 		token.setInitLocation(getLocationByName("P_capacity"));
 
 		lock.setName("Lock");

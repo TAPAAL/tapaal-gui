@@ -24,8 +24,12 @@ ModelTransformer<TimedArcPetriNet, NTA>,
 QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
+	protected static final String CLOCK_NAME = "x";
+	
 	private int extraTokens;
 	private boolean usesPriorities;
+	
+	
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	private Degree2Converter degree2Converter = new OptimizedInhibitorToPrioritiesDegree2Converter();
 	protected TAPNToNTATransformer(int extraTokens){
@@ -146,9 +150,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	protected String convertInvariant(String invariant) {
 		String inv = "";
 		if(!invariant.equals("<inf")){
-			inv = invariant.replace("<", "&lt;");
+			inv = CLOCK_NAME + " " + invariant;
 		}
-	
+
 		return inv;
 	}
 
@@ -160,7 +164,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		char secondDelim = guard.charAt(guard.length()-1);
 	
 		StringBuilder builder = new StringBuilder();
-		builder.append("x ");
+		builder.append(CLOCK_NAME);
+		builder.append(" ");
 	
 		if(firstDelim == '('){
 			builder.append(">");
@@ -171,7 +176,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		builder.append(splitGuard[0]);
 	
 		if(!splitGuard[1].equals("inf")){
-			builder.append(" && x ");
+			builder.append(" && ");
+			builder.append(CLOCK_NAME);
+			builder.append(" ");
 	
 			if(secondDelim == ')'){
 				builder.append("<");
@@ -204,7 +211,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	protected String createUpdateExpression(TAPNArc sourceArc) {
 		if(!(sourceArc instanceof TAPNTransportArc)){
-			return "x := 0"; //TODO: lock boolean?
+			return CLOCK_NAME + " := 0"; //TODO: lock boolean?
 		}else{
 			return "";
 		}
