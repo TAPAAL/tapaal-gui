@@ -15,6 +15,7 @@ import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TAPN.Pairing.ArcType;
 import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.PetriNetUtil;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNInhibitorArc;
@@ -325,9 +326,15 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 				String counter = String.format(COUNTER_NAME, i);
 				arcsToCounters.put(arc, counter);
 
+				String guard = null;
+				if(arc instanceof TAPNTransportArc){
+					guard = createTransitionGuard(((TAPNArc)arc).getGuard(), (TAPNPlace)arc.getTarget(), true);
+				}else{
+					guard = createTransitionGuard(((TAPNArc)arc).getGuard());
+				}
 				Edge e = new Edge(getLocationByName(source),
 						getLocationByName(source),
-						createTransitionGuard(((TAPNArc)arc).getGuard()),
+						guard,
 						String.format(TEST_CHANNEL, transition.getName(), "?"),
 						String.format(COUNTER_UPDATE, counter, "= true"));
 				ta.addTransition(e);		
@@ -425,6 +432,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
+	protected String createTransitionGuard(String guard, TAPNPlace target, boolean isTransportArc) {
+		String newGuard = PetriNetUtil.createGuard(guard, target, isTransportArc);
+		return createTransitionGuard(newGuard);
+	}
 	protected String createTransitionGuard(String guard) {
 		if(guard.equals("[0,inf)")) return "";
 
