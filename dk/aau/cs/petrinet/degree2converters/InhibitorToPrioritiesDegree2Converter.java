@@ -197,7 +197,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 			addTAPNArc(degree2Net, 
 					presetArc.getSource().getName(),
 					String.format(T_MAX_FORMAT, transitionName, i),
-					presetArc.getGuard());
+					createGuard(presetArc.getGuard(), (TAPNPlace)postsetArc.getTarget(), presetArc instanceof TAPNTransportArc));
 			addNormalArc(degree2Net, 
 					String.format(T_MAX_FORMAT, transitionName, i),
 					postsetArc.getTarget().getName());
@@ -208,7 +208,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 			addTAPNArc(degree2Net, 
 					presetArc.getSource().getName(),
 					trans,
-					presetArc.getGuard());
+					createGuard(presetArc.getGuard(), (TAPNPlace)postsetArc.getTarget(), presetArc instanceof TAPNTransportArc));
 			addNormalArc(degree2Net,
 					trans,
 					pholding);
@@ -224,6 +224,10 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 		}
 	}
 
+	protected String createGuard(String guard, TAPNPlace target, boolean isTransportArc) {
+		return guard;
+	}
+
 	private void addSimulationOfPresetPostsetPairing(TimedArcPetriNet degree2Net, TAPNTransition transition, int i,
 			TAPNTransportArc presetArc) throws Exception {
 		String transitionName = transition.getName();
@@ -232,7 +236,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					String.format(T_MAX_FORMAT, transitionName, i),
 					presetArc.getTarget().getName(),
-					presetArc.getGuard());
+					createGuard(presetArc.getGuard(), (TAPNPlace)presetArc.getTarget(), true));
 		}else{
 			String trans = String.format(T_I_IN_FORMAT, transitionName, i);
 			String pholding = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
@@ -241,14 +245,14 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					trans,
 					pholding,
-					presetArc.getGuard());
+					createGuard(presetArc.getGuard(), (TAPNPlace)presetArc.getTarget(), true));
 
 			trans = String.format(T_I_OUT_FORMAT, transitionName, i);
 			addTransportArc(degree2Net, 
 					pholding,
 					trans,
 					presetArc.getTarget().getName(),
-					presetArc.getGuard());
+					createGuard(presetArc.getGuard(), (TAPNPlace)presetArc.getTarget(), true));
 		}
 	}
 
