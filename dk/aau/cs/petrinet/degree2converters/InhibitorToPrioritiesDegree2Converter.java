@@ -154,7 +154,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					trans,
 					presetArc.getTarget().getName(),
-					((TAPNTransportArc)presetArc).getGuard());
+					createGuard(((TAPNTransportArc)presetArc).getGuard(), (TAPNPlace)presetArc.getTarget(), true));
 		}else{
 			addTAPNArc(degree2Net,
 					presetArc.getSource().getName(),
