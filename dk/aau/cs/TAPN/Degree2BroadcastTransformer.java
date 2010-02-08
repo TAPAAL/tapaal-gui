@@ -437,6 +437,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return createTransitionGuard(newGuard);
 	}
 	protected String createTransitionGuard(String guard) {
+		if(guard.equals("false")) return guard;
 		if(guard.equals("[0,inf)")) return "";
 
 		String[] splitGuard = guard.substring(1, guard.length()-1).split(",");

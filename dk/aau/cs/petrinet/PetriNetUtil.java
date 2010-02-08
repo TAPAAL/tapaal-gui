@@ -18,7 +18,9 @@ public final class PetriNetUtil {
 		int upper = Integer.parseInt(upperString);
 		int lower = Integer.parseInt(lowerString);
 
-		if(invariantBound < upper && invariantBound > lower){
+		if(invariantBound < lower){
+			return "false";
+		}else if(invariantBound < upper && invariantBound > lower){
 			return guard.replace(String.valueOf(upper), String.valueOf(invariantBound));
 		}else{
 			return guard;
