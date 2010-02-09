@@ -192,13 +192,14 @@ implements Cloneable {
 	 */
 	public DataLayer(String pnmlFileName) {
 
+		queries = new ArrayList<TAPNQuery>();
 		initializeMatrices();
 		PNMLTransformer transform = new PNMLTransformer();
 		File temp = new File(pnmlFileName);
 		pnmlName = temp.getName();
 		createFromPNML(transform.transformPNML(pnmlFileName));
 		transportArcMap = new HashMap<Transition, HashMap<TransportArc,TransportArc> >();
-		queries = new ArrayList<TAPNQuery>();
+		
 	}  
 
 
@@ -208,7 +209,6 @@ implements Cloneable {
 	 */
 	public DataLayer(File pnmlFile) {
 		this(pnmlFile.getAbsolutePath());
-		queries = new ArrayList<TAPNQuery>();
 	}
 
 
