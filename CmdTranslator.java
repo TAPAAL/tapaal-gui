@@ -5,12 +5,9 @@ import java.io.PrintStream;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TAPN.AdvancedBroadcastTransformer;
 import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
-import dk.aau.cs.TAPN.TAPNToNTAStandardTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
@@ -23,12 +20,14 @@ public class CmdTranslator {
 	private static final String BROADCAST_STANDARD = "-r2";
 	private static final String BROADCAST_SYM = "-r3";
 	private static final String DEG2_BROADCAST_SYM = "-r4";
+	private static final String ADV_BROADCAST_SYM = "-r5";
 
 	private static final String INHIB_PRIO_STANDARD_NAME = "Standard Reduction (inhib. using priorities)";
 	private static final String INHIB_PRIO_SYM_NAME = "Symmetry Reduction (inhib. using priorities)";
 	private static final String BROADCAST_STANDARD_NAME = "Standard Broadcast Reduction";
 	private static final String BROADCAST_SYM_NAME = "Symmetric Broadcast Reduction";
-	private static final String DEG2_BROADCAST_SYM_NAME = "Symmetric Degree 2 Broadcast Reduction";
+	private static final String DEG2_BROADCAST_SYM_NAME = "Symmetric Degree2 Broadcast Reduction";
+	private static final String ADV_BROADCAST_SYM_NAME = "Symmetric Advanced Broadcast Reduction";
 
 	/**
 	 * @param args
@@ -88,7 +87,7 @@ public class CmdTranslator {
 			try{
 				dk.aau.cs.TA.NTA nta = trans.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + 1 + tapn.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
@@ -104,7 +103,7 @@ public class CmdTranslator {
 			try{
 				dk.aau.cs.TA.NTA nta = trans.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + 1 + tapn.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
@@ -118,7 +117,7 @@ public class CmdTranslator {
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + 1 + tapn.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
@@ -132,7 +131,21 @@ public class CmdTranslator {
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + 1 + tapn.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if(args[0].equalsIgnoreCase(ADV_BROADCAST_SYM)){
+			AdvancedBroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.AdvancedBroadcastTransformer(capacity, true);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
@@ -170,6 +183,11 @@ public class CmdTranslator {
 		System.out.print(DEG2_BROADCAST_SYM);
 		System.out.print(" - ");
 		System.out.println(DEG2_BROADCAST_SYM_NAME);
+		
+		System.out.print(ADV_BROADCAST_SYM);
+		System.out.print(" - ");
+		System.out.println(ADV_BROADCAST_SYM_NAME);
+		
 
 	}
 
