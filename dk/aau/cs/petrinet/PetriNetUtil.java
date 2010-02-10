@@ -19,7 +19,7 @@ public final class PetriNetUtil {
 		String firstDelim = guard.substring(0,1);
 		String upperString = guard.substring(guard.indexOf(",")+1, guard.length()-1);
 		String lowerString = guard.substring(1,guard.indexOf(","));
-		int upper = Integer.parseInt(upperString);
+		int upper = upperString.equals("inf") ? Integer.MAX_VALUE : Integer.parseInt(upperString);
 		int lower = Integer.parseInt(lowerString);
 
 		if(invariantBound < lower || (invariantBound == lower && firstDelim.equals("("))
