@@ -1013,7 +1013,22 @@ public class Export {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else {
+		}else if(input.reductionOption == TAPNQuery.ReductionOption.ADV_BROADCAST_SYM){
+			TAPNToNTABroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.AdvancedBroadcastTransformer(capacity, true);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else {
 
 			try {
 				model.convertToConservative();

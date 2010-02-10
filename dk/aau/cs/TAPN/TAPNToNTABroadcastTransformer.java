@@ -34,24 +34,24 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private int initTransitions = 0;
 	private boolean useSymmetry = false;
 	
-	private static final String ID_TYPE = "id_t";
-	private static final String ID_TYPE_NAME = "id";
-	private static final String TOKEN_INTERMEDIATE_PLACE = "%1$s_%2$s_%3$d";
-	private static final String TEST_CHANNEL_NAME = "%1$s_test%2$s";
-	private static final String FIRE_CHANNEL_NAME = "%1$s_fire%2$s";
-	private static final String COUNTER_NAME = "count%1$d";
-	private static final String COUNTER_UPDATE = "%1$s%2$s";
-	private static final String TOKEN_CLOCK_NAME = "x";
-	private static final String PLOCK = "P_lock";
-	private static final String PCAPACITY = "P_capacity";
-	private static final String INITIALIZE_CHANNEL = "c%1$d%2$s";
+	protected static final String ID_TYPE = "id_t";
+	protected static final String ID_TYPE_NAME = "id";
+	protected static final String TOKEN_INTERMEDIATE_PLACE = "%1$s_%2$s_%3$d";
+	protected static final String TEST_CHANNEL_NAME = "%1$s_test%2$s";
+	protected static final String FIRE_CHANNEL_NAME = "%1$s_fire%2$s";
+	protected static final String COUNTER_NAME = "count%1$d";
+	protected static final String COUNTER_UPDATE = "%1$s%2$s";
+	protected static final String TOKEN_CLOCK_NAME = "x";
+	protected static final String PLOCK = "P_lock";
+	protected static final String PCAPACITY = "P_capacity";
+	protected static final String INITIALIZE_CHANNEL = "c%1$d%2$s";
 
-	private static final String CONTROL_TEMPLATE_NAME = "Control";
-	private static final String TOKEN_TEMPLATE_NAME = "Token";
+	protected static final String CONTROL_TEMPLATE_NAME = "Control";
+	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	private Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
+	protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
 
 	public TAPNToNTABroadcastTransformer(int extraTokens, boolean useSymmetry){
 		this.extraTokens = extraTokens;
@@ -171,7 +171,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}
 	}
 
-	private String createResetExpressionForControl(TAPNTransition transition) {
+	protected String createResetExpressionForControl(TAPNTransition transition) {
 		StringBuilder builder = new StringBuilder();
 
 		boolean first = true;
@@ -306,62 +306,79 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 			List<Pairing> pairing = CreatePairing(t);
 
-			int i = 0;
-			for(Pairing pair : pairing){
-				String inputPlaceName = pair.getInput().getName();
-				String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.getName(), i);
-
-				Location intermediate = new Location(locationName, convertInvariant(pair.getOutput().getInvariant()));
-				intermediate.setCommitted(true);
-				ta.addLocation(intermediate);
-				addLocationMapping(locationName, intermediate);
-
-				String counter = String.format(COUNTER_NAME, i);
-				arcsToCounters.put(pair.getInputArc(), counter);
-
-				Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
-						intermediate, 
-						createTransitionGuard(pair.getInterval()),
-						String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
-						String.format(COUNTER_UPDATE, counter, "++"));
-				ta.addTransition(testEdge);
-
-				Edge fireEdge = new Edge(intermediate,
-						getLocationByName(pair.getOutput().getName()),
-						"", //String.format(COUNTER_UPDATE, i, "==1"),
-						String.format(FIRE_CHANNEL_NAME, t.getName(), "?"),
-						CreateResetExpressionIfNormalArc(pair.getArcType()));
-				ta.addTransition(fireEdge);
-
-				Edge backEdge = new Edge(intermediate,
-						getLocationByName(inputPlaceName),
-						String.format(COUNTER_UPDATE, counter,">1"),
-						"",
-						String.format(COUNTER_UPDATE, counter, "--"));
-				ta.addTransition(backEdge);
-
-				i++;
-			}
-
-			for(TAPNInhibitorArc inhibArc : t.getInhibitorArcs()){
-				String inputPlace = inhibArc.getSource().getName();
-
-				String counter = String.format(COUNTER_NAME, i);
-				arcsToCounters.put(inhibArc, counter);
-
-				Location location = getLocationByName(inputPlace);
-				Edge inhibEdge = new Edge(location,
-						location,
-						createTransitionGuard(inhibArc.getGuard()),
-						String.format(TEST_CHANNEL_NAME, t.getName(),"?"),
-						String.format(COUNTER_UPDATE, counter, "++"));
-				ta.addTransition(inhibEdge);
-				i++;
-			}
+			createStructureForPairing(ta, t, pairing);
 		}	
 	}
 
-	private String CreateResetExpressionIfNormalArc(ArcType arcType) {
+
+	protected void createStructureForPairing(TimedAutomaton ta, TAPNTransition t,
+			List<Pairing> pairing) {
+		int i = 0;
+		for(Pairing pair : pairing){
+			String inputPlaceName = pair.getInput().getName();
+			String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.getName(), i);
+
+			String inv = "";
+			if(pair.getArcType().equals(ArcType.TARC)){
+				inv = convertInvariant(pair.getOutput().getInvariant());
+			}
+			
+			Location intermediate = new Location(locationName, inv);
+			intermediate.setCommitted(true);
+			ta.addLocation(intermediate);
+			addLocationMapping(locationName, intermediate);
+
+			String counter = String.format(COUNTER_NAME, i);
+			arcsToCounters.put(pair.getInputArc(), counter);
+
+			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
+					intermediate, 
+					createTransitionGuard(pair.getInterval()),
+					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
+					String.format(COUNTER_UPDATE, counter, "++"));
+			ta.addTransition(testEdge);
+
+			Edge fireEdge = new Edge(intermediate,
+					getLocationByName(pair.getOutput().getName()),
+					"", //String.format(COUNTER_UPDATE, i, "==1"),
+					String.format(FIRE_CHANNEL_NAME, t.getName(), "?"),
+					createResetExpressionIfNormalArc(pair.getArcType()));
+			ta.addTransition(fireEdge);
+
+			Edge backEdge = new Edge(intermediate,
+					getLocationByName(inputPlaceName),
+					String.format(COUNTER_UPDATE, counter,">1"),
+					"",
+					String.format(COUNTER_UPDATE, counter, "--"));
+			ta.addTransition(backEdge);
+
+			i++;
+		}
+
+		createStructureForInhibitorArcs(ta, t, i);
+	}
+
+
+	protected void createStructureForInhibitorArcs(TimedAutomaton ta,
+			TAPNTransition t, int i) {
+		for(TAPNInhibitorArc inhibArc : t.getInhibitorArcs()){
+			String inputPlace = inhibArc.getSource().getName();
+
+			String counter = String.format(COUNTER_NAME, i);
+			arcsToCounters.put(inhibArc, counter);
+
+			Location location = getLocationByName(inputPlace);
+			Edge inhibEdge = new Edge(location,
+					location,
+					createTransitionGuard(inhibArc.getGuard()),
+					String.format(TEST_CHANNEL_NAME, t.getName(),"?"),
+					String.format(COUNTER_UPDATE, counter, "++"));
+			ta.addTransition(inhibEdge);
+			i++;
+		}
+	}
+
+	protected String createResetExpressionIfNormalArc(ArcType arcType) {
 		if(arcType.equals(ArcType.NORMAL)){
 			return String.format("%1s := 0", TOKEN_CLOCK_NAME);
 		}else{
