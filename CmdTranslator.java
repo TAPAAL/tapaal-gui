@@ -21,6 +21,7 @@ public class CmdTranslator {
 	private static final String BROADCAST_SYM = "-r3";
 	private static final String DEG2_BROADCAST_SYM = "-r4";
 	private static final String ADV_BROADCAST_SYM = "-r5";
+	private static final String OPT_BROADCAST_SYM = "-r6";
 
 	private static final String INHIB_PRIO_STANDARD_NAME = "Standard Reduction (inhib. using priorities)";
 	private static final String INHIB_PRIO_SYM_NAME = "Symmetry Reduction (inhib. using priorities)";
@@ -28,6 +29,7 @@ public class CmdTranslator {
 	private static final String BROADCAST_SYM_NAME = "Symmetric Broadcast Reduction";
 	private static final String DEG2_BROADCAST_SYM_NAME = "Symmetric Degree2 Broadcast Reduction";
 	private static final String ADV_BROADCAST_SYM_NAME = "Symmetric Advanced Broadcast Reduction";
+	private static final String OPT_BROADCAST_SYM_NAME = "Optimized Symmetric Broadcast Reduction";
 
 	/**
 	 * @param args
@@ -153,6 +155,20 @@ public class CmdTranslator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}else if(args[0].equalsIgnoreCase(OPT_BROADCAST_SYM)){
+			TAPNToNTABroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, true);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else{
 			throw new Exception("Wrong reduction method");
@@ -188,7 +204,9 @@ public class CmdTranslator {
 		System.out.print(" - ");
 		System.out.println(ADV_BROADCAST_SYM_NAME);
 		
-
+		System.out.print(OPT_BROADCAST_SYM);
+		System.out.print(" - ");
+		System.out.println(OPT_BROADCAST_SYM_NAME);
 	}
 
 }
