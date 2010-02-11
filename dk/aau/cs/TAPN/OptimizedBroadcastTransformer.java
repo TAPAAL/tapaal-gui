@@ -40,14 +40,14 @@ public class OptimizedBroadcastTransformer extends
 
 			Edge tau = new Edge(tempLoc,
 					tempLoc2,
-					"",
+					createGuardForControl(transition, 1),
 					"",
 					"");
 			control.addTransition(tau);
 			
 			Edge fireEdge = new Edge(tempLoc2,
 					lock,
-					createGuardForControl(transition),
+					createGuardForControl(transition, 0),
 					"",
 					"");
 			control.addTransition(fireEdge);
@@ -106,8 +106,8 @@ public class OptimizedBroadcastTransformer extends
 	}
 	
 	
-	private String createGuardForControl(TAPNTransition transition){
-		return createBooleanExpressionForControl(transition, "==", "==", 0);
+	private String createGuardForControl(TAPNTransition transition, int number){
+		return createBooleanExpressionForControl(transition, "==", "==", number);
 	}
 
 }
