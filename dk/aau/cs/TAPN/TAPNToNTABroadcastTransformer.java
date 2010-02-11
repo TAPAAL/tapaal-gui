@@ -345,9 +345,16 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					createResetExpressionIfNormalArc(pair.getArcType()));
 			ta.addTransition(fireEdge);
 
+			String guard = String.format(COUNTER_UPDATE, counter,">1");
+			
+			for(int j = i-1; j >= 0; j--){
+				String c = String.format(COUNTER_NAME,j);
+				guard = String.format(COUNTER_UPDATE, c, "==1") + " && " + guard;
+			}
+			
 			Edge backEdge = new Edge(intermediate,
 					getLocationByName(inputPlaceName),
-					String.format(COUNTER_UPDATE, counter,">1"),
+					guard,
 					"",
 					String.format(COUNTER_UPDATE, counter, "--"));
 			ta.addTransition(backEdge);
