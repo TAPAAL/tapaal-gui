@@ -345,7 +345,8 @@ public class Verification {
 					|| input.reductionOption == ReductionOption.BROADCAST_SYM
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
 					|| input.reductionOption == ReductionOption.ADV_BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM)){
+					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.SUPER_BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"Verification of liveness properties (EG,AF) is not possible with the selected reduction option.",
@@ -359,7 +360,8 @@ public class Verification {
 			if (!model.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD || input.reductionOption == ReductionOption.BROADCAST_SYM
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
 					|| input.reductionOption == ReductionOption.ADV_BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM)){
+					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.SUPER_BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"The net cannot be verified for liveness properties (EG,AF) because there is\n"+
@@ -481,6 +483,20 @@ public class Verification {
 		}else if(input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM){
 			TAPNToNTABroadcastTransformer broadcastTransformer = 
 				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, true);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM){
+			TAPNToNTABroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, true);
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));

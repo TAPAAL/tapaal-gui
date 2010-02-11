@@ -121,6 +121,7 @@ public class QueryDialogue extends JPanel{
 	private String name_BROADCASTDEG2SYM = "Sym. Broadcast Degree 2 Reduction";
 	private String name_ADVBROADCASTSYM = "Sym. Advanced Broadcast Reduction";
 	private String name_OPTBROADCASTSYM = "Optimized Symmetric Broadcast Reduction";
+	private String name_SUPERBROADCASTSYM = "Symmetric Super Broadcast Reduction";
 	
 	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
@@ -680,7 +681,11 @@ public class QueryDialogue extends JPanel{
 			} else if(queryToCreateFrom.reductionOption == ReductionOption.OPT_BROADCAST_SYM){
 				reductionOption.setSelectedItem(name_OPTBROADCASTSYM);
 				disableTraceOptions();
-			}else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.SUPER_BROADCAST_SYM){
+				reductionOption.setSelectedItem(name_SUPERBROADCASTSYM);
+				disableTraceOptions();
+			}
+			else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
 				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
 					reductionOption.setSelectedIndex(0);
 					enableTraceOptions();
@@ -712,7 +717,7 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void disableLivenessReductionOptions(){
-		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM, name_OPTBROADCASTSYM};
+		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM, name_OPTBROADCASTSYM, name_SUPERBROADCASTSYM};
 		reductionOption.removeAllItems();
 
 		for (String s : options){
@@ -723,7 +728,7 @@ public class QueryDialogue extends JPanel{
 	private void enableAllReductionOptions(){
 		reductionOption.removeAllItems();
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM,name_OPTBROADCASTSYM};
+			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM,name_OPTBROADCASTSYM, name_SUPERBROADCASTSYM};
 
 			for (String s : options){
 				reductionOption.addItem(s);
@@ -736,6 +741,7 @@ public class QueryDialogue extends JPanel{
 			reductionOption.addItem(name_BROADCASTDEG2SYM);
 			reductionOption.addItem(name_ADVBROADCASTSYM);
 			reductionOption.addItem(name_OPTBROADCASTSYM);
+			reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
 	}
 
@@ -935,6 +941,8 @@ public class QueryDialogue extends JPanel{
 			reductionOptionToSet = ReductionOption.ADV_BROADCAST_SYM;
 		}else if(reductionOptionString.equals(name_OPTBROADCASTSYM)){
 			reductionOptionToSet = ReductionOption.OPT_BROADCAST_SYM;
+		}else if(reductionOptionString.equals(name_SUPERBROADCASTSYM)){
+			reductionOptionToSet = ReductionOption.SUPER_BROADCAST_SYM;
 		}
 		
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
