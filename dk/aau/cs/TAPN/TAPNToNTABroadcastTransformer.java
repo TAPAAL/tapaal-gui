@@ -151,7 +151,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		for(TAPNTransition transition : model.getTransitions()){
 			String invariant = createInvariantForControl(transition);
 
-			Location tempLoc = new Location("","");//,invariant);
+			Location tempLoc = new Location("",invariant);
 			tempLoc.setCommitted(true);
 			control.addLocation(tempLoc);
 
@@ -162,7 +162,18 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			"");
 			control.addTransition(testEdge);
 
-			Edge fireEdge = new Edge(tempLoc,
+			Location tempLoc2 = new Location("","");
+			tempLoc2.setCommitted(true);
+			control.addLocation(tempLoc2);
+			
+			Edge tau = new Edge(tempLoc, 
+					tempLoc2,
+					"",
+					"",
+					"");
+			control.addTransition(tau);
+			
+			Edge fireEdge = new Edge(tempLoc2,
 					lock,
 					createGuardForControl(transition),
 					String.format(FIRE_CHANNEL_NAME, transition.getName(), "!"),
@@ -324,7 +335,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			}
 			
 			Location intermediate = new Location(locationName, inv);
-			intermediate.setCommitted(true);
+			//intermediate.setCommitted(true);
 			ta.addLocation(intermediate);
 			addLocationMapping(locationName, intermediate);
 
