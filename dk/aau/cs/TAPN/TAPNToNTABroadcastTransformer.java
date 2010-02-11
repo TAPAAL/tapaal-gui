@@ -349,7 +349,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 						
 			Edge backEdge = new Edge(intermediate,
 					getLocationByName(inputPlaceName),
-					guard,
+					"", //guard,
 					"",
 					String.format(COUNTER_UPDATE, counter, "--"));
 			ta.addTransition(backEdge);
