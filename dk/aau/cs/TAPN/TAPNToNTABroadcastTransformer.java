@@ -145,7 +145,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return control;
 	}
 
-	private void createTransitionSimulations(TimedAutomaton control, Location lock,
+	protected void createTransitionSimulations(TimedAutomaton control, Location lock,
 			TimedArcPetriNet model) {
 
 		for(TAPNTransition transition : model.getTransitions()){
@@ -201,14 +201,14 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	private String createGuardForControl(TAPNTransition transition) {
-		return createBooleanExpressionForControl(transition, "==", "==");
+		return createBooleanExpressionForControl(transition, "==", "==", 1);
 	}
 
-	private String createInvariantForControl(TAPNTransition transition) {
-		return createBooleanExpressionForControl(transition, ">=", "==");
+	protected String createInvariantForControl(TAPNTransition transition) {
+		return createBooleanExpressionForControl(transition, ">=", "==",1);
 	}
 
-	private String createBooleanExpressionForControl(TAPNTransition transition, String comparison, String inhibComparison)
+	protected String createBooleanExpressionForControl(TAPNTransition transition, String comparison, String inhibComparison, int number)
 	{
 		StringBuilder builder = new StringBuilder();
 
@@ -222,7 +222,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			String counter = arcsToCounters.get(presetArc);
 			builder.append(counter);
 			builder.append(comparison);
-			builder.append("1");
+			builder.append(number);
 			first = false;
 		}
 
