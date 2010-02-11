@@ -151,7 +151,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		for(TAPNTransition transition : model.getTransitions()){
 			String invariant = createInvariantForControl(transition);
 
-			Location tempLoc = new Location("",invariant);
+			Location tempLoc = new Location("","");//,invariant);
 			tempLoc.setCommitted(true);
 			control.addLocation(tempLoc);
 
@@ -349,7 +349,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 						
 			Edge backEdge = new Edge(intermediate,
 					getLocationByName(inputPlaceName),
-					"", //guard,
+					guard,
 					"",
 					String.format(COUNTER_UPDATE, counter, "--"));
 			ta.addTransition(backEdge);
