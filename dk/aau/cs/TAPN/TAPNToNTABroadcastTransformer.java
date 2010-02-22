@@ -14,6 +14,7 @@ import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.PetriNetUtil;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNInhibitorArc;
 import dk.aau.cs.petrinet.TAPNPlace;
@@ -317,13 +318,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		for(Pairing pair : pairing){
 			String inputPlaceName = pair.getInput().getName();
 			String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.getName(), i);
-
-			String inv = "";
-			if(pair.getArcType().equals(ArcType.TARC)){
-				inv = convertInvariant(pair.getOutput().getInvariant());
-			}
 			
-			Location intermediate = new Location(locationName, inv);
+			Location intermediate = new Location(locationName, "");
 			intermediate.setCommitted(true);
 			ta.addLocation(intermediate);
 			addLocationMapping(locationName, intermediate);
@@ -333,7 +329,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
 					intermediate, 
-					createTransitionGuard(pair.getInterval()),
+					createTransitionGuard(pair.getInterval(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);
@@ -434,8 +430,14 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 		return locations;
 	}
+	
+	protected String createTransitionGuard(String guard, TAPNPlace target, boolean isTransportArc) {
+		String newGuard = PetriNetUtil.createGuard(guard, target, isTransportArc);
+		return createTransitionGuard(newGuard);
+	}
 
 	protected String createTransitionGuard(String guard) {
+		if(guard.equals("false")) return guard;
 		if(guard.equals("[0,inf)")) return "";
 
 		String[] splitGuard = guard.substring(1, guard.length()-1).split(",");

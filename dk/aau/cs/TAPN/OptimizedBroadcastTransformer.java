@@ -61,12 +61,8 @@ public class OptimizedBroadcastTransformer extends
 			String inputPlaceName = pair.getInput().getName();
 			String locationName = String.format(TOKEN_INTERMEDIATE_PLACE, inputPlaceName, t.getName(), i);
 
-			String inv = "";
-			if(pair.getArcType().equals(ArcType.TARC)){
-				inv = convertInvariant(pair.getOutput().getInvariant());
-			}
-			
-			Location intermediate = new Location(locationName, inv);
+				
+			Location intermediate = new Location(locationName, "");
 			intermediate.setCommitted(true);
 			ta.addLocation(intermediate);
 			addLocationMapping(locationName, intermediate);
@@ -76,7 +72,7 @@ public class OptimizedBroadcastTransformer extends
 
 			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
 					intermediate, 
-					createTransitionGuard(pair.getInterval()),
+					createTransitionGuard(pair.getInterval(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);

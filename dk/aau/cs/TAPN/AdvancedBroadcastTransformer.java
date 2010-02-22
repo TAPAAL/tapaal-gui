@@ -27,12 +27,6 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 			arcsToCounters.put(pair.getInputArc(), counter);
 			
 			String inv = counter + "==1";
-			if(pair.getArcType().equals(ArcType.TARC)){
-				String placeInvariant = convertInvariant(pair.getOutput().getInvariant());
-				if(!placeInvariant.isEmpty()){
-					inv = inv + " && " + placeInvariant;
-				}
-			}
 			
 			Location intermediate = new Location(locationName, inv);
 			intermediate.setCommitted(true);
@@ -41,7 +35,7 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 
 			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
 					intermediate, 
-					createTransitionGuard(pair.getInterval()),
+					createTransitionGuard(pair.getInterval(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);
@@ -59,7 +53,7 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 			
 			Edge testEdge2 = new Edge(getLocationByName(inputPlaceName),
 					l,
-					createTransitionGuard(pair.getInterval()),
+					createTransitionGuard(pair.getInterval(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					"");
 			ta.addTransition(testEdge2);
