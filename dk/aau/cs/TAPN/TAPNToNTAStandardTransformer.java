@@ -96,20 +96,20 @@ extends TAPNToNTATransformer{
 		String guard = createTransitionGuard(sourceArc.getGuard(), transition.isFromOriginalNet());
 		String sync = createSyncExpression(transition, symbol);
 		String update = createUpdateExpression(sourceArc);
-		if(source.getName().equals(PLOCK)){
-			if(update.length()>0){
-				update = "lock = 1, " + update;
-			}else{
-				update = "lock = 1";
-			}
-			
-		}else if(destination.getName().equals(PLOCK)){
-			if(update.length()>0){
-				update = "lock = 0, " + update;
-			}else{
-				update = "lock = 0";
-			}
-		}
+//		if(source.getName().equals(PLOCK)){
+//			if(update.length()>0){
+//				update = "lock = 1, " + update;
+//			}else{
+//				update = "lock = 1";
+//			}
+//			
+//		}else if(destination.getName().equals(PLOCK)){
+//			if(update.length()>0){
+//				update = "lock = 0, " + update;
+//			}else{
+//				update = "lock = 0";
+//			}
+//		}
 		Edge e = new Edge(source, destination, guard, sync, update);
 		return e;
 	}

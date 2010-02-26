@@ -17,6 +17,7 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
+import dk.aau.cs.petrinet.degree2converters.InhibitorToPrioritiesDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
 
 public abstract class TAPNToNTATransformer implements 
@@ -31,7 +32,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	
 	
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	private Degree2Converter degree2Converter = new OptimizedInhibitorToPrioritiesDegree2Converter();
+	private Degree2Converter degree2Converter = new InhibitorToPrioritiesDegree2Converter();
 	protected TAPNToNTATransformer(int extraTokens){
 		this.extraTokens = extraTokens;
 	}

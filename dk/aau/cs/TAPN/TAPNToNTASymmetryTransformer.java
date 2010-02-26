@@ -79,11 +79,11 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 						if(isPartOfLockTemplate(targetName) && !usedFromPostset.contains(postsetArc)){
 							String update = "";
 
-							if(sourceName.equals(PLOCK)){
-								update = "lock = 1";
-							}else if(targetName.equals(PLOCK)){
-								update = "lock = 0";
-							}
+//							if(sourceName.equals(PLOCK)){
+//								update = "lock = 1";
+//							}else if(targetName.equals(PLOCK)){
+//								update = "lock = 0";
+//							}
 
 							Edge e = new Edge(getLocationByName(sourceName),
 									getLocationByName(targetName),
