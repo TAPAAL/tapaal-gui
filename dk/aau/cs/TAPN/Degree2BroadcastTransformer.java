@@ -1,9 +1,6 @@
 package dk.aau.cs.TAPN;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,9 +51,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private int numberOfInitChannels = 0;
 	private int extraTokens = 0;
 	private int largestPresetSize = 0;
+	private boolean useSymmetry;
 
-	public Degree2BroadcastTransformer(int extraTokens) {
+	public Degree2BroadcastTransformer(int extraTokens, boolean useSymmetry) {
 		this.extraTokens = extraTokens;
+		this.useSymmetry = useSymmetry;
 	}
 
 	public NTA transformModel(TimedArcPetriNet model) throws Exception {
@@ -68,27 +67,77 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		TimedArcPetriNet degree2Net = new InhibDegree2Converter().transform((TAPN)model);
 
 		NTA nta = new NTA();
-		nta.addTimedAutomaton(createTokenAutomaton(degree2Net, model));
+		if(useSymmetry){
+			nta.addTimedAutomaton(createTokenAutomaton(degree2Net, model));
+		}else{
+			int j = 0;
+			for(Token token : degree2Net.getTokens()){
+				if(!token.getPlace().getName().equals(PLOCK)){
+					clearLocationMappings();
+					arcsToCounters.clear();
+					TimedAutomaton ta = createTokenAutomaton(degree2Net, model);
+					ta.setName(TOKEN_TEMPLATE_NAME + j);
+					ta.setInitLocation(getLocationByName(token.getPlace().getName()));
+					nta.addTimedAutomaton(ta);
+					j++;
+				}
+			}
+
+			for(int i = 0; i < extraTokens; i++){
+				clearLocationMappings();
+				arcsToCounters.clear();
+				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Net, model);
+				tokenTemplate.setInitLocation(getLocationByName(P_CAPACITY));
+				nta.addTimedAutomaton(tokenTemplate);
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Net.getNumberOfTokens()-1+i));
+			}
+		}
+
 		nta.addTimedAutomaton(createControlAutomaton(degree2Net, model));
-		nta.setSystemDeclarations("system " + CONTROL_TEMPLATE_NAME + "," + TOKEN_TEMPLATE_NAME + ";");
+		nta.setSystemDeclarations(createSystemDeclaration(degree2Net.getNumberOfTokens()));
 		nta.setGlobalDeclarations(createGlobalDeclarations(degree2Net, model));
 
 		return nta;
 	}
 
-	private String createGlobalDeclarations(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel) {
-		StringBuilder builder = new StringBuilder("const int N = ");
-		builder.append(degree2Net.getTokens().size() + extraTokens);
-		builder.append(";\ntypedef ");
-		builder.append("scalar[N] ");
-		builder.append(ID_TYPE);
-		builder.append(";\n");
+	private String createSystemDeclaration(int tokensInModel) {
+		if(useSymmetry){
+			return "system " + CONTROL_TEMPLATE_NAME + "," + TOKEN_TEMPLATE_NAME + ";";
+		}else{
+			StringBuilder builder = new StringBuilder("system ");
+			builder.append(CONTROL_TEMPLATE_NAME);
 
-		for(int i = 0; i < numberOfInitChannels; i++){
-			builder.append("chan ");
-			builder.append(String.format(INIT_CHANNEL, i,""));
-			builder.append(";\n");
+			for(int i = 0; i < extraTokens + tokensInModel - 1; i++)
+			{
+				builder.append(", ");
+				builder.append(TOKEN_TEMPLATE_NAME);
+				builder.append(i);
+			}
+			builder.append(";");
+
+			return builder.toString();
 		}
+	}
+
+	private String createGlobalDeclarations(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel) {
+		StringBuilder builder = new StringBuilder();
+		
+		if(useSymmetry){
+			builder.append("const int N = ");
+			builder.append(degree2Net.getTokens().size() + extraTokens);
+			builder.append(";\n");
+			builder.append("typedef ");
+			builder.append("scalar[N] ");
+			builder.append(ID_TYPE);
+			builder.append(";\n");
+
+			for(int i = 0; i < numberOfInitChannels; i++){
+				builder.append("chan ");
+				builder.append(String.format(INIT_CHANNEL, i,""));
+				builder.append(";\n");
+			}
+		}
+
 
 		for(TAPNTransition t : degree2Net.getTransitions()){
 			builder.append("chan ");
@@ -137,10 +186,14 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		TimedAutomaton control = new TimedAutomaton();
 		createInitialLocationsForControlAutomaton(degree2Net, control);
 		createEdgesForControlAutomaton(degree2Net, model, control);
-		Location initial = createInitializationTransitionsForControlAutomaton(degree2Net,control);
-
 		control.setName(CONTROL_TEMPLATE_NAME);
-		control.setInitLocation(initial);
+		if(useSymmetry){
+			Location initial = createInitializationTransitionsForControlAutomaton(degree2Net,control);
+			control.setInitLocation(initial);
+		}else{
+			control.setInitLocation(getLocationByName(PLOCK));
+		}
+
 		return control;
 	}
 
@@ -185,11 +238,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 						getLocationByName(pairing.getOutput().getName()),
 						"",
 						transition.getName() + "!",
-						"");
+				"");
 				control.addTransition(e);
 			}
 		}	
-		
+
 		for(TAPNTransition transition : originalModel.getTransitions()){
 			Location ptest = new Location("",createInvariantForControl(transition));
 			ptest.setCommitted(true);
@@ -203,12 +256,12 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			control.addTransition(first);
 
 			if(transition.getPreset().size() != 1){
-			Edge second = new Edge(ptest,
-					getLocationByName(String.format(P_T_IN_FORMAT, transition.getName(), 1)),
-					"",
-					String.format(T_I_IN_FORMAT+"%3$s", transition.getName(), 1, "!"),
-					createResetExpressionForControl(transition));
-			control.addTransition(second);
+				Edge second = new Edge(ptest,
+						getLocationByName(String.format(P_T_IN_FORMAT, transition.getName(), 1)),
+						"",
+						String.format(T_I_IN_FORMAT+"%3$s", transition.getName(), 1, "!"),
+						createResetExpressionForControl(transition));
+				control.addTransition(second);
 			}else{
 				Edge second = new Edge(ptest,
 						getLocationByName(PLOCK),
@@ -225,11 +278,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		for(TAPNPlace place: degree2Net.getPlaces()){			
 			if(isPartOfLockTemplate(place.getName())){
 				Location l = new Location(place.getName(),"");
-				
+
 				if(!place.getName().equals(PLOCK)){
 					l.setCommitted(true);
 				}
-				
+
 				ta.addLocation(l);
 				addLocationMapping(place.getName(), l);
 			}
@@ -242,12 +295,15 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		createInitialLocationsForTokenAutomata(degree2Net, token);
 		createTestingEdgesForTokenAutomata(originalModel, token);
 		createEdgesForTokenAutomata(degree2Net, token);
-		createInitializationTransitionsForTokenAutomata(degree2Net, token);
-		
-		token.setName(TOKEN_TEMPLATE_NAME);
+
+		if(useSymmetry){
+			createInitializationTransitionsForTokenAutomata(degree2Net, token);
+			token.setName(TOKEN_TEMPLATE_NAME);
+			token.setInitLocation(getLocationByName(P_CAPACITY));
+			token.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
+		}
+
 		token.setDeclarations("clock " + CLOCK_NAME + ";");
-		token.setInitLocation(getLocationByName(P_CAPACITY));
-		token.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
 
 		return token;
 	}
@@ -315,11 +371,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	private void createTestingEdgesForTokenAutomata(TimedArcPetriNet originalModel, TimedAutomaton ta) {
-		
+
 		for(TAPNTransition transition : originalModel.getTransitions()){
 			int size = transition.getPreset().size() + transition.getInhibitorArcs().size();
 			if(size > largestPresetSize) largestPresetSize = size;
-			
+
 			int i = 0;
 			for(Arc arc : transition.getPreset()){
 				String source = arc.getSource().getName();
@@ -340,12 +396,12 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 				ta.addTransition(e);		
 				i++;
 			}
-			
+
 			for(TAPNInhibitorArc arc : transition.getInhibitorArcs()){
 				String source = arc.getSource().getName();
 				String counter = String.format(COUNTER_NAME, i);
 				arcsToCounters.put(arc, counter);
-				
+
 				Edge e = new Edge(getLocationByName(source),
 						getLocationByName(source),
 						createTransitionGuard(arc.getGuard()),
@@ -492,15 +548,30 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		Pattern pattern = Pattern.compile(QUERY_PATTERN);
 		Matcher matcher = pattern.matcher(query);
 
-		StringBuilder builder = new StringBuilder("(sum(i:");
-		builder.append(ID_TYPE);
-		builder.append(")");
-		builder.append(TOKEN_TEMPLATE_NAME);
-		builder.append("(i).$1) $2 $3");
+		StringBuilder builder = new StringBuilder();
+		if(useSymmetry){
+			builder.append("(sum(i:");
+			builder.append(ID_TYPE);
+			builder.append(")");
+			builder.append(TOKEN_TEMPLATE_NAME);
+			builder.append("(i).$1) $2 $3");
+		}else{
+			builder.append("(");
+			for(int i = 0; i < tapnQuery.getTotalTokens()-1; i++){
+				if(i > 0){
+					builder.append(" + ");
+				}
+
+				builder.append(TOKEN_TEMPLATE_NAME);
+				builder.append(i);
+				builder.append(".$1");
+			}
+			builder.append(") $2 $3");
+		}
 
 		StringBuilder uppaalQuery = new StringBuilder();
 		uppaalQuery.append(matcher.replaceAll(builder.toString()));
-			
+
 		if(tapnQuery.isEFQuery() || tapnQuery.isAFQuery()){
 			uppaalQuery.append(" and ");
 		}else{
@@ -508,7 +579,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}
 		uppaalQuery.append("Control.");
 		uppaalQuery.append(PLOCK);
-		
+
 		return new StandardUPPAALQuery(uppaalQuery.toString());
 	}
 }

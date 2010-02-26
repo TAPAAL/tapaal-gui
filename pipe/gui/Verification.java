@@ -341,11 +341,15 @@ public class Verification {
 		if (inputQuery.contains("E[]") || inputQuery.contains("A<>") ) {
 			
 			//If selected wrong method for checking
-			if (!(input.reductionOption == ReductionOption.ADV_NOSYM || input.reductionOption == ReductionOption.ADV_UPPAAL_SYM || input.reductionOption == ReductionOption.BROADCAST_STANDARD 
+			if (!(input.reductionOption == ReductionOption.ADV_NOSYM || input.reductionOption == ReductionOption.ADV_UPPAAL_SYM 
+					|| input.reductionOption == ReductionOption.BROADCAST_STANDARD 
 					|| input.reductionOption == ReductionOption.BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.BROADCAST_DEG2
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
 					|| input.reductionOption == ReductionOption.ADV_BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.OPT_BROADCAST
 					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.SUPER_BROADCAST
 					|| input.reductionOption == ReductionOption.SUPER_BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -357,10 +361,14 @@ public class Verification {
 			}
 			
 			//Check if degree-2 or give an error
-			if (!model.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD || input.reductionOption == ReductionOption.BROADCAST_SYM
+			if (!model.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD 
+					|| input.reductionOption == ReductionOption.BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.BROADCAST_DEG2
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
 					|| input.reductionOption == ReductionOption.ADV_BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.OPT_BROADCAST
 					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM
+					|| input.reductionOption == ReductionOption.SUPER_BROADCAST
 					|| input.reductionOption == ReductionOption.SUPER_BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -452,9 +460,9 @@ public class Verification {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM){
+		} else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2){
 			Degree2BroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity);
+				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -480,9 +488,9 @@ public class Verification {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM){
+		}else if(input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM || input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST){
 			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, true);
+				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM);
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -494,9 +502,9 @@ public class Verification {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM){
+		}else if(input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM || input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST){
 			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, true);
+				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM);
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));

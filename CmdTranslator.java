@@ -23,15 +23,21 @@ public class CmdTranslator {
 	private static final String ADV_BROADCAST_SYM = "-r5";
 	private static final String OPT_BROADCAST_SYM = "-r6";
 	private static final String SUPER_BROADCAST_SYM = "-r7";
+	private static final String DEG2_BROADCAST = "-r8";
+	private static final String OPT_BROADCAST = "-r9";
+	private static final String SUPER_BROADCAST = "-r10";
 	
 	private static final String INHIB_PRIO_STANDARD_NAME = "Standard Reduction (inhib. using priorities)";
 	private static final String INHIB_PRIO_SYM_NAME = "Symmetry Reduction (inhib. using priorities)";
 	private static final String BROADCAST_STANDARD_NAME = "Standard Broadcast Reduction";
 	private static final String BROADCAST_SYM_NAME = "Symmetric Broadcast Reduction";
 	private static final String DEG2_BROADCAST_SYM_NAME = "Symmetric Degree2 Broadcast Reduction";
+	private static final String DEG2_BROADCAST_NAME = "Degree2 Broadcast Reduction";
 	private static final String ADV_BROADCAST_SYM_NAME = "Symmetric Advanced Broadcast Reduction";
 	private static final String OPT_BROADCAST_SYM_NAME = "Optimized Symmetric Broadcast Reduction";
 	private static final String SUPER_BROADCAST_SYM_NAME = "Symmetric Super Broadcast Reduction";
+	private static final String OPT_BROADCAST_NAME = "Optimized Broadcast Reduction";
+	private static final String SUPER_BROADCAST_NAME = "Super Broadcast Reduction";
 	
 	/**
 	 * @param args
@@ -129,9 +135,9 @@ public class CmdTranslator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else if(args[0].equalsIgnoreCase(DEG2_BROADCAST_SYM)){
+		} else if(args[0].equalsIgnoreCase(DEG2_BROADCAST_SYM)|| args[0].equalsIgnoreCase(DEG2_BROADCAST)){
 			Degree2BroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity);
+				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, args[0].equalsIgnoreCase(DEG2_BROADCAST_SYM));
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -157,9 +163,9 @@ public class CmdTranslator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if(args[0].equalsIgnoreCase(OPT_BROADCAST_SYM)){
+		}else if(args[0].equalsIgnoreCase(OPT_BROADCAST_SYM) || args[0].equalsIgnoreCase(OPT_BROADCAST)){
 			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, true);
+				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, args[0].equalsIgnoreCase(OPT_BROADCAST_SYM));
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -171,9 +177,9 @@ public class CmdTranslator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if(args[0].equalsIgnoreCase(SUPER_BROADCAST_SYM)){
+		}else if(args[0].equalsIgnoreCase(SUPER_BROADCAST_SYM) || args[0].equalsIgnoreCase(SUPER_BROADCAST)){
 			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, true);
+				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, args[0].equalsIgnoreCase(SUPER_BROADCAST_SYM));
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -227,6 +233,18 @@ public class CmdTranslator {
 		System.out.print(SUPER_BROADCAST_SYM);
 		System.out.print(" - ");
 		System.out.println(SUPER_BROADCAST_SYM_NAME);
+		
+		System.out.print(DEG2_BROADCAST);
+		System.out.print(" - ");
+		System.out.println(DEG2_BROADCAST_NAME);
+		
+		System.out.print(OPT_BROADCAST);
+		System.out.print(" - ");
+		System.out.println(OPT_BROADCAST_NAME);
+		
+		System.out.print(SUPER_BROADCAST);
+		System.out.print(" - ");
+		System.out.println(SUPER_BROADCAST_NAME);
 	}
 
 }

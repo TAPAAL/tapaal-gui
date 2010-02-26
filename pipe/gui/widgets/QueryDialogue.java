@@ -119,10 +119,13 @@ public class QueryDialogue extends JPanel{
 	private String name_BROADCAST = "Broadcast Reduction";
 	private String name_BROADCASTSYM = "Symmetric Broadcast Reduction";
 	private String name_BROADCASTDEG2SYM = "Sym. Broadcast Degree 2 Reduction";
+	private String name_BROADCASTDEG2 = "Broadcast Degree 2 Reduction";
 	private String name_ADVBROADCASTSYM = "Sym. Advanced Broadcast Reduction";
 	private String name_OPTBROADCASTSYM = "Optimized Symmetric Broadcast Reduction";
+	private String name_OPTBROADCAST = "Optimized Broadcast Reduction";
 	private String name_SUPERBROADCASTSYM = "Symmetric Super Broadcast Reduction";
-	
+	private String name_SUPERBROADCAST = "Super Broadcast Reduction";
+
 	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
 		this.datalayer = datalayer;
@@ -543,7 +546,10 @@ public class QueryDialogue extends JPanel{
 					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) 
 							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVNOSYM)
 							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSTANDARD)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCAST)){
+							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCAST)
+							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)
+							|| ((String) reductionOption.getSelectedItem()).equals(name_OPTBROADCAST)
+							|| ((String) reductionOption.getSelectedItem()).equals(name_SUPERBROADCAST)){
 						enableTraceOptions();
 					}
 				}
@@ -676,8 +682,8 @@ public class QueryDialogue extends JPanel{
 				reductionOption.setSelectedItem(name_BROADCASTDEG2SYM);
 				disableTraceOptions();
 			}else if(queryToCreateFrom.reductionOption == ReductionOption.ADV_BROADCAST_SYM){
-					reductionOption.setSelectedItem(name_ADVBROADCASTSYM);
-					disableTraceOptions();
+				reductionOption.setSelectedItem(name_ADVBROADCASTSYM);
+				disableTraceOptions();
 			} else if(queryToCreateFrom.reductionOption == ReductionOption.OPT_BROADCAST_SYM){
 				reductionOption.setSelectedItem(name_OPTBROADCASTSYM);
 				disableTraceOptions();
@@ -717,7 +723,7 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void disableLivenessReductionOptions(){
-		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM, name_OPTBROADCASTSYM, name_SUPERBROADCASTSYM};
+		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM, name_OPTBROADCAST,name_OPTBROADCASTSYM,name_SUPERBROADCAST, name_SUPERBROADCASTSYM};
 		reductionOption.removeAllItems();
 
 		for (String s : options){
@@ -728,7 +734,7 @@ public class QueryDialogue extends JPanel{
 	private void enableAllReductionOptions(){
 		reductionOption.removeAllItems();
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM,name_OPTBROADCASTSYM, name_SUPERBROADCASTSYM};
+			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM,name_BROADCASTDEG2,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM,name_OPTBROADCAST,name_OPTBROADCASTSYM, name_SUPERBROADCAST, name_SUPERBROADCASTSYM};
 
 			for (String s : options){
 				reductionOption.addItem(s);
@@ -738,9 +744,12 @@ public class QueryDialogue extends JPanel{
 			reductionOption.addItem(name_INHIBSYM);
 			reductionOption.addItem(name_BROADCAST);
 			reductionOption.addItem(name_BROADCASTSYM);
+			reductionOption.addItem(name_BROADCASTDEG2);
 			reductionOption.addItem(name_BROADCASTDEG2SYM);
 			reductionOption.addItem(name_ADVBROADCASTSYM);
+			reductionOption.addItem(name_OPTBROADCAST);
 			reductionOption.addItem(name_OPTBROADCASTSYM);
+			reductionOption.addItem(name_SUPERBROADCAST);
 			reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
 	}
@@ -943,8 +952,14 @@ public class QueryDialogue extends JPanel{
 			reductionOptionToSet = ReductionOption.OPT_BROADCAST_SYM;
 		}else if(reductionOptionString.equals(name_SUPERBROADCASTSYM)){
 			reductionOptionToSet = ReductionOption.SUPER_BROADCAST_SYM;
+		}else if(reductionOptionString.equals(name_BROADCASTDEG2)){
+			reductionOptionToSet = ReductionOption.BROADCAST_DEG2;
+		}else if(reductionOptionString.equals(name_OPTBROADCAST)){
+			reductionOptionToSet = ReductionOption.OPT_BROADCAST;
+		}else if(reductionOptionString.equals(name_SUPERBROADCAST)){
+			reductionOptionToSet = ReductionOption.SUPER_BROADCAST;
 		}
-		
+
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
 
 	}
