@@ -9,8 +9,10 @@ import dk.aau.cs.TAPN.AdvancedBroadcastTransformer;
 import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
+import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 
 
 public class CmdTranslator {
@@ -26,7 +28,9 @@ public class CmdTranslator {
 	private static final String DEG2_BROADCAST = "-r8";
 	private static final String OPT_BROADCAST = "-r9";
 	private static final String SUPER_BROADCAST = "-r10";
-	
+	private static final String YRKE = "-r11";
+	private static final String YRKE_SYM= "-r12";
+
 	private static final String INHIB_PRIO_STANDARD_NAME = "Standard Reduction (inhib. using priorities)";
 	private static final String INHIB_PRIO_SYM_NAME = "Symmetry Reduction (inhib. using priorities)";
 	private static final String BROADCAST_STANDARD_NAME = "Standard Broadcast Reduction";
@@ -38,7 +42,9 @@ public class CmdTranslator {
 	private static final String SUPER_BROADCAST_SYM_NAME = "Symmetric Super Broadcast Reduction";
 	private static final String OPT_BROADCAST_NAME = "Optimized Broadcast Reduction";
 	private static final String SUPER_BROADCAST_NAME = "Super Broadcast Reduction";
-	
+	private static final String YRKE_NAME = "Standard Degree 2 Reduction (kenneth)";
+	private static final String YRKE_SYM_NAME = "Symmetric Degree 2 Reduction (kenneth)";
+
 	/**
 	 * @param args
 	 * @throws Exception 
@@ -87,13 +93,13 @@ public class CmdTranslator {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		TAPNQuery tapnQuery = dataLayer.getQueries().get(0);
 
 		if(args[0].equalsIgnoreCase(INHIB_PRIO_STANDARD)){
 			TAPNToNTATransformer trans = 
 				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
-			
+
 			try{
 				dk.aau.cs.TA.NTA nta = trans.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -105,11 +111,11 @@ public class CmdTranslator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		} else if(args[0].equalsIgnoreCase(INHIB_PRIO_SYM)){
 			TAPNToNTATransformer trans = 
 				new dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer(capacity);
-			
+
 			try{
 				dk.aau.cs.TA.NTA nta = trans.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -191,8 +197,46 @@ public class CmdTranslator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		else{
+		}else if(args[0].equalsIgnoreCase(YRKE_SYM)){
+			NaiveUppaalSym t = new NaiveUppaalSym();
+			try {
+				t.autoTransform(tapn, new PrintStream(xmlfile), new PrintStream(qfile), tapnQuery.query, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(args[0].equalsIgnoreCase(YRKE)){
+			try {
+				tapn.convertToConservative();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			try {
+				tapn = tapn.convertToDegree2();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+
+
+			//Create uppaal xml file
+			try {
+				TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer(tapn, new PrintStream(xmlfile), capacity);
+				t2.transform();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			try {
+				tapn.transformQueriesToUppaal(capacity, tapnQuery.query, new PrintStream(qfile));
+			} catch (Exception e) {
+				System.err.println("We had an error translating the query");
+			}
+		} else{
 			throw new Exception("Wrong reduction method");
 		}
 	}
@@ -221,30 +265,38 @@ public class CmdTranslator {
 		System.out.print(DEG2_BROADCAST_SYM);
 		System.out.print(" - ");
 		System.out.println(DEG2_BROADCAST_SYM_NAME);
-		
+
 		System.out.print(ADV_BROADCAST_SYM);
 		System.out.print(" - ");
 		System.out.println(ADV_BROADCAST_SYM_NAME);
-		
+
 		System.out.print(OPT_BROADCAST_SYM);
 		System.out.print(" - ");
 		System.out.println(OPT_BROADCAST_SYM_NAME);
-		
+
 		System.out.print(SUPER_BROADCAST_SYM);
 		System.out.print(" - ");
 		System.out.println(SUPER_BROADCAST_SYM_NAME);
-		
+
 		System.out.print(DEG2_BROADCAST);
 		System.out.print(" - ");
 		System.out.println(DEG2_BROADCAST_NAME);
-		
+
 		System.out.print(OPT_BROADCAST);
 		System.out.print(" - ");
 		System.out.println(OPT_BROADCAST_NAME);
-		
+
 		System.out.print(SUPER_BROADCAST);
 		System.out.print(" - ");
 		System.out.println(SUPER_BROADCAST_NAME);
+
+		System.out.print(YRKE);
+		System.out.print(" - ");
+		System.out.println(YRKE_NAME);
+
+		System.out.print(YRKE_SYM);
+		System.out.print(" - ");
+		System.out.println(YRKE_SYM_NAME);
 	}
 
 }
