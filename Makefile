@@ -80,3 +80,10 @@ clean:
 	@rm -f ${all_javas}
 	@find . -name '*.class' | xargs -l rm -f
 	@rm -f tapaal_version.orig.tar.gz
+	@rm -rf ${OUTPUT_DIR}
+
+release: clean 
+	@mkdir $(OUTPUT_DIR)
+	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ RunGui.java
+
+	
