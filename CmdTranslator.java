@@ -5,10 +5,10 @@ import java.io.PrintStream;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import dk.aau.cs.TAPN.AdvancedBroadcastTransformer;
 import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
-import dk.aau.cs.TAPN.TAPNToNTATransformer;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
+import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
@@ -17,51 +17,40 @@ import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 
 public class CmdTranslator {
 
-	private static final String INHIB_PRIO_STANDARD = "-r0";
-	private static final String INHIB_PRIO_SYM = "-r1";
-	private static final String BROADCAST_STANDARD = "-r2";
-	private static final String BROADCAST_SYM = "-r3";
-	private static final String DEG2_BROADCAST_SYM = "-r4";
-	private static final String ADV_BROADCAST_SYM = "-r5";
-	private static final String OPT_BROADCAST_SYM = "-r6";
-	private static final String SUPER_BROADCAST_SYM = "-r7";
-	private static final String DEG2_BROADCAST = "-r8";
-	private static final String OPT_BROADCAST = "-r9";
-	private static final String SUPER_BROADCAST = "-r10";
-	private static final String YRKE = "-r11";
-	private static final String YRKE_SYM= "-r12";
+	private static final String STANDARD = "-r1";
+	private static final String OPT_STANDARD = "-r2";
+	private static final String BROADCAST_STANDARD = "-r3";
+	private static final String DEG2_BROADCAST = "-r4";
 
-	private static final String INHIB_PRIO_STANDARD_NAME = "Standard Reduction (inhib. using priorities)";
-	private static final String INHIB_PRIO_SYM_NAME = "Symmetry Reduction (inhib. using priorities)";
-	private static final String BROADCAST_STANDARD_NAME = "Standard Broadcast Reduction";
-	private static final String BROADCAST_SYM_NAME = "Symmetric Broadcast Reduction";
-	private static final String DEG2_BROADCAST_SYM_NAME = "Symmetric Degree2 Broadcast Reduction";
+	private static final String BROADCAST_STANDARD_NAME = "Broadcast Reduction";
 	private static final String DEG2_BROADCAST_NAME = "Degree2 Broadcast Reduction";
-	private static final String ADV_BROADCAST_SYM_NAME = "Symmetric Advanced Broadcast Reduction";
-	private static final String OPT_BROADCAST_SYM_NAME = "Optimized Symmetric Broadcast Reduction";
-	private static final String SUPER_BROADCAST_SYM_NAME = "Symmetric Super Broadcast Reduction";
-	private static final String OPT_BROADCAST_NAME = "Optimized Broadcast Reduction";
-	private static final String SUPER_BROADCAST_NAME = "Super Broadcast Reduction";
-	private static final String YRKE_NAME = "Standard Degree 2 Reduction (kenneth)";
-	private static final String YRKE_SYM_NAME = "Symmetric Degree 2 Reduction (kenneth)";
+	private static final String STANDARD_NAME = "Standard Reduction";
+	private static final String OPT_STANDARD_NAME = "Optimized Standard Reduction";
 
+	private static String reductionOption = null;
+	private static boolean symmetry = false;
+	private static String inputfile = null;
+	private static String outputfile = null;
+	
 	/**
 	 * @param args
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args == null || args.length != 3){
+		if(args == null || args.length < 3 || args.length > 4){
 			printHelp();
 			return;
 		}
+		
+		parseArguments(args);
 
-		File input = new File(args[1]);
+		File input = new File(inputfile);
 		if(!input.exists()){
 			System.out.append("Input file not found!");
 			return;
 		}
 
-		String filePrefix = args[2].lastIndexOf(".") == -1 ? args[2] : args[2].substring(0, args[2].lastIndexOf("."));
+		String filePrefix = outputfile.lastIndexOf(".") == -1 ? outputfile : outputfile.substring(0, outputfile.lastIndexOf("."));
 
 		File xmlfile = new File(filePrefix + ".xml");
 		File qfile = new File(filePrefix + ".q");
@@ -96,116 +85,7 @@ public class CmdTranslator {
 
 		TAPNQuery tapnQuery = dataLayer.getQueries().get(0);
 
-		if(args[0].equalsIgnoreCase(INHIB_PRIO_STANDARD)){
-			TAPNToNTATransformer trans = 
-				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
-
-			try{
-				dk.aau.cs.TA.NTA nta = trans.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} else if(args[0].equalsIgnoreCase(INHIB_PRIO_SYM)){
-			TAPNToNTATransformer trans = 
-				new dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer(capacity);
-
-			try{
-				dk.aau.cs.TA.NTA nta = trans.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(args[0].equalsIgnoreCase(BROADCAST_STANDARD) || args[0].equalsIgnoreCase(BROADCAST_SYM)){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, args[0].equalsIgnoreCase(BROADCAST_SYM));
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if(args[0].equalsIgnoreCase(DEG2_BROADCAST_SYM)|| args[0].equalsIgnoreCase(DEG2_BROADCAST)){
-			Degree2BroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, args[0].equalsIgnoreCase(DEG2_BROADCAST_SYM));
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if(args[0].equalsIgnoreCase(ADV_BROADCAST_SYM)){
-			AdvancedBroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.AdvancedBroadcastTransformer(capacity, true);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(args[0].equalsIgnoreCase(OPT_BROADCAST_SYM) || args[0].equalsIgnoreCase(OPT_BROADCAST)){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, args[0].equalsIgnoreCase(OPT_BROADCAST_SYM));
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(args[0].equalsIgnoreCase(SUPER_BROADCAST_SYM) || args[0].equalsIgnoreCase(SUPER_BROADCAST)){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, args[0].equalsIgnoreCase(SUPER_BROADCAST_SYM));
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(args[0].equalsIgnoreCase(YRKE_SYM)){
-			NaiveUppaalSym t = new NaiveUppaalSym();
-			try {
-				t.autoTransform(tapn, new PrintStream(xmlfile), new PrintStream(qfile), tapnQuery.query, capacity);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(args[0].equalsIgnoreCase(YRKE)){
+		if(reductionOption.equalsIgnoreCase(STANDARD) && !symmetry){
 			try {
 				tapn.convertToConservative();
 			} catch (Exception e1) {
@@ -236,67 +116,102 @@ public class CmdTranslator {
 			} catch (Exception e) {
 				System.err.println("We had an error translating the query");
 			}
+		}else if(reductionOption.equalsIgnoreCase(STANDARD) && symmetry){
+			NaiveUppaalSym t = new NaiveUppaalSym();
+			try {
+				t.autoTransform(tapn, new PrintStream(xmlfile), new PrintStream(qfile), tapnQuery.query, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if (reductionOption.equalsIgnoreCase(OPT_STANDARD) && !symmetry){
+			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
+			try {
+				t.autoTransform(tapn, new PrintStream(xmlfile), new PrintStream(qfile), tapnQuery.query, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		} else if (reductionOption.equalsIgnoreCase(OPT_STANDARD) && symmetry){
+			AdvancedUppaalSym t = new AdvancedUppaalSym();
+			try {
+				t.autoTransform(tapn, new PrintStream(xmlfile), new PrintStream(qfile), tapnQuery.query, capacity);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if(reductionOption.equalsIgnoreCase(BROADCAST_STANDARD)){
+			TAPNToNTABroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, symmetry);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if(reductionOption.equalsIgnoreCase(DEG2_BROADCAST)){
+			Degree2BroadcastTransformer broadcastTransformer = 
+				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, symmetry);
+			try{
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
+				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
+				query.output(new PrintStream(qfile));
+			}catch(FileNotFoundException e){
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else{
 			throw new Exception("Wrong reduction method");
 		}
 	}
 
+	private static void parseArguments(String[] args) {
+		reductionOption = args[0];
+		if(args.length == 4 && args[1].equals("-s")){
+			symmetry = true;
+		}
+		int offset = args.length == 4 ? 0 : -1;
+		
+		inputfile = args[2+offset];
+		outputfile = args[3+offset];		
+	}
+
 	private static void printHelp() {
-		System.out.println("CmdTranslator -rx inputfile outputfile");
+		System.out.println("CmdTranslator -rx [-s] inputfile outputfile");
 		System.out.println();
-		System.out.println("Argument:");
-
-		System.out.print(INHIB_PRIO_STANDARD);
+		System.out.println("Options:");
+		
+		System.out.println(" -s  use symmetry reduction");
+		System.out.println();
+		System.out.println("Reductions:");
+		
+		System.out.print(" ");
+		System.out.print(STANDARD);
 		System.out.print(" - ");
-		System.out.println(INHIB_PRIO_STANDARD_NAME);
+		System.out.println(STANDARD_NAME);
 
-		System.out.print(INHIB_PRIO_SYM);
+		System.out.print(" ");
+		System.out.print(OPT_STANDARD);
 		System.out.print(" - ");
-		System.out.println(INHIB_PRIO_SYM_NAME);
-
+		System.out.println(OPT_STANDARD_NAME);
+		
+		System.out.print(" ");
 		System.out.print(BROADCAST_STANDARD);
 		System.out.print(" - ");
 		System.out.println(BROADCAST_STANDARD_NAME);
 
-		System.out.print(BROADCAST_SYM);
-		System.out.print(" - ");
-		System.out.println(BROADCAST_SYM_NAME);
-
-		System.out.print(DEG2_BROADCAST_SYM);
-		System.out.print(" - ");
-		System.out.println(DEG2_BROADCAST_SYM_NAME);
-
-		System.out.print(ADV_BROADCAST_SYM);
-		System.out.print(" - ");
-		System.out.println(ADV_BROADCAST_SYM_NAME);
-
-		System.out.print(OPT_BROADCAST_SYM);
-		System.out.print(" - ");
-		System.out.println(OPT_BROADCAST_SYM_NAME);
-
-		System.out.print(SUPER_BROADCAST_SYM);
-		System.out.print(" - ");
-		System.out.println(SUPER_BROADCAST_SYM_NAME);
-
+		System.out.print(" ");
 		System.out.print(DEG2_BROADCAST);
 		System.out.print(" - ");
 		System.out.println(DEG2_BROADCAST_NAME);
-
-		System.out.print(OPT_BROADCAST);
-		System.out.print(" - ");
-		System.out.println(OPT_BROADCAST_NAME);
-
-		System.out.print(SUPER_BROADCAST);
-		System.out.print(" - ");
-		System.out.println(SUPER_BROADCAST_NAME);
-
-		System.out.print(YRKE);
-		System.out.print(" - ");
-		System.out.println(YRKE_NAME);
-
-		System.out.print(YRKE_SYM);
-		System.out.print(" - ");
-		System.out.println(YRKE_SYM_NAME);
 	}
 
 }
