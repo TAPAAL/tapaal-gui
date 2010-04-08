@@ -49,6 +49,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	protected static final String CONTROL_TEMPLATE_NAME = "Control";
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
+	protected static final String LOCK_BOOL = "lock";
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
@@ -117,14 +118,14 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}else{
 			StringBuilder builder = new StringBuilder("system ");
 			builder.append(CONTROL_TEMPLATE_NAME);
-			
+
 			for(int i = 0; i < extraTokens + tokensInModel; i++){
 				builder.append(", ");
 				builder.append(TOKEN_TEMPLATE_NAME);
 				builder.append(i);
 			}
 			builder.append(";");
-			
+
 			return builder.toString();
 		}
 	}
@@ -136,7 +137,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		builder.append("const int N = ");
 		builder.append(model.getTokens().size() + extraTokens);
 		builder.append(";\n");
-		
+
 		if(useSymmetry){
 			builder.append("typedef ");
 			builder.append("scalar[N] ");
@@ -151,11 +152,17 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}		
 
 		for(TAPNTransition t : model.getTransitions()){
-			builder.append("broadcast chan ");
-			builder.append(String.format(TEST_CHANNEL_NAME, t.getName(),""));
-			builder.append(",");
-			builder.append(String.format(FIRE_CHANNEL_NAME, t.getName(),""));
-			builder.append(";\n");
+			if(t.isDegree2() && !t.hasInhibitorArcs()){
+				builder.append("chan ");
+				builder.append(t.getName());
+				builder.append(";\n");
+			}else{			
+				builder.append("broadcast chan ");
+				builder.append(String.format(TEST_CHANNEL_NAME, t.getName(),""));
+				builder.append(",");
+				builder.append(String.format(FIRE_CHANNEL_NAME, t.getName(),""));
+				builder.append(";\n");
+			}
 		}
 
 		for(int i = 0; i < largestPresetSize; i++){
@@ -163,6 +170,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			builder.append(String.format(COUNTER_NAME, i));
 			builder.append(";\n");
 		}
+
+		builder.append("bool ");
+		builder.append(LOCK_BOOL);
+		builder.append(" = false;\n");
 
 		return builder.toString();
 	}
@@ -177,12 +188,16 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		if(useSymmetry){
 			Location last = createInitializationStructure(control, initTransitions);
 
-			Edge e = new Edge(last,
-					lock,
-					"",
-					String.format(INITIALIZE_CHANNEL, initTransitions-1, "!"),
-			"");
-			control.addTransition(e);
+			if(last == null){
+				control.setInitLocation(lock);
+			}else{
+				Edge e = new Edge(last,
+						lock,
+						"",
+						String.format(INITIALIZE_CHANNEL, initTransitions-1, "!"),
+				"");
+				control.addTransition(e);
+			}
 		}else{
 			control.setInitLocation(lock);
 		}
@@ -196,27 +211,34 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			TimedArcPetriNet model) {
 
 		for(TAPNTransition transition : model.getTransitions()){
-			String invariant = createInvariantForControl(transition);
+			if(!transition.isDegree2() || transition.hasInhibitorArcs()){
+				String invariant = createInvariantForControl(transition);
 
-			Location tempLoc = new Location("",invariant);
-			tempLoc.setCommitted(true);
-			control.addLocation(tempLoc);
+				Location tempLoc = new Location("",invariant);
+				tempLoc.setCommitted(true);
+				control.addLocation(tempLoc);
 
-			Edge testEdge = new Edge(lock,
-					tempLoc,
-					"",
-					String.format(TEST_CHANNEL_NAME, transition.getName(), "!"),
-			"");
-			control.addTransition(testEdge);
+				Edge testEdge = new Edge(lock,
+						tempLoc,
+						"",
+						String.format(TEST_CHANNEL_NAME, transition.getName(), "!"),
+						lockUpdateStatement(true));
+				control.addTransition(testEdge);
 
-			Edge fireEdge = new Edge(tempLoc,
-					lock,
-					createGuardForControl(transition),
-					String.format(FIRE_CHANNEL_NAME, transition.getName(), "!"),
-					createResetExpressionForControl(transition));
-			control.addTransition(fireEdge);
+				Edge fireEdge = new Edge(tempLoc,
+						lock,
+						createGuardForControl(transition),
+						String.format(FIRE_CHANNEL_NAME, transition.getName(), "!"),
+						createResetExpressionForControl(transition));
+				control.addTransition(fireEdge);
+			}	
 		}
 	}
+
+	private String lockUpdateStatement(boolean value) {
+		return LOCK_BOOL + " = " + value;
+	}
+
 
 	protected String createResetExpressionForControl(TAPNTransition transition) {
 		StringBuilder builder = new StringBuilder();
@@ -243,6 +265,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			builder.append(counter);
 			builder.append(":=0");
 		}
+
+		if(!first){
+			builder.append(", ");
+		}
+		builder.append(lockUpdateStatement(false));
 
 		return builder.toString();
 	}
@@ -316,16 +343,16 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	private TimedAutomaton createTokenTemplate(TimedArcPetriNet model) {		
 		TimedAutomaton ta = new TimedAutomaton();
-		
+
 		ta.setDeclarations("clock " + TOKEN_CLOCK_NAME + ";");
 		createTemplateStructure(ta, model);
-		
+
 		if(useSymmetry){
 			ta.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
 			addInitializationStructure(ta, model);
 			ta.setInitLocation(getLocationByName(PCAPACITY));
 		}
-		
+
 		return ta;
 	}
 
@@ -352,12 +379,66 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			int presetSize = t.getPreset().size() + t.getInhibitorArcs().size();
 			if(presetSize > largestPresetSize){
 				largestPresetSize = presetSize;
-			}	
+			}
 
-			List<Pairing> pairing = CreatePairing(t);
-
-			createStructureForPairing(ta, t, pairing);
+			if(t.isDegree2() && !t.hasInhibitorArcs()){
+				createDegree2Structure(ta,t);
+			}else{
+				List<Pairing> pairing = CreatePairing(t);
+				createStructureForPairing(ta, t, pairing);
+			}
 		}	
+	}
+
+
+	private void createDegree2Structure(TimedAutomaton ta, TAPNTransition t) {
+		List<Pairing> pairing = CreatePairing(t);
+
+		if(pairing.size() == 1){
+			Pairing pair = pairing.get(0);
+
+			Edge e = new Edge(getLocationByName(pair.getInput().getName()),
+					getLocationByName(pair.getOutput().getName()),
+					createTransitionGuardWithLock(pair.getInterval(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
+					"",
+					createResetExpressionIfNormalArc(pair.getArcType()));
+
+			ta.addTransition(e);
+		}else{
+			Pairing pair1 = pairing.get(0);
+
+			Edge e1 = new Edge(getLocationByName(pair1.getInput().getName()),
+					getLocationByName(pair1.getOutput().getName()),
+					createTransitionGuardWithLock(pair1.getInterval(), pair1.getOutput(), pair1.getArcType()==ArcType.TARC),
+					t.getName() + "?",
+					createResetExpressionIfNormalArc(pair1.getArcType()));
+
+			ta.addTransition(e1);
+
+			Pairing pair2 = pairing.get(1);
+
+			Edge e2 = new Edge(getLocationByName(pair2.getInput().getName()),
+					getLocationByName(pair2.getOutput().getName()),
+					createTransitionGuardWithLock(pair2.getInterval(), pair2.getOutput(), pair2.getArcType()==ArcType.TARC),
+					t.getName() + "!",
+					createResetExpressionIfNormalArc(pair2.getArcType()));
+
+			ta.addTransition(e2);
+		}
+	}
+
+
+	private String createTransitionGuardWithLock(String interval,
+			TAPNPlace output, boolean isTarc) {
+		String guard = createTransitionGuard(interval,output, isTarc);
+
+		if(guard == null || guard.isEmpty()){
+			guard = LOCK_BOOL + " == 0";
+		}else{
+			guard += " && " + LOCK_BOOL + " == 0";
+		}
+
+		return guard;
 	}
 
 
@@ -561,7 +642,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 				if(i > 0){
 					builder.append(" + ");
 				}
-				
+
 				builder.append(TOKEN_TEMPLATE_NAME);
 				builder.append(i);
 				builder.append(".$1");

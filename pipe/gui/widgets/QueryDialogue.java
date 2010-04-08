@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -95,6 +98,7 @@ public class QueryDialogue extends JPanel{
 
 	private JPanel reductionOptions;
 	private JComboBox reductionOption;
+	private JCheckBox symmetryReduction;
 
 	private JSpinner numberOfExtraTokensInNet;
 	private JButton kbounded;
@@ -526,32 +530,31 @@ public class QueryDialogue extends JPanel{
 		//ReductionOptions starts here:
 		this.reductionOptions = new JPanel(new FlowLayout());
 		this.reductionOptions.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
-		String[] reductionOptions = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2SYM};
+		String[] reductionOptions = {name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
 		reductionOption = new JComboBox(reductionOptions);
 		reductionOption.setSelectedIndex(3);
-		disableTraceOptions();
-
+		
 		reductionOption.addActionListener(new ActionListener(){
 
 			public void actionPerformed(ActionEvent arg0) {
-				if (reductionOption.getSelectedItem() != null){
-					if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVESYM) 
-							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) 
-							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTSYM)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2SYM)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVBROADCASTSYM)){
-						none.setSelected(true);
-						disableTraceOptions();
-					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) 
-							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVNOSYM)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSTANDARD)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCAST)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_OPTBROADCAST)
-							|| ((String) reductionOption.getSelectedItem()).equals(name_SUPERBROADCAST)){
-						enableTraceOptions();
-					}
+				if (reductionOption.getSelectedItem() != null){					
+//					if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVESYM) 
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVSYM)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSYM) 
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTSYM)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2SYM)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVBROADCASTSYM)){
+//						none.setSelected(true);
+//						disableTraceOptions();
+//					}else if ( ((String) reductionOption.getSelectedItem()).equals(name_NAIVE) 
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_ADVNOSYM)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_INHIBSTANDARD)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCAST)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_BROADCASTDEG2)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_OPTBROADCAST)
+//							|| ((String) reductionOption.getSelectedItem()).equals(name_SUPERBROADCAST)){
+//						enableTraceOptions();
+//					}
 				}
 			}
 
@@ -559,6 +562,26 @@ public class QueryDialogue extends JPanel{
 
 		this.reductionOptions.add(new JLabel("  Choose reduction method:"));
 		this.reductionOptions.add(reductionOption);
+		
+		this.symmetryReduction = new JCheckBox("Use Symmetry Reduction");
+		this.symmetryReduction.setSelected(true);
+		this.symmetryReduction.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					disableTraceOptions();
+				}else{
+					enableTraceOptions();
+				}
+				
+			}
+			
+		});
+
+		this.reductionOptions.add(symmetryReduction);
+		disableTraceOptions();
+		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 4;
@@ -672,48 +695,68 @@ public class QueryDialogue extends JPanel{
 
 		//Update the selected reduction
 		if (queryToCreateFrom!=null){
+			String reduction = "";
+			boolean symmetry = false;
+			
 			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD){
-				reductionOption.setSelectedItem(name_BROADCAST);
-				enableTraceOptions();
+				reduction = name_BROADCAST;
+				symmetry = false;
+				//enableTraceOptions();
 			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
-				reductionOption.setSelectedItem(name_BROADCASTSYM);
-				disableTraceOptions();
+				reduction = name_BROADCAST;
+				symmetry = true;
+				//disableTraceOptions();
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2){
+				reduction = name_BROADCASTDEG2;
+				symmetry = false;
+				//disableTraceOptions();
 			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2_SYM){
-				reductionOption.setSelectedItem(name_BROADCASTDEG2SYM);
-				disableTraceOptions();
-			}else if(queryToCreateFrom.reductionOption == ReductionOption.ADV_BROADCAST_SYM){
-				reductionOption.setSelectedItem(name_ADVBROADCASTSYM);
-				disableTraceOptions();
-			} else if(queryToCreateFrom.reductionOption == ReductionOption.OPT_BROADCAST_SYM){
-				reductionOption.setSelectedItem(name_OPTBROADCASTSYM);
-				disableTraceOptions();
-			}else if(queryToCreateFrom.reductionOption == ReductionOption.SUPER_BROADCAST_SYM){
-				reductionOption.setSelectedItem(name_SUPERBROADCASTSYM);
-				disableTraceOptions();
+				reduction = name_BROADCASTDEG2;
+				symmetry = true;
+				//disableTraceOptions();
 			}
+//			else if(queryToCreateFrom.reductionOption == ReductionOption.ADV_BROADCAST_SYM){
+//				reductionOption.setSelectedItem(name_ADVBROADCASTSYM);
+//				disableTraceOptions();
+//			} else if(queryToCreateFrom.reductionOption == ReductionOption.OPT_BROADCAST_SYM){
+//				reductionOption.setSelectedItem(name_OPTBROADCASTSYM);
+//				disableTraceOptions();
+//			}else if(queryToCreateFrom.reductionOption == ReductionOption.SUPER_BROADCAST_SYM){
+//				reductionOption.setSelectedItem(name_SUPERBROADCASTSYM);
+//				disableTraceOptions();
+//			}
 			else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
 				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
-					reductionOption.setSelectedIndex(0);
-					enableTraceOptions();
+					reduction = name_NAIVE;
+					symmetry = false;
+					//enableTraceOptions();
 				} else if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE_UPPAAL_SYM){
-					reductionOption.setSelectedIndex(2);
-					disableTraceOptions();
+					reduction = name_NAIVE;
+					symmetry = true;
+					//disableTraceOptions();
 				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
-					reductionOption.setSelectedIndex(3);
-					disableTraceOptions();
+					reduction = name_ADVNOSYM;
+					symmetry = true;
+					//disableTraceOptions();
 				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
-					reductionOption.setSelectedIndex(1);
-					enableTraceOptions();
+					reduction = name_ADVNOSYM;
+					symmetry = false;
+					//enableTraceOptions();
 				}
 			} else {
 				if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
-					reductionOption.setSelectedIndex(1);
-					disableTraceOptions();
+					reduction = name_ADVNOSYM;
+					symmetry = true;
+					//disableTraceOptions();
 				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
-					reductionOption.setSelectedIndex(0);
-					enableTraceOptions();
+					reduction = name_ADVNOSYM;
+					symmetry = false;
+					//enableTraceOptions();
 				}
 			}
+			
+			reductionOption.setSelectedItem(reduction);
+			symmetryReduction.setSelected(symmetry);
 		}
 	}
 
@@ -723,7 +766,12 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void disableLivenessReductionOptions(){
-		String[] options = {name_ADVNOSYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM, name_BROADCASTDEG2,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM, name_OPTBROADCAST,name_OPTBROADCASTSYM,name_SUPERBROADCAST, name_SUPERBROADCASTSYM};
+		String[] options = null;
+		if(!this.datalayer.hasTAPNInhibitorArcs()){
+			options = new String[]{name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
+		}else{
+			options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
+		}
 		reductionOption.removeAllItems();
 
 		for (String s : options){
@@ -734,23 +782,23 @@ public class QueryDialogue extends JPanel{
 	private void enableAllReductionOptions(){
 		reductionOption.removeAllItems();
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			String[] options = {name_NAIVE, name_ADVNOSYM, name_NAIVESYM, name_ADVSYM, name_BROADCAST, name_BROADCASTSYM,name_BROADCASTDEG2,name_BROADCASTDEG2SYM, name_ADVBROADCASTSYM,name_OPTBROADCAST,name_OPTBROADCASTSYM, name_SUPERBROADCAST, name_SUPERBROADCASTSYM};
+			String[] options = {name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
 
 			for (String s : options){
 				reductionOption.addItem(s);
 			}
 		}else {
-			reductionOption.addItem(name_INHIBSTANDARD);
-			reductionOption.addItem(name_INHIBSYM);
+			//reductionOption.addItem(name_INHIBSTANDARD);
+			//reductionOption.addItem(name_INHIBSYM);
 			reductionOption.addItem(name_BROADCAST);
-			reductionOption.addItem(name_BROADCASTSYM);
+			//reductionOption.addItem(name_BROADCASTSYM);
 			reductionOption.addItem(name_BROADCASTDEG2);
-			reductionOption.addItem(name_BROADCASTDEG2SYM);
-			reductionOption.addItem(name_ADVBROADCASTSYM);
-			reductionOption.addItem(name_OPTBROADCAST);
-			reductionOption.addItem(name_OPTBROADCASTSYM);
-			reductionOption.addItem(name_SUPERBROADCAST);
-			reductionOption.addItem(name_SUPERBROADCASTSYM);
+			//reductionOption.addItem(name_BROADCASTDEG2SYM);
+			//reductionOption.addItem(name_ADVBROADCASTSYM);
+			//reductionOption.addItem(name_OPTBROADCAST);
+			//reductionOption.addItem(name_OPTBROADCASTSYM);
+			//reductionOption.addItem(name_SUPERBROADCAST);
+			//reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
 	}
 
@@ -927,38 +975,50 @@ public class QueryDialogue extends JPanel{
 		 */		
 		TAPNQuery.ReductionOption reductionOptionToSet = null;
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
-
-		if (reductionOptionString.equals(name_NAIVESYM)){
-			reductionOptionToSet = ReductionOption.NAIVE_UPPAAL_SYM;
-		} else if (reductionOptionString.equals(name_ADVNOSYM)){
+		boolean symmetry = symmetryReduction.isSelected();
+		
+		if (reductionOptionString.equals(name_NAIVE) && !symmetry){
+				reductionOptionToSet = ReductionOption.NAIVE;
+		}else if(reductionOptionString.equals(name_NAIVE) && symmetry){
+				reductionOptionToSet = ReductionOption.NAIVE_UPPAAL_SYM;
+		}else if (reductionOptionString.equals(name_ADVNOSYM) && !symmetry){
 			reductionOptionToSet = ReductionOption.ADV_NOSYM;
-		}else if (reductionOptionString.equals(name_NAIVE)){
-			reductionOptionToSet = ReductionOption.NAIVE;
-		}else if (reductionOptionString.equals(name_ADVSYM)){
+		}else if (reductionOptionString.equals(name_ADVNOSYM) && symmetry){
 			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
-		}else if(reductionOptionString.equals(name_INHIBSTANDARD)){
-			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_STANDARD;
-		}else if(reductionOptionString.equals(name_INHIBSYM)){
-			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
-		}else if(reductionOptionString.equals(name_BROADCAST)){
+		}else if(reductionOptionString.equals(name_BROADCAST) && !symmetry){
 			reductionOptionToSet = ReductionOption.BROADCAST_STANDARD;
-		}else if(reductionOptionString.equals(name_BROADCASTSYM)){
+		}else if(reductionOptionString.equals(name_BROADCAST) && symmetry){
 			reductionOptionToSet = ReductionOption.BROADCAST_SYM;
-		}else if(reductionOptionString.equals(name_BROADCASTDEG2SYM)){
-			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
-		}else if(reductionOptionString.equals(name_ADVBROADCASTSYM)){
-			reductionOptionToSet = ReductionOption.ADV_BROADCAST_SYM;
-		}else if(reductionOptionString.equals(name_OPTBROADCASTSYM)){
-			reductionOptionToSet = ReductionOption.OPT_BROADCAST_SYM;
-		}else if(reductionOptionString.equals(name_SUPERBROADCASTSYM)){
-			reductionOptionToSet = ReductionOption.SUPER_BROADCAST_SYM;
-		}else if(reductionOptionString.equals(name_BROADCASTDEG2)){
+		}else if(reductionOptionString.equals(name_BROADCASTDEG2) && !symmetry){
 			reductionOptionToSet = ReductionOption.BROADCAST_DEG2;
-		}else if(reductionOptionString.equals(name_OPTBROADCAST)){
-			reductionOptionToSet = ReductionOption.OPT_BROADCAST;
-		}else if(reductionOptionString.equals(name_SUPERBROADCAST)){
-			reductionOptionToSet = ReductionOption.SUPER_BROADCAST;
+		}else if(reductionOptionString.equals(name_BROADCASTDEG2) && symmetry){
+			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
 		}
+//		else if (reductionOptionString.equals(name_NAIVESYM)){
+//			reductionOptionToSet = ReductionOption.NAIVE_UPPAAL_SYM;
+//		}else if (reductionOptionString.equals(name_ADVSYM)){
+//			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
+//		}else if(reductionOptionString.equals(name_INHIBSTANDARD)){
+//			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_STANDARD;
+//		}else if(reductionOptionString.equals(name_INHIBSYM)){
+//			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
+//		}else if(reductionOptionString.equals(name_BROADCASTSYM)){
+//			reductionOptionToSet = ReductionOption.BROADCAST_SYM;
+//		}else if(reductionOptionString.equals(name_BROADCASTDEG2SYM)){
+//			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
+//		}else if(reductionOptionString.equals(name_ADVBROADCASTSYM)){
+//			reductionOptionToSet = ReductionOption.ADV_BROADCAST_SYM;
+//		}else if(reductionOptionString.equals(name_OPTBROADCASTSYM)){
+//			reductionOptionToSet = ReductionOption.OPT_BROADCAST_SYM;
+//		}else if(reductionOptionString.equals(name_SUPERBROADCASTSYM)){
+//			reductionOptionToSet = ReductionOption.SUPER_BROADCAST_SYM;
+//		}else if(reductionOptionString.equals(name_BROADCASTDEG2)){
+//			reductionOptionToSet = ReductionOption.BROADCAST_DEG2;
+//		}else if(reductionOptionString.equals(name_OPTBROADCAST)){
+//			reductionOptionToSet = ReductionOption.OPT_BROADCAST;
+//		}else if(reductionOptionString.equals(name_SUPERBROADCAST)){
+//			reductionOptionToSet = ReductionOption.SUPER_BROADCAST;
+//		}
 
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
 

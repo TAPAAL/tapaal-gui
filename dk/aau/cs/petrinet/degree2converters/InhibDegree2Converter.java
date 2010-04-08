@@ -13,11 +13,11 @@ public class InhibDegree2Converter extends OptimizedInhibitorToPrioritiesDegree2
 	}
 
 	protected void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
-		//		if(transition.isDegree2() && transition.getInhibitorArcs().size() == 0){
-		//			createOptimizedSimulation(transition, degree2Net);
-		//		}else{
+				if(transition.isDegree2() && transition.getInhibitorArcs().size() == 0){
+					createOptimizedSimulation(transition, degree2Net);
+				}else{
 		super.createSimulationOfTransition(transition, degree2Net, false);
-		//		}
+				}
 	}
 
 	protected void createInhibitorArcSimulation(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
