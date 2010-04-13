@@ -17,6 +17,10 @@ import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.colors.ColoredInhibitorArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 import pipe.gui.GuiView;
@@ -68,6 +72,8 @@ public void mousePressed(MouseEvent e) {
       }
       
       PlaceTransitionObject currentObject = (PlaceTransitionObject)myObject;
+      boolean useColors = CreateGui.getModel().isUsingColors();
+      
       switch (CreateGui.getApp().getMode()) {
 
       case Pipe.FAST_TAPNPLACE:
@@ -89,14 +95,15 @@ public void mousePressed(MouseEvent e) {
     	  if (CreateGui.getView().createArc == null) {
     		  
     		  if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
-    			  
     			  // We only create a TAPNArc if source is not at TimedPlace
-    			  NormalArc tmparc =  new NormalArc(currentObject);
+    			  //NormalArc tmparc =  new NormalArc(currentObject);
 
-    			  if (tmparc.getSource() instanceof TimedPlace){
-    				  createArc(new TimedArc(tmparc), currentObject);  
+    			  if (currentObject instanceof TimedPlace){
+    				  Arc arc = useColors ? new ColoredInputArc(currentObject) : new TimedArc(currentObject);
+    				  createArc(arc, currentObject);  
     			  }else {
-    				  createArc(tmparc, currentObject);
+    				  Arc arc = useColors ? new ColoredOutputArc(currentObject) : new NormalArc(currentObject);
+    				  createArc(arc, currentObject);
     			  }
     		  }else {
     			  //XXX - Dont know why this has to be here, but i kind of works now?? -- kyrke 
@@ -126,18 +133,23 @@ public void mousePressed(MouseEvent e) {
         			 }
         		 } else if (CreateGui.getApp().getMode() == Pipe.TAPNINHIBITOR_ARC) {
         			 if (currentObject instanceof Place) {
-        				 createArc(new TAPNInhibitorArc(new TimedArc(new NormalArc(currentObject))), currentObject);
+        				 
+        				 Arc arc = useColors ? new ColoredInhibitorArc(currentObject) 
+        				 	: new TAPNInhibitorArc(currentObject);
+        				 
+        				 createArc(arc, currentObject);
         			 }
-        		 } else if (CreateGui.getApp().getMode() == Pipe.TAPNARC){
-        			 // XXX - kyrke - create only a TimedArc if source is not at TimedPlace
-        			 NormalArc tmparc =  new NormalArc(currentObject);
-
-        			 if (tmparc.getSource() instanceof TimedPlace){
-        				 createArc(new TimedArc(tmparc), currentObject);  
-        			 }else {
-        				 createArc(tmparc, currentObject);
-        			 }
-        		 }
+        		 } 
+//        		 else if (CreateGui.getApp().getMode() == Pipe.TAPNARC){
+//        			 // XXX - kyrke - create only a TimedArc if source is not at TimedPlace
+//        			 NormalArc tmparc =  new NormalArc(currentObject);
+//
+//        			 if (tmparc.getSource() instanceof TimedPlace){
+//        				 createArc(new TimedArc(tmparc), currentObject);  
+//        			 }else {
+//        				 createArc(tmparc, currentObject);
+//        			 }
+//        		 }
         	 }
             break;
          case Pipe.TRANSPORTARC:
@@ -145,7 +157,9 @@ public void mousePressed(MouseEvent e) {
         		 boolean isInPreSet = false;
         		 if (currentObject instanceof Place) {
         			 isInPreSet = true;
-        			 createArc(new TransportArc(currentObject, 1, isInPreSet), currentObject);
+        			 Arc arc = useColors ? new ColoredTransportArc(currentObject, 1, isInPreSet) 
+        			 	: new TransportArc(currentObject, 1, isInPreSet);
+        			 createArc(arc, currentObject);
         		 } else {
         			 //Do nothing this is not supported
         		 }
@@ -571,7 +585,10 @@ public void mouseReleased(MouseEvent e) {
         				 view.transportArcPart1 = (TransportArc)transportArcToCreate;
 
         				 //Create the next arc
-        				 createArc(new TransportArc(currentObject, 1, false), currentObject);
+        				 boolean useColors = CreateGui.getModel().isUsingColors();
+        				 Arc arc = useColors ? new ColoredTransportArc(currentObject,1,false) 
+        				 	: new TransportArc(currentObject, 1, false);
+        				 createArc(arc, currentObject);
 
         			 } else if (transportArcToCreate.getSource() instanceof Transition) {
         				 //Step 2 

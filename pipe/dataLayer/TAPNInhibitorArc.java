@@ -13,6 +13,12 @@ import pipe.gui.Zoomer;
 
 public class TAPNInhibitorArc extends TimedArc {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5492180277264669192L;
+
+
 	public TAPNInhibitorArc(NormalArc arc)
 	{
 		super(arc);
@@ -23,6 +29,9 @@ public class TAPNInhibitorArc extends TimedArc {
 	}
 	
 	
+	public TAPNInhibitorArc(PlaceTransitionObject source) {
+		super(source);
+	}
 	@Override
 	public boolean satisfiesGuard(BigDecimal token)
 	{

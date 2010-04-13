@@ -17,11 +17,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -30,8 +32,12 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.colors.ColorSet;
+import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.IntegerRange;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
+import pipe.gui.undo.UndoableEdit;
 
 /**
  *
@@ -100,108 +106,61 @@ extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		placeEditorPanel = new javax.swing.JPanel();
-		nameLabel = new javax.swing.JLabel();
-		nameTextField = new javax.swing.JTextField();
-		markingLabel = new javax.swing.JLabel();
-		invariantLabel = new javax.swing.JLabel();
-		markingSpinner = new javax.swing.JSpinner();
-		markingSpinner.setModel(new SpinnerNumberModel(place.getCurrentMarking(),0,Integer.MAX_VALUE,1));
-
-		attributesCheckBox = new javax.swing.JCheckBox();
 		markingComboBox = new javax.swing.JComboBox();
-		buttonPanel = new javax.swing.JPanel();
-		okButton = new javax.swing.JButton();
-		cancelButton = new javax.swing.JButton();
-		invariantGroup = new JPanel(new GridBagLayout());
-
-
 		//      tokenPanel = new JPanel(new FlowLayout());
 
 		setLayout(new java.awt.GridBagLayout());
 
 		placeEditorPanel.setLayout(new java.awt.GridBagLayout());
-
-		placeEditorPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Place Editor"));
-		nameLabel.setText("Name:");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(nameLabel, gridBagConstraints);
-
-		nameTextField.setText(place.getName());
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(nameTextField, gridBagConstraints);
-
-		markingLabel.setText("Marking:");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(markingLabel, gridBagConstraints);
-
-		initInvariantPanel();
-		
-
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		//      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(invariantGroup, gridBagConstraints);
-
-		markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
-		markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
-		//      markingSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-		//         public void stateChanged(javax.swing.event.ChangeEvent evt) {
-		////            markingSpinnerStateChanged(evt);
-		//        	 if (tokenPanel.getComponents().length > (Integer) markingSpinner.getValue() ){
-		//        		 tokenPanel.remove(tokenPanel.getComponents().length-1);
-		//        	 }else{
-		//        		 JSpinner newAgeSpinner = new JSpinner( new SpinnerNumberModel( 0f, 0f, Float.MAX_VALUE, 1f ) ); 
-		//        		 newAgeSpinner.setMaximumSize(new Dimension(50,30));
-		//        		 newAgeSpinner.setMinimumSize(new Dimension(50,30));
-		//        		 newAgeSpinner.setPreferredSize(new Dimension(50,30));
-		//        		 tokenPanel.add(newAgeSpinner);
-		//        	 }
-		//        	 ((EscapableDialog)rootPane.getParent()).pack();
-		//         }
-		//      });
-
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(markingSpinner, gridBagConstraints);
-
-		attributesCheckBox.setSelected(place.getAttributesVisible());
-		attributesCheckBox.setText("Show place attributes");
-		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(attributesCheckBox, gridBagConstraints);
-		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 8, 5, 8);
 		add(placeEditorPanel, gridBagConstraints);
 
+		initBasicPropertiesPanel();
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
+		placeEditorPanel.add(basicPropertiesPanel, gridBagConstraints);
+
+		initTimeInvariantPanel();
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
+		placeEditorPanel.add(timeInvariantPanel, gridBagConstraints);
+
+		if(pnmlData.isUsingColors()){
+			initColorInvariantPanel();
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 2;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+			//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
+			placeEditorPanel.add(colorInvariantPanel, gridBagConstraints);
+		}
+		
+		initButtonPanel();
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		add(buttonPanel, gridBagConstraints);
+	}// </editor-fold>//GEN-END:initComponents
+
+	private void initButtonPanel() {
+		java.awt.GridBagConstraints gridBagConstraints;
+		buttonPanel = new javax.swing.JPanel();
 		buttonPanel.setLayout(new java.awt.GridBagLayout());
 
+		okButton = new javax.swing.JButton();
 		okButton.setText("OK");
 		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
@@ -226,6 +185,7 @@ extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 9);
 		buttonPanel.add(okButton, gridBagConstraints);
 
+		cancelButton = new javax.swing.JButton();
 		cancelButton.setText("Cancel");
 		cancelButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -239,24 +199,121 @@ extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 10);
 		buttonPanel.add(cancelButton, gridBagConstraints);
+	}
+
+	private void initBasicPropertiesPanel() {
+		basicPropertiesPanel = new JPanel();
+		basicPropertiesPanel.setLayout(new java.awt.GridBagLayout());
+		basicPropertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Place"));
+
+		nameLabel = new javax.swing.JLabel();
+		nameLabel.setText("Name:");
+		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
+
+		nameTextField = new javax.swing.JTextField();
+		nameTextField.setText(place.getName());
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(nameTextField, gridBagConstraints);
+
+		markingLabel = new javax.swing.JLabel();
+		markingLabel.setText("Marking:");
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(markingLabel, gridBagConstraints);
+
+		markingSpinner = new javax.swing.JSpinner();
+		markingSpinner.setModel(new SpinnerNumberModel(place.getCurrentMarking(),0,Integer.MAX_VALUE,1));
+		markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
+		markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
+		//      markingSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+		//         public void stateChanged(javax.swing.event.ChangeEvent evt) {
+		////            markingSpinnerStateChanged(evt);
+		//        	 if (tokenPanel.getComponents().length > (Integer) markingSpinner.getValue() ){
+		//        		 tokenPanel.remove(tokenPanel.getComponents().length-1);
+		//        	 }else{
+		//        		 JSpinner newAgeSpinner = new JSpinner( new SpinnerNumberModel( 0f, 0f, Float.MAX_VALUE, 1f ) ); 
+		//        		 newAgeSpinner.setMaximumSize(new Dimension(50,30));
+		//        		 newAgeSpinner.setMinimumSize(new Dimension(50,30));
+		//        		 newAgeSpinner.setPreferredSize(new Dimension(50,30));
+		//        		 tokenPanel.add(newAgeSpinner);
+		//        	 }
+		//        	 ((EscapableDialog)rootPane.getParent()).pack();
+		//         }
+		//      });
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		add(buttonPanel, gridBagConstraints);
-
-	}// </editor-fold>//GEN-END:initComponents
-
-	private void initInvariantPanel() {
-		java.awt.GridBagConstraints gridBagConstraints;
-		invariantLabel.setText("Invariant:");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		placeEditorPanel.add(invariantLabel, gridBagConstraints);
+		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
+
+		attributesCheckBox = new javax.swing.JCheckBox();
+		attributesCheckBox.setSelected(place.getAttributesVisible());
+		attributesCheckBox.setText("Show place attributes");
+		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
+	}
+
+	private void initColorInvariantPanel() {
+		colorInvariantPanel = new JPanel();
+		colorInvariantPanel.setLayout(new java.awt.GridBagLayout());
+		colorInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Color Invariant"));
+
+		colorInvariantLabel = new JLabel("Color Invariant:");
+		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		colorInvariantPanel.add(colorInvariantLabel, gridBagConstraints);
+
+		String colorInvariant = ((ColoredTimedPlace)place).getColorInvariantStringWithoutSetNotation(); 
+		colorInvariantTextBox = new JTextField(colorInvariant);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		colorInvariantPanel.add(colorInvariantTextBox, gridBagConstraints);
+		
+		colorInvariantExampleLabel = new JLabel("Example: 1, 3, 4-6, 8, 12-");
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		colorInvariantPanel.add(colorInvariantExampleLabel, gridBagConstraints);
+	}
+
+	private void initTimeInvariantPanel() {
+		timeInvariantPanel = new JPanel();
+		timeInvariantPanel.setLayout(new java.awt.GridBagLayout());
+		timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Time Invariant"));		
+
+		invariantGroup = new JPanel(new GridBagLayout());
 
 		invRelationNormal = new JComboBox(new String[]{"<=","<"});
 		invRelationConstant = new JComboBox(new String[]{"<=","<"});
@@ -273,19 +330,19 @@ extends javax.swing.JPanel {
 			}
 
 		});
-				
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.insets = new Insets(3,3,3,3);
 		invariantGroup.add(invRelationNormal, gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.insets = new Insets(3,3,3,3);
 		invariantGroup.add(invRelationConstant, gbc);
-		
+
 		invariantSpinner.setMaximumSize(new Dimension(50,30));
 		invariantSpinner.setMinimumSize(new Dimension(50,30));
 		invariantSpinner.setPreferredSize(new Dimension(50,30));
@@ -322,7 +379,7 @@ extends javax.swing.JPanel {
 		gbc.gridx = 3;
 		gbc.gridy = 0;
 		invariantGroup.add(invariantInf, gbc);
-		
+
 		Set<String> constants = CreateGui.getModel().getConstantNames();
 		invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMinimumSize(new Dimension(80,30));
@@ -334,13 +391,13 @@ extends javax.swing.JPanel {
 				}
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		invariantGroup.add(invConstantsComboBox, gbc);
-				
+
 		normalInvRadioButton = new JRadioButton("Normal");
 		normalInvRadioButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -349,7 +406,7 @@ extends javax.swing.JPanel {
 			}
 		});
 
-		
+
 		constantInvRadioButton = new JRadioButton("Constant");
 		constantInvRadioButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -359,7 +416,7 @@ extends javax.swing.JPanel {
 		});
 		if(constants.isEmpty())
 			constantInvRadioButton.setEnabled(false);
-		
+
 
 		ButtonGroup btnGroup = new ButtonGroup();
 		btnGroup.add(normalInvRadioButton);
@@ -380,9 +437,9 @@ extends javax.swing.JPanel {
 		String invariantToSet = place.getInvariant();
 		int invariantValue = 0;
 		int substringStart = 0;
-		
+
 		String constantName ="";
-		
+
 		if (invariantToSet.contains("<=")){
 			invRelationNormal.setSelectedItem("<=");
 			substringStart = 2;
@@ -390,7 +447,7 @@ extends javax.swing.JPanel {
 			invRelationNormal.setSelectedItem("<");
 			substringStart = 1;
 		}
-		
+
 		boolean isInf = false;
 		if (invariantToSet.substring(substringStart).equals("inf")){
 			isInf = true;
@@ -399,7 +456,7 @@ extends javax.swing.JPanel {
 			invariantInf.setSelected(true);
 			invRelationNormal.setSelectedItem("<");
 		}
-		
+
 		if(!isInf)
 		{
 			boolean isNumber = true;
@@ -408,12 +465,12 @@ extends javax.swing.JPanel {
 			}catch(NumberFormatException e){
 				isNumber = false;
 			}
-			
+
 			if(!isNumber){
 				constantName = invariantToSet.substring(substringStart);
 			}
 		}
-		
+
 		disableInvariantComponents();
 		if(!constantName.isEmpty()){
 			enableConstantInvariantComponents();
@@ -434,16 +491,25 @@ extends javax.swing.JPanel {
 				invariantSpinner.setValue(invariantValue);
 				invariantSpinner.setEnabled(true);
 				invRelationNormal.setSelectedItem(invariantToSet.substring(0, substringStart));
-				
+
 				invariantInf.setSelected(false);
 			}
 		}
+
+		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		//gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		timeInvariantPanel.add(invariantGroup, gridBagConstraints);
 	}
 
 	private void setRelationModelForConstants() {
 		int value = CreateGui.getModel().getConstantValue(
 				invConstantsComboBox.getSelectedItem().toString());
-		
+
 		String selected = invRelationConstant.getSelectedItem().toString();
 		if(value == 0){
 			invRelationConstant.setModel(new DefaultComboBoxModel(new String[]{"<="}));
@@ -452,7 +518,7 @@ extends javax.swing.JPanel {
 		}
 		invRelationConstant.setSelectedItem(selected);
 	}
-	
+
 	protected void enableConstantInvariantComponents() {
 		invRelationConstant.setEnabled(true);
 		invConstantsComboBox.setEnabled(true);
@@ -534,11 +600,11 @@ extends javax.swing.JPanel {
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
 			} else {
-							
+
 				view.getUndoManager().addEdit(place.setPNObjectName(newName));
-				
+
 				ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
-				
+
 				for (TAPNQuery q : queries) {
 					q.query = q.query.replaceAll(name + "[^\\_a-zA-Z0-9]", newName); 
 				}
@@ -567,7 +633,7 @@ extends javax.swing.JPanel {
 
 		boolean isNormalInvariant = normalInvRadioButton.isSelected();
 		String newInvariant = "";
-	
+
 		if(isNormalInvariant)
 		{
 			newInvariant = (String)invRelationNormal.getSelectedItem();
@@ -581,10 +647,31 @@ extends javax.swing.JPanel {
 			String constantName = (String)invConstantsComboBox.getSelectedItem();
 			newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
 		}
-		
+
 		//if ()  -  TODO do some check if it has canged and if value is ok
 		view.getUndoManager().addEdit(place.setInvariant(newInvariant));
 
+		if(pnmlData.isUsingColors() && !colorInvariantTextBox.getText().isEmpty()){
+			ColorSet colorInvariant = new ColorSet();
+			String[] ranges = colorInvariantTextBox.getText().split(",");
+			for(String range : ranges){
+				try{
+					IntegerRange ir = IntegerRange.parse(range.trim());
+					colorInvariant.add(ir);
+				}catch(IllegalArgumentException e){
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							String.format("There was an error in parsing the color invariant. The problem concerns \"%1s\".",range),
+							"Error",
+							JOptionPane.INFORMATION_MESSAGE);
+					view.getUndoManager().undo();
+					
+					return;
+				}
+			}
+			UndoableEdit action = ((ColoredTimedPlace)place).setColorInvariant(colorInvariant); 
+			view.getUndoManager().addEdit(action);
+		}
+		
 		if (markingComboBox.getSelectedIndex() >0) {
 			// There's a marking parameter selected
 			MarkingParameter parameter = 
@@ -625,7 +712,7 @@ extends javax.swing.JPanel {
 			place.toggleAttributesVisible();
 		}    
 		place.repaint();
-		
+
 		CreateGui.getModel().buildConstraints();
 		exit();
 	}
@@ -651,7 +738,6 @@ extends javax.swing.JPanel {
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;
-	private javax.swing.JLabel invariantLabel;
 	private javax.swing.JComboBox markingComboBox;
 	private javax.swing.JLabel markingLabel;
 	private javax.swing.JSpinner markingSpinner;
@@ -659,7 +745,13 @@ extends javax.swing.JPanel {
 	private javax.swing.JTextField nameTextField;
 	private javax.swing.JButton okButton;
 	private javax.swing.JPanel placeEditorPanel;
+	private javax.swing.JPanel basicPropertiesPanel;
+	private javax.swing.JPanel timeInvariantPanel;
+	private javax.swing.JPanel colorInvariantPanel;
 	// End of variables declaration//GEN-END:variables
+	private JLabel colorInvariantLabel;
+	private JLabel colorInvariantExampleLabel;
+	private JTextField colorInvariantTextBox;
 	private JPanel invariantGroup;
 	private JComboBox invRelationNormal;
 	private JComboBox invRelationConstant;

@@ -39,29 +39,20 @@ public class TimedPlace extends Place {
 	private ArrayList<BigDecimal> myTokens;
 	private Window ageOfTokensWindow;
 	
-	public TimedPlace(Place place, String invariant){		
-		super(place.getX(), place.getY(), 
-				place.id, 
-				place.getName(), 
-				place.nameOffsetX, place.nameOffsetY, 
-				place.getInitialMarking(), 
-				place.getMarkingOffsetXObject(),  place.getMarkingOffsetYObject(),
-				place.capacity);
-		this.invariant = invariant;
+	public TimedPlace(double positionXInput, double positionYInput) {
+		super(positionXInput, positionYInput);
+		invariant = "<inf";
+
 		attributesVisible = true;
 
+//		pnName.zoomUpdate(zoom);
+//		update();
+//		repaint();
+
 		this.myTokens = new ArrayList<BigDecimal>();
-		for (int i=0; i<place.getInitialMarking(); i++){
-			this.myTokens.add(newToken());
-		}
 		ageOfTokensWindow = new Window(new Frame());
 	}
 	
-	private BigDecimal newToken() {
-		
-		return new BigDecimal(0, new MathContext(Pipe.AGE_PRECISION));
-	}
-
 	public TimedPlace(double positionXInput,  double positionYInput, 
             String idInput, 
             String nameInput, 
@@ -85,6 +76,24 @@ public class TimedPlace extends Place {
 		
 		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
+			this.myTokens.add(newToken());
+		}
+		ageOfTokensWindow = new Window(new Frame());
+	}
+
+	public TimedPlace(Place place, String invariant){		
+		super(place.getX(), place.getY(), 
+				place.id, 
+				place.getName(), 
+				place.nameOffsetX, place.nameOffsetY, 
+				place.getInitialMarking(), 
+				place.getMarkingOffsetXObject(),  place.getMarkingOffsetYObject(),
+				place.capacity);
+		this.invariant = invariant;
+		attributesVisible = true;
+
+		this.myTokens = new ArrayList<BigDecimal>();
+		for (int i=0; i<place.getInitialMarking(); i++){
 			this.myTokens.add(newToken());
 		}
 		ageOfTokensWindow = new Window(new Frame());
@@ -116,96 +125,16 @@ public class TimedPlace extends Place {
 
 	
 	
-	public TimedPlace(double positionXInput, double positionYInput) {
-		super(positionXInput, positionYInput);
-		invariant = "<inf";
-
-		attributesVisible = true;
-
-//		pnName.zoomUpdate(zoom);
-//		update();
-//		repaint();
-
-		this.myTokens = new ArrayList<BigDecimal>();
-		ageOfTokensWindow = new Window(new Frame());
+	@Override
+	public TimedPlace clone(){
+		TimedPlace toReturn = (TimedPlace)super.clone();
+		
+		toReturn.setInvariant(this.getInvariant());
+		return toReturn;
+		
 	}
 	
 
-	protected boolean validateInvariant(){
-
-		//TODO - make some tjek
-		return true;
-
-	}
-
-	public String getInvariant(){
-
-		return invariant;
-	}
-
-	public UndoableEdit setInvariant(String invariant) {
-
-		String oldinvariant = this.invariant;
-		this.invariant = invariant;
-
-		update();
-
-		return new TimedPlaceInvariantEdit(this, oldinvariant, this.invariant);
-	}
-
-	@Override
-	public void update() {
-		if (attributesVisible == true){
-			String value = "";
-			
-			//Dont show invariant if its default	
-			if (!invariant.equals("<inf")){ 
-				value += "\n Inv: " + invariant;
-			}
-			//Dont show if capacity is inf
-			if (capacity > 0){ 
-				value += "\n k=" + (capacity > 0 ? capacity :"\u221E");
-			}
-			pnName.setText(value);
-			
-		} else {
-			pnName.setText("");
-		}          
-		pnName.zoomUpdate(zoom);
-
-		updateBounds();
-		updateLabelLocation();
-		updateConnected();
-
-		repaint();
-	}
-
-
-	@Override
-	public void showEditor(){
-		// Build interface
-		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.PAGE_AXIS));      
-
-		// 2 Add Place editor
-		contentPane.add( new TimedPlaceEditorPanel(guiDialog.getRootPane(), 
-				this, CreateGui.getModel(), CreateGui.getView()));
-
-		guiDialog.setResizable(false);     
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-	}
-	
 	@Override
 	public TimedPlace copy(){
 		//TimedPlace copy = new TimedPlace(super.copy(), this.invariant);
@@ -226,44 +155,13 @@ public class TimedPlace extends Place {
 		copy.setOriginal(this);
 		return copy; 
 	}
-	
-	@Override
-	public TimedPlace paste(double despX, double despY, boolean toAnotherView){
-		//TimedPlace copy = new TimedPlace (super.paste(despX, despY, toAnotherView), this.invariant );
-//		copy.setOriginal(this);
-		//copy.set
-		
-		this.incrementCopyNumber();
-	      TimedPlace copy = new TimedPlace (
-	              Grid.getModifiedX(despX + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
-	              Grid.getModifiedY(despY + this.getY() + Pipe.PLACE_TRANSITION_HEIGHT/2));
-	      copy.pnName.setName(this.pnName.getName()  
-	                          + "(" + this.getCopyNumber() +")");
-	      this.newCopy(copy);
-	      copy.nameOffsetX = this.nameOffsetX;
-	      copy.nameOffsetY = this.nameOffsetY;
-	      copy.capacity = this.capacity;
-	      copy.attributesVisible = this.attributesVisible;
-	      copy.initialMarking = this.initialMarking;
-	      copy.currentMarking = this.currentMarking;
-	      copy.markingOffsetX = this.markingOffsetX;
-	      copy.markingOffsetY = this.markingOffsetY;
-	      copy.markingParameter = this.markingParameter;
-	      copy.update();
-		
-		return copy;
-	}
-	
-	@Override
-	public TimedPlace clone(){
-		TimedPlace toReturn = (TimedPlace)super.clone();
-		
-		toReturn.setInvariant(this.getInvariant());
-		return toReturn;
-		
+
+	public String getInvariant(){
+
+		return invariant;
 	}
 
-	public String getStringOfTokens() {
+	public String getStringOfTokens() {		
 		String stringArrayOfTokens = "{";
 		Iterator<BigDecimal> iterator = myTokens.iterator();
 		DecimalFormat df = new DecimalFormat();
@@ -325,24 +223,15 @@ public class TimedPlace extends Place {
 	public ArrayList<BigDecimal> getTokens(){
 		return myTokens;
 	}
+
+
+	public boolean isAgeOfTokensShown(){
+		return ageOfTokensWindow.isVisible();
+	}
 	
-	//overide, so that we can take care of the age of the tokens
-	@Override
-	public UndoableEdit setCurrentMarking(int currentMarkingInput) {
-		int oldMarking = currentMarking;
-		if (capacity == 0){
-			setNumberOfMyTokens(currentMarkingInput);
-			currentMarking = currentMarkingInput;
-		} else {
-			if (currentMarkingInput > capacity) {
-				currentMarking = capacity;
-			} else{
-				setNumberOfMyTokens(currentMarkingInput);
-				currentMarking = currentMarkingInput;
-			}
-		}
-		repaint();
-		return new PlaceMarkingEdit(this, oldMarking, currentMarking);      
+	private BigDecimal newToken() {
+		
+		return new BigDecimal(0, new MathContext(Pipe.AGE_PRECISION));
 	}
 	
 	//overide method
@@ -434,58 +323,33 @@ public class TimedPlace extends Place {
 		}
 	}
 	
-	private void setNumberOfMyTokens(int currentMarkingInput){
+	@Override
+	public TimedPlace paste(double despX, double despY, boolean toAnotherView){
+		//TimedPlace copy = new TimedPlace (super.paste(despX, despY, toAnotherView), this.invariant );
+//		copy.setOriginal(this);
+		//copy.set
 		
-		int toAddToMyTokens = currentMarkingInput - currentMarking;
-		if (toAddToMyTokens >= 0 ){
-			for (int i=0; i<toAddToMyTokens; i++){
-				myTokens.add(newToken());
-			}
-		}else {
-			int size = myTokens.size();
-			while (size > currentMarkingInput){
-				myTokens.trimToSize();
-				myTokens.remove(myTokens.size()-1);
-				myTokens.trimToSize();
-				size = myTokens.size();
-			}
-		}
+		this.incrementCopyNumber();
+	      TimedPlace copy = new TimedPlace (
+	              Grid.getModifiedX(despX + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
+	              Grid.getModifiedY(despY + this.getY() + Pipe.PLACE_TRANSITION_HEIGHT/2));
+	      copy.pnName.setName(this.pnName.getName()  
+	                          + "(" + this.getCopyNumber() +")");
+	      this.newCopy(copy);
+	      copy.nameOffsetX = this.nameOffsetX;
+	      copy.nameOffsetY = this.nameOffsetY;
+	      copy.capacity = this.capacity;
+	      copy.attributesVisible = this.attributesVisible;
+	      copy.initialMarking = this.initialMarking;
+	      copy.currentMarking = this.currentMarking;
+	      copy.markingOffsetX = this.markingOffsetX;
+	      copy.markingOffsetY = this.markingOffsetY;
+	      copy.markingParameter = this.markingParameter;
+	      copy.update();
+		
+		return copy;
 	}
 
-	public UndoableEdit setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
-		
-		if (newAgeOfTokens.size() == myTokens.size()){
-			ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
-			this.myTokens = newAgeOfTokens;
-
-			update();
-
-			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
-		} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
-	}
-	
-	public UndoableEdit setTokensAndAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
-		
-		//if (newAgeOfTokens.size() == myTokens.size()){
-			this.setCurrentMarking(newAgeOfTokens.size());
-		    ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
-			this.myTokens = newAgeOfTokens;
-
-			update();
-
-			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
-		//} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
-	}
-
-
-//	public void removeToken(int indexOfTokenToBeRemoved) {
-//		myTokens.remove(indexOfTokenToBeRemoved);
-//		Collections.sort(myTokens);
-//		myTokens.trimToSize();
-//		currentMarking--;
-//	}
-	
-	
 	public void removeTokenofAge(BigDecimal tokenage) {
 		boolean ableToRemoveToken = false;
 		BigDecimal tokenToRemove = null;
@@ -521,7 +385,88 @@ public class TimedPlace extends Place {
 			}else return false;
 		}
 	}
+	
+	public UndoableEdit setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
+		
+		if (newAgeOfTokens.size() == myTokens.size()){
+			ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
+			this.myTokens = newAgeOfTokens;
 
+			update();
+
+			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
+		} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
+	}
+	
+	//overide, so that we can take care of the age of the tokens
+	@Override
+	public UndoableEdit setCurrentMarking(int currentMarkingInput) {
+		int oldMarking = currentMarking;
+		if (capacity == 0){
+			setNumberOfMyTokens(currentMarkingInput);
+			currentMarking = currentMarkingInput;
+		} else {
+			if (currentMarkingInput > capacity) {
+				currentMarking = capacity;
+			} else{
+				setNumberOfMyTokens(currentMarkingInput);
+				currentMarking = currentMarkingInput;
+			}
+		}
+		repaint();
+		return new PlaceMarkingEdit(this, oldMarking, currentMarking);      
+	}
+	
+	public UndoableEdit setInvariant(String invariant) {
+
+		String oldinvariant = this.invariant;
+		this.invariant = invariant;
+
+		update();
+
+		return new TimedPlaceInvariantEdit(this, oldinvariant, this.invariant);
+	}
+
+	private void setNumberOfMyTokens(int currentMarkingInput){
+		
+		int toAddToMyTokens = currentMarkingInput - currentMarking;
+		if (toAddToMyTokens >= 0 ){
+			for (int i=0; i<toAddToMyTokens; i++){
+				myTokens.add(newToken());
+			}
+		}else {
+			int size = myTokens.size();
+			while (size > currentMarkingInput){
+				myTokens.trimToSize();
+				myTokens.remove(myTokens.size()-1);
+				myTokens.trimToSize();
+				size = myTokens.size();
+			}
+		}
+	}
+	
+	public UndoableEdit setTokensAndAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
+		
+		//if (newAgeOfTokens.size() == myTokens.size()){
+			this.setCurrentMarking(newAgeOfTokens.size());
+		    ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
+			this.myTokens = newAgeOfTokens;
+
+			update();
+
+			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
+		//} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
+	}
+
+
+//	public void removeToken(int indexOfTokenToBeRemoved) {
+//		myTokens.remove(indexOfTokenToBeRemoved);
+//		Collections.sort(myTokens);
+//		myTokens.trimToSize();
+//		currentMarking--;
+//	}
+	
+	
 	public void showAgeOfTokens(boolean show) {
 		// Build interface
 		if (!show){
@@ -551,8 +496,65 @@ public class TimedPlace extends Place {
 			ageOfTokensWindow.setVisible(show);	
 		}
 	}
-	public boolean isAgeOfTokensShown(){
-		return ageOfTokensWindow.isVisible();
+
+	@Override
+	public void showEditor(){
+		// Build interface
+		EscapableDialog guiDialog = 
+			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+
+		Container contentPane = guiDialog.getContentPane();
+
+		// 1 Set layout
+		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.PAGE_AXIS));      
+
+		// 2 Add Place editor
+		contentPane.add( new TimedPlaceEditorPanel(guiDialog.getRootPane(), 
+				this, CreateGui.getModel(), CreateGui.getView()));
+
+		guiDialog.setResizable(false);     
+
+		// Make window fit contents' preferred size
+		guiDialog.pack();
+
+		// Move window to the middle of the screen
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+	}
+
+	@Override
+	public void update() {
+		if (attributesVisible == true){
+			String value = getInvariantString();
+			pnName.setText(value);
+			
+		} else {
+			pnName.setText("");
+		}          
+		pnName.zoomUpdate(zoom);
+
+		updateBounds();
+		updateLabelLocation();
+		updateConnected();
+
+		repaint();
+	}
+
+	protected String getInvariantString() {
+		String value = "";
+		
+		//Dont show invariant if its default	
+		if (!invariant.equals("<inf")){ 
+			value += "\n Age: " + invariant;
+		}
+					
+		return value;
+	}
+	protected boolean validateInvariant(){
+
+		//TODO - make some tjek
+		return true;
+
 	}
 
 }

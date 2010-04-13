@@ -186,6 +186,8 @@ implements Cloneable {
 
 	private ArrayList<TAPNQuery> queries = null;
 	private ConstantStore constants = new ConstantStore();
+	private boolean useColors = true;
+	
 	/**
 	 * Create Petri-Net object from PNML file with URI pnmlFileName
 	 * @param pnmlFileName Name of PNML File
@@ -3948,5 +3950,15 @@ implements Cloneable {
 			}
 		}
 		return false;
+	}
+
+
+	public void setUseColors(boolean useColors) {
+		this.useColors = useColors;
+	}
+
+
+	public boolean isUsingColors() {
+		return useColors;
 	}
 }

@@ -9,6 +9,10 @@ import pipe.gui.undo.TransportArcGroupEdit;
 import pipe.gui.undo.UndoableEdit;
 
 public class TransportArc extends TimedArc {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3728885532894319528L;
 	private int group;
 	private boolean isInPreSet; 
 	TransportArc connectedTo=null;
@@ -23,7 +27,7 @@ public class TransportArc extends TimedArc {
 		super(new NormalArc(newSource));
 		this.isInPreSet = isInPreSet;
 		setHead();
-		group = groupNr;
+		setGroup(groupNr);
 		//hack to reprint the label of the arc
 		updateWeightLabel();
 	}
@@ -31,7 +35,7 @@ public class TransportArc extends TimedArc {
 		super(timedArc, timedArc.getGuard());
 		this.isInPreSet = isInPreSet;
 		setHead();
-		this.group = group;
+		this.setGroup(group);
 		//hack to reprint the label of the arc
 		updateWeightLabel();
 	}
@@ -43,25 +47,25 @@ public class TransportArc extends TimedArc {
 		repaint();
 	}
 	public UndoableEdit setGroupNr(int groupNr){
-		int oldGroup = this.group;
-		group = groupNr;
+		int oldGroup = this.getGroup();
+		setGroup(groupNr);
 
 		//hacks - I use the weight to display the TimeInterval
 		updateWeightLabel();
 		repaint();
 		
-		return new TransportArcGroupEdit(this, oldGroup, this.group);
+		return new TransportArcGroupEdit(this, oldGroup, this.getGroup());
 	}
 	public int getGroupNr(){
-		return group;
+		return getGroup();
 	}
 	
 	@Override
 	public void updateWeightLabel(){   
 		if (isInPreSet){
-		weightLabel.setText(timeInterval+" : "+group);
+		weightLabel.setText(timeInterval+" : "+getGroup());
 		} else {
-			weightLabel.setText(""+group);
+			weightLabel.setText(""+getGroup());
 		}
 		this.setWeightLabelPosition();
 	}
@@ -144,6 +148,14 @@ public class TransportArc extends TimedArc {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+	}
+
+	public void setGroup(int group) {
+		this.group = group;
+	}
+
+	public int getGroup() {
+		return group;
 	}
 	
 }

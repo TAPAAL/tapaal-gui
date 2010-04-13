@@ -21,14 +21,20 @@ public class TimedArc extends NormalArc{
 	private static final long serialVersionUID = 8263782840119274756L;
 	protected String timeInterval; 
 	
-	public TimedArc(NormalArc arc){
-		super(arc);
+	public TimedArc(PlaceTransitionObject source){
+		super(source);
+		init();
+	}
+
+	private void init() {
 		timeInterval="[0,inf)";
 		
-		if (arc.getSource() instanceof pipe.dataLayer.Transition){
-			
-		}
 		updateWeightLabel();
+	}
+	
+	public TimedArc(NormalArc arc){
+		super(arc);
+		init();
 	}
 
 	public TimedArc(NormalArc arc, String guard) {
