@@ -22,9 +22,7 @@ public class ColorSet {
 	}
 	
 	public void add(IntegerRange range){
-		if(!contains(range)){
-			ranges.add(range);
-		}
+		ranges.add(range);
 	}
 	
 	public void remove(IntegerRange range){

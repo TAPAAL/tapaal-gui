@@ -3,25 +3,22 @@ package pipe.gui.undo;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 
-public class PlaceColorInvariantEdit extends UndoableEdit {
+public class PlaceColorInvariantEdit extends ColorSetEdit {
 
-	private ColorSet oldColorInvariant;
-	private ColorSet newColorInvariant;
 	private ColoredTimedPlace place;
 	
 	public PlaceColorInvariantEdit(ColoredTimedPlace place, ColorSet oldInv, ColorSet newInv){
+		super(oldInv, newInv);
 		this.place = place;
-		this.oldColorInvariant = oldInv;
-		this.newColorInvariant = newInv;
 	}
 	
 	public void redo() {
-		place.setColorInvariant(newColorInvariant);
+		place.setColorInvariant(getNewColorSet());
 	}
 
 	
 	public void undo() {
-		place.setColorInvariant(oldColorInvariant);
+		place.setColorInvariant(getOldColorSet());
 	}
 
 }

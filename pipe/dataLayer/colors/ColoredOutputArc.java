@@ -2,10 +2,12 @@ package pipe.dataLayer.colors;
 
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
+import pipe.gui.undo.ColoredOutputArcOutputValueEdit;
+import pipe.gui.undo.UndoableEdit;
 
 public class ColoredOutputArc extends NormalArc {
 
-	private int outputValue;
+	private OutputValue outputValue = new OutputValue();
 	/**
 	 * 
 	 */
@@ -34,16 +36,21 @@ public class ColoredOutputArc extends NormalArc {
 		updateWeightLabel();
 	}
 
-	public void setOutputValue(int outputValue) {
-		this.outputValue = outputValue;
+	public UndoableEdit setOutputValue(OutputValue newOutputValue) {
+		OutputValue old = this.outputValue;
+		this.outputValue = newOutputValue;
+		
+		updateWeightLabel();
+		
+		return new ColoredOutputArcOutputValueEdit(this, old, newOutputValue);
 	}
 
-	public int getOutputValue() {
+	public OutputValue getOutputValue() {
 		return outputValue;
 	}
 	
 	public String getOutputString(){
-		return "v := " + outputValue;
+		return "val := " + outputValue;
 	}
 	
 	public void updateWeightLabel(){ 		

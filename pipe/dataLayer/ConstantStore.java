@@ -5,6 +5,11 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeMap;
 
+import pipe.dataLayer.colors.ColoredInhibitorArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTransportArc;
+import pipe.gui.CreateGui;
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
 import pipe.gui.undo.UndoableEdit;
@@ -122,9 +127,41 @@ public class ConstantStore {
 		}
 
 		for(Arc arc : arcs){
-			if(arc instanceof TimedArc || arc instanceof TransportArc)
-				buildConstraint((TimedArc)arc);
+			if(!CreateGui.getModel().isUsingColors()){
+				if(arc instanceof TimedArc || arc instanceof TransportArc){
+					buildConstraint((TimedArc)arc);
+				}
+			}else{
+				if(arc instanceof ColoredInputArc){
+					buildConstraint((ColoredInputArc)arc);
+				}else if(arc instanceof ColoredOutputArc){
+					buildConstraint((ColoredOutputArc)arc);
+				}else if(arc instanceof ColoredTransportArc){
+					buildConstraint((ColoredTransportArc)arc);
+				}else if(arc instanceof ColoredInhibitorArc){
+					buildConstraint((ColoredInhibitorArc)arc);
+				}
+			}
 		}
+	}
+
+	private void buildConstraint(ColoredOutputArc arc) {
+		if(arc.getOutputValue().isUsingConstant()){
+			Constant constant = getConstant(arc.getOutputValue().getConstantName());
+			constant.setIsUsed(true);
+		}
+	}
+	
+	public void buildConstraint(ColoredInputArc arc){
+		buildConstraint((TimedArc)arc);
+	}
+	
+	public void buildConstraint(ColoredTransportArc arc){
+		buildConstraint((TimedArc)arc);
+	}
+	
+	public void buildConstraint(ColoredInhibitorArc arc){
+		buildConstraint((TimedArc)arc);
 	}
 
 	public void buildConstraint(TimedArc arc) {

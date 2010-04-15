@@ -3,6 +3,8 @@ package pipe.dataLayer.colors;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNInhibitorArc;
+import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
+import pipe.gui.undo.UndoableEdit;
 
 
 public class ColoredInhibitorArc extends TAPNInhibitorArc {
@@ -26,23 +28,38 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 
 	public ColoredInhibitorArc(PlaceTransitionObject source) {
 		super(source);
+		colorGuard = new ColorSet();
 	}
 	public boolean satisfiesGuard(ColoredToken token) {
-		return !(colorGuard.contains(token.getColor()) || satisfiesGuard(token.getAge()));
+		return !(colorGuard.contains(token.getColor()) && satisfiesGuard(token.getAge()));
 	}
 
 	public void updateWeightLabel(){ 
 
-		String guard = timeInterval;
+		String guard = "age \u2208 " + timeInterval;
 
 		if(colorGuard != null && !colorGuard.isEmpty()){
-			guard += "\n" + colorGuard.toString();
+			guard += "\n val \u2208 " + colorGuard.toString();
 		}
 
 		weightLabel.setText(guard);
 
 		this.setWeightLabelPosition();
 	}
+	
+	public String getColorGuardStringWithoutSetNotation() {
+		return colorGuard.toStringNoSetNotation();
+	}
+
+	public UndoableEdit setColorGuard(ColorSet newColorGuard) {
+		ColorSet old = this.colorGuard;
+		this.colorGuard = newColorGuard;
+
+		updateWeightLabel();
+
+		return new ColoredInhibArcColorGuardEdit(this, old, newColorGuard);	
+	}
+
 
 
 }

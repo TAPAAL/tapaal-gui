@@ -6,7 +6,6 @@ import java.util.List;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlace;
 import pipe.gui.undo.PlaceColorInvariantEdit;
-import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.undo.UndoableEdit;
 
 public class ColoredTimedPlace extends TimedPlace {
@@ -86,12 +85,11 @@ public class ColoredTimedPlace extends TimedPlace {
 	}
 	
 	
-	@Override
 	protected String getInvariantString() {
 		String inv = super.getInvariantString();
 		
 		if(!colorInvariant.isEmpty()){
-			inv += "\n Value: " + colorInvariant.toString();
+			inv += "\n val \u2208 " + colorInvariant.toString();
 		}
 		
 		return inv;

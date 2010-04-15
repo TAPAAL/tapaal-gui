@@ -545,16 +545,18 @@ public class TimedPlace extends Place {
 		
 		//Dont show invariant if its default	
 		if (!invariant.equals("<inf")){ 
-			value += "\n Age: " + invariant;
+			
+			if(CreateGui.getModel().isUsingColors()){
+			int offset = 1;
+			if(invariant.contains("<=")) offset = 2;
+			
+			value = String.format("\n age \u2208 [0, %1$s%2$s", invariant.substring(offset).trim(),
+					offset == 2 ? "]" : ")");
+			}else{
+				value = "Inv: " + invariant;
+			}
 		}
 					
 		return value;
 	}
-	protected boolean validateInvariant(){
-
-		//TODO - make some tjek
-		return true;
-
-	}
-
 }
