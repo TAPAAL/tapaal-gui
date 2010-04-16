@@ -1,26 +1,36 @@
 package pipe.dataLayer.colors;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import pipe.gui.Pipe;
+import pipe.gui.undo.TokenValueEdit;
+import pipe.gui.undo.UndoableEdit;
 
 public class ColoredToken {
 	private BigDecimal age;
-	private int color;
+	private IntOrConstant color = new IntOrConstant();
 	
 	public ColoredToken(){
+		age = new BigDecimal(0, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
 	}
 	
 	public ColoredToken(int value){
+		this();
 		this.setColor(value);
 	}
 	
 	public ColoredToken(BigDecimal age, int color){
 		this.setAge(age);
 		this.setColor(color);
+	}
+
+	public ColoredToken(BigDecimal age, IntOrConstant color) {
+		this.age = age;
+		this.color = color;
 	}
 
 	public void setAge(BigDecimal age) {
@@ -32,10 +42,17 @@ public class ColoredToken {
 	}
 
 	public void setColor(int color) {
-		this.color = color;
+		this.color.setOutputValue(color);
+	}
+	
+	public UndoableEdit setColor(IntOrConstant newValue) {
+		IntOrConstant old = this.color;
+		this.color = newValue;
+		
+		return new TokenValueEdit(this,old,newValue);		
 	}
 
-	public int getColor() {
+	public IntOrConstant getColor() {
 		return color;
 	}
 	

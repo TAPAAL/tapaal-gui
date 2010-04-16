@@ -3,6 +3,7 @@ package pipe.dataLayer.colors;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNInhibitorArc;
+import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -31,7 +32,15 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		colorGuard = new ColorSet();
 	}
 	public boolean satisfiesGuard(ColoredToken token) {
-		return !(colorGuard.contains(token.getColor()) && satisfiesGuard(token.getAge()));
+		IntOrConstant val = token.getColor();
+		int value = 0;
+		if(val.isUsingConstant()){
+			value = CreateGui.getModel().getConstantValue(val.getConstantName());
+		}else{
+			value = val.getIntegerValue();
+		}
+		
+		return !(colorGuard.contains(value) && satisfiesGuard(token.getAge()));
 	}
 
 	public void updateWeightLabel(){ 

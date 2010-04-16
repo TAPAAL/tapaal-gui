@@ -39,7 +39,7 @@ import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntegerRange;
-import pipe.dataLayer.colors.OutputValue;
+import pipe.dataLayer.colors.IntOrConstant;
 import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
@@ -272,7 +272,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								UndoableEdit preserveEditConnectedTo = connectedTo.setPreservation(preserve);
 								undoManager.addEdit(preserveEditConnectedTo);
 
-								OutputValue outputValue = new OutputValue((Integer)updateExprSpinner.getValue());
+								IntOrConstant outputValue = new IntOrConstant((Integer)updateExprSpinner.getValue());
 								UndoableEdit outputEdit = tarc.setOutputValue(outputValue);
 								undoManager.addEdit(outputEdit);
 

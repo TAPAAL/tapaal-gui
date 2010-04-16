@@ -7,7 +7,7 @@ import pipe.gui.undo.UndoableEdit;
 
 public class ColoredOutputArc extends NormalArc {
 
-	private OutputValue outputValue = new OutputValue();
+	private IntOrConstant outputValue = new IntOrConstant();
 	/**
 	 * 
 	 */
@@ -36,8 +36,8 @@ public class ColoredOutputArc extends NormalArc {
 		updateWeightLabel();
 	}
 
-	public UndoableEdit setOutputValue(OutputValue newOutputValue) {
-		OutputValue old = this.outputValue;
+	public UndoableEdit setOutputValue(IntOrConstant newOutputValue) {
+		IntOrConstant old = this.outputValue;
 		this.outputValue = newOutputValue;
 		
 		updateWeightLabel();
@@ -45,7 +45,7 @@ public class ColoredOutputArc extends NormalArc {
 		return new ColoredOutputArcOutputValueEdit(this, old, newOutputValue);
 	}
 
-	public OutputValue getOutputValue() {
+	public IntOrConstant getOutputValue() {
 		return outputValue;
 	}
 	

@@ -1,15 +1,15 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.colors.ColoredOutputArc;
-import pipe.dataLayer.colors.OutputValue;
+import pipe.dataLayer.colors.IntOrConstant;
 
 public class ColoredOutputArcOutputValueEdit extends UndoableEdit {
 
-	private OutputValue oldValue;
-	private OutputValue newValue;
+	private IntOrConstant oldValue;
+	private IntOrConstant newValue;
 	private ColoredOutputArc arc;
 
-	public ColoredOutputArcOutputValueEdit(ColoredOutputArc arc, OutputValue oldValue, OutputValue newValue){
+	public ColoredOutputArcOutputValueEdit(ColoredOutputArc arc, IntOrConstant oldValue, IntOrConstant newValue){
 		this.arc = arc;
 		this.oldValue = oldValue;
 		this.newValue = newValue;

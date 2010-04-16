@@ -3,6 +3,7 @@ package pipe.dataLayer.colors;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TransportArc;
+import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredTransportArcColorGuardEdit;
 import pipe.gui.undo.ColoredTransportArcPreserveEdit;
 import pipe.gui.undo.ColoredTransportArcUpdateValueEdit;
@@ -13,7 +14,7 @@ public class ColoredTransportArc extends TransportArc {
 
 	private ColorSet colorGuard;
 	private Preserve preserves = Preserve.AgeAndValue;
-	private OutputValue outputValue = new OutputValue();
+	private IntOrConstant outputValue = new IntOrConstant();
 	/**
 	 * 
 	 */
@@ -31,7 +32,15 @@ public class ColoredTransportArc extends TransportArc {
 	}
 
 	public boolean satisfiesGuard(ColoredToken token) {
-		return colorGuard.contains(token.getColor()) && satisfiesGuard(token.getAge());
+		IntOrConstant val = token.getColor();
+		int value = 0;
+		if(val.isUsingConstant()){
+			value = CreateGui.getModel().getConstantValue(val.getConstantName());
+		}else{
+			value = val.getIntegerValue();
+		}
+		
+		return colorGuard.contains(value) && satisfiesGuard(token.getAge());
 	}
 	
 	public String getOutputString(){
@@ -81,12 +90,12 @@ public class ColoredTransportArc extends TransportArc {
 		return preserves;
 	}
 	
-	public OutputValue getOutputValue(){
+	public IntOrConstant getOutputValue(){
 		return outputValue;
 	}
 	
-	public UndoableEdit setOutputValue(OutputValue value){
-		OutputValue old = this.outputValue;
+	public UndoableEdit setOutputValue(IntOrConstant value){
+		IntOrConstant old = this.outputValue;
 		this.outputValue = value;
 		
 		updateWeightLabel();

@@ -20,7 +20,7 @@ import javax.swing.SpinnerNumberModel;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.colors.ColoredOutputArc;
-import pipe.dataLayer.colors.OutputValue;
+import pipe.dataLayer.colors.IntOrConstant;
 import pipe.gui.undo.UndoManager;
 
 public class OutputValueEditorPanel extends JPanel {
@@ -62,7 +62,7 @@ public class OutputValueEditorPanel extends JPanel {
 	}
 
 	private void setInitialState() {
-		OutputValue value = arc.getOutputValue();
+		IntOrConstant value = arc.getOutputValue();
 		
 		if(value.isUsingConstant()){
 			constantRadioButton.setSelected(true);
@@ -84,7 +84,7 @@ public class OutputValueEditorPanel extends JPanel {
 		okButton.addActionListener(new ActionListener(){
 			
 			public void actionPerformed(ActionEvent arg0) {
-				OutputValue output = new OutputValue();
+				IntOrConstant output = new IntOrConstant();
 				if(normalRadioButton.isSelected()){
 					output.setOutputValue((Integer)integerValueSpinner.getValue());
 				}else{

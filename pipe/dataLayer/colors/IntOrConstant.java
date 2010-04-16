@@ -1,20 +1,29 @@
 package pipe.dataLayer.colors;
 
-public class OutputValue {
+import pipe.gui.CreateGui;
+
+public class IntOrConstant {
 
 	private int value;
 	private String name;
 	
-	public OutputValue(){
-		
+	public IntOrConstant(){
 	}
 	
-	public OutputValue(int value){
+	public IntOrConstant(String intOrConstant){
+		try{
+			value = Integer.parseInt(intOrConstant);
+		}catch(IllegalArgumentException e){
+			if(!CreateGui.getModel().isConstantNameUsed(intOrConstant)){
+				throw new IllegalArgumentException("Cannot parse as integer and wrong constant name");
+			}else{
+				name = intOrConstant;
+			}
+		}
+	}
+	
+	public IntOrConstant(int value){
 		this.value = value;
-	}
-	
-	public OutputValue(String name){
-		this.name = name;
 	}
 	
 	public boolean isUsingConstant(){

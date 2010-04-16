@@ -5,6 +5,10 @@ import java.util.List;
 
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlace;
+import pipe.gui.CreateGui;
+import pipe.gui.undo.ColoredPlaceAddTokenEdit;
+import pipe.gui.undo.ColoredPlaceRemoveTokenEdit;
+import pipe.gui.undo.ColoredPlaceTokensChangedEdit;
 import pipe.gui.undo.PlaceColorInvariantEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -65,7 +69,15 @@ public class ColoredTimedPlace extends TimedPlace {
 	
 	
 	public boolean satisfiesInvariant(ColoredToken token) {
-		return colorInvariant.contains(token.getColor()) && satisfiesInvariant(token.getAge());
+		IntOrConstant val = token.getColor();
+		int value = 0;
+		if(val.isUsingConstant()){
+			value = CreateGui.getModel().getConstantValue(val.getConstantName());
+		}else{
+			value = val.getIntegerValue();
+		}
+		
+		return colorInvariant.contains(value) && satisfiesInvariant(token.getAge());
 	}
 	
 	public String getStringOfTokens() {
@@ -106,6 +118,29 @@ public class ColoredTimedPlace extends TimedPlace {
 		update();
 
 		return new PlaceColorInvariantEdit(this, old, newColorInvariant);		
+	}
+	
+	public List<ColoredToken> getColoredTokens(){
+		return tokens;
+	}
+	
+	public UndoableEdit addColoredToken(ColoredToken token){
+		tokens.add(token);
+		
+		return new ColoredPlaceAddTokenEdit(this, token);
+	}
+	
+	public UndoableEdit removeColoredToken(ColoredToken token){
+		tokens.remove(token);
+		
+		return new ColoredPlaceRemoveTokenEdit(this,token);
+	}
+	
+	public UndoableEdit setColoredTokens(List<ColoredToken> newTokens) {
+		List<ColoredToken> old = this.tokens;
+		this.tokens = newTokens;
+		
+		return new ColoredPlaceTokensChangedEdit(this,old,newTokens);
 	}
 	
 }

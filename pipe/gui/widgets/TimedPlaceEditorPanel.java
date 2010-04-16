@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -10,11 +11,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -22,11 +28,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.MarkingParameter;
@@ -34,6 +53,8 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.ColoredToken;
+import pipe.dataLayer.colors.IntOrConstant;
 import pipe.dataLayer.colors.IntegerRange;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
@@ -145,15 +166,117 @@ extends javax.swing.JPanel {
 			gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 			//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
 			placeEditorPanel.add(colorInvariantPanel, gridBagConstraints);
+
+			initTokenPanel();
+			gridBagConstraints = new GridBagConstraints();
+			gridBagConstraints.gridx = 2;
+			gridBagConstraints.gridy = 0;
+			gridBagConstraints.gridheight = 3;
+			gridBagConstraints.anchor = GridBagConstraints.EAST;
+			gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+			//gridBagConstraints.insets = new Insets(0,0,0,5);
+			placeEditorPanel.add(tokenPanel, gridBagConstraints);
 		}
-		
+
 		initButtonPanel();
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridwidth = 3;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		add(buttonPanel, gridBagConstraints);
 	}// </editor-fold>//GEN-END:initComponents
+
+	private void initTokenPanel() {
+		tokenPanel = new JPanel(new GridBagLayout());
+		tokenPanel.setBorder(BorderFactory.createTitledBorder("Tokens"));
+
+		tokenHelpLabel = new JLabel("Double-click a value to change it.");
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(3,3,0,3);
+		tokenPanel.add(tokenHelpLabel, gbc);
+
+		tokenHelpLabel2 = new JLabel("You can use integers and constants.");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0,3,3,3);
+		tokenPanel.add(tokenHelpLabel2, gbc);
+
+		tokenTableModel = new TokenTableModel((ColoredTimedPlace)place);
+		tokenTable = new JTable(tokenTableModel);
+		Dimension dims = new Dimension(150,133);
+		tokenTable.setPreferredScrollableViewportSize(dims);
+
+		DefaultTableCellRenderer render = new DefaultTableCellRenderer();
+		render.setHorizontalAlignment(JTextField.RIGHT);
+		tokenTable.getColumn("Value").setCellRenderer(render);
+		tokenTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tokenTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if(e.getValueIsAdjusting() || tokenTable.getSelectedRow() == -1){
+					removeTokenButton.setEnabled(false);
+				}else{
+					removeTokenButton.setEnabled(true);
+				}			
+			}
+		});
+		
+		JScrollPane pane = new JScrollPane(tokenTable);
+		pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		//gbc.insets = new Insets(3,3,3,3);
+		tokenPanel.add(pane, gbc);
+
+		JPanel btnPanel = new JPanel(new GridBagLayout());
+		addTokenButton = new JButton("Add");
+		addTokenButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				tokenTableModel.addColoredToken(new ColoredToken());
+
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.insets = new Insets(3,3,3,3);
+		btnPanel.add(addTokenButton, gbc);
+
+		removeTokenButton = new JButton("Remove");
+		removeTokenButton.setEnabled(false);
+		removeTokenButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tokenTableModel.removeColoredToken(tokenTable.getSelectedRow());
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(3,3,3,3);
+		btnPanel.add(removeTokenButton, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(3,3,3,3);
+		tokenPanel.add(btnPanel, gbc);
+	}
 
 	private void initButtonPanel() {
 		java.awt.GridBagConstraints gridBagConstraints;
@@ -224,41 +347,43 @@ extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(nameTextField, gridBagConstraints);
 
-		markingLabel = new javax.swing.JLabel();
-		markingLabel.setText("Marking:");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		basicPropertiesPanel.add(markingLabel, gridBagConstraints);
+		if(!pnmlData.isUsingColors()){
+			markingLabel = new javax.swing.JLabel();
+			markingLabel.setText("Marking:");
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 1;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+			gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+			basicPropertiesPanel.add(markingLabel, gridBagConstraints);
 
-		markingSpinner = new javax.swing.JSpinner();
-		markingSpinner.setModel(new SpinnerNumberModel(place.getCurrentMarking(),0,Integer.MAX_VALUE,1));
-		markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
-		markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
-		//      markingSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-		//         public void stateChanged(javax.swing.event.ChangeEvent evt) {
-		////            markingSpinnerStateChanged(evt);
-		//        	 if (tokenPanel.getComponents().length > (Integer) markingSpinner.getValue() ){
-		//        		 tokenPanel.remove(tokenPanel.getComponents().length-1);
-		//        	 }else{
-		//        		 JSpinner newAgeSpinner = new JSpinner( new SpinnerNumberModel( 0f, 0f, Float.MAX_VALUE, 1f ) ); 
-		//        		 newAgeSpinner.setMaximumSize(new Dimension(50,30));
-		//        		 newAgeSpinner.setMinimumSize(new Dimension(50,30));
-		//        		 newAgeSpinner.setPreferredSize(new Dimension(50,30));
-		//        		 tokenPanel.add(newAgeSpinner);
-		//        	 }
-		//        	 ((EscapableDialog)rootPane.getParent()).pack();
-		//         }
-		//      });
+			markingSpinner = new javax.swing.JSpinner();
+			markingSpinner.setModel(new SpinnerNumberModel(place.getCurrentMarking(),0,Integer.MAX_VALUE,1));
+			markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
+			markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
+			//      markingSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+			//         public void stateChanged(javax.swing.event.ChangeEvent evt) {
+			////            markingSpinnerStateChanged(evt);
+			//        	 if (tokenPanel.getComponents().length > (Integer) markingSpinner.getValue() ){
+			//        		 tokenPanel.remove(tokenPanel.getComponents().length-1);
+			//        	 }else{
+			//        		 JSpinner newAgeSpinner = new JSpinner( new SpinnerNumberModel( 0f, 0f, Float.MAX_VALUE, 1f ) ); 
+			//        		 newAgeSpinner.setMaximumSize(new Dimension(50,30));
+			//        		 newAgeSpinner.setMinimumSize(new Dimension(50,30));
+			//        		 newAgeSpinner.setPreferredSize(new Dimension(50,30));
+			//        		 tokenPanel.add(newAgeSpinner);
+			//        	 }
+			//        	 ((EscapableDialog)rootPane.getParent()).pack();
+			//         }
+			//      });
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = 1;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+			basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
+		}
 
 		attributesCheckBox = new javax.swing.JCheckBox();
 		attributesCheckBox.setSelected(place.getAttributesVisible());
@@ -297,7 +422,7 @@ extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		colorInvariantPanel.add(colorInvariantTextBox, gridBagConstraints);
-		
+
 		colorInvariantExampleLabel = new JLabel("Example: 1, 3, 4-6, 8, 12-");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -569,16 +694,18 @@ extends javax.swing.JPanel {
 
 	private void doOK(){
 		Integer newMarking = marking;
-		try {
-			newMarking = (Integer)markingSpinner.getValue();
-		} catch (Exception e){
-			JSpinner.NumberEditor numberEditor =
-				((JSpinner.NumberEditor)markingSpinner.getEditor());
-			numberEditor.getTextField().setBackground(new Color(255,0,0));
-			markingSpinner.addChangeListener(changeListener);
-			markingSpinner.requestFocusInWindow();
-			return;
-		}      
+		if(!pnmlData.isUsingColors()){
+			try {
+				newMarking = (Integer)markingSpinner.getValue();
+			} catch (Exception e){
+				JSpinner.NumberEditor numberEditor =
+					((JSpinner.NumberEditor)markingSpinner.getEditor());
+				numberEditor.getTextField().setBackground(new Color(255,0,0));
+				markingSpinner.addChangeListener(changeListener);
+				markingSpinner.requestFocusInWindow();
+				return;
+			}      
+		}
 
 		view.getUndoManager().newEdit(); // new "transaction""
 
@@ -651,51 +778,91 @@ extends javax.swing.JPanel {
 		//if ()  -  TODO do some check if it has canged and if value is ok
 		view.getUndoManager().addEdit(place.setInvariant(newInvariant));
 
-		if(pnmlData.isUsingColors() && !colorInvariantTextBox.getText().isEmpty()){
-			ColorSet colorInvariant = new ColorSet();
-			String[] ranges = colorInvariantTextBox.getText().split(",");
-			for(String range : ranges){
-				try{
-					IntegerRange ir = IntegerRange.parse(range.trim());
-					colorInvariant.add(ir);
-				}catch(IllegalArgumentException e){
+		if(pnmlData.isUsingColors()){
+			ColoredTimedPlace coloredTimedPlace = (ColoredTimedPlace)place;
+			if(!colorInvariantTextBox.getText().isEmpty()){
+
+				ColorSet colorInvariant = new ColorSet();
+				String[] ranges = colorInvariantTextBox.getText().split(",");
+				for(String range : ranges){
+					try{
+						IntegerRange ir = IntegerRange.parse(range.trim());
+						colorInvariant.add(ir);
+					}catch(IllegalArgumentException e){
+						JOptionPane.showMessageDialog(CreateGui.getApp(),
+								String.format("There was an error in parsing the color invariant. The problem concerns \"%1s\".",range),
+								"Error",
+								JOptionPane.INFORMATION_MESSAGE);
+						view.getUndoManager().undo();
+
+						return;
+					}
+				}
+				UndoableEdit action = coloredTimedPlace.setColorInvariant(colorInvariant); 
+				view.getUndoManager().addEdit(action);
+			}
+
+			List<ColoredToken> tokens = tokenTableModel.getTokens();
+			for(ColoredToken token : tokens){	
+				if(token.getColor() == null){
 					JOptionPane.showMessageDialog(CreateGui.getApp(),
-							String.format("There was an error in parsing the color invariant. The problem concerns \"%1s\".",range),
+							"One or more tokens are missing a color value.",
 							"Error",
 							JOptionPane.INFORMATION_MESSAGE);
 					view.getUndoManager().undo();
-					
+					return;
+				}
+				
+				if(!coloredTimedPlace.satisfiesInvariant(token)){
+					String msg = String.format("A token value violates the color invariant of the place. The problem concerns the token value \"%1$s\".", token.getColor());
+					if(token.getColor().isUsingConstant()){
+						msg += String.format("\n \"%1$s\" is a constant with value %2$d.",
+								token.getColor(),
+								CreateGui.getModel().getConstantValue(token.getColor().getConstantName()));
+					}
+
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							msg,
+							"Error",
+							JOptionPane.INFORMATION_MESSAGE);
+					view.getUndoManager().undo();
+
 					return;
 				}
 			}
-			UndoableEdit action = ((ColoredTimedPlace)place).setColorInvariant(colorInvariant); 
-			view.getUndoManager().addEdit(action);
-		}
-		
-		if (markingComboBox.getSelectedIndex() >0) {
-			// There's a marking parameter selected
-			MarkingParameter parameter = 
-				(MarkingParameter)markingComboBox.getSelectedItem() ;
-			if (parameter != mParameter){
 
-				if (mParameter != null) {
-					// The marking parameter has been changed
-					view.getUndoManager().addEdit(place.changeMarkingParameter(
-							(MarkingParameter)markingComboBox.getSelectedItem()));
-				} else {
-					//The marking parameter has been changed
-					view.getUndoManager().addEdit(place.setMarkingParameter(
-							(MarkingParameter)markingComboBox.getSelectedItem()));
+			UndoableEdit edit = coloredTimedPlace.setColoredTokens(tokens);
+			view.getUndoManager().addEdit(edit);
+		}
+
+
+
+		if(!pnmlData.isUsingColors()){
+			if (markingComboBox.getSelectedIndex() >0) {
+				// There's a marking parameter selected
+				MarkingParameter parameter = 
+					(MarkingParameter)markingComboBox.getSelectedItem() ;
+				if (parameter != mParameter){
+
+					if (mParameter != null) {
+						// The marking parameter has been changed
+						view.getUndoManager().addEdit(place.changeMarkingParameter(
+								(MarkingParameter)markingComboBox.getSelectedItem()));
+					} else {
+						//The marking parameter has been changed
+						view.getUndoManager().addEdit(place.setMarkingParameter(
+								(MarkingParameter)markingComboBox.getSelectedItem()));
+					}
 				}
-			}
-		} else {
-			// There is no marking parameter selected
-			if (mParameter != null) {
-				// The rate parameter has been changed
-				view.getUndoManager().addEdit(place.clearMarkingParameter());
-			}
-			if (newMarking != marking) {
-				view.getUndoManager().addEdit(place.setCurrentMarking(newMarking));            
+			} else {
+				// There is no marking parameter selected
+				if (mParameter != null) {
+					// The rate parameter has been changed
+					view.getUndoManager().addEdit(place.clearMarkingParameter());
+				}
+				if (newMarking != marking) {
+					view.getUndoManager().addEdit(place.setCurrentMarking(newMarking));            
+				}
 			}
 		}
 
@@ -729,6 +896,7 @@ extends javax.swing.JPanel {
 
 
 	private void cancelButtonHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonHandler
+		//view.getUndoManager().undo();
 		exit();
 	}//GEN-LAST:event_cancelButtonHandler
 
@@ -748,7 +916,6 @@ extends javax.swing.JPanel {
 	private javax.swing.JPanel basicPropertiesPanel;
 	private javax.swing.JPanel timeInvariantPanel;
 	private javax.swing.JPanel colorInvariantPanel;
-	// End of variables declaration//GEN-END:variables
 	private JLabel colorInvariantLabel;
 	private JLabel colorInvariantExampleLabel;
 	private JTextField colorInvariantTextBox;
@@ -760,5 +927,12 @@ extends javax.swing.JPanel {
 	private JComboBox invConstantsComboBox;
 	private JRadioButton normalInvRadioButton;
 	private JRadioButton constantInvRadioButton;
-	//   private JPanel tokenPanel;
+
+	private JPanel tokenPanel;
+	private JLabel tokenHelpLabel;
+	private JLabel tokenHelpLabel2;
+	private JTable tokenTable;
+	private JButton addTokenButton;
+	private JButton removeTokenButton;
+	private TokenTableModel tokenTableModel;
 }

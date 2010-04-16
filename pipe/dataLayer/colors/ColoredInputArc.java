@@ -3,6 +3,7 @@ package pipe.dataLayer.colors;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
+import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredInputArcColorGuardEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -33,7 +34,15 @@ public class ColoredInputArc extends TimedArc {
 	}
 		
 	public boolean satisfiesGuard(ColoredToken token) {
-		return integerGuard.contains(token.getColor()) && satisfiesGuard(token.getAge());
+		IntOrConstant val = token.getColor();
+		int value = 0;
+		if(val.isUsingConstant()){
+			value = CreateGui.getModel().getConstantValue(val.getConstantName());
+		}else{
+			value = val.getIntegerValue();
+		}
+		
+		return integerGuard.contains(value) && satisfiesGuard(token.getAge());
 	}
 	
 	public void updateWeightLabel(){ 
