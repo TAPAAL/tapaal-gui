@@ -812,6 +812,15 @@ extends javax.swing.JPanel {
 					return;
 				}
 				
+				if(token.getColor().getValue() < 0){
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							"One or more tokens have a negative color value.",
+							"Error",
+							JOptionPane.INFORMATION_MESSAGE);
+					view.getUndoManager().undo();
+					return;
+				}
+				
 				if(!coloredTimedPlace.satisfiesInvariant(token)){
 					String msg = String.format("A token value violates the color invariant of the place. The problem concerns the token value \"%1$s\".", token.getColor());
 					if(token.getColor().isUsingConstant()){

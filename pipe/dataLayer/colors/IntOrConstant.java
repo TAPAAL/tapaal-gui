@@ -13,6 +13,7 @@ public class IntOrConstant {
 	public IntOrConstant(String intOrConstant){
 		try{
 			value = Integer.parseInt(intOrConstant);
+			if(value < 0) throw new IllegalArgumentException();
 		}catch(IllegalArgumentException e){
 			if(!CreateGui.getModel().isConstantNameUsed(intOrConstant)){
 				throw new IllegalArgumentException("Cannot parse as integer and wrong constant name");

@@ -18,14 +18,14 @@ public class ColoredToken {
 		age = new BigDecimal(0, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
 	}
 	
-	public ColoredToken(int value){
+	public ColoredToken(int color){
 		this();
-		this.setColor(value);
+		this.setColor(new IntOrConstant(color));
 	}
 	
 	public ColoredToken(BigDecimal age, int color){
 		this.setAge(age);
-		this.setColor(color);
+		this.setColor(new IntOrConstant(color));
 	}
 
 	public ColoredToken(BigDecimal age, IntOrConstant color) {
@@ -33,19 +33,16 @@ public class ColoredToken {
 		this.color = color;
 	}
 
-	public void setAge(BigDecimal age) {
+	private void setAge(BigDecimal age) {
 		this.age = age;
 	}
 
 	public BigDecimal getAge() {
 		return age;
 	}
-
-	public void setColor(int color) {
-		this.color.setOutputValue(color);
-	}
 	
 	public UndoableEdit setColor(IntOrConstant newValue) {
+		if(newValue.getValue() < 0) throw new IllegalArgumentException();
 		IntOrConstant old = this.color;
 		this.color = newValue;
 		

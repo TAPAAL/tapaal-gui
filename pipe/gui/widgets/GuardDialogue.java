@@ -139,7 +139,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		inf.setSelected(timeGuard.goesToInfinity());
 		if(timeGuard.goesToInfinity()){
 			upperScaleTextbox.setText("0");
+			upperScaleTextbox.setEnabled(false);
 			upperOffsetTextbox.setText("0");
+			upperOffsetTextbox.setEnabled(false);
+			rightDelimiter.setEnabled(false);
+			
 		}else{
 			IntervalBound upper = timeGuard.getUpper();
 			upperScaleTextbox.setText(upper.getScale().toString());
@@ -472,6 +476,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								upperOffsetTextbox.setEnabled(true);
 								upperScaleTextbox.setEnabled(true);
 								rightDelimiter.setEnabled(true);
+								rightDelimiter.setSelectedItem("]");
 							}
 						}
 					}
