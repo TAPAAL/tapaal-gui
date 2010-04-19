@@ -24,7 +24,7 @@ public class IntervalBound {
 	public String toString() {
 		int valueOfa = a.isUsingConstant() ? a.getConstantValue() : a.getIntegerValue();
 		
-		if(!b.isUsingConstant() && b.getIntegerValue() == -1){
+		if(goesToInfinity()){
 			return "inf";
 		}else if(valueOfa == 0){
 			return String.valueOf(b);
@@ -43,5 +43,17 @@ public class IntervalBound {
 		int upper = token.getColor().getValue() * a.getValue() + b.getValue();
 		
 		return new BigDecimal(upper).compareTo(token.getAge()) >= 0;
+	}
+
+	public boolean goesToInfinity() {
+		return !b.isUsingConstant() && b.getIntegerValue() == -1;
+	}
+
+	public IntOrConstant getScale() {
+		return a;
+	}
+	
+	public IntOrConstant getOffset(){
+		return b;
 	}
 }

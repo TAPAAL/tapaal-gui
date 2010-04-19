@@ -112,4 +112,8 @@ public class ColoredTransportArc extends TransportArc {
 		return new ColoredTransportArcPreserveEdit(this, old, newPreserve);
 	}
 
+	public ColoredInterval getTimeGuard() {
+		return null;
+	}
+
 }

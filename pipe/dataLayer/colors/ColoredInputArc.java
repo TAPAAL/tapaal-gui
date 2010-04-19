@@ -78,4 +78,8 @@ public class ColoredInputArc extends TimedArc {
 
 		return new ColoredInputArcColorGuardEdit(this, old, newColorGuard);	
 	}
+
+	public ColoredInterval getTimeGuard() {
+		return timeGuard;
+	}
 }

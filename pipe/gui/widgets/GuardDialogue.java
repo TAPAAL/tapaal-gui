@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,9 +38,11 @@ import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntegerRange;
 import pipe.dataLayer.colors.IntOrConstant;
+import pipe.dataLayer.colors.IntervalBound;
 import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
@@ -83,6 +86,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	private JLabel colorGuardLabel;
 	private JTextField colorGuardTextBox;
 	private JLabel colorExampleLabel;
+	private JTextField lowerScaleTextbox;
+	private JTextField lowerOffsetTextbox;
+	private JTextField upperScaleTextbox;
+	private JTextField upperOffsetTextbox;
 
 	public GuardDialogue (JRootPane rootPane, PetriNetObject objectToBeEdited){
 		myRootPane = rootPane;
@@ -103,7 +110,41 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		initButtonPanel(objectToBeEdited);
 
 		myRootPane.setDefaultButton(okButton);
-		setInitialState((TimedArc)objectToBeEdited);	
+
+		if(CreateGui.getModel().isUsingColors()){
+			setColoredInitialState((TimedArc)objectToBeEdited);
+		}else{
+			setNoncoloredInitialState((TimedArc)objectToBeEdited);	
+		}
+	}
+
+	private void setColoredInitialState(TimedArc timedArc) {
+		ColoredInterval timeGuard = null;
+
+		if(timedArc instanceof ColoredInputArc){
+			timeGuard = ((ColoredInputArc)timedArc).getTimeGuard();
+		}else if(timedArc instanceof ColoredTransportArc){
+			timeGuard = ((ColoredTransportArc)timedArc).getTimeGuard();
+		}else if(timedArc instanceof ColoredInhibitorArc){
+			timeGuard = ((ColoredInhibitorArc)timedArc).getTimeGuard();
+		}
+
+		leftDelimiter.setSelectedItem(timeGuard.getOpenParenthesis());
+		rightDelimiter.setSelectedItem(timeGuard.getCloseParenthesis());
+
+		IntervalBound lower = timeGuard.getLower();
+		lowerScaleTextbox.setText(lower.getScale().toString());
+		lowerOffsetTextbox.setText(lower.getOffset().toString());
+
+		inf.setSelected(timeGuard.goesToInfinity());
+		if(timeGuard.goesToInfinity()){
+			upperScaleTextbox.setText("0");
+			upperOffsetTextbox.setText("0");
+		}else{
+			IntervalBound upper = timeGuard.getUpper();
+			upperScaleTextbox.setText(upper.getScale().toString());
+			upperOffsetTextbox.setText(upper.getOffset().toString());
+		}
 	}
 
 	private void initTransportArcFeaturesPanel(){
@@ -111,7 +152,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		transportArcFeaturesPanel.setBorder(BorderFactory.createTitledBorder("Transport Arc Features"));
 
 		ActionListener listener = new ActionListener(){
-			
+
 			public void actionPerformed(ActionEvent e) {
 				if(preserveAgeRadioBtn.isSelected()){
 					updateExprSpinner.setEnabled(true);
@@ -120,7 +161,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 				}				
 			}
 		};
-		
+
 		preserveBothRadioBtn = new JRadioButton("Preserve age and value");
 		preserveBothRadioBtn.addActionListener(listener);
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -230,7 +271,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 					public void actionPerformed(ActionEvent evt) {
 						TimedArc arc = (TimedArc) objectToBeEdited;
 						String guard = composeGuard(arc.getGuard());
-						
+
 						UndoManager undoManager = CreateGui.getView().getUndoManager();
 						undoManager.addNewEdit( arc.setGuard(guard) );
 
@@ -260,10 +301,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 								undoManager.addEdit(action);
 							}
-							
+
 							if(arc instanceof ColoredTransportArc){
 								ColoredTransportArc tarc = (ColoredTransportArc)arc;
-								
+
 								Preserve preserve = getPreservation();
 								UndoableEdit preserveEdit = tarc.setPreservation(preserve);
 								undoManager.addEdit(preserveEdit);
@@ -378,27 +419,6 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		guardEditPanel = new JPanel(new GridBagLayout());
 		guardEditPanel.setBorder(BorderFactory.createTitledBorder("Time Guard"));
 
-		String[] left = {"[","("};
-		leftDelimiter = new JComboBox();
-		Dimension dims = new Dimension(55,25);
-		leftDelimiter.setPreferredSize(dims);
-		leftDelimiter.setMinimumSize(dims);
-		leftDelimiter.setMaximumSize(dims);
-		leftDelimiter.setModel(new DefaultComboBoxModel(left));
-
-		String[] right = {"]",")"};
-		rightDelimiter = new JComboBox();
-		rightDelimiter.setPreferredSize(dims);
-		rightDelimiter.setMinimumSize(dims);
-		rightDelimiter.setMaximumSize(dims);
-		rightDelimiter.setModel(new DefaultComboBoxModel(right));
-
-
-		inf = new JCheckBox("inf", true);
-
-		firstIntervalNumber = new JSpinner();
-		secondIntervalNumber = new JSpinner();
-
 		label = new JLabel("Time Interval:");
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -407,12 +427,168 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
 		guardEditPanel.add(label, gridBagConstraints);
 
-
+		String[] left = {"[","("};
+		leftDelimiter = new JComboBox();
+		Dimension dims = new Dimension(55,25);
+		leftDelimiter.setPreferredSize(dims);
+		leftDelimiter.setMinimumSize(dims);
+		leftDelimiter.setMaximumSize(dims);
+		leftDelimiter.setModel(new DefaultComboBoxModel(left));
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(leftDelimiter, gridBagConstraints);
 
+
+		String[] right = {"]",")"};
+		rightDelimiter = new JComboBox();
+		rightDelimiter.setPreferredSize(dims);
+		rightDelimiter.setMinimumSize(dims);
+		rightDelimiter.setMaximumSize(dims);
+		rightDelimiter.setModel(new DefaultComboBoxModel(right));
+		gridBagConstraints.gridx = 5;
+		gridBagConstraints.gridy = 1;
+		guardEditPanel.add(rightDelimiter, gridBagConstraints);
+
+		inf = new JCheckBox("inf", true);
+		inf.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent evt){
+						if(!CreateGui.getModel().isUsingColors()){
+							if (inf.isSelected() ){
+								secondIntervalNumber.setEnabled(false);
+								rightDelimiter.setEnabled(false);
+							}else {
+								secondIntervalNumber.setEnabled(true);
+								rightDelimiter.setEnabled(true);
+							}
+							setDelimiterModels();
+						}else{
+							if(inf.isSelected()){
+								upperOffsetTextbox.setEnabled(false);
+								upperScaleTextbox.setEnabled(false);
+								rightDelimiter.setEnabled(false);
+								rightDelimiter.setSelectedItem(")");
+							}else{
+								upperOffsetTextbox.setEnabled(true);
+								upperScaleTextbox.setEnabled(true);
+								rightDelimiter.setEnabled(true);
+							}
+						}
+					}
+
+				});
+		gridBagConstraints.gridx = 6;
+		gridBagConstraints.gridy = 1;
+		guardEditPanel.add(inf, gridBagConstraints);
+
+		if(CreateGui.getModel().isUsingColors()){
+			initColoredTimeIntervalControls();
+		}else{
+			initNonColoredTimeIntervalControls();
+		}
+
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.insets = new Insets(5,5,0,5);
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		add(guardEditPanel, gridBagConstraints);
+	}
+
+	private void initColoredTimeIntervalControls() {
+		JPanel lowerPanel = new JPanel(new GridBagLayout());
+		Dimension txtBoxDims = new Dimension(50,25);
+
+		lowerScaleTextbox = new JTextField();
+		lowerScaleTextbox.setMinimumSize(txtBoxDims);
+		lowerScaleTextbox.setMaximumSize(txtBoxDims);
+		lowerScaleTextbox.setPreferredSize(txtBoxDims);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		lowerPanel.add(lowerScaleTextbox, gbc);
+
+		String mathExprString = "* val +";
+		JLabel label = new JLabel(mathExprString);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0,0,0,0);
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		lowerPanel.add(label, gbc);
+
+		lowerOffsetTextbox = new JTextField();
+		lowerOffsetTextbox.setMinimumSize(txtBoxDims);
+		lowerOffsetTextbox.setMaximumSize(txtBoxDims);
+		lowerOffsetTextbox.setPreferredSize(txtBoxDims);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		lowerPanel.add(lowerOffsetTextbox, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0,0,0,0);
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		guardEditPanel.add(new JLabel(" , "), gbc);
+
+		JPanel upperPanel = new JPanel(new GridBagLayout());
+
+		upperScaleTextbox = new JTextField();
+		upperScaleTextbox.setMinimumSize(txtBoxDims);
+		upperScaleTextbox.setMaximumSize(txtBoxDims);
+		upperScaleTextbox.setPreferredSize(txtBoxDims);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		upperPanel.add(upperScaleTextbox, gbc);
+
+		label = new JLabel(mathExprString);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		upperPanel.add(label, gbc);
+
+		upperOffsetTextbox = new JTextField();
+		upperOffsetTextbox.setMinimumSize(txtBoxDims);
+		upperOffsetTextbox.setMaximumSize(txtBoxDims);
+		upperOffsetTextbox.setPreferredSize(txtBoxDims);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		upperPanel.add(upperOffsetTextbox, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 4;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.insets = new Insets(3,3,3,3);
+		guardEditPanel.add(upperPanel, gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.insets = new Insets(3,3,3,3);
+		guardEditPanel.add(lowerPanel, gbc);
+	}
+
+	private void initNonColoredTimeIntervalControls() {
 		Dimension intervalBoxDims = new Dimension(90,25);
+		firstIntervalNumber = new JSpinner();
 		firstIntervalNumber.setMaximumSize(intervalBoxDims);
 		firstIntervalNumber.setMinimumSize(intervalBoxDims);
 		firstIntervalNumber.setPreferredSize(intervalBoxDims);
@@ -421,15 +597,18 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 				firstSpinnerStateChanged(evt);
 			}
 		});
-
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = GridBagConstraints.CENTER;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
 		guardEditPanel.add( firstIntervalNumber, gridBagConstraints);
 
 		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add( new JLabel(" , "), gridBagConstraints);
 
+		secondIntervalNumber = new JSpinner();
 		secondIntervalNumber.setMaximumSize(intervalBoxDims);
 		secondIntervalNumber.setMinimumSize(intervalBoxDims);
 		secondIntervalNumber.setPreferredSize(intervalBoxDims);
@@ -442,29 +621,6 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		gridBagConstraints.gridx = 4;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add( secondIntervalNumber, gridBagConstraints);
-
-		gridBagConstraints.gridx = 5;
-		gridBagConstraints.gridy = 1;
-		guardEditPanel.add(rightDelimiter, gridBagConstraints);
-
-		gridBagConstraints.gridx = 6;
-		gridBagConstraints.gridy = 1;
-		guardEditPanel.add(inf, gridBagConstraints);
-
-		inf.addActionListener(
-				new ActionListener(){
-					public void actionPerformed(ActionEvent evt){
-						if (inf.isSelected() ){
-							secondIntervalNumber.setEnabled(false);
-							rightDelimiter.setEnabled(false);
-						}else {
-							secondIntervalNumber.setEnabled(true);
-							rightDelimiter.setEnabled(true);
-						}
-						setDelimiterModels();
-					}
-
-				});
 
 		Set<String> constants = CreateGui.getModel().getConstantNames();
 		boolean enableConstantsCheckBoxes = !constants.isEmpty();
@@ -537,19 +693,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		gridBagConstraints.gridx = 4;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(rightConstantsComboBox, gridBagConstraints);
-
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(5,5,0,5);
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		add(guardEditPanel, gridBagConstraints);
 	}
 
 
 
-	private void setInitialState(TimedArc arc) {
+	private void setNoncoloredInitialState(TimedArc arc) {
 		String timeInterval = arc.getGuard();
 
 		String[] partedTimeInterval = timeInterval.split(",");

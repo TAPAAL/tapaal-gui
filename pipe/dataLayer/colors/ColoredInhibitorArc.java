@@ -68,6 +68,10 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 
 		return new ColoredInhibArcColorGuardEdit(this, old, newColorGuard);	
 	}
+	public ColoredInterval getTimeGuard() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 
