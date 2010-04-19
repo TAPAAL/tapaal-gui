@@ -237,16 +237,8 @@ public class TimedPlace extends Place {
 	//overide method
 	@Override
 	public void paintComponent(Graphics g) {
-		DecimalFormat df = new DecimalFormat();
-		df.setMinimumFractionDigits(1);
-		df.setMaximumFractionDigits(1);
-		df.setRoundingMode(RoundingMode.DOWN);
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
-
-		Insets insets = getInsets();
-		int x = insets.left;
-		int y = insets.top;
 
 		if (hasCapacity()){
 			g2.setStroke(new BasicStroke(2.0f));
@@ -271,6 +263,20 @@ public class TimedPlace extends Place {
 		g2.draw(place);
 
 		g2.setStroke(new BasicStroke(1.0f));
+		
+		paintTokens(g);
+	}
+
+	protected void paintTokens(Graphics g) {
+		DecimalFormat df = new DecimalFormat();
+		df.setMinimumFractionDigits(1);
+		df.setMaximumFractionDigits(1);
+		df.setRoundingMode(RoundingMode.DOWN);
+		
+		Insets insets = getInsets();
+		int x = insets.left;
+		int y = insets.top;
+		
 		int marking = getCurrentMarking();
 
 		// structure sees how many markings there are and fills the place in with 
@@ -290,7 +296,7 @@ public class TimedPlace extends Place {
 			/* falls through */
 		case 2: 
 			if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
-				g2.setFont(new Font("new font", Font.PLAIN, 11));
+				g.setFont(new Font("new font", Font.PLAIN, 11));
 				g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
 			}else{
 				g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
@@ -299,7 +305,7 @@ public class TimedPlace extends Place {
 			/* falls through */
 		case 1:
 			if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
-				g2.setFont(new Font("new font", Font.PLAIN, 11));
+				g.setFont(new Font("new font", Font.PLAIN, 11));
 				g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
 			}else{
 				g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);

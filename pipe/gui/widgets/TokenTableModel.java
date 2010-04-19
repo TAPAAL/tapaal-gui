@@ -30,7 +30,7 @@ public class TokenTableModel extends AbstractTableModel {
 		}
 	}
 
-	@Override
+	
 	public Class<?> getColumnClass(int columnIndex) {
 		if(columnIndex == 0){
 			return BigDecimal.class;
@@ -39,26 +39,26 @@ public class TokenTableModel extends AbstractTableModel {
 		}
 	}
 		
-	@Override
+	
 	public String getColumnName(int column) {
 		return columnNames[column];
 	}
-	@Override
+	
 	public int getColumnCount() {
 		return columnNames.length;
 	}
 
-	@Override
+	
 	public int getRowCount() {
 		return getTokens().size();
 	}
 	
-	@Override
+	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		return columnIndex == 1;
 	}
 	
-	@Override
+	
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		if(columnIndex == 1){
 			ColoredToken token = tokens.get(rowIndex);
@@ -68,7 +68,7 @@ public class TokenTableModel extends AbstractTableModel {
 	
 	
 
-	@Override
+	
 	public Object getValueAt(int i, int j) {
 		ColoredToken token = getTokens().get(i);
 		if(j == 0){

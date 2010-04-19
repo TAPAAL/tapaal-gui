@@ -567,7 +567,7 @@ public class QueryDialogue extends JPanel{
 		this.symmetryReduction.setSelected(true);
 		this.symmetryReduction.addItemListener(new ItemListener(){
 
-			@Override
+			
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED){
 					disableTraceOptions();

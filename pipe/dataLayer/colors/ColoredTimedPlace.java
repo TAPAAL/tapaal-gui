@@ -1,5 +1,7 @@
 package pipe.dataLayer.colors;
 
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +63,7 @@ public class ColoredTimedPlace extends TimedPlace {
 	private void init() {
 		colorInvariant = new ColorSet();
 		tokens = new ArrayList<ColoredToken>();
+		
 	}
 	
 	public String getColorInvariantString(){
@@ -141,6 +144,23 @@ public class ColoredTimedPlace extends TimedPlace {
 		this.tokens = newTokens;
 		
 		return new ColoredPlaceTokensChangedEdit(this,old,newTokens);
+	}
+	
+	
+	public int getCurrentMarking() {
+		return tokens.size();
+	}
+	
+	
+	protected void paintTokens(Graphics g) {
+		Insets insets = getInsets();
+		int x = insets.left + 2;
+		int y = insets.top + 20;
+		
+		int numberOfTokens = getCurrentMarking();
+		String toDraw = String.format("#%1$d", numberOfTokens);
+		
+		g.drawString(toDraw, x, y);
 	}
 	
 }

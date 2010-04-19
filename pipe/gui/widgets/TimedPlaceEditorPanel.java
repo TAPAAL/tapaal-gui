@@ -220,7 +220,7 @@ extends javax.swing.JPanel {
 		tokenTable.getColumn("Value").setCellRenderer(render);
 		tokenTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tokenTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-			@Override
+			
 			public void valueChanged(ListSelectionEvent e) {
 				if(e.getValueIsAdjusting() || tokenTable.getSelectedRow() == -1){
 					removeTokenButton.setEnabled(false);
@@ -242,7 +242,6 @@ extends javax.swing.JPanel {
 		JPanel btnPanel = new JPanel(new GridBagLayout());
 		addTokenButton = new JButton("Add");
 		addTokenButton.addActionListener(new ActionListener(){
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				tokenTableModel.addColoredToken(new ColoredToken());
 
@@ -257,7 +256,7 @@ extends javax.swing.JPanel {
 		removeTokenButton = new JButton("Remove");
 		removeTokenButton.setEnabled(false);
 		removeTokenButton.addActionListener(new ActionListener(){
-			@Override
+			
 			public void actionPerformed(ActionEvent e) {
 				tokenTableModel.removeColoredToken(tokenTable.getSelectedRow());
 			}
