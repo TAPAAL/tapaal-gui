@@ -57,4 +57,16 @@ public class IntOrConstant {
 			return String.valueOf(value);
 		}
 	}
+
+	public int getConstantValue() {
+		return CreateGui.getModel().getConstantValue(name);
+	}
+
+	public int getValue() {
+		if(isUsingConstant()){
+			return getConstantValue();
+		}else{
+			return getIntegerValue();
+		}
+	}
 }

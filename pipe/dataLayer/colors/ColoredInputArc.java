@@ -9,7 +9,8 @@ import pipe.gui.undo.UndoableEdit;
 
 public class ColoredInputArc extends TimedArc {
 
-	public ColorSet integerGuard;
+	private ColorSet integerGuard;
+	private ColoredInterval timeGuard;
 	/**
 	 * 
 	 */
@@ -18,19 +19,26 @@ public class ColoredInputArc extends TimedArc {
 	public ColoredInputArc(PlaceTransitionObject source) {
 		super(source);
 		
-		integerGuard = new ColorSet();
+		initialize();
 	}
-	
+
 	public ColoredInputArc(NormalArc arc) {
 		super(arc);
 		
-		integerGuard = new ColorSet();
+		initialize();
 	}
 
 	public ColoredInputArc(NormalArc arc, String guard) {
 		super(arc,guard);
 		
+		initialize();
+	}
+	
+	private void initialize() {
 		integerGuard = new ColorSet();
+		timeGuard = new ColoredInterval();
+		
+		updateWeightLabel();
 	}
 		
 	public boolean satisfiesGuard(ColoredToken token) {
@@ -42,7 +50,7 @@ public class ColoredInputArc extends TimedArc {
 			value = val.getIntegerValue();
 		}
 		
-		return integerGuard.contains(value) && satisfiesGuard(token.getAge());
+		return integerGuard.contains(value) && timeGuard.contains(token);
 	}
 	
 	public void updateWeightLabel(){ 
