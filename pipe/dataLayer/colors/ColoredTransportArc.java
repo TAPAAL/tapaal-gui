@@ -116,4 +116,9 @@ public class ColoredTransportArc extends TransportArc {
 		return null;
 	}
 
+	public UndoableEdit setTimeGuard(ColoredInterval timeGuard) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

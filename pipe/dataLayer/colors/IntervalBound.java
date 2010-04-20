@@ -29,7 +29,7 @@ public class IntervalBound {
 		}else if(valueOfa == 0){
 			return String.valueOf(b);
 		}else{
-			return String.format("%1$d*val+%2$s", valueOfa, b);
+			return String.format("%1$s*val+%2$s", a, b);
 		}
 	}
 
@@ -55,5 +55,9 @@ public class IntervalBound {
 	
 	public IntOrConstant getOffset(){
 		return b;
+	}
+	
+	public boolean equals(ColoredToken token){
+		return isLessThanOrEqual(token) && isGreaterThanOrEqual(token);
 	}
 }

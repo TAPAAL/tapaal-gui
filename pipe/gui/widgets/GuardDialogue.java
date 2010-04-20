@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,8 +39,8 @@ import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredTransportArc;
-import pipe.dataLayer.colors.IntegerRange;
 import pipe.dataLayer.colors.IntOrConstant;
+import pipe.dataLayer.colors.IntegerRange;
 import pipe.dataLayer.colors.IntervalBound;
 import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
@@ -143,7 +142,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			upperOffsetTextbox.setText("0");
 			upperOffsetTextbox.setEnabled(false);
 			rightDelimiter.setEnabled(false);
-			
+
 		}else{
 			IntervalBound upper = timeGuard.getUpper();
 			upperScaleTextbox.setText(upper.getScale().toString());
@@ -274,13 +273,36 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						TimedArc arc = (TimedArc) objectToBeEdited;
-						String guard = composeGuard(arc.getGuard());
-
 						UndoManager undoManager = CreateGui.getView().getUndoManager();
-						undoManager.addNewEdit( arc.setGuard(guard) );
-
-						if(CreateGui.getModel().isUsingColors()){
-
+						undoManager.newEdit();
+						
+						if(!CreateGui.getModel().isUsingColors()){
+							String guard = composeGuard(arc.getGuard());
+							undoManager.addEdit( arc.setGuard(guard) );
+						}else{
+							ColoredInterval timeGuard = null;
+							
+							try{								
+								timeGuard = composeTimeGuard();
+							}catch(IllegalArgumentException e){
+								JOptionPane.showMessageDialog(CreateGui.getApp(),
+										String.format("There was an error parsing the time interval. The problem concerns \"%1s\".\n Possible causes:\n\t- Use of negative values\n\t- Use of undefined constant\n\t- Ill-formed interval",e.getMessage()),
+										"Error",
+										JOptionPane.INFORMATION_MESSAGE);
+								undoManager.undo();
+								return;
+							}
+							
+							UndoableEdit action = null;
+							if(arc instanceof ColoredTransportArc){	
+								action = ((ColoredTransportArc)arc).setTimeGuard(timeGuard);
+							}else if(arc instanceof ColoredInhibitorArc){
+								action = ((ColoredInhibitorArc)arc).setTimeGuard(timeGuard);
+							}else{
+								action = ((ColoredInputArc)arc).setTimeGuard(timeGuard);
+							}
+							undoManager.addEdit(action);
+													
 							if(!colorGuardTextBox.getText().isEmpty()){
 								ColorSet colorGuard = null;
 								try{
@@ -290,11 +312,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 											String.format("There was an error in parsing the color invariant. The problem concerns \"%1s\".",e.getMessage()),
 											"Error",
 											JOptionPane.INFORMATION_MESSAGE);
-
+									undoManager.undo();
 									return;
 								}
 
-								UndoableEdit action = null;
+								action = null;
 								if(arc instanceof ColoredTransportArc){	
 									action = ((ColoredTransportArc)arc).setColorGuard(colorGuard);
 								}else if(arc instanceof ColoredInhibitorArc){
@@ -329,6 +351,29 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 						CreateGui.getModel().buildConstraints();
 
 						exit();
+					}
+
+
+					private ColoredInterval composeTimeGuard() {
+						String openParenthesis = (String)leftDelimiter.getSelectedItem();
+						String closeParenthesis = (String)rightDelimiter.getSelectedItem();
+						
+						IntOrConstant lowerScale = new IntOrConstant(lowerScaleTextbox.getText());
+						IntOrConstant lowerOffset = new IntOrConstant(lowerOffsetTextbox.getText());
+						IntervalBound a = new IntervalBound(lowerScale, lowerOffset);
+						boolean goesToInf = inf.isSelected();
+						
+						IntervalBound b = null;
+						if(goesToInf){
+							b = new IntervalBound(true);
+						}else{
+							IntOrConstant upperScale = new IntOrConstant(upperScaleTextbox.getText());
+							IntOrConstant upperOffset = new IntOrConstant(upperOffsetTextbox.getText());
+							
+							b = new IntervalBound(upperScale, upperOffset);
+						}
+						
+						return new ColoredInterval(openParenthesis, a, b, closeParenthesis);
 					}
 
 

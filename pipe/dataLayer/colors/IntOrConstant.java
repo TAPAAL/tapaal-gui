@@ -13,10 +13,10 @@ public class IntOrConstant {
 	public IntOrConstant(String intOrConstant){
 		try{
 			value = Integer.parseInt(intOrConstant);
-			if(value < 0) throw new IllegalArgumentException();
+			if(value < 0) throw new IllegalArgumentException(intOrConstant);
 		}catch(IllegalArgumentException e){
 			if(!CreateGui.getModel().isConstantNameUsed(intOrConstant)){
-				throw new IllegalArgumentException("Cannot parse as integer and wrong constant name");
+				throw new IllegalArgumentException(intOrConstant);
 			}else{
 				name = intOrConstant;
 			}
@@ -69,5 +69,15 @@ public class IntOrConstant {
 		}else{
 			return getIntegerValue();
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof IntOrConstant){
+			IntOrConstant other = (IntOrConstant)obj;
+			return value == other.value && name == other.name; 
+		}
+		
+		return false;
 	}
 }

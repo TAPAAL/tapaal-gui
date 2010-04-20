@@ -1,6 +1,5 @@
 package pipe.dataLayer.colors;
 
-import java.math.BigDecimal;
 
 public class ColoredInterval {
 	private boolean lowerIncluded = true;
@@ -13,8 +12,8 @@ public class ColoredInterval {
 	};
 	
 	public ColoredInterval(String lowerParenthesis, IntervalBound lower, IntervalBound upper, String upperParenthesis){
-		lowerIncluded = !lowerParenthesis.equals("(");
-		upperIncluded = upperParenthesis.equals("]");
+		lowerIncluded = !lowerParenthesis.equals("("); // to make it default to [
+		upperIncluded = upper.goesToInfinity() ? false : upperParenthesis.equals("]"); // to make it default to )
 		this.lower = lower;
 		this.upper = upper;		
 	}
@@ -40,15 +39,15 @@ public class ColoredInterval {
 	}
 		
 	public String toString() {
-		String format = "%1$s%2$s,%3$s%4$s";
+		String format = "%1$s%2$s, %3$s%4$s";
 		
 		return String.format(format, getOpenParenthesis(), lower, upper, getCloseParenthesis());
 	}
 
 	public boolean contains(ColoredToken token) {
-		BigDecimal age = token.getAge();
-		if(lower.equals(age) && !lowerIncluded) return false;
-		if(upper.equals(age) && !upperIncluded) return false;
+		// check if age fits one of the end points
+		if(lower.equals(token) && !lowerIncluded) return false;
+		if(upper.equals(token) && !upperIncluded) return false;
 		
 		return lower.isLessThanOrEqual(token) && upper.isGreaterThanOrEqual(token);
 	}

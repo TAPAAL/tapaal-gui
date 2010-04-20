@@ -5,6 +5,7 @@ import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredInputArcColorGuardEdit;
+import pipe.gui.undo.ColoredInputArcTimeGuardEdit;
 import pipe.gui.undo.UndoableEdit;
 
 public class ColoredInputArc extends TimedArc {
@@ -55,7 +56,7 @@ public class ColoredInputArc extends TimedArc {
 	
 	public void updateWeightLabel(){ 
 		
-		String guard = "age \u2208 " + timeInterval;
+		String guard = "age \u2208 " + timeGuard;
 		
 		if(integerGuard != null && !integerGuard.isEmpty()){
 			guard += "\n val \u2208 " + integerGuard.toString();
@@ -81,5 +82,14 @@ public class ColoredInputArc extends TimedArc {
 
 	public ColoredInterval getTimeGuard() {
 		return timeGuard;
+	}
+
+	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
+		ColoredInterval old = this.timeGuard;
+		this.timeGuard = newTimeGuard;
+		
+		updateWeightLabel();
+		
+		return new ColoredInputArcTimeGuardEdit(this, old, newTimeGuard);
 	}
 }

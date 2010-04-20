@@ -72,6 +72,10 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	public UndoableEdit setTimeGuard(ColoredInterval timeGuard) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 
