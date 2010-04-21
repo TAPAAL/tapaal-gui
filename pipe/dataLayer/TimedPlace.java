@@ -38,42 +38,42 @@ public class TimedPlace extends Place {
 	private String invariant;
 	private ArrayList<BigDecimal> myTokens;
 	private Window ageOfTokensWindow;
-	
+
 	public TimedPlace(double positionXInput, double positionYInput) {
 		super(positionXInput, positionYInput);
 		invariant = "<inf";
 
 		attributesVisible = true;
 
-//		pnName.zoomUpdate(zoom);
-//		update();
-//		repaint();
+		//		pnName.zoomUpdate(zoom);
+		//		update();
+		//		repaint();
 
 		this.myTokens = new ArrayList<BigDecimal>();
 		ageOfTokensWindow = new Window(new Frame());
 	}
-	
+
 	public TimedPlace(double positionXInput,  double positionYInput, 
-            String idInput, 
-            String nameInput, 
-            Double nameOffsetXInput, Double nameOffsetYInput, 
-            int initialMarkingInput, 
-            double markingOffsetXInput,  double markingOffsetYInput,
-            int capacityInput, String invariant){
-	
+			String idInput, 
+			String nameInput, 
+			Double nameOffsetXInput, Double nameOffsetYInput, 
+			int initialMarkingInput, 
+			double markingOffsetXInput,  double markingOffsetYInput,
+			int capacityInput, String invariant){
+
 		super( positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput,  nameOffsetYInput, 
-	             initialMarkingInput, 
-	             markingOffsetXInput,   markingOffsetYInput,
-	             capacityInput);
+				initialMarkingInput, 
+				markingOffsetXInput,   markingOffsetYInput,
+				capacityInput);
 		this.invariant = invariant;
-		
+
 		// XXX  - Hack to get shown attributes 
 		attributesVisible = true;
-		
+
 		if (invariant == "") {
 			this.invariant="<inf";
 		}
-		
+
 		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
 			this.myTokens.add(newToken());
@@ -98,24 +98,24 @@ public class TimedPlace extends Place {
 		}
 		ageOfTokensWindow = new Window(new Frame());
 	}
-	
+
 	public TimedPlace(String idInput, 
-            String nameInput, 
-            int initialMarkingInput, 
-            int capacityInput, String invariant){
-	
-		
+			String nameInput, 
+			int initialMarkingInput, 
+			int capacityInput, String invariant){
+
+
 		super(0.0, 0.0, idInput, nameInput, 0.0,  0.0, 
-	             initialMarkingInput, 
-	             0.0,   0.0,
-	             capacityInput);
-		
+				initialMarkingInput, 
+				0.0,   0.0,
+				capacityInput);
+
 		this.invariant = invariant;
-		
+
 		if (invariant == "") {
 			this.invariant="<inf";
 		}
-	
+
 		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
 			this.myTokens.add(newToken());
@@ -123,23 +123,23 @@ public class TimedPlace extends Place {
 		ageOfTokensWindow = new Window(new Frame());
 	}
 
-	
-	
+
+
 	@Override
 	public TimedPlace clone(){
 		TimedPlace toReturn = (TimedPlace)super.clone();
-		
+
 		toReturn.setInvariant(this.getInvariant());
 		return toReturn;
-		
+
 	}
-	
+
 
 	@Override
 	public TimedPlace copy(){
 		//TimedPlace copy = new TimedPlace(super.copy(), this.invariant);
-//		copy.setOriginal(this);
-		
+		//		copy.setOriginal(this);
+
 		TimedPlace copy = new TimedPlace (Zoomer.getUnzoomedValue(this.getX(), zoom), 
 				Zoomer.getUnzoomedValue(this.getY(), zoom));
 		copy.pnName.setName(this.getName());
@@ -212,7 +212,7 @@ public class TimedPlace extends Place {
 					}	
 				}
 			}
-			
+
 			i++;
 		}
 		stringArrayOfTokens = stringArrayOfTokens + "}";
@@ -228,12 +228,12 @@ public class TimedPlace extends Place {
 	public boolean isAgeOfTokensShown(){
 		return ageOfTokensWindow.isVisible();
 	}
-	
+
 	private BigDecimal newToken() {
-		
+
 		return new BigDecimal(0, new MathContext(Pipe.AGE_PRECISION));
 	}
-	
+
 	//overide method
 	@Override
 	public void paintComponent(Graphics g) {
@@ -247,7 +247,7 @@ public class TimedPlace extends Place {
 		}
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
 				RenderingHints.VALUE_ANTIALIAS_ON);
-		
+
 		if(selected && !ignoreSelection){
 			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
 		} else{
@@ -263,7 +263,7 @@ public class TimedPlace extends Place {
 		g2.draw(place);
 
 		g2.setStroke(new BasicStroke(1.0f));
-		
+
 		paintTokens(g);
 	}
 
@@ -272,25 +272,25 @@ public class TimedPlace extends Place {
 		df.setMinimumFractionDigits(1);
 		df.setMaximumFractionDigits(1);
 		df.setRoundingMode(RoundingMode.DOWN);
-		
+
 		Insets insets = getInsets();
 		int x = insets.left;
 		int y = insets.top;
-		
+
 		int marking = getCurrentMarking();
 
 		// structure sees how many markings there are and fills the place in with 
 		// the appropriate number.
 		switch(marking) {
-/*		case 5: 
+		/*		case 5: 
 			g.drawString(String.valueOf(myTokens.get(4)), x + 5, y + 13);
 //			g.fillOval(x + 6, y + 6, tWidth, tHeight);
 			/* falls through */
-/*		case 4:
+		/*		case 4:
 			g.drawString(String.valueOf(myTokens.get(3)), x + 17, y + 27);
 //			g.fillOval(x + 18, y + 20, tWidth, tHeight);
 			/* falls through */
-/*		case 3:
+		/*		case 3:
 			g.drawString(String.valueOf(myTokens.get(2)), x + 5, y + 27);
 //			g.fillOval(x + 6, y + 20, tWidth, tHeight);
 			/* falls through */
@@ -301,7 +301,7 @@ public class TimedPlace extends Place {
 			}else{
 				g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
 			}
-//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
+			//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
 			/* falls through */
 		case 1:
 			if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
@@ -310,7 +310,7 @@ public class TimedPlace extends Place {
 			}else{
 				g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);
 			}
-//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
+			//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
 			break;
 		case 0:
 			break;
@@ -325,34 +325,34 @@ public class TimedPlace extends Place {
 			} else {
 				g.drawString("#"+String.valueOf(marking), x + 6, y + 20);
 			}
-		break;
+			break;
 		}
 	}
-	
+
 	@Override
 	public TimedPlace paste(double despX, double despY, boolean toAnotherView){
 		//TimedPlace copy = new TimedPlace (super.paste(despX, despY, toAnotherView), this.invariant );
-//		copy.setOriginal(this);
+		//		copy.setOriginal(this);
 		//copy.set
-		
+
 		this.incrementCopyNumber();
-	      TimedPlace copy = new TimedPlace (
-	              Grid.getModifiedX(despX + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
-	              Grid.getModifiedY(despY + this.getY() + Pipe.PLACE_TRANSITION_HEIGHT/2));
-	      copy.pnName.setName(this.pnName.getName()  
-	                          + "(" + this.getCopyNumber() +")");
-	      this.newCopy(copy);
-	      copy.nameOffsetX = this.nameOffsetX;
-	      copy.nameOffsetY = this.nameOffsetY;
-	      copy.capacity = this.capacity;
-	      copy.attributesVisible = this.attributesVisible;
-	      copy.initialMarking = this.initialMarking;
-	      copy.currentMarking = this.currentMarking;
-	      copy.markingOffsetX = this.markingOffsetX;
-	      copy.markingOffsetY = this.markingOffsetY;
-	      copy.markingParameter = this.markingParameter;
-	      copy.update();
-		
+		TimedPlace copy = new TimedPlace (
+				Grid.getModifiedX(despX + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
+				Grid.getModifiedY(despY + this.getY() + Pipe.PLACE_TRANSITION_HEIGHT/2));
+		copy.pnName.setName(this.pnName.getName()  
+				+ "(" + this.getCopyNumber() +")");
+		this.newCopy(copy);
+		copy.nameOffsetX = this.nameOffsetX;
+		copy.nameOffsetY = this.nameOffsetY;
+		copy.capacity = this.capacity;
+		copy.attributesVisible = this.attributesVisible;
+		copy.initialMarking = this.initialMarking;
+		copy.currentMarking = this.currentMarking;
+		copy.markingOffsetX = this.markingOffsetX;
+		copy.markingOffsetY = this.markingOffsetY;
+		copy.markingParameter = this.markingParameter;
+		copy.update();
+
 		return copy;
 	}
 
@@ -391,9 +391,9 @@ public class TimedPlace extends Place {
 			}else return false;
 		}
 	}
-	
+
 	public UndoableEdit setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
-		
+
 		if (newAgeOfTokens.size() == myTokens.size()){
 			ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
 			this.myTokens = newAgeOfTokens;
@@ -403,7 +403,7 @@ public class TimedPlace extends Place {
 			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
 		} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
 	}
-	
+
 	//overide, so that we can take care of the age of the tokens
 	@Override
 	public UndoableEdit setCurrentMarking(int currentMarkingInput) {
@@ -422,7 +422,7 @@ public class TimedPlace extends Place {
 		repaint();
 		return new PlaceMarkingEdit(this, oldMarking, currentMarking);      
 	}
-	
+
 	public UndoableEdit setInvariant(String invariant) {
 
 		String oldinvariant = this.invariant;
@@ -434,7 +434,7 @@ public class TimedPlace extends Place {
 	}
 
 	private void setNumberOfMyTokens(int currentMarkingInput){
-		
+
 		int toAddToMyTokens = currentMarkingInput - currentMarking;
 		if (toAddToMyTokens >= 0 ){
 			for (int i=0; i<toAddToMyTokens; i++){
@@ -450,29 +450,29 @@ public class TimedPlace extends Place {
 			}
 		}
 	}
-	
+
 	public UndoableEdit setTokensAndAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
-		
+
 		//if (newAgeOfTokens.size() == myTokens.size()){
-			this.setCurrentMarking(newAgeOfTokens.size());
-		    ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
-			this.myTokens = newAgeOfTokens;
+		this.setCurrentMarking(newAgeOfTokens.size());
+		ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
+		this.myTokens = newAgeOfTokens;
 
-			update();
+		update();
 
-			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
+		return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
 		//} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
 	}
 
 
-//	public void removeToken(int indexOfTokenToBeRemoved) {
-//		myTokens.remove(indexOfTokenToBeRemoved);
-//		Collections.sort(myTokens);
-//		myTokens.trimToSize();
-//		currentMarking--;
-//	}
-	
-	
+	//	public void removeToken(int indexOfTokenToBeRemoved) {
+	//		myTokens.remove(indexOfTokenToBeRemoved);
+	//		Collections.sort(myTokens);
+	//		myTokens.trimToSize();
+	//		currentMarking--;
+	//	}
+
+
 	public void showAgeOfTokens(boolean show) {
 		// Build interface
 		if (!show){
@@ -533,7 +533,7 @@ public class TimedPlace extends Place {
 		if (attributesVisible == true){
 			String value = getInvariantString();
 			pnName.setText(value);
-			
+
 		} else {
 			pnName.setText("");
 		}          
@@ -548,21 +548,21 @@ public class TimedPlace extends Place {
 
 	protected String getInvariantString() {
 		String value = "";
-		
+
 		//Dont show invariant if its default	
 		if (!invariant.equals("<inf")){ 
-			
+
 			if(CreateGui.getModel().isUsingColors()){
-			int offset = 1;
-			if(invariant.contains("<=")) offset = 2;
-			
-			value = String.format("\n age \u2208 [0, %1$s%2$s", invariant.substring(offset).trim(),
-					offset == 2 ? "]" : ")");
+				int offset = 1;
+				if(invariant.contains("<=")) offset = 2;
+
+				value = String.format("\n age \u2208 [0, %1$s%2$s", invariant.substring(offset).trim(),
+						offset == 2 ? "]" : ")");
 			}else{
 				value = "Inv: " + invariant;
 			}
 		}
-					
+
 		return value;
 	}
 }

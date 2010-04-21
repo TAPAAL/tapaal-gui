@@ -2,6 +2,7 @@ package pipe.dataLayer;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -12,6 +13,7 @@ import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTimeInvariant;
 import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntOrConstant;
 import pipe.dataLayer.colors.IntOrConstantRange;
@@ -159,12 +161,20 @@ public class ConstantStore {
 	}
 
 	private void buildConstraint(ColoredTimedPlace place) {
-		ColorSet colorInvariant = place.getColorInvariant();
-		processColorGuards(colorInvariant);
-		
-		ColoredTimeInvariant timeInvariant = place.getTimeInvariant();
-		processTimeInvariant(timeInvariant);
-		
+		processColorGuards(place.getColorInvariant());
+		processTimeInvariant(place.getTimeInvariant());
+		processColoredTokens(place.getColoredTokens());
+	}
+
+	private void processColoredTokens(List<ColoredToken> coloredTokens) {
+		for(ColoredToken token : coloredTokens){
+			IntOrConstant value = token.getColor();
+			
+			if(value.isUsingConstant()){
+				Constant constant = getConstant(value.getConstantName());
+				constant.setIsUsed(true);
+			}
+		}		
 	}
 
 	private void processTimeInvariant(ColoredTimeInvariant timeInvariant) {

@@ -103,8 +103,8 @@ public class ColoredTimedPlace extends TimedPlace {
 
 
 	protected String getInvariantString() {
-		String inv = super.getInvariantString();
-
+		
+		String inv = timeInvariant.goesToInfinity() ? "" : "\nage " + timeInvariant.toString();
 		if(!colorInvariant.isEmpty()){
 			inv += "\n val \u2208 " + colorInvariant.toString();
 		}
