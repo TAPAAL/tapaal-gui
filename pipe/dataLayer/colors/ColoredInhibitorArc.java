@@ -35,6 +35,8 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 	private void initialize() {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
+		
+		updateWeightLabel();
 	}
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
@@ -79,6 +81,9 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		updateWeightLabel();
 		
 		return new ColoredInhibitorArcTimeGuardEdit(this, old, newTimeGuard);
+	}
+	public ColorSet getColorGuard() {
+		return colorGuard;
 	}
 
 

@@ -43,9 +43,12 @@ import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.colors.ColorSet;
+import pipe.dataLayer.colors.ColoredTimeInvariant;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
-import pipe.dataLayer.colors.IntegerRange;
+import pipe.dataLayer.colors.IntOrConstant;
+import pipe.dataLayer.colors.IntOrConstantRange;
+import pipe.dataLayer.colors.IntervalBound;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
 import pipe.gui.undo.UndoableEdit;
@@ -69,6 +72,7 @@ extends javax.swing.JPanel {
 	DataLayer pnmlData;
 	GuiView view;
 	JRootPane rootPane;
+
 
 
 	/**
@@ -138,16 +142,16 @@ extends javax.swing.JPanel {
 		//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
 		placeEditorPanel.add(basicPropertiesPanel, gridBagConstraints);
 
-		initTimeInvariantPanel();
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
-		placeEditorPanel.add(timeInvariantPanel, gridBagConstraints);
-
 		if(pnmlData.isUsingColors()){
+			initColoredTimeInvariantPanel();
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 1;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+			//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
+			placeEditorPanel.add(coloredTimeInvariantPanel, gridBagConstraints);
+
 			initColorInvariantPanel();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -166,6 +170,15 @@ extends javax.swing.JPanel {
 			gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 			//gridBagConstraints.insets = new Insets(0,0,0,5);
 			placeEditorPanel.add(tokenPanel, gridBagConstraints);
+		}else{
+			initTimeInvariantPanel();
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 1;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+			//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
+			placeEditorPanel.add(timeInvariantPanel, gridBagConstraints);
 		}
 
 		initButtonPanel();
@@ -177,6 +190,108 @@ extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		add(buttonPanel, gridBagConstraints);
 	}// </editor-fold>//GEN-END:initComponents
+
+	private void initColoredTimeInvariantPanel() {		
+		coloredTimeInvariantPanel = new JPanel(new GridBagLayout());
+		coloredTimeInvariantPanel.setBorder(BorderFactory.createTitledBorder("Time Invariant"));
+
+		JLabel label = new JLabel("Time invariant:");
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(3,3,3,3);
+		coloredTimeInvariantPanel.add(label, gbc);
+
+		invRelationNormal = new JComboBox(new String[]{"<=","<"});
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		coloredTimeInvariantPanel.add(invRelationNormal, gbc);
+
+		Dimension txtBoxDims = new Dimension(50,25);
+		invScaleTextbox = new JTextField();
+		invScaleTextbox.setMinimumSize(txtBoxDims);
+		invScaleTextbox.setMaximumSize(txtBoxDims);
+		invScaleTextbox.setPreferredSize(txtBoxDims);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		coloredTimeInvariantPanel.add(invScaleTextbox, gbc);
+
+		String mathExprString = "* val +";
+		JLabel mathExprLabel = new JLabel(mathExprString);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0,0,0,0);
+		gbc.gridx = 3;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		coloredTimeInvariantPanel.add(mathExprLabel, gbc);
+
+		invOffsetTextbox = new JTextField();
+		invOffsetTextbox.setMinimumSize(txtBoxDims);
+		invOffsetTextbox.setMaximumSize(txtBoxDims);
+		invOffsetTextbox.setPreferredSize(txtBoxDims);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 4;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		coloredTimeInvariantPanel.add(invOffsetTextbox, gbc);
+
+		invariantInf = new JCheckBox("Inf");
+		invariantInf.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				if(invariantInf.isSelected()){
+					invScaleTextbox.setEnabled(false);
+					invOffsetTextbox.setEnabled(false);
+					invRelationNormal.setEnabled(false);
+					invRelationNormal.setSelectedItem("<");
+				}else{
+					invScaleTextbox.setEnabled(true);
+					invOffsetTextbox.setEnabled(true);
+					invRelationNormal.setEnabled(true);
+					invRelationNormal.setSelectedItem("<=");
+				}
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(3,3,3,3);
+		gbc.gridx = 5;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		coloredTimeInvariantPanel.add(invariantInf, gbc);
+
+		setInitialTimeInvariantState();
+	}
+
+	private void setInitialTimeInvariantState() {
+		ColoredTimeInvariant inv = ((ColoredTimedPlace)place).getTimeInvariant();
+
+		if(inv.goesToInfinity()){
+			invScaleTextbox.setText("0");
+			invScaleTextbox.setEnabled(false);
+			invOffsetTextbox.setText("0");
+			invOffsetTextbox.setEnabled(false);
+			invRelationNormal.setSelectedItem("<");
+			invRelationNormal.setEnabled(false);
+
+			invariantInf.setSelected(true);
+		}else{
+			invScaleTextbox.setText(inv.getUpper().getScale().toString());
+			invScaleTextbox.setEnabled(true);
+			invOffsetTextbox.setText(inv.getUpper().getOffset().toString());
+			invOffsetTextbox.setEnabled(true);
+			invRelationNormal.setSelectedItem(inv.getOperator());
+			invRelationNormal.setEnabled(true);
+
+			invariantInf.setSelected(false);
+		}
+	}
 
 	private void initTokenPanel() {
 		tokenPanel = new JPanel(new GridBagLayout());
@@ -210,7 +325,7 @@ extends javax.swing.JPanel {
 		tokenTable.getColumn("Value").setCellRenderer(render);
 		tokenTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tokenTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-			
+
 			public void valueChanged(ListSelectionEvent e) {
 				if(e.getValueIsAdjusting() || tokenTable.getSelectedRow() == -1){
 					removeTokenButton.setEnabled(false);
@@ -219,7 +334,7 @@ extends javax.swing.JPanel {
 				}			
 			}
 		});
-		
+
 		JScrollPane pane = new JScrollPane(tokenTable);
 		pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		gbc = new GridBagConstraints();
@@ -246,7 +361,7 @@ extends javax.swing.JPanel {
 		removeTokenButton = new JButton("Remove");
 		removeTokenButton.setEnabled(false);
 		removeTokenButton.addActionListener(new ActionListener(){
-			
+
 			public void actionPerformed(ActionEvent e) {
 				tokenTableModel.removeColoredToken(tokenTable.getSelectedRow());
 			}
@@ -747,35 +862,34 @@ extends javax.swing.JPanel {
 			//    	  }
 		}
 
-		boolean isNormalInvariant = normalInvRadioButton.isSelected();
-		String newInvariant = "";
 
-		if(isNormalInvariant)
-		{
-			newInvariant = (String)invRelationNormal.getSelectedItem();
-			if ( ! invariantInf.isSelected()){
-				newInvariant = newInvariant + invariantSpinner.getValue();
-			} else {
-				newInvariant = newInvariant + "inf";
-			}
-		}
-		else{
-			String constantName = (String)invConstantsComboBox.getSelectedItem();
-			newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
-		}
-
-		//if ()  -  TODO do some check if it has canged and if value is ok
-		view.getUndoManager().addEdit(place.setInvariant(newInvariant));
 
 		if(pnmlData.isUsingColors()){
 			ColoredTimedPlace coloredTimedPlace = (ColoredTimedPlace)place;
+
+			ColoredTimeInvariant timeInvariant = null;
+			try{
+				timeInvariant = createTimeInvariant();
+			}catch(IllegalArgumentException e){
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"There was an error in parsing the time invariant.\n\nPossible causes:\n\t- Use of negative values\n\t- Use of undefined constant",
+						"Error",
+						JOptionPane.INFORMATION_MESSAGE);
+				view.getUndoManager().undo();
+
+				return;
+			}
+			
+			view.getUndoManager().addEdit(coloredTimedPlace.setTimeInvariant(timeInvariant));
+
+
 			if(!colorInvariantTextBox.getText().isEmpty()){
 
 				ColorSet colorInvariant = new ColorSet();
 				String[] ranges = colorInvariantTextBox.getText().split(",");
 				for(String range : ranges){
 					try{
-						IntegerRange ir = IntegerRange.parse(range.trim());
+						IntOrConstantRange ir = IntOrConstantRange.parse(range.trim());
 						colorInvariant.add(ir);
 					}catch(IllegalArgumentException e){
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -801,7 +915,7 @@ extends javax.swing.JPanel {
 					view.getUndoManager().undo();
 					return;
 				}
-				
+
 				if(token.getColor().getValue() < 0){
 					JOptionPane.showMessageDialog(CreateGui.getApp(),
 							"One or more tokens have a negative color value.",
@@ -810,7 +924,7 @@ extends javax.swing.JPanel {
 					view.getUndoManager().undo();
 					return;
 				}
-				
+
 				if(!coloredTimedPlace.satisfiesInvariant(token)){
 					String msg = String.format("A token value violates the color invariant of the place. The problem concerns the token value \"%1$s\".", token.getColor());
 					if(token.getColor().isUsingConstant()){
@@ -831,11 +945,27 @@ extends javax.swing.JPanel {
 
 			UndoableEdit edit = coloredTimedPlace.setColoredTokens(tokens);
 			view.getUndoManager().addEdit(edit);
-		}
+		}else{
+			boolean isNormalInvariant = normalInvRadioButton.isSelected();
+			String newInvariant = "";
 
+			if(isNormalInvariant)
+			{
+				newInvariant = (String)invRelationNormal.getSelectedItem();
+				if ( ! invariantInf.isSelected()){
+					newInvariant = newInvariant + invariantSpinner.getValue();
+				} else {
+					newInvariant = newInvariant + "inf";
+				}
+			}
+			else{
+				String constantName = (String)invConstantsComboBox.getSelectedItem();
+				newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
+			}
 
+			//if ()  -  TODO do some check if it has canged and if value is ok
+			view.getUndoManager().addEdit(place.setInvariant(newInvariant));
 
-		if(!pnmlData.isUsingColors()){
 			if (markingComboBox.getSelectedIndex() >0) {
 				// There's a marking parameter selected
 				MarkingParameter parameter = 
@@ -882,6 +1012,18 @@ extends javax.swing.JPanel {
 		exit();
 	}
 
+
+	private ColoredTimeInvariant createTimeInvariant() {
+		if(!invariantInf.isSelected()){
+			IntOrConstant scale = new IntOrConstant(invScaleTextbox.getText());
+			IntOrConstant offset = new IntOrConstant(invOffsetTextbox.getText());
+			
+			return new ColoredTimeInvariant((String)invRelationNormal.getSelectedItem(), 
+					new IntervalBound(scale, offset));
+		}else{
+			return new ColoredTimeInvariant();
+		}
+	}
 
 	private void okButtonHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonHandler
 		doOK();
@@ -933,4 +1075,8 @@ extends javax.swing.JPanel {
 	private JButton addTokenButton;
 	private JButton removeTokenButton;
 	private TokenTableModel tokenTableModel;
+
+	private JPanel coloredTimeInvariantPanel;
+	private JTextField invScaleTextbox;
+	private JTextField invOffsetTextbox;
 }

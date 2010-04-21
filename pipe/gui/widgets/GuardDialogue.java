@@ -40,7 +40,7 @@ import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntOrConstant;
-import pipe.dataLayer.colors.IntegerRange;
+import pipe.dataLayer.colors.IntOrConstantRange;
 import pipe.dataLayer.colors.IntervalBound;
 import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
@@ -63,7 +63,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	private JRadioButton preserveValueRadioBtn;
 	private JRadioButton preserveBothRadioBtn;
 	private JLabel updateExprLabel;
-	private JSpinner updateExprSpinner;
+	private JTextField updateExprTextbox;
 
 	private JButton okButton;
 	private JButton cancelButton;
@@ -148,6 +148,32 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			upperScaleTextbox.setText(upper.getScale().toString());
 			upperOffsetTextbox.setText(upper.getOffset().toString());
 		}
+		
+		String guard = null;
+		if(timedArc instanceof ColoredInputArc){
+			guard = ((ColoredInputArc)timedArc).getColorGuardStringWithoutSetNotation();
+		}else if(timedArc instanceof ColoredTransportArc){
+			guard = ((ColoredTransportArc)timedArc).getColorGuardStringWithoutSetNotation();
+		}else if(timedArc instanceof ColoredInhibitorArc){
+			guard = ((ColoredInhibitorArc)timedArc).getColorGuardStringWithoutSetNotation();
+		}
+
+		colorGuardTextBox.setText(guard);
+
+		if(timedArc instanceof ColoredTransportArc){
+			Preserve preserves = ((ColoredTransportArc)timedArc).getPreservation();
+
+			if(preserves.equals(Preserve.Age)){
+				preserveAgeRadioBtn.setSelected(true);
+				updateExprTextbox.setEnabled(true);
+			}else if(preserves.equals(Preserve.Value)){
+				preserveValueRadioBtn.setSelected(true);
+			}else{
+				preserveBothRadioBtn.setSelected(true);
+			}
+
+			updateExprTextbox.setText(((ColoredTransportArc)timedArc).getOutputValue().toString());
+		}
 	}
 
 	private void initTransportArcFeaturesPanel(){
@@ -158,9 +184,9 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 			public void actionPerformed(ActionEvent e) {
 				if(preserveAgeRadioBtn.isSelected()){
-					updateExprSpinner.setEnabled(true);
+					updateExprTextbox.setEnabled(true);
 				}else{
-					updateExprSpinner.setEnabled(false);
+					updateExprTextbox.setEnabled(false);
 				}				
 			}
 		};
@@ -202,18 +228,17 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
 		transportArcFeaturesPanel.add(updateExprLabel, gridBagConstraints);
 
-		updateExprSpinner = new JSpinner();
-		updateExprSpinner.setEnabled(false);
+		updateExprTextbox = new JTextField();
+		updateExprTextbox.setEnabled(false);
 		Dimension intervalBoxDims = new Dimension(90,25);
-		updateExprSpinner.setMaximumSize(intervalBoxDims);
-		updateExprSpinner.setMinimumSize(intervalBoxDims);
-		updateExprSpinner.setPreferredSize(intervalBoxDims);
-		updateExprSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+		updateExprTextbox.setMaximumSize(intervalBoxDims);
+		updateExprTextbox.setMinimumSize(intervalBoxDims);
+		updateExprTextbox.setPreferredSize(intervalBoxDims);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		transportArcFeaturesPanel.add(updateExprSpinner, gridBagConstraints);
+		transportArcFeaturesPanel.add(updateExprTextbox, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -339,7 +364,17 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								UndoableEdit preserveEditConnectedTo = connectedTo.setPreservation(preserve);
 								undoManager.addEdit(preserveEditConnectedTo);
 
-								IntOrConstant outputValue = new IntOrConstant((Integer)updateExprSpinner.getValue());
+								IntOrConstant outputValue = null;
+								try{
+								outputValue = new IntOrConstant(updateExprTextbox.getText());
+								}catch(IllegalArgumentException e){
+									JOptionPane.showMessageDialog(CreateGui.getApp(),
+											"The update value is invalid.\n\nPossible causes:\n\t- Use of negative values\n\t- Use of undefined constant\n\t- Use of non-constant expression.",
+											"Error",
+											JOptionPane.INFORMATION_MESSAGE);
+									undoManager.undo();
+									return;
+								}
 								UndoableEdit outputEdit = tarc.setOutputValue(outputValue);
 								undoManager.addEdit(outputEdit);
 
@@ -393,10 +428,9 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 						String[] ranges = colorGuardTextBox.getText().split(",");
 						for(String range : ranges){
 							try{
-								IntegerRange ir = IntegerRange.parse(range.trim());
+								IntOrConstantRange ir = IntOrConstantRange.parse(range.trim());
 								colorSet.add(ir);
 							}catch(IllegalArgumentException e){
-								CreateGui.getView().getUndoManager().undo();
 								throw new IllegalArgumentException(range, e);
 							}
 						}
@@ -818,34 +852,6 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			rightDelimiter.setSelectedItem("]");
 		}else {
 			rightDelimiter.setSelectedItem(")");
-		}
-
-		if(CreateGui.getModel().isUsingColors()){
-			String guard = null;
-			if(arc instanceof ColoredInputArc){
-				guard = ((ColoredInputArc)arc).getColorGuardStringWithoutSetNotation();
-			}else if(arc instanceof ColoredTransportArc){
-				guard = ((ColoredTransportArc)arc).getColorGuardStringWithoutSetNotation();
-			}else if(arc instanceof ColoredInhibitorArc){
-				guard = ((ColoredInhibitorArc)arc).getColorGuardStringWithoutSetNotation();
-			}
-
-			colorGuardTextBox.setText(guard);
-
-			if(arc instanceof ColoredTransportArc){
-				Preserve preserves = ((ColoredTransportArc)arc).getPreservation();
-
-				if(preserves.equals(Preserve.Age)){
-					preserveAgeRadioBtn.setSelected(true);
-					updateExprSpinner.setEnabled(true);
-				}else if(preserves.equals(Preserve.Value)){
-					preserveValueRadioBtn.setSelected(true);
-				}else{
-					preserveBothRadioBtn.setSelected(true);
-				}
-
-				updateExprSpinner.setValue(((ColoredTransportArc)arc).getOutputValue().getIntegerValue());
-			}
 		}
 	}
 

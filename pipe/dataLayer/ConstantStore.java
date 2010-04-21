@@ -5,10 +5,16 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeMap;
 
+import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTimeInvariant;
+import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredTransportArc;
+import pipe.dataLayer.colors.IntOrConstant;
+import pipe.dataLayer.colors.IntOrConstantRange;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
@@ -87,7 +93,7 @@ public class ConstantStore {
 	private boolean isConstantInUse(String name) {
 		return constants.get(name).getIsUsed();
 	}
-	
+
 	public boolean isConstantNameUsed(String name){
 		return constants.containsKey(name);
 	}
@@ -109,25 +115,32 @@ public class ConstantStore {
 			c.reset();
 		}
 
+		boolean isNotUsingColors = !CreateGui.getModel().isUsingColors();
 		for(Place place : places){
-			if(place instanceof TimedPlace){
-				TimedPlace tp = (TimedPlace)place;
-				String inv = tp.getInvariant();
-				int substringStart = 0;
-				if (inv.contains("<=")){
-					substringStart = 2;
-				}else {
-					substringStart = 1;
+			if(isNotUsingColors){
+				if(place instanceof TimedPlace){
+					TimedPlace tp = (TimedPlace)place;
+					String inv = tp.getInvariant();
+					int substringStart = 0;
+					if (inv.contains("<=")){
+						substringStart = 2;
+					}else {
+						substringStart = 1;
+					}
+					String val = inv.substring(substringStart);
+					if(constants.containsKey(val)){
+						constants.get(val).setIsUsed(true);
+					}
 				}
-				String val = inv.substring(substringStart);
-				if(constants.containsKey(val)){
-					constants.get(val).setIsUsed(true);
+			}else{
+				if(place instanceof ColoredTimedPlace){
+					buildConstraint((ColoredTimedPlace)place);	
 				}
 			}
 		}
 
 		for(Arc arc : arcs){
-			if(!CreateGui.getModel().isUsingColors()){
+			if(isNotUsingColors){
 				if(arc instanceof TimedArc || arc instanceof TransportArc){
 					buildConstraint((TimedArc)arc);
 				}
@@ -145,23 +158,90 @@ public class ConstantStore {
 		}
 	}
 
+	private void buildConstraint(ColoredTimedPlace place) {
+		ColorSet colorInvariant = place.getColorInvariant();
+		processColorGuards(colorInvariant);
+		
+		ColoredTimeInvariant timeInvariant = place.getTimeInvariant();
+		processTimeInvariant(timeInvariant);
+		
+	}
+
+	private void processTimeInvariant(ColoredTimeInvariant timeInvariant) {
+		for(String constantName : timeInvariant.getUsedConstantNames()){
+			Constant constant = getConstant(constantName);
+			constant.setIsUsed(true);
+		}		
+	}
+
 	private void buildConstraint(ColoredOutputArc arc) {
 		if(arc.getOutputValue().isUsingConstant()){
 			Constant constant = getConstant(arc.getOutputValue().getConstantName());
 			constant.setIsUsed(true);
 		}
 	}
-	
+
 	public void buildConstraint(ColoredInputArc arc){
-		buildConstraint((TimedArc)arc);
+		ColoredInterval interval = arc.getTimeGuard();
+		processTimeGuards(interval);
+
+		ColorSet colorGuard = arc.getColorGuard();
+		processColorGuards(colorGuard);
 	}
-	
+
+	private void processColorGuards(ColorSet colorGuard) {
+		for(IntOrConstantRange range : colorGuard.getRanges()){
+			if(range.usesConstants()){
+				if(!range.goesToInfinity() && !range.isSingle()){
+					IntOrConstant from = range.getFrom();
+					IntOrConstant to = range.getTo();
+
+					if(from.isUsingConstant()){
+						Constant constant = getConstant(from.getConstantName());
+						constant.setIsUsed(true);
+						constant.setUpperBound(to.getValue());
+					}
+
+					if(to.isUsingConstant()){
+						Constant constant = getConstant(to.getConstantName());
+						constant.setIsUsed(true);
+						constant.setLowerBound(from.getValue());
+					}
+				}
+			}
+		}
+		//		for(String constantName : colorGuard.getUsedConstants()){
+		//			Constant constant = getConstant(constantName);
+		//			constant.setIsUsed(true);
+		//		}
+	}
+
+	private void processTimeGuards(ColoredInterval interval) {
+		for(String constantName : interval.getUsedConstants()){
+			Constant constant = getConstant(constantName);
+			constant.setIsUsed(true);
+		}
+	}
+
 	public void buildConstraint(ColoredTransportArc arc){
-		buildConstraint((TimedArc)arc);
+		ColoredInterval interval = arc.getTimeGuard();
+		processTimeGuards(interval);
+
+		ColorSet colorGuard = arc.getColorGuard();
+		processColorGuards(colorGuard);
+
+		if(arc.getOutputValue().isUsingConstant()){
+			Constant constant = getConstant(arc.getOutputValue().getConstantName());
+			constant.setIsUsed(true);
+		}
 	}
-	
+
 	public void buildConstraint(ColoredInhibitorArc arc){
-		buildConstraint((TimedArc)arc);
+		ColoredInterval interval = arc.getTimeGuard();
+		processTimeGuards(interval);
+
+		ColorSet colorGuard = arc.getColorGuard();
+		processColorGuards(colorGuard);
 	}
 
 	public void buildConstraint(TimedArc arc) {

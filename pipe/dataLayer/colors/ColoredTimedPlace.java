@@ -11,6 +11,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredPlaceAddTokenEdit;
 import pipe.gui.undo.ColoredPlaceRemoveTokenEdit;
 import pipe.gui.undo.ColoredPlaceTokensChangedEdit;
+import pipe.gui.undo.ColoredTimedPlaceTimeInvariantEdit;
 import pipe.gui.undo.PlaceColorInvariantEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -22,6 +23,7 @@ public class ColoredTimedPlace extends TimedPlace {
 	private static final long serialVersionUID = 8389233604098400485L;
 	private ColorSet colorInvariant;
 	private List<ColoredToken> tokens;
+	private ColoredTimeInvariant timeInvariant;
 
 	public ColoredTimedPlace(double positionXInput, double positionYInput) {
 		super(positionXInput, positionYInput);
@@ -61,9 +63,9 @@ public class ColoredTimedPlace extends TimedPlace {
 	}
 
 	private void init() {
+		timeInvariant = new ColoredTimeInvariant();
 		colorInvariant = new ColorSet();
 		tokens = new ArrayList<ColoredToken>();
-
 	}
 
 	public String getColorInvariantString(){
@@ -80,7 +82,7 @@ public class ColoredTimedPlace extends TimedPlace {
 			value = val.getIntegerValue();
 		}
 
-		return colorInvariant.contains(value) && satisfiesInvariant(token.getAge());
+		return colorInvariant.contains(value) && timeInvariant.contains(token);
 	}
 
 	public String getStringOfTokens() {
@@ -164,6 +166,23 @@ public class ColoredTimedPlace extends TimedPlace {
 
 			g.drawString(toDraw, x, y);
 		}
+	}
+
+	public ColorSet getColorInvariant() {
+		return colorInvariant;
+	}
+
+	public ColoredTimeInvariant getTimeInvariant() {
+		return timeInvariant;
+	}
+
+	public UndoableEdit setTimeInvariant(ColoredTimeInvariant newTimeInvariant) {
+		ColoredTimeInvariant old = this.timeInvariant;
+		this.timeInvariant = newTimeInvariant;
+		
+		update();
+		
+		return new ColoredTimedPlaceTimeInvariantEdit(this, old, newTimeInvariant);
 	}
 
 }

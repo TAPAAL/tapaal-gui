@@ -1,5 +1,8 @@
 package pipe.dataLayer.colors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ColoredInterval {
 	private boolean lowerIncluded = true;
@@ -50,5 +53,14 @@ public class ColoredInterval {
 		if(upper.equals(token) && !upperIncluded) return false;
 		
 		return lower.isLessThanOrEqual(token) && upper.isGreaterThanOrEqual(token);
+	}
+
+	public List<String> getUsedConstants() {
+		List<String> list = new ArrayList<String>();
+		
+		list.addAll(lower.getUsedConstants());
+		list.addAll(upper.getUsedConstants());
+		
+		return list;
 	}
 }

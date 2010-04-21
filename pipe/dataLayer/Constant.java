@@ -44,7 +44,9 @@ public class Constant {
 	}
 	
 	public void setLowerBound(int value){
-		lowerBound = value;
+		if(value > lowerBound){
+			lowerBound = value;
+		}
 	}
 	
 	public int getUpperBound(){
@@ -52,7 +54,9 @@ public class Constant {
 	}
 	
 	public void setUpperBound(int value){
-		upperBound = value;
+		if(value < upperBound){
+			upperBound = value;
+		}
 	}
 	
 	public void setIsUsed(boolean value){

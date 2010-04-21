@@ -1,18 +1,21 @@
 package pipe.dataLayer.colors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 import java.util.TreeSet;
 
 public class ColorSet {
-	private SortedSet<IntegerRange> ranges;
+	private SortedSet<IntOrConstantRange> ranges;
 	
 	public ColorSet(){
-		ranges = new TreeSet<IntegerRange>();
+		ranges = new TreeSet<IntOrConstantRange>();
 	}
 	
-	public boolean contains(IntegerRange range){
-		for(IntegerRange ir : ranges){
+	public boolean contains(IntOrConstantRange range){
+		for(IntOrConstantRange ir : ranges){
 			if(ir.overlaps(range)){
 				return true;
 			}
@@ -21,18 +24,18 @@ public class ColorSet {
 		return false;
 	}
 	
-	public void add(IntegerRange range){
+	public void add(IntOrConstantRange range){
 		ranges.add(range);
 	}
 	
-	public void remove(IntegerRange range){
+	public void remove(IntOrConstantRange range){
 		ranges.remove(range);
 	}
 	
 	public boolean contains(int color) {
 		if(isEmpty()) return true;
 		
-		for(IntegerRange ir : ranges){
+		for(IntOrConstantRange ir : ranges){
 			if(ir.isInRange(color)) return true;
 		}
 		
@@ -44,7 +47,7 @@ public class ColorSet {
 		StringBuilder builder = new StringBuilder("");
 		
 		boolean first = true;
-		for(IntegerRange ir : ranges){
+		for(IntOrConstantRange ir : ranges){
 			if(!first){
 				builder.append(", ");
 			}
@@ -67,5 +70,19 @@ public class ColorSet {
 
 	public boolean isEmpty() {
 		return ranges.isEmpty();
+	}
+
+	public List<String> getUsedConstants() {
+		List<String> list = new ArrayList<String>();
+		
+		for(IntOrConstantRange range : ranges){
+			list.addAll(range.getUsedConstants());
+		}
+		
+		return list;		
+	}
+
+	public Set<IntOrConstantRange> getRanges() {
+		return ranges;
 	}
 }

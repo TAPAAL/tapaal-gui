@@ -65,6 +65,9 @@ public class ColoredInputArc extends TimedArc {
 		return integerGuard.toStringNoSetNotation();
 	}
 
+	public ColorSet getColorGuard(){
+		return integerGuard;
+	}
 	public UndoableEdit setColorGuard(ColorSet newColorGuard) {
 		ColorSet old = this.integerGuard;
 		this.integerGuard = newColorGuard;

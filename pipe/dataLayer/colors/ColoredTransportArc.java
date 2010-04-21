@@ -35,6 +35,8 @@ public class ColoredTransportArc extends TransportArc {
 	private void initialize() {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
+		
+		updateWeightLabel();
 	}
 
 	public boolean satisfiesGuard(ColoredToken token) {
@@ -124,6 +126,10 @@ public class ColoredTransportArc extends TransportArc {
 		updateWeightLabel();
 		
 		return new ColoredTransportArcTimeGuardEdit(this, old, newTimeGuard);
+	}
+
+	public ColorSet getColorGuard() {
+		return colorGuard;
 	}
 
 }
