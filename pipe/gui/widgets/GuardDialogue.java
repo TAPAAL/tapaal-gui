@@ -286,7 +286,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								timeGuard = composeTimeGuard();
 							}catch(IllegalArgumentException e){
 								JOptionPane.showMessageDialog(CreateGui.getApp(),
-										String.format("There was an error parsing the time interval. The problem concerns \"%1s\".\n Possible causes:\n\t- Use of negative values\n\t- Use of undefined constant\n\t- Ill-formed interval",e.getMessage()),
+										String.format("There was an error parsing the time interval. The problem concerns \"%1s\".\n Possible causes:\n\t- Use of negative values\n\t- Use of undefined constant",e.getMessage()),
 										"Error",
 										JOptionPane.INFORMATION_MESSAGE);
 								undoManager.undo();

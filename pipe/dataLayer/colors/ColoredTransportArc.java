@@ -3,9 +3,9 @@ package pipe.dataLayer.colors;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TransportArc;
-import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredTransportArcColorGuardEdit;
 import pipe.gui.undo.ColoredTransportArcPreserveEdit;
+import pipe.gui.undo.ColoredTransportArcTimeGuardEdit;
 import pipe.gui.undo.ColoredTransportArcUpdateValueEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -15,6 +15,7 @@ public class ColoredTransportArc extends TransportArc {
 	private ColorSet colorGuard;
 	private Preserve preserves = Preserve.AgeAndValue;
 	private IntOrConstant outputValue = new IntOrConstant();
+	private ColoredInterval timeGuard;
 	/**
 	 * 
 	 */
@@ -23,24 +24,24 @@ public class ColoredTransportArc extends TransportArc {
 	public ColoredTransportArc(PlaceTransitionObject newSource, int groupNr,
 			boolean isInPreSet) {
 		super(newSource, groupNr, isInPreSet);
-		colorGuard = new ColorSet();
+		initialize();
 	}
 
 	public ColoredTransportArc(TimedArc timedArc, int group, boolean isInPreset){
 		super(timedArc, group, isInPreset);
+		initialize();
+	}
+
+	private void initialize() {
 		colorGuard = new ColorSet();
+		timeGuard = new ColoredInterval();
 	}
 
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
-		int value = 0;
-		if(val.isUsingConstant()){
-			value = CreateGui.getModel().getConstantValue(val.getConstantName());
-		}else{
-			value = val.getIntegerValue();
-		}
+		int value = val.getValue();
 		
-		return colorGuard.contains(value) && satisfiesGuard(token.getAge());
+		return colorGuard.contains(value) && timeGuard.contains(token);
 	}
 	
 	public String getOutputString(){
@@ -51,7 +52,7 @@ public class ColoredTransportArc extends TransportArc {
 
 		String guard = null;
 		if (isInPreSet()){
-			guard = "age \u2208 " + timeInterval + " : " + getGroup();
+			guard = "age \u2208 " + timeGuard + " : " + getGroup();
 			
 			if(colorGuard != null && !colorGuard.isEmpty()){
 				guard += "\n val \u2208 " + colorGuard.toString();
@@ -113,12 +114,16 @@ public class ColoredTransportArc extends TransportArc {
 	}
 
 	public ColoredInterval getTimeGuard() {
-		return null;
+		return timeGuard;
 	}
 
-	public UndoableEdit setTimeGuard(ColoredInterval timeGuard) {
-		// TODO Auto-generated method stub
-		return null;
+	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
+		ColoredInterval old = this.timeGuard;
+		this.timeGuard = newTimeGuard;
+		
+		updateWeightLabel();
+		
+		return new ColoredTransportArcTimeGuardEdit(this, old, newTimeGuard);
 	}
 
 }

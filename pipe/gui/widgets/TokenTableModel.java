@@ -9,8 +9,6 @@ import javax.swing.table.AbstractTableModel;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.IntOrConstant;
-import pipe.gui.CreateGui;
-import pipe.gui.undo.UndoableEdit;
 
 public class TokenTableModel extends AbstractTableModel {
 	/**

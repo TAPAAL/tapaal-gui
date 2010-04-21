@@ -3,8 +3,8 @@ package pipe.dataLayer.colors;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
+import pipe.gui.undo.ColoredInhibitorArcTimeGuardEdit;
 import pipe.gui.undo.UndoableEdit;
 
 
@@ -15,37 +15,37 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 	 */
 	private static final long serialVersionUID = -6750834435940093632L;
 	private ColorSet colorGuard;
+	private ColoredInterval timeGuard;
 
 	public ColoredInhibitorArc(NormalArc arc)
 	{
 		super(arc);
-		colorGuard = new ColorSet();
+		initialize();
 	}
 	public ColoredInhibitorArc(NormalArc arc, String guard)
 	{
 		super(arc, guard);
-		colorGuard = new ColorSet();
+		initialize();
 	}
 
 	public ColoredInhibitorArc(PlaceTransitionObject source) {
 		super(source);
+		initialize();
+	}
+	private void initialize() {
 		colorGuard = new ColorSet();
+		timeGuard = new ColoredInterval();
 	}
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
-		int value = 0;
-		if(val.isUsingConstant()){
-			value = CreateGui.getModel().getConstantValue(val.getConstantName());
-		}else{
-			value = val.getIntegerValue();
-		}
+		int value = val.getValue();
 		
-		return !(colorGuard.contains(value) && satisfiesGuard(token.getAge()));
+		return !(colorGuard.contains(value) && timeGuard.contains(token));
 	}
 
 	public void updateWeightLabel(){ 
 
-		String guard = "age \u2208 " + timeInterval;
+		String guard = "age \u2208 " + timeGuard;
 
 		if(colorGuard != null && !colorGuard.isEmpty()){
 			guard += "\n val \u2208 " + colorGuard.toString();
@@ -69,12 +69,16 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		return new ColoredInhibArcColorGuardEdit(this, old, newColorGuard);	
 	}
 	public ColoredInterval getTimeGuard() {
-		// TODO Auto-generated method stub
-		return null;
+		return timeGuard;
 	}
-	public UndoableEdit setTimeGuard(ColoredInterval timeGuard) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
+		ColoredInterval old = this.timeGuard;
+		this.timeGuard = newTimeGuard;
+		
+		updateWeightLabel();
+		
+		return new ColoredInhibitorArcTimeGuardEdit(this, old, newTimeGuard);
 	}
 
 
