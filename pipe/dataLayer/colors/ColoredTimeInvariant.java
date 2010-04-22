@@ -21,7 +21,9 @@ public class ColoredTimeInvariant {
 		return upper == null;
 	}
 
-	public boolean contains(ColoredToken token) {		
+	public boolean contains(ColoredToken token) {
+		if(goesToInfinity()) return true;
+		
 		return (!strictLessThan && upper.isGreaterThanOrEqual(token)) ||
 			(strictLessThan && upper.isGreaterThanOrEqual(token) && !upper.equals(token));
 	}

@@ -23,6 +23,11 @@ public class ColoredToken {
 		this.setColor(new IntOrConstant(color));
 	}
 	
+	public ColoredToken(IntOrConstant color){
+		this();
+		this.setColor(color);
+	}
+	
 	public ColoredToken(BigDecimal age, int color){
 		this.setAge(age);
 		this.setColor(new IntOrConstant(color));
@@ -31,6 +36,11 @@ public class ColoredToken {
 	public ColoredToken(BigDecimal age, IntOrConstant color) {
 		this.age = age;
 		this.color = color;
+	}
+
+	public ColoredToken(ColoredToken token) {
+		this.age = token.getAge();
+		this.color = new IntOrConstant(token.getColor());
 	}
 
 	private void setAge(BigDecimal age) {
@@ -57,7 +67,11 @@ public class ColoredToken {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-		return String.format("(%1s,%2d)", df.format(getAge()), getColor());
+		return String.format("(%1$s,%2$s)", df.format(getAge()), getColor());
+	}
+	
+	public void doTimeDelay(BigDecimal delay){
+		this.age = age.add(delay);
 	}
 	
 

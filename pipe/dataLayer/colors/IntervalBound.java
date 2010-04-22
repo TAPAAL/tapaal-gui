@@ -37,12 +37,16 @@ public class IntervalBound {
 	}
 
 	public boolean isLessThanOrEqual(ColoredToken token) {
+		if(goesToInfinity()) return false;
+		
 		int lower = token.getColor().getValue() * a.getValue() + b.getValue();
 
-		return new BigDecimal(lower).compareTo(token.getAge()) < 0;
+		return new BigDecimal(lower).compareTo(token.getAge()) <= 0;
 	}
 
 	public boolean isGreaterThanOrEqual(ColoredToken token) {
+		if(goesToInfinity()) return true;
+		
 		int upper = token.getColor().getValue() * a.getValue() + b.getValue();
 
 		return new BigDecimal(upper).compareTo(token.getAge()) >= 0;

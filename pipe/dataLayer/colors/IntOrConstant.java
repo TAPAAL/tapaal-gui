@@ -27,6 +27,11 @@ public class IntOrConstant {
 		this.value = value;
 	}
 	
+	public IntOrConstant(IntOrConstant color) {
+		this.value = color.value;
+		this.name = name;
+	}
+
 	public boolean isUsingConstant(){
 		return name != null;
 	}

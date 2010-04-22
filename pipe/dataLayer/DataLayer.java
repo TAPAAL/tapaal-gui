@@ -9,11 +9,13 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 
@@ -27,6 +29,13 @@ import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.colors.ColorSet;
+import pipe.dataLayer.colors.ColoredInhibitorArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.ColoredToken;
+import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -187,7 +196,9 @@ implements Cloneable {
 	private ArrayList<TAPNQuery> queries = null;
 	private ConstantStore constants = new ConstantStore();
 	private boolean useColors = true;
-	
+
+	private HashMap<ColoredTimedPlace, List<ColoredToken>> coloredPlaceMarkingStorageMap;
+
 	/**
 	 * Create Petri-Net object from PNML file with URI pnmlFileName
 	 * @param pnmlFileName Name of PNML File
@@ -201,7 +212,7 @@ implements Cloneable {
 		pnmlName = temp.getName();
 		createFromPNML(transform.transformPNML(pnmlFileName));
 		transportArcMap = new HashMap<Transition, HashMap<TransportArc,TransportArc> >();
-		
+
 	}  
 
 
@@ -238,7 +249,7 @@ implements Cloneable {
 			//newClone.tapnInhibitorsArray = deepCopy(tapnInhibitorsArray);
 			//newClone.tokensArray = deepCopy(tokensArray);
 			newClone.labelsArray = deepCopy(labelsArray);
-						
+
 		} catch(CloneNotSupportedException e) {
 			throw new Error(e);
 		}
@@ -607,7 +618,7 @@ implements Cloneable {
 					inhibitorArcInput.setId("error");
 				}
 			}
-				
+
 			arcsArray.add(inhibitorArcInput);
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
 
@@ -2003,9 +2014,17 @@ implements Cloneable {
 	public void storeState(){
 		boolean isTAPN = true;
 		if (isTAPN){
-			placeMarkingStorageMap = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
-			for (Place p : getPlaces()){
-				placeMarkingStorageMap.put( (TimedPlace)p, (ArrayList<BigDecimal>)((TimedPlace)p).getTokens().clone() );
+			if(!isUsingColors()){
+				placeMarkingStorageMap = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
+				for (Place p : getPlaces()){
+					placeMarkingStorageMap.put( (TimedPlace)p, (ArrayList<BigDecimal>)((TimedPlace)p).getTokens().clone() );
+				}
+			}else{
+				coloredPlaceMarkingStorageMap = new HashMap<ColoredTimedPlace, List<ColoredToken>>();
+				for(Place p : getPlaces()){
+					ColoredTimedPlace ctp = (ColoredTimedPlace)p;
+					coloredPlaceMarkingStorageMap.put(ctp, copyListOfColoredTokens(ctp.getColoredTokens()));
+				}
 			}
 		}else {
 			int placeSize = placesArray.size();
@@ -2016,6 +2035,16 @@ implements Cloneable {
 			}
 		}
 	}
+
+	private List<ColoredToken> copyListOfColoredTokens(
+			List<ColoredToken> coloredTokens) {
+		ArrayList<ColoredToken> list = new ArrayList<ColoredToken>(coloredTokens.size());
+		for(ColoredToken token : coloredTokens){
+			list.add(new ColoredToken(token));
+		}
+		return list;
+	}
+
 
 	public HashMap<TimedPlace, ArrayList<BigDecimal>> getCurrentMarking(){
 		boolean isTAPN = true;
@@ -2036,14 +2065,26 @@ implements Cloneable {
 	public void restoreState(){
 		boolean isTAPN = true;
 		if(isTAPN){
-			if (placeMarkingStorageMap!=null){
-				for (Place p : getPlaces()){
-					ArrayList<BigDecimal> markingOfP = placeMarkingStorageMap.get((TimedPlace)p);
-					p.setCurrentMarking( markingOfP.size() );
-					((TimedPlace)p).setAgeOfTokens(markingOfP);
-					setChanged();
-					notifyObservers(p);
-					setMatrixChanged();
+			if(!isUsingColors()){
+				if (placeMarkingStorageMap!=null){
+					for (Place p : getPlaces()){
+						ArrayList<BigDecimal> markingOfP = placeMarkingStorageMap.get((TimedPlace)p);
+						p.setCurrentMarking( markingOfP.size() );
+						((TimedPlace)p).setAgeOfTokens(markingOfP);
+						setChanged();
+						notifyObservers(p);
+						setMatrixChanged();
+					}
+				}
+			}else{
+				if(coloredPlaceMarkingStorageMap != null){
+					for(Place p : getPlaces()){
+						ColoredTimedPlace ctp = (ColoredTimedPlace)p;
+						ctp.setColoredTokens(coloredPlaceMarkingStorageMap.get(ctp));
+						setChanged();
+						notifyObservers(p);
+						setMatrixChanged();
+					}
 				}
 			}
 		}else{
@@ -2070,115 +2111,16 @@ implements Cloneable {
 	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk> Changed to handeling
 	 * firing modes when working with TAPN.
 	 */
-	public DiscreetFiringAction fireTransition(Transition transition) {
-		DiscreetFiringAction toReturn = null;
+	public FiringAction fireTransition(Transition transition) {
+		FiringAction toReturn = null;
 
 		// If it is a TAPN
 		if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
-			toReturn = new DiscreetFiringAction(transition);
-
-			if (transition != null){
-				setEnabledTransitions();
-
-				// Index:
-				// Check transition is enables
-				//Find the tokens valid to fire (check guard)
-				// - If transportarc check if invariant is ok
-				// Select the tokens to consume, based on firing stradegy
-				// Consume the tokens and create the tokens
-
-				if (transition.isEnabled()){
-					boolean hadTransportArc = false;
-					HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
-
-					for (Arc a : (LinkedList<Arc>)transition.getPreset() ){
-
-
-
-						hadTransportArc = true;
-						if (a instanceof TransportArc){
-							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-
-
-							TimedPlace p = (TimedPlace)a.getSource();
-
-							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-
-							TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
-
-							for (int i=0; i< tokensOfPlace.size(); i++){
-								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
-									eligableToken.add(tokensOfPlace.get(i));
-								}
-							}	
-							BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
-
-							//							XXX  - This will break if two tokens from the same place is consumed
-							toReturn.addConsumedToken(p, tokenToRemove);
-
-							tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
-
-
-
-							p.removeTokenofAge(tokenToRemove);
-						}
-						// if arc is an inhibitor arc then do nothing.
-						else if(a instanceof TAPNInhibitorArc)
-						{
-
-						}
-						else if (a instanceof TimedArc){
-							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-							//int indexOfOldestEligebleToken = 0;
-
-							TimedPlace p = (TimedPlace)a.getSource();
-
-							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
-							for (int i=0; i< tokensOfPlace.size(); i++){
-								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
-									eligableToken.add(tokensOfPlace.get(i));
-								}
-							}						   
-
-							//Select torken to remove based on firing mode
-							BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
-
-							//							XXX  - This will break if two tokens from the same place is consumed
-							toReturn.addConsumedToken(p, tokenToRemove);
-
-							p.removeTokenofAge(tokenToRemove);
-
-
-
-						} 
-						else {
-							//Should not be possible
-						}
-					}
-
-
-
-					for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
-						if (a instanceof TransportArc){
-							TimedPlace p = (TimedPlace)a.getTarget();
-							int newNumberOfTokens = p.getTokens().size()+1;
-							p.setCurrentMarking(newNumberOfTokens);
-							ArrayList<BigDecimal> markingToBeSet = p.getTokens();
-							BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
-							markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
-
-							p.setAgeOfTokens(markingToBeSet);
-						}
-						else{
-							TimedPlace p = (TimedPlace)a.getTarget();
-							int newNumberOfTokens = p.getTokens().size()+1;
-							p.setCurrentMarking(newNumberOfTokens);
-
-						}
-					}
-
-				}
-			}		   
+			if(!isUsingColors()){
+				toReturn = fireTransitionInNonColoredTAPN(transition);	
+			}else{
+				toReturn = fireTransitionInColoredTAPN(transition);
+			}
 		}else{
 			if (transition != null) {
 
@@ -2194,6 +2136,179 @@ implements Cloneable {
 			}
 		}
 		setMatrixChanged();
+
+		return toReturn;
+	}
+
+
+	private FiringAction fireTransitionInColoredTAPN(
+			Transition transition) {
+		ColoredDiscreteFiringAction firingAction = new ColoredDiscreteFiringAction((TAPNTransition)transition);
+
+		setEnabledTransitions();
+		if(transition.isEnabled()){
+			HashMap<Integer, ColoredToken> tokensConsumedByTransportArcs = new HashMap<Integer, ColoredToken>();
+
+			for(Arc arc : transition.getPreset()){				
+				if(arc instanceof ColoredTransportArc){
+					ColoredTransportArc tarc = (ColoredTransportArc)arc;
+					ArrayList<ColoredToken> possibleTokens = new ArrayList<ColoredToken>();
+					ColoredTimedPlace source = (ColoredTimedPlace)arc.getSource();
+					ColoredTimedPlace target = (ColoredTimedPlace)tarc.getConnectedTo().getTarget();
+
+					for(ColoredToken token : source.getColoredTokens()){
+						if(tarc.satisfiesGuard(token) && target.satisfiesInvariant(token)){
+							possibleTokens.add(token);
+						}
+					}
+
+					ColoredToken usedToken = CreateGui.getAnimator().firingmode.fire(possibleTokens);
+					firingAction.addConsumedToken(source, usedToken);
+					tokensConsumedByTransportArcs.put(tarc.getGroupNr(), usedToken);
+					source.removeColoredToken(usedToken);
+				}else if(arc instanceof ColoredInputArc){
+					ColoredInputArc inputArc = (ColoredInputArc)arc;
+					ArrayList<ColoredToken> possibleTokens = new ArrayList<ColoredToken>();
+					ColoredTimedPlace source = (ColoredTimedPlace)arc.getSource();
+
+					for(ColoredToken token : source.getColoredTokens()){
+						if(inputArc.satisfiesGuard(token)){
+							possibleTokens.add(token);
+						}
+					}
+
+					ColoredToken usedToken = CreateGui.getAnimator().firingmode.fire(possibleTokens);
+					firingAction.addConsumedToken(source, usedToken);
+					source.removeColoredToken(usedToken);
+				}
+			}
+
+			for(Arc arc : transition.getPostset()){
+				if(arc instanceof ColoredTransportArc){
+					ColoredTransportArc tarc = (ColoredTransportArc)arc;
+					ColoredToken consumed = tokensConsumedByTransportArcs.get(tarc.getGroupNr());
+					ColoredToken newToken = tarc.generateOutputToken(consumed);
+
+					ColoredTimedPlace target = (ColoredTimedPlace)tarc.getTarget();
+					firingAction.addProducedToken(target, newToken);
+					target.addColoredToken(newToken);
+				}else if(arc instanceof ColoredOutputArc){
+					ColoredOutputArc outputArc = (ColoredOutputArc)arc;
+					ColoredToken token = outputArc.generateOutputToken();
+					ColoredTimedPlace target = (ColoredTimedPlace)outputArc.getTarget();
+
+					firingAction.addProducedToken(target, token);
+					target.addColoredToken(token);
+				}
+			}
+		}		
+
+		return firingAction;
+	}
+
+
+	private FiringAction fireTransitionInNonColoredTAPN(Transition transition) {
+		DiscreetFiringAction toReturn = new DiscreetFiringAction(transition);
+		if (transition != null){
+			setEnabledTransitions();
+
+			// Index:
+			// Check transition is enables
+			//Find the tokens valid to fire (check guard)
+			// - If transportarc check if invariant is ok
+			// Select the tokens to consume, based on firing stradegy
+			// Consume the tokens and create the tokens
+
+			if (transition.isEnabled()){
+				HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
+
+				for (Arc a : (LinkedList<Arc>)transition.getPreset() ){
+
+
+
+					if (a instanceof TransportArc){
+						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
+
+
+						TimedPlace p = (TimedPlace)a.getSource();
+
+						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
+
+						TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
+
+						for (int i=0; i< tokensOfPlace.size(); i++){
+							if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
+								eligableToken.add(tokensOfPlace.get(i));
+							}
+						}	
+						BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
+
+						//							XXX  - This will break if two tokens from the same place is consumed
+						toReturn.addConsumedToken(p, tokenToRemove);
+
+						tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
+
+
+
+						p.removeTokenofAge(tokenToRemove);
+					}
+					// if arc is an inhibitor arc then do nothing.
+					else if(a instanceof TAPNInhibitorArc)
+					{
+
+					}
+					else if (a instanceof TimedArc){
+						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
+						//int indexOfOldestEligebleToken = 0;
+
+						TimedPlace p = (TimedPlace)a.getSource();
+
+						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
+						for (int i=0; i< tokensOfPlace.size(); i++){
+							if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
+								eligableToken.add(tokensOfPlace.get(i));
+							}
+						}						   
+
+						//Select torken to remove based on firing mode
+						BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
+
+						//							XXX  - This will break if two tokens from the same place is consumed
+						toReturn.addConsumedToken(p, tokenToRemove);
+
+						p.removeTokenofAge(tokenToRemove);
+
+
+
+					} 
+					else {
+						//Should not be possible
+					}
+				}
+
+
+
+				for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
+					if (a instanceof TransportArc){
+						TimedPlace p = (TimedPlace)a.getTarget();
+						int newNumberOfTokens = p.getTokens().size()+1;
+						p.setCurrentMarking(newNumberOfTokens);
+						ArrayList<BigDecimal> markingToBeSet = p.getTokens();
+						BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
+						markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
+
+						p.setAgeOfTokens(markingToBeSet);
+					}
+					else{
+						TimedPlace p = (TimedPlace)a.getTarget();
+						int newNumberOfTokens = p.getTokens().size()+1;
+						p.setCurrentMarking(newNumberOfTokens);
+
+					}
+				}
+
+			}
+		}
 
 		return toReturn;
 	}
@@ -2223,26 +2338,12 @@ implements Cloneable {
 				// Consume the tokens and create the tokens
 
 				if (transition.isEnabled()){
-					boolean hadTransportArc = false;
 					HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
 
 					for ( Arc a : (LinkedList<Arc>)transition.getPreset() ){
+						TimedPlace p = (TimedPlace)a.getSource();
 
 						if (a instanceof TransportArc){
-							hadTransportArc = true;
-							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-
-							TimedPlace p = (TimedPlace)a.getSource();
-
-							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-
-							TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
-
-							for (int i=0; i< tokensOfPlace.size(); i++){
-								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
-									eligableToken.add(tokensOfPlace.get(i));
-								}
-							}	
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
 
 							//XXX  - This will break if two tokens from the same place is consumed
@@ -2252,24 +2353,7 @@ implements Cloneable {
 							p.removeTokenofAge(tokenToRemove);
 
 						}
-						// if arc is an inhibitor arc then do nothing
-						else if(a instanceof TAPNInhibitorArc)
-						{
-
-						}
 						else if (a instanceof TimedArc){
-							ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-							//int indexOfOldestEligebleToken = 0;
-
-							TimedPlace p = (TimedPlace)a.getSource();
-
-							ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
-							for (int i=0; i< tokensOfPlace.size(); i++){
-								if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
-									eligableToken.add(tokensOfPlace.get(i));
-								}
-							}						   
-
 							//Select torken to remove based on firing mode
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
 
@@ -2277,8 +2361,6 @@ implements Cloneable {
 
 							p.removeTokenofAge(tokenToRemove);
 
-						}else {
-							System.out.println("not a timed or transport arc");
 						}
 					}
 
@@ -2661,75 +2743,126 @@ implements Cloneable {
 		createMatrixes();
 
 		for ( Transition t : getTransitions() ){
-			boolean isEnabled = true;
+			boolean isEnabled = false;
 
-			Collection<Arc> presetArcs = t.getPreset();
-			for ( Arc a : presetArcs ){
-
-				Place p = (Place)a.getSource();
-				if (p instanceof TimedPlace){
-
-					boolean ageIsSatisfied;
-
-					if(a instanceof TAPNInhibitorArc)
-						ageIsSatisfied = true;
-					else
-						ageIsSatisfied = false;
-
-
-					if (p.currentMarking > 0){
-
-						for ( BigDecimal token : ((TimedPlace)p).getTokens() ){
-							if(a instanceof TAPNInhibitorArc)
-							{
-								if(!((TimedArc)a).satisfiesGuard(token))
-								{
-									ageIsSatisfied = false;
-									break;
-								}
-
-
-							}
-							else
-							{
-								if ( ((TimedArc)a).satisfiesGuard(token) ){
-
-									//make sure no invariants are violated
-									if (a instanceof TransportArc){
-										for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
-											if (postsetArc instanceof TransportArc){
-												if ( ((TransportArc) postsetArc).getGroupNr() == ((TransportArc)a).getGroupNr()){
-													if ( ((TimedPlace)postsetArc.getTarget()).satisfiesInvariant(token) ){
-														ageIsSatisfied = true;
-														break;
-													}
-												}
-											}
-										}
-										//invariants are not violated, if it is not a transport arc
-									}else {
-										ageIsSatisfied = true;
-										break;
-									}
-								}
-							}
-						}
-					}
-
-					isEnabled = ageIsSatisfied;
-
-					if (!isEnabled){
-						break;
-					}
-
-				}else {
-					//p should always be a TimedPlace unless we have introduced hybrid nets
-				}
+			if(!isUsingColors()){
+				isEnabled = isTransitionEnabledNonColored(t);
+			}else{
+				isEnabled = isTransitionEnabledColored(t);
 			}
 			t.setEnabled(isEnabled);
 			setChanged();
 			notifyObservers(t);
 		}
+	}
+
+
+	private boolean isTransitionEnabledColored(Transition t) {
+		boolean enabled = true;
+		for(Arc arc : t.getPreset()){
+			boolean arcEnabled = false;
+			ColoredTimedPlace inputPlace = (ColoredTimedPlace)arc.getSource();
+
+			for(ColoredToken token : inputPlace.getColoredTokens()){
+				if(arc instanceof ColoredInputArc){
+					arcEnabled = arcEnabled || ((ColoredInputArc)arc).satisfiesGuard(token);
+				}else if(arc instanceof ColoredTransportArc){
+					boolean guardSatisfied = ((ColoredTransportArc)arc).satisfiesGuard(token);
+					boolean targetInvariantSatisfied = ((ColoredTransportArc)arc).satisfiesTargetInvariant(token);
+
+					arcEnabled = arcEnabled || (guardSatisfied && targetInvariantSatisfied);
+				}else if(arc instanceof ColoredInhibitorArc){
+					arcEnabled = arcEnabled || ((ColoredInhibitorArc)arc).satisfiesGuard(token);
+				}
+
+				if(arcEnabled){
+					break;
+				}
+			}
+
+			enabled = enabled && arcEnabled;
+		}
+
+		for(Arc arc : t.getPostset()){
+			if(arc instanceof ColoredOutputArc){
+				int value = ((ColoredOutputArc)arc).getOutputValue().getValue();
+				ColorSet colorInvariant = ((ColoredTimedPlace)arc.getTarget()).getColorInvariant();
+				enabled = enabled && colorInvariant.contains(value);
+
+			}
+		}
+
+		return enabled;
+	}
+
+
+	private boolean isTransitionEnabledNonColored(Transition t) {
+		boolean isEnabled = true;
+
+		Collection<Arc> presetArcs = t.getPreset();
+		for ( Arc a : presetArcs ){
+
+			Place p = (Place)a.getSource();
+			if (p instanceof TimedPlace){
+
+				boolean ageIsSatisfied;
+
+				if(a instanceof TAPNInhibitorArc)
+					ageIsSatisfied = true;
+				else
+					ageIsSatisfied = false;
+
+
+				if (p.currentMarking > 0){
+
+					for ( BigDecimal token : ((TimedPlace)p).getTokens() ){
+						if(a instanceof TAPNInhibitorArc)
+						{
+							if(!((TimedArc)a).satisfiesGuard(token))
+							{
+								ageIsSatisfied = false;
+								break;
+							}
+
+
+						}
+						else
+						{
+							if ( ((TimedArc)a).satisfiesGuard(token) ){
+
+								//make sure no invariants are violated
+								if (a instanceof TransportArc){
+									for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
+										if (postsetArc instanceof TransportArc){
+											if ( ((TransportArc) postsetArc).getGroupNr() == ((TransportArc)a).getGroupNr()){
+												if ( ((TimedPlace)postsetArc.getTarget()).satisfiesInvariant(token) ){
+													ageIsSatisfied = true;
+													break;
+												}
+											}
+										}
+									}
+									//invariants are not violated, if it is not a transport arc
+								}else {
+									ageIsSatisfied = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				isEnabled = ageIsSatisfied;
+
+				if (!isEnabled){
+					break;
+				}
+
+			}else {
+				//p should always be a TimedPlace unless we have introduced hybrid nets
+			}
+		}
+		return isEnabled;
 	}
 
 
@@ -2993,7 +3126,7 @@ implements Cloneable {
 			if(arcsArray.get(i) instanceof TAPNInhibitorArc)
 				numInhibArcs++;
 		}
-		
+
 		TAPNInhibitorArc[] returnArray = new TAPNInhibitorArc[numInhibArcs];
 
 		for(int i = 0; i < numInhibArcs; i++)
@@ -3004,7 +3137,7 @@ implements Cloneable {
 					returnArray[i] = (TAPNInhibitorArc)arcsArray.get(j);
 			}
 		}
-			
+
 		return returnArray;
 	}   
 
@@ -3288,40 +3421,40 @@ implements Cloneable {
 	 */
 	public void createFromTAPN(TAPN model) {
 
-//		double xcord = 10;
-//		double ycord = 10;
-//
-//		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
-//		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
-//		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
-//
-//		// Add places
-//		for (dk.aau.cs.petrinet.TAPNPlace p : places){
-//			Place tmp = new Place(xcord, ycord, ""+p.getID(), p.getName(), 10.0, 10.0, 0, 0, 0, 0);
-//			TimedPlace tp = new TimedPlace(tmp, p.getInvariant());
-//			
-//			addPlace(tp);
-//
-//			xcord = xcord + 10;
-//			ycord = ycord + 10;
-//		}
-//
-//		// Add transitions
-//		for (dk.aau.cs.petrinet.TAPNTransition t : transitions){
-//			Transition trans = new Transition(xcord, ycord, ""+t.getID(), t.getName(), 10.0, 10.0, 10.0, false, false, 1, 1);
-//			addTransition(new TAPNTransition(trans));
-//			xcord = xcord + 10;
-//			ycord = ycord + 10;
-//		}
-//
-//		// Add arcs
-//		for (dk.aau.cs.petrinet.Arc a : arcs){
-//			
-//		}
-//
-//		if (CreateGui.getApp()!=null) {
-//			CreateGui.getApp().restoreMode();
-//		}
+		//		double xcord = 10;
+		//		double ycord = 10;
+		//
+		//		List<dk.aau.cs.petrinet.TAPNPlace> places = model.getPlaces(); 
+		//		List<dk.aau.cs.petrinet.TAPNTransition> transitions = model.getTransitions();
+		//		List<dk.aau.cs.petrinet.Arc> arcs = model.getArcs();
+		//
+		//		// Add places
+		//		for (dk.aau.cs.petrinet.TAPNPlace p : places){
+		//			Place tmp = new Place(xcord, ycord, ""+p.getID(), p.getName(), 10.0, 10.0, 0, 0, 0, 0);
+		//			TimedPlace tp = new TimedPlace(tmp, p.getInvariant());
+		//			
+		//			addPlace(tp);
+		//
+		//			xcord = xcord + 10;
+		//			ycord = ycord + 10;
+		//		}
+		//
+		//		// Add transitions
+		//		for (dk.aau.cs.petrinet.TAPNTransition t : transitions){
+		//			Transition trans = new Transition(xcord, ycord, ""+t.getID(), t.getName(), 10.0, 10.0, 10.0, false, false, 1, 1);
+		//			addTransition(new TAPNTransition(trans));
+		//			xcord = xcord + 10;
+		//			ycord = ycord + 10;
+		//		}
+		//
+		//		// Add arcs
+		//		for (dk.aau.cs.petrinet.Arc a : arcs){
+		//			
+		//		}
+		//
+		//		if (CreateGui.getApp()!=null) {
+		//			CreateGui.getApp().restoreMode();
+		//		}
 
 	}
 
@@ -3774,42 +3907,31 @@ implements Cloneable {
 	}
 
 	public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
-
-		//	 Can we do time delay
-		for (Place p : getPlaces()){
-			if ( ! (p instanceof TimedPlace) ){
-				//Do not do stuff with tokens
-			}else{
-				int sizeOfArray = ((TimedPlace)p).getTokens().size();
-
-				for (int i=0; i< sizeOfArray; i++ ){
-					BigDecimal tokensAge = ((TimedPlace)p).getTokens().get(i);
-
-					if (!((TimedPlace)p).satisfiesInvariant(tokensAge.add(timeToPass))){   
-						throw new InvariantViolatedAnimationException(p, tokensAge.add(timeToPass));
-					}
-
-				}
-
-			}
+		if(!canTimePass(timeToPass)){
+			throw new InvariantViolatedAnimationException();
 		}
 
 		//Do the update
 		for (Place p : getPlaces()){
-			if ( ! (p instanceof TimedPlace) ){
-				//Do not do stuff with tokens
-			}else{
-				int sizeOfArray = ((TimedPlace)p).getTokens().size();
-
-
-				for (int i=0; i< sizeOfArray; i++ ){
-					BigDecimal tokensAge = ((TimedPlace)p).getTokens().get(i);
-					((TimedPlace)p).getTokens().set(i, tokensAge.add(timeToPass));	   
+			if(isUsingColors()){
+				ColoredTimedPlace place = (ColoredTimedPlace)p;
+				for(ColoredToken token : place.getColoredTokens()){
+					token.doTimeDelay(timeToPass);
 				}
+			}else{
+				if (p instanceof TimedPlace){
+					TimedPlace place = (TimedPlace)p;
+					int sizeOfArray = place.getTokens().size();
 
-				setChanged();
-				notifyObservers(p);
+					for (int i = 0; i< sizeOfArray; i++){
+						BigDecimal token = place.getTokens().get(i);
+						place.getTokens().set(i, token.add(timeToPass));	   
+					}					
+				}
 			}
+
+			setChanged();
+			notifyObservers(p);
 		}
 
 
@@ -3819,24 +3941,27 @@ implements Cloneable {
 
 
 	public boolean canTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
-
 		//	 Can we do time delay
 		for (Place p : getPlaces()){
-			if ( ! (p instanceof TimedPlace) ){
-				//Do not do stuff with tokens
-			}else{
-				int sizeOfArray = ((TimedPlace)p).getTokens().size();
+			if(isUsingColors()){
+				ColoredTimedPlace ctp = (ColoredTimedPlace)p;
 
-				for (int i=0; i< sizeOfArray; i++ ){
-					BigDecimal tokensAge = ((TimedPlace)p).getTokens().get(i);
-
-					if (!((TimedPlace)p).satisfiesInvariant(tokensAge.add(timeToPass))){   
+				for(ColoredToken token : ctp.getColoredTokens()){
+					ColoredToken newToken = new ColoredToken(token.getAge().add(timeToPass), token.getColor());
+					if(!ctp.satisfiesInvariant(newToken)){
 						return false;
 					}
-
-
 				}
+			}else{
+				if (p instanceof TimedPlace){
+					TimedPlace timedPlace = (TimedPlace)p;
 
+					for (BigDecimal token : timedPlace.getTokens()){
+						if (!timedPlace.satisfiesInvariant(token.add(timeToPass))){   
+							return false;
+						}
+					}
+				}
 			}
 		}
 		return true;
@@ -3861,7 +3986,7 @@ implements Cloneable {
 		if(edit != null){
 			correctGuards(oldName, constant.getName());
 		}
-		
+
 		return edit;
 	}
 
@@ -3871,18 +3996,18 @@ implements Cloneable {
 			if(p instanceof TimedPlace){
 				TimedPlace tp = (TimedPlace)p;
 				String inv = tp.getInvariant();
-				
+
 				String operator = inv.contains("<=") ? "<=" : "<";
 				String first = inv.substring(operator.length());
-				
+
 				if(first.equals(oldName)){
 					first = newName;
 				}
-				
+
 				tp.setInvariant(operator + first);
 			}
 		}
-		
+
 	}
 
 
@@ -3895,14 +4020,14 @@ implements Cloneable {
 				String rightDelim = guard.substring(guard.length()-1, guard.length());
 				String first = guard.substring(1, guard.indexOf(","));
 				String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
-				
+
 				if(first.equals(oldName)){
 					first = newName;
 				}
 				if(second.equals(oldName)){
 					second = newName;
 				}
-				
+
 				tarc.setGuard(leftDelim + first + "," + second + rightDelim);
 			}
 		}
@@ -3942,7 +4067,7 @@ implements Cloneable {
 	public void buildConstraints() {
 		constants.buildConstraints(placesArray,arcsArray);
 	}	
-	
+
 	public boolean hasTAPNInhibitorArcs(){ // TODO: Fix this to make it faster
 		for(Arc arc : arcsArray){
 			if(arc instanceof TAPNInhibitorArc){
@@ -3960,5 +4085,37 @@ implements Cloneable {
 
 	public boolean isUsingColors() {
 		return useColors;
+	}
+
+
+	public void fireColoredTransitionBackwards(
+			ColoredDiscreteFiringAction action) {
+		for(Entry<ColoredTimedPlace, ColoredToken> entry : action.getConsumedTokens().entrySet()){
+			entry.getKey().addColoredToken(entry.getValue());
+		}
+
+		for(Entry<ColoredTimedPlace, ColoredToken> entry : action.getProducedTokens().entrySet()){
+			entry.getKey().removeColoredToken(entry.getValue());
+		}
+
+		fireTransitionBackwards(action.getTransition());
+		setMatrixChanged(); 
+	}
+
+
+	public void fireTransition(ColoredDiscreteFiringAction action) {
+
+		for(Entry<ColoredTimedPlace, ColoredToken> entry : action.getConsumedTokens().entrySet()){
+			ColoredTimedPlace place = entry.getKey();
+			ColoredToken token = entry.getValue();
+
+			place.removeColoredToken(token);
+		}
+
+		for(Entry<ColoredTimedPlace, ColoredToken> entry : action.getProducedTokens().entrySet()){
+			entry.getKey().addColoredToken(entry.getValue());
+		}
+
+		setMatrixChanged(); 
 	}
 }

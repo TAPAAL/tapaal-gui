@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.BoxLayout;
@@ -20,13 +21,16 @@ import javax.swing.Timer;
 import dk.aau.cs.debug.Logger;
 
 import pipe.dataLayer.Arc;
+import pipe.dataLayer.ColoredDiscreteFiringAction;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DiscreetFiringAction;
+import pipe.dataLayer.FiringAction;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
+import pipe.dataLayer.colors.ColoredToken;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
@@ -260,6 +264,8 @@ public class Animator {
 					 
 				 }
 
+			 }else if(actionHistory.get(currentAction) instanceof ColoredDiscreteFiringAction){
+				 CreateGui.currentPNMLData().fireColoredTransitionBackwards((ColoredDiscreteFiringAction)actionHistory.get(currentAction));
 			 }else if (actionHistory.get(currentAction) instanceof Transition ){
 				 Transition lastTransitionFired = (Transition)actionHistory.get(currentAction); 
 				 CreateGui.currentPNMLData().fireTransitionBackwards(lastTransitionFired);
@@ -338,6 +344,9 @@ public class Animator {
 				 }
 
 
+			 }else if(actionHistory.get(currentAction+1) instanceof ColoredDiscreteFiringAction){
+				 ColoredDiscreteFiringAction action = (ColoredDiscreteFiringAction)actionHistory.get(currentAction+1);
+				 CreateGui.currentPNMLData().fireTransition(action);
 			 }else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
 				 BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
 
@@ -412,7 +421,7 @@ public class Animator {
 		 }
 		 
 		 CreateGui.getAnimationHistory().addHistoryItem(transition.getName());
-		 DiscreetFiringAction fired;
+		 FiringAction fired;
 		 fired = CreateGui.currentPNMLData().fireTransition(transition);
 		 
 		 
@@ -556,14 +565,15 @@ public class Animator {
 	 
 	 public interface Firingmode {
 		 
-		 public BigDecimal fire(ArrayList<BigDecimal> tokens);
+		 public ColoredToken fire(List<ColoredToken> tokens);
+		 public BigDecimal fire(List<BigDecimal> tokens);
 		 public String getName();
 		 
 	 }
 	 
 	 public class OldestFiringmode implements Firingmode {
 
-		public BigDecimal fire(ArrayList<BigDecimal> tokens) {
+		public BigDecimal fire(List<BigDecimal> tokens) {
 			BigDecimal max=tokens.get(0);
 			for (BigDecimal a : tokens){
 				if (a.compareTo(max) > 0){
@@ -576,12 +586,23 @@ public class Animator {
 		public String getName() {
 			return "Oldest";
 		}
+
+		public ColoredToken fire(List<ColoredToken> tokens) {
+			ColoredToken oldest = tokens.get(0);
+			for(ColoredToken token : tokens){
+				if(token.getAge().compareTo(oldest.getAge()) > 0){
+					oldest = token;
+				}
+			}
+			
+			return oldest;
+		}
 		 
 	 }
 	 
 	 public class YoungestFiringmode implements Firingmode {
 
-			public BigDecimal fire(ArrayList<BigDecimal> tokens) {
+			public BigDecimal fire(List<BigDecimal> tokens) {
 				BigDecimal min=tokens.get(0);
 				for (BigDecimal a : tokens){
 					if (a.compareTo(min) < 0){
@@ -594,14 +615,24 @@ public class Animator {
 			public String getName() {
 				return "Youngest";
 			}
-			 
+			
+			public ColoredToken fire(List<ColoredToken> tokens) {
+				ColoredToken youngest = tokens.get(0);
+				for(ColoredToken token : tokens){
+					if(token.getAge().compareTo(youngest.getAge()) < 0){
+						youngest = token;
+					}
+				}
+				
+				return youngest;
+			}			 
 	 }
 	 
 	 
 	 
 	 public class RandomFiringmode implements Firingmode {
 
-			public BigDecimal fire(ArrayList<BigDecimal> tokens) {
+			public BigDecimal fire(List<BigDecimal> tokens) {
 				Random generator = new Random();
 				
 				int random = generator.nextInt(tokens.size());
@@ -611,6 +642,12 @@ public class Animator {
 			
 			public String getName() {
 				return "Random";
+			}
+			
+			public ColoredToken fire(List<ColoredToken> tokens) {
+				Random generator = new Random();
+				int random = generator.nextInt(tokens.size());
+				return tokens.get(random);
 			}
 			 
 	 }
@@ -626,7 +663,7 @@ public class Animator {
 		 	}
 		 
 			
-			public BigDecimal fire(ArrayList<BigDecimal> tokens) {
+			public BigDecimal fire(List<BigDecimal> tokens) {
 				
 				BigDecimal toReturn = tokens.get(tokensToFire.get(0));
 				tokensToFire.remove(0);
@@ -636,6 +673,13 @@ public class Animator {
 			 
 			public String getName() {
 				return "Select";
+			}
+			
+			public ColoredToken fire(List<ColoredToken> tokens) {
+				ColoredToken token = tokens.get(tokensToFire.get(0));
+				tokensToFire.remove(0);
+				
+				return token;
 			}
 	 }
 	 

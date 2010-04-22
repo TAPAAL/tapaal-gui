@@ -35,17 +35,31 @@ public class ColoredTransportArc extends TransportArc {
 	private void initialize() {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
-		
+
 		updateWeightLabel();
 	}
 
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
 		int value = val.getValue();
-		
+
 		return colorGuard.contains(value) && timeGuard.contains(token);
 	}
-	
+
+	public boolean satisfiesTargetInvariant(ColoredToken token) {
+		ColoredTimedPlace place = getTargetPlace();
+		ColoredToken newToken = generateOutputToken(token);
+		return place.satisfiesInvariant(newToken);
+	}
+
+	private ColoredTimedPlace getTargetPlace() {
+		if(getTarget() instanceof ColoredTimedPlace)
+			return (ColoredTimedPlace)getTarget();
+		else{
+			return (ColoredTimedPlace)getConnectedTo().getTarget();
+		}
+	}
+
 	public String getOutputString(){
 		return "v := " + outputValue;
 	}
@@ -55,7 +69,7 @@ public class ColoredTransportArc extends TransportArc {
 		String guard = null;
 		if (isInPreSet()){
 			guard = "age \u2208 " + timeGuard + " : " + getGroup();
-			
+
 			if(colorGuard != null && !colorGuard.isEmpty()){
 				guard += "\n val \u2208 " + colorGuard.toString();
 			}
@@ -71,7 +85,7 @@ public class ColoredTransportArc extends TransportArc {
 				guard = "preserve age : " + getGroup() + "\n preserve val";
 			}
 		}
-		
+
 		weightLabel.setText(guard);
 		this.setWeightLabelPosition();
 	}
@@ -92,26 +106,26 @@ public class ColoredTransportArc extends TransportArc {
 	public Preserve getPreservation() {
 		return preserves;
 	}
-	
+
 	public IntOrConstant getOutputValue(){
 		return outputValue;
 	}
-	
+
 	public UndoableEdit setOutputValue(IntOrConstant value){
 		IntOrConstant old = this.outputValue;
 		this.outputValue = value;
-		
+
 		updateWeightLabel();
-		
+
 		return new ColoredTransportArcUpdateValueEdit(this, old, value);
 	}
 
 	public UndoableEdit setPreservation(Preserve newPreserve) {
 		Preserve old = this.preserves;
 		this.preserves = newPreserve;
-		
+
 		updateWeightLabel();
-		
+
 		return new ColoredTransportArcPreserveEdit(this, old, newPreserve);
 	}
 
@@ -122,14 +136,24 @@ public class ColoredTransportArc extends TransportArc {
 	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
-		
+
 		updateWeightLabel();
-		
+
 		return new ColoredTransportArcTimeGuardEdit(this, old, newTimeGuard);
 	}
 
 	public ColorSet getColorGuard() {
 		return colorGuard;
+	}
+
+	public ColoredToken generateOutputToken(ColoredToken consumedToken) {
+		if(preserves.equals(Preserve.Age)){
+			return new ColoredToken(consumedToken.getAge(),getOutputValue());
+		}else if(preserves.equals(Preserve.Value)){
+			return new ColoredToken(consumedToken.getColor());
+		}else{
+			return new ColoredToken(consumedToken.getAge(), consumedToken.getColor());
+		}
 	}
 
 }

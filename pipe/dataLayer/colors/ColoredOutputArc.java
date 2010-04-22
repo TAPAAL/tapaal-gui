@@ -58,4 +58,8 @@ public class ColoredOutputArc extends NormalArc {
 		
 		this.setWeightLabelPosition();
 	}
+
+	public ColoredToken generateOutputToken() {
+		return new ColoredToken(getOutputValue());
+	}
 }
