@@ -347,6 +347,10 @@ public class Animator {
 			 }else if(actionHistory.get(currentAction+1) instanceof ColoredDiscreteFiringAction){
 				 ColoredDiscreteFiringAction action = (ColoredDiscreteFiringAction)actionHistory.get(currentAction+1);
 				 CreateGui.currentPNMLData().fireTransition(action);
+				 CreateGui.currentPNMLData().setEnabledTransitions();
+				 unhighlightDisabledTransitions();
+				 highlightEnabledTransitions();
+				 currentAction++;
 			 }else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
 				 BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
 
