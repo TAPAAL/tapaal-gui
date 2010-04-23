@@ -41,6 +41,12 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DataLayerWriter;
@@ -882,13 +888,25 @@ EOC */
 		}
 
 		setObjects(freeSpace);
+		int currentlySelected = appTab.getSelectedIndex();
+		
+		if (file == null) {
+			name = "New Petri net " + (newNameCounter++) + ".xml";
+		} else {
+			name = file.getName();
+		}
+		
+		JScrollPane scroller = new JScrollPane(appView);
+		// make it less bad on XP
+		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		appTab.addTab(name,null,scroller,null);
+		appTab.setSelectedIndex(freeSpace);
+		
 
 		appModel.addObserver((Observer)appView); // Add the view as Observer
 		appModel.addObserver((Observer)appGui);  // Add the app window as observer
 
-		if (file == null) {
-			name = "New Petri net " + (newNameCounter++) + ".xml";
-		} else {
+		if(file != null){
 			try {
 				//BK 10/02/07: Changed loading of PNML to accomodate new
 				//PNMLTransformer class
@@ -898,35 +916,41 @@ EOC */
 					appModel.createFromPNML(
 							transformer.transformTN(file.getPath()));
 				} else {
-
-					PNMLTransformer transformer = new PNMLTransformer();
-					appModel.createFromPNML(
-							transformer.transformPNML(file.getPath()));
-
+					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+					Document doc = builder.parse(file);
+					
+					Node top = doc.getElementsByTagName("net").item(0);
+					boolean colors = ((Element)top).getAttribute("type").equals("Colored P/T net");
+					
+					if(colors){
+						appModel.createFromPNML(doc,true);
+					}else{
+						PNMLTransformer transformer = new PNMLTransformer();
+						Document PNMLDoc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
+						appModel.createFromPNML(PNMLDoc, false);
+					}
+					
 					appView.scrollRectToVisible(new Rectangle(0,0,1,1));
 				}
 
 				CreateGui.setFile(file,freeSpace);
-				name = file.getName();
 			} catch(Exception e) {
+				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(
 						GuiFrame.this,
 						"Error loading file:\n" + name + "\nGuru meditation:\n"
 						+ e.toString(),
 						"File load error",
 						JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
+				e.printStackTrace();				
+				
 				return;
 			}
 		}
 
 		appView.setNetChanged(false);   // Status is unchanged
 
-		JScrollPane scroller = new JScrollPane(appView);
-		// make it less bad on XP
-		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		appTab.addTab(name,null,scroller,null);
-		appTab.setSelectedIndex(freeSpace);
+		
 
 		appView.updatePreferredSize();
 		
@@ -937,6 +961,14 @@ EOC */
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
 	}
+
+	private void undoAddTab(int currentlySelected) {
+		CreateGui.undoGetFreeSpace();
+		appTab.removeTabAt(appTab.getTabCount()-1);
+		appTab.setSelectedIndex(currentlySelected);
+		
+	}
+
 
 	// XXX - testting kyrke
 	/**

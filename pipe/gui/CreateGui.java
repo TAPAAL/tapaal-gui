@@ -460,6 +460,11 @@ public class CreateGui {
 	 }
 
 
+	public static void undoGetFreeSpace() {
+		tabs.remove(tabs.size()-1);
+	}
+
+
 
 
 

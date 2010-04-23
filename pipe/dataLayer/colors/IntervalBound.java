@@ -23,6 +23,26 @@ public class IntervalBound {
 		}
 	}
 
+	public IntervalBound(String upperBound) {
+		if(upperBound.equals("inf")){
+			this.a = new IntOrConstant();
+			this.b = new IntOrConstant(-1);
+		}else{
+			if(upperBound.contains("*")){
+				this.a = new IntOrConstant(upperBound.substring(0, upperBound.indexOf("*")));
+				
+				if(upperBound.contains("+")){
+					this.b = new IntOrConstant(upperBound.substring(upperBound.lastIndexOf("+")+1));
+				}else{
+					this.b = new IntOrConstant();
+				}
+			}else{
+				this.a = new IntOrConstant();
+				this.b = new IntOrConstant(upperBound);
+			}
+		}
+	}
+
 	public String toString() {
 		if(goesToInfinity()){
 			return "inf";

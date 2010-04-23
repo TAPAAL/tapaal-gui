@@ -11,11 +11,15 @@ public class IntOrConstant {
 	}
 	
 	public IntOrConstant(String intOrConstant){
+		this(intOrConstant, true);
+	}
+	
+	public IntOrConstant(String intOrConstant, boolean checkUsage){
 		try{
 			value = Integer.parseInt(intOrConstant);
 			if(value < 0) throw new IllegalArgumentException(intOrConstant);
 		}catch(IllegalArgumentException e){
-			if(!CreateGui.getModel().isConstantNameUsed(intOrConstant)){
+			if(checkUsage && !CreateGui.getModel().isConstantNameUsed(intOrConstant)){
 				throw new IllegalArgumentException(intOrConstant);
 			}else{
 				name = intOrConstant;
@@ -29,7 +33,7 @@ public class IntOrConstant {
 	
 	public IntOrConstant(IntOrConstant color) {
 		this.value = color.value;
-		this.name = name;
+		this.name = color.name;
 	}
 
 	public boolean isUsingConstant(){

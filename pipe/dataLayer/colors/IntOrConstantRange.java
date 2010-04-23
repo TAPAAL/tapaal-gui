@@ -87,22 +87,22 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 		return from.getValue() - range.from.getValue();
 	}
 
-	public static IntOrConstantRange parse(String range) {
+	public static IntOrConstantRange parse(String range, boolean checkUsage) {
 		if(range.contains("-")){
 			if(range.indexOf("-") == range.length()-1){ // Format: x-
-				IntOrConstant i = new IntOrConstant(range.substring(0,range.length()-1));
+				IntOrConstant i = new IntOrConstant(range.substring(0,range.length()-1),checkUsage);
 				return new IntOrConstantRange(i, true);
 			}else{ // Format: x-y
 				String[] limits = range.split("-");
 				if(limits.length > 2) throw new IllegalArgumentException("does not match range format");
 				
-				IntOrConstant lower = new IntOrConstant(limits[0]);
-				IntOrConstant upper = new IntOrConstant(limits[1]);
+				IntOrConstant lower = new IntOrConstant(limits[0],checkUsage);
+				IntOrConstant upper = new IntOrConstant(limits[1],checkUsage);
 				
 				return new IntOrConstantRange(lower,upper);
 			}
 		}else{ // Format: x
-			IntOrConstant i = new IntOrConstant(range);
+			IntOrConstant i = new IntOrConstant(range, checkUsage);
 			return new IntOrConstantRange(i);
 		}
 	}
@@ -127,6 +127,10 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 	
 	public IntOrConstant getTo() {
 		return to;
+	}
+
+	public static IntOrConstantRange parse(String str) {
+		return parse(str, true);
 	}
 	
 }

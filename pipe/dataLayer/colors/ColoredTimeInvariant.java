@@ -17,6 +17,13 @@ public class ColoredTimeInvariant {
 		this.upper = upper;
 	}
 	
+	public ColoredTimeInvariant(String invariant) {
+		String operator = invariant.contains("<=") ? "<=" : "<";
+		
+		strictLessThan = operator.equals("<");
+		upper = new IntervalBound(invariant.substring(operator.length()).trim());		
+	}
+
 	public boolean goesToInfinity(){
 		return upper == null;
 	}

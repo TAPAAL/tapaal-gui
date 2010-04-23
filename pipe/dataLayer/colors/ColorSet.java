@@ -7,58 +7,73 @@ import java.util.SortedSet;
 
 import java.util.TreeSet;
 
+import javax.swing.JOptionPane;
+
+import pipe.gui.CreateGui;
+
 public class ColorSet {
 	private SortedSet<IntOrConstantRange> ranges;
-	
+
 	public ColorSet(){
 		ranges = new TreeSet<IntOrConstantRange>();
 	}
-	
+
+	public ColorSet(String colorSet) {
+		this();
+		if(colorSet != null && !colorSet.isEmpty()){
+			String[] ranges = colorSet.split(",");
+			for(String range : ranges){
+				IntOrConstantRange ir = IntOrConstantRange.parse(range.trim(), true);
+				add(ir);
+			}
+		}
+	}
+
 	public boolean contains(IntOrConstantRange range){
 		for(IntOrConstantRange ir : ranges){
 			if(ir.overlaps(range)){
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public void add(IntOrConstantRange range){
 		ranges.add(range);
 	}
-	
+
 	public void remove(IntOrConstantRange range){
 		ranges.remove(range);
 	}
-	
+
 	public boolean contains(int color) {
 		if(isEmpty()) return true;
-		
+
 		for(IntOrConstantRange ir : ranges){
 			if(ir.isInRange(color)) return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public String toStringNoSetNotation(){
 		if(ranges.isEmpty()) return "";
 		StringBuilder builder = new StringBuilder("");
-		
+
 		boolean first = true;
 		for(IntOrConstantRange ir : ranges){
 			if(!first){
 				builder.append(", ");
 			}
-			
+
 			builder.append(ir.toString());
 			first = false;
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	public String toString() {
 		String str = toStringNoSetNotation();
 		if(!str.isEmpty()){
@@ -74,11 +89,11 @@ public class ColorSet {
 
 	public List<String> getUsedConstants() {
 		List<String> list = new ArrayList<String>();
-		
+
 		for(IntOrConstantRange range : ranges){
 			list.addAll(range.getUsedConstants());
 		}
-		
+
 		return list;		
 	}
 

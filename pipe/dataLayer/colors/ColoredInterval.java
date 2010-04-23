@@ -21,6 +21,14 @@ public class ColoredInterval {
 		this.upper = upper;		
 	}
 	
+	public ColoredInterval(String interval) {
+		this(interval.substring(0,1),
+				new IntervalBound(interval.substring(1,interval.indexOf(",")).trim()),
+				new IntervalBound(interval.substring(interval.indexOf(",")+1, interval.length()-1).trim()),
+				interval.substring(interval.length()-1));
+		
+	}
+
 	public IntervalBound getLower(){
 		return lower;
 	}

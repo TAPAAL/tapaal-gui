@@ -32,10 +32,14 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTimeInvariant;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
+import pipe.dataLayer.colors.IntOrConstant;
+import pipe.dataLayer.colors.Preserve;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -1256,7 +1260,7 @@ implements Cloneable {
 
 		if (heightTemp.length() > 0) {
 			heightInput = Integer.valueOf(heightTemp).intValue() *
-			(false ? DISPLAY_SCALE_FACTORY : 1) +
+			(1) +
 			(false ? DISPLAY_SHIFT_FACTORY : 1);
 		}
 
@@ -1286,12 +1290,9 @@ implements Cloneable {
 		int positionXInput = 0;
 		int positionYInput = 0;
 		String type = null;
-		boolean borderInput = true;
-
 		String positionXTempStorage = inputDefinitionElement.getAttribute("positionX");
 		String positionYTempStorage = inputDefinitionElement.getAttribute("positionY");
 		String typeTemp = inputDefinitionElement.getAttribute("type");
-		String borderTemp = "true";
 		String nameTemp = inputDefinitionElement.getAttribute("name");
 		String expressionTemp = inputDefinitionElement.getAttribute("expression");
 
@@ -1342,8 +1343,6 @@ implements Cloneable {
 		boolean infiniteServer;
 		int angle = 0;
 		int priority = 1;
-		double weight = 1.0;
-
 		String positionXTempStorage = element.getAttribute("positionX");
 		String positionYTempStorage = element.getAttribute("positionY");
 		String idTempStorage = element.getAttribute("id");
@@ -1381,13 +1380,13 @@ implements Cloneable {
 
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Double.valueOf(positionXTempStorage).doubleValue() *
-			(false ? Pipe.DISPLAY_SCALE_FACTORX : 1) +
-			(false ? Pipe.DISPLAY_SHIFT_FACTORX : 1);
+			(1) +
+			(1);
 		}
 		if (positionYTempStorage.length() > 0) {
 			positionYInput = Double.valueOf(positionYTempStorage).doubleValue() *
-			(false ? Pipe.DISPLAY_SCALE_FACTORY : 1) +
-			(false ? Pipe.DISPLAY_SHIFT_FACTORY : 1);
+			(1) +
+			(1);
 		}
 
 		positionXInput = Grid.getModifiedX(positionXInput);
@@ -1431,23 +1430,9 @@ implements Cloneable {
 		}
 
 		Transition transition = null;
-		// XXX - we need to se here if it is a TAPN or normal thing we are loading
-		// XXX - this is a quick hack
-		if (true) {
+		{
 			transition =  
 				new TAPNTransition(positionXInput, positionYInput,     
-						idInput, 
-						nameInput, 
-						nameOffsetXInput, nameOffsetYInput, 
-						rate, 
-						timedTransition, 
-						infiniteServer,
-						angle,
-						priority);
-		} else {
-
-			transition =  
-				new Transition(positionXInput, positionYInput,     
 						idInput, 
 						nameInput, 
 						nameOffsetXInput, nameOffsetYInput, 
@@ -3468,33 +3453,326 @@ implements Cloneable {
 	 * This code is modified so that dataLayer objects can be created
 	 * outside the GUI
 	 */
-	public void createFromPNML(Document PNMLDoc)	{
+	public void createFromPNML(Document PNMLDoc){
+		createFromPNML(PNMLDoc, false);		
+	}
+	
+	public void createFromPNML(Document PNMLDoc, boolean colors)	{
 		// XXX - kyrke debug
 		emptyPNML();
 		Node node = null;
 		NodeList nodeList = null;
 
 		try {
-			nodeList = PNMLDoc.getDocumentElement().getChildNodes();
 			if (CreateGui.getApp()!=null) {
 				// Notifies used to indicate new instances.
 				CreateGui.getApp().setMode(Pipe.CREATING); 
 			}
+
+			if(colors){
+				nodeList = PNMLDoc.getElementsByTagName("net").item(0).getChildNodes();
+			}else{
+				nodeList = PNMLDoc.getDocumentElement().getChildNodes();
+			}
+			
+
 			for(int i = 0 ; i < nodeList.getLength() ; i++) {
 				node = nodeList.item(i);
 
-				parseElement(node);
+				if(colors){
+					parseColoredElement(node);
+				}else{
+					parseElement(node);
+				}
 			}
 
 			if (CreateGui.getApp()!=null) {
 				CreateGui.getApp().restoreMode();
 			}
 			buildConstraints();
+			this.useColors = colors;
+			
 		} catch (Exception e) {
 			System.out.println("runtime except");
 			throw new RuntimeException(e);
 		}
 	}
+
+	private void parseColoredElement(Node node) {
+		Element element;
+		if(node instanceof Element) {
+			element = (Element)node;
+			if ("labels".equals(element.getNodeName())){
+				addAnnotation(createAnnotation(element));
+			} else if ("definition".equals(element.getNodeName())){
+				Note note = createParameter(element);
+				if (note instanceof MarkingParameter) {
+					addAnnotation((MarkingParameter)note);
+				} else if (note instanceof RateParameter) {
+					addAnnotation((RateParameter)note);
+				}
+			} else if("place".equals(element.getNodeName())){
+				addPlace(createColoredPlace(element));
+			} else if ("transition".equals(element.getNodeName())){
+				addTransition(createTransition(element));
+			} else if ("arc".equals(element.getNodeName())) {
+				Arc newArc = createColoredArc(element);
+				if (newArc instanceof InhibitorArc) {
+					addArc((InhibitorArc) newArc);
+				} else if (newArc instanceof TAPNInhibitorArc) {
+					addArc((TAPNInhibitorArc) newArc);
+				} else {
+					addArc((NormalArc) newArc);
+					checkForInverseArc((NormalArc) newArc);
+				}                  
+			} else if( "queries".equals(element.getNodeName()) ){
+				TAPNQuery query = createQuery(element);
+				queries.add(query);
+			} else if ("constant".equals(element.getNodeName())){
+				String name = element.getAttribute("name");
+				int value = Integer.parseInt(element.getAttribute("value"));
+				if(!name.isEmpty() && value >= 0)
+					addConstant(name, value);
+			} else {
+				System.out.println("!" + element.getNodeName());
+			}
+		}
+
+	}
+
+
+	private Arc createColoredArc(Element inputArcElement) {
+		String idInput = null;
+		String sourceInput = null;
+		String targetInput = null;
+		double startX = 0;
+		double startY = 0;
+		boolean taggedArc;
+
+		sourceInput = inputArcElement.getAttribute("source");
+		targetInput = inputArcElement.getAttribute("target");
+		idInput = inputArcElement.getAttribute("id");
+
+		String taggedTempStorage = inputArcElement.getAttribute("tagged");
+		//		String inscriptionOffsetXTempStorage = inputArcElement.getAttribute("inscriptionOffsetX");
+		//		String inscriptionOffsetYTempStorage = inputArcElement.getAttribute("inscriptionOffsetY");
+
+		taggedArc = !(taggedTempStorage.length() == 0 ||
+				taggedTempStorage.length() == 5);
+
+		if (sourceInput.length() > 0) {
+			if (getPlaceTransitionObject(sourceInput) != null) {
+				//				System.out.println("PNMLDATA: sourceInput is not null");
+				startX = getPlaceTransitionObject(sourceInput).getPositionX();
+				startX += getPlaceTransitionObject(sourceInput).centreOffsetLeft();
+				startY = getPlaceTransitionObject(sourceInput).getPositionY();
+				startY += getPlaceTransitionObject(sourceInput).centreOffsetTop();
+			}
+		}
+		if (targetInput.length() > 0) {
+			if (getPlaceTransitionObject(targetInput) != null) {
+			}
+		}
+
+		PlaceTransitionObject sourceIn = getPlaceTransitionObject(sourceInput);
+		PlaceTransitionObject targetIn = getPlaceTransitionObject(targetInput);
+
+		// add the insets and offset
+		int aStartx = sourceIn.getX() + sourceIn.centreOffsetLeft();
+		int aStarty = sourceIn.getY() + sourceIn.centreOffsetTop();
+
+		int aEndx = targetIn.getX() + targetIn.centreOffsetLeft();
+		int aEndy = targetIn.getY() + targetIn.centreOffsetTop();
+
+
+		double _startx = aStartx;
+		double _starty = aStarty;
+		double _endx = aEndx;
+		double _endy = aEndy;
+
+		String type = inputArcElement.getAttribute("type");
+
+		Arc arc = null;
+
+		if(type.equals("ColoredInputArc")){
+			ColoredInputArc cia = new ColoredInputArc(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc));
+			ColoredInterval timeGuard = new ColoredInterval(inputArcElement.getAttribute("timeGuard"));
+			cia.setTimeGuard(timeGuard);
+
+			ColorSet colorGuard = new ColorSet(inputArcElement.getAttribute("colorGuard"));
+			cia.setColorGuard(colorGuard);
+
+			arc = cia;
+		}else if(type.equals("ColoredOutputArc")){
+			ColoredOutputArc coa = new ColoredOutputArc(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc);
+			coa.setOutputValue(new IntOrConstant(inputArcElement.getAttribute("outputValue")));
+
+			arc = coa;
+		}else if(type.equals("ColoredInhibitorArc")){
+			ColoredInhibitorArc cia = new ColoredInhibitorArc(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc));
+			ColoredInterval timeGuard = new ColoredInterval(inputArcElement.getAttribute("timeGuard"));
+			cia.setTimeGuard(timeGuard);
+
+			ColorSet colorGuard = new ColorSet(inputArcElement.getAttribute("colorGuard"));
+			cia.setColorGuard(colorGuard);
+
+			arc = cia;
+
+		}else if(type.equals("ColoredTransportArc")){
+			ColoredTransportArc cta = new ColoredTransportArc(
+					new TimedArc( new NormalArc(_startx, _starty,
+							_endx, _endy,
+							sourceIn,
+							targetIn,
+							1,
+							idInput,
+							taggedArc),
+						""),
+					Integer.parseInt(inputArcElement.getAttribute("groupNo")), 
+					sourceIn instanceof Place);
+			
+			ColoredInterval timeGuard = new ColoredInterval(inputArcElement.getAttribute("timeGuard"));
+			cta.setTimeGuard(timeGuard);
+
+			ColorSet colorGuard = new ColorSet(inputArcElement.getAttribute("colorGuard"));
+			cta.setColorGuard(colorGuard);
+			
+			Preserve preservation = Preserve.valueOf(inputArcElement.getAttribute("preservation"));
+			cta.setPreservation(preservation);
+			
+			IntOrConstant outputValue = new IntOrConstant(inputArcElement.getAttribute("outputValue"));
+			cta.setOutputValue(outputValue);
+
+			arc = cta;
+		}
+
+		getPlaceTransitionObject(sourceInput).addConnectFrom(arc);
+		getPlaceTransitionObject(targetInput).addConnectTo(arc);
+
+		//		**********************************************************************************
+		//		The following section attempts to load and display arcpath details****************
+
+		//NodeList nodelist = inputArcElement.getChildNodes();
+		NodeList nodelist = inputArcElement.getElementsByTagName("arcpath");
+		if (nodelist.getLength()>0) {
+			arc.getArcPath().purgePathPoints();
+			for (int i = 0; i < nodelist.getLength(); i++) {         
+				Node node = nodelist.item(i);
+				if(node instanceof Element) {
+					Element element = (Element)node;
+					if ("arcpath".equals(element.getNodeName())){
+						String arcTempX = element.getAttribute("xCoord");
+						String arcTempY = element.getAttribute("yCoord");
+						String arcTempType = element.getAttribute("arcPointType");
+						float arcPointX = Float.valueOf(arcTempX).floatValue();
+						float arcPointY = Float.valueOf(arcTempY).floatValue();
+						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
+						boolean arcPointType = 
+							Boolean.valueOf(arcTempType).booleanValue();
+						arc.getArcPath().addPoint(arcPointX,arcPointY,arcPointType);
+					}
+				}
+			}
+		}
+
+		//		Arc path creation ends here***************************************************************
+		//		******************************************************************************************
+		return arc;
+	}
+
+
+	private Place createColoredPlace(Element element) {
+		double positionXInput = 0;
+		double positionYInput = 0;
+		String idInput = element.getAttribute("id");
+		String nameInput = element.getAttribute("name");
+		double nameOffsetYInput = 0;
+		double nameOffsetXInput = 0;
+		double markingOffsetXInput = 0;
+		double markingOffsetYInput = 0;
+		int capacityInput = 0;
+
+		String positionXTempStorage = element.getAttribute("positionX");
+		String positionYTempStorage = element.getAttribute("positionY");
+		String nameOffsetXTempStorage = element.getAttribute("nameOffsetX");
+		String nameOffsetYTempStorage = element.getAttribute("nameOffsetY");
+		String initialMarkingTempStorage = element.getAttribute("initialMarking");
+		String markingOffsetXTempStorage = element.getAttribute("markingOffsetX");
+		String markingOffsetYTempStorage = element.getAttribute("markingOffsetY");
+		String capacityTempStorage = element.getAttribute("capacity");
+		String parameterTempStorage = element.getAttribute("parameter");
+
+		if (positionXTempStorage.length() > 0) {
+			positionXInput = Double.valueOf(positionXTempStorage).doubleValue() + 1;
+		}
+		if (positionYTempStorage.length() > 0) {
+			positionYInput = Double.valueOf(positionYTempStorage).doubleValue() + 1;
+		}
+
+		positionXInput = Grid.getModifiedX(positionXInput);
+		positionYInput = Grid.getModifiedY(positionYInput);
+
+		if (nameOffsetYTempStorage.length() > 0) {
+			nameOffsetXInput = Double.valueOf(nameOffsetXTempStorage).doubleValue();
+		}
+		if (nameOffsetXTempStorage.length() > 0) {
+			nameOffsetYInput = Double.valueOf(nameOffsetYTempStorage).doubleValue();
+		}
+
+		if (initialMarkingTempStorage.length() > 0) {
+		}
+		if (markingOffsetXTempStorage.length() > 0) {
+			markingOffsetXInput = Double.valueOf(markingOffsetXTempStorage).doubleValue();
+		}
+		if (markingOffsetYTempStorage.length() > 0) {
+			markingOffsetYInput = Double.valueOf(markingOffsetYTempStorage).doubleValue();
+		}
+
+		if (capacityTempStorage.length() > 0) {
+			capacityInput = Integer.valueOf(capacityTempStorage).intValue();
+		}
+
+		ColoredTimeInvariant timeInvariant = new ColoredTimeInvariant(element.getAttribute("timeInvariant"));
+		ColorSet colorInvariant = new ColorSet(element.getAttribute("colorInvariant"));
+
+		ColoredTimedPlace place = new ColoredTimedPlace(positionXInput,positionYInput, idInput, nameInput,nameOffsetXInput, nameOffsetYInput, 0, markingOffsetXInput, markingOffsetYInput, capacityInput, "");
+		place.setTimeInvariant(timeInvariant);
+		place.setColorInvariant(colorInvariant);
+
+		NodeList tokenNodes = element.getChildNodes();
+		List<ColoredToken> tokens = parseTokens(tokenNodes);
+		place.setColoredTokens(tokens);
+
+		if (parameterTempStorage.length() > 0) {
+			if (existsMarkingParameter(parameterTempStorage)) { 
+				for (int i = 0; i < markingParametersArray.size(); i++) {
+					if (parameterTempStorage.equals(
+							((MarkingParameter)markingParametersArray.get(i)).getName())) {
+						place.setMarkingParameter(
+								(MarkingParameter)markingParametersArray.get(i));
+					}
+				}
+			}
+		}
+
+		return place;
+	}
+
+
+	private List<ColoredToken> parseTokens(NodeList tokenNodes) {
+		ArrayList<ColoredToken> list = new ArrayList<ColoredToken>();
+
+		for(int i = 0; i < tokenNodes.getLength(); i++){
+			Element element = (Element)tokenNodes.item(i);
+
+			IntOrConstant value = new IntOrConstant(element.getAttribute("value"));
+			list.add(new ColoredToken(value));
+		}
+
+		return list;
+	}
+
 
 	/**
 	 * Create model from transformed PNML file

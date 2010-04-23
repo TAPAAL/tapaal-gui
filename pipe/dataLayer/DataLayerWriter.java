@@ -23,6 +23,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import pipe.dataLayer.colors.ColoredInhibitorArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.ColoredToken;
+import pipe.dataLayer.colors.ColoredTransportArc;
+
 
 /**
  * Create DataLayerWriter object
@@ -86,7 +93,11 @@ public class DataLayerWriter {
 			netAttrId.setValue("Net-One");
 			NET.setAttributeNode(netAttrId);
 			Attr netAttrType = pnDOM.createAttribute("type"); // Net "type" Attribute
-			netAttrType.setValue("P/T net");
+			if(netModel.isUsingColors()){
+				netAttrType.setValue("Colored P/T net");
+			}else{
+				netAttrType.setValue("P/T net");
+			}
 			NET.setAttributeNode(netAttrType);
 
 			AnnotationNote[] labels = netModel.getLabels();
@@ -104,6 +115,12 @@ public class DataLayerWriter {
 				NET.appendChild(createDefinition(rateParameters[i], pnDOM));
 			}   
 
+			Collection<Constant> constants = netModel.getConstants();
+			for(Constant constant : constants)
+			{
+				Element elem = createConstantElement(constant, pnDOM);
+				NET.appendChild(elem);
+			}
 
 
 			Place[] places = netModel.getPlaces();
@@ -162,27 +179,20 @@ public class DataLayerWriter {
 				NET.appendChild(newQuery);
 			}
 
-			Collection<Constant> constants = netModel.getConstants();
-			for(Constant constant : constants)
-			{
-				Element elem = createConstantElement(constant, pnDOM);
-				NET.appendChild(elem);
-			}
-
 			//stateGroups = null;         
 
 			pnDOM.normalize();
 			// Create Transformer with XSL Source File
-			xsltSource = new StreamSource(Thread.currentThread().
-					getContextClassLoader().getResourceAsStream("xslt" + 
-							System.getProperty("file.separator") + "GeneratePNML.xsl"));
+			//			xsltSource = new StreamSource(Thread.currentThread().
+			//					getContextClassLoader().getResourceAsStream("xslt" + 
+			//							System.getProperty("file.separator") + "GeneratePNML.xsl"));
 
-			
-			transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
+			transformer = TransformerFactory.newInstance().newTransformer();
+			//			transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
 			// Write file and do XSLT transformation to generate correct PNML
 			File outputObjectArrayList = file;//new File(filename); // Output for XSLT Transformation
 			DOMSource source = new DOMSource(pnDOM);
-			
+
 			StreamResult result = new StreamResult(outputObjectArrayList);
 			transformer.transform(source, result);
 		} catch (ParserConfigurationException e) {
@@ -220,16 +230,16 @@ public class DataLayerWriter {
 
 	private Element createConstantElement(Constant constant, Document document) {
 		Element constantElement = null;
-		
+
 		if(document != null){
 			constantElement = document.createElement("constant");
 		}
-		
+
 		if(constant != null){
 			constantElement.setAttribute("name", constant.getName());
 			constantElement.setAttribute("value", String.valueOf(constant.getValue()));
 		}
-		
+
 		return constantElement;
 	}
 
@@ -297,10 +307,22 @@ public class DataLayerWriter {
 			placeElement.setAttribute("markingOffsetY", (markingOffsetYInput != null ? String.valueOf(markingOffsetYInput) : ""));
 			placeElement.setAttribute("capacity", (capacityInput != null ? String.valueOf(capacityInput) : ""));
 
-			if (inputPlace instanceof TimedPlace){        	 
-				String invariantInput = ((TimedPlace)inputPlace).getInvariant();
-				placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
-			}	
+			if(netModel.isUsingColors()){
+				ColoredTimedPlace ctp = (ColoredTimedPlace)inputPlace;
+				placeElement.setAttribute("timeInvariant", ctp.getTimeInvariant().toString());
+				placeElement.setAttribute("colorInvariant", ctp.getColorInvariantStringWithoutSetNotation());
+
+				for(ColoredToken token : ctp.getColoredTokens()){
+					Element elem = document.createElement("colored-token");
+					elem.setAttribute("value", token.getColor().toString());
+					placeElement.appendChild(elem);
+				}
+			}else{
+				if (inputPlace instanceof TimedPlace){        	 
+					String invariantInput = ((TimedPlace)inputPlace).getInvariant();
+					placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
+				}
+			}
 
 			placeElement.setAttribute("parameter", 
 					(markingParameter != null ? markingParameter : ""));         
@@ -435,53 +457,78 @@ public class DataLayerWriter {
 			arcElement.setAttribute("source", (sourceInput != null ? sourceInput : ""));
 			arcElement.setAttribute("target", (targetInput != null ? targetInput : ""));
 			/*CB Joakim Byg - Can now handle timed arcs*/
-			if (inputArc instanceof NormalArc ){
-
-				if (inputArc instanceof TimedArc){
-					if (inputArc instanceof TransportArc) {
-						arcElement.setAttribute("type", "transport");
-						if (inputArc.getSource() instanceof Place){
-							arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
-						}else {
-							arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
-						}
-						//it is not a TransportArc
-					
-					}
-					else if (inputArc instanceof TAPNInhibitorArc)
-					{
-						arcElement.setAttribute("type", "tapnInhibitor");
-						if (inputArc.getSource() instanceof Place)
-							arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
-						else
-							System.err.println("There is an TAPNInhibitorArc coming from a transition");
-					}
-					else
-					{
-						arcElement.setAttribute("type", "timed");
-						if (inputArc.getSource() instanceof Place){
-							arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
-						}else {
-							System.err.println("There is a TimedArc coming from a transition");
-						}
-					}
-
-					//Else the arc is not a TimedArc
-				} else {
-					arcElement.setAttribute("type", "normal");
-					arcElement.setAttribute("inscription", Integer.toString(inscriptionInput));
+			if(netModel.isUsingColors()){
+				if(inputArc instanceof ColoredInputArc){
+					arcElement.setAttribute("type", "ColoredInputArc");
+					ColoredInputArc coloredInputArc = (ColoredInputArc)inputArc;
+					arcElement.setAttribute("timeGuard", coloredInputArc.getTimeGuard().toString());
+					arcElement.setAttribute("colorGuard", coloredInputArc.getColorGuardStringWithoutSetNotation());
+				}else if(inputArc instanceof ColoredOutputArc){
+					arcElement.setAttribute("type", "ColoredOutputArc");
+					arcElement.setAttribute("outputValue", ((ColoredOutputArc)inputArc).getOutputValue().toString());
+				}else if(inputArc instanceof ColoredTransportArc){
+					arcElement.setAttribute("type", "ColoredTransportArc");
+					ColoredTransportArc cta = (ColoredTransportArc)inputArc;
+					arcElement.setAttribute("timeGuard", cta.getTimeGuard().toString());
+					arcElement.setAttribute("colorGuard", cta.getColorGuardStringWithoutSetNotation());
+					arcElement.setAttribute("groupNo", String.valueOf(cta.getGroupNr()));
+					arcElement.setAttribute("preservation", cta.getPreservation().toString());
+					arcElement.setAttribute("outputValue", cta.getOutputValue().toString());
+				}else if(inputArc instanceof ColoredInhibitorArc){
+					arcElement.setAttribute("type", "ColoredInhibitorArc");
+					ColoredInhibitorArc cia = (ColoredInhibitorArc)inputArc;
+					arcElement.setAttribute("timeGuard", cia.getTimeGuard().toString());
+					arcElement.setAttribute("colorGuard", cia.getColorGuardStringWithoutSetNotation());
 				}
-			} else if (inputArc instanceof InhibitorArc){
-				arcElement.setAttribute("type", "inhibitor");
-			} 
-			/*EOC*/           
-			// arcElement.setAttribute("inscriptionOffsetX", (inscriptionPositionXInput != null ? String.valueOf(inscriptionPositionXInput) : ""));
-			// arcElement.setAttribute("inscriptionOffsetY", (inscriptionPositionYInput != null ? String.valueOf(inscriptionPositionYInput) : ""));
+			}else{
+				if (inputArc instanceof NormalArc ){
 
-			if (inputArc instanceof NormalArc) {
-				boolean tagged = ((NormalArc)inputArc).isTagged();
-				arcElement.setAttribute("tagged", tagged ? "true" : "false");
-			}         
+					if (inputArc instanceof TimedArc){
+						if (inputArc instanceof TransportArc) {
+							arcElement.setAttribute("type", "transport");
+							if (inputArc.getSource() instanceof Place){
+								arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
+							}else {
+								arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
+							}
+							//it is not a TransportArc
+
+						}
+						else if (inputArc instanceof TAPNInhibitorArc)
+						{
+							arcElement.setAttribute("type", "tapnInhibitor");
+							if (inputArc.getSource() instanceof Place)
+								arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
+							else
+								System.err.println("There is an TAPNInhibitorArc coming from a transition");
+						}
+						else
+						{
+							arcElement.setAttribute("type", "timed");
+							if (inputArc.getSource() instanceof Place){
+								arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
+							}else {
+								System.err.println("There is a TimedArc coming from a transition");
+							}
+						}
+
+						//Else the arc is not a TimedArc
+					} else {
+						arcElement.setAttribute("type", "normal");
+						arcElement.setAttribute("inscription", Integer.toString(inscriptionInput));
+					}
+				} else if (inputArc instanceof InhibitorArc){
+					arcElement.setAttribute("type", "inhibitor");
+				} 
+				/*EOC*/           
+				// arcElement.setAttribute("inscriptionOffsetX", (inscriptionPositionXInput != null ? String.valueOf(inscriptionPositionXInput) : ""));
+				// arcElement.setAttribute("inscriptionOffsetY", (inscriptionPositionYInput != null ? String.valueOf(inscriptionPositionYInput) : ""));
+
+				if (inputArc instanceof NormalArc) {
+					boolean tagged = ((NormalArc)inputArc).isTagged();
+					arcElement.setAttribute("tagged", tagged ? "true" : "false");
+				}         
+			}
 		}
 		return arcElement;
 	}
