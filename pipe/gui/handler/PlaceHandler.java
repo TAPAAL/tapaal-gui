@@ -196,18 +196,20 @@ extends PlaceTransitionObjectHandler {
     		  undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
     	  }*/
 		} else {
-			int oldMarking = ((Place)myObject).getCurrentMarking();
-			int newMarking = oldMarking - e.getWheelRotation();
+			if(!CreateGui.getModel().isUsingColors()){
+				int oldMarking = ((Place)myObject).getCurrentMarking();
+				int newMarking = oldMarking - e.getWheelRotation();
 
-			if (newMarking < 0) {
-				newMarking = 0;
+				if (newMarking < 0) {
+					newMarking = 0;
+				}
+				if (oldMarking != newMarking) {            
+					undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));
+					if (((Place)myObject).getMarkingParameter() != null) {
+						undoManager.addEdit(((Place)myObject).clearMarkingParameter());
+					}            
+				} 
 			}
-			if (oldMarking != newMarking) {            
-				undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));
-				if (((Place)myObject).getMarkingParameter() != null) {
-					undoManager.addEdit(((Place)myObject).clearMarkingParameter());
-				}            
-			}         
 		}
 	}
 	@Override
