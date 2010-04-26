@@ -131,12 +131,16 @@ public class ColoredTimedPlace extends TimedPlace {
 
 	public UndoableEdit addColoredToken(ColoredToken token){
 		tokens.add(token);
+		
+		update();
 
 		return new ColoredPlaceAddTokenEdit(this, token);
 	}
 
 	public UndoableEdit removeColoredToken(ColoredToken token){
 		tokens.remove(token);
+		
+		update();
 
 		return new ColoredPlaceRemoveTokenEdit(this,token);
 	}
@@ -144,6 +148,8 @@ public class ColoredTimedPlace extends TimedPlace {
 	public UndoableEdit setColoredTokens(List<ColoredToken> newTokens) {
 		List<ColoredToken> old = this.tokens;
 		this.tokens = newTokens;
+		
+		update();
 
 		return new ColoredPlaceTokensChangedEdit(this,old,newTokens);
 	}

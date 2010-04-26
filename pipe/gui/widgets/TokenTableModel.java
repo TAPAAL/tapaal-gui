@@ -17,10 +17,15 @@ public class TokenTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = -6411895270257181310L;
 	private String[] columnNames = new String[] { "Age", "Value" };
 	private List<ColoredToken> tokens;
+	private boolean editable;
 	//private List<UndoableEdit> edits = new ArrayList<UndoableEdit>();
 	
+	public TokenTableModel(ColoredTimedPlace place){
+		this(place,true);
+	}
 	
-	public TokenTableModel(ColoredTimedPlace place) {
+	public TokenTableModel(ColoredTimedPlace place, boolean editable) {
+		this.editable = editable;
 		tokens = new ArrayList<ColoredToken>();
 		
 		for(ColoredToken token : place.getColoredTokens()){
@@ -53,7 +58,7 @@ public class TokenTableModel extends AbstractTableModel {
 	
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return columnIndex == 1;
+		return editable && columnIndex == 1;
 	}
 	
 	
