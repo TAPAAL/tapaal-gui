@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,17 +17,18 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.colors.ColoredTimedPlace;
-import pipe.dataLayer.colors.ColoredToken;
 import pipe.gui.undo.UndoManager;
 
 public class RemoveTokenPanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2685053954985939625L;
 	private JRootPane rootPane;
 	private ColoredTimedPlace place;
 	private UndoManager undoManager;
