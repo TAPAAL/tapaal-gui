@@ -3,6 +3,7 @@ package pipe.gui.handler;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
@@ -15,6 +16,7 @@ import javax.swing.JPopupMenu;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TimedArc;
@@ -67,20 +69,8 @@ extends PetriNetObjectHandler {
 			popup.insert(menuItem, popupIndex++);
 
 			popup.insert(new JPopupMenu.Separator(), popupIndex++);         
-		}if (myObject instanceof TAPNInhibitorArc) {
-			menuItem = new JMenuItem(new EditWeightAction(contentPane,
-					(Arc)myObject));
-			menuItem.setText("Edit Weight");
-			popup.insert(menuItem, popupIndex++);
-
-			menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
-					e.getPoint()));
-			menuItem.setText("Split Arc Segment");
-			popup.insert(menuItem, popupIndex++);
-
-			popup.insert(new JPopupMenu.Separator(), popupIndex++);
 			/*CB Joakim Byg - timed arcs should not be handled here*/         
-		}  else if (myObject instanceof NormalArc && !(myObject instanceof TimedArc) && !(myObject instanceof TransportArc)) {
+		} else if (myObject instanceof NormalArc && !(myObject instanceof TimedArc) && !(myObject instanceof TransportArc)) {
 			/*EOC*/
 			if (((NormalArc)myObject).isJoined()){
 				NormalArc PTArc;
@@ -158,9 +148,9 @@ extends PetriNetObjectHandler {
 					 */
 			} else {
 				//            if(!((NormalArc)myObject).isTagged()) {
-				menuItem = new JMenuItem(new EditWeightAction(contentPane, 
-						(Arc)myObject));
-				menuItem.setText("Edit Weight");
+				//menuItem = new JMenuItem(new EditWeightAction(contentPane, 
+				//		(Arc)myObject));
+				//menuItem.setText("Edit Weight");
 				//popup.insert(menuItem, popupIndex++);
 				//            }
 
@@ -177,12 +167,23 @@ extends PetriNetObjectHandler {
 				//                                             e.getPoint()));
 				//menuItem.setText("Split Arc Segment");
 
-
+				if(CreateGui.getModel().isUsingColors() && myObject instanceof ColoredOutputArc){
+					menuItem = new JMenuItem();            
+					menuItem.setText("Properties");
+					menuItem.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent e) {
+							showOutputValueEditor((ColoredOutputArc)myObject);
+						}
+					}); 
+					popup.insert(menuItem, popupIndex++);
+				}
+				
 				menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
 						e.getPoint()));            
 				menuItem.setText("Insert Point");
 				popup.insert(menuItem, popupIndex++);
 
+				
 				if (((NormalArc)myObject).hasInverse()){
 					menuItem = new JMenuItem(
 							new SplitArcsAction((NormalArc)myObject, false));

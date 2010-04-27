@@ -29,7 +29,7 @@ public class TimedArcHandler extends ArcHandler{
 
 		if (myObject instanceof TimedArc && ! (myObject instanceof TransportArc) ){
 			
-			menuItem = new JMenuItem("Edit Time Interval");      
+			menuItem = new JMenuItem("Properties");      
 			menuItem.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					((TimedArc)myObject).showTimeIntervalEditor();
