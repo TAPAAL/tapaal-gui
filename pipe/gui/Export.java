@@ -840,9 +840,9 @@ public class Export {
 			model3.exportToPIPExml(new PrintStream(new File(a[0]+"2.xml")));
 
 			
-			CreateGui.getApp().createNewTab(new File(filename),false);
-			CreateGui.getApp().createNewTab(new File(a[0]+"1.xml"),false);
-			CreateGui.getApp().createNewTab(new File(a[0]+"2.xml"),false);
+			CreateGui.getApp().createNewTabFromFile(new File(filename),false);
+			CreateGui.getApp().createNewTabFromFile(new File(a[0]+"1.xml"),false);
+			CreateGui.getApp().createNewTabFromFile(new File(a[0]+"2.xml"),false);
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

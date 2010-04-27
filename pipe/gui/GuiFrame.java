@@ -2,6 +2,7 @@ package pipe.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -23,6 +24,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -59,8 +61,11 @@ import pipe.dataLayer.TimedPlace;
 import pipe.experiment.Experiment;
 import pipe.experiment.editor.gui.ExperimentEditor;
 import pipe.gui.action.GuiAction;
+import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
+import pipe.gui.widgets.TimedPlaceEditorPanel;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import pipe.io.JarUtilities;
 import dk.aau.cs.petrinet.TAPN;
@@ -871,13 +876,49 @@ EOC */
 		}
 	}
 
+	public void createNewTab(String name){
+		int freeSpace = CreateGui.getFreeSpace();
 
+		// if we are in the middle of a paste action, we cancel it because we will
+		// create a new tab now
+		if (this.getCopyPasteManager().pasteInProgress()) {
+			this.getCopyPasteManager().cancelPaste();
+		}
+
+		setObjects(freeSpace);
+		int currentlySelected = appTab.getSelectedIndex();
+		
+		if (name == null || name.isEmpty()) {
+			name = "New Petri net " + (newNameCounter++) + ".xml";
+		}
+		
+		JScrollPane scroller = new JScrollPane(appView);
+		// make it less bad on XP
+		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		appTab.addTab(name,null,scroller,null);
+		appTab.setSelectedIndex(freeSpace);
+		
+
+		appModel.addObserver((Observer)appView); // Add the view as Observer
+		appModel.addObserver((Observer)appGui);  // Add the app window as observer
+		
+		appView.setNetChanged(false);   // Status is unchanged
+		appView.updatePreferredSize();
+		
+		//appView.add( new ViewExpansionComponent(appView.getWidth(),
+		//        appView.getHeight());
+
+		setTitle(name);// Change the program caption
+		appTab.setTitleAt(freeSpace, name);
+		selectAction.actionPerformed(null);
+	}
+	
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * @param filename Filename of net to load, or <b>null</b> to create a new,
 	 *                 empty tab
 	 */
-	public void createNewTab(File file, boolean isTN) {
+	public void createNewTabFromFile(File file, boolean isTN) {
 		int freeSpace = CreateGui.getFreeSpace();
 		String name="";
 
@@ -1466,7 +1507,7 @@ EOC */
 
 
 		public void actionPerformed(ActionEvent e){
-			createNewTab(filename, false);
+			createNewTabFromFile(filename, false);
 		}
 
 	}
@@ -1807,7 +1848,7 @@ EOC */
 				if ((filePath != null) && filePath.exists()
 						&& filePath.isFile() && filePath.canRead()) {
 					CreateGui.userPath = filePath.getParent();
-					createNewTab(filePath, false);
+					createNewTabFromFile(filePath, false);
 
 					//TODO make update leftPane work better
 					CreateGui.createLeftPane();
@@ -1817,11 +1858,11 @@ EOC */
 				if ((filePath != null) && filePath.exists() && filePath.isFile() &&
 						filePath.canRead()) {
 					CreateGui.userPath = filePath.getParent();
-					createNewTab(filePath,true);
+					createNewTabFromFile(filePath,true);
 					appView.getSelectionObject().enableSelection();
 				}
 			} else if (this == createAction) {
-				createNewTab(null, false);            // Create a new tab
+				showNewPNDialog();
 			} else if ((this == exitAction) && checkForSaveAll()) {
 				dispose();
 				System.exit(0);
@@ -1933,8 +1974,42 @@ EOC */
 		stepforwardAction.setEnabled(b);
 	}
 	
+	public void showNewPNDialog() {
+		// Build interface
+		EscapableDialog guiDialog = 
+			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+
+		Container contentPane = guiDialog.getContentPane();
+
+		// 1 Set layout
+		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.PAGE_AXIS));      
+
+		// 2 Add Place editor
+		contentPane.add( new NewTAPNPanel(guiDialog.getRootPane(), this));
+
+		guiDialog.setResizable(false);     
+
+		// Make window fit contents' preferred size
+		guiDialog.pack();
+
+		// Move window to the middle of the screen
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+		
+				
+	}
+
+
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
+	}
+	
+	public int getNameCounter(){
+		return newNameCounter;
+	}
+	
+	public void incrementNameCounter(){
+		newNameCounter++;
 	}
 
 }
