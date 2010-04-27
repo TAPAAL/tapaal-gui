@@ -214,18 +214,19 @@ extends PlaceTransitionObjectHandler {
 	}
 	@Override
 	public void mouseEntered(MouseEvent e){
-		if ((myObject instanceof TimedPlace) && CreateGui.getView().isInAnimationMode()){		   
-			((TimedPlace) myObject).showAgeOfTokens(true);
-		}else {
-			//do something else;
+		if ((myObject instanceof TimedPlace)){//&& CreateGui.getView().isInAnimationMode()){		   
+			if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
+				((TimedPlace) myObject).showAgeOfTokens(true);
+			}
 		}
 	}
+	
 	@Override
 	public void mouseExited(MouseEvent e){
-		if ((myObject instanceof TimedPlace) && CreateGui.getView().isInAnimationMode()){
-			((TimedPlace) myObject).showAgeOfTokens(false);
-		}else {
-			//do something else;
+		if ((myObject instanceof TimedPlace)){// && CreateGui.getView().isInAnimationMode()){
+			if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
+				((TimedPlace) myObject).showAgeOfTokens(false);
+			}
 		}
 	}
 

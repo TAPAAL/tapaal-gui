@@ -61,7 +61,7 @@ public class ColoredTransportArc extends TransportArc {
 	}
 
 	public String getOutputString(){
-		return "v := " + outputValue;
+		return "val := " + outputValue;
 	}
 
 	public void updateWeightLabel(){ 

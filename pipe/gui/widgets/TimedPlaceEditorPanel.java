@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -323,6 +324,10 @@ extends javax.swing.JPanel {
 		DefaultTableCellRenderer render = new DefaultTableCellRenderer();
 		render.setHorizontalAlignment(JTextField.RIGHT);
 		tokenTable.getColumn("Value").setCellRenderer(render);
+		DefaultTableCellRenderer notEditableRenderer = new DefaultTableCellRenderer();
+		Color color = (Color)UIManager.get("TextField.disabledBackground");
+		notEditableRenderer.setBackground(color);
+		tokenTable.getColumn("Age").setCellRenderer(notEditableRenderer);		
 		tokenTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tokenTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 

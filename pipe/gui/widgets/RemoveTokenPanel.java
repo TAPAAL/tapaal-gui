@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -152,6 +154,10 @@ public class RemoveTokenPanel extends JPanel {
 		DefaultTableCellRenderer render = new DefaultTableCellRenderer();
 		render.setHorizontalAlignment(JTextField.RIGHT);
 		tokenTable.getColumn("Value").setCellRenderer(render);
+		DefaultTableCellRenderer notEditableRenderer = new DefaultTableCellRenderer();
+		Color color = (Color)UIManager.get("TextField.disabledBackground");
+		notEditableRenderer.setBackground(color);
+		tokenTable.getColumn("Age").setCellRenderer(notEditableRenderer);
 		tokenTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 		JScrollPane pane = new JScrollPane(tokenTable);
