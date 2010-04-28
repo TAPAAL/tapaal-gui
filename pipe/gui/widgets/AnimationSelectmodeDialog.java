@@ -18,6 +18,11 @@ import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.ColoredToken;
+import pipe.dataLayer.colors.ColoredTransportArc;
+import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 
 public class AnimationSelectmodeDialog extends JPanel{
@@ -30,58 +35,82 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 	private JPanel namePanel;
 
-	private JComboBox selectTokenBox;
-
 	private JButton okButton;
 
 
 	public AnimationSelectmodeDialog(Transition t){
 
 		setLayout(new GridBagLayout());
-		
+
 		GridBagConstraints c = new GridBagConstraints();
-	    c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 0;
 		c.gridy = 0;
-		
-		
+
+
 		firedtransition = (TAPNTransition)t; // XXX - unsafe cast (ok by contract)
 
 		namePanel = new JPanel(new FlowLayout());
 		namePanel.add(new JLabel("Select tokens to Fire in Transition " + t.getName()));
 
-		
+
 		add(namePanel, c);
 
 
-		
+
 		//Start adding the stuff
 		JPanel presetPanelContainer;
 		presetPanelContainer = new JPanel(new FlowLayout());
-		
-		 
+
+
 		c.gridx = 0;
 		c.gridy = 1;
 
 		add(presetPanelContainer, c);
 
-		
-		Arc test = null;
 
-		for (Object o : t.getPreset()){
+		for (Arc a : t.getPreset()){
+			if(!(a instanceof TAPNInhibitorArc)){
+				JPanel presetPanel = createDropDownForArc(a);
+				presetPanelContainer.add(presetPanel);
+			}
 
-			JPanel presetPanel;
-			presetPanel = new JPanel(new FlowLayout());
-			
-			
-			Arc a = (Arc)o;
-	
-			//For each place in the preset create a box for selecting tokens
-			
-			presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + a.getSource().getName()));
-			presetPanel.add(new JLabel("Select token from Place " + a.getSource().getName()));
+		}
 
+		c.gridx = 0;
+		c.gridy = 2;
+		//OK
+		okButton = new javax.swing.JButton();
+
+		okButton.setText("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
+		okButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+				exit(); 
+
+			}
+		});
+
+
+		add(okButton,c);
+
+
+
+	}
+	private JPanel createDropDownForArc(Arc a) {
+		JPanel presetPanel;
+		presetPanel = new JPanel(new FlowLayout());
+
+		//For each place in the preset create a box for selecting tokens
+
+		presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + a.getSource().getName()));
+		presetPanel.add(new JLabel("Select token from Place " + a.getSource().getName()));
+
+		if(!CreateGui.getModel().isUsingColors()){
 			ArrayList<String> eligableToken = null;
 
 			DecimalFormat df = new DecimalFormat();
@@ -89,13 +118,11 @@ public class AnimationSelectmodeDialog extends JPanel{
 			df.setMinimumFractionDigits(1);
 			if (a instanceof TransportArc){
 				eligableToken= new ArrayList<String>();
-				
+				TimedPlace p = (TimedPlace)a.getSource();
 
-			   TimedPlace p = (TimedPlace)a.getSource();
-			   
-			   ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-			   
-			   TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getconnectedTo().getTarget();
+				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
+
+				TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getconnectedTo().getTarget();
 
 				for (int i=0; i< tokensOfPlace.size(); i++){
 					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
@@ -103,7 +130,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 					}
 				}	
 
-			}else if (a instanceof TimedArc || a instanceof TAPNInhibitorArc){
+			}else if (a instanceof TimedArc){
 				eligableToken = new ArrayList<String>();
 				//int indexOfOldestEligebleToken = 0;
 
@@ -116,46 +143,46 @@ public class AnimationSelectmodeDialog extends JPanel{
 					}
 				}						   
 			}
-			
-			
-			ArrayList<BigDecimal> tokens = ((TimedPlace)a.getSource()).getTokens();
 
-			selectTokenBox = new JComboBox(eligableToken.toArray());
-
+			JComboBox selectTokenBox = new JComboBox(eligableToken.toArray());
 			selectTokenBox.setSelectedIndex(0);
 
 			presetPanel.add(selectTokenBox);
 			presetPanels.add(selectTokenBox);
-			presetPanelContainer.add(presetPanel);
+		}else{
+			ColoredTimedPlace place = (ColoredTimedPlace)a.getSource();
+			
+			ArrayList<ColoredToken> eligibleTokens = new ArrayList<ColoredToken>();
+			
+			if(a instanceof ColoredTransportArc){
+				ColoredTransportArc cta = (ColoredTransportArc)a;
+				
+				for(ColoredToken token : place.getColoredTokens()){
+					if(cta.satisfiesGuard(token) 
+							&& cta.satisfiesTargetInvariant(token)){
+						eligibleTokens.add(token);
+					}
+				}
+			}else if(a instanceof ColoredInputArc){
+				ColoredInputArc cia = (ColoredInputArc)a;
+				
+				for(ColoredToken token : place.getColoredTokens()){
+					if(cia.satisfiesGuard(token)){
+						eligibleTokens.add(token);
+					}
+				}
+			}
+			
+			JComboBox selectTokenBox = new JComboBox(eligibleTokens.toArray());
+			selectTokenBox.setSelectedIndex(0);
 
-
+			presetPanel.add(selectTokenBox);
+			presetPanels.add(selectTokenBox);
 		}
-
-		c.gridx = 0;
-		c.gridy = 2;
-		//OK
-		okButton = new javax.swing.JButton();
-		
-		okButton.setText("OK");
-	      okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-	      okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-	      okButton.setPreferredSize(new java.awt.Dimension(75, 25));
-	      okButton.addActionListener(new java.awt.event.ActionListener() {
-	         public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            
-	        	 exit(); 
-	        	 
-	         }
-	      });
-		
-	      
-	      add(okButton,c);
-		
-
-
+		return presetPanel;
 	}
-	   private void exit(){
-			this.getRootPane().getParent().setVisible(false); 
-		}
+	private void exit(){
+		this.getRootPane().getParent().setVisible(false); 
+	}
 
 }

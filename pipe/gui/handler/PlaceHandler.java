@@ -214,10 +214,14 @@ extends PlaceTransitionObjectHandler {
 	}
 	@Override
 	public void mouseEntered(MouseEvent e){
-		if ((myObject instanceof TimedPlace)){//&& CreateGui.getView().isInAnimationMode()){		   
+		if ((myObject instanceof TimedPlace) && !isDragging){//&& CreateGui.getView().isInAnimationMode()){		   
 			if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
 				((TimedPlace) myObject).showAgeOfTokens(true);
 			}
+		}
+		
+		if(isDragging){
+			((TimedPlace) myObject).showAgeOfTokens(false);
 		}
 	}
 	
