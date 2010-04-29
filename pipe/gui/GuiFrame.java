@@ -571,6 +571,7 @@ EOC */
       addButton(drawingToolBar,rateAction);
       addButton(drawingToolBar,markingAction);
 EOC */      
+		drawingToolBar.addSeparator();
 		toolBar.add(drawingToolBar);
       
 		animationToolBar = new JToolBar();
@@ -586,7 +587,7 @@ EOC */
        // toolBar.add(animationToolBar);
         animationToolBar.setVisible(false);
 
-		toolBar.addSeparator();
+		
 
 		for(int i=0;i<toolBar.getComponentCount();i++){
 			toolBar.getComponent(i).setFocusable(false);
