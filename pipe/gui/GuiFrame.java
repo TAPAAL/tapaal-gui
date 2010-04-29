@@ -98,18 +98,18 @@ implements ActionListener, Observer {
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
-	private JToolBar animationToolBar, drawingToolBar;
+	private JToolBar drawingToolBar;
 	//private Map actions = new HashMap();
 	private JComboBox zoomComboBox;
 
-//	XXX kyrke testing 
+	//	XXX kyrke testing 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
 	exportTNAction, exportPSAction, importAction, exportToUppaal,
 	exportToUppaalAdvanced,exportToUppaalSymetric,  exportToTest,exportToTikZAction;
 
 	private VerificationAction runUppaalVerification;
-	
+
 	private EditAction /*copyAction, cutAction, pasteAction,*/ undoAction, redoAction;
 	private GridAction toggleGrid;
 	private ZoomAction zoomOutAction, zoomInAction, zoomAction;
@@ -123,10 +123,10 @@ implements ActionListener, Observer {
 	private TypeAction transportArcAction;
 
 	/*EOC*/   
-   private AnimateAction startAction, stepforwardAction, stepbackwardAction,
-           randomAction, randomAnimateAction, timeAction;
+	private AnimateAction startAction, stepforwardAction, stepbackwardAction,
+	randomAction, randomAnimateAction, timeAction;
 
-   public boolean dragging = false;
+	public boolean dragging = false;
 
 	private HelpBox helpAction;
 	private ExperimentAction loadExperimentAction, experimentEditorAction;
@@ -158,7 +158,7 @@ implements ActionListener, Observer {
 		this.setSize(screenSize.width * 80/100, screenSize.height  * 80/100);
 		this.setLocationRelativeTo(null);
 		this.setMinimumSize(new Dimension(640,480));
-		
+
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -223,7 +223,7 @@ implements ActionListener, Observer {
 			new FileAction("PostScript", "Export the net to PostScript format","ctrl T"));
 		addMenuItem(exportMenu, exportToTikZAction  =
 			new FileAction("TikZ", "Export the net to PNG format","ctrl L"));
-/*		addMenuItem(exportMenu, exportTNAction =
+		/*		addMenuItem(exportMenu, exportTNAction =
 			new FileAction("Timenet","Export the net to Timenet format",""));
 		addMenuItem(exportMenu, exportToUppaal =
 			new FileAction("Export to Uppaal","Export the to Uppaal format",""));
@@ -233,276 +233,276 @@ implements ActionListener, Observer {
 			new FileAction("Export to Uppaal, Symetric","Export the to Uppaal format, with symetricreduction",""));
 		addMenuItem(exportMenu, exportToTest =
 			new FileAction("Export a Degree-2 net","Export the to Uppaal format",""));
-*/		fileMenu.add(exportMenu);
-		fileMenu.addSeparator();
-		addMenuItem(fileMenu, printAction  =
-			new FileAction("Print",  "Print","ctrl P"));
-		fileMenu.addSeparator();
+		 */		fileMenu.add(exportMenu);
+		 fileMenu.addSeparator();
+		 addMenuItem(fileMenu, printAction  =
+			 new FileAction("Print",  "Print","ctrl P"));
+		 fileMenu.addSeparator();
 
-		// Example files menu
-		try {
-			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
-			getResource("Example nets" + System.getProperty("file.separator"));
+		 // Example files menu
+		 try {
+			 URL examplesDirURL = Thread.currentThread().getContextClassLoader().
+			 getResource("Example nets" + System.getProperty("file.separator"));
 
-			if (JarUtilities.isJarFile(examplesDirURL)){
+			 if (JarUtilities.isJarFile(examplesDirURL)){
 
-				JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
+				 JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
 
-				ArrayList <JarEntry> nets =
-					JarUtilities.getJarEntries(jarFile, "Example nets");
+				 ArrayList <JarEntry> nets =
+					 JarUtilities.getJarEntries(jarFile, "Example nets");
 
-				Arrays.sort(nets.toArray(), new Comparator(){
-					public int compare(Object one, Object two) {
-						return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
-					}
-				});
+				 Arrays.sort(nets.toArray(), new Comparator(){
+					 public int compare(Object one, Object two) {
+						 return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
+					 }
+				 });
 
-				if (nets.size() > 0) {
-					JMenu exampleMenu=new JMenu("Example nets");
-					exampleMenu.setIcon(
-							new ImageIcon(Thread.currentThread().getContextClassLoader().
-									getResource(CreateGui.imgPath + "Example.png")));
-					int index = 0;
-					for (int i = 0; i < nets.size(); i++){
-						if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
-							addMenuItem(exampleMenu,
-									new ExampleFileAction(nets.get(i),
-											(index < 10) ?("ctrl " + index) :null));
-							index++;
-						}
-					}
-					fileMenu.add(exampleMenu);
-					fileMenu.addSeparator();
-				}
-			} else {
-				File examplesDir = new File(examplesDirURL.toURI());
-				/**
-				 * The next block fixes a problem that surfaced on Mac OSX with
-				 * PIPE 2.4. In that environment (and not in Windows) any blanks
-				 * in the project name in Eclipse are property converted to '%20'
-				 * but the blank in "Example nets" is not. The following code
-				 * will do nothing on a Windows machine or if the logic on OSX
-				 * changess. I also added a stack trace so if the problem
-				 * occurs for another environment (perhaps multiple blanks need
-				 * to be manually changed) it can be easily fixed.  DP
-				 */
-				// examplesDir = new File(new URI(examplesDirURL.toString()));
-				String dirURLString = examplesDirURL.toString();
-				int index = dirURLString.indexOf( " " );
-				if ( index > 0 ) {
-					StringBuffer sb = new StringBuffer( dirURLString );
-					sb.replace( index, index + 1, "%20" );
-					dirURLString = sb.toString();
-				}
+				 if (nets.size() > 0) {
+					 JMenu exampleMenu=new JMenu("Example nets");
+					 exampleMenu.setIcon(
+							 new ImageIcon(Thread.currentThread().getContextClassLoader().
+									 getResource(CreateGui.imgPath + "Example.png")));
+					 int index = 0;
+					 for (int i = 0; i < nets.size(); i++){
+						 if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
+							 addMenuItem(exampleMenu,
+									 new ExampleFileAction(nets.get(i),
+											 (index < 10) ?("ctrl " + index) :null));
+							 index++;
+						 }
+					 }
+					 fileMenu.add(exampleMenu);
+					 fileMenu.addSeparator();
+				 }
+			 } else {
+				 File examplesDir = new File(examplesDirURL.toURI());
+				 /**
+				  * The next block fixes a problem that surfaced on Mac OSX with
+				  * PIPE 2.4. In that environment (and not in Windows) any blanks
+				  * in the project name in Eclipse are property converted to '%20'
+				  * but the blank in "Example nets" is not. The following code
+				  * will do nothing on a Windows machine or if the logic on OSX
+				  * changess. I also added a stack trace so if the problem
+				  * occurs for another environment (perhaps multiple blanks need
+				  * to be manually changed) it can be easily fixed.  DP
+				  */
+				 // examplesDir = new File(new URI(examplesDirURL.toString()));
+				 String dirURLString = examplesDirURL.toString();
+				 int index = dirURLString.indexOf( " " );
+				 if ( index > 0 ) {
+					 StringBuffer sb = new StringBuffer( dirURLString );
+					 sb.replace( index, index + 1, "%20" );
+					 dirURLString = sb.toString();
+				 }
 
-				examplesDir = new File( new URI(dirURLString ) );
+				 examplesDir = new File( new URI(dirURLString ) );
 
-				File[] nets = examplesDir.listFiles();
+				 File[] nets = examplesDir.listFiles();
 
-				Arrays.sort(nets,new Comparator(){
-					public int compare(Object one, Object two) {
-						
-						int toReturn=((File)one).getName().compareTo(((File)two).getName());
-						//Special hack to get intro-example first
-						if (((File)one).getName().equals("intro-example.xml")){toReturn=-1;}
-						if (((File)two).getName().equals("intro-example.xml")){toReturn=1;}
-						return toReturn;
-					}
-				});
+				 Arrays.sort(nets,new Comparator(){
+					 public int compare(Object one, Object two) {
 
-				// Oliver Haggarty - fixed code here so that if folder contains non
-				// .xml file the Example x counter is not incremented when that file
-				// is ignored
-				if (nets.length > 0) {
-					JMenu exampleMenu=new JMenu("Example nets");
-					exampleMenu.setIcon(
-							new ImageIcon(Thread.currentThread().getContextClassLoader().
-									getResource(CreateGui.imgPath + "Example.png")));
-					int k = 0;
-					for (int i = 0; i < nets.length; i++){
-						if(nets[i].getName().toLowerCase().endsWith(".xml")){
-							addMenuItem(exampleMenu,
-									new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
-						}
-					}
-					fileMenu.add(exampleMenu);
-					fileMenu.addSeparator();
-				}
-			}
-		} catch (Exception e) {
-			System.err.println("Error getting example files:" + e);
-			e.printStackTrace();
-		}
-		addMenuItem(fileMenu, exitAction =
-			new FileAction("Exit", "Close the program", "ctrl Q"));
+						 int toReturn=((File)one).getName().compareTo(((File)two).getName());
+						 //Special hack to get intro-example first
+						 if (((File)one).getName().equals("intro-example.xml")){toReturn=-1;}
+						 if (((File)two).getName().equals("intro-example.xml")){toReturn=1;}
+						 return toReturn;
+					 }
+				 });
 
-		JMenu editMenu = new JMenu("Edit");
-		editMenu.setMnemonic('E');
-		addMenuItem(editMenu, undoAction =
-			new EditAction("Undo", "Undo (Ctrl-Z)", "ctrl Z"));
-		addMenuItem(editMenu, redoAction =
-			new EditAction("Redo", "Redo (Ctrl-Y)","ctrl Y"));
-		editMenu.addSeparator();
-/*		
+				 // Oliver Haggarty - fixed code here so that if folder contains non
+				 // .xml file the Example x counter is not incremented when that file
+				 // is ignored
+				 if (nets.length > 0) {
+					 JMenu exampleMenu=new JMenu("Example nets");
+					 exampleMenu.setIcon(
+							 new ImageIcon(Thread.currentThread().getContextClassLoader().
+									 getResource(CreateGui.imgPath + "Example.png")));
+					 int k = 0;
+					 for (int i = 0; i < nets.length; i++){
+						 if(nets[i].getName().toLowerCase().endsWith(".xml")){
+							 addMenuItem(exampleMenu,
+									 new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
+						 }
+					 }
+					 fileMenu.add(exampleMenu);
+					 fileMenu.addSeparator();
+				 }
+			 }
+		 } catch (Exception e) {
+			 System.err.println("Error getting example files:" + e);
+			 e.printStackTrace();
+		 }
+		 addMenuItem(fileMenu, exitAction =
+			 new FileAction("Exit", "Close the program", "ctrl Q"));
+
+		 JMenu editMenu = new JMenu("Edit");
+		 editMenu.setMnemonic('E');
+		 addMenuItem(editMenu, undoAction =
+			 new EditAction("Undo", "Undo (Ctrl-Z)", "ctrl Z"));
+		 addMenuItem(editMenu, redoAction =
+			 new EditAction("Redo", "Redo (Ctrl-Y)","ctrl Y"));
+		 editMenu.addSeparator();
+		 /*		
 		addMenuItem(editMenu, cutAction =
 			new EditAction("Cut", "Cut (Ctrl-X)","ctrl X"));
 		addMenuItem(editMenu, copyAction =
 			new EditAction("Copy", "Copy (Ctrl-C)","ctrl C"));
 		addMenuItem(editMenu, pasteAction =
 			new EditAction("Paste", "Paste (Ctrl-V)","ctrl V"));
-*/		addMenuItem(editMenu, deleteAction =
-			new DeleteAction("Delete", "Delete selection","DELETE"));
-		
-		// Bind delete to backspace also
-		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"),"Delete");
-		editMenu.getActionMap().put("Delete", deleteAction);
+		  */		addMenuItem(editMenu, deleteAction =
+			  new DeleteAction("Delete", "Delete selection","DELETE"));
 
-		
-		JMenu drawMenu = new JMenu("Draw");
-		drawMenu.setMnemonic('D');
-		addMenuItem(drawMenu, selectAction =
-			new TypeAction("Select", Pipe.SELECT, "Select components","S",true));
-		drawMenu.addSeparator();
+		  // Bind delete to backspace also
+		  editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"),"Delete");
+		  editMenu.getActionMap().put("Delete", deleteAction);
 
-		//kyrke inserted timed place
-		addMenuItem(drawMenu, timedPlaceAction =
-			new TypeAction("Place", Pipe.TAPNPLACE, "Add a place","L",true));
-		//jokke removed normal places
-//		addMenuItem(drawMenu, placeAction =
-//		new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
 
-		addMenuItem(drawMenu, transAction =
-		new TypeAction("Transition", Pipe.TAPNTRANS,
-				"Add a transition","I",true));
-		
-		/*addMenuItem(drawMenu, transAction =
+		  JMenu drawMenu = new JMenu("Draw");
+		  drawMenu.setMnemonic('D');
+		  addMenuItem(drawMenu, selectAction =
+			  new TypeAction("Select", Pipe.SELECT, "Select components","S",true));
+		  drawMenu.addSeparator();
+
+		  //kyrke inserted timed place
+		  addMenuItem(drawMenu, timedPlaceAction =
+			  new TypeAction("Place", Pipe.TAPNPLACE, "Add a place","L",true));
+		  //jokke removed normal places
+		  //		addMenuItem(drawMenu, placeAction =
+		  //		new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
+
+		  addMenuItem(drawMenu, transAction =
+			  new TypeAction("Transition", Pipe.TAPNTRANS,
+					  "Add a transition","I",true));
+
+		  /*addMenuItem(drawMenu, transAction =
 			new TypeAction("Transition", Pipe.IMMTRANS,
 					"Add an immediate transition","I",true));*/
-		/* CB Joakim Byg - Not part of the model
+		  /* CB Joakim Byg - Not part of the model
       addMenuItem(drawMenu, timedtransAction  =
               new TypeAction("Timed transition", Pipe.TIMEDTRANS,
               "Add a timed transition","T",true));
 EOC */              
-		/* CB Jiri Srba - Not part of the model
+		  /* CB Jiri Srba - Not part of the model
          addMenuItem(drawMenu, arcAction = new TypeAction("Arc", Pipe.ARC, "Add an arc","A",true));" +
 EOC */
 
-		/*CB Joakim Byg - Adding timed arcs*/
-		addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc", Pipe.TAPNARC, "Add an arc","R",true));
+		  /*CB Joakim Byg - Adding timed arcs*/
+		  addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc", Pipe.TAPNARC, "Add an arc","R",true));
 
-		addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
-		/*EOC*/
-        //addMenuItem(drawMenu, inhibarcAction =
-        //      new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
-        //      "Add an inhibitor arc", "H",true));              
-		addMenuItem(drawMenu, annotationAction =
-			new TypeAction("Annotation", Pipe.ANNOTATION,
-					"Add an annotation","N",true));
-		drawMenu.addSeparator();
-		addMenuItem(drawMenu, tokenAction =
-			new TypeAction("Add token", Pipe.ADDTOKEN, "Add a token", "ADD", true));
-		addMenuItem(drawMenu, deleteTokenAction =
-			new TypeAction("Delete token", Pipe.DELTOKEN, "Delete a token",
-					"SUBTRACT",true));
-		/*drawMenu.addSeparator();*/
-		/*		addMenuItem(drawMenu, rateAction =
+		  addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
+		  /*EOC*/
+		  //addMenuItem(drawMenu, inhibarcAction =
+		  //      new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
+		  //      "Add an inhibitor arc", "H",true));              
+		  addMenuItem(drawMenu, annotationAction =
+			  new TypeAction("Annotation", Pipe.ANNOTATION,
+					  "Add an annotation","N",true));
+		  drawMenu.addSeparator();
+		  addMenuItem(drawMenu, tokenAction =
+			  new TypeAction("Add token", Pipe.ADDTOKEN, "Add a token", "ADD", true));
+		  addMenuItem(drawMenu, deleteTokenAction =
+			  new TypeAction("Delete token", Pipe.DELTOKEN, "Delete a token",
+					  "SUBTRACT",true));
+		  /*drawMenu.addSeparator();*/
+		  /*		addMenuItem(drawMenu, rateAction =
 			new TypeAction("Rate Parameter", Pipe.RATE, "Rate Parameter",
 					"R",true));
-		 */					
-		/*addMenuItem(drawMenu, markingAction =
+		   */					
+		  /*addMenuItem(drawMenu, markingAction =
 			new TypeAction("Marking Parameter", Pipe.MARKING, "Marking Parameter",
 					"M",true));*/
 
-		JMenu viewMenu = new JMenu("View");
-		viewMenu.setMnemonic('V');
+		  JMenu viewMenu = new JMenu("View");
+		  viewMenu.setMnemonic('V');
 
-		JMenu zoomMenu=new JMenu("Zoom");
-		zoomMenu.setIcon(
-				new ImageIcon(Thread.currentThread().getContextClassLoader().
-						getResource(CreateGui.imgPath + "Zoom.png")));
-		addZoomMenuItems(zoomMenu);
+		  JMenu zoomMenu=new JMenu("Zoom");
+		  zoomMenu.setIcon(
+				  new ImageIcon(Thread.currentThread().getContextClassLoader().
+						  getResource(CreateGui.imgPath + "Zoom.png")));
+		  addZoomMenuItems(zoomMenu);
 
-		addMenuItem(viewMenu, zoomOutAction =
-			new ZoomAction("Zoom out","Zoom out by 10% ", "ctrl MINUS"));
-		addMenuItem(viewMenu, zoomInAction =
-			new ZoomAction("Zoom in","Zoom in by 10% ", "ctrl PLUS"));
-		viewMenu.add(zoomMenu);
+		  addMenuItem(viewMenu, zoomOutAction =
+			  new ZoomAction("Zoom out","Zoom out by 10% ", "ctrl MINUS"));
+		  addMenuItem(viewMenu, zoomInAction =
+			  new ZoomAction("Zoom in","Zoom in by 10% ", "ctrl PLUS"));
+		  viewMenu.add(zoomMenu);
 
-		viewMenu.addSeparator();
-		addMenuItem(viewMenu, toggleGrid =
-			new GridAction("Cycle grid", "Change the grid size", "G"));
-		addMenuItem(viewMenu, dragAction =
-			new TypeAction("Drag", Pipe.DRAG, "Drag the drawing", "D", true));
+		  viewMenu.addSeparator();
+		  addMenuItem(viewMenu, toggleGrid =
+			  new GridAction("Cycle grid", "Change the grid size", "G"));
+		  addMenuItem(viewMenu, dragAction =
+			  new TypeAction("Drag", Pipe.DRAG, "Drag the drawing", "D", true));
 
- 
-      JMenu animateMenu = new JMenu("Simulator");
-      animateMenu.setMnemonic('A');
-      addMenuItem(animateMenu, startAction =
-              new AnimateAction("Simulation mode", Pipe.START,
-              "Toggle Simulation Mode", "Ctrl A", true));
-      animateMenu.addSeparator();
-      addMenuItem(animateMenu, stepbackwardAction =
-              new AnimateAction("Back", Pipe.STEPBACKWARD,
-              "Step backward a firing", "typed 4"));
-      addMenuItem(animateMenu, stepforwardAction  =
-              new AnimateAction("Forward", Pipe.STEPFORWARD,
-              "Step forward a firing", "typed 6"));
-      
-      addMenuItem(animateMenu, timeAction = new AnimateAction("Time", Pipe.TIMEPASS, "Let time pass", "_"));
-      
-      /*addMenuItem(animateMenu, randomAction =
+
+		  JMenu animateMenu = new JMenu("Simulator");
+		  animateMenu.setMnemonic('A');
+		  addMenuItem(animateMenu, startAction =
+			  new AnimateAction("Simulation mode", Pipe.START,
+					  "Toggle Simulation Mode", "Ctrl A", true));
+		  animateMenu.addSeparator();
+		  addMenuItem(animateMenu, stepbackwardAction =
+			  new AnimateAction("Back", Pipe.STEPBACKWARD,
+					  "Step backward a firing", "typed 4"));
+		  addMenuItem(animateMenu, stepforwardAction  =
+			  new AnimateAction("Forward", Pipe.STEPFORWARD,
+					  "Step forward a firing", "typed 6"));
+
+		  addMenuItem(animateMenu, timeAction = new AnimateAction("Time", Pipe.TIMEPASS, "Let time pass", "_"));
+
+		  /*addMenuItem(animateMenu, randomAction =
               new AnimateAction("Random", Pipe.RANDOM,
               "Randomly fire a transition", "typed 5"));
       addMenuItem(animateMenu, randomAnimateAction =
               new AnimateAction("Simulate", Pipe.ANIMATE,
               "Randomly fire a number of transitions", "typed 7",true));*/
-      randomAction =
-    	  new AnimateAction("Random", Pipe.RANDOM,
-    			  "Randomly fire a transition", "typed 5");
-      randomAnimateAction =
-    	  new AnimateAction("Simulate", Pipe.ANIMATE,
-    			  "Randomly fire a number of transitions", "typed 7",true);      
+		  randomAction =
+			  new AnimateAction("Random", Pipe.RANDOM,
+					  "Randomly fire a transition", "typed 5");
+		  randomAnimateAction =
+			  new AnimateAction("Simulate", Pipe.ANIMATE,
+					  "Randomly fire a number of transitions", "typed 7",true);      
 
-      // XXX - kyrke - by some reason the animation actions started to be enabled when 
-      //starting TAPAAL, so for now de just disable them here :s
-      stepbackwardAction.setEnabled(false);
-      stepforwardAction.setEnabled(false);
-      timeAction.setEnabled(false);
-      randomAction.setEnabled(false);
-      randomAnimateAction.setEnabled(false);
-      
-		JMenu helpMenu = new JMenu("Help");
-		helpMenu.setMnemonic('H');
-		helpAction = new HelpBox("Help", "View documentation", "F1", "index.htm");
-		
-		addMenuItem(helpMenu,helpAction);
-		JMenuItem aboutItem = helpMenu.add("About");
-		aboutItem.addActionListener(this); // Help - About is implemented differently
+		  // XXX - kyrke - by some reason the animation actions started to be enabled when 
+		  //starting TAPAAL, so for now de just disable them here :s
+		  stepbackwardAction.setEnabled(false);
+		  stepforwardAction.setEnabled(false);
+		  timeAction.setEnabled(false);
+		  randomAction.setEnabled(false);
+		  randomAnimateAction.setEnabled(false);
 
-		URL iconURL = Thread.currentThread().getContextClassLoader().
-		getResource(CreateGui.imgPath + "About.png");
-		if (iconURL != null) {
-			aboutItem.setIcon(new ImageIcon(iconURL));
-		}
+		  JMenu helpMenu = new JMenu("Help");
+		  helpMenu.setMnemonic('H');
+		  helpAction = new HelpBox("Help", "View documentation", "F1", "index.htm");
 
-		JMenu experimentMenu = new JMenu("Experiment");
-		addMenuItem(experimentMenu, loadExperimentAction =
-			new ExperimentAction("Load experiment", "Load an experiment file",""));
-		addMenuItem(experimentMenu, experimentEditorAction =
-			new ExperimentAction("Experiment Editor", "Start the experiment editor",""));
+		  addMenuItem(helpMenu,helpAction);
+		  JMenuItem aboutItem = helpMenu.add("About");
+		  aboutItem.addActionListener(this); // Help - About is implemented differently
 
-		menuBar.add(fileMenu);
-		menuBar.add(editMenu);
-		menuBar.add(viewMenu);
-		menuBar.add(drawMenu);
+		  URL iconURL = Thread.currentThread().getContextClassLoader().
+		  getResource(CreateGui.imgPath + "About.png");
+		  if (iconURL != null) {
+			  aboutItem.setIcon(new ImageIcon(iconURL));
+		  }
 
-		menuBar.add(animateMenu);
+		  JMenu experimentMenu = new JMenu("Experiment");
+		  addMenuItem(experimentMenu, loadExperimentAction =
+			  new ExperimentAction("Load experiment", "Load an experiment file",""));
+		  addMenuItem(experimentMenu, experimentEditorAction =
+			  new ExperimentAction("Experiment Editor", "Start the experiment editor",""));
 
-		//menuBar.add(experimentMenu);
-		menuBar.add(helpMenu);
-		setJMenuBar(menuBar);
-		
-		
+		  menuBar.add(fileMenu);
+		  menuBar.add(editMenu);
+		  menuBar.add(viewMenu);
+		  menuBar.add(drawMenu);
+
+		  menuBar.add(animateMenu);
+
+		  //menuBar.add(experimentMenu);
+		  menuBar.add(helpMenu);
+		  setJMenuBar(menuBar);
+
+
 	}
 
 
@@ -510,84 +510,69 @@ EOC */
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);//Inhibit toolbar floating
-
-		addButton(toolBar,createAction);
-		addButton(toolBar,openAction);
-		addButton(toolBar,saveAction);
-		addButton(toolBar,saveAsAction);
-		addButton(toolBar,closeAction);
+		
+		//Basis file operations
+		toolBar.add(createAction);
+		toolBar.add(openAction);
+		toolBar.add(saveAction);
+		toolBar.add(saveAsAction);
+		toolBar.add(closeAction);
+		
+		//Print
+		toolBar.addSeparator();	
+		toolBar.add(printAction);
+							
+		//Copy/past
+		/* Removed copy/past button
+		toolBar.addSeparator();			
+		toolBar.add(cutAction);
+	    toolBar.add(copyAction);
+	    toolBar.add(pasteAction);
+		 */
+		
+		//Undo/redo
+		toolBar.addSeparator();	
+		toolBar.add(deleteAction);
+		toolBar.add(undoAction);
+		toolBar.add(redoAction);
+		
+		//Zoom	
 		toolBar.addSeparator();
-		addButton(toolBar,printAction);
-		toolBar.addSeparator();
-/*		addButton(toolBar,cutAction);
-		addButton(toolBar,copyAction);
-		addButton(toolBar,pasteAction);
-*/		addButton(toolBar,deleteAction);
-		addButton(toolBar,undoAction);
-		addButton(toolBar,redoAction);
-		toolBar.addSeparator();
-
-		addButton(toolBar, zoomOutAction);
+		toolBar.add(zoomOutAction);
 		addZoomComboBox(toolBar,
 				zoomAction = new ZoomAction("Zoom","Select zoom percentage ", ""));
-		addButton(toolBar, zoomInAction);
+		toolBar.add(zoomInAction);
+		
+		//Modes
 		toolBar.addSeparator();
-		addButton(toolBar, toggleGrid);
-		addButton(toolBar, dragAction);
+		toolBar.add(toggleGrid);
+		toolBar.add(new ToggleButton(dragAction));
+		toolBar.add(new ToggleButton(startAction));
 
-		addButton(toolBar, startAction);
-      
+		//Start drawingToolBar
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
 
-		toolBar.addSeparator();
-		addButton(drawingToolBar,selectAction);
+		//Normal arraw
 		drawingToolBar.addSeparator();
-//		addButton(drawingToolBar,placeAction);//Add Draw Menu Buttons
-		addButton(drawingToolBar,timedPlaceAction);
-
-		addButton(drawingToolBar,transAction);
-
-		/* CB Joakim Byg - Timed transitions are not part of the model
-      addButton(drawingToolBar,timedtransAction);
-EOC */
-		/* CB Jiri Srba - Not part of the model
-      addButton(drawingToolBar,arcAction);
-EOC */
+		drawingToolBar.add(new ToggleButton(selectAction));
 		
-		/*CB Joakim Byg - adding timed arcs to the menu*/
-		addButton(drawingToolBar,timedArcAction);
-		addButton(drawingToolBar, transportArcAction);
-		/*EOC*/      
-     
-		//addButton(drawingToolBar,inhibarcAction);
- 
-		addButton(drawingToolBar,annotationAction);
+		//Drawing elements
 		drawingToolBar.addSeparator();
-		addButton(drawingToolBar,tokenAction);
-		addButton(drawingToolBar,deleteTokenAction);
-		/* CB Joakim Byg - not needed      
-      drawingToolBar.addSeparator();      
-      addButton(drawingToolBar,rateAction);
-      addButton(drawingToolBar,markingAction);
-EOC */      
+		drawingToolBar.add(new ToggleButton(timedPlaceAction));
+		drawingToolBar.add(new ToggleButton(transAction));
+		drawingToolBar.add(new ToggleButton(timedArcAction));
+		drawingToolBar.add(new ToggleButton(transportArcAction));
+		drawingToolBar.add(new ToggleButton(annotationAction));
+		
+		//Tokens
+		drawingToolBar.addSeparator();
+		drawingToolBar.add(tokenAction);
+		drawingToolBar.add(deleteTokenAction);
+
+		//Add drawingtoolbar to toolbar
 		drawingToolBar.addSeparator();
 		toolBar.add(drawingToolBar);
-      
-		animationToolBar = new JToolBar();
-		animationToolBar.setFloatable(false);
-		addButton(animationToolBar, stepbackwardAction);
-		addButton(animationToolBar, stepforwardAction);
-		
-		addButton(animationToolBar, timeAction);
-		
-		addButton(animationToolBar, randomAction);
-		addButton(animationToolBar, randomAnimateAction);
-
-       // toolBar.add(animationToolBar);
-        animationToolBar.setVisible(false);
-
-		
 
 		for(int i=0;i<toolBar.getComponentCount();i++){
 			toolBar.getComponent(i).setFocusable(false);
@@ -595,17 +580,6 @@ EOC */
 
 		getContentPane().add(toolBar,BorderLayout.PAGE_START);
 	}
-
-
-	private void addButton(JToolBar toolBar, GuiAction action) {
-
-		if (action.getValue("selected") != null) {
-			toolBar.add(new ToggleButton(action));
-		} else {
-			toolBar.add(action);
-		}
-	}
-
 
 	/**
 	 * @author Ben Kirby
@@ -664,19 +638,19 @@ EOC */
 		timedPlaceAction.setEnabled(status);
 		timedArcAction.setEnabled(status);
 		transportArcAction.setEnabled(status);
-		
-//		placeAction.setEnabled(status);
-//		arcAction.setEnabled(status);
+
+		//		placeAction.setEnabled(status);
+		//		arcAction.setEnabled(status);
 		//inhibarcAction.setEnabled(status);
 		annotationAction.setEnabled(status);
 		transAction.setEnabled(status);
-//		timedtransAction.setEnabled(status);
+		//		timedtransAction.setEnabled(status);
 		tokenAction.setEnabled(status);
 		deleteAction.setEnabled(status);
 		selectAction.setEnabled(status);
 		deleteTokenAction.setEnabled(status);
-//		rateAction.setEnabled(status);
-//		markingAction.setEnabled(status);
+		//		rateAction.setEnabled(status);
+		//		markingAction.setEnabled(status);
 
 		//      toggleGrid.setEnabled(status);
 
@@ -687,24 +661,23 @@ EOC */
 			stepbackwardAction.setEnabled(!status);
 			stepforwardAction.setEnabled(!status);
 			drawingToolBar.setVisible(true);
-			animationToolBar.setVisible(false);
+			
 		}
 		randomAction.setEnabled(!status);
 		randomAnimateAction.setEnabled(!status);
-		 
+
 
 		if (!status){
 			drawingToolBar.setVisible(false);
-			animationToolBar.setVisible(true);
 			timeAction.setEnabled(true);
-//			pasteAction.setEnabled(status);
+			//			pasteAction.setEnabled(status);
 			undoAction.setEnabled(status);
 			redoAction.setEnabled(status);
 		} else {
-//			pasteAction.setEnabled(getCopyPasteManager().pasteEnabled());
+			//			pasteAction.setEnabled(getCopyPasteManager().pasteEnabled());
 		}
-//		copyAction.setEnabled(status);
-//		cutAction.setEnabled(status);
+		//		copyAction.setEnabled(status);
+		//		cutAction.setEnabled(status);
 		deleteAction.setEnabled(status);
 	}
 
@@ -747,14 +720,14 @@ EOC */
 					appView.repaint();
 					updateZoomCombo();
 
-//					enableActions(!appView.isInAnimationMode());
-//					CreateGui.getAnimator().restoreModel();
-//					CreateGui.removeAnimationHistory();
+					//					enableActions(!appView.isInAnimationMode());
+					//					CreateGui.getAnimator().restoreModel();
+					//					CreateGui.removeAnimationHistory();
 
 					setTitle(appTab.getTitleAt(index));
-					
+
 					setAnimationMode(false);
-					
+
 					// TODO: change this code... it's ugly :)
 					if (appGui.getMode() == Pipe.SELECT) {
 						appGui.init();
@@ -785,17 +758,17 @@ EOC */
 		buffer.append(Verification.getVerifytaVersion());
 		buffer.append("\n");
 		buffer.append("   Located: ");
-		
+
 		if(Verification.verifytapath == null || Verification.verifytapath.equals(""))
 			buffer.append("N/A");
 		else
 			buffer.append(Verification.verifytapath);
-		
+
 		buffer.append("  \n\n"); 
 		buffer.append("Based on PIPE2:\n");
 		buffer.append("http://pipe2.sourceforge.net/");
-		
-		
+
+
 		JOptionPane.showMessageDialog(this,
 				buffer.toString(),
 				"About TAPAAL",
@@ -930,7 +903,7 @@ EOC */
 		appTab.setSelectedIndex(freeSpace);
 
 		appView.updatePreferredSize();
-		
+
 		//appView.add( new ViewExpansionComponent(appView.getWidth(),
 		//        appView.getHeight());
 
@@ -962,9 +935,9 @@ EOC */
 
 		appModel.addPetriNetObject(new Place(100.0, 100.0));
 		try {
-			
-			
-			
+
+
+
 			appModel.createFromTAPN(model);
 
 			appView.scrollRectToVisible(new Rectangle(0,0,1,1));
@@ -1078,58 +1051,58 @@ EOC */
 		return true;
 	}
 
-	   
-   public void setRandomAnimationMode(boolean on) {
-	   
-      if (on == false){
-         stepforwardAction.setEnabled(
-                 CreateGui.getAnimationHistory().isStepForwardAllowed());
-         stepbackwardAction.setEnabled(
-                 CreateGui.getAnimationHistory().isStepBackAllowed());
-         
-         CreateGui.animControlerBox.setAnimationButtonsEnabled();
-         
-      } else {
-         stepbackwardAction.setEnabled(false);
-         stepforwardAction.setEnabled(false);
-      }
-      randomAction.setEnabled(!on);
-      randomAnimateAction.setSelected(on);
-   }
+
+	public void setRandomAnimationMode(boolean on) {
+
+		if (on == false){
+			stepforwardAction.setEnabled(
+					CreateGui.getAnimationHistory().isStepForwardAllowed());
+			stepbackwardAction.setEnabled(
+					CreateGui.getAnimationHistory().isStepBackAllowed());
+
+			CreateGui.animControlerBox.setAnimationButtonsEnabled();
+
+		} else {
+			stepbackwardAction.setEnabled(false);
+			stepforwardAction.setEnabled(false);
+		}
+		randomAction.setEnabled(!on);
+		randomAnimateAction.setSelected(on);
+	}
 
 
-   public void setAnimationMode(boolean on) {
-      randomAnimateAction.setSelected(false);
-      CreateGui.getAnimator().setNumberSequences(0);
-      startAction.setSelected(on);
-      CreateGui.getView().changeAnimationMode(on);
-      if (on) {
-         CreateGui.getAnimator().storeModel();
-         CreateGui.currentPNMLData().setEnabledTransitions();
-         CreateGui.getAnimator().highlightEnabledTransitions();
-         CreateGui.addAnimationHistory();
-         CreateGui.addAnimationControler();
-         
-         enableActions(false);//disables all non-animation buttons
-         setEditionAllowed(false);
-         
-         statusBar.changeText(statusBar.textforAnimation);
-      } else {
-         setEditionAllowed(true);
-         statusBar.changeText(statusBar.textforDrawing);
-         CreateGui.getAnimator().restoreModel();
-//         CreateGui.removeAnimationHistory();
-//         CreateGui.removeAnimationControler();
-         enableActions(true); //renables all non-animation buttons
-         
-         //If abstract animation pane is shown, remove it when 
-         // Gowing out of animation mode.
-         CreateGui.removeAbstractAnimationPane();
-         
-         CreateGui.createLeftPane();
-      }
-   }
-   
+	public void setAnimationMode(boolean on) {
+		randomAnimateAction.setSelected(false);
+		CreateGui.getAnimator().setNumberSequences(0);
+		startAction.setSelected(on);
+		CreateGui.getView().changeAnimationMode(on);
+		if (on) {
+			CreateGui.getAnimator().storeModel();
+			CreateGui.currentPNMLData().setEnabledTransitions();
+			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.addAnimationHistory();
+			CreateGui.addAnimationControler();
+
+			enableActions(false);//disables all non-animation buttons
+			setEditionAllowed(false);
+
+			statusBar.changeText(statusBar.textforAnimation);
+		} else {
+			setEditionAllowed(true);
+			statusBar.changeText(statusBar.textforDrawing);
+			CreateGui.getAnimator().restoreModel();
+			//         CreateGui.removeAnimationHistory();
+			//         CreateGui.removeAnimationControler();
+			enableActions(true); //renables all non-animation buttons
+
+			//If abstract animation pane is shown, remove it when 
+			// Gowing out of animation mode.
+			CreateGui.removeAbstractAnimationPane();
+
+			CreateGui.createLeftPane();
+		}
+	}
+
 
 	public void resetMode(){
 		setMode(old_mode);
@@ -1185,8 +1158,8 @@ EOC */
 		if (timedPlaceAction != null) 
 			timedPlaceAction.setSelected(mode == Pipe.TAPNPLACE);
 
-//		if (inhibarcAction != null) 
-//			inhibarcAction.setSelected(mode == Pipe.TAPNINHIBITOR_ARC);
+		//		if (inhibarcAction != null) 
+		//			inhibarcAction.setSelected(mode == Pipe.TAPNINHIBITOR_ARC);
 
 		if (tokenAction != null) 
 			tokenAction.setSelected(mode == Pipe.ADDTOKEN);
@@ -1200,8 +1173,8 @@ EOC */
 		if (markingAction != null) 
 			//markingAction.setSelected(mode == Pipe.MARKING);
 
-		if (selectAction != null) 
-			selectAction.setSelected(mode == Pipe.SELECT);
+			if (selectAction != null) 
+				selectAction.setSelected(mode == Pipe.SELECT);
 
 		if (annotationAction != null) 
 			annotationAction.setSelected(mode == Pipe.ANNOTATION);
@@ -1282,128 +1255,128 @@ EOC */
 	}
 
 
-   class AnimateAction extends GuiAction {
+	class AnimateAction extends GuiAction {
 
-      private int typeID;
-      private AnimationHistory animBox;
-
-
-      AnimateAction(String name, int typeID, String tooltip, String keystroke){
-         super(name, tooltip, keystroke);
-         this.typeID = typeID;
-      }
+		private int typeID;
+		private AnimationHistory animBox;
 
 
-      AnimateAction(String name, int typeID, String tooltip, String keystroke,
-              boolean toggleable){
-         super(name, tooltip, keystroke, toggleable);
-         this.typeID = typeID;
-      }
+		AnimateAction(String name, int typeID, String tooltip, String keystroke){
+			super(name, tooltip, keystroke);
+			this.typeID = typeID;
+		}
 
 
-      public AnimateAction(String name, int typeID, String tooltip,
-			KeyStroke keyStroke) {
-    	  super(name, tooltip, keyStroke);
-    	  this.typeID = typeID;
+		AnimateAction(String name, int typeID, String tooltip, String keystroke,
+				boolean toggleable){
+			super(name, tooltip, keystroke, toggleable);
+			this.typeID = typeID;
+		}
+
+
+		public AnimateAction(String name, int typeID, String tooltip,
+				KeyStroke keyStroke) {
+			super(name, tooltip, keyStroke);
+			this.typeID = typeID;
+
+		}
+
+
+		public void actionPerformed(ActionEvent ae){
+			if (appView == null) {
+				return;
+			}
+
+			animBox = CreateGui.getAnimationHistory();
+
+			switch(typeID){
+			case Pipe.START:
+				try {
+					setAnimationMode(!appView.isInAnimationMode());
+					if (!appView.isInAnimationMode()) {
+						restoreMode();
+						PetriNetObject.ignoreSelection(false);
+					} else {
+						setMode(typeID);
+						PetriNetObject.ignoreSelection(true);
+						// Do we keep the selection??
+								appView.getSelectionObject().clearSelection();
+					}
+				} catch (Exception e) {
+					System.err.println(e);
+					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
+							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+					startAction.setSelected(false);
+					appView.changeAnimationMode(false);
+				}
+				stepforwardAction.setEnabled(false);
+				stepbackwardAction.setEnabled(false);
+				break;
+
+			case Pipe.TIMEPASS:
+				animBox.clearStepsForward();
+				//CreateGui.getAnimator().letTimePass(1f);
+				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.RANDOM:
+				animBox.clearStepsForward();
+				CreateGui.getAnimator().doRandomFiring();
+				//update mouseOverView
+				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
+					if (((TimedPlace)p).isAgeOfTokensShown()){
+						((TimedPlace)p).showAgeOfTokens(true);
+					}
+				}
+				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.STEPFORWARD:
+				animBox.stepForward();
+				CreateGui.getAnimator().stepForward();
+				//update mouseOverView
+				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
+					if (((TimedPlace)p).isAgeOfTokensShown()){
+						((TimedPlace)p).showAgeOfTokens(true);
+					}
+				}
+				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.STEPBACKWARD:
+				animBox.stepBackwards();
+				CreateGui.getAnimator().stepBack();
+				//update mouseOverView
+				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
+					if (((TimedPlace)p).isAgeOfTokensShown()){
+						((TimedPlace)p).showAgeOfTokens(true);
+					}
+				}
+				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.ANIMATE:
+				Animator a = CreateGui.getAnimator();
+
+				if (a.getNumberSequences() > 0) {
+					a.setNumberSequences(0); // stop animation
+					setSelected(false);
+				} else {
+					stepbackwardAction.setEnabled(false);
+					stepforwardAction.setEnabled(false);
+					randomAction.setEnabled(false);
+					setSelected(true);
+					animBox.clearStepsForward();
+					CreateGui.getAnimator().startRandomFiring();
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
 
 	}
-
-
-	public void actionPerformed(ActionEvent ae){
-         if (appView == null) {
-            return;
-         }
-
-         animBox = CreateGui.getAnimationHistory();
-
-         switch(typeID){
-            case Pipe.START:
-               try {
-                  setAnimationMode(!appView.isInAnimationMode());
-                  if (!appView.isInAnimationMode()) {
-                     restoreMode();
-                     PetriNetObject.ignoreSelection(false);
-                  } else {
-                     setMode(typeID);
-                     PetriNetObject.ignoreSelection(true);
-                     // Do we keep the selection??
-                     appView.getSelectionObject().clearSelection();
-                  }
-               } catch (Exception e) {
-                  System.err.println(e);
-                  JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-                          "Animation Mode Error", JOptionPane.ERROR_MESSAGE);
-                  startAction.setSelected(false);
-                  appView.changeAnimationMode(false);
-               }
-               stepforwardAction.setEnabled(false);
-               stepbackwardAction.setEnabled(false);
-               break;
-               
-            case Pipe.TIMEPASS:
-            	animBox.clearStepsForward();
-            	//CreateGui.getAnimator().letTimePass(1f);
-            	CreateGui.animControlerBox.setAnimationButtonsEnabled();
-            	break;
-            	
-            case Pipe.RANDOM:
-               animBox.clearStepsForward();
-               CreateGui.getAnimator().doRandomFiring();
-               //update mouseOverView
-               for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-            	   if (((TimedPlace)p).isAgeOfTokensShown()){
-            		   ((TimedPlace)p).showAgeOfTokens(true);
-            	   }
-               }
-               CreateGui.animControlerBox.setAnimationButtonsEnabled();
-               break;
-
-            case Pipe.STEPFORWARD:
-               animBox.stepForward();
-               CreateGui.getAnimator().stepForward();
-               //update mouseOverView
-               for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-            	   if (((TimedPlace)p).isAgeOfTokensShown()){
-            		   ((TimedPlace)p).showAgeOfTokens(true);
-            	   }
-               }
-               CreateGui.animControlerBox.setAnimationButtonsEnabled();
-               break;
-
-            case Pipe.STEPBACKWARD:
-               animBox.stepBackwards();
-               CreateGui.getAnimator().stepBack();
-               //update mouseOverView
-               for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-            	   if (((TimedPlace)p).isAgeOfTokensShown()){
-            		   ((TimedPlace)p).showAgeOfTokens(true);
-            	   }
-               }
-               CreateGui.animControlerBox.setAnimationButtonsEnabled();
-               break;
-
-            case Pipe.ANIMATE:
-               Animator a = CreateGui.getAnimator();
-
-               if (a.getNumberSequences() > 0) {
-                  a.setNumberSequences(0); // stop animation
-                  setSelected(false);
-               } else {
-                  stepbackwardAction.setEnabled(false);
-                  stepforwardAction.setEnabled(false);
-                  randomAction.setEnabled(false);
-                  setSelected(true);
-                  animBox.clearStepsForward();
-                  CreateGui.getAnimator().startRandomFiring();
-               }
-               break;
-
-            default:
-               break;
-         }
-      }
-
-   }
 
 
 	class ExampleFileAction extends GuiAction {
@@ -1454,7 +1427,7 @@ EOC */
 			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
 			ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
 			ArrayList<TAPNQuery> queriesToDelete = new ArrayList<TAPNQuery>();
-			
+
 			boolean queriesAffected = false;
 			for (PetriNetObject pn : selection) {
 				if(pn instanceof TimedPlace)
@@ -1472,12 +1445,12 @@ EOC */
 			if(choice == JOptionPane.YES_OPTION)
 			{
 				appView.getUndoManager().newEdit(); // new "transaction""
-				
+
 				if(queriesAffected){
 					CreateGui.getModel().getQueries().removeAll(queriesToDelete);
 					CreateGui.createLeftPane();	
 				}
-				
+
 				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
 				appView.getSelectionObject().deleteSelection();			
 				CreateGui.getModel().buildConstraints();
@@ -1506,7 +1479,7 @@ EOC */
 
 
 		public void actionPerformed(ActionEvent e){
-//			if (!isSelected()){
+			//			if (!isSelected()){
 			this.setSelected(true);
 
 			// deselect other actions
@@ -1538,9 +1511,9 @@ EOC */
 			if (this != transportArcAction) {
 				transportArcAction.setSelected(false);
 			}
-//			if (this != inhibarcAction) {
-//				inhibarcAction.setSelected(false);
-//			}     
+			//			if (this != inhibarcAction) {
+			//				inhibarcAction.setSelected(false);
+			//			}     
 			if (this != tokenAction) {
 				tokenAction.setSelected(false);
 			}
@@ -1575,32 +1548,32 @@ EOC */
 			setMode(typeID);
 			statusBar.changeText(typeID);
 
-			
-			
+
+
 			if ((typeID != Pipe.ARC) && (appView.createArc != null)) {
 				appView.createArc.delete();
 				appView.createArc=null;
 				appView.repaint();
 				//Also handel trasport arcs (if any)
-				
+
 				if (appView.transportArcPart1!=null){
 					appView.transportArcPart1.delete();
 					appView.transportArcPart1=null;
 					appView.repaint();
 				}
 			}
-			  
+
 			// XXX - kyrke - Dont think this code will ever be runned, as the above code vill handel it 
 			/*CB Joakim Byg - adding timed arc*/         
 			if ((typeID != Pipe.TAPNARC) && (appView.createArc != null)) {
 				appView.createArc.delete();
 				appView.createArc=null;
 				appView.repaint();
-			
+
 			}
 			/*EOC*/
-			
-			
+
+
 
 			if (typeID == Pipe.SELECT) {
 				//disable drawing to eliminate possiblity of connecting arc to
@@ -1614,7 +1587,7 @@ EOC */
 				appView.setCursorType("crosshair");
 			}
 		}
-//		}
+		//		}
 
 	}
 
@@ -1833,7 +1806,7 @@ EOC */
 		public void actionPerformed(ActionEvent e){
 
 			if (CreateGui.getApp().isEditionAllowed()) {
-/*				if (this == cutAction) {
+				/*				if (this == cutAction) {
 					ArrayList selection = appView.getSelectionObject().getSelection();
 					appGui.getCopyPasteManager().setUpPaste(selection, appView);
 					appView.getUndoManager().newEdit(); // new "transaction""
@@ -1901,7 +1874,7 @@ EOC */
 	public void setEnabledStepForwardAction(boolean b) {
 		stepforwardAction.setEnabled(b);
 	}
-	
+
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
 	}
