@@ -6,6 +6,10 @@ import dk.aau.cs.petrinet.TAPNTransition;
 public class ColoredOutputArc extends Arc {
 	private int outputValue;
 	
+	public ColoredOutputArc(TAPNTransition source, ColoredPlace target){
+		this(source,target,0);
+	}
+	
 	public ColoredOutputArc(TAPNTransition source, ColoredPlace target, int outputValue){
 		super(source, target);
 		this.outputValue = outputValue;

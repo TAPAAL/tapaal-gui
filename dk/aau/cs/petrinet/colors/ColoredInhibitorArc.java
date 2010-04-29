@@ -14,4 +14,12 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		this.timeGuard = timeGuard;
 		this.colorGuard = colorGuard;
 	}
+
+	public ColoredInterval getTimeGuard() {
+		return timeGuard;
+	}
+	
+	public ColorSet getColorGuard(){
+		return colorGuard;
+	}
 }

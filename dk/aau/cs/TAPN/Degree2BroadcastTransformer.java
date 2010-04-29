@@ -395,7 +395,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			for(Arc outputArc : t.getPostset()){
 				if(!usedPostSetArcs.contains(outputArc)){
 					if(inputArc instanceof TAPNTransportArc && outputArc instanceof TAPNTransportArc && inputArc == outputArc){
-						Pairing p = new Pairing(inputArc,
+						Pairing p = new Pairing((TAPNArc)inputArc,
 								((TAPNArc)inputArc).getGuard(),
 								outputArc,
 								ArcType.TARC);
@@ -404,7 +404,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 						usedPostSetArcs.add(outputArc);
 						break;
 					}else if(!(inputArc instanceof TAPNTransportArc) && !(outputArc instanceof TAPNTransportArc)){
-						Pairing p = new Pairing(inputArc,
+						Pairing p = new Pairing((TAPNArc)inputArc,
 								((TAPNArc)inputArc).getGuard(),
 								outputArc,
 								ArcType.NORMAL);
@@ -449,7 +449,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		boolean isTransportArc = source instanceof TAPNTransportArc;
 		ArcType type = isTransportArc ? ArcType.TARC : ArcType.NORMAL;
 
-		return new Pairing(source,((TAPNArc)source).getGuard(), dest, type);
+		return new Pairing((TAPNArc)source,((TAPNArc)source).getGuard(), dest, type);
 	}
 
 	private void createTestingEdgesForTokenAutomata(TimedArcPetriNet originalModel, TimedAutomaton ta) {

@@ -39,6 +39,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.QueryDialogue;
+import dk.aau.cs.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
@@ -883,7 +884,14 @@ public class Export {
 		}
 		
 		//Create transformer
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		PipeTapnToAauTapnTransformer transformer = null;
+		
+		if(appModel.isUsingColors()){
+			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
+		}else{
+			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		}
+		
 		TAPN model=null;
 		try {
 			model = transformer.getAAUTAPN();

@@ -1,8 +1,14 @@
 package dk.aau.cs.petrinet.colors;
 
+import java.util.List;
+
 import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
+import dk.aau.cs.petrinet.TAPNTransition;
+import dk.aau.cs.petrinet.Transition;
 
 public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 
@@ -56,4 +62,27 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 		}
 	}
 
+	
+	public void convertToConservative() throws Exception {
+		ColoredPlace capacity = new ColoredPlace("P_capacity", new ColoredTimeInvariant(), new ColorSet());
+		addPlace(capacity);
+
+		for (TAPNTransition t : getTransitions()) {
+			int difference = t.getPostset().size() - t.getPreset().size();
+
+			if (difference < 0){
+				// Add outgoing arcs from transitions to capacity
+				for (int i = 0; i > difference; i--) {
+					ColoredOutputArc tmp = new ColoredOutputArc(t, capacity);
+					add(tmp);
+				}
+			} else if (difference > 0){
+				// Add ingoing arcs from transitions to capacity
+				for (int i = 0; i < difference; i++) {
+					ColoredInputArc tmp = new ColoredInputArc(capacity, t);
+					add(tmp);
+				}
+			} 
+		}
+	}
 }

@@ -33,6 +33,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
+import dk.aau.cs.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.TA.AbstractMarking;
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
@@ -286,7 +287,14 @@ public class Verification {
 		}
 		
 		//Create transformer
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		PipeTapnToAauTapnTransformer transformer = null;
+		
+		if(appModel.isUsingColors()){
+			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
+		}else{
+			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		}
+		
 		TAPN model=null;
 		try {
 			model = transformer.getAAUTAPN();

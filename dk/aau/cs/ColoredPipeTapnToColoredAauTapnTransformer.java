@@ -19,6 +19,7 @@ import dk.aau.cs.petrinet.colors.ColoredInterval;
 import dk.aau.cs.petrinet.colors.ColoredOutputArc;
 import dk.aau.cs.petrinet.colors.ColoredPlace;
 import dk.aau.cs.petrinet.colors.ColoredTAPN;
+import dk.aau.cs.petrinet.colors.ColoredTimeInvariant;
 import dk.aau.cs.petrinet.colors.IntegerRange;
 
 public class ColoredPipeTapnToColoredAauTapnTransformer extends
@@ -34,7 +35,7 @@ PipeTapnToAauTapnTransformer {
 		ColoredTimedPlace ctp = (ColoredTimedPlace)place;
 		
 		ColorSet colorInvariant = transformColorGuard(ctp.getColorInvariant());
-		ColoredInterval timeInvariant = new ColoredInterval(ctp.getTimeInvariant().toString());
+		ColoredTimeInvariant timeInvariant = new ColoredTimeInvariant(ctp.getTimeInvariant().toString());
 		
 		ColoredPlace tapnPlace = new ColoredPlace(ctp.getName(), timeInvariant, colorInvariant);
 

@@ -1,17 +1,18 @@
 package dk.aau.cs.TAPN;
 
 import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
 
 public class Pairing {
 	public enum ArcType { NORMAL, TARC }
 
-	private Arc input;
+	private TAPNArc input;
 	private Arc output;
 	private String interval;
 	private ArcType arcType;
 	
-	public Pairing(Arc input, String interval, Arc output, ArcType arcType){
+	public Pairing(TAPNArc input, String interval, Arc output, ArcType arcType){
 		this.input = input;
 		this.interval = interval;
 		this.output = output;
@@ -34,7 +35,7 @@ public class Pairing {
 		return interval;
 	}
 	
-	public Arc getInputArc(){
+	public TAPNArc getInputArc(){
 		return input;		
 	}
 }

@@ -17,4 +17,12 @@ public class ColoredTransportArc extends TAPNTransportArc {
 		this.colorGuard = colorGuard;
 	}
 
+	public ColoredInterval getTimeGuard() {
+		return timeGuard;
+	}
+
+	public ColorSet getColorGuard() {
+		return colorGuard;
+	}
+
 }

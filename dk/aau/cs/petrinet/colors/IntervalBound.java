@@ -30,4 +30,29 @@ public class IntervalBound {
 			}
 		}
 	}
+	
+	public boolean goesToInfinity(){
+		return scale == 0 && offset == -1;
+	}
+
+	public boolean isZero() {
+		return scale == 0 && offset == 0;
+	}
+
+	public String toString(String valueName) {
+		if(goesToInfinity()){
+			return "";
+		}else if(scale == 0){
+			return String.valueOf(offset);
+		}else if(offset == 0){
+			return String.format("%1$d*%2$d", scale, valueName);
+		}
+		else{
+			return String.format("%1$d*%2$s+%3$d", scale, valueName, offset);
+		}
+	}
+	
+	public String toString() {
+		return toString("val");
+	}
 }
