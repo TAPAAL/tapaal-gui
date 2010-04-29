@@ -23,9 +23,9 @@ import pipe.dataLayer.TransportArc;
 
 public class PipeTapnToAauTapnTransformer {
 	private DataLayer appModel;
-	private TAPN aAUPetriNet;
+	protected TAPN aAUPetriNet;
 	private int capacity;
-	private HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject> PlaceTransitionObjectBookKeeper = new HashMap();
+	protected HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject> PlaceTransitionObjectBookKeeper = new HashMap();
 	
 	public PipeTapnToAauTapnTransformer(DataLayer model, int capacity){
 		appModel = model;
@@ -34,77 +34,105 @@ public class PipeTapnToAauTapnTransformer {
 	}
 	public TAPN getAAUTAPN() throws Exception{
 		for ( Place place : appModel.getPlaces() ) {
-			TAPNPlace aAUTimedPlace = new TAPNPlace(place.getName(),getInvariant(place), capacity);
-			PlaceTransitionObjectBookKeeper.put(place, aAUTimedPlace);
-			aAUPetriNet.addPlace(aAUTimedPlace);
-			
-			aAUPetriNet.addLocation(aAUTimedPlace, place.getX(), place.getY());
-			
-			for (int i = 0; i < place.getCurrentMarking(); i++){
-				aAUPetriNet.tokens.add(aAUTimedPlace);
-			}
-			
+			transformPlace(place);
 		}
+		
 		for( Transition transition : appModel.getTransitions() ){
-			TAPNTransition aAUTransition = new TAPNTransition(transition.getName());
-			PlaceTransitionObjectBookKeeper.put(transition, aAUTransition);
-			aAUPetriNet.addTransition(aAUTransition);
-			
-			aAUPetriNet.addLocation(aAUTransition, transition.getX(), transition.getY());
-			
+			transformTransition(transition);
 		}
 		
 		for ( Arc arc : appModel.getArcs() ){
-			dk.aau.cs.petrinet.Arc aAUArc = null;
-			
 			if (arc instanceof TransportArc){
-				TransportArc tmp = (TransportArc)arc;
-				TransportArc end=null;
-				
-				//We only handel arcs gowing from a place
-				if (tmp.getSource() instanceof Place) {
-					
-					for (Arc tmpend : appModel.getArcs()){ // TODO: can we do this better, by not searching all arcs?
-						
-						if (tmpend instanceof TransportArc){ // must be a transport arc
-							
-							if (tmpend.getSource() == tmp.getTarget() && tmp.getGroupNr() == ((TransportArc)(tmpend)).getGroupNr()){
-								// The arc is connected and is the same
-								end=(TransportArc)tmpend;
-								break;
-							}	
-						}
-					}
-					if (end==null){
-						throw new Exception("Inconsistens model, transport arc group not ended");
-					} else {
-						
-						aAUArc = new dk.aau.cs.petrinet.TAPNTransportArc(
-								(TAPNPlace)PlaceTransitionObjectBookKeeper.get( tmp.getSource() ),
-								(TAPNTransition)PlaceTransitionObjectBookKeeper.get( end.getSource() ) ,
-								(TAPNPlace)PlaceTransitionObjectBookKeeper.get( end.getTarget()),
-								getGuard(tmp));
-						
-						
-						aAUPetriNet.add(aAUArc);
-						aAUArc = null;
-					}
-				}
+				transformTransportArc((TransportArc)arc);
 			}else if(arc instanceof pipe.dataLayer.TAPNInhibitorArc){
-					aAUArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(getGuard((TimedArc)arc));	
+					transformInhibitorArc((pipe.dataLayer.TAPNInhibitorArc)arc);
 			}else if (arc instanceof TimedArc){
-				aAUArc = new TAPNArc(getGuard((TimedArc)arc));
+				transformTimedArc((TimedArc)arc);
 			}else if (arc instanceof NormalArc){
-				aAUArc = new dk.aau.cs.petrinet.Arc();
+				transformNormalArc((NormalArc)arc);
+			}
+		}
+		
+		return aAUPetriNet;
+	}
+	
+	protected void transformNormalArc(NormalArc arc) throws Exception {
+		dk.aau.cs.petrinet.Arc aAUArc;
+		aAUArc = new dk.aau.cs.petrinet.Arc();
+		if (aAUArc != null){
+			aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
+			aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
+			aAUPetriNet.add(aAUArc);
+		}
+	}
+	
+	protected void transformTimedArc(TimedArc arc) throws Exception {
+		dk.aau.cs.petrinet.Arc aAUArc;
+		aAUArc = new TAPNArc(getGuard((TimedArc)arc));
+		if (aAUArc != null){
+			aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
+			aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
+			aAUPetriNet.add(aAUArc);
+		}
+	}
+	
+	protected void transformInhibitorArc(pipe.dataLayer.TAPNInhibitorArc arc) throws Exception {
+		dk.aau.cs.petrinet.Arc aAUArc;
+		aAUArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(getGuard((TimedArc)arc));	
+		if (aAUArc != null){
+			aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
+			aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
+			aAUPetriNet.add(aAUArc);
+		}
+	}
+	
+	protected void transformTransportArc(TransportArc arc) throws Exception {
+		TransportArc end=null;
+		
+		//We only handel arcs gowing from a place
+		if (arc.getSource() instanceof Place) {			
+			for (Arc tmpend : appModel.getArcs()){ // TODO: can we do this better, by not searching all arcs?
+				if (tmpend instanceof TransportArc){ // must be a transport arc
+					if (tmpend.getSource() == arc.getTarget() && arc.getGroupNr() == ((TransportArc)(tmpend)).getGroupNr()){
+						// The arc is connected and is the same
+						end=(TransportArc)tmpend;
+						break;
+					}	
+				}
 			}
 			
-			if (aAUArc != null){
-				aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
-				aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
+			if (end==null){
+				throw new Exception("Inconsistens model, transport arc group not ended");
+			} else {
+				TAPNTransportArc aAUArc = new dk.aau.cs.petrinet.TAPNTransportArc(
+						(TAPNPlace)PlaceTransitionObjectBookKeeper.get( arc.getSource() ),
+						(TAPNTransition)PlaceTransitionObjectBookKeeper.get( end.getSource() ) ,
+						(TAPNPlace)PlaceTransitionObjectBookKeeper.get( end.getTarget()),
+						getGuard(arc));
+				
 				aAUPetriNet.add(aAUArc);
 			}
 		}
-		return aAUPetriNet;
+	}
+	
+	protected void transformTransition(Transition transition) {
+		TAPNTransition aAUTransition = new TAPNTransition(transition.getName());
+		PlaceTransitionObjectBookKeeper.put(transition, aAUTransition);
+		aAUPetriNet.addTransition(aAUTransition);
+		
+		aAUPetriNet.addLocation(aAUTransition, transition.getX(), transition.getY());
+	}
+	
+	protected void transformPlace(Place place) {
+		TAPNPlace aAUTimedPlace = new TAPNPlace(place.getName(),getInvariant(place), capacity);
+		PlaceTransitionObjectBookKeeper.put(place, aAUTimedPlace);
+		aAUPetriNet.addPlace(aAUTimedPlace);
+		
+		aAUPetriNet.addLocation(aAUTimedPlace, place.getX(), place.getY());
+		
+		for (int i = 0; i < place.getCurrentMarking(); i++){
+			aAUPetriNet.tokens.add(aAUTimedPlace);
+		}
 	}
 	
 	private String getGuard(TimedArc arc) {

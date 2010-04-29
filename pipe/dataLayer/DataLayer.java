@@ -950,7 +950,10 @@ implements Cloneable {
 				didSomething = changeArrayList.remove(pnObject);
 				// we want to remove all attached arcs also
 				if (pnObject instanceof PlaceTransitionObject) {
-
+					if(pnObject instanceof ColoredTimedPlace){
+						((ColoredTimedPlace)pnObject).showAgeOfTokens(false);
+					}
+					
 					if ( arcsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are removing

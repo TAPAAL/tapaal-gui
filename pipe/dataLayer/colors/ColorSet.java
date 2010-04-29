@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-
 import java.util.TreeSet;
-
-import javax.swing.JOptionPane;
-
-import pipe.gui.CreateGui;
 
 public class ColorSet {
 	private SortedSet<IntOrConstantRange> ranges;

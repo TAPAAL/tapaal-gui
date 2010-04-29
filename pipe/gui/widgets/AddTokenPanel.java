@@ -65,6 +65,7 @@ public class AddTokenPanel extends JPanel {
 	private void setInitialState() {
 		normalRadioButton.setSelected(true);
 		integerValueSpinner.setValue(0);
+		constantDropDown.setEnabled(false);
 	}
 
 	private void initButtonPanel() {

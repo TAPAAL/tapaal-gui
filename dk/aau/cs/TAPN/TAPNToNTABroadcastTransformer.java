@@ -24,6 +24,7 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
+import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 
 public class TAPNToNTABroadcastTransformer implements
 ModelTransformer<TimedArcPetriNet, NTA>,
@@ -50,6 +51,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	protected static final String LOCK_BOOL = "lock";
+	private static final String VALUE_VAR_NAME = "val";
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
@@ -344,7 +346,13 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private TimedAutomaton createTokenTemplate(TimedArcPetriNet model) {		
 		TimedAutomaton ta = new TimedAutomaton();
 
-		ta.setDeclarations("clock " + TOKEN_CLOCK_NAME + ";");
+		String declarations = "clock " + TOKEN_CLOCK_NAME + ";";
+		if(model instanceof ColoredTimedArcPetriNet){
+			ColoredTimedArcPetriNet ctapn = (ColoredTimedArcPetriNet)model;
+			declarations = String.format("int[%1$d,%2$d] %3$s", ctapn.getLowerBoundForColor(), ctapn.getUpperBoundForColor(), VALUE_VAR_NAME);
+		}
+		
+		ta.setDeclarations(declarations);
 		createTemplateStructure(ta, model);
 
 		if(useSymmetry){
