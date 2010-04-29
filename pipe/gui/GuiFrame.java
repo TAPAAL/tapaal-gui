@@ -109,7 +109,7 @@ implements ActionListener, Observer {
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
-	private JToolBar animationToolBar, drawingToolBar;
+	private JToolBar drawingToolBar;
 	//private Map actions = new HashMap();
 	private JComboBox zoomComboBox;
 
@@ -244,7 +244,10 @@ implements ActionListener, Observer {
 			new FileAction("Export to Uppaal, Symetric","Export the to Uppaal format, with symetricreduction",""));
 		addMenuItem(exportMenu, exportToTest =
 			new FileAction("Export a Degree-2 net","Export the to Uppaal format",""));
-		 */	fileMenu.add(exportMenu);
+<<<<<<< TREE
+		 */	
+		fileMenu.add(exportMenu);
+
 		 fileMenu.addSeparator();
 		 addMenuItem(fileMenu, printAction  =
 			 new FileAction("Print",  "Print","ctrl P"));
@@ -403,9 +406,11 @@ EOC */
 
 		  addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
 		  /*EOC*/
+
 		  addMenuItem(drawMenu, inhibarcAction =
 			  new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
 					  "Add an inhibitor arc", "H",true));              
+
 		  addMenuItem(drawMenu, annotationAction =
 			  new TypeAction("Annotation", Pipe.ANNOTATION,
 					  "Add an annotation","N",true));
@@ -521,101 +526,77 @@ EOC */
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);//Inhibit toolbar floating
-
-		addButton(toolBar,createAction);
-		addButton(toolBar,openAction);
-		addButton(toolBar,saveAction);
-		addButton(toolBar,saveAsAction);
-		addButton(toolBar,closeAction);
+		
+		//Basis file operations
+		toolBar.add(createAction);
+		toolBar.add(openAction);
+		toolBar.add(saveAction);
+		toolBar.add(saveAsAction);
+		toolBar.add(closeAction);
+		
+		//Print
+		toolBar.addSeparator();	
+		toolBar.add(printAction);
+							
+		//Copy/past
+		/* Removed copy/past button
+		toolBar.addSeparator();			
+		toolBar.add(cutAction);
+	    toolBar.add(copyAction);
+	    toolBar.add(pasteAction);
+		 */
+		
+		//Undo/redo
+		toolBar.addSeparator();	
+		toolBar.add(deleteAction);
+		toolBar.add(undoAction);
+		toolBar.add(redoAction);
+		
+		//Zoom	
 		toolBar.addSeparator();
-		addButton(toolBar,printAction);
+		toolBar.add(zoomOutAction);
+		addZoomComboBox(toolBar,
+				zoomAction = new ZoomAction("Zoom","Select zoom percentage ", ""));
+		toolBar.add(zoomInAction);
+		
+		//Modes
 		toolBar.addSeparator();
-		/*		addButton(toolBar,cutAction);
-		addButton(toolBar,copyAction);
-		addButton(toolBar,pasteAction);
-		 */		addButton(toolBar,deleteAction);
-		 addButton(toolBar,undoAction);
-		 addButton(toolBar,redoAction);
-		 toolBar.addSeparator();
+		toolBar.add(toggleGrid);
+		toolBar.add(new ToggleButton(dragAction));
+		toolBar.add(new ToggleButton(startAction));
 
-		 addButton(toolBar, zoomOutAction);
-		 addZoomComboBox(toolBar,
-				 zoomAction = new ZoomAction("Zoom","Select zoom percentage ", ""));
-		 addButton(toolBar, zoomInAction);
-		 toolBar.addSeparator();
-		 addButton(toolBar, toggleGrid);
-		 addButton(toolBar, dragAction);
+		//Start drawingToolBar
+		drawingToolBar = new JToolBar();
+		drawingToolBar.setFloatable(false);
 
-		 addButton(toolBar, startAction);
+		//Normal arraw
+		drawingToolBar.addSeparator();
+		drawingToolBar.add(new ToggleButton(selectAction));
+		
+		//Drawing elements
+		drawingToolBar.addSeparator();
+		drawingToolBar.add(new ToggleButton(timedPlaceAction));
+		drawingToolBar.add(new ToggleButton(transAction));
+		drawingToolBar.add(new ToggleButton(timedArcAction));
+		drawingToolBar.add(new ToggleButton(transportArcAction));
+		drawingToolBar.add(new ToggleButton(annotationAction));
+		
+		//Tokens
+		drawingToolBar.addSeparator();
+		drawingToolBar.add(tokenAction);
+		drawingToolBar.add(deleteTokenAction);
 
-		 drawingToolBar = new JToolBar();
-		 drawingToolBar.setFloatable(false);
+		//Add drawingtoolbar to toolbar
+		drawingToolBar.addSeparator();
+		toolBar.add(drawingToolBar);
 
-		 toolBar.addSeparator();
-		 addButton(drawingToolBar,selectAction);
-		 drawingToolBar.addSeparator();
-		 //		addButton(drawingToolBar,placeAction);//Add Draw Menu Buttons
-		 addButton(drawingToolBar,timedPlaceAction);
-
-		 addButton(drawingToolBar,transAction);
-
-		 /* CB Joakim Byg - Timed transitions are not part of the model
-      addButton(drawingToolBar,timedtransAction);
-EOC */
-		 /* CB Jiri Srba - Not part of the model
-      addButton(drawingToolBar,arcAction);
-EOC */
-
-		 /*CB Joakim Byg - adding timed arcs to the menu*/
-		 addButton(drawingToolBar,timedArcAction);
-		 addButton(drawingToolBar, transportArcAction);
-		 /*EOC*/      
-
-		 addButton(drawingToolBar,inhibarcAction);
-
-		 addButton(drawingToolBar,annotationAction);
-		 drawingToolBar.addSeparator();
-		 addButton(drawingToolBar,tokenAction);
-		 addButton(drawingToolBar,deleteTokenAction);
-		 /* CB Joakim Byg - not needed      
-      drawingToolBar.addSeparator();      
-      addButton(drawingToolBar,rateAction);
-      addButton(drawingToolBar,markingAction);
-EOC */      
-		 toolBar.add(drawingToolBar);
-
-		 animationToolBar = new JToolBar();
-		 animationToolBar.setFloatable(false);
-		 addButton(animationToolBar, stepbackwardAction);
-		 addButton(animationToolBar, stepforwardAction);
-
-		 addButton(animationToolBar, timeAction);
-
-		 addButton(animationToolBar, randomAction);
-		 addButton(animationToolBar, randomAnimateAction);
-
-		 // toolBar.add(animationToolBar);
-		 animationToolBar.setVisible(false);
-
-		 toolBar.addSeparator();
-
-		 for(int i=0;i<toolBar.getComponentCount();i++){
-			 toolBar.getComponent(i).setFocusable(false);
-		 }
-
-		 getContentPane().add(toolBar,BorderLayout.PAGE_START);
-	}
-
-
-	private void addButton(JToolBar toolBar, GuiAction action) {
-
-		if (action.getValue("selected") != null) {
-			toolBar.add(new ToggleButton(action));
-		} else {
-			toolBar.add(action);
+		for(int i=0;i<toolBar.getComponentCount();i++){
+			toolBar.getComponent(i).setFocusable(false);
 		}
-	}
 
+		getContentPane().add(toolBar,BorderLayout.PAGE_START);
+
+	}
 
 	/**
 	 * @author Ben Kirby
@@ -697,7 +678,7 @@ EOC */
 			stepbackwardAction.setEnabled(!status);
 			stepforwardAction.setEnabled(!status);
 			drawingToolBar.setVisible(true);
-			animationToolBar.setVisible(false);
+			
 		}
 		randomAction.setEnabled(!status);
 		randomAnimateAction.setEnabled(!status);
@@ -705,7 +686,6 @@ EOC */
 
 		if (!status){
 			drawingToolBar.setVisible(false);
-			animationToolBar.setVisible(true);
 			timeAction.setEnabled(true);
 			//			pasteAction.setEnabled(status);
 			undoAction.setEnabled(status);
@@ -1399,7 +1379,9 @@ EOC */
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(true);
 						// Do we keep the selection??
+
 						appView.getSelectionObject().clearSelection();
+
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -1610,9 +1592,11 @@ EOC */
 			if (this != transportArcAction) {
 				transportArcAction.setSelected(false);
 			}
+
 			if (this != inhibarcAction) {
 				inhibarcAction.setSelected(false);
 			}     
+
 			if (this != tokenAction) {
 				tokenAction.setSelected(false);
 			}
@@ -1974,6 +1958,7 @@ EOC */
 		stepforwardAction.setEnabled(b);
 	}
 
+
 	public void showNewPNDialog() {
 		// Build interface
 		EscapableDialog guiDialog = 
@@ -1998,6 +1983,7 @@ EOC */
 
 
 	}
+
 
 
 	public void setEnabledStepBackwardAction(boolean b) {
