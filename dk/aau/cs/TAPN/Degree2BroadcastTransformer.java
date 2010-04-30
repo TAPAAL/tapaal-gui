@@ -15,6 +15,7 @@ import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TAPN.Pairing.ArcType;
 import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PetriNetUtil;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -68,7 +69,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		numberOfInitChannels = 0;
 		largestPresetSize = 0;
 
-		TimedArcPetriNet degree2Net = new InhibDegree2Converter().transform((TAPN)model);
+		TimedArcPetriNet degree2Net = getDegree2Converter().transform((TAPN)model);
 
 		NTA nta = new NTA();
 		if(useSymmetry){
@@ -102,6 +103,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		nta.setGlobalDeclarations(createGlobalDeclarations(degree2Net, model));
 
 		return nta;
+	}
+
+	private Degree2Converter getDegree2Converter() {
+		return new InhibDegree2Converter();
 	}
 
 	private String createSystemDeclaration(int tokensInModel) {
