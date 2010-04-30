@@ -21,6 +21,7 @@ import dk.aau.cs.petrinet.colors.ColoredPlace;
 import dk.aau.cs.petrinet.colors.ColoredTAPN;
 import dk.aau.cs.petrinet.colors.ColoredTimeInvariant;
 import dk.aau.cs.petrinet.colors.IntegerRange;
+import dk.aau.cs.petrinet.colors.Preservation;
 
 public class ColoredPipeTapnToColoredAauTapnTransformer extends
 PipeTapnToAauTapnTransformer {
@@ -55,14 +56,18 @@ PipeTapnToAauTapnTransformer {
 
 			ColoredInterval timeGuard = new ColoredInterval(cta.getTimeGuard().toString());
 			ColorSet colorGuard = transformColorGuard(cta.getColorGuard());
-
+			Preservation preserves = Preservation.valueOf(cta.getPreservation().toString());
+			int outputValue = cta.getOutputValue().getValue();
+			
 			dk.aau.cs.petrinet.colors.ColoredTransportArc tarc = 
 				new dk.aau.cs.petrinet.colors.ColoredTransportArc(
 						(ColoredPlace)PlaceTransitionObjectBookKeeper.get(cta.getSource()),
 						(TAPNTransition)PlaceTransitionObjectBookKeeper.get(cta.getTarget()),
 						(ColoredPlace)PlaceTransitionObjectBookKeeper.get(cta.getConnectedTo().getTarget()),
 						timeGuard,
-						colorGuard);
+						colorGuard,
+						preserves,
+						outputValue);
 			aAUPetriNet.addArc(tarc);
 		}
 	}

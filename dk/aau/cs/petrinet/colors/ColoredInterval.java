@@ -11,8 +11,8 @@ public class ColoredInterval {
 		upperParenthesis = interval.charAt(interval.length()-1);
 
 		String[] split = interval.split(",");
-		lower = new IntervalBound(split[0].substring(1));
-		upper = new IntervalBound(split[1].substring(0,split[1].length()-1));
+		lower = new IntervalBound(split[0].substring(1).trim());
+		upper = new IntervalBound(split[1].substring(0,split[1].length()-1).trim());
 	}
 
 	public ColoredInterval() {

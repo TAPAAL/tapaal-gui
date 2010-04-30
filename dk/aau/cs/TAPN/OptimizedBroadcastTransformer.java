@@ -72,7 +72,7 @@ public class OptimizedBroadcastTransformer extends
 
 			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
 					intermediate, 
-					createTransitionGuard(pair.getInputArc(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
+					createTransitionGuard(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);

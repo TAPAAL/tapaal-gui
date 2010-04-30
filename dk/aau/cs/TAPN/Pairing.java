@@ -38,4 +38,8 @@ public class Pairing {
 	public TAPNArc getInputArc(){
 		return input;		
 	}
+
+	public Arc getOutputArc() {
+		return output;
+	}
 }

@@ -35,7 +35,7 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 
 			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
 					intermediate, 
-					createTransitionGuard(pair.getInputArc(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
+					createTransitionGuard(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);
@@ -53,7 +53,7 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 			
 			Edge testEdge2 = new Edge(getLocationByName(inputPlaceName),
 					l,
-					createTransitionGuard(pair.getInputArc(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
+					createTransitionGuard(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType() == ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					"");
 			ta.addTransition(testEdge2);

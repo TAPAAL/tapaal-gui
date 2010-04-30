@@ -409,7 +409,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 			Edge e = new Edge(getLocationByName(pair.getInput().getName()),
 					getLocationByName(pair.getOutput().getName()),
-					createTransitionGuardWithLock(pair.getInputArc(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
+					createTransitionGuardWithLock(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
 					"",
 					createResetExpressionIfNormalArc(pair.getArcType()));
 
@@ -419,7 +419,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 			Edge e1 = new Edge(getLocationByName(pair1.getInput().getName()),
 					getLocationByName(pair1.getOutput().getName()),
-					createTransitionGuardWithLock(pair1.getInputArc(), pair1.getOutput(), pair1.getArcType()==ArcType.TARC),
+					createTransitionGuardWithLock(pair1.getInputArc(), pair1.getOutputArc(), pair1.getOutput(), pair1.getArcType()==ArcType.TARC),
 					t.getName() + "?",
 					createResetExpressionIfNormalArc(pair1.getArcType()));
 
@@ -429,7 +429,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 			Edge e2 = new Edge(getLocationByName(pair2.getInput().getName()),
 					getLocationByName(pair2.getOutput().getName()),
-					createTransitionGuardWithLock(pair2.getInputArc(), pair2.getOutput(), pair2.getArcType()==ArcType.TARC),
+					createTransitionGuardWithLock(pair2.getInputArc(), pair2.getOutputArc(), pair2.getOutput(), pair2.getArcType()==ArcType.TARC),
 					t.getName() + "!",
 					createResetExpressionIfNormalArc(pair2.getArcType()));
 
@@ -438,9 +438,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 
-	private String createTransitionGuardWithLock(TAPNArc arc,
+	private String createTransitionGuardWithLock(TAPNArc inputArc, Arc outputArc,
 			TAPNPlace output, boolean isTarc) {
-		String guard = createTransitionGuard(arc, output, isTarc);
+		String guard = createTransitionGuard(inputArc, outputArc, output, isTarc);
 
 		if(guard == null || guard.isEmpty()){
 			guard = LOCK_BOOL + " == 0";
@@ -469,7 +469,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 			Edge testEdge = new Edge(getLocationByName(inputPlaceName), 
 					intermediate, 
-					createTransitionGuard(pair.getInputArc(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
+					createTransitionGuard(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
 					String.format(TEST_CHANNEL_NAME, t.getName(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);
@@ -571,8 +571,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return locations;
 	}
 
-	protected String createTransitionGuard(TAPNArc arc, TAPNPlace target, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(arc.getGuard(), target, isTransportArc);
+	protected String createTransitionGuard(TAPNArc inputArc, Arc outputArc, TAPNPlace target, boolean isTransportArc) {
+		String newGuard = PetriNetUtil.createGuard(inputArc.getGuard(), target, isTransportArc);
 		return createTransitionGuard(newGuard);
 	}
 

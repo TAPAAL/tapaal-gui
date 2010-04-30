@@ -74,6 +74,7 @@ extends PlaceTransitionObjectHandler {
 					CreateGui.getApp().isEditionAllowed() &&
 					(CreateGui.getApp().getMode() == Pipe.PLACE || 
 							CreateGui.getApp().getMode() == Pipe.SELECT)) {
+				((TimedPlace)myObject).showAgeOfTokens(false);
 				((Place)myObject).showEditor(); 
 			} else {
 				int currentMarking = ((Place)myObject).getCurrentMarking();

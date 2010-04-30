@@ -42,11 +42,17 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 		}
 		
 		for(Arc arc : getArcs()){
-			ColoredOutputArc outputArc = (ColoredOutputArc)arc;
-			
-			int value = outputArc.getOutputValue();
-			
-			updateBoundsIfNecessary(value);
+			if(arc instanceof ColoredOutputArc){
+				ColoredOutputArc outputArc = (ColoredOutputArc)arc;
+				int value = outputArc.getOutputValue();
+				updateBoundsIfNecessary(value);
+			}else if(arc instanceof ColoredTransportArc){
+				ColoredTransportArc outputArc = (ColoredTransportArc)arc;
+				if(outputArc.getPreservation().equals(Preservation.Age)){
+					int value = outputArc.getOutputValue();
+					updateBoundsIfNecessary(value);
+				}
+			}
 		}
 		
 		boundsCalculated = true;

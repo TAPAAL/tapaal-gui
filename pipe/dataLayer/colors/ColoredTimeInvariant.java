@@ -21,7 +21,11 @@ public class ColoredTimeInvariant {
 		String operator = invariant.contains("<=") ? "<=" : "<";
 		
 		strictLessThan = operator.equals("<");
-		upper = new IntervalBound(invariant.substring(operator.length()).trim());		
+		String val = invariant.substring(operator.length()).trim();
+		if(!val.equals("inf"))
+		{
+			upper = new IntervalBound(val);		
+		}
 	}
 
 	public boolean goesToInfinity(){

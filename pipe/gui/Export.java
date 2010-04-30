@@ -994,8 +994,12 @@ public class Export {
 				e.printStackTrace();
 			}
 		}else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_STANDARD || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
+			TAPNToNTABroadcastTransformer broadcastTransformer = null;
+			if(appModel.isUsingColors()){
+				broadcastTransformer = new dk.aau.cs.TAPN.colorTranslations.ColoredBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
+			}else{
+				broadcastTransformer = new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
+			}
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));

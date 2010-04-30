@@ -12,7 +12,7 @@ public class IntervalBound {
 	}
 
 	public IntervalBound(String bound) {
-		if(bound.equals("inf")){
+		if(bound.trim().equals("inf")){
 			this.scale = 0;
 			this.offset = -1;
 		}else{
