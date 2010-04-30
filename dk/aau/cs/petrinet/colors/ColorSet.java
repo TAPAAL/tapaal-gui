@@ -9,14 +9,14 @@ public class ColorSet {
 	public ColorSet(){
 		this(false);
 	}
-	
+
 	public ColorSet(boolean isEmpty){
 		if(!isEmpty){
 			ranges = new TreeSet<IntegerRange>();
 		}
 	}
-	
-	
+
+
 	public void addRange(IntegerRange range){
 		if(ranges == null){
 			ranges = new TreeSet<IntegerRange>();
@@ -25,18 +25,23 @@ public class ColorSet {
 	}
 
 	public ColorSet intersect(ColorSet colorInvariant) {
-		ColorSet newSet = new ColorSet(true);
-		
-		for(IntegerRange range : ranges){
-			for(IntegerRange other : colorInvariant.ranges){
-				IntegerRange intersection = range.intersect(other);
-				
-				if(!intersection.isEmpty()){
-					newSet.addRange(intersection);
+		if(ranges != null && ranges.size() == 0 
+				&& colorInvariant.ranges != null && colorInvariant.ranges.size() == 0){
+			return new ColorSet();
+		}else{
+			ColorSet newSet = new ColorSet(true);
+
+			for(IntegerRange range : ranges){
+				for(IntegerRange other : colorInvariant.ranges){
+					IntegerRange intersection = range.intersect(other);
+
+					if(!intersection.isEmpty()){
+						newSet.addRange(intersection);
+					}
 				}
 			}
+			return newSet;
 		}
-		return newSet;
 	}
 
 	public boolean contains(int outputValue) {
@@ -45,14 +50,14 @@ public class ColorSet {
 		for(IntegerRange range : ranges){
 			if(range.contains(outputValue)) return true;
 		}
-		
+
 		return false;
 	}
 
 	public String convertToTAGuardString(String valueVarName) {
 		if(ranges == null) return "false";
 		if(ranges.isEmpty()) return "";
-		
+
 		StringBuilder builder = new StringBuilder("(");
 		boolean first = true;
 		for(IntegerRange range : ranges){
@@ -64,9 +69,9 @@ public class ColorSet {
 			builder.append(")");
 			first = false;
 		}
-		
+
 		builder.append(")");
-		
+
 		return builder.toString();
 	}
 }

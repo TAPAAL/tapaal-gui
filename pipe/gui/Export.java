@@ -39,7 +39,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.QueryDialogue;
-import dk.aau.cs.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.TAPN.TAPNToNTATransformer;
@@ -49,6 +48,7 @@ import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
+import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.petrinet.degree2converters.KyrketestUppaalSym;
 
 

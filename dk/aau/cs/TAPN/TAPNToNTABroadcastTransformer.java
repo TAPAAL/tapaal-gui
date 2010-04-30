@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.dataLayer.TimedArc;
-
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
@@ -26,7 +24,6 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
-import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 
 public class TAPNToNTABroadcastTransformer implements
 ModelTransformer<TimedArcPetriNet, NTA>,
@@ -365,7 +362,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return "clock " + TOKEN_CLOCK_NAME + ";";
 	}
 
-	private void addInitializationStructure(TimedAutomaton ta,
+	protected void addInitializationStructure(TimedAutomaton ta,
 			TimedArcPetriNet model) {
 		int i = 0;
 
@@ -374,11 +371,16 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					getLocationByName(token.getPlace().getName()),
 					"",
 					String.format(INITIALIZE_CHANNEL, i, "?"),
-			"");
+					createUpdateExpressionForTokenInitialization(token));
 			ta.addTransition(initEdge);
 			i++;
 		}		
 	}
+
+	protected String createUpdateExpressionForTokenInitialization(Token token) {
+		return "";
+	}
+
 
 	private void createTemplateStructure(TimedAutomaton ta,
 			TimedArcPetriNet model) {
@@ -411,7 +413,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					getLocationByName(pair.getOutput().getName()),
 					createTransitionGuardWithLock(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
 					"",
-					createResetExpressionIfNormalArc(pair.getArcType()));
+					createResetExpressionIfNormalArc(pair.getOutputArc()));
 
 			ta.addTransition(e);
 		}else{
@@ -421,7 +423,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					getLocationByName(pair1.getOutput().getName()),
 					createTransitionGuardWithLock(pair1.getInputArc(), pair1.getOutputArc(), pair1.getOutput(), pair1.getArcType()==ArcType.TARC),
 					t.getName() + "?",
-					createResetExpressionIfNormalArc(pair1.getArcType()));
+					createResetExpressionIfNormalArc(pair1.getOutputArc()));
 
 			ta.addTransition(e1);
 
@@ -431,7 +433,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					getLocationByName(pair2.getOutput().getName()),
 					createTransitionGuardWithLock(pair2.getInputArc(), pair2.getOutputArc(), pair2.getOutput(), pair2.getArcType()==ArcType.TARC),
 					t.getName() + "!",
-					createResetExpressionIfNormalArc(pair2.getArcType()));
+					createResetExpressionIfNormalArc(pair2.getOutputArc()));
 
 			ta.addTransition(e2);
 		}
@@ -478,7 +480,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					getLocationByName(pair.getOutput().getName()),
 					"", //String.format(COUNTER_UPDATE, i, "==1"),
 					String.format(FIRE_CHANNEL_NAME, t.getName(), "?"),
-					createResetExpressionIfNormalArc(pair.getArcType()));
+					createResetExpressionIfNormalArc(pair.getOutputArc()));
 			ta.addTransition(fireEdge);
 
 			String guard = String.format(COUNTER_UPDATE, counter,">1");
@@ -516,8 +518,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}
 	}
 
-	protected String createResetExpressionIfNormalArc(ArcType arcType) {
-		if(arcType.equals(ArcType.NORMAL)){
+	protected String createResetExpressionIfNormalArc(Arc arc) {
+		if(!(arc instanceof TAPNTransportArc)){
 			return String.format("%1s := 0", TOKEN_CLOCK_NAME);
 		}else{
 			return "";
@@ -562,7 +564,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 		ArrayList<Location> locations = new ArrayList<Location>();
 		for(TAPNPlace p : model.getPlaces()){
-			Location l = new Location(p.getName(), convertInvariant(p.getInvariant()));
+			Location l = new Location(p.getName(), convertInvariant(p));
 
 			locations.add(l);	
 			addLocationMapping(p.getName(), l);
@@ -612,8 +614,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	protected String convertInvariant(String invariant) {
+	protected String convertInvariant(TAPNPlace place) {
 		String inv = "";
+		String invariant = place.getInvariant();
 		if(!invariant.equals("<inf")){
 			inv = TOKEN_CLOCK_NAME + " " + invariant;
 		}

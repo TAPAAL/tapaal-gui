@@ -33,7 +33,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
-import dk.aau.cs.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.TA.AbstractMarking;
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
@@ -49,6 +48,7 @@ import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
+import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification

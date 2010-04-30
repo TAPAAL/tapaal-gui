@@ -45,7 +45,7 @@ public class IntervalBound {
 		}else if(scale == 0){
 			return String.valueOf(offset);
 		}else if(offset == 0){
-			return String.format("%1$d*%2$d", scale, valueName);
+			return String.format("%1$d*%2$s", scale, valueName);
 		}
 		else{
 			return String.format("%1$d*%2$s+%3$d", scale, valueName, offset);

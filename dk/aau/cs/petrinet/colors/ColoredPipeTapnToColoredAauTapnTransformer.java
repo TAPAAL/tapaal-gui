@@ -1,4 +1,4 @@
-package dk.aau.cs;
+package dk.aau.cs.petrinet.colors;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
@@ -12,16 +12,6 @@ import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntOrConstantRange;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPNTransition;
-import dk.aau.cs.petrinet.colors.ColorSet;
-import dk.aau.cs.petrinet.colors.ColoredInhibitorArc;
-import dk.aau.cs.petrinet.colors.ColoredInputArc;
-import dk.aau.cs.petrinet.colors.ColoredInterval;
-import dk.aau.cs.petrinet.colors.ColoredOutputArc;
-import dk.aau.cs.petrinet.colors.ColoredPlace;
-import dk.aau.cs.petrinet.colors.ColoredTAPN;
-import dk.aau.cs.petrinet.colors.ColoredTimeInvariant;
-import dk.aau.cs.petrinet.colors.IntegerRange;
-import dk.aau.cs.petrinet.colors.Preservation;
 
 public class ColoredPipeTapnToColoredAauTapnTransformer extends
 PipeTapnToAauTapnTransformer {

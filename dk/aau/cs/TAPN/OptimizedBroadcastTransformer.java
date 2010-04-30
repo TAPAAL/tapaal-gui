@@ -77,7 +77,7 @@ public class OptimizedBroadcastTransformer extends
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(testEdge);
 
-			String resetExpr = createResetExpressionIfNormalArc(pair.getArcType());
+			String resetExpr = createResetExpressionIfNormalArc(pair.getOutputArc());
 			if(!resetExpr.isEmpty()){
 				resetExpr = ", " + resetExpr;
 			}

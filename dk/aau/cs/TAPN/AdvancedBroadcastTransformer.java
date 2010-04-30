@@ -6,7 +6,6 @@ import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TAPN.Pairing.ArcType;
-import dk.aau.cs.petrinet.TAPNInhibitorArc;
 import dk.aau.cs.petrinet.TAPNTransition;
 
 public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer {
@@ -44,7 +43,7 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 					getLocationByName(pair.getOutput().getName()),
 					"", //String.format(COUNTER_UPDATE, i, "==1"),
 					String.format(FIRE_CHANNEL_NAME, t.getName(), "?"),
-					createResetExpressionIfNormalArc(pair.getArcType()));
+					createResetExpressionIfNormalArc(pair.getOutputArc()));
 			ta.addTransition(fireEdge);
 
 			Location l = new Location("",counter + "==1");

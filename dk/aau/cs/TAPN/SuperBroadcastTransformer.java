@@ -5,7 +5,6 @@ import java.util.List;
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.TimedAutomaton;
-import dk.aau.cs.TAPN.Pairing.ArcType;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
@@ -52,7 +51,7 @@ public class SuperBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 			arcsToCounters.put(pair.getInputArc(), counter);
 
 			String resetExpr = String.format(COUNTER_UPDATE, counter, "++");
-			String expr = createResetExpressionIfNormalArc(pair.getArcType());
+			String expr = createResetExpressionIfNormalArc(pair.getOutputArc());
 			if(!expr.isEmpty()){
 				resetExpr = resetExpr + ", " + expr;
 			}

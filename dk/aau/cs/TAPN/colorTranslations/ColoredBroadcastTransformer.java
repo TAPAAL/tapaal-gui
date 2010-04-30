@@ -1,10 +1,13 @@
 package dk.aau.cs.TAPN.colorTranslations;
 
+import dk.aau.cs.TA.Edge;
+import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.colors.ColorSet;
 import dk.aau.cs.petrinet.colors.ColoredInhibitorArc;
 import dk.aau.cs.petrinet.colors.ColoredInputArc;
@@ -13,6 +16,7 @@ import dk.aau.cs.petrinet.colors.ColoredOutputArc;
 import dk.aau.cs.petrinet.colors.ColoredPlace;
 import dk.aau.cs.petrinet.colors.ColoredTimeInvariant;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
+import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
 
@@ -125,5 +129,49 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 			guard.append(colorGuardString);
 		}
 		return guard.toString();
+	}
+	
+	
+	protected String createResetExpressionIfNormalArc(Arc arc) {
+		String clockReset = String.format("%1$s := 0", TOKEN_CLOCK_NAME);
+		
+		if(arc instanceof ColoredOutputArc){
+			int value = ((ColoredOutputArc)arc).getOutputValue();
+			String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
+			return clockReset + ", " + valueReset;
+		}else {
+			ColoredTransportArc tarc = (ColoredTransportArc)arc;
+			if(tarc.getPreservation().equals(Preservation.Age)){
+				int value = tarc.getOutputValue();
+				String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
+				return valueReset;
+			}else if(tarc.getPreservation().equals(Preservation.Value)){
+				return clockReset;
+			}else{
+				return "";
+			}
+		}
+	}
+	
+	protected String convertInvariant(TAPNPlace place) {
+		ColoredPlace cp = (ColoredPlace)place;
+		
+		String timeInvariant = cp.getTimeInvariant().convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
+		String colorInvariant = cp.getColorInvariant().convertToTAGuardString(VALUE_VAR_NAME);
+		
+		String invariant = timeInvariant;
+		if(!invariant.isEmpty() && !colorInvariant.isEmpty()){
+			invariant += " && ";
+		}
+		invariant += colorInvariant;
+		
+		return invariant;
+	}
+		
+	
+	protected String createUpdateExpressionForTokenInitialization(Token token) {
+		ColoredToken ct = (ColoredToken)token;
+		
+		return String.format("%1$s := %2$d", VALUE_VAR_NAME, ct.getColor());
 	}
 }

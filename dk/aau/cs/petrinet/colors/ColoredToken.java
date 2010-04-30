@@ -4,7 +4,7 @@ import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.Token;
 
 public class ColoredToken extends Token {
-	public int color;
+	private int color;
 	
 	public ColoredToken(TAPNPlace place){
 		this(place, 0);

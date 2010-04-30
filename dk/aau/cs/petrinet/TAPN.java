@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
-import dk.aau.cs.petrinet.degree2converters.InhibitorToPrioritiesDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
 import dk.aau.cs.petrinet.degree2converters.degree2minimal;
@@ -43,6 +42,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	List<TAPNArc> tapnArcs = new ArrayList<TAPNArc>();
 	List<Arc> normalArcs = new ArrayList<Arc>();
 	
+	// TODO: Fix to use token class and non-public access
 	public LinkedList<Place> tokens = new LinkedList<Place>();//Add each place for each token it has.
 
 	public HashMap<PlaceTransitionObject, Location> locations = new HashMap<PlaceTransitionObject, Location>(); 

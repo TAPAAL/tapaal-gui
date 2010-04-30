@@ -1,19 +1,18 @@
 package dk.aau.cs.petrinet.colors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.petrinet.Arc;
-import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
-import dk.aau.cs.petrinet.Transition;
+import dk.aau.cs.petrinet.Token;
 
 public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 
-	private int lowerBound = Integer.MAX_VALUE;
-	private int upperBound = Integer.MIN_VALUE;
+	private Integer lowerBound;
+	private Integer upperBound;
 	private boolean boundsCalculated = false;
 	
 	public int getLowerBoundForColor() {
@@ -55,15 +54,17 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 			}
 		}
 		
+		if(upperBound == null) upperBound = 0;
+		if(lowerBound == null) lowerBound = 0;
 		boundsCalculated = true;
 	}
 
 	private void updateBoundsIfNecessary(int value) {
-		if(value < lowerBound){
+		if(lowerBound == null || value < lowerBound){
 			lowerBound = value;
 		}
 		
-		if(value > upperBound){
+		if(upperBound == null || value > upperBound){
 			upperBound = value;
 		}
 	}
@@ -90,5 +91,26 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 				}
 			} 
 		}
+	}
+	
+	
+	public List<Token> getTokens() {
+		ArrayList<Token> tokens = new ArrayList<Token>();
+		for(TAPNPlace place : getPlaces()){
+			ColoredPlace cp = (ColoredPlace)place;
+			tokens.addAll(cp.getColoredTokens());
+		}
+		
+		return tokens;
+	}
+	
+	
+	public int getNumberOfTokens() {
+		int i = 0;
+		for(TAPNPlace place : getPlaces()){
+			ColoredPlace cp = (ColoredPlace)place;
+			i += cp.getColoredTokens().size();
+		}
+		return i;
 	}
 }
