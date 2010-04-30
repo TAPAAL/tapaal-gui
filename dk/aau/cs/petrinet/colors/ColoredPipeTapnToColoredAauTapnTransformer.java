@@ -26,7 +26,7 @@ PipeTapnToAauTapnTransformer {
 		ColoredTimedPlace ctp = (ColoredTimedPlace)place;
 		
 		ColorSet colorInvariant = transformColorGuard(ctp.getColorInvariant());
-		ColoredTimeInvariant timeInvariant = new ColoredTimeInvariant(ctp.getTimeInvariant().toString());
+		ColoredTimeInvariant timeInvariant = new ColoredTimeInvariant(ctp.getTimeInvariant().toStringWithoutConstants());
 		
 		ColoredPlace tapnPlace = new ColoredPlace(ctp.getName(), timeInvariant, colorInvariant);
 
@@ -44,7 +44,7 @@ PipeTapnToAauTapnTransformer {
 		if(arc.getSource() instanceof Place){
 			ColoredTransportArc cta = (ColoredTransportArc)arc;
 
-			ColoredInterval timeGuard = new ColoredInterval(cta.getTimeGuard().toString());
+			ColoredInterval timeGuard = new ColoredInterval(cta.getTimeGuard().toStringWithoutConstants());
 			ColorSet colorGuard = transformColorGuard(cta.getColorGuard());
 			Preservation preserves = Preservation.valueOf(cta.getPreservation().toString());
 			int outputValue = cta.getOutputValue().getValue();
@@ -66,7 +66,7 @@ PipeTapnToAauTapnTransformer {
 		ColorSet colorGuard = new ColorSet();
 
 		for(IntOrConstantRange range : colorSet.getRanges()){
-			IntegerRange newRange = new IntegerRange(range.toString());
+			IntegerRange newRange = new IntegerRange(range.toStringWithoutConstants());
 			colorGuard.addRange(newRange);
 		}
 		return colorGuard;
@@ -75,7 +75,7 @@ PipeTapnToAauTapnTransformer {
 	protected void transformInhibitorArc(TAPNInhibitorArc arc) throws Exception {
 		pipe.dataLayer.colors.ColoredInhibitorArc cia = (pipe.dataLayer.colors.ColoredInhibitorArc)arc;
 		
-		ColoredInterval timeGuard = new ColoredInterval(cia.getTimeGuard().toString());
+		ColoredInterval timeGuard = new ColoredInterval(cia.getTimeGuard().toStringWithoutConstants());
 		ColorSet colorGuard = transformColorGuard(cia.getColorGuard());
 		
 		ColoredInhibitorArc newArc = new ColoredInhibitorArc(
@@ -90,7 +90,7 @@ PipeTapnToAauTapnTransformer {
 	protected void transformTimedArc(TimedArc arc) throws Exception {
 		pipe.dataLayer.colors.ColoredInputArc cia = (pipe.dataLayer.colors.ColoredInputArc)arc;
 		
-		ColoredInterval timeGuard = new ColoredInterval(cia.getTimeGuard().toString());
+		ColoredInterval timeGuard = new ColoredInterval(cia.getTimeGuard().toStringWithoutConstants());
 		ColorSet colorGuard = transformColorGuard(cia.getColorGuard());
 		
 		ColoredInputArc newArc = new ColoredInputArc(

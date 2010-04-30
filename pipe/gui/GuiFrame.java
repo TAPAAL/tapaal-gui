@@ -579,6 +579,7 @@ EOC */
 		drawingToolBar.add(new ToggleButton(transAction));
 		drawingToolBar.add(new ToggleButton(timedArcAction));
 		drawingToolBar.add(new ToggleButton(transportArcAction));
+		drawingToolBar.add(new ToggleButton(inhibarcAction));
 		drawingToolBar.add(new ToggleButton(annotationAction));
 		
 		//Tokens

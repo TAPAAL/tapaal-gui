@@ -58,4 +58,10 @@ public class ColoredTimeInvariant {
 	public List<String> getUsedConstantNames() {
 		return goesToInfinity() ? new ArrayList<String>() : upper.getUsedConstants();
 	}
+
+	public String toStringWithoutConstants() {
+		String operator = getOperator();
+		String bound = goesToInfinity() ? "inf" : upper.toStringWithoutConstants();
+		return String.format("%1$s%2$s", operator, bound); 
+	}
 }

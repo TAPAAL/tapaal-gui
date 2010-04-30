@@ -264,6 +264,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			String counter = arcsToCounters.get(inhib);
 			builder.append(counter);
 			builder.append(":=0");
+			first = false;
 		}
 
 		if(!first){
@@ -510,7 +511,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			Location location = getLocationByName(inputPlace);
 			Edge inhibEdge = new Edge(location,
 					location,
-					createTransitionGuard(inhibArc.getGuard()),
+					createTransitionGuard(inhibArc,null,null, false),
 					String.format(TEST_CHANNEL_NAME, t.getName(),"?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(inhibEdge);

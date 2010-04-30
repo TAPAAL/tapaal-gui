@@ -49,7 +49,7 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 	public String toString(){
 		if(goesToInfinity){
 			return String.valueOf(from) + "-";
-		}else if(from == to){
+		}else if(from.equals(to)){
 			return String.valueOf(from);
 		}else {
 			return String.valueOf(from) + "-" + String.valueOf(to);
@@ -131,6 +131,16 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 
 	public static IntOrConstantRange parse(String str) {
 		return parse(str, true);
+	}
+
+	public String toStringWithoutConstants() {
+		if(goesToInfinity){
+			return String.valueOf(from.getValue()) + "-";
+		}else if(from.equals(to)){
+			return String.valueOf(from.getValue());
+		}else {
+			return String.valueOf(from.getValue()) + "-" + String.valueOf(from.getValue());
+		}
 	}
 	
 }

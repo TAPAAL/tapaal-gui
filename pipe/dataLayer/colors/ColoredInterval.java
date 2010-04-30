@@ -71,4 +71,11 @@ public class ColoredInterval {
 		
 		return list;
 	}
+
+	public String toStringWithoutConstants() {
+String format = "%1$s%2$s, %3$s%4$s";
+		
+		return String.format(format, getOpenParenthesis(), lower.toStringWithoutConstants(), 
+				upper.toStringWithoutConstants(), getCloseParenthesis());
+	}
 }

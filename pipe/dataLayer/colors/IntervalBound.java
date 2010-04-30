@@ -100,4 +100,17 @@ public class IntervalBound {
 
 		return list;
 	}
+
+	public String toStringWithoutConstants() {
+		if(goesToInfinity()){
+			return "inf";
+		}else if(!a.isUsingConstant() && a.getValue() == 0){
+			return String.valueOf(b.getValue());
+		}else if(!b.isUsingConstant() && b.getValue() == 0){
+			return String.format("%1$d*val", a.getValue());
+		}
+		else{
+			return String.format("%1$d*val+%2$d", a.getValue(), b.getValue());
+		}
+	}
 }
