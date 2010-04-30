@@ -15,10 +15,12 @@ public class ColoredTimedPlaceTimeInvariantEdit extends UndoableEdit {
 		this.newInvariant = newInvariant;
 	}
 	
+	@Override
 	public void redo() {
 		place.setTimeInvariant(newInvariant);
 	}
 
+	@Override
 	public void undo() {
 		place.setTimeInvariant(oldInvariant);
 

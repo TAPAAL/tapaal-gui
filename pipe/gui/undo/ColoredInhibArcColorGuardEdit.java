@@ -13,11 +13,13 @@ public class ColoredInhibArcColorGuardEdit extends ColorSetEdit {
 	}
 
 	
+	@Override
 	public void redo() {
 		arc.setColorGuard(getNewColorSet());
 	}
 
 	
+	@Override
 	public void undo() {
 		arc.setColorGuard(getOldColorSet());
 

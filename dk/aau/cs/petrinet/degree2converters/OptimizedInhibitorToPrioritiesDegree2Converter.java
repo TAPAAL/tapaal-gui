@@ -8,6 +8,7 @@ import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 public class OptimizedInhibitorToPrioritiesDegree2Converter extends
 		InhibitorToPrioritiesDegree2Converter {
+	@Override
 	protected void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 		createSimulationOfTransition(transition, degree2Net, true);
 	}

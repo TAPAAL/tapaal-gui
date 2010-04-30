@@ -22,6 +22,7 @@ PipeTapnToAauTapnTransformer {
 		aAUPetriNet = new ColoredTAPN();
 	}
 
+	@Override
 	protected void transformPlace(Place place) {
 		ColoredTimedPlace ctp = (ColoredTimedPlace)place;
 		
@@ -40,6 +41,7 @@ PipeTapnToAauTapnTransformer {
 		PlaceTransitionObjectBookKeeper.put(place, tapnPlace);
 	}
 
+	@Override
 	protected void transformTransportArc(TransportArc arc) throws Exception {
 		if(arc.getSource() instanceof Place){
 			ColoredTransportArc cta = (ColoredTransportArc)arc;
@@ -72,6 +74,7 @@ PipeTapnToAauTapnTransformer {
 		return colorGuard;
 	}
 	
+	@Override
 	protected void transformInhibitorArc(TAPNInhibitorArc arc) throws Exception {
 		pipe.dataLayer.colors.ColoredInhibitorArc cia = (pipe.dataLayer.colors.ColoredInhibitorArc)arc;
 		
@@ -87,6 +90,7 @@ PipeTapnToAauTapnTransformer {
 		aAUPetriNet.add(newArc);
 	}
 	
+	@Override
 	protected void transformTimedArc(TimedArc arc) throws Exception {
 		pipe.dataLayer.colors.ColoredInputArc cia = (pipe.dataLayer.colors.ColoredInputArc)arc;
 		
@@ -102,6 +106,7 @@ PipeTapnToAauTapnTransformer {
 		aAUPetriNet.add(newArc);
 	}
 	
+	@Override
 	protected void transformNormalArc(NormalArc arc) throws Exception {
 		pipe.dataLayer.colors.ColoredOutputArc coa = (pipe.dataLayer.colors.ColoredOutputArc)arc;
 		

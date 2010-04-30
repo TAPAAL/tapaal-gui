@@ -236,7 +236,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					String.format(T_MAX_FORMAT, transitionName, i),
 					presetArc.getTarget().getName(),
-					createGuard(presetArc.getGuard(), (TAPNPlace)presetArc.getTarget(), true));
+					createGuard(presetArc.getGuard(), presetArc.getTarget(), true));
 		}else{
 			String trans = String.format(T_I_IN_FORMAT, transitionName, i);
 			String pholding = String.format(HOLDING_PLACE_FORMAT, transitionName, i);
@@ -245,14 +245,14 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					trans,
 					pholding,
-					createGuard(presetArc.getGuard(), (TAPNPlace)presetArc.getTarget(), true));
+					createGuard(presetArc.getGuard(), presetArc.getTarget(), true));
 
 			trans = String.format(T_I_OUT_FORMAT, transitionName, i);
 			addTransportArc(degree2Net, 
 					pholding,
 					trans,
 					presetArc.getTarget().getName(),
-					createGuard(presetArc.getGuard(), (TAPNPlace)presetArc.getTarget(), true));
+					createGuard(presetArc.getGuard(), presetArc.getTarget(), true));
 		}
 	}
 

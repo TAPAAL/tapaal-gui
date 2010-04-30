@@ -63,6 +63,7 @@ public class ColoredToken {
 		return color;
 	}
 	
+	@Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);

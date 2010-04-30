@@ -17,6 +17,7 @@ public class OptimizedBroadcastTransformer extends
 		
 	}
 	
+	@Override
 	protected void createTransitionSimulations(TimedAutomaton control, Location lock,
 			TimedArcPetriNet model) {
 
@@ -54,6 +55,7 @@ public class OptimizedBroadcastTransformer extends
 		}
 	}
 	
+	@Override
 	protected void createStructureForPairing(TimedAutomaton ta, TAPNTransition t,
 			List<Pairing> pairing) {
 		int i = 0;

@@ -44,6 +44,7 @@ public class ColoredTimeInvariant {
 	}
 	
 	
+	@Override
 	public String toString() {
 		String operator = getOperator();
 		String bound = goesToInfinity() ? "inf" : upper.toString();

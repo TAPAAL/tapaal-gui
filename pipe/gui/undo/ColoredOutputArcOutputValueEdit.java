@@ -15,10 +15,12 @@ public class ColoredOutputArcOutputValueEdit extends UndoableEdit {
 		this.newValue = newValue;
 	}
 	
+	@Override
 	public void redo() {
 		arc.setOutputValue(newValue);
 	}
 
+	@Override
 	public void undo() {
 		arc.setOutputValue(oldValue);
 	}

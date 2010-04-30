@@ -1,9 +1,6 @@
 package pipe.dataLayer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
-
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 

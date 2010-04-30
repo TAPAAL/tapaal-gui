@@ -10,10 +10,12 @@ public class ColoredInhibitorArcTimeGuardEdit extends TimeGuardEdit {
 		super(oldInterval,newInterval);
 		this.arc = arc;
 	}
+	@Override
 	public void redo() {
 		arc.setTimeGuard(getNewInterval());
 	}
 
+	@Override
 	public void undo() {
 		arc.setTimeGuard(getOldInterval());
 	}

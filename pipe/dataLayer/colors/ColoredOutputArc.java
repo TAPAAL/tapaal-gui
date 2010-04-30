@@ -53,6 +53,7 @@ public class ColoredOutputArc extends NormalArc {
 		return "val := " + outputValue;
 	}
 	
+	@Override
 	public void updateWeightLabel(){ 		
 		weightLabel.setText(getOutputString());
 		

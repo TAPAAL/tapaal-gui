@@ -69,6 +69,7 @@ public class ColorSet {
 		return builder.toString();
 	}
 
+	@Override
 	public String toString() {
 		String str = toStringNoSetNotation();
 		if(!str.isEmpty()){

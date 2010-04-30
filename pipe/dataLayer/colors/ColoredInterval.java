@@ -49,6 +49,7 @@ public class ColoredInterval {
 		return upperIncluded ? "]" : ")";
 	}
 		
+	@Override
 	public String toString() {
 		String format = "%1$s%2$s, %3$s%4$s";
 		

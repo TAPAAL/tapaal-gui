@@ -7,11 +7,13 @@ import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 
 public class InhibDegree2Converter extends OptimizedInhibitorToPrioritiesDegree2Converter {
+	@Override
 	protected void createInitialPlaces(TimedArcPetriNet model, TimedArcPetriNet degree2Net) {
 		super.createInitialPlaces(model, degree2Net);
 		degree2Net.removePlaceByName(PDEADLOCK);
 	}
 
+	@Override
 	protected void createSimulationOfTransition(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 				if(transition.isDegree2() && transition.getInhibitorArcs().size() == 0){
 					createOptimizedSimulation(transition, degree2Net);
@@ -20,6 +22,7 @@ public class InhibDegree2Converter extends OptimizedInhibitorToPrioritiesDegree2
 				}
 	}
 
+	@Override
 	protected void createInhibitorArcSimulation(TAPNTransition transition, TimedArcPetriNet degree2Net) throws Exception {
 		String transitionName = transition.getName();
 
@@ -28,6 +31,7 @@ public class InhibDegree2Converter extends OptimizedInhibitorToPrioritiesDegree2
 		addTAPNArc(degree2Net, PLOCK, tiin, ZERO_INF_GUARD);
 	}
 
+	@Override
 	protected String createGuard(String guard, TAPNPlace target, boolean isTransportArc) {
 		return PetriNetUtil.createGuard(guard, target, isTransportArc);
 	}

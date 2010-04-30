@@ -1,7 +1,5 @@
 package dk.aau.cs.TAPN.colorTranslations;
 
-import dk.aau.cs.TA.Edge;
-import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -27,6 +25,7 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		super(extraTokens, useSymmetry);
 	}
 
+	@Override
 	protected String createLocalDeclarations(TimedArcPetriNet model){
 		String decl = super.createLocalDeclarations(model);
 
@@ -35,6 +34,7 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		return decl;
 	}
 
+	@Override
 	protected String createTransitionGuard(TAPNArc inputArc, Arc outputArc, TAPNPlace target,
 			boolean isTransportArc) {
 
@@ -132,6 +132,7 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 	}
 	
 	
+	@Override
 	protected String createResetExpressionIfNormalArc(Arc arc) {
 		String clockReset = String.format("%1$s := 0", TOKEN_CLOCK_NAME);
 		
@@ -153,6 +154,7 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		}
 	}
 	
+	@Override
 	protected String convertInvariant(TAPNPlace place) {
 		ColoredPlace cp = (ColoredPlace)place;
 		
@@ -169,6 +171,7 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 	}
 		
 	
+	@Override
 	protected String createUpdateExpressionForTokenInitialization(Token token) {
 		ColoredToken ct = (ColoredToken)token;
 		

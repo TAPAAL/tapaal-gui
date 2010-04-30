@@ -15,6 +15,7 @@ public class SuperBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	protected void createTransitionSimulations(TimedAutomaton control, Location lock,
 			TimedArcPetriNet model) {
 
@@ -41,6 +42,7 @@ public class SuperBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		}
 	}
 	
+	@Override
 	protected void createStructureForPairing(TimedAutomaton ta, TAPNTransition t,
 			List<Pairing> pairing) {
 		int i = 0;
@@ -76,6 +78,7 @@ public class SuperBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		createStructureForInhibitorArcs(ta, t, i);
 	}
 	
+	@Override
 	protected String createInvariantForControl(TAPNTransition transition) {
 		return createBooleanExpressionForControl(transition, "==", "==",1);
 	}

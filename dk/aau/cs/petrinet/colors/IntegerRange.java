@@ -1,8 +1,5 @@
 package dk.aau.cs.petrinet.colors;
 
-import pipe.dataLayer.colors.IntOrConstant;
-import pipe.dataLayer.colors.IntOrConstantRange;
-
 
 
 public class IntegerRange implements Comparable<IntegerRange> {
@@ -120,6 +117,7 @@ public class IntegerRange implements Comparable<IntegerRange> {
 	}
 	
 
+	@Override
 	public String toString() {
 		if(isSingle()){
 			return String.valueOf(from);

@@ -21,7 +21,6 @@ import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.AddTokenPanel;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.OutputValueEditorPanel;
 import pipe.gui.widgets.RemoveTokenPanel;
 
 

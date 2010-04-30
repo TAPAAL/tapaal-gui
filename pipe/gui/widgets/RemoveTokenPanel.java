@@ -16,6 +16,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -145,13 +146,13 @@ public class RemoveTokenPanel extends JPanel {
 		gbc.insets = new Insets(0,3,3,3);
 		tokenPanel.add(tokenHelpLabel2, gbc);
 
-		tokenTableModel = new TokenTableModel((ColoredTimedPlace)place);
+		tokenTableModel = new TokenTableModel(place);
 		tokenTable = new JTable(tokenTableModel);
 		Dimension dims = new Dimension(150,133);
 		tokenTable.setPreferredScrollableViewportSize(dims);
 
 		DefaultTableCellRenderer render = new DefaultTableCellRenderer();
-		render.setHorizontalAlignment(JTextField.RIGHT);
+		render.setHorizontalAlignment(SwingConstants.RIGHT);
 		tokenTable.getColumn("Value").setCellRenderer(render);
 		DefaultTableCellRenderer notEditableRenderer = new DefaultTableCellRenderer();
 		Color color = (Color)UIManager.get("TextField.disabledBackground");

@@ -46,6 +46,7 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 		return goesToInfinity;
 	}
 	
+	@Override
 	public String toString(){
 		if(goesToInfinity){
 			return String.valueOf(from) + "-";
@@ -71,6 +72,7 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 		return largestFrom <= smallestTo;
 	}
 	
+	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof IntOrConstantRange){
 			return equals((IntOrConstantRange)obj);

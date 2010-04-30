@@ -68,7 +68,7 @@ public class PipeTapnToAauTapnTransformer {
 	
 	protected void transformTimedArc(TimedArc arc) throws Exception {
 		dk.aau.cs.petrinet.Arc aAUArc;
-		aAUArc = new TAPNArc(getGuard((TimedArc)arc));
+		aAUArc = new TAPNArc(getGuard(arc));
 		if (aAUArc != null){
 			aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
 			aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );
@@ -78,7 +78,7 @@ public class PipeTapnToAauTapnTransformer {
 	
 	protected void transformInhibitorArc(pipe.dataLayer.TAPNInhibitorArc arc) throws Exception {
 		dk.aau.cs.petrinet.Arc aAUArc;
-		aAUArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(getGuard((TimedArc)arc));	
+		aAUArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(getGuard(arc));	
 		if (aAUArc != null){
 			aAUArc.setSource( PlaceTransitionObjectBookKeeper.get( arc.getSource() ) );
 			aAUArc.setTarget( PlaceTransitionObjectBookKeeper.get( arc.getTarget() ) );

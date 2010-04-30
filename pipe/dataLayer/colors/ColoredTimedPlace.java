@@ -85,6 +85,7 @@ public class ColoredTimedPlace extends TimedPlace {
 		return colorInvariant.contains(value) && timeInvariant.contains(token);
 	}
 
+	@Override
 	public String getStringOfTokens() {
 		StringBuilder builder = new StringBuilder("{");
 
@@ -102,6 +103,7 @@ public class ColoredTimedPlace extends TimedPlace {
 	}
 
 
+	@Override
 	protected String getInvariantString() {
 		
 		String inv = timeInvariant.goesToInfinity() ? "" : "\nage " + timeInvariant.toString();
@@ -155,11 +157,13 @@ public class ColoredTimedPlace extends TimedPlace {
 	}
 
 
+	@Override
 	public int getCurrentMarking() {
 		return tokens.size();
 	}
 
 
+	@Override
 	protected void paintTokens(Graphics g) {
 		int numberOfTokens = getCurrentMarking();
 

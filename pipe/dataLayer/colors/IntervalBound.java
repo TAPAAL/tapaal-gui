@@ -43,6 +43,7 @@ public class IntervalBound {
 		}
 	}
 
+	@Override
 	public String toString() {
 		if(goesToInfinity()){
 			return "inf";

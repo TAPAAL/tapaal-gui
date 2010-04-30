@@ -45,6 +45,7 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		return !(colorGuard.contains(value) && timeGuard.contains(token));
 	}
 
+	@Override
 	public void updateWeightLabel(){ 
 
 		String guard = "age \u2208 " + timeGuard;

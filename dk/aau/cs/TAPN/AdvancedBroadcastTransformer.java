@@ -15,6 +15,7 @@ public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer 
 		
 	}
 	
+	@Override
 	protected void createStructureForPairing(TimedAutomaton ta, TAPNTransition t,
 			List<Pairing> pairing) {
 		int i = 0;

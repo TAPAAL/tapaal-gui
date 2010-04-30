@@ -64,6 +64,7 @@ public class ColoredTransportArc extends TransportArc {
 		return "val := " + outputValue;
 	}
 
+	@Override
 	public void updateWeightLabel(){ 
 
 		String guard = null;

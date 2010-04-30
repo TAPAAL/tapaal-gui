@@ -12,11 +12,13 @@ public class PlaceColorInvariantEdit extends ColorSetEdit {
 		this.place = place;
 	}
 	
+	@Override
 	public void redo() {
 		place.setColorInvariant(getNewColorSet());
 	}
 
 	
+	@Override
 	public void undo() {
 		place.setColorInvariant(getOldColorSet());
 	}

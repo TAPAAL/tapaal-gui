@@ -15,11 +15,13 @@ public class ColoredTransportArcPreserveEdit extends UndoableEdit {
 		this.newPreserve = newPreserve;
 	}
 	
+	@Override
 	public void redo() {
 		arc.setPreservation(newPreserve);
 	}
 
 	
+	@Override
 	public void undo() {
 		arc.setPreservation(oldPreserve);
 	}

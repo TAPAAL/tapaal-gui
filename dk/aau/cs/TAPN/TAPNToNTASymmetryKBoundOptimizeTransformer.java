@@ -20,6 +20,7 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		super(extraNumberOfTokens);
 	}
 
+	@Override
 	protected List<TimedAutomaton> createAutomata(TimedArcPetriNet model){
 		List<TimedAutomaton> tas = super.createAutomata(model);
 		tokens = model.getTokens().size();
@@ -69,6 +70,7 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		return newUpdate;
 	}
 
+	@Override
 	protected String createGlobalDeclarations(TimedArcPetriNet model) {
 		StringBuilder builder = new StringBuilder("int["); 
 		builder.append(-tokens);

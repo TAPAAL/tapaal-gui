@@ -70,6 +70,7 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 	}
 
 	
+	@Override
 	public void convertToConservative() throws Exception {
 		ColoredPlace capacity = new ColoredPlace("P_capacity", new ColoredTimeInvariant(), new ColorSet());
 		addPlace(capacity);
@@ -94,6 +95,7 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 	}
 	
 	
+	@Override
 	public List<Token> getTokens() {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 		for(TAPNPlace place : getPlaces()){
@@ -105,6 +107,7 @@ public class ColoredTAPN extends TAPN implements ColoredTimedArcPetriNet {
 	}
 	
 	
+	@Override
 	public int getNumberOfTokens() {
 		int i = 0;
 		for(TAPNPlace place : getPlaces()){

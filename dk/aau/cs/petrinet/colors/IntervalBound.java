@@ -1,7 +1,5 @@
 package dk.aau.cs.petrinet.colors;
 
-import pipe.dataLayer.colors.IntOrConstant;
-
 public class IntervalBound {
 	private int scale;
 	private int offset;
@@ -52,6 +50,7 @@ public class IntervalBound {
 		}
 	}
 	
+	@Override
 	public String toString() {
 		return toString("val");
 	}

@@ -65,7 +65,6 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
-import pipe.gui.widgets.TimedPlaceEditorPanel;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import pipe.io.JarUtilities;
 import dk.aau.cs.petrinet.TAPN;

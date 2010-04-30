@@ -48,6 +48,7 @@ public class ColoredInputArc extends TimedArc {
 		return integerGuard.contains(value) && timeGuard.contains(token);
 	}
 	
+	@Override
 	public void updateWeightLabel(){ 
 		
 		String guard = "age \u2208 " + timeGuard;
