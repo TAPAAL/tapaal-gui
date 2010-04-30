@@ -58,7 +58,6 @@ public class IntegerRange implements Comparable<IntegerRange> {
 		return from;
 	}
 
-	@Override
 	public int compareTo(IntegerRange range) {
 		return from - range.from;
 	}
