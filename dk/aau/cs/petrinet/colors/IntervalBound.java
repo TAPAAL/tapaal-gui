@@ -29,6 +29,11 @@ public class IntervalBound {
 		}
 	}
 	
+	public IntervalBound(IntervalBound other) {
+		this.scale = other.scale;
+		this.offset = other.offset;
+	}
+
 	public boolean goesToInfinity(){
 		return scale == 0 && offset == -1;
 	}

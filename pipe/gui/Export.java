@@ -1012,8 +1012,12 @@ public class Export {
 				e.printStackTrace();
 			}
 		} else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2){
-			Degree2BroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
+			Degree2BroadcastTransformer broadcastTransformer = null;
+			if(appModel.isUsingColors()){
+				broadcastTransformer = new dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
+			}else{
+				broadcastTransformer = new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
+			}
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));

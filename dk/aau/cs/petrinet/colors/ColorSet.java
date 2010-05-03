@@ -17,6 +17,16 @@ public class ColorSet {
 	}
 
 
+	public ColorSet(ColorSet other) {
+		if(other.ranges != null){
+			ranges = new TreeSet<IntegerRange>();
+
+			for(IntegerRange range : other.ranges){
+				ranges.add(new IntegerRange(range));
+			}
+		}
+	}
+
 	public void addRange(IntegerRange range){
 		if(ranges == null){
 			ranges = new TreeSet<IntegerRange>();

@@ -15,6 +15,11 @@ public class ColoredToken extends Token {
 		this.color = color;
 	}
 
+	public ColoredToken(ColoredToken token) {
+		super(token.getPlace());
+		this.color = token.color;
+	}
+
 	public int getColor() {
 		return color;
 	}

@@ -141,7 +141,7 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 		}else if(from.equals(to)){
 			return String.valueOf(from.getValue());
 		}else {
-			return String.valueOf(from.getValue()) + "-" + String.valueOf(from.getValue());
+			return String.valueOf(from.getValue()) + "-" + String.valueOf(to.getValue());
 		}
 	}
 	

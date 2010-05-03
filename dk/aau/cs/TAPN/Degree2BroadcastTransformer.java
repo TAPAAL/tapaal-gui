@@ -39,7 +39,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private static final String CONTROL_TEMPLATE_NAME = "Control";
 	private static final String ID_TYPE = "pid_t";
 	private static final String ID_PARAMETER_NAME = "id";
-	private static final String CLOCK_NAME = "x";
+	protected static final String CLOCK_NAME = "x";
 	private static final String COUNTER_NAME = "count%1$d";
 	private static final String COUNTER_UPDATE = "%1$s%2$s";
 	private static final String TEST_CHANNEL = "%1$s_test%2$s";
@@ -105,7 +105,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return nta;
 	}
 
-	private Degree2Converter getDegree2Converter() {
+	protected Degree2Converter getDegree2Converter() {
 		return new InhibDegree2Converter();
 	}
 
@@ -177,8 +177,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	protected String convertInvariant(String invariant) {
+	protected String convertInvariant(TAPNPlace place) {
 		String inv = "";
+		String invariant = place.getInvariant();
 		if(!invariant.equals("<inf")){
 			inv = CLOCK_NAME + " " + invariant;
 		}
@@ -324,9 +325,13 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			token.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
 		}
 
-		token.setDeclarations("clock " + CLOCK_NAME + ";");
+		token.setDeclarations(createLocalDeclarations(originalModel));
 
 		return token;
+	}
+
+	protected String createLocalDeclarations(TimedArcPetriNet model) {
+		return "clock " + CLOCK_NAME + ";";
 	}
 
 	private void createInitializationTransitionsForTokenAutomata(TimedArcPetriNet degree2Net,
@@ -338,7 +343,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 						getLocationByName(token.getPlace().getName()),
 						"",
 						String.format(INIT_CHANNEL, i, "?"),
-				"");
+				createUpdateExpressionForTokenInitialization(token));
 				ta.addTransition(e);
 				i++;
 				numberOfInitChannels++;
@@ -354,9 +359,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 					Edge e = new Edge(getLocationByName(pairing.getInput().getName()),
 							getLocationByName(pairing.getOutput().getName()),
-							createTransitionGuardWithLock(pairing.getInterval()),
+							createTransitionGuardWithLock(pairing.getInputArc()),
 							"",
-							CreateResetExpressionIfNormalArc(pairing.getArcType()));
+							CreateResetExpressionIfNormalArc(pairing.getOutputArc()));
 					token.addTransition(e);
 				}else{
 					List<Pairing> pairing = CreatePairing(transition);
@@ -365,18 +370,18 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 					Edge e1 = new Edge(getLocationByName(pair1.getInput().getName()),
 							getLocationByName(pair1.getOutput().getName()),
-							createTransitionGuardWithLock(pair1.getInterval()),
+							createTransitionGuardWithLock(pair1.getInputArc()),
 							transition.getName() + "?",
-							CreateResetExpressionIfNormalArc(pair1.getArcType()));
+							CreateResetExpressionIfNormalArc(pair1.getOutputArc()));
 					token.addTransition(e1);
 
 					Pairing pair2 = pairing.get(1);
 
 					Edge e2 = new Edge(getLocationByName(pair2.getInput().getName()),
 							getLocationByName(pair2.getOutput().getName()),
-							createTransitionGuardWithLock(pair2.getInterval()),
+							createTransitionGuardWithLock(pair2.getInputArc()),
 							transition.getName() + "!",
-							CreateResetExpressionIfNormalArc(pair2.getArcType()));
+							CreateResetExpressionIfNormalArc(pair2.getOutputArc()));
 					token.addTransition(e2);
 				}
 			}else{
@@ -384,9 +389,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 				Edge e = new Edge(getLocationByName(pairing.getInput().getName()),
 						getLocationByName(pairing.getOutput().getName()),
-						createTransitionGuard(pairing.getInterval()),
+						createTransitionGuard(pairing.getInputArc(), pairing.getOutput(), pairing.getArcType().equals(ArcType.TARC)),
 						transition.getName() + "?",
-						CreateResetExpressionIfNormalArc(pairing.getArcType()));
+						CreateResetExpressionIfNormalArc(pairing.getOutputArc()));
 				token.addTransition(e);
 			}
 		}		
@@ -470,12 +475,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					String counter = String.format(COUNTER_NAME, i);
 					arcsToCounters.put(arc, counter);
 
-					String guard = null;
-					if(arc instanceof TAPNTransportArc){
-						guard = createTransitionGuard(((TAPNArc)arc).getGuard(), (TAPNPlace)arc.getTarget(), true);
-					}else{
-						guard = createTransitionGuard(((TAPNArc)arc).getGuard());
-					}
+					String guard = createGuardForTestingEdge(transition, arc);
 					Edge e = new Edge(getLocationByName(source),
 							getLocationByName(source),
 							guard,
@@ -492,7 +492,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 					Edge e = new Edge(getLocationByName(source),
 							getLocationByName(source),
-							createTransitionGuard(arc.getGuard()),
+							createTransitionGuard(arc, null, false),
 							String.format(TEST_CHANNEL, arc.getTarget().getName(), "?"),
 							String.format(COUNTER_UPDATE, counter, "=true"));
 					ta.addTransition(e);
@@ -502,10 +502,20 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}
 	}
 
+	protected String createGuardForTestingEdge(TAPNTransition transition, Arc arc) {
+		String guard = null;
+		if(arc instanceof TAPNTransportArc){
+			guard = createTransitionGuard((TAPNArc)arc, (TAPNPlace)arc.getTarget(), true);
+		}else{
+			guard = createTransitionGuard((TAPNArc)arc, null, false);
+		}
+		return guard;
+	}
+
 	private void createInitialLocationsForTokenAutomata(TimedArcPetriNet degree2Net, TimedAutomaton ta) {
 		for(TAPNPlace place: degree2Net.getPlaces()){			
 			if(!isPartOfLockTemplate(place.getName())){
-				Location l = new Location(place.getName(), convertInvariant(place.getInvariant()));
+				Location l = new Location(place.getName(), convertInvariant(place));
 				ta.addLocation(l);
 				addLocationMapping(place.getName(), l);
 			}
@@ -577,13 +587,13 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	protected String createTransitionGuard(String guard, TAPNPlace target, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(guard, target, isTransportArc);
+	protected String createTransitionGuard(TAPNArc arc, TAPNPlace target, boolean isTransportArc) {
+		String newGuard = PetriNetUtil.createGuard(arc.getGuard(), target, isTransportArc);
 		return createTransitionGuard(newGuard);
 	}
 
-	protected String createTransitionGuardWithLock(String interval){
-		String guard = createTransitionGuard(interval);
+	protected String createTransitionGuardWithLock(TAPNArc arc){
+		String guard = createTransitionGuard(arc.getGuard());
 
 		if(guard == null || guard.isEmpty()){
 			guard = LOCK_BOOL + " == 0";
@@ -630,8 +640,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}	
 
-	private String CreateResetExpressionIfNormalArc(ArcType arcType) {
-		if(arcType.equals(ArcType.NORMAL)){
+	protected String CreateResetExpressionIfNormalArc(Arc arc) {
+		if(!(arc instanceof TAPNTransportArc)){
 			return String.format("%1s := 0", CLOCK_NAME);
 		}else{
 			return "";
@@ -643,6 +653,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 		Matcher matcher = pattern.matcher(name);
 		return matcher.find();
+	}
+	
+	protected String createUpdateExpressionForTokenInitialization(Token token) {
+		return "";
 	}
 
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {

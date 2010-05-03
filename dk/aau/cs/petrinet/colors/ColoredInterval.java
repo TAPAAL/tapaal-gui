@@ -1,10 +1,10 @@
 package dk.aau.cs.petrinet.colors;
 
 public class ColoredInterval {
-	private char lowerParenthesis;
-	private IntervalBound lower;
-	private IntervalBound upper;
-	private char upperParenthesis;
+	protected char lowerParenthesis;
+	protected IntervalBound lower;
+	protected IntervalBound upper;
+	protected char upperParenthesis;
 
 	public ColoredInterval(String interval){
 		lowerParenthesis = interval.charAt(0);
@@ -20,6 +20,13 @@ public class ColoredInterval {
 		lower = new IntervalBound(0,0);
 		upper = new IntervalBound("inf");
 		upperParenthesis = ')';
+	}
+
+	public ColoredInterval(ColoredInterval other) {
+		this.lowerParenthesis = other.lowerParenthesis;
+		this.upperParenthesis = other.upperParenthesis;
+		this.lower = new IntervalBound(other.lower);
+		this.upper = new IntervalBound(other.upper);
 	}
 
 	public String convertToTAGuardString(String clockName, String tokenValueName){
@@ -40,7 +47,7 @@ public class ColoredInterval {
 		}
 	}
 
-	private boolean goesToInfinity() {
+	protected boolean goesToInfinity() {
 		return upper.goesToInfinity();
 	}
 }

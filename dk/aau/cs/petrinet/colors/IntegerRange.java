@@ -42,6 +42,12 @@ public class IntegerRange implements Comparable<IntegerRange> {
 		}
 	}
 
+	public IntegerRange(IntegerRange range) {
+		this.to = range.to;
+		this.from = range.from;
+		this.goesToInfinity = range.goesToInfinity;
+	}
+
 	public void setTo(int to) {
 		this.to = to;
 	}

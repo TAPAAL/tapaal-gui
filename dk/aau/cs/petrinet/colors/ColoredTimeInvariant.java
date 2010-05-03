@@ -23,11 +23,20 @@ public class ColoredTimeInvariant {
 		upper = new IntervalBound(invariant.substring(operator.length()).trim());		
 	}
 
+	public ColoredTimeInvariant(ColoredTimeInvariant timeInvariant) {
+		this.strictLessThan = timeInvariant.strictLessThan;
+		this.upper = new IntervalBound(timeInvariant.upper);
+	}
+
 	public String convertToTAInvariantString(String tokenClockName,
 			String valueVarName) {
 		if(upper.goesToInfinity()) return "";
 		
 		String operator = strictLessThan ? "<" : "<=";
 		return String.format("%1$s %2$s %3$s", tokenClockName, operator , upper.toString(valueVarName));
+	}
+
+	public static ColoredTimeInvariant getZeroInvariant() {
+		return new ColoredTimeInvariant("<=", new IntervalBound(0,0));
 	}
 }
