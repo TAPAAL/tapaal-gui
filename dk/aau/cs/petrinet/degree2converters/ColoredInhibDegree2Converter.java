@@ -98,8 +98,10 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 
 	private void createSimulationOfTransitionOfDegree1(
 			TAPNTransition transition, ColoredTAPN degree2Net) throws Exception {
-		String trans = String.format(T_MAX_FORMAT, transition.getName(), 1);
+		String trans =transition.getName();//= String.format(T_MAX_FORMAT, transition.getName(), 1);
 		addTransition(degree2Net, trans);
+		TAPNTransition newTransition = (TAPNTransition)getByName(transition.getName());
+		newTransition.setFromOriginalNet(true);		
 		
 		Arc presetArc = transition.getPreset().get(0);
 		Arc postsetArc = transition.getPostset().get(0);
@@ -110,8 +112,8 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					trans,
 					targetPlace.getName(),
-					createTimeGuardForTransportArc(cta),
-					createColorGuardForTransportArc(cta),
+					cta.getTimeGuard(),
+					cta.getColorGuard(),
 					cta.getPreservation(),
 					cta.getOutputValue());	
 		}else{
@@ -121,7 +123,7 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 					presetArc.getSource().getName(),
 					trans,
 					new ColoredInterval(inputArc.getTimeGuard()),
-					createColorGuardForInputArc(inputArc, outputArc));
+					new ColorSet(inputArc.getColorGuard()));
 			addColoredOutputArc(degree2Net,
 					trans,
 					postsetArc.getTarget().getName(),

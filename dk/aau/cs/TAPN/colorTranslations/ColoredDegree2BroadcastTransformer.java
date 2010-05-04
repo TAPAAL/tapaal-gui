@@ -114,4 +114,6 @@ Degree2BroadcastTransformer {
 		
 		return invariant;
 	}
+	
+	
 }
