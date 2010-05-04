@@ -414,7 +414,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	private String getOriginalTransitionName(String name) {
-		Pattern pattern = Pattern.compile("^([a-zA-Z_][a-zA-Z0-9_]*)_([0-9]*_in)$");
+		Pattern pattern = Pattern.compile("^([a-zA-Z_][a-zA-Z0-9_]*)_([0-9]*(?:_in)?)$");
 
 		Matcher matcher = pattern.matcher(name);
 		if(!matcher.find()){
@@ -506,6 +506,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 					if(guard == null && source.equals(P_CAPACITY)){
 						guard = "";
 					}else if(guard == null){
+						if(arc instanceof TAPNInhibitorArc){
+							guard = createTransitionGuard((TAPNInhibitorArc)arc, null, false);
+						}
 						throw new Exception("guard was not precomputed");
 					}
 					
