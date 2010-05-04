@@ -6,8 +6,8 @@ import pipe.gui.undo.ColoredOutputArcOutputValueEdit;
 import pipe.gui.undo.UndoableEdit;
 
 public class ColoredOutputArc extends NormalArc {
-
 	private IntOrConstant outputValue = new IntOrConstant();
+	private boolean displayValues = false;
 	/**
 	 * 
 	 */
@@ -46,11 +46,14 @@ public class ColoredOutputArc extends NormalArc {
 	}
 
 	public IntOrConstant getOutputValue() {
+		if(outputValue == null){
+			outputValue = new IntOrConstant();
+		}
 		return outputValue;
 	}
 	
 	public String getOutputString(){
-		return "val := " + outputValue;
+		return "val := " + getOutputValue().toString(displayValues);
 	}
 	
 	@Override
@@ -62,5 +65,10 @@ public class ColoredOutputArc extends NormalArc {
 
 	public ColoredToken generateOutputToken() {
 		return new ColoredToken(getOutputValue());
+	}
+
+	public void displayValues(boolean showValues) {
+		this.displayValues  = showValues;		
+		updateWeightLabel();
 	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 public class ColoredTimeInvariant {
 	public boolean strictLessThan;
 	private IntervalBound upper;
+	private boolean displayValues = false;
 	
 	public ColoredTimeInvariant(){
 		
@@ -44,13 +45,6 @@ public class ColoredTimeInvariant {
 	}
 	
 	
-	@Override
-	public String toString() {
-		String operator = getOperator();
-		String bound = goesToInfinity() ? "inf" : upper.toString();
-		return String.format("%1$s%2$s", operator, bound); 
-	}
-
 	public String getOperator() {
 		String operator = goesToInfinity() || strictLessThan ? "<" : "<=";
 		return operator;
@@ -59,10 +53,23 @@ public class ColoredTimeInvariant {
 	public List<String> getUsedConstantNames() {
 		return goesToInfinity() ? new ArrayList<String>() : upper.getUsedConstants();
 	}
+	
+	@Override
+	public String toString() {
+		if(displayValues) return toStringWithoutConstants();
+		
+		String operator = getOperator();
+		String bound = goesToInfinity() ? "inf" : upper.toString();
+		return String.format("%1$s%2$s", operator, bound); 
+	}
 
 	public String toStringWithoutConstants() {
 		String operator = getOperator();
 		String bound = goesToInfinity() ? "inf" : upper.toStringWithoutConstants();
 		return String.format("%1$s%2$s", operator, bound); 
+	}
+
+	public void displayValues(boolean displayValues) {
+		this.displayValues = displayValues;
 	}
 }

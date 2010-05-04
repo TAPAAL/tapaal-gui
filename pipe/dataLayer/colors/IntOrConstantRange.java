@@ -45,15 +45,19 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 	public boolean goesToInfinity(){
 		return goesToInfinity;
 	}
-	
+
 	@Override
 	public String toString(){
+		return toString(false);
+	}
+
+	public String toString(boolean showValues){
 		if(goesToInfinity){
-			return String.valueOf(from) + "-";
+			return from.toString(showValues) + "-";
 		}else if(from.equals(to)){
-			return String.valueOf(from);
+			return from.toString(showValues);
 		}else {
-			return String.valueOf(from) + "-" + String.valueOf(to);
+			return from.toString(showValues) + "-" + to.toString(showValues);
 		}
 	}
 

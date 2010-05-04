@@ -13,6 +13,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
+import dk.aau.cs.petrinet.colors.ColoredTAPN;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
@@ -21,6 +23,11 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.colors.ColoredInhibitorArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredOutputArc;
+import pipe.dataLayer.colors.ColoredTimedPlace;
+import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
@@ -95,16 +102,16 @@ public class CreateGui {
 		appGui.setVisible(true);
 		appGui.init();
 		Verification.setupVerifytaPath();
-		
+
 		VersionChecker versionChecker = new VersionChecker();
 		if(versionChecker.checkForNewVersion()){
 			StringBuffer message = new StringBuffer(
-					"There is a new version of TAPAAL available at www.tapaal.net.");
+			"There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
 			message.append(Pipe.VERSION);
 			message.append("\nNew version: ");
 			message.append(versionChecker.getNewVersionNumber());			
-			
+
 			JOptionPane.showMessageDialog(appGui, 
 					message .toString(),
 					"New version available!",
@@ -196,268 +203,296 @@ public class CreateGui {
 
 	/** returns the current dataLayer object - 
 	 *  used to get a reference to pass to the modules */
-	 public static DataLayer currentPNMLData() {
+	public static DataLayer currentPNMLData() {
 		if (appTab.getSelectedIndex() < 0) {
 			return null;
 		}
 		TabData tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.appModel;
-	 }
+	}
 
-	 public static void setupModelForSimulation(){
-		 if (appTab.getSelectedIndex() >= 0) {
-			 TabData tab = (tabs.get(appTab.getSelectedIndex()));
-			 //DataLayer model = tab.appModel.clone();
-			 HashMap<PetriNetObject, String> oldGuards = transformToModelWithoutConstants(tab.appModel);
+	public static void setupModelForSimulation(){
+		if (appTab.getSelectedIndex() >= 0) {
+			TabData tab = (tabs.get(appTab.getSelectedIndex()));
+			//DataLayer model = tab.appModel.clone();
+			if(!tab.appModel.isUsingColors()){
+				HashMap<PetriNetObject, String> oldGuards = transformToModelWithoutConstants(tab.appModel);
+				tab.oldGuards = oldGuards;
+			}else{
+				configureNetToShowValues(tab.appModel, true);
+			}
+		}
+	}
 
-			 tab.oldGuards = oldGuards;
-		 }
-	 }
+	private static void configureNetToShowValues(DataLayer model, boolean showValues) {
+		for(Place tp : model.getPlaces()){
+			ColoredTimedPlace place = (ColoredTimedPlace)tp;
+			place.displayValues(showValues);
+		}		
 
-	 public static void restoreModelForEditing(){
-		 if (appTab.getSelectedIndex() >= 0) {
-			 TabData tab = (tabs.get(appTab.getSelectedIndex()));
-			 if(tab.oldGuards != null){
-				 setupModelWithOldGuards(tab.appModel, tab.oldGuards);
-				 tab.oldGuards = null;
-			 }
-		 }
-	 }
-
-	 private static void setupModelWithOldGuards(DataLayer model,
-			 HashMap<PetriNetObject, String> oldGuards) {
-		 for(Place p : model.getPlaces()){
-			 if(p instanceof TimedPlace){
-				 String inv = oldGuards.get(p);
-				 ((TimedPlace)p).setInvariant(inv);
-			 }
-		 }
-
-		 for(Arc arc : model.getArcs()){
-			 if(arc instanceof TimedArc || arc instanceof TransportArc){
-				 TimedArc tarc = (TimedArc)arc;
-				 String guard = oldGuards.get(arc);
-				 tarc.setGuard(guard);
-			 }
-		 }
-	 }
+		for(Arc arc : model.getArcs()){
+			if(arc instanceof ColoredTransportArc){
+				((ColoredTransportArc)arc).displayValues(showValues);
+			}else if(arc instanceof ColoredInputArc){
+				((ColoredInputArc)arc).displayValues(showValues);
+			}else if(arc instanceof ColoredInhibitorArc){
+				((ColoredInhibitorArc)arc).displayValues(showValues);
+			}else if(arc instanceof ColoredOutputArc){
+				((ColoredOutputArc)arc).displayValues(showValues);
+			}
+		}
+	}
 
 
-	 private static HashMap<PetriNetObject, String> transformToModelWithoutConstants(DataLayer model) {
-		 HashMap<PetriNetObject, String> oldGuards = new HashMap<PetriNetObject, String>();
-		 for(Place p : model.getPlaces()){
-			 if(p instanceof TimedPlace){
-				 oldGuards.put(p, ((TimedPlace) p).getInvariant());
-				 String inv = getInvariant(p, model);
-				 ((TimedPlace)p).setInvariant(inv);
-			 }
-		 }
+	public static void restoreModelForEditing(){
+		if (appTab.getSelectedIndex() >= 0) {
+			TabData tab = (tabs.get(appTab.getSelectedIndex()));
+			if(tab.appModel.isUsingColors()){
+				configureNetToShowValues(tab.appModel, false);
+			}else{
+				if(tab.oldGuards != null){
+					setupModelWithOldGuards(tab.appModel, tab.oldGuards);
+					tab.oldGuards = null;
+				}
+			}
+		}
+	}
 
-		 for(Arc arc : model.getArcs()){
-			 if(arc instanceof TimedArc || arc instanceof TransportArc){
-				 oldGuards.put(arc, ((TimedArc) arc).getGuard());
-				 TimedArc tarc = (TimedArc)arc;
-				 String guard = getGuard(tarc, model);
-				 tarc.setGuard(guard);
-			 }
-		 }
-		 
-		 return oldGuards;
-	 }
+	private static void setupModelWithOldGuards(DataLayer model,
+			HashMap<PetriNetObject, String> oldGuards) {
+		for(Place p : model.getPlaces()){
+			if(p instanceof TimedPlace){
+				String inv = oldGuards.get(p);
+				((TimedPlace)p).setInvariant(inv);
+			}
+		}
 
-	 private static String getGuard(TimedArc arc, DataLayer model) {
-		 String guard = arc.getGuard();
-		 String leftDelim = guard.substring(0,1);
-		 String rightDelim = guard.substring(guard.length()-1, guard.length());
-		 String first = guard.substring(1, guard.indexOf(","));
-		 String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
-
-		 boolean isFirstConstant = false;
-		 boolean isSecondConstant = false;
-
-		 try{
-			 Integer.parseInt(first);
-		 }catch(NumberFormatException e){
-			 isFirstConstant = true;
-		 }
-
-		 try{
-			 Integer.parseInt(second);
-		 }catch(NumberFormatException e){
-			 if(!second.equals("inf")) isSecondConstant = true;
-		 }
-
-		 if(isFirstConstant){
-			 first = String.valueOf(model.getConstantValue(first));
-		 }
-
-		 if(isSecondConstant){
-			 second = String.valueOf(model.getConstantValue(second));
-		 }
-
-		 return leftDelim + first + "," + second + rightDelim;
-	 }
-
-	 private static String getInvariant(Place place, DataLayer model) {
-		 String inv = ((TimedPlace)place).getInvariant();
-		 String operator = inv.contains("<=") ? "<=" : "<";
-
-		 String bound = inv.substring(operator.length());
-
-		 boolean isConstant = false;
-		 try{
-			 Integer.parseInt(bound);
-		 }catch(NumberFormatException e){
-			 if(!bound.equals("inf")) isConstant = true;
-		 }
-
-		 if(isConstant)
-			 bound = String.valueOf(model.getConstantValue(bound));
-
-		 return operator + bound;
-	 }
+		for(Arc arc : model.getArcs()){
+			if(arc instanceof TimedArc || arc instanceof TransportArc){
+				TimedArc tarc = (TimedArc)arc;
+				String guard = oldGuards.get(arc);
+				tarc.setGuard(guard);
+			}
+		}
+	}
 
 
-	 /** Creates a new animationHistory text area, and returns a reference to it*/
-	 public static void addAnimationHistory() {
-		 try {
-			 animBox = new AnimationHistory("Simulation history\n");
-			 animBox.setEditable(false);
+	private static HashMap<PetriNetObject, String> transformToModelWithoutConstants(DataLayer model) {
+		HashMap<PetriNetObject, String> oldGuards = new HashMap<PetriNetObject, String>();
 
-			 scroller = new JScrollPane(animBox);
-			 scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+		for(Place p : model.getPlaces()){
+			if(p instanceof TimedPlace){
+				oldGuards.put(p, ((TimedPlace) p).getInvariant());
+				String inv = getInvariant(p, model);
+				((TimedPlace)p).setInvariant(inv);
+			}
+		}
 
-			 leftPane.setBottomComponent(scroller);
+		for(Arc arc : model.getArcs()){
+			if(arc instanceof TimedArc || arc instanceof TransportArc){
+				oldGuards.put(arc, ((TimedArc) arc).getGuard());
+				TimedArc tarc = (TimedArc)arc;
+				String guard = getGuard(tarc, model);
+				tarc.setGuard(guard);
+			}
+		}
 
-			 //         leftPane.setDividerLocation(0.5);
-			 leftPane.setResizeWeight(0.05f);
+		return oldGuards;
+	}
 
-			 leftPane.setDividerSize(8);
-		 } catch (javax.swing.text.BadLocationException be) {
-			 be.printStackTrace();
-		 }
-	 }
+	private static String getGuard(TimedArc arc, DataLayer model) {
+		String guard = arc.getGuard();
+		String leftDelim = guard.substring(0,1);
+		String rightDelim = guard.substring(guard.length()-1, guard.length());
+		String first = guard.substring(1, guard.indexOf(","));
+		String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
 
-	 public static AnimationHistory getAbstractAnimationPane(){
-		 return abstractAnimationPane;
-	 }
+		boolean isFirstConstant = false;
+		boolean isSecondConstant = false;
 
-	 public static void addAbstractAnimationPane() {
-		 // TODO Auto-generated method stub
+		try{
+			Integer.parseInt(first);
+		}catch(NumberFormatException e){
+			isFirstConstant = true;
+		}
 
-		 try {
-			 abstractAnimationPane=new AnimationHistory("Untimed Trace\n");
-		 } catch (BadLocationException e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-		 }
-		 //abstractAnimationPane.setVerticalAlignment(SwingConstants.TOP);
+		try{
+			Integer.parseInt(second);
+		}catch(NumberFormatException e){
+			if(!second.equals("inf")) isSecondConstant = true;
+		}
 
-		 //Create a new empty animBox
-		 try {
-			 animBox = new AnimationHistory("Simulation history\n");
-			 animBox.setEditable(false);
-		 } catch (BadLocationException e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-		 }
+		if(isFirstConstant){
+			first = String.valueOf(model.getConstantValue(first));
+		}
 
+		if(isSecondConstant){
+			second = String.valueOf(model.getConstantValue(second));
+		}
 
-		 JSplitPane pane2 = 
-			 new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,animBox,abstractAnimationPane);
+		return leftDelim + first + "," + second + rightDelim;
+	}
 
-		 pane2.setContinuousLayout(true);
-		 pane2.setOneTouchExpandable(true);
-		 pane2.setBorder(null); // avoid multiple borders
+	private static String getInvariant(Place place, DataLayer model) {
+		String inv = ((TimedPlace)place).getInvariant();
+		String operator = inv.contains("<=") ? "<=" : "<";
 
-		 pane2.setDividerSize(8);
+		String bound = inv.substring(operator.length());
 
-		 leftPane.setBottomComponent(pane2);
-		 abstractAnimationPane.setBorder(new LineBorder(Color.black));
+		boolean isConstant = false;
+		try{
+			Integer.parseInt(bound);
+		}catch(NumberFormatException e){
+			if(!bound.equals("inf")) isConstant = true;
+		}
 
-	 }
+		if(isConstant)
+			bound = String.valueOf(model.getConstantValue(bound));
 
-	 public static void removeAbstractAnimationPane() {
-		 abstractAnimationPane=null;
-		 scroller = new JScrollPane(animBox);
-		 scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-		 leftPane.setBottomComponent(scroller);
-	 }
-
-	 public static void addAnimationControler() {
-		 try {
-			 animControlerBox = new AnimationControler("Simulation Controler\n");
-
-			 scroller2 = new JScrollPane(animControlerBox);
-			 scroller2.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
-			 leftPane.setTopComponent(scroller2);
-
-			 //         leftPane.setDividerLocation(0.5);
-			 leftPane.setDividerSize(8);
-			 leftPane.resetToPreferredSizes();
-			 //shortcutBottons should be usable from start of
-			 animControlerBox.requestFocus(true);
-		 } catch (javax.swing.text.BadLocationException be) {
-			 be.printStackTrace();
-			 System.out.println("There where an error in creating the AnimationControler");
-		 }
-	 }
-
-	 public static void removeAnimationHistory() {
-		 if (scroller != null) {
-			 leftPane.remove(scroller);
-			 leftPane.setDividerLocation(DIVIDER_LOCATION);
-			 leftPane.setDividerSize(0);
-		 }
-	 }
-	 public static void removeAnimationControler() {
-		 if (scroller != null) {
-			 leftPane.remove(scroller2);
-			 leftPane.setDividerLocation(DIVIDER_LOCATION);
-			 leftPane.setDividerSize(0);
-		 }
-	 }
+		return operator + bound;
+	}
 
 
-	 public static AnimationHistory getAnimationHistory() {
-		 return animBox;
-	 }
+	/** Creates a new animationHistory text area, and returns a reference to it*/
+	public static void addAnimationHistory() {
+		try {
+			animBox = new AnimationHistory("Simulation history\n");
+			animBox.setEditable(false);
 
-	 public static void createLeftPane(){
-		 leftBottomPanel = new LeftConstantsPane();
-		 queries = new LeftQueryPane(
-				 getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
-		 );
-		 leftPane.setDividerLocation(DIVIDER_LOCATION);
-		 leftPane.setResizeWeight(0.5);
-		 leftPane.setTopComponent(queries);
-		 leftPane.setBottomComponent(leftBottomPanel);
-		 leftPane.setContinuousLayout(true);
-		 leftPane.setDividerSize(0);
-		 updateLeftPanel();
-	 }
-	 	 
-	 public static void createEmptyLeftPane(){
-		 leftPane.setTopComponent(null);
-		 leftPane.setBottomComponent(null);
-	 }
-	 
-	 public static void updateConstantsList(){
-		 leftBottomPanel.showConstants();
-	 }
+			scroller = new JScrollPane(animBox);
+			scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
 
-	 public static void updateLeftPanel() {
+			leftPane.setBottomComponent(scroller);
 
-		 //	   if (queries.getBounds().height > getView().getBounds().height -50){
-		 //		   leftBottomPanel = null;
-		 //	   }else {
-		 //		   if (leftBottomPanel == null){
-		 //			   leftBottomPanel = new JPanel();
-		 //		   }
-		 //	   }
-		 leftPane.validate();
-	 }
+			//         leftPane.setDividerLocation(0.5);
+			leftPane.setResizeWeight(0.05f);
+
+			leftPane.setDividerSize(8);
+		} catch (javax.swing.text.BadLocationException be) {
+			be.printStackTrace();
+		}
+	}
+
+	public static AnimationHistory getAbstractAnimationPane(){
+		return abstractAnimationPane;
+	}
+
+	public static void addAbstractAnimationPane() {
+		// TODO Auto-generated method stub
+
+		try {
+			abstractAnimationPane=new AnimationHistory("Untimed Trace\n");
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//abstractAnimationPane.setVerticalAlignment(SwingConstants.TOP);
+
+		//Create a new empty animBox
+		try {
+			animBox = new AnimationHistory("Simulation history\n");
+			animBox.setEditable(false);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		JSplitPane pane2 = 
+			new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,animBox,abstractAnimationPane);
+
+		pane2.setContinuousLayout(true);
+		pane2.setOneTouchExpandable(true);
+		pane2.setBorder(null); // avoid multiple borders
+
+		pane2.setDividerSize(8);
+
+		leftPane.setBottomComponent(pane2);
+		abstractAnimationPane.setBorder(new LineBorder(Color.black));
+
+	}
+
+	public static void removeAbstractAnimationPane() {
+		abstractAnimationPane=null;
+		scroller = new JScrollPane(animBox);
+		scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+		leftPane.setBottomComponent(scroller);
+	}
+
+	public static void addAnimationControler() {
+		try {
+			animControlerBox = new AnimationControler("Simulation Controler\n");
+
+			scroller2 = new JScrollPane(animControlerBox);
+			scroller2.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+
+			leftPane.setTopComponent(scroller2);
+
+			//         leftPane.setDividerLocation(0.5);
+			leftPane.setDividerSize(8);
+			leftPane.resetToPreferredSizes();
+			//shortcutBottons should be usable from start of
+			animControlerBox.requestFocus(true);
+		} catch (javax.swing.text.BadLocationException be) {
+			be.printStackTrace();
+			System.out.println("There where an error in creating the AnimationControler");
+		}
+	}
+
+	public static void removeAnimationHistory() {
+		if (scroller != null) {
+			leftPane.remove(scroller);
+			leftPane.setDividerLocation(DIVIDER_LOCATION);
+			leftPane.setDividerSize(0);
+		}
+	}
+	public static void removeAnimationControler() {
+		if (scroller != null) {
+			leftPane.remove(scroller2);
+			leftPane.setDividerLocation(DIVIDER_LOCATION);
+			leftPane.setDividerSize(0);
+		}
+	}
+
+
+	public static AnimationHistory getAnimationHistory() {
+		return animBox;
+	}
+
+	public static void createLeftPane(){
+		leftBottomPanel = new LeftConstantsPane();
+		queries = new LeftQueryPane(
+				getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
+		);
+		leftPane.setDividerLocation(DIVIDER_LOCATION);
+		leftPane.setResizeWeight(0.5);
+		leftPane.setTopComponent(queries);
+		leftPane.setBottomComponent(leftBottomPanel);
+		leftPane.setContinuousLayout(true);
+		leftPane.setDividerSize(0);
+		updateLeftPanel();
+	}
+
+	public static void createEmptyLeftPane(){
+		leftPane.setTopComponent(null);
+		leftPane.setBottomComponent(null);
+	}
+
+	public static void updateConstantsList(){
+		leftBottomPanel.showConstants();
+	}
+
+	public static void updateLeftPanel() {
+
+		//	   if (queries.getBounds().height > getView().getBounds().height -50){
+		//		   leftBottomPanel = null;
+		//	   }else {
+		//		   if (leftBottomPanel == null){
+		//			   leftBottomPanel = new JPanel();
+		//		   }
+		//	   }
+		leftPane.validate();
+	}
 
 
 	public static void undoGetFreeSpace() {
@@ -468,20 +503,20 @@ public class CreateGui {
 
 
 
-	 //   public static BigDecimal newBigDecimal(Long i) {
-	 //	   DecimalFormat df = new DecimalFormat();
-	 //	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
-	 //	   df.setRoundingMode(RoundingMode.DOWN);
-	 //	   String toReturnFrom = df.format(i);
-	 //	   return new BigDecimal(toReturnFrom, new MathContext(Pipe.AGE_PRECISION));
-	 //   }
+	//   public static BigDecimal newBigDecimal(Long i) {
+	//	   DecimalFormat df = new DecimalFormat();
+	//	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
+	//	   df.setRoundingMode(RoundingMode.DOWN);
+	//	   String toReturnFrom = df.format(i);
+	//	   return new BigDecimal(toReturnFrom, new MathContext(Pipe.AGE_PRECISION));
+	//   }
 
 
-	 //   public static BigDecimal newBigDecimal(String i) {
-	 ////	   DecimalFormat df = new DecimalFormat();
-	 ////	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
-	 ////	   df.setRoundingMode(RoundingMode.DOWN);
-	 ////	   String toReturnFrom = df.format(i);
-	 //	   return new BigDecimal(i, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
-	 //   }
+	//   public static BigDecimal newBigDecimal(String i) {
+	////	   DecimalFormat df = new DecimalFormat();
+	////	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
+	////	   df.setRoundingMode(RoundingMode.DOWN);
+	////	   String toReturnFrom = df.format(i);
+	//	   return new BigDecimal(i, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
+	//   }
 }

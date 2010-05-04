@@ -90,4 +90,10 @@ public class ColoredInputArc extends TimedArc {
 		
 		return new ColoredInputArcTimeGuardEdit(this, old, newTimeGuard);
 	}
+
+	public void displayValues(boolean showValues) {
+		timeGuard.displayValues(showValues);
+		integerGuard.displayValues(showValues);
+		updateWeightLabel();
+	}
 }

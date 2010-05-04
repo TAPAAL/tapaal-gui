@@ -16,6 +16,7 @@ public class ColoredTransportArc extends TransportArc {
 	private Preserve preserves = Preserve.AgeAndValue;
 	private IntOrConstant outputValue = new IntOrConstant();
 	private ColoredInterval timeGuard;
+	private boolean displayValues = false;
 	/**
 	 * 
 	 */
@@ -61,7 +62,7 @@ public class ColoredTransportArc extends TransportArc {
 	}
 
 	public String getOutputString(){
-		return "val := " + outputValue;
+		return "val := " + outputValue.toString(displayValues);
 	}
 
 	@Override
@@ -154,6 +155,13 @@ public class ColoredTransportArc extends TransportArc {
 		}else{
 			return new ColoredToken(consumedToken.getAge(), consumedToken.getColor());
 		}
+	}
+
+	public void displayValues(boolean showValues) {
+		this.displayValues = showValues;		
+		this.timeGuard.displayValues(showValues);
+		this.colorGuard.displayValues(showValues);
+		updateWeightLabel();
 	}
 
 }

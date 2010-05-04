@@ -86,6 +86,12 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 	public ColorSet getColorGuard() {
 		return colorGuard;
 	}
+	
+	public void displayValues(boolean showValues) {
+		timeGuard.displayValues(showValues);
+		colorGuard.displayValues(showValues);
+		updateWeightLabel();
+	}
 
 
 

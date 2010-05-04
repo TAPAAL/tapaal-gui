@@ -195,4 +195,14 @@ public class ColoredTimedPlace extends TimedPlace {
 		return new ColoredTimedPlaceTimeInvariantEdit(this, old, newTimeInvariant);
 	}
 
+	public void displayValues(boolean showValues) {
+		timeInvariant.displayValues(showValues);
+		colorInvariant.displayValues(showValues);
+		
+		for(ColoredToken token : tokens){
+			token.displayValues(showValues);
+		}
+		update();		
+	}
+
 }

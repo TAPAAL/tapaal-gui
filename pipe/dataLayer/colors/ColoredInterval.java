@@ -9,6 +9,7 @@ public class ColoredInterval {
 	private IntervalBound lower = new IntervalBound(false);
 	private IntervalBound upper = new IntervalBound(true);
 	private boolean upperIncluded = false;
+	private boolean displayValues = false;
 	
 	public ColoredInterval(){
 		
@@ -51,6 +52,8 @@ public class ColoredInterval {
 		
 	@Override
 	public String toString() {
+		if(displayValues) return toStringWithoutConstants();
+		
 		String format = "%1$s%2$s, %3$s%4$s";
 		
 		return String.format(format, getOpenParenthesis(), lower, upper, getCloseParenthesis());
@@ -78,5 +81,9 @@ String format = "%1$s%2$s, %3$s%4$s";
 		
 		return String.format(format, getOpenParenthesis(), lower.toStringWithoutConstants(), 
 				upper.toStringWithoutConstants(), getCloseParenthesis());
+	}
+
+	public void displayValues(boolean showValues) {
+		this.displayValues = showValues;		
 	}
 }

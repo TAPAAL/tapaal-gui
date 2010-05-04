@@ -13,6 +13,7 @@ import pipe.gui.undo.UndoableEdit;
 public class ColoredToken {
 	private BigDecimal age;
 	private IntOrConstant color = new IntOrConstant();
+	private boolean displayValues = false;
 	
 	public ColoredToken(){
 		age = new BigDecimal(0, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
@@ -68,11 +69,16 @@ public class ColoredToken {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-		return String.format("(%1$s,%2$s)", df.format(getAge()), getColor());
+		return String.format("(%1$s,%2$s)", df.format(getAge()), getColor().toString(displayValues));
 	}
 	
 	public void doTimeDelay(BigDecimal delay){
 		this.age = age.add(delay);
+	}
+
+	public void displayValues(boolean showValues) {
+		this.displayValues = showValues;
+		
 	}
 	
 

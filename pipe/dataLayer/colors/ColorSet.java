@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 public class ColorSet {
 	private SortedSet<IntOrConstantRange> ranges;
+	private boolean displayValues = false;
 
 	public ColorSet(){
 		ranges = new TreeSet<IntOrConstantRange>();
@@ -62,7 +63,7 @@ public class ColorSet {
 				builder.append(", ");
 			}
 
-			builder.append(ir.toString());
+			builder.append(ir.toString(displayValues));
 			first = false;
 		}
 
@@ -95,5 +96,9 @@ public class ColorSet {
 
 	public Set<IntOrConstantRange> getRanges() {
 		return ranges;
+	}
+	
+	public void displayValues(boolean display){
+		this.displayValues = display;
 	}
 }
