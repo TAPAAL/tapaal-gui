@@ -13,10 +13,13 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.gui.Verification.RunUppaalVerification;
 import pipe.gui.Verification.RunningVerificationWidgets;
 import dk.aau.cs.TA.NTA;
+import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
-import dk.aau.cs.TAPN.TAPNToNTATransformer;
+import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastTransformer;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 
 public class KBoundAnalyzer 
 {
@@ -62,7 +65,13 @@ public class KBoundAnalyzer
 		xmlfile.deleteOnExit();qfile.deleteOnExit();
 		
 //		Create transformer and create uppaal model
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		PipeTapnToAauTapnTransformer transformer = null;
+		if(!appModel.isUsingColors()){
+			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+		}else{
+			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
+		}
+		
 		TAPN model=null;
 		try {
 			model = transformer.getAAUTAPN();
@@ -70,7 +79,7 @@ public class KBoundAnalyzer
 			e.printStackTrace();
 		}
 		
-		TAPNToNTATransformer te = getReductionStrategy();
+		ModelTransformer<TimedArcPetriNet, NTA> te = getReductionStrategy();
 		try {
 			NTA nta = null;
 			try {
@@ -85,7 +94,7 @@ public class KBoundAnalyzer
 			//We can not auto transform as query is not having lock==1
 			//te.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, k+1);
 			
-			PrintStream stream = new PrintStream(qfile);	
+			PrintStream stream = new PrintStream(qfile);
 			printQuery(stream);
 					
 		} catch (FileNotFoundException e) {
@@ -143,8 +152,12 @@ public class KBoundAnalyzer
 		showResult(a);	
 	}
 
-	protected TAPNToNTATransformer getReductionStrategy() {
-		return new TAPNToNTASymmetryTransformer(k+1);
+	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy() {
+		if(!appModel.isUsingColors()){
+			return new TAPNToNTASymmetryTransformer(k+1);
+		}else{
+			return new ColoredDegree2BroadcastTransformer(k+1, true);
+		}
 	}
 
 	protected void showResult(RunUppaalVerification a) {
@@ -209,8 +222,12 @@ public class KBoundAnalyzer
 		stream.println(" " + inputQuery + " " );
 		stream.println("*/");
 		
-		//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
-		stream.println("E<>((sum(i:pid_t) Token(i).P_capacity)== 0) and (Control.finish == 1)");
+		if(!appModel.isUsingColors()){
+			//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
+			stream.println("E<>((sum(i:pid_t) Token(i).P_capacity)== 0) and (Control.finish == 1)");
+		}else{
+			stream.println("E<>((sum(i:pid_t) Token(i).P_capacity) == 0) and (Control.P_lock == 1) and lock == 0");
+		}
 	}
 
 	protected String getAnswerNotBoundedString() {

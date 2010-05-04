@@ -13,8 +13,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
-import dk.aau.cs.petrinet.colors.ColoredTAPN;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;

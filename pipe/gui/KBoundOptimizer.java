@@ -6,10 +6,12 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.Verification.RunUppaalVerification;
+import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryKBoundOptimizeTransformer;
-import dk.aau.cs.TAPN.TAPNToNTATransformer;
+import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 
@@ -35,7 +37,7 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 	}
 	
 	@Override
-	protected TAPNToNTATransformer getReductionStrategy()
+	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy()
 	{
 		return new TAPNToNTASymmetryKBoundOptimizeTransformer(k+1);
 	}
