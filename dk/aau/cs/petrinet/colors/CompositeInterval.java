@@ -8,6 +8,7 @@ public class CompositeInterval extends ColoredInterval {
 		this.other = second;
 	}
 	
+	@Override
 	public String convertToTAGuardString(String clockName, String tokenValueName){
 		String guard = super.convertToTAGuardString(clockName, tokenValueName);
 		String otherGuard = other.convertToTAInvariantString(clockName, tokenValueName);

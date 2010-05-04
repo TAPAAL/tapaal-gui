@@ -377,7 +377,6 @@ implements Cloneable {
 	 * @param labelInput AnnotationNote Object to add
 	 */
 	private void addAnnotation(AnnotationNote labelInput) {
-		boolean unique = true;
 		labelsArray.add(labelInput);
 		setChanged();
 		notifyObservers(labelInput);
@@ -390,7 +389,6 @@ implements Cloneable {
 	 * @param placeInput Place Object to add
 	 */
 	private void addAnnotation(MarkingParameter markingParameterInput) {
-		boolean unique = true;
 		markingParametersArray.add(markingParameterInput);
 		setChanged();
 		notifyObservers(markingParameterInput);
@@ -403,7 +401,6 @@ implements Cloneable {
 	 * @param placeInput Place Object to add
 	 */
 	private void addAnnotation(RateParameter rateParameterInput) {
-		boolean unique = true;
 		rateParametersArray.add(rateParameterInput);
 		setChanged();
 		notifyObservers(rateParameterInput);
@@ -1582,13 +1579,8 @@ implements Cloneable {
 		String idInput = null;
 		String sourceInput = null;
 		String targetInput = null;
-		int weightInput = 1;
-		double inscriptionOffsetXInput = 0;
-		double inscriptionOffsetYInput = 0;
 		double startX = 0;
 		double startY = 0;
-		double endX = 0;
-		double endY = 0;
 		boolean taggedArc;
 
 		sourceInput = inputArcElement.getAttribute("source");
@@ -1627,9 +1619,8 @@ implements Cloneable {
 		}
 		if (targetInput.length() > 0) {
 			if (getPlaceTransitionObject(targetInput) != null) {
-				//				System.out.println("PNMLDATA: targetInput is not null");
-				endX = getPlaceTransitionObject(targetInput).getPositionX();
-				endY = getPlaceTransitionObject(targetInput).getPositionY();
+				getPlaceTransitionObject(targetInput).getPositionX();
+				getPlaceTransitionObject(targetInput).getPositionY();
 			}
 		}
 

@@ -29,10 +29,12 @@ Degree2BroadcastTransformer {
 	}
 
 
+	@Override
 	protected Degree2Converter getDegree2Converter() {
 		return new ColoredInhibDegree2Converter();
 	}
 
+	@Override
 	protected String createLocalDeclarations(TimedArcPetriNet model) {
 		String decl = super.createLocalDeclarations(model);
 
@@ -41,6 +43,7 @@ Degree2BroadcastTransformer {
 		return decl;
 	}
 
+	@Override
 	protected String CreateResetExpressionIfNormalArc(Arc arc) {
 		String clockReset = String.format("%1$s := 0", CLOCK_NAME);
 
@@ -94,6 +97,7 @@ Degree2BroadcastTransformer {
 		return guard;
 	}
 	
+	@Override
 	protected String createUpdateExpressionForTokenInitialization(Token token) {
 		ColoredToken ct = (ColoredToken)token;
 		
@@ -101,6 +105,7 @@ Degree2BroadcastTransformer {
 	}
 	
 	
+	@Override
 	protected String convertInvariant(TAPNPlace place) {
 		ColoredPlace cp = (ColoredPlace)place;
 		String invariant = cp.getTimeInvariant().convertToTAInvariantString(CLOCK_NAME, VALUE_VAR_NAME);
