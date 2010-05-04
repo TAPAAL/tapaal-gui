@@ -18,13 +18,13 @@ public class ColoredTransportArcUpdateValueEdit extends UndoableEdit {
 	@Override
 	public void redo() {
 		arc.setOutputValue(newValue);
-		((ColoredTransportArc)arc.getconnectedTo()).setOutputValue(newValue);
+		((ColoredTransportArc)arc.getConnectedTo()).setOutputValue(newValue);
 	}
 
 	@Override
 	public void undo() {
 		arc.setOutputValue(oldValue);
-		((ColoredTransportArc)arc.getconnectedTo()).setOutputValue(oldValue);
+		((ColoredTransportArc)arc.getConnectedTo()).setOutputValue(oldValue);
 	}
 
 }

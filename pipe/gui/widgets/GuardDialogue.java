@@ -102,7 +102,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 				initTransportArcFeaturesPanel();
 				TransportArc arc = (TransportArc)objectToBeEdited;
 				if(arc.getConnectedTo() != null && arc.getSource() instanceof TAPNTransition){
-					objectToBeEdited = arc.getconnectedTo();
+					objectToBeEdited = arc.getConnectedTo();
 				}
 			}
 		}
@@ -360,7 +360,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								UndoableEdit preserveEdit = tarc.setPreservation(preserve);
 								undoManager.addEdit(preserveEdit);
 
-								ColoredTransportArc connectedTo = (ColoredTransportArc)tarc.getconnectedTo();
+								ColoredTransportArc connectedTo = (ColoredTransportArc)tarc.getConnectedTo();
 								UndoableEdit preserveEditConnectedTo = connectedTo.setPreservation(preserve);
 								undoManager.addEdit(preserveEditConnectedTo);
 
@@ -378,7 +378,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								UndoableEdit outputEdit = tarc.setOutputValue(outputValue);
 								undoManager.addEdit(outputEdit);
 
-								connectedTo = (ColoredTransportArc)tarc.getconnectedTo();
+								connectedTo = (ColoredTransportArc)tarc.getConnectedTo();
 								UndoableEdit outputEditConnectedTo =  connectedTo.setOutputValue(outputValue);
 								undoManager.addEdit(outputEditConnectedTo);
 							}

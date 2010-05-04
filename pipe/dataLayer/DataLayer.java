@@ -530,7 +530,7 @@ implements Cloneable {
 				TransportArc tmp = (TransportArc)arcInput;
 				PlaceTransitionObject first = tmp.getSource();
 
-				if (tmp.connectedTo == null){
+				if (tmp.getConnectedTo() == null){
 					if (first instanceof TimedPlace){
 
 						for (Object o : tmp.getTarget().getPostset()){
@@ -539,8 +539,8 @@ implements Cloneable {
 								if (tmp.getGroupNr() == ((TransportArc)o).getGroupNr()){
 									//Found partner
 
-									tmp.connectedTo = ((TransportArc)o);
-									((TransportArc)o).connectedTo = tmp; 
+									tmp.setConnectedTo(((TransportArc)o));
+									((TransportArc)o).setConnectedTo(tmp); 
 
 									break;
 								}
@@ -558,8 +558,8 @@ implements Cloneable {
 								if (tmp.getGroupNr() == ((TransportArc)o).getGroupNr()){
 									//Found partner
 
-									tmp.connectedTo = ((TransportArc)o);
-									((TransportArc)o).connectedTo = tmp; 
+									tmp.setConnectedTo(((TransportArc)o));
+									((TransportArc)o).setConnectedTo(tmp); 
 
 									break;
 								}
@@ -2222,7 +2222,7 @@ implements Cloneable {
 
 						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 
-						TimedPlace targetPlace = (TimedPlace)((TransportArc)a).connectedTo.getTarget();
+						TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getConnectedTo().getTarget();
 
 						for (int i=0; i< tokensOfPlace.size(); i++){
 							if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {

@@ -66,7 +66,6 @@ public class ColoredTransportArc extends TransportArc {
 
 	@Override
 	public void updateWeightLabel(){ 
-
 		String guard = null;
 		if (isInPreSet()){
 			guard = "age \u2208 " + timeGuard + " : " + getGroup();

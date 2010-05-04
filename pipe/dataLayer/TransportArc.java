@@ -15,13 +15,7 @@ public class TransportArc extends TimedArc {
 	private static final long serialVersionUID = 3728885532894319528L;
 	private int group;
 	private boolean isInPreSet; 
-	TransportArc connectedTo=null;
-//	private TransportArc pairArc = null;
-//	private boolean hasPairArcYet = false; 
-
-	public TransportArc getconnectedTo() {
-		return connectedTo;
-	}
+	private TransportArc connectedTo=null;
 	
 	public TransportArc(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
 		super(new NormalArc(newSource));
@@ -141,6 +135,7 @@ public class TransportArc extends TimedArc {
 	public TransportArc getConnectedTo() {
 		return connectedTo;
 	}
+	
 	public void setConnectedTo(TransportArc connectedTo) {
 		this.connectedTo = connectedTo;
 	}

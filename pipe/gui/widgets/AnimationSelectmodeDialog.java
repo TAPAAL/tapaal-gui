@@ -122,7 +122,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 
-				TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getconnectedTo().getTarget();
+				TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getConnectedTo().getTarget();
 
 				for (int i=0; i< tokensOfPlace.size(); i++){
 					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {

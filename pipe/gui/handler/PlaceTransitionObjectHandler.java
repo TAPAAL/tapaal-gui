@@ -586,8 +586,8 @@ public void mouseReleased(MouseEvent e) {
 
         				 //Create the next arc
         				 boolean useColors = CreateGui.getModel().isUsingColors();
-        				 Arc arc = useColors ? new ColoredTransportArc(currentObject,1,false) 
-        				 	: new TransportArc(currentObject, 1, false);
+        				 Arc arc = useColors ? new ColoredTransportArc(currentObject,groupMaxCounter+1,false) 
+        				 	: new TransportArc(currentObject, groupMaxCounter+1, false);
         				 createArc(arc, currentObject);
 
         			 } else if (transportArcToCreate.getSource() instanceof Transition) {
