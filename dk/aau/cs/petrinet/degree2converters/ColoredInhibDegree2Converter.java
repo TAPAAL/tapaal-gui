@@ -264,7 +264,7 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 			lastPTO = pt;
 
 			String holdingPlace = String.format(HOLDING_PLACE_FORMAT, transitionName,i);
-			addPlace(degree2Net, holdingPlace, ColoredTimeInvariant.getZeroInvariant(), new ColorSet());
+			addPlace(degree2Net, holdingPlace, new ColoredTimeInvariant(), new ColorSet());
 		}
 		addColoredInputArc(degree2Net, PLOCK, String.format(T_I_IN_FORMAT, transitionName, 1), new ColoredInterval(), new ColorSet());
 

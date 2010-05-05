@@ -56,8 +56,8 @@ public class KBoundAnalyzer
 		//Tmp files
 		File xmlfile=null, qfile=null;
 		try {
-			xmlfile = File.createTempFile("verifyta", ".xml");
-			qfile = File.createTempFile("verifyta", ".q");
+			xmlfile = File.createTempFile("verifyta", ".xml", new File("/home/tapaald/Skrivebord/test/"));
+			qfile = File.createTempFile("verifyta", ".q", new File("/home/tapaald/Skrivebord/test/"));
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
