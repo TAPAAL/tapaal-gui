@@ -950,7 +950,7 @@ implements Cloneable {
 					if(pnObject instanceof ColoredTimedPlace){
 						((ColoredTimedPlace)pnObject).showAgeOfTokens(false);
 					}
-					
+
 					if ( arcsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are removing
@@ -3450,7 +3450,7 @@ implements Cloneable {
 	public void createFromPNML(Document PNMLDoc){
 		createFromPNML(PNMLDoc, false);		
 	}
-	
+
 	public void createFromPNML(Document PNMLDoc, boolean colors)	{
 		// XXX - kyrke debug
 		emptyPNML();
@@ -3468,7 +3468,7 @@ implements Cloneable {
 			}else{
 				nodeList = PNMLDoc.getDocumentElement().getChildNodes();
 			}
-			
+
 
 			for(int i = 0 ; i < nodeList.getLength() ; i++) {
 				node = nodeList.item(i);
@@ -3485,7 +3485,7 @@ implements Cloneable {
 			}
 			buildConstraints();
 			this.useColors = colors;
-			
+
 		} catch (Exception e) {
 			System.out.println("runtime except");
 			throw new RuntimeException(e);
@@ -3621,19 +3621,19 @@ implements Cloneable {
 							1,
 							idInput,
 							taggedArc),
-						""),
+					""),
 					Integer.parseInt(inputArcElement.getAttribute("groupNo")), 
 					sourceIn instanceof Place);
-			
+
 			ColoredInterval timeGuard = new ColoredInterval(inputArcElement.getAttribute("timeGuard"));
 			cta.setTimeGuard(timeGuard);
 
 			ColorSet colorGuard = new ColorSet(inputArcElement.getAttribute("colorGuard"));
 			cta.setColorGuard(colorGuard);
-			
+
 			Preserve preservation = Preserve.valueOf(inputArcElement.getAttribute("preservation"));
 			cta.setPreservation(preservation);
-			
+
 			IntOrConstant outputValue = new IntOrConstant(inputArcElement.getAttribute("outputValue"));
 			cta.setOutputValue(outputValue);
 
@@ -4265,18 +4265,22 @@ implements Cloneable {
 	public void correctGuards(String oldName, String newName) {
 		updateArcGuards(oldName, newName);
 		for(Place p : placesArray){
-			if(p instanceof TimedPlace){
-				TimedPlace tp = (TimedPlace)p;
-				String inv = tp.getInvariant();
+			if(!isUsingColors()){
+				if(p instanceof TimedPlace){
+					TimedPlace tp = (TimedPlace)p;
+					String inv = tp.getInvariant();
 
-				String operator = inv.contains("<=") ? "<=" : "<";
-				String first = inv.substring(operator.length());
+					String operator = inv.contains("<=") ? "<=" : "<";
+					String first = inv.substring(operator.length());
 
-				if(first.equals(oldName)){
-					first = newName;
+					if(first.equals(oldName)){
+						first = newName;
+					}
+
+					tp.setInvariant(operator + first);
 				}
-
-				tp.setInvariant(operator + first);
+			}else{
+				((ColoredTimedPlace)p).updateConstantName(oldName, newName);
 			}
 		}
 
@@ -4285,22 +4289,35 @@ implements Cloneable {
 
 	private void updateArcGuards(String oldName, String newName) {
 		for(Arc arc : arcsArray){
-			if(arc instanceof TimedArc || arc instanceof TransportArc){
-				TimedArc tarc = (TimedArc)arc;
-				String guard = tarc.getGuard();
-				String leftDelim = guard.substring(0,1);
-				String rightDelim = guard.substring(guard.length()-1, guard.length());
-				String first = guard.substring(1, guard.indexOf(","));
-				String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
+			if(!isUsingColors()){
+				if(arc instanceof TimedArc || arc instanceof TransportArc){
+					TimedArc tarc = (TimedArc)arc;
+					String guard = tarc.getGuard();
+					String leftDelim = guard.substring(0,1);
+					String rightDelim = guard.substring(guard.length()-1, guard.length());
+					String first = guard.substring(1, guard.indexOf(","));
+					String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
 
-				if(first.equals(oldName)){
-					first = newName;
-				}
-				if(second.equals(oldName)){
-					second = newName;
-				}
+					if(first.equals(oldName)){
+						first = newName;
+					}
+					if(second.equals(oldName)){
+						second = newName;
+					}
 
-				tarc.setGuard(leftDelim + first + "," + second + rightDelim);
+					tarc.setGuard(leftDelim + first + "," + second + rightDelim);
+				}
+			}else{
+				if(arc instanceof ColoredTransportArc){
+					ColoredTransportArc cta = (ColoredTransportArc)arc;
+					cta.updateConstantName(oldName, newName);
+				}else if(arc instanceof ColoredInhibitorArc){
+					((ColoredInhibitorArc)arc).updateConstantName(oldName, newName);
+				}else if(arc instanceof ColoredInputArc){
+					((ColoredInputArc)arc).updateConstantName(oldName, newName);
+				}else if(arc instanceof ColoredOutputArc){
+					((ColoredOutputArc)arc).updateConstantName(oldName, newName);
+				}
 			}
 		}
 	}

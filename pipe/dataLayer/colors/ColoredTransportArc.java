@@ -164,4 +164,11 @@ public class ColoredTransportArc extends TransportArc {
 		updateWeightLabel();
 	}
 
+	public void updateConstantName(String oldName, String newName) {
+		colorGuard.updateConstantName(oldName, newName);
+		timeGuard.updateConstantName(oldName, newName);
+		outputValue.updateConstantName(oldName, newName);
+		updateWeightLabel();
+	}
+
 }

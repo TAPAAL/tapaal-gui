@@ -71,4 +71,9 @@ public class ColoredOutputArc extends NormalArc {
 		this.displayValues  = showValues;		
 		updateWeightLabel();
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		outputValue.updateConstantName(oldName, newName);
+		updateWeightLabel();		
+	}
 }

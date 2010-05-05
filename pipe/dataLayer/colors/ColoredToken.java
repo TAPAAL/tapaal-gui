@@ -80,6 +80,10 @@ public class ColoredToken {
 		this.displayValues = showValues;
 		
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		color.updateConstantName(oldName, newName);		
+	}
 	
 
 }

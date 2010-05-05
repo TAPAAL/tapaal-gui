@@ -114,4 +114,9 @@ public class IntervalBound {
 			return String.format("%1$d*val+%2$d", a.getValue(), b.getValue());
 		}
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		a.updateConstantName(oldName, newName);
+		b.updateConstantName(oldName, newName);		
+	}
 }

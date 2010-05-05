@@ -101,4 +101,10 @@ public class ColorSet {
 	public void displayValues(boolean display){
 		this.displayValues = display;
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		for(IntOrConstantRange range : ranges){
+			range.updateConstantName(oldName, newName);
+		}		
+	}
 }

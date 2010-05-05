@@ -97,4 +97,12 @@ public class IntOrConstant {
 
 		return false;
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		if(isUsingConstant() && name.equals(oldName)){
+			name = newName;
+		}
+		
+	}
+
 }

@@ -9,7 +9,7 @@ import pipe.gui.undo.UndoableEdit;
 
 public class ColoredInputArc extends TimedArc {
 
-	private ColorSet integerGuard;
+	private ColorSet colorGuard;
 	private ColoredInterval timeGuard;
 	/**
 	 * 
@@ -35,7 +35,7 @@ public class ColoredInputArc extends TimedArc {
 	}
 	
 	private void initialize() {
-		integerGuard = new ColorSet();
+		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
 		
 		updateWeightLabel();
@@ -45,7 +45,7 @@ public class ColoredInputArc extends TimedArc {
 		IntOrConstant val = token.getColor();
 		int value = val.getValue();
 		
-		return integerGuard.contains(value) && timeGuard.contains(token);
+		return colorGuard.contains(value) && timeGuard.contains(token);
 	}
 	
 	@Override
@@ -53,8 +53,8 @@ public class ColoredInputArc extends TimedArc {
 		
 		String guard = "age \u2208 " + timeGuard;
 		
-		if(integerGuard != null && !integerGuard.isEmpty()){
-			guard += "\n val \u2208 " + integerGuard.toString();
+		if(colorGuard != null && !colorGuard.isEmpty()){
+			guard += "\n val \u2208 " + colorGuard.toString();
 		}
 		
 		weightLabel.setText(guard);
@@ -63,15 +63,15 @@ public class ColoredInputArc extends TimedArc {
 	}
 	
 	public String getColorGuardStringWithoutSetNotation() {
-		return integerGuard.toStringNoSetNotation();
+		return colorGuard.toStringNoSetNotation();
 	}
 
 	public ColorSet getColorGuard(){
-		return integerGuard;
+		return colorGuard;
 	}
 	public UndoableEdit setColorGuard(ColorSet newColorGuard) {
-		ColorSet old = this.integerGuard;
-		this.integerGuard = newColorGuard;
+		ColorSet old = this.colorGuard;
+		this.colorGuard = newColorGuard;
 
 		updateWeightLabel();
 
@@ -93,7 +93,13 @@ public class ColoredInputArc extends TimedArc {
 
 	public void displayValues(boolean showValues) {
 		timeGuard.displayValues(showValues);
-		integerGuard.displayValues(showValues);
+		colorGuard.displayValues(showValues);
 		updateWeightLabel();
+	}
+
+	public void updateConstantName(String oldName, String newName) {
+		timeGuard.updateConstantName(oldName, newName);
+		colorGuard.updateConstantName(oldName, newName);
+		updateWeightLabel();		
 	}
 }

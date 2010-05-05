@@ -148,5 +148,10 @@ public class IntOrConstantRange implements Comparable<IntOrConstantRange> {
 			return String.valueOf(from.getValue()) + "-" + String.valueOf(to.getValue());
 		}
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		from.updateConstantName(oldName, newName);
+		to.updateConstantName(oldName, newName);		
+	}
 	
 }

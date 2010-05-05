@@ -205,4 +205,15 @@ public class ColoredTimedPlace extends TimedPlace {
 		update();		
 	}
 
+	public void updateConstantName(String oldName, String newName) {
+		timeInvariant.updateConstantName(oldName, newName);
+		colorInvariant.updateConstantName(oldName, newName);
+		
+		for(ColoredToken token : tokens){
+			token.updateConstantName(oldName, newName);
+		}
+		
+		update();		
+	}
+
 }

@@ -86,4 +86,9 @@ String format = "%1$s%2$s, %3$s%4$s";
 	public void displayValues(boolean showValues) {
 		this.displayValues = showValues;		
 	}
+
+	public void updateConstantName(String oldName, String newName) {
+		lower.updateConstantName(oldName, newName);
+		upper.updateConstantName(oldName, newName);
+	}
 }

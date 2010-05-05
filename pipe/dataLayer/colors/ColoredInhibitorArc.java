@@ -92,6 +92,11 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		colorGuard.displayValues(showValues);
 		updateWeightLabel();
 	}
+	public void updateConstantName(String oldName, String newName) {
+		timeGuard.updateConstantName(oldName, newName);
+		colorGuard.updateConstantName(oldName, newName);
+		updateWeightLabel();		
+	}
 
 
 

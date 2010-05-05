@@ -116,6 +116,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     						"on one or more arcs.",
     						"Constant value invalid for current net",
     						JOptionPane.ERROR_MESSAGE);
+    				return;
     			}else{
     				CreateGui.getView().getUndoManager().addNewEdit(edit);
     			}

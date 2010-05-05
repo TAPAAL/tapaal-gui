@@ -7,20 +7,20 @@ public class ColoredTimeInvariant {
 	public boolean strictLessThan;
 	private IntervalBound upper;
 	private boolean displayValues = false;
-	
+
 	public ColoredTimeInvariant(){
-		
+
 	}
-	
+
 	public ColoredTimeInvariant(String operator, IntervalBound upper){
 		strictLessThan = operator.equals("<");
-		
+
 		this.upper = upper;
 	}
-	
+
 	public ColoredTimeInvariant(String invariant) {
 		String operator = invariant.contains("<=") ? "<=" : "<";
-		
+
 		strictLessThan = operator.equals("<");
 		String val = invariant.substring(operator.length()).trim();
 		if(!val.equals("inf"))
@@ -35,16 +35,16 @@ public class ColoredTimeInvariant {
 
 	public boolean contains(ColoredToken token) {
 		if(goesToInfinity()) return true;
-		
+
 		return (!strictLessThan && upper.isGreaterThanOrEqual(token)) ||
-			(strictLessThan && upper.isGreaterThanOrEqual(token) && !upper.equals(token));
+		(strictLessThan && upper.isGreaterThanOrEqual(token) && !upper.equals(token));
 	}
-	
+
 	public IntervalBound getUpper(){
 		return upper;
 	}
-	
-	
+
+
 	public String getOperator() {
 		String operator = goesToInfinity() || strictLessThan ? "<" : "<=";
 		return operator;
@@ -53,11 +53,11 @@ public class ColoredTimeInvariant {
 	public List<String> getUsedConstantNames() {
 		return goesToInfinity() ? new ArrayList<String>() : upper.getUsedConstants();
 	}
-	
+
 	@Override
 	public String toString() {
 		if(displayValues) return toStringWithoutConstants();
-		
+
 		String operator = getOperator();
 		String bound = goesToInfinity() ? "inf" : upper.toString();
 		return String.format("%1$s%2$s", operator, bound); 
@@ -71,5 +71,11 @@ public class ColoredTimeInvariant {
 
 	public void displayValues(boolean displayValues) {
 		this.displayValues = displayValues;
+	}
+
+	public void updateConstantName(String oldName, String newName) {
+		if(upper != null){
+			upper.updateConstantName(oldName, newName);		
+		}
 	}
 }
