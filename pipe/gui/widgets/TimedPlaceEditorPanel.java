@@ -888,9 +888,10 @@ extends javax.swing.JPanel {
 			
 			view.getUndoManager().addEdit(coloredTimedPlace.setTimeInvariant(timeInvariant));
 
-
-			if(!colorInvariantTextBox.getText().isEmpty()){
-
+			UndoableEdit colorInvEdit = null;
+			if(colorInvariantTextBox.getText().isEmpty()){
+				colorInvEdit = coloredTimedPlace.setColorInvariant(new ColorSet());
+			}else{
 				ColorSet colorInvariant = new ColorSet();
 				String[] ranges = colorInvariantTextBox.getText().split(",");
 				for(String range : ranges){
@@ -907,9 +908,10 @@ extends javax.swing.JPanel {
 						return;
 					}
 				}
-				UndoableEdit action = coloredTimedPlace.setColorInvariant(colorInvariant); 
-				view.getUndoManager().addEdit(action);
+				colorInvEdit = coloredTimedPlace.setColorInvariant(colorInvariant); 
+				
 			}
+			view.getUndoManager().addEdit(colorInvEdit);
 
 			List<ColoredToken> tokens = tokenTableModel.getTokens();
 			for(ColoredToken token : tokens){	

@@ -327,9 +327,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								action = ((ColoredInputArc)arc).setTimeGuard(timeGuard);
 							}
 							undoManager.addEdit(action);
-													
-							if(!colorGuardTextBox.getText().isEmpty()){
-								ColorSet colorGuard = null;
+									
+							ColorSet colorGuard = null;
+							if(colorGuardTextBox.getText().isEmpty()){
+								colorGuard = new ColorSet();
+							}else{
 								try{
 									colorGuard = createColorGuard();
 								}catch(IllegalArgumentException e){
@@ -339,19 +341,19 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 											JOptionPane.INFORMATION_MESSAGE);
 									undoManager.undo();
 									return;
-								}
-
-								action = null;
-								if(arc instanceof ColoredTransportArc){	
-									action = ((ColoredTransportArc)arc).setColorGuard(colorGuard);
-								}else if(arc instanceof ColoredInhibitorArc){
-									action = ((ColoredInhibitorArc)arc).setColorGuard(colorGuard);
-								}else{
-									action = ((ColoredInputArc)arc).setColorGuard(colorGuard);
-								}
-
-								undoManager.addEdit(action);
+								}								
 							}
+							
+							action = null;
+							if(arc instanceof ColoredTransportArc){	
+								action = ((ColoredTransportArc)arc).setColorGuard(colorGuard);
+							}else if(arc instanceof ColoredInhibitorArc){
+								action = ((ColoredInhibitorArc)arc).setColorGuard(colorGuard);
+							}else{
+								action = ((ColoredInputArc)arc).setColorGuard(colorGuard);
+							}
+							
+							undoManager.addEdit(action);
 
 							if(arc instanceof ColoredTransportArc){
 								ColoredTransportArc tarc = (ColoredTransportArc)arc;
