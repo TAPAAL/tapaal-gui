@@ -23,7 +23,7 @@ import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 
 public class KBoundAnalyzer 
 {
-	private DataLayer appModel;
+	protected DataLayer appModel;
 	protected int k;
 	private boolean notBounded = true;
 	

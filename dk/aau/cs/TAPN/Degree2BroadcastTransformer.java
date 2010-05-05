@@ -53,7 +53,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
 	private Hashtable<String, Hashtable<String, String>> arcGuards = new Hashtable<String, Hashtable<String,String>>();
 	private int numberOfInitChannels = 0;
-	private int extraTokens = 0;
+	protected int extraTokens = 0;
 	private int largestPresetSize = 0;
 	private boolean useSymmetry;
 
@@ -128,7 +128,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}
 	}
 
-	private String createGlobalDeclarations(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel) {
+	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel) {
 		StringBuilder builder = new StringBuilder();
 
 		if(useSymmetry){
