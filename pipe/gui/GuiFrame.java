@@ -39,6 +39,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -587,7 +588,7 @@ EOC */
 		drawingToolBar.add(deleteTokenAction);
 		
 		//Create panel to put toolbars in
-		Panel toolBarPanel = new Panel();
+		JPanel toolBarPanel = new JPanel();
 		toolBarPanel.setLayout(new FlowLayout(0,0,0));
 
 		//Add toolbars to pane
@@ -596,7 +597,7 @@ EOC */
 			
 		//Create a toolBarPaneltmp usign broderlayout and a spacer to get toolbar to fill
 		// the screen
-		Panel toolBarPaneltmp = new Panel();
+		JPanel toolBarPaneltmp = new JPanel();
 		toolBarPaneltmp.setLayout(new BorderLayout());
 		toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
 		JToolBar spacer = new JToolBar();
