@@ -24,7 +24,7 @@ JAVA_HOME := /usr/lib/jvm/java-6-sun/
 JAVA_LIB  := $(JAVA_HOME)/lib
 
 
-DEPEND := jpowergraph-0.2-common.jar:jpowergraph-0.2-swing.jar
+DEPEND := jpowergraph-0.2-common.jar:jpowergraph-0.2-swing.jar:gtkjfilechooser.jar
 
 
 JFLAGS      := -sourcepath $(SOURCE_DIR) \
@@ -57,7 +57,7 @@ $(all_javas):
 #	for arg in `cat $<`; do make $${arg}; done
 
 buildsrc: clean
-	tar czf tapaal_version.orig.tar.gz Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/  xslt/ RunGui.java
+	tar czf tapaal_version.orig.tar.gz Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar gtkjfilechooser.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/  xslt/ RunGui.java
 
 install: $(compile)
 	mkdir -p $(DESTDIR)/usr/lib/tapaal/
@@ -73,6 +73,7 @@ install: $(compile)
 	cp -r $(CURDIR)/jpowergraph $(DESTDIR)/usr/lib/tapaal/
 	cp $(CURDIR)/jpowergraph-0.2-common.jar $(DESTDIR)/usr/lib/tapaal/ 
 	cp $(CURDIR)/jpowergraph-0.2-swing.jar $(DESTDIR)/usr/lib/tapaal/ 
+	cp $(CURDIR)/gtkjfilechooser.jar $(DESTDIR)/usr/lib/tapaal/ 
 	cp $(CURDIR)/run-unix $(DESTDIR)/usr/bin/tapaal
 
 .PHONY : clean
