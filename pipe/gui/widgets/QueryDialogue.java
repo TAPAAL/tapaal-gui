@@ -21,7 +21,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -67,34 +67,40 @@ public class QueryDialogue extends JPanel{
 	private JButton saveUppaalXMLButton;
 
 	private ButtonGroup quantificationRadioButtonGroup;
-	private JRadioButtonMenuItem existsDiamond;
-	private JRadioButtonMenuItem existsBox;
-	private JRadioButtonMenuItem forAllDiamond;
-	private JRadioButtonMenuItem forAllBox;	
+	private JRadioButton existsDiamond;
+	private JRadioButton existsBox;
+	private JRadioButton forAllDiamond;
+	private JRadioButton forAllBox;	
 
 	private ButtonGroup searchRadioButtonGroup;
-	private JRadioButtonMenuItem bFS;
-	private JRadioButtonMenuItem dFS;
-	private JRadioButtonMenuItem rDFS;
-	private JRadioButtonMenuItem closestToTargetFirst;
+
+		private JRadioButton bFS;
+	private JRadioButton dFS;
+	private JRadioButton rDFS;
+	private JRadioButton closestToTargetFirst;
+	
 
 	private ButtonGroup traceRadioButtonGroup;
-	private JRadioButtonMenuItem none;
-	private JRadioButtonMenuItem some;
-	private JRadioButtonMenuItem fastest;
+
+	private JRadioButton none;
+	private JRadioButton some;
+	private JRadioButton fastest;
+	
 
 	private ButtonGroup hashTableSizeButtonGroup;
-	private JRadioButtonMenuItem size4;
-	private JRadioButtonMenuItem size16;
-	private JRadioButtonMenuItem size64;
-	private JRadioButtonMenuItem size256;
-	private JRadioButtonMenuItem size512;
+
+	private JRadioButton size4;
+	private JRadioButton size16;
+	private JRadioButton size64;
+	private JRadioButton size256;
+	private JRadioButton size512;
 
 	private ButtonGroup extrapolationButtonGroup;
-	private JRadioButtonMenuItem automaticExtr;
-	private JRadioButtonMenuItem difExtr;
-	private JRadioButtonMenuItem locBasedExtr;
-	private JRadioButtonMenuItem lowUpExtr;
+
+	private JRadioButton automaticExtr;
+	private JRadioButton difExtr;
+	private JRadioButton locBasedExtr;
+	private JRadioButton lowUpExtr;
 
 	private JPanel reductionOptions;
 	private JComboBox reductionOption;
@@ -103,8 +109,10 @@ public class QueryDialogue extends JPanel{
 	private JSpinner numberOfExtraTokensInNet;
 	private JButton kbounded;
 	private JButton kboundedOptimize;
+
 	//XXX shortest can be quite hard to guarantee, because, it might not be the shortest in UPPAAL
 	//	private JRadioButtonMenuItem shortest;
+
 
 	private DataLayer datalayer;
 	private EscapableDialog me;
@@ -217,11 +225,12 @@ public class QueryDialogue extends JPanel{
 		queryPanel.setBorder(BorderFactory.createTitledBorder("Query"));
 
 		quantificationRadioButtonGroup = new ButtonGroup();
-		existsDiamond = new JRadioButtonMenuItem("(EF) There exists some reachable marking that satisifies:");
-		existsBox = new JRadioButtonMenuItem("(EG) There exists a trace on which every marking satisfies:");
-		forAllDiamond = new JRadioButtonMenuItem("(AF) On all traces there is eventually a marking that satisfies:");
-		forAllBox = new JRadioButtonMenuItem("(AG) All reachable markings satisfy:");
 
+		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
+		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
+		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
+		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
+		
 		quantificationRadioButtonGroup.add(existsDiamond);
 		quantificationRadioButtonGroup.add(existsBox);
 		quantificationRadioButtonGroup.add(forAllDiamond);
@@ -259,10 +268,11 @@ public class QueryDialogue extends JPanel{
 
 		//Add action listeners to the query options
 		for (Object radioButton : queryPanel.getComponents()){
-			if( (radioButton instanceof JRadioButtonMenuItem)){
+
+			if( (radioButton instanceof JRadioButton)){
 
 
-				((JRadioButtonMenuItem)radioButton).addActionListener(new ActionListener(){
+				((JRadioButton)radioButton).addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent arg0) {
 						//Update stuff
 						quantificationRadioButtonChanged(arg0);
@@ -297,10 +307,10 @@ public class QueryDialogue extends JPanel{
 		searchOptions = new JPanel(new GridBagLayout());
 		searchOptions.setBorder(BorderFactory.createTitledBorder("Analysis Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		bFS = new JRadioButtonMenuItem("Breadth First Search");
-		dFS = new JRadioButtonMenuItem("Depth First Search");
-		rDFS = new JRadioButtonMenuItem("Random Depth First Search");
-		closestToTargetFirst = new JRadioButtonMenuItem("Search by Closest To Target First");
+		bFS = new JRadioButton("Breadth First Search");
+		dFS = new JRadioButton("Depth First Search");
+		rDFS = new JRadioButton("Random Depth First Search");
+		closestToTargetFirst = new JRadioButton("Search by Closest To Target First");
 		searchRadioButtonGroup.add(bFS);
 		searchRadioButtonGroup.add(dFS);
 		searchRadioButtonGroup.add(rDFS);
@@ -338,9 +348,9 @@ public class QueryDialogue extends JPanel{
 		traceOptions = new JPanel(new GridBagLayout());
 		traceOptions.setBorder(BorderFactory.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
-		some = new JRadioButtonMenuItem("Some encountered trace (only without symmetry reduction)");
-		fastest = new JRadioButtonMenuItem("Fastest trace (only without symmetry reduction)");
-		none = new JRadioButtonMenuItem("No trace");
+		some = new JRadioButton("Some encountered trace (only without symmetry reduction)");
+		fastest = new JRadioButton("Fastest trace (only without symmetry reduction)");
+		none = new JRadioButton("No trace");
 		traceRadioButtonGroup.add(some);
 		traceRadioButtonGroup.add(fastest);
 		traceRadioButtonGroup.add(none);
@@ -424,11 +434,11 @@ public class QueryDialogue extends JPanel{
 		hashTableOptions = new JPanel(new GridBagLayout());
 		hashTableOptions.setBorder(BorderFactory.createTitledBorder("Hash Table Size"));
 		hashTableSizeButtonGroup = new ButtonGroup();
-		size4 = new JRadioButtonMenuItem("4 MB");
-		size16 = new JRadioButtonMenuItem("16 MB");
-		size64 = new JRadioButtonMenuItem("64 MB");
-		size256 = new JRadioButtonMenuItem("256 MB");
-		size512 = new JRadioButtonMenuItem("512 MB");
+		size4 = new JRadioButton("4 MB");
+		size16 = new JRadioButton("16 MB");
+		size64 = new JRadioButton("64 MB");
+		size256 = new JRadioButton("256 MB");
+		size512 = new JRadioButton("512 MB");
 		hashTableSizeButtonGroup.add(size4);
 		hashTableSizeButtonGroup.add(size16);
 		hashTableSizeButtonGroup.add(size64);
@@ -475,10 +485,10 @@ public class QueryDialogue extends JPanel{
 		extrapolationOptions = new JPanel(new GridBagLayout());
 		extrapolationOptions.setBorder(BorderFactory.createTitledBorder("Extrapolation Options"));
 		extrapolationButtonGroup = new ButtonGroup();
-		automaticExtr = new JRadioButtonMenuItem("Automatic");
-		difExtr = new JRadioButtonMenuItem("Use difference extrapolation");
-		locBasedExtr = new JRadioButtonMenuItem("Use location based extrapolation");
-		lowUpExtr = new JRadioButtonMenuItem("Use Lower/Upper extrapolation");
+		automaticExtr = new JRadioButton("Automatic");
+		difExtr = new JRadioButton("Use difference extrapolation");
+		locBasedExtr = new JRadioButton("Use location based extrapolation");
+		lowUpExtr = new JRadioButton("Use Lower/Upper extrapolation");
 		extrapolationButtonGroup.add(automaticExtr);
 		extrapolationButtonGroup.add(difExtr);
 		extrapolationButtonGroup.add(locBasedExtr);
@@ -1027,10 +1037,10 @@ public class QueryDialogue extends JPanel{
 	private String getExtrapolationOption() {
 		String toReturn = null;
 		for (Object radioButton : extrapolationOptions.getComponents()){
-			if( (radioButton instanceof JRadioButtonMenuItem)){
-				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-
-					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
+			if( (radioButton instanceof JRadioButton)){
+				if ( ((JRadioButton)radioButton).isSelected() ){
+			
+					toReturn = ((JRadioButton)radioButton).getText();
 					break;
 				}
 			}
@@ -1042,10 +1052,10 @@ public class QueryDialogue extends JPanel{
 	private String getHashTableSize() {
 		String toReturn = null;
 		for (Object radioButton : hashTableOptions.getComponents()){
-			if( (radioButton instanceof JRadioButtonMenuItem)){
-				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-
-					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
+			if( (radioButton instanceof JRadioButton)){
+				if ( ((JRadioButton)radioButton).isSelected() ){
+			
+					toReturn = ((JRadioButton)radioButton).getText();
 					break;
 				}
 			}
@@ -1065,10 +1075,9 @@ public class QueryDialogue extends JPanel{
 	private String getTraceOptions() {
 		String toReturn = null;
 		for (Object radioButton : traceOptions.getComponents()){
-			if( (radioButton instanceof JRadioButtonMenuItem)){
-				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-
-					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
+			if( (radioButton instanceof JRadioButton)){
+				if ( ((JRadioButton)radioButton).isSelected() ){
+					toReturn = ((JRadioButton)radioButton).getText();
 					break;
 				}
 			}
@@ -1079,10 +1088,10 @@ public class QueryDialogue extends JPanel{
 	private String getSearchOptions() {
 		String toReturn = null;
 		for (Object radioButton : searchOptions.getComponents()){
-			if( (radioButton instanceof JRadioButtonMenuItem)){
-				if ( ((JRadioButtonMenuItem)radioButton).isSelected() ){
-
-					toReturn = ((JRadioButtonMenuItem)radioButton).getText();
+			if( (radioButton instanceof JRadioButton)){
+				if ( ((JRadioButton)radioButton).isSelected() ){
+			
+					toReturn = ((JRadioButton)radioButton).getText();
 					break;
 				}
 			}

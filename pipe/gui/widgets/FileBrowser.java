@@ -13,10 +13,15 @@ import pipe.gui.ExtensionFilter;
  * @author Maxim
  *
  * Opens a file browser with appropriate settings for the given filetype/extension
+ * 2010-05-07: Kenneth Yrke Jørgensen: changed behaviour of the class from extending JFileChooser,
+ * to have a static instance. This is an ugly hack to handle speed problems with the java-reimplementation
+ * of the GTKJFileChooser. The java-reimplementation of GTKJFileChooser is needed as the default implementation
+ * is completly useless. 
  */
 public class FileBrowser 
-        extends JFileChooser {
+         {
    
+   static JFileChooser fc = new JFileChooser();
    private String ext;
    
    
@@ -29,17 +34,20 @@ public class FileBrowser
       if (path != null) {
          File f = new File(path);
          if (f.exists()) {
-            setCurrentDirectory(f);
+            fc.setCurrentDirectory(f);
          }
          if (!f.isDirectory()) {
-            setSelectedFile(f);
+            fc.setSelectedFile(f);
          }
       }
       
       this.ext = ext;
       ExtensionFilter filter = new ExtensionFilter(ext,filetype);
 
-      setFileFilter(filter);
+      fc.setFileFilter(filter);
+      
+      //By default hide hidden files
+      fc.setFileHidingEnabled(true);
    }
    
    
@@ -54,9 +62,9 @@ public class FileBrowser
    
    
    public File openFile() {
-      if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+      if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
          try {
-            return getSelectedFile().getCanonicalFile();
+            return fc.getSelectedFile().getCanonicalFile();
          } catch (IOException e){
             /* gulp */
          }
@@ -66,14 +74,14 @@ public class FileBrowser
    
    
    public String saveFile() {
-      if (showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+      if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
          try {
-            File f = getSelectedFile();
+            File f = fc.getSelectedFile();
             if (!f.getName().endsWith("." + ext)) {
                f = new File(f.getCanonicalPath() + "." + ext); // force extension
             }
             if (f.exists() && 
-                    JOptionPane.showConfirmDialog(this, f.getCanonicalPath() + 
+                    JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + 
                     "\nDo you want to overwrite this file?") !=
                     JOptionPane.YES_OPTION) {
                return null;
