@@ -2,7 +2,13 @@ package pipe.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -23,6 +29,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -31,6 +39,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
@@ -558,11 +567,11 @@ EOC */
 		toolBar.add(new ToggleButton(startAction));
 
 		//Start drawingToolBar
+		toolBar.addSeparator();
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
 
 		//Normal arraw
-		drawingToolBar.addSeparator();
 		drawingToolBar.add(new ToggleButton(selectAction));
 		
 		//Drawing elements
@@ -580,13 +589,17 @@ EOC */
 
 		//Add drawingtoolbar to toolbar
 		drawingToolBar.addSeparator();
-		toolBar.add(drawingToolBar);
+		//toolBar.add(drawingToolBar);
+		
+		
+		Panel toolBarPanel = new Panel();
+		toolBarPanel.setLayout(new FlowLayout(0,0,0));
 
-		for(int i=0;i<toolBar.getComponentCount();i++){
-			toolBar.getComponent(i).setFocusable(false);
-		}
-
-		getContentPane().add(toolBar,BorderLayout.PAGE_START);
+		toolBarPanel.add(toolBar);
+		toolBarPanel.add(drawingToolBar);
+		toolBarPanel.add(Box.createHorizontalGlue());
+			
+		getContentPane().add(toolBarPanel,BorderLayout.PAGE_START);
 	}
 
 	/**
