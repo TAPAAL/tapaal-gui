@@ -561,15 +561,14 @@ EOC */
 		toolBar.add(zoomInAction);
 		
 		//Modes
-		toolBar.addSeparator();
 		toolBar.add(toggleGrid);
 		toolBar.add(new ToggleButton(dragAction));
 		toolBar.add(new ToggleButton(startAction));
 
 		//Start drawingToolBar
-		toolBar.addSeparator();
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
+		drawingToolBar.addSeparator();
 
 		//Normal arraw
 		drawingToolBar.add(new ToggleButton(selectAction));
@@ -586,20 +585,27 @@ EOC */
 		drawingToolBar.addSeparator();
 		drawingToolBar.add(tokenAction);
 		drawingToolBar.add(deleteTokenAction);
-
-		//Add drawingtoolbar to toolbar
-		drawingToolBar.addSeparator();
-		//toolBar.add(drawingToolBar);
 		
-		
+		//Create panel to put toolbars in
 		Panel toolBarPanel = new Panel();
 		toolBarPanel.setLayout(new FlowLayout(0,0,0));
 
+		//Add toolbars to pane
 		toolBarPanel.add(toolBar);
 		toolBarPanel.add(drawingToolBar);
-		toolBarPanel.add(Box.createHorizontalGlue());
 			
-		getContentPane().add(toolBarPanel,BorderLayout.PAGE_START);
+		//Create a toolBarPaneltmp usign broderlayout and a spacer to get toolbar to fill
+		// the screen
+		Panel toolBarPaneltmp = new Panel();
+		toolBarPaneltmp.setLayout(new BorderLayout());
+		toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
+		JToolBar spacer = new JToolBar();
+		spacer.addSeparator();
+		spacer.setFloatable(false);
+		toolBarPaneltmp.add(spacer, BorderLayout.CENTER);
+		
+		//Add to GUI
+		getContentPane().add(toolBarPaneltmp,BorderLayout.PAGE_START);
 	}
 
 	/**
