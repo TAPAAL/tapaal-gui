@@ -6,6 +6,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import dk.aau.cs.debug.Logger;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 
@@ -111,19 +113,19 @@ public class TAPNtoUppaalTransformer {
 			
 			if (symmetricreduction && drawnice && removeUnused){
 				a=createTemplateReductionNiceDrawingRemoveUnused(uppaalXML,	p, i);
-				System.out.println("remove unused");
+				Logger.log("remove unused");
 			} else if (!symmetricreduction && !drawnice){
 				a = createTemplate(uppaalXML, p, i);
-				System.out.println("normal used");
+				Logger.log("normal used");
 			} else if (!symmetricreduction && drawnice){
-				System.out.println("Created with drawnice");
+				Logger.log("Created with drawnice");
 				a = createTemplateNiceDrawing(uppaalXML, p, i);
 			}else if (drawnice && symmetricreduction){
 				a = createTemplateReductionNiceDrawing(uppaalXML, p, i);
-				System.out.println("drawnice used");			
+				Logger.log("drawnice used");			
 			}else {
 				a = createTemplateReduction(uppaalXML, p, i);
-				System.out.println("default used");
+				Logger.log("default used");
 			}
 			
 			String b = a.toString();
@@ -284,7 +286,7 @@ public class TAPNtoUppaalTransformer {
 					}				
 					tmp.append("<label kind=\"synchronisation\" x=\"200\" y=\"120\">"+ t.getName() +  symbol +"</label>\n");
 					
-					System.out.println(a.getTarget());
+					Logger.log(a.getTarget());
 					
 					if (nontransportplaces.get(0).getName().equals("P_capacity")){
 						tmp.append("<label kind=\"assignment\" x=\"10\" y=\"300\">x:=0, g["+ templatenumber +"]:=1</label>\n");
@@ -447,7 +449,7 @@ public class TAPNtoUppaalTransformer {
 	
 	
 	private StringBuffer createTemplateReductionNiceDrawing(PrintStream uppaalXML2, Place initialPlace, int templatenumber) {
-		System.out.println("GoGoGo");
+		Logger.log("GoGoGo");
 		StringBuffer tmp = new StringBuffer();
 
 		// Create the xml for the model
@@ -508,7 +510,7 @@ public class TAPNtoUppaalTransformer {
 			//We let presetPlaceOne and postsetPlaceTwo be the locking chanin.
 			if ( !((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ){
 				//Swap them
-				System.out.println("Swaped arc one " + presetPlaceOne.getSource().getName() + "hmm " + presetPlaceOne.getSource().getName().equals("P_lock") );
+				Logger.log("Swaped arc one " + presetPlaceOne.getSource().getName() + "hmm " + presetPlaceOne.getSource().getName().equals("P_lock") );
 				Arc swap = presetPlaceTwo;
 				presetPlaceTwo = presetPlaceOne;
 				presetPlaceOne = swap;
@@ -516,17 +518,17 @@ public class TAPNtoUppaalTransformer {
 
 			if (!((postsetPlaceOne.getTarget().getName().contains("_im")) || (postsetPlaceOne.getTarget().getName().equals("P_lock")))){
 				//Swap them
-				System.out.println("Swaped arc two " + presetPlaceOne.getSource().getName() );
+				Logger.log("Swaped arc two " + presetPlaceOne.getSource().getName() );
 				Arc swap = postsetPlaceTwo;
 				postsetPlaceTwo = postsetPlaceOne;
 				postsetPlaceOne = swap;
 			}
 
-			System.out.println(presetPlaceOne);
-			System.out.println(postsetPlaceOne);
+			Logger.log(presetPlaceOne);
+			Logger.log(postsetPlaceOne);
 			
-			System.out.println(presetPlaceTwo);
-			System.out.println(postsetPlaceTwo);
+			Logger.log(presetPlaceTwo);
+			Logger.log(postsetPlaceTwo);
 
 			// Add first arc, we know this is in the chain. 
 			tmp.append("<transition>\n");
@@ -640,7 +642,7 @@ public class TAPNtoUppaalTransformer {
 			
 			id.add(p);
 			
-			System.out.println(id.indexOf(p));
+			Logger.log(id.indexOf(p));
 			
 			int xcord = 0, ycord = 0;
 
@@ -682,7 +684,7 @@ public class TAPNtoUppaalTransformer {
 			Arc postsetPlaceOne = t.getPostset().get(0);
 			Arc postsetPlaceTwo = t.getPostset().get(1);
 
-			System.out.println(id.indexOf(postsetPlaceOne));
+			Logger.log(id.indexOf(postsetPlaceOne));
 			
 			//We let presetPlaceOne and postsetPlaceTwo be the locking chanin.
 			if ( !((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ){

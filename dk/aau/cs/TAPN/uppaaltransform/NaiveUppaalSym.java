@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
@@ -99,7 +100,7 @@ public class NaiveUppaalSym implements UppaalTransformer {
 		a = createTemplateControl(tokens);
 		uppaalXML.append(a);
 		
-		System.out.println("Finished Control token");
+		Logger.log("Finished Control token");
 		
 		a = createTemplateByModel(model,tokens, true);
 		uppaalXML.append(a);
@@ -173,7 +174,7 @@ public class NaiveUppaalSym implements UppaalTransformer {
 	}
 
 	private StringBuffer createTemplateByModel(TAPN model, ArrayList<Place> tokens, boolean lock) {
-		System.out.println("GoGoGo");
+		Logger.log("GoGoGo");
 		StringBuffer tmp = new StringBuffer();
 
 		// Create the xml for the model
@@ -264,7 +265,7 @@ public class NaiveUppaalSym implements UppaalTransformer {
 			//We let presetPlaceOne and postsetPlaceTwo be the locking chanin.
 			if ( !((presetPlaceOne.getSource().getName().contains("_im")) || (presetPlaceOne.getSource().getName().equals("P_lock"))) ){
 				//Swap them
-				System.out.println("Swaped arc one " + presetPlaceOne.getSource().getName() + "hmm " + presetPlaceOne.getSource().getName().equals("P_lock") );
+				Logger.log("Swaped arc one " + presetPlaceOne.getSource().getName() + "hmm " + presetPlaceOne.getSource().getName().equals("P_lock") );
 				Arc swap = presetPlaceTwo;
 				presetPlaceTwo = presetPlaceOne;
 				presetPlaceOne = swap;
@@ -272,17 +273,17 @@ public class NaiveUppaalSym implements UppaalTransformer {
 
 			if (!((postsetPlaceOne.getTarget().getName().contains("_im")) || (postsetPlaceOne.getTarget().getName().equals("P_lock")))){
 				//Swap them
-				System.out.println("Swaped arc two " + presetPlaceOne.getSource().getName() );
+				Logger.log("Swaped arc two " + presetPlaceOne.getSource().getName() );
 				Arc swap = postsetPlaceTwo;
 				postsetPlaceTwo = postsetPlaceOne;
 				postsetPlaceOne = swap;
 			}
 
-			System.out.println(presetPlaceOne);
-			System.out.println(postsetPlaceOne);
+			Logger.log(presetPlaceOne);
+			Logger.log(postsetPlaceOne);
 			
-			System.out.println(presetPlaceTwo);
-			System.out.println(postsetPlaceTwo);
+			Logger.log(presetPlaceTwo);
+			Logger.log(postsetPlaceTwo);
 
 			// Add first arc, we know this is in the chain. 
 			tmp.append("<transition>\n");

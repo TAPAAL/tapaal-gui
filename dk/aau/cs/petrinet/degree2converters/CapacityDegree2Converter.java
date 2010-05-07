@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.Location;
@@ -63,7 +64,7 @@ public class CapacityDegree2Converter implements Degree2Converter {
 			//If notpresets intersects postset
 			List<Place> intersection = new ArrayList<Place>(t.getPresetPlaces());
 			intersection.retainAll(t.getPostsetPlaces());
-			System.out.println("Size2" + intersection.size());
+			Logger.log("Size2" + intersection.size());
 			
 			if ( intersection.size() == 0) {
 //				 No cycles, we can move tokens directly

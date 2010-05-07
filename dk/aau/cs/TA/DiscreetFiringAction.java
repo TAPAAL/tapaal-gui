@@ -3,6 +3,8 @@ package dk.aau.cs.TA;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import dk.aau.cs.debug.Logger;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
 
@@ -39,7 +41,7 @@ public class DiscreetFiringAction implements FiringAction {
 		//XXX  - This will break if two tokens from the same place is consumed
 		ArrayList<Float> tmp = new ArrayList<Float>();
 		tmp.add(token);
-		System.out.println("added place "+ place);
+		Logger.log("added place "+ place);
 		consumedTokens.put(place, tmp);
 		
 	}

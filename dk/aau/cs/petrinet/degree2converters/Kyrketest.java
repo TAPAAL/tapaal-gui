@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.PlaceTransitionObject;
@@ -89,7 +90,7 @@ public class Kyrketest {
 			} else{
 				// The normal way
 
-				System.out.println("Making normal degree-2 reduction");
+				Logger.log("Making normal degree-2 reduction");
 			}
 
 		}
@@ -218,7 +219,7 @@ public class Kyrketest {
 	private StringBuffer createTemplateReduction(PrintStream uppaalXML2, Place initialPlace, int templatenumber) {
 		StringBuffer tmp = new StringBuffer();
 
-		System.out.println("Creating stuff");
+		Logger.log("Creating stuff");
 		// Create the xml for the model
 		tmp.append("<template>\n");
 
@@ -286,7 +287,7 @@ public class Kyrketest {
 						!((presetPlaceTwo.getSource().getName().contains("_im")) || (presetPlaceTwo.getSource().getName().equals("P_lock")))) && 
 						templatenumber!=0){
 
-					System.out.println("Hmm the new way " + templatenumber );
+					Logger.log("Hmm the new way " + templatenumber );
 					//It the new way 
 					tmp.append(createTransition(t.getPreset().get(0), t.getPostset().get(0), t.getName(), templatenumber, '!'));
 					tmp.append(createTransition(t.getPreset().get(1), t.getPostset().get(1), t.getName(),templatenumber, '?'));
@@ -294,7 +295,7 @@ public class Kyrketest {
 				} else {
 					//Its the old way
 
-					System.out.println("The old way!!");
+					Logger.log("The old way!!");
 
 				}
 
