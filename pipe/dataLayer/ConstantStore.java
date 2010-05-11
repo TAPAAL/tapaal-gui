@@ -112,14 +112,13 @@ public class ConstantStore {
 		return largest;
 	}
 
-	public void buildConstraints(ArrayList<Place> places, ArrayList<Arc> arcs) {
+	public void buildConstraints(ArrayList<Place> places, ArrayList<Arc> arcs, boolean isUsingColors) {
 		for(Constant c : constants.values()){
 			c.reset();
 		}
 
-		boolean isNotUsingColors = !CreateGui.getModel().isUsingColors();
 		for(Place place : places){
-			if(isNotUsingColors){
+			if(!isUsingColors){
 				if(place instanceof TimedPlace){
 					TimedPlace tp = (TimedPlace)place;
 					String inv = tp.getInvariant();
@@ -142,7 +141,7 @@ public class ConstantStore {
 		}
 
 		for(Arc arc : arcs){
-			if(isNotUsingColors){
+			if(!isUsingColors){
 				if(arc instanceof TimedArc || arc instanceof TransportArc){
 					buildConstraint((TimedArc)arc);
 				}

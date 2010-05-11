@@ -4354,7 +4354,7 @@ implements Cloneable {
 
 
 	public void buildConstraints() {
-		constants.buildConstraints(placesArray,arcsArray);
+		constants.buildConstraints(placesArray,arcsArray, isUsingColors());
 	}	
 
 	public boolean hasTAPNInhibitorArcs(){ // TODO: Fix this to make it faster

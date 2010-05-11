@@ -211,7 +211,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			TimedArcPetriNet model) {
 
 		for(TAPNTransition transition : model.getTransitions()){
-			//if(!transition.isDegree2() || transition.hasInhibitorArcs()){
+			if(!transition.isDegree2() || transition.hasInhibitorArcs()){
 				String invariant = createInvariantForControl(transition);
 
 				Location tempLoc = new Location("",invariant);
@@ -231,7 +231,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 						String.format(FIRE_CHANNEL_NAME, transition.getName(), "!"),
 						createResetExpressionForControl(transition));
 				control.addTransition(fireEdge);
-			//}	
+			}	
 		}
 	}
 
@@ -393,12 +393,12 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 				largestPresetSize = presetSize;
 			}
 
-//			if(t.isDegree2() && !t.hasInhibitorArcs()){
-//				createDegree2Structure(ta,t);
-//			}else{
+			if(t.isDegree2() && !t.hasInhibitorArcs()){
+				createDegree2Structure(ta,t);
+			}else{
 				List<Pairing> pairing = CreatePairing(t);
 				createStructureForPairing(ta, t, pairing);
-//			}
+			}
 		}	
 	}
 
