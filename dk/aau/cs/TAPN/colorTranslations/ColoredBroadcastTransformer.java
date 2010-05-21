@@ -105,11 +105,13 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 
 			guard.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME));
 
-			String invString = targetTimeInvariant.convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
-			if(guard.length() > 0 && !invString.isEmpty()){
-				guard.append(" && ");
-			}		
-			guard.append(invString);
+			if(!inputArc.getPreservation().equals(Preservation.Value)){
+				String invString = targetTimeInvariant.convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
+				if(guard.length() > 0 && !invString.isEmpty()){
+					guard.append(" && ");
+				}		
+				guard.append(invString);
+			}
 
 			ColorSet colorGuard = inputArc.getColorGuard();
 
@@ -130,12 +132,12 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		}
 		return guard.toString();
 	}
-	
-	
+
+
 	@Override
 	protected String createResetExpressionIfNormalArc(Arc arc) {
 		String clockReset = String.format("%1$s := 0", TOKEN_CLOCK_NAME);
-		
+
 		if(arc instanceof ColoredOutputArc){
 			int value = ((ColoredOutputArc)arc).getOutputValue();
 			String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
@@ -153,28 +155,28 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 			}
 		}
 	}
-	
+
 	@Override
 	protected String convertInvariant(TAPNPlace place) {
 		ColoredPlace cp = (ColoredPlace)place;
-		
+
 		String timeInvariant = cp.getTimeInvariant().convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
 		String colorInvariant = cp.getColorInvariant().convertToTAGuardString(VALUE_VAR_NAME);
-		
+
 		String invariant = timeInvariant;
 		if(!invariant.isEmpty() && !colorInvariant.isEmpty()){
 			invariant += " && ";
 		}
 		invariant += colorInvariant;
-		
+
 		return invariant;
 	}
-		
-	
+
+
 	@Override
 	protected String createUpdateExpressionForTokenInitialization(Token token) {
 		ColoredToken ct = (ColoredToken)token;
-		
+
 		return String.format("%1$s := %2$d", VALUE_VAR_NAME, ct.getColor());
 	}
 }
