@@ -146,7 +146,7 @@ public class CmdTranslator {
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + 1 + tapn.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
@@ -160,7 +160,7 @@ public class CmdTranslator {
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + tapn.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.query, capacity + 1 + tapn.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
