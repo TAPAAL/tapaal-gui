@@ -1521,6 +1521,7 @@ EOC */
 
 		public void actionPerformed(ActionEvent e){
 			createNewTabFromFile(filename, false);
+			CreateGui.createLeftPane();
 		}
 
 	}
