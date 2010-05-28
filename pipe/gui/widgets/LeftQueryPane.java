@@ -156,8 +156,10 @@ public class LeftQueryPane extends JPanel {
 		addQueryButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				TAPNQuery q = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, null);
-				addQuery(q);
-				showQueries();
+				if (q != null){
+					addQuery(q);
+					showQueries();
+				}
 			}
 		});
 
