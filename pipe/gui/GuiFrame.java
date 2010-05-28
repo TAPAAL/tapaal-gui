@@ -4,6 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -24,6 +29,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -33,6 +39,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
@@ -157,13 +165,15 @@ implements ActionListener, Observer {
 		try {
 			//Set the Look and Feel native for the system.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			
+
 			//2010-05-07, Kenneth Yrke Jørgensen:
 			//If the native look and feel is GTK replace the useless open dialog, 
 			//with a java-reimplementation. 		
+
 			//if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
 			//	UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
 			//}
+
 		} catch (Exception exc) {
 			System.err.println("Error loading L&F: " + exc);
 		}
@@ -251,279 +261,280 @@ implements ActionListener, Observer {
 			new FileAction("Export to Uppaal, Symetric","Export the to Uppaal format, with symetricreduction",""));
 		addMenuItem(exportMenu, exportToTest =
 			new FileAction("Export a Degree-2 net","Export the to Uppaal format",""));
-<<<<<<< TREE
 		 */	
 		fileMenu.add(exportMenu);
 
-		 fileMenu.addSeparator();
-		 addMenuItem(fileMenu, printAction  =
-			 new FileAction("Print",  "Print","ctrl P"));
-		 fileMenu.addSeparator();
+		fileMenu.addSeparator();
+		addMenuItem(fileMenu, printAction  =
+			new FileAction("Print",  "Print","ctrl P"));
+		fileMenu.addSeparator();
 
-		 // Example files menu
-		 try {
-			 URL examplesDirURL = Thread.currentThread().getContextClassLoader().
-			 getResource("Example nets" + System.getProperty("file.separator"));
+		// Example files menu
+		try {
+			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
+			getResource("Example nets" + System.getProperty("file.separator"));
 
-			 if (JarUtilities.isJarFile(examplesDirURL)){
+			if (JarUtilities.isJarFile(examplesDirURL)){
 
-				 JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
+				JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
 
-				 ArrayList <JarEntry> nets =
-					 JarUtilities.getJarEntries(jarFile, "Example nets");
+				ArrayList <JarEntry> nets =
+					JarUtilities.getJarEntries(jarFile, "Example nets");
 
-				 Arrays.sort(nets.toArray(), new Comparator(){
-					 public int compare(Object one, Object two) {
-						 return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
-					 }
-				 });
+				Arrays.sort(nets.toArray(), new Comparator(){
+					public int compare(Object one, Object two) {
+						return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
+					}
+				});
 
-				 if (nets.size() > 0) {
-					 JMenu exampleMenu=new JMenu("Example nets");
-					 exampleMenu.setIcon(
-							 new ImageIcon(Thread.currentThread().getContextClassLoader().
-									 getResource(CreateGui.imgPath + "Example.png")));
-					 int index = 0;
-					 for (int i = 0; i < nets.size(); i++){
-						 if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
-							 addMenuItem(exampleMenu,
-									 new ExampleFileAction(nets.get(i),
-											 (index < 10) ?("ctrl " + index) :null));
-							 index++;
-						 }
-					 }
-					 fileMenu.add(exampleMenu);
-					 fileMenu.addSeparator();
-				 }
-			 } else {
-				 File examplesDir = new File(examplesDirURL.toURI());
-				 /**
-				  * The next block fixes a problem that surfaced on Mac OSX with
-				  * PIPE 2.4. In that environment (and not in Windows) any blanks
-				  * in the project name in Eclipse are property converted to '%20'
-				  * but the blank in "Example nets" is not. The following code
-				  * will do nothing on a Windows machine or if the logic on OSX
-				  * changess. I also added a stack trace so if the problem
-				  * occurs for another environment (perhaps multiple blanks need
-				  * to be manually changed) it can be easily fixed.  DP
-				  */
-				 // examplesDir = new File(new URI(examplesDirURL.toString()));
-				 String dirURLString = examplesDirURL.toString();
-				 int index = dirURLString.indexOf( " " );
-				 if ( index > 0 ) {
-					 StringBuffer sb = new StringBuffer( dirURLString );
-					 sb.replace( index, index + 1, "%20" );
-					 dirURLString = sb.toString();
-				 }
+				if (nets.size() > 0) {
+					JMenu exampleMenu=new JMenu("Example nets");
+					exampleMenu.setIcon(
+							new ImageIcon(Thread.currentThread().getContextClassLoader().
+									getResource(CreateGui.imgPath + "Example.png")));
+					int index = 0;
+					for (int i = 0; i < nets.size(); i++){
+						if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
+							addMenuItem(exampleMenu,
+									new ExampleFileAction(nets.get(i),
+											(index < 10) ?("ctrl " + index) :null));
+							index++;
+						}
+					}
+					fileMenu.add(exampleMenu);
+					fileMenu.addSeparator();
+				}
+			} else {
+				File examplesDir = new File(examplesDirURL.toURI());
+				/**
+				 * The next block fixes a problem that surfaced on Mac OSX with
+				 * PIPE 2.4. In that environment (and not in Windows) any blanks
+				 * in the project name in Eclipse are property converted to '%20'
+				 * but the blank in "Example nets" is not. The following code
+				 * will do nothing on a Windows machine or if the logic on OSX
+				 * changess. I also added a stack trace so if the problem
+				 * occurs for another environment (perhaps multiple blanks need
+				 * to be manually changed) it can be easily fixed.  DP
+				 */
+				// examplesDir = new File(new URI(examplesDirURL.toString()));
+				String dirURLString = examplesDirURL.toString();
+				int index = dirURLString.indexOf( " " );
+				if ( index > 0 ) {
+					StringBuffer sb = new StringBuffer( dirURLString );
+					sb.replace( index, index + 1, "%20" );
+					dirURLString = sb.toString();
+				}
 
-				 examplesDir = new File( new URI(dirURLString ) );
+				examplesDir = new File( new URI(dirURLString ) );
 
-				 File[] nets = examplesDir.listFiles();
+				File[] nets = examplesDir.listFiles();
 
-				 Arrays.sort(nets,new Comparator(){
-					 public int compare(Object one, Object two) {
+				Arrays.sort(nets,new Comparator(){
+					public int compare(Object one, Object two) {
 
-						 int toReturn=((File)one).getName().compareTo(((File)two).getName());
-						 //Special hack to get intro-example first
-						 if (((File)one).getName().equals("intro-example.xml")){toReturn=-1;}
-						 if (((File)two).getName().equals("intro-example.xml")){toReturn=1;}
-						 return toReturn;
-					 }
-				 });
+						int toReturn=((File)one).getName().compareTo(((File)two).getName());
+						//Special hack to get intro-example first
+						if (((File)one).getName().equals("intro-example.xml")){toReturn=-1;}
+						if (((File)two).getName().equals("intro-example.xml")){toReturn=1;}
+						return toReturn;
+					}
+				});
 
-				 // Oliver Haggarty - fixed code here so that if folder contains non
-				 // .xml file the Example x counter is not incremented when that file
-				 // is ignored
-				 if (nets.length > 0) {
-					 JMenu exampleMenu=new JMenu("Example nets");
-					 exampleMenu.setIcon(
-							 new ImageIcon(Thread.currentThread().getContextClassLoader().
-									 getResource(CreateGui.imgPath + "Example.png")));
-					 int k = 0;
-					 for (int i = 0; i < nets.length; i++){
-						 if(nets[i].getName().toLowerCase().endsWith(".xml")){
-							 addMenuItem(exampleMenu,
-									 new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
-						 }
-					 }
-					 fileMenu.add(exampleMenu);
-					 fileMenu.addSeparator();
-				 }
-			 }
-		 } catch (Exception e) {
-			 System.err.println("Error getting example files:" + e);
-			 e.printStackTrace();
-		 }
-		 addMenuItem(fileMenu, exitAction =
-			 new FileAction("Exit", "Close the program", "ctrl Q"));
+				// Oliver Haggarty - fixed code here so that if folder contains non
+				// .xml file the Example x counter is not incremented when that file
+				// is ignored
+				if (nets.length > 0) {
+					JMenu exampleMenu=new JMenu("Example nets");
+					exampleMenu.setIcon(
+							new ImageIcon(Thread.currentThread().getContextClassLoader().
+									getResource(CreateGui.imgPath + "Example.png")));
+					int k = 0;
+					for (int i = 0; i < nets.length; i++){
+						if(nets[i].getName().toLowerCase().endsWith(".xml")){
+							addMenuItem(exampleMenu,
+									new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
+						}
+					}
+					fileMenu.add(exampleMenu);
+					fileMenu.addSeparator();
+				}
+			}
+		} catch (Exception e) {
+			System.err.println("Error getting example files:" + e);
+			e.printStackTrace();
+		}
+		addMenuItem(fileMenu, exitAction =
+			new FileAction("Exit", "Close the program", "ctrl Q"));
 
-		 JMenu editMenu = new JMenu("Edit");
-		 editMenu.setMnemonic('E');
-		 addMenuItem(editMenu, undoAction =
-			 new EditAction("Undo", "Undo (Ctrl-Z)", "ctrl Z"));
-		 addMenuItem(editMenu, redoAction =
-			 new EditAction("Redo", "Redo (Ctrl-Y)","ctrl Y"));
-		 editMenu.addSeparator();
-		 /*		
+		JMenu editMenu = new JMenu("Edit");
+		editMenu.setMnemonic('E');
+		addMenuItem(editMenu, undoAction =
+			new EditAction("Undo", "Undo (Ctrl-Z)", "ctrl Z"));
+		addMenuItem(editMenu, redoAction =
+			new EditAction("Redo", "Redo (Ctrl-Y)","ctrl Y"));
+		editMenu.addSeparator();
+		/*		
 		addMenuItem(editMenu, cutAction =
 			new EditAction("Cut", "Cut (Ctrl-X)","ctrl X"));
 		addMenuItem(editMenu, copyAction =
 			new EditAction("Copy", "Copy (Ctrl-C)","ctrl C"));
 		addMenuItem(editMenu, pasteAction =
 			new EditAction("Paste", "Paste (Ctrl-V)","ctrl V"));
-		  */		addMenuItem(editMenu, deleteAction =
-			  new DeleteAction("Delete", "Delete selection","DELETE"));
+		 */		addMenuItem(editMenu, deleteAction =
+			 new DeleteAction("Delete", "Delete selection","DELETE"));
 
-		  // Bind delete to backspace also
-		  editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"),"Delete");
-		  editMenu.getActionMap().put("Delete", deleteAction);
+		 // Bind delete to backspace also
+		 editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"),"Delete");
+		 editMenu.getActionMap().put("Delete", deleteAction);
 
 
-		  JMenu drawMenu = new JMenu("Draw");
-		  drawMenu.setMnemonic('D');
-		  addMenuItem(drawMenu, selectAction =
-			  new TypeAction("Select", Pipe.SELECT, "Select components","S",true));
-		  drawMenu.addSeparator();
+		 JMenu drawMenu = new JMenu("Draw");
+		 drawMenu.setMnemonic('D');
+		 addMenuItem(drawMenu, selectAction =
+			 new TypeAction("Select", Pipe.SELECT, "Select components","S",true));
+		 drawMenu.addSeparator();
 
-		  //kyrke inserted timed place
-		  addMenuItem(drawMenu, timedPlaceAction =
-			  new TypeAction("Place", Pipe.TAPNPLACE, "Add a place","L",true));
-		  //jokke removed normal places
-		  //		addMenuItem(drawMenu, placeAction =
-		  //		new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
+		 //kyrke inserted timed place
+		 addMenuItem(drawMenu, timedPlaceAction =
+			 new TypeAction("Place", Pipe.TAPNPLACE, "Add a place","L",true));
+		 //jokke removed normal places
+		 //		addMenuItem(drawMenu, placeAction =
+		 //		new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
 
-		  addMenuItem(drawMenu, transAction =
-			  new TypeAction("Transition", Pipe.TAPNTRANS,
-					  "Add a transition","I",true));
+		 addMenuItem(drawMenu, transAction =
+			 new TypeAction("Transition", Pipe.TAPNTRANS,
+					 "Add a transition","I",true));
 
-		  /*addMenuItem(drawMenu, transAction =
+		 /*addMenuItem(drawMenu, transAction =
 			new TypeAction("Transition", Pipe.IMMTRANS,
 					"Add an immediate transition","I",true));*/
-		  /* CB Joakim Byg - Not part of the model
+		 /* CB Joakim Byg - Not part of the model
       addMenuItem(drawMenu, timedtransAction  =
               new TypeAction("Timed transition", Pipe.TIMEDTRANS,
               "Add a timed transition","T",true));
 EOC */              
-		  /* CB Jiri Srba - Not part of the model
+		 /* CB Jiri Srba - Not part of the model
          addMenuItem(drawMenu, arcAction = new TypeAction("Arc", Pipe.ARC, "Add an arc","A",true));" +
 EOC */
 
-		  /*CB Joakim Byg - Adding timed arcs*/
-		  addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc", Pipe.TAPNARC, "Add an arc","R",true));
+		 /*CB Joakim Byg - Adding timed arcs*/
+		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc", Pipe.TAPNARC, "Add an arc","R",true));
 
-		  addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
-		  /*EOC*/
+		 addMenuItem(drawMenu, transportArcAction = new TypeAction("Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "", true));
+		 /*EOC*/
 
-		  addMenuItem(drawMenu, inhibarcAction =
-			  new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
-					  "Add an inhibitor arc", "H",true));              
 
-		  addMenuItem(drawMenu, annotationAction =
-			  new TypeAction("Annotation", Pipe.ANNOTATION,
-					  "Add an annotation","N",true));
-		  drawMenu.addSeparator();
-		  addMenuItem(drawMenu, tokenAction =
-			  new TypeAction("Add token", Pipe.ADDTOKEN, "Add a token", "ADD", true));
-		  addMenuItem(drawMenu, deleteTokenAction =
-			  new TypeAction("Delete token", Pipe.DELTOKEN, "Delete a token",
-					  "SUBTRACT",true));
-		  /*drawMenu.addSeparator();*/
-		  /*		addMenuItem(drawMenu, rateAction =
+		 addMenuItem(drawMenu, inhibarcAction =
+			 new TypeAction("Inhibitor Arc", Pipe.TAPNINHIBITOR_ARC,
+					 "Add an inhibitor arc", "H",true));              
+
+		 addMenuItem(drawMenu, annotationAction =
+			 new TypeAction("Annotation", Pipe.ANNOTATION,
+					 "Add an annotation","N",true));
+		 drawMenu.addSeparator();
+		 addMenuItem(drawMenu, tokenAction =
+			 new TypeAction("Add token", Pipe.ADDTOKEN, "Add a token", "ADD", true));
+		 addMenuItem(drawMenu, deleteTokenAction =
+			 new TypeAction("Delete token", Pipe.DELTOKEN, "Delete a token",
+					 "SUBTRACT",true));
+
+		 /*drawMenu.addSeparator();*/
+		 /*		addMenuItem(drawMenu, rateAction =
 			new TypeAction("Rate Parameter", Pipe.RATE, "Rate Parameter",
 					"R",true));
-		   */					
-		  /*addMenuItem(drawMenu, markingAction =
+		  */					
+		 /*addMenuItem(drawMenu, markingAction =
 			new TypeAction("Marking Parameter", Pipe.MARKING, "Marking Parameter",
 					"M",true));*/
 
-		  JMenu viewMenu = new JMenu("View");
-		  viewMenu.setMnemonic('V');
+		 JMenu viewMenu = new JMenu("View");
+		 viewMenu.setMnemonic('V');
 
-		  JMenu zoomMenu=new JMenu("Zoom");
-		  zoomMenu.setIcon(
-				  new ImageIcon(Thread.currentThread().getContextClassLoader().
-						  getResource(CreateGui.imgPath + "Zoom.png")));
-		  addZoomMenuItems(zoomMenu);
+		 JMenu zoomMenu=new JMenu("Zoom");
+		 zoomMenu.setIcon(
+				 new ImageIcon(Thread.currentThread().getContextClassLoader().
+						 getResource(CreateGui.imgPath + "Zoom.png")));
+		 addZoomMenuItems(zoomMenu);
 
-		  addMenuItem(viewMenu, zoomOutAction =
-			  new ZoomAction("Zoom out","Zoom out by 10% ", "ctrl MINUS"));
-		  addMenuItem(viewMenu, zoomInAction =
-			  new ZoomAction("Zoom in","Zoom in by 10% ", "ctrl PLUS"));
-		  viewMenu.add(zoomMenu);
+		 addMenuItem(viewMenu, zoomOutAction =
+			 new ZoomAction("Zoom out","Zoom out by 10% ", "ctrl MINUS"));
+		 addMenuItem(viewMenu, zoomInAction =
+			 new ZoomAction("Zoom in","Zoom in by 10% ", "ctrl PLUS"));
+		 viewMenu.add(zoomMenu);
 
-		  viewMenu.addSeparator();
-		  addMenuItem(viewMenu, toggleGrid =
-			  new GridAction("Cycle grid", "Change the grid size", "G"));
-		  addMenuItem(viewMenu, dragAction =
-			  new TypeAction("Drag", Pipe.DRAG, "Drag the drawing", "D", true));
+		 viewMenu.addSeparator();
+		 addMenuItem(viewMenu, toggleGrid =
+			 new GridAction("Cycle grid", "Change the grid size", "G"));
+		 addMenuItem(viewMenu, dragAction =
+			 new TypeAction("Drag", Pipe.DRAG, "Drag the drawing", "D", true));
 
 
-		  JMenu animateMenu = new JMenu("Simulator");
-		  animateMenu.setMnemonic('A');
-		  addMenuItem(animateMenu, startAction =
-			  new AnimateAction("Simulation mode", Pipe.START,
-					  "Toggle Simulation Mode", "Ctrl A", true));
-		  animateMenu.addSeparator();
-		  addMenuItem(animateMenu, stepbackwardAction =
-			  new AnimateAction("Back", Pipe.STEPBACKWARD,
-					  "Step backward a firing", "typed 4"));
-		  addMenuItem(animateMenu, stepforwardAction  =
-			  new AnimateAction("Forward", Pipe.STEPFORWARD,
-					  "Step forward a firing", "typed 6"));
+		 JMenu animateMenu = new JMenu("Simulator");
+		 animateMenu.setMnemonic('A');
+		 addMenuItem(animateMenu, startAction =
+			 new AnimateAction("Simulation mode", Pipe.START,
+					 "Toggle Simulation Mode", "Ctrl A", true));
+		 animateMenu.addSeparator();
+		 addMenuItem(animateMenu, stepbackwardAction =
+			 new AnimateAction("Back", Pipe.STEPBACKWARD,
+					 "Step backward a firing", "typed 4"));
+		 addMenuItem(animateMenu, stepforwardAction  =
+			 new AnimateAction("Forward", Pipe.STEPFORWARD,
+					 "Step forward a firing", "typed 6"));
 
-		  addMenuItem(animateMenu, timeAction = new AnimateAction("Time", Pipe.TIMEPASS, "Let time pass", "_"));
+		 addMenuItem(animateMenu, timeAction = new AnimateAction("Time", Pipe.TIMEPASS, "Let time pass", "_"));
 
-		  /*addMenuItem(animateMenu, randomAction =
+		 /*addMenuItem(animateMenu, randomAction =
               new AnimateAction("Random", Pipe.RANDOM,
               "Randomly fire a transition", "typed 5"));
       addMenuItem(animateMenu, randomAnimateAction =
               new AnimateAction("Simulate", Pipe.ANIMATE,
               "Randomly fire a number of transitions", "typed 7",true));*/
-		  randomAction =
-			  new AnimateAction("Random", Pipe.RANDOM,
-					  "Randomly fire a transition", "typed 5");
-		  randomAnimateAction =
-			  new AnimateAction("Simulate", Pipe.ANIMATE,
-					  "Randomly fire a number of transitions", "typed 7",true);      
+		 randomAction =
+			 new AnimateAction("Random", Pipe.RANDOM,
+					 "Randomly fire a transition", "typed 5");
+		 randomAnimateAction =
+			 new AnimateAction("Simulate", Pipe.ANIMATE,
+					 "Randomly fire a number of transitions", "typed 7",true);      
 
-		  // XXX - kyrke - by some reason the animation actions started to be enabled when 
-		  //starting TAPAAL, so for now de just disable them here :s
-		  stepbackwardAction.setEnabled(false);
-		  stepforwardAction.setEnabled(false);
-		  timeAction.setEnabled(false);
-		  randomAction.setEnabled(false);
-		  randomAnimateAction.setEnabled(false);
+		 // XXX - kyrke - by some reason the animation actions started to be enabled when 
+		 //starting TAPAAL, so for now de just disable them here :s
+		 stepbackwardAction.setEnabled(false);
+		 stepforwardAction.setEnabled(false);
+		 timeAction.setEnabled(false);
+		 randomAction.setEnabled(false);
+		 randomAnimateAction.setEnabled(false);
 
-		  JMenu helpMenu = new JMenu("Help");
-		  helpMenu.setMnemonic('H');
-		  helpAction = new HelpBox("Help", "View documentation", "F1", "index.htm");
+		 JMenu helpMenu = new JMenu("Help");
+		 helpMenu.setMnemonic('H');
+		 helpAction = new HelpBox("Help", "View documentation", "F1", "index.htm");
 
-		  addMenuItem(helpMenu,helpAction);
-		  JMenuItem aboutItem = helpMenu.add("About");
-		  aboutItem.addActionListener(this); // Help - About is implemented differently
+		 addMenuItem(helpMenu,helpAction);
+		 JMenuItem aboutItem = helpMenu.add("About");
+		 aboutItem.addActionListener(this); // Help - About is implemented differently
 
-		  URL iconURL = Thread.currentThread().getContextClassLoader().
-		  getResource(CreateGui.imgPath + "About.png");
-		  if (iconURL != null) {
-			  aboutItem.setIcon(new ImageIcon(iconURL));
-		  }
+		 URL iconURL = Thread.currentThread().getContextClassLoader().
+		 getResource(CreateGui.imgPath + "About.png");
+		 if (iconURL != null) {
+			 aboutItem.setIcon(new ImageIcon(iconURL));
+		 }
 
-		  JMenu experimentMenu = new JMenu("Experiment");
-		  addMenuItem(experimentMenu, loadExperimentAction =
-			  new ExperimentAction("Load experiment", "Load an experiment file",""));
-		  addMenuItem(experimentMenu, experimentEditorAction =
-			  new ExperimentAction("Experiment Editor", "Start the experiment editor",""));
+		 JMenu experimentMenu = new JMenu("Experiment");
+		 addMenuItem(experimentMenu, loadExperimentAction =
+			 new ExperimentAction("Load experiment", "Load an experiment file",""));
+		 addMenuItem(experimentMenu, experimentEditorAction =
+			 new ExperimentAction("Experiment Editor", "Start the experiment editor",""));
 
-		  menuBar.add(fileMenu);
-		  menuBar.add(editMenu);
-		  menuBar.add(viewMenu);
-		  menuBar.add(drawMenu);
+		 menuBar.add(fileMenu);
+		 menuBar.add(editMenu);
+		 menuBar.add(viewMenu);
+		 menuBar.add(drawMenu);
 
-		  menuBar.add(animateMenu);
+		 menuBar.add(animateMenu);
 
-		  //menuBar.add(experimentMenu);
-		  menuBar.add(helpMenu);
-		  setJMenuBar(menuBar);
+		 //menuBar.add(experimentMenu);
+		 menuBar.add(helpMenu);
+		 setJMenuBar(menuBar);
 
 
 	}
@@ -533,18 +544,18 @@ EOC */
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);//Inhibit toolbar floating
-		
+
 		//Basis file operations
 		toolBar.add(createAction);
 		toolBar.add(openAction);
 		toolBar.add(saveAction);
 		toolBar.add(saveAsAction);
 		toolBar.add(closeAction);
-		
+
 		//Print
 		toolBar.addSeparator();	
 		toolBar.add(printAction);
-							
+
 		//Copy/past
 		/* Removed copy/past button
 		toolBar.addSeparator();			
@@ -552,21 +563,22 @@ EOC */
 	    toolBar.add(copyAction);
 	    toolBar.add(pasteAction);
 		 */
-		
+
 		//Undo/redo
 		toolBar.addSeparator();	
 		toolBar.add(deleteAction);
 		toolBar.add(undoAction);
 		toolBar.add(redoAction);
-		
+
 		//Zoom	
 		toolBar.addSeparator();
 		toolBar.add(zoomOutAction);
 		addZoomComboBox(toolBar,
 				zoomAction = new ZoomAction("Zoom","Select zoom percentage ", ""));
 		toolBar.add(zoomInAction);
-		
+
 		//Modes
+
 		toolBar.addSeparator();
 		toolBar.add(toggleGrid);
 		toolBar.add(new ToggleButton(dragAction));
@@ -576,10 +588,12 @@ EOC */
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
 
-		//Normal arraw
 		drawingToolBar.addSeparator();
+
+		//Normal arraw
+
 		drawingToolBar.add(new ToggleButton(selectAction));
-		
+
 		//Drawing elements
 		drawingToolBar.addSeparator();
 		drawingToolBar.add(new ToggleButton(timedPlaceAction));
@@ -587,23 +601,34 @@ EOC */
 		drawingToolBar.add(new ToggleButton(timedArcAction));
 		drawingToolBar.add(new ToggleButton(transportArcAction));
 		drawingToolBar.add(new ToggleButton(inhibarcAction));
+
 		drawingToolBar.add(new ToggleButton(annotationAction));
-		
+
 		//Tokens
 		drawingToolBar.addSeparator();
 		drawingToolBar.add(tokenAction);
 		drawingToolBar.add(deleteTokenAction);
 
-		//Add drawingtoolbar to toolbar
-		drawingToolBar.addSeparator();
-		toolBar.add(drawingToolBar);
+		//Create panel to put toolbars in
+		JPanel toolBarPanel = new JPanel();
+		toolBarPanel.setLayout(new FlowLayout(0,0,0));
 
-		for(int i=0;i<toolBar.getComponentCount();i++){
-			toolBar.getComponent(i).setFocusable(false);
-		}
+		//Add toolbars to pane
+		toolBarPanel.add(toolBar);
+		toolBarPanel.add(drawingToolBar);
 
-		getContentPane().add(toolBar,BorderLayout.PAGE_START);
+		//Create a toolBarPaneltmp usign broderlayout and a spacer to get toolbar to fill
+		// the screen
+		JPanel toolBarPaneltmp = new JPanel();
+		toolBarPaneltmp.setLayout(new BorderLayout());
+		toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
+		JToolBar spacer = new JToolBar();
+		spacer.addSeparator();
+		spacer.setFloatable(false);
+		toolBarPaneltmp.add(spacer, BorderLayout.CENTER);
 
+		//Add to GUI
+		getContentPane().add(toolBarPaneltmp,BorderLayout.PAGE_START);
 	}
 
 	/**
@@ -686,7 +711,7 @@ EOC */
 			stepbackwardAction.setEnabled(!status);
 			stepforwardAction.setEnabled(!status);
 			drawingToolBar.setVisible(true);
-			
+
 		}
 		randomAction.setEnabled(!status);
 		randomAnimateAction.setEnabled(!status);
@@ -1387,9 +1412,7 @@ EOC */
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(true);
 						// Do we keep the selection??
-
 						appView.getSelectionObject().clearSelection();
-
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -1612,9 +1635,9 @@ EOC */
 				deleteTokenAction.setSelected(false);
 			}
 			/*	
-	if (this != rateAction) {
-		rateAction.setSelected(false);
-	}
+			if (this != rateAction) {
+				rateAction.setSelected(false);
+			}
 			 */	
 			if (this != markingAction) {
 				//markingAction.setSelected(false);
@@ -1966,7 +1989,6 @@ EOC */
 		stepforwardAction.setEnabled(b);
 	}
 
-
 	public void showNewPNDialog() {
 		// Build interface
 		EscapableDialog guiDialog = 
@@ -1991,8 +2013,6 @@ EOC */
 
 
 	}
-
-
 
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
