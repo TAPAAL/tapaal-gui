@@ -559,7 +559,7 @@ public class TimedPlace extends Place {
 				value = String.format("\n age \u2208 [0, %1$s%2$s", invariant.substring(offset).trim(),
 						offset == 2 ? "]" : ")");
 			}else{
-				value = "Inv: " + invariant;
+				value = "\nInv: " + invariant;
 			}
 		}
 
