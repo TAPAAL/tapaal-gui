@@ -169,6 +169,18 @@ public class UppaalTrace {
 						
 						tmp2 = line.trim().split("\\.");
 						
+						//KYRKE
+						//This is a hack to solve bug #622134
+						//It fixes the fact that the advanced reduction tokens
+						//numbers start with 1 where the orginal reduction tokens
+						//starts with 0, we can detect the reduction type by seeing
+						//if the tokens starts with Token
+						
+						boolean isSimpleReduction = false;
+						
+						if (tmp2[0].contains("Token")){
+							isSimpleReduction = true;
+						}
 						
 						tmp = tmp2[0].replace("Token", "");
 						
@@ -183,7 +195,13 @@ public class UppaalTrace {
 							String placename = tmp2[1].split("->")[0];
 
 							dfa.setTrasition(transitionname.trim());
-							dfa.addConsumedToken(placename, tmpAgeOfTokens.get(tokenConsumed));
+							
+							if (isSimpleReduction) {
+								dfa.addConsumedToken(placename, tmpAgeOfTokens.get(tokenConsumed));
+							} else {
+								dfa.addConsumedToken(placename, tmpAgeOfTokens.get(tokenConsumed-1));
+							}
+								
 						}
 						//Add the tokens consumed
 
