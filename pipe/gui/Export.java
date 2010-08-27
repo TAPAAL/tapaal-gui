@@ -42,6 +42,7 @@ import pipe.gui.widgets.QueryDialogue;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
@@ -941,7 +942,7 @@ public class Export {
 				e.printStackTrace();
 			}
 		}else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_NOSYM){
-			System.out.println("Using ADV_NOSYMQ");
+			Logger.log("Using ADV_NOSYMQ");
 			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
