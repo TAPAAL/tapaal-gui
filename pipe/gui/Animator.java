@@ -267,7 +267,7 @@ public class Animator {
 				 CreateGui.currentPNMLData().fireColoredTransitionBackwards((ColoredDiscreteFiringAction)actionHistory.get(currentAction));
 			 }else if (actionHistory.get(currentAction) instanceof Transition ){
 				 Transition lastTransitionFired = (Transition)actionHistory.get(currentAction); 
-				 CreateGui.currentPNMLData().fireTransitionBackwards(lastTransitionFired);
+				// CreateGui.currentPNMLData().fireTransitionBackwards(lastTransitionFired);
 
 			 }else if ( actionHistory.get(currentAction) instanceof TimeDelayFiringAction){
 				 BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction)).getDealy();

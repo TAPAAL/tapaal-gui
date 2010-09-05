@@ -152,17 +152,6 @@ implements Cloneable {
 	/** Marking Vector Storage used during animation */
 	private int[] markingVectorAnimationStorage = null;
 
-	/** Forward Incidence Matrix */
-	private PNMatrix forwardsIncidenceMatrix = null;
-	/** Backward Incidence Matrix */
-	private PNMatrix backwardsIncidenceMatrix = null;
-	/** Incidence Matrix */
-	private PNMatrix incidenceMatrix = null;
-
-	/** Inhibition Matrix */
-	private PNMatrix inhibitionMatrix = null;
-	private PNMatrix tapnInhibitionMatrix = null;
-
 	/** Used to determine whether the matrixes have been modified */
 	static boolean initialMarkingVectorChanged = true;
 
@@ -292,11 +281,6 @@ implements Cloneable {
 		markingParametersArray = new ArrayList();
 		rateParametersArray = new ArrayList();
 		initialMarkingVector = null;
-		forwardsIncidenceMatrix = null;
-		backwardsIncidenceMatrix = null;
-		incidenceMatrix = null;
-		inhibitionMatrix = null;
-		tapnInhibitionMatrix = null;
 
 		// may as well do the hashtable here as well
 		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<NormalArc>>();
@@ -364,7 +348,6 @@ implements Cloneable {
 			}
 			placesArray.add(placeInput);
 			setChanged();
-			setMatrixChanged();
 			// notifyObservers(placeInput.getBounds());
 			notifyObservers(placeInput);
 		}
@@ -466,7 +449,7 @@ implements Cloneable {
 			}
 			transitionsArray.add(transitionInput);
 			setChanged();
-			setMatrixChanged();
+
 			//    notifyObservers(transitionInput.getBounds());
 			notifyObservers(transitionInput);
 		}
@@ -575,7 +558,7 @@ implements Cloneable {
 			addArcToArcsMap(arcInput);
 
 			setChanged();
-			setMatrixChanged();
+	
 			//notifyObservers(arcInput.getBounds());
 			notifyObservers(arcInput);
 		}
@@ -624,7 +607,7 @@ implements Cloneable {
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
 
 			setChanged();
-			setMatrixChanged();
+
 			//notifyObservers(arcInput.getBounds());
 			notifyObservers(inhibitorArcInput);
 		}
@@ -676,7 +659,7 @@ implements Cloneable {
 			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
 
 			setChanged();
-			setMatrixChanged();
+
 			//notifyObservers(arcInput.getBounds());
 			notifyObservers(inhibitorArcInput);
 		}
@@ -857,7 +840,7 @@ implements Cloneable {
 			} else { // arrows, other labels.
 				changeArrayList.add(pnObject);
 				setChanged();
-				setMatrixChanged();
+	
 				notifyObservers(pnObject);
 			}
 		}
@@ -919,9 +902,7 @@ implements Cloneable {
 	public void changed(){
 
 		setChanged();
-		setMatrixChanged();
-
-
+		
 
 		for(Transition t : getTransitions()){
 			Logger.log("lalal" + t.id);
@@ -1104,7 +1085,7 @@ implements Cloneable {
 
 				if (didSomething) {
 					setChanged();
-					setMatrixChanged();
+		
 					// notifyObservers(pnObject.getBounds());
 					notifyObservers(pnObject);
 				}
@@ -1742,108 +1723,6 @@ implements Cloneable {
 
 
 	/**
-	 * Creates all Petri-Net Matrixes from current Petri-Net
-	 */
-	private void createMatrixes(){
-		createIncidenceMatrix();
-		createInitialMarkingVector();
-		createCurrentMarkingVector();
-		createInhibitionMatrix();
-		createTAPNInhibitionMatrix();
-	}
-
-
-	/**
-	 * Creates Forward Incidence Matrix from current Petri-Net
-	 */
-	private void createForwardIncidenceMatrix(){
-		int placeSize = placesArray.size();
-		int transitionSize = transitionsArray.size();
-
-		forwardsIncidenceMatrix = new PNMatrix(placeSize, transitionSize);
-
-		for (int i = 0; i < arcsArray.size(); i++) {
-			Arc arc = (Arc)arcsArray.get(i);
-			if (arc != null ) {
-				PetriNetObject pnObject = arc.getTarget();
-				if (pnObject != null) {
-					if (pnObject instanceof Place) {
-						Place place = (Place)pnObject;
-						pnObject = arc.getSource();
-						if (pnObject != null) {
-							if (pnObject instanceof Transition) {
-								Transition transition = (Transition)pnObject;
-								int transitionNo = getListPosition(transition);
-								int placeNo = getListPosition(place);
-								try {
-									forwardsIncidenceMatrix.set(
-											placeNo, transitionNo, arc.getWeight());
-								} catch (Exception e) {
-									JOptionPane.showMessageDialog(null, 
-									"Problem in forwardsIncidenceMatrix");
-									Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Creates Backwards Incidence Matrix from current Petri-Net
-	 */
-	private void createBackwardsIncidenceMatrix(){//Matthew
-		int placeSize = placesArray.size();
-		int transitionSize = transitionsArray.size();
-
-		backwardsIncidenceMatrix = new PNMatrix(placeSize, transitionSize);
-
-		for (int i = 0 ; i < arcsArray.size() ; i++) {
-			Arc arc = (Arc)arcsArray.get(i);
-			if (arc != null) {
-				PetriNetObject pnObject = arc.getSource();
-				if (pnObject != null){
-					if (pnObject instanceof Place) {
-						Place place = (Place)pnObject;
-						pnObject = arc.getTarget();
-						if (pnObject != null){
-							if (pnObject instanceof Transition){
-								Transition transition = (Transition)pnObject;
-								int transitionNo = getListPosition(transition);
-								int placeNo = getListPosition(place);
-								try {
-									backwardsIncidenceMatrix.set(
-											placeNo, transitionNo, arc.getWeight());
-								} catch (Exception e) {
-									JOptionPane.showMessageDialog(null, 
-									"Problem in backwardsIncidenceMatrix");                            
-									Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + arc.getWeight());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Creates Incidence Matrix from current Petri-Net
-	 */
-	private void createIncidenceMatrix(){
-		createForwardIncidenceMatrix();
-		createBackwardsIncidenceMatrix();
-		incidenceMatrix = new PNMatrix(forwardsIncidenceMatrix);
-		incidenceMatrix = incidenceMatrix.minus(backwardsIncidenceMatrix);
-		incidenceMatrix.matrixChanged  = false;      
-	}
-
-
-	/**
 	 * Creates Initial Marking Vector from current Petri-Net
 	 */
 	private void createInitialMarkingVector(){
@@ -1912,79 +1791,6 @@ implements Cloneable {
 	}     
 
 
-	/**
-	 * Creates Inhibition Matrix from current Petri-Net
-	 */
-	private void createInhibitionMatrix(){
-		int placeSize = placesArray.size();
-		int transitionSize = transitionsArray.size();
-		inhibitionMatrix = new PNMatrix(placeSize, transitionSize);
-
-		for (int i = 0; i < inhibitorsArray.size(); i++) {
-			InhibitorArc inhibitorArc = (InhibitorArc)inhibitorsArray.get(i);
-			if (inhibitorArc != null) {
-				PetriNetObject pnObject = inhibitorArc.getSource();
-				if (pnObject != null) {
-					if (pnObject instanceof Place) {
-						Place place = (Place)pnObject;
-						pnObject = inhibitorArc.getTarget();
-						if (pnObject != null) {
-							if (pnObject instanceof Transition) {
-								Transition transition = (Transition)pnObject;
-								int transitionNo = getListPosition(transition);
-								int placeNo = getListPosition(place);
-								try {
-									inhibitionMatrix.set(
-											placeNo, transitionNo, inhibitorArc.getWeight());
-								} catch (Exception e) {
-									JOptionPane.showMessageDialog(null, 
-									"Problema a inhibitionMatrix");                          
-									Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
-								}                        
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	private void createTAPNInhibitionMatrix(){
-		int placeSize = placesArray.size();
-		int transitionSize = transitionsArray.size();
-		tapnInhibitionMatrix = new PNMatrix(placeSize, transitionSize);
-
-		for (int i = 0; i < arcsArray.size(); i++) 
-		{
-			if(arcsArray.get(i) instanceof TAPNInhibitorArc)
-			{
-				TAPNInhibitorArc inhibitorArc = (TAPNInhibitorArc)arcsArray.get(i);
-				if (inhibitorArc != null) {
-					PetriNetObject pnObject = inhibitorArc.getSource();
-					if (pnObject != null) {
-						if (pnObject instanceof Place) {
-							Place place = (Place)pnObject;
-							pnObject = inhibitorArc.getTarget();
-							if (pnObject != null) {
-								if (pnObject instanceof Transition) {
-									Transition transition = (Transition)pnObject;
-									int transitionNo = getListPosition(transition);
-									int placeNo = getListPosition(place);
-									try {
-										tapnInhibitionMatrix.set(
-												placeNo, transitionNo, inhibitorArc.getWeight());
-									} catch (Exception e) {
-										JOptionPane.showMessageDialog(null, 
-										"Problema a inhibitionMatrix");                          
-										Logger.log("p:" + placeNo + ";t:" + transitionNo + ";w:" + inhibitorArc.getWeight());
-									}                        
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 
 
 	/**
@@ -2052,7 +1858,7 @@ implements Cloneable {
 						((TimedPlace)p).setAgeOfTokens(markingOfP);
 						setChanged();
 						notifyObservers(p);
-						setMatrixChanged();
+			
 					}
 				}
 			}else{
@@ -2062,7 +1868,7 @@ implements Cloneable {
 						ctp.setColoredTokens(coloredPlaceMarkingStorageMap.get(ctp));
 						setChanged();
 						notifyObservers(p);
-						setMatrixChanged();
+			
 					}
 				}
 			}
@@ -2075,7 +1881,7 @@ implements Cloneable {
 						place.setCurrentMarking(markingVectorAnimationStorage[placeNo]);
 						setChanged();
 						notifyObservers(place);
-						setMatrixChanged();
+			
 					}
 				}
 			}
@@ -2100,21 +1906,7 @@ implements Cloneable {
 			}else{
 				toReturn = fireTransitionInColoredTAPN(transition);
 			}
-		}else{
-			if (transition != null) {
-
-				setEnabledTransitions();
-				if (transition.isEnabled() && placesArray != null){
-					int transitionNo = transitionsArray.indexOf(transition);
-					for (int placeNo = 0; placeNo < placesArray.size(); placeNo++) {
-						((Place)placesArray.get(placeNo)).setCurrentMarking(
-								(currentMarkingVector[placeNo] + 
-										incidenceMatrix.get(placeNo, transitionNo)));
-					}
-				}
-			}
 		}
-		setMatrixChanged();
 
 		return toReturn;
 	}
@@ -2368,7 +2160,6 @@ implements Cloneable {
 			}		   
 
 		}
-		setMatrixChanged();
 	}
 
 
@@ -2414,111 +2205,6 @@ implements Cloneable {
 		return null;
 	}
 
-	/**
-	 * This method will fire a random transition, and gives precedence 
-	 * to immediate transitions before considering "timed" transitions. 
-	 * The "rate" property of the transition is used as a weighting 
-	 * factor so the probability of selecting a transition is the 
-	 * rate of that transition divided by the sum of the weights of the
-	 * other enabled transitions of its class. The "rate" property can 
-	 * now be used to give priority among several enabled, immediate
-	 * transitions, or when there are no enabled, immediate transitions
-	 * to give priority among several enabled, "timed" transitions. 
-	 * 
-	 * Note: in spite of the name "timed" there is no probabilistic rate
-	 * calculated -- just a weighting factor among similar transitions. 
-	 * 
-	 * Changed by David Patterson Jan 2, 2006
-	 *
-	 * Changed by David Patterson Apr 24, 2007 to clean up problems 
-	 * caused by fractional rates, and to speed up processing when only
-	 * one transition of a kind is enabled.
-	 * 
-	 * Changed by David Patterson May 10, 2007 to properly handle fractional
-	 * weights for immeditate transitions.
-	 * 
-	 * THe same logic is also used for timed transitions until the exponential
-	 * distribution is added. When that happens, the code will only be used for
-	 * immediate transitions.
-	 * /
-  public Transition fireRandomTransition() {
-     Transition result = null;
-     Transition t;
-     setEnabledTransitions();
-     // int transitionsSize = transitionsArray.size()*transitionsArray.size()*transitionsArray.size();
-     int transitionNo = 0;
-
-     double rate = 0.0d;
-     double sumOfImmedWeights = 0.0d;
-     double sumOfTimedWeights = 0.0d;
-     ArrayList timedTransitions = new ArrayList();	// ArrayList<Transition>
-     ArrayList immedTransitions = new ArrayList();	// ArrayList<Transition>
-
-     for(transitionNo = 0 ; transitionNo < transitionsArray.size() ; transitionNo++){
-        t = (Transition) transitionsArray.get(  transitionNo  );
-        rate = t.getRate();
-        if ( t.isEnabled()) {
-           if ( t.isTimed() ) {                     // is it a timed transition
-              timedTransitions.add( t );
-              sumOfTimedWeights += rate;
-           } else {                                  // immediate transition
-              immedTransitions.add( t  );
-              sumOfImmedWeights += rate;
-           }
-        }		// end of if isEnabled
-     }		// end of for transitionNo
-
-     // Now, if there are immediate transitions, pick one
-     // next block changed by David Patterson to fix bug
-     int count = immedTransitions.size();
-     switch ( count ) {
-        case 0:		// no immediate transitions
-           break;	// skip out
-        case 1: 	// only one immediate transition
-           result = (Transition) immedTransitions.get( 0 );
-           break;	// skip out
-        default:	// several immediate transitions
-           double rval = sumOfImmedWeights * randomNumber.nextDouble();
-           for ( int index = 0; index < count; index++ ) {
-              t = (Transition) immedTransitions.get( index );
-              rval -= t.getRate();
-              if ( rval <= 0.0d ) {
-                 result = t;
-                 break;
-              }	
-           }
-     }
-     if ( result == null ) {             // no immediate transition found
-        count = timedTransitions.size(); // count of timed, enabled transitions
-        switch( count ) {
-           case 0:		// trouble! No enabled transition found
-              break;
-           case 1: 	// only one timed transition
-              result = ( Transition ) timedTransitions.get( 0 );
-              break;
-           default:		// several timed transitions -- for now, pick one
-              double rval = sumOfTimedWeights * randomNumber.nextDouble();
-              for ( int index = 0; index < count; index++ ) {
-                 t = (Transition) timedTransitions.get( index );
-                 rval -= t.getRate();
-                 if ( rval <= 0.0d ) {
-                    result = t;
-                    break;
-                 }
-              }
-        }
-     }
-
-     if ( result == null ) {
-        System.out.println( "no random transition to fire" );
-     } else {
-        fireTransition(result);
-        createCurrentMarkingVector();
-     }
-     resetEnabledTransitions();
-     return result;
-  }     // end of method fireRandomTransition */
-
 
 	public void fireTimedTransitionBackwards(HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking, 
 			HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking, 
@@ -2532,7 +2218,6 @@ implements Cloneable {
 				throw new IllegalArgumentException("Incorrect Postset for transition argument!");
 		}
 
-		fireTransitionBackwards(transition);
 
 		for (Arc a : (LinkedList<Arc>)transition.getPreset()){
 			TimedPlace place = (TimedPlace)a.getSource();
@@ -2552,46 +2237,9 @@ implements Cloneable {
 			// But the dont... So we will just use this function for now instead
 			place.setTokensAndAgeOfTokens(postsetMarking.get(place));
 		}
-		setMatrixChanged(); 
 	}
 
 
-
-	public void fireTransitionBackwards(Transition transition) {
-		if (transition != null) {
-			setEnabledTransitionsBackwards();
-			if (transition.isEnabled() && placesArray != null){
-				int transitionNo = transitionsArray.indexOf(transition);
-				for (int placeNo = 0; placeNo < placesArray.size(); placeNo++) {
-					((Place)placesArray.get(placeNo)).setCurrentMarking(
-							(currentMarkingVector[placeNo] - 
-									incidenceMatrix.get(placeNo, transitionNo)));
-				}
-			}
-		}
-		setMatrixChanged();
-	}
-
-
-	/* Method not used * /
-   public void fireRandomTransitionBackwards() {
-      setEnabledTransitionsBackwards();
-      int transitionsSize = transitionsArray.size() * transitionsArray.size() *
-              transitionsArray.size();
-      int randomTransitionNumber = 0;
-      Transition randomTransition = null;
-      do {
-         randomTransitionNumber = randomNumber.nextInt(transitionsArray.size());
-         randomTransition = 
-                 (Transition)transitionsArray.get(randomTransitionNumber);
-         transitionsSize--;
-         if(transitionsSize <= 0){
-            break;
-         }
-      } while(! randomTransition.isEnabled());
-      fireTransitionBackwards(randomTransition);
-//    System.out.println("Random Fired Transition Backwards" + ((Transition)transitionsArray.get(randonTransition)).getId());
-   }*/
 
 
 	public void resetEnabledTransitions()  {
@@ -2604,123 +2252,10 @@ implements Cloneable {
 	}
 
 
-	/**Calculate whether a transition is enabled given a specific marking
-	 * @param DataLayer - the net
-	 * @param int[]     - the marking
-	 * @param int       - the specific transition to test for enabled status
-	 * @return boolean  - an array of booleans specifying which transitions are 
-	 *                    enabled in the specified marking
-	 */
-	public boolean getTransitionEnabledStatus(int[] marking, int transition) {
-		int transCount = this.getTransitionsCount();
-		int placeCount = this.getPlacesCount();
-		boolean[] result = new boolean[transCount];
-		int[][] CMinus = this.getBackwardsIncidenceMatrix();
-
-		//initialise matrix to true
-		for (int k = 0; k < transCount; k++) { 
-			result[k] = true;
-		}
-		for (int i = 0; i < transCount; i++) {
-			for (int j = 0; j < placeCount; j++) {
-				if (marking[j] < CMinus[j][i]) {
-					result[i] = false;
-				}
-			}
-		}
-		return result[transition];
-	}   
 
 
-	/**
-	 * getTransitionEnabledStatusArray()
-	 * Calculate which transitions are enabled given a specific marking.
-	 * @author Matthew Cook (original code), Nadeem Akharware (optimisation)
-	 * @author Pere Bonet added inhibitor arcs, place capacities and transition 
-	 * priorities
-	 * @param int[]       the marking
-	 * @return boolean[]  an array of booleans specifying which transitions are 
-	 *                    enabled in the specified marking
-	 */
-	public boolean[] getTransitionEnabledStatusArray(int[] marking) {
-		return getTransitionEnabledStatusArray(
-				this.getTransitions(),
-				marking,
-				this.getBackwardsIncidenceMatrix(),
-				this.getForwardsIncidenceMatrix(),              
-				this.getInhibitionMatrix(),
-				this.getCapacityVector(),
-				this.getPlacesCount(),
-				this.getTransitionsCount());
-	}
 
-
-	/**
-	 * Determines whether all transitions are enabled and sets
-	 * the correct value of the enabled boolean
-	 */
-	public void setEnabledTransitionsBackwards() {
-
-		if (currentMarkingVectorChanged) {
-			createMatrixes();
-		}
-
-		boolean[] enabledTransitions = getTransitionEnabledStatusArray(
-				this.getTransitions(),
-				this.getCurrentMarkingVector(),
-				this.getForwardsIncidenceMatrix(),
-				this.getBackwardsIncidenceMatrix(),
-				this.getInhibitionMatrix(),
-				this.getCapacityVector(),
-				this.getPlacesCount(),
-				this.getTransitionsCount());
-
-		for (int i = 0; i < enabledTransitions.length; i++) {
-			Transition transition = (Transition)transitionsArray.get(i);
-			if (enabledTransitions[i] != transition.isEnabled()) {
-				transition.setEnabled(enabledTransitions[i]);
-				setChanged();
-				notifyObservers(transition);
-			}
-		}
-	}
-
-
-	/**
-	 * Determines whether all transitions are enabled and sets
-	 * the correct value of the enabled boolean
-	 */
-	//	Joakim Byg - Used other less obscure method implemented right below   
-	/*   public void setEnabledTransitions() {
-
-      if (currentMarkingVectorChanged) {
-         createMatrixes();
-      }      
-
-      boolean[] enabledTransitions = getTransitionEnabledStatusArray(
-              this.getTransitions(),
-              this.getCurrentMarkingVector(),
-              this.getBackwardsIncidenceMatrix(),
-              this.getForwardsIncidenceMatrix(),              
-              this.getInhibitionMatrix(),
-              this.getCapacityVector(),
-              this.getPlacesCount(),
-              this.getTransitionsCount());
-
-      for (int i = 0; i < enabledTransitions.length; i++) {
-         Transition transition = (Transition)transitionsArray.get(i);
-         if (enabledTransitions[i] != transition.isEnabled()) {
-            transition.setEnabled(enabledTransitions[i]);
-            setChanged();
-            notifyObservers(transition);
-         }
-      }
-   }
-	 */  
-	//	Joakim Byg - new less obscure global update for enabled transitions
 	public void setEnabledTransitions(){
-		createMatrixes();
-
 		for ( Transition t : getTransitions() ){
 			boolean isEnabled = false;
 
@@ -2845,89 +2380,6 @@ implements Cloneable {
 	}
 
 
-	/**
-	 * getTransitionEnabledStatusArray()
-	 * Calculate which transitions are enabled given a specific marking.
-	 * @author Matthew Cook (original code), Nadeem Akharware (optimisation)
-	 * @author Pere Bonet added inhibitor arcs, place capacities and transition 
-	 * priorities
-	 * @param int[]       the marking
-	 * @return boolean[]  an array of booleans specifying which transitions are 
-	 *                    enabled in the specified marking
-	 */
-	private boolean[] getTransitionEnabledStatusArray(
-			final Transition[] transArray, final int[] marking, 
-			final int[][] CMinus, final int[][]CPlus, final int [][]inhibition, 
-			final int capacities[], final int placeCount, 
-			final int transitionCount) {
-
-		boolean[] result = new boolean[transitionCount];
-		boolean hasTimed = false;
-		boolean hasImmediate = false;
-
-		int maxPriority = 0;
-
-		for (int i = 0; i < transitionCount ;i++) {
-			result[i] = true; //inicialitzam a enabled
-			for (int j = 0; j < placeCount; j++) {
-				if ((marking[j] < CMinus[j][i]) && (marking[j]!=-1)) {
-					result[i] = false;
-					break;
-				}
-
-				// capacities
-				if ((capacities[j] > 0) && 
-						(marking[j] + CPlus[j][i] - CMinus[j][i]> capacities[j])) {
-					// firing this transition would break a capacity restriction so 
-					// the transition is not enabled
-					result[i] = false;
-					break;
-				}
-
-				// inhibitor arcs
-				if (inhibition[j][i] > 0 && marking[j] >= inhibition[j][i]) {
-					// an inhibitor arc prevents the firing of this transition so 
-					// the transition is not enabled               
-					result[i] = false;
-					break;
-				}
-			}
-
-
-			// we look for the highest priority of the enabled transitions
-			if (result[i] == true) {
-				if (transArray[i].isTimed() == true) {
-					hasTimed = true;
-				} else {
-					hasImmediate = true;
-					if (transArray[i].getPriority() > maxPriority) {
-						maxPriority = transArray[i].getPriority();
-					}               
-				}
-			}
-
-		}
-
-		// Now make sure that if any of the enabled transitions are immediate 
-		// transitions, only they can fire as this must then be a vanishing state.
-		// - disable the immediate transitions with lower priority.
-		// - disable all timed transitions if there is an immediate transition enabled.
-		for (int i = 0; i < transitionCount ;i++) {
-			if (!transArray[i].isTimed() && 
-					transArray[i].getPriority() < maxPriority) {
-				result[i] = false;            
-			}
-			if (hasTimed && hasImmediate) {
-				if (transArray[i].isTimed() == true) {
-					result[i] = false;
-				}
-			}
-		}
-
-		//print("getTransitionEnabledStatusArray: ",result);//debug
-		return result;
-	}   
-
 
 	/**
 	 * Empty all attributes, turn into empty Petri-Net
@@ -2942,11 +2394,6 @@ implements Cloneable {
 		rateParametersArray = null;
 		changeArrayList = null;
 		initialMarkingVector = null;
-		forwardsIncidenceMatrix = null;
-		backwardsIncidenceMatrix = null;
-		incidenceMatrix = null;
-		inhibitionMatrix = null;
-		tapnInhibitionMatrix = null;
 		arcsMap = null;
 		initializeMatrices();
 	}
@@ -3261,65 +2708,6 @@ implements Cloneable {
 
 
 	/**
-	 * Return the Forward Incidence Matrix for the Petri-Net
-	 * @return The Forward Incidence Matrix for the Petri-Net
-	 */
-	public int[][] getForwardsIncidenceMatrix() {
-		if (forwardsIncidenceMatrix == null 
-				|| forwardsIncidenceMatrix.matrixChanged) {
-			createForwardIncidenceMatrix();
-		}
-		return (forwardsIncidenceMatrix != null
-				? forwardsIncidenceMatrix.getArrayCopy() 
-						: null);
-	}
-
-
-	/**
-	 * Return the Backward Incidence Matrix for the Petri-Net
-	 * @return The Backward Incidence Matrix for the Petri-Net
-	 */
-	public int[][] getBackwardsIncidenceMatrix() {
-		if (backwardsIncidenceMatrix == null 
-				|| backwardsIncidenceMatrix.matrixChanged) {
-			createBackwardsIncidenceMatrix();
-		}
-		return (backwardsIncidenceMatrix != null 
-				? backwardsIncidenceMatrix.getArrayCopy()
-						: null);
-	}
-
-
-	/**
-	 * Return the Incidence Matrix for the Petri-Net
-	 * @return The Incidence Matrix for the Petri-Net
-	 */
-	public int[][] getIncidenceMatrix() {
-		if (incidenceMatrix == null || incidenceMatrix.matrixChanged) {
-			createIncidenceMatrix();
-		}
-		return (incidenceMatrix != null ? incidenceMatrix.getArrayCopy() : null);
-	}
-
-
-	/**
-	 * Return the Incidence Matrix for the Petri-Net
-	 * @return The Incidence Matrix for the Petri-Net
-	 */
-	public int[][] getInhibitionMatrix() {
-		if (inhibitionMatrix == null || inhibitionMatrix.matrixChanged) {
-			createInhibitionMatrix();
-		}
-		return (inhibitionMatrix != null ? inhibitionMatrix.getArrayCopy() : null);
-	}
-	public int[][] getTAPNInhibitionMatrix() {
-		if (tapnInhibitionMatrix == null || tapnInhibitionMatrix.matrixChanged) {
-			createInhibitionMatrix();
-		}
-		return (tapnInhibitionMatrix != null ? tapnInhibitionMatrix.getArrayCopy() : null);
-	}   
-
-	/**
 	 * Return the Initial Marking Vector for the Petri-Net
 	 * @return The Initial Marking Vector for the Petri-Net
 	 */
@@ -3372,26 +2760,6 @@ implements Cloneable {
 		return timedVector;
 	}
 
-
-	private void setMatrixChanged () {
-		if (forwardsIncidenceMatrix != null) {
-			forwardsIncidenceMatrix.matrixChanged = true;
-		}
-		if (backwardsIncidenceMatrix != null) {
-			backwardsIncidenceMatrix.matrixChanged  = true;
-		}
-		if (incidenceMatrix != null) {
-			incidenceMatrix.matrixChanged = true;
-		}
-		if (inhibitionMatrix != null) {
-			inhibitionMatrix.matrixChanged = true;
-		}
-		if (tapnInhibitionMatrix != null) {
-			tapnInhibitionMatrix.matrixChanged = true;
-		}   
-		initialMarkingVectorChanged = true;
-		currentMarkingVectorChanged = true;
-	}
 
 	/**
 	 * Create model from TAPN model
@@ -4120,35 +3488,6 @@ implements Cloneable {
 	}   
 
 
-	/**Work out if a specified marking describes a tangible state.
-	 * A state is either tangible (all enabled transitions are timed)
-	 * or vanishing (there exists at least one enabled state that is transient, 
-	 * i.e. untimed).
-	 * If an immediate transition exists, it will automatically fire before a 
-	 * timed transition.
-	 * @param DataLayer - the net to be tested
-	 * @param int[]     - the marking of the net to be tested
-	 * @return boolean  - is it tangible or not
-	 */
-	public boolean isTangibleState(int[] marking) {   
-		Transition[] trans = this.getTransitions();
-		int numTrans = trans.length;
-		boolean hasTimed = false;
-		boolean hasImmediate = false;
-
-		for (int i = 0; i < numTrans; i++ ){
-			if (this.getTransitionEnabledStatus(marking, i) == true){
-				if (trans[i].isTimed()== true) {
-					//If any immediate transtions exist, the state is vanishing
-					//as they will fire immediately
-					hasTimed = true;
-				} else if (trans[i].isTimed() != true) {
-					hasImmediate = true;
-				}
-			}
-		}
-		return (hasTimed == true && hasImmediate == false);   
-	}
 
 
 	private void checkForInverseArc(NormalArc newArc) {
@@ -4208,7 +3547,6 @@ implements Cloneable {
 
 
 		setEnabledTransitions();
-		setMatrixChanged();
 	}
 
 
@@ -4387,8 +3725,7 @@ implements Cloneable {
 			entry.getKey().removeColoredToken(entry.getValue());
 		}
 
-		fireTransitionBackwards(action.getTransition());
-		setMatrixChanged(); 
+		//fireTransitionBackwards(action.getTransition());
 	}
 
 
@@ -4405,6 +3742,5 @@ implements Cloneable {
 			entry.getKey().addColoredToken(entry.getValue());
 		}
 
-		setMatrixChanged(); 
 	}
 }

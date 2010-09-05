@@ -329,15 +329,6 @@ public class AnimationControler extends JPanel {
 		               animBox.stepForward();
 		               CreateGui.getAnimator().stepForward();
 		               setAnimationButtonsEnabled();
-
-//This is totally overruled by the actions in pipe/gui/GuiFram.java in fact it is unclear if this code is ever active after initialization
-		               
-//		               for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-//		            	   if (((TimedPlace)p).isAgeOfTokensShown()){
-//		            		   //((TimedPlace)p).showAgeOfTokens(false);
-//		            		   ((TimedPlace)p).showAgeOfTokens(true);
-//		            	   }
-//		               }
 		               break;
 
 		            case Pipe.STEPBACKWARD:

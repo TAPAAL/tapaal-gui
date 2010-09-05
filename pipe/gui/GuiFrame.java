@@ -66,8 +66,6 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.TimedPlace;
-import pipe.experiment.Experiment;
-import pipe.experiment.editor.gui.ExperimentEditor;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -147,8 +145,7 @@ implements ActionListener, Observer {
 	public boolean dragging = false;
 
 	private HelpBox helpAction;
-	private ExperimentAction loadExperimentAction, experimentEditorAction;
-
+	
 
 	private boolean editionAllowed = true;
 
@@ -520,10 +517,6 @@ EOC */
 		 }
 
 		 JMenu experimentMenu = new JMenu("Experiment");
-		 addMenuItem(experimentMenu, loadExperimentAction =
-			 new ExperimentAction("Load experiment", "Load an experiment file",""));
-		 addMenuItem(experimentMenu, experimentEditorAction =
-			 new ExperimentAction("Experiment Editor", "Start the experiment editor",""));
 
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
@@ -1084,42 +1077,6 @@ EOC */
 		selectAction.actionPerformed(null);
 
 	}
-
-
-	/**Loads an Experiment XML file and shows a suitable message in case of error.
-	 * @param path the absolute path to the experiment file.
-	 */
-	private void loadExperiment(String path){
-		Experiment exp = new Experiment(path,appModel);
-		try{
-			exp.Load();
-		} catch(org.xml.sax.SAXParseException spe) {
-			//if the experiment file does not fit the schema.
-			JOptionPane.showMessageDialog(GuiFrame.this,
-					"The Experiment file is not valid."+
-					System.getProperty("line.separator")+
-					"Line "+spe.getLineNumber()+": "+
-					spe.getMessage(),
-					"Experiment Input Error",
-					JOptionPane.ERROR_MESSAGE);
-		} catch(pipe.experiment.validation.NotMatchingException nme) {
-			//if the experiment file does not match with the current net.
-			JOptionPane.showMessageDialog(GuiFrame.this,
-					"The Experiment file is not valid."+
-					System.getProperty("line.separator")+
-					nme.getMessage(),
-					"Experiment Input Error",
-					JOptionPane.ERROR_MESSAGE);
-		} catch(pipe.experiment.InvalidExpressionException iee) {
-			JOptionPane.showMessageDialog(GuiFrame.this,
-					"The Experiment file is not valid."+
-					System.getProperty("line.separator")+
-					iee.getMessage(),
-					"Experiment Input Error",
-					JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
 
 	/**
 	 * If current net has modifications, asks if you want to save and does it if
@@ -1808,29 +1765,6 @@ EOC */
 
 	}
 
-
-
-	class ExperimentAction extends GuiAction{
-
-		ExperimentAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			if (this == loadExperimentAction) {
-				File filePath = new FileBrowser(CreateGui.userPath).openFile();
-				if ((filePath != null) && filePath.exists()
-						&& filePath.isFile() && filePath.canRead()) {
-					loadExperiment(filePath.getAbsolutePath());
-				}
-			}
-			if (this == experimentEditorAction) {
-				ExperimentEditor ee = new ExperimentEditor(appModel);
-				//ee.start();
-			}
-		}
-
-	}
 
 
 	class VerificationAction extends GuiAction{
