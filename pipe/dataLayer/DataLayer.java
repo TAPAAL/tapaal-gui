@@ -139,16 +139,6 @@ implements Cloneable {
 	 * ArrayLists when these ArrayLists are being update */
 	private ArrayList changeArrayList = null;
 
-	/** Initial Marking Vector */
-	private int[] initialMarkingVector = null;
-	/** Current Marking Vector */
-	private int[] currentMarkingVector = null;
-	/** Capacity Matrix */
-	private int[] capacityVector = null;
-	/** Priority Matrix */
-	private int[] priorityVector = null;
-	/** Timed Matrix */
-	private boolean[] timedVector = null;   
 	/** Marking Vector Storage used during animation */
 	private int[] markingVectorAnimationStorage = null;
 
@@ -280,7 +270,7 @@ implements Cloneable {
 		stateGroups = new ArrayList<StateGroup>();
 		markingParametersArray = new ArrayList();
 		rateParametersArray = new ArrayList();
-		initialMarkingVector = null;
+		
 
 		// may as well do the hashtable here as well
 		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<NormalArc>>();
@@ -1723,77 +1713,6 @@ implements Cloneable {
 
 
 	/**
-	 * Creates Initial Marking Vector from current Petri-Net
-	 */
-	private void createInitialMarkingVector(){
-		int placeSize = placesArray.size();
-
-		initialMarkingVector = new int[placeSize];
-		for (int placeNo = 0; placeNo < placeSize; placeNo++) {
-			initialMarkingVector[placeNo] = 
-				((Place)placesArray.get(placeNo)).getInitialMarking();
-		}
-	}
-
-
-	/**
-	 * Creates Current Marking Vector from current Petri-Net
-	 */
-	private void createCurrentMarkingVector(){
-		int placeSize = placesArray.size();
-
-		currentMarkingVector = new int[placeSize];
-		for (int placeNo = 0; placeNo < placeSize; placeNo++) {
-			currentMarkingVector[placeNo] = 
-				((Place)placesArray.get(placeNo)).getCurrentMarking();
-		}
-	}
-
-
-	/**
-	 * Creates Capacity Vector from current Petri-Net
-	 */
-	private void createCapacityVector(){
-		int placeSize = placesArray.size();
-
-		capacityVector = new int[placeSize];
-		for (int placeNo = 0; placeNo < placeSize; placeNo++) {
-			capacityVector[placeNo] = ((Place)placesArray.get(placeNo)).getCapacity();
-		}
-	}   
-
-
-	/**
-	 * Creates Timed Vector from current Petri-Net
-	 */
-	private void createTimedVector() {
-		int transitionSize = transitionsArray.size();
-
-		timedVector = new boolean[transitionSize];
-		for (int transitionNo = 0; transitionNo < transitionSize; transitionNo++) {
-			timedVector[transitionNo] =
-				((Transition)transitionsArray.get(transitionNo)).isTimed();
-		}
-	}  
-
-
-	/**
-	 * Creates Priority Vector from current Petri-Net
-	 */
-	private void createPriorityVector() {
-		int transitionSize = transitionsArray.size();
-
-		priorityVector = new int[transitionSize];
-		for (int transitionNo = 0; transitionNo < transitionSize; transitionNo++) {
-			priorityVector[transitionNo] =
-				((Transition)transitionsArray.get(transitionNo)).getPriority();
-		}
-	}     
-
-
-
-
-	/**
 	 * Stores Current Marking
 	 */
 	public void storeState(){
@@ -2393,7 +2312,6 @@ implements Cloneable {
 		markingParametersArray = null;
 		rateParametersArray = null;
 		changeArrayList = null;
-		initialMarkingVector = null;
 		arcsMap = null;
 		initializeMatrices();
 	}
@@ -2706,59 +2624,6 @@ implements Cloneable {
 		return null;
 	}
 
-
-	/**
-	 * Return the Initial Marking Vector for the Petri-Net
-	 * @return The Initial Marking Vector for the Petri-Net
-	 */
-	public int[] getInitialMarkingVector() {
-		if (initialMarkingVectorChanged) {
-			createInitialMarkingVector();
-		}
-		return initialMarkingVector;
-	}
-
-
-	/**
-	 * Return the Initial Marking Vector for the Petri-Net
-	 * @return The Initial Marking Vector for the Petri-Net
-	 */
-	public int[] getCurrentMarkingVector() {
-		if (currentMarkingVectorChanged)  {
-			createCurrentMarkingVector();
-		}
-		return currentMarkingVector;
-	}
-
-
-	/**
-	 * Return the capacity Matrix for the Petri-Net
-	 * @return The capacity Matrix for the Petri-Net
-	 */
-	public int[] getCapacityVector() {
-		createCapacityVector();
-		return capacityVector;
-	}
-
-
-	/**
-	 * Return the capacity Matrix for the Petri-Net
-	 * @return The capacity Matrix for the Petri-Net
-	 */
-	public int[] getPriorityVector() {
-		createPriorityVector();
-		return priorityVector;
-	}
-
-
-	/**
-	 * Return the capacity Matrix for the Petri-Net
-	 * @return The capacity Matrix for the Petri-Net
-	 */
-	public boolean[] getTimedVector() {
-		createTimedVector();
-		return timedVector;
-	}
 
 
 	/**

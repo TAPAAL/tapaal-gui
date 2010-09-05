@@ -29,9 +29,9 @@ public abstract class JarUtilities {
    }
 
    
-   public static ArrayList getJarEntries(JarFile jarFile, String directory) {
-      Enumeration enumeration = jarFile.entries();
-      ArrayList <JarEntry> nets = new ArrayList();
+   public static ArrayList<JarEntry> getJarEntries(JarFile jarFile, String directory) {
+      Enumeration<JarEntry> enumeration = jarFile.entries();
+      ArrayList <JarEntry> nets = new ArrayList<JarEntry>();
       directory = directory + System.getProperty("file.separator");
       
       while (enumeration.hasMoreElements()) {
