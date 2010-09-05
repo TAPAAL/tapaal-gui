@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
-import javax.swing.JOptionPane;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
