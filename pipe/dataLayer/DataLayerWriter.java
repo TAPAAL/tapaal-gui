@@ -161,18 +161,7 @@ public class DataLayerWriter {
 				NET.appendChild(newArc);
 			}
 
-			StateGroup[] stateGroups = netModel.getStateGroups();
-			for(int i = 0; i< stateGroups.length; i++) {
-				Element newStateGroup = createStateGroupElement(stateGroups[i], pnDOM);
-
-				int numConditions = stateGroups[i].numElements();
-				String[] conditions = stateGroups[i].getConditions();
-				for(int j = 0; j<numConditions; j++) {
-					newStateGroup.appendChild(createCondition(conditions[j], pnDOM));
-				}
-				NET.appendChild(newStateGroup);
-			}
-
+	
 			ArrayList<TAPNQuery> queries = netModel.getQueries();
 			for (TAPNQuery query : queries){
 				Element newQuery = createQueryElement(query, pnDOM);
@@ -626,34 +615,6 @@ public class DataLayerWriter {
 		}
 		return labelElement;
 	}   
-
-
-	/**
-	 * Creates a State Group Element for a PNML Petri-Net DOM
-	 *
-	 * @param inputStateGroup Input State Group
-	 * @param document Any DOM to enable creation of Elements and Attributes
-	 * @return State Group Element for a PNML Petri-Net DOM
-	 * @author Barry Kearns, August 2007
-	 */
-	private Element createStateGroupElement(StateGroup inputStateGroup, Document document){
-		Element stateGroupElement = null;
-
-		if(document != null) {
-			stateGroupElement = document.createElement("stategroup");
-		}
-
-		if(inputStateGroup != null ) {
-			String idInput = inputStateGroup.getId();
-			String nameInput = inputStateGroup.getName();
-
-			stateGroupElement.setAttribute("name", 
-					(nameInput != null ? nameInput 
-							: (idInput != null && idInput.length() > 0? idInput : "")));
-			stateGroupElement.setAttribute("id", (idInput != null ? idInput : "error"));
-		}
-		return stateGroupElement;
-	}
 
 
 	private Element createCondition(String condition, Document document) {

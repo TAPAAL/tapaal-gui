@@ -162,10 +162,6 @@ implements Cloneable {
 	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
 	private Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>> tapnInhibitorsMap = null;
 
-	/** An ArrayList used store the source / destination state groups associated 
-	 * with this Petri-Net */
-	private ArrayList<StateGroup> stateGroups = null;   
-
 	private HashSet<String> markingParameterHashSet = new HashSet<String>();
 
 	private HashSet<String> rateParameterHashSet = new HashSet<String>();
@@ -265,7 +261,6 @@ implements Cloneable {
 		inhibitorsArray = new ArrayList();
 		//tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList();
-		stateGroups = new ArrayList<StateGroup>();
 		markingParametersArray = new ArrayList();
 		rateParametersArray = new ArrayList();
 		
@@ -759,41 +754,6 @@ implements Cloneable {
 	}
 
 
-	public void addStateGroup(StateGroup stateGroupInput) {
-		boolean unique = true;
-		String id = null;
-		int no = stateGroups.size();
-
-		// Check if ID is set from PNML file
-		if (stateGroupInput.getId() != null &&
-				stateGroupInput.getId().length() > 0) {
-			id = stateGroupInput.getId();
-
-			// Check if ID is unique
-			for (int i = 0; i < stateGroups.size(); i++) {
-				if(id.equals(stateGroups.get(i).getId())) {
-					unique = false;
-				}
-			}
-		} else {
-			unique = false;
-		}
-
-		// Find a unique ID for the new state group
-		if (!unique) {
-			id = "SG" + no;
-			for (int i = 0; i < stateGroups.size(); i++) {
-				// If a matching ID is found, increment id and reset loop
-				if (id.equals(stateGroups.get(i).getId())) {
-					id = "SG" + ++no;
-					i = 0;
-				}
-			}
-			stateGroupInput.setId(id);
-		}
-		stateGroups.add(stateGroupInput);
-	}   
-
 	/**
 	 * Add any PetriNetObject - the object will be added to the appropriate list.
 	 * If the object passed in isn't a Transition, Place or Arc nothing will happen.
@@ -1085,33 +1045,6 @@ implements Cloneable {
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
 	}
-
-
-	/**
-	 *  This method removes a state group from the arrayList
-	 * @param SGObject The State Group objet to be removed
-	 */
-	public void removeStateGroup(StateGroup SGObject) {
-		stateGroups.remove(SGObject);
-	}
-
-	/**
-	 * Checks whether a state group with the same name exists already as the
-	 * argument
-	 * * @param stateName
-	 * @return
-	 */
-	public boolean stateGroupExistsAlready(String stateName) {
-		Iterator<StateGroup> i = stateGroups.iterator();
-		while(i.hasNext()) {
-			StateGroup stateGroup = i.next();
-			String stateGroupName = stateGroup.getName();
-			if (stateName.equals(stateGroupName)) {
-				return true;
-			}
-		}
-		return false;
-	}   
 
 
 	/**
@@ -3155,52 +3088,7 @@ implements Cloneable {
 		} 
 	}
 
-	/**
-	 * Creates a StateGroup object from a DOM element
-	 *
-	 * @param inputStateGroupElement input state group DOM Element
-	 * @return StateGroup Object
-	 */
-	private StateGroup createStateGroup(Element inputStateGroupElement) {
-		// Create the state group with name and id
-		String id = inputStateGroupElement.getAttribute("id");
-		String name = inputStateGroupElement.getAttribute("name");
-		StateGroup newGroup = new StateGroup(id, name);
-
-		Node node = null;
-		NodeList nodelist = null;
-		StringTokenizer tokeniser;
-		nodelist = inputStateGroupElement.getChildNodes();
-
-		// If this state group contains states then add them
-		if (nodelist.getLength() > 0) {
-			for (int i = 1; i < nodelist.getLength()-1; i++) {
-				node = nodelist.item(i);
-				if(node instanceof Element) {
-					Element element = (Element)node;
-					if ("statecondition".equals(element.getNodeName() )) {
-						// Loads the condition in the form "P0 > 4"
-						String condition = element.getAttribute("value");
-						// Now we tokenise the elements of the condition
-						// (i.e. "P0" ">" "4") to create a state
-						tokeniser = new StringTokenizer(condition);
-						newGroup.addState(tokeniser.nextToken(), tokeniser.nextToken(), tokeniser.nextToken());
-					}
-				}
-			}
-		}
-		return newGroup;
-	}   
-
-
-	public StateGroup[] getStateGroups() {
-		StateGroup[] returnArray = new StateGroup[stateGroups.size()];
-		for(int i = 0; i < stateGroups.size(); i++) {
-			returnArray[i] = stateGroups.get(i);
-		}
-		return returnArray;
-	}   
-
+	
 
 	private TAPNQuery createQuery(Element queryElement) {
 
