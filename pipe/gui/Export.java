@@ -236,7 +236,12 @@ public class Export {
 				
 				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
 				if (filename!=null) {
-					TikZExporter output = new TikZExporter(model,filename,tikZOption);
+					TikZExporter output;
+					if(!model.isUsingColors()){
+						output = new TikZExporter(model,filename,tikZOption);
+					}else{
+						output = new TikZExporterForColoredTAPN(model, filename, tikZOption);
+					}
 					output.ExportToTikZ();
 				}
 			}

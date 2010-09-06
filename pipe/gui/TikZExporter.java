@@ -169,22 +169,8 @@ public class TikZExporter {
 		StringBuffer out = new StringBuffer();
 		for(Place place:places){
 
-			String invariant = "";
-			if(!((TimedPlace)place).getInvariant().contains("inf"))
-				invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant())+",";
-
-
-			ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
-			String tokensInPlace= "";
-			if(tokens.size() > 0)
-			{
-				if(tokens.size() == 1){
-					tokensInPlace = "structured tokens={"+tokens.get(0).setScale(1)+"},";
-				}
-				else{
-					tokensInPlace = exportMultipleTokens(tokens);
-				}
-			}
+			String invariant = getPlaceInvariantString(place);
+			String tokensInPlace = tokensInPlace = getTokenListStringFor(place);
 
 			out.append("\\node[place,label=above:");
 			out.append(exportMathName(place.getName()));
@@ -201,6 +187,28 @@ public class TikZExporter {
 		}
 
 		return out;
+	}
+
+	protected String getTokenListStringFor(Place place) {
+		ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
+		String tokensInPlace = "";
+		if(tokens.size() > 0)
+		{
+			if(tokens.size() == 1){
+				tokensInPlace = "structured tokens={"+tokens.get(0).setScale(1)+"},";
+			}
+			else{
+				tokensInPlace = exportMultipleTokens(tokens);
+			}
+		}
+		return tokensInPlace;
+	}
+
+	protected String getPlaceInvariantString(Place place) {
+		String invariant = "";
+		if(!((TimedPlace)place).getInvariant().contains("inf"))
+			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant())+",";
+		return invariant;
 	}
 
 	private String exportMultipleTokens(ArrayList<BigDecimal> tokens)
@@ -232,8 +240,8 @@ public class TikZExporter {
 		return out;
 	}
 
-	private String replaceWithMathLatex(String text){
-		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq ")+"$";
+	protected String replaceWithMathLatex(String text){
+		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq ").replace("{", "\\{").replace("}","\\}").replace("*", "\\cdot ")+"$";
 	}
 
 	private String exportMathName(String name){

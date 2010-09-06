@@ -104,7 +104,7 @@ public class ColoredTimedPlace extends TimedPlace {
 
 
 	@Override
-	protected String getInvariantString() {
+	public String getInvariantString() {
 		
 		String inv = timeInvariant.goesToInfinity() ? "" : "\nage " + timeInvariant.toString();
 		if(!colorInvariant.isEmpty()){
