@@ -1,18 +1,24 @@
 package pipe.gui;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
+import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.colors.ColorSet;
+import pipe.dataLayer.colors.ColoredInhibitorArc;
+import pipe.dataLayer.colors.ColoredInputArc;
+import pipe.dataLayer.colors.ColoredInterval;
+import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
-import pipe.gui.TikZExporter.TikZOutputOption;
+import pipe.dataLayer.colors.ColoredTransportArc;
 
 public class TikZExporterForColoredTAPN extends TikZExporter {
 
+	private final int MULTILINE_SHIFT_VALUE = 3;
+	
 	public TikZExporterForColoredTAPN(DataLayer net, String fullpath,
 			TikZOutputOption option) {
 		super(net, fullpath, option);
@@ -23,22 +29,24 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 		ColoredTimedPlace ctp = (ColoredTimedPlace)place;
 
 		String timeInvariant = ctp.getTimeInvariant().toString();
-		String colorInvariant = ctp.getColorInvariantString();
+		String colorInvariant = "\\{" + ctp.getColorInvariantStringWithoutSetNotation() + "\\}";
 		boolean shiftColorInvariant = false;
 		if(!timeInvariant.contains("inf")){
-			invariant.append("label=below: age ");
-			invariant.append(replaceWithMathLatex(timeInvariant));
+			invariant.append("label=below:");
+			invariant.append(replaceWithMathLatex("\\mathit{age}" + timeInvariant));
 			invariant.append(",");
 			shiftColorInvariant = true;
 		}	
 		
-		if(!colorInvariant.isEmpty()){
+		if(!colorInvariant.equals("\\{\\}")){
 			invariant.append("label={");
 			if(shiftColorInvariant){
-				invariant.append("[yshift=-4mm]");
+				invariant.append("[yshift=-");
+				invariant.append(MULTILINE_SHIFT_VALUE);
+				invariant.append("mm]");
 			}
-			invariant.append("below: val ");
-			invariant.append(replaceWithMathLatex("\\in" + colorInvariant));
+			invariant.append("below: ");
+			invariant.append(replaceWithMathLatex("\\mathit{val} \\in " + colorInvariant));
 			invariant.append("},");
 		}
 
@@ -68,4 +76,48 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 		}
 		return tokensInPlace;
 	}	
+	
+	protected String getArcLabels(Arc arc){
+		StringBuffer result = new StringBuffer("");
+		
+		ColorSet colorGuard = new ColorSet();
+		ColoredInterval timeGuard = new ColoredInterval();
+		
+		if(arc instanceof ColoredInputArc){
+			ColoredInputArc cia = (ColoredInputArc)arc;
+			timeGuard = cia.getTimeGuard();
+			colorGuard = cia.getColorGuard();
+		}else if(arc instanceof ColoredTransportArc){
+			ColoredTransportArc cta = (ColoredTransportArc)arc;
+			timeGuard = cta.getTimeGuard();
+			colorGuard = cta.getColorGuard();
+		}else if(arc instanceof ColoredInhibitorArc){
+			ColoredInhibitorArc cia = (ColoredInhibitorArc)arc;
+			timeGuard = cia.getTimeGuard();
+			colorGuard = cia.getColorGuard();
+		}
+		
+		String line1 = "\\mathit{age} \\in" +timeGuard.toString();;
+		String line2 = "\\mathit{val} \\in \\{" + colorGuard.toStringNoSetNotation() + "\\}";
+		boolean usesLine2 = !colorGuard.isEmpty();;
+		
+		result.append("node[midway,auto");
+		if(usesLine2){
+			result.append(",yshift=");
+			result.append(MULTILINE_SHIFT_VALUE);
+			result.append("mm");
+		}
+		result.append("] {");
+		result.append(replaceWithMathLatex(line1));
+		result.append("}");
+		
+		if(usesLine2){
+			result.append("node[midway,auto");
+			result.append("] {");
+			result.append(replaceWithMathLatex(line2));
+			result.append("}");
+		}
+		
+		return result.toString();
+	}
 }

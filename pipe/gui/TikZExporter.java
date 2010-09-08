@@ -100,7 +100,6 @@ public class TikZExporter {
 			}
 			else if(arc instanceof TransportArc){
 				arrowType = "transportArc";
-				arcNo = String.valueOf(((TransportArc)arc).getGroupNr());
 			}
 			else if(arc instanceof TimedArc){
 				arrowType = "arc";
@@ -110,23 +109,7 @@ public class TikZExporter {
 			}
 
 
-			String arcLabel ="";
-			if(arc instanceof TimedArc)
-			{
-				if(!(arc.getSource() instanceof TAPNTransition)){
-					arcLabel = "node[midway,auto] {";
-					arcLabel += replaceWithMathLatex(((TimedArc)arc).getGuard());
-
-					if(arcNo != "")
-						arcLabel += ":"+arcNo;
-
-					arcLabel += "}";
-				}
-				else{
-					if(arcNo != "")
-						arcLabel = "node[midway,auto] {"+arcNo+"}";
-				}
-			}
+			String arcLabel = getArcLabels(arc);
 			
 			out.append("\\draw[");
 			out.append(arrowType);
@@ -141,6 +124,27 @@ public class TikZExporter {
 			out.append(" {};\n");
 		}
 		return out;
+	}
+
+	protected String getArcLabels(Arc arc) {
+		String arcLabel ="";
+		if(arc instanceof TimedArc)
+		{
+			if(!(arc.getSource() instanceof TAPNTransition)){
+				arcLabel = "node[midway,auto] {";
+				arcLabel += replaceWithMathLatex(((TimedArc)arc).getGuard());
+
+				if(arc instanceof TransportArc)
+					arcLabel += ":"+ ((TransportArc)arc).getGroupNr();
+
+				arcLabel += "}";
+			}
+			else{
+				if(arc instanceof TransportArc)
+					arcLabel = "node[midway,auto] {"+((TransportArc)arc).getGroupNr()+"}";
+			}
+		}
+		return arcLabel;
 	}
 
 	private StringBuffer exportTransitions(Transition[] transitions) {
@@ -170,7 +174,7 @@ public class TikZExporter {
 		for(Place place:places){
 
 			String invariant = getPlaceInvariantString(place);
-			String tokensInPlace = tokensInPlace = getTokenListStringFor(place);
+			String tokensInPlace = getTokenListStringFor(place);
 
 			out.append("\\node[place,label=above:");
 			out.append(exportMathName(place.getName()));
@@ -241,7 +245,7 @@ public class TikZExporter {
 	}
 
 	protected String replaceWithMathLatex(String text){
-		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq ").replace("{", "\\{").replace("}","\\}").replace("*", "\\cdot ")+"$";
+		return "$"+text.replace("inf", "\\infty").replace("<=","\\leq ").replace("*", "\\cdot ")+"$";
 	}
 
 	private String exportMathName(String name){
