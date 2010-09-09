@@ -5,7 +5,6 @@ import java.util.List;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -14,6 +13,7 @@ import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
+import pipe.dataLayer.colors.Preserve;
 
 public class TikZExporterForColoredTAPN extends TikZExporter {
 
@@ -97,9 +97,34 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 			colorGuard = cia.getColorGuard();
 		}
 		
-		String line1 = "\\mathit{age} \\in" +timeGuard.toString();;
-		String line2 = "\\mathit{val} \\in \\{" + colorGuard.toStringNoSetNotation() + "\\}";
-		boolean usesLine2 = !colorGuard.isEmpty();;
+		String line1 = null; 
+		String line2 = null;
+		boolean usesLine2 = false;
+		
+		if(arc instanceof ColoredOutputArc){
+			line1 = ((ColoredOutputArc)arc).getOutputString();
+		}else if(arc instanceof ColoredTransportArc && !((ColoredTransportArc)arc).isInPreSet()){
+			ColoredTransportArc cta = (ColoredTransportArc)arc;
+			usesLine2 = true;
+			Preserve preserves = cta.getPreservation();
+			if(preserves == null){
+				preserves = Preserve.AgeAndValue;
+			}
+			if(preserves.equals(Preserve.Age)){
+				line1 = "\\text{preserve } \\mathit{age} : " + cta.getGroup();
+				line2 = cta.getOutputString();
+			}else if(preserves.equals(Preserve.Value)){
+				line1 = "\\mathit{age} := 0 : " + cta.getGroup();
+				line2 = "\\text{preserve }\\mathit{val}";
+			}else{
+				line1 = "\\text{preserve } \\mathit{age} : " + cta.getGroup();
+				line2 = "\\text{preserve } \\mathit{val}";
+			}
+		}else{
+			line1 = "\\mathit{age} \\in" +timeGuard.toString();;
+			line2 = "\\mathit{val} \\in \\{" + colorGuard.toStringNoSetNotation() + "\\}";
+			usesLine2 = !colorGuard.isEmpty();;
+		}
 		
 		result.append("node[midway,auto");
 		if(usesLine2){

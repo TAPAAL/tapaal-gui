@@ -75,20 +75,26 @@ public class ColoredTransportArc extends TransportArc {
 				guard += "\n val \u2208 " + colorGuard.toString();
 			}
 		} else {
-			if(preserves == null){
-				preserves = Preserve.AgeAndValue;
-			}
-			if(preserves.equals(Preserve.Age)){
-				guard = "preserve age : " + getGroup() + "\n" + getOutputString();
-			}else if(preserves.equals(Preserve.Value)){
-				guard = "age := 0 : " + getGroup() + "\n preserve val";
-			}else{
-				guard = "preserve age : " + getGroup() + "\n preserve val";
-			}
+			guard = getPreservationString();
 		}
 
 		weightLabel.setText(guard);
 		this.setWeightLabelPosition();
+	}
+
+	public String getPreservationString() {
+		String guard;
+		if(preserves == null){
+			preserves = Preserve.AgeAndValue;
+		}
+		if(preserves.equals(Preserve.Age)){
+			guard = "preserve age : " + getGroup() + "\n" + getOutputString();
+		}else if(preserves.equals(Preserve.Value)){
+			guard = "age := 0 : " + getGroup() + "\n preserve val";
+		}else{
+			guard = "preserve age : " + getGroup() + "\n preserve val";
+		}
+		return guard;
 	}
 
 	public String getColorGuardStringWithoutSetNotation() {

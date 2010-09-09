@@ -46,6 +46,7 @@ public class TikZExporter {
 				out.println("\\documentclass[a4paper]{article}");
 				out.println("\\usepackage{tikz}");
 				out.println("\\usetikzlibrary{petri,arrows}");
+				out.println("\\usepackage{amstext}");
 				out.println();
 				out.println("\\begin{document}");
 				out.println();
@@ -94,7 +95,6 @@ public class TikZExporter {
 				arcPoints += "-- ("+point.getX()*scale+","+point.getY()*scale*(-1)+") ";
 			}
 			String arrowType ="";
-			String arcNo = "";
 			if(arc instanceof TAPNInhibitorArc){
 				arrowType = "-o";
 			}

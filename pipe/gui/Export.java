@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
 import javax.print.Doc;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -92,7 +93,7 @@ public class Export {
 
 
 	public static void toPNG(JComponent g,String filename) throws IOException {
-		Iterator i = ImageIO.getImageWritersBySuffix("png");
+		Iterator<ImageWriter> i = ImageIO.getImageWritersBySuffix("png");
 		if (!i.hasNext()) {
 			throw new RuntimeException("No ImageIO exporters can handle PNG");
 		}
