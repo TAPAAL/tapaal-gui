@@ -35,7 +35,6 @@ import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.FileBrowser;
@@ -64,9 +63,8 @@ public class Export {
 	public static final int PNG = 1;
 	public static final int POSTSCRIPT = 2;
 	public static final int PRINTER = 3;
-	public static final int TN = 4;
 	public static final int TIKZ = 5;
-	
+
 
 	public static void toPostScript(Object g,String filename) 
 	throws PrintException, IOException {
@@ -106,22 +104,6 @@ public class Export {
 		ImageIO.write(img, "png", f);
 	}
 
-
-	public static void toTN(DataLayer net, String filename) throws IOException{
-		TNTransformer tnt = new TNTransformer();
-		try{
-			tnt.saveTN(new File(filename), net);
-		}catch(javax.xml.parsers.ParserConfigurationException e){
-			System.out.println(e);
-		}catch(javax.xml.transform.TransformerConfigurationException e){
-			System.out.println(e);
-		}
-		catch(javax.xml.transform.TransformerException e){
-			System.out.println(e);
-		}
-	}
-
-
 	private static void toPrinter(Object g) throws PrintException {
 		///* The Swing way
 		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
@@ -156,13 +138,11 @@ public class Export {
 
 
 	public static void exportGuiView(GuiView g,int format, DataLayer model) {
-		boolean gridEnabled = Grid.isEnabled();
-		String filename = null;
-
 		if (g.getComponentCount() == 0) {
 			return;
 		}
 
+		String filename = null;
 		if (CreateGui.getFile() != null) {
 			filename=CreateGui.getFile().getAbsolutePath();
 			// change file extension
@@ -176,22 +156,15 @@ public class Export {
 					break;
 				case POSTSCRIPT: 
 					filename += "ps";
-					break;
-				case TN:
-					filename += "xml";
-					break;             
+					break;  
 				case TIKZ:
 					filename += "tex";
 				}
 			}
 		}
 
-		// Stuff to make it export properly
-		g.updatePreferredSize();
-		PetriNetObject.ignoreSelection(true);
-		if (gridEnabled) {
-			Grid.disableGrid();
-		}
+		boolean gridEnabled = Grid.isEnabled();
+		setupViewForExport(g, gridEnabled);
 
 		try {
 			switch (format) {
@@ -209,32 +182,26 @@ public class Export {
 				break;
 			case PRINTER:
 				toPrinter(g);
-				break;
-			case TN:
-				filename=new FileBrowser("TN net","xml",filename).saveFile();
-				if (filename!=null) {
-					toTN(model,filename);
-				}
 				break;  
 			case TIKZ:
 				Object[] possibilities = {"Only the TikZ figure", "Full compilable LaTex including your figure"};
 				String figureOptions = (String)JOptionPane.showInputDialog(
-									CreateGui.getApp(),
-				                    "Choose how you would like your TikZ figure outputted: \n",
-				                    "Customized Dialog",
-				                    JOptionPane.PLAIN_MESSAGE,
-				                    null,
-				                    possibilities,
-				                    "Only the TikZ figure");
+						CreateGui.getApp(),
+						"Choose how you would like your TikZ figure outputted: \n",
+						"Export to TikZ",
+						JOptionPane.PLAIN_MESSAGE,
+						null,
+						possibilities,
+						"Only the TikZ figure");
 				TikZExporter.TikZOutputOption tikZOption  = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if(figureOptions == null)
 					return;
-				
+
 				if(figureOptions == possibilities[0])
 					tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
 				if(figureOptions == possibilities[1])
 					tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
-				
+
 				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
 				if (filename!=null) {
 					TikZExporter output;
@@ -254,20 +221,35 @@ public class Export {
 			);
 		}
 
+		resetViewAfterExport(g, gridEnabled);
+
+		return;
+	}
+
+
+	private static void resetViewAfterExport(GuiView g, boolean gridEnabled) {
 		if (gridEnabled) {
 			Grid.enableGrid();
 		}
 		PetriNetObject.ignoreSelection(false);
 		g.repaint();
+	}
 
-		return;
+
+	private static void setupViewForExport(GuiView g, boolean gridEnabled) {
+		// Stuff to make it export properly
+		g.updatePreferredSize();
+		PetriNetObject.ignoreSelection(true);
+		if (gridEnabled) {
+			Grid.disableGrid();
+		}
 	}
 
 	public static void exportUppaalAdvancedGuiView(GuiView appView, DataLayer AppModel) {
 		// TODO Auto-generated method stub
 		boolean gridEnabled = Grid.isEnabled();
 		String filename = null;
-		
+
 		//Create transformer
 		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(AppModel, 0);
 		TAPN model=null;
@@ -292,28 +274,23 @@ public class Export {
 			}
 		}
 
-		// Stuff to make it export proper
-		appView.updatePreferredSize();
-		PetriNetObject.ignoreSelection(true);
-		if (gridEnabled) {
-			Grid.disableGrid();
-		}
+		setupViewForExport(appView, gridEnabled);
 
-		 //int currentCapacity = this.getCapacity();
+		//int currentCapacity = this.getCapacity();
 
 		//String input = JOptionPane.showInputDialog("Maximum number of extra capacity tokens:", String.valueOf(currentCapacity));
 		String input = JOptionPane.showInputDialog("Number of ekstra token capacity : (use x - y to generate from x to ty)", 0);
-		
+
 		int capacity;
 		int capacitymax=0;
-		
+
 		if (input.contains("-")) {
 			//Generate many files
-			
+
 			String[] t =  input.split("-");
 			capacity = Integer.parseInt(t[0]);
 			capacitymax = Integer.parseInt(t[1]);
-			
+
 
 		}else {
 			try {
@@ -333,13 +310,13 @@ public class Export {
 
 		}
 
-		
+
 		TAPNQuery inputFromGUI = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogue.QueryDialogueOption.Export, null);
 		if (inputFromGUI == null) {return;}
 		String inputQuery = inputFromGUI.query;
-		
-		
-		
+
+
+
 		//Selete export type
 		input = JOptionPane.showInputDialog(CreateGui.getApp(),"Please enter the export tecqnique: \n" +
 				"(enter nothing): naive export\n" +
@@ -350,9 +327,9 @@ public class Export {
 				"-c -s -d capacity with symetry reduction and nice draw, \n" +
 				"-o order preset" +
 				"-y kyrke testing" + 
-				"-s -d -r for remove unsused");
-				
-		
+		"-s -d -r for remove unsused");
+
+
 		boolean drawnice=false, symred = false;
 		boolean minialmodel = false;
 		boolean capacityminial = false;
@@ -360,31 +337,31 @@ public class Export {
 		boolean removeun = false;
 		boolean orderpreset = false;
 		boolean kyrketesting = false;
-		
+
 		if (input.contains("-r")) {
 			System.out.println("removeun selected");
 			removeun = true;
 		} 
-		
+
 		if (input.contains("-s")) {
 			symred = true;
 		} 
-		
+
 		if (input.contains("-z")) {
 		}
 		if (input.contains("-o")) {
 			orderpreset = true;
 		} 
-		
+
 		if (input.contains("-y")) {
 			kyrketesting = true;
 		} 
-		
+
 		if (input.contains("-d")) {
 			System.out.println("drawnice selected");
 			drawnice = true;
 		} 
-		
+
 		if (input.contains("-n") && input.contains("-d")) {
 			try {
 				throw new Exception("Export method not implemented");
@@ -393,16 +370,16 @@ public class Export {
 				e.printStackTrace();
 			}
 		}
-		
+
 		if (input.contains("-m")){
 			minialmodel = true;
 		}
-		
+
 		if (input.contains("-c")){
 			capacityminial = true;
 		}
-		
-//		Get export file
+
+		//		Get export file
 		try {
 			filename = new FileBrowser("Uppaal XML","xml",filename).saveFile();
 		} catch (Exception e) {
@@ -413,11 +390,11 @@ public class Export {
 			);
 		}
 
-		
-		
-		
-		
-		
+
+
+
+
+
 		// Do transform
 		try {
 			model.convertToConservative();
@@ -425,54 +402,54 @@ public class Export {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		if (orderpreset){
-			
+
 			model.orderPresetRescrition();
-			
+
 			for (dk.aau.cs.petrinet.Arc a : model.getTransitions().get(0).getPreset()){
 				System.out.println(a);
 			}
 		}
 		KyrketestUppaalSym test = null;
 		try {
-			
+
 			if (minialmodel){
 				model = model.convertToDegree2("minimal");
 			} else if (capacityminial)  {
 				model = model.convertToDegree2("capacity");
 			} else if (kyrketesting) {
-				
+
 				test = new KyrketestUppaalSym(model);
 				model = test.transform(model);
-				
+
 			}else {
-			
+
 				model = model.convertToDegree2();
 			}
-			
+
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		int i = capacity;
 		String[] a = filename.split(".xml");
-		
+
 		do {
 			//Create uppaal query file
 			//Remove the .xml part
-			
+
 			filename=a[0];	
 
 			if (capacitymax != 0) {
 				// Append number to name
 				filename+="-"+i;
 			}
-			
+
 			//Create uppaal xml file
 			try {
-				
+
 				if (kyrketesting){
 					test = new KyrketestUppaalSym(model);
 					test.transformToUppaal(new PrintStream(new File(filename+".xml")), i);
@@ -487,7 +464,7 @@ public class Export {
 
 
 			try {
-				
+
 				if (kyrketesting){
 					test.transformQueriesToUppaal(i, inputQuery, new PrintStream(new File(filename+".q")));
 				}else {
@@ -505,24 +482,20 @@ public class Export {
 				"The uppaal files .xml and .q have been generated.",
 				"Translation into UPPAAL finished",
 				JOptionPane.INFORMATION_MESSAGE);
-	
-	
 
 
-	if (gridEnabled) {
-		Grid.enableGrid();
+
+
+		resetViewAfterExport(appView, gridEnabled);
+
+		return;
 	}
-	PetriNetObject.ignoreSelection(false);
-	appView.repaint();
-
-	return;
-}
 
 	public static void exportUppaalGuiView(GuiView appView, DataLayer AppModel) {
 		// TODO Auto-generated method stub
 		boolean gridEnabled = Grid.isEnabled();
 		String filename = null;
-		
+
 		//Create transformer
 		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(AppModel, 0);
 		TAPN model=null;
@@ -547,19 +520,14 @@ public class Export {
 			}
 		}
 
-		// Stuff to make it export properly
-		appView.updatePreferredSize();
-		PetriNetObject.ignoreSelection(true);
-		if (gridEnabled) {
-			Grid.disableGrid();
-		}
+		setupViewForExport(appView, gridEnabled);
 
-		 //int currentCapacity = this.getCapacity();
+		//int currentCapacity = this.getCapacity();
 
 		//String input = JOptionPane.showInputDialog("Maximum number of extra capacity tokens:", String.valueOf(currentCapacity));
-//		String input = JOptionPane.showInputDialog("Number of ekstra token capacity :", 0);
+		//		String input = JOptionPane.showInputDialog("Number of ekstra token capacity :", 0);
 		int capacity;
-/*		try {
+		/*		try {
 			capacity = Integer.parseInt(input);
 			if (capacity < 0)
 				JOptionPane.showMessageDialog(CreateGui.getApp(),"Please enter a positive number.");
@@ -573,16 +541,16 @@ public class Export {
 			System.err.println(exc.toString());
 			return;
 		}
-*/		
+		 */		
 
 
 		TAPNQuery inputFromGUI = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogue.QueryDialogueOption.Export, null);
 		if (inputFromGUI == null) {return;}
 		capacity = inputFromGUI.capacity;
 		String inputQuery = inputFromGUI.query;
-		
-		
-//		Get export file
+
+
+		//		Get export file
 		try {
 			filename = new FileBrowser("Uppaal XML","xml",filename).saveFile();
 		} catch (Exception e) {
@@ -593,9 +561,9 @@ public class Export {
 			);
 		}
 
-		
 
-		
+
+
 		// Do transform
 		try {
 			model.convertToConservative();
@@ -603,16 +571,16 @@ public class Export {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		try {
 			model = model.convertToDegree2();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
-		
+
+
+
 		//Create uppaal xml file
 		try {
 			TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer(model, new PrintStream(new File(filename)), capacity, false, false, false, false);
@@ -625,37 +593,33 @@ public class Export {
 		//Remove the .xml part
 		String[] a = filename.split(".xml");
 		filename=a[0];
-		
+
 		try {
 			model.transformQueriesToUppaal(capacity, inputQuery, new PrintStream(new File(filename+".q")));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.err.println("We had an error translating the query");
 		}
-		    
+
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				"The uppaal files .xml and .q have been generated.",
 				"Translation into UPPAAL finished",
 				JOptionPane.INFORMATION_MESSAGE);
-	
-	
 
 
-	if (gridEnabled) {
-		Grid.enableGrid();
+
+
+		resetViewAfterExport(appView, gridEnabled);
+
+		return;
 	}
-	PetriNetObject.ignoreSelection(false);
-	appView.repaint();
 
-	return;
-}
-	
-	
+
 	public static void exportUppaalSymetricGuiView(GuiView appView, DataLayer AppModel) {
 		// TODO Auto-generated method stub
 		boolean gridEnabled = Grid.isEnabled();
 		String filename = null;
-		
+
 		//Create transformer
 		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(AppModel, 0);
 		TAPN model=null;
@@ -680,19 +644,14 @@ public class Export {
 			}
 		}
 
-		// Stuff to make it export properly
-		appView.updatePreferredSize();
-		PetriNetObject.ignoreSelection(true);
-		if (gridEnabled) {
-			Grid.disableGrid();
-		}
+		setupViewForExport(appView, gridEnabled);
 
-		 //int currentCapacity = this.getCapacity();
+		//int currentCapacity = this.getCapacity();
 
 		//String input = JOptionPane.showInputDialog("Maximum number of extra capacity tokens:", String.valueOf(currentCapacity));
-//		String input = JOptionPane.showInputDialog("Number of ekstra token capacity :", 0);
+		//		String input = JOptionPane.showInputDialog("Number of ekstra token capacity :", 0);
 		int capacity;
-/*		try {
+		/*		try {
 			capacity = Integer.parseInt(input);
 			if (capacity < 0)
 				JOptionPane.showMessageDialog(CreateGui.getApp(),"Please enter a positive number.");
@@ -706,15 +665,15 @@ public class Export {
 			System.err.println(exc.toString());
 			return;
 		}
-*/		
+		 */		
 
 
 		TAPNQuery inputFromGUI = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogue.QueryDialogueOption.Export, null);
 		if (inputFromGUI == null) {return;}
 		capacity = inputFromGUI.capacity;
 		String inputQuery = inputFromGUI.query;
-		
-//		Get export file
+
+		//		Get export file
 		try {
 			filename = new FileBrowser("Uppaal XML","xml",filename).saveFile();
 		} catch (Exception e) {
@@ -725,9 +684,9 @@ public class Export {
 			);
 		}
 
-		
 
-		
+
+
 		// Do transform
 		try {
 			model.convertToConservative();
@@ -735,16 +694,16 @@ public class Export {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		try {
 			model = model.convertToDegree2();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
-		
+
+
+
 		//Create uppaal xml file
 		try {
 			TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer(model, new PrintStream(new File(filename)), capacity);
@@ -757,108 +716,23 @@ public class Export {
 		//Remove the .xml part
 		String[] a = filename.split(".xml");
 		filename=a[0];
-		
+
 		try {
 			model.transformQueriesToUppaal(capacity, inputQuery, new PrintStream(new File(filename+".q")));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.err.println("We had an error translating the query");
 		}
-		    
+
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				"The uppaal files .xml and .q have been generated.",
 				"Translation into UPPAAL finished",
 				JOptionPane.INFORMATION_MESSAGE);
-	
-	
 
+		resetViewAfterExport(appView, gridEnabled);
 
-	if (gridEnabled) {
-		Grid.enableGrid();
+		return;
 	}
-	PetriNetObject.ignoreSelection(false);
-	appView.repaint();
-
-	return;
-}
-
-	public static void exportDegree2(GuiView appView, DataLayer appModel) {
-		
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
-		TAPN model=null;
-		try {
-			model = transformer.getAAUTAPN();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-
-		
-		//CreateGui.getApp().createNewTab(model);
-		
-		try {
-			model.convertToConservative();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		TAPN model1=null, model2=null, model3 = null;
-		try {
-			model1 = model.convertToDegree2();
-			model2 = model.convertToDegree2capacity();
-			model3 = model.convertToDegree2("minimal");
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		/*
-		
-		try {
-			model.exportToDOT(new PrintStream(new File("/tmp/test1")));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		String command = "/tmp/script.sh";
-	    try {
-			Process child = Runtime.getRuntime().exec(command);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-		String filename="";
-		try {
-			filename = new FileBrowser("TAPN/PIPE XML","xml",filename).saveFile();
-		} catch (Exception e) {
-			// There was some problem with the action
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"There were errors performing the requested action:\n" + e,
-					"Error", JOptionPane.ERROR_MESSAGE
-			);
-		}
-		
-		String[] a = filename.split(".xml");
-		
-		try {
-			model1.exportToPIPExml(new PrintStream(new File(filename)));
-			model2.exportToPIPExml(new PrintStream(new File(a[0]+"1.xml")));
-			model3.exportToPIPExml(new PrintStream(new File(a[0]+"2.xml")));
-
-			
-			CreateGui.getApp().createNewTabFromFile(new File(filename),false);
-			CreateGui.getApp().createNewTabFromFile(new File(a[0]+"1.xml"),false);
-			CreateGui.getApp().createNewTabFromFile(new File(a[0]+"2.xml"),false);
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		
-	}
-
 
 	public static void exportUppaalXMLFromQuery(DataLayer appModel, TAPNQuery input) {
 		File xmlfile=null, qfile=null;
@@ -889,16 +763,16 @@ public class Export {
 				);				
 			}
 		}
-		
+
 		//Create transformer
 		PipeTapnToAauTapnTransformer transformer = null;
-		
+
 		if(appModel.isUsingColors()){
 			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
 		}else{
 			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
 		}
-		
+
 		TAPN model=null;
 		try {
 			model = transformer.getAAUTAPN();
@@ -937,10 +811,10 @@ public class Export {
 		}
 
 		if (inputQuery == null) {return;}
-		
+
 		// Select the model based on selected export option.
 		if (input.reductionOption == TAPNQuery.ReductionOption.NAIVE_UPPAAL_SYM){
-			
+
 			NaiveUppaalSym t = new NaiveUppaalSym();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
@@ -950,7 +824,7 @@ public class Export {
 			}
 
 		} else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_UPPAAL_SYM){
-			
+
 			AdvancedUppaalSym t = new AdvancedUppaalSym();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
@@ -968,11 +842,11 @@ public class Export {
 				e.printStackTrace();
 			}	
 
-			
+
 		} else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_STANDARD){
 			TAPNToNTATransformer trans = 
 				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
-			
+
 			try{
 				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -984,11 +858,11 @@ public class Export {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		} else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_SYM){
 			TAPNToNTATransformer trans = 
 				new dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer(capacity);
-			
+
 			try{
 				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -1113,6 +987,6 @@ public class Export {
 			}
 
 		}
-		
+
 	}	
 }

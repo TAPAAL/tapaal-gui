@@ -5,10 +5,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -29,7 +25,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -40,7 +35,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
@@ -64,7 +58,6 @@ import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TNTransformer;
 import pipe.dataLayer.TimedPlace;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
@@ -121,8 +114,8 @@ implements ActionListener, Observer {
 	//	XXX kyrke testing 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
-	exportTNAction, exportPSAction, importAction, exportToUppaal,
-	exportToUppaalAdvanced,exportToUppaalSymetric,  exportToTest,exportToTikZAction;
+	exportPSAction, exportToUppaal,
+	exportToUppaalAdvanced,exportToUppaalSymetric, exportToTikZAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -145,7 +138,7 @@ implements ActionListener, Observer {
 	public boolean dragging = false;
 
 	private HelpBox helpAction;
-	
+
 
 	private boolean editionAllowed = true;
 
@@ -924,7 +917,7 @@ EOC */
 	 * @param filename Filename of net to load, or <b>null</b> to create a new,
 	 *                 empty tab
 	 */
-	public void createNewTabFromFile(File file, boolean isTN) {
+	public void createNewTabFromFile(File file) {
 		int freeSpace = CreateGui.getFreeSpace();
 		String name="";
 
@@ -955,30 +948,21 @@ EOC */
 
 		if(file != null){
 			try {
-				//BK 10/02/07: Changed loading of PNML to accomodate new
-				//PNMLTransformer class
-				CreateGui.setFile(file,freeSpace);
-				if (isTN) {
-					TNTransformer transformer=new TNTransformer();
-					appModel.createFromPNML(
-							transformer.transformTN(file.getPath()));
-				} else {
-					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-					Document doc = builder.parse(file);
+				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				Document doc = builder.parse(file);
 
-					Node top = doc.getElementsByTagName("net").item(0);
-					boolean colors = ((Element)top).getAttribute("type").equals("Colored P/T net");
+				Node top = doc.getElementsByTagName("net").item(0);
+				boolean colors = ((Element)top).getAttribute("type").equals("Colored P/T net");
 
-					if(colors){
-						appModel.createFromPNML(doc,true);
-					}else{
-						PNMLTransformer transformer = new PNMLTransformer();
-						Document PNMLDoc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
-						appModel.createFromPNML(PNMLDoc, false);
-					}
-
-					appView.scrollRectToVisible(new Rectangle(0,0,1,1));
+				if(colors){
+					appModel.createFromPNML(doc,true);
+				}else{
+					PNMLTransformer transformer = new PNMLTransformer();
+					Document PNMLDoc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
+					appModel.createFromPNML(PNMLDoc, false);
 				}
+
+				appView.scrollRectToVisible(new Rectangle(0,0,1,1));
 
 				CreateGui.setFile(file,freeSpace);
 			} catch(Exception e) {
@@ -1477,7 +1461,7 @@ EOC */
 
 
 		public void actionPerformed(ActionEvent e){
-			createNewTabFromFile(filename, false);
+			createNewTabFromFile(filename);
 			CreateGui.createLeftPane();
 		}
 
@@ -1769,6 +1753,11 @@ EOC */
 
 	class VerificationAction extends GuiAction{
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4588356505465429153L;
+
 		VerificationAction(String name, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 		}
@@ -1782,6 +1771,11 @@ EOC */
 	}
 
 	class FileAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1438830908690683060L;
 
 		//constructor
 		FileAction(String name, String tooltip, String keystroke) {
@@ -1798,18 +1792,10 @@ EOC */
 				if ((filePath != null) && filePath.exists()
 						&& filePath.isFile() && filePath.canRead()) {
 					CreateGui.userPath = filePath.getParent();
-					createNewTabFromFile(filePath, false);
+					createNewTabFromFile(filePath);
 
 					//TODO make update leftPane work better
 					CreateGui.createLeftPane();
-				}
-			} else if (this == importAction) {
-				File filePath = new FileBrowser(CreateGui.userPath).openFile();
-				if ((filePath != null) && filePath.exists() && filePath.isFile() &&
-						filePath.canRead()) {
-					CreateGui.userPath = filePath.getParent();
-					createNewTabFromFile(filePath,true);
-					appView.getSelectionObject().enableSelection();
 				}
 			} else if (this == createAction) {
 				showNewPNDialog();
@@ -1826,16 +1812,12 @@ EOC */
 				Export.exportGuiView(appView, Export.TIKZ, appModel);
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
-			} else if (this == exportTNAction){
-				Export.exportGuiView(appView, Export.TN, appModel);
 			} else if (this == exportToUppaal) {
 				Export.exportUppaalGuiView(appView, appModel);
 			} else if (this == exportToUppaalAdvanced) {
 				Export.exportUppaalAdvancedGuiView(appView, appModel);
 			} else if (this == exportToUppaalSymetric) {
 				Export.exportUppaalSymetricGuiView(appView, appModel);
-			} else if (this == exportToTest) {
-				Export.exportDegree2(appView, appModel);
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			}
@@ -1846,6 +1828,12 @@ EOC */
 
 
 	class EditAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2402602825981305085L;
+
 
 		EditAction(String name, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
@@ -1889,6 +1877,12 @@ EOC */
 	 * Selection must be stored in the action using putValue("selected",Boolean);
 	 */
 	class ToggleButton extends JToggleButton implements PropertyChangeListener {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5085200741780612997L;
+
 
 		public ToggleButton(Action a) {
 			super(a);

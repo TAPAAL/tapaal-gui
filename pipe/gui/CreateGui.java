@@ -95,7 +95,7 @@ public class CreateGui {
 
 		appGui.getContentPane().add(pane);
 
-		appGui.createNewTabFromFile(null,false);
+		//appGui.createNewTabFromFile(null);
 
 		appGui.setVisible(true);
 		appGui.init();
