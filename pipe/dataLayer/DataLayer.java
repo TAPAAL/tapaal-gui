@@ -10,11 +10,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Random;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.w3c.dom.Document;
@@ -44,7 +42,6 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.ProgressBar;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.TAPN;
 
 
@@ -113,25 +110,23 @@ implements Cloneable {
 	public String pnmlName = null;
 
 	/** List containing all the Place objects in the Petri-Net */
-	// kyrke -  this is java >1.4 use generics!!!
 	private ArrayList<Place> placesArray = null;
 	/** ArrayList containing all the Transition objects in the Petri-Net */
-	// kyrke -  this is java >1.4 use generics!!!
 	private ArrayList<Transition> transitionsArray = null;
 	/** ArrayList containing all the Arc objects in the Petri-Net */
 	private ArrayList<Arc> arcsArray = null;
 
 	/** ArrayList containing all the Arc objects in the Petri-Net */
-	private ArrayList inhibitorsArray = null;  
+	private ArrayList<InhibitorArc> inhibitorsArray = null;  
 
 	/** ArrayList for net-level label objects (as opposed to element-level labels).*/
-	private ArrayList labelsArray = null;
+	private ArrayList<AnnotationNote> labelsArray = null;
 
 	/** ArrayList for marking Parmameters objects.*/
-	private ArrayList markingParametersArray = null;   
+	private ArrayList<MarkingParameter> markingParametersArray = null;   
 
 	/** ArrayList for rate Parmameters objects.*/
-	private ArrayList rateParametersArray = null;      
+	private ArrayList<RateParameter> rateParametersArray = null;      
 
 	/** An ArrayList used to point to either the Arc, Place or Transition 
 	 * ArrayLists when these ArrayLists are being update */
@@ -144,16 +139,6 @@ implements Cloneable {
 	static boolean initialMarkingVectorChanged = true;
 
 	static boolean currentMarkingVectorChanged = true;
-
-
-	/** X-Axis Scale Value */
-	private final int DISPLAY_SCALE_FACTORX = 7; // Scale factors for loading other Petri-Nets (not yet implemented)
-	/** Y-Axis Scale Value */
-	private final int DISPLAY_SCALE_FACTORY = 7; // Scale factors for loading other Petri-Nets (not yet implemented)
-	/** X-Axis Shift Value */
-	private final int DISPLAY_SHIFT_FACTORX = 270; // Scale factors for loading other Petri-Nets (not yet implemented)
-	/** Y-Axis Shift Value */
-	private final int DISPLAY_SHIFT_FACTORY = 120; // Scale factors for loading other Petri-Nets (not yet implemented)
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
 	private Hashtable<PlaceTransitionObject, ArrayList<NormalArc>> arcsMap = null;
@@ -212,45 +197,6 @@ implements Cloneable {
 
 
 	/**
-	 * Method to clone a DataLayer obejct
-	 */
-	public DataLayer clone() {
-		DataLayer newClone = null;
-		try { 
-			newClone = (DataLayer)super.clone();
-
-			newClone.placesArray = deepCopy(placesArray);
-			newClone.transitionsArray = deepCopy(transitionsArray);
-			newClone.arcsArray = deepCopy(arcsArray);
-			newClone.inhibitorsArray = deepCopy(inhibitorsArray);
-			//newClone.tapnInhibitorsArray = deepCopy(tapnInhibitorsArray);
-			//newClone.tokensArray = deepCopy(tokensArray);
-			newClone.labelsArray = deepCopy(labelsArray);
-
-		} catch(CloneNotSupportedException e) {
-			throw new Error(e);
-		}
-		return newClone;
-	}
-
-
-	/**
-	 * @param original arraylist to be deep copied
-	 * @return a clone of the arraylist
-	 */
-	private static ArrayList deepCopy(ArrayList original) {
-		ArrayList result = (ArrayList) original.clone();
-		ListIterator listIter = result.listIterator();
-
-		while(listIter.hasNext()) {
-			PetriNetObject pnObj = (PetriNetObject) listIter.next();
-			listIter.set(pnObj.clone());
-		}
-		return result;
-	}   
-
-
-	/**
 	 * Initialize Arrays
 	 */
 	private void initializeMatrices() {
@@ -258,11 +204,11 @@ implements Cloneable {
 		placesArray = new ArrayList<Place>();
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
-		inhibitorsArray = new ArrayList();
+		inhibitorsArray = new ArrayList<InhibitorArc>();
 		//tapnInhibitorsArray = new ArrayList();
-		labelsArray = new ArrayList();
-		markingParametersArray = new ArrayList();
-		rateParametersArray = new ArrayList();
+		labelsArray = new ArrayList<AnnotationNote>();
+		markingParametersArray = new ArrayList<MarkingParameter>();
+		rateParametersArray = new ArrayList<RateParameter>();
 		
 
 		// may as well do the hashtable here as well
@@ -778,12 +724,12 @@ implements Cloneable {
 			}else if (pnObject instanceof Transition) {
 				addTransition((Transition)pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
-				labelsArray.add(pnObject);
+				labelsArray.add((AnnotationNote)pnObject);
 			} else if (pnObject instanceof RateParameter) {
-				rateParametersArray.add(pnObject);
+				rateParametersArray.add((RateParameter)pnObject);
 				rateParameterHashSet.add(pnObject.getName());
 			} else if (pnObject instanceof MarkingParameter) {
-				markingParametersArray.add(pnObject);            
+				markingParametersArray.add((MarkingParameter)pnObject);            
 				markingParameterHashSet.add(pnObject.getName());
 			} else { // arrows, other labels.
 				changeArrayList.add(pnObject);
@@ -794,72 +740,6 @@ implements Cloneable {
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
-	}
-
-	//	private void addTAPNTransition(TAPNTransition transitionInput) {
-	//		boolean unique = true;
-	//
-	//		if (transitionInput != null) {
-	//			if (transitionInput.getId() != null
-	//					&& transitionInput.getId().length() > 0) {
-	//				for (int i = 0; i < transitionsArray.size(); i++) {
-	//					if (transitionInput.getId().equals(
-	//							((Transition)transitionsArray.get(i)).getId())) {
-	//						unique = false;
-	//					}
-	//				}
-	//			} else {
-	//				String id = null;
-	//				if (transitionsArray != null && transitionsArray.size() > 0) {
-	//					int no = transitionsArray.size();
-	//					do {
-	//						// System.out.println("transition while loop");
-	//						for (int i = 0; i < transitionsArray.size(); i++) {
-	//							id = "T" + no;
-	//							if (transitionsArray.get(i) != null) {
-	//								if (id.equals(
-	//										((TAPNTransition)transitionsArray.get(i)).getId())) {
-	//									unique = false;
-	//									no++;
-	//								} else {
-	//									unique = true;
-	//								}
-	//							}
-	//						}
-	//					} while(!unique);
-	//				} else {
-	//					id = "T0";
-	//				}
-	//
-	//				if(id != null) {
-	//					transitionInput.setId(id);
-	//				} else {
-	//					transitionInput.setId("error");
-	//				}
-	//			}
-	//			transitionsArray.add(transitionInput);
-	//			setChanged();
-	//			setMatrixChanged();
-	//			//    notifyObservers(transitionInput.getBounds());
-	//			notifyObservers(transitionInput);
-	//		}
-	//	}
-
-
-	// XXX - kyrke 
-	public void changed(){
-
-		setChanged();
-		
-
-		for(Transition t : getTransitions()){
-			Logger.log("lalal" + t.id);
-			notifyObservers(t);   
-
-		}
-
-
-
 	}
 
 	/**
@@ -935,7 +815,7 @@ implements Cloneable {
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList a = arcsMap.get(attached);
+						ArrayList<NormalArc> a = arcsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -967,7 +847,7 @@ implements Cloneable {
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList a=inhibitorsMap.get(attached);
+						ArrayList<InhibitorArc> a=inhibitorsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -1051,7 +931,7 @@ implements Cloneable {
 	 * Returns an iterator for the transitions array.
 	 * Used by Animator.class to set all enabled transitions to highlighted 
 	 */
-	public Iterator returnTransitions(){
+	public Iterator<Transition> returnTransitions(){
 		return transitionsArray.iterator();
 	}
 
@@ -1103,8 +983,8 @@ implements Cloneable {
 	 * Returns an iterator of all PetriNetObjects - the order of these cannot be guaranteed.
 	 * @return An iterator of all PetriNetObjects
 	 */
-	public Iterator getPetriNetObjects(){
-		ArrayList all = new ArrayList(placesArray);
+	public Iterator<PetriNetObject> getPetriNetObjects(){
+		ArrayList<PetriNetObject> all = new ArrayList<PetriNetObject>(placesArray);
 		all.addAll(transitionsArray);
 		all.addAll(arcsArray);
 		all.addAll(labelsArray);
@@ -1140,30 +1020,21 @@ implements Cloneable {
 		String heightTemp = inputLabelElement.getAttribute("h");
 		String textTempStorage = inputLabelElement.getAttribute("txt");
 		String borderTemp = inputLabelElement.getAttribute("border");
-		String nameTemp = inputLabelElement.getAttribute("name");
-
+		
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage).intValue() *
-			(false ? DISPLAY_SCALE_FACTORX : 1) +
-			(false ? DISPLAY_SHIFT_FACTORX : 1);
+			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
 		}
 
 		if (positionYTempStorage.length() > 0){
-			positionYInput = Integer.valueOf(positionYTempStorage).intValue() *
-			(false ? DISPLAY_SCALE_FACTORX : 1) +
-			(false ? DISPLAY_SHIFT_FACTORX : 1);
+			positionYInput = Integer.valueOf(positionYTempStorage).intValue() + 1;
 		}
 
 		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp).intValue() *
-			(false ? DISPLAY_SCALE_FACTORY : 1) +
-			(false ? DISPLAY_SHIFT_FACTORY : 1);
+			widthInput = Integer.valueOf(widthTemp).intValue() + 1;
 		}
 
 		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp).intValue() *
-			(1) +
-			(false ? DISPLAY_SHIFT_FACTORY : 1);
+			heightInput = Integer.valueOf(heightTemp).intValue() + 1;
 		}
 
 		if (borderTemp.length()>0) {
@@ -1388,14 +1259,10 @@ implements Cloneable {
 
 
 		if (positionXTempStorage.length() > 0) {
-			positionXInput = Double.valueOf(positionXTempStorage).doubleValue() *
-			(false ? Pipe.DISPLAY_SCALE_FACTORX : 1) +
-			(false ? Pipe.DISPLAY_SHIFT_FACTORX : 1);
+			positionXInput = Double.valueOf(positionXTempStorage).doubleValue() + 1;
 		}
 		if (positionYTempStorage.length() > 0) {
-			positionYInput = Double.valueOf(positionYTempStorage).doubleValue() *
-			(false ? Pipe.DISPLAY_SCALE_FACTORY : 1) +
-			(false ? Pipe.DISPLAY_SHIFT_FACTORY : 1);
+			positionYInput = Double.valueOf(positionYTempStorage).doubleValue() + 1;
 		}
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);

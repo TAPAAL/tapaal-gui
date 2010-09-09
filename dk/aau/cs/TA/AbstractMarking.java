@@ -14,7 +14,7 @@ public class AbstractMarking {
 		
 		if (placeToTokenMap.get(placename)==null){
 			
-			ArrayList a = new ArrayList<String>();
+			ArrayList<String> a = new ArrayList<String>();
 			a.add(tokenName);
 			placeToTokenMap.put(placename, a);	
 			
