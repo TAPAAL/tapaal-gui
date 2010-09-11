@@ -137,9 +137,6 @@ implements ActionListener, Observer {
 
 	public boolean dragging = false;
 
-	private HelpBox helpAction;
-
-
 	private boolean editionAllowed = true;
 
 	private CopyPasteManager copyPasteManager;
@@ -497,9 +494,7 @@ EOC */
 
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
-		 helpAction = new HelpBox("Help", "View documentation", "F1", "index.htm");
-
-		 addMenuItem(helpMenu,helpAction);
+		  
 		 JMenuItem aboutItem = helpMenu.add("About");
 		 aboutItem.addActionListener(this); // Help - About is implemented differently
 

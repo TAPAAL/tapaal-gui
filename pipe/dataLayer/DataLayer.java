@@ -41,7 +41,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.undo.UndoableEdit;
-import pipe.gui.widgets.ProgressBar;
 import dk.aau.cs.petrinet.TAPN;
 
 
@@ -122,12 +121,6 @@ implements Cloneable {
 	/** ArrayList for net-level label objects (as opposed to element-level labels).*/
 	private ArrayList<AnnotationNote> labelsArray = null;
 
-	/** ArrayList for marking Parmameters objects.*/
-	private ArrayList<MarkingParameter> markingParametersArray = null;   
-
-	/** ArrayList for rate Parmameters objects.*/
-	private ArrayList<RateParameter> rateParametersArray = null;      
-
 	/** An ArrayList used to point to either the Arc, Place or Transition 
 	 * ArrayLists when these ArrayLists are being update */
 	private ArrayList changeArrayList = null;
@@ -207,8 +200,6 @@ implements Cloneable {
 		inhibitorsArray = new ArrayList<InhibitorArc>();
 		//tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList<AnnotationNote>();
-		markingParametersArray = new ArrayList<MarkingParameter>();
-		rateParametersArray = new ArrayList<RateParameter>();
 		
 
 		// may as well do the hashtable here as well
@@ -293,30 +284,6 @@ implements Cloneable {
 		setChanged();
 		notifyObservers(labelInput);
 	}
-
-
-	/**
-	 * Add markingParameterInput to the back of the Marking Parameter ArrayList
-	 * All observers are notified of this change (Model-View Architecture)
-	 * @param placeInput Place Object to add
-	 */
-	private void addAnnotation(MarkingParameter markingParameterInput) {
-		markingParametersArray.add(markingParameterInput);
-		setChanged();
-		notifyObservers(markingParameterInput);
-	}
-
-
-	/**
-	 * Add rateParameterInput to the back of the Rate Parameter ArrayList
-	 * All observers are notified of this change (Model-View Architecture)
-	 * @param placeInput Place Object to add
-	 */
-	private void addAnnotation(RateParameter rateParameterInput) {
-		rateParametersArray.add(rateParameterInput);
-		setChanged();
-		notifyObservers(rateParameterInput);
-	}   
 
 	/**
 	 * Add transitionInput to back of the Transition ArrayList
@@ -725,12 +692,6 @@ implements Cloneable {
 				addTransition((Transition)pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
 				labelsArray.add((AnnotationNote)pnObject);
-			} else if (pnObject instanceof RateParameter) {
-				rateParametersArray.add((RateParameter)pnObject);
-				rateParameterHashSet.add(pnObject.getName());
-			} else if (pnObject instanceof MarkingParameter) {
-				markingParametersArray.add((MarkingParameter)pnObject);            
-				markingParameterHashSet.add(pnObject.getName());
 			} else { // arrows, other labels.
 				changeArrayList.add(pnObject);
 				setChanged();
@@ -905,10 +866,6 @@ implements Cloneable {
 						}
 						//						attached.updateConnected(); //causing null pointer exceptions (?)
 					}
-				} else if (pnObject instanceof MarkingParameter) {
-					markingParameterHashSet.remove(pnObject.getName());
-				} else if (pnObject instanceof RateParameter) {
-					rateParameterHashSet.remove(pnObject.getName());
 				}
 
 				if (didSomething) {
@@ -968,13 +925,7 @@ implements Cloneable {
 		else if(pnObject instanceof AnnotationNote) {
 			changeArrayList = labelsArray;
 			return true;
-		} else if(pnObject instanceof MarkingParameter) {
-			changeArrayList = markingParametersArray;
-			return true;
-		} else if(pnObject instanceof RateParameter) {
-			changeArrayList = rateParametersArray;
-			return true;
-		}      
+		}    
 		return false;
 	}
 
@@ -988,10 +939,7 @@ implements Cloneable {
 		all.addAll(transitionsArray);
 		all.addAll(arcsArray);
 		all.addAll(labelsArray);
-		//tokensArray removed
-		all.addAll(markingParametersArray);
-		all.addAll(rateParametersArray);
-
+		
 		return all.iterator();
 	}
 
@@ -1053,50 +1001,6 @@ implements Cloneable {
 				widthInput, heightInput, borderInput);
 	}   
 
-
-	/**
-	 * Creates a Parameter object from a Definition DOM Element
-	 * @param inputDefinitionElement Input Label DOM Element
-	 * @return Parameter Object
-	 */
-	private Parameter createParameter (Element inputDefinitionElement) {
-		int positionXInput = 0;
-		int positionYInput = 0;
-		String type = null;
-		String positionXTempStorage = inputDefinitionElement.getAttribute("positionX");
-		String positionYTempStorage = inputDefinitionElement.getAttribute("positionY");
-		String typeTemp = inputDefinitionElement.getAttribute("type");
-		String nameTemp = inputDefinitionElement.getAttribute("name");
-		String expressionTemp = inputDefinitionElement.getAttribute("expression");
-
-		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage).intValue()/* *
-                  (false ? DISPLAY_SCALE_FACTORX : 1) +
-                  (false ? DISPLAY_SHIFT_FACTORX : 1)*/;
-		}
-
-		if (positionYTempStorage.length() > 0){
-			positionYInput = Integer.valueOf(positionYTempStorage).intValue()/* *
-                  (false ? DISPLAY_SCALE_FACTORX : 1) +
-                  (false ? DISPLAY_SHIFT_FACTORX : 1)*/;
-		}
-
-		if (typeTemp.length() > 0) {
-			type = typeTemp;
-		} else {
-			type = "real";
-		}
-
-		if (type.equals("real")) {
-			rateParameterHashSet.add(nameTemp);
-			return new RateParameter(nameTemp, Double.parseDouble(expressionTemp),  
-					positionXInput, positionYInput);
-		} else {
-			markingParameterHashSet.add(nameTemp);
-			return new MarkingParameter(nameTemp, Integer.parseInt(expressionTemp),  
-					positionXInput, positionYInput);               
-		}
-	}     
 
 
 	/**
@@ -1216,18 +1120,6 @@ implements Cloneable {
 						priority);
 		}
 
-		if (parameterTempStorage.length() > 0) {
-			if (existsRateParameter(parameterTempStorage)) { 
-				for (int i = 0; i < rateParametersArray.size(); i++) {
-					if (parameterTempStorage.equals(
-							((RateParameter)rateParametersArray.get(i)).getName())) {
-						transition.setRateParameter(
-								(RateParameter)rateParametersArray.get(i));
-					}
-				}
-			}
-		}
-
 		return transition;
 	}
 
@@ -1320,19 +1212,6 @@ implements Cloneable {
 					initialMarkingInput,
 					markingOffsetXInput, markingOffsetYInput,  
 					capacityInput, invariantTempStorage);
-		}
-
-
-		if (parameterTempStorage.length() > 0) {
-			if (existsMarkingParameter(parameterTempStorage)) { 
-				for (int i = 0; i < markingParametersArray.size(); i++) {
-					if (parameterTempStorage.equals(
-							((MarkingParameter)markingParametersArray.get(i)).getName())) {
-						place.setMarkingParameter(
-								(MarkingParameter)markingParametersArray.get(i));
-					}
-				}
-			}
 		}
 
 		return place;
@@ -2107,8 +1986,6 @@ implements Cloneable {
 		transitionsArray = null;
 		arcsArray = null;
 		labelsArray = null;
-		markingParametersArray = null;
-		rateParametersArray = null;
 		changeArrayList = null;
 		arcsMap = null;
 		initializeMatrices();
@@ -2182,36 +2059,6 @@ implements Cloneable {
 		}
 		return returnArray;
 	}
-
-
-	/**
-	 * Get a List of all the marking Parameter objects in the Petri-Net
-	 * @return A List of all the marking Parameter objects 
-	 */
-	public MarkingParameter[] getMarkingParameters() {
-		MarkingParameter[] returnArray = 
-			new MarkingParameter[markingParametersArray.size()];
-
-		for (int i = 0; i < markingParametersArray.size(); i++){
-			returnArray[i] = (MarkingParameter)markingParametersArray.get(i);
-		}
-		return returnArray;
-	}   
-
-
-	/**
-	 * Get a List of all the marking Parameter objects in the Petri-Net
-	 * @return A List of all the marking Parameter objects 
-	 */
-	public RateParameter[] getRateParameters() {
-		RateParameter[] returnArray =  new RateParameter[rateParametersArray.size()];
-
-		for (int i = 0; i < rateParametersArray.size(); i++){
-			returnArray[i] = (RateParameter)rateParametersArray.get(i);
-		}
-		return returnArray;
-	}   
-
 
 	/**
 	 * Get an List of all the Transition objects in the Petri-Net
@@ -2529,13 +2376,6 @@ implements Cloneable {
 			element = (Element)node;
 			if ("labels".equals(element.getNodeName())){
 				addAnnotation(createAnnotation(element));
-			} else if ("definition".equals(element.getNodeName())){
-				Note note = createParameter(element);
-				if (note instanceof MarkingParameter) {
-					addAnnotation((MarkingParameter)note);
-				} else if (note instanceof RateParameter) {
-					addAnnotation((RateParameter)note);
-				}
 			} else if("place".equals(element.getNodeName())){
 				addPlace(createColoredPlace(element));
 			} else if ("transition".equals(element.getNodeName())){
@@ -2769,18 +2609,7 @@ implements Cloneable {
 		List<ColoredToken> tokens = parseTokens(tokenNodes);
 		place.setColoredTokens(tokens);
 
-		if (parameterTempStorage.length() > 0) {
-			if (existsMarkingParameter(parameterTempStorage)) { 
-				for (int i = 0; i < markingParametersArray.size(); i++) {
-					if (parameterTempStorage.equals(
-							((MarkingParameter)markingParametersArray.get(i)).getName())) {
-						place.setMarkingParameter(
-								(MarkingParameter)markingParametersArray.get(i));
-					}
-				}
-			}
-		}
-
+	
 		return place;
 	}
 
@@ -2798,52 +2627,13 @@ implements Cloneable {
 		return list;
 	}
 
-
-	/**
-	 * Create model from transformed PNML file
-	 */
-	public void createFromPNML(Document PNMLDoc, ProgressBar progressBar) {
-		emptyPNML();
-		Node node = null;
-		NodeList nodeList = null;
-		try {
-			nodeList = PNMLDoc.getDocumentElement().getChildNodes();
-			if (CreateGui.getApp()!=null) {
-				// Notifies used to indicate new instances.
-				CreateGui.getApp().setMode(Pipe.CREATING); 
-			}
-			progressBar.setProgressBar(nodeList.getLength());
-			for(int i = 0 ; i < nodeList.getLength() ; i++) {
-				node = nodeList.item(i);
-
-				parseElement(node);
-				progressBar.step();
-			}
-
-			if (CreateGui.getApp()!=null) {
-				CreateGui.getApp().restoreMode();
-			}
-			CreateGui.getModel().setQueries(queries);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-
 	private void parseElement(Node node) {
 		Element element;
 		if(node instanceof Element) {
 			element = (Element)node;
 			if ("labels".equals(element.getNodeName())){
 				addAnnotation(createAnnotation(element));
-			} else if ("definition".equals(element.getNodeName())){
-				Note note = createParameter(element);
-				if (note instanceof MarkingParameter) {
-					addAnnotation((MarkingParameter)note);
-				} else if (note instanceof RateParameter) {
-					addAnnotation((RateParameter)note);
-				}
-			} else if("place".equals(element.getNodeName())){
+			}  else if("place".equals(element.getNodeName())){
 				addPlace(createPlace(element));
 			} else if ("transition".equals(element.getNodeName())){
 				addTransition(createTransition(element));

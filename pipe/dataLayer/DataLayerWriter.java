@@ -105,16 +105,6 @@ public class DataLayerWriter {
 				NET.appendChild(createAnnotationNoteElement(labels[i], pnDOM));
 			}
 
-			MarkingParameter[] markingParameters = netModel.getMarkingParameters();
-			for (int i = 0; i < markingParameters.length; i++) {
-				NET.appendChild(createDefinition(markingParameters[i], pnDOM));
-			}        
-
-			RateParameter[] rateParameters = netModel.getRateParameters();
-			for (int i = 0; i < rateParameters.length; i++) {
-				NET.appendChild(createDefinition(rateParameters[i], pnDOM));
-			}   
-
 			Collection<Constant> constants = netModel.getConstants();
 			for(Constant constant : constants)
 			{
@@ -282,11 +272,7 @@ public class DataLayerWriter {
 			Double markingOffsetXInput = inputPlace.getMarkingOffsetXObject();
 			Double markingOffsetYInput = inputPlace.getMarkingOffsetYObject();
 			Integer capacityInput = inputPlace.getCapacity();
-			String markingParameter = "";
-			if (inputPlace.getMarkingParameter() != null) {
-				markingParameter = inputPlace.getMarkingParameter().getName();
-			}         
-
+			
 			placeElement.setAttribute("positionX", (positionXInput != null ? String.valueOf(positionXInput) : ""));
 			placeElement.setAttribute("positionY", (positionYInput != null ? String.valueOf(positionYInput) : ""));
 			placeElement.setAttribute("name", (nameInput != null ? nameInput : (idInput != null && idInput.length() > 0? idInput : "")));
@@ -314,10 +300,7 @@ public class DataLayerWriter {
 					placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
 				}
 			}
-
-			placeElement.setAttribute("parameter", 
-					(markingParameter != null ? markingParameter : ""));         
-		}
+	}
 
 		return placeElement;
 	}
@@ -388,11 +371,7 @@ public class DataLayerWriter {
 			boolean infiniteServer = inputTransition.isInfiniteServer();
 			int orientation = inputTransition.getAngle();
 			int priority = inputTransition.getPriority();
-			String rateParameter = "";
-			if (inputTransition.getRateParameter() != null) {
-				rateParameter = inputTransition.getRateParameter().getName();
-			}
-
+			
 			transitionElement.setAttribute("positionX", 
 					(positionXInput != null ? String.valueOf(positionXInput) : ""));
 			transitionElement.setAttribute("positionY", 
@@ -412,8 +391,6 @@ public class DataLayerWriter {
 					String.valueOf(infiniteServer));
 			transitionElement.setAttribute("angle", String.valueOf(orientation));
 			transitionElement.setAttribute("priority", String.valueOf(priority));
-			transitionElement.setAttribute("parameter", 
-					(rateParameter != null ? rateParameter : ""));
 		}
 		return transitionElement;
 	}
@@ -546,86 +523,4 @@ public class DataLayerWriter {
 
 		return arcPoint;
 	}
-
-
-	private Node createDefinition(RateParameter inputParameter, Document document) {
-		Element labelElement = null;
-
-		if (document != null) {
-			labelElement = document.createElement("definitions");
-		}
-
-		if (inputParameter != null ) {
-
-			int positionXInput = inputParameter.getOriginalX();//getX()
-			int positionYInput = inputParameter.getOriginalY();//getY()
-			int widthInput = inputParameter.getNoteWidth();
-			int heightInput = inputParameter.getNoteHeight();
-			double valueInput = inputParameter.getValue();
-			String nameInput = inputParameter.getNoteText();
-			String idInput = inputParameter.getName();
-			boolean borderInput = inputParameter.isShowingBorder();
-			labelElement.setAttribute("defType", "real");
-			labelElement.setAttribute("expression", String.valueOf(valueInput));
-			labelElement.setAttribute("id", idInput);
-			labelElement.setAttribute("name", idInput);
-			labelElement.setAttribute("type", "text");
-			labelElement.setAttribute("positionX", 
-					(positionXInput >= 0.0 ? String.valueOf(positionXInput) : ""));
-			labelElement.setAttribute("positionY", 
-					(positionYInput >= 0.0 ? String.valueOf(positionYInput) : ""));
-
-			labelElement.setAttribute("width", 
-					(widthInput>=0.0? String.valueOf(widthInput):""));
-			labelElement.setAttribute("height", 
-					(heightInput>=0.0? String.valueOf(heightInput):""));
-			labelElement.setAttribute("border",String.valueOf(borderInput));      
-		}
-		return labelElement;
-	}
-
-
-	private Node createDefinition(MarkingParameter inputParameter,
-			Document document) {
-		Element labelElement = null;
-
-		if (document != null) {
-			labelElement = document.createElement("definitions");
-		}
-
-		if (inputParameter != null ) {
-
-			int positionXInput = inputParameter.getOriginalX();
-			int positionYInput = inputParameter.getOriginalY();
-			int widthInput = inputParameter.getNoteWidth();
-			int heightInput = inputParameter.getNoteHeight();
-			int valueInput = inputParameter.getValue();
-			String nameInput = inputParameter.getNoteText();
-			String idInput = inputParameter.getName();
-			boolean borderInput = inputParameter.isShowingBorder();
-			labelElement.setAttribute("defType", "int");
-			labelElement.setAttribute("expression", String.valueOf(valueInput));
-			labelElement.setAttribute("id", idInput);
-			labelElement.setAttribute("name", idInput);
-			labelElement.setAttribute("type", "text");
-			labelElement.setAttribute("positionX", 
-					(positionXInput >= 0.0 ? String.valueOf(positionXInput) : ""));
-			labelElement.setAttribute("positionY", 
-					(positionYInput >= 0.0 ? String.valueOf(positionYInput) : ""));    
-		}
-		return labelElement;
-	}   
-
-
-	private Element createCondition(String condition, Document document) {
-		Element stateCondition = null;
-
-		if (document != null) { 
-			stateCondition = document.createElement("statecondition");
-		}
-
-		stateCondition.setAttribute("condition", condition);
-		return stateCondition;
-	}
-
 }

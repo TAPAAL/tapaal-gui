@@ -9,7 +9,6 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.RateParameter;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
@@ -33,7 +32,6 @@ extends javax.swing.JPanel {
 	Integer priority = 0;
 	Double rate;
 	String name;   
-	RateParameter rParameter;
 	DataLayer pnmlData;
 	GuiView view;
 	JRootPane rootPane;
@@ -47,7 +45,6 @@ extends javax.swing.JPanel {
 		transition = _transition;
 		pnmlData = _pnmlData;
 		view = _view;
-		rParameter = transition.getRateParameter();
 		name = transition.getName();
 		timed = transition.isTimed();
 		infiniteServer = transition.isInfiniteServer();

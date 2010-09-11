@@ -41,7 +41,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.colors.ColorSet;
@@ -70,7 +69,6 @@ extends javax.swing.JPanel {
 	Boolean attributesVisible;
 	Integer marking;
 	String name;
-	MarkingParameter mParameter;
 	DataLayer pnmlData;
 	GuiView view;
 	JRootPane rootPane;
@@ -88,29 +86,10 @@ extends javax.swing.JPanel {
 		attributesVisible = place.getAttributesVisible();
 		marking = place.getCurrentMarking();
 		name = place.getName();
-		mParameter = place.getMarkingParameter();
 		rootPane = _rootPane;
 
 		initComponents();
 		rootPane.setDefaultButton(okButton);
-
-		MarkingParameter[] markings = pnmlData.getMarkingParameters();
-		if (markings.length > 0) {
-			markingComboBox.addItem("");
-			for (int i = 0; i < markings.length; i++) {
-				markingComboBox.addItem(markings[i]);
-			}
-		} else {
-			markingComboBox.setEnabled(false);
-		}  
-
-		if (mParameter != null){
-			for (int i = 1; i < markingComboBox.getItemCount(); i++) {
-				if (mParameter == (MarkingParameter)markingComboBox.getItemAt(i)){
-					markingComboBox.setSelectedIndex(i);
-				}
-			}
-		}
 	}
 
 	/** This method is called from within the constructor to
@@ -885,7 +864,7 @@ extends javax.swing.JPanel {
 
 				return;
 			}
-			
+
 			view.getUndoManager().addEdit(coloredTimedPlace.setTimeInvariant(timeInvariant));
 
 			UndoableEdit colorInvEdit = null;
@@ -909,7 +888,7 @@ extends javax.swing.JPanel {
 					}
 				}
 				colorInvEdit = coloredTimedPlace.setColorInvariant(colorInvariant); 
-				
+
 			}
 			view.getUndoManager().addEdit(colorInvEdit);
 
@@ -971,45 +950,13 @@ extends javax.swing.JPanel {
 				newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
 			}
 
-			//if ()  -  TODO do some check if it has canged and if value is ok
 			view.getUndoManager().addEdit(place.setInvariant(newInvariant));
 
-			if (markingComboBox.getSelectedIndex() >0) {
-				// There's a marking parameter selected
-				MarkingParameter parameter = 
-					(MarkingParameter)markingComboBox.getSelectedItem() ;
-				if (parameter != mParameter){
-
-					if (mParameter != null) {
-						// The marking parameter has been changed
-						view.getUndoManager().addEdit(place.changeMarkingParameter(
-								(MarkingParameter)markingComboBox.getSelectedItem()));
-					} else {
-						//The marking parameter has been changed
-						view.getUndoManager().addEdit(place.setMarkingParameter(
-								(MarkingParameter)markingComboBox.getSelectedItem()));
-					}
-				}
-			} else {
-				// There is no marking parameter selected
-				if (mParameter != null) {
-					// The rate parameter has been changed
-					view.getUndoManager().addEdit(place.clearMarkingParameter());
-				}
-				if (newMarking != marking) {
-					view.getUndoManager().addEdit(place.setCurrentMarking(newMarking));            
-				}
+			if (newMarking != marking) {
+				view.getUndoManager().addEdit(place.setCurrentMarking(newMarking));            
 			}
+
 		}
-
-		//      ArrayList<Float> ageOfTokensToSet = new ArrayList<Float>();
-		//      for (Component ageOfTokenSpinner : tokenPanel.getComponents()){
-		//    	  if (ageOfTokenSpinner instanceof JSpinner){
-		//    		  ageOfTokensToSet.add(Float.parseFloat(""+((JSpinner)ageOfTokenSpinner).getValue()));
-		//    	  }
-		//      }
-		//      view.getUndoManager().addEdit(place.setAgeOfTokens(ageOfTokensToSet));
-
 
 		if (attributesVisible != attributesCheckBox.isSelected()){
 			place.toggleAttributesVisible();
@@ -1025,7 +972,7 @@ extends javax.swing.JPanel {
 		if(!invariantInf.isSelected()){
 			IntOrConstant scale = new IntOrConstant(invScaleTextbox.getText());
 			IntOrConstant offset = new IntOrConstant(invOffsetTextbox.getText());
-			
+
 			return new ColoredTimeInvariant((String)invRelationNormal.getSelectedItem(), 
 					new IntervalBound(scale, offset));
 		}else{

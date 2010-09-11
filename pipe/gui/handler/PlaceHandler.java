@@ -204,10 +204,7 @@ extends PlaceTransitionObjectHandler {
 					newMarking = 0;
 				}
 				if (oldMarking != newMarking) {            
-					undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));
-					if (((Place)myObject).getMarkingParameter() != null) {
-						undoManager.addEdit(((Place)myObject).clearMarkingParameter());
-					}            
+					undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));            
 				} 
 			}
 		}

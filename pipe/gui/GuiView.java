@@ -26,13 +26,10 @@ import javax.swing.event.MouseInputAdapter;
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.Note;
-import pipe.dataLayer.Parameter;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.RateParameter;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
@@ -43,7 +40,6 @@ import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
 import pipe.gui.handler.LabelHandler;
-import pipe.gui.handler.ParameterHandler;
 import pipe.gui.handler.PlaceHandler;
 import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TimedArcHandler;
@@ -224,15 +220,8 @@ implements Observer, Printable {
 					newObject.addMouseMotionListener(noteHandler);
 					((Note)newObject).getNote().addMouseListener(noteHandler);
 					((Note)newObject).getNote().addMouseMotionListener(noteHandler);
-				} else if (newObject instanceof Parameter) {
-					add(newObject);
-					ParameterHandler parameterHandler =
-						new ParameterHandler(this, (Parameter)newObject);
-					newObject.addMouseListener(parameterHandler);
-					newObject.addMouseMotionListener(parameterHandler);
-					((Parameter)newObject).getNote().addMouseListener(parameterHandler);
-					((Parameter)newObject).getNote().addMouseMotionListener(parameterHandler);
-				}
+				} 
+				
 				if (newObject instanceof Zoomable) {
 					newObject.zoomUpdate(getZoom());
 				}
@@ -660,84 +649,6 @@ EOC*/
 							new AddPetriNetObjectEdit(pnObject, view, model));
 					((AnnotationNote)pnObject).enableEditMode();
 					break;
-
-				case Pipe.RATE:
-					try {
-						String label = JOptionPane.showInputDialog(
-								"Rate Parameter Label:",  "");
-						if (label == null) {
-							// User has chosen "Cancel", nothing to be done
-							break;
-						}
-
-						if (label.length() == 0) {
-							throw new Exception("label Incorrecte");
-						} else if (model.existsRateParameter(label)){
-							throw new Exception("label Already Defined");
-						}
-
-						String value = JOptionPane.showInputDialog(
-								"Rate Parameter Value:", "");
-
-						p = adjustPoint(e.getPoint(), view.getZoom());
-
-						pnObject = new RateParameter(label,
-								Double.parseDouble(value), p.x, p.y);
-						model.addPetriNetObject(pnObject);
-						view.addNewPetriNetObject(pnObject);
-						getUndoManager().addNewEdit(
-								new AddPetriNetObjectEdit(pnObject, view, model));
-					} catch (java.lang.NumberFormatException nfe) {
-						JOptionPane.showMessageDialog(null, "Enter a rate",
-								"Invalid entry", JOptionPane.ERROR_MESSAGE);
-					} catch (Exception exc) {
-						String message = exc.getMessage();
-						if (message == null){
-							message = "Unknown Error!";
-						}
-						JOptionPane.showMessageDialog(null, message,
-								"Invalid entry", JOptionPane.ERROR_MESSAGE);
-					}
-					break;
-
-				case Pipe.MARKING:
-					try {
-						String label = JOptionPane.showInputDialog(
-								"Marking Parameter Label:", "");
-						if (label == null) {
-							// User has chosen "Cancel", nothing to be done
-							break;
-						}
-
-						if (label.length() == 0) {
-							throw new Exception("Please, enter a name");
-						} else if (model.existsMarkingParameter(label)){
-							throw new Exception("Parameter already defined");
-						}
-						String value = JOptionPane.showInputDialog(
-								"Marking Parameter Value:", "");
-
-						p = adjustPoint(e.getPoint(), view.getZoom());
-
-						pnObject = new MarkingParameter(label,
-								Integer.parseInt(value),  p.x, p.y);
-						model.addPetriNetObject(pnObject);
-						view.addNewPetriNetObject(pnObject);
-						getUndoManager().addNewEdit(
-								new AddPetriNetObjectEdit(pnObject, view, model));
-					} catch (java.lang.NumberFormatException nfe) {
-						JOptionPane.showMessageDialog(null, "Enter a positive integer",
-								"Invalid entry", JOptionPane.ERROR_MESSAGE);
-					} catch (Exception exc) {
-						String message = exc.getMessage();
-						if (message == null) {
-							message = "Unknown Error!";
-						}
-						JOptionPane.showMessageDialog(null, message,
-								"Invalid entry", JOptionPane.ERROR_MESSAGE);
-					}
-					break;
-
 				case Pipe.FAST_PLACE:
 					if (e.isMetaDown() || metaDown) { // provisional
 						if (createArc != null) {

@@ -151,7 +151,6 @@ public class TimedPlace extends Place {
 		copy.currentMarking = this.currentMarking;
 		copy.markingOffsetX = this.markingOffsetX;
 		copy.markingOffsetY = this.markingOffsetY;
-		copy.markingParameter = this.markingParameter;
 		copy.setOriginal(this);
 		return copy; 
 	}
@@ -350,7 +349,6 @@ public class TimedPlace extends Place {
 		copy.currentMarking = this.currentMarking;
 		copy.markingOffsetX = this.markingOffsetX;
 		copy.markingOffsetY = this.markingOffsetY;
-		copy.markingParameter = this.markingParameter;
 		copy.update();
 
 		return copy;

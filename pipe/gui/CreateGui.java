@@ -52,7 +52,7 @@ public class CreateGui {
 	/** The Module will go in the top pane, the animation window in the bottom pane */
 	private static JSplitPane leftPane;
 	private static AnimationHistory animBox;
-	static AnimationControler animControlerBox;
+	static AnimationController animControlerBox;
 	private static JScrollPane scroller;
 	private static JScrollPane scroller2;
 	private static LeftQueryPane queries;
@@ -419,7 +419,7 @@ public class CreateGui {
 
 	public static void addAnimationControler() {
 		try {
-			animControlerBox = new AnimationControler("Simulation Controler\n");
+			animControlerBox = new AnimationController("Simulation Controler\n");
 
 			scroller2 = new JScrollPane(animControlerBox);
 			scroller2.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP

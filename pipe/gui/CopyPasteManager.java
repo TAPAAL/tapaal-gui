@@ -15,12 +15,10 @@ import java.util.Iterator;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.MarkingParameter;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.RateParameter;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
@@ -178,28 +176,7 @@ public class CopyPasteManager
       for (int i = 0; i < ptaToPaste.size(); i++) {
          PetriNetObject pnObject = ptaToPaste.get(i).paste(despX, despY, sourceView != view);
          
-         if (pnObject != null) {
-        	 if ((pnObject instanceof TAPNTransition) && (sourceView != view)) {
-                 System.out.println("was in correct place in CopyPasteManager");
-              }else if ((pnObject instanceof Transition) && (sourceView != view)) {
-               RateParameter rateParameter = 
-                       ((Transition)pnObject).getRateParameter();
-               if (rateParameter != null) {
-                  ((Transition)pnObject).clearRateParameter();
-               }
-            } else if ((pnObject instanceof TimedPlace) && (sourceView != view)){
-            	MarkingParameter markingParameter =
-            		((TimedPlace)pnObject).getMarkingParameter();
-            	if (markingParameter != null) {
-            		((TimedPlace)pnObject).clearMarkingParameter();
-            	}
-            } else if ((pnObject instanceof Place) && (sourceView != view)) {
-               MarkingParameter markingParameter =
-                        ((Place)pnObject).getMarkingParameter();
-               if (markingParameter != null) {
-                  ((Place)pnObject).clearMarkingParameter();
-               }
-            }           
+         if (pnObject != null) {         
             model.addPetriNetObject(pnObject);
             view.addNewPetriNetObject(pnObject);
             view.updatePreferredSize();
