@@ -16,7 +16,7 @@ public class InvariantViolatedAnimationException extends Exception {
 	}
 
 	public InvariantViolatedAnimationException() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 }

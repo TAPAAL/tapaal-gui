@@ -24,6 +24,12 @@ import pipe.gui.CreateGui;
 public abstract class GuiAction 
 extends AbstractAction {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2625265285612924719L;
+
+
 	public GuiAction(String name, String tooltip, String keystroke) {
 
 		super(name);
@@ -82,11 +88,7 @@ extends AbstractAction {
 
 	public void setSelected(boolean selected) {
 
-		// XXX - kyrke fixed possible null pointer cast
-		Boolean  b=null;
 		if (getValue("selected") != null){ 
-			b = (Boolean)getValue("selected");
-
 			putValue("selected", null);
 			putValue("selected", new Boolean(selected));
 

@@ -15,7 +15,11 @@ import pipe.gui.CreateGui;
 public class EditAnnotationBorderAction
         extends AbstractAction {
 
-   private AnnotationNote selected;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2849415077610764209L;
+private AnnotationNote selected;
    
 
    public EditAnnotationBorderAction(AnnotationNote component) {

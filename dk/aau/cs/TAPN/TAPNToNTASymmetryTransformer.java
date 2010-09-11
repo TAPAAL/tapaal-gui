@@ -23,8 +23,6 @@ import dk.aau.cs.petrinet.Token;
 public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 	private int numberOfInitChannels = 0;
 	private static final String TokenTAName = "Token";
-	private static final String PLOCK = "P_lock";
-
 	public TAPNToNTASymmetryTransformer(int extraNumberOfTokens) {
 		super(extraNumberOfTokens);
 	}

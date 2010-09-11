@@ -13,7 +13,11 @@ import pipe.dataLayer.Note;
 public class EditNoteAction 
         extends AbstractAction {
 
-   private Note selected;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4438126438814153880L;
+private Note selected;
    
 
    public EditNoteAction(Note component) {

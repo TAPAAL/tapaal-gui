@@ -19,13 +19,13 @@ public class JSplitPaneFix extends JSplitPane {
 	public JSplitPaneFix(int verticalSplit, JScrollPane panel1,
 			JPanel panel2) {
 		super(verticalSplit, panel1, panel2);
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public JSplitPaneFix(int verticalSplit, JPanel panel1,
 			JPanel panel2) {
 		super(verticalSplit, panel1, panel2);
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public JSplitPaneFix(int verticalSplit) {

@@ -21,7 +21,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -180,9 +179,7 @@ public class DataLayerWriter {
 			// System.out.println("=====================================================================================");
 			System.out.println("ParserConfigurationException thrown in savePNML() " +
 					": dataLayerWriter Class : dataLayer Package: filename=\"" + 
-					file.getCanonicalPath() + "\" xslt=\"" + 
-					xsltSource.getSystemId() + "\" transformer=\"" + 
-					transformer.getURIResolver() + "\"");
+					file.getCanonicalPath() + "\" xslt=\"");
 			// System.out.println("=====================================================================================");
 			// e.printStackTrace(System.err);
 		} catch (DOMException e) {
@@ -261,7 +258,6 @@ public class DataLayerWriter {
 		}
 
 		if (inputPlace != null ) {
-			Integer attrValue = null;
 			Double positionXInput = inputPlace.getPositionXObject();
 			Double positionYInput = inputPlace.getPositionYObject();
 			String idInput = inputPlace.getId();
@@ -359,14 +355,12 @@ public class DataLayerWriter {
 		}
 
 		if (inputTransition != null ) {
-			Integer attrValue = null;
 			Double positionXInput = inputTransition.getPositionXObject();
 			Double positionYInput = inputTransition.getPositionYObject();
 			Double nameOffsetXInput = inputTransition.getNameOffsetXObject();
 			Double nameOffsetYInput = inputTransition.getNameOffsetYObject();
 			String idInput = inputTransition.getId();
 			String nameInput = inputTransition.getName();
-			double aRate = inputTransition.getRate();
 			boolean timedTrans = inputTransition.isTimed();
 			boolean infiniteServer = inputTransition.isInfiniteServer();
 			int orientation = inputTransition.getAngle();
@@ -384,8 +378,6 @@ public class DataLayerWriter {
 					(nameInput != null ? nameInput : (idInput != null && idInput.length() > 0? idInput : "")));
 			transitionElement.setAttribute("id", 
 					(idInput != null ? idInput : "error"));
-			transitionElement.setAttribute("rate", 
-					(aRate != 1 ? String.valueOf(aRate):"1.0"));
 			transitionElement.setAttribute("timed", String.valueOf(timedTrans));
 			transitionElement.setAttribute("infiniteServer", 
 					String.valueOf(infiniteServer));
@@ -410,11 +402,6 @@ public class DataLayerWriter {
 		}
 
 		if (inputArc != null ) {
-			Integer attrValue = null;
-			double positionXInputD = (int)inputArc.getStartPositionX();
-			Double positionXInput = new Double (positionXInputD);
-			double positionYInputD = (int)inputArc.getStartPositionY();
-			Double positionYInput = new Double (positionXInputD);
 			String idInput = inputArc.getId();
 			String sourceInput = inputArc.getSource().getId();
 			String targetInput = inputArc.getTarget().getId();

@@ -16,10 +16,9 @@ import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
-import pipe.gui.Zoomer;
 import pipe.gui.Zoomable;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.undo.PetriNetObjectNameEdit;
+import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -33,7 +32,12 @@ public abstract class PetriNetObject
         extends JComponent 
         implements Zoomable, CopyPasteable, Cloneable, Translatable {
 
-   protected final static int COMPONENT_DRAW_OFFSET = 5;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2693171860021066729L;
+
+protected final static int COMPONENT_DRAW_OFFSET = 5;
    
    /** Id */
    protected String id = null;
@@ -51,9 +55,6 @@ public abstract class PetriNetObject
    
    protected boolean deleted = false;
    protected boolean markedAsDeleted = false;
-   
-   // The ZoomController of the GuiView this component is part of.
-   private Zoomer zoomControl;   
    
    // Integer value which represents a zoom percentage
    protected int zoom = 100;   

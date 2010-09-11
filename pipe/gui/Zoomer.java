@@ -11,8 +11,6 @@ public class Zoomer {
 
    private int percent;
 
-   private GuiFrame app;
-   
    public Zoomer(GuiFrame _app){
       this(100, _app);
    }
@@ -20,7 +18,6 @@ public class Zoomer {
    
    public Zoomer(int pct, GuiFrame _app){
       percent = pct;
-      app = _app;
    }
    
    

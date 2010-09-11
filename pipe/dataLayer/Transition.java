@@ -19,13 +19,9 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.undo.TransitionServerSemanticEdit;
 import pipe.gui.undo.UndoableEdit;
-import pipe.gui.undo.TransitionPriorityEdit;
-import pipe.gui.undo.TransitionRateEdit;
 import pipe.gui.undo.TransitionRotationEdit;
 import pipe.gui.undo.TransitionTimingEdit;
 import pipe.gui.Zoomer;
-import pipe.gui.widgets.EscapableDialog;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -62,6 +58,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class Transition
 extends PlaceTransitionObject {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 942116302162925121L;
 	/** Transition is of Rectangle2D.Double*/
 	private GeneralPath transition;
 	private Shape proximityTransition;
@@ -93,25 +93,10 @@ extends PlaceTransitionObject {
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
-	private ArrayList arcAngleList = new ArrayList();
-
-	/** The transition rate */
-	private double rate = 1;   
-
-	/** Rate X-axis Offset */
-	private Double rateOffsetX = 0.0;
-
-	/** Rate Y-axis Offset */
-	private Double rateOffsetY = 24.0;
+	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
 
 	/**  The transition priority */
 	private Integer priority = 1;
-
-	/** Priority X-axis Offset */
-	private Double priorityOffsetX = 0.0;
-
-	/** Priority Y-axis Offset */
-	private Double priorityOffsetY = 13.0;   
 
 	public Transition(Transition t){
 
@@ -119,7 +104,6 @@ extends PlaceTransitionObject {
 
 		this(t.positionX, t.positionY, t.id, t.getName(), t.nameOffsetX, 
 				t.nameOffsetY,
-				t.getRate(), 
 				t.timed,
 				t.infiniteServer,
 				t.angle,
@@ -145,7 +129,6 @@ extends PlaceTransitionObject {
 			String idInput, 
 			String nameInput,
 			double nameOffsetXInput, double nameOffsetYInput,
-			double rateInput,
 			boolean timedTransition, 
 			boolean infServer, 
 			int angleInput,
@@ -156,7 +139,6 @@ extends PlaceTransitionObject {
 				nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; //sets width
 		componentHeight = TRANSITION_HEIGHT;//sets height
-		rate = rateInput;
 		timed = timedTransition;
 		infiniteServer = infServer;
 		constructTransition();
@@ -175,7 +157,6 @@ extends PlaceTransitionObject {
 		this(0.0, 0.0, idInput, 
 				nameInput,
 				0.0, 0.0,
-				0.0,
 				false, 
 				false, 
 				0,
@@ -211,7 +192,6 @@ extends PlaceTransitionObject {
 		copy.nameOffsetY = this.nameOffsetY;
 
 		copy.timed = this.timed;
-		copy.rate = this.rate;
 		copy.angle = this.angle;
 
 		copy.attributesVisible = this.attributesVisible;
@@ -232,7 +212,6 @@ extends PlaceTransitionObject {
 		copy.nameOffsetX = this.nameOffsetX;
 		copy.nameOffsetY = this.nameOffsetY;
 		copy.timed = this.timed;
-		copy.rate = this.rate;
 		copy.angle = this.angle;
 		copy.attributesVisible = this.attributesVisible;
 		copy.priority = this.priority;
@@ -314,7 +293,7 @@ extends PlaceTransitionObject {
 						componentHeight/2));
 		outlineTransition();
 
-		Iterator arcIterator = arcAngleList.iterator();
+		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		while (arcIterator.hasNext()){
 			((ArcAngleCompare)arcIterator.next()).calcAngle();
 		}
@@ -415,22 +394,6 @@ extends PlaceTransitionObject {
 		 highlighted = false;
 	 }
 
-
-	 public UndoableEdit setRate(double _rate){
-		 double oldRate = rate;
-
-		 rate = _rate;
-		 pnName.setText(getText());
-		 repaint();
-		 return new TransitionRateEdit(this, oldRate, rate);
-	 }
-
-
-	 public double getRate() {
-		 return rate;
-	 }
-
-
 	 public int getAngle(){
 		 return angle;
 	 }
@@ -439,21 +402,6 @@ extends PlaceTransitionObject {
 	 public int getPriority(){
 		 return priority;
 	 }
-
-
-	 /**
-	  * Set priority
-	  * @param newPriority Integer value for ...
-	  */
-	 public UndoableEdit setPriority(int newPriority) {
-		 int oldPriority = priority;
-
-		 priority = new Integer(newPriority);
-		 pnName.setText(getText());
-		 repaint();
-		 return new TransitionPriorityEdit(this, oldPriority, priority);
-	 }      
-
 
 	 /**Set the timed transition attribute (for GSPNs)*/
 	 public UndoableEdit setTimed(boolean change) {
@@ -573,7 +521,7 @@ extends PlaceTransitionObject {
 
 
 	 public void removeArcCompareObject(Arc a) {
-		 Iterator arcIterator = arcAngleList.iterator();
+		 Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		 while (arcIterator.hasNext()) {
 			 if (((ArcAngleCompare)arcIterator.next()).arc == a) {
 				 arcIterator.remove();
@@ -589,7 +537,7 @@ extends PlaceTransitionObject {
 	 public void updateEndPoint(Arc arc) {
 		 boolean match = false;
 
-		 Iterator arcIterator = arcAngleList.iterator();
+		 Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		 while (arcIterator.hasNext()) {
 			 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
 			 if (thisArc.arc == arc || !arc.inView()) {
@@ -609,12 +557,12 @@ extends PlaceTransitionObject {
 
 
 	 public void updateEndPoints() {
-		 ArrayList top = new ArrayList();
-		 ArrayList bottom = new ArrayList();
-		 ArrayList left = new ArrayList();
-		 ArrayList right = new ArrayList();
+		 ArrayList<ArcAngleCompare> top = new ArrayList<ArcAngleCompare>();
+		 ArrayList<ArcAngleCompare> bottom = new ArrayList<ArcAngleCompare>();
+		 ArrayList<ArcAngleCompare> left = new ArrayList<ArcAngleCompare>();
+		 ArrayList<ArcAngleCompare> right = new ArrayList<ArcAngleCompare>();
 
-		 Iterator arcIterator = arcAngleList.iterator();
+		 Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		 while (arcIterator.hasNext()) {
 			 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
 			 double thisAngle = thisArc.angle - Math.toRadians(angle);
@@ -721,13 +669,6 @@ extends PlaceTransitionObject {
 
 
 	 private String getText(){
-		 if (attributesVisible == true){
-			 if (isTimed()) {
-				 return "\nr=" + rate;
-			 } else {
-				 return "\n" + '\u03C0' + "=" + priority + "\nw=" + rate;
-			 }
-		 }
 		 return "";
 	 }
 
@@ -748,7 +689,7 @@ extends PlaceTransitionObject {
 
 	 @Override
 	 public void showEditor(){
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException();
 	 }      
 
 
@@ -766,7 +707,7 @@ extends PlaceTransitionObject {
 
 
 
-	 class ArcAngleCompare implements Comparable {
+	 class ArcAngleCompare implements Comparable<ArcAngleCompare> {
 
 		 private final static boolean SOURCE = false;
 		 private final static boolean TARGET = true;
@@ -782,8 +723,8 @@ extends PlaceTransitionObject {
 		 }
 
 
-		 public int compareTo(Object arg0) {
-			 double angle2 = ((ArcAngleCompare)arg0).angle;
+		 public int compareTo(ArcAngleCompare arg0) {
+			 double angle2 = arg0.angle;
 
 			 return (angle < angle2 ? -1 
 					 : (angle == angle2 ? 0 
@@ -839,7 +780,6 @@ extends PlaceTransitionObject {
 
 		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
 		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-		 toReturn.rate = getRate();
 		 toReturn.timed = timed;
 		 toReturn.infiniteServer = infiniteServer;
 		 toReturn.constructTransition();

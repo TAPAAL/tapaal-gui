@@ -457,7 +457,7 @@ public class CapacityDegree2Converter implements Degree2Converter {
 		}
 		
 		// Do Grafical stuff
-		for (Map.Entry entry : oldToNewPlacesMap.entrySet()){
+		for (Map.Entry<TAPNPlace, TAPNPlace> entry : oldToNewPlacesMap.entrySet()){
 			// XXX - Unsafe cast but ok by assumption
 			toReturn.addLocation((PlaceTransitionObject)entry.getValue(), model.locations.get(entry.getKey()));
 		}	

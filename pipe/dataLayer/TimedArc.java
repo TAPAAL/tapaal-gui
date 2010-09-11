@@ -60,7 +60,7 @@ public class TimedArc extends NormalArc{
 		return false;
 	}
 	public String getGuard() {
-		// TODO Auto-generated method stub
+		
 		return timeInterval;
 	}
 	public UndoableEdit setGuard(String timeInteval) {

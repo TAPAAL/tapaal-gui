@@ -25,7 +25,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 
 import pipe.dataLayer.DataLayer;
@@ -55,11 +54,6 @@ public class QueryDialogue extends JPanel{
 	private JPanel traceOptions;
 	private JPanel searchOptions;
 	private JPanel uppaalOptions;
-	private JPanel advancedUppaalOptions;
-	private JPanel hashTableOptions;
-	private JPanel extrapolationOptions;
-	private JToggleButton showAdvancedUppaalOptions;
-
 	private JButton okButton;
 	private JButton verifyButton;
 	private JButton cancelButton;
@@ -87,21 +81,6 @@ public class QueryDialogue extends JPanel{
 	private JRadioButton fastest;
 	
 
-	private ButtonGroup hashTableSizeButtonGroup;
-
-	private JRadioButton size4;
-	private JRadioButton size16;
-	private JRadioButton size64;
-	private JRadioButton size256;
-	private JRadioButton size512;
-
-	private ButtonGroup extrapolationButtonGroup;
-
-	private JRadioButton automaticExtr;
-	private JRadioButton difExtr;
-	private JRadioButton locBasedExtr;
-	private JRadioButton lowUpExtr;
-
 	private JPanel reductionOptions;
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
@@ -124,20 +103,8 @@ public class QueryDialogue extends JPanel{
 
 	private String name_ADVNOSYM = "Optimised Standard";
 	private String name_NAIVE = "Standard";
-	private String name_NAIVESYM = "Symmetry Reduction";
-	private String name_ADVSYM = "Optimised Symmetry Reduction";
-	private String name_INHIBSTANDARD = "Standard (with inhibitor arcs)";
-	private String name_INHIBSYM = "Symmetry Reduction (with inhibitor arcs)";
 	private String name_BROADCAST = "Broadcast Reduction";
-	private String name_BROADCASTSYM = "Symmetric Broadcast Reduction";
-	private String name_BROADCASTDEG2SYM = "Sym. Broadcast Degree 2 Reduction";
 	private String name_BROADCASTDEG2 = "Broadcast Degree 2 Reduction";
-	private String name_ADVBROADCASTSYM = "Sym. Advanced Broadcast Reduction";
-	private String name_OPTBROADCASTSYM = "Optimized Symmetric Broadcast Reduction";
-	private String name_OPTBROADCAST = "Optimized Broadcast Reduction";
-	private String name_SUPERBROADCASTSYM = "Symmetric Super Broadcast Reduction";
-	private String name_SUPERBROADCAST = "Super Broadcast Reduction";
-
 	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
 		this.datalayer = datalayer;
@@ -1033,36 +1000,6 @@ public class QueryDialogue extends JPanel{
 		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
 
 	}
-
-	private String getExtrapolationOption() {
-		String toReturn = null;
-		for (Object radioButton : extrapolationOptions.getComponents()){
-			if( (radioButton instanceof JRadioButton)){
-				if ( ((JRadioButton)radioButton).isSelected() ){
-			
-					toReturn = ((JRadioButton)radioButton).getText();
-					break;
-				}
-			}
-		}
-		return toReturn;
-	}
-
-
-	private String getHashTableSize() {
-		String toReturn = null;
-		for (Object radioButton : hashTableOptions.getComponents()){
-			if( (radioButton instanceof JRadioButton)){
-				if ( ((JRadioButton)radioButton).isSelected() ){
-			
-					toReturn = ((JRadioButton)radioButton).getText();
-					break;
-				}
-			}
-		}
-		return toReturn;
-	}
-
 
 	private int getCapacity(){
 		return (Integer) ((JSpinner)capacityPanel.getComponent(1)).getValue();

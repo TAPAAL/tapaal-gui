@@ -12,11 +12,13 @@ import pipe.gui.CreateGui;
 
 public class EditGroupAction extends AbstractAction {
 	
-	private Container contentPane;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6000849375126934761L;
 	private Arc myArc;
 	
 	public EditGroupAction(Container contentPane, Arc a) {
-		this.contentPane = contentPane;
 		myArc = a;
 	}
 	

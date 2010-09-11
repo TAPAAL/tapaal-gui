@@ -17,7 +17,11 @@ import pipe.dataLayer.AnnotationNote;
  */
 public class AnnotationPanel extends javax.swing.JPanel {
    
-   private AnnotationNote annotation;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5241113917349530815L;
+private AnnotationNote annotation;
    
    /**
     * Creates new form ParameterPanel
@@ -93,7 +97,12 @@ public class AnnotationPanel extends javax.swing.JPanel {
       buttonPanel.add(cancelButton, gridBagConstraints);
       
       JSplitPaneFix split = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, panel, buttonPanel){
-    	  @Override
+    	  /**
+		 * 
+		 */
+		private static final long serialVersionUID = -3436043116983340340L;
+
+		@Override
     	  public int getMinimumDividerLocation(){
     		  return this.lastDividerLocation;
     	  }
@@ -115,15 +124,6 @@ public class AnnotationPanel extends javax.swing.JPanel {
       exit();
    }//GEN-LAST:event_cancelButtonActionPerformed
 
-   
-   private void focusGained(javax.swing.JTextField textField){
-      textField.setCaretPosition(0);
-      textField.moveCaretPosition(textField.getText().length());
-   }
-   
-   private void focusLost(javax.swing.JTextField textField){
-      textField.setCaretPosition(0);
-   }   
    
    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
       annotation.setText(textArea.getText());

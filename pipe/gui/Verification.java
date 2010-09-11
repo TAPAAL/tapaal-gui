@@ -26,8 +26,6 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
-import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -308,26 +306,20 @@ public class Verification {
 
 
 		int capacity;
-		String currentQuery = "";
 		capacity = input.capacity;
 		String inputQuery = input.query;
 		TraceOption traceOption = input.traceOption;
 		SearchOption searchOption = input.searchOption;
-		HashTableSize hashTableSize = input.hashTableSize;
-		ExtrapolationOption extrapolationOption = input.extrapolationOption;
 		String verifytaOptions = "";
 
 		if (untimedTrace){
 			verifytaOptions+="-Y";
 		}
 		
-		boolean traceRequested = false;
 		if (traceOption == TraceOption.SOME){
 			verifytaOptions += "-t0";
-			traceRequested = true;
 		}else if (traceOption == TraceOption.FASTEST){
 			verifytaOptions += "-t2";
-			traceRequested = true;
 		}else if (traceOption == TraceOption.NONE){
 			verifytaOptions += "";
 		}
@@ -627,9 +619,6 @@ public class Verification {
 				if (line.contains("Property is satisfied")) {
 					property = true;
 
-					//Print trace,
-					ArrayList<String> tmp=null;
-					
 					error=false;
 					//break;
 
@@ -796,15 +785,16 @@ public class Verification {
 
 	
 	public class RunningVerificationWidgets extends javax.swing.JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7324730866458670919L;
 		private JRootPane myRootPane;
 		Thread verification=null;
 		boolean finished=false;
 		boolean interrupted=false;
 		
 		public RunningVerificationWidgets() {
-			  
-			this.verification = verification;
-				
 			setLayout(new GridLayout(2,1));
 			add(new Label("Verification is running ...\n" +
 					"Please wait!")
@@ -894,7 +884,7 @@ public class Verification {
 		}
 
 		public void verifyStop() {
-			// TODO Auto-generated method stub
+			
 			child.destroy();
 		}
 		Process child=null;
@@ -935,8 +925,6 @@ public class Verification {
 				/*for (String s : commands){
 					System.out.print(s + " ");
 				}*/ 
-				
-				String line=null;
 				
 				verificationtime = endTimeMs-startTimeMs;
 				

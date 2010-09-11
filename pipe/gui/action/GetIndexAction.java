@@ -17,7 +17,11 @@ import pipe.dataLayer.ArcPathPoint;
 public class GetIndexAction 
         extends AbstractAction {
    
-   private ArcPathPoint selected;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7191268435513189218L;
+private ArcPathPoint selected;
    private Point mp;
    
    

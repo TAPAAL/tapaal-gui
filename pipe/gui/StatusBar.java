@@ -9,7 +9,11 @@ import javax.swing.JPanel;
 public class StatusBar 
         extends JPanel{
    
-   /* Provides the appropriate text for the mode that the user is in */
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8253246293753481390L;
+/* Provides the appropriate text for the mode that the user is in */
    public String textforDrawing =
            "Drawing Mode: Click on a button to start adding components to the "
            + "Editor";
@@ -125,13 +129,6 @@ public class StatusBar
             changeText(textforDrag);
             break;            
             
-         case Pipe.MARKING:
-            changeText(textforMarking);
-            break;
-
-         case Pipe.RATE:
-            changeText(textforRate);
-            break;  
          default:
             changeText("To-do (textfor" + type);
             break;

@@ -30,7 +30,6 @@ extends javax.swing.JPanel {
 	boolean timed;
 	boolean infiniteServer;
 	Integer priority = 0;
-	Double rate;
 	String name;   
 	DataLayer pnmlData;
 	GuiView view;
@@ -54,9 +53,6 @@ extends javax.swing.JPanel {
 		rootPane.setDefaultButton(okButton);
 
 		attributesVisible = transition.getAttributesVisible();
-
-		rate = transition.getRate();
-
 	}
 
 	/** This method is called from within the constructor to

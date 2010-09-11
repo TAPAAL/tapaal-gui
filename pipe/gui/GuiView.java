@@ -18,7 +18,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -464,7 +463,7 @@ EOC*/
 
 		JViewport viewport = (JViewport)getParent();
 
-		double currentXNoZoom = Zoomer.getUnzoomedValue(
+		Zoomer.getUnzoomedValue(
 				viewport.getViewPosition().x + (viewport.getWidth() * 0.5), zoom);
 		double newZoomedX = Zoomer.getZoomedValue(point.x, zoom);
 		double newZoomedY = Zoomer.getZoomedValue(point.y, zoom);

@@ -29,7 +29,11 @@ public class SelectionManager
                    java.awt.event.MouseWheelListener,
                    java.awt.event.MouseMotionListener {
 
-   private Point startPoint;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9057152447545103393L;
+private Point startPoint;
    private Rectangle selectionRectangle = new Rectangle(-1,-1);
    private boolean isSelecting;
    private static final Color selectionColor = new Color(000, 000, 255, 030);
@@ -117,7 +121,7 @@ public void paintComponent(Graphics g) {
    }
 
    
-   public void translateSelection(int transX, int transY) {
+	public void translateSelection(int transX, int transY) {
       
       if (transX == 0 && transY == 0) {
          return;

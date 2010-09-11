@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -139,10 +138,6 @@ implements Cloneable {
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
 	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
 	private Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>> tapnInhibitorsMap = null;
-
-	private HashSet<String> markingParameterHashSet = new HashSet<String>();
-
-	private HashSet<String> rateParameterHashSet = new HashSet<String>();
 
 	private HashMap<Transition, HashMap<TransportArc, TransportArc> > transportArcMap;
 
@@ -710,7 +705,7 @@ implements Cloneable {
 	 */
 	public void removePetriNetObject(PetriNetObject pnObject){
 		boolean didSomething = false;
-		ArrayList attachedArcs = null;
+		ArrayList<?> attachedArcs = null;
 
 		try{
 			if (setPetriNetObjectArrayList(pnObject)) {
@@ -840,7 +835,7 @@ implements Cloneable {
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList a=tapnInhibitorsMap.get(attached);
+						ArrayList<TAPNInhibitorArc> a=tapnInhibitorsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -1015,7 +1010,6 @@ implements Cloneable {
 		String nameInput = null;
 		double nameOffsetYInput = 0;
 		double nameOffsetXInput = 0;
-		double rate = 1.0;
 		boolean timedTransition;
 		boolean infiniteServer;
 		int angle = 0;
@@ -1026,24 +1020,11 @@ implements Cloneable {
 		String nameTempStorage = element.getAttribute("name");
 		String nameOffsetXTempStorage = element.getAttribute("nameOffsetX");
 		String nameOffsetYTempStorage = element.getAttribute("nameOffsetY");
-		String nameRate = element.getAttribute("rate");
 		String nameTimed = element.getAttribute("timed");
 		String nameInfiniteServer = element.getAttribute("infiniteServer");
 		String nameAngle = element.getAttribute("angle");
 		String namePriority = element.getAttribute("priority");
-		//String nameWeight = element.getAttribute("weight");
-		String parameterTempStorage = element.getAttribute("parameter");
-
-		/* wjk - a useful little routine to display all attributes of a transition
-       for (int i=0; ; i++) {
-          Object obj = inputTransitionElement.getAttributes().item(i);
-          if (obj == null) {
-             break;
-          }
-          System.out.println("Attribute " + i + " = " + obj.toString());
-       }
-		 */      
-
+	
 		if (nameTimed.length() == 0) {
 			timedTransition = false;
 		} else if (nameTimed.length()== 5) {
@@ -1089,15 +1070,6 @@ implements Cloneable {
 			nameOffsetYInput = Double.valueOf(nameOffsetYTempStorage).doubleValue();
 		}
 
-		if (nameRate.length()== 0) {
-			nameRate = "1.0";
-		}
-		if (nameRate != "1.0") {
-			rate = Double.valueOf(nameRate).doubleValue();
-		} else {
-			rate = 1.0;
-		}
-
 		if (nameAngle.length() > 0) {
 			angle = Integer.valueOf(nameAngle).intValue();
 		}
@@ -1113,7 +1085,6 @@ implements Cloneable {
 						idInput, 
 						nameInput, 
 						nameOffsetXInput, nameOffsetYInput, 
-						rate, 
 						timedTransition, 
 						infiniteServer,
 						angle,
@@ -1146,7 +1117,6 @@ implements Cloneable {
 		String markingOffsetXTempStorage = element.getAttribute("markingOffsetX");
 		String markingOffsetYTempStorage = element.getAttribute("markingOffsetY");
 		String capacityTempStorage = element.getAttribute("capacity");
-		String parameterTempStorage = element.getAttribute("parameter");
 		String invariantTempStorage = element.getAttribute("invariant");
 
 
@@ -1771,12 +1741,11 @@ implements Cloneable {
 		// b) all are timed transitions.
 
 		ArrayList<Transition> enabledTransitions = new ArrayList<Transition>();
-		double rate = 0;
+		
 		for (int i = 0; i < transitionsArray.size(); i++) {
 			Transition transition = (Transition)transitionsArray.get(i);
 			if (transition.isEnabled()) {
 				enabledTransitions.add(transition);
-				rate += transition.getRate();
 			}
 		}
 
@@ -1785,20 +1754,10 @@ implements Cloneable {
 			return enabledTransitions.get(0);
 		}      
 
-		double random = randomNumber.nextDouble();
-		double x = 0;
-		for (int i = 0; i < enabledTransitions.size(); i++) {
-			Transition t = enabledTransitions.get(i);
-
-			x += t.getRate() / rate;
-
-			if (random < x) {
-				return t;
-			}         
-		}
-
+		int random = randomNumber.nextInt(enabledTransitions.size());
+		
 		// no enabled transition found, so no transition can be fired
-		return null;
+		return enabledTransitions.get(random);
 	}
 
 
@@ -1990,23 +1949,6 @@ implements Cloneable {
 		arcsMap = null;
 		initializeMatrices();
 	}
-
-
-	/**
-	 * Get position of Petri-Net Object in ArrayList of given Petri-Net Object's type
-	 * @param pnObject PlaceTransitionObject to get the position of
-	 * @return Position (-1 if not present) of Petri-Net Object in ArrayList of 
-	 * given Petri-Net Object's type
-	 */
-	public int getListPosition(PetriNetObject pnObject){
-
-		if (setPetriNetObjectArrayList(pnObject)){
-			return changeArrayList.indexOf(pnObject);
-		} else {
-			return -1;
-		}
-	}
-
 
 	/**
 	 * Get a List of all the Place objects in the Petri-Net
@@ -2566,8 +2508,7 @@ implements Cloneable {
 		String markingOffsetXTempStorage = element.getAttribute("markingOffsetX");
 		String markingOffsetYTempStorage = element.getAttribute("markingOffsetY");
 		String capacityTempStorage = element.getAttribute("capacity");
-		String parameterTempStorage = element.getAttribute("parameter");
-
+		
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Double.valueOf(positionXTempStorage).doubleValue() + 1;
 		}
@@ -2684,10 +2625,6 @@ implements Cloneable {
 
 		for (Place p : m.getPlaces()){
 			addPlace(p.clone());
-
-			for (Object a : p.getPostset()){
-
-			}
 		}
 
 
@@ -2829,36 +2766,7 @@ implements Cloneable {
 	}
 
 
-	public boolean existsMarkingParameter (String name){
-		return markingParameterHashSet.contains(name);
-	}
-
-
-	public boolean existsRateParameter (String name){
-		return rateParameterHashSet.contains(name);
-	}
-
-
-	public boolean changeRateParameter(String oldName, String newName) {
-		if (rateParameterHashSet.contains(newName)){
-			return false;
-		}
-		rateParameterHashSet.remove(oldName);
-		rateParameterHashSet.add(newName);
-		return true;
-	}
-
-
-	public boolean changeMarkingParameter(String oldName, String newName) {
-		if (markingParameterHashSet.contains(newName)){
-			return false;
-		}
-		markingParameterHashSet.remove(oldName);
-		markingParameterHashSet.add(newName);
-		return true;
-	}   
-
-
+	
 	/**
 	 * See if the supplied net has any timed transitions.
 	 * @param DataLayer
@@ -2899,11 +2807,11 @@ implements Cloneable {
 
 
 	private void checkForInverseArc(NormalArc newArc) {
-		Iterator iterator = newArc.getSource().getConnectToIterator();
+		Iterator<Arc> iterator = newArc.getSource().getConnectToIterator();
 
 		Arc anArc;
 		while (iterator.hasNext()){
-			anArc = (Arc)iterator.next();
+			anArc = iterator.next();
 			if (anArc.getTarget() == newArc.getSource() && 
 					anArc.getSource() == newArc.getTarget()) {
 				if (anArc.getClass() == NormalArc.class) {

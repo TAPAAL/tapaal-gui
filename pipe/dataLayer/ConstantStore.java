@@ -17,7 +17,6 @@ import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntOrConstant;
 import pipe.dataLayer.colors.IntOrConstantRange;
-import pipe.gui.CreateGui;
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
 import pipe.gui.undo.UndoableEdit;

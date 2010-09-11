@@ -21,6 +21,12 @@ public class InhibitorArc
 EOC*/   
    
    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4104630135052601706L;
+
+
+/**
     * Create Petri-Net Arc object
     *
     * @param startPositionXInput Start X-axis Position

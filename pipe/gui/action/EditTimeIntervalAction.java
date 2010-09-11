@@ -10,6 +10,10 @@ import pipe.gui.CreateGui;
 
 public class EditTimeIntervalAction extends AbstractAction {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5730320425921717153L;
 	private Container contentPane;
 	private Arc myArc;
 

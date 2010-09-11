@@ -21,7 +21,11 @@ public class NameLabel
         extends JTextArea 
         implements Cloneable, Translatable, Zoomable {
    
-   private int positionX;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5167510420195429773L;
+private int positionX;
    private int positionY;
    private String name = "";
    private String text = "";
@@ -29,9 +33,6 @@ public class NameLabel
    private Font font = 
            new Font(Pipe.LABEL_FONT, Font.BOLD, Pipe.LABEL_DEFAULT_FONT_SIZE);
 
-   private boolean doZoom = false;
-
-   
    public NameLabel(){
       this("");
    }

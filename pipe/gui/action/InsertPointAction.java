@@ -19,7 +19,11 @@ import pipe.gui.CreateGui;
 public class InsertPointAction 
         extends javax.swing.AbstractAction{
    
-   private Arc selected;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6718916328220594869L;
+private Arc selected;
    Point2D.Float mouseposition;
    
    

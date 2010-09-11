@@ -15,7 +15,6 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.PlaceCapacityEdit;
 import pipe.gui.undo.PlaceMarkingEdit;
 import pipe.gui.undo.UndoableEdit;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -37,6 +36,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class Place 
 extends PlaceTransitionObject {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5155964364065651381L;
 	public final static String type = "Place";
 	/** Initial Marking */
 	protected Integer initialMarking = 0;
@@ -55,12 +58,6 @@ extends PlaceTransitionObject {
 	/*
    private boolean strongCapacity = false;
 	 */
-
-	/** Initial Marking X-axis Offset */
-	private Double capacityOffsetX = 0.0;
-
-	/** Initial Marking Y-axis Offset */
-	private Double capacityOffsetY = 22.0;
 
 	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
@@ -439,7 +436,7 @@ extends PlaceTransitionObject {
 
 	@Override
 	public void showEditor(){
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException();
 	}
 
 

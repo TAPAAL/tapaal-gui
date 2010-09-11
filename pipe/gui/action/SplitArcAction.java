@@ -18,7 +18,11 @@ import pipe.gui.CreateGui;
 public class SplitArcAction 
         extends javax.swing.AbstractAction{
    
-   private Arc selected;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6841076240159898489L;
+private Arc selected;
    Point2D.Float mouseposition;
    
    

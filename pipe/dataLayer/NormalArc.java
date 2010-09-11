@@ -28,6 +28,11 @@ import pipe.gui.undo.SplitInverseArcEdit;
  */
 public class NormalArc
         extends Arc {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5588142404135607382L;
+
 /*CB Joakim Byg - probably not needed   
    public final static String type = "normal";
 EOC*/   

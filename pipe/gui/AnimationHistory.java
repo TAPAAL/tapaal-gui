@@ -24,7 +24,11 @@ import javax.swing.text.StyleContext;
 public class AnimationHistory
         extends JTextPane {
    
-   /** Holds all the transitions in the sequence */
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4284885450021683552L;
+/** Holds all the transitions in the sequence */
    public Vector<String> fSeq;
    private String initText;
    private Document doc;
@@ -41,7 +45,7 @@ public class AnimationHistory
       initStyles();
       doc = getDocument();
       doc.insertString(doc.getLength(),text,bold);
-      fSeq = new Vector();
+      fSeq = new Vector<String>();
       fSeq.add("Initial Marking");
       currentItem = 1;
       updateText();
@@ -84,9 +88,7 @@ public class AnimationHistory
    private void updateText() {
       String newS;
       int count=1;
-      Style currentStyle = regular;
-      
-      Enumeration e = fSeq.elements();
+      Enumeration<String> e = fSeq.elements();
       try {
          doc.remove(initText.length(),doc.getLength()-initText.length());
          

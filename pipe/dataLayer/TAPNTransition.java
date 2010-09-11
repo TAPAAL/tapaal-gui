@@ -17,25 +17,25 @@ public class TAPNTransition extends Transition {
 	
 	public TAPNTransition(Transition t) {
 		super(t);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public TAPNTransition(double positionXInput, double positionYInput) {
 		super(positionXInput, positionYInput);
-		// TODO Auto-generated constructor stub
+		
 	}
 
-	public TAPNTransition(double positionXInput, double positionYInput, String idInput, String nameInput, double nameOffsetXInput, double nameOffsetYInput, double rateInput, boolean timedTransition, boolean infServer, int angleInput, int priority) {
+	public TAPNTransition(double positionXInput, double positionYInput, String idInput, String nameInput, double nameOffsetXInput, double nameOffsetYInput, boolean timedTransition, boolean infServer, int angleInput, int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput,
-				nameOffsetYInput, rateInput, timedTransition, infServer, angleInput,
+				nameOffsetYInput, timedTransition, infServer, angleInput,
 				priority);
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 
 	public TAPNTransition(String idInput, String nameInput) {
 		super(idInput, nameInput);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
@@ -89,16 +89,8 @@ public class TAPNTransition extends Transition {
 	      this.newCopy(copy);
 	      copy.nameOffsetX = this.nameOffsetX;
 	      copy.nameOffsetY = this.nameOffsetY;
-	           
-//	      copy.angle = this.angle;
-
 	      copy.attributesVisible = this.attributesVisible;
-//	      copy.priority = this.priority;
-//	      copy.transition.transform(
-//	              AffineTransform.getRotateInstance(Math.toRadians(copy.angle), 
-//	                                                Transition.TRANSITION_HEIGHT/2,
-//	                                                Transition.TRANSITION_HEIGHT/2));
-//	      copy.rateParameter = null;//this.rateParameter;
+
 	      return copy;
 	   }
 
@@ -121,7 +113,7 @@ public class TAPNTransition extends Transition {
 	   }
 
 	private boolean isEnabledByDelay() {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 }

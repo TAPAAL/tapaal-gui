@@ -25,7 +25,11 @@ import pipe.gui.undo.ArcPathPointTypeEdit;
 public class ArcPathPoint 
         extends PetriNetObject { 
    
-   public static final boolean STRAIGHT = false;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7584441718171173604L;
+public static final boolean STRAIGHT = false;
    public static final boolean CURVED = true;
    private static int SIZE = 3;
    private static int SIZE_OFFSET = 1;

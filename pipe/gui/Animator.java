@@ -68,14 +68,14 @@ public class Animator {
 
 	Timer timer;
 	int numberSequences;   
-	private ArrayList actionHistory;
+	private ArrayList<FiringAction> actionHistory;
 	private int currentAction;
 	private ArrayList<HashMap<TimedPlace, ArrayList<BigDecimal>>> markingHistory;
 	
 	public Firingmode firingmode = new RandomFiringmode();
 
 	public Animator(){
-		actionHistory = new ArrayList();
+		actionHistory = new ArrayList<FiringAction>();
 
 		timer = new Timer(0, new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -104,7 +104,7 @@ public class Animator {
 		
 		 //current.setEnabledTransitions();      
 
-		 Iterator transitionIterator = current.returnTransitions();
+		 Iterator<Transition> transitionIterator = current.returnTransitions();
 		 while (transitionIterator.hasNext()) {
 			 Transition tempTransition = (Transition)transitionIterator.next();
 			 if (tempTransition.isEnabled(true) == true) {
@@ -123,7 +123,7 @@ public class Animator {
 
 		 //current.setEnabledTransitions();      
 
-		 Iterator transitionIterator = current.returnTransitions();
+		 Iterator<Transition> transitionIterator = current.returnTransitions();
 		 while (transitionIterator.hasNext()) {
 			 Transition tempTransition = (Transition) transitionIterator.next();
 			 if (tempTransition.isEnabled(true) == false) {
@@ -139,7 +139,7 @@ public class Animator {
 	  * unhighlighted
 	  */
 	 private void disableTransitions(){
-		 Iterator transitionIterator = 
+		 Iterator<Transition> transitionIterator = 
 			 CreateGui.currentPNMLData().returnTransitions();
 		 while (transitionIterator.hasNext()) {
 			 Transition tempTransition = (Transition)transitionIterator.next();
@@ -266,8 +266,6 @@ public class Animator {
 			 }else if(actionHistory.get(currentAction) instanceof ColoredDiscreteFiringAction){
 				 CreateGui.currentPNMLData().fireColoredTransitionBackwards((ColoredDiscreteFiringAction)actionHistory.get(currentAction));
 			 }else if (actionHistory.get(currentAction) instanceof Transition ){
-				 Transition lastTransitionFired = (Transition)actionHistory.get(currentAction); 
-				// CreateGui.currentPNMLData().fireTransitionBackwards(lastTransitionFired);
 
 			 }else if ( actionHistory.get(currentAction) instanceof TimeDelayFiringAction){
 				 BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction)).getDealy();
@@ -537,7 +535,7 @@ public class Animator {
 		 this.numberSequences = numberSequences;
 	 }
 
-	 private void addToHistory(Object newAction, HashMap<TimedPlace, ArrayList<BigDecimal>> currentMarking){
+	 private void addToHistory(FiringAction newAction, HashMap<TimedPlace, ArrayList<BigDecimal>> currentMarking){
 		 actionHistory.add(newAction);
 		 markingHistory.add(currentMarking);
 		 currentAction++;

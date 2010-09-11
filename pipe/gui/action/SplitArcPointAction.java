@@ -19,7 +19,11 @@ import pipe.gui.CreateGui;
 public class SplitArcPointAction 
         extends javax.swing.AbstractAction {
    
-   private ArcPathPoint arcPathPoint;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6080999798954816351L;
+private ArcPathPoint arcPathPoint;
    
    
    public SplitArcPointAction(ArcPathPoint _arcPathPoint) {

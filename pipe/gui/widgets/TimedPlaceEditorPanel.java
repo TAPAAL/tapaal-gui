@@ -102,8 +102,7 @@ extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		placeEditorPanel = new javax.swing.JPanel();
-		markingComboBox = new javax.swing.JComboBox();
-		//      tokenPanel = new JPanel(new FlowLayout());
+		new javax.swing.JComboBox();
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -1001,7 +1000,6 @@ extends javax.swing.JPanel {
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;
-	private javax.swing.JComboBox markingComboBox;
 	private javax.swing.JLabel markingLabel;
 	private javax.swing.JSpinner markingSpinner;
 	private javax.swing.JLabel nameLabel;

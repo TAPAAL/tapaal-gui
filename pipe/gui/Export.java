@@ -246,7 +246,7 @@ public class Export {
 	}
 
 	public static void exportUppaalAdvancedGuiView(GuiView appView, DataLayer AppModel) {
-		// TODO Auto-generated method stub
+		
 		boolean gridEnabled = Grid.isEnabled();
 		String filename = null;
 
@@ -492,7 +492,7 @@ public class Export {
 	}
 
 	public static void exportUppaalGuiView(GuiView appView, DataLayer AppModel) {
-		// TODO Auto-generated method stub
+		
 		boolean gridEnabled = Grid.isEnabled();
 		String filename = null;
 
@@ -616,7 +616,7 @@ public class Export {
 
 
 	public static void exportUppaalSymetricGuiView(GuiView appView, DataLayer AppModel) {
-		// TODO Auto-generated method stub
+		
 		boolean gridEnabled = Grid.isEnabled();
 		String filename = null;
 

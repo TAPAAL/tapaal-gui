@@ -376,7 +376,7 @@ public class CreateGui {
 	}
 
 	public static void addAbstractAnimationPane() {
-		// TODO Auto-generated method stub
+		
 
 		try {
 			abstractAnimationPane=new AnimationHistory("Untimed Trace\n");

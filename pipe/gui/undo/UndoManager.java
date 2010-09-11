@@ -30,7 +30,7 @@ public class UndoManager {
    private int startOfBuffer  = 0;
    private int undoneEdits    = 0;
 
-   private ArrayList<ArrayList> edits = new ArrayList(UNDO_BUFFER_CAPACITY);
+   private ArrayList<ArrayList<UndoableEdit>> edits = new ArrayList<ArrayList<UndoableEdit>>(UNDO_BUFFER_CAPACITY);
    
    private GuiView view;
    private DataLayer model;
@@ -111,7 +111,7 @@ public class UndoManager {
    
    
    public void newEdit(){
-      ArrayList lastEdit = edits.get(currentIndex());
+      ArrayList<UndoableEdit> lastEdit = edits.get(currentIndex());
       if ((lastEdit != null) && (lastEdit.isEmpty())){
          return;
       }              
@@ -121,7 +121,7 @@ public class UndoManager {
       app.setRedoActionEnabled(false);
       view.setNetChanged(true);
       
-      ArrayList<UndoableEdit> compoundEdit = new ArrayList();
+      ArrayList<UndoableEdit> compoundEdit = new ArrayList<UndoableEdit>();
       edits.set(indexOfNextAdd, compoundEdit);
       indexOfNextAdd = (indexOfNextAdd + 1) % UNDO_BUFFER_CAPACITY;
       if (sizeOfBuffer < UNDO_BUFFER_CAPACITY){
@@ -157,7 +157,7 @@ public class UndoManager {
    }   
 
      
-   public void translateSelection(ArrayList objects, int transX, int transY) {
+   public void translateSelection(ArrayList<PetriNetObject> objects, int transX, int transY) {
       newEdit(); // new "transaction""
       Iterator<PetriNetObject> iterator = objects.iterator();
       while (iterator.hasNext()){
@@ -206,7 +206,7 @@ public class UndoManager {
       } else {
          if (pnObject instanceof PlaceTransitionObject) {
             //
-            Iterator arcsTo = 
+            Iterator<Arc> arcsTo = 
                     ((PlaceTransitionObject)pnObject).getConnectToIterator();
             while (arcsTo.hasNext()) {
                Arc anArc = (Arc)arcsTo.next();
@@ -215,7 +215,7 @@ public class UndoManager {
                }
             }            
             //
-            Iterator arcsFrom = 
+            Iterator<Arc> arcsFrom = 
                     ((PlaceTransitionObject)pnObject).getConnectFromIterator();
             while (arcsFrom.hasNext()) {
                Arc anArc = (Arc)arcsFrom.next();
@@ -242,19 +242,6 @@ public class UndoManager {
             addEdit(new DeletePetriNetObjectEdit(pnObject, view, model));
             pnObject.delete();
          }
-      }
-   }
-   
-   
-   private void debug(){
-      int i = startOfBuffer;
-      System.out.println("");
-      for (int k = 0; k < sizeOfBuffer; k++) {
-         Iterator<UndoableEdit> currentEdit = edits.get(i).iterator();
-         while (currentEdit.hasNext()) {
-            System.out.println("["+ i + "]" + currentEdit.next().toString());
-         }
-         i = (i + 1 ) % UNDO_BUFFER_CAPACITY;
       }
    }
    

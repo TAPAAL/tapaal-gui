@@ -23,15 +23,9 @@ public class Location {
 	private boolean isUrgent = false;
 	private boolean isCommitted = false;
 	
-	private int x = 0;
-	private int y = 0;
-	
 	public Location(String name, String invariant, int x, int y, boolean isUrgent, boolean isCommitted)
 	{
 		this(name, invariant);
-		
-		this.x = x;
-		this.y = y;
 		
 		this.isUrgent = isUrgent;
 		this.isCommitted = isCommitted;

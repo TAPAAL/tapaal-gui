@@ -14,7 +14,11 @@ import javax.swing.JComponent;
  */
 public class BlankLayer extends JComponent {
    
-   private static final Color gridColor = new Color(255,255,255);
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4133511967694844508L;
+private static final Color gridColor = new Color(255,255,255);
    private static GuiFrame f;
 
    

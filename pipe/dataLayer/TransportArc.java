@@ -66,7 +66,7 @@ public class TransportArc extends TimedArc {
 	
 	@Override
 	public TransportArc copy() {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	
@@ -105,7 +105,7 @@ public class TransportArc extends TimedArc {
 
 	@Override
 	public TransportArc paste(double despX, double despY, boolean toAnotherView) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 	/*

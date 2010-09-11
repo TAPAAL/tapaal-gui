@@ -28,7 +28,12 @@ import pipe.gui.widgets.EscapableDialog;
 public class AnnotationNote 
         extends Note {
 
-   private boolean fillNote = true;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3503959956765396720L;
+
+private boolean fillNote = true;
    
    private ResizePoint[] dragPoints = new ResizePoint[8];
    
@@ -205,7 +210,6 @@ public void paintComponent(Graphics g) {
       g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, 
                           RenderingHints.VALUE_STROKE_NORMALIZE);
 
-      AffineTransform saveAT = g2.getTransform();
       g2.transform(Zoomer.getTransform(zoom));   
       if (selected && !ignoreSelection) {
          g2.setPaint(Pipe.SELECTION_FILL_COLOUR);
@@ -295,8 +299,11 @@ public int getLayerOffset() {
    public class ResizePoint 
            extends javax.swing.JComponent {
  
-      private int SIZE   = 3;
-      private int OFFSET = 1;
+      /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1615544376708838434L;
+	private int SIZE   = 3;
       private static final int TOP    = 1;
       private static final int BOTTOM = 2;
       private static final int LEFT   = 4;

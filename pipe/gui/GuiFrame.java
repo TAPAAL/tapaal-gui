@@ -21,8 +21,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -65,7 +63,6 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
-import pipe.io.JarUtilities;
 import dk.aau.cs.petrinet.TAPN;
 
 
@@ -121,11 +118,11 @@ implements ActionListener, Observer {
 
 	private EditAction /*copyAction, cutAction, pasteAction,*/ undoAction, redoAction;
 	private GridAction toggleGrid;
-	private ZoomAction zoomOutAction, zoomInAction, zoomAction;
+	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction, placeAction,
-	transAction, timedtransAction, tokenAction, selectAction, rateAction,
-	markingAction, deleteTokenAction, dragAction, timedPlaceAction;
+	transAction, timedtransAction, tokenAction, selectAction,
+	deleteTokenAction, dragAction, timedPlaceAction;
 	/* CB Joakim Byg - tries both */   
 	private TypeAction timedArcAction;
 
@@ -139,7 +136,6 @@ implements ActionListener, Observer {
 
 	private boolean editionAllowed = true;
 
-	private CopyPasteManager copyPasteManager;
 
 
 
@@ -188,8 +184,6 @@ implements ActionListener, Observer {
 
 		addWindowListener(new WindowHandler());
 
-		//
-		copyPasteManager = new CopyPasteManager();
 
 		this.setForeground(java.awt.Color.BLACK);
 		this.setBackground(java.awt.Color.WHITE);
@@ -261,90 +255,59 @@ implements ActionListener, Observer {
 			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
 			getResource("Example nets" + System.getProperty("file.separator"));
 
-			if (JarUtilities.isJarFile(examplesDirURL)){
 
-				JarFile jarFile = new JarFile(JarUtilities.getJarName(examplesDirURL));
+			File examplesDir = new File(examplesDirURL.toURI());
+			/**
+			 * The next block fixes a problem that surfaced on Mac OSX with
+			 * PIPE 2.4. In that environment (and not in Windows) any blanks
+			 * in the project name in Eclipse are property converted to '%20'
+			 * but the blank in "Example nets" is not. The following code
+			 * will do nothing on a Windows machine or if the logic on OSX
+			 * changess. I also added a stack trace so if the problem
+			 * occurs for another environment (perhaps multiple blanks need
+			 * to be manually changed) it can be easily fixed.  DP
+			 */
+			// examplesDir = new File(new URI(examplesDirURL.toString()));
+			String dirURLString = examplesDirURL.toString();
+			int index = dirURLString.indexOf( " " );
+			if ( index > 0 ) {
+				StringBuffer sb = new StringBuffer( dirURLString );
+				sb.replace( index, index + 1, "%20" );
+				dirURLString = sb.toString();
+			}
 
-				ArrayList <JarEntry> nets =
-					JarUtilities.getJarEntries(jarFile, "Example nets");
+			examplesDir = new File( new URI(dirURLString ) );
 
-				Arrays.sort(nets.toArray(), new Comparator(){
-					public int compare(Object one, Object two) {
-						return ((JarEntry)one).getName().compareTo(((JarEntry)two).getName());
-					}
-				});
+			File[] nets = examplesDir.listFiles();
 
-				if (nets.size() > 0) {
-					JMenu exampleMenu=new JMenu("Example nets");
-					exampleMenu.setIcon(
-							new ImageIcon(Thread.currentThread().getContextClassLoader().
-									getResource(CreateGui.imgPath + "Example.png")));
-					int index = 0;
-					for (int i = 0; i < nets.size(); i++){
-						if (nets.get(i).getName().toLowerCase().endsWith(".xml")){
-							addMenuItem(exampleMenu,
-									new ExampleFileAction(nets.get(i),
-											(index < 10) ?("ctrl " + index) :null));
-							index++;
-						}
-					}
-					fileMenu.add(exampleMenu);
-					fileMenu.addSeparator();
+			Arrays.sort(nets,new Comparator<File>(){
+				public int compare(File one, File two) {
+
+					int toReturn=((File)one).getName().compareTo(((File)two).getName());
+					//Special hack to get intro-example first
+					if (one.getName().equals("intro-example.xml")){toReturn=-1;}
+					if (two.getName().equals("intro-example.xml")){toReturn=1;}
+					return toReturn;
 				}
-			} else {
-				File examplesDir = new File(examplesDirURL.toURI());
-				/**
-				 * The next block fixes a problem that surfaced on Mac OSX with
-				 * PIPE 2.4. In that environment (and not in Windows) any blanks
-				 * in the project name in Eclipse are property converted to '%20'
-				 * but the blank in "Example nets" is not. The following code
-				 * will do nothing on a Windows machine or if the logic on OSX
-				 * changess. I also added a stack trace so if the problem
-				 * occurs for another environment (perhaps multiple blanks need
-				 * to be manually changed) it can be easily fixed.  DP
-				 */
-				// examplesDir = new File(new URI(examplesDirURL.toString()));
-				String dirURLString = examplesDirURL.toString();
-				int index = dirURLString.indexOf( " " );
-				if ( index > 0 ) {
-					StringBuffer sb = new StringBuffer( dirURLString );
-					sb.replace( index, index + 1, "%20" );
-					dirURLString = sb.toString();
-				}
+			});
 
-				examplesDir = new File( new URI(dirURLString ) );
-
-				File[] nets = examplesDir.listFiles();
-
-				Arrays.sort(nets,new Comparator(){
-					public int compare(Object one, Object two) {
-
-						int toReturn=((File)one).getName().compareTo(((File)two).getName());
-						//Special hack to get intro-example first
-						if (((File)one).getName().equals("intro-example.xml")){toReturn=-1;}
-						if (((File)two).getName().equals("intro-example.xml")){toReturn=1;}
-						return toReturn;
+			// Oliver Haggarty - fixed code here so that if folder contains non
+			// .xml file the Example x counter is not incremented when that file
+			// is ignored
+			if (nets.length > 0) {
+				JMenu exampleMenu=new JMenu("Example nets");
+				exampleMenu.setIcon(
+						new ImageIcon(Thread.currentThread().getContextClassLoader().
+								getResource(CreateGui.imgPath + "Example.png")));
+				int k = 0;
+				for (int i = 0; i < nets.length; i++){
+					if(nets[i].getName().toLowerCase().endsWith(".xml")){
+						addMenuItem(exampleMenu,
+								new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
 					}
-				});
-
-				// Oliver Haggarty - fixed code here so that if folder contains non
-				// .xml file the Example x counter is not incremented when that file
-				// is ignored
-				if (nets.length > 0) {
-					JMenu exampleMenu=new JMenu("Example nets");
-					exampleMenu.setIcon(
-							new ImageIcon(Thread.currentThread().getContextClassLoader().
-									getResource(CreateGui.imgPath + "Example.png")));
-					int k = 0;
-					for (int i = 0; i < nets.length; i++){
-						if(nets[i].getName().toLowerCase().endsWith(".xml")){
-							addMenuItem(exampleMenu,
-									new ExampleFileAction(nets[i], (k<10)?"ctrl " + (k++) :null));
-						}
-					}
-					fileMenu.add(exampleMenu);
-					fileMenu.addSeparator();
 				}
+				fileMenu.add(exampleMenu);
+				fileMenu.addSeparator();
 			}
 		} catch (Exception e) {
 			System.err.println("Error getting example files:" + e);
@@ -494,7 +457,7 @@ EOC */
 
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
-		  
+
 		 JMenuItem aboutItem = helpMenu.add("About");
 		 aboutItem.addActionListener(this); // Help - About is implemented differently
 
@@ -504,7 +467,7 @@ EOC */
 			 aboutItem.setIcon(new ImageIcon(iconURL));
 		 }
 
-		 JMenu experimentMenu = new JMenu("Experiment");
+		 new JMenu("Experiment");
 
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
@@ -555,7 +518,7 @@ EOC */
 		toolBar.addSeparator();
 		toolBar.add(zoomOutAction);
 		addZoomComboBox(toolBar,
-				zoomAction = new ZoomAction("Zoom","Select zoom percentage ", ""));
+				new ZoomAction("Zoom","Select zoom percentage ", ""));
 		toolBar.add(zoomInAction);
 
 		//Modes
@@ -740,10 +703,6 @@ EOC */
 
 			public void stateChanged(ChangeEvent e) {
 
-				if (appGui.getCopyPasteManager().pasteInProgress()) {
-					appGui.getCopyPasteManager().cancelPaste();
-				}
-
 				int index = appTab.getSelectedIndex();
 				setObjects(index);
 				if (appView != null) {
@@ -873,14 +832,8 @@ EOC */
 	public void createNewTab(String name){
 		int freeSpace = CreateGui.getFreeSpace();
 
-		// if we are in the middle of a paste action, we cancel it because we will
-		// create a new tab now
-		if (this.getCopyPasteManager().pasteInProgress()) {
-			this.getCopyPasteManager().cancelPaste();
-		}
-
 		setObjects(freeSpace);
-		int currentlySelected = appTab.getSelectedIndex();
+		appTab.getSelectedIndex();
 
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
@@ -915,12 +868,6 @@ EOC */
 	public void createNewTabFromFile(File file) {
 		int freeSpace = CreateGui.getFreeSpace();
 		String name="";
-
-		// if we are in the middle of a paste action, we cancel it because we will
-		// create a new tab now
-		if (this.getCopyPasteManager().pasteInProgress()) {
-			this.getCopyPasteManager().cancelPaste();
-		}
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
@@ -1006,11 +953,6 @@ EOC */
 		int freeSpace = CreateGui.getFreeSpace();
 		String name="";
 
-		// if we are in the middle of a paste action, we cancel it because we will
-		// create a new tab now
-		if (this.getCopyPasteManager().pasteInProgress()) {
-			this.getCopyPasteManager().cancelPaste();
-		}
 
 		setObjects(freeSpace);
 
@@ -1215,14 +1157,8 @@ EOC */
 		if (deleteTokenAction != null) 
 			deleteTokenAction.setSelected(mode == Pipe.DELTOKEN);
 
-		if (rateAction != null) 
-			rateAction.setSelected(mode == Pipe.RATE);
-
-		if (markingAction != null) 
-			//markingAction.setSelected(mode == Pipe.MARKING);
-
-			if (selectAction != null) 
-				selectAction.setSelected(mode == Pipe.SELECT);
+		if (selectAction != null) 
+			selectAction.setSelected(mode == Pipe.SELECT);
 
 		if (annotationAction != null) 
 			annotationAction.setSelected(mode == Pipe.ANNOTATION);
@@ -1253,12 +1189,6 @@ EOC */
 	public void setRedoActionEnabled(boolean flag) {
 		redoAction.setEnabled(flag);
 	}
-
-
-	public CopyPasteManager getCopyPasteManager() {
-		return copyPasteManager;
-	}
-
 
 	public void init() {
 		// Set selection mode at startup
@@ -1305,6 +1235,10 @@ EOC */
 
 	class AnimateAction extends GuiAction {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8582324286370859664L;
 		private int typeID;
 		private AnimationHistory animBox;
 
@@ -1429,6 +1363,10 @@ EOC */
 
 	class ExampleFileAction extends GuiAction {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5983638671592349736L;
 		private File filename;
 
 
@@ -1441,20 +1379,6 @@ EOC */
 							getResource(CreateGui.imgPath + "Net.png")));
 		}
 
-
-		ExampleFileAction(JarEntry entry, String keyStroke) {
-			super(entry.getName().substring(1 + entry.getName().
-					indexOf(System.getProperty("file.separator"))),
-					"Open example file \"" + entry.getName() + "\"",
-					keyStroke);
-			putValue(SMALL_ICON,
-					new ImageIcon(Thread.currentThread().getContextClassLoader().
-							getResource(CreateGui.imgPath + "Net.png")));
-
-			filename = JarUtilities.getFile(entry);//.getPath();
-		}
-
-
 		public void actionPerformed(ActionEvent e){
 			createNewTabFromFile(filename);
 			CreateGui.createLeftPane();
@@ -1465,6 +1389,12 @@ EOC */
 
 
 	class DeleteAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8592450390507637174L;
+
 
 		DeleteAction(String name, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
@@ -1512,6 +1442,10 @@ EOC */
 
 	class TypeAction extends GuiAction {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1333311291148756241L;
 		private int typeID;
 
 		TypeAction(String name, int typeID, String tooltip, String keystroke){
@@ -1571,14 +1505,7 @@ EOC */
 			if (this != deleteTokenAction) {
 				deleteTokenAction.setSelected(false);
 			}
-			/*	
-			if (this != rateAction) {
-				rateAction.setSelected(false);
-			}
-			 */	
-			if (this != markingAction) {
-				//markingAction.setSelected(false);
-			}
+
 			if (this != selectAction) {
 				selectAction.setSelected(false);
 			}
@@ -1646,6 +1573,12 @@ EOC */
 
 	class GridAction extends GuiAction {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5654512618471549653L;
+
+
 		GridAction(String name, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 		}
@@ -1661,6 +1594,12 @@ EOC */
 
 
 	class ZoomAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 549331166742882564L;
+
 
 		ZoomAction(String name, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);

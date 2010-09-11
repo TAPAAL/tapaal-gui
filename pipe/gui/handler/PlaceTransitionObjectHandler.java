@@ -199,7 +199,7 @@ public void mouseReleased(MouseEvent e) {
                if (!currentObject.getClass().equals(
             		   createTAPNInhibitorArc.getSource().getClass())) {
                   
-                  Iterator arcsFrom =
+                  Iterator<Arc> arcsFrom =
                 	  createTAPNInhibitorArc.getSource().getConnectFromIterator();
                   // search for pre-existent arcs from createInhibitorArc's 
                   // source to createInhibitorArc's target
@@ -281,7 +281,7 @@ public void mouseReleased(MouseEvent e) {
                if (!currentObject.getClass().equals(
                        createInhibitorArc.getSource().getClass())) {
                   
-                  Iterator arcsFrom =
+                  Iterator<Arc> arcsFrom =
                           createInhibitorArc.getSource().getConnectFromIterator();
                   // search for pre-existent arcs from createInhibitorArc's 
                   // source to createInhibitorArc's target
@@ -341,7 +341,7 @@ public void mouseReleased(MouseEvent e) {
         	 if (createArc != null) {
         		 if (currentObject != createArc.getSource()) {
         			 createArc.setSelectable(true);
-        			 Iterator arcsFrom = createArc.getSource().getConnectFromIterator();
+        			 Iterator<Arc> arcsFrom = createArc.getSource().getConnectFromIterator();
         			 // search for pre-existent arcs from createArc's source to 
         			 // createArc's target                  
         			 while(arcsFrom.hasNext()) {
@@ -384,7 +384,7 @@ public void mouseReleased(MouseEvent e) {
         				 createArc.setTarget(currentObject);
 
         				 //check if there is an inverse arc
-        				 Iterator arcsFromTarget =
+        				 Iterator<Arc> arcsFromTarget =
         					 createArc.getTarget().getConnectFromIterator();
         				 while (arcsFromTarget.hasNext()) {
         					 Arc anArc = (Arc)arcsFromTarget.next();
@@ -503,7 +503,7 @@ public void mouseReleased(MouseEvent e) {
     						 break;
     					 }
     					 
-    					 Iterator arcsFrom = transportArcToCreate.getSource().getConnectFromIterator();
+    					 Iterator<Arc> arcsFrom = transportArcToCreate.getSource().getConnectFromIterator();
             			 // search for pre-existent arcs from transportArcToCreate's source to 
             			 // transportArcToCreate's target                  
             			 while(arcsFrom.hasNext()) {
@@ -611,7 +611,7 @@ public void mouseReleased(MouseEvent e) {
         				 
     					 //Check that there is not an other arc
     					 boolean existsArc = false;
-        				 Iterator arcsFromTranasition = transportArcToCreate.getSource().getConnectFromIterator();
+        				 Iterator<Arc> arcsFromTranasition = transportArcToCreate.getSource().getConnectFromIterator();
         				 Arc someArc = null;
 
         				 while ( arcsFromTranasition.hasNext() ){        					 
@@ -717,7 +717,7 @@ public void mouseReleased(MouseEvent e) {
         			 //We create NormalArcs when source of arc is Transition( since there are no intervals on output arcs.) ...except if the arc is a TransportArc
         			 if (!(timedArcToCreate instanceof TimedArc)){
         				 boolean toDrawNewArc = true;
-        				 Iterator arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
+        				 Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
         				 Arc someArc = null;
 
         				 while ( arcsFromTranasition.hasNext() ){        					 
@@ -801,7 +801,7 @@ public void mouseReleased(MouseEvent e) {
     					 }
     					 
     					 boolean existsArc = false;
-        				 Iterator arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
+        				 Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
         				 Arc someArc = null;
     					 
     					 while ( arcsFromTranasition.hasNext() ){        					 

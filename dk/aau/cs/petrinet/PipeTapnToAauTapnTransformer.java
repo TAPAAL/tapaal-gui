@@ -25,7 +25,7 @@ public class PipeTapnToAauTapnTransformer {
 	private DataLayer appModel;
 	protected TAPN aAUPetriNet;
 	private int capacity;
-	protected HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject> PlaceTransitionObjectBookKeeper = new HashMap();
+	protected HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject> PlaceTransitionObjectBookKeeper = new HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject>();
 	
 	public PipeTapnToAauTapnTransformer(DataLayer model, int capacity){
 		appModel = model;

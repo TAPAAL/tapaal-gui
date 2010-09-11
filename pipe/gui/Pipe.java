@@ -68,9 +68,6 @@ public class Pipe {
    // Other
    public static final int DRAW         = 115;
    
-   public static final int RATE         = 117;
-   public static final int MARKING      = 118;
-   
    public static final int DRAG         = 120;
    
    

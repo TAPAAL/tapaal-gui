@@ -25,6 +25,10 @@ public abstract class PlaceTransitionObject
 extends PetriNetObject 
 implements Cloneable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6629006415467929184L;
 	/** X-axis Position on screen*/
 	protected double positionX;
 	/** Y-axis Position on screen*/
@@ -37,9 +41,6 @@ implements Cloneable {
 
 	protected double componentWidth;
 	protected double componentHeight;
-
-	/** Used in the mouse events to control dragging*/
-	private boolean isDragging;
 
 	private LinkedList<Arc> connectTo = new LinkedList<Arc>();
 	private LinkedList<Arc> connectFrom = new LinkedList<Arc>();
@@ -351,14 +352,15 @@ implements Cloneable {
 
 	/** Updates location of any attached arcs */
 	public void updateConnected() {
-		Iterator arcsFrom = connectFrom.iterator();
+		Iterator<Arc> arcsFrom = connectFrom.iterator();
+
 		while (arcsFrom.hasNext()) {
 			someArc = ((Arc)arcsFrom.next());
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
 		}
 
-		Iterator arcsTo = connectTo.iterator();
+		Iterator<Arc> arcsTo = connectTo.iterator();
 		while (arcsTo.hasNext()) {
 			someArc = ((Arc)arcsTo.next());
 			updateEndPoint(someArc);
@@ -419,14 +421,14 @@ implements Cloneable {
 		if (selectable && !selected) {
 			selected = true;
 
-			Iterator arcsFrom = connectFrom.iterator();
+			Iterator<Arc> arcsFrom = connectFrom.iterator();
 			while(arcsFrom.hasNext()) {
-				((Arc)arcsFrom.next()).select();
+				arcsFrom.next().select();
 			}
 
-			Iterator arcsTo = connectTo.iterator();
+			Iterator<Arc> arcsTo = connectTo.iterator();
 			while(arcsTo.hasNext()) {
-				((Arc)arcsTo.next()).select();
+				arcsTo.next().select();
 			}
 			repaint();
 		}
@@ -458,12 +460,12 @@ implements Cloneable {
 		return new LinkedList<Arc>(connectFrom);
 	}
 
-	public Iterator getConnectFromIterator() {
+	public Iterator<Arc> getConnectFromIterator() {
 		return connectFrom.iterator();
 	}
 
 
-	public Iterator getConnectToIterator() {
+	public Iterator<Arc> getConnectToIterator() {
 		return connectTo.iterator();
 	}
 

@@ -33,14 +33,13 @@ public abstract class  Arc
         extends PetriNetObject 
         implements Cloneable {
    
-   //public final static String TYPE = "arc";
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6527845538091358791L;
+//public final static String TYPE = "arc";
    /** Current Marking */
    protected int weight = 1;
-   /** Initial Marking X-axis Offset */
-   private Double weightOffsetX = null;
-   /** Initial Marking Y-axis Offset */
-   private Double weightOffsetY = null;
-    
    protected NameLabel weightLabel;
       
    private static Point2D.Double point;

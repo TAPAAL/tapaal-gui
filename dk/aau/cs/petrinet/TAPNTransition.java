@@ -22,7 +22,7 @@ public class TAPNTransition extends Transition {
 	private boolean fromOriginalNet = false;
 	
 	public TAPNTransition(TAPNTransition t) {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public TAPNTransition(String name, boolean urgent){

@@ -14,7 +14,11 @@ import pipe.gui.CreateGui;
 public class ToggleArcPointAction 
         extends javax.swing.AbstractAction {
 
-   private ArcPathPoint arcPathPoint;
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8250176608566816298L;
+private ArcPathPoint arcPathPoint;
 
    
    public ToggleArcPointAction(ArcPathPoint _arcPathPoint) {

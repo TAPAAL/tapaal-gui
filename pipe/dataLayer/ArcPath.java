@@ -37,9 +37,7 @@ public class ArcPath
         implements Shape, Cloneable {
    
    private GeneralPath path = new GeneralPath();
-   private GeneralPath arcSelection;
-   private GeneralPath pointSelection;
-   private List pathPoints = new ArrayList();
+   private List<ArcPathPoint> pathPoints = new ArrayList<ArcPathPoint>();
    private Arc myArc;
    protected ArcPathPoint currentPoint;
    private boolean pointLock = false;

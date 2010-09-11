@@ -20,6 +20,10 @@ import pipe.gui.CreateGui;
 public class DeletePetriNetObjectAction 
 extends AbstractAction {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5945117611937154440L;
 	private PetriNetObject selected;
 
 

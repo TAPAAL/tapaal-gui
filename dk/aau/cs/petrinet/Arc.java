@@ -78,7 +78,7 @@ public class Arc implements Comparable<Arc> {
 	}
 
 	public int compareTo(Arc arg0) {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 }

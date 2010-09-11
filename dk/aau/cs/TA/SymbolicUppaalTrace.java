@@ -9,9 +9,7 @@ public class SymbolicUppaalTrace {
 	public static ArrayList<AbstractMarking> parseUppaalAbstractTrace(BufferedReader traceReader) throws Exception{
 		ArrayList<AbstractMarking> trace = new ArrayList<AbstractMarking>();
 		
-		int turn = 0;
 		int lastSequencenumber = 0;
-		boolean collect=false;
 		String line="";
 		AbstractMarking marking = new AbstractMarking();
 		
@@ -20,7 +18,7 @@ public class SymbolicUppaalTrace {
 			if (line.contains("Transitions:")){
 			
 				String line1 = traceReader.readLine();
-				String line2 = traceReader.readLine();
+				traceReader.readLine();
 				
 				
 				

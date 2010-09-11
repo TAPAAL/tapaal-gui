@@ -13,7 +13,7 @@ public class TAPNTransitionHandler extends TransitionHandler {
 
 	public TAPNTransitionHandler(Container contentpane, Transition obj) {
 		super(contentpane, obj);
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	//overwrite to remove shift behaviour

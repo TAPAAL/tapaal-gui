@@ -12,7 +12,7 @@ public class SuperBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 
 	public SuperBroadcastTransformer(int extraTokens, boolean useSymmetry) {
 		super(extraTokens, useSymmetry);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
