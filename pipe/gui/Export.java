@@ -734,36 +734,17 @@ public class Export {
 		return;
 	}
 
-	public static void exportUppaalXMLFromQuery(DataLayer appModel, TAPNQuery input) {
+	public static void exportUppaalXMLFromQuery(DataLayer appModel, TAPNQuery input, String modelFile, String queryFile) {
 		File xmlfile=null, qfile=null;
 		try {
-			xmlfile = File.createTempFile("verifyta", ".xml");
-			qfile = File.createTempFile("verifyta", ".q");
-		} catch (IOException e2) {
+			xmlfile = new File(modelFile);
+			qfile = new File(queryFile);
+		} catch (NullPointerException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
+			return;
 		}
-		xmlfile.deleteOnExit();qfile.deleteOnExit();
-		String filename = null;
-		try {
-			filename = new FileBrowser("Uppaal XML","xml",filename).saveFile();
-			xmlfile=new File(filename);
-			String[] a = filename.split(".xml");
-			qfile=new File(a[0]+".q");
-
-		} catch (Exception e) {
-			// There was some problem with the action
-			if (filename == null){
-				JOptionPane.showMessageDialog(CreateGui.getApp(), "No Uppaal XML file saved.");
-				return;
-			}else{
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						"There were errors performing the requested action:\n" + e,
-						"Error", JOptionPane.ERROR_MESSAGE
-				);				
-			}
-		}
-
+	
 		//Create transformer
 		PipeTapnToAauTapnTransformer transformer = null;
 
@@ -985,8 +966,6 @@ public class Export {
 			} catch (Exception e) {
 				System.err.println("We had an error translating the query");
 			}
-
 		}
-
 	}	
 }

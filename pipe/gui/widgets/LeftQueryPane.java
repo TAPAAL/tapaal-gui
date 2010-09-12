@@ -132,7 +132,7 @@ public class LeftQueryPane extends JPanel {
 		verifyButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
-				Verification.runUppaalVerification(CreateGui.getModel(), q, false);
+				Verification.runUppaalVerification(CreateGui.getModel(), q);
 			}			
 		});
 		p1.add(verifyButton);

@@ -7,13 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -27,8 +27,6 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.TA.AbstractMarking;
@@ -37,16 +35,6 @@ import dk.aau.cs.TA.FiringAction;
 import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UppaalTrace;
-import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
-import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
-import dk.aau.cs.TAPN.TAPNToNTATransformer;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
-import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
-import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
-import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -105,7 +93,7 @@ public class Verification {
 		}
 		return verifyta;
 	}
-	//Check if verifyta is present and if it is the right version
+
 	public static String getVerifytaVersion(){
 		
 		if (verifytapath.equals("")){
@@ -136,17 +124,10 @@ public class Verification {
 			return "Error";
 		}
 		
-		String[] stringarray = null;
-		stringarray = versioninfo.split("\\(rev\\.");
-		String versiontmp = stringarray[1];
-		
-		stringarray = versiontmp.split("\\)");
-		
-		versiontmp = stringarray[0];
-		
-		int version = Integer.parseInt(versiontmp.trim());
-		
-		return ""+version;
+		Pattern pattern = Pattern.compile("\\(rev. (\\d+)\\)");
+		Matcher m =  pattern.matcher(versioninfo);
+		m.find();
+		return m.group(1);
 	}
 	//Check if verifyta is present and if it is the right version
 	public static boolean checkVerifyta(){
@@ -236,10 +217,10 @@ public class Verification {
 		analyzer.analyze();
 	}
 	
-	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean saveUppaal) {
-		runUppaalVerification(appModel, input, saveUppaal, false);
+	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input) {
+		runUppaalVerification(appModel, input, false);
 	}
-	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean saveUppaal, boolean untimedTrace) {
+	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean untimedTrace) {
 		//Setup
 
 		setupVerifyta();
@@ -264,77 +245,11 @@ public class Verification {
 		}
 		xmlfile.deleteOnExit();qfile.deleteOnExit();
 
-		// Save the model
-		// Get export file
-		
-		if (saveUppaal){
-			String filename = null;
-			try {
-				filename = new FileBrowser("Uppaal XML","xml",filename).saveFile();
-				xmlfile=new File(filename);
-				String[] a = filename.split(".xml");
-				qfile=new File(a[0]+".q");
-
-			} catch (Exception e) {
-				// There was some problem with the action
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						"There were errors performing the requested action:\n" + e,
-						"Error", JOptionPane.ERROR_MESSAGE
-				);
-			}
-		}
-		
-		//Create transformer
-		PipeTapnToAauTapnTransformer transformer = null;
-		
-		if(appModel.isUsingColors()){
-			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
-		}else{
-			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
-		}
-		
-		TAPN model=null;
-		try {
-			model = transformer.getAAUTAPN();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		if (CreateGui.getApp().getComponentCount() == 0) {
-			return;
-		}
-
-
-		int capacity;
-		capacity = input.capacity;
-		String inputQuery = input.query;
-		TraceOption traceOption = input.traceOption;
-		SearchOption searchOption = input.searchOption;
-		String verifytaOptions = "";
-
-		if (untimedTrace){
-			verifytaOptions+="-Y";
-		}
-		
-		if (traceOption == TraceOption.SOME){
-			verifytaOptions += "-t0";
-		}else if (traceOption == TraceOption.FASTEST){
-			verifytaOptions += "-t2";
-		}else if (traceOption == TraceOption.NONE){
-			verifytaOptions += "";
-		}
-		
-		if (searchOption == SearchOption.BFS){
-			verifytaOptions += "-o0";
-		}else if (searchOption == SearchOption.DFS ){
-			verifytaOptions += "-o1";
-		}else if (searchOption == SearchOption.RDFS ){
-			verifytaOptions += "-o2";
-		}else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
-			verifytaOptions += "-o6";
-		}
 				
-
+		String inputQuery = input.query;
+		
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.traceOption, input.searchOption, untimedTrace);
+				
 		if (inputQuery == null) {return;}
 
 		//Handle problems with liveness checking 
@@ -361,7 +276,7 @@ public class Verification {
 			}
 			
 			//Check if degree-2 or give an error
-			if (!model.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD 
+			if (!appModel.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD 
 					|| input.reductionOption == ReductionOption.BROADCAST_SYM
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
@@ -383,192 +298,20 @@ public class Verification {
 			
 		}
 
-		// Select the model based on selected export option.
-
-		if (input.reductionOption == TAPNQuery.ReductionOption.NAIVE_UPPAAL_SYM){
-			
-			NaiveUppaalSym t = new NaiveUppaalSym();
-			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			
-		} else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_UPPAAL_SYM){
-					
-			AdvancedUppaalSym t = new AdvancedUppaalSym();
-			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if (input.reductionOption == TAPNQuery.ReductionOption.ADV_NOSYM){
-			System.out.println("Using ADV_NOSYMQ");
-			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
-			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}		
-		
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_STANDARD){
-			TAPNToNTATransformer trans = 
-				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
-			
-			try{
-				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		} else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_SYM){
-			TAPNToNTATransformer trans = 
-				new dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer(capacity);
-			
-			try{
-				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_STANDARD || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2){
-			Degree2BroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.ADV_BROADCAST_SYM){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.AdvancedBroadcastTransformer(capacity, true);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM || input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM || input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		else {
-
-			try {
-				model.convertToConservative();
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			try {
-				model = model.convertToDegree2();
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-
-
-			//Create uppaal xml file
-			try {
-				TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer(model, new PrintStream(xmlfile), capacity);
-				t2.transform();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			try {
-				model.transformQueriesToUppaal(capacity, inputQuery, new PrintStream(qfile));
-			} catch (Exception e) {
-				System.err.println("We had an error translating the query");
-			}
-
-		}
-		
-
-
-
-		
+	
+		Export.exportUppaalXMLFromQuery(appModel, input, xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
 
 		
 		// Do verifta 
-		PetriNetObject.ignoreSelection(false);
-		CreateGui.getApp().repaint();
+//		PetriNetObject.ignoreSelection(false);
+//		CreateGui.getApp().repaint();
 
 		
 		RunningVerificationWidgets t = (new Verification()).new RunningVerificationWidgets();
 		t.createDialog();
 		
 		//Run the verifucation thread 	
-		RunUppaalVerification a = (new Verification()).new RunUppaalVerification(verifyta, verifytaOptions, xmlfile, qfile, t); //Wtf?
+		RunUppaalVerification a = (new Verification()).new RunUppaalVerification(verifyta, verifytaOptions.toString(), xmlfile, qfile, t); //Wtf?
 		a.start();
 		
 		t.show();
@@ -690,7 +433,7 @@ public class Verification {
 							JOptionPane.INFORMATION_MESSAGE);
 					//XXX - Srba
 					
-					runUppaalVerification(appModel, input, saveUppaal, true);
+					runUppaalVerification(appModel, input, true);
 					return;
 					
 				}
