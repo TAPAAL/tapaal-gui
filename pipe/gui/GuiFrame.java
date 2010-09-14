@@ -749,10 +749,11 @@ EOC */
 		buffer.append("\n");
 		buffer.append("   Located: ");
 
-		if(Verification.verifytapath == null || Verification.verifytapath.equals(""))
+		String path = Verification.getPath();
+		if(path == null || path.isEmpty())
 			buffer.append("N/A");
 		else
-			buffer.append(Verification.verifytapath);
+			buffer.append(path);
 
 		buffer.append("  \n\n"); 
 		buffer.append("Based on PIPE2:\n");

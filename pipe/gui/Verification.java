@@ -47,158 +47,22 @@ import dk.aau.cs.TA.UppaalTrace;
 
 
 public class Verification {
-	static String verifytapath="";
+	private static ModelChecker modelChecker = new Verifyta(new FileFinderImpl(), new MessengerImpl()); // TODO: MJ -- Temporary during refactoring
 
 	public static boolean setupVerifyta(){
-		// if not set
-		if (verifytapath == null || verifytapath.equals("")){
-			
-			
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"TAPAAL needs to know the location of the file verifyta.\n\n"+
-					"Verifyta is a part of the UPPAAL distribution and it is\n" +
-					"normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n" +
-					"depending on the operating system used.", 
-					"Locate UPPAAL Verifyta",
-					JOptionPane.INFORMATION_MESSAGE);
-			
-			try {
-				File verifytaf = new FileBrowser("Uppaal Verifyta","",verifytapath).openFile();
-				verifytapath=verifytaf.getAbsolutePath();
-			} catch (Exception e) {
-				// There was some problem with the action
-				if (verifytapath == null){
-					//JOptionPane.showMessageDialog(CreateGui.getApp(), "No verifyta specified: The verification is cancelled");
-					verifytapath = "";
-					return false;
-				}else{
-					JOptionPane.showMessageDialog(CreateGui.getApp(),
-							"There were errors performing the requested action:\n" + e,
-							"Error", JOptionPane.INFORMATION_MESSAGE
-					);	
-					verifytapath = "";
-					return false;
-				}
-			}
-		}
-		
-		return true;
-		
-	}
-	public static String setupVerifytaPath() {
-		String verifyta = System.getenv("verifyta");
-
-		if (verifytapath.equals("")){			
-			verifytapath = verifyta == null ? "" : verifyta;
-		}
-		return verifyta;
+		return modelChecker.setup();		
 	}
 
 	public static String getVerifytaVersion(){
-		
-		if (verifytapath.equals("")){
-			return "N/A";
-		}
-		
-		String[] commands;
-
-		commands = new String[]{verifytapath, "-v"};
-
-		Process child=null;
-		
-		try {
-			child = Runtime.getRuntime().exec(commands);
-			child.waitFor();
-		} catch (IOException e) {
-			return "N/A";
-		} catch (InterruptedException e) {
-			return "N/A";
-		}
-		
-		BufferedReader bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));
-		
-		String versioninfo = null;
-		try {
-			versioninfo = bufferedReaderStdout.readLine();
-		} catch (IOException e) {
-			return "Error";
-		}
-		
-		Pattern pattern = Pattern.compile("\\(rev. (\\d+)\\)");
-		Matcher m =  pattern.matcher(versioninfo);
-		m.find();
-		return m.group(1);
+		return modelChecker.getVersion();
 	}
-	//Check if verifyta is present and if it is the right version
+	
 	public static boolean checkVerifyta(){
-		
-		if (verifytapath == ""){
-			
-			
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"No verifyta specified: The verification is cancelled",
-					"Verification Error",
-					JOptionPane.ERROR_MESSAGE);
-			verifytapath = "";
-			
-			return false;
-		}
-		
-		String[] commands;
-
-		commands = new String[]{verifytapath, "-v"};
-
-		Process child=null;
-		try {
-		
-			child = Runtime.getRuntime().exec(commands);
-			child.waitFor();
-		
-		int version;
-		
-		//Try to see if this program is recognised as verifyta
-		
-		BufferedReader bufferedReaderStdout = new BufferedReader(new InputStreamReader(child.getInputStream()));
-		
-		String versioninfo = null;
-		
-		versioninfo = bufferedReaderStdout.readLine();
-		
-		String[] stringarray = null;
-		stringarray = versioninfo.split("\\(rev\\.");
-		String versiontmp = stringarray[1];
-		
-		stringarray = versiontmp.split("\\)");
-		
-		versiontmp = stringarray[0];
-		
-		version = Integer.parseInt(versiontmp.trim());
-		
-				if (version < Pipe.verifytaMinRev){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"The specified version of the file verifyta is too old.\n\n" +
-					"Get the latest development version of UPPAAL from \n" +
-					"www.uppaal.com.",
-					"Verifyta Error",
-					JOptionPane.ERROR_MESSAGE);
-			verifytapath="";
-			return false;
-		}
-				
-		} catch (Exception e) {
-		
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"The program can not be verified as being verifyta. \nThe verifyta path will be reset. Please try again, to manually set the verifyta path.",
-					"Verifyta Error",
-					JOptionPane.ERROR_MESSAGE);
-			verifytapath="";
-			return false;
-		}
-		
-
-				
-		
-		return true;
+		return modelChecker.isCorrectVersion();
+	}
+	
+	public static String getPath(){
+		return modelChecker.getPath(); // TODO: MJ -- delete me when refactoring done
 	}
 	
 	public static void analyzeAndOptimizeKBound(DataLayer appModel, int k, JSpinner tokensControl)
@@ -224,17 +88,12 @@ public class Verification {
 		//Setup
 
 		setupVerifyta();
-		if (verifytapath == ""){
-			return;
-		}
 		if (!checkVerifyta()){
 			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n" +
 			"Update to the latest development version.");
 			return;
 		}
-
-		String verifyta = verifytapath;
-		
+		String verifyta = modelChecker.getPath();
 		File xmlfile=null, qfile=null;
 		try {
 			xmlfile = File.createTempFile( "verifyta", "test.xml");

@@ -50,7 +50,7 @@ public class KBoundAnalyzer
 					"Update to the latest development version.");
 			return;
 		}
-		String verifyta = Verification.verifytapath;
+		String verifyta = Verification.getPath();
 		
 		
 		//Tmp files
