@@ -11,8 +11,9 @@ import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.gui.Verifier.RunUppaalVerification;
-import pipe.gui.Verifier.RunningVerificationWidgets;
+import pipe.gui.widgets.RunningVerificationPanel;
 import dk.aau.cs.TA.NTA;
+import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
 import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastTransformer;
@@ -30,27 +31,30 @@ public class KBoundAnalyzer
 	private boolean error=true;
 	private boolean readingPropertyOneResult = false;
 	
+	private ModelChecker<NTA, UPPAALQuery> modelChecker;
+	
 	
 	public boolean isBounded() {
 		return !notBounded;
 	}
 	
-	public KBoundAnalyzer(DataLayer appModel, int k)
+	public KBoundAnalyzer(ModelChecker<NTA, UPPAALQuery> modelChecker, DataLayer appModel, int k)
 	{
 		this.k = k;
 		this.appModel = appModel;
+		this.modelChecker = modelChecker;
 	}
 	
 	public void analyze()
 	{
-		Verifier.setupVerifyta();
+		modelChecker.setup();
 		
-		if (!Verifier.checkVerifyta()){
+		if (!modelChecker.isCorrectVersion()){
 			System.err.println("Verifyta not found, or you are running an old version of verifyta.\n" +
 					"Update to the latest development version.");
 			return;
 		}
-		String verifyta = Verifier.getPath();
+		String verifyta = modelChecker.getPath();
 		
 		
 		//Tmp files
@@ -108,7 +112,7 @@ public class KBoundAnalyzer
 		CreateGui.getApp().repaint();
 
 		
-		RunningVerificationWidgets t = (new Verifier()).new RunningVerificationWidgets();
+		RunningVerificationPanel t = new RunningVerificationPanel();
 		t.createDialog();
 		
 		//Run the verifucation thread 	
@@ -117,7 +121,7 @@ public class KBoundAnalyzer
 		
 		t.show();
 		
-		if (t.interrupted){
+		if (t.isInterrupted()){
 			a.verifyStop();
 			a.interrupt();
 			a.stop();

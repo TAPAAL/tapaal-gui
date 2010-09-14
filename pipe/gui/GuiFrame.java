@@ -745,11 +745,13 @@ EOC */
 		buffer.append("Read more at: www.tapaal.net \n\n");
 		buffer.append("verifyta:\n");
 		buffer.append("   Version: ");
-		buffer.append(Verifier.getVerifytaVersion());
+		
+		Verifyta verifyta = new Verifyta(new FileFinderImpl(),new MessengerImpl());// TODO: MJ -- fix this
+		buffer.append(verifyta); 
 		buffer.append("\n");
 		buffer.append("   Located: ");
 
-		String path = Verifier.getPath();
+		String path = verifyta.getPath();
 		if(path == null || path.isEmpty())
 			buffer.append("N/A");
 		else

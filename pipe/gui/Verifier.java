@@ -1,10 +1,5 @@
 package pipe.gui;
 
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.Label;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,13 +7,8 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.DataLayer;
@@ -27,13 +17,14 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.RunningVerificationPanel;
 import dk.aau.cs.TA.AbstractMarking;
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
+import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
+import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TA.UppaalTrace;
 
 /**
@@ -46,28 +37,25 @@ import dk.aau.cs.TA.UppaalTrace;
  */
 
 
-public class Verifier {
-	private static ModelChecker modelChecker = new Verifyta(new FileFinderImpl(), new MessengerImpl()); // TODO: MJ -- Temporary during refactoring
+public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order to remember that path was set
+	private ModelChecker<NTA, UPPAALQuery> modelChecker;
 	
-	public static boolean setupVerifyta(){
-		return modelChecker.setup();		
-	}
-
-	public static String getVerifytaVersion(){
-		return modelChecker.getVersion();
+	private static Verifyta getVerifyta() {
+		return new Verifyta(new FileFinderImpl(), new MessengerImpl());
 	}
 	
-	public static boolean checkVerifyta(){
-		return modelChecker.isCorrectVersion();
+	public Verifier(){ // TODO: MJ -- delete me
+		this(getVerifyta());
 	}
 	
-	public static String getPath(){
-		return modelChecker.getPath(); // TODO: MJ -- delete me when refactoring done
+	public Verifier(ModelChecker<NTA, UPPAALQuery> modelChecker){
+		this.modelChecker = modelChecker;
 	}
+	
 	
 	public static void analyzeAndOptimizeKBound(DataLayer appModel, int k, JSpinner tokensControl)
 	{
-		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k);
+		KBoundOptimizer optimizer = new KBoundOptimizer(getVerifyta(), appModel, k);
 		optimizer.analyze();
 		
 		if(optimizer.isBounded())
@@ -77,7 +65,7 @@ public class Verifier {
 	}
 	
 	public static void analyseKBounded(DataLayer appModel, int k){
-		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k);
+		KBoundAnalyzer analyzer = new KBoundAnalyzer( getVerifyta(),appModel, k);
 		analyzer.analyze();
 	}
 	
@@ -85,15 +73,13 @@ public class Verifier {
 		runUppaalVerification(appModel, input, false);
 	}
 	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input, boolean untimedTrace) {
-		//Setup
-
-		setupVerifyta();
-		if (!checkVerifyta()){
+		getVerifyta().setup();
+		if (!getVerifyta().isCorrectVersion()){
 			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n" +
 			"Update to the latest development version.");
 			return;
 		}
-		String verifyta = modelChecker.getPath();
+		String verifyta = getVerifyta().getPath();
 		File xmlfile=null, qfile=null;
 		try {
 			xmlfile = File.createTempFile( "verifyta", "test.xml");
@@ -111,6 +97,7 @@ public class Verifier {
 				
 		if (inputQuery == null) {return;}
 
+		
 		//Handle problems with liveness checking 
 		if (inputQuery.contains("E[]") || inputQuery.contains("A<>") ) {
 			
@@ -135,7 +122,8 @@ public class Verifier {
 			}
 			
 			//Check if degree-2 or give an error
-			if (!appModel.isDegree2() && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD 
+			boolean isModelDegree2 = appModel.isDegree2();
+			if (!isModelDegree2 && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD 
 					|| input.reductionOption == ReductionOption.BROADCAST_SYM
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2
 					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
@@ -159,14 +147,8 @@ public class Verifier {
 
 	
 		Export.exportUppaalXMLFromQuery(appModel, input, xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
-
-		
-		// Do verifta 
-//		PetriNetObject.ignoreSelection(false);
-//		CreateGui.getApp().repaint();
-
-		
-		RunningVerificationWidgets t = (new Verifier()).new RunningVerificationWidgets();
+	
+		RunningVerificationPanel t = new RunningVerificationPanel();
 		t.createDialog();
 		
 		//Run the verifucation thread 	
@@ -175,7 +157,7 @@ public class Verifier {
 		
 		t.show();
 		
-		if (t.interrupted){
+		if (t.isInterrupted()){
 			a.verifyStop();
 			a.interrupt();
 			a.stop();
@@ -385,83 +367,8 @@ public class Verifier {
 
 	}
 
-	
-	public class RunningVerificationWidgets extends javax.swing.JPanel {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -7324730866458670919L;
-		private JRootPane myRootPane;
-		Thread verification=null;
-		boolean finished=false;
-		boolean interrupted=false;
-		
-		public RunningVerificationWidgets() {
-			setLayout(new GridLayout(2,1));
-			add(new Label("Verification is running ...\n" +
-					"Please wait!")
-			);
-			
-			JButton okButton = new JButton("Interupt Verification");
-			
 
-			okButton.addActionListener(	
-					new ActionListener() {
-						public void actionPerformed(ActionEvent evt) {
-							interrupted=true;
-							close();
-						}
-					}
-			);
-			
-			add(okButton);
-		    
-			
-		}
 
-		public void close() {
-			myRootPane.getParent().setVisible(false);
-		}
-		
-		public void show() {
-			if (!finished){
-				myRootPane.getParent().setVisible(true);
-			}
-		}
-		
-		public void createDialog(){
-			EscapableDialog guiDialog = 
-				new EscapableDialog(CreateGui.getApp(), "Verification running : " + Pipe.getProgramName(), true);
-
-			myRootPane = guiDialog.getRootPane();
-			Container contentPane = guiDialog.getContentPane();
-			
-			// 1 Set layout
-			contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
-
-			// 2 Add query editor
-			contentPane.add(this);
-			
-			guiDialog.setResizable(true);     
-
-			// Make window fit contents' preferred size
-			guiDialog.pack();
-
-			// Move window to the middle of the screen
-			guiDialog.setLocationRelativeTo(null);
-			guiDialog.setVisible(false);
-			
-			return;
-		}
-
-		public void finished() {
-			finished = true;
-			this.close();
-		}
-		
-		
-	}
-	
 	public class RunUppaalVerification extends Thread{
 		
 		String verifyta=null;
@@ -470,11 +377,11 @@ public class Verifier {
 		BufferedReader bufferedReaderStderr=null;
 		BufferedReader bufferedReaderStdout=null;
 		boolean error=true;
-		RunningVerificationWidgets dialog = null;
+		RunningVerificationPanel dialog = null;
 		long verificationtime=0;
 		
 		
-		public RunUppaalVerification(String verifyta, String verifytaOptions, File xmlfile, File qfile, RunningVerificationWidgets dialog) {
+		public RunUppaalVerification(String verifyta, String verifytaOptions, File xmlfile, File qfile, RunningVerificationPanel dialog) {
 		
 			this.verifyta = verifyta;
 			this.verifytaOptions = verifytaOptions;

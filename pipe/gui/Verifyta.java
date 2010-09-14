@@ -8,13 +8,16 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Verifyta implements ModelChecker {
+import dk.aau.cs.TA.NTA;
+import dk.aau.cs.TA.UPPAALQuery;
+
+public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	private static final String NEED_TO_LOCATE_VERIFYTA_MSG = "TAPAAL needs to know the location of the file verifyta.\n\n"+
-				"Verifyta is a part of the UPPAAL distribution and it is\n" +
-				"normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n" +
-				"depending on the operating system used.";
-	
-	private String verifytapath="";
+	"Verifyta is a part of the UPPAAL distribution and it is\n" +
+	"normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n" +
+	"depending on the operating system used.";
+
+	private static String verifytapath=""; // MJ -- Should be part of a configuration file that can be accessed
 	private FileFinder fileFinder;
 	private Messenger messenger;
 
@@ -25,24 +28,22 @@ public class Verifyta implements ModelChecker {
 
 	public boolean setup(){ // TODO: Should maybe eliminate boolean return value from here?
 		if(isNotSetup()){
-			boolean success = setVerifytaFromEnvironmentVariable();
-			if(!success){
-				messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTA_MSG, "Locate UPPAAL Verifyta");
+			messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTA_MSG, "Locate UPPAAL Verifyta");
 
-				try {
-					File file = fileFinder.ShowFileBrowserDialog("Uppaal Verifyta","");
-					verifytapath=file.getAbsolutePath();
-				} catch (Exception e) {
-					messenger.displayErrorMessage(
-							"There were errors performing the requested action:\n" + e,
-					"Error");
-				}
+			try {
+				File file = fileFinder.ShowFileBrowserDialog("Uppaal Verifyta","");
+				verifytapath=file.getAbsolutePath();
+			} catch (Exception e) {
+				messenger.displayErrorMessage(
+						"There were errors performing the requested action:\n" + e,
+				"Error");
 			}
+
 		}
 
 		return isNotSetup() ? false : true;
 	}
-	
+
 	public String getPath(){
 		return verifytapath; // TODO: MJ -- delete me
 	}
@@ -86,6 +87,7 @@ public class Verifyta implements ModelChecker {
 					"The verifyta path will be reset. Please try again, " + 
 					"to manually set the verifyta path.",
 			"Verifyta Error");
+			resetVerifyta();
 			return false;
 		}else{		
 			int version = Integer.parseInt(versionAsString);
@@ -96,11 +98,16 @@ public class Verifyta implements ModelChecker {
 						"Get the latest development version of UPPAAL from \n" +
 						"www.uppaal.com.",
 				"Verifyta Error");
+				resetVerifyta();
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	private void resetVerifyta() {
+		verifytapath = null;	
 	}
 
 	private boolean isNotSetup() {
@@ -125,7 +132,7 @@ public class Verifyta implements ModelChecker {
 		return result;
 	}
 
-	private boolean setVerifytaFromEnvironmentVariable() {
+	public static boolean trySetupFromEnvironmentVariable() {
 		String verifyta = System.getenv("verifyta");
 		if(verifyta != null && !verifyta.equals("")){
 			verifytapath = verifyta;
@@ -133,4 +140,13 @@ public class Verifyta implements ModelChecker {
 		}
 		return false;
 	}
+
+
+	public VerificationResult Verify(NTA model, UPPAALQuery query,
+			VerificationOptions options, File xmlFile, File queryFile) {
+		return null;
+	}
+
+	
+
 }

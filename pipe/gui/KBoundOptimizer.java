@@ -22,9 +22,9 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		return minBound;
 	}
 
-	public KBoundOptimizer(DataLayer appModel, int k)
+	public KBoundOptimizer(ModelChecker<NTA, UPPAALQuery> modelChecker, DataLayer appModel, int k)
 	{
-		super(appModel, k);
+		super(modelChecker, appModel, k);
 	}
 
 	@Override

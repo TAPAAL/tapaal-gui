@@ -6,7 +6,7 @@ import java.util.Map;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 
-public class VerifytaOptions {
+public class VerifytaOptions implements VerificationOptions {
 	private TraceOption traceOption;
 	private SearchOption searchOption;
 	private boolean untimedTrace;

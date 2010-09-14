@@ -59,6 +59,7 @@ public class CreateGui {
 	private static LeftConstantsPane leftBottomPanel;
 	private static JSplitPane pane;
 	private static AnimationHistory abstractAnimationPane=null;
+	
 	public static void init() {
 		imgPath = "Images" + System.getProperty("file.separator");
 
@@ -99,7 +100,7 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 		appGui.init();
-		Verifier.setupVerifyta();
+		Verifyta.trySetupFromEnvironmentVariable();
 
 		VersionChecker versionChecker = new VersionChecker();
 		if(versionChecker.checkForNewVersion()){
