@@ -36,7 +36,7 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.Export;
 import pipe.gui.Pipe;
-import pipe.gui.Verification;
+import pipe.gui.Verifier;
 
 public class QueryDialogue extends JPanel{
 	/**
@@ -161,7 +161,7 @@ public class QueryDialogue extends JPanel{
 		kbounded.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						Verification.analyseKBounded(CreateGui.getModel(), getCapacity());
+						Verifier.analyseKBounded(CreateGui.getModel(), getCapacity());
 					}
 				}
 		);		
@@ -171,7 +171,7 @@ public class QueryDialogue extends JPanel{
 		kboundedOptimize.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt){
-						Verification.analyzeAndOptimizeKBound(CreateGui.getModel(), getCapacity(), numberOfExtraTokensInNet);
+						Verifier.analyzeAndOptimizeKBound(CreateGui.getModel(), getCapacity(), numberOfExtraTokensInNet);
 					}
 				}
 		);
@@ -413,7 +413,7 @@ public class QueryDialogue extends JPanel{
 						public void actionPerformed(ActionEvent evt) {
 							querySaved = true;
 							exit();
-							Verification.runUppaalVerification(CreateGui.getModel(), getQuery());
+							Verifier.runUppaalVerification(CreateGui.getModel(), getQuery());
 						}
 					}
 			);

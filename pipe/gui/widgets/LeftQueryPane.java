@@ -24,7 +24,7 @@ import javax.swing.event.ListSelectionListener;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
-import pipe.gui.Verification;
+import pipe.gui.Verifier;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 
 public class LeftQueryPane extends JPanel {
@@ -132,7 +132,7 @@ public class LeftQueryPane extends JPanel {
 		verifyButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
-				Verification.runUppaalVerification(CreateGui.getModel(), q);
+				Verifier.runUppaalVerification(CreateGui.getModel(), q);
 			}			
 		});
 		p1.add(verifyButton);

@@ -99,7 +99,7 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 		appGui.init();
-		Verification.setupVerifyta();
+		Verifier.setupVerifyta();
 
 		VersionChecker versionChecker = new VersionChecker();
 		if(versionChecker.checkForNewVersion()){

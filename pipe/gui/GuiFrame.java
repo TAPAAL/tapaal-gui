@@ -745,11 +745,11 @@ EOC */
 		buffer.append("Read more at: www.tapaal.net \n\n");
 		buffer.append("verifyta:\n");
 		buffer.append("   Version: ");
-		buffer.append(Verification.getVerifytaVersion());
+		buffer.append(Verifier.getVerifytaVersion());
 		buffer.append("\n");
 		buffer.append("   Located: ");
 
-		String path = Verification.getPath();
+		String path = Verifier.getPath();
 		if(path == null || path.isEmpty())
 			buffer.append("N/A");
 		else

@@ -10,8 +10,8 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.gui.Verification.RunUppaalVerification;
-import pipe.gui.Verification.RunningVerificationWidgets;
+import pipe.gui.Verifier.RunUppaalVerification;
+import pipe.gui.Verifier.RunningVerificationWidgets;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
@@ -43,14 +43,14 @@ public class KBoundAnalyzer
 	
 	public void analyze()
 	{
-		Verification.setupVerifyta();
+		Verifier.setupVerifyta();
 		
-		if (!Verification.checkVerifyta()){
+		if (!Verifier.checkVerifyta()){
 			System.err.println("Verifyta not found, or you are running an old version of verifyta.\n" +
 					"Update to the latest development version.");
 			return;
 		}
-		String verifyta = Verification.getPath();
+		String verifyta = Verifier.getPath();
 		
 		
 		//Tmp files
@@ -108,11 +108,11 @@ public class KBoundAnalyzer
 		CreateGui.getApp().repaint();
 
 		
-		RunningVerificationWidgets t = (new Verification()).new RunningVerificationWidgets();
+		RunningVerificationWidgets t = (new Verifier()).new RunningVerificationWidgets();
 		t.createDialog();
 		
 		//Run the verifucation thread 	
-		RunUppaalVerification a = (new Verification()).new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
+		RunUppaalVerification a = (new Verifier()).new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
 		a.start();
 		
 		t.show();

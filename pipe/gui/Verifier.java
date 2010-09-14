@@ -46,9 +46,9 @@ import dk.aau.cs.TA.UppaalTrace;
  */
 
 
-public class Verification {
+public class Verifier {
 	private static ModelChecker modelChecker = new Verifyta(new FileFinderImpl(), new MessengerImpl()); // TODO: MJ -- Temporary during refactoring
-
+	
 	public static boolean setupVerifyta(){
 		return modelChecker.setup();		
 	}
@@ -166,11 +166,11 @@ public class Verification {
 //		CreateGui.getApp().repaint();
 
 		
-		RunningVerificationWidgets t = (new Verification()).new RunningVerificationWidgets();
+		RunningVerificationWidgets t = (new Verifier()).new RunningVerificationWidgets();
 		t.createDialog();
 		
 		//Run the verifucation thread 	
-		RunUppaalVerification a = (new Verification()).new RunUppaalVerification(verifyta, verifytaOptions.toString(), xmlfile, qfile, t); //Wtf?
+		RunUppaalVerification a = (new Verifier()).new RunUppaalVerification(verifyta, verifytaOptions.toString(), xmlfile, qfile, t); //Wtf?
 		a.start();
 		
 		t.show();
