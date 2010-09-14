@@ -142,11 +142,13 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	}
 
 
-	public VerificationResult Verify(NTA model, UPPAALQuery query,
+	public VerificationResult verify(NTA model, UPPAALQuery query,
 			VerificationOptions options, File xmlFile, File queryFile) {
 		return null;
 	}
 
-	
+	public VerificationResult verify(NTA model, UPPAALQuery query, VerificationOptions options){
+		return verify(model, query, options, null, null);
+	}
 
 }

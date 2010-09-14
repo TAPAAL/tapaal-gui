@@ -10,6 +10,7 @@ public interface ModelChecker<TModel, TQuery> {
 	
 	String getPath(); // TODO: MJ -- Delete me when refactoring is done
 
+	VerificationResult verify(TModel model, TQuery query, VerificationOptions options);
 	// TODO: MJ -- get rid of xmlFile and queryFile.. Legacy stuff to support older reductions
-	VerificationResult Verify(TModel model, TQuery query, VerificationOptions options, File xmlFile, File queryFile);
+	VerificationResult verify(TModel model, TQuery query, VerificationOptions options, File xmlFile, File queryFile);
 }
