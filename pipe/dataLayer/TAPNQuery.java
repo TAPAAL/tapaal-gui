@@ -1,5 +1,7 @@
 package pipe.dataLayer;
 
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+
 
 public class TAPNQuery {
 	public enum TraceOption {SOME, FASTEST, NONE};
@@ -17,6 +19,20 @@ public class TAPNQuery {
 	public HashTableSize hashTableSize;
 	public ExtrapolationOption extrapolationOption;
 	
+	private TCTLAbstractProperty property;
+	
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOption, HashTableSize hashTabelSize, ExtrapolationOption extrapolationOption)
+	{
+		this.name = name;
+		this.capacity = capacity;
+		this.property = property;
+		this.traceOption = traceOption;
+		this.searchOption = searchOption;
+		this.reductionOption = reductionOption;
+		this.hashTableSize = hashTabelSize;
+		this.extrapolationOption = extrapolationOption;
+	}
+	
 	public TAPNQuery(String name, int capacity, String query, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOption, HashTableSize hashTabelSize, ExtrapolationOption extrapolationOption) {
 		this.name = name;
 		this.capacity = capacity;
@@ -26,6 +42,16 @@ public class TAPNQuery {
 		this.reductionOption = reductionOption;
 		this.hashTableSize = hashTabelSize;
 		this.extrapolationOption = extrapolationOption;
+	}
+	
+	public TCTLAbstractProperty getProperty()
+	{
+		return property;
+	}
+	
+	public String getPropertyString()
+	{
+		return property.toString();
 	}
 	
 	@Override

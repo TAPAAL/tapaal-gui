@@ -37,49 +37,59 @@ import pipe.gui.CreateGui;
 import pipe.gui.Export;
 import pipe.gui.Pipe;
 import pipe.gui.Verifier;
+import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 
 public class CopyOfQueryDialogue extends JPanel{
 
 	private static final long serialVersionUID = 7852107237344005546L;
 	public enum QueryDialogueOption {VerifyNow, Save, Export}
-	
+
 	private boolean querySaved = false;
-	
+
 	private JRootPane rootPane;
-	
+
 	// Query Name Panel;
 	private JPanel namePanel;
-	
+
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
 	private JSpinner numberOfExtraTokensInNet;
 	private JButton kbounded;
 	private JButton kboundedOptimize;
-	
+
 	// Query Panel
 	private JPanel queryPanel;
-	
-	// Search options panel
+
+	private ButtonGroup quantificationRadioButtonGroup;
+	private JRadioButton existsDiamond;
+	private JRadioButton existsBox;
+	private JRadioButton forAllDiamond;
+	private JRadioButton forAllBox;	
+
+
+	// Uppaal options panel (search + trace options)
+	// search options panel
 	private JPanel searchOptionsPanel;
+	private JPanel uppaalOptionsPanel;
 	private ButtonGroup searchRadioButtonGroup;
 	private JRadioButton bFS;
 	private JRadioButton dFS;
 	private JRadioButton rDFS;
 	private JRadioButton closestToTargetFirst;
-	
+
 	// Trace options panel
 	private JPanel traceOptionsPanel;
-	
+
 	private ButtonGroup traceRadioButtonGroup;
 	private JRadioButton none;
 	private JRadioButton some;
 	private JRadioButton fastest;
-	
+
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
-	
+
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -91,7 +101,7 @@ public class CopyOfQueryDialogue extends JPanel{
 	// Private Members
 	private DataLayer datalayer;
 	private EscapableDialog me;
-	
+
 	private HashMap<JPanel, ActionListener> andActionListenerMap;
 
 	private String name_ADVNOSYM = "Optimised Standard";
@@ -99,7 +109,7 @@ public class CopyOfQueryDialogue extends JPanel{
 	private String name_BROADCAST = "Broadcast Reduction";
 	private String name_BROADCASTDEG2 = "Broadcast Degree 2 Reduction";
 
-	
+
 	public CopyOfQueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
 		this.datalayer = datalayer;
@@ -110,26 +120,202 @@ public class CopyOfQueryDialogue extends JPanel{
 
 		init(option, queryToCreateFrom);
 	}
-	
-	private void init(QueryDialogueOption option, TAPNQuery queryToCreateFrom) {
+
+	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
 		initQueryNamePanel(queryToCreateFrom);
 		initBoundednessCheckPanel(queryToCreateFrom);
 		initQueryPanel(queryToCreateFrom);
-		initSearchOptionsPanel(queryToCreateFrom);
-		initTraceOptionsPanel(queryToCreateFrom);
+		initUppaalOptionsPanel(queryToCreateFrom);
 		initReductionOptionsPanel(queryToCreateFrom);
-		initButtonPanel();
-		
-	}
-	
-	private void initButtonPanel() {
-		// TODO Auto-generated method stub
-		
+		initButtonPanel(option,queryToCreateFrom);
+
+		rootPane.setDefaultButton(saveButton);
+
+		quantificationRadioButtonChanged(null);
+
+		//Update the selected reduction
+		if (queryToCreateFrom!=null){
+			String reduction = "";
+			boolean symmetry = false;
+
+			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD){
+				reduction = name_BROADCAST;
+				symmetry = false;
+				//enableTraceOptions();
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
+				reduction = name_BROADCAST;
+				symmetry = true;
+				//disableTraceOptions();
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2){
+				reduction = name_BROADCASTDEG2;
+				symmetry = false;
+				//disableTraceOptions();
+			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2_SYM){
+				reduction = name_BROADCASTDEG2;
+				symmetry = true;
+				//disableTraceOptions();
+			}
+			else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
+				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
+					reduction = name_NAIVE;
+					symmetry = false;
+					//enableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE_UPPAAL_SYM){
+					reduction = name_NAIVE;
+					symmetry = true;
+					//disableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
+					reduction = name_ADVNOSYM;
+					symmetry = true;
+					//disableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
+					reduction = name_ADVNOSYM;
+					symmetry = false;
+					//enableTraceOptions();
+				}
+			} else {
+				if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
+					reduction = name_ADVNOSYM;
+					symmetry = true;
+					//disableTraceOptions();
+				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
+					reduction = name_ADVNOSYM;
+					symmetry = false;
+					//enableTraceOptions();
+				}
+			}
+
+			reductionOption.setSelectedItem(reduction);
+			symmetryReduction.setSelected(symmetry);
+		}
+
 	}
 
-	private void initReductionOptionsPanel(TAPNQuery queryToCreateFrom) {
-		
-		
+	private void initButtonPanel(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
+		buttonPanel = new JPanel(new FlowLayout());
+		if (option == QueryDialogueOption.Save){
+			saveButton = new JButton("Save");
+			saveAndVerifyButton = new JButton("Save and Verify");
+			cancelButton = new JButton("Cancel");
+			removeButton = new JButton("Remove");
+			saveUppaalXMLButton = new JButton("Save UPPAAL XML");
+
+			saveButton.addActionListener(	
+					new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+							//TODO make save
+							//save();
+							querySaved = true;
+							exit();
+						}
+					}
+			);
+			saveAndVerifyButton.addActionListener(	
+					new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+							querySaved = true;
+							exit();
+							//Verifier.runUppaalVerification(CreateGui.getModel(), getQuery());
+						}
+					}
+			);
+			cancelButton.addActionListener(	
+					new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+
+							exit();
+						}
+					}
+			);
+			removeButton.addActionListener(
+					new ActionListener(){
+						public void actionPerformed(ActionEvent evt) {
+
+							datalayer.getQueries().remove(queryToCreateFrom);
+							CreateGui.createLeftPane();
+							exit();
+						}
+					}
+			);
+			saveUppaalXMLButton.addActionListener(
+					new ActionListener(){
+						public void actionPerformed(ActionEvent e) {
+							querySaved = true;
+
+							String xmlFile = null, queryFile = null;
+							try {
+								xmlFile = new FileBrowser("Uppaal XML","xml",xmlFile).saveFile();
+								String[] a = xmlFile.split(".xml");
+								queryFile= a[0]+".q";
+
+							} catch (Exception ex) {
+								JOptionPane.showMessageDialog(CreateGui.getApp(),
+										"There were errors performing the requested action:\n" + e,
+										"Error", JOptionPane.ERROR_MESSAGE
+								);				
+							}
+
+							if(xmlFile != null && queryFile != null){
+								Export.exportUppaalXMLFromQuery(CreateGui.getModel(), getQuery(), xmlFile, queryFile);
+							}else{
+								JOptionPane.showMessageDialog(CreateGui.getApp(), "No Uppaal XML file saved.");
+							}
+						}
+					}
+			);
+		}else if (option == QueryDialogueOption.Export){
+			saveButton = new JButton("export");
+			cancelButton = new JButton("Cancel");
+
+			saveButton.addActionListener(	
+					new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+							querySaved = true;
+							exit();
+						}
+					}
+			);
+			cancelButton.addActionListener(	
+					new ActionListener() {
+						public void actionPerformed(ActionEvent evt) {
+
+							exit();
+						}
+					}
+			);		
+		}
+		if (option == QueryDialogueOption.Save){
+			buttonPanel.add(cancelButton);
+
+			if (queryToCreateFrom!=null){
+				buttonPanel.add(removeButton);	
+			}
+
+			buttonPanel.add(saveButton);
+
+			buttonPanel.add(saveAndVerifyButton);
+
+			buttonPanel.add(saveUppaalXMLButton);
+		}else {
+			buttonPanel.add(cancelButton);
+
+			buttonPanel.add(saveButton);
+
+			//			buttonPanel.add(saveUppaalXMLButton);
+		}
+
+
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.anchor = GridBagConstraints.CENTER;
+		add(buttonPanel, gridBagConstraints);
+
+	}
+
+	private void initReductionOptionsPanel(final TAPNQuery queryToCreateFrom) {
+
+
 		//ReductionOptions starts here:
 		reductionOptionsPanel = new JPanel(new FlowLayout());
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
@@ -165,26 +351,116 @@ public class CopyOfQueryDialogue extends JPanel{
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 4;
 		add(reductionOptionsPanel, gridBagConstraints);
-		
+
 	}
 
-	private void initTraceOptionsPanel(TAPNQuery queryToCreateFrom) {
+	private void initUppaalOptionsPanel(final TAPNQuery queryToCreateFrom) {
+
+		uppaalOptionsPanel = new JPanel(new GridBagLayout());
+
+		initSearchOptionsPanel(queryToCreateFrom);
+		initTraceOptionsPanel(queryToCreateFrom);
+
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 3;
+		add(uppaalOptionsPanel, gridBagConstraints);
+
+	}
+
+	private void initSearchOptionsPanel(final TAPNQuery queryToCreateFrom) {
+		//verification option-radio buttons starts here:		
+		searchOptionsPanel = new JPanel(new GridBagLayout());
+
+		JPanel searchOptions = new JPanel(new GridBagLayout());
+		searchOptions.setBorder(BorderFactory.createTitledBorder("Analysis Options"));
+		searchRadioButtonGroup = new ButtonGroup();
+		bFS = new JRadioButton("Breadth First Search");
+		dFS = new JRadioButton("Depth First Search");
+		rDFS = new JRadioButton("Random Depth First Search");
+		closestToTargetFirst = new JRadioButton("Search by Closest To Target First");
+		searchRadioButtonGroup.add(bFS);
+		searchRadioButtonGroup.add(dFS);
+		searchRadioButtonGroup.add(rDFS);
+		searchRadioButtonGroup.add(closestToTargetFirst);
+
+		if (queryToCreateFrom==null){
+			bFS.setSelected(true);
+		}else{
+			if (queryToCreateFrom.searchOption == SearchOption.BFS){
+				bFS.setSelected(true);
+			} else if (queryToCreateFrom.searchOption == SearchOption.DFS){
+				dFS.setSelected(true);
+			} else if (queryToCreateFrom.searchOption == SearchOption.RDFS){
+				rDFS.setSelected(true);
+			} else if (queryToCreateFrom.searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
+				closestToTargetFirst.setSelected(true);
+			}	
+		}
+
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.gridy = 0;
+		searchOptions.add(bFS,gridBagConstraints);
+		gridBagConstraints.gridy = 1;
+		searchOptions.add(dFS,gridBagConstraints);
+		gridBagConstraints.gridy = 2;
+		searchOptions.add(rDFS,gridBagConstraints);
+		gridBagConstraints.gridy = 3;
+		searchOptions.add(closestToTargetFirst,gridBagConstraints);
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		uppaalOptionsPanel.add(searchOptions, gridBagConstraints);
+
+	}
+
+	private void initTraceOptionsPanel(final TAPNQuery queryToCreateFrom) {
+		traceOptionsPanel = new JPanel(new GridBagLayout());
+		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
+		traceRadioButtonGroup = new ButtonGroup();
+		some = new JRadioButton("Some encountered trace (only without symmetry reduction)");
+		fastest = new JRadioButton("Fastest trace (only without symmetry reduction)");
+		none = new JRadioButton("No trace");
+		traceRadioButtonGroup.add(some);
+		traceRadioButtonGroup.add(fastest);
+		traceRadioButtonGroup.add(none);
+
+		if (queryToCreateFrom==null){
+			none.setSelected(true);
+		}else{
+			if (queryToCreateFrom.traceOption == TraceOption.SOME){
+				some.setSelected(true);
+			} else if (queryToCreateFrom.traceOption == TraceOption.FASTEST){
+				fastest.setSelected(true);
+			} else if (queryToCreateFrom.traceOption == TraceOption.NONE){
+				none.setSelected(true);
+			}	
+		}
+
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.gridy = 0;
+		traceOptionsPanel.add(some,gridBagConstraints);
+		gridBagConstraints.gridy = 1;
+		traceOptionsPanel.add(fastest,gridBagConstraints);
+		gridBagConstraints.gridy = 2;
+		traceOptionsPanel.add(none,gridBagConstraints);
+
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
+
+	}
+
+	private void initQueryPanel(final TAPNQuery queryToCreateFrom) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	private void initSearchOptionsPanel(TAPNQuery queryToCreateFrom) {
-		// TODO Auto-generated method stub
-		
-	}
+	private void initBoundednessCheckPanel(final TAPNQuery queryToCreateFrom) {
 
-	private void initQueryPanel(TAPNQuery queryToCreateFrom) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void initBoundednessCheckPanel(TAPNQuery queryToCreateFrom) {
-		
 		// Number of extra tokens field
 		boundednessCheckPanel = new JPanel(new FlowLayout());
 		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
@@ -229,7 +505,7 @@ public class CopyOfQueryDialogue extends JPanel{
 		add(boundednessCheckPanel, gridBagConstraints);
 	}
 
-	private void initQueryNamePanel(TAPNQuery queryToCreateFrom) {
+	private void initQueryNamePanel(final TAPNQuery queryToCreateFrom) {
 		// Query comment field starts here:		
 		namePanel = new JPanel(new FlowLayout());
 		namePanel.add(new JLabel("Query comment: "));
@@ -248,542 +524,11 @@ public class CopyOfQueryDialogue extends JPanel{
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(namePanel, gridBagConstraints);
 	}
-	
-	private int getCapacity(){
-		return (Integer) ((JSpinner)boundednessCheckPanel.getComponent(1)).getValue();
-	}
 
-	private String getQueryComment() {
-		return ((JTextField)namePanel.getComponent(1)).getText();
-	}
-	
-	private void enableTraceOptions() {
-		some.setEnabled(true);
-		fastest.setEnabled(true);
-	}
-	
-	private void disableTraceOptions() {
-		some.setEnabled(false);
-		fastest.setEnabled(false);
-	}
-//
-//
-//	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
-//		GridBagConstraints gridBagConstraints;
-//		initQueryComment(queryToCreateFrom);
-//
-//		initCapacityPanel(queryToCreateFrom);
-//
-//		initQueryPanel(queryToCreateFrom);
-//
-//		initUPPAALOptionsPanel(queryToCreateFrom);
-//
-//		initReductionOptions();
-//
-//		//add save and verify buttons starts here:
-//		buttonPanel = new JPanel(new FlowLayout());
-//		if (option == QueryDialogueOption.Save){
-//			okButton = new JButton("Save");
-//			verifyButton = new JButton("Save and Verify");
-//			cancelButton = new JButton("Cancel");
-//			removeButton = new JButton("Remove");
-//			saveUppaalXMLButton = new JButton("Save UPPAAL XML");
-//
-//			okButton.addActionListener(	
-//					new ActionListener() {
-//						public void actionPerformed(ActionEvent evt) {
-//							//TODO make save
-//							//save();
-//							querySaved = true;
-//							exit();
-//						}
-//					}
-//			);
-//			verifyButton.addActionListener(	
-//					new ActionListener() {
-//						public void actionPerformed(ActionEvent evt) {
-//							querySaved = true;
-//							exit();
-//							Verification.runUppaalVerification(CreateGui.getModel(), getQuery());
-//						}
-//					}
-//			);
-//			cancelButton.addActionListener(	
-//					new ActionListener() {
-//						public void actionPerformed(ActionEvent evt) {
-//
-//							exit();
-//						}
-//					}
-//			);
-//			removeButton.addActionListener(
-//					new ActionListener(){
-//						public void actionPerformed(ActionEvent evt) {
-//
-//							datalayer.getQueries().remove(queryToCreateFrom);
-//							CreateGui.createLeftPane();
-//							exit();
-//						}
-//					}
-//			);
-//			saveUppaalXMLButton.addActionListener(
-//					new ActionListener(){
-//						public void actionPerformed(ActionEvent e) {
-//							querySaved = true;
-//
-//							String xmlFile = null, queryFile = null;
-//							try {
-//								xmlFile = new FileBrowser("Uppaal XML","xml",xmlFile).saveFile();
-//								String[] a = xmlFile.split(".xml");
-//								queryFile= a[0]+".q";
-//
-//							} catch (Exception ex) {
-//								JOptionPane.showMessageDialog(CreateGui.getApp(),
-//										"There were errors performing the requested action:\n" + e,
-//										"Error", JOptionPane.ERROR_MESSAGE
-//								);				
-//							}
-//
-//							if(xmlFile != null && queryFile != null){
-//								Export.exportUppaalXMLFromQuery(CreateGui.getModel(), getQuery(), xmlFile, queryFile);
-//							}else{
-//								JOptionPane.showMessageDialog(CreateGui.getApp(), "No Uppaal XML file saved.");
-//							}
-//						}
-//					}
-//			);
-//		}else if (option == QueryDialogueOption.Export){
-//			okButton = new JButton("export");
-//			cancelButton = new JButton("Cancel");
-//
-//			okButton.addActionListener(	
-//					new ActionListener() {
-//						public void actionPerformed(ActionEvent evt) {
-//							querySaved = true;
-//							exit();
-//						}
-//					}
-//			);
-//			cancelButton.addActionListener(	
-//					new ActionListener() {
-//						public void actionPerformed(ActionEvent evt) {
-//
-//							exit();
-//						}
-//					}
-//			);		
-//		}
-//		if (option == QueryDialogueOption.Save){
-//			buttonPanel.add(cancelButton);
-//
-//			if (queryToCreateFrom!=null){
-//				buttonPanel.add(removeButton);	
-//			}
-//
-//			buttonPanel.add(okButton);
-//
-//			buttonPanel.add(verifyButton);
-//
-//			buttonPanel.add(saveUppaalXMLButton);
-//		}else {
-//			buttonPanel.add(cancelButton);
-//
-//			buttonPanel.add(okButton);
-//
-//			//			buttonPanel.add(saveUppaalXMLButton);
-//		}
-//
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 5;
-//		gridBagConstraints.anchor = GridBagConstraints.CENTER;
-//		add(buttonPanel, gridBagConstraints);
-//
-//		myRootPane.setDefaultButton(okButton);
-//
-//		quantificationRadioButtonChanged(null);
-//
-//		//Update the selected reduction
-//		if (queryToCreateFrom!=null){
-//			String reduction = "";
-//			boolean symmetry = false;
-//
-//			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD){
-//				reduction = name_BROADCAST;
-//				symmetry = false;
-//				//enableTraceOptions();
-//			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
-//				reduction = name_BROADCAST;
-//				symmetry = true;
-//				//disableTraceOptions();
-//			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2){
-//				reduction = name_BROADCASTDEG2;
-//				symmetry = false;
-//				//disableTraceOptions();
-//			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2_SYM){
-//				reduction = name_BROADCASTDEG2;
-//				symmetry = true;
-//				//disableTraceOptions();
-//			}
-//			//			else if(queryToCreateFrom.reductionOption == ReductionOption.ADV_BROADCAST_SYM){
-//			//				reductionOption.setSelectedItem(name_ADVBROADCASTSYM);
-//			//				disableTraceOptions();
-//			//			} else if(queryToCreateFrom.reductionOption == ReductionOption.OPT_BROADCAST_SYM){
-//			//				reductionOption.setSelectedItem(name_OPTBROADCASTSYM);
-//			//				disableTraceOptions();
-//			//			}else if(queryToCreateFrom.reductionOption == ReductionOption.SUPER_BROADCAST_SYM){
-//			//				reductionOption.setSelectedItem(name_SUPERBROADCASTSYM);
-//			//				disableTraceOptions();
-//			//			}
-//			else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-//				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
-//					reduction = name_NAIVE;
-//					symmetry = false;
-//					//enableTraceOptions();
-//				} else if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE_UPPAAL_SYM){
-//					reduction = name_NAIVE;
-//					symmetry = true;
-//					//disableTraceOptions();
-//				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
-//					reduction = name_ADVNOSYM;
-//					symmetry = true;
-//					//disableTraceOptions();
-//				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
-//					reduction = name_ADVNOSYM;
-//					symmetry = false;
-//					//enableTraceOptions();
-//				}
-//			} else {
-//				if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
-//					reduction = name_ADVNOSYM;
-//					symmetry = true;
-//					//disableTraceOptions();
-//				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
-//					reduction = name_ADVNOSYM;
-//					symmetry = false;
-//					//enableTraceOptions();
-//				}
-//			}
-//
-//			reductionOption.setSelectedItem(reduction);
-//			symmetryReduction.setSelected(symmetry);
-//		}
-//	}
-//
-//
-//	private void initReductionOptions() {
-//		
-//	}
-//
-//
-//	private void initUPPAALOptionsPanel(final TAPNQuery queryToCreateFrom) {
-//		GridBagConstraints gridBagConstraints;
-//		//verification option-radio buttons starts here:		
-//		uppaalOptions = new JPanel(new GridBagLayout());
-//
-//		searchOptions = new JPanel(new GridBagLayout());
-//		searchOptions.setBorder(BorderFactory.createTitledBorder("Analysis Options"));
-//		searchRadioButtonGroup = new ButtonGroup();
-//		bFS = new JRadioButton("Breadth First Search");
-//		dFS = new JRadioButton("Depth First Search");
-//		rDFS = new JRadioButton("Random Depth First Search");
-//		closestToTargetFirst = new JRadioButton("Search by Closest To Target First");
-//		searchRadioButtonGroup.add(bFS);
-//		searchRadioButtonGroup.add(dFS);
-//		searchRadioButtonGroup.add(rDFS);
-//		searchRadioButtonGroup.add(closestToTargetFirst);
-//
-//		if (queryToCreateFrom==null){
-//			bFS.setSelected(true);
-//		}else{
-//			if (queryToCreateFrom.searchOption == SearchOption.BFS){
-//				bFS.setSelected(true);
-//			} else if (queryToCreateFrom.searchOption == SearchOption.DFS){
-//				dFS.setSelected(true);
-//			} else if (queryToCreateFrom.searchOption == SearchOption.RDFS){
-//				rDFS.setSelected(true);
-//			} else if (queryToCreateFrom.searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
-//				closestToTargetFirst.setSelected(true);
-//			}	
-//		}
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.anchor = GridBagConstraints.WEST;
-//		gridBagConstraints.gridy = 0;
-//		searchOptions.add(bFS,gridBagConstraints);
-//		gridBagConstraints.gridy = 1;
-//		searchOptions.add(dFS,gridBagConstraints);
-//		gridBagConstraints.gridy = 2;
-//		searchOptions.add(rDFS,gridBagConstraints);
-//		gridBagConstraints.gridy = 3;
-//		searchOptions.add(closestToTargetFirst,gridBagConstraints);
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 0;
-//		uppaalOptions.add(searchOptions, gridBagConstraints);
-//
-//		traceOptions = new JPanel(new GridBagLayout());
-//		traceOptions.setBorder(BorderFactory.createTitledBorder("Trace Options"));
-//		traceRadioButtonGroup = new ButtonGroup();
-//		some = new JRadioButton("Some encountered trace (only without symmetry reduction)");
-//		fastest = new JRadioButton("Fastest trace (only without symmetry reduction)");
-//		none = new JRadioButton("No trace");
-//		traceRadioButtonGroup.add(some);
-//		traceRadioButtonGroup.add(fastest);
-//		traceRadioButtonGroup.add(none);
-//
-//		if (queryToCreateFrom==null){
-//			none.setSelected(true);
-//		}else{
-//			if (queryToCreateFrom.traceOption == TraceOption.SOME){
-//				some.setSelected(true);
-//			} else if (queryToCreateFrom.traceOption == TraceOption.FASTEST){
-//				fastest.setSelected(true);
-//			} else if (queryToCreateFrom.traceOption == TraceOption.NONE){
-//				none.setSelected(true);
-//			}	
-//		}
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.anchor = GridBagConstraints.WEST;
-//		gridBagConstraints.gridy = 0;
-//		traceOptions.add(some,gridBagConstraints);
-//		gridBagConstraints.gridy = 1;
-//		traceOptions.add(fastest,gridBagConstraints);
-//		gridBagConstraints.gridy = 2;
-//		traceOptions.add(none,gridBagConstraints);
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 1;
-//		gridBagConstraints.gridy = 0;
-//		uppaalOptions.add(traceOptions, gridBagConstraints);
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 3;
-//		add(uppaalOptions, gridBagConstraints);
-//	}
-//
-//
-//	private void initQueryPanel(final TAPNQuery queryToCreateFrom) {
-//		GridBagConstraints gridBagConstraints;
-//		// Query field starts here: 		
-//		queryPanel = new JPanel(new GridBagLayout());
-//		queryPanel.setBorder(BorderFactory.createTitledBorder("Query"));
-//
-//		
-//
-//	
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 0;
-//		gridBagConstraints.anchor = GridBagConstraints.WEST;
-//		
-//
-//
-//
-//		
-//		//Add action listeners to the query options
-//		for (Object radioButton : queryPanel.getComponents()){
-//
-//			if( (radioButton instanceof JRadioButton)){
-//
-//
-//				((JRadioButton)radioButton).addActionListener(new ActionListener(){
-//					public void actionPerformed(ActionEvent arg0) {
-//						//Update stuff
-//						quantificationRadioButtonChanged(arg0);
-//					}
-//
-//				});
-//			}
-//		}
-//
-//
-//
-//		markingSpecificsPanel = new JPanel(new GridBagLayout());
-//
-//		if (queryToCreateFrom==null){
-//			addNewDisjunction();
-//		}else {
-//			addQuery(queryToCreateFrom);	
-//		}
-//
-//		gridBagConstraints.gridy = 4;
-//		queryPanel.add( markingSpecificsPanel , gridBagConstraints);
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 2;
-//		gridBagConstraints.anchor = GridBagConstraints.WEST;
-//		add(queryPanel, gridBagConstraints);
-//	}
-//
-//
-//	private void initCapacityPanel(final TAPNQuery queryToCreateFrom) {
-//		GridBagConstraints gridBagConstraints;
-//		//Capacity number field starts here:
-//		capacityPanel = new JPanel(new FlowLayout());
-//		capacityPanel.add(new JLabel("Extra number of tokens: "));
-//
-//		if (queryToCreateFrom == null){
-//			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3,0,Integer.MAX_VALUE, 1));
-//		}else{
-//			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(queryToCreateFrom.capacity,0,Integer.MAX_VALUE, 1));
-//		}
-//		numberOfExtraTokensInNet.setMaximumSize(new Dimension(50,30));
-//		numberOfExtraTokensInNet.setMinimumSize(new Dimension(50,30));
-//		numberOfExtraTokensInNet.setPreferredSize(new Dimension(50,30));
-//		capacityPanel.add(numberOfExtraTokensInNet);
-//
-//		//Capacity boundness starts here
-//
-//		kbounded = new JButton("Check Boundedness");
-//		kbounded.addActionListener(	
-//				new ActionListener() {
-//					public void actionPerformed(ActionEvent evt) {
-//						Verification.analyseKBounded(CreateGui.getModel(), getCapacity());
-//					}
-//				}
-//		);		
-//		capacityPanel.add(kbounded);
-//
-//		kboundedOptimize = new JButton("Optimize Number of Tokens");
-//		kboundedOptimize.addActionListener(
-//				new ActionListener() {
-//					public void actionPerformed(ActionEvent evt){
-//						Verification.analyzeAndOptimizeKBound(CreateGui.getModel(), getCapacity(), numberOfExtraTokensInNet);
-//					}
-//				}
-//		);
-//		capacityPanel.add(kboundedOptimize);
-//
-//
-//		gridBagConstraints = new GridBagConstraints();
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 1;
-//		gridBagConstraints.anchor = GridBagConstraints.WEST;
-//		add(capacityPanel, gridBagConstraints);
-//	}
-//
-//
-//	private void initQueryComment(final TAPNQuery queryToCreateFrom) {
-//		// Query comment field starts here:		
-//		namePanel = new JPanel(new FlowLayout());
-//		namePanel.add(new JLabel("Query comment: "));
-//		JTextField queryComment;
-//		if (queryToCreateFrom==null){
-//			queryComment = new JTextField("Query Comment/Name Here",25);
-//		}else{
-//			queryComment = new JTextField(queryToCreateFrom.name,25);	
-//		}
-//
-//		namePanel.add(queryComment);
-//
-//		GridBagConstraints gridBagConstraints = new GridBagConstraints();		
-//		gridBagConstraints.gridx = 0;
-//		gridBagConstraints.gridy = 0;
-//		gridBagConstraints.anchor = GridBagConstraints.WEST;
-//		add(namePanel, gridBagConstraints);
-//	}
-//	
-
-//
-//	private void disableLivenessReductionOptions(){
-//		String[] options = null;
-//		if(!this.datalayer.hasTAPNInhibitorArcs()){
-//			options = new String[]{name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
-//		}else{
-//			options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
-//		}
-//		reductionOption.removeAllItems();
-//
-//		for (String s : options){
-//			reductionOption.addItem(s);
-//		}
-//	}
-//
-//	private void enableAllReductionOptions(){
-//		reductionOption.removeAllItems();
-//		if(!this.datalayer.hasTAPNInhibitorArcs()){
-//			String[] options = {name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
-//
-//			for (String s : options){
-//				reductionOption.addItem(s);
-//			}
-//		}else {
-//			//reductionOption.addItem(name_INHIBSTANDARD);
-//			//reductionOption.addItem(name_INHIBSYM);
-//			reductionOption.addItem(name_BROADCAST);
-//			//reductionOption.addItem(name_BROADCASTSYM);
-//			reductionOption.addItem(name_BROADCASTDEG2);
-//			//reductionOption.addItem(name_BROADCASTDEG2SYM);
-//			//reductionOption.addItem(name_ADVBROADCASTSYM);
-//			//reductionOption.addItem(name_OPTBROADCAST);
-//			//reductionOption.addItem(name_OPTBROADCASTSYM);
-//			//reductionOption.addItem(name_SUPERBROADCAST);
-//			//reductionOption.addItem(name_SUPERBROADCASTSYM);
-//		}
-//	}
-//
-//	
-//
-//	private void addQuery(TAPNQuery queryToCreateFrom) {
-//	
-//	}
-//
-//	private String[] partedComparison(String comparison){
-//		String[] toReturn = {"","",""};
-//		if (comparison.contains("<=")){
-//			toReturn[1] = "<=";
-//			String[] placeAndSize = comparison.split("\\<\\=");
-//			for (int i = 0; i < placeAndSize.length; i++) {
-//				placeAndSize[i] = placeAndSize[i].trim();
-//			}
-//			toReturn[0] = placeAndSize[0];
-//			toReturn[2] = placeAndSize[1];
-//		}else if (comparison.contains(">=")){
-//			toReturn[1] = ">=";
-//			String[] placeAndSize = comparison.split("\\>\\=");
-//			for (int i = 0; i < placeAndSize.length; i++) {
-//				placeAndSize[i] = placeAndSize[i].trim();
-//			}
-//			toReturn[0] = placeAndSize[0];
-//			toReturn[2] = placeAndSize[1];
-//		}else if (comparison.contains("=")){
-//			toReturn[1] = "=";
-//			String[] placeAndSize = comparison.split("\\=\\=");
-//			for (int i = 0; i < placeAndSize.length; i++) {
-//				placeAndSize[i] = placeAndSize[i].trim();
-//			}
-//			toReturn[0] = placeAndSize[0];
-//			toReturn[2] = placeAndSize[1];
-//		}else if (comparison.contains("<")){
-//			toReturn[1] = "<";
-//			String[] placeAndSize = comparison.split("\\<");
-//			for (int i = 0; i < placeAndSize.length; i++) {
-//				placeAndSize[i] = placeAndSize[i].trim();
-//			}
-//			toReturn[0] = placeAndSize[0];
-//			toReturn[2] = placeAndSize[1];
-//		}else if (comparison.contains(">")){
-//			toReturn[1] = ">";
-//			String[] placeAndSize = comparison.split("\\>");
-//			for (int i = 0; i < placeAndSize.length; i++) {
-//				placeAndSize[i] = placeAndSize[i].trim();
-//			}
-//			toReturn[0] = placeAndSize[0];
-//			toReturn[2] = placeAndSize[1];
-//		}		
-//		return toReturn;
-//	}
-//
-//	public TAPNQuery getQuery() {
-//		if (!querySaved){
-//			return null;
-//		}
+	public TAPNQuery getQuery() {
+		if (!querySaved){
+			return null;
+		}
 //		String name = getQueryComment();
 //		int capacity = getCapacity();
 //		String query = composeQuery();
@@ -812,33 +557,6 @@ public class CopyOfQueryDialogue extends JPanel{
 //			searchOption = SearchOption.CLOSE_TO_TARGET_FIRST;
 //		}
 //
-//		/* these options are not yet supported		
-//		TAPNQuery.HashTableSize hashTableSizeToSet = null;
-//		String hashTableOptionString = getHashTableSize();
-//		if (hashTableOptionString.equals("4 MB")){
-//			hashTableSizeToSet = HashTableSize.MB_4;
-//		}else if (hashTableOptionString.equals("16 MB")){
-//			hashTableSizeToSet = HashTableSize.MB_16;
-//		}else if (hashTableOptionString.equals("64 MB")){
-//			hashTableSizeToSet = HashTableSize.MB_64;
-//		}else if (hashTableOptionString.equals("256 MB")){
-//			hashTableSizeToSet = HashTableSize.MB_256;
-//		}else if (hashTableOptionString.equals("512 MB")){
-//			hashTableSizeToSet = HashTableSize.MB_512;
-//		}
-//
-//		TAPNQuery.ExtrapolationOption extrapolationOptionToSet = null;
-//		String extrapolationOptionString = getExtrapolationOption();
-//		if (extrapolationOptionString.toLowerCase().equals("automatic")){
-//			extrapolationOptionToSet = ExtrapolationOption.AUTOMATIC;
-//		}else if (extrapolationOptionString.toLowerCase().equals("use difference extrapolation")){
-//			extrapolationOptionToSet = ExtrapolationOption.DIFF;
-//		}else if (extrapolationOptionString.toLowerCase().equals("use location based extrapolation")){
-//			extrapolationOptionToSet = ExtrapolationOption.LOCAL;
-//		}else if (extrapolationOptionString.toLowerCase().equals("use lower/upper extrapolation")){
-//			extrapolationOptionToSet = ExtrapolationOption.LOW_UP;
-//		}
-//		 */		
 //		TAPNQuery.ReductionOption reductionOptionToSet = null;
 //		String reductionOptionString = ""+reductionOption.getSelectedItem();
 //		boolean symmetry = symmetryReduction.isSelected();
@@ -860,127 +578,138 @@ public class CopyOfQueryDialogue extends JPanel{
 //		}else if(reductionOptionString.equals(name_BROADCASTDEG2) && symmetry){
 //			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
 //		}
-//		//		else if (reductionOptionString.equals(name_NAIVESYM)){
-//		//			reductionOptionToSet = ReductionOption.NAIVE_UPPAAL_SYM;
-//		//		}else if (reductionOptionString.equals(name_ADVSYM)){
-//		//			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
-//		//		}else if(reductionOptionString.equals(name_INHIBSTANDARD)){
-//		//			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_STANDARD;
-//		//		}else if(reductionOptionString.equals(name_INHIBSYM)){
-//		//			reductionOptionToSet = ReductionOption.INHIB_TO_PRIO_SYM;
-//		//		}else if(reductionOptionString.equals(name_BROADCASTSYM)){
-//		//			reductionOptionToSet = ReductionOption.BROADCAST_SYM;
-//		//		}else if(reductionOptionString.equals(name_BROADCASTDEG2SYM)){
-//		//			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
-//		//		}else if(reductionOptionString.equals(name_ADVBROADCASTSYM)){
-//		//			reductionOptionToSet = ReductionOption.ADV_BROADCAST_SYM;
-//		//		}else if(reductionOptionString.equals(name_OPTBROADCASTSYM)){
-//		//			reductionOptionToSet = ReductionOption.OPT_BROADCAST_SYM;
-//		//		}else if(reductionOptionString.equals(name_SUPERBROADCASTSYM)){
-//		//			reductionOptionToSet = ReductionOption.SUPER_BROADCAST_SYM;
-//		//		}else if(reductionOptionString.equals(name_BROADCASTDEG2)){
-//		//			reductionOptionToSet = ReductionOption.BROADCAST_DEG2;
-//		//		}else if(reductionOptionString.equals(name_OPTBROADCAST)){
-//		//			reductionOptionToSet = ReductionOption.OPT_BROADCAST;
-//		//		}else if(reductionOptionString.equals(name_SUPERBROADCAST)){
-//		//			reductionOptionToSet = ReductionOption.SUPER_BROADCAST;
-//		//		}
+//		
 //
 //		return new TAPNQuery(name, capacity, query, traceOption, searchOption, reductionOptionToSet, /*hashTableSizeToSet*/null, /*extrapolationOptionToSet*/ null);
-//
-//	}
-//
-//	
-//
-//	private String getTraceOptions() {
-//		String toReturn = null;
-//		for (Object radioButton : traceOptions.getComponents()){
-//			if( (radioButton instanceof JRadioButton)){
-//				if ( ((JRadioButton)radioButton).isSelected() ){
-//					toReturn = ((JRadioButton)radioButton).getText();
-//					break;
-//				}
-//			}
-//		}
-//		return toReturn;
-//	}
-//
-//	private String getSearchOptions() {
-//		String toReturn = null;
-//		for (Object radioButton : searchOptions.getComponents()){
-//			if( (radioButton instanceof JRadioButton)){
-//				if ( ((JRadioButton)radioButton).isSelected() ){
-//
-//					toReturn = ((JRadioButton)radioButton).getText();
-//					break;
-//				}
-//			}
-//		}
-//		return toReturn;
-//	}
-//
-//	private String composeQuery() {
-//		return "";
-//	}
-//
-//	private void exit(){
-//		myRootPane.getParent().setVisible(false);
-//	}
-//
-//
-//	public static TAPNQuery ShowUppaalQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent){
-//		EscapableDialog guiDialog = 
-//			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
-//
-//		Container contentPane = guiDialog.getContentPane();
-//
-//		// 1 Set layout
-//		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
-//
-//		// 2 Add query editor
-//		CopyOfQueryDialogue queryDialogue = new CopyOfQueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent); 
-//		contentPane.add( queryDialogue );
-//
-//		guiDialog.setResizable(false);     
-//
-//		// Make window fit contents' preferred size
-//		guiDialog.pack();
-//
-//		// Move window to the middle of the screen
-//		guiDialog.setLocationRelativeTo(null);
-//		guiDialog.setVisible(true);
-//
-//		return  queryDialogue.getQuery();
-//	}
-//
-//
-//	public String getQuantificationSelection() {
-//		if (existsDiamond.isSelected()){
-//			return "E<>";
-//		}else if (existsBox.isSelected()){
-//			return "E[]";
-//		}else if (forAllDiamond.isSelected()){
-//			return "A<>";
-//		}else if (forAllBox.isSelected()){
-//			return "A[]";
-//		} else {
-//			return "";
-//		}
-//	}
-//
-//	private void quantificationRadioButtonChanged(ActionEvent arg0) {
-//		// 
-//		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-//			disableLivenessReductionOptions();
-//		} else {
-//			enableAllReductionOptions();
-//		}
-//
-//	}
+		return null;
+	}
 
+	private int getCapacity(){
+		return (Integer) ((JSpinner)boundednessCheckPanel.getComponent(1)).getValue();
+	}
+
+	private String getQueryComment() {
+		return ((JTextField)namePanel.getComponent(1)).getText();
+	}
+
+	private void enableTraceOptions() {
+		some.setEnabled(true);
+		fastest.setEnabled(true);
+	}
+
+	private void disableTraceOptions() {
+		some.setEnabled(false);
+		fastest.setEnabled(false);
+	}
+
+	private void exit(){
+		rootPane.getParent().setVisible(false);
+	}
+
+	public String getQuantificationSelection() {
+		if (existsDiamond.isSelected()){
+			return "E<>";
+		}else if (existsBox.isSelected()){
+			return "E[]";
+		}else if (forAllDiamond.isSelected()){
+			return "A<>";
+		}else if (forAllBox.isSelected()){
+			return "A[]";
+		} else {
+			return "";
+		}
+	}
+
+	private void quantificationRadioButtonChanged(ActionEvent arg0) {
+		// 
+		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+			disableLivenessReductionOptions();
+		} else {
+			enableAllReductionOptions();
+		}
+
+	}
+
+	private void disableLivenessReductionOptions(){
+		String[] options = null;
+		if(!this.datalayer.hasTAPNInhibitorArcs()){
+			options = new String[]{name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
+		}else{
+			options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
+		}
+		reductionOption.removeAllItems();
+
+		for (String s : options){
+			reductionOption.addItem(s);
+		}
+	}
+
+	private void enableAllReductionOptions(){
+		reductionOption.removeAllItems();
+		if(!this.datalayer.hasTAPNInhibitorArcs()){
+			String[] options = {name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
+
+			for (String s : options){
+				reductionOption.addItem(s);
+			}
+		}else {
+			//reductionOption.addItem(name_INHIBSTANDARD);
+			//reductionOption.addItem(name_INHIBSYM);
+			reductionOption.addItem(name_BROADCAST);
+			//reductionOption.addItem(name_BROADCASTSYM);
+			reductionOption.addItem(name_BROADCASTDEG2);
+			//reductionOption.addItem(name_BROADCASTDEG2SYM);
+			//reductionOption.addItem(name_ADVBROADCASTSYM);
+			//reductionOption.addItem(name_OPTBROADCAST);
+			//reductionOption.addItem(name_OPTBROADCASTSYM);
+			//reductionOption.addItem(name_SUPERBROADCAST);
+			//reductionOption.addItem(name_SUPERBROADCASTSYM);
+		}
+	}
 	
+	private String getSearchOptions() {
+		String toReturn = null;
+		for (Object radioButton : searchOptionsPanel.getComponents()){
+			if( (radioButton instanceof JRadioButton)){
+				if ( ((JRadioButton)radioButton).isSelected() ){
 
-
+					toReturn = ((JRadioButton)radioButton).getText();
+					break;
+				}
+			}
+		}
+		return toReturn;
+	}
 	
+	public static TAPNQuery ShowUppaalQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent){
+		EscapableDialog guiDialog = 
+			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+
+		Container contentPane = guiDialog.getContentPane();
+
+		// 1 Set layout
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
+
+		// 2 Add query editor
+		CopyOfQueryDialogue queryDialogue = new CopyOfQueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent); 
+		contentPane.add( queryDialogue );
+
+		guiDialog.setResizable(false);     
+
+		// Make window fit contents' preferred size
+		guiDialog.pack();
+
+		// Move window to the middle of the screen
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+
+		return  queryDialogue.getQuery();
+	}
+
+
+
+
+
+
 
 }
