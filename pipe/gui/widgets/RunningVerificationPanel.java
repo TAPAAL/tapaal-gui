@@ -17,9 +17,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 
 public class RunningVerificationPanel extends javax.swing.JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7324730866458670919L;
 	private JRootPane myRootPane;
 	Thread verification=null;

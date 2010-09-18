@@ -8,12 +8,8 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
-import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
-
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.verification.Messenger;
@@ -31,6 +27,8 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	private static String verifytapath=""; // MJ -- Should be part of a configuration file that can be accessed
 	private FileFinder fileFinder;
 	private Messenger messenger;
+
+	private ProcessRunner runner;
 	
 	public Verifyta(FileFinder fileFinder, Messenger messenger){
 		this.fileFinder = fileFinder;
@@ -165,7 +163,7 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 
 	// TODO: MJ - get rid of this method -- used for legacy support
 	public VerificationResult verify(File modelFile, File queryFile, VerificationOptions options) {
-		ProcessRunner runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
+		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
 		runner.run();
 		
 		if(runner.error()){
@@ -187,6 +185,12 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 
 	public VerificationResult verify(NTA model, UPPAALQuery query, VerificationOptions options){
 		return null;
+	}
+	
+	public void kill(){
+		if(runner != null){
+			runner.kill();
+		}
 	}
 
 }
