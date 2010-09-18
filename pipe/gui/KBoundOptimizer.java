@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.Verifier.RunUppaalVerification;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.UPPAALQuery;
@@ -13,6 +12,7 @@ import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.verification.ModelChecker;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 

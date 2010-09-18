@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.gui.Verifier.RunUppaalVerification;
 import pipe.gui.widgets.RunningVerificationPanel;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
@@ -21,6 +20,7 @@ import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
+import dk.aau.cs.verification.ModelChecker;
 
 public class KBoundAnalyzer 
 {
@@ -116,7 +116,7 @@ public class KBoundAnalyzer
 		t.createDialog();
 		
 		//Run the verifucation thread 	
-		RunUppaalVerification a = (new Verifier()).new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
+		RunUppaalVerification a = new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
 		a.start();
 		
 		t.show();

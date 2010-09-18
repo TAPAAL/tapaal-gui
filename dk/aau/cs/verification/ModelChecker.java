@@ -1,4 +1,4 @@
-package pipe.gui;
+package dk.aau.cs.verification;
 
 import java.io.File;
 
@@ -12,5 +12,5 @@ public interface ModelChecker<TModel, TQuery> {
 
 	VerificationResult verify(TModel model, TQuery query, VerificationOptions options);
 	// TODO: MJ -- get rid of xmlFile and queryFile.. Legacy stuff to support older reductions
-	VerificationResult verify(TModel model, TQuery query, VerificationOptions options, File xmlFile, File queryFile);
+	VerificationResult verify(File modelFile, File queryFile, VerificationOptions options);
 }

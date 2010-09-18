@@ -3,8 +3,6 @@ package pipe.gui;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -26,6 +24,9 @@ import dk.aau.cs.TA.SymbolicUppaalTrace;
 import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TA.UppaalTrace;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -152,7 +153,7 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 		t.createDialog();
 		
 		//Run the verifucation thread 	
-		RunUppaalVerification a = (new Verifier()).new RunUppaalVerification(verifyta, verifytaOptions.toString(), xmlfile, qfile, t); //Wtf?
+		RunUppaalVerification a = new RunUppaalVerification(verifyta, verifytaOptions.toString(), xmlfile, qfile, t); //Wtf?
 		a.start();
 		
 		t.show();
@@ -346,151 +347,14 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 					for (AbstractMarking am : tmp2){
 						untimedAnimationHistory.addHistoryItemDontChange(am.getFiredTranstiion().trim());
 					}
-					
-					
-
-					
-					
+						
 				} catch (Exception e){
 //					 TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-				
-			}
-
-			
+				}	
+			}			
 		}
-		
-		
+
 		return;
-
-
 	}
-
-
-
-	public class RunUppaalVerification extends Thread{
-		
-		String verifyta=null;
-		String verifytaOptions=null;
-		File xmlfile=null, qfile=null;
-		BufferedReader bufferedReaderStderr=null;
-		BufferedReader bufferedReaderStdout=null;
-		boolean error=true;
-		RunningVerificationPanel dialog = null;
-		long verificationtime=0;
-		
-		
-		public RunUppaalVerification(String verifyta, String verifytaOptions, File xmlfile, File qfile, RunningVerificationPanel dialog) {
-		
-			this.verifyta = verifyta;
-			this.verifytaOptions = verifytaOptions;
-			
-			this.xmlfile = xmlfile;
-			this.qfile = qfile;
-			this.dialog = dialog;
-			
-		}
-
-		public void verifyStop() {
-			
-			child.destroy();
-		}
-		Process child=null;
-		public void run() {
-
-			try {
-				// Execute a command with an argument that contains a space
-				//String[] commands = new String[]{"/usr/bin/time", "-p", verifyta, verifytaOptions, xmlfile.getAbsolutePath(), qfile.getAbsolutePath()/*, " 2> ", tracefile.getAbsolutePath()*/};
-				String[] commands;
-
-				commands = new String[]{verifyta, verifytaOptions, xmlfile.getAbsolutePath(), qfile.getAbsolutePath()/*, " 2> ", tracefile.getAbsolutePath()*/};
-
-				long startTimeMs=0, endTimeMs=0;
-				
-				startTimeMs = System.currentTimeMillis();
-				child = Runtime.getRuntime().exec(commands);
-				
-				//Start drain for buffers
-				
-				BufferDrain stdout = new BufferDrain(new BufferedReader(new InputStreamReader(child.getInputStream())));
-				BufferDrain stderr = new BufferDrain(new BufferedReader(new InputStreamReader(child.getErrorStream())));
-				
-				stdout.start();
-				stderr.start();
-				
-				child.waitFor();
-				endTimeMs  = System.currentTimeMillis();
-				
-				//Wait for the buffers to be drained3
-				// XXX - kyrke - are thise subprocess killed right when 
-				// mother process is killed?, or do we have to handle them better?
-				stdout.join();
-				stderr.join();
-
-				bufferedReaderStdout = new BufferedReader(new StringReader(stdout.getString().toString()));
-				bufferedReaderStderr = new BufferedReader(new StringReader(stderr.getString().toString()));
-
-				/*for (String s : commands){
-					System.out.print(s + " ");
-				}*/ 
-				
-				verificationtime = endTimeMs-startTimeMs;
-				
-				dialog.close();
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		
-	
-
-	}
-
-	public class BufferDrain extends Thread{
-
-		BufferedReader drain=null;
-		StringBuffer string=null;
-		boolean running;
-
-		public BufferDrain(BufferedReader drain) {
-			this.drain = drain;
-			string = new StringBuffer();
-		}
-
-		public void run() {
-
-			try {
-				running = true;
-
-				int c;
-				while (running){
-
-
-					c=drain.read();
-
-					if (c!=-1){
-						string.append((char)c);
-					} else {
-						running = false;
-					}
-				}
-
-			} catch (IOException e) {
-
-				e.printStackTrace();
-				running=false;
-			}
-
-
-		}
-		
-		public StringBuffer getString(){
-			return string;
-		}
-
-	}
-	
 }

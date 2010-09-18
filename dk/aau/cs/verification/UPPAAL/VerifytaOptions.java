@@ -1,7 +1,9 @@
-package pipe.gui;
+package dk.aau.cs.verification.UPPAAL;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import dk.aau.cs.verification.VerificationOptions;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -19,7 +21,7 @@ public class VerifytaOptions implements VerificationOptions {
 		this.searchOption = search;
 		this.untimedTrace = untimedTrace;
 	}
-	
+		
 	public String toString(){
 		StringBuffer result = new StringBuffer();
 		
