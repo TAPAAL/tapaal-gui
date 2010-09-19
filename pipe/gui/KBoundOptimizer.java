@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
-import pipe.gui.Verifier.RunUppaalVerification;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.UPPAALQuery;
@@ -13,6 +12,7 @@ import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.verification.ModelChecker;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 
@@ -68,7 +68,8 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		if(!isBounded())
 		{
 			resultmessage = answerNetIsNotBounded; 
-			resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
+		// TODO: MJ -- fix
+			//resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
 
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					resultmessage,

@@ -10,8 +10,7 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.gui.Verifier.RunUppaalVerification;
-import pipe.gui.widgets.RunningVerificationPanel;
+import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TAPN.ModelTransformer;
@@ -21,6 +20,7 @@ import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
+import dk.aau.cs.verification.ModelChecker;
 
 public class KBoundAnalyzer 
 {
@@ -111,49 +111,49 @@ public class KBoundAnalyzer
 		PetriNetObject.ignoreSelection(false);
 		CreateGui.getApp().repaint();
 
+	// TODO: MJ -- FIX	
+//		RunningVerificationDialog t = new RunningVerificationDialog();
+//		t.createDialog();
+//		
+//		//Run the verifucation thread 	
+//		RunUppaalVerification a = null;//new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
+//		a.start();
+//		
+//		t.show();
+//		
+//		if (t.isInterrupted()){
+//			a.verifyStop();
+//			a.interrupt();
+//			a.stop();
+//			a.destroy();
+//			
+//			try {
+//				a.wait();
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			a=null;
+//			//Stop ther verification!
+//			JOptionPane.showMessageDialog(CreateGui.getApp(),
+//					"Verification was interupted by the user. No result found!",
+//					"Verification Result",
+//					JOptionPane.INFORMATION_MESSAGE);
+//			return;
+//			
+//		}
+//			
+//		try
+//		{
+//			notBounded = isNetBounded(a.bufferedReaderStderr, a.bufferedReaderStdout);
+//		}
+//		catch(Exception e)
+//		{
+//			System.err.println("There was an error verifying the model.");
+//			return;
+//		}
 		
-		RunningVerificationPanel t = new RunningVerificationPanel();
-		t.createDialog();
-		
-		//Run the verifucation thread 	
-		RunUppaalVerification a = (new Verifier()).new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
-		a.start();
-		
-		t.show();
-		
-		if (t.isInterrupted()){
-			a.verifyStop();
-			a.interrupt();
-			a.stop();
-			a.destroy();
-			
-			try {
-				a.wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			a=null;
-			//Stop ther verification!
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"Verification was interupted by the user. No result found!",
-					"Verification Result",
-					JOptionPane.INFORMATION_MESSAGE);
-			return;
-			
-		}
-			
-		try
-		{
-			notBounded = isNetBounded(a.bufferedReaderStderr, a.bufferedReaderStdout);
-		}
-		catch(Exception e)
-		{
-			System.err.println("There was an error verifying the model.");
-			return;
-		}
-		
-		showResult(a);	
+//		showResult(a);	
 	}
 
 	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy() {
@@ -173,7 +173,8 @@ public class KBoundAnalyzer
 		
 		//Display Answer
 		resultmessage = notBounded ? answerNetIsNotBounded : answerNetIsBounded; 
-		resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
+		// TODO: MJ -- fix
+		// resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
 		
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				resultmessage,

@@ -1,4 +1,4 @@
-package pipe.gui;
+package dk.aau.cs.verification;
 
 public interface Messenger {
 	void displayInfoMessage(String message);

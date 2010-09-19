@@ -1,4 +1,4 @@
-package pipe.gui;
+package dk.aau.cs.verification.UPPAAL;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,8 +8,15 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import pipe.gui.FileFinder;
+import pipe.gui.Pipe;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.verification.Messenger;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.ProcessRunner;
+import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerificationResult;
 
 public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	private static final String NEED_TO_LOCATE_VERIFYTA_MSG = "TAPAAL needs to know the location of the file verifyta.\n\n"+
@@ -21,6 +28,8 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	private FileFinder fileFinder;
 	private Messenger messenger;
 
+	private ProcessRunner runner;
+	
 	public Verifyta(FileFinder fileFinder, Messenger messenger){
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
@@ -141,14 +150,45 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 		return false;
 	}
 
+	
+	private String createArgumentString(File modelFile, File queryFile, VerificationOptions options){
+		StringBuffer buffer = new StringBuffer(options.toString());
+		buffer.append(" ");
+		buffer.append(modelFile.getAbsolutePath());
+		buffer.append(" ");
+		buffer.append(queryFile.getAbsolutePath());
+		
+		return buffer.toString();
+	}
 
-	public VerificationResult verify(NTA model, UPPAALQuery query,
-			VerificationOptions options, File xmlFile, File queryFile) {
-		return null;
+	// TODO: MJ - get rid of this method -- used for legacy support
+	public VerificationResult verify(File modelFile, File queryFile, VerificationOptions options) {
+		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
+		runner.run();
+				
+		if(runner.error()){
+			return null;
+		}else{			
+			VerifytaOutputParser outputParser = new VerifytaOutputParser();
+			outputParser.parseOutput(runner.standardOutput());
+			
+			VerificationResult result = new VerificationResult();
+			result.setQuerySatisfied(outputParser.isPropertySatisfied());
+
+			// TODO: handle trace via VerifytaTraceParser
+						
+			return result;
+		}
 	}
 
 	public VerificationResult verify(NTA model, UPPAALQuery query, VerificationOptions options){
-		return verify(model, query, options, null, null);
+		return null;
+	}
+	
+	public void kill(){
+		if(runner != null){
+			runner.kill();
+		}
 	}
 
 }

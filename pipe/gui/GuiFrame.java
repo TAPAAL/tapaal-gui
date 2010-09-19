@@ -64,6 +64,7 @@ import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
 /**
