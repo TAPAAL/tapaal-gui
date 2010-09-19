@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
-public class ProcessRunner extends Thread {
+public class ProcessRunner {
 
 	private String file;
 	private String arguments;
@@ -17,6 +17,8 @@ public class ProcessRunner extends Thread {
 	private boolean error = false;
 	
 	public ProcessRunner(String file, String arguments){
+		//this.setName("verification thread");
+		
 		if(file == null || file.isEmpty()){
 			throw new IllegalArgumentException("file");
 		}
@@ -47,7 +49,6 @@ public class ProcessRunner extends Thread {
 		}
 	}
 			
-	@Override
 	public void run() {
 		long startTimeMs=0, endTimeMs=0;
 		startTimeMs = System.currentTimeMillis();

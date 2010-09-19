@@ -3,90 +3,75 @@
  */
 package pipe.gui;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import dk.aau.cs.verification.BufferDrain; // TODO: MJ -- get rid of these references in pipe namespace to our work
+import java.util.concurrent.ExecutionException;
 
-import pipe.gui.widgets.RunningVerificationPanel;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
-public class RunUppaalVerification extends Thread{
+import pipe.gui.widgets.RunningVerificationDialog;
+
+import dk.aau.cs.TA.NTA;
+import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.VerificationOptions;
+import dk.aau.cs.verification.VerificationResult;
+
+public class RunUppaalVerification extends SwingWorker<VerificationResult, Void> {
+
+	private ModelChecker<NTA, UPPAALQuery> modelChecker;
+	private VerificationOptions options;
+	private File modelFile;
+	private File queryFile;
+	private RunningVerificationDialog dialog;
+	private long verificationTime = 0;
 	
-	String verifyta=null;
-	String verifytaOptions=null;
-	File xmlfile=null, qfile=null;
-	BufferedReader bufferedReaderStderr=null;
-	BufferedReader bufferedReaderStdout=null;
-	boolean error=true;
-	RunningVerificationPanel dialog = null;
-	long verificationtime=0;
-	
-	
-	public RunUppaalVerification(String verifyta, String verifytaOptions, File xmlfile, File qfile, RunningVerificationPanel dialog) {
-	
-		this.verifyta = verifyta;
-		this.verifytaOptions = verifytaOptions;
-		
-		this.xmlfile = xmlfile;
-		this.qfile = qfile;
-		this.dialog = dialog;
-		
+	public RunUppaalVerification(ModelChecker<NTA, UPPAALQuery> modelChecker, VerificationOptions options, File modelFile, File queryFile) {
+		this.modelChecker = modelChecker;
+		this.options = options;
+		this.modelFile = modelFile;
+		this.queryFile = queryFile;
 	}
 
-	public void verifyStop() {
+	@Override
+	protected VerificationResult doInBackground() throws Exception {
+		long startMS = System.currentTimeMillis();
+		VerificationResult result = modelChecker.verify(modelFile, queryFile, options);
+		long endMS = System.currentTimeMillis();
 		
-		child.destroy();
+		verificationTime = endMS - startMS;
+		return result;
 	}
-	Process child=null;
-	public void run() {
-
-		try {
-			// Execute a command with an argument that contains a space
-			//String[] commands = new String[]{"/usr/bin/time", "-p", verifyta, verifytaOptions, xmlfile.getAbsolutePath(), qfile.getAbsolutePath()/*, " 2> ", tracefile.getAbsolutePath()*/};
-			String[] commands;
-
-			commands = new String[]{verifyta, verifytaOptions, xmlfile.getAbsolutePath(), qfile.getAbsolutePath()/*, " 2> ", tracefile.getAbsolutePath()*/};
-
-			long startTimeMs=0, endTimeMs=0;
-			
-			startTimeMs = System.currentTimeMillis();
-			child = Runtime.getRuntime().exec(commands);
-			
-			//Start drain for buffers
-			
-			BufferDrain stdout = new BufferDrain(new BufferedReader(new InputStreamReader(child.getInputStream())));
-			BufferDrain stderr = new BufferDrain(new BufferedReader(new InputStreamReader(child.getErrorStream())));
-			
-			stdout.start();
-			stderr.start();
-			
-			child.waitFor();
-			endTimeMs  = System.currentTimeMillis();
-			
-			//Wait for the buffers to be drained3
-			// XXX - kyrke - are thise subprocess killed right when 
-			// mother process is killed?, or do we have to handle them better?
-			stdout.join();
-			stderr.join();
-
-			bufferedReaderStdout = new BufferedReader(new StringReader(stdout.getString().toString()));
-			bufferedReaderStderr = new BufferedReader(new StringReader(stderr.getString().toString()));
-
-			/*for (String s : commands){
-				System.out.print(s + " ");
-			}*/ 
-			
-			verificationtime = endTimeMs-startTimeMs;
-			
-			dialog.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
+	
+	@Override
+	protected void done() {
+		dialog.finished();
+						
+		if(!isCancelled() && isDone()){
+			VerificationResult result = null;
+			try {
+				result = get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
+			JOptionPane.showMessageDialog(CreateGui.getApp(), 
+					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime/1000.0),
+					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
+		}else{
+			modelChecker.kill();			
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Verification was interupted by the user. No result found!",
+					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
-	
-
+	public void setDialog(RunningVerificationDialog dialog) {
+		this.dialog = dialog;
+	}
 
 }

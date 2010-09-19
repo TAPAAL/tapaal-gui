@@ -68,7 +68,8 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		if(!isBounded())
 		{
 			resultmessage = answerNetIsNotBounded; 
-			resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
+		// TODO: MJ -- fix
+			//resultmessage+= "\nAnalysis time is estimated to: " + (a.verificationtime/1000.0) + "s";
 
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					resultmessage,

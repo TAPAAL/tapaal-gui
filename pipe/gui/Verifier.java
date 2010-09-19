@@ -15,7 +15,7 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
-import pipe.gui.widgets.RunningVerificationPanel;
+import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TA.AbstractMarking;
 import dk.aau.cs.TA.DiscreetFiringAction;
 import dk.aau.cs.TA.FiringAction;
@@ -149,211 +149,179 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 		Export.exportUppaalXMLFromQuery(appModel, input, xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
 	
-		RunningVerificationPanel t = new RunningVerificationPanel();
-		t.createDialog();
-		
-		//Run the verifucation thread 	
-		RunUppaalVerification a = new RunUppaalVerification(verifyta, verifytaOptions.toString(), xmlfile, qfile, t); //Wtf?
-		a.start();
-		
-		t.show();
-		
-		if (t.isInterrupted()){
-			a.verifyStop();
-			a.interrupt();
-			a.stop();
-			a.destroy();
-			
-			try {
-				a.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			a=null;
-			//Stop ther verification!
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"Verification was interupted by the user. No result found!",
-					"Verification Result",
-					JOptionPane.INFORMATION_MESSAGE);
-			return;
-			
-		}
-		
-		//Close ther verification running dialog, (bug for possible racecondition)
-		t.close();
-		
-		
-		
-		
-		boolean property=false; 
-		boolean error=true;
-		BufferedReader bufferedReaderStderr = a.bufferedReaderStderr;
-		BufferedReader bufferedReaderStdout = a.bufferedReaderStdout;
-		
-		// Show the verification result dialog
-		
-		String resultmessage = "";
-		
-		
-		//Parse result
-		String line=null;
-
-		try {
-			while ( (line = bufferedReaderStdout.readLine()) != null){
-				if (line.contains("Property is satisfied")) {
-					property = true;
-
-					error=false;
-					//break;
-
-				}else if (line.contains("Property is NOT satisfied.")){
-					property=false;
-					error=false;
-				}
-
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			error=true;
-		}
-		
-		if (error){
-			System.err.println("There was an error verifying the model.");
-			return;
-		}
-
-		
-	
-		//Display Answer
-		resultmessage = property ? "Property Satisfied.": "Property Not Satisfied."; 
-		resultmessage+= "\nVerification time is estimated to: " + (a.verificationtime/1000.0) + "s";
-		
-		JOptionPane.showMessageDialog(CreateGui.getApp(),
-				resultmessage,
-				"Verification Result",
-				JOptionPane.INFORMATION_MESSAGE);
-
-
-		
-		// Show simulator is selected and reduction is the right method
-		if ((input.traceOption != TAPNQuery.TraceOption.NONE && (input.reductionOption == TAPNQuery.ReductionOption.NAIVE || input.reductionOption == ReductionOption.ADV_NOSYM) )&&
-				//and Only view the trace, if a trace is generated based on property
-				((inputQuery.contains("E<>") && property) || (inputQuery.contains("A[]") && !property) ||
-						(inputQuery.contains("E[]") && property) || (inputQuery.contains("A<>") && !property))){
-			
-			
-			
-
-			
-			//Select to display concreet trace
-			if ((inputQuery.contains("E<>") || inputQuery.contains("A[]")) && !untimedTrace){
-				
-			
-
-		    //Set to animation mode   
-			CreateGui.getApp().setAnimationMode(true);
-			CreateGui.getApp().setMode(Pipe.START);
-            PetriNetObject.ignoreSelection(true);
-			CreateGui.getView().getSelectionObject().clearSelection();
-			
-			CreateGui.getAnimator().resethistory();
-			
-			
-			try {
-				ArrayList<FiringAction> tmp2 = null;
-				tmp2 = UppaalTrace.parseUppaalTraceAdvanced(bufferedReaderStderr);
-
-				// Handeling of the UPPAAL verifyta error in generating traces
-				if (tmp2 == null){
-					JOptionPane.showMessageDialog(CreateGui.getApp(),
-							"Generation of a concrete trace in UPPAAL failed.\n\n" +
-							"TAPAAL will re-run the verification process\n" +
-							"in order to obtain at least an untimed trace.",				
-							"Concrete Trace Generation Error",
-							JOptionPane.INFORMATION_MESSAGE);
-					//XXX - Srba
-					
-					runUppaalVerification(appModel, input, true);
-					return;
-					
-				}
-				
-				CreateGui.getAnimator().resethistory();
-				
-				for (FiringAction f : tmp2){
-
-					if (f instanceof TimeDelayFiringAction){
-
-						BigDecimal time = new BigDecimal(""+((TimeDelayFiringAction)f).getDealy());
-						CreateGui.getAnimator().manipulatehistory(time);
-
-					} else if (f instanceof DiscreetFiringAction){
-						DiscreetFiringAction stringdfa = (DiscreetFiringAction) f;
-
-						Transition trans = CreateGui.currentPNMLData().getTransitionByName(stringdfa.getTransition());
-						pipe.dataLayer.DiscreetFiringAction realdfa = new pipe.dataLayer.DiscreetFiringAction(trans);
-
-						for (String s : stringdfa.getConsumedTokensList().keySet()){
-
-							Place p = CreateGui.currentPNMLData().getPlaceByName(s);
-							BigDecimal token = new BigDecimal(""+stringdfa.getConsumedTokensList().get(s).get(0)); // XXX - just getting the first, guess that we dont support more tokens from smae place any wway :( (for now)
-
-							realdfa.addConsumedToken(p, token);
-						}
-						CreateGui.getAnimator().manipulatehistory(realdfa);
-					}
-					
-				}
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			} else {
-				// Display abstract trace
-				try {
-					ArrayList<AbstractMarking> tmp2 = null;
-					tmp2 = SymbolicUppaalTrace.parseUppaalAbstractTrace(bufferedReaderStderr);
-
-					JOptionPane.showMessageDialog(CreateGui.getApp(),
-							"The verification process returned an untimed trace.\n\n"+
-							"This means that with appropriate time delays the displayed\n"+
-							"sequence of discrete transitions can become a concrete trace.\n"+
-							"In case of liveness properties (EG, AF) the untimed trace\n"+
-							"either ends in a deadlock, or time divergent computation without\n" +
-							"any discrete transitions, or it loops back to some earlier configuration.\n"+
-							"The user may experiment in the simulator with different time delays\n"+
-							"in order to realize the suggested untimed trace in the model.",
-							"Verification Information",
-							JOptionPane.INFORMATION_MESSAGE);
-					
-					//Set to animation mode   
-					CreateGui.getApp().setAnimationMode(true);
-					CreateGui.getApp().setMode(Pipe.START);
-		            PetriNetObject.ignoreSelection(true);
-					CreateGui.getView().getSelectionObject().clearSelection();
-					
-			
-					CreateGui.getAnimator().resethistory();
-					
-					CreateGui.addAbstractAnimationPane();
-					
-					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
-
-					
-					for (AbstractMarking am : tmp2){
-						untimedAnimationHistory.addHistoryItemDontChange(am.getFiredTranstiion().trim());
-					}
-						
-				} catch (Exception e){
-//					 TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
-			}			
-		}
+		RunUppaalVerification thread = new RunUppaalVerification(getVerifyta(), verifytaOptions, xmlfile, qfile);
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
+		thread.setDialog(dialog);
+		thread.execute();
+		dialog.setVisible(true);
+//		boolean property=false; 
+//		boolean error=true;
+//		BufferedReader bufferedReaderStderr = a.bufferedReaderStderr;
+//		BufferedReader bufferedReaderStdout = a.bufferedReaderStdout;
+//		
+//		// Show the verification result dialog
+//		
+//		String resultmessage = "";
+//		
+//		
+//		//Parse result
+//		String line=null;
+//
+//		try {
+//			while ( (line = bufferedReaderStdout.readLine()) != null){
+//				if (line.contains("Property is satisfied")) {
+//					property = true;
+//
+//					error=false;
+//					//break;
+//
+//				}else if (line.contains("Property is NOT satisfied.")){
+//					property=false;
+//					error=false;
+//				}
+//
+//			}
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			error=true;
+//		}
+//		
+//		if (error){
+//			System.err.println("There was an error verifying the model.");
+//			return;
+//		}
+//
+//		
+//	
+//		//Display Answer
+//		resultmessage = property ? "Property Satisfied.": "Property Not Satisfied."; 
+//		resultmessage+= "\nVerification time is estimated to: " + (a.verificationtime/1000.0) + "s";
+//		
+//		JOptionPane.showMessageDialog(CreateGui.getApp(),
+//				resultmessage,
+//				"Verification Result",
+//				JOptionPane.INFORMATION_MESSAGE);
+//
+//
+//		
+//		// Show simulator is selected and reduction is the right method
+//		if ((input.traceOption != TAPNQuery.TraceOption.NONE && (input.reductionOption == TAPNQuery.ReductionOption.NAIVE || input.reductionOption == ReductionOption.ADV_NOSYM) )&&
+//				//and Only view the trace, if a trace is generated based on property
+//				((inputQuery.contains("E<>") && property) || (inputQuery.contains("A[]") && !property) ||
+//						(inputQuery.contains("E[]") && property) || (inputQuery.contains("A<>") && !property))){
+//			
+//			
+//			
+//
+//			
+//			//Select to display concreet trace
+//			if ((inputQuery.contains("E<>") || inputQuery.contains("A[]")) && !untimedTrace){
+//				
+//			
+//
+//		    //Set to animation mode   
+//			CreateGui.getApp().setAnimationMode(true);
+//			CreateGui.getApp().setMode(Pipe.START);
+//            PetriNetObject.ignoreSelection(true);
+//			CreateGui.getView().getSelectionObject().clearSelection();
+//			
+//			CreateGui.getAnimator().resethistory();
+//			
+//			
+//			try {
+//				ArrayList<FiringAction> tmp2 = null;
+//				tmp2 = UppaalTrace.parseUppaalTraceAdvanced(bufferedReaderStderr);
+//
+//				// Handeling of the UPPAAL verifyta error in generating traces
+//				if (tmp2 == null){
+//					JOptionPane.showMessageDialog(CreateGui.getApp(),
+//							"Generation of a concrete trace in UPPAAL failed.\n\n" +
+//							"TAPAAL will re-run the verification process\n" +
+//							"in order to obtain at least an untimed trace.",				
+//							"Concrete Trace Generation Error",
+//							JOptionPane.INFORMATION_MESSAGE);
+//					//XXX - Srba
+//					
+//					runUppaalVerification(appModel, input, true);
+//					return;
+//					
+//				}
+//				
+//				CreateGui.getAnimator().resethistory();
+//				
+//				for (FiringAction f : tmp2){
+//
+//					if (f instanceof TimeDelayFiringAction){
+//
+//						BigDecimal time = new BigDecimal(""+((TimeDelayFiringAction)f).getDealy());
+//						CreateGui.getAnimator().manipulatehistory(time);
+//
+//					} else if (f instanceof DiscreetFiringAction){
+//						DiscreetFiringAction stringdfa = (DiscreetFiringAction) f;
+//
+//						Transition trans = CreateGui.currentPNMLData().getTransitionByName(stringdfa.getTransition());
+//						pipe.dataLayer.DiscreetFiringAction realdfa = new pipe.dataLayer.DiscreetFiringAction(trans);
+//
+//						for (String s : stringdfa.getConsumedTokensList().keySet()){
+//
+//							Place p = CreateGui.currentPNMLData().getPlaceByName(s);
+//							BigDecimal token = new BigDecimal(""+stringdfa.getConsumedTokensList().get(s).get(0)); // XXX - just getting the first, guess that we dont support more tokens from smae place any wway :( (for now)
+//
+//							realdfa.addConsumedToken(p, token);
+//						}
+//						CreateGui.getAnimator().manipulatehistory(realdfa);
+//					}
+//					
+//				}
+//				
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			} else {
+//				// Display abstract trace
+//				try {
+//					ArrayList<AbstractMarking> tmp2 = null;
+//					tmp2 = SymbolicUppaalTrace.parseUppaalAbstractTrace(bufferedReaderStderr);
+//
+//					JOptionPane.showMessageDialog(CreateGui.getApp(),
+//							"The verification process returned an untimed trace.\n\n"+
+//							"This means that with appropriate time delays the displayed\n"+
+//							"sequence of discrete transitions can become a concrete trace.\n"+
+//							"In case of liveness properties (EG, AF) the untimed trace\n"+
+//							"either ends in a deadlock, or time divergent computation without\n" +
+//							"any discrete transitions, or it loops back to some earlier configuration.\n"+
+//							"The user may experiment in the simulator with different time delays\n"+
+//							"in order to realize the suggested untimed trace in the model.",
+//							"Verification Information",
+//							JOptionPane.INFORMATION_MESSAGE);
+//					
+//					//Set to animation mode   
+//					CreateGui.getApp().setAnimationMode(true);
+//					CreateGui.getApp().setMode(Pipe.START);
+//		            PetriNetObject.ignoreSelection(true);
+//					CreateGui.getView().getSelectionObject().clearSelection();
+//					
+//			
+//					CreateGui.getAnimator().resethistory();
+//					
+//					CreateGui.addAbstractAnimationPane();
+//					
+//					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+//
+//					
+//					for (AbstractMarking am : tmp2){
+//						untimedAnimationHistory.addHistoryItemDontChange(am.getFiredTranstiion().trim());
+//					}
+//						
+//				} catch (Exception e){
+////					 TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}	
+//			}			
+//		}
 
 		return;
 	}

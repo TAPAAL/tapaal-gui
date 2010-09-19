@@ -165,10 +165,8 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	public VerificationResult verify(File modelFile, File queryFile, VerificationOptions options) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
 		runner.run();
-		
+				
 		if(runner.error()){
-			messenger.displayInfoMessage("There was an error during verification. No result found!",
-					"Verification Result");
 			return null;
 		}else{			
 			VerifytaOutputParser outputParser = new VerifytaOutputParser();
