@@ -19,7 +19,7 @@ public class TAPNQuery {
 	public HashTableSize hashTableSize;
 	public ExtrapolationOption extrapolationOption;
 	
-	private TCTLAbstractProperty property;
+	private TCTLAbstractProperty property = null;
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOption, HashTableSize hashTabelSize, ExtrapolationOption extrapolationOption)
 	{

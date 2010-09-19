@@ -77,5 +77,13 @@ public class TCTLOrNode extends TCTLAbstractStateProperty {
 			return this;
 		}
 	}
+	
+	@Override
+	public void accept(ITCTLVisitor visitor) {
+		property1.accept(visitor);
+		property2.accept(visitor);
+		visitor.visit(this);
+		
+	}
 
 }

@@ -24,6 +24,7 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	@Override
 	public StringPosition[] getChildren() {
 		int start = property.isSimpleProperty() ? 0 : 1;
+		start = start + 3;
 		int end = start + property.toString().length();
 		StringPosition position = new StringPosition(start, end, property);
 		
@@ -62,6 +63,12 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 		}
 	}
 
+	@Override
+	public void accept(ITCTLVisitor visitor) {
+		property.accept(visitor);
+		visitor.visit(this);
+		
+	}
 	
 
 }

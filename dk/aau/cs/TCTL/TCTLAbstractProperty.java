@@ -1,6 +1,7 @@
 
 package dk.aau.cs.TCTL;
 
+
 public abstract class TCTLAbstractProperty {
 	
 	// used to determine whether to put parenthesis around the property
@@ -47,5 +48,7 @@ public abstract class TCTLAbstractProperty {
 		StringPosition[] children = { };
 		return children;
 	}
+	
+	public abstract void accept(ITCTLVisitor visitor);
 	
 }

@@ -4,10 +4,8 @@ package dk.aau.cs.TCTL;
 // where <operator> = {<, <=, =, >=, >}
 public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	
-	public enum ComparisonOperator { LESS_THAN, LEQ, EQUAL, GEQ, GREATER_THAN }
-	
 	private String place;
-	private ComparisonOperator op;
+	private String op;
 	private int n;
 	
 	public String getPlace() {
@@ -18,11 +16,11 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		this.place = place;
 	}
 
-	public ComparisonOperator getOp() {
+	public String getOp() {
 		return op;
 	}
 
-	public void setOp(ComparisonOperator op) {
+	public void setOp(String op) {
 		this.op = op;
 	}
 
@@ -34,7 +32,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		this.n = n;
 	}
 
-	public TCTLAtomicPropositionNode(String place, ComparisonOperator op, int n) {
+	public TCTLAtomicPropositionNode(String place, String op, int n) {
 		this.place = place;
 		this.op = op;
 		this.n = n;
@@ -65,27 +63,13 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public String toString() {
-		String s = place;
+		return place + " " + op + " " + n;
+	}
+	
+	@Override
+	public void accept(ITCTLVisitor visitor) {
+		visitor.visit(this);
 		
-		switch (op) {
-		case LESS_THAN:
-			s = s + " < ";
-			break;
-		case LEQ:
-			s = s + " <= ";
-			break;
-		case EQUAL:
-			s = s + " = ";
-			break;
-		case GEQ:
-			s = s + " >= ";
-			break;
-		case GREATER_THAN:
-			s = s + " > ";
-		}
-		
-		s = s + n;
-		return s;
 	}
 
 }

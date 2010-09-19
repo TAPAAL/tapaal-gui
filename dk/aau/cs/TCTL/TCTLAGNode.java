@@ -23,6 +23,7 @@ private TCTLAbstractStateProperty property;
 	@Override
 	public StringPosition[] getChildren() {
 		int start = property.isSimpleProperty() ? 0 : 1;
+		start = 3 + start;
 		int end = start + property.toString().length();
 		StringPosition position = new StringPosition(start, end, property);
 		
@@ -59,6 +60,15 @@ private TCTLAbstractStateProperty property;
 			property = property.replace(object1, object2);
 			return this;
 		}
+	}
+
+
+
+	@Override
+	public void accept(ITCTLVisitor visitor) {
+		property.accept(visitor);
+		visitor.visit(this);
+		
 	}
 
 }
