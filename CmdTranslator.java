@@ -73,11 +73,11 @@ public class CmdTranslator {
 		DataLayer dataLayer = new DataLayer(input);
 		int capacity = dataLayer.getQueries().get(0).capacity;
 
-		PipeTapnToAauTapnTransformer aauTrans = new PipeTapnToAauTapnTransformer(dataLayer, capacity);
+		PipeTapnToAauTapnTransformer aauTrans = new PipeTapnToAauTapnTransformer();
 		TAPN tapn = null;
 
 		try{
-			tapn = aauTrans.getAAUTAPN();
+			tapn = aauTrans.getAAUTAPN(dataLayer, capacity);
 		}catch(Exception e){
 			e.printStackTrace();
 			return;

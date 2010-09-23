@@ -2,7 +2,7 @@ package pipe.gui;
 
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.verification.Messenger;
+import dk.aau.cs.Messenger;
 
 public class MessengerImpl implements Messenger {
 

@@ -251,10 +251,10 @@ public class Export {
 		String filename = null;
 
 		//Create transformer
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(AppModel, 0);
+		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
 		TAPN model=null;
 		try {
-			model = transformer.getAAUTAPN();
+			model = transformer.getAAUTAPN(AppModel, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -497,10 +497,10 @@ public class Export {
 		String filename = null;
 
 		//Create transformer
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(AppModel, 0);
+		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
 		TAPN model=null;
 		try {
-			model = transformer.getAAUTAPN();
+			model = transformer.getAAUTAPN(AppModel, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -621,10 +621,10 @@ public class Export {
 		String filename = null;
 
 		//Create transformer
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer(AppModel, 0);
+		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
 		TAPN model=null;
 		try {
-			model = transformer.getAAUTAPN();
+			model = transformer.getAAUTAPN(AppModel, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -749,14 +749,14 @@ public class Export {
 		PipeTapnToAauTapnTransformer transformer = null;
 
 		if(appModel.isUsingColors()){
-			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
+			transformer = new ColoredPipeTapnToColoredAauTapnTransformer();
 		}else{
-			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
+			transformer = new PipeTapnToAauTapnTransformer();
 		}
 
 		TAPN model=null;
 		try {
-			model = transformer.getAAUTAPN();
+			model = transformer.getAAUTAPN(appModel, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

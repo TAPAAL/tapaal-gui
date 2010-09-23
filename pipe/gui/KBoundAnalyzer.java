@@ -1,26 +1,19 @@
 package pipe.gui;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
-import pipe.gui.widgets.RunningVerificationDialog;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
 import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastTransformer;
-import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
-import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
-import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
-import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.translations.PipeToNTATransformer;
 
 public class KBoundAnalyzer 
 {
@@ -31,117 +24,31 @@ public class KBoundAnalyzer
 	private boolean error=true;
 	private boolean readingPropertyOneResult = false;
 	
-	private ModelChecker<NTA, UPPAALQuery> modelChecker;
+	private ModelTransformer<DataLayer, NTA> pipeToNtaTransformer;
+	private Messenger messenger;
 	
 	
 	public boolean isBounded() {
 		return !notBounded;
 	}
 	
-	public KBoundAnalyzer(ModelChecker<NTA, UPPAALQuery> modelChecker, DataLayer appModel, int k)
+	public KBoundAnalyzer(DataLayer appModel, int k, Messenger messenger)
 	{
 		this.k = k;
 		this.appModel = appModel;
-		this.modelChecker = modelChecker;
+		this.pipeToNtaTransformer = new PipeToNTATransformer(getReductionStrategy());
 	}
 	
 	public void analyze()
 	{
-		modelChecker.setup();
-		
-		if (!modelChecker.isCorrectVersion()){
-			System.err.println("Verifyta not found, or you are running an old version of verifyta.\n" +
-					"Update to the latest development version.");
+		NTA nta;
+		try {
+			nta = pipeToNtaTransformer.transformModel(appModel);
+		} catch (Exception e) {
+			messenger.displayErrorMessage("Something went wrong while preparing the model.");
 			return;
 		}
-		String verifyta = modelChecker.getPath();
-		
-		
-		//Tmp files
-		File xmlfile=null, qfile=null;
-		try {
-			xmlfile = File.createTempFile("verifyta", ".xml");
-			qfile = File.createTempFile("verifyta", ".q");
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		xmlfile.deleteOnExit();qfile.deleteOnExit();
-		
-//		Create transformer and create uppaal model
-		PipeTapnToAauTapnTransformer transformer = null;
-		if(!appModel.isUsingColors()){
-			transformer = new PipeTapnToAauTapnTransformer(appModel, 0);
-		}else{
-			transformer = new ColoredPipeTapnToColoredAauTapnTransformer(appModel, 0);
-		}
-		
-		TAPN model=null;
-		try {
-			model = transformer.getAAUTAPN();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		ModelTransformer<TimedArcPetriNet, NTA> te = getReductionStrategy();
-		try {
-			NTA nta = null;
-			try {
-				nta = te.transformModel(model);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			nta.outputToUPPAALXML(new PrintStream(xmlfile));
-			//te.transformToUppaal(model2, new PrintStream(xmlfile), k+1);
-			
-			//We can not auto transform as query is not having lock==1
-			//te.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, k+1);
-			
-			PrintStream stream = new PrintStream(qfile);
-			printQuery(stream);
-					
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-//		 Do verifta 
-		PetriNetObject.ignoreSelection(false);
-		CreateGui.getApp().repaint();
-
-	// TODO: MJ -- FIX	
-//		RunningVerificationDialog t = new RunningVerificationDialog();
-//		t.createDialog();
-//		
-//		//Run the verifucation thread 	
-//		RunUppaalVerification a = null;//new RunUppaalVerification(verifyta, "-o0", xmlfile, qfile, t); //Wtf?
-//		a.start();
-//		
-//		t.show();
-//		
-//		if (t.isInterrupted()){
-//			a.verifyStop();
-//			a.interrupt();
-//			a.stop();
-//			a.destroy();
-//			
-//			try {
-//				a.wait();
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			a=null;
-//			//Stop ther verification!
-//			JOptionPane.showMessageDialog(CreateGui.getApp(),
-//					"Verification was interupted by the user. No result found!",
-//					"Verification Result",
-//					JOptionPane.INFORMATION_MESSAGE);
-//			return;
-//			
-//		}
+				
 //			
 //		try
 //		{
@@ -164,7 +71,7 @@ public class KBoundAnalyzer
 		}
 	}
 
-	protected void showResult(RunUppaalVerification a) {
+	protected void showResult(RunVerificationBase a) {
 		String resultmessage = "";
 		
 		String answerNetIsBounded = getAnswerBoundedString();

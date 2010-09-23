@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.UPPAALQuery;
@@ -12,7 +13,6 @@ import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.TAPN.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
-import dk.aau.cs.verification.ModelChecker;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 
@@ -22,9 +22,9 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		return minBound;
 	}
 
-	public KBoundOptimizer(ModelChecker<NTA, UPPAALQuery> modelChecker, DataLayer appModel, int k)
+	public KBoundOptimizer(DataLayer appModel, int k, Messenger messenger)
 	{
-		super(modelChecker, appModel, k);
+		super(appModel, k, messenger);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 	}
 
 	@Override
-	protected void showResult(RunUppaalVerification a) {
+	protected void showResult(RunVerificationBase a) {
 		String resultmessage = "";
 
 		String answerNetIsNotBounded = getAnswerNotBoundedString();

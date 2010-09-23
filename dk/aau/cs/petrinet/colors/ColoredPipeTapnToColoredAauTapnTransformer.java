@@ -16,12 +16,17 @@ import dk.aau.cs.petrinet.TAPNTransition;
 public class ColoredPipeTapnToColoredAauTapnTransformer extends
 PipeTapnToAauTapnTransformer {
 
-	public ColoredPipeTapnToColoredAauTapnTransformer(DataLayer model,
-			int capacity) {
-		super(model, capacity);
-		aAUPetriNet = new ColoredTAPN();
+	public ColoredPipeTapnToColoredAauTapnTransformer() {
+		super();
 	}
 
+	@Override
+	protected void reset(DataLayer model, int capacity){
+		this.appModel = model;
+		this.capacity = capacity;
+		this.aAUPetriNet = new ColoredTAPN();
+	}
+	
 	@Override
 	protected void transformPlace(Place place) {
 		ColoredTimedPlace ctp = (ColoredTimedPlace)place;

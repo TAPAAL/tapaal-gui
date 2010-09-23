@@ -12,6 +12,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */ 
 import java.util.HashMap;
 
+import dk.aau.cs.TAPN.ModelTransformer;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
@@ -21,18 +23,18 @@ import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
 
-public class PipeTapnToAauTapnTransformer {
-	private DataLayer appModel;
+public class PipeTapnToAauTapnTransformer implements ModelTransformer<DataLayer, TimedArcPetriNet> {
+	protected DataLayer appModel;
 	protected TAPN aAUPetriNet;
-	private int capacity;
+	protected int capacity;
 	protected HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject> PlaceTransitionObjectBookKeeper = new HashMap<pipe.dataLayer.PlaceTransitionObject, dk.aau.cs.petrinet.PlaceTransitionObject>();
 	
-	public PipeTapnToAauTapnTransformer(DataLayer model, int capacity){
-		appModel = model;
-		aAUPetriNet = new TAPN();
-		this.capacity = capacity;
+	public PipeTapnToAauTapnTransformer(){
 	}
-	public TAPN getAAUTAPN() throws Exception{
+
+	public TAPN getAAUTAPN(DataLayer model, int capacity) throws Exception{
+		reset(model, capacity);
+		
 		for ( Place place : appModel.getPlaces() ) {
 			transformPlace(place);
 		}
@@ -56,6 +58,12 @@ public class PipeTapnToAauTapnTransformer {
 		return aAUPetriNet;
 	}
 	
+	protected void reset(DataLayer model, int capacity) {
+		appModel = model;
+		this.capacity = capacity;
+		aAUPetriNet = new TAPN();
+	}
+
 	protected void transformNormalArc(NormalArc arc) throws Exception {
 		dk.aau.cs.petrinet.Arc aAUArc;
 		aAUArc = new dk.aau.cs.petrinet.Arc();
@@ -184,6 +192,10 @@ public class PipeTapnToAauTapnTransformer {
 			bound = String.valueOf(appModel.getConstantValue(bound));
 		
 		return operator + bound;
+	}
+	
+	public TimedArcPetriNet transformModel(DataLayer model) throws Exception {
+		return getAAUTAPN(model,0);
 	}
 	
 	
