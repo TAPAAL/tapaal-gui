@@ -31,6 +31,7 @@ public class SupQuery implements UPPAALQuery {
 			}
 			file.append(elem);
 		}
+		file.append("\n");
 	}
 	
 }

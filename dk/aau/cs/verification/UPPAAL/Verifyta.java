@@ -20,6 +20,7 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
+import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -34,7 +35,7 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	private Messenger messenger;
 
 	private ProcessRunner runner;
-	
+
 	public Verifyta(FileFinder fileFinder, Messenger messenger){
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
@@ -55,7 +56,7 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 
 		}
 
-		return isNotSetup() ? false : true;
+		return !isNotSetup();
 	}
 
 	public String getPath(){
@@ -155,38 +156,37 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 		return false;
 	}
 
-	
+
 	private String createArgumentString(File modelFile, File queryFile, VerificationOptions options){
 		StringBuffer buffer = new StringBuffer(options.toString());
 		buffer.append(" ");
 		buffer.append(modelFile.getAbsolutePath());
 		buffer.append(" ");
 		buffer.append(queryFile.getAbsolutePath());
-		
+
 		return buffer.toString();
 	}
 
 	// TODO: MJ - get rid of this method -- used for legacy support
-	public VerificationResult verify(File modelFile, File queryFile, VerificationOptions options) {
+	public VerificationResult verify(VerificationOptions options, File modelFile, File queryFile) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
 		runner.run();
-				
+
 		if(runner.error()){
 			return null;
 		}else{			
 			VerifytaOutputParser outputParser = new VerifytaOutputParser();
-			outputParser.parseOutput(runner.standardOutput());
-			
-			VerificationResult result = new VerificationResult();
-			result.setQuerySatisfied(outputParser.isPropertySatisfied());
+
+			QueryResult[] results = outputParser.parseOutput(runner.standardOutput());
+			VerificationResult result = new VerificationResult(results);
 
 			// TODO: handle trace via VerifytaTraceParser
-						
+
 			return result;
 		}
 	}
 
-	public VerificationResult verify(NTA model, UPPAALQuery query, VerificationOptions options){
+	public VerificationResult verify(VerificationOptions options, NTA model, UPPAALQuery... queries){
 		File modelFile;
 		File queryFile;
 		try {
@@ -198,18 +198,21 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 		}
 		modelFile.deleteOnExit();
 		queryFile.deleteOnExit();
-		
+
 		try {
 			model.outputToUPPAALXML(new PrintStream(modelFile));
-			query.output(new PrintStream(queryFile));
+			PrintStream queryStream = new PrintStream(queryFile);
+			for(UPPAALQuery query : queries){
+				query.output(queryStream);
+			}
 		} catch (FileNotFoundException e) {
 			messenger.displayInfoMessage("There was an error outputting the model.");
 			return null;
 		}
-		
-		return verify(modelFile, queryFile, options);
+
+		return verify(options, modelFile, queryFile);
 	}
-	
+
 	public void kill(){
 		if(runner != null){
 			runner.kill();

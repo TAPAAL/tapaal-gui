@@ -98,7 +98,7 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 
 	private void createSimulationOfTransitionOfDegree1(
 			TAPNTransition transition, ColoredTAPN degree2Net) throws Exception {
-		String trans = String.format(T_MAX_FORMAT, transition.getName(), 1);
+		String trans = transition.getName();//String.format(T_MAX_FORMAT, transition.getName(), 1);
 		addTransition(degree2Net, trans);
 		TAPNTransition newTransition = (TAPNTransition)getByName(trans);
 		newTransition.setFromOriginalNet(true);		

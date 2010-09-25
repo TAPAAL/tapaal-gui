@@ -19,7 +19,7 @@ public class RunVerification extends RunVerificationBase {
 	@Override
 	protected void showResult(VerificationResult result, long verificationTime) {	
 		if(result != null){
-			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
+			String satisfaction = result.isQuerySatisfied(0) ? "satisfied" : "not satisfied";
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
 					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime/1000.0),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);

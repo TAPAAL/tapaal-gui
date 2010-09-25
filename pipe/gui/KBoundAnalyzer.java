@@ -1,10 +1,9 @@
 package pipe.gui;
 
-import javax.swing.SwingWorker;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.StandardUPPAALQuery;
@@ -21,21 +20,23 @@ public class KBoundAnalyzer
 {
 	protected DataLayer appModel;
 	protected int k;
-	
+
 	private ModelTransformer<DataLayer, NTA> pipeToNtaTransformer;
 	private Messenger messenger;
 	private ModelChecker<NTA, UPPAALQuery> modelChecker;
-	private RunKBoundAnalysis analyzer;
-		
+	
 	public KBoundAnalyzer(DataLayer appModel, int k, ModelChecker<NTA, UPPAALQuery> modelChecker)
 	{
 		this.k = k;
 		this.appModel = appModel;
 		this.modelChecker = modelChecker;
-		analyzer = new RunKBoundAnalysis(modelChecker);
 		this.pipeToNtaTransformer = new PipeToNTATransformer(getReductionStrategy());
 	}
-	
+
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker<NTA, UPPAALQuery> modelChecker) {
+		return new RunKBoundAnalysis(modelChecker);
+	}
+
 	public void analyze()
 	{
 		NTA nta;
@@ -45,11 +46,16 @@ public class KBoundAnalyzer
 			messenger.displayErrorMessage("Something went wrong while translating the model.");
 			return;
 		}
-		
-		UPPAALQuery query = getQuery();
-		
+
+		UPPAALQuery[] queries = getQueries();
 		VerifytaOptions options = new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false);
-		analyzer.execute(nta, query, options);
+
+		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker);
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());	
+		dialog.setupListeners(analyzer);
+		
+		analyzer.execute(options, nta, queries);
+		dialog.setVisible(true);
 	}
 
 	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy() {
@@ -60,7 +66,11 @@ public class KBoundAnalyzer
 		}
 	}
 
-	protected UPPAALQuery getQuery() {
+	protected UPPAALQuery[] getQueries() {
+		return new UPPAALQuery[] { getBoundednessQuery() };
+	}
+
+	protected UPPAALQuery getBoundednessQuery() {
 		StringBuffer buffer = new StringBuffer();
 
 		if(!appModel.isUsingColors()){
@@ -69,11 +79,8 @@ public class KBoundAnalyzer
 		}else{
 			buffer.append("E<>((sum(i:pid_t) Token(i).P_capacity) == 0) and (Control.P_lock == 1) and lock == 0\n");
 		}
-		
-		return new StandardUPPAALQuery(buffer.toString());
-	}
 
-	public SwingWorker<?, ?> getWorker() {
-		return analyzer;
+		UPPAALQuery boundednessQuery = new StandardUPPAALQuery(buffer.toString());
+		return boundednessQuery;
 	}
 }

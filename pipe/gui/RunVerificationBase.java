@@ -20,7 +20,7 @@ public abstract class RunVerificationBase extends
 	private File modelFile; // TODO: MJ -- Get rid of both, used now for legacy support
 	private File queryFile;
 	private NTA model;
-	private UPPAALQuery query;
+	private UPPAALQuery[] queries;
 	private long verificationTime = 0;
 	
 	public RunVerificationBase(ModelChecker<NTA, UPPAALQuery> modelChecker) {
@@ -35,9 +35,9 @@ public abstract class RunVerificationBase extends
 		execute();
 	}
 	
-	public void execute(NTA model, UPPAALQuery query, VerificationOptions options){
+	public void execute(VerificationOptions options, NTA model, UPPAALQuery... queries){
 		this.model = model;
-		this.query = query;
+		this.queries = queries;
 		this.options = options;
 		execute();
 	}
@@ -47,9 +47,9 @@ public abstract class RunVerificationBase extends
 		long startMS = System.currentTimeMillis();
 		VerificationResult result;
 		if(model != null){
-			result = modelChecker.verify(model, query, options);
+			result = modelChecker.verify(options, model, queries);
 		}else{
-			result = modelChecker.verify(modelFile, queryFile, options);
+			result = modelChecker.verify(options, modelFile, queryFile);
 		}
 		long endMS = System.currentTimeMillis();
 		

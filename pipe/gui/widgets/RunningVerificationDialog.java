@@ -27,13 +27,13 @@ public class RunningVerificationDialog extends JDialog {
 		super(owner, "Verification in progress", true);
 		setLocationRelativeTo(null);
 		setLayout(new GridLayout(2,1));
-		
+
 		okButton = new JButton("Interupt Verification");
-		
+
 		Container content = getContentPane();
 		content.add(new Label("Verification is running ...\nPlease wait!"));
 		content.add(okButton);		
-			
+
 		pack();
 	}
 
@@ -43,7 +43,7 @@ public class RunningVerificationDialog extends JDialog {
 				worker.cancel(true);
 			}
 		});
-		
+
 		addWindowListener(new WindowAdapter(){
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -55,16 +55,13 @@ public class RunningVerificationDialog extends JDialog {
 			public void propertyChange(PropertyChangeEvent event) {
 				if(event.getPropertyName().equals("state")){
 					StateValue stateValue = (StateValue)event.getNewValue();
-//					if(stateValue.equals(StateValue.STARTED)){
-//						setVisible(true);
-//					}else 
-						if(stateValue.equals(StateValue.DONE)){
+					if(stateValue.equals(StateValue.DONE)){
 						setVisible(false);
 						dispose();
 					}
 				}
 			}
-			
+
 		});
 	}
 }

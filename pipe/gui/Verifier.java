@@ -26,7 +26,7 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
  */
 
 
-public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order to remember that path was set
+public class Verifier {
 	private ModelChecker<NTA, UPPAALQuery> modelChecker;
 	
 	private static Verifyta getVerifyta() {
@@ -44,7 +44,7 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 	public static void analyzeAndOptimizeKBound(DataLayer appModel, int k, JSpinner tokensControl)
 	{
-		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, getVerifyta());
+		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, getVerifyta(), tokensControl);
 		optimizer.analyze();
 		
 //		if(optimizer.isBounded())
@@ -55,10 +55,7 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 	public static void analyseKBounded(DataLayer appModel, int k){
 		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k, getVerifyta());
-		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());	
-		dialog.setupListeners(analyzer.getWorker());
 		analyzer.analyze();
-		dialog.setVisible(true);
 	}
 	
 	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input) {
@@ -71,7 +68,7 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 			"Update to the latest development version.");
 			return;
 		}
-		String verifyta = getVerifyta().getPath();
+		
 		File xmlfile=null, qfile=null;
 		try {
 			xmlfile = File.createTempFile( "verifyta", "test.xml");
