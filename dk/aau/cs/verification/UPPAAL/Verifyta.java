@@ -2,12 +2,17 @@ package dk.aau.cs.verification.UPPAAL;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
+import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
@@ -182,7 +187,27 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	}
 
 	public VerificationResult verify(NTA model, UPPAALQuery query, VerificationOptions options){
-		return null;
+		File modelFile;
+		File queryFile;
+		try {
+			modelFile = File.createTempFile("verifyta", "model.xml");
+			queryFile = File.createTempFile("verifyta", "query.q");
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an internal error while analyzing the model. Try again.");
+			return null;
+		}
+		modelFile.deleteOnExit();
+		queryFile.deleteOnExit();
+		
+		try {
+			model.outputToUPPAALXML(new PrintStream(modelFile));
+			query.output(new PrintStream(queryFile));
+		} catch (FileNotFoundException e) {
+			messenger.displayInfoMessage("There was an error outputting the model.");
+			return null;
+		}
+		
+		return verify(modelFile, queryFile, options);
 	}
 	
 	public void kill(){

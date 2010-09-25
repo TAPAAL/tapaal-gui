@@ -17,22 +17,40 @@ public abstract class RunVerificationBase extends
 
 	private ModelChecker<NTA, UPPAALQuery> modelChecker;
 	private VerificationOptions options;
-	private File modelFile;
+	private File modelFile; // TODO: MJ -- Get rid of both, used now for legacy support
 	private File queryFile;
+	private NTA model;
+	private UPPAALQuery query;
 	private long verificationTime = 0;
 	
-	public RunVerificationBase(ModelChecker<NTA, UPPAALQuery> modelChecker, VerificationOptions options, File modelFile, File queryFile) {
+	public RunVerificationBase(ModelChecker<NTA, UPPAALQuery> modelChecker) {
 		super();
 		this.modelChecker = modelChecker;
-		this.options = options;
-		this.modelFile = modelFile;
-		this.queryFile = queryFile;
 	}
 
+	public void execute(File modelFile, File queryFile, VerificationOptions options){
+		this.modelFile = modelFile;
+		this.queryFile = queryFile;
+		this.options = options;
+		execute();
+	}
+	
+	public void execute(NTA model, UPPAALQuery query, VerificationOptions options){
+		this.model = model;
+		this.query = query;
+		this.options = options;
+		execute();
+	}
+	
 	@Override
 	protected VerificationResult doInBackground() throws Exception {
 		long startMS = System.currentTimeMillis();
-		VerificationResult result = modelChecker.verify(modelFile, queryFile, options);
+		VerificationResult result;
+		if(model != null){
+			result = modelChecker.verify(model, query, options);
+		}else{
+			result = modelChecker.verify(modelFile, queryFile, options);
+		}
 		long endMS = System.currentTimeMillis();
 		
 		verificationTime = endMS - startMS;
@@ -55,7 +73,7 @@ public abstract class RunVerificationBase extends
 		}else{
 			modelChecker.kill();			
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "Verification was interupted by the user. No result found!",
-					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
+					"Verification Cancelled", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 

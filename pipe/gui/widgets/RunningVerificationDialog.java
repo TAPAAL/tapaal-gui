@@ -55,11 +55,12 @@ public class RunningVerificationDialog extends JDialog {
 			public void propertyChange(PropertyChangeEvent event) {
 				if(event.getPropertyName().equals("state")){
 					StateValue stateValue = (StateValue)event.getNewValue();
-					if(stateValue.equals(StateValue.STARTED)){
-						setVisible(true);
-					}else if(stateValue.equals(StateValue.DONE)){
+//					if(stateValue.equals(StateValue.STARTED)){
+//						setVisible(true);
+//					}else 
+						if(stateValue.equals(StateValue.DONE)){
 						setVisible(false);
-						worker.removePropertyChangeListener(this);
+						dispose();
 					}
 				}
 			}

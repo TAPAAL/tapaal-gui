@@ -44,18 +44,21 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 	public static void analyzeAndOptimizeKBound(DataLayer appModel, int k, JSpinner tokensControl)
 	{
-		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, new MessengerImpl());
+		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, getVerifyta());
 		optimizer.analyze();
 		
-		if(optimizer.isBounded())
-		{
-			tokensControl.setValue(optimizer.getMinBound());
-		}
+//		if(optimizer.isBounded())
+//		{
+//			tokensControl.setValue(optimizer.getMinBound());
+//		}
 	}
 	
 	public static void analyseKBounded(DataLayer appModel, int k){
-		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k, new MessengerImpl());
+		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k, getVerifyta());
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());	
+		dialog.setupListeners(analyzer.getWorker());
 		analyzer.analyze();
+		dialog.setVisible(true);
 	}
 	
 	public static void runUppaalVerification(DataLayer appModel, TAPNQuery input) {
@@ -137,11 +140,11 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 		Export.exportUppaalXMLFromQuery(appModel, input, xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
 	
-		RunVerificationBase thread = new RunVerification(getVerifyta(), verifytaOptions, xmlfile, qfile);
+		RunVerificationBase thread = new RunVerification(getVerifyta());
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 		dialog.setupListeners(thread);
-		thread.execute();
-
+		thread.execute(xmlfile, qfile, verifytaOptions);
+		dialog.setVisible(true);
 
 //		// Show simulator is selected and reduction is the right method
 //		if ((input.traceOption != TAPNQuery.TraceOption.NONE && (input.reductionOption == TAPNQuery.ReductionOption.NAIVE || input.reductionOption == ReductionOption.ADV_NOSYM) )&&
