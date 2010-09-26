@@ -10,7 +10,7 @@ public class SymbolicState {
 		this.ages = ages;
 	}
 	
-	public static SymbolicState Parse(String state){
+	public static SymbolicState parse(String state){
 		String[] stateLines = state.split("\n");
 		
 		String[] locations = parseLocations(stateLines[1]);
@@ -32,10 +32,10 @@ public class SymbolicState {
 
 	private static String[] parseLocations(String string) {
 		String[] split = string.split(" ");
-		String[] locations = new String[split.length];
-		for(int i = 0; i < split.length; i++){
+		String[] locations = new String[split.length-2];
+		for(int i = 1; i < split.length-1; i++){
 			String location = split[i].replace("(", "").replace(")", "").trim();
-			locations[i] = location.replaceFirst(".*\\.", "");
+			locations[i-1] = location.replaceFirst(".*\\.", "");
 		}
 		
 		return locations;
