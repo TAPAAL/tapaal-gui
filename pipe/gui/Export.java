@@ -50,7 +50,6 @@ import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.petrinet.degree2converters.KyrketestUppaalSym;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
-import dk.aau.cs.translations.tapn.TAPNToNTATransformer;
 
 
 
@@ -824,37 +823,6 @@ public class Export {
 			}	
 
 
-		} else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_STANDARD){
-			TAPNToNTATransformer trans = 
-				new dk.aau.cs.TAPN.TAPNToNTAStandardTransformer(capacity);
-
-			try{
-				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} else if(input.reductionOption == TAPNQuery.ReductionOption.INHIB_TO_PRIO_SYM){
-			TAPNToNTATransformer trans = 
-				new dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer(capacity);
-
-			try{
-				dk.aau.cs.TA.NTA nta = trans.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = trans.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_STANDARD || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM){
 			TAPNToNTABroadcastTransformer broadcastTransformer = null;
 			if(appModel.isUsingColors()){
@@ -891,50 +859,7 @@ public class Export {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.ADV_BROADCAST_SYM){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.AdvancedBroadcastTransformer(capacity, true);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM || input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.OptimizedBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.OPT_BROADCAST_SYM);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else if(input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM || input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST){
-			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.SuperBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.SUPER_BROADCAST_SYM);
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else {
+		} else {
 
 			try {
 				model.convertToConservative();
