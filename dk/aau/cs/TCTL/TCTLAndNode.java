@@ -78,4 +78,9 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 		
 	}
 
+	@Override
+	public boolean containsPlaceHolder() {
+		return property1.containsPlaceHolder() || property2.containsPlaceHolder();
+	}
+
 }

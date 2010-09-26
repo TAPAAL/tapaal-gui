@@ -69,6 +69,13 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 		visitor.visit(this);
 		
 	}
+
+
+
+	@Override
+	public boolean containsPlaceHolder() {
+		return property.containsPlaceHolder();
+	}
 	
 
 }

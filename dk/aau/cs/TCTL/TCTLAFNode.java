@@ -70,4 +70,11 @@ private TCTLAbstractStateProperty property;
 		visitor.visit(this);
 	}
 
+
+
+	@Override
+	public boolean containsPlaceHolder() {
+		return property.containsPlaceHolder();
+	}
+
 }

@@ -49,7 +49,7 @@ public class TAPNQuery {
 		return property;
 	}
 	
-	public String getPropertyString()
+	public String getPropertyAsString()
 	{
 		return property.toString();
 	}

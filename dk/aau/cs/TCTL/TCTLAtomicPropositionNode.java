@@ -72,4 +72,9 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		
 	}
 
+	@Override
+	public boolean containsPlaceHolder() {
+		return false;
+	}
+
 }

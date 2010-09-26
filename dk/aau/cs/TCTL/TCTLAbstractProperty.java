@@ -39,6 +39,7 @@ public abstract class TCTLAbstractProperty {
 		}
 	}
 	
+	public abstract boolean containsPlaceHolder();
 	
 	public abstract TCTLAbstractProperty copy();
 	

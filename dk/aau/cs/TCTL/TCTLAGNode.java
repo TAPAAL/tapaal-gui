@@ -71,4 +71,11 @@ private TCTLAbstractStateProperty property;
 		
 	}
 
+
+
+	@Override
+	public boolean containsPlaceHolder() {
+		return property.containsPlaceHolder();
+	}
+
 }
