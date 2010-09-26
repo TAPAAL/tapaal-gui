@@ -53,7 +53,7 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty copy() {
-		return new TCTLEFNode(property.copy());
+		return new TCTLAFNode(property.copy());
 	}
 
 	@Override

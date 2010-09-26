@@ -985,14 +985,27 @@ public class QueryDialogue extends JPanel{
 		}else{
 			options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
 		}
+		
+		String reductionOptionString = ""+reductionOption.getSelectedItem();
+		boolean selectedOptionStillAvailable = false;
+		
 		reductionOption.removeAllItems();
 
 		for (String s : options){
 			reductionOption.addItem(s);
+			if(s.equals(reductionOptionString))
+			{
+				selectedOptionStillAvailable = true;
+			}
 		}
+		
+		if(selectedOptionStillAvailable)
+			reductionOption.setSelectedItem(reductionOptionString);
+		
 	}
 
 	private void enableAllReductionOptions(){
+		String reductionOptionString = ""+reductionOption.getSelectedItem();
 		reductionOption.removeAllItems();
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
 			String[] options = {name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
@@ -1013,6 +1026,10 @@ public class QueryDialogue extends JPanel{
 			//reductionOption.addItem(name_SUPERBROADCAST);
 			//reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
+		
+		reductionOption.setSelectedItem(reductionOptionString);
+		
+		
 	}
 
 

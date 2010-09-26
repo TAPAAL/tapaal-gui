@@ -15,21 +15,9 @@ public class BroadcastTranslationQueryVisitor implements ITCTLVisitor {
 	protected enum QueryType { EF, EG, AF, AG }
 	
 	protected static final String ID_TYPE = "id_t";
-	protected static final String ID_TYPE_NAME = "id";
-	protected static final String TOKEN_INTERMEDIATE_PLACE = "%1$s_%2$s_%3$d";
-	protected static final String TEST_CHANNEL_NAME = "%1$s_test%2$s";
-	protected static final String FIRE_CHANNEL_NAME = "%1$s_fire%2$s";
-	protected static final String COUNTER_NAME = "count%1$d";
-	protected static final String COUNTER_UPDATE = "%1$s%2$s";
-	protected static final String TOKEN_CLOCK_NAME = "x";
 	protected static final String PLOCK = "P_lock";
-	protected static final String PCAPACITY = "P_capacity";
-	protected static final String INITIALIZE_CHANNEL = "c%1$d%2$s";
-
-	protected static final String CONTROL_TEMPLATE_NAME = "Control";
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
-	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
-	protected static final String LOCK_BOOL = "lock";
+
 	
 	private boolean useSymmetry;
 	private StringBuffer uppaalQuery;
@@ -105,7 +93,7 @@ public class BroadcastTranslationQueryVisitor implements ITCTLVisitor {
 			uppaalQuery.append("(i).");
 			uppaalQuery.append(atomicPropositionNode.getPlace());
 			uppaalQuery.append(") ");
-			uppaalQuery.append(atomicPropositionNode.getOp());
+			uppaalQuery.append(OperatorConversion(atomicPropositionNode.getOp()));
 			uppaalQuery.append(" ");
 			uppaalQuery.append(atomicPropositionNode.getN());
 		}
@@ -122,7 +110,7 @@ public class BroadcastTranslationQueryVisitor implements ITCTLVisitor {
 				uppaalQuery.append(atomicPropositionNode.getPlace());
 			}
 			uppaalQuery.append(") ");
-			uppaalQuery.append(atomicPropositionNode.getOp());
+			uppaalQuery.append(OperatorConversion(atomicPropositionNode.getOp()));
 			uppaalQuery.append(" ");
 			uppaalQuery.append(atomicPropositionNode.getN());
 		}
@@ -139,12 +127,19 @@ public class BroadcastTranslationQueryVisitor implements ITCTLVisitor {
 	
 	private void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
-			uppaalQuery.append(" and ");
+			uppaalQuery.append(" && ");
 		}else{
-			uppaalQuery.append(" or !");
+			uppaalQuery.append(" || !");
 		}
 		uppaalQuery.append("Control.");
 		uppaalQuery.append(PLOCK);
+	}
+	
+	private String OperatorConversion(String op){
+		if(op.equals("="))
+			return "==";
+		
+		return op;
 	}
 
 }

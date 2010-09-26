@@ -852,7 +852,7 @@ public class Export {
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(inputQuery, capacity + 1 + model.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();

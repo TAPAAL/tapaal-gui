@@ -52,7 +52,7 @@ private TCTLAbstractStateProperty property;
 
 	@Override
 	public TCTLAbstractPathProperty copy() {
-		return new TCTLEFNode(property.copy());
+		return new TCTLAGNode(property.copy());
 	}
 
 	@Override

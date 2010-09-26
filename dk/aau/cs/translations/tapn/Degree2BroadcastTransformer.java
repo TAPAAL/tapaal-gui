@@ -13,6 +13,7 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PetriNetUtil;
@@ -40,7 +41,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private static final String P_CAPACITY = "P_capacity";
 	private static final String TOKEN_TEMPLATE_NAME = "Token";
 	private static final String CONTROL_TEMPLATE_NAME = "Control";
-	private static final String ID_TYPE = "pid_t";
+	private static final String ID_TYPE = "id_t";
 	private static final String ID_PARAMETER_NAME = "id";
 	protected static final String CLOCK_NAME = "x";
 	private static final String COUNTER_NAME = "count%1$d";
@@ -690,42 +691,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
-		String query = tapnQuery.toString();
-		Pattern pattern = Pattern.compile(QUERY_PATTERN);
-		Matcher matcher = pattern.matcher(query);
-
-		StringBuilder builder = new StringBuilder();
-		if(useSymmetry){
-			builder.append("(sum(i:");
-			builder.append(ID_TYPE);
-			builder.append(")");
-			builder.append(TOKEN_TEMPLATE_NAME);
-			builder.append("(i).$1) $2 $3");
-		}else{
-			builder.append("(");
-			for(int i = 0; i < tapnQuery.getTotalTokens()-1; i++){
-				if(i > 0){
-					builder.append(" + ");
-				}
-
-				builder.append(TOKEN_TEMPLATE_NAME);
-				builder.append(i);
-				builder.append(".$1");
-			}
-			builder.append(") $2 $3");
-		}
-
-		StringBuilder uppaalQuery = new StringBuilder();
-		uppaalQuery.append(matcher.replaceAll(builder.toString()));
-
-		if(tapnQuery.isEFQuery() || tapnQuery.isAFQuery()){
-			uppaalQuery.append(" and ");
-		}else{
-			uppaalQuery.append(" or !");
-		}
-		uppaalQuery.append("Control.");
-		uppaalQuery.append(PLOCK);
-
-		return new StandardUPPAALQuery(uppaalQuery.toString());
+		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry,tapnQuery.getTotalTokens());
+		
+		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}
 }
