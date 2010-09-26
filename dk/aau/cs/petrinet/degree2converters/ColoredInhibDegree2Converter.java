@@ -3,6 +3,8 @@ package dk.aau.cs.petrinet.degree2converters;
 import java.util.HashSet;
 import java.util.Hashtable;
 
+import pipe.gui.widgets.NewTAPNPanel;
+
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PlaceTransitionObject;
@@ -98,10 +100,16 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 
 	private void createSimulationOfTransitionOfDegree1(
 			TAPNTransition transition, ColoredTAPN degree2Net) throws Exception {
-		String trans = transition.getName();//String.format(T_MAX_FORMAT, transition.getName(), 1);
+		String trans = String.format(T_MAX_FORMAT, transition.getName(), 1);
 		addTransition(degree2Net, trans);
 		TAPNTransition newTransition = (TAPNTransition)getByName(trans);
-		newTransition.setFromOriginalNet(true);		
+				
+		if(transition.hasInhibitorArcs()){
+			addColoredInputArc(degree2Net, PLOCK, trans, new ColoredInterval(), new ColorSet());
+			addColoredOutputArc(degree2Net, trans, PLOCK, 0);
+		}else{
+			newTransition.setFromOriginalNet(true);	
+		}
 		
 		Arc presetArc = transition.getPreset().get(0);
 		Arc postsetArc = transition.getPostset().get(0);
@@ -128,7 +136,12 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 					trans,
 					postsetArc.getTarget().getName(),
 					outputArc.getOutputValue());
-		}
+		}	
+		
+//		if(transition.hasInhibitorArcs()){
+//			addColoredInputArc(degree2Net, PLOCK, trans, new ColoredInterval(), new ColorSet());
+//			addColoredOutputArc(degree2Net, trans, PLOCK, 0);
+//		}
 	}
 
 	private void createRingSimulationOfTransition(TAPNTransition transition,
