@@ -1,21 +1,18 @@
 package dk.aau.cs.verification;
 
 public class VerificationResult {
-	private boolean querySatisfied;
+	private QueryResult[] queryResults;
 	// TODO: MJ -- add trace
 
-	public boolean isQuerySatisfied() {
-		return querySatisfied;
+	public boolean isQuerySatisfied(int index) {
+		return queryResults[index].isQuerySatisfied();
 	}
-	
-	public void setQuerySatisfied(boolean result){
-		querySatisfied = result;
+		
+	public VerificationResult(QueryResult... queryResults){
+		this.queryResults = queryResults;
 	}
-	
-	public VerificationResult(){
-		this(false);
-	}	
-	public VerificationResult(boolean isQuerySatisfied){
-		this.querySatisfied = isQuerySatisfied;
-	}
+
+	public QueryResult getQueryResult(int index) {
+		return queryResults[index];
+	}		
 }

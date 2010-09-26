@@ -1,29 +1,17 @@
 package pipe.gui;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.Transition;
 import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.gui.widgets.RunningVerificationDialog;
-import dk.aau.cs.TA.AbstractMarking;
-import dk.aau.cs.TA.DiscreetFiringAction;
-import dk.aau.cs.TA.FiringAction;
 import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.SymbolicUppaalTrace;
-import dk.aau.cs.TA.TimeDelayFiringAction;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TA.UppaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
@@ -38,7 +26,7 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
  */
 
 
-public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order to remember that path was set
+public class Verifier {
 	private ModelChecker<NTA, UPPAALQuery> modelChecker;
 	
 	private static Verifyta getVerifyta() {
@@ -56,17 +44,17 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 	public static void analyzeAndOptimizeKBound(DataLayer appModel, int k, JSpinner tokensControl)
 	{
-		KBoundOptimizer optimizer = new KBoundOptimizer(getVerifyta(), appModel, k);
+		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, getVerifyta(), tokensControl);
 		optimizer.analyze();
 		
-		if(optimizer.isBounded())
-		{
-			tokensControl.setValue(optimizer.getMinBound());
-		}
+//		if(optimizer.isBounded())
+//		{
+//			tokensControl.setValue(optimizer.getMinBound());
+//		}
 	}
 	
 	public static void analyseKBounded(DataLayer appModel, int k){
-		KBoundAnalyzer analyzer = new KBoundAnalyzer( getVerifyta(),appModel, k);
+		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k, getVerifyta());
 		analyzer.analyze();
 	}
 	
@@ -80,7 +68,7 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 			"Update to the latest development version.");
 			return;
 		}
-		String verifyta = getVerifyta().getPath();
+		
 		File xmlfile=null, qfile=null;
 		try {
 			xmlfile = File.createTempFile( "verifyta", "test.xml");
@@ -149,62 +137,12 @@ public class Verifier { // TODO: MJ -- Verifyta needs to be a singleton in order
 	
 		Export.exportUppaalXMLFromQuery(appModel, input, xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
 	
-		RunUppaalVerification thread = new RunUppaalVerification(getVerifyta(), verifytaOptions, xmlfile, qfile);
-		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp(), thread);
-		thread.setDialog(dialog);
-		thread.execute();
+		RunVerificationBase thread = new RunVerification(getVerifyta());
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
+		dialog.setupListeners(thread);
+		thread.execute(xmlfile, qfile, verifytaOptions);
 		dialog.setVisible(true);
-//		boolean property=false; 
-//		boolean error=true;
-//		BufferedReader bufferedReaderStderr = a.bufferedReaderStderr;
-//		BufferedReader bufferedReaderStdout = a.bufferedReaderStdout;
-//		
-//		// Show the verification result dialog
-//		
-//		String resultmessage = "";
-//		
-//		
-//		//Parse result
-//		String line=null;
-//
-//		try {
-//			while ( (line = bufferedReaderStdout.readLine()) != null){
-//				if (line.contains("Property is satisfied")) {
-//					property = true;
-//
-//					error=false;
-//					//break;
-//
-//				}else if (line.contains("Property is NOT satisfied.")){
-//					property=false;
-//					error=false;
-//				}
-//
-//			}
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//			error=true;
-//		}
-//		
-//		if (error){
-//			System.err.println("There was an error verifying the model.");
-//			return;
-//		}
-//
-//		
-//	
-//		//Display Answer
-//		resultmessage = property ? "Property Satisfied.": "Property Not Satisfied."; 
-//		resultmessage+= "\nVerification time is estimated to: " + (a.verificationtime/1000.0) + "s";
-//		
-//		JOptionPane.showMessageDialog(CreateGui.getApp(),
-//				resultmessage,
-//				"Verification Result",
-//				JOptionPane.INFORMATION_MESSAGE);
-//
-//
-//		
+
 //		// Show simulator is selected and reduction is the right method
 //		if ((input.traceOption != TAPNQuery.TraceOption.NONE && (input.reductionOption == TAPNQuery.ReductionOption.NAIVE || input.reductionOption == ReductionOption.ADV_NOSYM) )&&
 //				//and Only view the trace, if a trace is generated based on property

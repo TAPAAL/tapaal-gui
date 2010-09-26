@@ -1,4 +1,4 @@
-package dk.aau.cs.verification;
+package dk.aau.cs;
 
 public interface Messenger {
 	void displayInfoMessage(String message);
