@@ -858,7 +858,7 @@ public class Export {
 		}else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_STANDARD || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM){
 			TAPNToNTABroadcastTransformer broadcastTransformer = null;
 			if(appModel.isUsingColors()){
-				broadcastTransformer = new dk.aau.cs.TAPN.colorTranslations.ColoredBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
+				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredBroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
 			}else{
 				broadcastTransformer = new dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_SYM);
 			}
@@ -876,7 +876,7 @@ public class Export {
 		} else if(input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM || input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2){
 			Degree2BroadcastTransformer broadcastTransformer = null;
 			if(appModel.isUsingColors()){
-				broadcastTransformer = new dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
+				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
 			}else{
 				broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTransformer(capacity, input.reductionOption == TAPNQuery.ReductionOption.BROADCAST_DEG2_SYM);
 			}

@@ -1,4 +1,4 @@
-package dk.aau.cs.TAPN.colorTranslations;
+package dk.aau.cs.translations.coloredtapn;
 
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
