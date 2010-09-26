@@ -77,4 +77,11 @@ private TCTLAbstractStateProperty property;
 		return property.containsPlaceHolder();
 	}
 
+
+
+	@Override
+	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+			return property.containsAtomicPropWithSpecificPlace(placeName);
+	}
+
 }

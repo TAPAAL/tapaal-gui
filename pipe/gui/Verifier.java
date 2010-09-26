@@ -12,6 +12,9 @@ import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
@@ -80,27 +83,29 @@ public class Verifier {
 		xmlfile.deleteOnExit();qfile.deleteOnExit();
 
 				
-		String inputQuery = input.query;
+		TCTLAbstractProperty inputQuery = input.getProperty();
 		
-		VerifytaOptions verifytaOptions = new VerifytaOptions(input.traceOption, input.searchOption, untimedTrace);
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace);
 				
 		if (inputQuery == null) {return;}
 
 		
 		//Handle problems with liveness checking 
-		if (inputQuery.contains("E[]") || inputQuery.contains("A<>") ) {
+		// Bit of a hack because we know the first node of the query AST is always the path quantifier,
+		// i.e. we cant have nested path quantifiers
+		if (inputQuery instanceof TCTLEGNode || inputQuery instanceof TCTLAFNode ) {
 			
 			//If selected wrong method for checking
-			if (!(input.reductionOption == ReductionOption.ADV_NOSYM || input.reductionOption == ReductionOption.ADV_UPPAAL_SYM 
-					|| input.reductionOption == ReductionOption.BROADCAST_STANDARD 
-					|| input.reductionOption == ReductionOption.BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.BROADCAST_DEG2
-					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
-					|| input.reductionOption == ReductionOption.ADV_BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.OPT_BROADCAST
-					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.SUPER_BROADCAST
-					|| input.reductionOption == ReductionOption.SUPER_BROADCAST_SYM)){
+			if (!(input.getReductionOption() == ReductionOption.ADV_NOSYM || input.getReductionOption() == ReductionOption.ADV_UPPAAL_SYM 
+					|| input.getReductionOption() == ReductionOption.BROADCAST_STANDARD 
+					|| input.getReductionOption() == ReductionOption.BROADCAST_SYM
+					|| input.getReductionOption() == ReductionOption.BROADCAST_DEG2
+					|| input.getReductionOption() == ReductionOption.BROADCAST_DEG2_SYM
+					|| input.getReductionOption() == ReductionOption.ADV_BROADCAST_SYM
+					|| input.getReductionOption() == ReductionOption.OPT_BROADCAST
+					|| input.getReductionOption() == ReductionOption.OPT_BROADCAST_SYM
+					|| input.getReductionOption() == ReductionOption.SUPER_BROADCAST
+					|| input.getReductionOption() == ReductionOption.SUPER_BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"Verification of liveness properties (EG,AF) is not possible with the selected reduction option.",
@@ -112,15 +117,15 @@ public class Verifier {
 			
 			//Check if degree-2 or give an error
 			boolean isModelDegree2 = appModel.isDegree2();
-			if (!isModelDegree2 && !(input.reductionOption == ReductionOption.BROADCAST_STANDARD 
-					|| input.reductionOption == ReductionOption.BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.BROADCAST_DEG2
-					|| input.reductionOption == ReductionOption.BROADCAST_DEG2_SYM
-					|| input.reductionOption == ReductionOption.ADV_BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.OPT_BROADCAST
-					|| input.reductionOption == ReductionOption.OPT_BROADCAST_SYM
-					|| input.reductionOption == ReductionOption.SUPER_BROADCAST
-					|| input.reductionOption == ReductionOption.SUPER_BROADCAST_SYM)){
+			if (!isModelDegree2 && !(input.getReductionOption() == ReductionOption.BROADCAST_STANDARD 
+					|| input.getReductionOption() == ReductionOption.BROADCAST_SYM
+					|| input.getReductionOption() == ReductionOption.BROADCAST_DEG2
+					|| input.getReductionOption() == ReductionOption.BROADCAST_DEG2_SYM
+					|| input.getReductionOption() == ReductionOption.ADV_BROADCAST_SYM
+					|| input.getReductionOption() == ReductionOption.OPT_BROADCAST
+					|| input.getReductionOption() == ReductionOption.OPT_BROADCAST_SYM
+					|| input.getReductionOption() == ReductionOption.SUPER_BROADCAST
+					|| input.getReductionOption() == ReductionOption.SUPER_BROADCAST_SYM)){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"The net cannot be verified for liveness properties (EG,AF) because there is\n"+

@@ -52,4 +52,6 @@ public abstract class TCTLAbstractProperty {
 	
 	public abstract void accept(ITCTLVisitor visitor);
 	
+	public abstract boolean containsAtomicPropWithSpecificPlace(String placeName);
+	
 }

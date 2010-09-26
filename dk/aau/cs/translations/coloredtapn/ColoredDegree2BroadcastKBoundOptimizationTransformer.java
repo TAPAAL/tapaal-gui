@@ -1,4 +1,4 @@
-package dk.aau.cs.TAPN.colorTranslations;
+package dk.aau.cs.translations.coloredtapn;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

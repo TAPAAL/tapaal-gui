@@ -1,4 +1,4 @@
-package dk.aau.cs.TAPN;
+package dk.aau.cs.translations.tapn;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,7 +13,6 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TAPN.Pairing.ArcType;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PetriNetUtil;
@@ -27,6 +26,10 @@ import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.degree2converters.InhibDegree2Converter;
+import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.Pairing;
+import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.Pairing.ArcType;
 
 public class Degree2BroadcastTransformer implements
 ModelTransformer<TimedArcPetriNet, NTA>,

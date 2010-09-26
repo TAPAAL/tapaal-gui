@@ -1,6 +1,5 @@
-package dk.aau.cs.TAPN.colorTranslations;
+package dk.aau.cs.translations.coloredtapn;
 
-import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
@@ -17,6 +16,7 @@ import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
+import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 
 public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 	private static final String VALUE_VAR_NAME = "value";

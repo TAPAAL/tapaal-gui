@@ -18,6 +18,7 @@ import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TA.UppaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
@@ -176,8 +177,11 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 			return null;
 		}else{			
 			VerifytaOutputParser outputParser = new VerifytaOutputParser();
-
 			QueryResult[] results = outputParser.parseOutput(runner.standardOutput());
+
+			VerifytaTraceParser traceParser = new VerifytaTraceParser();
+			UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
+			
 			VerificationResult result = new VerificationResult(results);
 
 			// TODO: handle trace via VerifytaTraceParser

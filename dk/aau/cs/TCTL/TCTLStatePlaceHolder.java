@@ -42,5 +42,10 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		visitor.visit(this);
 		
 	}
+	
+	@Override
+	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+			return false;
+	}
 
 }

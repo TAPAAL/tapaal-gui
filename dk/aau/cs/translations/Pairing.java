@@ -1,4 +1,4 @@
-package dk.aau.cs.TAPN;
+package dk.aau.cs.translations;
 
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;

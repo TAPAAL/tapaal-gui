@@ -90,5 +90,10 @@ public class TCTLOrNode extends TCTLAbstractStateProperty {
 	public boolean containsPlaceHolder() {
 		return property1.containsPlaceHolder() || property2.containsPlaceHolder();
 	}
+	
+	@Override
+	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+			return property1.containsAtomicPropWithSpecificPlace(placeName) || property2.containsAtomicPropWithSpecificPlace(placeName);
+	}
 
 }

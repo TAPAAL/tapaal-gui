@@ -42,4 +42,9 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 	public void accept(ITCTLVisitor visitor) {
 		visitor.visit(this);
 	}
+	
+	@Override
+	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+			return false;
+	}
 }

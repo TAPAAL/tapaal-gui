@@ -8,11 +8,11 @@ import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TAPN.ModelTransformer;
-import dk.aau.cs.TAPN.TAPNToNTASymmetryTransformer;
-import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.translations.ModelTransformer;
 import dk.aau.cs.translations.PipeToNTATransformer;
+import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer;
+import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 

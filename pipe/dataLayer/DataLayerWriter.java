@@ -229,14 +229,14 @@ public class DataLayerWriter {
 		}
 
 		if (query != null){
-			queryElement.setAttribute("name", query.name);
-			queryElement.setAttribute("capacity", ""+query.capacity);
-			queryElement.setAttribute("query", query.query);
-			queryElement.setAttribute("traceOption", ""+query.traceOption);
-			queryElement.setAttribute("searchOption", ""+query.searchOption);
-			queryElement.setAttribute("hashTableSize", ""+query.hashTableSize);
-			queryElement.setAttribute("extrapolationOption", ""+query.extrapolationOption);
-			queryElement.setAttribute("reductionOption", ""+query.reductionOption);
+			queryElement.setAttribute("name", query.getName());
+			queryElement.setAttribute("capacity", ""+query.getCapacity());
+			queryElement.setAttribute("query", query.getQuery());
+			queryElement.setAttribute("traceOption", ""+query.getTraceOption());
+			queryElement.setAttribute("searchOption", ""+query.getSearchOption());
+			queryElement.setAttribute("hashTableSize", ""+query.getHashTableSize());
+			queryElement.setAttribute("extrapolationOption", ""+query.getExtrapolationOption());
+			queryElement.setAttribute("reductionOption", ""+query.getReductionOption());
 
 		}
 

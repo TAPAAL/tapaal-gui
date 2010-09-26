@@ -4,6 +4,7 @@ package dk.aau.cs.TCTL;
 // where <operator> = {<, <=, =, >=, >}
 public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	
+	// TODO: make this more object oriented, i.e. use something like TAPNPlace instead of String for places.
 	private String place;
 	private String op;
 	private int n;
@@ -75,6 +76,11 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	@Override
 	public boolean containsPlaceHolder() {
 		return false;
+	}
+
+	@Override
+	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
+		return place.equals(placeName);
 	}
 
 }

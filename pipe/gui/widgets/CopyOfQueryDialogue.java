@@ -138,47 +138,47 @@ public class CopyOfQueryDialogue extends JPanel{
 			String reduction = "";
 			boolean symmetry = false;
 
-			if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_STANDARD){
+			if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_STANDARD){
 				reduction = name_BROADCAST;
 				symmetry = false;
 				//enableTraceOptions();
-			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_SYM){
+			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_SYM){
 				reduction = name_BROADCAST;
 				symmetry = true;
 				//disableTraceOptions();
-			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2){
+			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_DEG2){
 				reduction = name_BROADCASTDEG2;
 				symmetry = false;
 				//disableTraceOptions();
-			}else if(queryToCreateFrom.reductionOption == ReductionOption.BROADCAST_DEG2_SYM){
+			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_DEG2_SYM){
 				reduction = name_BROADCASTDEG2;
 				symmetry = true;
 				//disableTraceOptions();
 			}
 			else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-				if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE){
+				if (queryToCreateFrom.getReductionOption() == ReductionOption.NAIVE){
 					reduction = name_NAIVE;
 					symmetry = false;
 					//enableTraceOptions();
-				} else if (queryToCreateFrom.reductionOption == ReductionOption.NAIVE_UPPAAL_SYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.NAIVE_UPPAAL_SYM){
 					reduction = name_NAIVE;
 					symmetry = true;
 					//disableTraceOptions();
-				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_UPPAAL_SYM){
 					reduction = name_ADVNOSYM;
 					symmetry = true;
 					//disableTraceOptions();
-				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_NOSYM){
 					reduction = name_ADVNOSYM;
 					symmetry = false;
 					//enableTraceOptions();
 				}
 			} else {
-				if (queryToCreateFrom.reductionOption == ReductionOption.ADV_UPPAAL_SYM){
+				if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_UPPAAL_SYM){
 					reduction = name_ADVNOSYM;
 					symmetry = true;
 					//disableTraceOptions();
-				} else if (queryToCreateFrom.reductionOption == ReductionOption.ADV_NOSYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_NOSYM){
 					reduction = name_ADVNOSYM;
 					symmetry = false;
 					//enableTraceOptions();
@@ -387,13 +387,13 @@ public class CopyOfQueryDialogue extends JPanel{
 		if (queryToCreateFrom==null){
 			bFS.setSelected(true);
 		}else{
-			if (queryToCreateFrom.searchOption == SearchOption.BFS){
+			if (queryToCreateFrom.getSearchOption() == SearchOption.BFS){
 				bFS.setSelected(true);
-			} else if (queryToCreateFrom.searchOption == SearchOption.DFS){
+			} else if (queryToCreateFrom.getSearchOption() == SearchOption.DFS){
 				dFS.setSelected(true);
-			} else if (queryToCreateFrom.searchOption == SearchOption.RDFS){
+			} else if (queryToCreateFrom.getSearchOption() == SearchOption.RDFS){
 				rDFS.setSelected(true);
-			} else if (queryToCreateFrom.searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
+			} else if (queryToCreateFrom.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST){
 				closestToTargetFirst.setSelected(true);
 			}	
 		}
@@ -429,11 +429,11 @@ public class CopyOfQueryDialogue extends JPanel{
 		if (queryToCreateFrom==null){
 			none.setSelected(true);
 		}else{
-			if (queryToCreateFrom.traceOption == TraceOption.SOME){
+			if (queryToCreateFrom.getTraceOption() == TraceOption.SOME){
 				some.setSelected(true);
-			} else if (queryToCreateFrom.traceOption == TraceOption.FASTEST){
+			} else if (queryToCreateFrom.getTraceOption() == TraceOption.FASTEST){
 				fastest.setSelected(true);
-			} else if (queryToCreateFrom.traceOption == TraceOption.NONE){
+			} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE){
 				none.setSelected(true);
 			}	
 		}
@@ -468,7 +468,7 @@ public class CopyOfQueryDialogue extends JPanel{
 		if (queryToCreateFrom == null){
 			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3,0,Integer.MAX_VALUE, 1));
 		}else{
-			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(queryToCreateFrom.capacity,0,Integer.MAX_VALUE, 1));
+			numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(queryToCreateFrom.getCapacity(),0,Integer.MAX_VALUE, 1));
 		}
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(50,30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(50,30));
@@ -513,7 +513,7 @@ public class CopyOfQueryDialogue extends JPanel{
 		if (queryToCreateFrom==null){
 			queryComment = new JTextField("Query Comment/Name Here",25);
 		}else{
-			queryComment = new JTextField(queryToCreateFrom.name,25);	
+			queryComment = new JTextField(queryToCreateFrom.getName(),25);	
 		}
 
 		namePanel.add(queryComment);

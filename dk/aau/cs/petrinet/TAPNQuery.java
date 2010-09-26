@@ -1,15 +1,24 @@
 package dk.aau.cs.petrinet;
 
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+
 public class TAPNQuery {
 	private String pathQuantifier; // E or A
 	private String nodeQuantifier; // [] or <>
 	
 	private String remQuery; // TODO: make this more object oriented (modify query dialog
+	private TCTLAbstractProperty property;
 	private int totalTokens = 0;
 	
 	public TAPNQuery(String inputQuery, int totalTokens){
 		String query = inputQuery.trim();
 		parseQuery(query);
+		this.totalTokens = totalTokens;
+	}
+	
+	public TAPNQuery(TCTLAbstractProperty inputProperty, int totalTokens)
+	{
+		this.property = inputProperty;
 		this.totalTokens = totalTokens;
 	}
 
