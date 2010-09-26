@@ -5,14 +5,14 @@ import java.io.PrintStream;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
-import dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
 import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
 import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
+import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
+import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 
 
 public class CmdTranslator {
@@ -142,7 +142,7 @@ public class CmdTranslator {
 			}
 		} else if(reductionOption.equalsIgnoreCase(BROADCAST_STANDARD)){
 			TAPNToNTABroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.TAPNToNTABroadcastTransformer(capacity, symmetry);
+				new dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer(capacity, symmetry);
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -156,7 +156,7 @@ public class CmdTranslator {
 			}
 		} else if(reductionOption.equalsIgnoreCase(DEG2_BROADCAST)){
 			Degree2BroadcastTransformer broadcastTransformer = 
-				new dk.aau.cs.TAPN.Degree2BroadcastTransformer(capacity, symmetry);
+				new dk.aau.cs.translations.tapn.Degree2BroadcastTransformer(capacity, symmetry);
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(tapn);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));

@@ -1,6 +1,5 @@
 package dk.aau.cs.TAPN.colorTranslations;
 
-import dk.aau.cs.TAPN.Degree2BroadcastTransformer;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -18,6 +17,7 @@ import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
 import dk.aau.cs.petrinet.degree2converters.ColoredInhibDegree2Converter;
+import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
 
 public class ColoredDegree2BroadcastTransformer extends
 Degree2BroadcastTransformer {

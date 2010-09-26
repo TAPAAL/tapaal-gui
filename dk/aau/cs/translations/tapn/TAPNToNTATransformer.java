@@ -1,4 +1,4 @@
-package dk.aau.cs.TAPN;
+package dk.aau.cs.translations.tapn;
 
 import java.util.Hashtable;
 import java.util.List;

@@ -1,4 +1,4 @@
-package dk.aau.cs.TAPN;
+package dk.aau.cs.translations.tapn;
 
 import java.util.ArrayList;
 import java.util.HashSet;

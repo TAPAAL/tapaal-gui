@@ -18,6 +18,7 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
+import dk.aau.cs.translations.tapn.TAPNToNTATransformer;
 
 public class TAPNToNTAStandardTransformer 
 extends TAPNToNTATransformer{

@@ -6,10 +6,10 @@ import pipe.dataLayer.DataLayer;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TAPN.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.TAPN.colorTranslations.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.verification.ModelChecker;
 
 public class KBoundOptimizer extends KBoundAnalyzer {

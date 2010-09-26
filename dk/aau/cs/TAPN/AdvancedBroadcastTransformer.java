@@ -8,6 +8,7 @@ import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.Pairing.ArcType;
+import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 
 public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 

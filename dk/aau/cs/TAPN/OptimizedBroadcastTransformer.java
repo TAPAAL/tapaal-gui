@@ -9,6 +9,7 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.Pairing.ArcType;
+import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 
 public class OptimizedBroadcastTransformer extends
 		TAPNToNTABroadcastTransformer {
