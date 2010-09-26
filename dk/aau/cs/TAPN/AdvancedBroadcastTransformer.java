@@ -5,8 +5,9 @@ import java.util.List;
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.TimedAutomaton;
-import dk.aau.cs.TAPN.Pairing.ArcType;
 import dk.aau.cs.petrinet.TAPNTransition;
+import dk.aau.cs.translations.Pairing;
+import dk.aau.cs.translations.Pairing.ArcType;
 
 public class AdvancedBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 

@@ -2,7 +2,6 @@ package dk.aau.cs.translations;
 
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TAPN.ModelTransformer;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;

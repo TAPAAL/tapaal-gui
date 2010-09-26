@@ -7,6 +7,7 @@ import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.translations.Pairing;
 
 public class SuperBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 

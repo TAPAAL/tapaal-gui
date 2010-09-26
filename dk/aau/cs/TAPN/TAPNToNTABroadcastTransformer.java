@@ -13,7 +13,6 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TAPN.Pairing.ArcType;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.PetriNetUtil;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -24,6 +23,10 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
+import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.Pairing;
+import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.Pairing.ArcType;
 
 public class TAPNToNTABroadcastTransformer implements
 ModelTransformer<TimedArcPetriNet, NTA>,

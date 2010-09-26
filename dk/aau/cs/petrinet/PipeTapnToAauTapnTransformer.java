@@ -12,7 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */ 
 import java.util.HashMap;
 
-import dk.aau.cs.TAPN.ModelTransformer;
+import dk.aau.cs.translations.ModelTransformer;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;

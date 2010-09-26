@@ -18,6 +18,8 @@ import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.degree2converters.InhibitorToPrioritiesDegree2Converter;
+import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.QueryTransformer;
 
 public abstract class TAPNToNTATransformer implements 
 ModelTransformer<TimedArcPetriNet, NTA>,
