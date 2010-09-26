@@ -40,7 +40,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import dk.aau.cs.TCTL.RenamePlaceTCTLVisitor;
+import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;

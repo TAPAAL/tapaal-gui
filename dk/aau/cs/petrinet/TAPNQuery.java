@@ -9,7 +9,11 @@ public class TAPNQuery {
 	private String remQuery; // TODO: make this more object oriented (modify query dialog
 	private TCTLAbstractProperty property;
 	private int totalTokens = 0;
-	
+
+	public TCTLAbstractProperty getProperty() {
+		return property;
+	}
+
 	public TAPNQuery(String inputQuery, int totalTokens){
 		String query = inputQuery.trim();
 		parseQuery(query);

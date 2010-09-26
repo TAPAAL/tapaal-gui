@@ -1,5 +1,8 @@
 package dk.aau.cs.TCTL;
 
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+
 public class TCTLAndNode extends TCTLAbstractStateProperty {
 
 	private TCTLAbstractStateProperty property1;
@@ -72,8 +75,6 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 	
 	@Override
 	public void accept(ITCTLVisitor visitor) {
-		property1.accept(visitor);
-		property2.accept(visitor);
 		visitor.visit(this);
 		
 	}

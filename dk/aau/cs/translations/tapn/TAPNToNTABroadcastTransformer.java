@@ -1,5 +1,6 @@
 package dk.aau.cs.translations.tapn;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -13,6 +14,7 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.PetriNetUtil;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -642,41 +644,8 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
-		String query = tapnQuery.toString();
-		Pattern pattern = Pattern.compile(QUERY_PATTERN);
-		Matcher matcher = pattern.matcher(query);
-
-		StringBuilder builder = new StringBuilder();
-		if(useSymmetry){
-			builder.append("(sum(i:");
-			builder.append(ID_TYPE);
-			builder.append(")");
-			builder.append(TOKEN_TEMPLATE_NAME);
-			builder.append("(i).$1) $2 $3");
-		}else{
-			builder.append("(");
-			for(int i = 0; i < tapnQuery.getTotalTokens()-1; i++){
-				if(i > 0){
-					builder.append(" + ");
-				}
-
-				builder.append(TOKEN_TEMPLATE_NAME);
-				builder.append(i);
-				builder.append(".$1");
-			}
-			builder.append(") $2 $3");
-		}
-		StringBuilder uppaalQuery = new StringBuilder();
-		uppaalQuery.append(matcher.replaceAll(builder.toString()));
-
-		if(tapnQuery.isEFQuery() || tapnQuery.isAFQuery()){
-			uppaalQuery.append(" and ");
-		}else{
-			uppaalQuery.append(" or !");
-		}
-		uppaalQuery.append("Control.");
-		uppaalQuery.append(PLOCK);
-
-		return new StandardUPPAALQuery(uppaalQuery.toString());
+		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry, tapnQuery.getTotalTokens());
+		
+		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}
 }

@@ -1,5 +1,8 @@
 package dk.aau.cs.TCTL;
 
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+
 public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 
 	public TCTLStatePlaceHolder() {

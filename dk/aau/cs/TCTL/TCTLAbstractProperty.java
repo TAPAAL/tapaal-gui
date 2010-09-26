@@ -1,6 +1,9 @@
 
 package dk.aau.cs.TCTL;
 
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+
 
 public abstract class TCTLAbstractProperty {
 	

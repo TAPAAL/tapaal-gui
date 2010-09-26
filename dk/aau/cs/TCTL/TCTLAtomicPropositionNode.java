@@ -1,5 +1,8 @@
 package dk.aau.cs.TCTL;
 
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+
 // atomic propositions are of the form: <place_name> <operator> n,
 // where <operator> = {<, <=, =, >=, >}
 public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {

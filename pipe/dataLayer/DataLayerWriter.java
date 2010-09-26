@@ -231,7 +231,7 @@ public class DataLayerWriter {
 		if (query != null){
 			queryElement.setAttribute("name", query.getName());
 			queryElement.setAttribute("capacity", ""+query.getCapacity());
-			queryElement.setAttribute("query", query.getQuery());
+			queryElement.setAttribute("query", query.getProperty().toString());
 			queryElement.setAttribute("traceOption", ""+query.getTraceOption());
 			queryElement.setAttribute("searchOption", ""+query.getSearchOption());
 			queryElement.setAttribute("hashTableSize", ""+query.getHashTableSize());

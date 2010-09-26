@@ -1,5 +1,8 @@
 package dk.aau.cs.TCTL;
 
+import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
+
+
 public class TCTLEGNode extends TCTLAbstractPathProperty {
 
 private TCTLAbstractStateProperty property;
@@ -64,9 +67,7 @@ private TCTLAbstractStateProperty property;
 	
 	@Override
 	public void accept(ITCTLVisitor visitor) {
-		property.accept(visitor);
 		visitor.visit(this);
-		
 	}
 
 
