@@ -1,11 +1,9 @@
-package dk.aau.cs.TA;
+package dk.aau.cs.TA.trace;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dk.aau.cs.TA.trace.FiringAction;
-import dk.aau.cs.TA.trace.SymbolicState;
 import dk.aau.cs.verification.Trace;
 
 public class UppaalTrace implements Iterable<FiringAction>, Trace {

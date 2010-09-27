@@ -3,10 +3,10 @@ package dk.aau.cs.verification.UPPAAL;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import dk.aau.cs.TA.UppaalTrace;
 import dk.aau.cs.TA.trace.SymbolicState;
 import dk.aau.cs.TA.trace.TimeDelayFiringAction;
 import dk.aau.cs.TA.trace.TransitionFiringAction;
+import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.verification.Trace;
 
 public class VerifytaTraceParser {
