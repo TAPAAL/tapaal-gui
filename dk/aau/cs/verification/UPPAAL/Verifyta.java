@@ -22,6 +22,7 @@ import dk.aau.cs.TA.UppaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.Trace;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -180,11 +181,9 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 			QueryResult[] results = outputParser.parseOutput(runner.standardOutput());
 
 			VerifytaTraceParser traceParser = new VerifytaTraceParser();
-			UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
+			Trace[] traces = traceParser.parseTrace(runner.errorOutput());
 			
-			VerificationResult result = new VerificationResult(results);
-
-			// TODO: handle trace via VerifytaTraceParser
+			VerificationResult result = new VerificationResult(results, traces);
 
 			return result;
 		}

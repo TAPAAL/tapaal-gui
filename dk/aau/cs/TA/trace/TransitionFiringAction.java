@@ -1,4 +1,7 @@
-package dk.aau.cs.TA;
+package dk.aau.cs.TA.trace;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
@@ -11,22 +14,36 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
-public class TimeDelayFiringAction implements FiringAction{
+public class TransitionFiringAction implements FiringAction {
 
-	float timedelay;
+	private String channel;
 	
-	public TimeDelayFiringAction(float delay) {
-		this.timedelay = delay;
+	public TransitionFiringAction(String channel){
+		this.channel = channel;
 	}
-
-	public float getDealy() {
-		return timedelay;
+	
+	public String channel(){
+		return channel;
 	}
 	
 	@Override
 	public String toString() {
-		
-		return "Delay " + timedelay;
+		return "Transition: channel = " + channel;
 	}
 	
+	public static TransitionFiringAction parse(String element){
+		String[] split = element.split("\n");
+		
+		String channel = parseChannel(split[1]);
+		
+		return new TransitionFiringAction(channel);
+	}
+
+	private static String parseChannel(String string) {
+		Pattern pattern = Pattern.compile("(\\w*)(?:\\?|!)");
+		Matcher matcher = pattern.matcher(string);
+		matcher.find();
+		
+		return matcher.group(1);
+	}
 }

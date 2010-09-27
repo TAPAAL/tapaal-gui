@@ -1,4 +1,4 @@
-package dk.aau.cs.TA;
+package dk.aau.cs.TA.trace;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
 

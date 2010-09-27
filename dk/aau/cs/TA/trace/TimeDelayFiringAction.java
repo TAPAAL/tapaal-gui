@@ -1,8 +1,6 @@
-package dk.aau.cs.TA;
+package dk.aau.cs.TA.trace;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import dk.aau.cs.debug.Logger;
+
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
 
@@ -14,52 +12,28 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
-public class DiscreetFiringAction implements FiringAction {
+public class TimeDelayFiringAction implements FiringAction{
 
-	String firedtransition;
-	HashMap<String, ArrayList<Float>> consumedTokens = new HashMap<String, ArrayList<Float>>();
+	double timedelay;
 	
-	public DiscreetFiringAction() {
-		
-	}
-	
-	public void setTrasition(String transition){
-		firedtransition=transition;
-		
-	}
-	
-	public DiscreetFiringAction(String transition) {
-		firedtransition= transition;
+	public TimeDelayFiringAction(double delay) {
+		this.timedelay = delay;
 	}
 
-	
-	
-	public void addConsumedToken(String place, Float token){
-		
-		//XXX  - This will break if two tokens from the same place is consumed
-		ArrayList<Float> tmp = new ArrayList<Float>();
-		tmp.add(token);
-		Logger.log("added place "+ place);
-		consumedTokens.put(place, tmp);
-		
+	public double getDelay() {
+		return timedelay;
 	}
-	
-	public HashMap<String, ArrayList<Float>> getConsumedTokensList(){
-		return consumedTokens;
-	}
-
-
-
-	public String getTransition() {
-		
-		return firedtransition;
-	}
-	
 	
 	@Override
 	public String toString() {
-	
-		return "Transition " + firedtransition +" is fired ("+  consumedTokens.keySet()  + " Size:"+  consumedTokens.size() + ") Tokens age " + consumedTokens;
+		
+		return "Delay: " + timedelay;
+	}
+
+	public static TimeDelayFiringAction parse(String element) {
+		String delayAsString = element.replace("Delay:", "").trim();
+		double delay = Double.parseDouble(delayAsString);
+		return new TimeDelayFiringAction(delay);
 	}
 	
 }

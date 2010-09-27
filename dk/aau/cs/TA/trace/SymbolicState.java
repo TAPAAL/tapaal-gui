@@ -10,6 +10,22 @@ public class SymbolicState {
 		this.ages = ages;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer("State: ");
+		for(int i = 0; i < locations.length; i++){
+			buffer.append("Automata(");
+			buffer.append(i);
+			buffer.append("): ");
+			buffer.append(locations[i]);
+			buffer.append(" x = ");
+			buffer.append(ages[i]);
+			buffer.append(". ");
+		}
+		
+		return buffer.toString();
+	}
+	
 	public static SymbolicState parse(String state){
 		String[] stateLines = state.split("\n");
 		
