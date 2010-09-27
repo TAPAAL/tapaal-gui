@@ -1,5 +1,6 @@
 package dk.aau.cs.verification;
 
-public interface Trace {
+
+public interface Trace extends Iterable<FiringAction> {
 
 }

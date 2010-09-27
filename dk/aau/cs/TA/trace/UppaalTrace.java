@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dk.aau.cs.verification.FiringAction;
 import dk.aau.cs.verification.Trace;
 
-public class UppaalTrace implements Iterable<FiringAction>, Trace {
+public class UppaalTrace implements Trace {
 	private List<FiringAction> firingActions;
 	private List<SymbolicState> symbolicStates;
 	

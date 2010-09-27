@@ -1,5 +1,7 @@
 package dk.aau.cs.TA.trace;
 
+import dk.aau.cs.verification.FiringAction;
+
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
