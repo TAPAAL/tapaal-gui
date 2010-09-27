@@ -39,7 +39,6 @@ public class VerifytaTraceParser {
 			return null;
 		}
 		
-		System.out.println(trace.toString());
 		return new Trace[] { trace };
 	}
 }
