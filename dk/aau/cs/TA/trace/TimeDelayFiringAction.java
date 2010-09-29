@@ -1,5 +1,10 @@
 package dk.aau.cs.TA.trace;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
+import pipe.gui.Pipe;
+
 import dk.aau.cs.verification.FiringAction;
 
 
@@ -16,26 +21,31 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 public class TimeDelayFiringAction implements FiringAction{
 
-	double timedelay;
+	private SymbolicState state;
+	private BigDecimal timedelay;
 	
-	public TimeDelayFiringAction(double delay) {
+	public TimeDelayFiringAction(SymbolicState state, BigDecimal delay) {
+		this.state = state;
 		this.timedelay = delay;
 	}
 
-	public double getDelay() {
+	public BigDecimal getDelay() {
 		return timedelay;
 	}
 	
+	public SymbolicState state(){
+		return state;
+	}
+		
 	@Override
 	public String toString() {
 		
 		return "Delay: " + timedelay;
 	}
 
-	public static TimeDelayFiringAction parse(String element) {
+	public static TimeDelayFiringAction parse(SymbolicState previousState, String element) {
 		String delayAsString = element.replace("Delay:", "").trim();
 		double delay = Double.parseDouble(delayAsString);
-		return new TimeDelayFiringAction(delay);
-	}
-	
+		return new TimeDelayFiringAction(previousState, new BigDecimal(delay, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
+	}	
 }

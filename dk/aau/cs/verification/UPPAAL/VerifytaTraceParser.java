@@ -14,6 +14,7 @@ public class VerifytaTraceParser {
 		UppaalTrace trace = new UppaalTrace();
 		try {			
 			String line;
+			SymbolicState previousState = null;
 			while(reader.ready()){
 				StringBuffer buffer = new StringBuffer();
 				while((line = reader.readLine()) != null && !line.isEmpty()){
@@ -27,11 +28,12 @@ public class VerifytaTraceParser {
 				if(element.contains("State:\n")){ // TODO: Two states in a row, indicates start of new trace (for next query)
 					SymbolicState state = SymbolicState.parse(element);
 					trace.addSymbolicState(state);
+					previousState = state;
 				}else if(element.contains("Delay:")){
-					TimeDelayFiringAction delay = TimeDelayFiringAction.parse(element);
+					TimeDelayFiringAction delay = TimeDelayFiringAction.parse(previousState, element);
 					trace.addFiringAction(delay);
 				}else if(element.contains("Transitions:")){
-					TransitionFiringAction transition = TransitionFiringAction.parse(element);
+					TransitionFiringAction transition = TransitionFiringAction.parse(previousState, element);
 					trace.addFiringAction(transition);
 				}
 			}

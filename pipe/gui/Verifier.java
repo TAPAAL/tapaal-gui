@@ -142,7 +142,6 @@ public class Verifier {
 		dialog.setupListeners(thread);
 		thread.execute(xmlfile, qfile, verifytaOptions);
 		dialog.setVisible(true);
-
 //		// Show simulator is selected and reduction is the right method
 //		if ((input.traceOption != TAPNQuery.TraceOption.NONE && (input.reductionOption == TAPNQuery.ReductionOption.NAIVE || input.reductionOption == ReductionOption.ADV_NOSYM) )&&
 //				//and Only view the trace, if a trace is generated based on property

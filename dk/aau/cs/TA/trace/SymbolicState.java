@@ -1,59 +1,69 @@
 package dk.aau.cs.TA.trace;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import pipe.gui.Pipe;
+
 
 public class SymbolicState {
-	private String[] locations;
-	private double[] ages;
+	private HashMap<String, String> automataLocations = new HashMap<String, String>();
+	private HashMap<String, HashMap<String, BigDecimal>> automataClockValues = new HashMap<String, HashMap<String,BigDecimal>>();
 	
-	public SymbolicState(String[] locations, double[] ages){
-		this.locations = locations;
-		this.ages = ages;
+	public SymbolicState(HashMap<String,String> locations, HashMap<String, HashMap<String, BigDecimal>> clocks){
+		this.automataLocations = locations;
+		this.automataClockValues = clocks;
 	}
-	
-	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer("State: ");
-		for(int i = 0; i < locations.length; i++){
-			buffer.append("Automata(");
-			buffer.append(i);
-			buffer.append("): ");
-			buffer.append(locations[i]);
-			buffer.append(" x = ");
-			buffer.append(ages[i]);
-			buffer.append(". ");
-		}
 		
-		return buffer.toString();
-	}
-	
 	public static SymbolicState parse(String state){
 		String[] stateLines = state.split("\n");
 		
-		String[] locations = parseLocations(stateLines[1]);
-		double[] ages = parseAges(stateLines[2]);
-		return new SymbolicState(locations, ages);
+		HashMap<String,String> locations = parseLocations(stateLines[1]);
+		HashMap<String, HashMap<String, BigDecimal>> clocks = parseAges(stateLines[2]);
+		return new SymbolicState(locations, clocks);
 	}
 
-	private static double[] parseAges(String string) {
+	private static HashMap<String, HashMap<String, BigDecimal>> parseAges(String string) {
 		String[] split = string.split(" ");
-		double[] ages = new double[split.length - 1];
+		HashMap<String, HashMap<String, BigDecimal>> clocks = new HashMap<String, HashMap<String,BigDecimal>>(split.length-1);
 		
+		Pattern pattern = Pattern.compile("(\\w+)\\.(\\w+)=(\\d+)");
 		for(int i = 0; i < split.length-1; i++){
-			String ageAsString = split[i].replaceFirst(".*\\..*=", "");
-			ages[i] = Double.parseDouble(ageAsString.trim());
+			Matcher matcher = pattern.matcher(split[i]);
+			matcher.find();
+			
+			String automata = matcher.group(1);
+			String clock = matcher.group(2);
+			double value = Double.parseDouble(matcher.group(3));
+			
+			if(!clocks.containsKey(automata)){
+				clocks.put(automata, new HashMap<String, BigDecimal>());
+			}
+			
+			clocks.get(automata).put(clock, new BigDecimal(value, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
 		}
 		
-		return ages;
+		return clocks;
 	}
 
-	private static String[] parseLocations(String string) {
+	private static HashMap<String, String> parseLocations(String string) {
 		String[] split = string.split(" ");
-		String[] locations = new String[split.length-2];
+		HashMap<String,String> locations = new HashMap<String, String>(split.length-2);
+
+		Pattern pattern = Pattern.compile("(\\w+)\\.(\\w+)");
 		for(int i = 1; i < split.length-1; i++){
-			String location = split[i].replace("(", "").replace(")", "").trim();
-			locations[i-1] = location.replaceFirst(".*\\.", "");
+			Matcher matcher = pattern.matcher(split[i]);
+			matcher.find();
+			locations.put(matcher.group(1), matcher.group(2));
 		}
 		
 		return locations;
+	}
+
+	public HashMap<String, BigDecimal> getClockValues(String automata) {
+		return automataClockValues.get(automata);
 	}
 }

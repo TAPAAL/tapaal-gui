@@ -14,4 +14,8 @@ public class TimeDelayFiringAction implements FiringAction{
 		return timedelay;
 	}
 	
+	@Override
+	public String toString() {
+		return "Delay: " + timedelay;
+	}
 }

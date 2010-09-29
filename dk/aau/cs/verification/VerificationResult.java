@@ -10,6 +10,7 @@ public class VerificationResult {
 		
 	public VerificationResult(QueryResult[] queryResults, Trace[] traces){
 		this.queryResults = queryResults;
+		this.traces = traces;
 	}
 
 	public QueryResult getQueryResult(int index) {
