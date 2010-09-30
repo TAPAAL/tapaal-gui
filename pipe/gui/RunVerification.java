@@ -31,7 +31,16 @@ public class RunVerification extends RunVerificationBase {
 			if(result.getTrace(0) != null){
 				TraceTransformer traceTransformer = new TraceTransformer(CreateGui.getModel(), new StandardNamingScheme());
 				TAPNTrace trace = traceTransformer.interpretTrace((UppaalTrace)result.getTrace(0));
+				showAnimationMode();
+				CreateGui.getAnimator().SetTrace(trace);
 			}
 		}
+	}
+
+	private void showAnimationMode() {
+		CreateGui.getApp().setAnimationMode(true);
+		CreateGui.getApp().setMode(Pipe.START);
+        CreateGui.getView().getSelectionObject().clearSelection();
+		CreateGui.getAnimator().resethistory();
 	}
 }

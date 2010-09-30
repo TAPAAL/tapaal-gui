@@ -57,6 +57,7 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.simulation.Marking;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;

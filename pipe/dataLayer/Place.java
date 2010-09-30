@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
+import pipe.dataLayer.simulation.Marking;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
@@ -475,4 +476,9 @@ extends PlaceTransitionObject {
 
 	}
 
+
+	public void showMarking(Marking marking) {
+		currentMarking = marking.getTokensInPlace(this).size();
+		repaint();
+	}
 }

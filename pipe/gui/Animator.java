@@ -25,6 +25,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DiscreetFiringAction;
 import pipe.dataLayer.FiringAction;
 import pipe.dataLayer.Place;
+import pipe.dataLayer.TAPNTrace;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlace;
@@ -71,7 +72,7 @@ public class Animator {
 	private ArrayList<FiringAction> actionHistory;
 	private int currentAction;
 	private ArrayList<HashMap<TimedPlace, ArrayList<BigDecimal>>> markingHistory;
-	
+		
 	public Firingmode firingmode = new RandomFiringmode();
 
 	public Animator(){
@@ -92,6 +93,16 @@ public class Animator {
 		currentAction = -1;
 		markingHistory = new ArrayList<HashMap<TimedPlace,ArrayList<BigDecimal>>>();
 		
+	}
+	
+	public void SetTrace(TAPNTrace trace){
+		for(FiringAction action : trace){
+			if(action instanceof TimeDelayFiringAction)
+				manipulatehistory(((TimeDelayFiringAction)action).getDealy());
+			else{
+				manipulatehistory((DiscreetFiringAction)action);
+			}
+		}
 	}
 
 

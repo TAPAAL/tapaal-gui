@@ -20,6 +20,9 @@ import java.util.Iterator;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
+
+import pipe.dataLayer.simulation.Marking;
+import pipe.dataLayer.simulation.Token;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
@@ -562,5 +565,14 @@ public class TimedPlace extends Place {
 		}
 
 		return value;
+	}
+	
+	@Override
+	public void showMarking(Marking marking) {
+		myTokens.clear();
+		for(Token token : marking.getTokensInPlace(this)){
+			myTokens.add(token.age());
+		}
+		super.showMarking(marking);
 	}
 }

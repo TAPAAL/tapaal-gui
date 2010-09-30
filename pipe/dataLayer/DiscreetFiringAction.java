@@ -10,12 +10,11 @@ import pipe.dataLayer.simulation.Token;
 public class DiscreetFiringAction implements FiringAction {
 
 	private Transition firedtransition;
-	private HashMap<Place, ArrayList<BigDecimal>> consumedTokensHashMap = new HashMap<Place, ArrayList<BigDecimal>>();
 	private List<Token> consumedTokens;
 	
 	
 	public DiscreetFiringAction(Transition transition) {
-		this(transition, null);
+		this(transition, new ArrayList<Token>());
 	}
 	
 	public DiscreetFiringAction(Transition transition, List<Token> consumedTokens) {
@@ -24,16 +23,20 @@ public class DiscreetFiringAction implements FiringAction {
 	}
 	
 	public void addConsumedToken(Place p, BigDecimal token){
-		
-		//XXX  - This will break if two tokens from the same place is consumed
-		ArrayList<BigDecimal> tmp = new ArrayList<BigDecimal>();
-		tmp.add(token);
-		consumedTokensHashMap.put(p, tmp);
-		
+		consumedTokens.add(new Token((TimedPlace)p, token));
 	}
 	
 	public HashMap<Place, ArrayList<BigDecimal>> getConsumedTokensList(){
-		return consumedTokensHashMap;
+		HashMap<Place, ArrayList<BigDecimal>> map = new HashMap<Place, ArrayList<BigDecimal>>();
+		for(Token token : consumedTokens){
+			if(!map.containsKey(token.place())){
+				map.put(token.place(), new ArrayList<BigDecimal>());
+			}
+			
+			map.get(token.place()).add(token.age());
+		}
+		
+		return map;
 	}
 
 
