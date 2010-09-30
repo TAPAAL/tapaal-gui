@@ -3,6 +3,7 @@ package dk.aau.cs.TAPN.uppaaltransform;
 import java.io.PrintStream;
 
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.TAPNQuery;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
 
@@ -16,13 +17,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 public interface UppaalTransformer {
 
-	public void autoTransform(TAPN model, PrintStream uppaalXML,PrintStream queryFile, String query, int numberOfTokens);
+	public void autoTransform(TAPN model, PrintStream uppaalXML,PrintStream queryFile, TAPNQuery query, int numberOfTokens);
 	
 	public TAPN transform(TAPN model);
 	
 	public void transformToUppaal(TAPN model, PrintStream uppaalXML, int numberOfTokens);
 	
-	public void transformQueriesToUppaal(TAPN model, int numberOfEkstraTokens, String inputQuery, PrintStream stream) throws Exception;
+	public void transformQueriesToUppaal(TAPN model, int numberOfEkstraTokens, TAPNQuery inputQuery, PrintStream stream) throws Exception;
 	
 	
 }

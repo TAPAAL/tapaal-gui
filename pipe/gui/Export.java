@@ -793,12 +793,14 @@ public class Export {
 
 		if (inputQuery == null) {return;}
 
+		// TODO: Refactor so translation to dk.aau.cs.petrinet.TAPNQuery happens exactly once
+		
 		// Select the model based on selected export option.
 		if (input.getReductionOption() == TAPNQuery.ReductionOption.NAIVE_UPPAAL_SYM){
 
 			NaiveUppaalSym t = new NaiveUppaalSym();
 			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -808,7 +810,7 @@ public class Export {
 
 			AdvancedUppaalSym t = new AdvancedUppaalSym();
 			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -817,7 +819,7 @@ public class Export {
 			Logger.log("Using ADV_NOSYMQ");
 			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
 			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), inputQuery, capacity);
+				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
