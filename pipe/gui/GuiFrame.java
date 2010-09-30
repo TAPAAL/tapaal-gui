@@ -1417,7 +1417,7 @@ EOC */
 				if(pn instanceof TimedPlace)
 				{
 					for (TAPNQuery q : queries) {
-						if(q.query.matches(".*" + pn.getName() + "[^\\_a-zA-Z0-9].*")){
+						if(q.getProperty().containsAtomicPropWithSpecificPlace(pn.getName())){
 							queriesAffected = true;
 							queriesToDelete.add(q);
 						}

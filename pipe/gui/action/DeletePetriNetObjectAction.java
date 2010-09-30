@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
@@ -46,7 +48,7 @@ extends AbstractAction {
 			if(p instanceof TimedPlace)
 			{
 				for (TAPNQuery q : queries) {
-					if(q.query.matches(".*" + p.getName() + "[^\\_a-zA-Z0-9].*")){
+					if(q.getProperty().containsAtomicPropWithSpecificPlace(p.getName())){ 	// matches(".*" + p.getName() + "[^\\_a-zA-Z0-9].*")){
 						queriesAffected = true;
 						queriesToDelete.add(q);
 					}

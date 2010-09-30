@@ -3,6 +3,8 @@ package dk.aau.cs.petrinet.degree2converters;
 import java.util.HashSet;
 import java.util.Hashtable;
 
+import pipe.gui.widgets.NewTAPNPanel;
+
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.PlaceTransitionObject;

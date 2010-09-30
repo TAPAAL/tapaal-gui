@@ -40,6 +40,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
@@ -820,8 +822,9 @@ extends javax.swing.JPanel {
 
 				ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
 
+				RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(name, newName);
 				for (TAPNQuery q : queries) {
-					q.query = q.query.replaceAll(name + "[^\\_a-zA-Z0-9]", newName); 
+					q.getProperty().accept(renameVisitor);
 				}
 				//CreateGui.createLeftPane();
 			}
