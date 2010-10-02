@@ -8,20 +8,32 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 	private TCTLAbstractStateProperty property1;
 	private TCTLAbstractStateProperty property2;
 	
-	
+	public void setProperty1(TCTLAbstractStateProperty property1) {
+		this.property1 = property1;
+	}
+
 	public TCTLAbstractStateProperty getProperty1() {
 		return property1;
+	}
+
+	public void setProperty2(TCTLAbstractStateProperty property2) {
+		this.property2 = property2;
 	}
 
 	public TCTLAbstractStateProperty getProperty2() {
 		return property2;
 	}
-	
+
 	public TCTLAndNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
 		this.property1 = property1;
 		this.property2 = property2;
 	}
 	
+	public TCTLAndNode() {
+		this.property1 = new TCTLStatePlaceHolder();
+		this.property2 = new TCTLStatePlaceHolder();
+	}
+
 	@Override
 	public boolean isSimpleProperty() {
 		return false;
@@ -68,7 +80,7 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
+		if (this.equals(object1) && object2 instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty)object2;
 		} else {
 			property1 = property1.replace(object1, object2);

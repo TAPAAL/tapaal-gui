@@ -5,17 +5,30 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
 public class TCTLEGNode extends TCTLAbstractPathProperty {
 
-private TCTLAbstractStateProperty property;
-	
+	private TCTLAbstractStateProperty property;
+
+
+	public void setProperty(TCTLAbstractStateProperty property) {
+		this.property = property;
+	}
+
+
+
 	public TCTLAbstractStateProperty getProperty() {
 		return property;
 	}
-	
-	
-	
+
+
+
 	public TCTLEGNode(TCTLAbstractStateProperty property) {
 		this.property = property;
 	}
+
+
+	public TCTLEGNode() {
+		this.property = new TCTLStatePlaceHolder();
+	}
+
 
 
 	@Override
@@ -29,12 +42,12 @@ private TCTLAbstractStateProperty property;
 		start = start + 3;
 		int end = start + property.toString().length();
 		StringPosition position = new StringPosition(start, end, property);
-		
+
 		StringPosition[] children = { position };
 		return children;
 	}
 
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof TCTLEFNode) {
@@ -57,14 +70,14 @@ private TCTLAbstractStateProperty property;
 
 	@Override
 	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
+		if (this.equals(object1) && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
 			property = property.replace(object1, object2);
 			return this;
 		}
 	}
-	
+
 	@Override
 	public void accept(ITCTLVisitor visitor) {
 		visitor.visit(this);
@@ -76,9 +89,9 @@ private TCTLAbstractStateProperty property;
 	public boolean containsPlaceHolder() {
 		return property.containsPlaceHolder();
 	}
-	
+
 	@Override
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-			return property.containsAtomicPropWithSpecificPlace(placeName);
+		return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
 }

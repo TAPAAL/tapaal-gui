@@ -8,6 +8,12 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 
 	private TCTLAbstractStateProperty property;
 	
+	public void setProperty(TCTLAbstractStateProperty property) {
+		this.property = property;
+	}
+
+
+
 	public TCTLAbstractStateProperty getProperty() {
 		return property;
 	}
@@ -17,6 +23,12 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	public TCTLEFNode(TCTLAbstractStateProperty property) {
 		this.property = property;
 	}
+
+
+	public TCTLEFNode() {
+		this.property = new TCTLStatePlaceHolder();
+	}
+
 
 
 	@Override
@@ -58,7 +70,7 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
+		if (this.equals(object1) && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
 			property = property.replace(object1, object2);

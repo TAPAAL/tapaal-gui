@@ -31,7 +31,7 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 	
 	@Override
 	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {		
-		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
+		if (this.equals(object1) && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
 			return this;

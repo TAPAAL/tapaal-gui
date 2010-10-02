@@ -49,7 +49,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
+		if (this.equals(object1) && object2 instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty)object2;
 		} else {
 			return this;
