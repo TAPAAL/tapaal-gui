@@ -2,15 +2,14 @@ package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 
-public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
-	protected static final String ID_TYPE = "pid_t";
-	protected static final String LOCK_TEMPLATE = "Lock";
-	protected static final String PLOCK = "P_lock";
-	protected static final String CONTROL = "Control";
-	protected static final String FINISH = "finish";
-	protected static final String LOCK_BOOL = "lock";
+public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
+	private static final String ID_TYPE = "pid_t";
+	private static final String LOCK_TEMPLATE = "Lock";
+	private static final String PLOCK = "P_lock";
+	private static final String CONTROL = "Control";
+	private static final String FINISH = "finish";
 	
-	protected static final String TOKEN_TEMPLATE_NAME = "P";
+	private static final String TOKEN_TEMPLATE_NAME = "P";
 
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 		append("(sum(i:");
@@ -31,7 +30,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 		}else{
 			append(" || !");
 		}
-		append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1 && %5$s == 0)", LOCK_TEMPLATE, PLOCK, CONTROL, FINISH, LOCK_BOOL));
+		append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1)", LOCK_TEMPLATE, PLOCK, CONTROL, FINISH));
 	}
 
 }

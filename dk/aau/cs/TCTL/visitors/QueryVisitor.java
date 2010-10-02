@@ -13,14 +13,17 @@ import dk.aau.cs.petrinet.TAPNQuery;
 
 public abstract class QueryVisitor implements ITCTLVisitor {
 	protected enum QueryType { EF, EG, AF, AG }
-	protected StringBuffer uppaalQuery;
+	private StringBuffer uppaalQuery;
 
 	public QueryVisitor() {
-		super();
 	}
 	
 	protected void append(String string){
 		uppaalQuery.append(string);
+	}
+	
+	protected void append(int number){
+		uppaalQuery.append(number);
 	}
 
 	public String getUppaalQueryFor(TAPNQuery tapnQuery) {

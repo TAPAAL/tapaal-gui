@@ -3,6 +3,7 @@ package dk.aau.cs.TAPN.uppaaltransform;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import dk.aau.cs.TCTL.visitors.StandardSymmetryTranslationQueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Location;
@@ -366,85 +367,9 @@ public class NaiveUppaalSym implements UppaalTransformer {
 	}
 	
 	
-	private String transformQueriesToUppaal(int numberOfTemplates, TAPNQuery querie) throws Exception{
-//
-//		//String toReturn=null;
-//		//TODO - Sanity validation, are the uses names in the qyerie in the model?
-//
-//		String expandpart=null;
-//
-//		querie.trim(); // Remove ending and beginning spaces
-//
-//		String quantifier = querie.substring(0, 3);
-//
-//		//Get the id's that needs to be changed
-//		Pattern p = Pattern.compile("[ ][a-zA-Z](([a-zA-Z])*([0-9])*(_)*)*[ ]");
-//		//Pattern p = Pattern.compile("[ ][[a-zA-Z](([a-zA-Z])*([0-9])*(_)*)*]*[ ]");
-//		//Pattern p = Pattern.compile("[ ][[[a-zA-Z](([a-zA-Z])*([0-9])*(_)*)*]]*[ ]");
-//		Matcher m = p.matcher(querie);
-//
-//		//Make a copy of the querie that we makes the changes in
-//		expandpart = querie.toString();
-//
-//		// TODO put () around the org part, else using or wil fail when appending lock part.
-//
-//		ArrayList<String> ident = new ArrayList<String>();
-//		
-//		
-//		while (m.find()){
-//			boolean found = false;
-//			String i = m.group().trim();
-//			
-//			for (String tmp : ident){
-//				
-//				if (tmp.equals(i)){
-//					found=true;
-//					break;		
-//				}
-//				//Not in the set add it	
-//			}
-//			if (!found){
-//				ident.add(i);
-//			}
-//
-//		}
-//		
-//		for (String a : ident){
-//			
-////			Generate a new replacement
-//			String tmp = a.trim();
-//
-//			new StringBuffer();
-// 
-//			expandpart=expandpart.replaceAll(" "+tmp+" ", "(sum(i:pid_t) P(i)."+ a +")");		
-//			
-//		}
-//		
-//		
-//		//Translation
-//		if (quantifier.substring(1, 3).equals("<>")){
-//
-//			expandpart=expandpart.replace("<>", "<>(");
-//			expandpart=expandpart.concat(") and "); // The stuff before the lock sum part
-//
-//
-//		} else { // This is the "[]" case
-//			expandpart=expandpart.replace("[]", "[](");
-//			expandpart=expandpart.concat(") or !"); // The stuff before the lock sum part
-//
-//		}
-//		//Lock part 
-//
-//		StringBuffer toReturn = new StringBuffer(expandpart);
-//
-//		toReturn.append("( ");
-//		toReturn.append("Lock.P_lock == 1 "); //Lock token is not locked
-//		toReturn.append(" && Control.finish == 1");
-//		toReturn.append(")");
-//		
-//
-//		return toReturn.toString();
-		return "";
+	private String transformQueriesToUppaal(int numberOfTemplates, TAPNQuery query) throws Exception{
+		StandardSymmetryTranslationQueryVisitor visitor = new StandardSymmetryTranslationQueryVisitor();
+		return visitor.getUppaalQueryFor(query);
 	}
 
 

@@ -21,23 +21,23 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 
-		uppaalQuery.append("(");
-		uppaalQuery.append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));
-		uppaalQuery.append(OperatorConversion(atomicPropositionNode.getOp()));
-		uppaalQuery.append(" ");
-		uppaalQuery.append(atomicPropositionNode.getN());
-		uppaalQuery.append(")");
+		append("(");
+		append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));
+		append(OperatorConversion(atomicPropositionNode.getOp()));
+		append(" ");
+		append(atomicPropositionNode.getN());
+		append(")");
 	}
 
 	protected void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
-			uppaalQuery.append(" && ");
+			append(" && ");
 		}else{
-			uppaalQuery.append(" || !");
+			append(" || !");
 		}
-		uppaalQuery.append("(");
-		uppaalQuery.append(createAtomicPropositionSum(PLOCK));
-		uppaalQuery.append(" == 1)");
+		append("(");
+		append(createAtomicPropositionSum(PLOCK));
+		append(" == 1)");
 	}
 	
 	private String createAtomicPropositionSum(String place) {

@@ -20,43 +20,43 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 
 		if(useSymmetry){
-			uppaalQuery.append("(sum(i:");
-			uppaalQuery.append(ID_TYPE);
-			uppaalQuery.append(")");
-			uppaalQuery.append(TOKEN_TEMPLATE_NAME);
-			uppaalQuery.append("(i).");
-			uppaalQuery.append(atomicPropositionNode.getPlace());
-			uppaalQuery.append(") ");
-			uppaalQuery.append(OperatorConversion(atomicPropositionNode.getOp()));
-			uppaalQuery.append(" ");
-			uppaalQuery.append(atomicPropositionNode.getN());
+			append("(sum(i:");
+			append(ID_TYPE);
+			append(")");
+			append(TOKEN_TEMPLATE_NAME);
+			append("(i).");
+			append(atomicPropositionNode.getPlace());
+			append(") ");
+			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(" ");
+			append(atomicPropositionNode.getN());
 		}
 		else {
-			uppaalQuery.append("(");
+			append("(");
 			for(int i = 0; i < totalTokens-1; i++){
 				if(i > 0){
-					uppaalQuery.append(" + ");
+					append(" + ");
 				}
 
-				uppaalQuery.append(TOKEN_TEMPLATE_NAME);
-				uppaalQuery.append(i);
-				uppaalQuery.append(".");
-				uppaalQuery.append(atomicPropositionNode.getPlace());
+				append(TOKEN_TEMPLATE_NAME);
+				append(i);
+				append(".");
+				append(atomicPropositionNode.getPlace());
 			}
-			uppaalQuery.append(") ");
-			uppaalQuery.append(OperatorConversion(atomicPropositionNode.getOp()));
-			uppaalQuery.append(" ");
-			uppaalQuery.append(atomicPropositionNode.getN());
+			append(") ");
+			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(" ");
+			append(atomicPropositionNode.getN());
 		}
 	}
 
 	protected void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
-			uppaalQuery.append(" && ");
+			append(" && ");
 		}else{
-			uppaalQuery.append(" || !");
+			append(" || !");
 		}
-		uppaalQuery.append("Control.");
-		uppaalQuery.append(PLOCK);
+		append("Control.");
+		append(PLOCK);
 	}
 }
