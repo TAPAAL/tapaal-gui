@@ -37,7 +37,7 @@ public class TraceTransformer {
 		while(iterator.hasNext()){
 			List<TransitionFiringAction> firingSequence = new ArrayList<TransitionFiringAction>();
 			List<String> firingSequenceNames = new ArrayList<String>();
-			
+
 			while(iterator.hasNext() && 
 					(action = iterator.next()) instanceof TransitionFiringAction){
 				firingSequence.add((TransitionFiringAction)action);
@@ -55,6 +55,7 @@ public class TraceTransformer {
 				pipe.dataLayer.FiringAction firingAction = new pipe.dataLayer.DiscreetFiringAction(transition, tokens);
 				result.addFiringAction(firingAction);
 			}
+
 
 			if(action != null && action instanceof TimeDelayFiringAction){
 				BigDecimal delay = ((TimeDelayFiringAction)action).getDelay();

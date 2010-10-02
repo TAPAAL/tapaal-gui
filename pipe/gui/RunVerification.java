@@ -27,7 +27,7 @@ public class RunVerification extends RunVerificationBase {
 					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime/1000.0),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 			
-			if(result.getTrace(0) != null){
+			if(result.getTrace(0) != null){ // TODO: This is too simplistic.. It works because the same naming scheme works for all translations (excluding colors)
 				TraceTransformer traceTransformer = new TraceTransformer(CreateGui.getModel(), new StandardNamingScheme());
 				TAPNTrace trace = traceTransformer.interpretTrace((UppaalTrace)result.getTrace(0));
 				showAnimationMode();
