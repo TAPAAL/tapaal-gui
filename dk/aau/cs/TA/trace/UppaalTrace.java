@@ -43,6 +43,10 @@ public class UppaalTrace implements Trace {
 		return buffer.toString();
 	}
 
+	public int length() {
+		return firingActions.size();
+	}
+
 
 //	public static ArrayList<String> parseUppaalTrace(BufferedReader traceReader) throws Exception{
 //		ArrayList<String> trace = new ArrayList<String>();

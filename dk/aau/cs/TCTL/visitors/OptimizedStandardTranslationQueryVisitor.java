@@ -1,19 +1,8 @@
 package dk.aau.cs.TCTL.visitors;
 
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLOrNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.petrinet.TAPNQuery;
 
-public class OptimizedStandardTranslationQueryVisitor implements ITCTLVisitor {
-	protected enum QueryType { EF, EG, AF, AG }
-
+public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "pid_t";
 	protected static final String LOCK_TEMPLATE = "Lock";
 	protected static final String PLOCK = "P_lock";
@@ -21,55 +10,7 @@ public class OptimizedStandardTranslationQueryVisitor implements ITCTLVisitor {
 	protected static final String FINISH = "finish";
 	protected static final String LOCK_BOOL = "lock";
 	
-	protected static final String TOKEN_TEMPLATE_NAME = "Token";
-
-	private StringBuffer uppaalQuery;
-
-	public String getUppaalQueryFor(TAPNQuery tapnQuery) {
-		this.uppaalQuery = new StringBuffer();
-		tapnQuery.getProperty().accept(this);
-		return uppaalQuery.toString();
-	}
-
-	public void visit(TCTLAFNode afNode) {
-		uppaalQuery.append("A<> ");
-		afNode.getProperty().accept(this);
-		addEnding(QueryType.AF);
-	}
-
-	public void visit(TCTLAGNode agNode) {
-		uppaalQuery.append("A[] ");
-		agNode.getProperty().accept(this);
-		addEnding(QueryType.AG);
-	}
-
-	public void visit(TCTLEFNode efNode) {
-		uppaalQuery.append("E<> ");
-		efNode.getProperty().accept(this);
-		addEnding(QueryType.EF);
-	}
-
-	public void visit(TCTLEGNode egNode) {
-		uppaalQuery.append("E[] ");
-		egNode.getProperty().accept(this);
-		addEnding(QueryType.EG);
-	}
-
-	public void visit(TCTLAndNode andNode) {
-		uppaalQuery.append("(");
-		andNode.getProperty1().accept(this);
-		uppaalQuery.append(" && ");
-		andNode.getProperty2().accept(this);
-		uppaalQuery.append(")");
-	}
-
-	public void visit(TCTLOrNode orNode) {
-		uppaalQuery.append("(");
-		orNode.getProperty1().accept(this);
-		uppaalQuery.append(" || ");
-		orNode.getProperty2().accept(this);
-		uppaalQuery.append(")");
-	}
+	protected static final String TOKEN_TEMPLATE_NAME = "P";
 
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 		uppaalQuery.append("(sum(i:");
@@ -84,27 +25,13 @@ public class OptimizedStandardTranslationQueryVisitor implements ITCTLVisitor {
 		uppaalQuery.append(atomicPropositionNode.getN());
 	}
 
-	public void visit(TCTLStatePlaceHolder statePlaceHolderNode) {
-	}
-
-	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode) {
-
-	}
-
-	private void addEnding(QueryType type) {
+	protected void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
 			uppaalQuery.append(" && ");
 		}else{
 			uppaalQuery.append(" || !");
 		}
 		uppaalQuery.append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1 && %5$s == 0)", LOCK_TEMPLATE, PLOCK, CONTROL, FINISH, LOCK_BOOL));
-	}
-
-	private String OperatorConversion(String op){
-		if(op.equals("="))
-			return "==";
-
-		return op;
 	}
 
 }

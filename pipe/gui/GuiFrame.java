@@ -1751,12 +1751,6 @@ EOC */
 				Export.exportGuiView(appView, Export.TIKZ, appModel);
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
-			} else if (this == exportToUppaal) {
-				Export.exportUppaalGuiView(appView, appModel);
-			} else if (this == exportToUppaalAdvanced) {
-				Export.exportUppaalAdvancedGuiView(appView, appModel);
-			} else if (this == exportToUppaalSymetric) {
-				Export.exportUppaalSymetricGuiView(appView, appModel);
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			}

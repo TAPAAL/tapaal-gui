@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import dk.aau.cs.TCTL.visitors.OptimizedStandardTranslationQueryVisitor;
+import dk.aau.cs.TCTL.visitors.QueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Location;
@@ -565,7 +566,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 	}
 	
 	private String transformQueriesToUppaal(int numberOfTemplates, TAPNQuery inputQuery) throws Exception{
-		OptimizedStandardTranslationQueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
+		QueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
 		return visitor.getUppaalQueryFor(inputQuery);
 	}
 

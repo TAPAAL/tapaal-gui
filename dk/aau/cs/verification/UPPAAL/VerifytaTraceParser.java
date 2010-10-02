@@ -41,6 +41,6 @@ public class VerifytaTraceParser {
 			return null;
 		}
 		
-		return new Trace[] { trace };
+		return trace.length() > 0 ? new Trace[] { trace } : null;
 	}
 }

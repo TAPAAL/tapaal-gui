@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.TCTL.visitors.OptimizedStandardTranslationQueryVisitor;
+import dk.aau.cs.TCTL.visitors.QueryVisitor;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Location;
@@ -699,7 +700,7 @@ private StringBuffer createTemplateControl(ArrayList<Place> tokens) {
 	}
 	
 	private String transformQueriesToUppaal(int numberOfTemplates, TAPNQuery query) throws Exception{
-		OptimizedStandardTranslationQueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
+		QueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
 		return visitor.getUppaalQueryFor(query);
 //
 //		//String toReturn=null;
