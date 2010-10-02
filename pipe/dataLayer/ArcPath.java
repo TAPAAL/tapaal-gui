@@ -17,10 +17,10 @@ import java.util.List;
 
 import javax.swing.JLayeredPane;
 
-import pipe.gui.handler.ArcPathPointHandler;
-import pipe.gui.Pipe;
 import pipe.gui.GuiView;
+import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.ArcPathPointHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -58,7 +58,7 @@ public class ArcPath
    
 
    public ArcPathPoint getArcPathPoint(int i) {
-      return (ArcPathPoint)(pathPoints.get(i));
+      return (pathPoints.get(i));
    }
    
    
@@ -66,7 +66,7 @@ public class ArcPath
       setControlPoints();
       
       path = new GeneralPath();
-      currentPoint = (ArcPathPoint)pathPoints.get(0);
+      currentPoint = pathPoints.get(0);
       path.moveTo(currentPoint.getPoint().x, currentPoint.getPoint().y);
       
       currentPoint.setPointType(ArcPathPoint.STRAIGHT);
@@ -74,7 +74,7 @@ public class ArcPath
       double length = 0;
       for (int c = 1; c <= getEndIndex(); c++) {
          ArcPathPoint previousPoint = currentPoint;
-         currentPoint = (ArcPathPoint)pathPoints.get(c);
+         currentPoint = pathPoints.get(c);
          
          if (currentPoint.getPointType() == ArcPathPoint.STRAIGHT) {
             path.lineTo(currentPoint.getPoint().x, currentPoint.getPoint().y);
@@ -102,19 +102,19 @@ public class ArcPath
 
       length /= 2;
       int c = 0;
-      currentPoint = (ArcPathPoint)pathPoints.get(c++);
+      currentPoint = pathPoints.get(c++);
       
       if (getEndIndex() < 2) {
-         midPoint.x = (float)((((ArcPathPoint)pathPoints.get(0)).getPoint().x 
-                       + ((ArcPathPoint)pathPoints.get(1)).getPoint().x)*0.5);
-         midPoint.y = (float)((((ArcPathPoint)pathPoints.get(0)).getPoint().y 
-                       + ((ArcPathPoint)pathPoints.get(1)).getPoint().y)*0.5);
+         midPoint.x = (float)(((pathPoints.get(0)).getPoint().x 
+                       + (pathPoints.get(1)).getPoint().x)*0.5);
+         midPoint.y = (float)(((pathPoints.get(0)).getPoint().y 
+                       + (pathPoints.get(1)).getPoint().y)*0.5);
       } else {
          double acc = 0;
          double percent = 0;
          for (c = 1; c <= getEndIndex(); c++) {
             ArcPathPoint previousPoint = currentPoint;
-            currentPoint = (ArcPathPoint)pathPoints.get(c);
+            currentPoint = pathPoints.get(c);
 
             double inc = getMod(currentPoint.getPoint(), previousPoint.getPoint());
             if ((acc + inc > length)) {
@@ -124,7 +124,7 @@ public class ArcPath
             acc += inc;
          }
 
-         ArcPathPoint previousPoint = (ArcPathPoint)pathPoints.get(c-1);
+         ArcPathPoint previousPoint = pathPoints.get(c-1);
          midPoint.x = previousPoint.getPoint().x + 
                  (float)((currentPoint.getPoint().x - 
                           previousPoint.getPoint().x) * percent);
@@ -182,7 +182,7 @@ public class ArcPath
       if (pathPoints.size() < 1) {
          return;
       }
-      ArcPathPoint myCurrentPoint = (ArcPathPoint)pathPoints.get(0);
+      ArcPathPoint myCurrentPoint = pathPoints.get(0);
       myCurrentPoint.setPointType(ArcPathPoint.STRAIGHT);
       
       Cubic[] X,Y;
@@ -192,13 +192,13 @@ public class ArcPath
       for (int c = 1; c <= endIndex;) {
          int curveStartIndex = 0;
          int curveEndIndex = 0;
-         myCurrentPoint = (ArcPathPoint)pathPoints.get(c);
+         myCurrentPoint = pathPoints.get(c);
          
          if (myCurrentPoint.getPointType() == true) {
             curveStartIndex = c-1;
             
             for(; c <= endIndex && myCurrentPoint.getPointType() == true; c++) {
-               myCurrentPoint = (ArcPathPoint)pathPoints.get(c);
+               myCurrentPoint = pathPoints.get(c);
                curveEndIndex = c;
             }
             /* calculate a cubic for each section of the curve */
@@ -210,8 +210,8 @@ public class ArcPath
             Y = new Cubic[lengthOfCurve + 2];
             
             for (k1= 0; k1 <= (curveEndIndex - curveStartIndex); k1++) {
-               x[k1] = (int)((ArcPathPoint)pathPoints.get(curveStartIndex + k1)).getPoint().x;
-               y[k1] = (int)((ArcPathPoint)pathPoints.get(curveStartIndex + k1)).getPoint().y;
+               x[k1] = (int)(pathPoints.get(curveStartIndex + k1)).getPoint().x;
+               y[k1] = (int)(pathPoints.get(curveStartIndex + k1)).getPoint().y;
             }
             x[k1] = x[k1-1];
             y[k1] = y[k1-1];
@@ -220,7 +220,7 @@ public class ArcPath
             Y = calcNaturalCubic(k1,y);
             
             for (int k2 = 1; k2 <= lengthOfCurve; k2++) {
-               myCurrentPoint = (ArcPathPoint)pathPoints.get(k2 + curveStartIndex);
+               myCurrentPoint = pathPoints.get(k2 + curveStartIndex);
                myCurrentPoint.setControl1(X[k2-1].getX1(),Y[k2-1].getX1());
                myCurrentPoint.setControl2(X[k2-1].getX2(),Y[k2-1].getX2());               
             }            
@@ -235,14 +235,14 @@ public class ArcPath
     * intersection between straight and curved sections */
    private void setStraightControlPoints() {
       
-      ArcPathPoint myCurrentPoint = (ArcPathPoint)pathPoints.get(0);
+      ArcPathPoint myCurrentPoint = pathPoints.get(0);
       ArcPathPoint myPreviousButOnePoint = null;
       ArcPathPoint myNextPoint = null;
       ArcPathPoint myPreviousPoint = null;
       
       for (int c = 1; c <= getEndIndex(); c++) {
-         myPreviousPoint = (ArcPathPoint)pathPoints.get(c-1);
-         myCurrentPoint = (ArcPathPoint)pathPoints.get(c);
+         myPreviousPoint = pathPoints.get(c-1);
+         myCurrentPoint = pathPoints.get(c);
          
          if (myCurrentPoint.getPointType() == false) {
             myCurrentPoint.setControl1(getControlPoint(myPreviousPoint.getPoint(),
@@ -255,7 +255,7 @@ public class ArcPath
                      myPreviousPoint.getPoint()));
          } else {
             if (c > 1 && myPreviousPoint.getPointType() == false) {
-               myPreviousButOnePoint = (ArcPathPoint)pathPoints.get(c-2);
+               myPreviousButOnePoint = pathPoints.get(c-2);
                myCurrentPoint.setControl1(getControlPoint(
                         myPreviousButOnePoint.getPoint(),
                         myPreviousPoint.getPoint(),
@@ -263,7 +263,7 @@ public class ArcPath
                         myCurrentPoint.getPoint()));
             }
             if (c < getEndIndex()) {
-               myNextPoint = (ArcPathPoint)pathPoints.get(c+1);
+               myNextPoint = pathPoints.get(c+1);
                if (myNextPoint.getPointType() == false ) {
                   myCurrentPoint.setControl2(getControlPoint(myNextPoint.getPoint(),
                            myCurrentPoint.getPoint(),
@@ -284,35 +284,35 @@ public class ArcPath
       if  (!(getEndIndex() > 0)) {
          return;
       } else if (source != null && source instanceof Transition &&
-               ((ArcPathPoint)pathPoints.get(1)).getPointType() == true) {
-         ArcPathPoint myPoint = (ArcPathPoint)pathPoints.get(1);
-         ArcPathPoint myLastPoint = (ArcPathPoint)pathPoints.get(0);
+               (pathPoints.get(1)).getPointType() == true) {
+         ArcPathPoint myPoint = pathPoints.get(1);
+         ArcPathPoint myLastPoint = pathPoints.get(0);
          float distance = (float)getMod(myPoint.getPoint(), myLastPoint.getPoint())
                           / Pipe.ARC_CONTROL_POINT_CONSTANT;
          myPoint.setControl1(
                  (float)(myLastPoint.getPoint().x + Math.cos(anAngle)*distance),
                  (float)(myLastPoint.getPoint().y + Math.sin(anAngle)*distance));
          
-         myPoint = (ArcPathPoint)pathPoints.get(getEndIndex());
+         myPoint = pathPoints.get(getEndIndex());
          myPoint.setControl2(getControlPoint(myPoint.getPoint(),
                                              myPoint.getControl1(),
                                              myPoint.getPoint(),
                                              myPoint.getControl1()));
       } else if (target != null && source instanceof Place&&
-               ((ArcPathPoint)pathPoints.get(getEndIndex())).getPointType() == true) {
-         ArcPathPoint myPoint = (ArcPathPoint)pathPoints.get(getEndIndex());
-         ArcPathPoint myLastPoint = (ArcPathPoint)pathPoints.get(getEndIndex()-1);
+               (pathPoints.get(getEndIndex())).getPointType() == true) {
+         ArcPathPoint myPoint = pathPoints.get(getEndIndex());
+         ArcPathPoint myLastPoint = pathPoints.get(getEndIndex()-1);
          float distance = (float)getMod(myPoint.getPoint(), myLastPoint.getPoint())
                           / Pipe.ARC_CONTROL_POINT_CONSTANT;
          myPoint.setControl2(
                  (float)(myPoint.getPoint().x + Math.cos(anAngle)*distance),
                  (float)(myPoint.getPoint().y + Math.sin(anAngle)*distance));
          
-         myPoint = (ArcPathPoint)pathPoints.get(1);
+         myPoint = pathPoints.get(1);
          myPoint.setControl1(getControlPoint(
-                 ((ArcPathPoint)pathPoints.get(0)).getPoint(),
+                 (pathPoints.get(0)).getPoint(),
                  myPoint.getControl2(),
-                 ((ArcPathPoint)pathPoints.get(0)).getPoint(),
+                 (pathPoints.get(0)).getPoint(),
                  myPoint.getControl2()));
       }
    }
@@ -353,34 +353,34 @@ public class ArcPath
    
    public void setPointLocation(int index, double x, double y) {
       if (index < pathPoints.size() && index >= 0) {
-         ((ArcPathPoint)pathPoints.get(index)).setPointLocation((float)x,
+         (pathPoints.get(index)).setPointLocation((float)x,
                                                                 (float)y);
       }
    }
    
    
    public void setPointType(int index, boolean type) {
-      ((ArcPathPoint)pathPoints.get(index)).setPointType(type);
+      (pathPoints.get(index)).setPointType(type);
    }
    
    
    public void setFinalPointType(boolean type) {
-      ((ArcPathPoint)pathPoints.get(getEndIndex())).setPointType(type);
+      (pathPoints.get(getEndIndex())).setPointType(type);
    }
    
    
    public void togglePointType(int index) {
-      ((ArcPathPoint)pathPoints.get(index)).togglePointType();
+      (pathPoints.get(index)).togglePointType();
    }
    
    
    public boolean getPointType(int index) {
-      return ((ArcPathPoint)pathPoints.get(index)).getPointType();
+      return (pathPoints.get(index)).getPointType();
    }
    
    
    public void selectPoint(int index) {
-      ((ArcPathPoint)pathPoints.get(index)).select();
+      (pathPoints.get(index)).select();
    }
    
       
@@ -390,12 +390,12 @@ public class ArcPath
    
    
    public Point2D.Float getPoint(int index) {
-      return ((ArcPathPoint)pathPoints.get(index)).getPoint();
+      return (pathPoints.get(index)).getPoint();
    }
    
    
    public ArcPathPoint getPathPoint(int index) {
-      return ((ArcPathPoint)pathPoints.get(index));
+      return (pathPoints.get(index));
    }
    
    
@@ -407,7 +407,7 @@ public class ArcPath
    public void showPoints() {
       if (!pointLock) {
          for (int i = 0; i < pathPoints.size(); i++) {
-            ((ArcPathPoint)pathPoints.get(i)).setVisible(true);
+            (pathPoints.get(i)).setVisible(true);
          }
       }
    }
@@ -416,7 +416,7 @@ public class ArcPath
    public void hidePoints() {
       if (!pointLock) {
          for (int i = 0; i < pathPoints.size(); i++) {
-            currentPoint = ((ArcPathPoint)pathPoints.get(i));
+            currentPoint = (pathPoints.get(i));
             if (!currentPoint.isSelected()) {
                currentPoint.setVisible(false);
             }
@@ -428,7 +428,7 @@ public class ArcPath
    //
    public void forceHidePoints() {
       for (int i = 0; i < pathPoints.size(); i++) {
-         ((ArcPathPoint)pathPoints.get(i)).hidePoint();
+         (pathPoints.get(i)).hidePoint();
       }
    }   
    
@@ -445,9 +445,9 @@ public class ArcPath
    public double getEndAngle() {
       if (getEndIndex() > 0) {
          if (getArc().getTarget() instanceof Transition) {
-            return ((ArcPathPoint)pathPoints.get(getEndIndex())).getAngle(((ArcPathPoint)(pathPoints.get(getEndIndex()))).getControl2());
+            return (pathPoints.get(getEndIndex())).getAngle(((pathPoints.get(getEndIndex()))).getControl2());
          } else{
-            return ((ArcPathPoint)pathPoints.get(getEndIndex())).getAngle(((ArcPathPoint)(pathPoints.get(getEndIndex()))).getControl1());
+            return (pathPoints.get(getEndIndex())).getAngle(((pathPoints.get(getEndIndex()))).getControl1());
          }
       }
       return 0;
@@ -456,7 +456,7 @@ public class ArcPath
    
    public double getStartAngle() {
       if (getEndIndex()>0) {
-         return ((ArcPathPoint)pathPoints.get(0)).getAngle(((ArcPathPoint)(pathPoints.get(1))).getControl2());
+         return (pathPoints.get(0)).getAngle(((pathPoints.get(1))).getControl2());
       }
       return 0;
    }
@@ -600,11 +600,11 @@ public class ArcPath
       ArcPathPoint pathPoint;
       ArcPathPointHandler pointHandler;
       
-      ((ArcPathPoint)pathPoints.get(0)).setDraggable(false);
-      ((ArcPathPoint)pathPoints.get(pathPoints.size()-1)).setDraggable(false);
+      (pathPoints.get(0)).setDraggable(false);
+      (pathPoints.get(pathPoints.size()-1)).setDraggable(false);
       
       for (int i = 0; i < pathPoints.size(); i++) {
-         pathPoint = (ArcPathPoint)pathPoints.get(i);
+         pathPoint = pathPoints.get(i);
          pathPoint.setVisible(false);
          
          // Check whether the point has already been added to the gui
@@ -639,11 +639,11 @@ public class ArcPath
       ArcPathPoint pathPoint;
       ArcPathPointHandler pointHandler;
       
-      ((ArcPathPoint)pathPoints.get(0)).setDraggable(false);
-      ((ArcPathPoint)pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
+      (pathPoints.get(0)).setDraggable(false);
+      (pathPoints.get(pathPoints.size() - 1)).setDraggable(false);
       
       for (int i = 0; i < pathPoints.size(); i++) {
-         pathPoint = (ArcPathPoint)pathPoints.get(i);
+         pathPoint = pathPoints.get(i);
          pathPoint.setVisible(false);
          
          // Check whether the point has already been added to the gui
@@ -675,7 +675,7 @@ public class ArcPath
 
    public void delete() {  // Michael: Tells the arc points to remove themselves
       while (!pathPoints.isEmpty()) {
-         ((ArcPathPoint)pathPoints.get(0)).kill(); // force delete of ALL points
+         (pathPoints.get(0)).kill(); // force delete of ALL points
       }
    }
    
@@ -687,12 +687,12 @@ public class ArcPath
       int zoom = this.getArc().getZoom();
       int x, y;
       for (int c = 0; c < length; c++) {         
-         x = ((ArcPathPoint)pathPoints.get(c)).getX();
+         x = (pathPoints.get(c)).getX();
          details[c][0] = String.valueOf(Zoomer.getUnzoomedValue(x, zoom));
-         y = ((ArcPathPoint)pathPoints.get(c)).getY();        
+         y = (pathPoints.get(c)).getY();        
          details[c][1] = String.valueOf(Zoomer.getUnzoomedValue(y, zoom));
          details[c][2] = 
-                 String.valueOf(((ArcPathPoint)pathPoints.get(c)).getPointType());
+                 String.valueOf((pathPoints.get(c)).getPointType());
       }
       return details;
    }
@@ -743,8 +743,8 @@ public class ArcPath
       // wantedpoint is now the index of the first point in the pair of arc 
       // points marking the segment to be split. So we have all we need to 
       // split the arc.
-      ArcPathPoint first = (ArcPathPoint)pathPoints.get(wantedpoint);
-      ArcPathPoint second = (ArcPathPoint)pathPoints.get(wantedpoint + 1);
+      ArcPathPoint first = pathPoints.get(wantedpoint);
+      ArcPathPoint second = pathPoints.get(wantedpoint + 1);
       ArcPathPoint newpoint = 
               new ArcPathPoint(second.getMidPoint(first), first.getPointType(), this);
       insertPoint(wantedpoint+1, newpoint);
@@ -776,8 +776,8 @@ public class ArcPath
       
       // Calculate the midpoints and distances to them
       for (int index = 0; index < (pathPoints.size() - 1); index++) {
-         ArcPathPoint first = (ArcPathPoint)pathPoints.get(index);
-         ArcPathPoint second = (ArcPathPoint)pathPoints.get(index+1);
+         ArcPathPoint first = pathPoints.get(index);
+         ArcPathPoint second = pathPoints.get(index+1);
          Point2D.Float midpoint = first.getMidPoint(second);
          distances[index] = midpoint.distance(mouseposition);
       }
@@ -796,7 +796,7 @@ public class ArcPath
 
    
    public boolean isPointSelected(int j) {
-      return ((ArcPathPoint)pathPoints.get(j)).isSelected();
+      return (pathPoints.get(j)).isSelected();
    }
    
 }

@@ -10,7 +10,6 @@ import pipe.dataLayer.TAPNTrace;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.simulation.Token;
-
 import dk.aau.cs.TA.trace.Participant;
 import dk.aau.cs.TA.trace.TimeDelayFiringAction;
 import dk.aau.cs.TA.trace.TransitionFiringAction;

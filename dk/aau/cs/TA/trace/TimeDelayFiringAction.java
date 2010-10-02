@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import pipe.gui.Pipe;
-
 import dk.aau.cs.verification.FiringAction;
 
 

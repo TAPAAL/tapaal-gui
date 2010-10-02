@@ -6,7 +6,6 @@ package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
-
 import pipe.gui.GuiView;
 
 /**

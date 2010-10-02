@@ -24,6 +24,7 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 		super(net, fullpath, option);
 	}
 
+	@Override
 	protected String getPlaceInvariantString(Place place) {
 		StringBuffer invariant = new StringBuffer("");
 		ColoredTimedPlace ctp = (ColoredTimedPlace)place;
@@ -53,6 +54,7 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 		return invariant.toString();
 	}
 
+	@Override
 	protected String getTokenListStringFor(Place place) {
 		List<ColoredToken> tokens =((ColoredTimedPlace)place).getColoredTokens();
 		String tokensInPlace = "";
@@ -77,6 +79,7 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 		return tokensInPlace;
 	}	
 	
+	@Override
 	protected String getArcLabels(Arc arc){
 		StringBuffer result = new StringBuffer("");
 		

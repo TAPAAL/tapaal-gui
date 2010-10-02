@@ -1,6 +1,5 @@
 package dk.aau.cs.petrinet.colors;
 
-import dk.aau.cs.petrinet.colors.IntervalBound;
 
 public class ColoredTimeInvariant {
 	public boolean strictLessThan;

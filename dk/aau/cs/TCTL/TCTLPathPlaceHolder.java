@@ -10,6 +10,7 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 	public TCTLPathPlaceHolder() {
 	}
 	
+	@Override
 	public TCTLAbstractPathProperty copy() {
 		return new TCTLPathPlaceHolder();
 	}
@@ -18,14 +19,17 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 		return true;
 	}
 
+	@Override
 	public String toString() {
 		return "<*>";
 	}
 	
+	@Override
 	public boolean containsPlaceHolder() {
 		return true;
 	}
 	
+	@Override
 	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {		
 		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
@@ -34,6 +38,7 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 		}
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLPathPlaceHolder) {
 			return true;

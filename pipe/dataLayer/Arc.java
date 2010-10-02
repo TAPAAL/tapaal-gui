@@ -4,12 +4,13 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
 import javax.swing.JLayeredPane;
+
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import pipe.gui.GuiView;
-import pipe.gui.undo.UndoableEdit;
+import pipe.gui.Pipe;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcWeightEdit;
+import pipe.gui.undo.UndoableEdit;
 
 
 /**

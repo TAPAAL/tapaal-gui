@@ -10,13 +10,13 @@ import java.awt.geom.AffineTransform;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.undo.ArcWeightEdit;
 import pipe.gui.undo.ClearInverseArcEdit;
+import pipe.gui.undo.JoinInverseArcEdit;
+import pipe.gui.undo.SetInverseArcEdit;
+import pipe.gui.undo.SplitInverseArcEdit;
 import pipe.gui.undo.TagArcEdit;
 import pipe.gui.undo.UndoableEdit;
-import pipe.gui.undo.SetInverseArcEdit;
-import pipe.gui.undo.ArcWeightEdit;
-import pipe.gui.undo.JoinInverseArcEdit;
-import pipe.gui.undo.SplitInverseArcEdit;
 
 
 /**

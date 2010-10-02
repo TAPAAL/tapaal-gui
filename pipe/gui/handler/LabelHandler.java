@@ -3,10 +3,11 @@ package pipe.gui.handler;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.NameLabel;
+import pipe.dataLayer.PlaceTransitionObject;
 
 
 public class LabelHandler 

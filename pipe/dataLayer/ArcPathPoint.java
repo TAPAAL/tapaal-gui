@@ -17,9 +17,9 @@ import java.awt.geom.RectangularShape;
 import pipe.gui.GuiView;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
+import pipe.gui.undo.UndoableEdit;
 
 
 public class ArcPathPoint 

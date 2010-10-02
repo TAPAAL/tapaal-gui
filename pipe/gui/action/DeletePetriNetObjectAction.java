@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;

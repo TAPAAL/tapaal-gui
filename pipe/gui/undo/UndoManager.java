@@ -209,7 +209,7 @@ public class UndoManager {
             Iterator<Arc> arcsTo = 
                     ((PlaceTransitionObject)pnObject).getConnectToIterator();
             while (arcsTo.hasNext()) {
-               Arc anArc = (Arc)arcsTo.next();
+               Arc anArc = arcsTo.next();
                if (!anArc.isDeleted()){  
                   addEdit(new DeletePetriNetObjectEdit(anArc, view, model));
                }
@@ -218,7 +218,7 @@ public class UndoManager {
             Iterator<Arc> arcsFrom = 
                     ((PlaceTransitionObject)pnObject).getConnectFromIterator();
             while (arcsFrom.hasNext()) {
-               Arc anArc = (Arc)arcsFrom.next();
+               Arc anArc = arcsFrom.next();
                if (!anArc.isDeleted()){
                   addEdit(new DeletePetriNetObjectEdit(anArc, view, model));
                }

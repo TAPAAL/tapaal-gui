@@ -7,7 +7,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.math.BigDecimal;
 
-import pipe.dataLayer.TimedArc;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 

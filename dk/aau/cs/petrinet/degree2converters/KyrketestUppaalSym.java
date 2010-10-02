@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.PlaceTransitionObject;
@@ -17,7 +18,6 @@ import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.Transition;
-import dk.aau.cs.petrinet.Arc;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
 

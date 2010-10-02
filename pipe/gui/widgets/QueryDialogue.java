@@ -14,8 +14,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
@@ -33,10 +31,9 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import dk.aau.cs.TCTL.*;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -47,6 +44,19 @@ import pipe.gui.CreateGui;
 import pipe.gui.Export;
 import pipe.gui.Pipe;
 import pipe.gui.Verifier;
+import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndNode;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLOrNode;
+import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 
 public class QueryDialogue extends JPanel{
 
@@ -260,9 +270,10 @@ public class QueryDialogue extends JPanel{
 		
 		
 		queryField.setText(newProperty.toString());
-		queryField.setHorizontalAlignment(JTextField.CENTER);
+		queryField.setHorizontalAlignment(SwingConstants.CENTER);
 		queryField.setEditable(false);
 		queryField.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				updateSelection();
 			}

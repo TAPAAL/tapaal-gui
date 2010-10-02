@@ -5,11 +5,10 @@ package pipe.gui.undo;
 
 import java.util.ArrayList;
 
-import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
-
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
+import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 
 
 /**

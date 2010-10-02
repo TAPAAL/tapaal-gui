@@ -17,6 +17,7 @@ public class BufferDrain extends Thread{
 		string = new StringBuffer();
 	}
 
+	@Override
 	public void run() {
 
 		try {

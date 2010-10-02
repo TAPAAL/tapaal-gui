@@ -25,8 +25,8 @@ import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 import pipe.gui.GuiView;
 import pipe.gui.Pipe;
-import pipe.gui.undo.UndoManager;
 import pipe.gui.undo.AddPetriNetObjectEdit;
+import pipe.gui.undo.UndoManager;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -204,7 +204,7 @@ public void mouseReleased(MouseEvent e) {
                   // search for pre-existent arcs from createInhibitorArc's 
                   // source to createInhibitorArc's target
                   while(arcsFrom.hasNext()) {
-                     Arc someArc = ((Arc)arcsFrom.next());
+                     Arc someArc = (arcsFrom.next());
                      if (someArc == createTAPNInhibitorArc) {
                         break;
                      } else if (someArc.getTarget() == currentObject &&
@@ -286,7 +286,7 @@ public void mouseReleased(MouseEvent e) {
                   // search for pre-existent arcs from createInhibitorArc's 
                   // source to createInhibitorArc's target
                   while(arcsFrom.hasNext()) {
-                     Arc someArc = ((Arc)arcsFrom.next());
+                     Arc someArc = (arcsFrom.next());
                      if (someArc == createInhibitorArc) {
                         break;
                      } else if (someArc.getTarget() == currentObject &&
@@ -345,7 +345,7 @@ public void mouseReleased(MouseEvent e) {
         			 // search for pre-existent arcs from createArc's source to 
         			 // createArc's target                  
         			 while(arcsFrom.hasNext()) {
-        				 Arc someArc = ((Arc)arcsFrom.next());
+        				 Arc someArc = (arcsFrom.next());
         				 if (someArc == createArc) {
         					 break;
         				 } else if (someArc.getSource() == createArc.getSource() &&
@@ -387,7 +387,7 @@ public void mouseReleased(MouseEvent e) {
         				 Iterator<Arc> arcsFromTarget =
         					 createArc.getTarget().getConnectFromIterator();
         				 while (arcsFromTarget.hasNext()) {
-        					 Arc anArc = (Arc)arcsFromTarget.next();
+        					 Arc anArc = arcsFromTarget.next();
         					 if (anArc.getTarget() == createArc.getSource()) {
         						 if (anArc instanceof NormalArc) {
         							 inverse = (NormalArc)anArc;
@@ -507,7 +507,7 @@ public void mouseReleased(MouseEvent e) {
             			 // search for pre-existent arcs from transportArcToCreate's source to 
             			 // transportArcToCreate's target                  
             			 while(arcsFrom.hasNext()) {
-            				 Arc someArc = ((Arc)arcsFrom.next());
+            				 Arc someArc = (arcsFrom.next());
             				 if (someArc == transportArcToCreate) {
             					 break;
             				 } else if (someArc.getSource() == transportArcToCreate.getSource() &&
@@ -615,7 +615,7 @@ public void mouseReleased(MouseEvent e) {
         				 Arc someArc = null;
 
         				 while ( arcsFromTranasition.hasNext() ){        					 
-        					 someArc = (Arc)arcsFromTranasition.next();
+        					 someArc = arcsFromTranasition.next();
         					 if (someArc == transportArcToCreate){
         						 break;
         						 //continue;
@@ -721,7 +721,7 @@ public void mouseReleased(MouseEvent e) {
         				 Arc someArc = null;
 
         				 while ( arcsFromTranasition.hasNext() ){        					 
-        					 someArc = (Arc)arcsFromTranasition.next();
+        					 someArc = arcsFromTranasition.next();
         					 if (someArc == timedArcToCreate){
         						 break;
         						 //continue;
@@ -805,7 +805,7 @@ public void mouseReleased(MouseEvent e) {
         				 Arc someArc = null;
     					 
     					 while ( arcsFromTranasition.hasNext() ){        					 
-        					 someArc = (Arc)arcsFromTranasition.next();
+        					 someArc = arcsFromTranasition.next();
         					 if (someArc == timedArcToCreate){
         						 //break;
         						 continue;

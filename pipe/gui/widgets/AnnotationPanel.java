@@ -2,6 +2,7 @@ package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+
 import javax.swing.JSplitPane;
 
 import pipe.dataLayer.AnnotationNote;

@@ -16,8 +16,8 @@ import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomer;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.undo.AnnotationBorderEdit;
+import pipe.gui.undo.UndoableEdit;
 
 
 /** 

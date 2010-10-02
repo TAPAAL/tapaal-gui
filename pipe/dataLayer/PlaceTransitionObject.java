@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -355,14 +356,14 @@ implements Cloneable {
 		Iterator<Arc> arcsFrom = connectFrom.iterator();
 
 		while (arcsFrom.hasNext()) {
-			someArc = ((Arc)arcsFrom.next());
+			someArc = (arcsFrom.next());
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
 		}
 
 		Iterator<Arc> arcsTo = connectTo.iterator();
 		while (arcsTo.hasNext()) {
-			someArc = ((Arc)arcsTo.next());
+			someArc = (arcsTo.next());
 			updateEndPoint(someArc);
 			someArc.updateArcPosition();
 		}

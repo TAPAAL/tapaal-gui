@@ -6,8 +6,10 @@ public abstract class TCTLAbstractStateProperty extends TCTLAbstractProperty {
 	
 //	protected boolean isCompositional;
 	
+	@Override
 	public abstract TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2);
 	
+	@Override
 	public abstract TCTLAbstractStateProperty copy();
 	
 //	public abstract void accept(ICSLVisitor visitor) throws ModelCheckingException;

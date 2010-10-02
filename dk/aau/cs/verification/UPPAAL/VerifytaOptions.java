@@ -3,10 +3,9 @@ package dk.aau.cs.verification.UPPAAL;
 import java.util.HashMap;
 import java.util.Map;
 
-import dk.aau.cs.verification.VerificationOptions;
-
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifytaOptions implements VerificationOptions {
 	private TraceOption traceOption;
@@ -22,6 +21,7 @@ public class VerifytaOptions implements VerificationOptions {
 		this.untimedTrace = untimedTrace;
 	}
 		
+	@Override
 	public String toString(){
 		StringBuffer result = new StringBuffer();
 		

@@ -6,11 +6,13 @@ import java.awt.GridBagLayout;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNTransition;

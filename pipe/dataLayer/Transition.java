@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import pipe.gui.Pipe;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.undo.TransitionServerSemanticEdit;
-import pipe.gui.undo.UndoableEdit;
-import pipe.gui.undo.TransitionRotationEdit;
-import pipe.gui.undo.TransitionTimingEdit;
+import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.undo.TransitionRotationEdit;
+import pipe.gui.undo.TransitionServerSemanticEdit;
+import pipe.gui.undo.TransitionTimingEdit;
+import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -295,7 +295,7 @@ extends PlaceTransitionObject {
 
 		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		while (arcIterator.hasNext()){
-			((ArcAngleCompare)arcIterator.next()).calcAngle();
+			(arcIterator.next()).calcAngle();
 		}
 		Collections.sort(arcAngleList);
 
@@ -523,7 +523,7 @@ extends PlaceTransitionObject {
 	 public void removeArcCompareObject(Arc a) {
 		 Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		 while (arcIterator.hasNext()) {
-			 if (((ArcAngleCompare)arcIterator.next()).arc == a) {
+			 if ((arcIterator.next()).arc == a) {
 				 arcIterator.remove();
 			 }
 		 }
@@ -539,7 +539,7 @@ extends PlaceTransitionObject {
 
 		 Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		 while (arcIterator.hasNext()) {
-			 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
+			 ArcAngleCompare thisArc = arcIterator.next();
 			 if (thisArc.arc == arc || !arc.inView()) {
 				 thisArc.calcAngle();
 				 match = true;
@@ -564,7 +564,7 @@ extends PlaceTransitionObject {
 
 		 Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		 while (arcIterator.hasNext()) {
-			 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
+			 ArcAngleCompare thisArc = arcIterator.next();
 			 double thisAngle = thisArc.angle - Math.toRadians(angle);
 			 if (Math.cos(thisAngle) > (rootThreeOverTwo)){
 				 top.add(thisArc);
@@ -591,7 +591,7 @@ extends PlaceTransitionObject {
 		 transform.transform(new Point2D.Double(1, 0.5*TRANSITION_HEIGHT), 
 				 transformed); // +1 due to rounding making it off by 1
 				 while (arcIterator.hasNext()) {
-					 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
+					 ArcAngleCompare thisArc = arcIterator.next();
 					 if (thisArc.sourceOrTarget()) {
 						 thisArc.arc.setTargetLocation(
 								 positionX + centreOffsetLeft() + transformed.x,
@@ -607,7 +607,7 @@ extends PlaceTransitionObject {
 				 transform.transform(new Point2D.Double(0, -0.5*TRANSITION_HEIGHT),
 						 transformed);
 				 while (arcIterator.hasNext()) {
-					 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
+					 ArcAngleCompare thisArc = arcIterator.next();
 					 if (thisArc.sourceOrTarget()) {
 						 thisArc.arc.setTargetLocation(
 								 positionX + centreOffsetLeft() + transformed.x,
@@ -623,7 +623,7 @@ extends PlaceTransitionObject {
 				 double inc = TRANSITION_HEIGHT/(left.size()+1);
 				 double current = TRANSITION_HEIGHT/2 - inc;
 				 while (arcIterator.hasNext()) {
-					 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
+					 ArcAngleCompare thisArc = arcIterator.next();
 					 transform.transform(
 							 new Point2D.Double(-0.5 * TRANSITION_WIDTH, current + 1),
 							 transformed); // +1 due to rounding making it off by 1
@@ -643,7 +643,7 @@ extends PlaceTransitionObject {
 				 current = -TRANSITION_HEIGHT/2 + inc;
 				 arcIterator = right.iterator();
 				 while (arcIterator.hasNext()) {
-					 ArcAngleCompare thisArc = (ArcAngleCompare)arcIterator.next();
+					 ArcAngleCompare thisArc = arcIterator.next();
 					 transform.transform(
 							 new Point2D.Double(+0.5 * TRANSITION_WIDTH, current),
 							 transformed);

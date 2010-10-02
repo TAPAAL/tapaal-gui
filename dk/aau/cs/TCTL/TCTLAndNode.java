@@ -22,10 +22,12 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 		this.property2 = property2;
 	}
 	
+	@Override
 	public boolean isSimpleProperty() {
 		return false;
 	}
 	
+	@Override
 	public String toString() {
 		String s1 = property1.isSimpleProperty() ? property1.toString()
 				                         : "(" + property1.toString() + ")";
@@ -35,6 +37,7 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 		//return s1 + " /\\ " + s2;
 	}
 	
+	@Override
 	public StringPosition[] getChildren() {
 		int start1 = property1.isSimpleProperty() ? 0 : 1;
 		int end1 = start1 + property1.toString().length();
@@ -49,6 +52,7 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 		return children;
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLAndNode) {
 			TCTLAndNode node = (TCTLAndNode)o;

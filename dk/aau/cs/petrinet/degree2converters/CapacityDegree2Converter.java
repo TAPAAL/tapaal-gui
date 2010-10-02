@@ -9,7 +9,6 @@ import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
 import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
-import dk.aau.cs.petrinet.PlaceTransitionObject;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
@@ -459,7 +458,7 @@ public class CapacityDegree2Converter implements Degree2Converter {
 		// Do Grafical stuff
 		for (Map.Entry<TAPNPlace, TAPNPlace> entry : oldToNewPlacesMap.entrySet()){
 			// XXX - Unsafe cast but ok by assumption
-			toReturn.addLocation((PlaceTransitionObject)entry.getValue(), model.locations.get(entry.getKey()));
+			toReturn.addLocation(entry.getValue(), model.locations.get(entry.getKey()));
 		}	
 
 		return toReturn;

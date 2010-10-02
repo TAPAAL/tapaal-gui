@@ -12,8 +12,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */ 
 import java.util.HashMap;
 
-import dk.aau.cs.translations.ModelTransformer;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
@@ -22,6 +20,7 @@ import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
+import dk.aau.cs.translations.ModelTransformer;
 
 public class PipeTapnToAauTapnTransformer implements ModelTransformer<DataLayer, TimedArcPetriNet> {
 	protected DataLayer appModel;

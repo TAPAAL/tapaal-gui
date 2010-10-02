@@ -19,6 +19,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 		this.totalTokens = totalTokens;
 	}
 
+	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 
 		append("(");
@@ -29,6 +30,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 		append(")");
 	}
 
+	@Override
 	protected void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
 			append(" && ");

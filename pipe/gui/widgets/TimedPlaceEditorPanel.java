@@ -40,8 +40,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
@@ -55,6 +53,7 @@ import pipe.dataLayer.colors.IntervalBound;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiView;
 import pipe.gui.undo.UndoableEdit;
+import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 
 /**
  *

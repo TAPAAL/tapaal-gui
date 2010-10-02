@@ -196,9 +196,9 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 
 		//Remove all arcs pointing to this place/tranistion object
 		if (pt instanceof TAPNTransition){
-			transitions.remove((Transition)pt);
+			transitions.remove(pt);
 		} else if (pt instanceof Place ) {
-			places.remove((Place)pt);
+			places.remove(pt);
 		} 
 
 		// Remove arcs from preset/postset of place transition objects

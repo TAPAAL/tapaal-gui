@@ -9,13 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -37,7 +35,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.Export;
 import pipe.gui.Pipe;
 import pipe.gui.Verifier;
-import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 
 public class CopyOfQueryDialogue extends JPanel{
 

@@ -17,6 +17,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 		this.totalTokens = totalTokens;
 	}
 
+	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 
 		if(useSymmetry){
@@ -50,6 +51,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 		}
 	}
 
+	@Override
 	protected void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
 			append(" && ");

@@ -12,6 +12,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	
 	protected static final String TOKEN_TEMPLATE_NAME = "P";
 
+	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
 		append("(sum(i:");
 		append(ID_TYPE);
@@ -25,6 +26,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 		append(atomicPropositionNode.getN());
 	}
 
+	@Override
 	protected void addEnding(QueryType type) {
 		if(type == QueryType.EF || type == QueryType.AF){
 			append(" && ");

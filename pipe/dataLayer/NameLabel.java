@@ -6,8 +6,8 @@ import javax.swing.JTextArea;
 
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
-import pipe.gui.Zoomer;
 import pipe.gui.Zoomable;
+import pipe.gui.Zoomer;
 
 
 /**

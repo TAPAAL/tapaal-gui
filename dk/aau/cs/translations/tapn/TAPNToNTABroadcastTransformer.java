@@ -1,12 +1,9 @@
 package dk.aau.cs.translations.tapn;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;

@@ -60,6 +60,7 @@ public class IntOrConstant {
 		}
 	}
 
+	@Override
 	public String toString(){
 		return toString(false);
 	}

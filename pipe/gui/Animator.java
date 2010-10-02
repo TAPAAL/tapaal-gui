@@ -17,8 +17,6 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
-import dk.aau.cs.debug.Logger;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ColoredDiscreteFiringAction;
 import pipe.dataLayer.DataLayer;
@@ -34,6 +32,7 @@ import pipe.dataLayer.colors.ColoredToken;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
+import dk.aau.cs.debug.Logger;
 
 
 /**
@@ -117,7 +116,7 @@ public class Animator {
 
 		 Iterator<Transition> transitionIterator = current.returnTransitions();
 		 while (transitionIterator.hasNext()) {
-			 Transition tempTransition = (Transition)transitionIterator.next();
+			 Transition tempTransition = transitionIterator.next();
 			 if (tempTransition.isEnabled(true) == true) {
 				 current.notifyObservers();
 				 tempTransition.repaint();
@@ -136,7 +135,7 @@ public class Animator {
 
 		 Iterator<Transition> transitionIterator = current.returnTransitions();
 		 while (transitionIterator.hasNext()) {
-			 Transition tempTransition = (Transition) transitionIterator.next();
+			 Transition tempTransition = transitionIterator.next();
 			 if (tempTransition.isEnabled(true) == false) {
 				 current.notifyObservers();
 				 tempTransition.repaint();
@@ -153,7 +152,7 @@ public class Animator {
 		 Iterator<Transition> transitionIterator = 
 			 CreateGui.currentPNMLData().returnTransitions();
 		 while (transitionIterator.hasNext()) {
-			 Transition tempTransition = (Transition)transitionIterator.next();
+			 Transition tempTransition = transitionIterator.next();
 			 tempTransition.setEnabledFalse();
 			 CreateGui.currentPNMLData().notifyObservers();
 			 tempTransition.repaint();

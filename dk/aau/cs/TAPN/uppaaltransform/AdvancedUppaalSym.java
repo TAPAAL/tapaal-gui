@@ -2,8 +2,6 @@ package dk.aau.cs.TAPN.uppaaltransform;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dk.aau.cs.TCTL.visitors.OptimizedStandardTranslationQueryVisitor;
 import dk.aau.cs.TCTL.visitors.QueryVisitor;

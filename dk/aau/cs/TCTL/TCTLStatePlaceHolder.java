@@ -8,6 +8,7 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 	public TCTLStatePlaceHolder() {
 	}
 	
+	@Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLStatePlaceHolder();
 	}
@@ -16,14 +17,17 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		return true;
 	}
 
+	@Override
 	public String toString() {
 		return "<*>";
 	}
 	
+	@Override
 	public boolean containsPlaceHolder() {
 		return true;
 	}
 	
+	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {		
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty)object2;
@@ -32,6 +36,7 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		}
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLStatePlaceHolder) {
 			return true;

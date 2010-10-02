@@ -93,7 +93,7 @@ public class AnimationHistory
          doc.remove(initText.length(),doc.getLength()-initText.length());
          
          while (e.hasMoreElements()) {
-            newS = (String)e.nextElement();
+            newS = e.nextElement();
             doc.insertString(doc.getLength(), newS+"\n",
                     (count ==currentItem) ?emph :regular);
             count++;

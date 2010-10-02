@@ -13,8 +13,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
-import dk.aau.cs.verification.UPPAAL.Verifyta;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
@@ -31,6 +29,7 @@ import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
+import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
 public class CreateGui {
