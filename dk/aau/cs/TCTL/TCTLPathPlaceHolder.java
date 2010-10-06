@@ -38,13 +38,6 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 		}
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof TCTLPathPlaceHolder) {
-			return true;
-		}
-		return false;
-	}
 	
 	@Override
 	public void accept(ITCTLVisitor visitor) {

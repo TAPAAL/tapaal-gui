@@ -36,14 +36,6 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		}
 	}
 	
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof TCTLStatePlaceHolder) {
-			return true;
-		}
-		return false;
-	}
-	
 
 	@Override
 	public void accept(ITCTLVisitor visitor) {

@@ -54,6 +54,7 @@ import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
@@ -94,6 +95,7 @@ public class QueryDialogue extends JPanel{
 	private ButtonGroup logicButtonGroup;
 	private JButton conjunctionButton;
 	private JButton disjunctionButton;
+	private JButton negationButton;
 
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
@@ -415,9 +417,11 @@ public class QueryDialogue extends JPanel{
 		logicButtonGroup = new ButtonGroup();
 		conjunctionButton = new JButton("And");
 		disjunctionButton = new JButton("Or");
+		negationButton = new JButton("not");
 
 		logicButtonGroup.add(conjunctionButton);
 		logicButtonGroup.add(disjunctionButton);
+		logicButtonGroup.add(negationButton);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -427,6 +431,9 @@ public class QueryDialogue extends JPanel{
 
 		gbc.gridy = 1;
 		logicButtonPanel.add(disjunctionButton,gbc);
+		
+		gbc.gridy = 2;
+		logicButtonPanel.add(negationButton,gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -467,6 +474,16 @@ public class QueryDialogue extends JPanel{
 						newProperty = newProperty.replace(currentSelection.getObject(), property);
 						updateSelection(property);
 
+					}
+				}
+		);
+		
+		negationButton.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						TCTLNotNode property = new TCTLNotNode(getState(currentSelection.getObject()));
+						newProperty = newProperty.replace(currentSelection.getObject(), property);
+						updateSelection(property);
 					}
 				}
 		);
@@ -1074,6 +1091,7 @@ public class QueryDialogue extends JPanel{
 		forAllDiamond.setEnabled(false);
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
+		negationButton.setEnabled(false);
 		placesBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
@@ -1088,6 +1106,7 @@ public class QueryDialogue extends JPanel{
 		forAllDiamond.setEnabled(true);
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
+		negationButton.setEnabled(false);	
 		placesBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
@@ -1101,6 +1120,7 @@ public class QueryDialogue extends JPanel{
 		forAllDiamond.setEnabled(false);
 		conjunctionButton.setEnabled(true);
 		disjunctionButton.setEnabled(true);
+		negationButton.setEnabled(true);
 		placesBox.setEnabled(true);
 		relationalOperatorBox.setEnabled(true);
 		placeMarking.setEnabled(true);

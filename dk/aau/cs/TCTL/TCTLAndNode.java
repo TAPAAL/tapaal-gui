@@ -46,7 +46,6 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 		String s2 = property2.isSimpleProperty() ? property2.toString()
                                          : "(" + property2.toString() + ")";
 		return s1 + " and " + s2;
-		//return s1 + " /\\ " + s2;
 	}
 	
 	@Override

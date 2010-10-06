@@ -12,7 +12,6 @@ public class TAPNQuery {
 	
 	private String name;
 	private int capacity;
-	private String query;
 	private TraceOption traceOption;
 	private SearchOption searchOption;
 	private ReductionOption reductionOption;
@@ -49,12 +48,6 @@ public class TAPNQuery {
 		return capacity;
 	}
 
-	/**
-	 * @param query the query to set
-	 */
-	public void setQuery(String query) {
-		this.query = query;
-	}
 	
 	public String getQuery() {
 		return property.toString();
@@ -150,17 +143,6 @@ public class TAPNQuery {
 		this.setExtrapolationOption(extrapolationOption);
 	}
 	
-	public TAPNQuery(String name, int capacity, String query, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOption, HashTableSize hashTabelSize, ExtrapolationOption extrapolationOption) {
-		this.setName(name);
-		this.setCapacity(capacity);
-		this.setQuery(query);
-		this.setTraceOption(traceOption);
-		this.setSearchOption(searchOption);
-		this.setReductionOption(reductionOption);
-		this.setHashTableSize(hashTabelSize);
-		this.setExtrapolationOption(extrapolationOption);
-	}
-	
 	@Override
 	public String toString()
 	{
@@ -170,7 +152,6 @@ public class TAPNQuery {
 	public void set(TAPNQuery newQuery) {
 		this.name = newQuery.getName();
 		this.capacity =newQuery.getCapacity();
-//		this.setQuery(newQuery.getQuery());
 		this.property = newQuery.getProperty();
 		this.traceOption = newQuery.getTraceOption();
 		this.searchOption = newQuery.getSearchOption();

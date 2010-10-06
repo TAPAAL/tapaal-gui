@@ -57,15 +57,6 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof TCTLAtomicPropositionNode) {
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)o;
-			return place.equals(node.getPlace()) && op.equals(node.getOp()) && (n == node.getN());
-		}
-		return false;
-	}
-
-	@Override
 	public String toString() {
 		return place + " " + op + " " + n;
 	}

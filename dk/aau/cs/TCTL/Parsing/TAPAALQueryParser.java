@@ -120,11 +120,12 @@ public class TAPAALQueryParser implements GPMessageConstants
           temp.deleteOnExit();
           PrintStream out = new PrintStream(temp); 
           out.append(textToParse);
+          out.append("\n");
           out.close();
 
           // open temp file
-//          parser.openFile(temp.getPath());
-          parser.openFile("/home/lassejac/Desktop/test_queries/test");
+          parser.openFile(temp.getPath());
+//          parser.openFile("/home/lassejac/Desktop/test_queries/test");
        }
        catch(ParserException parse)
        {
@@ -363,7 +364,7 @@ public class TAPAALQueryParser implements GPMessageConstants
            case RuleConstants.RULE_NOT_NOT_LPARAN_RPARAN:  //<Not> ::= not '(' <Factor> ')'
            case RuleConstants.RULE_NOT_EXCLAM_LPARAN_RPARAN:  //<Not> ::= '!' '(' <Factor> ')'
         	  // TODO Implement support for negation
-        	   retObj = null;
+        	   retObj = (TCTLAbstractStateProperty)createObject(((Reduction)token.getData()).getToken(2));
               break;
               
            case RuleConstants.RULE_ABSTRACTSTATEPROPERTY: //<AbstractStateProperty> ::= <Expr>

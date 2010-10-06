@@ -46,8 +46,8 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 	
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof TCTLEFNode) {
-			TCTLEFNode node = (TCTLEFNode)o;
+		if(o instanceof TCTLAFNode) {
+			TCTLAFNode node = (TCTLAFNode)o;
 			return getProperty().equals(node.getProperty());
 		}
 		return false;
