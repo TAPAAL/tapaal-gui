@@ -6,11 +6,18 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.StandardUPPAALQuery;
-import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAndNode;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
+import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.translations.ModelTransformer;
 import dk.aau.cs.translations.PipeToNTATransformer;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
 import dk.aau.cs.verification.ModelChecker;
@@ -23,9 +30,9 @@ public class KBoundAnalyzer
 
 	private ModelTransformer<DataLayer, NTA> pipeToNtaTransformer;
 	private Messenger messenger;
-	private ModelChecker<NTA, UPPAALQuery> modelChecker;
-	
-	public KBoundAnalyzer(DataLayer appModel, int k, ModelChecker<NTA, UPPAALQuery> modelChecker)
+	private ModelChecker modelChecker;
+
+	public KBoundAnalyzer(DataLayer appModel, int k, ModelChecker modelChecker)
 	{
 		this.k = k;
 		this.appModel = appModel;
@@ -33,29 +40,34 @@ public class KBoundAnalyzer
 		this.pipeToNtaTransformer = new PipeToNTATransformer(getReductionStrategy());
 	}
 
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker<NTA, UPPAALQuery> modelChecker) {
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker) {
 		return new RunKBoundAnalysis(modelChecker);
 	}
 
 	public void analyze()
 	{
-		NTA nta;
-		try {
-			nta = pipeToNtaTransformer.transformModel(appModel);
-		} catch (Exception e1) {
-			messenger.displayErrorMessage("Something went wrong while translating the model.");
-			return;
-		}
-
-		UPPAALQuery[] queries = getQueries();
-		VerifytaOptions options = new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false);
+		TAPN model = convertModelToAAUTAPN(appModel);
+		TAPNQuery query = getBoundednessQuery(model.getNumberOfTokens());
+		VerifytaOptions options = new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS);
 
 		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker);
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());	
 		dialog.setupListeners(analyzer);
-		
-		analyzer.execute(options, nta, queries);
+
+		analyzer.execute(options, model, query);
 		dialog.setVisible(true);
+	}
+
+	private TAPN convertModelToAAUTAPN(DataLayer appModel) {
+		PipeTapnToAauTapnTransformer transformer = appModel.isUsingColors() ? new ColoredPipeTapnToColoredAauTapnTransformer() : new PipeTapnToAauTapnTransformer();
+
+		TAPN model=null;
+		try {
+			model = transformer.getAAUTAPN(appModel, 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return model;
 	}
 
 	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy() {
@@ -66,21 +78,17 @@ public class KBoundAnalyzer
 		}
 	}
 
-	protected UPPAALQuery[] getQueries() {
-		return new UPPAALQuery[] { getBoundednessQuery() };
-	}
-
-	protected UPPAALQuery getBoundednessQuery() {
-		StringBuffer buffer = new StringBuffer();
+	protected TAPNQuery getBoundednessQuery(int tokensInModel) {
+		TCTLAbstractProperty property = null;
 
 		if(!appModel.isUsingColors()){
-			//stream.println("A[]((sum(i:pid_t) P(i).P_capacity)>= 1) and (Control.finish == 1)");
-			buffer.append("E<>((sum(i:pid_t) Token(i).P_capacity)== 0) and (Control.finish == 1)\n");
+			property = new TCTLEFNode(
+					new TCTLAtomicPropositionNode("P_capacity", "=", 0)
+			);		
 		}else{
-			buffer.append("E<>((sum(i:pid_t) Token(i).P_capacity) == 0) and (Control.P_lock == 1) and lock == 0\n");
+			//	buffer.append("E<>((sum(i:pid_t) Token(i).P_capacity) == 0) and (Control.P_lock == 1) and lock == 0\n");
 		}
 
-		UPPAALQuery boundednessQuery = new StandardUPPAALQuery(buffer.toString());
-		return boundednessQuery;
+		return new TAPNQuery(property, k + tokensInModel);
 	}
 }

@@ -4,8 +4,6 @@ import javax.swing.JSpinner;
 
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.SupQuery;
-import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.translations.ModelTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
@@ -21,25 +19,17 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		return minBound;
 	}
 
-	public KBoundOptimizer(DataLayer appModel, int k, ModelChecker<NTA, UPPAALQuery> modelChecker, JSpinner spinner)
+	public KBoundOptimizer(DataLayer appModel, int k, ModelChecker modelChecker, JSpinner spinner)
 	{
 		super(appModel, k, modelChecker);
 		this.spinner = spinner;
 	}
 
 	@Override
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker<NTA, UPPAALQuery> modelChecker) {
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker) {
 		return new RunKBoundOptimization(modelChecker, spinner);
 	}
-	
-	@Override
-	protected UPPAALQuery[] getQueries(){
-		UPPAALQuery boundednessQuery = getBoundednessQuery();
-		UPPAALQuery supQuery = new SupQuery("usedExtraTokens");
 		
-		return new UPPAALQuery[]{ boundednessQuery, supQuery };		
-	}
-	
 	@Override
 	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy() {
 		if(!appModel.isUsingColors()){

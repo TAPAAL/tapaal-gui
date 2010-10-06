@@ -5,20 +5,23 @@ import java.util.Map;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifytaOptions implements VerificationOptions {
 	private TraceOption traceOption;
 	private SearchOption searchOption;
 	private boolean untimedTrace;
+	private ReductionOption reduction;
 	
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 	
-	public VerifytaOptions(TraceOption trace, SearchOption search, boolean untimedTrace){
+	public VerifytaOptions(TraceOption trace, SearchOption search, boolean untimedTrace, ReductionOption reduction){
 		this.traceOption = trace;
 		this.searchOption = search;
 		this.untimedTrace = untimedTrace;
+		this.reduction = reduction;
 	}
 		
 	@Override
@@ -52,5 +55,9 @@ public class VerifytaOptions implements VerificationOptions {
 		map.put(SearchOption.CLOSE_TO_TARGET_FIRST, "-o6");
 		
 		return map;
+	}
+
+	public ReductionOption getReduction() {
+		return reduction;
 	}
 }

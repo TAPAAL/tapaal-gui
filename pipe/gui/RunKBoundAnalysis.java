@@ -2,14 +2,12 @@ package pipe.gui;
 
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
 public class RunKBoundAnalysis extends RunVerificationBase {
 	
-	public RunKBoundAnalysis(ModelChecker<NTA, UPPAALQuery> modelChecker){
+	public RunKBoundAnalysis(ModelChecker modelChecker){
 		super(modelChecker);
 	}
 

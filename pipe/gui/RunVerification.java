@@ -6,8 +6,6 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.TAPNTrace;
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.translations.StandardNamingScheme;
 import dk.aau.cs.verification.ModelChecker;
@@ -15,7 +13,7 @@ import dk.aau.cs.verification.VerificationResult;
 
 public class RunVerification extends RunVerificationBase {
 
-	public RunVerification(ModelChecker<NTA, UPPAALQuery> modelChecker) {
+	public RunVerification(ModelChecker modelChecker) {
 		super(modelChecker);
 	}
 
