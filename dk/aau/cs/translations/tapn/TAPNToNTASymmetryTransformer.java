@@ -11,6 +11,8 @@ import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.TCTL.visitors.OptimizedStandardTranslationQueryVisitor;
+import dk.aau.cs.TCTL.visitors.QueryVisitor;
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.TAPNArc;
 import dk.aau.cs.petrinet.TAPNPlace;
@@ -22,7 +24,7 @@ import dk.aau.cs.petrinet.Token;
 
 public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 	private int numberOfInitChannels = 0;
-	private static final String TokenTAName = "Token";
+	protected static final String TokenTAName = "P";
 	public TAPNToNTASymmetryTransformer(int extraNumberOfTokens) {
 		super(extraNumberOfTokens);
 	}
@@ -43,7 +45,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		TimedAutomaton lock = new TimedAutomaton();
 
 		createLocations(model, token, lock);
-		token.setName("Token");
+		token.setName(TokenTAName);
 		token.setParameters("const pid_t id");
 		token.setDeclarations("clock " + CLOCK_NAME + ";");
 		token.setInitLocation(getLocationByName("P_capacity"));
@@ -233,17 +235,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 
 	
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
-		String query = tapnQuery.toString();
-		Pattern pattern = Pattern.compile(QUERY_PATTERN);
-		Matcher matcher = pattern.matcher(query);
-
-		StringBuilder builder = new StringBuilder("(sum(i:pid_t)");
-		builder.append(TokenTAName);
-		builder.append("(i).$1) $2 $3");
-
-		StringBuilder uppaalQuery = new StringBuilder();
-		uppaalQuery.append(matcher.replaceAll(builder.toString()));
-		uppaalQuery.append(" and ( Lock.P_lock == 1  && Control.finish == 1 && lock == 0)");
-		return new StandardUPPAALQuery(uppaalQuery.toString());
+		QueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
+		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}
 }

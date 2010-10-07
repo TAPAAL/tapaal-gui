@@ -2,22 +2,18 @@ package dk.aau.cs.verification.UPPAAL;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-
-import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
@@ -25,7 +21,7 @@ import dk.aau.cs.verification.Trace;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
-public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
+public class Verifyta implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTA_MSG = "TAPAAL needs to know the location of the file verifyta.\n\n"+
 	"Verifyta is a part of the UPPAAL distribution and it is\n" +
 	"normally located in uppaal/bin-Linux or uppaal/bin-Win32,\n" +
@@ -158,18 +154,18 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 	}
 
 
-	private String createArgumentString(File modelFile, File queryFile, VerificationOptions options){
+	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options){
 		StringBuffer buffer = new StringBuffer(options.toString());
 		buffer.append(" ");
-		buffer.append(modelFile.getAbsolutePath());
+		buffer.append(modelFile);
 		buffer.append(" ");
-		buffer.append(queryFile.getAbsolutePath());
+		buffer.append(queryFile);
 
 		return buffer.toString();
 	}
 
 	// TODO: MJ - get rid of this method -- used for legacy support
-	public VerificationResult verify(VerificationOptions options, File modelFile, File queryFile) {
+	public VerificationResult verify(VerificationOptions options, String modelFile, String queryFile) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
 		runner.run();
 
@@ -188,31 +184,20 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 		}
 	}
 
-	public VerificationResult verify(VerificationOptions options, NTA model, UPPAALQuery... queries){
-		File modelFile;
-		File queryFile;
-		try {
-			modelFile = File.createTempFile("verifyta", "model.xml");
-			queryFile = File.createTempFile("verifyta", "query.q");
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an internal error while analyzing the model. Try again.");
-			return null;
+	public VerificationResult verify(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query){
+		UppaalExporter exporter = new UppaalExporter();
+		ExportedModel exportedModel = null;
+		if(model instanceof ColoredTimedArcPetriNet){
+			exportedModel = exporter.export((ColoredTimedArcPetriNet)model, query, ((VerifytaOptions)options).getReduction());
+		}else{
+			exportedModel = exporter.export(model, query, ((VerifytaOptions)options).getReduction());
 		}
-		modelFile.deleteOnExit();
-		queryFile.deleteOnExit();
-
-		try {
-			model.outputToUPPAALXML(new PrintStream(modelFile));
-			PrintStream queryStream = new PrintStream(queryFile);
-			for(UPPAALQuery query : queries){
-				query.output(queryStream);
-			}
-		} catch (FileNotFoundException e) {
-			messenger.displayInfoMessage("There was an error outputting the model.");
-			return null;
+		
+		if(exportedModel == null){
+			messenger.displayErrorMessage("There was an error exporting the model");
 		}
-
-		return verify(options, modelFile, queryFile);
+						
+		return verify(options, exportedModel.modelFile(), exportedModel.queryFile());
 	}
 
 	public void kill(){
@@ -220,5 +205,4 @@ public class Verifyta implements ModelChecker<NTA, UPPAALQuery> {
 			runner.kill();
 		}
 	}
-
 }

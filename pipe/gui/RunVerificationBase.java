@@ -6,8 +6,8 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -15,15 +15,15 @@ import dk.aau.cs.verification.VerificationResult;
 public abstract class RunVerificationBase extends
 		SwingWorker<VerificationResult, Void> {
 
-	private ModelChecker<NTA, UPPAALQuery> modelChecker;
+	private ModelChecker modelChecker;
 	private VerificationOptions options;
 	private File modelFile; // TODO: MJ -- Get rid of both, used now for legacy support
 	private File queryFile;
-	private NTA model;
-	private UPPAALQuery[] queries;
+	private TimedArcPetriNet model;
 	private long verificationTime = 0;
+	private TAPNQuery query;
 	
-	public RunVerificationBase(ModelChecker<NTA, UPPAALQuery> modelChecker) {
+	public RunVerificationBase(ModelChecker modelChecker) {
 		super();
 		this.modelChecker = modelChecker;
 	}
@@ -35,10 +35,10 @@ public abstract class RunVerificationBase extends
 		execute();
 	}
 	
-	public void execute(VerificationOptions options, NTA model, UPPAALQuery... queries){
+	public void execute(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query){
 		this.model = model;
-		this.queries = queries;
 		this.options = options;
+		this.query = query;
 		execute();
 	}
 	
@@ -47,9 +47,9 @@ public abstract class RunVerificationBase extends
 		long startMS = System.currentTimeMillis();
 		VerificationResult result;
 		if(model != null){
-			result = modelChecker.verify(options, model, queries);
+			result = modelChecker.verify(options, model, query);
 		}else{
-			result = modelChecker.verify(options, modelFile, queryFile);
+			result = modelChecker.verify(options, modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
 		}
 		long endMS = System.currentTimeMillis();
 		

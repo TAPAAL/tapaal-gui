@@ -21,7 +21,6 @@ import org.w3c.dom.NodeList;
 
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
-import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.colors.ColorSet;
@@ -43,6 +42,7 @@ import pipe.gui.undo.UndoableEdit;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.translations.ReductionOption;
 
 
 /**
@@ -2727,7 +2727,7 @@ implements Cloneable {
 		try{
 			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
 		}catch (Exception e) {
-			reductionOption = ReductionOption.NAIVE;
+			reductionOption = ReductionOption.STANDARD;
 		}
 
 		String capacity;

@@ -37,7 +37,6 @@ import javax.swing.event.DocumentListener;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.ReductionOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
@@ -58,6 +57,7 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.translations.ReductionOption;
 
 public class QueryDialogue extends JPanel{
 
@@ -696,47 +696,47 @@ public class QueryDialogue extends JPanel{
 			String reduction = "";
 			boolean symmetry = false;
 
-			if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_STANDARD){
+			if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST){
 				reduction = name_BROADCAST;
 				symmetry = false;
 				//enableTraceOptions();
-			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_SYM){
+			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCASTSYMMETRY){
 				reduction = name_BROADCAST;
 				symmetry = true;
 				//disableTraceOptions();
-			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_DEG2){
+			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST){
 				reduction = name_BROADCASTDEG2;
 				symmetry = false;
 				//disableTraceOptions();
-			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST_DEG2_SYM){
+			}else if(queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY){
 				reduction = name_BROADCASTDEG2;
 				symmetry = true;
 				//disableTraceOptions();
 			}
 			else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-				if (queryToCreateFrom.getReductionOption() == ReductionOption.NAIVE){
+				if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD){
 					reduction = name_NAIVE;
 					symmetry = false;
 					//enableTraceOptions();
-				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.NAIVE_UPPAAL_SYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARDSYMMETRY){
 					reduction = name_NAIVE;
 					symmetry = true;
 					//disableTraceOptions();
-				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_UPPAAL_SYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY){
 					reduction = name_ADVNOSYM;
 					symmetry = true;
 					//disableTraceOptions();
-				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_NOSYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD){
 					reduction = name_ADVNOSYM;
 					symmetry = false;
 					//enableTraceOptions();
 				}
 			} else {
-				if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_UPPAAL_SYM){
+				if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY){
 					reduction = name_ADVNOSYM;
 					symmetry = true;
 					//disableTraceOptions();
-				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.ADV_NOSYM){
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD){
 					reduction = name_ADVNOSYM;
 					symmetry = false;
 					//enableTraceOptions();
@@ -905,26 +905,26 @@ public class QueryDialogue extends JPanel{
 			searchOption = SearchOption.CLOSE_TO_TARGET_FIRST;
 		}
 
-		TAPNQuery.ReductionOption reductionOptionToSet = null;
+		ReductionOption reductionOptionToSet = null;
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
 		boolean symmetry = symmetryReduction.isSelected();
 
 		if (reductionOptionString.equals(name_NAIVE) && !symmetry){
-			reductionOptionToSet = ReductionOption.NAIVE;
+			reductionOptionToSet = ReductionOption.STANDARD;
 		}else if(reductionOptionString.equals(name_NAIVE) && symmetry){
-			reductionOptionToSet = ReductionOption.NAIVE_UPPAAL_SYM;
+			reductionOptionToSet = ReductionOption.STANDARDSYMMETRY;
 		}else if (reductionOptionString.equals(name_ADVNOSYM) && !symmetry){
-			reductionOptionToSet = ReductionOption.ADV_NOSYM;
+			reductionOptionToSet = ReductionOption.OPTIMIZEDSTANDARD;
 		}else if (reductionOptionString.equals(name_ADVNOSYM) && symmetry){
-			reductionOptionToSet = ReductionOption.ADV_UPPAAL_SYM;
+			reductionOptionToSet = ReductionOption.OPTIMIZEDSTANDARDSYMMETRY;
 		}else if(reductionOptionString.equals(name_BROADCAST) && !symmetry){
-			reductionOptionToSet = ReductionOption.BROADCAST_STANDARD;
+			reductionOptionToSet = ReductionOption.BROADCAST;
 		}else if(reductionOptionString.equals(name_BROADCAST) && symmetry){
-			reductionOptionToSet = ReductionOption.BROADCAST_SYM;
+			reductionOptionToSet = ReductionOption.BROADCASTSYMMETRY;
 		}else if(reductionOptionString.equals(name_BROADCASTDEG2) && !symmetry){
-			reductionOptionToSet = ReductionOption.BROADCAST_DEG2;
+			reductionOptionToSet = ReductionOption.DEGREE2BROADCAST;
 		}else if(reductionOptionString.equals(name_BROADCASTDEG2) && symmetry){
-			reductionOptionToSet = ReductionOption.BROADCAST_DEG2_SYM;
+			reductionOptionToSet = ReductionOption.DEGREE2BROADCASTSYMMETRY;
 		}
 
 

@@ -5,8 +5,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
+import dk.aau.cs.TA.KBoundOptmizerUPPAALQuery;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.TimedAutomaton;
+import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
@@ -26,7 +29,7 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		tokens = model.getTokens().size();
 		
 		for(TimedAutomaton ta : tas){
-			if(ta.getName().equals("Token")){
+			if(ta.getName().equals(TokenTAName)){
 				addKBoundUpdates(ta);
 				break;
 			}
@@ -81,5 +84,11 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		builder.append(" = 0;\n");
 		builder.append(super.createGlobalDeclarations(model));
 		return builder.toString();
+	}
+	
+	@Override
+	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
+		UPPAALQuery query = super.transformQuery(tapnQuery);
+		return new KBoundOptmizerUPPAALQuery(query);
 	}
 }

@@ -4,9 +4,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
+import dk.aau.cs.TA.KBoundOptmizerUPPAALQuery;
 import dk.aau.cs.TA.Location;
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.TimedAutomaton;
+import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 public class ColoredDegree2BroadcastKBoundOptimizationTransformer extends
@@ -89,6 +92,12 @@ public class ColoredDegree2BroadcastKBoundOptimizationTransformer extends
 		builder.append(" = 0;\n");
 		builder.append(super.createGlobalDeclarations(degree2Net, originalModel));
 		return builder.toString();
+	}
+	
+	@Override
+	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
+		UPPAALQuery query = super.transformQuery(tapnQuery);
+		return new KBoundOptmizerUPPAALQuery(query);
 	}
 	
 

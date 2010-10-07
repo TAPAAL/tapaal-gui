@@ -3,8 +3,6 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -12,7 +10,7 @@ public class RunKBoundOptimization extends RunKBoundAnalysis {
 
 	private JSpinner spinner;
 
-	public RunKBoundOptimization(ModelChecker<NTA, UPPAALQuery> modelChecker, JSpinner spinner) {
+	public RunKBoundOptimization(ModelChecker modelChecker, JSpinner spinner) {
 		super(modelChecker);
 		this.spinner = spinner;
 	}
