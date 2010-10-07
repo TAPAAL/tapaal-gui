@@ -164,9 +164,8 @@ public class Verifyta implements ModelChecker {
 		return buffer.toString();
 	}
 
-	// TODO: MJ - get rid of this method -- used for legacy support
-	public VerificationResult verify(VerificationOptions options, String modelFile, String queryFile) {
-		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
+	private VerificationResult verify(VerificationOptions options, ExportedModel exportedModel) {
+		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 
 		if(runner.error()){
@@ -197,7 +196,7 @@ public class Verifyta implements ModelChecker {
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
 						
-		return verify(options, exportedModel.modelFile(), exportedModel.queryFile());
+		return verify(options, exportedModel);
 	}
 
 	public void kill(){

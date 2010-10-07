@@ -450,7 +450,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 
 
 	public void addToken(Token token) {
-		tokens.add(token.getPlace());
+		tokens.add(token.place());
 	}
 	
 	public void removePlaceByName(String place){
@@ -465,5 +465,14 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		if(toRemove != null){
 			places.remove(toRemove);
 		}
+	}
+	
+	public TAPNTransition getTransitionsByName(String transitionName) {
+		for(TAPNTransition trans : transitions){
+			if(trans.getName().equals(transitionName)){
+				return trans;
+			}
+		}
+		return null;
 	}
 }

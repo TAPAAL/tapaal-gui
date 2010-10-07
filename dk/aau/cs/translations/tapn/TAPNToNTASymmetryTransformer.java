@@ -186,7 +186,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		List<Token> tokens = model.getTokens();
 		for(int i = 0; i < tokens.size(); i++){
 			Token token = tokens.get(i);
-			Location destination = getLocationByName(token.getPlace().getName());
+			Location destination = getLocationByName(token.place().getName());
 
 			if(destination != pcapacity && destination != plock){
 				numberOfInitChannels++;

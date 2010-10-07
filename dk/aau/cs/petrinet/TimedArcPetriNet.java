@@ -2,6 +2,8 @@ package dk.aau.cs.petrinet;
 
 import java.util.List;
 
+import pipe.dataLayer.Transition;
+
 
 public interface TimedArcPetriNet {	
 	void addPlace(TAPNPlace place);
@@ -19,10 +21,10 @@ public interface TimedArcPetriNet {
 //	void remove(TAPNTransition transition);
 //	boolean remove(TAPNArc arc);
 	
-	
 	List<TAPNPlace> 	   getPlaces();
 	TAPNPlace			   getPlaceByName(String name);
 	List<TAPNTransition>   getTransitions();
+	TAPNTransition 		   getTransitionsByName(String transitionName);
 	List<Token> 		   getTokens();
 		
 	List<TAPNTransportArc> getTransportArcs();
@@ -35,4 +37,5 @@ public interface TimedArcPetriNet {
 	boolean isDegree2();
 	void convertToConservative() throws Exception;
 	void removePlaceByName(String place);
+	
 }

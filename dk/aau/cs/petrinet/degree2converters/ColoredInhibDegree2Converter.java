@@ -62,7 +62,7 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 	private void createTokens(TAPN model, ColoredTAPN degree2Net) {
 		for(Token token : model.getTokens()){
 			ColoredToken ct = (ColoredToken)token;
-			ColoredPlace place = (ColoredPlace)getByName(ct.getPlace().getName());
+			ColoredPlace place = (ColoredPlace)getByName(ct.place().getName());
 			ColoredToken newToken = new ColoredToken(place, ct.getColor());
 			place.addColoredToken(newToken);
 		}

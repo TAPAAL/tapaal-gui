@@ -81,12 +81,12 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}else{
 			int j = 0;
 			for(Token token : degree2Net.getTokens()){
-				if(!token.getPlace().getName().equals(PLOCK)){
+				if(!token.place().getName().equals(PLOCK)){
 					clearLocationMappings();
 					arcsToCounters.clear();
 					TimedAutomaton ta = createTokenAutomaton(degree2Net, model);
 					ta.setName(TOKEN_TEMPLATE_NAME + j);
-					ta.setInitLocation(getLocationByName(token.getPlace().getName()));
+					ta.setInitLocation(getLocationByName(token.place().getName()));
 					nta.addTimedAutomaton(ta);
 					j++;
 				}
@@ -342,9 +342,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			TimedAutomaton ta) {
 		int i = 0;
 		for(Token token : degree2Net.getTokens()){
-			if(!token.getPlace().getName().equals(PLOCK) && !token.getPlace().getName().equals(P_CAPACITY)){
+			if(!token.place().getName().equals(PLOCK) && !token.place().getName().equals(P_CAPACITY)){
 				Edge e = new Edge(getLocationByName(P_CAPACITY),
-						getLocationByName(token.getPlace().getName()),
+						getLocationByName(token.place().getName()),
 						"",
 						String.format(INIT_CHANNEL, i, "?"),
 						createUpdateExpressionForTokenInitialization(token));

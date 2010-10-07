@@ -26,10 +26,10 @@ public class RunVerification extends RunVerificationBase {
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 			
 			if(result.getTrace(0) != null){ // TODO: This is too simplistic.. It works because the same naming scheme works for all translations (excluding colors)
-				TraceTransformer traceTransformer = new TraceTransformer(CreateGui.getModel(), new StandardNamingScheme());
-				TAPNTrace trace = traceTransformer.interpretTrace((UppaalTrace)result.getTrace(0));
-				showAnimationMode();
-				CreateGui.getAnimator().SetTrace(trace);
+//				TraceTransformer traceTransformer = new TraceTransformer(CreateGui.getModel(), new StandardNamingScheme());
+//				TAPNTrace trace = traceTransformer.interpretTrace((UppaalTrace)result.getTrace(0));
+//				showAnimationMode();
+//				CreateGui.getAnimator().SetTrace(trace);
 			}
 		}
 	}

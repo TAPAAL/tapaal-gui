@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
 import dk.aau.cs.TA.Location;
@@ -25,6 +27,7 @@ import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.translations.ModelTransformer;
 import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.Pairing.ArcType;
 
 public class TAPNToNTABroadcastTransformer implements
@@ -55,10 +58,12 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
+	private TranslationNamingScheme namingScheme;
 
 	public TAPNToNTABroadcastTransformer(int extraTokens, boolean useSymmetry){
 		this.extraTokens = extraTokens;
 		this.useSymmetry = useSymmetry;
+		namingScheme = new BroadcastNamingScheme();
 	}
 
 
@@ -86,7 +91,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 				clearLocationMappings();
 				arcsToCounters.clear();
 				TimedAutomaton tokenTemplate = createTokenTemplate(model);
-				tokenTemplate.setInitLocation(getLocationByName(token.getPlace().getName()));
+				tokenTemplate.setInitLocation(getLocationByName(token.place().getName()));
 				nta.addTimedAutomaton(tokenTemplate);
 				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + j);
 				j++;
@@ -371,7 +376,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 		for(Token token : model.getTokens()){
 			Edge initEdge = new Edge(getLocationByName(PCAPACITY),
-					getLocationByName(token.getPlace().getName()),
+					getLocationByName(token.place().getName()),
 					"",
 					String.format(INITIALIZE_CHANNEL, i, "?"),
 					createUpdateExpressionForTokenInitialization(token));
@@ -644,5 +649,48 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry, tapnQuery.getTotalTokens());
 		
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
+	}
+	
+	
+	public TranslationNamingScheme namingScheme(){
+		return namingScheme;
+	}
+	
+	private class BroadcastNamingScheme implements TranslationNamingScheme {
+		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(?:_test)?$";
+		private Pattern pattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		
+		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
+			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
+
+			for(int i = 0; i < firingSequence.size(); i++){
+				String transitionName = firingSequence.get(i);
+				if(!isIgnoredTransition(transitionName)){
+					Matcher matcher = pattern.matcher(transitionName);
+
+					if(matcher.find()){
+						transitionTranslations.add(new TransitionTranslation(i, matcher.group(1)));
+					}			
+				}
+			}
+			
+			TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
+			transitionTranslations.toArray(array);
+			return array;
+		}
+
+		private boolean isIgnoredTransition(String string) {
+			Pattern pattern = Pattern.compile("c\\d+");
+			Matcher matcher = pattern.matcher(string);
+			return matcher.find();
+		}
+
+		public String getTokenClockName() {
+			return "x";
+		}
+
+		public boolean isIgnoredPlace(String location) {
+			return location.equals("P_lock") ||  location.equals("P_capacity");
+		}
 	}
 }
