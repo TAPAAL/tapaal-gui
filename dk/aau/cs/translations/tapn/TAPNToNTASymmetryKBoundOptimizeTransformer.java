@@ -29,7 +29,7 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 		tokens = model.getTokens().size();
 		
 		for(TimedAutomaton ta : tas){
-			if(ta.getName().equals("Token")){
+			if(ta.getName().equals(TokenTAName)){
 				addKBoundUpdates(ta);
 				break;
 			}

@@ -3,12 +3,11 @@ package pipe.gui;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.DataLayer;
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.petrinet.TimedArcPetriNet;
-import dk.aau.cs.translations.ModelTransformer;
-import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
-import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
 public class KBoundOptimizer extends KBoundAnalyzer {
 
@@ -31,11 +30,7 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 	}
 		
 	@Override
-	protected ModelTransformer<TimedArcPetriNet, NTA> getReductionStrategy() {
-		if(!appModel.isUsingColors()){
-			return new TAPNToNTASymmetryKBoundOptimizeTransformer(k+1);
-		}else{
-			return new ColoredDegree2BroadcastKBoundOptimizationTransformer(k+1);
-		}
+	protected VerifytaOptions verificationOptions() {
+		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDOPTMIZATION);
 	}
 }

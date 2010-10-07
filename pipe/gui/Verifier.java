@@ -13,7 +13,6 @@ import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
@@ -28,20 +27,9 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
 
 public class Verifier {
-	private ModelChecker modelChecker;
-
 	private static Verifyta getVerifyta() {
 		return new Verifyta(new FileFinderImpl(), new MessengerImpl());
 	}
-
-	public Verifier(){ // TODO: MJ -- delete me
-		this(getVerifyta());
-	}
-
-	public Verifier(ModelChecker modelChecker){
-		this.modelChecker = modelChecker;
-	}
-
 
 	public static void analyzeAndOptimizeKBound(DataLayer appModel, int k, JSpinner tokensControl)
 	{
