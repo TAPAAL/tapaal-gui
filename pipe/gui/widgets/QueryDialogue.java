@@ -265,7 +265,7 @@ public class QueryDialogue extends JPanel{
 
 	private void initQueryPanel(final TAPNQuery queryToCreateFrom) {
 		queryPanel = new JPanel(new GridBagLayout());
-		queryPanel.setBorder(BorderFactory.createTitledBorder("Query"));
+		queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
 
 		// Query Text Field
 		queryField = new JTextField();
@@ -1172,7 +1172,9 @@ public class QueryDialogue extends JPanel{
 	private void updateSelection(TCTLAbstractProperty newSelection) {
 		queryField.setText(newProperty.toString());
 		if (currentSelection != null) {
-			StringPosition position = newProperty.indexOf(newSelection);
+			
+			StringPosition position = GetNewSelectionPosition(newSelection);
+			
 			queryField.select(position.getStart(),position.getEnd());
 			currentSelection = position;
 			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
@@ -1188,6 +1190,37 @@ public class QueryDialogue extends JPanel{
 		}
 	}
 
+	// returns the position in the string of the new selection.
+	// When there is only one child property we want to select that child instead of the whole parent.
+	// E.g. if selection is EF <*> then we want to select <*> to allow for speedier query construction.
+	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
+		
+		StringPosition position;
+		
+		
+		if(newSelection instanceof TCTLEFNode){
+			position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLEGNode) {
+			position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLAFNode) {
+			position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLAGNode) {
+			position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLNotNode) {
+			position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
+		}
+		else {
+			position = newProperty.indexOf(newSelection);
+		}
+		
+		return position;
+	}
+
+	// Delete current selection
 	private void deleteSelection() {
 		TCTLAbstractProperty replacement = null;
 		if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {

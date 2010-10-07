@@ -66,7 +66,7 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this.equals(object1) && object2 instanceof TCTLAbstractPathProperty) {
+		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
 			setProperty(getProperty().replace(object1, object2));

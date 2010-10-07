@@ -79,7 +79,7 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this.equals(object1) && object2 instanceof TCTLAbstractStateProperty) {
+		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty)object2;
 		} else {
 			property1 = property1.replace(object1, object2);

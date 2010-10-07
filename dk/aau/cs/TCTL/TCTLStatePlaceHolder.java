@@ -28,8 +28,16 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o instanceof TCTLStatePlaceHolder) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {		
-		if (this.equals(object1) && object2 instanceof TCTLAbstractStateProperty) {
+		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty)object2;
 		} else {
 			return this;
