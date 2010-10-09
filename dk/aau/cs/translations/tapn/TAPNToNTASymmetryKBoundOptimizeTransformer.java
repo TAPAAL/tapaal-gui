@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.Edge;
-import dk.aau.cs.TA.KBoundOptmizerUPPAALQuery;
 import dk.aau.cs.TA.Location;
+import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.TAPNQuery;
@@ -88,7 +88,6 @@ public class TAPNToNTASymmetryKBoundOptimizeTransformer extends
 	
 	@Override
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
-		UPPAALQuery query = super.transformQuery(tapnQuery);
-		return new KBoundOptmizerUPPAALQuery(query);
+		return new SupQuery(usedExtraTokens);
 	}
 }

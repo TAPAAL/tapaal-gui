@@ -63,7 +63,7 @@ public class TransitionFiringAction implements TAFiringAction {
 			String automata = matcher.group(1);
 			String location = matcher.group(2);
 			HashMap<String,BigDecimal> clockValues = state.getClockValues(automata);
-			participants[i-1] = new Participant(location, clockValues);
+			participants[i-1] = new Participant(automata, location, clockValues);
 		}		
 
 		return participants;
@@ -72,9 +72,11 @@ public class TransitionFiringAction implements TAFiringAction {
 	private static String parseChannel(String string) {
 		Pattern pattern = Pattern.compile("(\\w+)(?:\\?|!)");
 		Matcher matcher = pattern.matcher(string);
-		matcher.find();
-
-		return matcher.group(1);
+		
+		if(matcher.find())
+			return matcher.group(1);
+		else
+			return "tau";
 	}
 
 	public Participant[] participants() {

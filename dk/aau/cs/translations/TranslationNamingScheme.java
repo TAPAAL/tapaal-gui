@@ -6,6 +6,7 @@ public interface TranslationNamingScheme {
 	TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence);
 	String getTokenClockName();
 	boolean isIgnoredPlace(String location);	
+	boolean isIgnoredAutomata(String automata);
 	
 	public class TransitionTranslation {
 		private int startsAt;
@@ -21,6 +22,11 @@ public interface TranslationNamingScheme {
 		}
 		
 		public String originalTransitionName(){
+			return originalTransitionName;
+		}
+		
+		@Override
+		public String toString() {
 			return originalTransitionName;
 		}
 	}

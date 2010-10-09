@@ -657,8 +657,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	}
 	
 	private class BroadcastNamingScheme implements TranslationNamingScheme {
+		private final String TAU = "tau";
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(?:_test)?$";
-		private Pattern pattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private final String END_OF_SEQUENCE_PATTERN = "^(\\w+?)_fire$";
+		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
 		
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
@@ -666,10 +669,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			for(int i = 0; i < firingSequence.size(); i++){
 				String transitionName = firingSequence.get(i);
 				if(!isIgnoredTransition(transitionName)){
-					Matcher matcher = pattern.matcher(transitionName);
-
-					if(matcher.find()){
-						transitionTranslations.add(new TransitionTranslation(i, matcher.group(1)));
+					Matcher startMatcher = startPattern.matcher(transitionName);
+					Matcher endMatcher = endPattern.matcher(transitionName);
+					if(startMatcher.find() && !endMatcher.find() && !transitionName.equals(TAU)){
+						transitionTranslations.add(new TransitionTranslation(i, startMatcher.group(1)));
 					}			
 				}
 			}
@@ -686,11 +689,15 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}
 
 		public String getTokenClockName() {
-			return "x";
+			return TOKEN_CLOCK_NAME;
 		}
 
 		public boolean isIgnoredPlace(String location) {
-			return location.equals("P_lock") ||  location.equals("P_capacity");
+			return location.equals(PLOCK) ||  location.equals(PCAPACITY);
+		}
+		
+		public boolean isIgnoredAutomata(String automata){
+			return automata.equals(CONTROL_TEMPLATE_NAME);
 		}
 	}
 }

@@ -14,7 +14,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	@Override
 	protected void showResult(VerificationResult result, long verificationTime) {
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
-				result.isQuerySatisfied(0) ? getAnswerNotBoundedString() : getAnswerBoundedString(), 
+				result.isQuerySatisfied() ? getAnswerNotBoundedString() : getAnswerBoundedString(), 
 				"Analysis Result", JOptionPane.INFORMATION_MESSAGE);
 	}
 	

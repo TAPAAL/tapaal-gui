@@ -1,27 +1,29 @@
 package dk.aau.cs.verification;
 
-public class VerificationResult {
-	private QueryResult[] queryResults;
-	private Trace[] traces;
+import dk.aau.cs.petrinet.trace.TAPNTrace;
 
-	public boolean isQuerySatisfied(int index) {
-		return queryResults[index].isQuerySatisfied();
+public class VerificationResult {
+	private QueryResult queryResult;
+	private TAPNTrace trace;
+
+	public boolean isQuerySatisfied() {
+		return queryResult.isQuerySatisfied();
 	}
 		
-	public VerificationResult(QueryResult[] queryResults, Trace[] traces){
-		this.queryResults = queryResults;
-		this.traces = traces;
+	public VerificationResult(QueryResult queryResult){
+		this(queryResult, null);
+	}
+	
+	public VerificationResult(QueryResult queryResult, TAPNTrace trace){
+		this.queryResult = queryResult;
+		this.trace = trace;
 	}
 
-	public QueryResult getQueryResult(int index) {
-		return queryResults[index];
+	public QueryResult getQueryResult() {
+		return queryResult;
 	}		
 	
-	public Trace getTrace(int index){
-		if(traces == null || index >= traces.length){
-			return null;
-		}else{
-			return traces[index];
-		}
+	public TAPNTrace getTrace(){
+		return trace;
 	}
 }

@@ -7,10 +7,9 @@ import dk.aau.cs.TA.trace.SymbolicState;
 import dk.aau.cs.TA.trace.TimeDelayFiringAction;
 import dk.aau.cs.TA.trace.TransitionFiringAction;
 import dk.aau.cs.TA.trace.UppaalTrace;
-import dk.aau.cs.verification.Trace;
 
 public class VerifytaTraceParser {
-	public Trace[] parseTrace(BufferedReader reader){
+	public UppaalTrace parseTrace(BufferedReader reader){
 		UppaalTrace trace = new UppaalTrace();
 		try {			
 			String line;
@@ -41,6 +40,6 @@ public class VerifytaTraceParser {
 			return null;
 		}
 		
-		return trace.length() > 0 ? new Trace[] { trace } : null;
+		return trace.length() == 0 ? null : trace;
 	}
 }

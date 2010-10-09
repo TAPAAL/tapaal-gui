@@ -71,7 +71,7 @@ public class TraceTransformer {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		for(Participant participant : transitionFiring.participants()){
-			if(!namingScheme.isIgnoredPlace(participant.location())){
+			if(!namingScheme.isIgnoredAutomata(participant.automata()) && !namingScheme.isIgnoredPlace(participant.location())){
 				TAPNPlace place = tapn.getPlaceByName(participant.location());
 				Token token = new Token(place, participant.clockValue(namingScheme.getTokenClockName()));
 				tokens.add(token);

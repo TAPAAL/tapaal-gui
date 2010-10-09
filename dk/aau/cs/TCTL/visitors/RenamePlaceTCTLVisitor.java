@@ -51,7 +51,6 @@ public class RenamePlaceTCTLVisitor implements ITCTLVisitor {
 
 	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode) { }
 
-	@Override
 	public void visit(TCTLNotNode notNode) {
 		notNode.getProperty().accept(this);
 	}
