@@ -26,7 +26,7 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 
 	@Override
 	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker) {
-		return new RunKBoundOptimization(modelChecker, spinner);
+		return new RunKBoundOptimization(modelChecker, super.k, spinner);
 	}
 		
 	@Override

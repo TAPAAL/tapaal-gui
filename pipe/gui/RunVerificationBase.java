@@ -1,6 +1,5 @@
 package pipe.gui;
 
-import java.io.File;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
@@ -17,8 +16,6 @@ public abstract class RunVerificationBase extends
 
 	private ModelChecker modelChecker;
 	private VerificationOptions options;
-	private File modelFile; // TODO: MJ -- Get rid of both, used now for legacy support
-	private File queryFile;
 	private TimedArcPetriNet model;
 	private long verificationTime = 0;
 	private TAPNQuery query;
@@ -26,13 +23,6 @@ public abstract class RunVerificationBase extends
 	public RunVerificationBase(ModelChecker modelChecker) {
 		super();
 		this.modelChecker = modelChecker;
-	}
-
-	public void execute(File modelFile, File queryFile, VerificationOptions options){
-		this.modelFile = modelFile;
-		this.queryFile = queryFile;
-		this.options = options;
-		execute();
 	}
 	
 	public void execute(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query){
@@ -45,12 +35,7 @@ public abstract class RunVerificationBase extends
 	@Override
 	protected VerificationResult doInBackground() throws Exception {
 		long startMS = System.currentTimeMillis();
-		VerificationResult result;
-		if(model != null){
-			result = modelChecker.verify(options, model, query);
-		}else{
-			result = modelChecker.verify(options, modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
-		}
+		VerificationResult result = modelChecker.verify(options, model, query);
 		long endMS = System.currentTimeMillis();
 		
 		verificationTime = endMS - startMS;

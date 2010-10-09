@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.verification.FiringAction;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
@@ -18,7 +17,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
-public class TransitionFiringAction implements FiringAction {
+public class TransitionFiringAction implements TAFiringAction {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final String channel;
 	private final SymbolicState state;
@@ -64,7 +63,7 @@ public class TransitionFiringAction implements FiringAction {
 			String automata = matcher.group(1);
 			String location = matcher.group(2);
 			HashMap<String,BigDecimal> clockValues = state.getClockValues(automata);
-			participants[i-1] = new Participant(location, clockValues);
+			participants[i-1] = new Participant(automata, location, clockValues);
 		}		
 
 		return participants;
@@ -73,9 +72,11 @@ public class TransitionFiringAction implements FiringAction {
 	private static String parseChannel(String string) {
 		Pattern pattern = Pattern.compile("(\\w+)(?:\\?|!)");
 		Matcher matcher = pattern.matcher(string);
-		matcher.find();
-
-		return matcher.group(1);
+		
+		if(matcher.find())
+			return matcher.group(1);
+		else
+			return "tau";
 	}
 
 	public Participant[] participants() {

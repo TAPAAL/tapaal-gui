@@ -11,13 +11,15 @@ import java.util.regex.Pattern;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
+import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.Trace;
+import dk.aau.cs.verification.TraceTransformer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -164,22 +166,27 @@ public class Verifyta implements ModelChecker {
 		return buffer.toString();
 	}
 
-	// TODO: MJ - get rid of this method -- used for legacy support
-	public VerificationResult verify(VerificationOptions options, String modelFile, String queryFile) {
-		runner = new ProcessRunner(verifytapath, createArgumentString(modelFile, queryFile, options));
+	private VerificationResult verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel) {
+		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 
 		if(runner.error()){
 			return null;
 		}else{			
 			VerifytaOutputParser outputParser = new VerifytaOutputParser();
-			QueryResult[] results = outputParser.parseOutput(runner.standardOutput());
+			QueryResult queryResult = outputParser.parseOutput(runner.standardOutput());
 
 			VerifytaTraceParser traceParser = new VerifytaTraceParser();
-			Trace[] traces = traceParser.parseTrace(runner.errorOutput());
+			UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
 			
-			VerificationResult result = new VerificationResult(results, traces);
-
+			VerificationResult result = null;
+			if(trace == null){
+				result = new VerificationResult(queryResult);
+			}else{
+				TraceTransformer traceIntepreter = new TraceTransformer(model, exportedModel.namingScheme());
+				TAPNTrace tapnTrace = traceIntepreter.interpretTrace(trace);
+				result = new VerificationResult(queryResult, tapnTrace);
+			}
 			return result;
 		}
 	}
@@ -197,7 +204,7 @@ public class Verifyta implements ModelChecker {
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
 						
-		return verify(options, exportedModel.modelFile(), exportedModel.queryFile());
+		return verify(options, model, exportedModel);
 	}
 
 	public void kill(){

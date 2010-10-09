@@ -40,4 +40,8 @@ public class StandardNamingScheme implements TranslationNamingScheme {
 	public boolean isIgnoredPlace(String location) {
 		return location.equals("P_lock") ||  location.equals("P_capacity");
 	}
+
+	public boolean isIgnoredAutomata(String automata) {
+		return false;
+	}
 }

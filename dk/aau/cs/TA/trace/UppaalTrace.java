@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dk.aau.cs.verification.FiringAction;
 import dk.aau.cs.verification.Trace;
 
 public class UppaalTrace implements Trace {
-	private List<FiringAction> firingActions;
+	private List<TAFiringAction> firingActions;
 	private List<SymbolicState> symbolicStates;
 	
 	public UppaalTrace(){
-		firingActions = new ArrayList<FiringAction>();
+		firingActions = new ArrayList<TAFiringAction>();
 		symbolicStates = new ArrayList<SymbolicState>();
 	}
 
@@ -20,11 +19,11 @@ public class UppaalTrace implements Trace {
 		symbolicStates.add(state);
 	}
 	
-	public void addFiringAction(FiringAction action){
+	public void addFiringAction(TAFiringAction action){
 		firingActions.add(action);
 	}
 	
-	public Iterator<FiringAction> iterator() {
+	public Iterator<TAFiringAction> iterator() {
 		return firingActions.iterator();
 	}
 	

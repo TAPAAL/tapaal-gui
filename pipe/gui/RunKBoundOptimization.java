@@ -9,20 +9,22 @@ import dk.aau.cs.verification.VerificationResult;
 public class RunKBoundOptimization extends RunKBoundAnalysis {
 
 	private JSpinner spinner;
-
-	public RunKBoundOptimization(ModelChecker modelChecker, JSpinner spinner) {
+	private int extraTokens;
+	
+	public RunKBoundOptimization(ModelChecker modelChecker, int extraTokens, JSpinner spinner) {
 		super(modelChecker);
+		this.extraTokens = extraTokens;
 		this.spinner = spinner;
 	}
 
 	@Override
 	protected void showResult(VerificationResult result, long verificationTime) {
-		if(result.isQuerySatisfied(0)){
+		if(result.getQueryResult().integerResult() == extraTokens+1){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					getAnswerNotBoundedString(), 
 					"Analysis Result", JOptionPane.INFORMATION_MESSAGE);
 		}else{
-			spinner.setValue(result.getQueryResult(1).integerResult());
+			spinner.setValue(result.getQueryResult().integerResult());
 		}
 	}
 	

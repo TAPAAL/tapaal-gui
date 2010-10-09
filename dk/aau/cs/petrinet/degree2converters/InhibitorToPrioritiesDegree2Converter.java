@@ -61,7 +61,7 @@ public class InhibitorToPrioritiesDegree2Converter implements Degree2Converter {
 
 		List<Token> tokens = model.getTokens();
 		for(Token token : tokens){
-			tapn.addToken(new Token((TAPNPlace) nameToPTO.get(token.getPlace().getName())));
+			tapn.addToken(new Token((TAPNPlace) nameToPTO.get(token.place().getName())));
 		}
 
 		tapn.addToken(new Token((TAPNPlace)nameToPTO.get(PLOCK)));

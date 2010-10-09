@@ -19,6 +19,7 @@ import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.translations.ModelTransformer;
 import dk.aau.cs.translations.QueryTransformer;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer;
@@ -37,6 +38,7 @@ public class UppaalExporter {
 
 		ModelTransformer<TimedArcPetriNet, NTA> modelTransformer = null;
 		QueryTransformer<TAPNQuery, UPPAALQuery> queryTransformer = null;
+
 		if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
 			ColoredBroadcastTransformer transformer = new ColoredBroadcastTransformer(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			modelTransformer = transformer;
@@ -68,7 +70,7 @@ public class UppaalExporter {
 			return null;
 		}
 
-		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
+		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), null);
 	}
 
 	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){
@@ -77,6 +79,7 @@ public class UppaalExporter {
 		if(xmlfile == null || qfile == null) return null;
 
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
+		TranslationNamingScheme namingScheme = null;
 		if (reduction == ReductionOption.STANDARDSYMMETRY){
 
 			NaiveUppaalSym t = new NaiveUppaalSym();
@@ -105,7 +108,7 @@ public class UppaalExporter {
 			}	
 		} else if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
 			TAPNToNTABroadcastTransformer broadcastTransformer = new TAPNToNTABroadcastTransformer(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
-
+			namingScheme = broadcastTransformer.namingScheme();
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
@@ -196,7 +199,7 @@ public class UppaalExporter {
 
 
 		}
-		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath());
+		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), namingScheme);
 	}
 
 	private File createTempFile(String ending) {

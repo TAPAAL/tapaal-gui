@@ -13,8 +13,5 @@ public interface ModelChecker {
 	String getPath(); // TODO: MJ -- Delete me when refactoring is done
 
 	VerificationResult verify(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query);
-	// TODO: MJ -- get rid of xmlFile and queryFile.. Legacy stuff to support older reductions
-	VerificationResult verify(VerificationOptions options, String modelFile, String queryFile);
-	
 	void kill();
 }
