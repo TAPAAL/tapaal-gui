@@ -5,6 +5,8 @@ package pipe.gui;
 
 import javax.swing.JOptionPane;
 
+import pipe.dataLayer.TAPNTrace;
+
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -23,10 +25,10 @@ public class RunVerification extends RunVerificationBase {
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 			
 			if(result.getTrace() != null){ // TODO: This is too simplistic.. It works because the same naming scheme works for all translations (excluding colors)
-//				TraceTransformer traceTransformer = new TraceTransformer(CreateGui.getModel(), new StandardNamingScheme());
-//				TAPNTrace trace = traceTransformer.interpretTrace((UppaalTrace)result.getTrace(0));
-//				showAnimationMode();
-//				CreateGui.getAnimator().SetTrace(trace);
+				TraceTransformer interpreter = new TraceTransformer(CreateGui.getModel());
+				TAPNTrace trace = interpreter.interpretTrace(result.getTrace());
+				showAnimationMode();
+				CreateGui.getAnimator().SetTrace(trace);
 			}
 		}
 	}

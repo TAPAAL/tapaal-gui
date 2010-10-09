@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
@@ -19,7 +20,6 @@ import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.TraceTransformer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -181,9 +181,12 @@ public class Verifyta implements ModelChecker {
 			
 			VerificationResult result = null;
 			if(trace == null){
+				if(((VerifytaOptions)options).trace() != TraceOption.NONE){
+					messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
+				}
 				result = new VerificationResult(queryResult);
 			}else{
-				TraceTransformer traceIntepreter = new TraceTransformer(model, exportedModel.namingScheme());
+				VerifytaTraceInterpreter traceIntepreter = new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
 				TAPNTrace tapnTrace = traceIntepreter.interpretTrace(trace);
 				result = new VerificationResult(queryResult, tapnTrace);
 			}

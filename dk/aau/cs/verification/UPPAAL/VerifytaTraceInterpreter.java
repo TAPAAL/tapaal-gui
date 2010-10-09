@@ -1,4 +1,4 @@
-package dk.aau.cs.verification;
+package dk.aau.cs.verification.UPPAAL;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation;
 
-public class TraceTransformer {
+public class VerifytaTraceInterpreter {
 	private final TimedArcPetriNet tapn;
 	private final TranslationNamingScheme namingScheme;
 
-	public TraceTransformer(TimedArcPetriNet tapn, TranslationNamingScheme namingScheme){
+	public VerifytaTraceInterpreter(TimedArcPetriNet tapn, TranslationNamingScheme namingScheme){
 		this.tapn = tapn;
 		this.namingScheme = namingScheme;
 	}

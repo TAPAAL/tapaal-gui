@@ -20,8 +20,8 @@ public class TransitionFiringAction implements TAPNFiringAction {
 		this.consumedTokens = consumedTokens;
 	}
 	
-	public TAPNTransition transition(){
-		return firedtransition;
+	public String transition(){
+		return firedtransition.getName();
 	}
 	
 	public List<Token> consumedTokens(){

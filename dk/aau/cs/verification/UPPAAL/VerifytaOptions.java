@@ -23,6 +23,10 @@ public class VerifytaOptions implements VerificationOptions {
 		this.untimedTrace = untimedTrace;
 		this.reduction = reduction;
 	}
+	
+	public TraceOption trace(){
+		return traceOption;
+	}
 		
 	@Override
 	public String toString(){
