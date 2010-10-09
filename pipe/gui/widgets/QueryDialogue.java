@@ -1,6 +1,7 @@
 package pipe.gui.widgets;
 
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -28,12 +29,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -89,13 +97,18 @@ public class QueryDialogue extends JPanel{
 	private JRadioButton forAllDiamond;
 	private JRadioButton forAllBox;	
 
-	private JTextField queryField;
+	private JTextPane queryField;
 
 	private JPanel logicButtonPanel;
 	private ButtonGroup logicButtonGroup;
 	private JButton conjunctionButton;
 	private JButton disjunctionButton;
 	private JButton negationButton;
+
+	private JPanel editingButtonPanel;
+	private ButtonGroup editingButtonsGroup;
+	private JButton deleteButton;
+	private JButton resetButton;
 
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
@@ -268,12 +281,29 @@ public class QueryDialogue extends JPanel{
 		queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
 
 		// Query Text Field
-		queryField = new JTextField();
-		
-		
+		queryField = new JTextPane();
+
+		StyledDocument doc = queryField.getStyledDocument();
+
+		//  Set alignment to be centered for all paragraphs
+
+		MutableAttributeSet standard = new SimpleAttributeSet();
+		StyleConstants.setAlignment(standard, StyleConstants.ALIGN_CENTER);
+		doc.setParagraphAttributes(0, 0, standard, true);
+
 		queryField.setText(newProperty.toString());
-		queryField.setHorizontalAlignment(SwingConstants.CENTER);
 		queryField.setEditable(false);
+
+		//Put the text pane in a scroll pane.
+		JScrollPane queryScrollPane = new JScrollPane(queryField);
+		queryScrollPane.setVerticalScrollBarPolicy(
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		Dimension d = new Dimension(882, 50);
+		queryScrollPane.setPreferredSize(d);
+		queryScrollPane.setMinimumSize(d);
+
+
+
 		queryField.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -314,10 +344,10 @@ public class QueryDialogue extends JPanel{
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridwidth = 4;
 
-		queryPanel.add(queryField,gbc);
+		queryPanel.add(queryScrollPane,gbc);
 
 		// Quantification Panel
 		quantificationPanel = new JPanel(new GridBagLayout());
@@ -339,7 +369,7 @@ public class QueryDialogue extends JPanel{
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		quantificationPanel.add(existsDiamond, gbc);
-		
+
 		// bit of a hack, possible because quantifier node is always the first node atm (we cant have nested quantifiers)
 		if (queryToCreateFrom != null){
 			if (queryToCreateFrom.getProperty() instanceof TCTLEFNode){
@@ -408,7 +438,7 @@ public class QueryDialogue extends JPanel{
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 			}
-		});
+		});		
 
 		// Logic panel
 		logicButtonPanel = new JPanel(new GridBagLayout());
@@ -431,7 +461,7 @@ public class QueryDialogue extends JPanel{
 
 		gbc.gridy = 1;
 		logicButtonPanel.add(disjunctionButton,gbc);
-		
+
 		gbc.gridy = 2;
 		logicButtonPanel.add(negationButton,gbc);
 
@@ -463,6 +493,7 @@ public class QueryDialogue extends JPanel{
 		disjunctionButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+
 						TCTLOrNode property;
 						if(currentSelection.getObject() instanceof TCTLAndNode || currentSelection.getObject() instanceof TCTLOrNode){
 							property = new TCTLOrNode(getStateChild(1,currentSelection.getObject()), 
@@ -477,7 +508,7 @@ public class QueryDialogue extends JPanel{
 					}
 				}
 		);
-		
+
 		negationButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -545,9 +576,58 @@ public class QueryDialogue extends JPanel{
 
 		);
 
+		// Editing buttons panel
+		editingButtonPanel = new JPanel(new GridBagLayout());
+		editingButtonPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
+
+		editingButtonsGroup = new ButtonGroup();
+		deleteButton = new JButton("Delete Selection");
+		resetButton = new JButton("Reset Query");
+
+		editingButtonsGroup.add(deleteButton);
+		editingButtonsGroup.add(resetButton);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		editingButtonPanel.add(deleteButton,gbc);
+
+		gbc.gridy = 1;
+		editingButtonPanel.add(resetButton, gbc);
+
+		// Add action Listeners
+		deleteButton.addActionListener(
+				new ActionListener() {
+
+					public void actionPerformed(ActionEvent e) {
+						deleteSelection();
+					}
+				}	
+		);
+
+		resetButton.addActionListener(
+				new ActionListener() {
+
+					public void actionPerformed(ActionEvent e) {
+						newProperty = new TCTLPathPlaceHolder();
+						updateSelection(newProperty);
+					}
+				}
+		);
+
+
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.VERTICAL;
+		queryPanel.add(editingButtonPanel,gbc);
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.WEST;
 		add(queryPanel, gbc);
 
@@ -1001,10 +1081,10 @@ public class QueryDialogue extends JPanel{
 		}else{
 			options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
 		}
-		
+
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
 		boolean selectedOptionStillAvailable = false;
-		
+
 		reductionOption.removeAllItems();
 
 		for (String s : options){
@@ -1014,10 +1094,10 @@ public class QueryDialogue extends JPanel{
 				selectedOptionStillAvailable = true;
 			}
 		}
-		
+
 		if(selectedOptionStillAvailable)
 			reductionOption.setSelectedItem(reductionOptionString);
-		
+
 	}
 
 	private void enableAllReductionOptions(){
@@ -1042,10 +1122,10 @@ public class QueryDialogue extends JPanel{
 			//reductionOption.addItem(name_SUPERBROADCAST);
 			//reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
-		
+
 		reductionOption.setSelectedItem(reductionOptionString);
-		
-		
+
+
 	}
 
 
@@ -1063,7 +1143,8 @@ public class QueryDialogue extends JPanel{
 		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent); 
 		contentPane.add( queryDialogue );
 
-		guiDialog.setResizable(false);     
+		guiDialog.setResizable(false); 
+
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
@@ -1172,9 +1253,9 @@ public class QueryDialogue extends JPanel{
 	private void updateSelection(TCTLAbstractProperty newSelection) {
 		queryField.setText(newProperty.toString());
 		if (currentSelection != null) {
-			
+
 			StringPosition position = GetNewSelectionPosition(newSelection);
-			
+
 			queryField.select(position.getStart(),position.getEnd());
 			currentSelection = position;
 			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
@@ -1194,10 +1275,10 @@ public class QueryDialogue extends JPanel{
 	// When there is only one child property we want to select that child instead of the whole parent.
 	// E.g. if selection is EF <*> then we want to select <*> to allow for speedier query construction.
 	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
-		
+
 		StringPosition position;
-		
-		
+
+
 		if(newSelection instanceof TCTLEFNode){
 			position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
 		}
@@ -1216,21 +1297,24 @@ public class QueryDialogue extends JPanel{
 		else {
 			position = newProperty.indexOf(newSelection);
 		}
-		
+
 		return position;
 	}
 
 	// Delete current selection
 	private void deleteSelection() {
-		TCTLAbstractProperty replacement = null;
-		if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-			replacement = getStateChild(1, currentSelection.getObject());
-		} else if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-			replacement = new TCTLPathPlaceHolder();
-		}
-		if(replacement !=null) {
-			newProperty = newProperty.replace(currentSelection.getObject(), replacement);
-			updateSelection(replacement);
+		if(currentSelection != null)
+		{
+			TCTLAbstractProperty replacement = null;
+			if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+				replacement = getStateChild(1, currentSelection.getObject());
+			} else if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
+				replacement = new TCTLPathPlaceHolder();
+			}
+			if(replacement !=null) {
+				newProperty = newProperty.replace(currentSelection.getObject(), replacement);
+				updateSelection(replacement);
+			}
 		}
 	}
 

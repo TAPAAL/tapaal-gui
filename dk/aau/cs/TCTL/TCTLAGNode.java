@@ -46,7 +46,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 	public boolean equals(Object o) {
 		if(o instanceof TCTLAGNode) {
 			TCTLAGNode node = (TCTLAGNode)o;
-			return getProperty().equals(node.getProperty());
+			return property.equals(node.getProperty());
 		}
 		return false;
 	}
@@ -59,7 +59,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty copy() {
-		return new TCTLAGNode(getProperty().copy());
+		return new TCTLAGNode(property.copy());
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
-			setProperty(getProperty().replace(object1, object2));
+			property = property.replace(object1, object2);
 			return this;
 		}
 	}
@@ -84,7 +84,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public boolean containsPlaceHolder() {
-		return getProperty().containsPlaceHolder();
+		return property.containsPlaceHolder();
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 	public boolean equals(Object o) {
 		if(o instanceof TCTLAFNode) {
 			TCTLAFNode node = (TCTLAFNode)o;
-			return getProperty().equals(node.getProperty());
+			return property.equals(node.getProperty());
 		}
 		return false;
 	}
@@ -61,7 +61,7 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty copy() {
-		return new TCTLAFNode(getProperty().copy());
+		return new TCTLAFNode(property.copy());
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
-			setProperty(getProperty().replace(object1, object2));
+			property = property.replace(object1, object2);
 			return this;
 		}
 	}
@@ -85,7 +85,7 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public boolean containsPlaceHolder() {
-		return getProperty().containsPlaceHolder();
+		return property.containsPlaceHolder();
 	}
 
 
