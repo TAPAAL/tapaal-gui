@@ -159,7 +159,11 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		}		
 
 		for(TAPNTransition t : model.getTransitions()){
-			if(t.isDegree2() && !t.hasInhibitorArcs()){
+			if(t.isDegree1() && !t.hasInhibitorArcs()){
+				builder.append("broadcast chan ");
+				builder.append(t.getName());
+				builder.append(";");
+			}else if(t.isDegree2() && !t.hasInhibitorArcs()){
 				builder.append("chan ");
 				builder.append(t.getName());
 				builder.append(";\n");
@@ -420,7 +424,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			Edge e = new Edge(getLocationByName(pair.getInput().getName()),
 					getLocationByName(pair.getOutput().getName()),
 					createTransitionGuardWithLock(pair.getInputArc(), pair.getOutputArc(), pair.getOutput(), pair.getArcType()==ArcType.TARC),
-					"",
+					t.getName() + "!",
 					createResetExpressionIfNormalArc(pair.getOutputArc()));
 
 			ta.addTransition(e);
@@ -665,12 +669,13 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 		
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
-
+			
 			for(int i = 0; i < firingSequence.size(); i++){
 				String transitionName = firingSequence.get(i);
 				if(!isIgnoredTransition(transitionName)){
 					Matcher startMatcher = startPattern.matcher(transitionName);
 					Matcher endMatcher = endPattern.matcher(transitionName);
+					
 					if(startMatcher.find() && !endMatcher.find() && !transitionName.equals(TAU)){
 						transitionTranslations.add(new TransitionTranslation(i, startMatcher.group(1)));
 					}			

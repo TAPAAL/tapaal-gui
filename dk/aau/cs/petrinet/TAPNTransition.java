@@ -82,4 +82,8 @@ public class TAPNTransition extends Transition {
 	{
 		return preset.size() <= 2 && postset.size() <= 2;
 	}
+
+	public boolean isDegree1() {
+		return preset.size() == 1 && postset.size() == 1;
+	}
 }
