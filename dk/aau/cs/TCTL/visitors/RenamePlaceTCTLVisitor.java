@@ -6,6 +6,7 @@ import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
@@ -49,5 +50,10 @@ public class RenamePlaceTCTLVisitor implements ITCTLVisitor {
 	public void visit(TCTLStatePlaceHolder statePlaceHolderNode) { }
 
 	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode) { }
+
+	@Override
+	public void visit(TCTLNotNode notNode) {
+		notNode.getProperty().accept(this);
+	}
 
 }

@@ -53,6 +53,7 @@ import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
@@ -94,6 +95,7 @@ public class QueryDialogue extends JPanel{
 	private ButtonGroup logicButtonGroup;
 	private JButton conjunctionButton;
 	private JButton disjunctionButton;
+	private JButton negationButton;
 
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
@@ -263,7 +265,7 @@ public class QueryDialogue extends JPanel{
 
 	private void initQueryPanel(final TAPNQuery queryToCreateFrom) {
 		queryPanel = new JPanel(new GridBagLayout());
-		queryPanel.setBorder(BorderFactory.createTitledBorder("Query"));
+		queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
 
 		// Query Text Field
 		queryField = new JTextField();
@@ -415,9 +417,11 @@ public class QueryDialogue extends JPanel{
 		logicButtonGroup = new ButtonGroup();
 		conjunctionButton = new JButton("And");
 		disjunctionButton = new JButton("Or");
+		negationButton = new JButton("not");
 
 		logicButtonGroup.add(conjunctionButton);
 		logicButtonGroup.add(disjunctionButton);
+		logicButtonGroup.add(negationButton);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -427,6 +431,9 @@ public class QueryDialogue extends JPanel{
 
 		gbc.gridy = 1;
 		logicButtonPanel.add(disjunctionButton,gbc);
+		
+		gbc.gridy = 2;
+		logicButtonPanel.add(negationButton,gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -467,6 +474,16 @@ public class QueryDialogue extends JPanel{
 						newProperty = newProperty.replace(currentSelection.getObject(), property);
 						updateSelection(property);
 
+					}
+				}
+		);
+		
+		negationButton.addActionListener(
+				new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						TCTLNotNode property = new TCTLNotNode(getState(currentSelection.getObject()));
+						newProperty = newProperty.replace(currentSelection.getObject(), property);
+						updateSelection(property);
 					}
 				}
 		);
@@ -1074,6 +1091,7 @@ public class QueryDialogue extends JPanel{
 		forAllDiamond.setEnabled(false);
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
+		negationButton.setEnabled(false);
 		placesBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
@@ -1088,6 +1106,7 @@ public class QueryDialogue extends JPanel{
 		forAllDiamond.setEnabled(true);
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
+		negationButton.setEnabled(false);	
 		placesBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
@@ -1101,6 +1120,7 @@ public class QueryDialogue extends JPanel{
 		forAllDiamond.setEnabled(false);
 		conjunctionButton.setEnabled(true);
 		disjunctionButton.setEnabled(true);
+		negationButton.setEnabled(true);
 		placesBox.setEnabled(true);
 		relationalOperatorBox.setEnabled(true);
 		placeMarking.setEnabled(true);
@@ -1152,7 +1172,9 @@ public class QueryDialogue extends JPanel{
 	private void updateSelection(TCTLAbstractProperty newSelection) {
 		queryField.setText(newProperty.toString());
 		if (currentSelection != null) {
-			StringPosition position = newProperty.indexOf(newSelection);
+			
+			StringPosition position = GetNewSelectionPosition(newSelection);
+			
 			queryField.select(position.getStart(),position.getEnd());
 			currentSelection = position;
 			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
@@ -1168,6 +1190,37 @@ public class QueryDialogue extends JPanel{
 		}
 	}
 
+	// returns the position in the string of the new selection.
+	// When there is only one child property we want to select that child instead of the whole parent.
+	// E.g. if selection is EF <*> then we want to select <*> to allow for speedier query construction.
+	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
+		
+		StringPosition position;
+		
+		
+		if(newSelection instanceof TCTLEFNode){
+			position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLEGNode) {
+			position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLAFNode) {
+			position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLAGNode) {
+			position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
+		}
+		else if(newSelection instanceof TCTLNotNode) {
+			position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
+		}
+		else {
+			position = newProperty.indexOf(newSelection);
+		}
+		
+		return position;
+	}
+
+	// Delete current selection
 	private void deleteSelection() {
 		TCTLAbstractProperty replacement = null;
 		if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {

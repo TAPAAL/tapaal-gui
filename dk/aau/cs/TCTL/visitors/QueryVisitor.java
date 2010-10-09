@@ -6,6 +6,7 @@ import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
@@ -69,6 +70,13 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		orNode.getProperty1().accept(this);
 		uppaalQuery.append(" || ");
 		orNode.getProperty2().accept(this);
+		uppaalQuery.append(")");
+	}
+	
+	public void visit(TCTLNotNode notNode) {
+		uppaalQuery.append("!");
+		uppaalQuery.append("(");
+		notNode.getProperty().accept(this);
 		uppaalQuery.append(")");
 	}
 

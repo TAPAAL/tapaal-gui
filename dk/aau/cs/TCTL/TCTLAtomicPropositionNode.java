@@ -46,23 +46,23 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLAtomicPropositionNode(place, op, n);
 	}
-
-	@Override
-	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this.equals(object1) && object2 instanceof TCTLAbstractStateProperty) {
-			return (TCTLAbstractStateProperty)object2;
-		} else {
-			return this;
-		}
-	}
-
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)o;
-			return place.equals(node.getPlace()) && op.equals(node.getOp()) && (n == node.getN());
+			return this.place == node.getPlace() && this.op == node.getOp() && this.n == node.getN();
 		}
 		return false;
+	}
+
+	@Override
+	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
+		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
+			return (TCTLAbstractStateProperty)object2;
+		} else {
+			return this;
+		}
 	}
 
 	@Override

@@ -39,6 +39,8 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.undo.UndoableEdit;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
 
@@ -2734,9 +2736,10 @@ implements Cloneable {
 		}catch (Exception e) {
 			capacity = "3";
 		}
-		String query;
+		TAPAALQueryParser queryParser = new TAPAALQueryParser();
+		TCTLAbstractProperty query;
 		try{
-			query = queryElement.getAttribute("query");
+			query = queryParser.parse(queryElement.getAttribute("query"));
 			return new TAPNQuery(comment, Integer.parseInt(capacity), query, traceOption, searchOption, reductionOption, hashTableSize, extrapolationOption);
 		}catch (Exception e) {
 			System.err.println("No query was specified: " + e.getStackTrace());

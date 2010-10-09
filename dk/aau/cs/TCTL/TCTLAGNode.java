@@ -44,8 +44,8 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof TCTLEFNode) {
-			TCTLEFNode node = (TCTLEFNode)o;
+		if(o instanceof TCTLAGNode) {
+			TCTLAGNode node = (TCTLAGNode)o;
 			return getProperty().equals(node.getProperty());
 		}
 		return false;
@@ -64,7 +64,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
-		if (this.equals(object1) && object2 instanceof TCTLAbstractPathProperty) {
+		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
 			return (TCTLAbstractPathProperty)object2;
 		} else {
 			setProperty(getProperty().replace(object1, object2));
