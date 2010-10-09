@@ -7,6 +7,7 @@ import java.util.List;
 
 import dk.aau.cs.TA.trace.Participant;
 import dk.aau.cs.TA.trace.TAFiringAction;
+import dk.aau.cs.TA.trace.TimeDelayFiringAction;
 import dk.aau.cs.TA.trace.TransitionFiringAction;
 import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.petrinet.TAPNPlace;
@@ -56,11 +57,11 @@ public class TraceTransformer {
 			}
 
 
-//			if(action != null && action instanceof TimeDelayFiringAction){
-//				BigDecimal delay = ((TimeDelayFiringAction)action).getDelay();
-//				pipe.dataLayer.TimeDelayFiringAction delayAction = new pipe.dataLayer.TimeDelayFiringAction(delay);
-//				result.addFiringAction(delayAction);
-//			}
+			if(action != null && action instanceof TimeDelayFiringAction){
+				BigDecimal delay = ((TimeDelayFiringAction)action).getDelay();
+				TAPNFiringAction delayAction = new dk.aau.cs.petrinet.trace.TimeDelayFiringAction(delay);
+				result.addFiringAction(delayAction);
+			}
 		}
 
 		return result;
