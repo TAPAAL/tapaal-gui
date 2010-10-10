@@ -44,11 +44,11 @@ import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
+import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
-import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
+import dk.aau.cs.translations.tapn.BroadcastTranslation;
 
 
 
@@ -337,11 +337,11 @@ public class Export {
 
 
 		} else if(input.getReductionOption() == ReductionOption.BROADCAST || input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY){
-			TAPNToNTABroadcastTransformer broadcastTransformer = null;
+			BroadcastTranslation broadcastTransformer = null;
 			if(appModel.isUsingColors()){
-				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredBroadcastTransformer(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
+				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
 			}else{
-				broadcastTransformer = new dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
+				broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
 			}
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
@@ -355,11 +355,11 @@ public class Export {
 				e.printStackTrace();
 			}
 		} else if(input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY || input.getReductionOption() == ReductionOption.DEGREE2BROADCAST){
-			Degree2BroadcastTransformer broadcastTransformer = null;
+			Degree2BroadcastTranslation broadcastTransformer = null;
 			if(appModel.isUsingColors()){
-				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer(capacity, input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			}else{
-				broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTransformer(capacity, input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+				broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			}
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);

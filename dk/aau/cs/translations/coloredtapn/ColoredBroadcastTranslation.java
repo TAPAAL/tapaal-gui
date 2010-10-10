@@ -17,12 +17,12 @@ import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
 import dk.aau.cs.translations.ColoredTranslationNamingScheme;
-import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
+import dk.aau.cs.translations.tapn.BroadcastTranslation;
 
-public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
+public class ColoredBroadcastTranslation extends BroadcastTranslation {
 	private static final String VALUE_VAR_NAME = "value";
 
-	public ColoredBroadcastTransformer(int extraTokens, boolean useSymmetry) {
+	public ColoredBroadcastTranslation(int extraTokens, boolean useSymmetry) {
 		super(extraTokens, useSymmetry);
 	}
 

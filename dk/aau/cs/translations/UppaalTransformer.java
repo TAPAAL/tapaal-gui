@@ -18,7 +18,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 /**
  * @deprecated
- * use ModelTransformer and QueryTransformer interfaces instead
+ * use ModelTranslator and QueryTranslator interfaces instead
  */
 @Deprecated
 public interface UppaalTransformer {

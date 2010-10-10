@@ -1,5 +1,5 @@
 package dk.aau.cs.translations;
 
-public interface ModelTransformer<TInput, TOutput> {
+public interface ModelTranslator<TInput, TOutput> {
 	TOutput transformModel(TInput model) throws Exception;
 }

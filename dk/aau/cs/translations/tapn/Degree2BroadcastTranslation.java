@@ -27,14 +27,14 @@ import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.degree2converters.InhibDegree2Converter;
-import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.Pairing;
-import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.Pairing.ArcType;
 
-public class Degree2BroadcastTransformer implements
-ModelTransformer<TimedArcPetriNet, NTA>,
-QueryTransformer<TAPNQuery, UPPAALQuery>{
+public class Degree2BroadcastTranslation implements
+ModelTranslator<TimedArcPetriNet, NTA>,
+QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	private static final String PLOCK = "P_lock";
@@ -61,7 +61,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	private int largestPresetSize = 0;
 	private boolean useSymmetry;
 
-	public Degree2BroadcastTransformer(int extraTokens, boolean useSymmetry) {
+	public Degree2BroadcastTranslation(int extraTokens, boolean useSymmetry) {
 		this.extraTokens = extraTokens;
 		this.useSymmetry = useSymmetry;
 	}

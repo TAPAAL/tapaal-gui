@@ -17,13 +17,13 @@ import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
 import dk.aau.cs.petrinet.degree2converters.ColoredInhibDegree2Converter;
-import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
+import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 
-public class ColoredDegree2BroadcastTransformer extends
-Degree2BroadcastTransformer {
+public class ColoredDegree2BroadcastTranslation extends
+Degree2BroadcastTranslation {
 	private static final String VALUE_VAR_NAME = "value";
 
-	public ColoredDegree2BroadcastTransformer(int extraTokens,
+	public ColoredDegree2BroadcastTranslation(int extraTokens,
 			boolean useSymmetry) {
 		super(extraTokens, useSymmetry);
 	}

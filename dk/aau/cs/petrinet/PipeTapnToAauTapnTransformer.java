@@ -20,9 +20,9 @@ import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
-import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.ModelTranslator;
 
-public class PipeTapnToAauTapnTransformer implements ModelTransformer<DataLayer, TimedArcPetriNet> {
+public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, TimedArcPetriNet> {
 	protected DataLayer appModel;
 	protected TAPN aAUPetriNet;
 	protected int capacity;

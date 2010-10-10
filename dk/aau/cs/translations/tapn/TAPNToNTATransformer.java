@@ -18,12 +18,12 @@ import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.degree2converters.InhibitorToPrioritiesDegree2Converter;
-import dk.aau.cs.translations.ModelTransformer;
-import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.ModelTranslator;
+import dk.aau.cs.translations.QueryTranslator;
 
 public abstract class TAPNToNTATransformer implements 
-ModelTransformer<TimedArcPetriNet, NTA>,
-QueryTransformer<TAPNQuery, UPPAALQuery>{
+ModelTranslator<TimedArcPetriNet, NTA>,
+QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	protected static final String CLOCK_NAME = "x";

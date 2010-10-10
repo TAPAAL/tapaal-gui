@@ -13,7 +13,7 @@ import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
 public class ColoredDegree2BroadcastKBoundOptimizationTransformer extends
-		ColoredDegree2BroadcastTransformer {
+		ColoredDegree2BroadcastTranslation {
 
 	private final String usedExtraTokens = "usedExtraTokens";
 	private int tokens = 0;

@@ -24,15 +24,15 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
-import dk.aau.cs.translations.ModelTransformer;
+import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.Pairing;
-import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.Pairing.ArcType;
 
-public class TAPNToNTABroadcastTransformer implements
-ModelTransformer<TimedArcPetriNet, NTA>,
-QueryTransformer<TAPNQuery, UPPAALQuery>{
+public class BroadcastTranslation implements
+ModelTranslator<TimedArcPetriNet, NTA>,
+QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 	private int extraTokens;
 	private int largestPresetSize = 0;
@@ -58,7 +58,7 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
-	public TAPNToNTABroadcastTransformer(int extraTokens, boolean useSymmetry){
+	public BroadcastTranslation(int extraTokens, boolean useSymmetry){
 		this.extraTokens = extraTokens;
 		this.useSymmetry = useSymmetry;
 	}

@@ -14,18 +14,18 @@ import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.translations.ColoredTranslationNamingScheme;
-import dk.aau.cs.translations.ModelTransformer;
-import dk.aau.cs.translations.QueryTransformer;
+import dk.aau.cs.translations.ModelTranslator;
+import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.TranslationNamingScheme;
-import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTransformer;
+import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
-import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer;
-import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
+import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation;
+import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
-import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
+import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
 
@@ -37,24 +37,24 @@ public class UppaalExporter {
 
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
 
-		ModelTransformer<TimedArcPetriNet, NTA> modelTransformer = null;
-		QueryTransformer<TAPNQuery, UPPAALQuery> queryTransformer = null;
+		ModelTranslator<TimedArcPetriNet, NTA> modelTransformer = null;
+		QueryTranslator<TAPNQuery, UPPAALQuery> queryTransformer = null;
 		ColoredTranslationNamingScheme namingScheme = null;
 		if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
-			ColoredBroadcastTransformer transformer = new ColoredBroadcastTransformer(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
+			ColoredBroadcastTranslation transformer = new ColoredBroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			modelTransformer = transformer;
 			queryTransformer = transformer;
 			namingScheme = transformer.namingScheme();
 		}  else if(reduction == ReductionOption.KBOUNDANALYSIS){
-			Degree2BroadcastTransformer broadcastTransformer = new ColoredDegree2BroadcastTransformer(extraTokens, true);
+			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(extraTokens, true);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
 		}else if(reduction == ReductionOption.KBOUNDOPTMIZATION){
-			Degree2BroadcastTransformer broadcastTransformer = new ColoredDegree2BroadcastKBoundOptimizationTransformer(extraTokens);
+			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastKBoundOptimizationTransformer(extraTokens);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
 		}else{
-			Degree2BroadcastTransformer broadcastTransformer = new ColoredDegree2BroadcastTransformer(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
 		}
@@ -109,7 +109,7 @@ public class UppaalExporter {
 				return null;
 			}	
 		} else if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
-			TAPNToNTABroadcastTransformer broadcastTransformer = new TAPNToNTABroadcastTransformer(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
+			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
@@ -124,7 +124,7 @@ public class UppaalExporter {
 				return null;
 			}
 		} else if(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST){
-			Degree2BroadcastTransformer broadcastTransformer = new Degree2BroadcastTransformer(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+			Degree2BroadcastTranslation broadcastTransformer = new Degree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
