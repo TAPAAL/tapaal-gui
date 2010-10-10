@@ -2,6 +2,8 @@ package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
@@ -53,6 +55,13 @@ public class RenamePlaceTCTLVisitor implements ITCTLVisitor {
 
 	public void visit(TCTLNotNode notNode) {
 		notNode.getProperty().accept(this);
+	}
+
+	@Override
+	public void visit(TCTLAndListNode andListNode) {
+		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
+			p.accept(this);
+		}		
 	}
 
 }

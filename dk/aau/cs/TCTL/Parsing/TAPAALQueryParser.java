@@ -176,7 +176,7 @@ public class TAPAALQueryParser implements GPMessageConstants
                       property to your own customized class. If this is not the case,
                       this message can be ignored and the Reduction object will be used
                       to store the parse tree.  */
-
+				
 				switch(parser.currentReduction().getParentRule().getTableIndex())
 				{
 				
@@ -199,26 +199,22 @@ public class TAPAALQueryParser implements GPMessageConstants
 				
 				case RuleConstants.RULE_OR_OR: // <Or> ::= <Or> or <And>
 				case RuleConstants.RULE_OR_PIPEPIPE: // <Or> ::= <Or> '||' <And>
-					TCTLOrNode orNode = new TCTLOrNode();
-					orNode.setProperty1(parseStack.pop());
-					orNode.setProperty2(parseStack.pop());
+					TCTLOrNode orNode = new TCTLOrNode(parseStack.pop(),parseStack.pop());			
 					parseStack.push(orNode);
 					break;
 				
 				case RuleConstants.RULE_AND_AND: // <And> ::= <And> and <Not>
 				case RuleConstants.RULE_AND_AMPAMP: // <And> ::= <And> '&&' <Not>
-					TCTLAndNode andNode = new TCTLAndNode();
-					andNode.setProperty1(parseStack.pop());
-					andNode.setProperty2(parseStack.pop());
+					TCTLAndNode andNode = new TCTLAndNode(parseStack.pop(),parseStack.pop());
 					parseStack.push(andNode);
 					break;
 
 				case RuleConstants.RULE_NOT_NOT_LPARAN_RPARAN: // <Not> ::= not '(' <Expr> ')'
 				case RuleConstants.RULE_NOT_EXCLAM_LPARAN_RPARAN: // <Not> ::= '!' '(' <Expr> ')'
-					TCTLNotNode notNode = new TCTLNotNode();
-					notNode.setProperty(parseStack.pop());
+					TCTLNotNode notNode = new TCTLNotNode(parseStack.pop());
 					parseStack.push(notNode);
 					break;
+					
 				case RuleConstants.RULE_EXPR: // <Expr> ::= <Or>
 				case RuleConstants.RULE_OR: // <Or> ::= <And>
 				case RuleConstants.RULE_AND: // <And> ::= <Not>

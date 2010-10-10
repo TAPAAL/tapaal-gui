@@ -10,6 +10,7 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	
 	public void setProperty(TCTLAbstractStateProperty property) {
 		this.property = property;
+		this.property.setParent(this);
 	}
 
 
@@ -22,11 +23,13 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	
 	public TCTLEFNode(TCTLAbstractStateProperty property) {
 		this.property = property;
+		this.property.setParent(this);
 	}
 
 
 	public TCTLEFNode() {
 		this.property = new TCTLStatePlaceHolder();
+		this.property.setParent(this);
 	}
 
 

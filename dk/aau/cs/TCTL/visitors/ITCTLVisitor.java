@@ -2,6 +2,7 @@ package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
@@ -23,4 +24,5 @@ public interface ITCTLVisitor {
 	void visit(TCTLAtomicPropositionNode atomicPropositionNode);
 	void visit(TCTLStatePlaceHolder statePlaceHolderNode);
 	void visit(TCTLPathPlaceHolder pathPlaceHolderNode);
+	void visit(TCTLAndListNode andListNode);
 }

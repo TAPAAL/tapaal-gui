@@ -10,6 +10,7 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 	
 	public void setProperty1(TCTLAbstractStateProperty property1) {
 		this.property1 = property1;
+		this.property1.setParent(this);
 	}
 
 	public TCTLAbstractStateProperty getProperty1() {
@@ -18,21 +19,26 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 
 	public void setProperty2(TCTLAbstractStateProperty property2) {
 		this.property2 = property2;
+		this.property2.setParent(this);
 	}
 
 	public TCTLAbstractStateProperty getProperty2() {
 		return property2;
 	}
-
+	
 	public TCTLAndNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
 		this.property1 = property1;
+		this.property1.setParent(this);
 		this.property2 = property2;
+		this.property2.setParent(this);
+	}
+	public TCTLAndNode(TCTLAbstractStateProperty property1) {
+		this.property1 = property1;
+		this.property1.setParent(this);
+		this.property2 = new TCTLStatePlaceHolder();
+		this.property2.setParent(this);
 	}
 	
-	public TCTLAndNode() {
-		this.property1 = new TCTLStatePlaceHolder();
-		this.property2 = new TCTLStatePlaceHolder();
-	}
 
 	@Override
 	public boolean isSimpleProperty() {
@@ -80,7 +86,9 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
-			return (TCTLAbstractStateProperty)object2;
+			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
+			obj2.setParent(this.parent);
+			return obj2;
 		} else {
 			property1 = property1.replace(object1, object2);
 			property2 = property2.replace(object1, object2);

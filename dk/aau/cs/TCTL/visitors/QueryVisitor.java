@@ -2,6 +2,8 @@ package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
@@ -63,6 +65,23 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		uppaalQuery.append(" && ");
 		andNode.getProperty2().accept(this);
 		uppaalQuery.append(")");
+	}
+	
+	public void visit(TCTLAndListNode andListNode) {
+		uppaalQuery.append("(");
+		boolean firstTime = true;
+		
+		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
+			if(!firstTime) {
+				uppaalQuery.append(" && ");
+			}
+			
+			p.accept(this);
+			firstTime = false;
+		}
+		
+		uppaalQuery.append(")");
+		
 	}
 
 	public void visit(TCTLOrNode orNode) {

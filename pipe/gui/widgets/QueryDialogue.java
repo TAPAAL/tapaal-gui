@@ -14,6 +14,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
@@ -54,6 +55,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
@@ -472,16 +474,79 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						TCTLAndNode property;
-						if(currentSelection.getObject() instanceof TCTLAndNode || currentSelection.getObject() instanceof TCTLOrNode) {
-							property = new TCTLAndNode(getStateChild(1,currentSelection.getObject()), 
+						if(currentSelection.getObject() instanceof TCTLAndNode) { 
+							// in this case we have e.g. "p1 < 3 and p2 >= 3" and 
+							//we want to add another conjunct and get "p1 < 3 and p2 >= 3 and <*>"
+							ArrayList<TCTLAbstractStateProperty> properties = new ArrayList<TCTLAbstractStateProperty>();
+							TCTLAndNode property = (TCTLAndNode)currentSelection.getObject();
+							
+							properties.add(property.getProperty1());
+							properties.add(property.getProperty2());
+							
+							TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+							
+							properties.add(ph);
+							
+							TCTLAndListNode andListNode = new TCTLAndListNode(properties);
+							
+							newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
+							updateSelection(ph); // select the newly added placeholder for speedier query construction
+						}
+						else if(currentSelection.getObject() instanceof TCTLAndListNode){
+							TCTLAndListNode andListNode = (TCTLAndListNode)currentSelection.getObject();
+							TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+							
+							andListNode.addConjunct(ph);
+							
+							updateSelection(ph); // select the newly added placeholder for speedier query construction
+						}
+						else if(currentSelection.getObject() instanceof TCTLOrNode) {
+							TCTLAndNode property = new TCTLAndNode(getStateChild(1,currentSelection.getObject()), 
 									getStateChild(2, currentSelection.getObject()));
+							newProperty = newProperty.replace(currentSelection.getObject(), property);
+							updateSelection(property);
 						}
 						else {
-							property = new TCTLAndNode(getState(currentSelection.getObject()),getState(currentSelection.getObject()));
+							if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
+								TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty)currentSelection.getObject();
+								TCTLAbstractProperty parentNode = prop.getParent();
+							
+								if(parentNode instanceof TCTLAndNode) {
+									// in this case we have selected a atomic proposition or place holder whose parent is and and node.
+									// we want to add another conjunct to and get and andListNode.
+									ArrayList<TCTLAbstractStateProperty> properties = new ArrayList<TCTLAbstractStateProperty>();
+									TCTLAndNode property = (TCTLAndNode)parentNode;
+									
+									properties.add(property.getProperty1());
+									properties.add(property.getProperty2());
+									
+									TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+									
+									properties.add(ph);
+									
+									TCTLAndListNode andListNode = new TCTLAndListNode(properties);
+									
+									newProperty = newProperty.replace(parentNode, andListNode);
+									updateSelection(ph); // select the newly added placeholder for speedier query construction
+								}
+								else if(parentNode instanceof TCTLAndListNode) {
+									TCTLAndListNode andListNode = (TCTLAndListNode)parentNode;
+									TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+									
+									andListNode.addConjunct(ph);
+									
+									updateSelection(ph); // select the newly added placeholder for speedier query construction
+								}
+								else {
+									TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+									TCTLAndNode property = new TCTLAndNode(getState(currentSelection.getObject()),ph);
+									newProperty = newProperty.replace(currentSelection.getObject(), property);
+									updateSelection(ph);
+								}
+							}
+							
 						}
-						newProperty = newProperty.replace(currentSelection.getObject(), property);
-						updateSelection(property);
+						
 					}
 
 				}
@@ -490,17 +555,19 @@ public class QueryDialogue extends JPanel{
 		disjunctionButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-
 						TCTLOrNode property;
 						if(currentSelection.getObject() instanceof TCTLAndNode || currentSelection.getObject() instanceof TCTLOrNode){
 							property = new TCTLOrNode(getStateChild(1,currentSelection.getObject()), 
 									getStateChild(2, currentSelection.getObject()));
+							newProperty = newProperty.replace(currentSelection.getObject(), property);
+							updateSelection(property);
 						}
 						else {
-							property = new TCTLOrNode(getState(currentSelection.getObject()),getState(currentSelection.getObject()));
+							property = new TCTLOrNode(getState(currentSelection.getObject()));
+							newProperty = newProperty.replace(currentSelection.getObject(), property);
+							updateSelection(property);
 						}
-						newProperty = newProperty.replace(currentSelection.getObject(), property);
-						updateSelection(property);
+						
 
 					}
 				}

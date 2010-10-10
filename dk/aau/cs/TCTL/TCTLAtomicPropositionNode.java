@@ -35,11 +35,12 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	public void setN(int n) {
 		this.n = n;
 	}
-
+	
 	public TCTLAtomicPropositionNode(String place, String op, int n) {
 		this.place = place;
 		this.op = op;
 		this.n = n;
+
 	}
 
 	@Override
@@ -59,7 +60,9 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
-			return (TCTLAbstractStateProperty)object2;
+			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
+			obj2.setParent(this.parent);
+			return obj2;
 		} else {
 			return this;
 		}

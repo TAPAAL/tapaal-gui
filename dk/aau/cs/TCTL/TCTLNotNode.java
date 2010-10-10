@@ -8,19 +8,18 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 
 	public void setProperty(TCTLAbstractStateProperty property) {
 		this.property = property;
+		this.property.setParent(this);
 	}
 
 	public TCTLAbstractStateProperty getProperty() {
 		return property;
 	}
 	
-	public TCTLNotNode() {
-		this.property = new TCTLStatePlaceHolder();
-	}
-
 	public TCTLNotNode(TCTLAbstractStateProperty property) {
 		this.property = property;
+		this.property.setParent(this);
 	}
+
 	
 	// this returns true because we don't want 
 	// e.g. an TCTLANDNode to print like "P2 <= 2 and (!(P3 >= 3))"
@@ -62,7 +61,9 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 	@Override
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
-			return (TCTLAbstractStateProperty)object2;
+			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
+			obj2.setParent(this.parent);
+			return obj2;
 		} else {
 			property = property.replace(object1, object2);
 			return this;

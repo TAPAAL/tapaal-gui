@@ -9,6 +9,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	public void setProperty(TCTLAbstractStateProperty property) {
 		this.property = property;
+		this.property.setParent(this);
 	}
 
 	public TCTLAbstractStateProperty getProperty() {
@@ -18,11 +19,13 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	public TCTLAGNode(TCTLAbstractStateProperty property) {
 		this.property = property;
+		this.property.setParent(this);
 	}
 
 
 	public TCTLAGNode() {
 		this.property = new TCTLStatePlaceHolder();
+		this.property.setParent(this);
 	}
 
 	@Override
