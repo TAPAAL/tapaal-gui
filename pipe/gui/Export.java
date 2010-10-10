@@ -38,9 +38,6 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.FileBrowser;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
@@ -48,6 +45,9 @@ import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
+import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
+import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
+import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 
 
@@ -308,7 +308,7 @@ public class Export {
 		// Select the model based on selected export option.
 		if (input.getReductionOption() == ReductionOption.STANDARDSYMMETRY){
 
-			NaiveUppaalSym t = new NaiveUppaalSym();
+			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
@@ -318,7 +318,7 @@ public class Export {
 
 		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY){
 
-			AdvancedUppaalSym t = new AdvancedUppaalSym();
+			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
@@ -327,7 +327,7 @@ public class Export {
 			}
 		}else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD){
 			Logger.log("Using ADV_NOSYMQ");
-			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
+			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
 			try {
 				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {

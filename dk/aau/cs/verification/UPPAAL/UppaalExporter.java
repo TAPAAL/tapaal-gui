@@ -8,9 +8,6 @@ import java.io.PrintStream;
 
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalNoSym;
-import dk.aau.cs.TAPN.uppaaltransform.AdvancedUppaalSym;
-import dk.aau.cs.TAPN.uppaaltransform.NaiveUppaalSym;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
@@ -25,6 +22,9 @@ import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTransformer;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTransformer;
+import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
+import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
+import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
@@ -84,7 +84,7 @@ public class UppaalExporter {
 		TranslationNamingScheme namingScheme = null;
 		if (reduction == ReductionOption.STANDARDSYMMETRY){
 
-			NaiveUppaalSym t = new NaiveUppaalSym();
+			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
 				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
 			} catch (FileNotFoundException e) {
@@ -93,7 +93,7 @@ public class UppaalExporter {
 			}
 
 		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY){
-			AdvancedUppaalSym t = new AdvancedUppaalSym();
+			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
 				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
 			} catch (FileNotFoundException e) {
@@ -101,7 +101,7 @@ public class UppaalExporter {
 				return null;
 			}
 		}else if (reduction == ReductionOption.OPTIMIZEDSTANDARD){
-			AdvancedUppaalNoSym t = new AdvancedUppaalNoSym();
+			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
 			try {
 				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
 			} catch (FileNotFoundException e) {
