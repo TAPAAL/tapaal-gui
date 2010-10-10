@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
-
 import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.TAPN;
@@ -20,14 +19,14 @@ import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation;
+import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
-import dk.aau.cs.translations.tapn.BroadcastTranslation;
+import dk.aau.cs.translations.tapn.StandardTranslation;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
-import dk.aau.cs.translations.tapn.StandardTranslation;
 
 public class UppaalExporter {
 	public ExportedModel export(ColoredTimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){

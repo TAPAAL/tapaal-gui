@@ -6,7 +6,6 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.TAPNTrace;
-
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 

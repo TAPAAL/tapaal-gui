@@ -112,8 +112,7 @@ implements ActionListener, Observer {
 	//	XXX kyrke testing 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
-	exportPSAction, exportToUppaal,
-	exportToUppaalAdvanced,exportToUppaalSymetric, exportToTikZAction;
+	exportPSAction, exportToTikZAction;
 
 	private VerificationAction runUppaalVerification;
 

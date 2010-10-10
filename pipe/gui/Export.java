@@ -43,11 +43,11 @@ import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
-import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
 
 

@@ -1,12 +1,26 @@
 ﻿package dk.aau.cs.TCTL.Parsing;
 
-import java.io.*;
+import goldengine.java.GOLDParser;
+import goldengine.java.GPMessageConstants;
+import goldengine.java.ParserException;
+import goldengine.java.Reduction;
+import goldengine.java.Token;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Stack;
 
-import dk.aau.cs.Messenger;
-import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.TCTL.*;
-import goldengine.java.*;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndNode;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrNode;
 
 /*
  * Licensed Material - Property of Matthew Hawkins (hawkini@4email.net) 

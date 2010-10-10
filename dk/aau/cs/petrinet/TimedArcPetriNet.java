@@ -2,7 +2,6 @@ package dk.aau.cs.petrinet;
 
 import java.util.List;
 
-import pipe.dataLayer.Transition;
 
 
 public interface TimedArcPetriNet {	
