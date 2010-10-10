@@ -41,7 +41,6 @@ import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
@@ -49,6 +48,7 @@ import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
+import dk.aau.cs.translations.tapn.StandardTranslation;
 
 
 
@@ -393,7 +393,7 @@ public class Export {
 
 			//Create uppaal xml file
 			try {
-				TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer(model, new PrintStream(xmlfile), capacity);
+				StandardTranslation t2 = new StandardTranslation(model, new PrintStream(xmlfile), capacity);
 				t2.transform();
 				t2.transformQueriesToUppaal(capacity, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), new PrintStream(qfile));
 			} catch (FileNotFoundException e) {

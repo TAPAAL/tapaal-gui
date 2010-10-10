@@ -1,10 +1,20 @@
-package dk.aau.cs.petrinet;
+package dk.aau.cs.translations.tapn;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 
 import dk.aau.cs.TCTL.visitors.StandardTranslationQueryVisitor;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.petrinet.Arc;
+import dk.aau.cs.petrinet.Location;
+import dk.aau.cs.petrinet.Place;
+import dk.aau.cs.petrinet.TAPN;
+import dk.aau.cs.petrinet.TAPNArc;
+import dk.aau.cs.petrinet.TAPNPlace;
+import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.petrinet.TAPNTransition;
+import dk.aau.cs.petrinet.TAPNTransportArc;
+import dk.aau.cs.petrinet.Transition;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 
@@ -16,7 +26,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */ 
-public class TAPNtoUppaalTransformer {
+public class StandardTranslation {
 
 	TAPN model = null; 
 	PrintStream uppaalXML = null;
@@ -26,14 +36,14 @@ public class TAPNtoUppaalTransformer {
 	boolean capacityreset = false;
 	boolean removeUnused = false;
 	
-	public TAPNtoUppaalTransformer(TAPN model, PrintStream uppaalXML, int numberoftokens) {
+	public StandardTranslation(TAPN model, PrintStream uppaalXML, int numberoftokens) {
 		this.model = model;
 		this.uppaalXML = uppaalXML;
 		this.numberOfEkstraTokens = numberoftokens;
 		
 	}
 	
-	public TAPNtoUppaalTransformer(TAPN model, PrintStream uppaalXML, int numberoftokens, boolean symmetricreduction, boolean drawnice, boolean capacityreset, boolean removeUnused) {
+	public StandardTranslation(TAPN model, PrintStream uppaalXML, int numberoftokens, boolean symmetricreduction, boolean drawnice, boolean capacityreset, boolean removeUnused) {
 		this.symmetricreduction = symmetricreduction;
 		this.model = model;
 		this.uppaalXML = uppaalXML;
@@ -175,8 +185,8 @@ public class TAPNtoUppaalTransformer {
 			
 			Location a=null;
 			if ((a = model.locations.get(p)) != null){
-				xcord= (int)(a.x);
-				ycord=  (int)(a.y);
+				xcord= (int)(a.getX());
+				ycord=  (int)(a.getY());
 			}
 			
 			
@@ -331,8 +341,8 @@ public class TAPNtoUppaalTransformer {
 			
 			Location a=null;
 			if ((a = model.locations.get(p)) != null){
-				xcord= (int)(a.x/2);
-				ycord=  (int)(a.y/2);
+				xcord= (int)(a.getX()/2);
+				ycord=  (int)(a.getY()/2);
 			}
 			
 			
@@ -469,8 +479,8 @@ public class TAPNtoUppaalTransformer {
 
 			Location a=null;
 			if ((a = model.locations.get(p)) != null){
-				xcord= (int)(a.x);
-				ycord=  (int)(a.y);
+				xcord= (int)(a.getX());
+				ycord=  (int)(a.getY());
 			}
 
 			tmp.append("<location id=\"a"+p.getID()+"\" x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">\n");
@@ -645,8 +655,8 @@ public class TAPNtoUppaalTransformer {
 
 			Location a=null;
 			if ((a = model.locations.get(p)) != null){
-				xcord= (int)(a.x);
-				ycord=  (int)(a.y);
+				xcord= (int)(a.getX());
+				ycord=  (int)(a.getY());
 			}
 			
 			if ((templatenumber==0 && (p.getName().contains("_im") || p.getName().contains("P_lock")) || (templatenumber != 0 && !(p.getName().contains("_im") || p.getName().contains("P_lock"))))){
@@ -817,8 +827,8 @@ public class TAPNtoUppaalTransformer {
 
 			Location a=null;
 			if ((a = model.locations.get(p)) != null){
-				xcord= (int)(a.x);
-				ycord=  (int)(a.y);
+				xcord= (int)(a.getX());
+				ycord=  (int)(a.getY());
 			}
 
 			tmp.append("<location id=\"a"+p.getID()+"\" x=\"" + (xcord) +"\" y=\"" + (ycord) +"\">\n");

@@ -10,7 +10,6 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.translations.ColoredTranslationNamingScheme;
@@ -28,6 +27,7 @@ import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
+import dk.aau.cs.translations.tapn.StandardTranslation;
 
 public class UppaalExporter {
 	public ExportedModel export(ColoredTimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){
@@ -188,7 +188,7 @@ public class UppaalExporter {
 
 			//Create uppaal xml file
 			try {
-				TAPNtoUppaalTransformer t2 = new TAPNtoUppaalTransformer((TAPN)model, new PrintStream(xmlfile), extraTokens);
+				StandardTranslation t2 = new StandardTranslation((TAPN)model, new PrintStream(xmlfile), extraTokens);
 				t2.transform();
 				t2.transformQueriesToUppaal(extraTokens, query, new PrintStream(qfile));
 			} catch (FileNotFoundException e) {
