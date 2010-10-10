@@ -1,5 +1,6 @@
 package dk.aau.cs.petrinet.degree2converters;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Hashtable;
 
@@ -63,11 +64,11 @@ public class ColoredInhibDegree2Converter implements Degree2Converter {
 		for(Token token : model.getTokens()){
 			ColoredToken ct = (ColoredToken)token;
 			ColoredPlace place = (ColoredPlace)getByName(ct.place().getName());
-			ColoredToken newToken = new ColoredToken(place, ct.getColor());
+			ColoredToken newToken = new ColoredToken(place, BigDecimal.ZERO, ct.getColor());
 			place.addColoredToken(newToken);
 		}
 		ColoredPlace plock = (ColoredPlace)getByName(PLOCK);
-		plock.addColoredToken(new ColoredToken(plock, 0));
+		plock.addColoredToken(new ColoredToken(plock, BigDecimal.ZERO, 0));
 	}
 
 	private PlaceTransitionObject getByName(String name) {

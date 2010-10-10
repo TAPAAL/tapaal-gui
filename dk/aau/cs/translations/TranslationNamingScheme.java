@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface TranslationNamingScheme {
 	TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence);
-	String getTokenClockName();
+	String tokenClockName();
 	boolean isIgnoredPlace(String location);	
 	boolean isIgnoredAutomata(String automata);
 	

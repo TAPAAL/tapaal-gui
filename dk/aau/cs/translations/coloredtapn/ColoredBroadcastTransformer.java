@@ -16,6 +16,7 @@ import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
+import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.tapn.TAPNToNTABroadcastTransformer;
 
 public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
@@ -178,5 +179,18 @@ public class ColoredBroadcastTransformer extends TAPNToNTABroadcastTransformer {
 		ColoredToken ct = (ColoredToken)token;
 
 		return String.format("%1$s := %2$d", VALUE_VAR_NAME, ct.getColor());
+	}
+	
+	@Override
+	public ColoredTranslationNamingScheme namingScheme() {
+		return new ColoredBroadcastNamingScheme();
+	}
+	
+	private class ColoredBroadcastNamingScheme extends BroadcastNamingScheme
+		implements ColoredTranslationNamingScheme
+	{
+		public String colorVariableName() {
+			return VALUE_VAR_NAME;
+		}
 	}
 }

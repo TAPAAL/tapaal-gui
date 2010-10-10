@@ -11,12 +11,37 @@ import pipe.gui.Pipe;
 
 public class SymbolicState {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
-	private HashMap<String, String> automataLocations = new HashMap<String, String>();
-	private HashMap<String, HashMap<String, BigDecimal>> automataClockValues = new HashMap<String, HashMap<String,BigDecimal>>();
+	private final HashMap<String, String> automataLocations;
+	private final HashMap<String, HashMap<String, BigDecimal>> automataClockValues;
+	private final HashMap<String, Integer> globalVariables;
+	private final HashMap<String, HashMap<String, Integer>> localVariables;
 
-	public SymbolicState(HashMap<String,String> locations, HashMap<String, HashMap<String, BigDecimal>> clocks){
+	public SymbolicState(
+			HashMap<String,String> locations, 
+			HashMap<String, HashMap<String, BigDecimal>> clocks, 
+			HashMap<String, Integer> globalVariables, 
+			HashMap<String, HashMap<String, Integer>> localVariables
+		){
 		this.automataLocations = locations;
 		this.automataClockValues = clocks;
+		this.globalVariables = globalVariables;
+		this.localVariables = localVariables;
+	}
+	
+	public HashMap<String, BigDecimal> getClockValues(String automata) {
+		return automataClockValues.get(automata);
+	}
+	
+	public HashMap<String, Integer> localVariablesFor(String automata) {
+		return localVariables.get(automata);
+	}
+	
+	public int globalVariableValue(String variable){
+		return globalVariables.get(variable);
+	}
+	
+	public String locationFor(String automata){
+		return automataLocations.get(automata);
 	}
 
 	public static SymbolicState parse(String state){
@@ -24,31 +49,9 @@ public class SymbolicState {
 
 		HashMap<String,String> locations = parseLocations(stateLines[1]);
 		HashMap<String, HashMap<String, BigDecimal>> clocks = parseAges(stateLines[2]);
-		return new SymbolicState(locations, clocks);
-	}
-
-	private static HashMap<String, HashMap<String, BigDecimal>> parseAges(String string) {
-		String[] split = string.split(" ");
-		HashMap<String, HashMap<String, BigDecimal>> clocks = new HashMap<String, HashMap<String,BigDecimal>>(split.length-1);
-
-		Pattern pattern = Pattern.compile(AUTOMATA_LOCATION_PATTERN + "=(\\d+)");
-		for(int i = 0; i < split.length-1; i++){
-			Matcher matcher = pattern.matcher(split[i]);
-
-			if(matcher.find()){			
-				String automata = matcher.group(1);
-				String clock = matcher.group(2);
-				double value = Double.parseDouble(matcher.group(3));
-
-				if(!clocks.containsKey(automata)){
-					clocks.put(automata, new HashMap<String, BigDecimal>());
-				}
-
-				clocks.get(automata).put(clock, new BigDecimal(value, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
-			}
-		}
-
-		return clocks;
+		HashMap<String, Integer> globalVariables = parseGlobalVariables(stateLines[2]);
+		HashMap<String, HashMap<String, Integer>> localVariables = parseLocalVariables(stateLines[2]);
+		return new SymbolicState(locations, clocks, globalVariables, localVariables);
 	}
 
 	private static HashMap<String, String> parseLocations(String string) {
@@ -66,8 +69,97 @@ public class SymbolicState {
 
 		return locations;
 	}
+	
+	private static HashMap<String, HashMap<String, BigDecimal>> parseAges(String string) {
+		String clockValues = extractClockPart(string);
+		String[] split = clockValues.split(" ");
+		HashMap<String, HashMap<String, BigDecimal>> clocks = new HashMap<String, HashMap<String,BigDecimal>>(split.length-1);
 
-	public HashMap<String, BigDecimal> getClockValues(String automata) {
-		return automataClockValues.get(automata);
+		Pattern pattern = Pattern.compile(AUTOMATA_LOCATION_PATTERN + "=(\\d+)");
+		for(int i = 0; i < split.length-1; i++){
+			Matcher matcher = pattern.matcher(split[i]);
+
+			if(matcher.matches()){			
+				String automata = matcher.group(1);
+				String clock = matcher.group(2);
+				double value = Double.parseDouble(matcher.group(3));
+
+				if(!clocks.containsKey(automata)){
+					clocks.put(automata, new HashMap<String, BigDecimal>());
+				}
+
+				clocks.get(automata).put(clock, new BigDecimal(value, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
+			}
+		}
+
+		return clocks;
+	}
+	
+	private static HashMap<String, Integer> parseGlobalVariables(String string) {
+		String variables = extractVariablePart(string);
+		HashMap<String, Integer> global = new HashMap<String, Integer>();
+		
+		if(variables != null && !variables.isEmpty()){
+			String[] split = variables.split(" ");
+			Pattern variablePattern = Pattern.compile("\\s*(\\w+)=(\\d+)\\s*");
+			
+			for(String variable : split){
+				Matcher variableMatcher = variablePattern.matcher(variable);
+				if(variableMatcher.matches()){
+					String name = variableMatcher.group(1);
+					Integer value = Integer.parseInt(variableMatcher.group(2));
+					global.put(name, value);
+				}
+			}
+		}
+		
+		return global;
+	}
+	
+
+	private static HashMap<String, HashMap<String, Integer>> parseLocalVariables(
+			String string) {
+		String variables = extractVariablePart(string);
+		HashMap<String, HashMap<String, Integer>> local = new HashMap<String, HashMap<String, Integer>>();
+		
+		if(variables != null && !variables.isEmpty()){
+			String[] split = variables.split(" ");
+			Pattern variablePattern = Pattern.compile("\\s*" + AUTOMATA_LOCATION_PATTERN + "=(\\d+)\\s*");
+			
+			for(String variable : split){
+				Matcher variableMatcher = variablePattern.matcher(variable);
+				if(variableMatcher.matches()){
+					String automata = variableMatcher.group(1);
+					String name = variableMatcher.group(2);
+					Integer value = Integer.parseInt(variableMatcher.group(3));
+					
+					if(!local.containsKey(automata)){
+						local.put(automata, new HashMap<String, Integer>());
+					}
+					local.get(automata).put(name, value);
+				}
+			}
+		}
+		return local;
+	}
+
+	private static String extractClockPart(String string) {
+		Pattern pattern = Pattern.compile("^(.*)#tau=\\d+(?:.*)?$");
+
+		Matcher matcher = pattern.matcher(string);
+		matcher.find();
+		
+		String variables = matcher.group(1);
+		return variables.trim();
+	}
+	
+	private static String extractVariablePart(String string) {
+		Pattern pattern = Pattern.compile("^.* #tau=\\d+(.*)?$");
+
+		Matcher matcher = pattern.matcher(string);
+		matcher.find();
+		
+		String variables = matcher.group(1);
+		return variables.trim();
 	}
 }

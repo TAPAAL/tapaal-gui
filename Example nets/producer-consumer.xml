@@ -518,7 +518,7 @@ and these items wait in place In_transit for Transport.</text>
 <value>5</value>
 </capacity>
 <query>
-<value>E[](( Garbage == 0 ))</value>
+<value>E[]( Garbage = 0 )</value>
 </query>
 </queries>
 <queries name="Three in Garbage" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE">
@@ -526,7 +526,7 @@ and these items wait in place In_transit for Transport.</text>
 <value>5</value>
 </capacity>
 <query>
-<value>E&lt;&gt;(( Garbage == 3 ))</value>
+<value>E&lt;&gt;( Garbage = 3 )</value>
 </query>
 </queries>
 </net>

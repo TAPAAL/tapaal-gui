@@ -35,11 +35,6 @@ public class Verifier {
 	{
 		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, getVerifyta(), tokensControl);
 		optimizer.analyze();
-
-		//		if(optimizer.isBounded())
-		//		{
-		//			tokensControl.setValue(optimizer.getMinBound());
-		//		}
 	}
 
 	public static void analyseKBounded(DataLayer appModel, int k){

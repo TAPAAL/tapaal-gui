@@ -17,6 +17,7 @@ import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
+import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
@@ -186,7 +187,9 @@ public class Verifyta implements ModelChecker {
 				}
 				result = new VerificationResult(queryResult);
 			}else{
-				VerifytaTraceInterpreter traceIntepreter = new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
+				VerifytaTraceInterpreter traceIntepreter = model instanceof ColoredTimedArcPetriNet ? 
+						new VerifytaColoredTraceInterpreter((ColoredTimedArcPetriNet)model, (ColoredTranslationNamingScheme)exportedModel.namingScheme()) 
+						: new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
 				TAPNTrace tapnTrace = traceIntepreter.interpretTrace(trace);
 				result = new VerificationResult(queryResult, tapnTrace);
 			}

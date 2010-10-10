@@ -38,7 +38,7 @@ PipeTapnToAauTapnTransformer {
 
 		for(ColoredToken token : ctp.getColoredTokens()){
 			dk.aau.cs.petrinet.colors.ColoredToken newToken = 
-				new dk.aau.cs.petrinet.colors.ColoredToken(tapnPlace,token.getColor().getValue());
+				new dk.aau.cs.petrinet.colors.ColoredToken(tapnPlace, token.getAge(), token.getColor().getValue());
 			tapnPlace.addColoredToken(newToken);
 		}
 

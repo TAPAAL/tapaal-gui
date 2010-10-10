@@ -58,12 +58,9 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
-	private TranslationNamingScheme namingScheme;
-
 	public TAPNToNTABroadcastTransformer(int extraTokens, boolean useSymmetry){
 		this.extraTokens = extraTokens;
 		this.useSymmetry = useSymmetry;
-		namingScheme = new BroadcastNamingScheme();
 	}
 
 
@@ -657,10 +654,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 	
 	
 	public TranslationNamingScheme namingScheme(){
-		return namingScheme;
+		return new BroadcastNamingScheme();
 	}
 	
-	private class BroadcastNamingScheme implements TranslationNamingScheme {
+	protected class BroadcastNamingScheme implements TranslationNamingScheme {
 		private final String TAU = "tau";
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(?:_test)?$";
 		private final String END_OF_SEQUENCE_PATTERN = "^(\\w+?)_fire$";
@@ -693,10 +690,10 @@ QueryTransformer<TAPNQuery, UPPAALQuery>{
 			return matcher.find();
 		}
 
-		public String getTokenClockName() {
+		public String tokenClockName() {
 			return TOKEN_CLOCK_NAME;
 		}
-
+		
 		public boolean isIgnoredPlace(String location) {
 			return location.equals(PLOCK) ||  location.equals(PCAPACITY);
 		}

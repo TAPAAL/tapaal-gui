@@ -27,6 +27,14 @@ public class VerifytaTraceInterpreter {
 		this.tapn = tapn;
 		this.namingScheme = namingScheme;
 	}
+	
+	protected TimedArcPetriNet tapn(){
+		return tapn;
+	}
+	
+	protected TranslationNamingScheme namingScheme(){
+		return namingScheme;
+	}
 
 	public TAPNTrace interpretTrace(UppaalTrace trace){
 		TAPNTrace result = new TAPNTrace();
@@ -47,12 +55,7 @@ public class VerifytaTraceInterpreter {
 			TransitionTranslation[] transitions = namingScheme.interpretTransitionSequence(firingSequenceNames);
 
 			for(TransitionTranslation transitionTranslation : transitions){
-				TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
-
-				TransitionFiringAction transitionFiring = firingSequence.get(transitionTranslation.startsAt());
-				List<Token> tokens = parseConsumedTokens(transitionFiring);				
-
-				TAPNFiringAction firingAction = new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
+				TAPNFiringAction firingAction = interpretTransitionFiring(firingSequence, transitionTranslation);
 				result.addFiringAction(firingAction);
 			}
 
@@ -67,13 +70,26 @@ public class VerifytaTraceInterpreter {
 		return result;
 	}
 
+	protected TAPNFiringAction interpretTransitionFiring
+	(
+			List<TransitionFiringAction> firingSequence,
+			TransitionTranslation transitionTranslation
+	) {
+		TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
+
+		TransitionFiringAction transitionFiring = firingSequence.get(transitionTranslation.startsAt());
+		List<Token> tokens = parseConsumedTokens(transitionFiring);				
+
+		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
+	}
+
 	private List<Token> parseConsumedTokens(TransitionFiringAction transitionFiring) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		for(Participant participant : transitionFiring.participants()){
 			if(!namingScheme.isIgnoredAutomata(participant.automata()) && !namingScheme.isIgnoredPlace(participant.location())){
 				TAPNPlace place = tapn.getPlaceByName(participant.location());
-				Token token = new Token(place, participant.clockValue(namingScheme.getTokenClockName()));
+				Token token = new Token(place, participant.clockValue(namingScheme.tokenClockName()));
 				tokens.add(token);
 			}
 		}

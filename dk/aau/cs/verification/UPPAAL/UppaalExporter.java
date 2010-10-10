@@ -16,6 +16,7 @@ import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TAPNtoUppaalTransformer;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
+import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.ModelTransformer;
 import dk.aau.cs.translations.QueryTransformer;
 import dk.aau.cs.translations.ReductionOption;
@@ -38,11 +39,12 @@ public class UppaalExporter {
 
 		ModelTransformer<TimedArcPetriNet, NTA> modelTransformer = null;
 		QueryTransformer<TAPNQuery, UPPAALQuery> queryTransformer = null;
-
+		ColoredTranslationNamingScheme namingScheme = null;
 		if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
 			ColoredBroadcastTransformer transformer = new ColoredBroadcastTransformer(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			modelTransformer = transformer;
 			queryTransformer = transformer;
+			namingScheme = transformer.namingScheme();
 		}  else if(reduction == ReductionOption.KBOUNDANALYSIS){
 			Degree2BroadcastTransformer broadcastTransformer = new ColoredDegree2BroadcastTransformer(extraTokens, true);
 			modelTransformer = broadcastTransformer;
@@ -70,7 +72,7 @@ public class UppaalExporter {
 			return null;
 		}
 
-		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), null);
+		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), namingScheme);
 	}
 
 	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){

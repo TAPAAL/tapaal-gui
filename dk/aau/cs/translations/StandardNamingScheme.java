@@ -33,10 +33,10 @@ public class StandardNamingScheme implements TranslationNamingScheme {
 		return matcher.find();
 	}
 
-	public String getTokenClockName() {
+	public String tokenClockName() {
 		return "x";
 	}
-
+	
 	public boolean isIgnoredPlace(String location) {
 		return location.equals("P_lock") ||  location.equals("P_capacity");
 	}
@@ -44,4 +44,6 @@ public class StandardNamingScheme implements TranslationNamingScheme {
 	public boolean isIgnoredAutomata(String automata) {
 		return false;
 	}
+
+
 }

@@ -63,7 +63,8 @@ public class TransitionFiringAction implements TAFiringAction {
 			String automata = matcher.group(1);
 			String location = matcher.group(2);
 			HashMap<String,BigDecimal> clockValues = state.getClockValues(automata);
-			participants[i-1] = new Participant(automata, location, clockValues);
+			HashMap<String,Integer> localVariables = state.localVariablesFor(automata);
+			participants[i-1] = new Participant(automata, location, clockValues, localVariables);
 		}		
 
 		return participants;

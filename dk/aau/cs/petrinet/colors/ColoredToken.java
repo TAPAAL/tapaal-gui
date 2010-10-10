@@ -1,17 +1,19 @@
 package dk.aau.cs.petrinet.colors;
 
+import java.math.BigDecimal;
+
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.Token;
 
 public class ColoredToken extends Token {
 	private int color;
 	
-	public ColoredToken(TAPNPlace place){
-		this(place, 0);
+	public ColoredToken(TAPNPlace place, BigDecimal age){
+		this(place, age, 0);
 	}
 	
-	public ColoredToken(TAPNPlace place, int color){
-		super(place);
+	public ColoredToken(TAPNPlace place, BigDecimal age, int color){
+		super(place, age);
 		this.color = color;
 	}
 
