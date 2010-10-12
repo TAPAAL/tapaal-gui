@@ -88,5 +88,9 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		return place.equals(placeName);
 	}
+	
+	public TCTLAbstractProperty findFirstPlaceHolder() {
+		return null;
+	}
 
 }

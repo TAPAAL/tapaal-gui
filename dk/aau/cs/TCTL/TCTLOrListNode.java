@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-public class TCTLAndListNode extends TCTLAbstractStateProperty {
+public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	private ArrayList<TCTLAbstractStateProperty> properties;
 	
@@ -20,7 +20,7 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		return properties;
 	}
 	
-	public TCTLAndListNode(ArrayList<TCTLAbstractStateProperty> properties) {
+	public TCTLOrListNode(ArrayList<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
 		
 		for (TCTLAbstractStateProperty p : properties) {
@@ -28,15 +28,14 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		}		
 	}
 	
-	// constructs and TCTLAndListNode from and TCTLAndNode
-	public TCTLAndListNode(TCTLAndNode andNode) {
+	public TCTLOrListNode(TCTLOrNode orNode) {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		
-		addConjunct(andNode.getProperty1().copy());
-		addConjunct(andNode.getProperty2().copy());
+		addDisjunct(orNode.getProperty1().copy());
+		addDisjunct(orNode.getProperty2().copy());
 	}
 	
-	public TCTLAndListNode() {
+	public TCTLOrListNode() {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 		ph.setParent(this);
@@ -46,9 +45,9 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		this.properties.add(ph);
 	}
 	
-	public void addConjunct(TCTLAbstractStateProperty conjunct) {
-		conjunct.setParent(this);
-		properties.add(conjunct);
+	public void addDisjunct(TCTLAbstractStateProperty disjunct) {
+		disjunct.setParent(this);
+		properties.add(disjunct);
 	}
 	
 	@Override
@@ -65,7 +64,7 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		for (TCTLAbstractStateProperty prop : properties) {
 			
 			if(!firstTime){
-				s.append(" and ");
+				s.append(" or ");
 			}
 			
 			s.append(prop.isSimpleProperty() ? prop.toString()
@@ -97,7 +96,7 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 				
 			}
 			else {
-				start = endPrev + 5 + (p.isSimpleProperty() ? 0 : 1) + (wasPrevSimple ? 0 : 1);
+				start = endPrev + 4 + (p.isSimpleProperty() ? 0 : 1) + (wasPrevSimple ? 0 : 1);
 				end = start + p.toString().length();
 				
 				endPrev = end;
@@ -115,12 +114,12 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 	
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof TCTLAndListNode) {
-			TCTLAndListNode node = (TCTLAndListNode)o;
+		if (o instanceof TCTLOrListNode) {
+			TCTLOrListNode node = (TCTLOrListNode)o;
 			return properties.equals(node.properties);
 		}
-		else if(o instanceof TCTLAndNode) {
-			TCTLAndNode node = (TCTLAndNode)o;
+		else if(o instanceof TCTLOrNode) {
+			TCTLOrNode node = (TCTLOrNode)o;
 			return properties.size() == 2 && properties.get(0).equals(node.getProperty1()) && properties.get(1).equals(node.getProperty2());
 		}
 		return false;
@@ -134,12 +133,11 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 			copy.add(p.copy());
 		}
 		
-		return new TCTLAndListNode(copy);
+		return new TCTLOrListNode(copy);
 	}
 
 	@Override
-	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
-			TCTLAbstractProperty object2) {
+	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
 			obj2.setParent(this.parent);
@@ -195,3 +193,33 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 	}
 
 }
+
+////returns the position in the string of the new selection.
+//// When there is only one child property we want to select that child instead of the whole parent.
+//// E.g. if selection is EF <*> then we want to select <*> to allow for speedier query construction.
+//private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
+//
+//	StringPosition position;
+//
+//
+//	if(newSelection instanceof TCTLEFNode){
+//		position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
+//	}
+//	else if(newSelection instanceof TCTLEGNode) {
+//		position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
+//	}
+//	else if(newSelection instanceof TCTLAFNode) {
+//		position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
+//	}
+//	else if(newSelection instanceof TCTLAGNode) {
+//		position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
+//	}
+//	else if(newSelection instanceof TCTLNotNode) {
+//		position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
+//	}
+//	else {
+//		position = newProperty.indexOf(newSelection);
+//	}
+//
+//	return position;
+//}

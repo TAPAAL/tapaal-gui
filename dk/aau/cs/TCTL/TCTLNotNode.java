@@ -84,5 +84,11 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 	public boolean containsPlaceHolder() {
 		return property.containsPlaceHolder();
 	}
+	
+	@Override
+	public TCTLAbstractProperty findFirstPlaceHolder() {
+		return property.findFirstPlaceHolder();
+		
+	}
 
 }

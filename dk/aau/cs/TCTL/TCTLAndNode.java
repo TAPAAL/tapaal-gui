@@ -111,5 +111,13 @@ public class TCTLAndNode extends TCTLAbstractStateProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 			return property1.containsAtomicPropWithSpecificPlace(placeName) || property2.containsAtomicPropWithSpecificPlace(placeName);
 	}
+	
+	@Override
+	public TCTLAbstractProperty findFirstPlaceHolder() {
+		if(property1.containsPlaceHolder())
+			return property1.findFirstPlaceHolder();
+		else
+			return property2.findFirstPlaceHolder();
+	}
 
 }

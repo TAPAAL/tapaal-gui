@@ -42,8 +42,6 @@ public abstract class TCTLAbstractProperty {
 		}
 	}
 	
-	public abstract boolean containsPlaceHolder();
-	
 	public abstract TCTLAbstractProperty copy();
 	
 	public abstract TCTLAbstractProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2);
@@ -56,5 +54,10 @@ public abstract class TCTLAbstractProperty {
 	public abstract void accept(ITCTLVisitor visitor);
 	
 	public abstract boolean containsAtomicPropWithSpecificPlace(String placeName);
+	
+	public abstract boolean containsPlaceHolder();
+	
+	// This method assumes that a place holder exists in the current query
+	public abstract TCTLAbstractProperty findFirstPlaceHolder();
 	
 }

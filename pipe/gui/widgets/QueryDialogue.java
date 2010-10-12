@@ -61,6 +61,7 @@ import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
@@ -474,102 +475,101 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						if(currentSelection.getObject() instanceof TCTLAndNode) { 
-							// in this case we have e.g. "p1 < 3 and p2 >= 3" and 
-							//we want to add another conjunct and get "p1 < 3 and p2 >= 3 and <*>"
-							ArrayList<TCTLAbstractStateProperty> properties = new ArrayList<TCTLAbstractStateProperty>();
+						if(currentSelection.getObject() instanceof TCTLAndNode)
+						{
 							TCTLAndNode property = (TCTLAndNode)currentSelection.getObject();
-							
-							properties.add(property.getProperty1());
-							properties.add(property.getProperty2());
-							
-							TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-							
-							properties.add(ph);
-							
-							TCTLAndListNode andListNode = new TCTLAndListNode(properties);
-							
+							TCTLAndListNode andListNode = new TCTLAndListNode(property);
+
+							andListNode.addConjunct(new TCTLStatePlaceHolder());
 							newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
-							updateSelection(ph); // select the newly added placeholder for speedier query construction
+							updateSelection(andListNode);
 						}
-						else if(currentSelection.getObject() instanceof TCTLAndListNode){
+						else if(currentSelection.getObject() instanceof TCTLAndListNode) {
 							TCTLAndListNode andListNode = (TCTLAndListNode)currentSelection.getObject();
-							TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-							
-							andListNode.addConjunct(ph);
-							
-							updateSelection(ph); // select the newly added placeholder for speedier query construction
+							andListNode.addConjunct(new TCTLStatePlaceHolder());
+							updateSelection(andListNode); 
 						}
-						else if(currentSelection.getObject() instanceof TCTLOrNode) {
-							TCTLAndNode property = new TCTLAndNode(getStateChild(1,currentSelection.getObject()), 
-									getStateChild(2, currentSelection.getObject()));
-							newProperty = newProperty.replace(currentSelection.getObject(), property);
-							updateSelection(property);
-						}
-						else {
-							if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-								TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty)currentSelection.getObject();
-								TCTLAbstractProperty parentNode = prop.getParent();
-							
-								if(parentNode instanceof TCTLAndNode) {
-									// in this case we have selected a atomic proposition or place holder whose parent is and and node.
-									// we want to add another conjunct to and get and andListNode.
-									ArrayList<TCTLAbstractStateProperty> properties = new ArrayList<TCTLAbstractStateProperty>();
-									TCTLAndNode property = (TCTLAndNode)parentNode;
-									
-									properties.add(property.getProperty1());
-									properties.add(property.getProperty2());
-									
-									TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-									
-									properties.add(ph);
-									
-									TCTLAndListNode andListNode = new TCTLAndListNode(properties);
-									
-									newProperty = newProperty.replace(parentNode, andListNode);
-									updateSelection(ph); // select the newly added placeholder for speedier query construction
-								}
-								else if(parentNode instanceof TCTLAndListNode) {
-									TCTLAndListNode andListNode = (TCTLAndListNode)parentNode;
-									TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-									
-									andListNode.addConjunct(ph);
-									
-									updateSelection(ph); // select the newly added placeholder for speedier query construction
-								}
-								else {
-									TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-									TCTLAndNode property = new TCTLAndNode(getState(currentSelection.getObject()),ph);
-									newProperty = newProperty.replace(currentSelection.getObject(), property);
-									updateSelection(ph);
-								}
+						else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) 
+						{
+							TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty)currentSelection.getObject();
+							TCTLAbstractProperty parentNode = prop.getParent();
+
+							if(parentNode instanceof TCTLAndNode) {
+								// current selection is a child of an "and" node => convert to andList node and add a conjunct to it.
+								TCTLAndNode property = (TCTLAndNode)parentNode;
+								TCTLAndListNode andListNode = new TCTLAndListNode(property);
+
+								andListNode.addConjunct(new TCTLStatePlaceHolder());
+								newProperty = newProperty.replace(parentNode, andListNode);
+								updateSelection(andListNode);
 							}
-							
+							else if(parentNode instanceof TCTLAndListNode) {
+								// current selection is child of an andList node => add new placeholder conjunct to it
+								TCTLAndListNode andListNode = (TCTLAndListNode)parentNode;
+								andListNode.addConjunct(new TCTLStatePlaceHolder());
+								updateSelection(andListNode); 
+							}
+							else {
+								TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+								TCTLAndNode property = new TCTLAndNode(getState(currentSelection.getObject()),ph);
+								newProperty = newProperty.replace(currentSelection.getObject(), property);
+								updateSelection(ph);
+							}
 						}
-						
+
 					}
 
 				}
+
+
 		);	
 
 		disjunctionButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						TCTLOrNode property;
-						if(currentSelection.getObject() instanceof TCTLAndNode || currentSelection.getObject() instanceof TCTLOrNode){
-							property = new TCTLOrNode(getStateChild(1,currentSelection.getObject()), 
-									getStateChild(2, currentSelection.getObject()));
-							newProperty = newProperty.replace(currentSelection.getObject(), property);
-							updateSelection(property);
-						}
-						else {
-							property = new TCTLOrNode(getState(currentSelection.getObject()));
-							newProperty = newProperty.replace(currentSelection.getObject(), property);
-							updateSelection(property);
-						}
-						
+						if(currentSelection.getObject() instanceof TCTLOrNode) {
+							TCTLOrNode property = (TCTLOrNode)currentSelection.getObject();
+							TCTLOrListNode orListNode = new TCTLOrListNode(property);
 
+							orListNode.addDisjunct(new TCTLStatePlaceHolder());
+							newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
+							updateSelection(orListNode); 
+						}
+						else if(currentSelection.getObject() instanceof TCTLOrListNode) {
+							TCTLOrListNode orListNode = (TCTLOrListNode)currentSelection.getObject();
+							orListNode.addDisjunct(new TCTLStatePlaceHolder());
+							updateSelection(orListNode); 
+						}
+						else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) 
+						{
+							TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty)currentSelection.getObject();
+							TCTLAbstractProperty parentNode = prop.getParent();
+
+							if(parentNode instanceof TCTLOrNode) {
+								// current selection is a child of an "or" node => convert to orList node and add a disjunct to it.
+								TCTLOrNode property = (TCTLOrNode)parentNode;
+								TCTLOrListNode orListNode = new TCTLOrListNode(property);
+
+								orListNode.addDisjunct(new TCTLStatePlaceHolder());
+								newProperty = newProperty.replace(parentNode, orListNode);
+								updateSelection(orListNode); 
+							}
+							else if(parentNode instanceof TCTLOrListNode) {
+								// current selection is child of an orList node => add new placeholder disjunct to it
+								TCTLOrListNode orListNode = (TCTLOrListNode)parentNode;
+								orListNode.addDisjunct(new TCTLStatePlaceHolder());
+								updateSelection(orListNode); 
+							}
+							else {
+								TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
+								TCTLOrNode property = new TCTLOrNode(getState(currentSelection.getObject()),ph);
+								newProperty = newProperty.replace(currentSelection.getObject(), property);
+								updateSelection(ph);
+							}
+						}
 					}
+
+
 				}
 		);
 
@@ -1297,6 +1297,8 @@ public class QueryDialogue extends JPanel{
 		return new TCTLStatePlaceHolder();
 	}
 
+	// Update current selection based on position of the caret in the string representation
+	// used for updating when selecting with the mouse.
 	private void updateSelection() {
 		int index = queryField.getCaretPosition();
 		StringPosition position = newProperty.objectAt(index);
@@ -1313,12 +1315,23 @@ public class QueryDialogue extends JPanel{
 
 	}
 
-
+	// update selection based on some change to the query.
+	// If the query contains place holders we want to select 
+	// the first placeholder to speed up query construction
 	private void updateSelection(TCTLAbstractProperty newSelection) {
 		queryField.setText(newProperty.toString());
+
+		StringPosition position;
 		if (currentSelection != null) {
 
-			StringPosition position = GetNewSelectionPosition(newSelection);
+			if(newProperty.containsPlaceHolder())
+			{
+				TCTLAbstractProperty ph = newProperty.findFirstPlaceHolder();
+				position = newProperty.indexOf(ph);
+			}
+			else {
+				position = GetNewSelectionPosition(newSelection);
+			}
 
 			queryField.select(position.getStart(),position.getEnd());
 			currentSelection = position;
@@ -1335,9 +1348,10 @@ public class QueryDialogue extends JPanel{
 		}
 	}
 
+
 	// returns the position in the string of the new selection.
-	// When there is only one child property we want to select that child instead of the whole parent.
-	// E.g. if selection is EF <*> then we want to select <*> to allow for speedier query construction.
+	// used when adding or changing stuff in the query
+	// E.g. if selection is EF p < 2 then we want to select p < 2 to allow for speedier query construction.
 	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
 
 		StringPosition position;

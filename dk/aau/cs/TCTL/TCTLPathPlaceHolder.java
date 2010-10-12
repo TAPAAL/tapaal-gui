@@ -56,4 +56,9 @@ public class TCTLPathPlaceHolder extends TCTLAbstractPathProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 			return false;
 	}
+	
+	@Override
+	public TCTLAbstractProperty findFirstPlaceHolder() {
+		return this;
+	}
 }

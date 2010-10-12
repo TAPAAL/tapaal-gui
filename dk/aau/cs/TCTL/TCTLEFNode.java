@@ -98,5 +98,10 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 			return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
 	
+	@Override
+	public TCTLAbstractProperty findFirstPlaceHolder() {
+		return property.findFirstPlaceHolder();
+		
+	}
 
 }

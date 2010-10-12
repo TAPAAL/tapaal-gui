@@ -97,4 +97,10 @@ public class TCTLEGNode extends TCTLAbstractPathProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
+	
+	@Override
+	public TCTLAbstractProperty findFirstPlaceHolder() {
+		return property.findFirstPlaceHolder();
+		
+	}
 }

@@ -198,14 +198,18 @@ public class TAPAALQueryParser implements GPMessageConstants
 					break;
 				
 				case RuleConstants.RULE_OR_OR: // <Or> ::= <Or> or <And>
-				case RuleConstants.RULE_OR_PIPEPIPE: // <Or> ::= <Or> '||' <And>
-					TCTLOrNode orNode = new TCTLOrNode(parseStack.pop(),parseStack.pop());			
+				case RuleConstants.RULE_OR_PIPEPIPE: // <Or> ::= <Or> '||' <And>			
+					TCTLAbstractStateProperty orProp2 = parseStack.pop();
+					TCTLAbstractStateProperty orProp1 = parseStack.pop();
+					TCTLOrNode orNode = new TCTLOrNode(orProp1,orProp2);
 					parseStack.push(orNode);
 					break;
 				
 				case RuleConstants.RULE_AND_AND: // <And> ::= <And> and <Not>
 				case RuleConstants.RULE_AND_AMPAMP: // <And> ::= <And> '&&' <Not>
-					TCTLAndNode andNode = new TCTLAndNode(parseStack.pop(),parseStack.pop());
+					TCTLAbstractStateProperty andProp2 = parseStack.pop();
+					TCTLAbstractStateProperty andProp1 = parseStack.pop();
+					TCTLAndNode andNode = new TCTLAndNode(andProp1,andProp2);
 					parseStack.push(andNode);
 					break;
 
