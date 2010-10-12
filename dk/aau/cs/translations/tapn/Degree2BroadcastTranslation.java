@@ -59,7 +59,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	private int numberOfInitChannels = 0;
 	protected int extraTokens = 0;
 	private int largestPresetSize = 0;
-	private boolean useSymmetry;
+	protected boolean useSymmetry;
 
 	public Degree2BroadcastTranslation(int extraTokens, boolean useSymmetry) {
 		this.extraTokens = extraTokens;
@@ -77,14 +77,19 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 		NTA nta = new NTA();
 		if(useSymmetry){
-			nta.addTimedAutomaton(createTokenAutomaton(degree2Net, model));
+			TimedAutomaton ta = createTokenAutomaton(degree2Net, model, null);
+			createInitializationTransitionsForTokenAutomata(degree2Net, ta);
+			ta.setName(TOKEN_TEMPLATE_NAME);
+			ta.setInitLocation(getLocationByName(P_CAPACITY));
+			ta.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
+			nta.addTimedAutomaton(ta);
 		}else{
 			int j = 0;
 			for(Token token : degree2Net.getTokens()){
 				if(!token.place().getName().equals(PLOCK)){
 					clearLocationMappings();
 					arcsToCounters.clear();
-					TimedAutomaton ta = createTokenAutomaton(degree2Net, model);
+					TimedAutomaton ta = createTokenAutomaton(degree2Net, model, token);
 					ta.setName(TOKEN_TEMPLATE_NAME + j);
 					ta.setInitLocation(getLocationByName(token.place().getName()));
 					nta.addTimedAutomaton(ta);
@@ -95,7 +100,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			for(int i = 0; i < extraTokens; i++){
 				clearLocationMappings();
 				arcsToCounters.clear();
-				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Net, model);
+				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Net, model, new Token(degree2Net.getPlaceByName(P_CAPACITY)));
 				tokenTemplate.setInitLocation(getLocationByName(P_CAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
 				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Net.getNumberOfTokens()-1+i));
@@ -316,25 +321,17 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	}
 
 	private TimedAutomaton createTokenAutomaton(TimedArcPetriNet degree2Net,
-			TimedArcPetriNet originalModel) throws Exception {
-		TimedAutomaton token = new TimedAutomaton();
-		createInitialLocationsForTokenAutomata(degree2Net, token);
-		createEdgesForTokenAutomata(degree2Net, token);
-		createTestingEdgesForTokenAutomata(originalModel, token);
+			TimedArcPetriNet originalModel, Token token) throws Exception {
+		TimedAutomaton tokenTA = new TimedAutomaton();
+		createInitialLocationsForTokenAutomata(degree2Net, tokenTA);
+		createEdgesForTokenAutomata(degree2Net, tokenTA);
+		createTestingEdgesForTokenAutomata(originalModel, tokenTA);
+		tokenTA.setDeclarations(createLocalDeclarations(originalModel, token));
 
-		if(useSymmetry){
-			createInitializationTransitionsForTokenAutomata(degree2Net, token);
-			token.setName(TOKEN_TEMPLATE_NAME);
-			token.setInitLocation(getLocationByName(P_CAPACITY));
-			token.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
-		}
-
-		token.setDeclarations(createLocalDeclarations(originalModel));
-
-		return token;
+		return tokenTA;
 	}
 
-	protected String createLocalDeclarations(TimedArcPetriNet model) {
+	protected String createLocalDeclarations(TimedArcPetriNet model, Token token) {
 		return "clock " + CLOCK_NAME + ";";
 	}
 
