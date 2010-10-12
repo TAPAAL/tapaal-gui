@@ -9,18 +9,18 @@ public class StandardNamingScheme implements TranslationNamingScheme {
 	public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 		List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
 
-		String lastTransitionName = "";
-		for(int i = 0; i < firingSequence.size(); i++){
-			String transitionName = firingSequence.get(i);
-			if(!isIgnoredTransition(transitionName)){
-				String[] transitionNameSplit = transitionName.split("_");
-
-				if(!transitionNameSplit[0].equals(lastTransitionName)){
-					lastTransitionName = transitionNameSplit[0];
-					transitionTranslations.add(new TransitionTranslation(i, transitionNameSplit[0]));
-				}			
-			}
-		}
+//		String lastTransitionName = "";
+//		for(int i = 0; i < firingSequence.size(); i++){
+//			String transitionName = firingSequence.get(i);
+//			if(!isIgnoredTransition(transitionName)){
+//				String[] transitionNameSplit = transitionName.split("_");
+//
+//				if(!transitionNameSplit[0].equals(lastTransitionName)){
+//					lastTransitionName = transitionNameSplit[0];
+//					transitionTranslations.add(new TransitionTranslation(i, transitionNameSplit[0]));
+//				}			
+//			}
+//		}
 		
 		TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
 		transitionTranslations.toArray(array);

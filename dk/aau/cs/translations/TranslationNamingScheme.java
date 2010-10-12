@@ -11,14 +11,20 @@ public interface TranslationNamingScheme {
 	public class TransitionTranslation {
 		private int startsAt;
 		private String originalTransitionName;
+		private int endsAt;
 		
-		public TransitionTranslation(int startsAt, String originalTransitionName){
+		public TransitionTranslation(int startsAt, int endsAt, String originalTransitionName){			
 			this.startsAt = startsAt;
+			this.endsAt = endsAt;
 			this.originalTransitionName = originalTransitionName;
 		}
 		
 		public int startsAt(){
 			return startsAt;
+		}
+		
+		public int endsAt(){
+			return endsAt;
 		}
 		
 		public String originalTransitionName(){

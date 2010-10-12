@@ -77,19 +77,21 @@ public class VerifytaTraceInterpreter {
 	) {
 		TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
 
-		TransitionFiringAction transitionFiring = firingSequence.get(transitionTranslation.startsAt());
-		List<Token> tokens = parseConsumedTokens(transitionFiring);				
+		TransitionFiringAction start = firingSequence.get(transitionTranslation.startsAt());
+		TransitionFiringAction end = firingSequence.get(transitionTranslation.endsAt());
+		List<Token> tokens = parseConsumedTokens(start, end);				
 
 		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
 	}
 
-	private List<Token> parseConsumedTokens(TransitionFiringAction transitionFiring) {
+	private List<Token> parseConsumedTokens(TransitionFiringAction start, TransitionFiringAction end) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
-		for(Participant participant : transitionFiring.participants()){
+		for(Participant participant : end.participants()){
 			if(!namingScheme.isIgnoredAutomata(participant.automata()) && !namingScheme.isIgnoredPlace(participant.location())){
-				TAPNPlace place = tapn.getPlaceByName(participant.location());
-				Token token = new Token(place, participant.clockValue(namingScheme.tokenClockName()));
+				String location = start.state().locationFor(participant.automata());				
+				TAPNPlace place = tapn.getPlaceByName(location);
+				Token token = new Token(place, participant.clockValue(namingScheme.tokenClockName())); // safe since delays cannot happen during simulation of transition
 				tokens.add(token);
 			}
 		}

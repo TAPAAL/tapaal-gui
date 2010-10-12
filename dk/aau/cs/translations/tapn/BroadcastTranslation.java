@@ -655,8 +655,9 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	}
 	
 	protected class BroadcastNamingScheme implements TranslationNamingScheme {
+		private static final int NOT_FOUND = -1;
 		private final String TAU = "tau";
-		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(?:_test)?$";
+		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(_test)?$";
 		private final String END_OF_SEQUENCE_PATTERN = "^(\\w+?)_fire$";
 		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
 		private Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
@@ -664,14 +665,27 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
 			
+			int startIndex = 0;
+			int endIndex = NOT_FOUND;
+			String originalTransitionName = null;
 			for(int i = 0; i < firingSequence.size(); i++){
 				String transitionName = firingSequence.get(i);
 				if(!isIgnoredTransition(transitionName)){
 					Matcher startMatcher = startPattern.matcher(transitionName);
 					Matcher endMatcher = endPattern.matcher(transitionName);
 					
-					if(startMatcher.find() && !endMatcher.find() && !transitionName.equals(TAU)){
-						transitionTranslations.add(new TransitionTranslation(i, startMatcher.group(1)));
+					boolean isTau = transitionName.equals(TAU);
+					boolean isEndTransition = endMatcher.matches();
+					boolean isStartTransition = !isTau && !isEndTransition && startMatcher.matches();
+					boolean isDegree2Optimization = isStartTransition && (startMatcher.group(2) == null || startMatcher.group(2).isEmpty());
+					
+					if(isStartTransition) { startIndex = i; originalTransitionName = startMatcher.group(1); }
+					if(isEndTransition || isDegree2Optimization) endIndex = i;
+					
+					if(endIndex != NOT_FOUND){
+						transitionTranslations.add(new TransitionTranslation(startIndex, endIndex, originalTransitionName));
+						endIndex = NOT_FOUND;
+						originalTransitionName = null;
 					}			
 				}
 			}
