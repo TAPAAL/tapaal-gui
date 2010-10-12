@@ -24,7 +24,7 @@ public class VerifytaTraceParser {
 				if(line == null) break; // we are done parsing trace, exit outer loop
 				
 				String element = buffer.toString();
-				if(element.contains("State:\n")){ // TODO: Two states in a row, indicates start of new trace (for next query)
+				if(element.contains("State:\n")){ 
 					SymbolicState state = SymbolicState.parse(element);
 					trace.addSymbolicState(state);
 					previousState = state;

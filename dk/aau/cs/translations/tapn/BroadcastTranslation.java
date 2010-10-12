@@ -37,7 +37,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	private int extraTokens;
 	private int largestPresetSize = 0;
 	private int initTransitions = 0;
-	private boolean useSymmetry = false;
+	protected boolean useSymmetry = false;
 
 	protected static final String ID_TYPE = "id_t";
 	protected static final String ID_TYPE_NAME = "id";
@@ -79,15 +79,18 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		NTA nta = new NTA();
 
 		if(useSymmetry){
-			TimedAutomaton tokenTemplate = createTokenTemplate(model);
+			TimedAutomaton tokenTemplate = createTokenTemplate(model, null);
+			addInitializationStructure(tokenTemplate, model);
 			tokenTemplate.setName(TOKEN_TEMPLATE_NAME);
+			tokenTemplate.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
+			tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 			nta.addTimedAutomaton(tokenTemplate);
 		}else{
 			int j = 0;
 			for(Token token : model.getTokens()){
 				clearLocationMappings();
 				arcsToCounters.clear();
-				TimedAutomaton tokenTemplate = createTokenTemplate(model);
+				TimedAutomaton tokenTemplate = createTokenTemplate(model, token);
 				tokenTemplate.setInitLocation(getLocationByName(token.place().getName()));
 				nta.addTimedAutomaton(tokenTemplate);
 				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + j);
@@ -97,7 +100,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			for(int i = 0; i < extraTokens; i++){
 				clearLocationMappings();
 				arcsToCounters.clear();
-				TimedAutomaton tokenTemplate = createTokenTemplate(model);
+				TimedAutomaton tokenTemplate = createTokenTemplate(model, new Token(model.getPlaceByName(PCAPACITY)));
 				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
 				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(model.getNumberOfTokens()+i));
@@ -350,24 +353,18 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		return previous;
 	}
 
-	private TimedAutomaton createTokenTemplate(TimedArcPetriNet model) {		
+	private TimedAutomaton createTokenTemplate(TimedArcPetriNet model, Token token) {		
 		TimedAutomaton ta = new TimedAutomaton();
 
-		String declarations = createLocalDeclarations(model);
+		String declarations = createLocalDeclarations(model, token);
 		ta.setDeclarations(declarations);
 		createTemplateStructure(ta, model);
-
-		if(useSymmetry){
-			ta.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
-			addInitializationStructure(ta, model);
-			ta.setInitLocation(getLocationByName(PCAPACITY));
-		}
 
 		return ta;
 	}
 
 
-	protected String createLocalDeclarations(TimedArcPetriNet model) {
+	protected String createLocalDeclarations(TimedArcPetriNet model, Token token) {
 		return "clock " + TOKEN_CLOCK_NAME + ";";
 	}
 

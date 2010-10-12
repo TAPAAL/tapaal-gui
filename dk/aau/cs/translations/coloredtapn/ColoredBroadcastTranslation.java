@@ -27,11 +27,15 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 	}
 
 	@Override
-	protected String createLocalDeclarations(TimedArcPetriNet model){
-		String decl = super.createLocalDeclarations(model);
+	protected String createLocalDeclarations(TimedArcPetriNet model, Token token){
+		String decl = super.createLocalDeclarations(model,token);
 
+		int value = token instanceof ColoredToken ? ((ColoredToken)token).getColor() : 0; // Hack -- Capacity tokens are ordinary tokens
+		String init = useSymmetry ? "" : " = " + value;
+		
 		ColoredTimedArcPetriNet ctapn = (ColoredTimedArcPetriNet)model;
-		decl += String.format("\nint[%1$d,%2$d] %3$s;", ctapn.getLowerBoundForColor(), ctapn.getUpperBoundForColor(), VALUE_VAR_NAME);
+		decl += String.format("\nint[%1$d,%2$d] %3$s%4$s;", ctapn.getLowerBoundForColor(), ctapn.getUpperBoundForColor(), 
+				VALUE_VAR_NAME, init);
 		return decl;
 	}
 
