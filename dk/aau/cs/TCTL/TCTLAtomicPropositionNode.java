@@ -70,7 +70,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public String toString() {
-		return place + " " + op + " " + n;
+		return place + "" + op + "" + n;
 	}
 	
 	@Override
