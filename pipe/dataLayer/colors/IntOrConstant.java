@@ -89,21 +89,41 @@ public class IntOrConstant {
 		}
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if(obj instanceof IntOrConstant){
-			IntOrConstant other = (IntOrConstant)obj;
-			return value == other.value && name == other.name; 
-		}
 
-		return false;
-	}
 
 	public void updateConstantName(String oldName, String newName) {
 		if(isUsingConstant() && name.equals(oldName)){
 			name = newName;
 		}
 		
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + value;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IntOrConstant other = (IntOrConstant) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (value != other.value)
+			return false;
+		return true;
 	}
 
 }

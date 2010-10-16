@@ -9,14 +9,12 @@ import java.util.HashMap;
 public class Participant {
 	private String automata;
 	private String location;
-	private HashMap<String,BigDecimal> clockValue;
-	private HashMap<String, Integer> localVariables;
+	private HashMap<String,BigDecimal> localClocksAndVariables;
 
-	public Participant(String automata, String location, HashMap<String,BigDecimal> clockValue, HashMap<String, Integer> localVariables){
+	public Participant(String automata, String location, HashMap<String,BigDecimal> localClocksAndVariables){
 		this.automata = automata;
 		this.location = location;
-		this.clockValue = clockValue;
-		this.localVariables = localVariables;
+		this.localClocksAndVariables = localClocksAndVariables;
 	}
 
 	public String location(){
@@ -27,11 +25,7 @@ public class Participant {
 		return automata;
 	}
 
-	public BigDecimal clockValue(String clock){
-		return clockValue.get(clock);
-	}
-	
-	public int variable(String variable){
-		return localVariables.get(variable);
+	public BigDecimal clockOrVariableValue(String name){
+		return localClocksAndVariables.get(name);
 	}
 }

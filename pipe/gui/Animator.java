@@ -98,8 +98,10 @@ public class Animator {
 		for(FiringAction action : trace){
 			if(action instanceof TimeDelayFiringAction)
 				manipulatehistory(((TimeDelayFiringAction)action).getDealy());
-			else{
+			else if(action instanceof DiscreetFiringAction){
 				manipulatehistory((DiscreetFiringAction)action);
+			}else if(action instanceof ColoredDiscreteFiringAction){
+				manipulatehistory((ColoredDiscreteFiringAction)action);
 			}
 		}
 	}
@@ -503,6 +505,17 @@ public class Animator {
 		 markingHistory.clear();
 		 actionHistory.clear();
 		 currentAction = -1;
+	 }
+	 
+	 public void manipulatehistory(ColoredDiscreteFiringAction dfa){
+		 
+		 
+		 markingHistory.add(null);
+		 
+		 actionHistory.add(dfa); // newAction = the transition to fire
+		 CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
+		 
+		 CreateGui.animControlerBox.setAnimationButtonsEnabled();
 	 }
 	 
 	 public void manipulatehistory(DiscreetFiringAction dfa){

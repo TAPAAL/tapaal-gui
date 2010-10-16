@@ -522,7 +522,7 @@ One may observe that two extra tokens are needed in the intermediate markings in
 <value>2</value>
 </capacity>
 <query>
-<value>E&lt;&gt;(( Target == 1 ))</value>
+<value>E&lt;&gt;( Target = 1 )</value>
 </query>
 </queries>
 </net>

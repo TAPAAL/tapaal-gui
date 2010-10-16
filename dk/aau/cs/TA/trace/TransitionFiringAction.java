@@ -20,11 +20,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 public class TransitionFiringAction implements TAFiringAction {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final String channel;
-	private final SymbolicState state;
+	private final SymbolicState previousState;
 	private final Participant[] participants;
+	private SymbolicState nextState;
 
 	public TransitionFiringAction(SymbolicState state, String channel, Participant... participants){
-		this.state = state;
+		this.previousState = state;
 		this.channel = channel;
 		this.participants = participants;
 	}
@@ -33,8 +34,20 @@ public class TransitionFiringAction implements TAFiringAction {
 		return channel;
 	}
 
-	public SymbolicState state() {
-		return state;
+	public SymbolicState sourceState() {
+		return previousState;
+	}
+	
+	public SymbolicState targetState() {
+		return nextState;
+	}
+	
+	public Participant[] participants() {
+		return participants;
+	}
+
+	public void setTargetState(SymbolicState state) {
+		nextState = state;
 	}
 
 	@Override
@@ -62,9 +75,8 @@ public class TransitionFiringAction implements TAFiringAction {
 
 			String automata = matcher.group(1);
 			String location = matcher.group(2);
-			HashMap<String,BigDecimal> clockValues = state.getClockValues(automata);
-			HashMap<String,Integer> localVariables = state.localVariablesFor(automata);
-			participants[i-1] = new Participant(automata, location, clockValues, localVariables);
+			HashMap<String, BigDecimal> localClocksAndVariables = state.getLocalClocksAndVariablesFor(automata);
+			participants[i-1] = new Participant(automata, location, localClocksAndVariables);
 		}		
 
 		return participants;
@@ -78,9 +90,5 @@ public class TransitionFiringAction implements TAFiringAction {
 			return matcher.group(1);
 		else
 			return "tau";
-	}
-
-	public Participant[] participants() {
-		return participants;
 	}
 }

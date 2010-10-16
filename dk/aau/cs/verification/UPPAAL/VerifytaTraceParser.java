@@ -14,6 +14,7 @@ public class VerifytaTraceParser {
 		try {			
 			String line;
 			SymbolicState previousState = null;
+			TransitionFiringAction previousTransitionFiring = null;
 			while(reader.ready()){
 				StringBuffer buffer = new StringBuffer();
 				while((line = reader.readLine()) != null && !line.isEmpty()){
@@ -21,19 +22,26 @@ public class VerifytaTraceParser {
 					buffer.append("\n");
 				}
 				
-				if(line == null) break; // we are done parsing trace, exit outer loop
-				
 				String element = buffer.toString();
+				
+				if(line == null && element.isEmpty()) break; // we are done parsing trace, exit outer loop
+				
+				
 				if(element.contains("State:\n")){ 
 					SymbolicState state = SymbolicState.parse(element);
 					trace.addSymbolicState(state);
 					previousState = state;
+					if(previousTransitionFiring != null){
+						previousTransitionFiring.setTargetState(state);
+						previousTransitionFiring = null;
+					}					
 				}else if(element.contains("Delay:")){
 					TimeDelayFiringAction delay = TimeDelayFiringAction.parse(previousState, element);
 					trace.addFiringAction(delay);
 				}else if(element.contains("Transitions:")){
 					TransitionFiringAction transition = TransitionFiringAction.parse(previousState, element);
 					trace.addFiringAction(transition);
+					previousTransitionFiring = transition;
 				}
 			}
 		} catch (IOException e) {

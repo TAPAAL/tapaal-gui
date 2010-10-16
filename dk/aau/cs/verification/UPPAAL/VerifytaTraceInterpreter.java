@@ -88,10 +88,13 @@ public class VerifytaTraceInterpreter {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		for(Participant participant : end.participants()){
-			if(!namingScheme.isIgnoredAutomata(participant.automata()) && !namingScheme.isIgnoredPlace(participant.location())){
-				String location = start.state().locationFor(participant.automata());				
-				TAPNPlace place = tapn.getPlaceByName(location);
-				Token token = new Token(place, participant.clockValue(namingScheme.tokenClockName())); // safe since delays cannot happen during simulation of transition
+			String automata = participant.automata();
+			String sourceLocation = start.sourceState().locationFor(automata);
+			
+			if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
+				TAPNPlace place = tapn.getPlaceByName(sourceLocation);
+				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName());
+				Token token = new Token(place, clockValue); 
 				tokens.add(token);
 			}
 		}

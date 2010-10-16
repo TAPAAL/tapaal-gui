@@ -9,12 +9,14 @@ import dk.aau.cs.petrinet.colors.ColoredToken;
 public class ColoredTransitionFiringAction 
 		implements TAPNFiringAction {
 
-	private final List<ColoredToken> tokens;
+	private final List<ColoredToken> consumedTokens;
+	private final List<ColoredToken> producedTokens;
 	private final TAPNTransition transition;
 
-	public ColoredTransitionFiringAction(TAPNTransition transition, List<ColoredToken> tokens) {
+	public ColoredTransitionFiringAction(TAPNTransition transition, List<ColoredToken> consumedTokens, List<ColoredToken> producedTokens) {
 				this.transition = transition;
-				this.tokens = tokens;
+				this.consumedTokens = consumedTokens;
+				this.producedTokens = producedTokens;
 	}
 	
 	public String transition(){
@@ -22,7 +24,11 @@ public class ColoredTransitionFiringAction
 	}
 	
 	public List<ColoredToken> consumedTokens(){
-		return tokens;
+		return consumedTokens;
+	}
+	
+	public List<ColoredToken> producedTokens(){
+		return producedTokens;
 	}
 
 }

@@ -31,7 +31,7 @@ public class TimeDelayFiringAction implements TAFiringAction{
 		return timedelay;
 	}
 	
-	public SymbolicState state(){
+	public SymbolicState sourceState(){
 		return state;
 	}
 		

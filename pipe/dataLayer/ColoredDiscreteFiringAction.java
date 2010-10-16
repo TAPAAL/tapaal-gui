@@ -13,7 +13,7 @@ public class ColoredDiscreteFiringAction implements FiringAction {
 	public ColoredDiscreteFiringAction(TAPNTransition transition){
 		this.transition = transition;
 	}
-	
+		
 	public void addConsumedToken(ColoredTimedPlace place, ColoredToken token){
 		consumedTokens.put(place, token);
 	}
