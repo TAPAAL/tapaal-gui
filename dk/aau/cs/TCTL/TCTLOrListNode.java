@@ -28,11 +28,11 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 		}		
 	}
 	
-	public TCTLOrListNode(TCTLOrNode orNode) {
+	public TCTLOrListNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		
-		addDisjunct(orNode.getProperty1().copy());
-		addDisjunct(orNode.getProperty2().copy());
+		addDisjunct(property1);
+		addDisjunct(property2);
 	}
 	
 	public TCTLOrListNode() {
@@ -118,10 +118,6 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 			TCTLOrListNode node = (TCTLOrListNode)o;
 			return properties.equals(node.properties);
 		}
-		else if(o instanceof TCTLOrNode) {
-			TCTLOrNode node = (TCTLOrNode)o;
-			return properties.size() == 2 && properties.get(0).equals(node.getProperty1()) && properties.get(1).equals(node.getProperty2());
-		}
 		return false;
 	}
 
@@ -193,33 +189,3 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 	}
 
 }
-
-////returns the position in the string of the new selection.
-//// When there is only one child property we want to select that child instead of the whole parent.
-//// E.g. if selection is EF <*> then we want to select <*> to allow for speedier query construction.
-//private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
-//
-//	StringPosition position;
-//
-//
-//	if(newSelection instanceof TCTLEFNode){
-//		position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
-//	}
-//	else if(newSelection instanceof TCTLEGNode) {
-//		position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
-//	}
-//	else if(newSelection instanceof TCTLAFNode) {
-//		position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
-//	}
-//	else if(newSelection instanceof TCTLAGNode) {
-//		position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
-//	}
-//	else if(newSelection instanceof TCTLNotNode) {
-//		position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
-//	}
-//	else {
-//		position = newProperty.indexOf(newSelection);
-//	}
-//
-//	return position;
-//}

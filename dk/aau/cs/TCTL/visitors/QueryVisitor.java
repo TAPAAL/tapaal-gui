@@ -4,13 +4,11 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.petrinet.TAPNQuery;
@@ -59,14 +57,6 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		egNode.getProperty().accept(this);
 		addEnding(QueryType.EG);
 	}
-
-	public void visit(TCTLAndNode andNode) {
-		uppaalQuery.append("(");
-		andNode.getProperty1().accept(this);
-		uppaalQuery.append(" && ");
-		andNode.getProperty2().accept(this);
-		uppaalQuery.append(")");
-	}
 	
 	public void visit(TCTLAndListNode andListNode) {
 		uppaalQuery.append("(");
@@ -85,13 +75,6 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		
 	}
 
-	public void visit(TCTLOrNode orNode) {
-		uppaalQuery.append("(");
-		orNode.getProperty1().accept(this);
-		uppaalQuery.append(" || ");
-		orNode.getProperty2().accept(this);
-		uppaalQuery.append(")");
-	}
 	
 	public void visit(TCTLOrListNode orListNode) {
 		uppaalQuery.append("(");

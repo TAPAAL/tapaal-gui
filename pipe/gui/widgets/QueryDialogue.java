@@ -4,6 +4,7 @@ package pipe.gui.widgets;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -56,21 +57,17 @@ import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAndNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLOrNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.translations.ReductionOption;
 
 public class QueryDialogue extends JPanel{
 
-	//private static final Font PROPERTY_FONT = new Font("Ariel", Font.BOLD, 14);
-	//private static final Color SELECTED_BG_COLOR = new Color(255, 240, 153);
 	private static final long serialVersionUID = 7852107237344005546L;
 	public enum QueryDialogueOption {VerifyNow, Save, Export}
 
@@ -289,7 +286,10 @@ public class QueryDialogue extends JPanel{
 
 		MutableAttributeSet standard = new SimpleAttributeSet();
 		StyleConstants.setAlignment(standard, StyleConstants.ALIGN_CENTER);
+		StyleConstants.setFontSize(standard, 14);
 		doc.setParagraphAttributes(0, 0, standard, true);
+
+
 
 		queryField.setText(newProperty.toString());
 		queryField.setEditable(false);
@@ -298,7 +298,7 @@ public class QueryDialogue extends JPanel{
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane.setVerticalScrollBarPolicy(
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		Dimension d = new Dimension(882, 50);
+		Dimension d = new Dimension(882, 56);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
@@ -475,16 +475,7 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						if(currentSelection.getObject() instanceof TCTLAndNode)
-						{
-							TCTLAndNode property = (TCTLAndNode)currentSelection.getObject();
-							TCTLAndListNode andListNode = new TCTLAndListNode(property);
-
-							andListNode.addConjunct(new TCTLStatePlaceHolder());
-							newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
-							updateSelection(andListNode);
-						}
-						else if(currentSelection.getObject() instanceof TCTLAndListNode) {
+						if(currentSelection.getObject() instanceof TCTLAndListNode) {
 							TCTLAndListNode andListNode = (TCTLAndListNode)currentSelection.getObject();
 							andListNode.addConjunct(new TCTLStatePlaceHolder());
 							updateSelection(andListNode); 
@@ -494,16 +485,7 @@ public class QueryDialogue extends JPanel{
 							TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty)currentSelection.getObject();
 							TCTLAbstractProperty parentNode = prop.getParent();
 
-							if(parentNode instanceof TCTLAndNode) {
-								// current selection is a child of an "and" node => convert to andList node and add a conjunct to it.
-								TCTLAndNode property = (TCTLAndNode)parentNode;
-								TCTLAndListNode andListNode = new TCTLAndListNode(property);
-
-								andListNode.addConjunct(new TCTLStatePlaceHolder());
-								newProperty = newProperty.replace(parentNode, andListNode);
-								updateSelection(andListNode);
-							}
-							else if(parentNode instanceof TCTLAndListNode) {
+							if(parentNode instanceof TCTLAndListNode) {
 								// current selection is child of an andList node => add new placeholder conjunct to it
 								TCTLAndListNode andListNode = (TCTLAndListNode)parentNode;
 								andListNode.addConjunct(new TCTLStatePlaceHolder());
@@ -511,7 +493,7 @@ public class QueryDialogue extends JPanel{
 							}
 							else {
 								TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-								TCTLAndNode property = new TCTLAndNode(getState(currentSelection.getObject()),ph);
+								TCTLAndListNode property = new TCTLAndListNode(getState(currentSelection.getObject()),ph);
 								newProperty = newProperty.replace(currentSelection.getObject(), property);
 								updateSelection(ph);
 							}
@@ -527,15 +509,7 @@ public class QueryDialogue extends JPanel{
 		disjunctionButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if(currentSelection.getObject() instanceof TCTLOrNode) {
-							TCTLOrNode property = (TCTLOrNode)currentSelection.getObject();
-							TCTLOrListNode orListNode = new TCTLOrListNode(property);
-
-							orListNode.addDisjunct(new TCTLStatePlaceHolder());
-							newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
-							updateSelection(orListNode); 
-						}
-						else if(currentSelection.getObject() instanceof TCTLOrListNode) {
+						if(currentSelection.getObject() instanceof TCTLOrListNode) {
 							TCTLOrListNode orListNode = (TCTLOrListNode)currentSelection.getObject();
 							orListNode.addDisjunct(new TCTLStatePlaceHolder());
 							updateSelection(orListNode); 
@@ -545,16 +519,7 @@ public class QueryDialogue extends JPanel{
 							TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty)currentSelection.getObject();
 							TCTLAbstractProperty parentNode = prop.getParent();
 
-							if(parentNode instanceof TCTLOrNode) {
-								// current selection is a child of an "or" node => convert to orList node and add a disjunct to it.
-								TCTLOrNode property = (TCTLOrNode)parentNode;
-								TCTLOrListNode orListNode = new TCTLOrListNode(property);
-
-								orListNode.addDisjunct(new TCTLStatePlaceHolder());
-								newProperty = newProperty.replace(parentNode, orListNode);
-								updateSelection(orListNode); 
-							}
-							else if(parentNode instanceof TCTLOrListNode) {
+							if(parentNode instanceof TCTLOrListNode) {
 								// current selection is child of an orList node => add new placeholder disjunct to it
 								TCTLOrListNode orListNode = (TCTLOrListNode)parentNode;
 								orListNode.addDisjunct(new TCTLStatePlaceHolder());
@@ -562,7 +527,7 @@ public class QueryDialogue extends JPanel{
 							}
 							else {
 								TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-								TCTLOrNode property = new TCTLOrNode(getState(currentSelection.getObject()),ph);
+								TCTLOrListNode property = new TCTLOrListNode(getState(currentSelection.getObject()),ph);
 								newProperty = newProperty.replace(currentSelection.getObject(), property);
 								updateSelection(ph);
 							}
@@ -675,6 +640,7 @@ public class QueryDialogue extends JPanel{
 
 					public void actionPerformed(ActionEvent e) {
 						newProperty = new TCTLPathPlaceHolder();
+						resetQuantifierSelectionButtons();
 						updateSelection(newProperty);
 					}
 				}
@@ -947,8 +913,11 @@ public class QueryDialogue extends JPanel{
 							String xmlFile = null, queryFile = null;
 							try {
 								xmlFile = new FileBrowser("Uppaal XML","xml",xmlFile).saveFile();
-								String[] a = xmlFile.split(".xml");
-								queryFile= a[0]+".q";
+								if(xmlFile != null)
+								{
+									String[] a = xmlFile.split(".xml");
+									queryFile= a[0]+".q";
+								}
 
 							} catch (Exception ex) {
 								JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -1118,6 +1087,11 @@ public class QueryDialogue extends JPanel{
 	private void disableTraceOptions() {
 		some.setEnabled(false);
 		fastest.setEnabled(false);
+		none.setSelected(true);
+	}
+
+	private void resetQuantifierSelectionButtons() {
+		quantificationRadioButtonGroup.clearSelection();
 	}
 
 	private void exit(){
@@ -1313,6 +1287,14 @@ public class QueryDialogue extends JPanel{
 			disableAllQueryButtons();
 		}
 
+		if(currentSelection.getObject() instanceof TCTLAtomicPropositionNode)
+		{
+			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)currentSelection.getObject();
+			placesBox.setSelectedItem(node.getPlace());
+			relationalOperatorBox.setSelectedItem(node.getOp());
+			placeMarking.setValue(node.getN());
+		}
+
 	}
 
 	// update selection based on some change to the query.
@@ -1391,13 +1373,16 @@ public class QueryDialogue extends JPanel{
 			}
 			if(replacement !=null) {
 				newProperty = newProperty.replace(currentSelection.getObject(), replacement);
+
+				if(currentSelection.getObject() instanceof TCTLAbstractPathProperty)
+					resetQuantifierSelectionButtons();
+
 				updateSelection(replacement);
 			}
 		}
 	}
 
 	private void clearSelection() {
-		queryField.selectAll();
 		queryField.select(0, 0);
 		currentSelection = null;
 		disableAllQueryButtons();

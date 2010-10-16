@@ -9,18 +9,23 @@ import goldengine.java.Token;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Stack;
+
+import javax.swing.JOptionPane;
+
+import pipe.gui.CreateGui;
 
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndNode;
+import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
 
 /*
  * Licensed Material - Property of Matthew Hawkins (hawkini@4email.net) 
@@ -28,71 +33,75 @@ import dk.aau.cs.TCTL.TCTLOrNode;
 
 public class TAPAALQueryParser implements GPMessageConstants
 {	
+	
 	public interface SymbolConstants 
 	{
-	   final int SYMBOL_EOF               =  0;  // (EOF)
-	   final int SYMBOL_ERROR             =  1;  // (Error)
-	   final int SYMBOL_WHITESPACE        =  2;  // (Whitespace)
-	   final int SYMBOL_EXCLAM            =  3;  // '!'
-	   final int SYMBOL_AMPAMP            =  4;  // '&&'
-	   final int SYMBOL_LPARAN            =  5;  // '('
-	   final int SYMBOL_RPARAN            =  6;  // ')'
-	   final int SYMBOL_PIPEPIPE          =  7;  // '||'
-	   final int SYMBOL_LT                =  8;  // '<'
-	   final int SYMBOL_LTEQ              =  9;  // '<='
-	   final int SYMBOL_EQ                = 10;  // '='
-	   final int SYMBOL_GT                = 11;  // '>'
-	   final int SYMBOL_GTEQ              = 12;  // '>='
-	   final int SYMBOL_ALBRACKETRBRACKET = 13;  // 'A[]'
-	   final int SYMBOL_ALTGT             = 14;  // 'A<>'
-	   final int SYMBOL_AF                = 15;  // AF
-	   final int SYMBOL_AG                = 16;  // AG
-	   final int SYMBOL_AND               = 17;  // and
-	   final int SYMBOL_ELBRACKETRBRACKET = 18;  // 'E[]'
-	   final int SYMBOL_ELTGT             = 19;  // 'E<>'
-	   final int SYMBOL_EF                = 20;  // EF
-	   final int SYMBOL_EG                = 21;  // EG
-	   final int SYMBOL_IDENTIFIER        = 22;  // Identifier
-	   final int SYMBOL_NOT               = 23;  // not
-	   final int SYMBOL_NUM               = 24;  // Num
-	   final int SYMBOL_OR                = 25;  // or
-	   final int SYMBOL_ABSTRACTPROPERTY  = 26;  // <AbstractProperty>
-	   final int SYMBOL_AND2              = 27;  // <And>
-	   final int SYMBOL_ATOMICPROPOSITION = 28;  // <AtomicProposition>
-	   final int SYMBOL_EXPR              = 29;  // <Expr>
-	   final int SYMBOL_FACTOR            = 30;  // <Factor>
-	   final int SYMBOL_NOT2              = 31;  // <Not>
-	   final int SYMBOL_OR2               = 32;  // <Or>
-	};
+		   final int SYMBOL_EOF               =  0;  // (EOF)
+		   final int SYMBOL_ERROR             =  1;  // (Error)
+		   final int SYMBOL_WHITESPACE        =  2;  // (Whitespace)
+		   final int SYMBOL_EXCLAM            =  3;  // '!'
+		   final int SYMBOL_AMPAMP            =  4;  // '&&'
+		   final int SYMBOL_LPARAN            =  5;  // '('
+		   final int SYMBOL_RPARAN            =  6;  // ')'
+		   final int SYMBOL_PIPEPIPE          =  7;  // '||'
+		   final int SYMBOL_LT                =  8;  // '<'
+		   final int SYMBOL_LTEQ              =  9;  // '<='
+		   final int SYMBOL_EQ                = 10;  // '='
+		   final int SYMBOL_EQEQ              = 11;  // '=='
+		   final int SYMBOL_GT                = 12;  // '>'
+		   final int SYMBOL_GTEQ              = 13;  // '>='
+		   final int SYMBOL_ALBRACKETRBRACKET = 14;  // 'A[]'
+		   final int SYMBOL_ALTGT             = 15;  // 'A<>'
+		   final int SYMBOL_AF                = 16;  // AF
+		   final int SYMBOL_AG                = 17;  // AG
+		   final int SYMBOL_AND               = 18;  // and
+		   final int SYMBOL_ELBRACKETRBRACKET = 19;  // 'E[]'
+		   final int SYMBOL_ELTGT             = 20;  // 'E<>'
+		   final int SYMBOL_EF                = 21;  // EF
+		   final int SYMBOL_EG                = 22;  // EG
+		   final int SYMBOL_IDENTIFIER        = 23;  // Identifier
+		   final int SYMBOL_NOT               = 24;  // not
+		   final int SYMBOL_NUM               = 25;  // Num
+		   final int SYMBOL_OR                = 26;  // or
+		   final int SYMBOL_ABSTRACTPROPERTY  = 27;  // <AbstractProperty>
+		   final int SYMBOL_AND2              = 28;  // <And>
+		   final int SYMBOL_ATOMICPROPOSITION = 29;  // <AtomicProposition>
+		   final int SYMBOL_EXPR              = 30;  // <Expr>
+		   final int SYMBOL_FACTOR            = 31;  // <Factor>
+		   final int SYMBOL_NOT2              = 32;  // <Not>
+		   final int SYMBOL_OR2               = 33;  // <Or>
+		};
+	
 
-	public interface RuleConstants
-	{
-	   final int RULE_ABSTRACTPROPERTY_EF                   =  0;  // <AbstractProperty> ::= EF <Expr>
-	   final int RULE_ABSTRACTPROPERTY_ELTGT                =  1;  // <AbstractProperty> ::= 'E<>' <Expr>
-	   final int RULE_ABSTRACTPROPERTY_EG                   =  2;  // <AbstractProperty> ::= EG <Expr>
-	   final int RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET    =  3;  // <AbstractProperty> ::= 'E[]' <Expr>
-	   final int RULE_ABSTRACTPROPERTY_AF                   =  4;  // <AbstractProperty> ::= AF <Expr>
-	   final int RULE_ABSTRACTPROPERTY_ALTGT                =  5;  // <AbstractProperty> ::= 'A<>' <Expr>
-	   final int RULE_ABSTRACTPROPERTY_AG                   =  6;  // <AbstractProperty> ::= AG <Expr>
-	   final int RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET    =  7;  // <AbstractProperty> ::= 'A[]' <Expr>
-	   final int RULE_EXPR                                  =  8;  // <Expr> ::= <Or>
-	   final int RULE_OR_OR                                 =  9;  // <Or> ::= <Or> or <And>
-	   final int RULE_OR_PIPEPIPE                           = 10;  // <Or> ::= <Or> '||' <And>
-	   final int RULE_OR                                    = 11;  // <Or> ::= <And>
-	   final int RULE_AND_AND                               = 12;  // <And> ::= <And> and <Not>
-	   final int RULE_AND_AMPAMP                            = 13;  // <And> ::= <And> '&&' <Not>
-	   final int RULE_AND                                   = 14;  // <And> ::= <Not>
-	   final int RULE_NOT_NOT_LPARAN_RPARAN                 = 15;  // <Not> ::= not '(' <Expr> ')'
-	   final int RULE_NOT_EXCLAM_LPARAN_RPARAN              = 16;  // <Not> ::= '!' '(' <Expr> ')'
-	   final int RULE_NOT                                   = 17;  // <Not> ::= <Factor>
-	   final int RULE_FACTOR                                = 18;  // <Factor> ::= <AtomicProposition>
-	   final int RULE_FACTOR_LPARAN_RPARAN                  = 19;  // <Factor> ::= '(' <Expr> ')'
-	   final int RULE_ATOMICPROPOSITION_IDENTIFIER_LT_NUM   = 20;  // <AtomicProposition> ::= Identifier '<' Num
-	   final int RULE_ATOMICPROPOSITION_IDENTIFIER_LTEQ_NUM = 21;  // <AtomicProposition> ::= Identifier '<=' Num
-	   final int RULE_ATOMICPROPOSITION_IDENTIFIER_EQ_NUM   = 22;  // <AtomicProposition> ::= Identifier '=' Num
-	   final int RULE_ATOMICPROPOSITION_IDENTIFIER_GTEQ_NUM = 23;  // <AtomicProposition> ::= Identifier '>=' Num
-	   final int RULE_ATOMICPROPOSITION_IDENTIFIER_GT_NUM   = 24;  // <AtomicProposition> ::= Identifier '>' Num
-	};
+		public interface RuleConstants
+		{
+		   final int RULE_ABSTRACTPROPERTY_EF                   =  0;  // <AbstractProperty> ::= EF <Expr>
+		   final int RULE_ABSTRACTPROPERTY_ELTGT                =  1;  // <AbstractProperty> ::= 'E<>' <Expr>
+		   final int RULE_ABSTRACTPROPERTY_EG                   =  2;  // <AbstractProperty> ::= EG <Expr>
+		   final int RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET    =  3;  // <AbstractProperty> ::= 'E[]' <Expr>
+		   final int RULE_ABSTRACTPROPERTY_AF                   =  4;  // <AbstractProperty> ::= AF <Expr>
+		   final int RULE_ABSTRACTPROPERTY_ALTGT                =  5;  // <AbstractProperty> ::= 'A<>' <Expr>
+		   final int RULE_ABSTRACTPROPERTY_AG                   =  6;  // <AbstractProperty> ::= AG <Expr>
+		   final int RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET    =  7;  // <AbstractProperty> ::= 'A[]' <Expr>
+		   final int RULE_EXPR                                  =  8;  // <Expr> ::= <Or>
+		   final int RULE_OR_OR                                 =  9;  // <Or> ::= <Or> or <And>
+		   final int RULE_OR_PIPEPIPE                           = 10;  // <Or> ::= <Or> '||' <And>
+		   final int RULE_OR                                    = 11;  // <Or> ::= <And>
+		   final int RULE_AND_AND                               = 12;  // <And> ::= <And> and <Not>
+		   final int RULE_AND_AMPAMP                            = 13;  // <And> ::= <And> '&&' <Not>
+		   final int RULE_AND                                   = 14;  // <And> ::= <Not>
+		   final int RULE_NOT_NOT_LPARAN_RPARAN                 = 15;  // <Not> ::= not '(' <Expr> ')'
+		   final int RULE_NOT_EXCLAM_LPARAN_RPARAN              = 16;  // <Not> ::= '!' '(' <Expr> ')'
+		   final int RULE_NOT                                   = 17;  // <Not> ::= <Factor>
+		   final int RULE_FACTOR                                = 18;  // <Factor> ::= <AtomicProposition>
+		   final int RULE_FACTOR_LPARAN_RPARAN                  = 19;  // <Factor> ::= '(' <Expr> ')'
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_LT_NUM   = 20;  // <AtomicProposition> ::= Identifier '<' Num
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_LTEQ_NUM = 21;  // <AtomicProposition> ::= Identifier '<=' Num
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_EQ_NUM   = 22;  // <AtomicProposition> ::= Identifier '=' Num
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_EQEQ_NUM = 23;  // <AtomicProposition> ::= Identifier '==' Num
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_GTEQ_NUM = 24;  // <AtomicProposition> ::= Identifier '>=' Num
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_GT_NUM   = 25;  // <AtomicProposition> ::= Identifier '>' Num
+		};
 
 
 	private Stack<TCTLAbstractStateProperty> parseStack;
@@ -201,16 +210,60 @@ public class TAPAALQueryParser implements GPMessageConstants
 				case RuleConstants.RULE_OR_PIPEPIPE: // <Or> ::= <Or> '||' <And>			
 					TCTLAbstractStateProperty orProp2 = parseStack.pop();
 					TCTLAbstractStateProperty orProp1 = parseStack.pop();
-					TCTLOrNode orNode = new TCTLOrNode(orProp1,orProp2);
-					parseStack.push(orNode);
+					ArrayList<TCTLAbstractStateProperty> disjunctions = new ArrayList<TCTLAbstractStateProperty>();
+					if(orProp1 instanceof TCTLOrListNode) {
+						TCTLOrListNode node1 = (TCTLOrListNode)orProp1;
+						
+						for (TCTLAbstractStateProperty p : node1.getProperties()) {
+							disjunctions.add(p);
+						}
+					}
+					else {
+						disjunctions.add(orProp1);
+					}
+					
+					if(orProp2 instanceof TCTLOrListNode) {
+						TCTLOrListNode node2 = (TCTLOrListNode)orProp2;
+						
+						for (TCTLAbstractStateProperty p : node2.getProperties()) {
+							disjunctions.add(p);
+						}
+					}
+					else {
+						disjunctions.add(orProp2);
+					}
+					TCTLOrListNode orListNode = new TCTLOrListNode(disjunctions);
+					parseStack.push(orListNode);
 					break;
 				
 				case RuleConstants.RULE_AND_AND: // <And> ::= <And> and <Not>
 				case RuleConstants.RULE_AND_AMPAMP: // <And> ::= <And> '&&' <Not>
 					TCTLAbstractStateProperty andProp2 = parseStack.pop();
 					TCTLAbstractStateProperty andProp1 = parseStack.pop();
-					TCTLAndNode andNode = new TCTLAndNode(andProp1,andProp2);
-					parseStack.push(andNode);
+					ArrayList<TCTLAbstractStateProperty> conjunctions = new ArrayList<TCTLAbstractStateProperty>();
+					if(andProp1 instanceof TCTLAndListNode) {
+						TCTLAndListNode node1 = (TCTLAndListNode)andProp1;
+						
+						for (TCTLAbstractStateProperty p : node1.getProperties()) {
+							conjunctions.add(p);
+						}
+					}
+					else {
+						conjunctions.add(andProp1);
+					}
+					
+					if(andProp2 instanceof TCTLAndListNode) {
+						TCTLAndListNode node2 = (TCTLAndListNode)andProp2;
+						
+						for (TCTLAbstractStateProperty p : node2.getProperties()) {
+							conjunctions.add(p);
+						}
+					}
+					else {
+						conjunctions.add(andProp2);
+					}
+					TCTLAndListNode andListNode = new TCTLAndListNode(conjunctions);
+					parseStack.push(andListNode);
 					break;
 
 				case RuleConstants.RULE_NOT_NOT_LPARAN_RPARAN: // <Not> ::= not '(' <Expr> ')'
@@ -229,6 +282,7 @@ public class TAPAALQueryParser implements GPMessageConstants
 				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_LT_NUM: // <AtomicProposition> ::= Identifier '<' Num
 				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_LTEQ_NUM: // <AtomicProposition> ::= Identifier '<=' Num
 				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_EQ_NUM: // <AtomicProposition> ::= Identifier '=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_EQEQ_NUM: // <AtomicProposition> ::= Identifier '==' Num
 				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_GTEQ_NUM: // <AtomicProposition> ::= Identifier '>=' Num
 				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_GT_NUM: // <AtomicProposition> ::= Identifier '>' Num
 					String place = (String)createObjectFromTerminal(parser.currentReduction().getToken(0));
@@ -239,20 +293,20 @@ public class TAPAALQueryParser implements GPMessageConstants
 				}
 				
 
-				// ************************************** log file
-				System.out.println("gpMsgReduction");
-				Reduction myRed = parser.currentReduction();
-				System.out.println(myRed.getParentRule().getText());
-				// ************************************** end log
+//				// ************************************** log file
+//				System.out.println("gpMsgReduction");
+//				Reduction myRed = parser.currentReduction();
+//				System.out.println(myRed.getParentRule().getText());
+//				// ************************************** end log
 
 				break;
 
 			case gpMsgAccept:
 				/* The program was accepted by the parsing engine */
 
-				// ************************************** log file
-				System.out.println("gpMsgAccept");
-				// ************************************** end log
+//				// ************************************** log file
+//				System.out.println("gpMsgAccept");
+//				// ************************************** end log
 
 				done = true;
 
@@ -262,9 +316,9 @@ public class TAPAALQueryParser implements GPMessageConstants
 				/* Place code here to handle a illegal or unrecognized token
                            To recover, pop the token from the stack: Parser.PopInputToken */
 
-				// ************************************** log file
-				System.out.println("gpMsgLexicalError");
-				// ************************************** end log
+//				// ************************************** log file
+//				System.out.println("gpMsgLexicalError");
+//				// ************************************** end log
 
 				parser.popInputToken();
 
@@ -273,10 +327,10 @@ public class TAPAALQueryParser implements GPMessageConstants
 			case gpMsgNotLoadedError:
 				/* Load the Compiled Grammar Table file first. */
 
-				// ************************************** log file
-				System.out.println("gpMsgNotLoadedError");
-				// ************************************** end log
-
+//				// ************************************** log file
+//				System.out.println("gpMsgNotLoadedError");
+//				// ************************************** end log
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 				done = true;
 
 				break;
@@ -288,14 +342,14 @@ public class TAPAALQueryParser implements GPMessageConstants
                               expected tokens onto the parser's input queue (the first in this case):
                            You should limit the number of times this type of recovery can take
                            place. */
-
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 				done = true;
 				Token theTok = parser.currentToken();
 				System.out.println("Token not expected: " + (String)theTok.getData());
 
-				// ************************************** log file
-				System.out.println("gpMsgSyntaxError");
-				// ************************************** end log
+//				// ************************************** log file
+//				System.out.println("gpMsgSyntaxError");
+//				// ************************************** end log
 
 				break;
 
@@ -303,9 +357,9 @@ public class TAPAALQueryParser implements GPMessageConstants
 				/* The end of the input was reached while reading a comment.
                              This is caused by a comment that was not terminated */
 
-				// ************************************** log file
-				System.out.println("gpMsgCommentError");
-				// ************************************** end log
+//				// ************************************** log file
+//				System.out.println("gpMsgCommentError");
+//				// ************************************** end log
 
 				done = true;
 
@@ -314,9 +368,10 @@ public class TAPAALQueryParser implements GPMessageConstants
 			case gpMsgInternalError:
 				/* Something horrid happened inside the parser. You cannot recover */
 
-				// ************************************** log file
-				System.out.println("gpMsgInternalError");
-				// ************************************** end log
+//				// ************************************** log file
+//				System.out.println("gpMsgInternalError");
+//				// ************************************** end log
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 
 				done = true;
 
@@ -347,9 +402,12 @@ public class TAPAALQueryParser implements GPMessageConstants
 		case SymbolConstants.SYMBOL_LTEQ: // '<='
 		case SymbolConstants.SYMBOL_EQ: // '='
 		case SymbolConstants.SYMBOL_GT: // '>'
-		case SymbolConstants.SYMBOL_GTEQ: // '>='
+		case SymbolConstants.SYMBOL_GTEQ: // '>='			
 			String op = (String)token.getData();
 			retObj = op;
+			break;
+		case SymbolConstants.SYMBOL_EQEQ: // '=='
+			retObj = "=";
 			break;
 		case SymbolConstants.SYMBOL_IDENTIFIER: // Identifier
 			String id = (String)token.getData();

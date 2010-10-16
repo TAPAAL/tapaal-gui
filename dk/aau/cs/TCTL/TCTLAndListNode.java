@@ -28,12 +28,11 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		}		
 	}
 	
-	// constructs and TCTLAndListNode from and TCTLAndNode
-	public TCTLAndListNode(TCTLAndNode andNode) {
+	public TCTLAndListNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		
-		addConjunct(andNode.getProperty1().copy());
-		addConjunct(andNode.getProperty2().copy());
+		addConjunct(property1);
+		addConjunct(property2);
 	}
 	
 	public TCTLAndListNode() {
@@ -118,10 +117,6 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		if (o instanceof TCTLAndListNode) {
 			TCTLAndListNode node = (TCTLAndListNode)o;
 			return properties.equals(node.properties);
-		}
-		else if(o instanceof TCTLAndNode) {
-			TCTLAndNode node = (TCTLAndNode)o;
-			return properties.size() == 2 && properties.get(0).equals(node.getProperty1()) && properties.get(1).equals(node.getProperty2());
 		}
 		return false;
 	}

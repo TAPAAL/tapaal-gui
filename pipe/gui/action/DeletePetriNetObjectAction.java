@@ -7,6 +7,7 @@ package pipe.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -39,7 +40,7 @@ extends AbstractAction {
 		// check if queries need to be removed
 		ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
 		ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
-		ArrayList<TAPNQuery> queriesToDelete = new ArrayList<TAPNQuery>();
+		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 		boolean queriesAffected = false;
 		
 		for (PetriNetObject p : selection) {
@@ -53,8 +54,15 @@ extends AbstractAction {
 				}
 			}
 		}
-
-		int choice = queriesAffected ? JOptionPane.showConfirmDialog(CreateGui.getApp(), "All queries associated with the currently selected objects will also be removed.\n\n Are you sure you want to remove the current selection and all associated queries?", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) : JOptionPane.YES_OPTION;
+		StringBuilder s = new StringBuilder();
+		s.append("The following queries are associated with the currently selected objects:\n\n");
+		for (TAPNQuery q : queriesToDelete) {
+			s.append(q.getName());
+			s.append("\n");
+		}
+		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+		
+		int choice = queriesAffected ? JOptionPane.showConfirmDialog(CreateGui.getApp(), s.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) : JOptionPane.YES_OPTION;
 
 		if(choice == JOptionPane.YES_OPTION)
 		{

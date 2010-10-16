@@ -2336,7 +2336,8 @@ implements Cloneable {
 				}                  
 			} else if( "queries".equals(element.getNodeName()) ){
 				TAPNQuery query = createQuery(element);
-				queries.add(query);
+				if(query != null)
+					queries.add(query);
 			} else if ("constant".equals(element.getNodeName())){
 				String name = element.getAttribute("name");
 				int value = Integer.parseInt(element.getAttribute("value"));
@@ -2592,7 +2593,8 @@ implements Cloneable {
 				}                  
 			} else if( "queries".equals(element.getNodeName()) ){
 				TAPNQuery query = createQuery(element);
-				queries.add(query);
+				if(query != null)
+					queries.add(query);
 			} else if ("constant".equals(element.getNodeName())){
 				String name = element.getAttribute("name");
 				int value = Integer.parseInt(element.getAttribute("value"));
@@ -2740,7 +2742,10 @@ implements Cloneable {
 		TCTLAbstractProperty query;
 		try{
 			query = queryParser.parse(queryElement.getAttribute("query"));
-			return new TAPNQuery(comment, Integer.parseInt(capacity), query, traceOption, searchOption, reductionOption, hashTableSize, extrapolationOption);
+			if(query != null)
+				return new TAPNQuery(comment, Integer.parseInt(capacity), query, traceOption, searchOption, reductionOption, hashTableSize, extrapolationOption);
+			else
+				return null;
 		}catch (Exception e) {
 			System.err.println("No query was specified: " + e.getStackTrace());
 			return null;
