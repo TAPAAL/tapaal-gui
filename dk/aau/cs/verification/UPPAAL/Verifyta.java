@@ -179,7 +179,7 @@ public class Verifyta implements ModelChecker {
 
 			VerifytaTraceParser traceParser = new VerifytaTraceParser();
 			UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
-			
+
 			VerificationResult result = null;
 			if(trace == null){
 				if(((VerifytaOptions)options).trace() != TraceOption.NONE){
@@ -187,11 +187,16 @@ public class Verifyta implements ModelChecker {
 				}
 				result = new VerificationResult(queryResult);
 			}else{
-				VerifytaTraceInterpreter traceIntepreter = model instanceof ColoredTimedArcPetriNet ? 
-						new VerifytaColoredTraceInterpreter((ColoredTimedArcPetriNet)model, (ColoredTranslationNamingScheme)exportedModel.namingScheme()) 
-						: new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
-				TAPNTrace tapnTrace = traceIntepreter.interpretTrace(trace);
-				result = new VerificationResult(queryResult, tapnTrace);
+				if(exportedModel.namingScheme() == null){ // TODO: get rid of
+					messenger.displayErrorMessage("Traces are currently not supported on the chosen translation");
+					result = new VerificationResult(queryResult);
+				}else{
+					VerifytaTraceInterpreter traceIntepreter = model instanceof ColoredTimedArcPetriNet ? 
+							new VerifytaColoredTraceInterpreter((ColoredTimedArcPetriNet)model, (ColoredTranslationNamingScheme)exportedModel.namingScheme()) 
+					: new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
+							TAPNTrace tapnTrace = traceIntepreter.interpretTrace(trace);
+							result = new VerificationResult(queryResult, tapnTrace);
+				}
 			}
 			return result;
 		}
@@ -205,11 +210,11 @@ public class Verifyta implements ModelChecker {
 		}else{
 			exportedModel = exporter.export(model, query, ((VerifytaOptions)options).getReduction());
 		}
-		
+
 		if(exportedModel == null){
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
-						
+
 		return verify(options, model, exportedModel);
 	}
 
