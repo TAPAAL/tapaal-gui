@@ -12,11 +12,15 @@ public interface TranslationNamingScheme {
 		private int startsAt;
 		private String originalTransitionName;
 		private int endsAt;
+		private SequenceInfo sequenceInfo;
 		
-		public TransitionTranslation(int startsAt, int endsAt, String originalTransitionName){			
+		public enum SequenceInfo { WHOLE, END };
+		
+		public TransitionTranslation(int startsAt, int endsAt, String originalTransitionName, SequenceInfo sequenceInfo){			
 			this.startsAt = startsAt;
 			this.endsAt = endsAt;
 			this.originalTransitionName = originalTransitionName;
+			this.sequenceInfo = sequenceInfo;
 		}
 		
 		public int startsAt(){
@@ -25,6 +29,10 @@ public interface TranslationNamingScheme {
 		
 		public int endsAt(){
 			return endsAt;
+		}
+		
+		public SequenceInfo sequenceInfo(){
+			return sequenceInfo;
 		}
 		
 		public String originalTransitionName(){

@@ -15,6 +15,7 @@ import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.translations.StandardNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
@@ -198,7 +199,7 @@ public class UppaalExporter {
 				return null;
 			}
 
-
+			namingScheme = new StandardNamingScheme();
 		}
 		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), namingScheme);
 	}

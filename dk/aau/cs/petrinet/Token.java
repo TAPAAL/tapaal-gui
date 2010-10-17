@@ -23,4 +23,9 @@ public class Token {
 	public BigDecimal age(){
 		return age;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + place.getName() + ", age:" + age + ")";
+	}
 }

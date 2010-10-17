@@ -18,6 +18,7 @@ import dk.aau.cs.petrinet.trace.TAPNFiringAction;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation;
+import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class VerifytaTraceInterpreter {
 	private final TimedArcPetriNet tapn;
@@ -27,11 +28,11 @@ public class VerifytaTraceInterpreter {
 		this.tapn = tapn;
 		this.namingScheme = namingScheme;
 	}
-	
+
 	protected TimedArcPetriNet tapn(){
 		return tapn;
 	}
-	
+
 	protected TranslationNamingScheme namingScheme(){
 		return namingScheme;
 	}
@@ -76,29 +77,57 @@ public class VerifytaTraceInterpreter {
 			TransitionTranslation transitionTranslation
 	) {
 		TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
-
-		TransitionFiringAction start = firingSequence.get(transitionTranslation.startsAt());
-		TransitionFiringAction end = firingSequence.get(transitionTranslation.endsAt());
-		List<Token> tokens = parseConsumedTokens(start, end);				
+		List<Token> tokens = null;
+		if(transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)){
+			tokens = parseConsumedTokens(
+					firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt()+1)
+			);
+		}else if(transitionTranslation.sequenceInfo().equals(SequenceInfo.END)){
+			TransitionFiringAction start = firingSequence.get(transitionTranslation.startsAt());
+			TransitionFiringAction end = firingSequence.get(transitionTranslation.endsAt());
+			tokens = parseConsumedTokens(start, end);
+		}
 
 		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
 	}
 
-	private List<Token> parseConsumedTokens(TransitionFiringAction start, TransitionFiringAction end) {
+	private List<Token> parseConsumedTokens(List<TransitionFiringAction> actions) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
-		for(Participant participant : end.participants()){
-			String automata = participant.automata();
-			String sourceLocation = start.sourceState().locationFor(automata);
-			
-			if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
-				TAPNPlace place = tapn.getPlaceByName(sourceLocation);
-				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName());
-				Token token = new Token(place, clockValue); 
-				tokens.add(token);
+		for(int i = 0; i < actions.size(); i++){
+			TransitionFiringAction action = actions.get(i);
+
+			for(Participant participant : action.participants()){
+				String automata = participant.automata();
+				String sourceLocation = participant.location();
+
+				if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
+					TAPNPlace place = tapn.getPlaceByName(sourceLocation);
+					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName());
+					Token token = new Token(place, clockValue); 
+					tokens.add(token);
+				}
 			}
 		}
 
 		return tokens;
 	}
+
+		private List<Token> parseConsumedTokens(TransitionFiringAction start, TransitionFiringAction end) {
+			ArrayList<Token> tokens = new ArrayList<Token>();
+	
+			for(Participant participant : end.participants()){
+				String automata = participant.automata();
+				String sourceLocation = start.sourceState().locationFor(automata);
+				
+				if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
+					TAPNPlace place = tapn.getPlaceByName(sourceLocation);
+					BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName());
+					Token token = new Token(place, clockValue); 
+					tokens.add(token);
+				}
+			}
+	
+			return tokens;
+		}
 }

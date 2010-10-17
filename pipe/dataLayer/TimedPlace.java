@@ -575,4 +575,9 @@ public class TimedPlace extends Place {
 		}
 		super.showMarking(marking);
 	}
+	
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

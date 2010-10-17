@@ -29,6 +29,7 @@ import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.Pairing.ArcType;
+import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class BroadcastTranslation implements
 ModelTranslator<TimedArcPetriNet, NTA>,
@@ -661,6 +662,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		private final String END_OF_SEQUENCE_PATTERN = "^(\\w+?)_fire$";
 		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
 		private Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
+		private final SequenceInfo seqInfo = SequenceInfo.END;
 		
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
@@ -670,7 +672,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			String originalTransitionName = null;
 			for(int i = 0; i < firingSequence.size(); i++){
 				String transitionName = firingSequence.get(i);
-				if(!isIgnoredTransition(transitionName)){
+				if(!isInitializationTransition(transitionName)){
 					Matcher startMatcher = startPattern.matcher(transitionName);
 					Matcher endMatcher = endPattern.matcher(transitionName);
 					
@@ -683,7 +685,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					if(isEndTransition || isDegree2Optimization) endIndex = i;
 					
 					if(endIndex != NOT_FOUND){
-						transitionTranslations.add(new TransitionTranslation(startIndex, endIndex, originalTransitionName));
+						transitionTranslations.add(new TransitionTranslation(startIndex, endIndex, originalTransitionName, seqInfo));
 						endIndex = NOT_FOUND;
 						originalTransitionName = null;
 					}			
@@ -695,8 +697,14 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			return array;
 		}
 
-		private boolean isIgnoredTransition(String string) {
-			Pattern pattern = Pattern.compile("c\\d+");
+		private boolean isInitializationTransition(String transitionName) {
+			Pattern pattern = Pattern.compile("^c\\d+$");
+			Matcher matcher = pattern.matcher(transitionName);
+			return matcher.find();
+		}
+
+		public boolean isIgnoredTransition(String string) {
+			Pattern pattern = Pattern.compile("^tau|\\w+?_test$");
 			Matcher matcher = pattern.matcher(string);
 			return matcher.find();
 		}

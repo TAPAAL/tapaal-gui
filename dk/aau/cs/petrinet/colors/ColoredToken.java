@@ -25,4 +25,9 @@ public class ColoredToken extends Token {
 	public int getColor() {
 		return color;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + place().getName() + ", age: " + age() + ", val: " + color + ")";
+	}
 }
