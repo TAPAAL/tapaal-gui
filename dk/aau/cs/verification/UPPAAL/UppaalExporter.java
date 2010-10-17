@@ -15,15 +15,16 @@ import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.translations.StandardNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
+import dk.aau.cs.translations.tapn.OptimizedStandardNamingScheme;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
+import dk.aau.cs.translations.tapn.StandardNamingScheme;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
 import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
@@ -108,6 +109,7 @@ public class UppaalExporter {
 				e.printStackTrace();
 				return null;
 			}	
+			namingScheme = new OptimizedStandardNamingScheme();
 		} else if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
 			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
