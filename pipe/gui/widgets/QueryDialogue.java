@@ -709,7 +709,6 @@ public class QueryDialogue extends JPanel{
 		undoButton.addActionListener(
 				new ActionListener() {
 
-					@Override
 					public void actionPerformed(ActionEvent e) {
 						UndoableEdit edit = undoManager.GetNextEditToUndo();
 
@@ -728,7 +727,6 @@ public class QueryDialogue extends JPanel{
 		redoButton.addActionListener(
 				new ActionListener() {
 
-					@Override
 					public void actionPerformed(ActionEvent e) {
 						UndoableEdit edit = undoManager.GetNextEditToRedo();
 						if(edit instanceof QueryConstructionEdit)
@@ -1510,7 +1508,6 @@ public class QueryDialogue extends JPanel{
 
 
 	private class UndoAdapter implements UndoableEditListener {
-		@Override
 		public void undoableEditHappened(UndoableEditEvent arg0) {
 			UndoableEdit edit = arg0.getEdit();
 			undoManager.addEdit( edit );
