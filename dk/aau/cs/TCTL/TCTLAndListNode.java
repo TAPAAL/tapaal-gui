@@ -35,6 +35,14 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		addConjunct(property2);
 	}
 	
+	public TCTLAndListNode(TCTLAndListNode andListNode) {
+		this.properties = new ArrayList<TCTLAbstractStateProperty>();
+		
+		for (TCTLAbstractStateProperty p : andListNode.properties) {
+			addConjunct(p.copy());		
+		}
+	}
+	
 	public TCTLAndListNode() {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();

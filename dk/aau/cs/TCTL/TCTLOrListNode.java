@@ -28,6 +28,14 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 		}		
 	}
 	
+	public TCTLOrListNode(TCTLOrListNode orListNode) {
+		this.properties = new ArrayList<TCTLAbstractStateProperty>();
+		
+		for (TCTLAbstractStateProperty p : orListNode.properties) {
+			addDisjunct(p.copy());		
+		}
+	}
+	
 	public TCTLOrListNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		

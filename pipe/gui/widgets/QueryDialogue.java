@@ -1,10 +1,8 @@
 package pipe.gui.widgets;
 
-
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -15,7 +13,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
@@ -37,10 +34,18 @@ import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
@@ -106,6 +111,8 @@ public class QueryDialogue extends JPanel{
 	private ButtonGroup editingButtonsGroup;
 	private JButton deleteButton;
 	private JButton resetButton;
+	private JButton undoButton;
+	private JButton redoButton;
 
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
@@ -151,8 +158,8 @@ public class QueryDialogue extends JPanel{
 
 	private DataLayer datalayer;
 	private EscapableDialog me;
-
-	private HashMap<JPanel, ActionListener> andActionListenerMap;
+	private QueryConstructionUndoManager undoManager;
+	private UndoableEditSupport undoSupport;
 
 	private String name_ADVNOSYM = "Optimised Standard";
 	private String name_NAIVE = "Standard";
@@ -167,7 +174,6 @@ public class QueryDialogue extends JPanel{
 		this.datalayer = datalayer;
 		this.me = me;
 		this.newProperty = queryToCreateFrom==null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
-		andActionListenerMap = new HashMap<JPanel, ActionListener>();
 		rootPane = me.getRootPane();
 		setLayout(new GridBagLayout());
 
@@ -185,6 +191,12 @@ public class QueryDialogue extends JPanel{
 		rootPane.setDefaultButton(saveButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
+
+		// initilize the undo.redo system
+		undoManager= new QueryConstructionUndoManager();
+		undoSupport = new UndoableEditSupport();
+		undoSupport.addUndoableEditListener(new UndoAdapter());
+		refreshUndoRedo();
 	}
 
 	private void initQueryNamePanel(final TAPNQuery queryToCreateFrom) {
@@ -404,8 +416,10 @@ public class QueryDialogue extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
 				TCTLEGNode property = new TCTLEGNode(getStateChild(1,currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);	
+				undoSupport.postEdit(edit);
 			}
 		});
 
@@ -414,9 +428,10 @@ public class QueryDialogue extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
 				TCTLEFNode property = new TCTLEFNode(getStateChild(1,currentSelection.getObject()));
-
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
+				undoSupport.postEdit(edit);
 			}
 		});
 
@@ -425,8 +440,10 @@ public class QueryDialogue extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
 				TCTLAGNode property = new TCTLAGNode(getStateChild(1,currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
+				undoSupport.postEdit(edit);
 			}
 		});
 
@@ -435,8 +452,10 @@ public class QueryDialogue extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
 				TCTLAFNode property = new TCTLAFNode(getStateChild(1,currentSelection.getObject()));
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
+				undoSupport.postEdit(edit);
 			}
 		});		
 
@@ -475,10 +494,14 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
+						TCTLAndListNode andListNode = null;
 						if(currentSelection.getObject() instanceof TCTLAndListNode) {
-							TCTLAndListNode andListNode = (TCTLAndListNode)currentSelection.getObject();
+							andListNode = new TCTLAndListNode((TCTLAndListNode)currentSelection.getObject());
 							andListNode.addConjunct(new TCTLStatePlaceHolder());
+							UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
+							newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
 							updateSelection(andListNode); 
+							undoSupport.postEdit(edit);
 						}
 						else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) 
 						{
@@ -487,18 +510,22 @@ public class QueryDialogue extends JPanel{
 
 							if(parentNode instanceof TCTLAndListNode) {
 								// current selection is child of an andList node => add new placeholder conjunct to it
-								TCTLAndListNode andListNode = (TCTLAndListNode)parentNode;
+								andListNode = new TCTLAndListNode((TCTLAndListNode)parentNode);
 								andListNode.addConjunct(new TCTLStatePlaceHolder());
+								UndoableEdit edit = new QueryConstructionEdit((TCTLAndListNode)parentNode, andListNode);
+								newProperty = newProperty.replace(parentNode, andListNode);
 								updateSelection(andListNode); 
+								undoSupport.postEdit(edit);
 							}
 							else {
 								TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-								TCTLAndListNode property = new TCTLAndListNode(getState(currentSelection.getObject()),ph);
-								newProperty = newProperty.replace(currentSelection.getObject(), property);
-								updateSelection(ph);
+								andListNode = new TCTLAndListNode(getState(currentSelection.getObject()),ph);
+								UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), andListNode);
+								newProperty = newProperty.replace(currentSelection.getObject(), andListNode);
+								updateSelection(andListNode);
+								undoSupport.postEdit(edit);
 							}
 						}
-
 					}
 
 				}
@@ -509,10 +536,14 @@ public class QueryDialogue extends JPanel{
 		disjunctionButton.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						TCTLOrListNode orListNode;
 						if(currentSelection.getObject() instanceof TCTLOrListNode) {
-							TCTLOrListNode orListNode = (TCTLOrListNode)currentSelection.getObject();
+							orListNode = new TCTLOrListNode((TCTLOrListNode)currentSelection.getObject());
 							orListNode.addDisjunct(new TCTLStatePlaceHolder());
+							UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
+							newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
 							updateSelection(orListNode); 
+							undoSupport.postEdit(edit);
 						}
 						else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) 
 						{
@@ -521,15 +552,20 @@ public class QueryDialogue extends JPanel{
 
 							if(parentNode instanceof TCTLOrListNode) {
 								// current selection is child of an orList node => add new placeholder disjunct to it
-								TCTLOrListNode orListNode = (TCTLOrListNode)parentNode;
+								orListNode = new TCTLOrListNode((TCTLOrListNode)parentNode);
 								orListNode.addDisjunct(new TCTLStatePlaceHolder());
+								UndoableEdit edit = new QueryConstructionEdit((TCTLOrListNode)parentNode, orListNode);
+								newProperty = newProperty.replace(parentNode, orListNode);
 								updateSelection(orListNode); 
+								undoSupport.postEdit(edit);
 							}
 							else {
 								TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
-								TCTLOrListNode property = new TCTLOrListNode(getState(currentSelection.getObject()),ph);
-								newProperty = newProperty.replace(currentSelection.getObject(), property);
-								updateSelection(ph);
+								orListNode = new TCTLOrListNode(getState(currentSelection.getObject()),ph);
+								UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), orListNode);
+								newProperty = newProperty.replace(currentSelection.getObject(), orListNode);
+								updateSelection(orListNode);
+								undoSupport.postEdit(edit);
 							}
 						}
 					}
@@ -542,8 +578,10 @@ public class QueryDialogue extends JPanel{
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						TCTLNotNode property = new TCTLNotNode(getState(currentSelection.getObject()));
+						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 						newProperty = newProperty.replace(currentSelection.getObject(), property);
 						updateSelection(property);
+						undoSupport.postEdit(edit);
 					}
 				}
 		);
@@ -585,8 +623,10 @@ public class QueryDialogue extends JPanel{
 		addPredicateButton = new JButton("Add Predicate to Query");
 		gbc.gridx = 0;
 		gbc.gridy = 1;
+		gbc.gridwidth = 3;
 		predicatePanel.add(addPredicateButton,gbc);
 
+		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.VERTICAL;
@@ -598,8 +638,10 @@ public class QueryDialogue extends JPanel{
 
 					public void actionPerformed(ActionEvent e) {
 						TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode((String)placesBox.getSelectedItem(), (String)relationalOperatorBox.getSelectedItem(), (Integer) placeMarking.getValue());
+						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 						newProperty = newProperty.replace(currentSelection.getObject(), property);
 						updateSelection(property);
+						undoSupport.postEdit(edit);
 					}
 				}
 
@@ -612,18 +654,33 @@ public class QueryDialogue extends JPanel{
 		editingButtonsGroup = new ButtonGroup();
 		deleteButton = new JButton("Delete Selection");
 		resetButton = new JButton("Reset Query");
+		undoButton = new JButton("Undo");
+		redoButton = new JButton("Redo");
 
 		editingButtonsGroup.add(deleteButton);
 		editingButtonsGroup.add(resetButton);
+		editingButtonsGroup.add(undoButton);
+		editingButtonsGroup.add(redoButton);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
+		editingButtonPanel.add(undoButton,gbc);
+
+		gbc.gridx = 1;
+		editingButtonPanel.add(redoButton,gbc);
+
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		editingButtonPanel.add(deleteButton,gbc);
 
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		editingButtonPanel.add(resetButton, gbc);
+
+
 
 		// Add action Listeners
 		deleteButton.addActionListener(
@@ -639,9 +696,48 @@ public class QueryDialogue extends JPanel{
 				new ActionListener() {
 
 					public void actionPerformed(ActionEvent e) {
-						newProperty = new TCTLPathPlaceHolder();
+						TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
+						UndoableEdit edit = new QueryConstructionEdit(newProperty, ph);
+						newProperty = ph;
 						resetQuantifierSelectionButtons();
 						updateSelection(newProperty);
+						undoSupport.postEdit(edit);
+					}
+				}
+		);
+
+		undoButton.addActionListener(
+				new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						UndoableEdit edit = undoManager.GetNextEditToUndo();
+
+						if(edit instanceof QueryConstructionEdit)
+						{
+							TCTLAbstractProperty original = ((QueryConstructionEdit)edit).getOriginal();
+							undoManager.undo();
+							refreshUndoRedo();
+							updateSelection(original);
+						}
+
+					}
+				}
+		);
+
+		redoButton.addActionListener(
+				new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						UndoableEdit edit = undoManager.GetNextEditToRedo();
+						if(edit instanceof QueryConstructionEdit)
+						{
+							TCTLAbstractProperty replacement = ((QueryConstructionEdit)edit).getReplacement();
+							undoManager.redo();
+							refreshUndoRedo();
+							updateSelection(replacement);
+						}
 					}
 				}
 		);
@@ -735,7 +831,7 @@ public class QueryDialogue extends JPanel{
 		traceRadioButtonGroup.add(none);
 
 		if (queryToCreateFrom==null){
-			none.setSelected(true);
+			disableTraceOptions(); // symmetry is on by default
 		}else{
 			if (queryToCreateFrom.getTraceOption() == TraceOption.SOME){
 				some.setSelected(true);
@@ -793,7 +889,6 @@ public class QueryDialogue extends JPanel{
 		});
 
 		reductionOptionsPanel.add(symmetryReduction);
-		disableTraceOptions();
 
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();
@@ -1194,59 +1289,6 @@ public class QueryDialogue extends JPanel{
 		return  queryDialogue.getQuery();
 	}
 
-	private void setEnabledReductionOptions() {
-		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-			disableLivenessReductionOptions();
-		} else {
-			enableAllReductionOptions();
-		}
-
-	}
-
-	private void disableAllQueryButtons() {
-		existsBox.setEnabled(false);
-		existsDiamond.setEnabled(false);
-		forAllBox.setEnabled(false);
-		forAllDiamond.setEnabled(false);
-		conjunctionButton.setEnabled(false);
-		disjunctionButton.setEnabled(false);
-		negationButton.setEnabled(false);
-		placesBox.setEnabled(false);
-		relationalOperatorBox.setEnabled(false);
-		placeMarking.setEnabled(false);
-		addPredicateButton.setEnabled(false);
-
-	}
-
-	private void enablePathButtons() {
-		existsBox.setEnabled(true);
-		existsDiamond.setEnabled(true);
-		forAllBox.setEnabled(true);
-		forAllDiamond.setEnabled(true);
-		conjunctionButton.setEnabled(false);
-		disjunctionButton.setEnabled(false);
-		negationButton.setEnabled(false);	
-		placesBox.setEnabled(false);
-		relationalOperatorBox.setEnabled(false);
-		placeMarking.setEnabled(false);
-		addPredicateButton.setEnabled(false);
-	}
-
-	private void enableStateButtons() {
-		existsBox.setEnabled(false);
-		existsDiamond.setEnabled(false);
-		forAllBox.setEnabled(false);
-		forAllDiamond.setEnabled(false);
-		conjunctionButton.setEnabled(true);
-		disjunctionButton.setEnabled(true);
-		negationButton.setEnabled(true);
-		placesBox.setEnabled(true);
-		relationalOperatorBox.setEnabled(true);
-		placeMarking.setEnabled(true);
-		addPredicateButton.setEnabled(true);
-
-	}
-
 
 	private TCTLAbstractStateProperty getState(TCTLAbstractProperty property) {
 		if (property instanceof TCTLAbstractStateProperty) {
@@ -1372,12 +1414,17 @@ public class QueryDialogue extends JPanel{
 				replacement = new TCTLPathPlaceHolder();
 			}
 			if(replacement !=null) {
+				
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), replacement);
+				
 				newProperty = newProperty.replace(currentSelection.getObject(), replacement);
 
 				if(currentSelection.getObject() instanceof TCTLAbstractPathProperty)
 					resetQuantifierSelectionButtons();
 
 				updateSelection(replacement);
+
+				undoSupport.postEdit(edit);
 			}
 		}
 	}
@@ -1394,5 +1441,122 @@ public class QueryDialogue extends JPanel{
 		saveAndVerifyButton.setEnabled(isQueryOk);
 		saveUppaalXMLButton.setEnabled(isQueryOk);
 	}
+	
+	private void setEnabledReductionOptions() {
+		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+			disableLivenessReductionOptions();
+		} else {
+			enableAllReductionOptions();
+		}
+
+	}
+
+	private void disableAllQueryButtons() {
+		existsBox.setEnabled(false);
+		existsDiamond.setEnabled(false);
+		forAllBox.setEnabled(false);
+		forAllDiamond.setEnabled(false);
+		conjunctionButton.setEnabled(false);
+		disjunctionButton.setEnabled(false);
+		negationButton.setEnabled(false);
+		placesBox.setEnabled(false);
+		relationalOperatorBox.setEnabled(false);
+		placeMarking.setEnabled(false);
+		addPredicateButton.setEnabled(false);
+
+	}
+
+	private void enablePathButtons() {
+		existsBox.setEnabled(true);
+		existsDiamond.setEnabled(true);
+		forAllBox.setEnabled(true);
+		forAllDiamond.setEnabled(true);
+		conjunctionButton.setEnabled(false);
+		disjunctionButton.setEnabled(false);
+		negationButton.setEnabled(false);	
+		placesBox.setEnabled(false);
+		relationalOperatorBox.setEnabled(false);
+		placeMarking.setEnabled(false);
+		addPredicateButton.setEnabled(false);
+	}
+
+	private void enableStateButtons() {
+		existsBox.setEnabled(false);
+		existsDiamond.setEnabled(false);
+		forAllBox.setEnabled(false);
+		forAllDiamond.setEnabled(false);
+		conjunctionButton.setEnabled(true);
+		disjunctionButton.setEnabled(true);
+		negationButton.setEnabled(true);
+		placesBox.setEnabled(true);
+		relationalOperatorBox.setEnabled(true);
+		placeMarking.setEnabled(true);
+		if(placesBox.getSelectedItem() == null)
+			addPredicateButton.setEnabled(false);
+		else
+			addPredicateButton.setEnabled(true);
+
+	}
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////
+	// Undo support stuff
+	///////////////////////////////////////////////////////////////////////
+	private void refreshUndoRedo() {
+		undoButton.setEnabled(undoManager.canUndo());
+		redoButton.setEnabled(undoManager.canRedo());
+	}
+
+
+	private class UndoAdapter implements UndoableEditListener {
+		@Override
+		public void undoableEditHappened(UndoableEditEvent arg0) {
+			UndoableEdit edit = arg0.getEdit();
+			undoManager.addEdit( edit );
+			refreshUndoRedo();
+		}
+	}
+
+	private class QueryConstructionUndoManager extends UndoManager {
+		private static final long serialVersionUID = 1L;
+		
+		public UndoableEdit GetNextEditToUndo() { return editToBeUndone(); }
+		public UndoableEdit GetNextEditToRedo() { return editToBeRedone(); }
+	}
+	
+	public class QueryConstructionEdit extends AbstractUndoableEdit {
+		private static final long serialVersionUID = 1L;
+		
+		private TCTLAbstractProperty original;
+		private TCTLAbstractProperty replacement;
+
+		public TCTLAbstractProperty getOriginal() {
+			return original;
+		}
+
+		public TCTLAbstractProperty getReplacement() {
+			return replacement;
+		}
+
+		public QueryConstructionEdit(TCTLAbstractProperty original, TCTLAbstractProperty replacement) {
+			this.original = original;
+			this.replacement = replacement;
+		}
+		
+		public void undo() throws CannotUndoException {
+			newProperty = newProperty.replace(replacement, original);
+		}
+		
+		public void redo() throws CannotRedoException {
+			newProperty = newProperty.replace(original, replacement);
+		}
+		
+		public boolean canUndo() { return true; }
+		
+		public boolean canRedo() { return true; }
+
+	}
+
 
 }
