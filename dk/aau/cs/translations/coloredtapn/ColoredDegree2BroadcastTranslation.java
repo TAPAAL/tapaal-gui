@@ -17,6 +17,7 @@ import dk.aau.cs.petrinet.colors.ColoredToken;
 import dk.aau.cs.petrinet.colors.ColoredTransportArc;
 import dk.aau.cs.petrinet.colors.Preservation;
 import dk.aau.cs.petrinet.degree2converters.ColoredInhibDegree2Converter;
+import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 
 public class ColoredDegree2BroadcastTranslation extends
@@ -121,6 +122,19 @@ Degree2BroadcastTranslation {
 		invariant += colorInvariant;
 		
 		return invariant;
+	}
+	
+	@Override
+	public ColoredTranslationNamingScheme namingScheme() {
+		return new ColoredDegree2BroadcastNamingScheme();
+	}
+	
+	private class ColoredDegree2BroadcastNamingScheme extends Degree2BroadcastNamingScheme
+		implements ColoredTranslationNamingScheme
+	{
+		public String colorVariableName() {
+			return VALUE_VAR_NAME;
+		}
 	}
 	
 	

@@ -55,9 +55,10 @@ public class UppaalExporter {
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
 		}else{
-			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+			ColoredDegree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
+			namingScheme = broadcastTransformer.namingScheme();
 		}
 		
 		try{
@@ -127,7 +128,7 @@ public class UppaalExporter {
 			}
 		} else if(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST){
 			Degree2BroadcastTranslation broadcastTransformer = new Degree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
-
+			namingScheme = broadcastTransformer.namingScheme();
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));

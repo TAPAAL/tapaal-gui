@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.translations.TranslationNamingScheme;
-import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class StandardNamingScheme implements TranslationNamingScheme {

@@ -30,12 +30,16 @@ import dk.aau.cs.petrinet.degree2converters.InhibDegree2Converter;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.QueryTranslator;
+import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.Pairing.ArcType;
+import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class Degree2BroadcastTranslation implements
 ModelTranslator<TimedArcPetriNet, NTA>,
 QueryTranslator<TAPNQuery, UPPAALQuery>{
 
+	private static final String DEG2_SUFFIX = "_deg2";
+	private static final String DEG1_SUFFIX = "_single";
 	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	private static final String PLOCK = "P_lock";
 	private static final String P_CAPACITY = "P_capacity";
@@ -158,7 +162,17 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 
 		for(TAPNTransition t : degree2Net.getTransitions()){
-			if(t.getPreset().size() > 1){
+			if(t.isFromOriginalNet()){
+				if(t.getPreset().size() == 1){
+					builder.append("broadcast chan ");
+					builder.append(t.getName() + DEG1_SUFFIX);
+					builder.append(";\n");
+				}else if(t.getPreset().size() == 2){
+					builder.append("chan ");
+					builder.append(t.getName() + DEG2_SUFFIX);
+					builder.append(";\n");
+				}
+			}else{
 				builder.append("chan ");
 				builder.append(t.getName());
 				builder.append(";\n");
@@ -361,7 +375,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					Edge e = new Edge(getLocationByName(pairing.getInput().getName()),
 							getLocationByName(pairing.getOutput().getName()),
 							guard,
-							"",
+							transition.getName() + DEG1_SUFFIX + "!",
 							CreateResetExpressionIfNormalArc(pairing.getOutputArc()));
 					token.addTransition(e);
 					saveGuard(transition.getName(),pairing.getInput().getName(), guard);
@@ -373,7 +387,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					Edge e1 = new Edge(getLocationByName(pair1.getInput().getName()),
 							getLocationByName(pair1.getOutput().getName()),
 							guard1,
-							transition.getName() + "?",
+							transition.getName() + DEG2_SUFFIX + "?",
 							CreateResetExpressionIfNormalArc(pair1.getOutputArc()));
 					token.addTransition(e1);
 					saveGuard(transition.getName(), pair1.getInput().getName(), guard1);
@@ -383,7 +397,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					Edge e2 = new Edge(getLocationByName(pair2.getInput().getName()),
 							getLocationByName(pair2.getOutput().getName()),
 							guard2,
-							transition.getName() + "!",
+							transition.getName() + DEG2_SUFFIX + "!",
 							CreateResetExpressionIfNormalArc(pair2.getOutputArc()));
 					token.addTransition(e2);
 					saveGuard(transition.getName(), pair2.getInput().getName(), guard2);
@@ -512,7 +526,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 						}
 						throw new Exception("guard was not precomputed");
 					}
-					
+
 					//String guard = createGuardForTestingEdge(transition, arc);
 					Edge e = new Edge(getLocationByName(source),
 							getLocationByName(source),
@@ -689,7 +703,71 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry,tapnQuery.getTotalTokens());
-		
+
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
+	}
+
+	public TranslationNamingScheme namingScheme(){
+		return new Degree2BroadcastNamingScheme();
+	}
+
+	protected class Degree2BroadcastNamingScheme implements TranslationNamingScheme {
+		private static final int NOT_FOUND = -1;
+		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+)_(?:test|single|deg2)$";
+		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private Pattern testTransitionPattern = Pattern.compile("^(\\w+)_test$");
+		private Pattern ignoredPlacePattern = Pattern.compile("^" + PLOCK + "|" + P_CAPACITY + "|P_hp_\\w+_\\d+$");
+		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
+
+		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
+			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
+
+			int startIndex = NOT_FOUND;
+			String originalTransitionName = null;
+			for(int i = 0; i < firingSequence.size(); i++){
+				String transitionName = firingSequence.get(i);
+				Matcher startMatcher = startPattern.matcher(transitionName);
+
+				boolean isStartTransition = startMatcher.matches();
+
+				if(isStartTransition){ 
+					if(startIndex != NOT_FOUND){
+						TransitionTranslation transitionTranslation = createTransitionTranslation(firingSequence.get(startIndex), startIndex, i-1, originalTransitionName);
+						transitionTranslations.add(transitionTranslation);
+					}
+					startIndex = i; 
+					originalTransitionName = startMatcher.group(1); 
+				}			
+			}
+			
+			if(startIndex != NOT_FOUND){
+				TransitionTranslation transitionTranslation = createTransitionTranslation(firingSequence.get(startIndex), startIndex, firingSequence.size()-1, originalTransitionName);
+				transitionTranslations.add(transitionTranslation);
+			}
+			TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
+			transitionTranslations.toArray(array);
+			return array;
+		}
+
+		private TransitionTranslation createTransitionTranslation(String startTransition, int startIndex, int endIndex, String originalTransitionName) {
+			if(testTransitionPattern.matcher(startTransition).matches()){
+				startIndex += 1; // ignores _test transition
+			}
+			TransitionTranslation transitionTranslation = new TransitionTranslation(startIndex, endIndex, originalTransitionName, seqInfo);
+			return transitionTranslation;
+		}
+
+		public String tokenClockName() {
+			return CLOCK_NAME;
+		}
+
+		public boolean isIgnoredPlace(String location) {
+			Matcher matcher = ignoredPlacePattern.matcher(location);
+			return matcher.matches();
+		}
+
+		public boolean isIgnoredAutomata(String automata){
+			return automata.equals(CONTROL_TEMPLATE_NAME);
+		}
 	}
 }

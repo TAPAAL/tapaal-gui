@@ -79,7 +79,7 @@ public class KyrketestUppaalSym {
 			if (t.getPreset().size() <= 2 && t.getPostset().size() <=2){
 
 
-				TAPNTransition transition = new TAPNTransition(t.getName() + "_deg2");
+				TAPNTransition transition = new TAPNTransition(t.getName() + "_T0");
 				toReturn.addTransition(transition);
 
 				for (Arc a : t.getPreset()){

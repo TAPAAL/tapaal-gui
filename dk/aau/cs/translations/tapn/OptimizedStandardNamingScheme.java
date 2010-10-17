@@ -6,12 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.translations.TranslationNamingScheme;
-import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class OptimizedStandardNamingScheme implements TranslationNamingScheme {
 	private static final int NOT_FOUND = -1;
-	private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)(?:_T0|_deg2)$";
+	private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_T0$";
 	private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
 	private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|P_capacity|\\w+_im\\d+|\\w+_hp_0|\\w+_hp\\d+$");;
 	private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
