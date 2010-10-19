@@ -29,6 +29,11 @@ public class ConcreteState {
 		return localClocksAndVariables.get(automata);
 	}
 
+	public BigDecimal getLocalClockOrVariable(String automata,
+			String colorVariableName) {
+		return localClocksAndVariables.get(automata).get(colorVariableName);
+	}
+	
 	public BigDecimal globalClockOrVariableValue(String name){
 		return globalClocksAndVariables.get(name);
 	}
@@ -104,10 +109,5 @@ public class ConcreteState {
 
 
 		return global;
-	}
-
-	public BigDecimal getLocalClockOrVariable(String automata,
-			String colorVariableName) {
-		return localClocksAndVariables.get(automata).get(colorVariableName);
 	}
 }

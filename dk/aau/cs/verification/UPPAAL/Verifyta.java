@@ -167,41 +167,12 @@ public class Verifyta implements ModelChecker {
 		return buffer.toString();
 	}
 
-	private VerificationResult verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel) {
-		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
-		runner.run();
-
-		if(runner.error()){
-			return null;
-		}else{			
-			VerifytaOutputParser outputParser = new VerifytaOutputParser();
-			QueryResult queryResult = outputParser.parseOutput(runner.standardOutput());
-
-			VerifytaTraceParser traceParser = new VerifytaTraceParser();
-			UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
-
-			VerificationResult result = null;
-			if(trace == null){
-				if(((VerifytaOptions)options).trace() != TraceOption.NONE){
-					messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
-				}
-				result = new VerificationResult(queryResult);
-			}else{
-				if(exportedModel.namingScheme() == null){ // TODO: get rid of
-					messenger.displayErrorMessage("Traces are currently not supported on the chosen translation");
-					result = new VerificationResult(queryResult);
-				}else{
-					VerifytaTraceInterpreter traceIntepreter = model instanceof ColoredTimedArcPetriNet ? 
-							new VerifytaColoredTraceInterpreter((ColoredTimedArcPetriNet)model, (ColoredTranslationNamingScheme)exportedModel.namingScheme()) 
-					: new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
-							TAPNTrace tapnTrace = traceIntepreter.interpretTrace(trace);
-							result = new VerificationResult(queryResult, tapnTrace);
-				}
-			}
-			return result;
+	public void kill(){
+		if(runner != null){
+			runner.kill();
 		}
 	}
-
+	
 	public VerificationResult verify(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query){
 		UppaalExporter exporter = new UppaalExporter();
 		ExportedModel exportedModel = null;
@@ -218,9 +189,55 @@ public class Verifyta implements ModelChecker {
 		return verify(options, model, exportedModel);
 	}
 
-	public void kill(){
-		if(runner != null){
-			runner.kill();
+	private VerificationResult verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel) {
+		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+		runner.run();
+
+		if(runner.error()){
+			return null;
+		}else{			
+			QueryResult queryResult = parseQueryResult();
+			TAPNTrace tapnTrace = parseTrace(options, model, exportedModel);
+			
+			return new VerificationResult(queryResult, tapnTrace);
 		}
+	}
+
+	private QueryResult parseQueryResult() {
+		VerifytaOutputParser outputParser = new VerifytaOutputParser();
+		QueryResult queryResult = outputParser.parseOutput(runner.standardOutput());
+		return queryResult;
+	}
+
+	private TAPNTrace parseTrace(VerificationOptions options,
+			TimedArcPetriNet model, ExportedModel exportedModel) {
+		TAPNTrace tapnTrace = null;
+		
+		VerifytaTraceParser traceParser = new VerifytaTraceParser();
+		UppaalTrace trace = traceParser.parseTimedTrace(runner.errorOutput());
+
+		
+		if(trace == null){
+			if(((VerifytaOptions)options).trace() != TraceOption.NONE){
+				messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
+			}
+		}else{
+			if(exportedModel.namingScheme() == null){ // TODO: get rid of
+				messenger.displayErrorMessage("Traces are currently not supported on the chosen translation");
+			}else{
+				tapnTrace = interpretTimedTrace(model, exportedModel, trace);
+			}
+		}
+		return tapnTrace;
+	}
+
+	private TAPNTrace interpretTimedTrace(TimedArcPetriNet model,
+			ExportedModel exportedModel, UppaalTrace trace) {
+		TAPNTrace tapnTrace;
+		VerifytaTraceInterpreter traceIntepreter = model instanceof ColoredTimedArcPetriNet ? 
+				new VerifytaColoredTraceInterpreter((ColoredTimedArcPetriNet)model, (ColoredTranslationNamingScheme)exportedModel.namingScheme()) 
+		: new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
+				 tapnTrace = traceIntepreter.interpretTrace(trace);
+		return tapnTrace;
 	}
 }
