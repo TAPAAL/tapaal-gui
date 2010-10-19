@@ -3,7 +3,7 @@ package dk.aau.cs.verification.UPPAAL;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import dk.aau.cs.TA.trace.SymbolicState;
+import dk.aau.cs.TA.trace.ConcreteState;
 import dk.aau.cs.TA.trace.TimeDelayFiringAction;
 import dk.aau.cs.TA.trace.TransitionFiringAction;
 import dk.aau.cs.TA.trace.UppaalTrace;
@@ -13,7 +13,7 @@ public class VerifytaTraceParser {
 		UppaalTrace trace = new UppaalTrace();
 		try {			
 			String line;
-			SymbolicState previousState = null;
+			ConcreteState previousState = null;
 			TransitionFiringAction previousTransitionFiring = null;
 			while(reader.ready()){
 				StringBuffer buffer = new StringBuffer();
@@ -28,7 +28,7 @@ public class VerifytaTraceParser {
 				
 				
 				if(element.contains("State:\n")){ 
-					SymbolicState state = SymbolicState.parse(element);
+					ConcreteState state = ConcreteState.parse(element);
 					trace.addSymbolicState(state);
 					previousState = state;
 					if(previousTransitionFiring != null){

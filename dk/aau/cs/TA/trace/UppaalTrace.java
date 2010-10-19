@@ -6,14 +6,14 @@ import java.util.List;
 
 public class UppaalTrace {
 	private List<TAFiringAction> firingActions;
-	private List<SymbolicState> symbolicStates;
+	private List<ConcreteState> symbolicStates;
 	
 	public UppaalTrace(){
 		firingActions = new ArrayList<TAFiringAction>();
-		symbolicStates = new ArrayList<SymbolicState>();
+		symbolicStates = new ArrayList<ConcreteState>();
 	}
 
-	public void addSymbolicState(SymbolicState state){
+	public void addSymbolicState(ConcreteState state){
 		symbolicStates.add(state);
 	}
 	

@@ -20,11 +20,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 public class TransitionFiringAction implements TAFiringAction {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final String channel;
-	private final SymbolicState previousState;
+	private final ConcreteState previousState;
 	private final Participant[] participants;
-	private SymbolicState nextState;
+	private ConcreteState nextState;
 
-	public TransitionFiringAction(SymbolicState state, String channel, Participant... participants){
+	public TransitionFiringAction(ConcreteState state, String channel, Participant... participants){
 		this.previousState = state;
 		this.channel = channel;
 		this.participants = participants;
@@ -34,11 +34,11 @@ public class TransitionFiringAction implements TAFiringAction {
 		return channel;
 	}
 
-	public SymbolicState sourceState() {
+	public ConcreteState sourceState() {
 		return previousState;
 	}
 	
-	public SymbolicState targetState() {
+	public ConcreteState targetState() {
 		return nextState;
 	}
 	
@@ -46,7 +46,7 @@ public class TransitionFiringAction implements TAFiringAction {
 		return participants;
 	}
 
-	public void setTargetState(SymbolicState state) {
+	public void setTargetState(ConcreteState state) {
 		nextState = state;
 	}
 
@@ -55,7 +55,7 @@ public class TransitionFiringAction implements TAFiringAction {
 		return "Transition: channel = " + channel;
 	}
 
-	public static TransitionFiringAction parse(SymbolicState state, String element){
+	public static TransitionFiringAction parse(ConcreteState state, String element){
 		String[] split = element.split("\n");
 
 		String channel = parseChannel(split[1]);
@@ -64,7 +64,7 @@ public class TransitionFiringAction implements TAFiringAction {
 		return new TransitionFiringAction(state, channel, participants);
 	}
 
-	private static Participant[] parseParticipants(SymbolicState state, String[] lines) {
+	private static Participant[] parseParticipants(ConcreteState state, String[] lines) {
 		Participant[] participants = new Participant[lines.length-1];
 
 		for(int i = 1; i < lines.length; i++){

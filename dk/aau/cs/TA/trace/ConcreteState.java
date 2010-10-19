@@ -9,13 +9,13 @@ import java.util.regex.Pattern;
 import pipe.gui.Pipe;
 
 
-public class SymbolicState {
+public class ConcreteState {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final HashMap<String, String> automataLocations;
 	private final HashMap<String, HashMap<String, BigDecimal>> localClocksAndVariables;
 	private final HashMap<String, BigDecimal> globalClocksAndVariables;
 
-	public SymbolicState(
+	public ConcreteState(
 			HashMap<String,String> locations, 
 			HashMap<String, HashMap<String, BigDecimal>> localClocksAndVariables, 
 			HashMap<String, BigDecimal> globalClocksAndVariables 
@@ -37,13 +37,13 @@ public class SymbolicState {
 		return automataLocations.get(automata);
 	}
 
-	public static SymbolicState parse(String state){
+	public static ConcreteState parse(String state){
 		String[] stateLines = state.split("\n");
 
 		HashMap<String,String> locations = parseLocations(stateLines[1]);
 		HashMap<String, HashMap<String, BigDecimal>> localClocksAndVariables = parseLocalClocksAndVariables(stateLines[2]);
 		HashMap<String, BigDecimal> globalClocksAndVariables = parseGlobalClocksAndVariables(stateLines[2]);
-		return new SymbolicState(locations, localClocksAndVariables, globalClocksAndVariables);
+		return new ConcreteState(locations, localClocksAndVariables, globalClocksAndVariables);
 	}
 
 	private static HashMap<String, String> parseLocations(String string) {
