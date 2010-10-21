@@ -17,14 +17,14 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
-public class TransitionFiringAction implements TAFiringAction {
+public class ConcreteTransitionFiring implements TAFiringAction {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final String channel;
 	private final ConcreteState previousState;
 	private final Participant[] participants;
 	private ConcreteState nextState;
 
-	public TransitionFiringAction(ConcreteState state, String channel, Participant... participants){
+	public ConcreteTransitionFiring(ConcreteState state, String channel, Participant... participants){
 		this.previousState = state;
 		this.channel = channel;
 		this.participants = participants;
@@ -55,13 +55,13 @@ public class TransitionFiringAction implements TAFiringAction {
 		return "Transition: channel = " + channel;
 	}
 
-	public static TransitionFiringAction parse(ConcreteState state, String element){
+	public static ConcreteTransitionFiring parse(ConcreteState state, String element){
 		String[] split = element.split("\n");
 
 		String channel = parseChannel(split[1]);
 		Participant[] participants = parseParticipants(state, split);
 
-		return new TransitionFiringAction(state, channel, participants);
+		return new ConcreteTransitionFiring(state, channel, participants);
 	}
 
 	private static Participant[] parseParticipants(ConcreteState state, String[] lines) {
@@ -75,7 +75,7 @@ public class TransitionFiringAction implements TAFiringAction {
 
 			String automata = matcher.group(1);
 			String location = matcher.group(2);
-			HashMap<String, BigDecimal> localClocksAndVariables = state.getLocalClocksAndVariablesFor(automata);
+			HashMap<String, ValueRange> localClocksAndVariables = state.getLocalClocksAndVariablesFor(automata);
 			participants[i-1] = new Participant(automata, location, localClocksAndVariables);
 		}		
 

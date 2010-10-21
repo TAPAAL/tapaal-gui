@@ -8,13 +8,14 @@ import java.util.List;
 import dk.aau.cs.TA.trace.Participant;
 import dk.aau.cs.TA.trace.TAFiringAction;
 import dk.aau.cs.TA.trace.TimeDelayFiringAction;
-import dk.aau.cs.TA.trace.TransitionFiringAction;
+import dk.aau.cs.TA.trace.ConcreteTransitionFiring;
 import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.trace.TAPNFiringAction;
+import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation;
@@ -38,19 +39,28 @@ public class VerifytaTraceInterpreter {
 	}
 
 	public TAPNTrace interpretTrace(UppaalTrace trace){
+		return trace.isConcreteTrace() ? interpretTimedTrace(trace) : interpretUntimedTrace(trace);
+	}
+
+	private TAPNTrace interpretUntimedTrace(UppaalTrace trace) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private TAPNTrace interpretTimedTrace(UppaalTrace trace) {
 		TAPNTrace result = new TAPNTrace();
 
 		Iterator<TAFiringAction> iterator = trace.iterator();
 		TAFiringAction action = null;
 
 		while(iterator.hasNext()){
-			List<TransitionFiringAction> firingSequence = new ArrayList<TransitionFiringAction>();
+			List<ConcreteTransitionFiring> firingSequence = new ArrayList<ConcreteTransitionFiring>();
 			List<String> firingSequenceNames = new ArrayList<String>();
 
 			while(iterator.hasNext() && 
-					(action = iterator.next()) instanceof TransitionFiringAction){
-				firingSequence.add((TransitionFiringAction)action);
-				firingSequenceNames.add(((TransitionFiringAction)action).channel());
+					(action = iterator.next()) instanceof ConcreteTransitionFiring){
+				firingSequence.add((ConcreteTransitionFiring)action);
+				firingSequenceNames.add(((ConcreteTransitionFiring)action).channel());
 			}
 
 			TransitionTranslation[] transitions = namingScheme.interpretTransitionSequence(firingSequenceNames);
@@ -73,7 +83,7 @@ public class VerifytaTraceInterpreter {
 
 	protected TAPNFiringAction interpretTransitionFiring
 	(
-			List<TransitionFiringAction> firingSequence,
+			List<ConcreteTransitionFiring> firingSequence,
 			TransitionTranslation transitionTranslation
 	) {
 		TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
@@ -83,19 +93,19 @@ public class VerifytaTraceInterpreter {
 					firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt()+1)
 			);
 		}else if(transitionTranslation.sequenceInfo().equals(SequenceInfo.END)){
-			TransitionFiringAction start = firingSequence.get(transitionTranslation.startsAt());
-			TransitionFiringAction end = firingSequence.get(transitionTranslation.endsAt());
+			ConcreteTransitionFiring start = firingSequence.get(transitionTranslation.startsAt());
+			ConcreteTransitionFiring end = firingSequence.get(transitionTranslation.endsAt());
 			tokens = parseConsumedTokens(start, end);
 		}
 
 		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
 	}
 
-	private List<Token> parseConsumedTokens(List<TransitionFiringAction> actions) {
+	private List<Token> parseConsumedTokens(List<ConcreteTransitionFiring> actions) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
 		for(int i = 0; i < actions.size(); i++){
-			TransitionFiringAction action = actions.get(i);
+			ConcreteTransitionFiring action = actions.get(i);
 
 			for(Participant participant : action.participants()){
 				String automata = participant.automata();
@@ -103,7 +113,7 @@ public class VerifytaTraceInterpreter {
 
 				if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
 					TAPNPlace place = tapn.getPlaceByName(sourceLocation);
-					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName());
+					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName()).lower();
 					Token token = new Token(place, clockValue); 
 					tokens.add(token);
 				}
@@ -113,7 +123,7 @@ public class VerifytaTraceInterpreter {
 		return tokens;
 	}
 
-		private List<Token> parseConsumedTokens(TransitionFiringAction start, TransitionFiringAction end) {
+		private List<Token> parseConsumedTokens(ConcreteTransitionFiring start, ConcreteTransitionFiring end) {
 			ArrayList<Token> tokens = new ArrayList<Token>();
 	
 			for(Participant participant : end.participants()){
@@ -122,7 +132,7 @@ public class VerifytaTraceInterpreter {
 				
 				if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
 					TAPNPlace place = tapn.getPlaceByName(sourceLocation);
-					BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName());
+					BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName()).lower();
 					Token token = new Token(place, clockValue); 
 					tokens.add(token);
 				}

@@ -51,4 +51,17 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 	public boolean isEmpty() {
 		return length() == 0 && numberOfStates() == 0;
 	}
+
+	public List<ConcreteState> States() {
+		return concreteStates;
+	}
+
+	public boolean isConcreteTrace() {
+		for(ConcreteState state : concreteStates){
+			if(!state.IsConcreteState()){
+				return false;
+			}
+		}
+		return true;
+	}
 }

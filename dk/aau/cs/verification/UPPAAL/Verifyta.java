@@ -214,7 +214,7 @@ public class Verifyta implements ModelChecker {
 		TAPNTrace tapnTrace = null;
 		
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
-		UppaalTrace trace = traceParser.parseTimedTrace(runner.errorOutput());
+		UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
 
 		
 		if(trace == null){

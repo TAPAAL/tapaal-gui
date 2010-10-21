@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.aau.cs.petrinet.trace.TAPNTrace;
+
 import pipe.dataLayer.DataLayer;
 
 public class TraceTransformer {
@@ -17,7 +19,7 @@ public class TraceTransformer {
 		return model;
 	}
 
-	public pipe.dataLayer.TAPNTrace interpretTrace(dk.aau.cs.petrinet.trace.TAPNTrace trace){
+	public pipe.dataLayer.TAPNTrace interpretTrace(TAPNTrace trace){
 		pipe.dataLayer.TAPNTrace pipeTrace = new pipe.dataLayer.TAPNTrace();
 		for(dk.aau.cs.petrinet.trace.TAPNFiringAction action : trace){
 			pipe.dataLayer.FiringAction firingAction = transformFiringAction(action);
