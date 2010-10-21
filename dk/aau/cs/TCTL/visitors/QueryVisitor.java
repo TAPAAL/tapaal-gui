@@ -30,35 +30,35 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 
 	public String getUppaalQueryFor(TAPNQuery tapnQuery) {
 		this.uppaalQuery = new StringBuffer();
-		tapnQuery.getProperty().accept(this);
+		tapnQuery.getProperty().accept(this, null);
 		return uppaalQuery.toString();
 	}
 
-	public void visit(TCTLAFNode afNode) {
+	public void visit(TCTLAFNode afNode, Object context) {
 		uppaalQuery.append("A<> ");
-		afNode.getProperty().accept(this);
+		afNode.getProperty().accept(this, context);
 		addEnding(QueryType.AF);
 	}
 
-	public void visit(TCTLAGNode agNode) {
+	public void visit(TCTLAGNode agNode, Object context) {
 		uppaalQuery.append("A[] ");
-		agNode.getProperty().accept(this);
+		agNode.getProperty().accept(this, context);
 		addEnding(QueryType.AG);
 	}
 
-	public void visit(TCTLEFNode efNode) {
+	public void visit(TCTLEFNode efNode, Object context) {
 		uppaalQuery.append("E<> ");
-		efNode.getProperty().accept(this);
+		efNode.getProperty().accept(this, context);
 		addEnding(QueryType.EF);
 	}
 
-	public void visit(TCTLEGNode egNode) {
+	public void visit(TCTLEGNode egNode, Object context) {
 		uppaalQuery.append("E[] ");
-		egNode.getProperty().accept(this);
+		egNode.getProperty().accept(this, context);
 		addEnding(QueryType.EG);
 	}
 	
-	public void visit(TCTLAndListNode andListNode) {
+	public void visit(TCTLAndListNode andListNode, Object context) {
 		uppaalQuery.append("(");
 		boolean firstTime = true;
 		
@@ -67,7 +67,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 				uppaalQuery.append(" && ");
 			}
 			
-			p.accept(this);
+			p.accept(this, context);
 			firstTime = false;
 		}
 		
@@ -76,7 +76,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	}
 
 	
-	public void visit(TCTLOrListNode orListNode) {
+	public void visit(TCTLOrListNode orListNode, Object context) {
 		uppaalQuery.append("(");
 		boolean firstTime = true;
 		
@@ -85,7 +85,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 				uppaalQuery.append(" && ");
 			}
 			
-			p.accept(this);
+			p.accept(this, context);
 			firstTime = false;
 		}
 		
@@ -93,17 +93,17 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		
 	}
 	
-	public void visit(TCTLNotNode notNode) {
+	public void visit(TCTLNotNode notNode, Object context) {
 		uppaalQuery.append("!");
 		uppaalQuery.append("(");
-		notNode.getProperty().accept(this);
+		notNode.getProperty().accept(this, context);
 		uppaalQuery.append(")");
 	}
 
-	public void visit(TCTLStatePlaceHolder statePlaceHolderNode) {
+	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) {
 	}
 
-	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode) {
+	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) {
 	
 	}
 
@@ -114,6 +114,6 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		return op;
 	}
 
-	public abstract void visit(TCTLAtomicPropositionNode atomicPropositionNode);
+	public abstract void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context);
 	protected abstract void addEnding(QueryType queryType);
 }

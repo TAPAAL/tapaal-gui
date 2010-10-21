@@ -9,6 +9,7 @@ import goldengine.java.Token;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -115,7 +116,7 @@ public class TAPAALQueryParser implements GPMessageConstants
 	 * @return TODO
 	 * @throws IOException 
 	 ***************************************************************/
-	public TCTLAbstractProperty parse(String query)
+	public TCTLAbstractProperty parse(String query) throws ParseException
 	{
 
 		String textToParse = query, compiledGrammar = "./dk/aau/cs/TCTL/Parsing/TAPAALQuery.cgt";
@@ -330,10 +331,8 @@ public class TAPAALQueryParser implements GPMessageConstants
 //				// ************************************** log file
 //				System.out.println("gpMsgNotLoadedError");
 //				// ************************************** end log
-				JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 				done = true;
-
-				break;
+				throw new ParseException("TAPAAL countered an error trying to parse the query", 0);
 
 			case gpMsgSyntaxError:
 				/* This is a syntax error: the source has produced a token that was
@@ -342,16 +341,14 @@ public class TAPAALQueryParser implements GPMessageConstants
                               expected tokens onto the parser's input queue (the first in this case):
                            You should limit the number of times this type of recovery can take
                            place. */
-				JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 				done = true;
 				Token theTok = parser.currentToken();
 				System.out.println("Token not expected: " + (String)theTok.getData());
-
+				throw new ParseException("TAPAAL countered an error trying to parse the query", 0);
+				
 //				// ************************************** log file
 //				System.out.println("gpMsgSyntaxError");
 //				// ************************************** end log
-
-				break;
 
 			case gpMsgCommentError:
 				/* The end of the input was reached while reading a comment.
@@ -371,11 +368,10 @@ public class TAPAALQueryParser implements GPMessageConstants
 //				// ************************************** log file
 //				System.out.println("gpMsgInternalError");
 //				// ************************************** end log
-				JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-
 				done = true;
+				throw new ParseException("TAPAAL countered an error trying to parse the query", 0);
 
-				break;
+		
 			}
 		}
 		try

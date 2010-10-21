@@ -20,7 +20,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 	}
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 
 		append("(");
 		append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));

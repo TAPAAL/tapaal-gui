@@ -823,7 +823,7 @@ extends javax.swing.JPanel {
 
 				RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(name, newName);
 				for (TAPNQuery q : queries) {
-					q.getProperty().accept(renameVisitor);
+					q.getProperty().accept(renameVisitor,null);
 				}
 				//CreateGui.createLeftPane();
 			}

@@ -14,6 +14,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.swing.JOptionPane;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -2747,6 +2749,7 @@ implements Cloneable {
 			else
 				return null;
 		}catch (Exception e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			System.err.println("No query was specified: " + e.getStackTrace());
 			return null;
 		}

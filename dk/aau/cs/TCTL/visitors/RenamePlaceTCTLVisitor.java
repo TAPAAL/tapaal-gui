@@ -24,37 +24,37 @@ public class RenamePlaceTCTLVisitor implements ITCTLVisitor {
 		this.newPlaceName = newName;
 	}
 	
-	public void visit(TCTLAFNode afNode) { afNode.getProperty().accept(this); }
+	public void visit(TCTLAFNode afNode, Object context) { afNode.getProperty().accept(this, context); }
 
-	public void visit(TCTLAGNode agNode) { agNode.getProperty().accept(this); }
+	public void visit(TCTLAGNode agNode, Object context) { agNode.getProperty().accept(this, context); }
 
-	public void visit(TCTLEFNode efNode) { efNode.getProperty().accept(this); }
+	public void visit(TCTLEFNode efNode, Object context) { efNode.getProperty().accept(this, context); }
 
-	public void visit(TCTLEGNode egNode) { egNode.getProperty().accept(this); }
+	public void visit(TCTLEGNode egNode, Object context) { egNode.getProperty().accept(this, context); }
 
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 		if(atomicPropositionNode.getPlace().equals(oldPlaceName)) {
 			atomicPropositionNode.setPlace(newPlaceName);
 		}
 	}
 
-	public void visit(TCTLStatePlaceHolder statePlaceHolderNode) { }
+	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) { }
 
-	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode) { }
+	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) { }
 
-	public void visit(TCTLNotNode notNode) {
-		notNode.getProperty().accept(this);
+	public void visit(TCTLNotNode notNode, Object context) {
+		notNode.getProperty().accept(this, context);
 	}
 
-	public void visit(TCTLAndListNode andListNode) {
+	public void visit(TCTLAndListNode andListNode, Object context) {
 		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
-			p.accept(this);
+			p.accept(this, context);
 		}		
 	}
 	
-	public void visit(TCTLOrListNode orListNode) {
+	public void visit(TCTLOrListNode orListNode, Object context) {
 		for (TCTLAbstractStateProperty p : orListNode.getProperties()) {
-			p.accept(this);
+			p.accept(this, context);
 		}		
 	}
 
