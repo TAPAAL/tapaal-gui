@@ -3,7 +3,6 @@
  */
 package dk.aau.cs.TA.trace;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class Participant {

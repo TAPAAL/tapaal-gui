@@ -9,13 +9,13 @@ import java.util.regex.Pattern;
 import pipe.gui.Pipe;
 
 
-public class ConcreteState {
+public class SymbolicState {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final HashMap<String, String> automataLocations;
 	private final HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables;
 	private final HashMap<String, ValueRange> globalClocksAndVariables;
 
-	public ConcreteState(
+	public SymbolicState(
 			HashMap<String,String> locations, 
 			HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables, 
 			HashMap<String, ValueRange> globalClocksAndVariables 
@@ -41,14 +41,28 @@ public class ConcreteState {
 	public String locationFor(String automata){
 		return automataLocations.get(automata);
 	}
+	
+	public boolean IsConcreteState() {
+		for(ValueRange range : globalClocksAndVariables.values()){
+			if(!range.hasExactValue()) return false;
+		}
+		
+		for(HashMap<String, ValueRange> locals : localClocksAndVariables.values()){
+			for(ValueRange range : locals.values()){
+				if(!range.hasExactValue()) return false;
+			}
+		}
+		
+		return true;
+	}
 
-	public static ConcreteState parse(String state){
+	public static SymbolicState parse(String state){
 		String[] stateLines = state.split("\n");
 
 		HashMap<String,String> locations = parseLocations(stateLines[1]);
 		HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables = parseLocalClocksAndVariables(stateLines[2]);
 		HashMap<String, ValueRange> globalClocksAndVariables = parseGlobalClocksAndVariables(stateLines[2]);
-		return new ConcreteState(locations, localClocksAndVariables, globalClocksAndVariables);
+		return new SymbolicState(locations, localClocksAndVariables, globalClocksAndVariables);
 	}
 
 	private static HashMap<String, String> parseLocations(String string) {
@@ -73,7 +87,7 @@ public class ConcreteState {
 
 		Pattern pattern = Pattern.compile(AUTOMATA_LOCATION_PATTERN + "(<|<=|=|>=|>)(\\d+)");
 		for(int i = 0; i < split.length; i++){
-			Matcher matcher = pattern.matcher(split[i].trim());
+			Matcher matcher = pattern.matcher(split[i].replace(",", "").trim());
 
 			if(matcher.matches()){			
 				String automata = matcher.group(1);
@@ -94,7 +108,9 @@ public class ConcreteState {
 				if(isLower){
 					range.setLower(new BigDecimal(value, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
 					range.setLowerIncluded(operator.equals("<=") || operator.equals("="));
-				}else if(isUpper){
+				}
+				
+				if(isUpper){
 					range.setUpper(new BigDecimal(value, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
 					range.setUpperIncluded(operator.equals(">=") || operator.equals("="));
 				}
@@ -128,7 +144,9 @@ public class ConcreteState {
 				if(isLower){
 					range.setLower(new BigDecimal(valueAsDouble, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
 					range.setLowerIncluded(operator.equals("<=") || operator.equals("="));
-				}else if(isUpper){
+				}
+				
+				if(isUpper){
 					range.setUpper(new BigDecimal(valueAsDouble, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
 					range.setUpperIncluded(operator.equals(">=") || operator.equals("="));
 				}
@@ -141,19 +159,5 @@ public class ConcreteState {
 
 
 		return global;
-	}
-
-	public boolean IsConcreteState() {
-		for(ValueRange range : globalClocksAndVariables.values()){
-			if(!range.hasExactValue()) return false;
-		}
-		
-		for(HashMap<String, ValueRange> locals : localClocksAndVariables.values()){
-			for(ValueRange range : locals.values()){
-				if(!range.hasExactValue()) return false;
-			}
-		}
-		
-		return true;
 	}
 }

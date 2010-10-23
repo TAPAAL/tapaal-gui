@@ -13,9 +13,9 @@ public class ColoredTraceTransformer extends TraceTransformer {
 	public ColoredTraceTransformer(DataLayer model) {
 		super(model);
 	}
-	
+
 	@Override
-	protected pipe.dataLayer.FiringAction transformDiscreteTransition(dk.aau.cs.petrinet.trace.TAPNFiringAction action) {
+	protected pipe.dataLayer.FiringAction transformDiscreteTransition(dk.aau.cs.petrinet.trace.TAPNFiringAction action, boolean isConcreteTrace) {
 		pipe.dataLayer.ColoredDiscreteFiringAction firingAction = null;
 		if(action instanceof dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction){
 			dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction transitionFiringAction = (dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction)action;
@@ -23,10 +23,12 @@ public class ColoredTraceTransformer extends TraceTransformer {
 			pipe.dataLayer.TAPNTransition transition = (pipe.dataLayer.TAPNTransition)model().getTransitionByName(transitionFiringAction.transition());
 			firingAction = new pipe.dataLayer.ColoredDiscreteFiringAction(transition);
 
-			convertAndAddConsumedTokens(firingAction, transitionFiringAction.consumedTokens());
-			convertAndAddProducedTokens(firingAction, transitionFiringAction.producedTokens());
+			if(isConcreteTrace){
+				convertAndAddConsumedTokens(firingAction, transitionFiringAction.consumedTokens());
+				convertAndAddProducedTokens(firingAction, transitionFiringAction.producedTokens());
+			}
 		}
-		
+
 		return firingAction;
 	}
 
@@ -40,7 +42,7 @@ public class ColoredTraceTransformer extends TraceTransformer {
 			pipe.dataLayer.colors.ColoredToken pipeToken = new pipe.dataLayer.colors.ColoredToken(age, color);
 			firingAction.addProducedToken(place, pipeToken);
 		}
-		
+
 	}
 
 	private void convertAndAddConsumedTokens(pipe.dataLayer.ColoredDiscreteFiringAction firingAction, List<dk.aau.cs.petrinet.colors.ColoredToken> consumedTokens) {

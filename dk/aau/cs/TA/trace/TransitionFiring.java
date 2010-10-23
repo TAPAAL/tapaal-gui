@@ -1,6 +1,5 @@
 package dk.aau.cs.TA.trace;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,14 +16,14 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
-public class ConcreteTransitionFiring implements TAFiringAction {
+public class TransitionFiring implements TAFiringAction {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
 	private final String channel;
-	private final ConcreteState previousState;
+	private final SymbolicState previousState;
 	private final Participant[] participants;
-	private ConcreteState nextState;
+	private SymbolicState nextState;
 
-	public ConcreteTransitionFiring(ConcreteState state, String channel, Participant... participants){
+	public TransitionFiring(SymbolicState state, String channel, Participant... participants){
 		this.previousState = state;
 		this.channel = channel;
 		this.participants = participants;
@@ -34,11 +33,11 @@ public class ConcreteTransitionFiring implements TAFiringAction {
 		return channel;
 	}
 
-	public ConcreteState sourceState() {
+	public SymbolicState sourceState() {
 		return previousState;
 	}
 	
-	public ConcreteState targetState() {
+	public SymbolicState targetState() {
 		return nextState;
 	}
 	
@@ -46,7 +45,7 @@ public class ConcreteTransitionFiring implements TAFiringAction {
 		return participants;
 	}
 
-	public void setTargetState(ConcreteState state) {
+	public void setTargetState(SymbolicState state) {
 		nextState = state;
 	}
 
@@ -55,16 +54,16 @@ public class ConcreteTransitionFiring implements TAFiringAction {
 		return "Transition: channel = " + channel;
 	}
 
-	public static ConcreteTransitionFiring parse(ConcreteState state, String element){
+	public static TransitionFiring parse(SymbolicState state, String element){
 		String[] split = element.split("\n");
 
 		String channel = parseChannel(split[1]);
 		Participant[] participants = parseParticipants(state, split);
 
-		return new ConcreteTransitionFiring(state, channel, participants);
+		return new TransitionFiring(state, channel, participants);
 	}
 
-	private static Participant[] parseParticipants(ConcreteState state, String[] lines) {
+	private static Participant[] parseParticipants(SymbolicState state, String[] lines) {
 		Participant[] participants = new Participant[lines.length-1];
 
 		for(int i = 1; i < lines.length; i++){

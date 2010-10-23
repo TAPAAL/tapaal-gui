@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.TA.trace.Participant;
-import dk.aau.cs.TA.trace.ConcreteTransitionFiring;
+import dk.aau.cs.TA.trace.TransitionFiring;
 import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
@@ -35,33 +35,36 @@ public class VerifytaColoredTraceInterpreter extends VerifytaTraceInterpreter {
 	@Override
 	protected TAPNFiringAction interpretTransitionFiring
 	(
-			List<ConcreteTransitionFiring> firingSequence,
-			TransitionTranslation transitionTranslation
+			List<TransitionFiring> firingSequence,
+			TransitionTranslation transitionTranslation,
+			boolean isConcreteTrace
 	) {
 		TAPNTransition transition = tapn().getTransitionsByName(transitionTranslation.originalTransitionName());
 
 		List<ColoredToken> consumedTokens = null;
 		List<ColoredToken> producedTokens = null;
-		if(transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)){
-			List<ConcreteTransitionFiring> actions = firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt()+1);
-			consumedTokens = parseConsumedTokens(actions);
-			producedTokens = parseProducedTokens(actions);
-		}else if(transitionTranslation.sequenceInfo().equals(SequenceInfo.END)){
-			ConcreteTransitionFiring start = firingSequence.get(transitionTranslation.startsAt());
-			ConcreteTransitionFiring end = firingSequence.get(transitionTranslation.endsAt());
-			consumedTokens = parseConsumedTokens(start, end);	
-			producedTokens = parseProducedTokens(start, end);	
+		if(isConcreteTrace){
+			if(transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)){
+				List<TransitionFiring> actions = firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt()+1);
+				consumedTokens = parseConsumedTokens(actions);
+				producedTokens = parseProducedTokens(actions);
+			}else if(transitionTranslation.sequenceInfo().equals(SequenceInfo.END)){
+				TransitionFiring start = firingSequence.get(transitionTranslation.startsAt());
+				TransitionFiring end = firingSequence.get(transitionTranslation.endsAt());
+				consumedTokens = parseConsumedTokens(start, end);	
+				producedTokens = parseProducedTokens(start, end);	
+			}
 		}
 
 		return new dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction(transition, consumedTokens, producedTokens);
 	}
 
-	private List<ColoredToken> parseProducedTokens(List<ConcreteTransitionFiring> actions) {
+	private List<ColoredToken> parseProducedTokens(List<TransitionFiring> actions) {
 		ArrayList<ColoredToken> tokens = new ArrayList<ColoredToken>();
-		ConcreteTransitionFiring end = actions.get(actions.size()-1);
+		TransitionFiring end = actions.get(actions.size()-1);
 
 		for(int i = actions.size()/2; i < actions.size(); i++){
-			ConcreteTransitionFiring action = actions.get(i);
+			TransitionFiring action = actions.get(i);
 
 			for(Participant participant : action.participants()){
 				String automata = participant.automata();
@@ -81,7 +84,7 @@ public class VerifytaColoredTraceInterpreter extends VerifytaTraceInterpreter {
 		return tokens;
 	}
 
-	private List<ColoredToken> parseProducedTokens(ConcreteTransitionFiring start, ConcreteTransitionFiring end) {
+	private List<ColoredToken> parseProducedTokens(TransitionFiring start, TransitionFiring end) {
 		ArrayList<ColoredToken> tokens = new ArrayList<ColoredToken>();
 
 		for(Participant participant : end.participants()){
@@ -101,11 +104,11 @@ public class VerifytaColoredTraceInterpreter extends VerifytaTraceInterpreter {
 		return tokens;
 	}
 
-	private List<ColoredToken> parseConsumedTokens(List<ConcreteTransitionFiring> actions) {
+	private List<ColoredToken> parseConsumedTokens(List<TransitionFiring> actions) {
 		ArrayList<ColoredToken> tokens = new ArrayList<ColoredToken>();
 
 		for(int i = 0; i < actions.size(); i++){
-			ConcreteTransitionFiring action = actions.get(i);
+			TransitionFiring action = actions.get(i);
 
 			for(Participant participant : action.participants()){
 				String automata = participant.automata();
@@ -125,7 +128,7 @@ public class VerifytaColoredTraceInterpreter extends VerifytaTraceInterpreter {
 		return tokens;
 	}
 
-	private List<ColoredToken> parseConsumedTokens(ConcreteTransitionFiring start, ConcreteTransitionFiring end) {
+	private List<ColoredToken> parseConsumedTokens(TransitionFiring start, TransitionFiring end) {
 		ArrayList<ColoredToken> tokens = new ArrayList<ColoredToken>();
 
 		for(Participant participant : end.participants()){

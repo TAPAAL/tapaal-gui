@@ -19,10 +19,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 public class TimeDelayFiringAction implements TAFiringAction{
 
-	private ConcreteState state;
+	private SymbolicState state;
 	private BigDecimal timedelay;
 	
-	public TimeDelayFiringAction(ConcreteState state, BigDecimal delay) {
+	public TimeDelayFiringAction(SymbolicState state, BigDecimal delay) {
 		this.state = state;
 		this.timedelay = delay;
 	}
@@ -31,7 +31,7 @@ public class TimeDelayFiringAction implements TAFiringAction{
 		return timedelay;
 	}
 	
-	public ConcreteState sourceState(){
+	public SymbolicState sourceState(){
 		return state;
 	}
 		
@@ -41,7 +41,7 @@ public class TimeDelayFiringAction implements TAFiringAction{
 		return "Delay: " + timedelay;
 	}
 
-	public static TimeDelayFiringAction parse(ConcreteState previousState, String element) {
+	public static TimeDelayFiringAction parse(SymbolicState previousState, String element) {
 		String delayAsString = element.replace("Delay:", "").trim();
 		double delay = Double.parseDouble(delayAsString);
 		return new TimeDelayFiringAction(previousState, new BigDecimal(delay, new MathContext(Pipe.AGE_DECIMAL_PRECISION)));

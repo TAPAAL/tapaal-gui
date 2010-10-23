@@ -66,11 +66,7 @@ public class Verifier {
 		if (inputQuery instanceof TCTLEGNode || inputQuery instanceof TCTLAFNode ) {
 
 			//If selected wrong method for checking
-			if (!(input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD || input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY 
-					|| input.getReductionOption() == ReductionOption.BROADCAST 
-					|| input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY
-					|| input.getReductionOption() == ReductionOption.DEGREE2BROADCAST
-					|| input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY)){
+			if (input.getReductionOption() == ReductionOption.STANDARD || input.getReductionOption() == ReductionOption.STANDARDSYMMETRY){
 				//Error
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"Verification of liveness properties (EG,AF) is not possible with the selected reduction option.",

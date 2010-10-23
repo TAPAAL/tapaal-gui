@@ -3,9 +3,9 @@ package dk.aau.cs.verification.UPPAAL;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import dk.aau.cs.TA.trace.ConcreteState;
+import dk.aau.cs.TA.trace.SymbolicState;
 import dk.aau.cs.TA.trace.TimeDelayFiringAction;
-import dk.aau.cs.TA.trace.ConcreteTransitionFiring;
+import dk.aau.cs.TA.trace.TransitionFiring;
 import dk.aau.cs.TA.trace.UppaalTrace;
 
 public class VerifytaTraceParser {
@@ -13,8 +13,8 @@ public class VerifytaTraceParser {
 		UppaalTrace trace = new UppaalTrace();
 		try {			
 			String line;
-			ConcreteState previousState = null;
-			ConcreteTransitionFiring previousTransitionFiring = null;
+			SymbolicState previousState = null;
+			TransitionFiring previousTransitionFiring = null;
 			boolean nextIsState = false;
 			while(reader.ready()){
 				StringBuffer buffer = new StringBuffer();
@@ -28,8 +28,8 @@ public class VerifytaTraceParser {
 				if(line == null && element.isEmpty()) break; // we are done parsing trace, exit outer loop
 				
 				if(nextIsState){ // untimed trace
-					ConcreteState state = ConcreteState.parse("State:\n" + element);
-					trace.addConcreteState(state);
+					SymbolicState state = SymbolicState.parse("State:\n" + element);
+					trace.addState(state);
 					previousState = state;
 					if(previousTransitionFiring != null){
 						previousTransitionFiring.setTargetState(state);
@@ -39,8 +39,8 @@ public class VerifytaTraceParser {
 				}else if(element.contains("State\n")){ // untimed trace
 					nextIsState = true;
 				}else if(element.contains("State:\n")){ // timed trace
-					ConcreteState state = ConcreteState.parse(element);
-					trace.addConcreteState(state);
+					SymbolicState state = SymbolicState.parse(element);
+					trace.addState(state);
 					previousState = state;
 					if(previousTransitionFiring != null){
 						previousTransitionFiring.setTargetState(state);
@@ -50,7 +50,7 @@ public class VerifytaTraceParser {
 					TimeDelayFiringAction delay = TimeDelayFiringAction.parse(previousState, element);
 					trace.addFiringAction(delay);
 				}else if(element.contains("Transitions:")){
-					ConcreteTransitionFiring transition = ConcreteTransitionFiring.parse(previousState, element);
+					TransitionFiring transition = TransitionFiring.parse(previousState, element);
 					trace.addFiringAction(transition);
 					previousTransitionFiring = transition;
 				}

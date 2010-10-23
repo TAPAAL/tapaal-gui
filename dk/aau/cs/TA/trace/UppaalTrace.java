@@ -6,15 +6,15 @@ import java.util.List;
 
 public class UppaalTrace implements Iterable<TAFiringAction> {
 	private List<TAFiringAction> firingActions;
-	private List<ConcreteState> concreteStates;
+	private List<SymbolicState> states;
 	
 	public UppaalTrace(){
 		firingActions = new ArrayList<TAFiringAction>();
-		concreteStates = new ArrayList<ConcreteState>();
+		states = new ArrayList<SymbolicState>();
 	}
 
-	public void addConcreteState(ConcreteState state){
-		concreteStates.add(state);
+	public void addState(SymbolicState state){
+		states.add(state);
 	}
 	
 	public void addFiringAction(TAFiringAction action){
@@ -28,14 +28,14 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer("Trace:\n");
-		for(int i = 0; i < concreteStates.size()-1; i++){
-			buffer.append(concreteStates.get(i).toString());
+		for(int i = 0; i < states.size()-1; i++){
+			buffer.append(states.get(i).toString());
 			buffer.append("\n\n");
 			buffer.append(firingActions.get(i).toString());
 			buffer.append("\n\n");
 		}
 		
-		buffer.append(concreteStates.get(concreteStates.size()-1).toString());
+		buffer.append(states.get(states.size()-1).toString());
 				
 		return buffer.toString();
 	}
@@ -45,19 +45,19 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 	}
 
 	public int numberOfStates() {
-		return concreteStates.size();
+		return states.size();
 	}
 
 	public boolean isEmpty() {
 		return length() == 0 && numberOfStates() == 0;
 	}
 
-	public List<ConcreteState> States() {
-		return concreteStates;
+	public List<SymbolicState> States() {
+		return states;
 	}
 
 	public boolean isConcreteTrace() {
-		for(ConcreteState state : concreteStates){
+		for(SymbolicState state : states){
 			if(!state.IsConcreteState()){
 				return false;
 			}
