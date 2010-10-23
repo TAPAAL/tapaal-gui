@@ -82,8 +82,8 @@ public class TCTLEGNode extends TCTLAbstractPathProperty {
 	}
 
 	@Override
-	public void accept(ITCTLVisitor visitor) {
-		visitor.visit(this);
+	public void accept(ITCTLVisitor visitor, Object context) {
+		visitor.visit(this, context);
 	}
 
 

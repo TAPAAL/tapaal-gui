@@ -12,7 +12,7 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 	private static final String TOKEN_TEMPLATE_NAME = "P";
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 		append("(sum(i:");
 		append(ID_TYPE);
 		append(")");

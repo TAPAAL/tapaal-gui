@@ -51,7 +51,7 @@ public abstract class TCTLAbstractProperty {
 		return children;
 	}
 	
-	public abstract void accept(ITCTLVisitor visitor);
+	public abstract void accept(ITCTLVisitor visitor, Object context);
 	
 	public abstract boolean containsAtomicPropWithSpecificPlace(String placeName);
 	

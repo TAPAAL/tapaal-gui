@@ -74,8 +74,8 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	}
 	
 	@Override
-	public void accept(ITCTLVisitor visitor) {
-		visitor.visit(this);
+	public void accept(ITCTLVisitor visitor, Object context) {
+		visitor.visit(this, context);
 		
 	}
 

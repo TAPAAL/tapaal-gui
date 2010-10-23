@@ -40,7 +40,7 @@ public class PetriNetObjectNameEdit extends UndoableEdit {
 
 		RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(newName, oldName);
 		for (TAPNQuery q : queries) {
-			q.getProperty().accept(renameVisitor);
+			q.getProperty().accept(renameVisitor,null);
 		}
 	}
 
@@ -54,7 +54,7 @@ public class PetriNetObjectNameEdit extends UndoableEdit {
 
 		RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(oldName, newName);
 		for (TAPNQuery q : queries) {
-			q.getProperty().accept(renameVisitor);
+			q.getProperty().accept(renameVisitor,null);
 		}
 	}
 
