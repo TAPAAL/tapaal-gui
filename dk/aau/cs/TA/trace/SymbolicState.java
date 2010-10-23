@@ -85,7 +85,7 @@ public class SymbolicState {
 		String[] split = string.split(" ");
 		HashMap<String, HashMap<String, ValueRange>> clocksAndVariables = new HashMap<String, HashMap<String,ValueRange>>();
 
-		Pattern pattern = Pattern.compile(AUTOMATA_LOCATION_PATTERN + "(<|<=|=|>=|>)(\\d+)");
+		Pattern pattern = Pattern.compile(AUTOMATA_LOCATION_PATTERN + "(<|<=|=|>=|>)(\\d+(?:\\.\\d+)?)");
 		for(int i = 0; i < split.length; i++){
 			Matcher matcher = pattern.matcher(split[i].replace(",", "").trim());
 
@@ -128,7 +128,7 @@ public class SymbolicState {
 		String[] split = string.split(" ");
 		HashMap<String, ValueRange> global = new HashMap<String, ValueRange>();
 
-		Pattern pattern = Pattern.compile("(\\w+)(<|<=|=|>=|>)(\\d+)");
+		Pattern pattern = Pattern.compile("(\\w+)(<|<=|=|>=|>)(\\d+(?:\\.\\d+)?)");
 
 		for(String variable : split){
 			Matcher matcher = pattern.matcher(variable.trim());
