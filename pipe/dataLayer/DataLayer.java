@@ -2315,6 +2315,7 @@ implements Cloneable {
 	public void createFromPNML(Document PNMLDoc, boolean colors)	{
 		// XXX - kyrke debug
 		emptyPNML();
+		this.useColors = colors;
 		Node node = null;
 		NodeList nodeList = null;
 
@@ -2345,7 +2346,7 @@ implements Cloneable {
 				CreateGui.getApp().restoreMode();
 			}
 			buildConstraints();
-			this.useColors = colors;
+			
 
 		} catch (Exception e) {
 			System.out.println("runtime except");
