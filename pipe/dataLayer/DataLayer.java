@@ -199,7 +199,7 @@ implements Cloneable {
 		inhibitorsArray = new ArrayList<InhibitorArc>();
 		//tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList<AnnotationNote>();
-		
+
 
 		// may as well do the hashtable here as well
 		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<NormalArc>>();
@@ -453,7 +453,7 @@ implements Cloneable {
 			addArcToArcsMap(arcInput);
 
 			setChanged();
-	
+
 			//notifyObservers(arcInput.getBounds());
 			notifyObservers(arcInput);
 		}
@@ -694,7 +694,7 @@ implements Cloneable {
 			} else { // arrows, other labels.
 				changeArrayList.add(pnObject);
 				setChanged();
-	
+
 				notifyObservers(pnObject);
 			}
 		}
@@ -869,7 +869,7 @@ implements Cloneable {
 
 				if (didSomething) {
 					setChanged();
-		
+
 					// notifyObservers(pnObject.getBounds());
 					notifyObservers(pnObject);
 				}
@@ -938,7 +938,7 @@ implements Cloneable {
 		all.addAll(transitionsArray);
 		all.addAll(arcsArray);
 		all.addAll(labelsArray);
-		
+
 		return all.iterator();
 	}
 
@@ -967,7 +967,7 @@ implements Cloneable {
 		String heightTemp = inputLabelElement.getAttribute("h");
 		String textTempStorage = inputLabelElement.getAttribute("txt");
 		String borderTemp = inputLabelElement.getAttribute("border");
-		
+
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
 		}
@@ -1028,7 +1028,7 @@ implements Cloneable {
 		String nameInfiniteServer = element.getAttribute("infiniteServer");
 		String nameAngle = element.getAttribute("angle");
 		String namePriority = element.getAttribute("priority");
-	
+
 		if (nameTimed.length() == 0) {
 			timedTransition = false;
 		} else if (nameTimed.length()== 5) {
@@ -1428,7 +1428,7 @@ implements Cloneable {
 						((TimedPlace)p).setAgeOfTokens(markingOfP);
 						setChanged();
 						notifyObservers(p);
-			
+
 					}
 				}
 			}else{
@@ -1438,7 +1438,7 @@ implements Cloneable {
 						ctp.setColoredTokens(coloredPlaceMarkingStorageMap.get(ctp));
 						setChanged();
 						notifyObservers(p);
-			
+
 					}
 				}
 			}
@@ -1451,7 +1451,7 @@ implements Cloneable {
 						place.setCurrentMarking(markingVectorAnimationStorage[placeNo]);
 						setChanged();
 						notifyObservers(place);
-			
+
 					}
 				}
 			}
@@ -1745,7 +1745,7 @@ implements Cloneable {
 		// b) all are timed transitions.
 
 		ArrayList<Transition> enabledTransitions = new ArrayList<Transition>();
-		
+
 		for (int i = 0; i < transitionsArray.size(); i++) {
 			Transition transition = (Transition)transitionsArray.get(i);
 			if (transition.isEnabled()) {
@@ -1759,7 +1759,7 @@ implements Cloneable {
 		}      
 
 		int random = randomNumber.nextInt(enabledTransitions.size());
-		
+
 		// no enabled transition found, so no transition can be fired
 		return enabledTransitions.get(random);
 	}
@@ -2120,6 +2120,24 @@ implements Cloneable {
 		return returnTransition;
 	}
 
+	public Transition getTransitionByNameIgnoreGiven(Transition ignore, String transitionName) {
+		Transition returnTransition = null;
+
+		if (transitionsArray != null) {
+			if (transitionName != null) {
+				for (int i = 0; i < transitionsArray.size(); i++) {
+					if(!transitionsArray.get(i).equals(ignore)) {
+						if (transitionName.equalsIgnoreCase(
+								((Transition)transitionsArray.get(i)).getName())) {
+							returnTransition = (Transition)transitionsArray.get(i);
+						}
+					}
+				}
+			}
+		}
+		return returnTransition;
+	}
+
 
 	/**
 	 * Return the Transition called transitionName from the Petri-Net
@@ -2173,6 +2191,25 @@ implements Cloneable {
 					if (placeName.equalsIgnoreCase(
 							((Place)placesArray.get(i)).getName())) {
 						returnPlace = (Place)placesArray.get(i);
+					}
+				}
+			}
+		}
+		return returnPlace;
+	}
+
+	public Place getPlaceByNameIgnoreGiven(Place ignore, String placeName)
+	{
+		Place returnPlace = null;
+
+		if (placesArray != null) {
+			if (placeName != null) {
+				for (int i = 0; i < placesArray.size(); i++) {
+					if(!placesArray.get(i).equals(ignore)) {
+						if (placeName.equalsIgnoreCase(
+								((Place)placesArray.get(i)).getName())) {
+							returnPlace = (Place)placesArray.get(i);
+						}
 					}
 				}
 			}
@@ -2513,7 +2550,7 @@ implements Cloneable {
 		String markingOffsetXTempStorage = element.getAttribute("markingOffsetX");
 		String markingOffsetYTempStorage = element.getAttribute("markingOffsetY");
 		String capacityTempStorage = element.getAttribute("capacity");
-		
+
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Double.valueOf(positionXTempStorage).doubleValue() + 1;
 		}
@@ -2555,7 +2592,7 @@ implements Cloneable {
 		List<ColoredToken> tokens = parseTokens(tokenNodes);
 		place.setColoredTokens(tokens);
 
-	
+
 		return place;
 	}
 
@@ -2688,7 +2725,7 @@ implements Cloneable {
 		} 
 	}
 
-	
+
 
 	private TAPNQuery createQuery(Element queryElement) {
 
@@ -2777,7 +2814,7 @@ implements Cloneable {
 	}
 
 
-	
+
 	/**
 	 * See if the supplied net has any timed transitions.
 	 * @param DataLayer
@@ -3069,20 +3106,20 @@ implements Cloneable {
 			entry.getKey().addColoredToken(entry.getValue());
 		}
 	}
-	
+
 	public boolean isDegree2(){
 		boolean isDegree2=true;
-		
+
 		for (Transition t : getTransitions()){
-			
+
 			if (t.getPostset().size() > 2 || t.getPreset().size() > 2){
 				isDegree2 = false;
 				break;
 			}
-			
+
 		}
-		
+
 		return isDegree2;
-		
+
 	}
 }

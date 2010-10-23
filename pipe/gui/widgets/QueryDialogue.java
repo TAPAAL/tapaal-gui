@@ -46,6 +46,8 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import com.sun.xml.internal.messaging.saaj.util.transform.EfficientStreamingTransformer;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -114,7 +116,7 @@ public class QueryDialogue extends JPanel{
 	private JButton resetButton;
 	private JButton undoButton;
 	private JButton redoButton;
-	private JButton editParseButton;
+	private JButton editQueryButton;
 
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
@@ -445,6 +447,22 @@ public class QueryDialogue extends JPanel{
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(node.getN());
 		}
+		else if(currentSelection.getObject() instanceof TCTLEFNode)
+		{
+			existsDiamond.setSelected(true);
+		}
+		else if(currentSelection.getObject() instanceof TCTLEGNode)
+		{
+			existsBox.setSelected(true);
+		}
+		else if(currentSelection.getObject() instanceof TCTLAGNode)
+		{
+			forAllBox.setSelected(true);
+		}
+		else if(currentSelection.getObject() instanceof TCTLAFNode)
+		{
+			forAllDiamond.setSelected(true);
+		}
 
 	}
 
@@ -455,7 +473,6 @@ public class QueryDialogue extends JPanel{
 		queryField.setText(newProperty.toString());
 
 		StringPosition position;
-		//		if (currentSelection != null) {
 
 		if(newProperty.containsPlaceHolder())
 		{
@@ -475,10 +492,6 @@ public class QueryDialogue extends JPanel{
 		} else {
 			disableAllQueryButtons();
 		}
-
-		//		} else {
-		//			clearSelection();
-		//		}
 	}
 
 
@@ -634,14 +647,14 @@ public class QueryDialogue extends JPanel{
 
 		updateSelection(newProperty);
 		resetButton.setText("Reset Query");
-		editParseButton.setText("Edit Query");
+		editQueryButton.setText("Edit Query");
 		enableEditingButtons();
 	}
 
 	private void changeToEditMode() {
 		setQueryFieldEditable(true);
 		resetButton.setText("Parse Query");
-		editParseButton.setText("Cancel");
+		editQueryButton.setText("Cancel");
 		clearSelection();
 		disableAllQueryButtons();
 		disableEditingButtons();
@@ -844,7 +857,8 @@ public class QueryDialogue extends JPanel{
 				}
 				else {
 					if(e.getKeyChar() == KeyEvent.VK_ENTER) {
-						editParseButton.doClick();
+						resetButton.doClick(); // we are in manual edit mode, so the reset button is now the Parse Query button
+						e.consume();
 					}
 				}
 
@@ -1114,8 +1128,13 @@ public class QueryDialogue extends JPanel{
 		for (int i=0; i< places.length; i++){
 			places[i] = datalayer.getPlaces()[i].getName();
 		}
-
 		placesBox = new JComboBox(new DefaultComboBoxModel(places));
+		
+		Dimension d = placesBox.getMaximumSize();		
+		d.width = 150;
+		placesBox.setMaximumSize(d);
+
+		
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -1180,13 +1199,13 @@ public class QueryDialogue extends JPanel{
 		resetButton = new JButton("Reset Query");
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
-		editParseButton = new JButton("Edit Query");
+		editQueryButton = new JButton("Edit Query");
 
 		editingButtonsGroup.add(deleteButton);
 		editingButtonsGroup.add(resetButton);
 		editingButtonsGroup.add(undoButton);
 		editingButtonsGroup.add(redoButton);
-		editingButtonsGroup.add(editParseButton);
+		editingButtonsGroup.add(editQueryButton);
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -1207,7 +1226,7 @@ public class QueryDialogue extends JPanel{
 		editingButtonPanel.add(resetButton, gbc);
 
 		gbc.gridy = 3;
-		editingButtonPanel.add(editParseButton,gbc);
+		editingButtonPanel.add(editQueryButton,gbc);
 
 
 
@@ -1226,55 +1245,52 @@ public class QueryDialogue extends JPanel{
 
 					public void actionPerformed(ActionEvent e) {
 						if(queryField.isEditable()) { // in edit mode, this button is now the parse query button. User has potentially altered the query, so try to parse it
-							if(!queryField.getText().equals(newProperty.toString()))
-							{
-								TAPAALQueryParser queryParser = new TAPAALQueryParser();
-								TCTLAbstractProperty newQuery = null;
+							TAPAALQueryParser queryParser = new TAPAALQueryParser();
+							TCTLAbstractProperty newQuery = null;
 
-								try {
-									newQuery = queryParser.parse(queryField.getText());
-								} catch (Exception ex) {
-									int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?", "Error Parsing Query", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+							try {
+								newQuery = queryParser.parse(queryField.getText());
+							} catch (Exception ex) {
+								int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?", "Error Parsing Query", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+								if(choice == JOptionPane.NO_OPTION)
+								{
+									returnFromManualEdit(null);
+								}
+							}
+
+							if(newQuery != null) // new query parsed successfully
+							{
+								// check correct place names are used in atomic propositions
+								ArrayList<String> places = new ArrayList<String>();
+								for (int i=0; i< datalayer.getPlaces().length; i++){
+									places.add(datalayer.getPlaces()[i].getName());
+								}
+
+								VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(places);
+
+								VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(newQuery);
+
+								if(!c.getResult())
+								{
+									StringBuilder s = new StringBuilder();
+									s.append("The following places was used in the query, but are not present in your model:\n\n");
+
+									for (String placeName : c.getIncorrectPlaceNames()) {
+										s.append(placeName);
+										s.append("\n");
+									}
+
+									s.append("\nThe specified query has not been saved. Do you want to edit it again?");
+									int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), s.toString(), "Error Parsing Query", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
 									if(choice == JOptionPane.NO_OPTION)
 									{
 										returnFromManualEdit(null);
 									}
-								}
-
-								if(newQuery != null) // new query parsed successfully
-								{
-									// check correct place names are used in atomic propositions
-									ArrayList<String> places = new ArrayList<String>();
-									for (int i=0; i< datalayer.getPlaces().length; i++){
-										places.add(datalayer.getPlaces()[i].getName());
-									}
-
-									VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(places);
-
-									VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(newQuery);
-
-									if(!c.getResult())
-									{
-										StringBuilder s = new StringBuilder();
-										s.append("The following places was used in the query, but are not present in your model:\n\n");
-
-										for (String placeName : c.getIncorrectPlaceNames()) {
-											s.append(placeName);
-											s.append("\n");
-										}
-
-										s.append("\nThe specified query has not been saved. Do you want to edit it again?");
-										int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), s.toString(), "Error Parsing Query", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-										if(choice == JOptionPane.NO_OPTION)
-										{
-											returnFromManualEdit(null);
-										}
-									} 
-									else {
-										UndoableEdit edit = new QueryConstructionEdit(newProperty, newQuery);
-										returnFromManualEdit(newQuery);
-										undoSupport.postEdit(edit);
-									}
+								} 
+								else {
+									UndoableEdit edit = new QueryConstructionEdit(newProperty, newQuery);
+									returnFromManualEdit(newQuery);
+									undoSupport.postEdit(edit);
 								}
 							}
 							else
@@ -1329,22 +1345,17 @@ public class QueryDialogue extends JPanel{
 				}
 		);
 
-		editParseButton.addActionListener(
+		editQueryButton.addActionListener(
 				new ActionListener() {
 
 					public void actionPerformed(ActionEvent arg0) {
 						if(queryField.isEditable()) { // we are in edit mode so the user pressed cancel
 							returnFromManualEdit(null);
-
 						}
 						else { // user wants to edit query manually
 							changeToEditMode();
 						}
 					}
-
-
-
-
 				}
 		);
 

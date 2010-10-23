@@ -808,10 +808,10 @@ extends javax.swing.JPanel {
 						"Error",
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
-			} else if ( (pnmlData.getPlaceByName(newName) != null) || (pnmlData.getTransitionByName(newName) != null) ){
+			} else if ( (pnmlData.getPlaceByNameIgnoreGiven(place,newName) != null) || (pnmlData.getTransitionByName(newName) != null) ){
 				System.err.println("Places cannot be called the same as an other Place or Transition.");
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						"Places cannot be called the same as an other Place or Transition.",
+						"Places cannot be called the same as another Place or Transition.",
 						"Error",
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
