@@ -83,11 +83,9 @@ public class CreateGui {
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
 		createLeftPane();
-
-
-		pane = 
-			new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
-
+		pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
+		
+		
 		pane.setContinuousLayout(true);
 		pane.setOneTouchExpandable(true);
 		pane.setBorder(null); // avoid multiple borders
@@ -101,6 +99,7 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 		appGui.init();
+		emptyLeftPane();
 		Verifyta.trySetupFromEnvironmentVariable();
 
 		VersionChecker versionChecker = new VersionChecker();
@@ -188,7 +187,7 @@ public class CreateGui {
 	public static void removeTab(int index) {
 		tabs.remove(index);
 		if(tabs.isEmpty()){
-			createEmptyLeftPane();
+			emptyLeftPane();
 		}
 	}
 
@@ -473,7 +472,7 @@ public class CreateGui {
 		updateLeftPanel();
 	}
 
-	public static void createEmptyLeftPane(){
+	public static void emptyLeftPane(){
 		leftPane.setTopComponent(null);
 		leftPane.setBottomComponent(null);
 	}
