@@ -1383,7 +1383,7 @@ of processes.
 <arcpath id="001" x="817" y="567" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="Mutual Exclusion Violation" traceOption="NONE" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="ADV_UPPAAL_SYM">
+<queries name="Mutual Exclusion Violation" traceOption="NONE" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="OPTIMIZEDSTANDARDSYMMETRY">
 <capacity>
 <value>0</value>
 </capacity>

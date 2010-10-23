@@ -1232,7 +1232,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 <arcpath id="001" x="612" y="597" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="Synchronization Violation" traceOption="NONE" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE_UPPAAL_SYM">
+<queries name="Synchronization Violation" traceOption="NONE" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="STANDARDSYMMETRY">
 <capacity>
 <value>11</value>
 </capacity>

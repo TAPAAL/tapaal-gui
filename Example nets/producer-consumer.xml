@@ -513,7 +513,7 @@ and these items wait in place In_transit for Transport.</text>
 <arcpath id="001" x="702" y="552" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="Avoid Garbage" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="ADV_NOSYM">
+<queries name="Avoid Garbage" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="OPTIMIZEDSTANDARD">
 <capacity>
 <value>5</value>
 </capacity>
@@ -521,7 +521,7 @@ and these items wait in place In_transit for Transport.</text>
 <value>E[]( Garbage = 0 )</value>
 </query>
 </queries>
-<queries name="Three in Garbage" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE">
+<queries name="Three in Garbage" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="STANDARD">
 <capacity>
 <value>5</value>
 </capacity>

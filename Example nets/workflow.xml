@@ -1135,7 +1135,7 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 <arcpath id="001" x="672" y="102" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="Find Fastest Schedule" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE">
+<queries name="Find Fastest Schedule" traceOption="FASTEST" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="STANDARD">
 <capacity>
 <value>2</value>
 </capacity>

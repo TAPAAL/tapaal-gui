@@ -534,7 +534,7 @@ The user of the tool can now experiments with different values of the periods an
 <arcpath id="001" x="146" y="124" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="5 responses, no drops" traceOption="SOME" searchOption="DFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="NAIVE">
+<queries name="5 responses, no drops" traceOption="SOME" searchOption="DFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="STANDARD">
 <capacity>
 <value>6</value>
 </capacity>

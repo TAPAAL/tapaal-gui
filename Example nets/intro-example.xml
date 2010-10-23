@@ -517,7 +517,7 @@ One may observe that two extra tokens are needed in the intermediate markings in
 <arcpath id="001" x="222" y="732" curvePoint="false"/>
 <type value="normal"/>
 </arc>
-<queries name="Target Reachable" traceOption="FASTEST" searchOption="BFS" hashTableSize="null" extrapolationOption="null" reductionOption="NAIVE">
+<queries name="Target Reachable" traceOption="FASTEST" searchOption="BFS" hashTableSize="null" extrapolationOption="null" reductionOption="STANDARD">
 <capacity>
 <value>2</value>
 </capacity>

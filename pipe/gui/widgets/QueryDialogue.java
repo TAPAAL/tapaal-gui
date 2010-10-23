@@ -317,8 +317,28 @@ public class QueryDialogue extends JPanel{
 			return "";
 		}
 	}
+	
+	private void enableColorsReductionOptions() {
+		String[] options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
 
-	private void disableLivenessReductionOptions(){
+		String reductionOptionString = ""+reductionOption.getSelectedItem();
+		boolean selectedOptionStillAvailable = false;
+
+		reductionOption.removeAllItems();
+
+		for (String s : options){
+			reductionOption.addItem(s);
+			if(s.equals(reductionOptionString))
+			{
+				selectedOptionStillAvailable = true;
+			}
+		}
+
+		if(selectedOptionStillAvailable)
+			reductionOption.setSelectedItem(reductionOptionString);
+	}
+
+	private void enableOnlyLivenessReductionOptions(){
 		String[] options = null;
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
 			options = new String[]{name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
@@ -480,7 +500,7 @@ public class QueryDialogue extends JPanel{
 			position = newProperty.indexOf(ph);
 		}
 		else {
-			position = GetNewSelectionPosition(newSelection);
+			position = newProperty.indexOf(newSelection);
 		}
 
 		queryField.select(position.getStart(),position.getEnd());
@@ -495,35 +515,35 @@ public class QueryDialogue extends JPanel{
 	}
 
 
-	// returns the position in the string of the new selection.
-	// used when adding or changing stuff in the query
-	// E.g. if selection is EF p < 2 then we want to select p < 2 to allow for speedier query construction.
-	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
-
-		StringPosition position;
-
-
-		if(newSelection instanceof TCTLEFNode){
-			position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
-		}
-		else if(newSelection instanceof TCTLEGNode) {
-			position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
-		}
-		else if(newSelection instanceof TCTLAFNode) {
-			position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
-		}
-		else if(newSelection instanceof TCTLAGNode) {
-			position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
-		}
-		else if(newSelection instanceof TCTLNotNode) {
-			position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
-		}
-		else {
-			position = newProperty.indexOf(newSelection);
-		}
-
-		return position;
-	}
+//	// returns the position in the string of the new selection.
+//	// used when adding or changing stuff in the query
+//	// E.g. if selection is EF p < 2 then we want to select p < 2 to allow for speedier query construction.
+//	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
+//
+//		StringPosition position;
+//
+//
+//		if(newSelection instanceof TCTLEFNode){
+//			position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
+//		}
+//		else if(newSelection instanceof TCTLEGNode) {
+//			position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
+//		}
+//		else if(newSelection instanceof TCTLAFNode) {
+//			position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
+//		}
+//		else if(newSelection instanceof TCTLAGNode) {
+//			position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
+//		}
+//		else if(newSelection instanceof TCTLNotNode) {
+//			position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
+//		}
+//		else {
+//			position = newProperty.indexOf(newSelection);
+//		}
+//
+//		return position;
+//	}
 
 	// Delete current selection
 	private void deleteSelection() {
@@ -572,8 +592,11 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void setEnabledReductionOptions() {
-		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
-			disableLivenessReductionOptions();
+		if(this.datalayer.isUsingColors()) {
+			enableColorsReductionOptions();
+		}
+		else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+			enableOnlyLivenessReductionOptions();
 		} else {
 			enableAllReductionOptions();
 		}
@@ -1563,7 +1586,7 @@ public class QueryDialogue extends JPanel{
 			reductionOption.setSelectedItem(reduction);
 			symmetryReduction.setSelected(symmetry);
 		}
-
+		setEnabledReductionOptions();
 	}
 
 	private void initButtonPanel(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
