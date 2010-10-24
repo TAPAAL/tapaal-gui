@@ -36,6 +36,13 @@ public class Verifyta implements ModelChecker {
 
 	private ProcessRunner runner;
 
+	/**
+	 *  Default constructor, used for reading version number (if verifyta is set)
+	 *  used eg. in the about dialog. 
+	 */
+	public Verifyta(){
+	}
+	
 	public Verifyta(FileFinder fileFinder, Messenger messenger){
 		this.fileFinder = fileFinder;
 		this.messenger = messenger;
@@ -60,7 +67,7 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public String getPath(){
-		return verifytapath; // TODO: MJ -- delete me
+		return verifytapath; 
 	}
 
 	public String getVersion(){

@@ -821,20 +821,26 @@ EOC */
 		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
 		buffer.append("Aalborg University 2009 \n\n");
 		buffer.append("Read more at: www.tapaal.net \n\n");
-		buffer.append("verifyta:\n");
-		buffer.append("   Version: ");
 		
-		Verifyta verifyta = new Verifyta(new FileFinderImpl(),new MessengerImpl());// TODO: MJ -- fix this
-		buffer.append(verifyta); 
-		buffer.append("\n");
+		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
+		
+		String verifytaPath = verifyta.getPath();
+		String verifytaversion = "";
+		
+		if (verifytaPath == null || verifytaPath.isEmpty()) { 
+			verifytaPath = "Not setup";
+			verifytaversion = "N/A";
+		} else {
+			verifytaversion = verifyta.getVersion();
+		}
+		
+		buffer.append("Verifyta Information:\n");
 		buffer.append("   Located: ");
-
-		String path = verifyta.getPath();
-		if(path == null || path.isEmpty())
-			buffer.append("N/A");
-		else
-			buffer.append(path);
-
+		buffer.append(verifytaPath);
+		buffer.append("\n");
+		buffer.append("   Version: ");
+		buffer.append(verifytaversion);
+	
 		buffer.append("  \n\n"); 
 		buffer.append("Based on PIPE2:\n");
 		buffer.append("http://pipe2.sourceforge.net/");
