@@ -632,6 +632,7 @@ EOC */
 
 		timedPlaceAction.setEnabled(status);
 		timedArcAction.setEnabled(status);
+		inhibarcAction.setEnabled(status);
 		transportArcAction.setEnabled(status);
 
 		//		placeAction.setEnabled(status);
