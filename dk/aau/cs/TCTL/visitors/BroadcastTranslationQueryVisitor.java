@@ -31,8 +31,16 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append(OperatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
-		}
-		else {
+		} else if(totalTokens == 0){
+			append("(");
+			append(TOKEN_TEMPLATE_NAME);
+			append(".");
+			append(atomicPropositionNode.getPlace());
+			append(") ");
+			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(" ");
+			append(atomicPropositionNode.getN());
+		}else{
 			append("(");
 			for(int i = 0; i < totalTokens-1; i++){
 				if(i > 0){

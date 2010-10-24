@@ -79,14 +79,14 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 		NTA nta = new NTA();
 
-		if(useSymmetry){
+		if(useSymmetry || model.getNumberOfTokens()+extraTokens == 0){
 			TimedAutomaton tokenTemplate = createTokenTemplate(model, null);
 			addInitializationStructure(tokenTemplate, model);
 			tokenTemplate.setName(TOKEN_TEMPLATE_NAME);
-			tokenTemplate.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
+			if(useSymmetry) tokenTemplate.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
 			tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
 			nta.addTimedAutomaton(tokenTemplate);
-		}else{
+		}else {
 			int j = 0;
 			for(Token token : model.getTokens()){
 				clearLocationMappings();
@@ -121,7 +121,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 
 	private String createSystemDeclaration(int tokensInModel) {
-		if(useSymmetry){
+		if(useSymmetry || tokensInModel + extraTokens == 0){
 			return "system " + CONTROL_TEMPLATE_NAME + "," + TOKEN_TEMPLATE_NAME + ";";
 		}else{
 			StringBuilder builder = new StringBuilder("system ");
@@ -646,15 +646,15 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry, tapnQuery.getTotalTokens());
-		
+
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}
-	
-	
+
+
 	public TranslationNamingScheme namingScheme(){
 		return new BroadcastNamingScheme();
 	}
-	
+
 	protected class BroadcastNamingScheme implements TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String TAU = "tau";
@@ -663,10 +663,10 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
 		private Pattern endPattern = Pattern.compile(END_OF_SEQUENCE_PATTERN);
 		private final SequenceInfo seqInfo = SequenceInfo.END;
-		
+
 		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
-			
+
 			int startIndex = 0;
 			int endIndex = NOT_FOUND;
 			String originalTransitionName = null;
@@ -675,15 +675,15 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 				if(!isInitializationTransition(transitionName)){
 					Matcher startMatcher = startPattern.matcher(transitionName);
 					Matcher endMatcher = endPattern.matcher(transitionName);
-					
+
 					boolean isTau = transitionName.equals(TAU);
 					boolean isEndTransition = endMatcher.matches();
 					boolean isStartTransition = !isTau && !isEndTransition && startMatcher.matches();
 					boolean isDegree2Optimization = isStartTransition && (startMatcher.group(2) == null || startMatcher.group(2).isEmpty());
-					
+
 					if(isStartTransition) { startIndex = i; originalTransitionName = startMatcher.group(1); }
 					if(isEndTransition || isDegree2Optimization) endIndex = i;
-					
+
 					if(endIndex != NOT_FOUND){
 						transitionTranslations.add(new TransitionTranslation(startIndex, endIndex, originalTransitionName, seqInfo));
 						endIndex = NOT_FOUND;
@@ -691,7 +691,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					}			
 				}
 			}
-			
+
 			TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
 			transitionTranslations.toArray(array);
 			return array;
@@ -712,11 +712,11 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		public String tokenClockName() {
 			return TOKEN_CLOCK_NAME;
 		}
-		
+
 		public boolean isIgnoredPlace(String location) {
 			return location.equals(PLOCK) ||  location.equals(PCAPACITY);
 		}
-		
+
 		public boolean isIgnoredAutomata(String automata){
 			return automata.equals(CONTROL_TEMPLATE_NAME);
 		}

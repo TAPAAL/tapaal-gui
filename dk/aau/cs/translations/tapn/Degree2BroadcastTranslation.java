@@ -80,12 +80,12 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		TimedArcPetriNet degree2Net = getDegree2Converter().transform((TAPN)model);
 
 		NTA nta = new NTA();
-		if(useSymmetry){
+		if(useSymmetry || model.getNumberOfTokens()+extraTokens == 0){
 			TimedAutomaton ta = createTokenAutomaton(degree2Net, model, null);
 			createInitializationTransitionsForTokenAutomata(degree2Net, ta);
 			ta.setName(TOKEN_TEMPLATE_NAME);
 			ta.setInitLocation(getLocationByName(P_CAPACITY));
-			ta.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
+			if(useSymmetry) ta.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
 			nta.addTimedAutomaton(ta);
 		}else{
 			int j = 0;
@@ -123,7 +123,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	}
 
 	private String createSystemDeclaration(int tokensInModel) {
-		if(useSymmetry){
+		if(useSymmetry  || tokensInModel + extraTokens == 1){
 			return "system " + CONTROL_TEMPLATE_NAME + "," + TOKEN_TEMPLATE_NAME + ";";
 		}else{
 			StringBuilder builder = new StringBuilder("system ");
@@ -240,6 +240,8 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 	private Location createInitializationTransitionsForControlAutomaton(
 			TimedArcPetriNet degree2Net, TimedAutomaton control) {
+		if(degree2Net.getNumberOfTokens() == 1) return getLocationByName(PLOCK);
+			
 		Location first = new Location("","");
 		first.setCommitted(true);
 		control.addLocation(first);
