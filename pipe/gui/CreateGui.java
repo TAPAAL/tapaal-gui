@@ -116,6 +116,9 @@ public class CreateGui {
 					"New version available!",
 					JOptionPane.INFORMATION_MESSAGE);			
 		}
+		
+		//Show the new file dialog by default
+		appGui.showNewPNDialog();
 	}
 
 
