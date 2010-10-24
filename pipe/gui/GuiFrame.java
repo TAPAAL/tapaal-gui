@@ -1210,6 +1210,7 @@ EOC */
 			break;
 		case noNet:
 			//Disable All Actions
+			statusBar.changeText(statusBar.textforNoNet);
 			break;
 
 		default:
