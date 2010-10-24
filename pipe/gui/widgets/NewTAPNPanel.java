@@ -99,6 +99,10 @@ public class NewTAPNPanel extends JPanel {
 	}
 
 	protected void createNewTAPNBasedOnSelection(String name, boolean colored) {
+		if (!name.endsWith(".xml")){
+			name = name + ".xml";
+		}
+		
 		if(name.isEmpty()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"You must provide a name for the net.",
@@ -135,7 +139,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.insets = new Insets(3,3,3,3);
 		choicePanel.add(nameLabel, gbc);
 		
-		String defaultName = String.format("New Petri net %1$d.xml", frame.getNameCounter());
+		String defaultName = String.format("New Petri net %1$d", frame.getNameCounter());
 		nameTextBox = new JTextField(defaultName);
 		nameTextBox.setPreferredSize(new Dimension(150,20));
 		gbc = new GridBagConstraints();
