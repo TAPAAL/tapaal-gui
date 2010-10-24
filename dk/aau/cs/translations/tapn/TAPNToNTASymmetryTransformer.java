@@ -69,7 +69,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		for(TAPNTransition transition : model.getTransitions()){
 			boolean changeSymbol = false;
 			HashSet<Arc> usedFromPostset= new HashSet<Arc>();
-			
+
 			for(Arc presetArc : transition.getPreset()){
 				for(Arc postsetArc : transition.getPostset()){
 					String sourceName = presetArc.getSource().getName();
@@ -79,11 +79,11 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 						if(isPartOfLockTemplate(targetName) && !usedFromPostset.contains(postsetArc)){
 							String update = "";
 
-//							if(sourceName.equals(PLOCK)){
-//								update = "lock = 1";
-//							}else if(targetName.equals(PLOCK)){
-//								update = "lock = 0";
-//							}
+							//							if(sourceName.equals(PLOCK)){
+							//								update = "lock = 1";
+							//							}else if(targetName.equals(PLOCK)){
+							//								update = "lock = 0";
+							//							}
 
 							Edge e = new Edge(getLocationByName(sourceName),
 									getLocationByName(targetName),
@@ -98,7 +98,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 						if(!isPartOfLockTemplate(targetName)){
 							if(isMatchingArcs(presetArc, postsetArc) && !usedFromPostset.contains(postsetArc)){
 								char symbol = '?';
-								
+
 								if(transition.isFromOriginalNet()){
 									if(changeSymbol){
 										symbol = '!';
@@ -107,7 +107,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 										changeSymbol = true;
 									}
 								}
-								
+
 								Edge e = new Edge(getLocationByName(sourceName),
 										getLocationByName(targetName),
 										createTransitionGuard(((TAPNArc)presetArc).getGuard(), transition.isFromOriginalNet()),
@@ -129,11 +129,11 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		if (presetArc instanceof TAPNTransportArc && postsetArc instanceof TAPNTransportArc){
 			return presetArc == postsetArc; // they are only matching if its the same arc. Handles case where a degree 2 transition is preserved with two transport arcs
 		}
-		
+
 		if(presetArc instanceof TAPNTransportArc && !(postsetArc instanceof TAPNTransportArc)) return false;
-		
+
 		if(!(presetArc instanceof TAPNTransportArc) && postsetArc instanceof TAPNTransportArc) return false;
-		
+
 		return true;
 	}
 
@@ -174,7 +174,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		builder.append(super.createGlobalDeclarations(model));
 		return builder.toString();
 	}
-	
+
 	private void addSymmetricInitialization(TimedAutomaton ta, TimedArcPetriNet model){
 		numberOfInitChannels = 0;
 		Location pcapacity = getLocationByName("P_capacity");
@@ -198,29 +198,32 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 
 	private TimedAutomaton createControlTemplate(TimedArcPetriNet model) {
 		TimedAutomaton control = new TimedAutomaton();
-
-		Location lastLocation = new Location("","");
-		lastLocation.setCommitted(true);
-		control.addLocation(lastLocation);
-		control.setInitLocation(lastLocation);
-
-		for(int i = 1; i < numberOfInitChannels; i++){
-			Location l = new Location("","");
-			l.setCommitted(true);
-			control.addLocation(l);
-
-			Edge e = new Edge(lastLocation, l, "", "c" + (i-1) + "!", "");
-			control.addTransition(e);
-
-			lastLocation = l;
-		}
-
 		Location finish = new Location("finish","");
 		control.addLocation(finish);
+		
+		if(model.getNumberOfTokens() == 0){
+			Location lastLocation = new Location("","");
+			lastLocation.setCommitted(true);
+			control.addLocation(lastLocation);
+			control.setInitLocation(lastLocation);
 
-		Edge e = new Edge(lastLocation, finish, "", "c" + (numberOfInitChannels-1) + "!", "");
-		control.addTransition(e);
+			for(int i = 1; i < numberOfInitChannels; i++){
+				Location l = new Location("","");
+				l.setCommitted(true);
+				control.addLocation(l);
 
+				Edge e = new Edge(lastLocation, l, "", "c" + (i-1) + "!", "");
+				control.addTransition(e);
+
+				lastLocation = l;
+			}
+			
+			Edge e = new Edge(lastLocation, finish, "", "c" + (numberOfInitChannels-1) + "!", "");
+			control.addTransition(e);
+		}else{
+			control.setInitLocation(finish);
+		}
+		
 		control.setName("Control");
 
 		return control;		
@@ -233,7 +236,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		return matcher.find();
 	}
 
-	
+
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		QueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
