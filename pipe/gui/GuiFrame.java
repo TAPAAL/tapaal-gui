@@ -459,14 +459,7 @@ EOC */
 			 new AnimateAction("Simulate", Pipe.ANIMATE,
 					 "Randomly fire a number of transitions", "typed 7",true);      
 
-		 // XXX - kyrke - by some reason the animation actions started to be enabled when 
-		 //starting TAPAAL, so for now de just disable them here :s
-		 stepbackwardAction.setEnabled(false);
-		 stepforwardAction.setEnabled(false);
-		 timeAction.setEnabled(false);
-		 randomAction.setEnabled(false);
-		 randomAnimateAction.setEnabled(false);
-
+		 
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
 
