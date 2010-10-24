@@ -136,6 +136,13 @@ implements ActionListener, Observer {
 	public boolean dragging = false;
 
 	private boolean editionAllowed = true;
+	
+	enum GUIMode {
+		draw, animation, noNet 
+	}
+	
+	private GUIMode guiMode = GUIMode.noNet;
+	private JMenu exportMenu, zoomMenu;
 
 
 
@@ -188,6 +195,9 @@ implements ActionListener, Observer {
 
 		this.setForeground(java.awt.Color.BLACK);
 		this.setBackground(java.awt.Color.WHITE);
+		
+		//Set GUI mode
+		setGUIMode(GUIMode.noNet);
 	}
 
 
@@ -223,7 +233,8 @@ implements ActionListener, Observer {
 			new FileAction("Save as","Save as...","shift ctrl S"));
 
 		// Export menu
-		JMenu exportMenu=new JMenu("Export");
+		exportMenu=new JMenu("Export");
+		
 		exportMenu.setIcon(
 				new ImageIcon(Thread.currentThread().getContextClassLoader().
 						getResource(CreateGui.imgPath + "Export.png")));
@@ -401,7 +412,7 @@ EOC */
 		 JMenu viewMenu = new JMenu("View");
 		 viewMenu.setMnemonic('V');
 
-		 JMenu zoomMenu=new JMenu("Zoom");
+		 zoomMenu=new JMenu("Zoom");
 		 zoomMenu.setIcon(
 				 new ImageIcon(Thread.currentThread().getContextClassLoader().
 						 getResource(CreateGui.imgPath + "Zoom.png")));
@@ -624,57 +635,126 @@ EOC */
 	}
 
 
-	/* sets all buttons to enabled or disabled according to status. */
-	private void enableActions(boolean status){
+	/**
+	 *  Sets all buttons to enabled or disabled according to the current GUImode.
+	 *  
+	 *  Reimplementation of old enableGUIActions(bool status)
+	 *  
+	 *  @author Kenneth Yrke Joergensen (kyrke)
+	 *  */
+	private void enableGUIActions(){
 
-		saveAction.setEnabled(status);
-		saveAsAction.setEnabled(status);
+		switch (getGUIMode()) {
+		case draw:
 
-		timedPlaceAction.setEnabled(status);
-		timedArcAction.setEnabled(status);
-		inhibarcAction.setEnabled(status);
-		transportArcAction.setEnabled(status);
+			enableAllActions(true);
+			
+			timedPlaceAction.setEnabled(true);
+			timedArcAction.setEnabled(true);
+			inhibarcAction.setEnabled(true);
+			transportArcAction.setEnabled(true);
 
-		//		placeAction.setEnabled(status);
-		//		arcAction.setEnabled(status);
-		//inhibarcAction.setEnabled(status);
-		annotationAction.setEnabled(status);
-		transAction.setEnabled(status);
-		//		timedtransAction.setEnabled(status);
-		tokenAction.setEnabled(status);
-		deleteAction.setEnabled(status);
-		selectAction.setEnabled(status);
-		deleteTokenAction.setEnabled(status);
-		//		rateAction.setEnabled(status);
-		//		markingAction.setEnabled(status);
-
-		//      toggleGrid.setEnabled(status);
-
-		if (status) {
-			startAction.setSelected(false);
-			randomAnimateAction.setSelected(false);
+			annotationAction.setEnabled(true);
+			transAction.setEnabled(true);
+			tokenAction.setEnabled(true);
+			deleteAction.setEnabled(true);
+			selectAction.setEnabled(true);
+			deleteTokenAction.setEnabled(true);
+			
 			timeAction.setEnabled(false);
-			stepbackwardAction.setEnabled(!status);
-			stepforwardAction.setEnabled(!status);
-			drawingToolBar.setVisible(true);
+			stepbackwardAction.setEnabled(false);
+			stepforwardAction.setEnabled(false);
+			
+			deleteAction.setEnabled(true);
+			undoAction.setEnabled(true);
+			redoAction.setEnabled(true);
 
+			break;
+
+		case animation:
+			
+			enableAllActions(true);
+
+            timedPlaceAction.setEnabled(false);
+            timedArcAction.setEnabled(false);
+            inhibarcAction.setEnabled(false);
+            transportArcAction.setEnabled(false);
+
+            annotationAction.setEnabled(false);
+            transAction.setEnabled(false);
+            tokenAction.setEnabled(false);
+            deleteAction.setEnabled(false);
+            selectAction.setEnabled(false);
+            deleteTokenAction.setEnabled(false);
+            
+            timeAction.setEnabled(true);
+			stepbackwardAction.setEnabled(true);
+			stepforwardAction.setEnabled(true);
+			
+			deleteAction.setEnabled(false);
+			undoAction.setEnabled(false);
+			redoAction.setEnabled(false);
+
+			break;
+		case noNet:
+
+            timedPlaceAction.setEnabled(false);
+            timedArcAction.setEnabled(false);
+            inhibarcAction.setEnabled(false);
+            transportArcAction.setEnabled(false);
+
+            annotationAction.setEnabled(false);
+            transAction.setEnabled(false);
+            tokenAction.setEnabled(false);
+            deleteAction.setEnabled(false);
+            selectAction.setEnabled(false);
+            deleteTokenAction.setEnabled(false);
+            
+            timeAction.setEnabled(false);
+			stepbackwardAction.setEnabled(false);
+			stepforwardAction.setEnabled(false);
+			
+			deleteAction.setEnabled(false);
+			undoAction.setEnabled(false);
+			redoAction.setEnabled(false);
+
+			enableAllActions(false);
+			break;
 		}
-		randomAction.setEnabled(!status);
-		randomAnimateAction.setEnabled(!status);
+		
+	}
+	
+	/**
+	 * Helperfunction for disabeling/enabeling all actions when we are in noNet GUImode
+	 * @return
+	 */
+	private void enableAllActions(boolean enable){
+		
+		//File
+		closeAction.setEnabled(enable);
+		
+		saveAction.setEnabled(enable);
+        saveAsAction.setEnabled(enable);
+        
+        exportMenu.setEnabled(enable);
+        exportPNGAction.setEnabled(enable);
+        exportPSAction.setEnabled(enable);
+        exportToTikZAction.setEnabled(enable);
 
-
-		if (!status){
-			drawingToolBar.setVisible(false);
-			timeAction.setEnabled(true);
-			//			pasteAction.setEnabled(status);
-			undoAction.setEnabled(status);
-			redoAction.setEnabled(status);
-		} else {
-			//			pasteAction.setEnabled(getCopyPasteManager().pasteEnabled());
-		}
-		//		copyAction.setEnabled(status);
-		//		cutAction.setEnabled(status);
-		deleteAction.setEnabled(status);
+        printAction.setEnabled(enable);
+        
+        //View 
+        zoomInAction.setEnabled(enable);
+        zoomOutAction.setEnabled(enable);
+        zoomComboBox.setEnabled(enable);
+        zoomMenu.setEnabled(enable);
+        
+        toggleGrid.setEnabled(enable);
+        dragAction.setEnabled(enable);
+        
+        //Simulator 
+        startAction.setEnabled(enable);
+		
 	}
 
 	//set frame objects by array index
@@ -1066,36 +1146,86 @@ EOC */
 	}
 
 
+	/**
+	 * @deprecated Replaced with setGUIMode
+	 * @param on enable or disable animation mode
+	 */
 	public void setAnimationMode(boolean on) {
-		randomAnimateAction.setSelected(false);
-		CreateGui.getAnimator().setNumberSequences(0);
-		startAction.setSelected(on);
-		CreateGui.getView().changeAnimationMode(on);
+
 		if (on) {
-			CreateGui.getAnimator().storeModel();
-			CreateGui.currentPNMLData().setEnabledTransitions();
-			CreateGui.getAnimator().highlightEnabledTransitions();
-			CreateGui.addAnimationHistory();
-			CreateGui.addAnimationControler();
+			setGUIMode(GUIMode.animation);
+		}else {
+			setGUIMode(GUIMode.draw);
+		}
 
-			enableActions(false);//disables all non-animation buttons
-			setEditionAllowed(false);
-
-			statusBar.changeText(statusBar.textforAnimation);
-		} else {
+	}
+	
+	/**
+	 * Returns the current GUIMode
+	 * 
+	 * @author Kenneth Yrke Joergensen (kyrke)
+	 * @return the current GUIMode
+	 */
+	public GUIMode getGUIMode(){
+		return guiMode;
+	}
+	
+	/**
+	 * Set the current mode of the GUI, and changes possible actions
+	 * @param mode change GUI to this mode
+	 * @author Kenneth Yrke Joergensen (kyrke) 
+	 */
+	public void setGUIMode(GUIMode mode){
+		
+		this.guiMode = mode; 
+		
+		switch (mode) {
+		case draw:
+			//Enable all draw actions
+			CreateGui.getAnimator().setNumberSequences(0);
+			startAction.setSelected(false);
+			CreateGui.getView().changeAnimationMode(false);
+			
 			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
 			CreateGui.getAnimator().restoreModel();
 			//         CreateGui.removeAnimationHistory();
 			//         CreateGui.removeAnimationControler();
-			enableActions(true); //renables all non-animation buttons
 
 			//If abstract animation pane is shown, remove it when 
 			// Gowing out of animation mode.
 			CreateGui.removeAbstractAnimationPane();
 
 			CreateGui.createLeftPane();
+			
+			break;
+		case animation:
+			CreateGui.getAnimator().setNumberSequences(0);
+			startAction.setSelected(true);
+			CreateGui.getView().changeAnimationMode(true);
+			CreateGui.getAnimator().storeModel();
+			CreateGui.currentPNMLData().setEnabledTransitions();
+			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.addAnimationHistory();
+			CreateGui.addAnimationControler();
+
+			
+			setEditionAllowed(false);
+
+			statusBar.changeText(statusBar.textforAnimation);
+			//Disable all draw actions
+			break;
+		case noNet:
+			//Disable All Actions
+			break;
+
+		default:
+			break;
 		}
+		
+		//Enable actions based on GUI mode
+		enableGUIActions();
+		
 	}
 
 
@@ -1752,8 +1882,13 @@ EOC */
 				System.exit(0);
 			} else if ((this == closeAction) && (appTab.getTabCount() > 0)
 					&& checkForSave()) {
+				//Set GUI mode to noNet
+				setGUIMode(GUIMode.noNet);
+				
 				setObjectsNull(appTab.getSelectedIndex());
 				appTab.remove(appTab.getSelectedIndex());
+				
+				//Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);
 			} else if (this == exportToTikZAction) {
