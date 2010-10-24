@@ -245,6 +245,32 @@ public class AnimationController extends JPanel {
 		//		      add(timedelayPanel, c);
 		animationToolBar.add(timedelayPanel);		      
 	}
+	
+	public void addTimeDelayToHistory(BigDecimal delay){
+		AnimationHistory animBox = CreateGui.getAnimationHistory();
+		animBox.clearStepsForward();
+		try {
+		
+			BigDecimal timeDelayToSet  =  delay;
+			
+			
+		//	BigDecimal timeDelayToSet = new BigDecimal(TimeDelayField.getText(), new MathContext(Pipe.AGE_PRECISION));
+			if (timeDelayToSet.compareTo(new BigDecimal(0l))<=0){
+				//Nothing to do, illegal value 
+				System.err.println("Illegal value");
+			}else{
+				CreateGui.getAnimator().letTimePass(timeDelayToSet);		        				 
+			}
+		} catch (NumberFormatException e) {
+			//Do nothing, invalud number 
+		} catch (InvariantViolatedAnimationException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Invariant Violated, TimeDelay Not allowed");
+		} 
+
+		setAnimationButtonsEnabled();
+	}
+	
 	private void addTimeDelayToHistory(){
 		AnimationHistory animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
@@ -284,8 +310,7 @@ public class AnimationController extends JPanel {
 		}
 
 
-		stepforwardAction.setEnabled(animBox.isStepForwardAllowed());
-		stepbackwardAction.setEnabled(animBox.isStepBackAllowed());
+		setAnimationButtonsEnabled();
 	}
 	   
 	   class AnimateAction extends GuiAction {
@@ -359,8 +384,7 @@ public class AnimationController extends JPanel {
 		                  a.setNumberSequences(0); // stop animation
 		                  setSelected(false);
 		               } else {
-		                  stepbackwardAction.setEnabled(false);
-		                  stepforwardAction.setEnabled(false);
+		            	  setAnimationButtonsEnabled();
 		                  randomAction.setEnabled(false);
 		                  setSelected(true);
 		                  animBox.clearStepsForward();
