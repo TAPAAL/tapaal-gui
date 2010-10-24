@@ -132,9 +132,6 @@ extends javax.swing.JPanel {
 		buttonPanel.setLayout(new java.awt.GridBagLayout());
 
 		okButton.setText("OK");
-		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				okButtonHandler(evt);
