@@ -119,18 +119,7 @@ public class ConstantStore {
 		for(Place place : places){
 			if(!isUsingColors){
 				if(place instanceof TimedPlace){
-					TimedPlace tp = (TimedPlace)place;
-					String inv = tp.getInvariant();
-					int substringStart = 0;
-					if (inv.contains("<=")){
-						substringStart = 2;
-					}else {
-						substringStart = 1;
-					}
-					String val = inv.substring(substringStart);
-					if(constants.containsKey(val)){
-						constants.get(val).setIsUsed(true);
-					}
+					buildConstraint((TimedPlace)place);
 				}
 			}else{
 				if(place instanceof ColoredTimedPlace){
@@ -158,6 +147,24 @@ public class ConstantStore {
 		}
 	}
 
+	private void buildConstraint(TimedPlace place) {
+		String inv = place.getInvariant();
+		int substringStart = 0;
+		if (inv.contains("<=")){
+			substringStart = 2;
+		}else {
+			substringStart = 1;
+		}
+		String val = inv.substring(substringStart);
+		if(constants.containsKey(val)){
+			Constant constant = constants.get(val);
+			constant.setIsUsed(true);
+			if(substringStart == 1){
+				constant.setLowerBound(1);
+			}
+		}
+	}
+
 	private void buildConstraint(ColoredTimedPlace place) {
 		processColorGuards(place.getColorInvariant());
 		processTimeInvariant(place.getTimeInvariant());
@@ -167,7 +174,7 @@ public class ConstantStore {
 	private void processColoredTokens(List<ColoredToken> coloredTokens) {
 		for(ColoredToken token : coloredTokens){
 			IntOrConstant value = token.getColor();
-			
+
 			if(value.isUsingConstant()){
 				Constant constant = getConstant(value.getConstantName());
 				constant.setIsUsed(true);
@@ -176,10 +183,27 @@ public class ConstantStore {
 	}
 
 	private void processTimeInvariant(ColoredTimeInvariant timeInvariant) {
-		for(String constantName : timeInvariant.getUsedConstantNames()){
-			Constant constant = getConstant(constantName);
-			constant.setIsUsed(true);
-		}		
+		if(!timeInvariant.goesToInfinity()){
+			IntOrConstant scale = timeInvariant.getUpper().getScale();
+			IntOrConstant offset = timeInvariant.getUpper().getOffset();
+			String operator = timeInvariant.getOperator();
+			if(scale.isUsingConstant()){
+				Constant scaleConstant = getConstant(scale.getConstantName());
+				scaleConstant.setIsUsed(true);
+				if(operator.equals("<") && offset.getValue() == 0) scaleConstant.setLowerBound(1);
+			}
+
+			if(offset.isUsingConstant()){
+				Constant offsetConstant = getConstant(offset.getConstantName());
+				offsetConstant.setIsUsed(true);
+				if(operator.equals("<") && scale.getValue() == 0) offsetConstant.setLowerBound(1);
+			}
+		}
+		//		for(String constantName : timeInvariant.getUsedConstantNames()){
+		//			Constant constant = getConstant(constantName);
+		//			constant.setIsUsed(true);
+		//			
+		//		}		
 	}
 
 	private void buildConstraint(ColoredOutputArc arc) {

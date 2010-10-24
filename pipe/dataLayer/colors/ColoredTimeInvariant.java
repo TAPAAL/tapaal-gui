@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ColoredTimeInvariant {
-	public boolean strictLessThan;
+	private boolean strictLessThan;
 	private IntervalBound upper;
 	private boolean displayValues = false;
 

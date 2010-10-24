@@ -825,27 +825,7 @@ extends javax.swing.JPanel {
 				for (TAPNQuery q : queries) {
 					q.getProperty().accept(renameVisitor,null);
 				}
-				//CreateGui.createLeftPane();
 			}
-			//    	  if (!(newName.charAt(0)=='#')){
-			//    		  if(newName.contains("*") || newName.contains("+")){
-			//        		  System.err.println("Places can't have names with *'s or +'s");
-			//        		  JOptionPane.showMessageDialog(CreateGui.getApp(),
-			//          				"Places can't have names with *'s or +'s\n",
-			//          				"Error",
-			//          				JOptionPane.INFORMATION_MESSAGE);
-			//        		  return;
-			//        	  }else {
-			//        		  view.getUndoManager().addEdit(place.setPNObjectName(newName));
-			//        	  }
-			//    	  } else {
-			//    		  System.err.println("Places can't have names starting with #");
-			//    		  JOptionPane.showMessageDialog(CreateGui.getApp(),
-			//      				"Places can't have names starting with #\n",
-			//      				"Error",
-			//      				JOptionPane.INFORMATION_MESSAGE);
-			//    		  return;
-			//    	  }
 		}
 
 
@@ -973,8 +953,11 @@ extends javax.swing.JPanel {
 		if(!invariantInf.isSelected()){
 			IntOrConstant scale = new IntOrConstant(invScaleTextbox.getText());
 			IntOrConstant offset = new IntOrConstant(invOffsetTextbox.getText());
-
-			return new ColoredTimeInvariant((String)invRelationNormal.getSelectedItem(), 
+			String operator = (String)invRelationNormal.getSelectedItem();
+			
+			if(scale.getValue() == 0 && offset.getValue() == 0 && operator.equals("<")) throw new IllegalArgumentException();
+			
+			return new ColoredTimeInvariant(operator, 
 					new IntervalBound(scale, offset));
 		}else{
 			return new ColoredTimeInvariant();
