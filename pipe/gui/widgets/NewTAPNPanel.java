@@ -148,21 +148,24 @@ public class NewTAPNPanel extends JPanel {
 		choicePanel.add(nameTextBox, gbc);
 		
 		JPanel choice = new JPanel(new GridBagLayout());
-		coloredTAPNRadioButton = new JRadioButton("Colored TAPN");
-		coloredTAPNRadioButton.setSelected(true);
-		gbc = new GridBagConstraints();
+		
+		standardTAPNRadioButton = new JRadioButton("TAPN");
+		standardTAPNRadioButton.setSelected(true);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(3,3,3,3);
-		choice.add(coloredTAPNRadioButton, gbc);
+		choice.add(standardTAPNRadioButton, gbc);
 		
-		standardTAPNRadioButton = new JRadioButton("TAPN");
+		coloredTAPNRadioButton = new JRadioButton("Colored TAPN");
+		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(3,3,3,3);
-		choice.add(standardTAPNRadioButton, gbc);
+		choice.add(coloredTAPNRadioButton, gbc);
+		
+		
 		
 		ButtonGroup btnGroup = new ButtonGroup();
 		btnGroup.add(coloredTAPNRadioButton);
