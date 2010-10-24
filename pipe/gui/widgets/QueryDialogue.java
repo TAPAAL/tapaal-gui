@@ -284,16 +284,19 @@ public class QueryDialogue extends JPanel{
 		}
 		return toReturn;
 	}
-
-	private void enableTraceOptions() {
-		some.setEnabled(true);
-		fastest.setEnabled(true);
-	}
-
-	private void disableTraceOptions() {
-		some.setEnabled(false);
-		fastest.setEnabled(false);
-		none.setSelected(true);
+	
+	private void refreshTraceOptions() {
+		if(symmetryReduction.isSelected())
+		{
+			some.setEnabled(false);
+			fastest.setEnabled(false);
+			none.setSelected(true);
+		}
+		else
+		{
+			some.setEnabled(true);
+			fastest.setEnabled(true);
+		}
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -705,6 +708,10 @@ public class QueryDialogue extends JPanel{
 		undoSupport = new UndoableEditSupport();
 		undoSupport.addUndoableEditListener(new UndoAdapter());
 		refreshUndoRedo();
+		
+		setEnabledReductionOptions();
+		refreshTraceOptions();
+		
 	}
 
 	private void initQueryNamePanel(final TAPNQuery queryToCreateFrom) {
@@ -1466,7 +1473,9 @@ public class QueryDialogue extends JPanel{
 		traceRadioButtonGroup.add(none);
 
 		if (queryToCreateFrom==null){
-			disableTraceOptions(); // symmetry is on by default
+			some.setEnabled(false);
+			fastest.setEnabled(false);
+			none.setSelected(true);
 		}else{
 			if (queryToCreateFrom.getTraceOption() == TraceOption.SOME){
 				some.setSelected(true);
@@ -1513,14 +1522,8 @@ public class QueryDialogue extends JPanel{
 
 
 			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.SELECTED){
-					disableTraceOptions();
-				}else{
-					enableTraceOptions();
+					refreshTraceOptions();
 				}
-
-			}
-
 		});
 
 		reductionOptionsPanel.add(symmetryReduction);
@@ -1586,7 +1589,7 @@ public class QueryDialogue extends JPanel{
 			reductionOption.setSelectedItem(reduction);
 			symmetryReduction.setSelected(symmetry);
 		}
-		setEnabledReductionOptions();
+		
 	}
 
 	private void initButtonPanel(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {

@@ -82,7 +82,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		
 		for (TCTLAbstractStateProperty p : orListNode.getProperties()) {
 			if(!firstTime) {
-				uppaalQuery.append(" && ");
+				uppaalQuery.append(" || ");
 			}
 			
 			p.accept(this, context);
