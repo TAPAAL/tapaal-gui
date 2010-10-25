@@ -144,6 +144,7 @@ public class Pipe {
    public static final int ZOOM_DEFAULT = 100;
 
    public static Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
+   public static Color ANIMATION_BACKGROUND_COLOR = new Color(246,250,255);
 
    public static final int MAX_NODES = 20000; //it was 10000 previously
    // TODO: find a better value for MAX_NODES

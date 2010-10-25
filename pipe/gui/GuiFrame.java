@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -1199,6 +1200,8 @@ EOC */
 			CreateGui.removeAbstractAnimationPane();
 
 			CreateGui.createLeftPane();
+
+			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 			
 			break;
 		case animation:
@@ -1215,6 +1218,9 @@ EOC */
 			setEditionAllowed(false);
 
 			statusBar.changeText(statusBar.textforAnimation);
+			
+			//Set a light blue backgound color for animation mode
+			CreateGui.getView().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			//Disable all draw actions
 			break;
 		case noNet:
