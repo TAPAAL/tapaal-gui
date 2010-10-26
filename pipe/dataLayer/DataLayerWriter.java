@@ -9,6 +9,7 @@ import java.util.Collection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -78,6 +79,7 @@ public class DataLayerWriter {
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
 			pnDOM = builder.newDocument();
+			
 
 			Element PNML = pnDOM.createElement("pnml"); // PNML Top Level Element
 			pnDOM.appendChild(PNML);
@@ -168,6 +170,7 @@ public class DataLayerWriter {
 				transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
 			}else{
 				transformer = TransformerFactory.newInstance().newTransformer();
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			}
 			// Write file and do XSLT transformation to generate correct PNML
 			File outputObjectArrayList = file;//new File(filename); // Output for XSLT Transformation

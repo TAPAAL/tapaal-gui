@@ -2326,19 +2326,15 @@ implements Cloneable {
 			}
 
 			if(colors){
-				nodeList = PNMLDoc.getElementsByTagName("net").item(0).getChildNodes();
+				NodeList places = PNMLDoc.getElementsByTagName("net").item(0).getChildNodes();
+				for(int i = 0; i < places.getLength(); i++){
+					this.parseColoredElement(places.item(i));
+				}
 			}else{
 				nodeList = PNMLDoc.getDocumentElement().getChildNodes();
-			}
-
-
-			for(int i = 0 ; i < nodeList.getLength() ; i++) {
-				node = nodeList.item(i);
-
-				if(colors){
-					parseColoredElement(node);
-				}else{
-					parseElement(node);
+				for(int i = 0 ; i < nodeList.getLength() ; i++) {
+					node = nodeList.item(i);
+						parseElement(node);
 				}
 			}
 
@@ -2589,7 +2585,7 @@ implements Cloneable {
 		place.setTimeInvariant(timeInvariant);
 		place.setColorInvariant(colorInvariant);
 
-		NodeList tokenNodes = element.getChildNodes();
+		NodeList tokenNodes = element.getElementsByTagName("colored-token");
 		List<ColoredToken> tokens = parseTokens(tokenNodes);
 		place.setColoredTokens(tokens);
 
