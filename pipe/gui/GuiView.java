@@ -813,8 +813,8 @@ EOC*/
 							pnObject.getMouseListeners()[0].mousePressed(e);
 
 						}
-						break;
 					}
+					break;
 				case Pipe.TAPNINHIBITOR_ARC:
 					// Add point to arc in creation
 					if (createArc != null) {

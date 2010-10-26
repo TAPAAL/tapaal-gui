@@ -198,13 +198,25 @@ public void mouseReleased(MouseEvent e) {
             if (createTAPNInhibitorArc != null) {
                if (!currentObject.getClass().equals(
             		   createTAPNInhibitorArc.getSource().getClass())) {
-                  
+            	   
+            	// XXX  -- kyrke hack to precent some race condisions in pipe gui   					 
+				 if ((createTAPNInhibitorArc.getTarget()) == null || (!(createTAPNInhibitorArc.getTransition() instanceof Transition))) {
+					 createTAPNInhibitorArc.delete();
+					 createTAPNInhibitorArc.removeKeyListener(keyHandler);
+	    			 keyHandler = null;
+	    			 view.remove(createTAPNInhibitorArc);  
+	    			 view.createArc = null;
+	    			 view.repaint();
+	    			 break;
+				 }
+            	   
+            	   Arc someArc = null;
                   Iterator<Arc> arcsFrom =
                 	  createTAPNInhibitorArc.getSource().getConnectFromIterator();
                   // search for pre-existent arcs from createInhibitorArc's 
                   // source to createInhibitorArc's target
                   while(arcsFrom.hasNext()) {
-                     Arc someArc = (arcsFrom.next());
+                     someArc = (arcsFrom.next());
                      if (someArc == createTAPNInhibitorArc) {
                         break;
                      } else if (someArc.getTarget() == currentObject &&
@@ -236,18 +248,22 @@ public void mouseReleased(MouseEvent e) {
        					} else  {
                            // This is not supposed to happen
                         }
-                        createTAPNInhibitorArc.delete();
-                        someArc.getTransition().removeArcCompareObject(createTAPNInhibitorArc);
-                        someArc.getTransition().updateConnected();
+                        
                         break;
                      }
                   }
-                  
-                  if (isNewArc == true) {
+                  if(!isNewArc)
+                  {
+                	  createTAPNInhibitorArc.delete();
+                      someArc.getTransition().removeArcCompareObject(createTAPNInhibitorArc);
+                      someArc.getTransition().updateConnected();
+                  }
+                  else {
                 	  createTAPNInhibitorArc.setSelectable(true);
                 	  createTAPNInhibitorArc.setTarget(currentObject);
                      
                      currentObject.addConnectTo(createTAPNInhibitorArc);
+                     createTAPNInhibitorArc.getTransition().updateConnected();
                     
                      // Evil hack to prevent the arc being added to GuiView twice
                      contentPane.remove(createTAPNInhibitorArc);
@@ -259,18 +275,22 @@ public void mouseReleased(MouseEvent e) {
                      undoManager.addNewEdit(
                              new AddPetriNetObjectEdit(createTAPNInhibitorArc,
                              view, model));
-                     if(createTAPNInhibitorArc.getTarget() == null)
-                    	 JOptionPane.showMessageDialog(CreateGui.getApp(),
-									 "Whooops, target was not set on last arc, please redraw. DEBUG",
-									 "Error",
-									 JOptionPane.ERROR_MESSAGE);
+//                     if(createTAPNInhibitorArc.getTarget() == null)
+//                    	 JOptionPane.showMessageDialog(CreateGui.getApp(),
+//									 "Whooops, target was not set on last arc, please redraw. DEBUG",
+//									 "Error",
+//									 JOptionPane.ERROR_MESSAGE);
 						 	 
                   }
-                  
                   
                   // arc is drawn, remove handler:
                   createTAPNInhibitorArc.removeKeyListener(keyHandler);
                   keyHandler = null;
+                  /**/
+      			 if (isNewArc == false){                	  
+      				 view.remove(createTAPNInhibitorArc);                      
+      			 }
+      			 /* */
                   view.createArc = null;
                }
             }
@@ -593,7 +613,7 @@ public void mouseReleased(MouseEvent e) {
         			 } else if (transportArcToCreate.getSource() instanceof Transition) {
         				 //Step 2 
         				 if (view.transportArcPart1 == null ){
-        					 System.err.println("There where a error, cant creat a transport arc with out part one");
+        					 System.err.println("There where a error, cant creat a transport arc without part one");
 //      					 arc is drawn, remove handler:
         					 transportArcToCreate.removeKeyListener(keyHandler);
         					 keyHandler = null;
@@ -679,14 +699,14 @@ public void mouseReleased(MouseEvent e) {
         				 //arc is drawn, remove handler:
         					 transportArcToCreate.removeKeyListener(keyHandler);
         					 keyHandler = null;
+        					 /**/
+        	      			 if (isNewArc == false){                	  
+        	      				 view.remove(transportArcToCreate);                      
+        	      			 }
+        	      			 /* */
         					 view.createArc = null;
 
         					 ((TransportArc)transportArcToCreate).setGroupNr(view.transportArcPart1.getGroupNr());
-
-//      					 arc is drawn, remove handler:
-        					 transportArcToCreate.removeKeyListener(keyHandler);
-        					 keyHandler = null;
-        					 view.createArc = null;
 
         					 //Ekstra suff
         					 view.transportArcPart1.setConnectedTo(((TransportArc)transportArcToCreate));
@@ -795,8 +815,9 @@ public void mouseReleased(MouseEvent e) {
     						 timedArcToCreate.delete();
     						 timedArcToCreate.removeKeyListener(keyHandler);
     	        			 keyHandler = null;
-    	        			 
+    	        			 view.remove(timedArcToCreate);
     	        			 view.createArc = null;
+    	        			 view.repaint();
     	        			 break;
     					 }
     					 
@@ -878,7 +899,11 @@ public void mouseReleased(MouseEvent e) {
         			 //arc is drawn, remove handler:
         			 timedArcToCreate.removeKeyListener(keyHandler);
         			 keyHandler = null;
-        			 
+        			 /**/
+	      			 if (isNewArc == false){                	  
+	      				 view.remove(timedArcToCreate);                      
+	      			 }
+	      			 /* */
         			 view.createArc = null;
         		 }
         	 }
