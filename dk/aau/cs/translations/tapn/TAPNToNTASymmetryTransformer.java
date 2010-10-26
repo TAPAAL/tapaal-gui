@@ -201,7 +201,7 @@ public class TAPNToNTASymmetryTransformer extends TAPNToNTATransformer{
 		Location finish = new Location("finish","");
 		control.addLocation(finish);
 		
-		if(model.getNumberOfTokens() == 0){
+		if(model.getNumberOfTokens() - getExtraTokens() > 1){
 			Location lastLocation = new Location("","");
 			lastLocation.setCommitted(true);
 			control.addLocation(lastLocation);
