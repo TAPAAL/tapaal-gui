@@ -475,11 +475,9 @@ public class TimedPlace extends Place {
 
 
 	public void showAgeOfTokens(boolean show) {
+		if(ageOfTokensWindow != null) ageOfTokensWindow.dispose();
 		// Build interface
-		if (!show){
-			ageOfTokensWindow.setVisible(show);
-		}else{
-			ageOfTokensWindow.removeAll();
+		if(show){
 			ageOfTokensWindow = new Window(new Frame());
 			ageOfTokensWindow.add(new JTextArea(getStringOfTokens()));
 			ageOfTokensWindow.getComponent(0).setBackground(Color.lightGray);

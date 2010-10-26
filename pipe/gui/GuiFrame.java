@@ -1,7 +1,6 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -16,7 +15,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,7 +59,6 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
-import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;

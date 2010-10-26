@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -45,8 +46,6 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
-
-import com.sun.xml.internal.messaging.saaj.util.transform.EfficientStreamingTransformer;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;

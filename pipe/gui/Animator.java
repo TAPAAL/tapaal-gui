@@ -413,9 +413,8 @@ public class Animator {
 				highlightEnabledTransitions();
 				currentAction++;
 			}
-
+			CreateGui.currentPNMLData().redrawVisibleTokenLists();
 		}
-
 	}
 
 	/** This method keeps track of a fired transition in the AnimationHistory 

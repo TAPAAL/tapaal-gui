@@ -3,10 +3,9 @@ package pipe.gui;
 import java.math.BigDecimal;
 import java.util.List;
 
-import dk.aau.cs.petrinet.colors.ColoredToken;
-
 import pipe.dataLayer.ColoredDiscreteFiringAction;
 import pipe.dataLayer.DataLayer;
+import dk.aau.cs.petrinet.colors.ColoredToken;
 
 public class ColoredTraceTransformer extends TraceTransformer {
 

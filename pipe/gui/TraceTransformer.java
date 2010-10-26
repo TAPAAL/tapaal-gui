@@ -4,9 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.aau.cs.petrinet.trace.TAPNTrace;
-
 import pipe.dataLayer.DataLayer;
+import dk.aau.cs.petrinet.trace.TAPNTrace;
 
 public class TraceTransformer {
 	private final DataLayer model;

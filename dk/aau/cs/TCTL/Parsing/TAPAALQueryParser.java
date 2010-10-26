@@ -3,7 +3,6 @@
 import goldengine.java.GOLDParser;
 import goldengine.java.GPMessageConstants;
 import goldengine.java.ParserException;
-import goldengine.java.Reduction;
 import goldengine.java.Token;
 
 import java.io.File;
@@ -12,10 +11,6 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Stack;
-
-import javax.swing.JOptionPane;
-
-import pipe.gui.CreateGui;
 
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;

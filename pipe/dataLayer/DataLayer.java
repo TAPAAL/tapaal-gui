@@ -3119,4 +3119,16 @@ implements Cloneable {
 		return isDegree2;
 
 	}
+
+
+	public void redrawVisibleTokenLists() {
+		for (Place place : placesArray) {
+			if(place instanceof TimedPlace){
+				TimedPlace tp = (TimedPlace)place;
+				if(tp.isAgeOfTokensShown()){
+					tp.showAgeOfTokens(true);
+				}
+			}
+		}
+	}
 }
