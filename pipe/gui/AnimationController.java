@@ -131,30 +131,11 @@ public class AnimationController extends JPanel {
 
 		JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-		String[] firermodes = { "Random", "Oldest", "Youngest", "Manual" };
-
-		// TODO - set current fire mode
-
 		label = new JLabel("Token selection method: ");
 
-		firermodebox = new JComboBox(firermodes);
-
-		int o=0;
-		boolean found=false;
-
-		for (String s : firermodes){
-			if (CreateGui.getAnimator().getFiringmode().getName().equals(s)){
-				found=true;
-				break;
-			}
-			o++;
-		}
-
-		if (found){
-			firermodebox.setSelectedIndex(o);
-		} else {
-			firermodebox.setSelectedIndex(0);
-		}
+		firermodebox = new JComboBox(FIRINGMODES);
+		updateFiringModeComboBox();
+		
 
 		firermodebox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -246,6 +227,11 @@ public class AnimationController extends JPanel {
 		animationToolBar.add(timedelayPanel);		      
 	}
 	
+	public void updateFiringModeComboBox() {
+		String currentFiringMode = CreateGui.getAnimator().getFiringmode().getName();
+		firermodebox.setSelectedItem(currentFiringMode);
+	}
+
 	public void addTimeDelayToHistory(BigDecimal delay){
 		AnimationHistory animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
@@ -423,4 +409,5 @@ public class AnimationController extends JPanel {
 	   
 	   JTextField TimeDelayField = new JTextField();
 	   JComboBox firermodebox = null;
+	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 }

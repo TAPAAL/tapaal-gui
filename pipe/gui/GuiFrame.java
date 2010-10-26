@@ -1213,6 +1213,7 @@ EOC */
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			CreateGui.addAnimationHistory();
 			CreateGui.addAnimationControler();
+			CreateGui.getAnimator().setFiringmode("Random");
 
 			
 			setEditionAllowed(false);

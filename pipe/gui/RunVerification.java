@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNTrace;
+import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -35,9 +36,9 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	private void showAnimationMode() {
-		CreateGui.getApp().setAnimationMode(true);
-		CreateGui.getApp().setMode(Pipe.START);
-        CreateGui.getView().getSelectionObject().clearSelection();
-		CreateGui.getAnimator().resethistory();
+		CreateGui.getApp().setGUIMode(GUIMode.animation);
+//		CreateGui.getApp().setMode(Pipe.START);
+//        CreateGui.getView().getSelectionObject().clearSelection();
+//		CreateGui.getAnimator().resethistory();
 	}
 }

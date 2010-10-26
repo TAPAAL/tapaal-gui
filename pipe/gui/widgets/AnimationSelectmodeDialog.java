@@ -38,8 +38,12 @@ public class AnimationSelectmodeDialog extends JPanel{
 	private JPanel namePanel;
 
 	private JButton okButton;
-
-
+	private boolean cancelled = true;
+	
+	public boolean cancelled(){
+		return cancelled;
+	}
+	
 	public AnimationSelectmodeDialog(Transition t){
 
 		setLayout(new GridBagLayout());
@@ -91,17 +95,13 @@ public class AnimationSelectmodeDialog extends JPanel{
 		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-
+				cancelled = false;
 				exit(); 
-
 			}
 		});
 
 
 		add(okButton,c);
-
-
-
 	}
 	private JPanel createDropDownForArc(Arc a) {
 		JPanel presetPanel;

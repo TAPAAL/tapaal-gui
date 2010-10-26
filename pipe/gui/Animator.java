@@ -109,7 +109,8 @@ public class Animator {
 			String transitionName = action instanceof ColoredDiscreteFiringAction ? ((ColoredDiscreteFiringAction)action).getTransition().getName() : ((DiscreetFiringAction)action).getTransition().getName();
 			untimedAnimationHistory.addHistoryItemDontChange(transitionName);
 		}
-		
+		setFiringmode("Manual");
+
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				"The verification process returned an untimed trace.\n\n"+
 				"This means that with appropriate time delays the displayed\n"+
@@ -614,6 +615,7 @@ public class Animator {
 			System.err.println("Iligal firing mode mode: " + t + " not found.");
 		}
 
+		CreateGui.animControlerBox.updateFiringModeComboBox();
 	}
 
 	public interface Firingmode {
@@ -725,7 +727,7 @@ public class Animator {
 		}
 
 		public String getName() {
-			return "Select";
+			return "Manual";
 		}
 
 		public ColoredToken fire(List<ColoredToken> tokens) {
@@ -737,7 +739,7 @@ public class Animator {
 	}
 
 
-	public void showSelectSimulatorDialogue(Transition t){
+	public boolean showSelectSimulatorDialogue(Transition t){
 		EscapableDialog guiDialog = 
 			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
 
@@ -759,35 +761,14 @@ public class Animator {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 
-		// Update the animator
-
-
-		if (firingmode instanceof SelectFiringmode){
-
+		if(!animationSelectmodeDialog.cancelled()){
 			ArrayList<Integer> intlist = new ArrayList<Integer>();
-
 			for (JComboBox jb : animationSelectmodeDialog.presetPanels){
-
 				intlist.add(jb.getSelectedIndex());
-
 			}
-
 			((SelectFiringmode)firingmode).setTokensToFire(intlist);
-
-		}else {
-			Logger.log("ATTTHHHHTHHTHTH HOW CAN THIS FUNCTINO BE CALLED WHEN NOT IN SELECT FIRING MODE??");
-			assert false;
 		}
-
-
-		/*String[] toReturn = new String[5];*/
-		/*toReturn[0] = animationSelectmodeDialog.getQueryComment();
-			toReturn[1] = "" + animationSelectmodeDialog.getCapacity();
-			toReturn[2] = animationSelectmodeDialog.getQuery();
-			toReturn[3] = animationSelectmodeDialog.getTraceOptions();
-			toReturn[4] = animationSelectmodeDialog.getSearchOptions();*/
-
-		//return toReturn;
+		
+		return !animationSelectmodeDialog.cancelled();
 	}
-
 }
