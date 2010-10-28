@@ -1237,7 +1237,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 <value>11</value>
 </capacity>
 <query>
-<value>E&lt;&gt;(( Sender_A == 1 ) &amp;&amp; ( Receiver_B == 1 )) || (( Sender_A == 1 ) &amp;&amp; ( Receiver_C == 1 )) || (( Sender_C == 1 ) &amp;&amp; ( Receiver_A == 1 )) || (( Sender_C == 1 ) &amp;&amp; ( Receiver_D == 1 ))</value>
+<value>E&lt;&gt;( Sender_A == 1  &amp;&amp; Receiver_B == 1) || ( Sender_A == 1 &amp;&amp; Receiver_C == 1 ) || ( Sender_C == 1 &amp;&amp; Receiver_A == 1 ) || ( Sender_C == 1  &amp;&amp; Receiver_D == 1 )</value>
 </query>
 </queries>
 </net>

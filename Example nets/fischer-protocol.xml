@@ -1388,7 +1388,7 @@ of processes.
 <value>0</value>
 </capacity>
 <query>
-<value>E&lt;&gt;(( CS &gt;= 2 )) || (( CS_ &gt;= 2 )) || (( CS &gt;= 1 ) &amp;&amp; ( CS_ &gt;= 1 ))</value>
+<value>E&lt;&gt;( CS &gt;= 2 || CS_ &gt;= 2 || ( CS &gt;= 1 &amp;&amp; CS_ &gt;= 1 ))</value>
 </query>
 </queries>
 </net>

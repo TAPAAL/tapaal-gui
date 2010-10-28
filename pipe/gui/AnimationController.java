@@ -131,7 +131,7 @@ public class AnimationController extends JPanel {
 
 		JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-		label = new JLabel("Token selection method: ");
+		label = new JLabel("Token selection mode: ");
 
 		firermodebox = new JComboBox(FIRINGMODES);
 		updateFiringModeComboBox();

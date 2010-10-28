@@ -1140,7 +1140,7 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 <value>2</value>
 </capacity>
 <query>
-<value>E&lt;&gt;(( Work_Done == 1 ))</value>
+<value>E&lt;&gt;( Work_Done == 1 )</value>
 </query>
 </queries>
 </net>

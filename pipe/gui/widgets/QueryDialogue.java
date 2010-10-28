@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -831,7 +832,7 @@ public class QueryDialogue extends JPanel{
 		doc.setParagraphAttributes(0, 0, standard, true);
 
 
-
+		queryField.setBackground(Color.white);
 		queryField.setText(newProperty.toString());
 		queryField.setEditable(false);
 

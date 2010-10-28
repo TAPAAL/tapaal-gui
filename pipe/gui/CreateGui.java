@@ -83,7 +83,7 @@ public class CreateGui {
 
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		leftPane.setPreferredSize(new Dimension(258, 100)); // height is ignored because the component is stretched
+		leftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		leftPane.setMinimumSize(new Dimension(175,100));
 		createLeftPane();
 		pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
