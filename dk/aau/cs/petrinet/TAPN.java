@@ -341,11 +341,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 	
 	public TAPN convertToDegree2(String method) throws Exception{
 	
-		//TODO - check that net is concervatative
-		if (method.equals("capacity")){
-			degree2converter = new CapacityDegree2Converter();
-			return convertToDegree2();
-		} else if (method.equals("minimal")){
+		if (method.equals("minimal")){
 			degree2converter = new degree2minimal();
 			return convertToDegree2();
 		}else {
@@ -366,11 +362,6 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 			}
 		}
 		return null;
-	}
-
-	public TAPN convertToDegree2capacity() throws Exception {
-		
-		return convertToDegree2("capacity");
 	}
 
 	public void orderPresetRescrition() {

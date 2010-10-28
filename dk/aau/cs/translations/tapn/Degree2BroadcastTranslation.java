@@ -180,11 +180,11 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		}
 
 		for(TAPNTransition t : originalModel.getTransitions()){
-			//if(!t.isDegree2() || t.hasInhibitorArcs()){
+			if(!t.isDegree2() || t.hasInhibitorArcs()){
 				builder.append("broadcast chan ");
 				builder.append(String.format(TEST_CHANNEL, t.getName(),""));
 				builder.append(";\n");
-			//}
+			}
 		}		
 
 		for(int i = 0; i < largestPresetSize; i++){
@@ -289,7 +289,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		}	
 
 		for(TAPNTransition transition : originalModel.getTransitions()){
-			//if(!transition.isDegree2() || transition.hasInhibitorArcs()){
+			if(!transition.isDegree2() || transition.hasInhibitorArcs()){
 				Location ptest = new Location("",createInvariantForControl(transition));
 				ptest.setCommitted(true);
 				control.addLocation(ptest);
@@ -317,7 +317,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					control.addTransition(second);
 				}
 			}
-		//}
+		}
 	}
 
 	private void createInitialLocationsForControlAutomaton(
@@ -512,7 +512,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			int size = transition.getPreset().size() + transition.getInhibitorArcs().size();
 			if(size > largestPresetSize) largestPresetSize = size;
 
-			//if(!transition.isDegree2() || transition.hasInhibitorArcs()){
+			if(!transition.isDegree2() || transition.hasInhibitorArcs()){
 				int i = 0;
 				for(Arc arc : transition.getPreset()){
 					String source = arc.getSource().getName();
@@ -552,7 +552,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 					ta.addTransition(e);
 					i++;
 				}
-			//}
+			}
 		}
 	}
 

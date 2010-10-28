@@ -20,6 +20,7 @@ import dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastKBoundOptimizationTransformer;
 import dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
+import dk.aau.cs.translations.tapn.Degree2BroadcastKBoundOptimizeTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardNamingScheme;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
@@ -27,8 +28,6 @@ import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardNamingScheme;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
-import dk.aau.cs.translations.tapn.TAPNToNTASymmetryKBoundOptimizeTransformer;
-import dk.aau.cs.translations.tapn.TAPNToNTASymmetryTransformer;
 
 public class UppaalExporter {
 	public ExportedModel export(ColoredTimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){
@@ -94,7 +93,7 @@ public class UppaalExporter {
 				return null;
 			}
 
-		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY){
+		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS){
 			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
 				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
@@ -141,23 +140,8 @@ public class UppaalExporter {
 				e.printStackTrace();
 				return null;
 			}
-		}else if(reduction == ReductionOption.KBOUNDANALYSIS){
-			TAPNToNTASymmetryTransformer transformer = new TAPNToNTASymmetryTransformer(extraTokens);
-
-			try{
-				dk.aau.cs.TA.NTA nta = transformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-				return null;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
 		} else if(reduction == ReductionOption.KBOUNDOPTMIZATION){
-			TAPNToNTASymmetryTransformer transformer = new TAPNToNTASymmetryKBoundOptimizeTransformer(extraTokens);
+			Degree2BroadcastKBoundOptimizeTranslation transformer = new Degree2BroadcastKBoundOptimizeTranslation(extraTokens);
 
 			try{
 				dk.aau.cs.TA.NTA nta = transformer.transformModel(model);
