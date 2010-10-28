@@ -177,7 +177,7 @@ implements ActionListener, Observer {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setSize(screenSize.width * 80/100, screenSize.height  * 80/100);
 		this.setLocationRelativeTo(null);
-		this.setMinimumSize(new Dimension(640,480));
+		this.setMinimumSize(new Dimension(825,480));
 
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

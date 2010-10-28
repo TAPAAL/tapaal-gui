@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,6 +83,8 @@ public class CreateGui {
 
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+		leftPane.setPreferredSize(new Dimension(258, 100)); // height is ignored because the component is stretched
+		leftPane.setMinimumSize(new Dimension(175,100));
 		createLeftPane();
 		pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
 		
@@ -482,14 +485,6 @@ public class CreateGui {
 	}
 
 	public static void updateLeftPanel() {
-
-		//	   if (queries.getBounds().height > getView().getBounds().height -50){
-		//		   leftBottomPanel = null;
-		//	   }else {
-		//		   if (leftBottomPanel == null){
-		//			   leftBottomPanel = new JPanel();
-		//		   }
-		//	   }
 		leftPane.validate();
 	}
 
@@ -497,25 +492,4 @@ public class CreateGui {
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size()-1);
 	}
-
-
-
-
-
-	//   public static BigDecimal newBigDecimal(Long i) {
-	//	   DecimalFormat df = new DecimalFormat();
-	//	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
-	//	   df.setRoundingMode(RoundingMode.DOWN);
-	//	   String toReturnFrom = df.format(i);
-	//	   return new BigDecimal(toReturnFrom, new MathContext(Pipe.AGE_PRECISION));
-	//   }
-
-
-	//   public static BigDecimal newBigDecimal(String i) {
-	////	   DecimalFormat df = new DecimalFormat();
-	////	   df.setMaximumFractionDigits(Pipe.AGE_PRECISION);
-	////	   df.setRoundingMode(RoundingMode.DOWN);
-	////	   String toReturnFrom = df.format(i);
-	//	   return new BigDecimal(i, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
-	//   }
 }
