@@ -14,6 +14,7 @@ import dk.aau.cs.petrinet.TAPNPlace;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.Transition;
+import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.translations.UppaalTransformer;
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
 All rights reserved.
@@ -35,7 +36,8 @@ public class StandardSymmetryTranslation implements UppaalTransformer {
 		
 		try {
 			model.convertToConservative();
-			TAPN model2 = model.convertToDegree2("naive");
+			NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
+			TAPN model2 = deg2Converter.transform(model);
 			return model2;
 		} catch (Exception e) {
 			System.err.println("There was an error in making the net conservative");

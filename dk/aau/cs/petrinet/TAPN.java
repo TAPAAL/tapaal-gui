@@ -7,11 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import dk.aau.cs.petrinet.degree2converters.CapacityDegree2Converter;
-import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
-import dk.aau.cs.petrinet.degree2converters.OptimizedInhibitorToPrioritiesDegree2Converter;
-import dk.aau.cs.petrinet.degree2converters.degree2minimal;
-
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
 All rights reserved.
 
@@ -39,9 +34,6 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 
 	public HashMap<PlaceTransitionObject, Location> locations = new HashMap<PlaceTransitionObject, Location>(); 
 
-	
-	private Degree2Converter degree2converter = new NaiveDegree2Converter();
-		
 	
 	public boolean isDegree2(){
 		boolean isDegree2=true;
@@ -326,35 +318,7 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		}
 
 	}
-	
-	
-	
-	public TAPN convertToDegree2() throws Exception{
-		
-		if(inhibitorArcs.size() > 0){
-			degree2converter = new OptimizedInhibitorToPrioritiesDegree2Converter();
-		}
-		return degree2converter.transform(this);
-		
-	}
-	
-	
-	public TAPN convertToDegree2(String method) throws Exception{
-	
-		if (method.equals("minimal")){
-			degree2converter = new degree2minimal();
-			return convertToDegree2();
-		}else {
-			degree2converter = new NaiveDegree2Converter();
-			return convertToDegree2();
-		}
-		
-	}		
-	
-
-
-	
-	
+			
 	public TAPNPlace getPlaceByName(String string) {
 		for (TAPNPlace p : places){
 			if (p.name.equals(string)){

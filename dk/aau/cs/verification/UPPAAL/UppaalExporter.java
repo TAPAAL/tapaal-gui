@@ -11,6 +11,7 @@ import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;
+import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.QueryTranslator;
@@ -165,7 +166,8 @@ public class UppaalExporter {
 			}
 
 			try {
-				model = ((TAPN)model).convertToDegree2();
+				NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
+				model = deg2Converter.transform((TAPN)model);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				return null;

@@ -6,6 +6,7 @@ import dk.aau.cs.petrinet.TAPNTransition;
 import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
+// TODO: Merge this (and base type) into InhibDegree2Converter since this is the only place it's used
 public class OptimizedInhibitorToPrioritiesDegree2Converter extends
 		InhibitorToPrioritiesDegree2Converter {
 	@Override

@@ -42,6 +42,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
+import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
@@ -383,7 +384,8 @@ public class Export {
 			}
 
 			try {
-				model = model.convertToDegree2();
+				NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
+				model = deg2Converter.transform(model);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

@@ -30,7 +30,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 public class NaiveDegree2Converter implements Degree2Converter {
 
 	public TAPN transform(TAPN model) throws Exception {
-
+		if(model.getInhibitorArcs().size() > 0) throw new Exception("Inhibitor arcs are not supported in this converter.");
 		HashMap<TAPNPlace, TAPNPlace> oldToNewPlacesMap = new HashMap<TAPNPlace, TAPNPlace>();
 
 		TAPN toReturn = new TAPN();

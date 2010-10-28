@@ -160,7 +160,6 @@ public class QueryDialogue extends JPanel{
 	private StringPosition currentSelection = null;
 
 	private DataLayer datalayer;
-	private EscapableDialog me;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 
@@ -174,7 +173,6 @@ public class QueryDialogue extends JPanel{
 	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
 
 		this.datalayer = datalayer;
-		this.me = me;
 		this.newProperty = queryToCreateFrom==null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		setLayout(new GridBagLayout());
