@@ -73,6 +73,16 @@ public class UndoManager {
       }
    }
    
+   public void setUndoRedoStatus(){
+	   
+	   boolean canRedo = (undoneEdits!=0);
+	   app.setRedoActionEnabled(canRedo);
+       
+	   boolean canUndo = sizeOfBuffer!=0;
+	   app.setUndoActionEnabled(canUndo);
+	   
+   }
+   
    
    public void undo() {
 

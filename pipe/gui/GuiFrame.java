@@ -660,8 +660,9 @@ EOC */
 			stepforwardAction.setEnabled(false);
 			
 			deleteAction.setEnabled(true);
-			undoAction.setEnabled(true);
-			redoAction.setEnabled(true);
+			
+			//Undo/Redo is enabled based on undo/redo manager
+			appView.getUndoManager().setUndoRedoStatus();
 
 			break;
 
