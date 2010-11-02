@@ -17,6 +17,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 
@@ -29,6 +30,7 @@ public class NewTAPNPanel extends JPanel {
 	private JRootPane rootPane;
 	private JRadioButton coloredTAPNRadioButton;
 	private JRadioButton standardTAPNRadioButton;
+	private JRadioButton untimedRadioButton;
 	private GuiFrame frame;
 	private JTextField nameTextBox;
 	
@@ -56,8 +58,15 @@ public class NewTAPNPanel extends JPanel {
 		
 		okButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
+				NetType type = NetType.TAPN;
+				if(coloredTAPNRadioButton.isSelected()){
+					type = NetType.COLORED;
+				}else if(untimedRadioButton.isSelected()){
+					type = NetType.UNTIMED;
+				}
+				
 				createNewTAPNBasedOnSelection(nameTextBox.getText(),
-						coloredTAPNRadioButton.isSelected());
+						type);
 			}
 		});
 		
@@ -98,7 +107,7 @@ public class NewTAPNPanel extends JPanel {
 		rootPane.getParent().setVisible(false);
 	}
 
-	protected void createNewTAPNBasedOnSelection(String name, boolean colored) {
+	protected void createNewTAPNBasedOnSelection(String name, NetType type) {
 		if (!name.endsWith(".xml")){
 			name = name + ".xml";
 		}
@@ -122,7 +131,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 		
 		frame.incrementNameCounter();
-		CreateGui.getModel().setUseColors(colored);
+		CreateGui.getModel().setNetType(type);
 		exit();
 	}
 
@@ -153,10 +162,18 @@ public class NewTAPNPanel extends JPanel {
 		
 		JPanel choice = new JPanel(new GridBagLayout());
 		
-		standardTAPNRadioButton = new JRadioButton("TAPN");
-		standardTAPNRadioButton.setSelected(true);
+		untimedRadioButton = new JRadioButton("Petri Net");
+		untimedRadioButton.setSelected(true);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(3,3,3,3);
+		choice.add(untimedRadioButton, gbc);
+		
+		standardTAPNRadioButton = new JRadioButton("Timed-Arc Petri Net (TAPN)");
+		standardTAPNRadioButton.setSelected(true);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(3,3,3,3);
 		choice.add(standardTAPNRadioButton, gbc);
@@ -164,16 +181,17 @@ public class NewTAPNPanel extends JPanel {
 		coloredTAPNRadioButton = new JRadioButton("Colored TAPN");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(3,3,3,3);
-		choice.add(coloredTAPNRadioButton, gbc);
+		//choice.add(coloredTAPNRadioButton, gbc);
 		
 		
 		
 		ButtonGroup btnGroup = new ButtonGroup();
 		btnGroup.add(coloredTAPNRadioButton);
 		btnGroup.add(standardTAPNRadioButton);
+		btnGroup.add(untimedRadioButton);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;

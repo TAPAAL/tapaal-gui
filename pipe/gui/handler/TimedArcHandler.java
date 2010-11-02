@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
+import pipe.dataLayer.NetType;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TransportArc;
 import pipe.gui.CreateGui;
@@ -28,19 +29,20 @@ public class TimedArcHandler extends ArcHandler{
 		JPopupMenu popup = super.getPopup(e);
 
 		if (myObject instanceof TimedArc && ! (myObject instanceof TransportArc) ){
-			
-			menuItem = new JMenuItem("Properties");      
-			menuItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e) {
-					((TimedArc)myObject).showTimeIntervalEditor();
-				}
-			}); 
-			popup.insert(menuItem, popupIndex++);
-/*
+			if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
+				menuItem = new JMenuItem("Properties");      
+				menuItem.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e) {
+						((TimedArc)myObject).showTimeIntervalEditor();
+					}
+				}); 
+				popup.insert(menuItem, popupIndex++);
+			} 
+			/*
 			menuItem = new JMenuItem(new EditTimeIntervalAction(contentPane, (Arc)myObject));
 			menuItem.setText("Edit Time Interval");
 			popup.insert(menuItem, popupIndex++);
-*/
+			 */
 			menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, e.getPoint()));            
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
@@ -66,7 +68,7 @@ public class TimedArcHandler extends ArcHandler{
 							arc.getArcPath().insertPoint(
 									new Point2D.Float(arc.getX() + e.getX(), 
 											arc.getY() + e.getY()), e.isAltDown()));
-				}else{
+				}else if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
 					((TimedArc)myObject).showTimeIntervalEditor();
 				}
 			}else{

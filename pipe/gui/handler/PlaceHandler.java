@@ -11,6 +11,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.colors.ColoredTimedPlace;
@@ -211,17 +212,19 @@ extends PlaceTransitionObjectHandler {
 	}
 	@Override
 	public void mouseEntered(MouseEvent e){
-		if ((myObject instanceof TimedPlace) && !isDragging){//&& CreateGui.getView().isInAnimationMode()){		   
-			if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
-				((TimedPlace) myObject).showAgeOfTokens(true);
+		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
+			if ((myObject instanceof TimedPlace) && !isDragging){//&& CreateGui.getView().isInAnimationMode()){		   
+				if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
+					((TimedPlace) myObject).showAgeOfTokens(true);
+				}
 			}
 		}
-		
+
 		if(isDragging){
 			((TimedPlace) myObject).showAgeOfTokens(false);
 		}
 	}
-	
+
 	@Override
 	public void mouseExited(MouseEvent e){
 		if ((myObject instanceof TimedPlace)){// && CreateGui.getView().isInAnimationMode()){
@@ -239,5 +242,6 @@ extends PlaceTransitionObjectHandler {
 		}else{
 			//do nothing except the things that one do in the simulator (handled somewhere else).
 		}
+
 	}
 }

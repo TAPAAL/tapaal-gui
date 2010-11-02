@@ -32,7 +32,7 @@ import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.undo.TimedPlaceTokenEdit;
 import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.TimedPlaceEditorPanel;
+import pipe.gui.widgets.PlaceEditorPanel;
 
 public class TimedPlace extends Place {
 
@@ -514,7 +514,7 @@ public class TimedPlace extends Place {
 		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.PAGE_AXIS));      
 
 		// 2 Add Place editor
-		contentPane.add( new TimedPlaceEditorPanel(guiDialog.getRootPane(), 
+		contentPane.add( new PlaceEditorPanel(guiDialog.getRootPane(), 
 				this, CreateGui.getModel(), CreateGui.getView()));
 
 		guiDialog.setResizable(false);     

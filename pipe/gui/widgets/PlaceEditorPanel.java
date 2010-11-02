@@ -41,6 +41,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.dataLayer.colors.ColorSet;
@@ -59,7 +60,7 @@ import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
  *
  * @author  pere
  */
-public class TimedPlaceEditorPanel 
+public class PlaceEditorPanel 
 extends javax.swing.JPanel {
 
 	/**
@@ -79,7 +80,7 @@ extends javax.swing.JPanel {
 	/**
 	 * Creates new form PlaceEditor
 	 */
-	public TimedPlaceEditorPanel(JRootPane _rootPane, TimedPlace _place, 
+	public PlaceEditorPanel(JRootPane _rootPane, TimedPlace _place, 
 			DataLayer _pnmlData, GuiView _view) {
 		place = _place;
 		pnmlData = _pnmlData;
@@ -123,7 +124,7 @@ extends javax.swing.JPanel {
 		//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
 		placeEditorPanel.add(basicPropertiesPanel, gridBagConstraints);
 
-		if(pnmlData.isUsingColors()){
+		if(pnmlData.netType().equals(NetType.COLORED)){
 			initColoredTimeInvariantPanel();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -151,7 +152,7 @@ extends javax.swing.JPanel {
 			gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 			//gridBagConstraints.insets = new Insets(0,0,0,5);
 			placeEditorPanel.add(tokenPanel, gridBagConstraints);
-		}else{
+		}else if(pnmlData.netType().equals(NetType.TAPN)){
 			initTimeInvariantPanel();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -374,7 +375,7 @@ extends javax.swing.JPanel {
 
 		okButton = new javax.swing.JButton();
 		okButton.setText("OK");
-		
+
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				okButtonHandler(evt);
@@ -472,18 +473,21 @@ extends javax.swing.JPanel {
 			basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
 		}
 
-		attributesCheckBox = new javax.swing.JCheckBox();
-		attributesCheckBox.setSelected(place.getAttributesVisible());
-		attributesCheckBox.setText("Show place attributes");
-		attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
+
+		if(!pnmlData.netType().equals(NetType.UNTIMED)){
+			attributesCheckBox = new javax.swing.JCheckBox();
+			attributesCheckBox.setSelected(place.getAttributesVisible());
+			attributesCheckBox.setText("Show place attributes");
+			attributesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+			attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = 3;
+			gridBagConstraints.gridwidth = 2;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+			basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
+		}
 	}
 
 	private void initColorInvariantPanel() {
@@ -911,7 +915,7 @@ extends javax.swing.JPanel {
 
 			UndoableEdit edit = coloredTimedPlace.setColoredTokens(tokens);
 			view.getUndoManager().addEdit(edit);
-		}else{
+		}else if(pnmlData.netType().equals(NetType.TAPN)){
 			boolean isNormalInvariant = normalInvRadioButton.isSelected();
 			String newInvariant = "";
 
@@ -937,7 +941,7 @@ extends javax.swing.JPanel {
 
 		}
 
-		if (attributesVisible != attributesCheckBox.isSelected()){
+		if (attributesCheckBox != null && attributesVisible != attributesCheckBox.isSelected()){
 			place.toggleAttributesVisible();
 		}    
 		place.repaint();
@@ -952,9 +956,9 @@ extends javax.swing.JPanel {
 			IntOrConstant scale = new IntOrConstant(invScaleTextbox.getText());
 			IntOrConstant offset = new IntOrConstant(invOffsetTextbox.getText());
 			String operator = (String)invRelationNormal.getSelectedItem();
-			
+
 			if(scale.getValue() == 0 && offset.getValue() == 0 && operator.equals("<")) throw new IllegalArgumentException();
-			
+
 			return new ColoredTimeInvariant(operator, 
 					new IntervalBound(scale, offset));
 		}else{

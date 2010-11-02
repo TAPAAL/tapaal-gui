@@ -149,7 +149,7 @@ implements Cloneable {
 
 	private ArrayList<TAPNQuery> queries = null;
 	private ConstantStore constants = new ConstantStore();
-	private boolean useColors = true;
+	private NetType type = NetType.TAPN;
 
 	private HashMap<ColoredTimedPlace, List<ColoredToken>> coloredPlaceMarkingStorageMap;
 
@@ -166,10 +166,8 @@ implements Cloneable {
 		pnmlName = temp.getName();
 		createFromPNML(transform.transformPNML(pnmlFileName));
 		transportArcMap = new HashMap<Transition, HashMap<TransportArc,TransportArc> >();
-
 	}  
-
-
+	
 	/**
 	 * Create Petri-Net object from pnmlFile
 	 * @param pnmlFile PNML File
@@ -2315,7 +2313,7 @@ implements Cloneable {
 	public void createFromPNML(Document PNMLDoc, boolean colors)	{
 		// XXX - kyrke debug
 		emptyPNML();
-		this.useColors = colors;
+		if(colors) this.setNetType(NetType.COLORED);
 		Node node = null;
 		NodeList nodeList = null;
 
@@ -3065,14 +3063,16 @@ implements Cloneable {
 		return false;
 	}
 
-
-	public void setUseColors(boolean useColors) {
-		this.useColors = useColors;
-	}
-
-
 	public boolean isUsingColors() {
-		return useColors;
+		return type.equals(NetType.COLORED);
+	}
+		
+	public NetType netType(){
+		return type;
+	}
+	
+	public void setNetType(NetType type) {
+		this.type = type;
 	}
 
 

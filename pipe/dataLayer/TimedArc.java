@@ -77,9 +77,11 @@ public class TimedArc extends NormalArc{
 	//hacks - I use the weight to display the TimeInterval
 	@Override
 	public void updateWeightLabel(){   
-		weightLabel.setText(timeInterval);
+		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
+			weightLabel.setText(timeInterval);
 
-		this.setWeightLabelPosition();
+			this.setWeightLabelPosition();	
+		}
 	}
 	
 	

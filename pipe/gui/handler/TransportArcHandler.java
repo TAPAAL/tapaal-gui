@@ -29,7 +29,7 @@ public class TransportArcHandler extends TimedArcHandler {
 		if (myObject instanceof TransportArc){
 		//	if ( ! ( ((TimedArc) myObject).getSource() instanceof Transition) ){
 				final TransportArc tarc = (TransportArc)myObject;
-				
+
 				menuItem = new JMenuItem("Properties");      
 				menuItem.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e) {
