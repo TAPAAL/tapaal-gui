@@ -33,6 +33,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -168,6 +170,7 @@ public class QueryDialogue extends JPanel{
 	private String name_NAIVE = "Standard";
 	private String name_BROADCAST = "Broadcast Reduction";
 	private String name_BROADCASTDEG2 = "Broadcast Degree 2 Reduction";
+	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
 
@@ -282,7 +285,7 @@ public class QueryDialogue extends JPanel{
 		}
 		return toReturn;
 	}
-	
+
 	private void refreshTraceOptions() {
 		if(symmetryReduction.isSelected())
 		{
@@ -318,7 +321,7 @@ public class QueryDialogue extends JPanel{
 			return "";
 		}
 	}
-	
+
 	private void enableColorsReductionOptions() {
 		String[] options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
 
@@ -461,31 +464,13 @@ public class QueryDialogue extends JPanel{
 			disableAllQueryButtons();
 		}
 
-		if(currentSelection.getObject() instanceof TCTLAtomicPropositionNode)
-		{
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)currentSelection.getObject();
-			placesBox.setSelectedItem(node.getPlace());
-			relationalOperatorBox.setSelectedItem(node.getOp());
-			placeMarking.setValue(node.getN());
-		}
-		else if(currentSelection.getObject() instanceof TCTLEFNode)
-		{
-			existsDiamond.setSelected(true);
-		}
-		else if(currentSelection.getObject() instanceof TCTLEGNode)
-		{
-			existsBox.setSelected(true);
-		}
-		else if(currentSelection.getObject() instanceof TCTLAGNode)
-		{
-			forAllBox.setSelected(true);
-		}
-		else if(currentSelection.getObject() instanceof TCTLAFNode)
-		{
-			forAllDiamond.setSelected(true);
-		}
+		updateQueryButtonsAccordingToSelection();
 
 	}
+
+
+
+	
 
 	// update selection based on some change to the query.
 	// If the query contains place holders we want to select 
@@ -513,38 +498,41 @@ public class QueryDialogue extends JPanel{
 		} else {
 			disableAllQueryButtons();
 		}
+		
+		updateQueryButtonsAccordingToSelection();
 	}
-
-
-//	// returns the position in the string of the new selection.
-//	// used when adding or changing stuff in the query
-//	// E.g. if selection is EF p < 2 then we want to select p < 2 to allow for speedier query construction.
-//	private StringPosition GetNewSelectionPosition(TCTLAbstractProperty newSelection) {
-//
-//		StringPosition position;
-//
-//
-//		if(newSelection instanceof TCTLEFNode){
-//			position = newProperty.indexOf(((TCTLEFNode)newSelection).getProperty());
-//		}
-//		else if(newSelection instanceof TCTLEGNode) {
-//			position = newProperty.indexOf(((TCTLEGNode)newSelection).getProperty());
-//		}
-//		else if(newSelection instanceof TCTLAFNode) {
-//			position = newProperty.indexOf(((TCTLAFNode)newSelection).getProperty());
-//		}
-//		else if(newSelection instanceof TCTLAGNode) {
-//			position = newProperty.indexOf(((TCTLAGNode)newSelection).getProperty());
-//		}
-//		else if(newSelection instanceof TCTLNotNode) {
-//			position = newProperty.indexOf(((TCTLNotNode)newSelection).getProperty());
-//		}
-//		else {
-//			position = newProperty.indexOf(newSelection);
-//		}
-//
-//		return position;
-//	}
+	
+	private void updateQueryButtonsAccordingToSelection() {
+		if(currentSelection.getObject() instanceof TCTLAtomicPropositionNode)
+		{
+			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)currentSelection.getObject();
+			
+			// bit of a hack to prevent posting edits when we programmatically
+			// change the selection in the atomic proposition nodes because a different
+			// atomic proposition was selected
+			userChangedAtomicPropSelection = false;
+			placesBox.setSelectedItem(node.getPlace());
+			relationalOperatorBox.setSelectedItem(node.getOp());
+			placeMarking.setValue(node.getN());
+			userChangedAtomicPropSelection = true;
+		}
+		else if(currentSelection.getObject() instanceof TCTLEFNode)
+		{
+			existsDiamond.setSelected(true);
+		}
+		else if(currentSelection.getObject() instanceof TCTLEGNode)
+		{
+			existsBox.setSelected(true);
+		}
+		else if(currentSelection.getObject() instanceof TCTLAGNode)
+		{
+			forAllBox.setSelected(true);
+		}
+		else if(currentSelection.getObject() instanceof TCTLAFNode)
+		{
+			forAllDiamond.setSelected(true);
+		}
+	}
 
 	// Delete current selection
 	private void deleteSelection() {
@@ -685,6 +673,18 @@ public class QueryDialogue extends JPanel{
 		setSaveButtonsEnabled();
 	}
 
+	private void updateQueryOnAtomicPropositionChange() {
+		if(currentSelection.getObject() instanceof TCTLAtomicPropositionNode){
+			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode((String)placesBox.getSelectedItem(), (String)relationalOperatorBox.getSelectedItem(), (Integer) placeMarking.getValue());
+			if(!property.equals(currentSelection.getObject())) {
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(), property);
+				updateSelection(property);
+				undoSupport.postEdit(edit);
+			}
+		}
+	}
+
 	///////////////////////////////////////////////////////////////////////
 	// Initialization of the dialogue
 	///////////////////////////////////////////////////////////////////////
@@ -706,10 +706,10 @@ public class QueryDialogue extends JPanel{
 		undoSupport = new UndoableEditSupport();
 		undoSupport.addUndoableEditListener(new UndoAdapter());
 		refreshUndoRedo();
-		
+
 		setEnabledReductionOptions();
 		refreshTraceOptions();
-		
+
 	}
 
 	private void initQueryNamePanel(final TAPNQuery queryToCreateFrom) {
@@ -1157,12 +1157,12 @@ public class QueryDialogue extends JPanel{
 			places[i] = datalayer.getPlaces()[i].getName();
 		}
 		placesBox = new JComboBox(new DefaultComboBoxModel(places));
-		
+
 		Dimension d = placesBox.getMaximumSize();		
 		d.width = 150;
 		placesBox.setMaximumSize(d);
 
-		
+
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -1212,6 +1212,43 @@ public class QueryDialogue extends JPanel{
 					}
 				}
 
+		);
+
+		placesBox.addActionListener(
+				new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(userChangedAtomicPropSelection) {
+							updateQueryOnAtomicPropositionChange();
+						}
+					}
+				}
+		);
+
+		relationalOperatorBox.addActionListener(
+				new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(userChangedAtomicPropSelection) {
+							updateQueryOnAtomicPropositionChange();
+						}
+						
+					}
+				}
+		);
+
+		placeMarking.addChangeListener(
+				new ChangeListener() {
+
+					@Override
+					public void stateChanged(ChangeEvent arg0) {
+						if(userChangedAtomicPropSelection) {
+							updateQueryOnAtomicPropositionChange();
+						}
+					}
+				}
 		);
 	}
 
@@ -1520,8 +1557,8 @@ public class QueryDialogue extends JPanel{
 
 
 			public void itemStateChanged(ItemEvent e) {
-					refreshTraceOptions();
-				}
+				refreshTraceOptions();
+			}
 		});
 
 		reductionOptionsPanel.add(symmetryReduction);
@@ -1587,7 +1624,7 @@ public class QueryDialogue extends JPanel{
 			reductionOption.setSelectedItem(reduction);
 			symmetryReduction.setSelected(symmetry);
 		}
-		
+
 	}
 
 	private void initButtonPanel(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
