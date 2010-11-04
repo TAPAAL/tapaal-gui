@@ -1692,7 +1692,7 @@ implements Cloneable {
 							p.removeTokenofAge(tokenToRemove);
 
 						}
-						else if (a instanceof TimedArc){
+						else if (a instanceof TimedArc && !(a instanceof TAPNInhibitorArc)){
 							//Select torken to remove based on firing mode
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
 

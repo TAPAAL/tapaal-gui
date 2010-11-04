@@ -22,6 +22,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
+import pipe.dataLayer.NetType;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.action.GuiAction;
 
@@ -36,13 +37,13 @@ import pipe.gui.action.GuiAction;
  */
 
 public class AnimationController extends JPanel {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
-	
+
 	class ToggleButton extends JToggleButton implements PropertyChangeListener {
 
 		/**
@@ -79,7 +80,7 @@ public class AnimationController extends JPanel {
 			toolBar.add(action);
 		}
 	}
-	
+
 	AnimateAction startAction, stepforwardAction, stepbackwardAction,
 	randomAction, randomAnimateAction, timeAction;
 
@@ -127,15 +128,9 @@ public class AnimationController extends JPanel {
 		c.gridy = 0;
 		add(label, c);
 
-
-
-		JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-		label = new JLabel("Token selection mode: ");
-
 		firermodebox = new JComboBox(FIRINGMODES);
 		updateFiringModeComboBox();
-		
+
 
 		firermodebox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -143,28 +138,11 @@ public class AnimationController extends JPanel {
 				CreateGui.getAnimator().setFiringmode(firermodebox.getSelectedItem().toString());
 			}
 		});
-		firemode.add(label);
-		firemode.add(firermodebox);
-
-
-
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 1;
-		add(firemode, c);
-
-
+		
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
 		addButton(animationToolBar, stepbackwardAction);
 		addButton(animationToolBar, stepforwardAction);
-
-		//addButton(animationToolBar, timeAction);
-
-		// kyrke - removed random firing until it works  
-		//addButton(animationToolBar, randomAction);
-		//addButton(animationToolBar, randomAnimateAction);
-
 
 		animationToolBar.setVisible(true);
 
@@ -172,61 +150,77 @@ public class AnimationController extends JPanel {
 		c.weightx = 0.5;
 		c.gridx = 0;
 		c.gridy = 2;
-		add(animationToolBar, c);
+		add(animationToolBar, c);    
+		
+		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
+			JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+			label = new JLabel("Token selection mode: ");
+
+			firemode.add(label);
+			firemode.add(firermodebox);
 
 
-		JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+			c.weightx = 0.5;
+			c.gridx = 0;
+			c.gridy = 1;
+			add(firemode, c);
+			
+
+			JPanel timedelayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 
-		okButton = new javax.swing.JButton();
+			okButton = new javax.swing.JButton();
 
-		okButton.setText("Time delay");
-		//okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		//okButton.setPreferredSize(new java.awt.Dimension(75, 25));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//okButtonHandler(evt);
-				addTimeDelayToHistory();
-			}
-		});
-
-		TimeDelayField.addKeyListener(new KeyListener(){
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER){
+			okButton.setText("Time delay");
+			//okButton.setMaximumSize(new java.awt.Dimension(75, 25));
+			okButton.setMinimumSize(new java.awt.Dimension(75, 25));
+			//okButton.setPreferredSize(new java.awt.Dimension(75, 25));
+			okButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					//okButtonHandler(evt);
 					addTimeDelayToHistory();
 				}
-			}
+			});
 
-			public void keyReleased(KeyEvent e) {
-				
+			TimeDelayField.addKeyListener(new KeyListener(){
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER){
+						addTimeDelayToHistory();
+					}
+				}
 
-			}
+				public void keyReleased(KeyEvent e) {
 
-			public void keyTyped(KeyEvent e) {
-				
-			}
 
-		});
-		
-		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		
-		TimeDelayField.setText(df.format(1f));
-		TimeDelayField.setColumns(5);
+				}
 
-		timedelayPanel.add(TimeDelayField);
-		timedelayPanel.add(okButton);
+				public void keyTyped(KeyEvent e) {
 
-		//		      c.fill = GridBagConstraints.HORIZONTAL;
-		//				c.weightx = 0.5;
-		//				c.gridx = 0;
-		//				c.gridy = 3;
-		//		      add(timedelayPanel, c);
-		animationToolBar.add(timedelayPanel);		      
+				}
+
+			});
+
+			DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+			df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+
+			TimeDelayField.setText(df.format(1f));
+			TimeDelayField.setColumns(5);
+
+			timedelayPanel.add(TimeDelayField);
+			timedelayPanel.add(okButton);
+
+			//		      c.fill = GridBagConstraints.HORIZONTAL;
+			//				c.weightx = 0.5;
+			//				c.gridx = 0;
+			//				c.gridy = 3;
+			//		      add(timedelayPanel, c);
+			animationToolBar.add(timedelayPanel);		
+		}  
 	}
-	
+
 	public void updateFiringModeComboBox() {
 		String currentFiringMode = CreateGui.getAnimator().getFiringmode().getName();
 		firermodebox.setSelectedItem(currentFiringMode);
@@ -236,11 +230,11 @@ public class AnimationController extends JPanel {
 		AnimationHistory animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
 		try {
-		
+
 			BigDecimal timeDelayToSet  =  delay;
-			
-			
-		//	BigDecimal timeDelayToSet = new BigDecimal(TimeDelayField.getText(), new MathContext(Pipe.AGE_PRECISION));
+
+
+			//	BigDecimal timeDelayToSet = new BigDecimal(TimeDelayField.getText(), new MathContext(Pipe.AGE_PRECISION));
 			if (timeDelayToSet.compareTo(new BigDecimal(0l))<=0){
 				//Nothing to do, illegal value 
 				System.err.println("Illegal value");
@@ -256,7 +250,7 @@ public class AnimationController extends JPanel {
 
 		setAnimationButtonsEnabled();
 	}
-	
+
 	private void addTimeDelayToHistory(){
 		AnimationHistory animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
@@ -267,18 +261,18 @@ public class AnimationController extends JPanel {
 			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			df.applyLocalizedPattern("#.#");
-			
+
 			DecimalFormat parser = new DecimalFormat();
 			parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-			
+
 			Number parseTime = parser.parse(TimeDelayField.getText()); // Parse the number localised
-																	   // Try parse
-		
+			// Try parse
+
 			BigDecimal timeDelayToSet  =  new BigDecimal(parseTime.toString(), new MathContext(Pipe.AGE_PRECISION));
-			
-			
-		//	BigDecimal timeDelayToSet = new BigDecimal(TimeDelayField.getText(), new MathContext(Pipe.AGE_PRECISION));
+
+
+			//	BigDecimal timeDelayToSet = new BigDecimal(TimeDelayField.getText(), new MathContext(Pipe.AGE_PRECISION));
 			if (timeDelayToSet.compareTo(new BigDecimal(0l))<=0){
 				//Nothing to do, illegal value 
 				System.err.println("Illegal value");
@@ -298,116 +292,116 @@ public class AnimationController extends JPanel {
 
 		setAnimationButtonsEnabled();
 	}
-	   
-	   class AnimateAction extends GuiAction {
 
-		      /**
+	class AnimateAction extends GuiAction {
+
+		/**
 		 * 
 		 */
 		private static final long serialVersionUID = -4066032248332540289L;
-			private int typeID;
-		      private AnimationHistory animBox;
+		private int typeID;
+		private AnimationHistory animBox;
 
 
-		      AnimateAction(String name, int typeID, String tooltip, String keystroke){
-		         super(name, tooltip, keystroke);
-		         this.typeID = typeID;
-		      }
+		AnimateAction(String name, int typeID, String tooltip, String keystroke){
+			super(name, tooltip, keystroke);
+			this.typeID = typeID;
+		}
 
-		      AnimateAction(String name, int typeID, String tooltip, String keystroke,
-		              boolean toggleable){
-		         super(name, tooltip, keystroke, toggleable);
-		         this.typeID = typeID;
-		      }
+		AnimateAction(String name, int typeID, String tooltip, String keystroke,
+				boolean toggleable){
+			super(name, tooltip, keystroke, toggleable);
+			this.typeID = typeID;
+		}
 
 
-		      public AnimateAction(String name, int typeID, String tooltip,
-					KeyStroke keyStroke) {
-			         super(name, tooltip, keyStroke);
-			         this.typeID = typeID;
+		public AnimateAction(String name, int typeID, String tooltip,
+				KeyStroke keyStroke) {
+			super(name, tooltip, keyStroke);
+			this.typeID = typeID;
+		}
+
+		public void actionPerformed(ActionEvent ae){
+
+			animBox = CreateGui.getAnimationHistory();
+
+			switch(typeID){
+			case Pipe.TIMEPASS:
+				animBox.clearStepsForward();
+				try {
+					CreateGui.getAnimator().letTimePass(new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
+				} catch (InvariantViolatedAnimationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				setAnimationButtonsEnabled();
+
+				break;
+
+			case Pipe.RANDOM:
+				animBox.clearStepsForward();
+				CreateGui.getAnimator().doRandomFiring();
+
+				setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.STEPFORWARD:
+				animBox.stepForward();
+				CreateGui.getAnimator().stepForward();
+				setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.STEPBACKWARD:
+				animBox.stepBackwards();
+				CreateGui.getAnimator().stepBack();
+				setAnimationButtonsEnabled();
+				break;
+
+			case Pipe.ANIMATE:
+				Animator a = CreateGui.getAnimator();
+				if (a.getNumberSequences() > 0) {
+					a.setNumberSequences(0); // stop animation
+					setSelected(false);
+				} else {
+					setAnimationButtonsEnabled();
+					randomAction.setEnabled(false);
+					setSelected(true);
+					animBox.clearStepsForward();
+					CreateGui.getAnimator().startRandomFiring();
+				}
+				break;
+
+			default:
+				break;
 			}
+		}
 
-			public void actionPerformed(ActionEvent ae){
-		         
-		         animBox = CreateGui.getAnimationHistory();
+	}
 
-		         switch(typeID){
-		            case Pipe.TIMEPASS:
-		            	animBox.clearStepsForward();
-		            	try {
-							CreateGui.getAnimator().letTimePass(new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
-						} catch (InvariantViolatedAnimationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-		            	
-						setAnimationButtonsEnabled();
-		            	
-		            	break;
-		            	
-		            case Pipe.RANDOM:
-		               animBox.clearStepsForward();
-		               CreateGui.getAnimator().doRandomFiring();
-		               
-		               setAnimationButtonsEnabled();
-		               break;
+	private void setEnabledStepbackwardAction(boolean b) {
+		stepbackwardAction.setEnabled(b);
 
-		            case Pipe.STEPFORWARD:
-		               animBox.stepForward();
-		               CreateGui.getAnimator().stepForward();
-		               setAnimationButtonsEnabled();
-		               break;
+	}
+	private void setEnabledStepforwardAction(boolean b) {
+		stepforwardAction.setEnabled(b);
 
-		            case Pipe.STEPBACKWARD:
-		               animBox.stepBackwards();
-		               CreateGui.getAnimator().stepBack();
-		               setAnimationButtonsEnabled();
-		               break;
+	}
 
-		            case Pipe.ANIMATE:
-		               Animator a = CreateGui.getAnimator();
-		               if (a.getNumberSequences() > 0) {
-		                  a.setNumberSequences(0); // stop animation
-		                  setSelected(false);
-		               } else {
-		            	  setAnimationButtonsEnabled();
-		                  randomAction.setEnabled(false);
-		                  setSelected(true);
-		                  animBox.clearStepsForward();
-		                  CreateGui.getAnimator().startRandomFiring();
-		               }
-		               break;
+	public void setAnimationButtonsEnabled(){
+		AnimationHistory animationHistory = CreateGui.getAnimationHistory();
 
-		            default:
-		               break;
-		         }
-		      }
+		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
+		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
 
-	   }
+		CreateGui.appGui.setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
+		CreateGui.appGui.setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
 
-	   private void setEnabledStepbackwardAction(boolean b) {
-		   stepbackwardAction.setEnabled(b);
+		//		   setEnabledStepforwardAction(false);
+		//		   setEnabledStepbackwardAction(false);
+	}
 
-	   }
-	   private void setEnabledStepforwardAction(boolean b) {
-		   stepforwardAction.setEnabled(b);
-
-	   }
-	   
-	   public void setAnimationButtonsEnabled(){
-		   AnimationHistory animationHistory = CreateGui.getAnimationHistory();
-
-		   setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
-		   setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
-
-		   CreateGui.appGui.setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
-		   CreateGui.appGui.setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
-		   
-//		   setEnabledStepforwardAction(false);
-//		   setEnabledStepbackwardAction(false);
-	   }
-	   
-	   JTextField TimeDelayField = new JTextField();
-	   JComboBox firermodebox = null;
+	JTextField TimeDelayField = new JTextField();
+	JComboBox firermodebox = null;
 	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 }
