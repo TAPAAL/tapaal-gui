@@ -16,6 +16,7 @@ import javax.swing.text.BadLocationException;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
@@ -44,7 +45,6 @@ public class CreateGui {
 	public static String imgPath, userPath; // useful for stuff
 
 	private static class TabData { // a structure for holding a tab's data
-
 		public DataLayer appModel;
 		public HashMap<PetriNetObject, String> oldGuards;
 		public GuiView appView;
@@ -462,7 +462,9 @@ public class CreateGui {
 	}
 
 	public static void createLeftPane(){
-		leftBottomPanel = new LeftConstantsPane();
+		DataLayer model = CreateGui.getModel();
+		boolean enableAddButton = model == null ? true : !model.netType().equals(NetType.UNTIMED);
+		leftBottomPanel = new LeftConstantsPane(enableAddButton);
 		queries = new LeftQueryPane(
 				getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
 		);

@@ -24,6 +24,7 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.undo.UndoableEdit;
@@ -44,8 +45,11 @@ public class LeftConstantsPane extends JPanel {
 	private JButton editBtn;
 	private JButton removeBtn;
 
-
 	public LeftConstantsPane(){
+		this(true);
+	}
+
+	public LeftConstantsPane(boolean enableAddButton){
 		constantsPanel = new JPanel(new BorderLayout());
 		addConstantPanel = new JPanel();
 
@@ -90,7 +94,7 @@ public class LeftConstantsPane extends JPanel {
 
 
 		addConstantsComponents();
-		addConstantsButtons();
+		addConstantsButtons(enableAddButton);
 
 		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, constantsPanel, addConstantPanel);
 		setLayout(new BorderLayout());
@@ -104,7 +108,7 @@ public class LeftConstantsPane extends JPanel {
 		showConstants();
 	}
 
-	private void addConstantsButtons() {
+	private void addConstantsButtons(boolean enableAddButton) {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
 		editBtn.addActionListener(new ActionListener(){
@@ -126,6 +130,7 @@ public class LeftConstantsPane extends JPanel {
 		addConstantPanel.add(removeBtn);
 
 		JButton addConstantButton = new JButton("Add..");
+		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				showEditConstantDialog(new Constant());

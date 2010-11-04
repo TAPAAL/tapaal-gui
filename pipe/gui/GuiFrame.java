@@ -647,7 +647,11 @@ EOC */
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
-			transportArcAction.setEnabled(true);
+			if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+				transportArcAction.setEnabled(true);
+			}else{
+				transportArcAction.setEnabled(false);
+			}
 
 			annotationAction.setEnabled(true);
 			transAction.setEnabled(true);
@@ -916,11 +920,12 @@ EOC */
 		}
 	}
 
-	public void createNewTab(String name){
+	public void createNewTab(String name, NetType netType){
 		int freeSpace = CreateGui.getFreeSpace();
 
 		setObjects(freeSpace);
 		appTab.getSelectedIndex();
+		CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";

@@ -121,7 +121,7 @@ public class NewTAPNPanel extends JPanel {
 		}
 		
 		try{
-			frame.createNewTab(name);
+			frame.createNewTab(name, type);
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"Something went wrong while creating a new model. Please try again.",
@@ -131,7 +131,6 @@ public class NewTAPNPanel extends JPanel {
 		}
 		
 		frame.incrementNameCounter();
-		CreateGui.getModel().setNetType(type);
 		exit();
 	}
 
