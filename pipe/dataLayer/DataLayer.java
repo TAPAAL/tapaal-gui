@@ -2307,13 +2307,13 @@ implements Cloneable {
 	 * outside the GUI
 	 */
 	public void createFromPNML(Document PNMLDoc){
-		createFromPNML(PNMLDoc, false);		
+		createFromPNML(PNMLDoc, NetType.TAPN);		
 	}
 
-	public void createFromPNML(Document PNMLDoc, boolean colors)	{
+	public void createFromPNML(Document PNMLDoc, NetType type)	{
 		// XXX - kyrke debug
 		emptyPNML();
-		if(colors) this.setNetType(NetType.COLORED);
+		this.setNetType(type);
 		Node node = null;
 		NodeList nodeList = null;
 
@@ -2323,7 +2323,7 @@ implements Cloneable {
 				CreateGui.getApp().setMode(Pipe.CREATING); 
 			}
 
-			if(colors){
+			if(type.equals(NetType.COLORED)){
 				NodeList places = PNMLDoc.getElementsByTagName("net").item(0).getChildNodes();
 				for(int i = 0; i < places.getLength(); i++){
 					this.parseColoredElement(places.item(i));

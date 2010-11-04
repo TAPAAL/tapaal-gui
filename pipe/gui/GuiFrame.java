@@ -54,6 +54,7 @@ import org.w3c.dom.Node;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DataLayerWriter;
+import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
@@ -137,11 +138,11 @@ implements ActionListener, Observer {
 	public boolean dragging = false;
 
 	private boolean editionAllowed = true;
-	
+
 	enum GUIMode {
 		draw, animation, noNet 
 	}
-	
+
 	private GUIMode guiMode = GUIMode.noNet;
 	private JMenu exportMenu, zoomMenu;
 
@@ -196,7 +197,7 @@ implements ActionListener, Observer {
 
 		this.setForeground(java.awt.Color.BLACK);
 		this.setBackground(java.awt.Color.WHITE);
-		
+
 		//Set GUI mode
 		setGUIMode(GUIMode.noNet);
 	}
@@ -235,7 +236,7 @@ implements ActionListener, Observer {
 
 		// Export menu
 		exportMenu=new JMenu("Export");
-		
+
 		exportMenu.setIcon(
 				new ImageIcon(Thread.currentThread().getContextClassLoader().
 						getResource(CreateGui.imgPath + "Export.png")));
@@ -460,7 +461,7 @@ EOC */
 			 new AnimateAction("Simulate", Pipe.ANIMATE,
 					 "Randomly fire a number of transitions", "typed 7",true);      
 
-		 
+
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
 
@@ -642,7 +643,7 @@ EOC */
 		case draw:
 
 			enableAllActions(true);
-			
+
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
@@ -654,38 +655,38 @@ EOC */
 			deleteAction.setEnabled(true);
 			selectAction.setEnabled(true);
 			deleteTokenAction.setEnabled(true);
-			
+
 			timeAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
-			
+
 			deleteAction.setEnabled(true);
-			
+
 			//Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
 
 			break;
 
 		case animation:
-			
+
 			enableAllActions(true);
 
-            timedPlaceAction.setEnabled(false);
-            timedArcAction.setEnabled(false);
-            inhibarcAction.setEnabled(false);
-            transportArcAction.setEnabled(false);
+			timedPlaceAction.setEnabled(false);
+			timedArcAction.setEnabled(false);
+			inhibarcAction.setEnabled(false);
+			transportArcAction.setEnabled(false);
 
-            annotationAction.setEnabled(false);
-            transAction.setEnabled(false);
-            tokenAction.setEnabled(false);
-            deleteAction.setEnabled(false);
-            selectAction.setEnabled(false);
-            deleteTokenAction.setEnabled(false);
-            
-            timeAction.setEnabled(true);
+			annotationAction.setEnabled(false);
+			transAction.setEnabled(false);
+			tokenAction.setEnabled(false);
+			deleteAction.setEnabled(false);
+			selectAction.setEnabled(false);
+			deleteTokenAction.setEnabled(false);
+
+			timeAction.setEnabled(true);
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);
-			
+
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
@@ -693,22 +694,22 @@ EOC */
 			break;
 		case noNet:
 
-            timedPlaceAction.setEnabled(false);
-            timedArcAction.setEnabled(false);
-            inhibarcAction.setEnabled(false);
-            transportArcAction.setEnabled(false);
+			timedPlaceAction.setEnabled(false);
+			timedArcAction.setEnabled(false);
+			inhibarcAction.setEnabled(false);
+			transportArcAction.setEnabled(false);
 
-            annotationAction.setEnabled(false);
-            transAction.setEnabled(false);
-            tokenAction.setEnabled(false);
-            deleteAction.setEnabled(false);
-            selectAction.setEnabled(false);
-            deleteTokenAction.setEnabled(false);
-            
-            timeAction.setEnabled(false);
+			annotationAction.setEnabled(false);
+			transAction.setEnabled(false);
+			tokenAction.setEnabled(false);
+			deleteAction.setEnabled(false);
+			selectAction.setEnabled(false);
+			deleteTokenAction.setEnabled(false);
+
+			timeAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
-			
+
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
@@ -716,40 +717,40 @@ EOC */
 			enableAllActions(false);
 			break;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Helperfunction for disabeling/enabeling all actions when we are in noNet GUImode
 	 * @return
 	 */
 	private void enableAllActions(boolean enable){
-		
+
 		//File
 		closeAction.setEnabled(enable);
-		
-		saveAction.setEnabled(enable);
-        saveAsAction.setEnabled(enable);
-        
-        exportMenu.setEnabled(enable);
-        exportPNGAction.setEnabled(enable);
-        exportPSAction.setEnabled(enable);
-        exportToTikZAction.setEnabled(enable);
 
-        printAction.setEnabled(enable);
-        
-        //View 
-        zoomInAction.setEnabled(enable);
-        zoomOutAction.setEnabled(enable);
-        zoomComboBox.setEnabled(enable);
-        zoomMenu.setEnabled(enable);
-        
-        toggleGrid.setEnabled(enable);
-        dragAction.setEnabled(enable);
-        
-        //Simulator 
-        startAction.setEnabled(enable);
-		
+		saveAction.setEnabled(enable);
+		saveAsAction.setEnabled(enable);
+
+		exportMenu.setEnabled(enable);
+		exportPNGAction.setEnabled(enable);
+		exportPSAction.setEnabled(enable);
+		exportToTikZAction.setEnabled(enable);
+
+		printAction.setEnabled(enable);
+
+		//View 
+		zoomInAction.setEnabled(enable);
+		zoomOutAction.setEnabled(enable);
+		zoomComboBox.setEnabled(enable);
+		zoomMenu.setEnabled(enable);
+
+		toggleGrid.setEnabled(enable);
+		dragAction.setEnabled(enable);
+
+		//Simulator 
+		startAction.setEnabled(enable);
+
 	}
 
 	//set frame objects by array index
@@ -820,26 +821,26 @@ EOC */
 		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
 		buffer.append("Aalborg University 2009 \n\n");
 		buffer.append("Read more at: www.tapaal.net \n\n");
-		
+
 		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
-		
+
 		String verifytaPath = verifyta.getPath();
 		String verifytaversion = "";
-		
+
 		if (verifytaPath == null || verifytaPath.isEmpty()) { 
 			verifytaPath = "Not setup";
 			verifytaversion = "N/A";
 		} else {
 			verifytaversion = verifyta.getVersion();
 		}
-		
+
 		buffer.append("Verifyta Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytaPath);
 		buffer.append("\n");
 		buffer.append("   Version: ");
 		buffer.append(verifytaversion);
-	
+
 		buffer.append("  \n\n"); 
 		buffer.append("Based on PIPE2:\n");
 		buffer.append("http://pipe2.sourceforge.net/");
@@ -980,15 +981,13 @@ EOC */
 				Document doc = builder.parse(file);
 
 				Node top = doc.getElementsByTagName("net").item(0);
-				boolean colors = ((Element)top).getAttribute("type").equals("Colored P/T net");
+				NetType type = parseNetType(((Element)top).getAttribute("type"));
 
-				if(colors){
-					appModel.createFromPNML(doc,true);
-				}else{
+				if(!type.equals(NetType.COLORED)){
 					PNMLTransformer transformer = new PNMLTransformer();
-					Document PNMLDoc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
-					appModel.createFromPNML(PNMLDoc, false);
+					doc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
 				}
+				appModel.createFromPNML(doc, type);
 
 				appView.scrollRectToVisible(new Rectangle(0,0,1,1));
 
@@ -1020,6 +1019,17 @@ EOC */
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
 	}
+
+	private NetType parseNetType(String attribute) {
+		if(attribute.equals("Colored P/T net")){
+			return NetType.COLORED;
+		}else if(attribute.equals("Untimed P/T net")){
+			return NetType.UNTIMED;
+		}else{
+			return NetType.TAPN;
+		}
+	}
+
 
 	private void undoAddTab(int currentlySelected) {
 		CreateGui.undoGetFreeSpace();
@@ -1160,7 +1170,7 @@ EOC */
 		}
 
 	}
-	
+
 	/**
 	 * Returns the current GUIMode
 	 * 
@@ -1170,23 +1180,23 @@ EOC */
 	public GUIMode getGUIMode(){
 		return guiMode;
 	}
-	
+
 	/**
 	 * Set the current mode of the GUI, and changes possible actions
 	 * @param mode change GUI to this mode
 	 * @author Kenneth Yrke Joergensen (kyrke) 
 	 */
 	public void setGUIMode(GUIMode mode){
-		
+
 		this.guiMode = mode; 
-		
+
 		switch (mode) {
 		case draw:
 			//Enable all draw actions
 			CreateGui.getAnimator().setNumberSequences(0);
 			startAction.setSelected(false);
 			CreateGui.getView().changeAnimationMode(false);
-			
+
 			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
 			CreateGui.getAnimator().restoreModel();
@@ -1200,7 +1210,7 @@ EOC */
 			CreateGui.createLeftPane();
 
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-			
+
 			break;
 		case animation:
 			CreateGui.getAnimator().setNumberSequences(0);
@@ -1213,11 +1223,11 @@ EOC */
 			CreateGui.addAnimationControler();
 			CreateGui.getAnimator().setFiringmode("Random");
 
-			
+
 			setEditionAllowed(false);
 
 			statusBar.changeText(statusBar.textforAnimation);
-			
+
 			//Set a light blue backgound color for animation mode
 			CreateGui.getView().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			//Disable all draw actions
@@ -1230,10 +1240,10 @@ EOC */
 		default:
 			break;
 		}
-		
+
 		//Enable actions based on GUI mode
 		enableGUIActions();
-		
+
 	}
 
 
@@ -1547,7 +1557,7 @@ EOC */
 			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
 			ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
 			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-			
+
 
 			boolean queriesAffected = false;
 			for (PetriNetObject pn : selection) {
@@ -1568,7 +1578,7 @@ EOC */
 				s.append("\n");
 			}
 			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
-			
+
 			int choice = queriesAffected ? JOptionPane.showConfirmDialog(CreateGui.getApp(), s.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) : JOptionPane.YES_OPTION;
 
 			if(choice == JOptionPane.YES_OPTION)
@@ -1890,10 +1900,10 @@ EOC */
 					&& checkForSave()) {
 				//Set GUI mode to noNet
 				setGUIMode(GUIMode.noNet);
-				
+
 				setObjectsNull(appTab.getSelectedIndex());
 				appTab.remove(appTab.getSelectedIndex());
-				
+
 				//Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);

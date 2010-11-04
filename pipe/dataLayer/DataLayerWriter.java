@@ -79,7 +79,7 @@ public class DataLayerWriter {
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
 			pnDOM = builder.newDocument();
-			
+
 
 			Element PNML = pnDOM.createElement("pnml"); // PNML Top Level Element
 			pnDOM.appendChild(PNML);
@@ -94,9 +94,14 @@ public class DataLayerWriter {
 			netAttrId.setValue("Net-One");
 			NET.setAttributeNode(netAttrId);
 			Attr netAttrType = pnDOM.createAttribute("type"); // Net "type" Attribute
-			if(netModel.isUsingColors()){
+			switch(netModel.netType()){
+			case COLORED:			
 				netAttrType.setValue("Colored P/T net");
-			}else{
+				break;
+			case UNTIMED:
+				netAttrType.setValue("Untimed P/T net");
+				break;
+			default:
 				netAttrType.setValue("P/T net");
 			}
 			NET.setAttributeNode(netAttrType);
@@ -112,7 +117,6 @@ public class DataLayerWriter {
 				Element elem = createConstantElement(constant, pnDOM);
 				NET.appendChild(elem);
 			}
-
 
 			Place[] places = netModel.getPlaces();
 			for (int i = 0 ; i < places.length ; i++) {
@@ -152,7 +156,7 @@ public class DataLayerWriter {
 				NET.appendChild(newArc);
 			}
 
-	
+
 			ArrayList<TAPNQuery> queries = netModel.getQueries();
 			for (TAPNQuery query : queries){
 				Element newQuery = createQueryElement(query, pnDOM);
@@ -163,7 +167,7 @@ public class DataLayerWriter {
 
 			pnDOM.normalize();
 			// Create Transformer with XSL Source File
-			if(!netModel.isUsingColors()){
+			if(!netModel.netType().equals(NetType.COLORED)){
 				xsltSource = new StreamSource(Thread.currentThread().
 						getContextClassLoader().getResourceAsStream("xslt" + 
 								System.getProperty("file.separator") + "GeneratePNML.xsl"));
@@ -271,7 +275,7 @@ public class DataLayerWriter {
 			Double markingOffsetXInput = inputPlace.getMarkingOffsetXObject();
 			Double markingOffsetYInput = inputPlace.getMarkingOffsetYObject();
 			Integer capacityInput = inputPlace.getCapacity();
-			
+
 			placeElement.setAttribute("positionX", (positionXInput != null ? String.valueOf(positionXInput) : ""));
 			placeElement.setAttribute("positionY", (positionYInput != null ? String.valueOf(positionYInput) : ""));
 			placeElement.setAttribute("name", (nameInput != null ? nameInput : (idInput != null && idInput.length() > 0? idInput : "")));
@@ -299,7 +303,7 @@ public class DataLayerWriter {
 					placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
 				}
 			}
-	}
+		}
 
 		return placeElement;
 	}
@@ -368,7 +372,7 @@ public class DataLayerWriter {
 			boolean infiniteServer = inputTransition.isInfiniteServer();
 			int orientation = inputTransition.getAngle();
 			int priority = inputTransition.getPriority();
-			
+
 			transitionElement.setAttribute("positionX", 
 					(positionXInput != null ? String.valueOf(positionXInput) : ""));
 			transitionElement.setAttribute("positionY", 

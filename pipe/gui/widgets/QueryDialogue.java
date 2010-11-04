@@ -1216,8 +1216,6 @@ public class QueryDialogue extends JPanel{
 
 		placesBox.addActionListener(
 				new ActionListener() {
-
-					@Override
 					public void actionPerformed(ActionEvent e) {
 						if(userChangedAtomicPropSelection) {
 							updateQueryOnAtomicPropositionChange();
@@ -1228,8 +1226,6 @@ public class QueryDialogue extends JPanel{
 
 		relationalOperatorBox.addActionListener(
 				new ActionListener() {
-
-					@Override
 					public void actionPerformed(ActionEvent e) {
 						if(userChangedAtomicPropSelection) {
 							updateQueryOnAtomicPropositionChange();
@@ -1241,8 +1237,6 @@ public class QueryDialogue extends JPanel{
 
 		placeMarking.addChangeListener(
 				new ChangeListener() {
-
-					@Override
 					public void stateChanged(ChangeEvent arg0) {
 						if(userChangedAtomicPropSelection) {
 							updateQueryOnAtomicPropositionChange();

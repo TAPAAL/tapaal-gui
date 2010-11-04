@@ -281,53 +281,49 @@ public class TimedPlace extends Place {
 
 		int marking = getCurrentMarking();
 
-		// structure sees how many markings there are and fills the place in with 
-		// the appropriate number.
-		switch(marking) {
-		/*		case 5: 
-			g.drawString(String.valueOf(myTokens.get(4)), x + 5, y + 13);
-//			g.fillOval(x + 6, y + 6, tWidth, tHeight);
-			/* falls through */
-		/*		case 4:
-			g.drawString(String.valueOf(myTokens.get(3)), x + 17, y + 27);
-//			g.fillOval(x + 18, y + 20, tWidth, tHeight);
-			/* falls through */
-		/*		case 3:
-			g.drawString(String.valueOf(myTokens.get(2)), x + 5, y + 27);
-//			g.fillOval(x + 6, y + 20, tWidth, tHeight);
-			/* falls through */
-		case 2: 
-			if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
-				g.setFont(new Font("new font", Font.PLAIN, 11));
-				g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
-			}else{
-				g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
+		if(CreateGui.getModel().netType().equals(NetType.UNTIMED)){
+			if(marking > 0){
+				String toDraw = String.format("#%1$d", marking);
+				g.drawString(toDraw, x + 2, y + 20);
 			}
-			//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
-			/* falls through */
-		case 1:
-			if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
-				g.setFont(new Font("new font", Font.PLAIN, 11));
-				g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
-			}else{
-				g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);
+		}else{
+
+			// structure sees how many markings there are and fills the place in with 
+			// the appropriate number.
+			switch(marking) {
+			case 2: 
+				if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
+					g.setFont(new Font("new font", Font.PLAIN, 11));
+					g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
+				}else{
+					g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
+				}
+				//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
+				/* falls through */
+			case 1:
+				if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
+					g.setFont(new Font("new font", Font.PLAIN, 11));
+					g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
+				}else{
+					g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);
+				}
+				//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
+				break;
+			case 0:
+				break;
+			default:
+				if (marking > 999){
+					//XXX could be better...
+					g.drawString("#"+String.valueOf(marking), x, y + 20);
+				} else if (marking > 99){
+					g.drawString("#"+String.valueOf(marking), x, y + 20);
+				} else if (marking > 9){
+					g.drawString("#"+String.valueOf(marking), x + 2, y + 20);
+				} else {
+					g.drawString("#"+String.valueOf(marking), x + 6, y + 20);
+				}
+				break;
 			}
-			//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
-			break;
-		case 0:
-			break;
-		default:
-			if (marking > 999){
-				//XXX could be better...
-				g.drawString("#"+String.valueOf(marking), x, y + 20);
-			} else if (marking > 99){
-				g.drawString("#"+String.valueOf(marking), x, y + 20);
-			} else if (marking > 9){
-				g.drawString("#"+String.valueOf(marking), x + 2, y + 20);
-			} else {
-				g.drawString("#"+String.valueOf(marking), x + 6, y + 20);
-			}
-			break;
 		}
 	}
 
@@ -564,7 +560,7 @@ public class TimedPlace extends Place {
 
 		return value;
 	}
-	
+
 	@Override
 	public void showMarking(Marking marking) {
 		myTokens.clear();
@@ -573,7 +569,7 @@ public class TimedPlace extends Place {
 		}
 		super.showMarking(marking);
 	}
-	
+
 	@Override
 	public String toString() {
 		return getName();
