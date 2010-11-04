@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNTransition;
@@ -110,7 +111,7 @@ public class TikZExporter {
 
 
 			String arcLabel = getArcLabels(arc);
-			
+
 			out.append("\\draw[");
 			out.append(arrowType);
 			out.append("] (");
@@ -128,7 +129,7 @@ public class TikZExporter {
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel ="";
-		if(arc instanceof TimedArc)
+		if(arc instanceof TimedArc && !net.netType().equals(NetType.UNTIMED))
 		{
 			if(!(arc.getSource() instanceof TAPNTransition)){
 				arcLabel = "node[midway,auto] {";
@@ -153,7 +154,7 @@ public class TikZExporter {
 			String angle ="";
 			if(trans.getAngle() != 0)
 				angle = "rotate="+String.valueOf(trans.getAngle())+","; 
-			
+
 			out.append("\\node[transition,");
 			out.append(angle);
 			out.append("label=above:");
@@ -198,7 +199,7 @@ public class TikZExporter {
 		String tokensInPlace = "";
 		if(tokens.size() > 0)
 		{
-			if(tokens.size() == 1){
+			if(tokens.size() == 1 && !net.netType().equals(NetType.UNTIMED)){
 				tokensInPlace = "structured tokens={"+tokens.get(0).setScale(1)+"},";
 			}
 			else{
@@ -209,7 +210,9 @@ public class TikZExporter {
 	}
 
 	protected String getPlaceInvariantString(Place place) {
+		if(net.netType().equals(NetType.UNTIMED)) return "";
 		String invariant = "";
+
 		if(!((TimedPlace)place).getInvariant().contains("inf"))
 			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant())+",";
 		return invariant;
@@ -222,13 +225,15 @@ public class TikZExporter {
 		out.append("structured tokens={\\#");
 		out.append(String.valueOf(tokens.size()));
 		out.append("},");
-		out.append("pin=above:{\\{");
-		for (int i = 0; i < tokens.size()-1; i++) {
-			out.append(tokens.get(i).setScale(1));
-			out.append(",");
+		if(!net.netType().equals(NetType.UNTIMED)){
+			out.append("pin=above:{\\{");
+			for (int i = 0; i < tokens.size()-1; i++) {
+				out.append(tokens.get(i).setScale(1));
+				out.append(",");
+			}
+			out.append(tokens.get(tokens.size()-1).setScale(1));
+			out.append("\\}},");
 		}
-		out.append(tokens.get(tokens.size()-1).setScale(1));
-		out.append("\\}},");
 		return out.toString();
 	}
 
@@ -237,7 +242,7 @@ public class TikZExporter {
 
 		out.append("\\begin{tikzpicture}[font=\\scriptsize]\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
-		out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
+		if(!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
 		out.append("\\tikzstyle{every place}=[minimum size=6mm,thick]\n");
 		out.append("\\tikzstyle{every transition} = [fill=black,minimum width=2mm,minimum height=5mm]\n");
 		out.append("\\tikzstyle{every token}=[fill=white,text=black]\n");
@@ -261,13 +266,13 @@ public class TikZExporter {
 				out.append(c);
 			}
 		}
-		
+
 		char last = name.charAt(name.length()-1);
 		if(last == '_'){
 			out.append("\\_");
 		}else
 			out.append(last);
-		
+
 		for(int i = 0; i < subscripts; i++){
 			out.append("}");
 		}
