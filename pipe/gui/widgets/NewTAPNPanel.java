@@ -148,8 +148,7 @@ public class NewTAPNPanel extends JPanel {
 		choicePanel.add(nameLabel, gbc);
 		
 		String defaultName = String.format("New Petri net %1$d", frame.getNameCounter());
-		nameTextBox = new JTextField(defaultName);
-		nameTextBox.setPreferredSize(new Dimension(150,20));
+		nameTextBox = new JTextField(defaultName, 12);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;

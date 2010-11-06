@@ -507,8 +507,8 @@ public class QueryDialogue extends JPanel{
 		{
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)currentSelection.getObject();
 			
-			// bit of a hack to prevent posting edits when we programmatically
-			// change the selection in the atomic proposition nodes because a different
+			// bit of a hack to prevent posting edits to the undo manager when we programmatically
+			// change the selection in the atomic proposition comboboxes etc. because a different
 			// atomic proposition was selected
 			userChangedAtomicPropSelection = false;
 			placesBox.setSelectedItem(node.getPlace());
@@ -1021,6 +1021,7 @@ public class QueryDialogue extends JPanel{
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		logicButtonPanel.add(conjunctionButton,gbc);
 
 		gbc.gridy = 1;
