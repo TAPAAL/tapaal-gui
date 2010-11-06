@@ -2,13 +2,14 @@ package pipe.gui;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.Messenger;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
 public class RunKBoundAnalysis extends RunVerificationBase {
 	
-	public RunKBoundAnalysis(ModelChecker modelChecker){
-		super(modelChecker);
+	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger){
+		super(modelChecker, messenger);
 	}
 
 	@Override

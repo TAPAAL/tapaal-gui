@@ -5,6 +5,7 @@ import javax.swing.JSpinner;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
@@ -18,15 +19,15 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		return minBound;
 	}
 
-	public KBoundOptimizer(DataLayer appModel, int k, ModelChecker modelChecker, JSpinner spinner)
+	public KBoundOptimizer(DataLayer appModel, int k, ModelChecker modelChecker, Messenger messenger, JSpinner spinner)
 	{
-		super(appModel, k, modelChecker);
+		super(appModel, k, modelChecker, messenger);
 		this.spinner = spinner;
 	}
 
 	@Override
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker) {
-		return new RunKBoundOptimization(modelChecker, super.k, spinner);
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker, Messenger messenger) {
+		return new RunKBoundOptimization(modelChecker, messenger, super.k, spinner);
 	}
 		
 	@Override

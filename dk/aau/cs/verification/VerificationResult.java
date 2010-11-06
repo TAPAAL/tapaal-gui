@@ -5,6 +5,7 @@ import dk.aau.cs.petrinet.trace.TAPNTrace;
 public class VerificationResult {
 	private QueryResult queryResult;
 	private TAPNTrace trace;
+	private String errorMessage = null;
 
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -19,11 +20,23 @@ public class VerificationResult {
 		this.trace = trace;
 	}
 
+	public VerificationResult(String outputMessage) {
+		this.errorMessage = outputMessage;
+	}
+
 	public QueryResult getQueryResult() {
 		return queryResult;
 	}		
 	
 	public TAPNTrace getTrace(){
 		return trace;
+	}
+	
+	public String errorMessage(){
+		return errorMessage;
+	}
+	
+	public boolean error(){
+		return errorMessage != null;
 	}
 }

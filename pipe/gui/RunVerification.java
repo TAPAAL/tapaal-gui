@@ -8,18 +8,19 @@ import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNTrace;
 import pipe.gui.GuiFrame.GUIMode;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
 public class RunVerification extends RunVerificationBase {
 
-	public RunVerification(ModelChecker modelChecker) {
-		super(modelChecker);
+	public RunVerification(ModelChecker modelChecker, Messenger messenger) {
+		super(modelChecker, messenger);
 	}
 
 	@Override
 	protected void showResult(VerificationResult result, long verificationTime) {	
-		if(result != null){
+		if(result != null && !result.error()){
 			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
 					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime/1000.0),
@@ -29,16 +30,15 @@ public class RunVerification extends RunVerificationBase {
 				DataLayer model = CreateGui.getModel();
 				TraceTransformer interpreter =  model.isUsingColors() ? new ColoredTraceTransformer(model) : new TraceTransformer(model);
 				TAPNTrace trace = interpreter.interpretTrace(result.getTrace());
-				showAnimationMode();
+				CreateGui.getApp().setGUIMode(GUIMode.animation);
 				CreateGui.getAnimator().SetTrace(trace);
 			}
+		}else{
+			messenger.displayWrappedErrorMessage("An error occured during the verification." +
+					System.getProperty("line.separator") + 	
+					System.getProperty("line.separator") + 
+					"UPPAAL output:\n" + result.errorMessage(), 
+					"Error during verification");
 		}
-	}
-
-	private void showAnimationMode() {
-		CreateGui.getApp().setGUIMode(GUIMode.animation);
-//		CreateGui.getApp().setMode(Pipe.START);
-//        CreateGui.getView().getSelectionObject().clearSelection();
-//		CreateGui.getAnimator().resethistory();
 	}
 }

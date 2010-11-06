@@ -6,4 +6,6 @@ public interface Messenger {
 	
 	void displayErrorMessage(String message);
 	void displayErrorMessage(String message, String title);
+	
+	void displayWrappedErrorMessage(String message, String title);
 }

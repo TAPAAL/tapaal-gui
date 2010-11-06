@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -203,25 +204,50 @@ public class Verifyta implements ModelChecker {
 		if(runner.error()){
 			return null;
 		}else{			
-			QueryResult queryResult = parseQueryResult();
-			TAPNTrace tapnTrace = parseTrace(options, model, exportedModel);
-			
-			return new VerificationResult(queryResult, tapnTrace);
+			String errorOutput = readOutput(runner.errorOutput());
+			String standardOutput = readOutput(runner.standardOutput());
+						
+			QueryResult queryResult = parseQueryResult(standardOutput);
+			if(queryResult == null){
+				return new VerificationResult(errorOutput + System.getProperty("line.separator") + standardOutput);
+			}else{
+				TAPNTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
+				return new VerificationResult(queryResult, tapnTrace);
+			}
 		}
 	}
 
-	private QueryResult parseQueryResult() {
+	private String readOutput(BufferedReader reader) {
+		try {
+			if(!reader.ready()) return "";
+		} catch (IOException e1) {
+			return "";
+		}
+		StringBuffer buffer = new StringBuffer();
+		String line = null;
+		try {
+			while( (line = reader.readLine()) != null){
+				buffer.append(line);
+				buffer.append(System.getProperty("line.separator"));
+			}
+		} catch (IOException e) {
+		}
+		
+		return buffer.toString();
+	}
+
+	private QueryResult parseQueryResult(String output) {
 		VerifytaOutputParser outputParser = new VerifytaOutputParser();
-		QueryResult queryResult = outputParser.parseOutput(runner.standardOutput());
+		QueryResult queryResult = outputParser.parseOutput(output);
 		return queryResult;
 	}
 
-	private TAPNTrace parseTrace(VerificationOptions options,
+	private TAPNTrace parseTrace(String output, VerificationOptions options,
 			TimedArcPetriNet model, ExportedModel exportedModel) {
 		TAPNTrace tapnTrace = null;
 		
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
-		UppaalTrace trace = traceParser.parseTrace(runner.errorOutput());
+		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 
 		
 		if(trace == null){

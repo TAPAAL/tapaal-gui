@@ -42,7 +42,7 @@ public class Verifier {
 			"Update to the latest development version.");
 			return;
 		}
-		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, verifyta, tokensControl);
+		KBoundOptimizer optimizer = new KBoundOptimizer(appModel, k, verifyta, new MessengerImpl(), tokensControl);
 		optimizer.analyze();
 	}
 
@@ -54,7 +54,7 @@ public class Verifier {
 			"Update to the latest development version.");
 			return;
 		}
-		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k, verifyta);
+		KBoundAnalyzer analyzer = new KBoundAnalyzer(appModel, k, verifyta, new MessengerImpl());
 		analyzer.analyze();
 	}
 
@@ -114,7 +114,7 @@ public class Verifier {
 		TAPN model = convertModelToAAUTAPN(appModel);
 
 		if(model != null){
-			RunVerificationBase thread = new RunVerification(verifyta);
+			RunVerificationBase thread = new RunVerification(verifyta, new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
 			thread.execute(verifytaOptions, model, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), input.getCapacity() + model.getNumberOfTokens()));

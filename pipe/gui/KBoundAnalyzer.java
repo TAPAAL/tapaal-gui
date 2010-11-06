@@ -4,6 +4,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
@@ -21,16 +22,18 @@ public class KBoundAnalyzer
 	protected int k;
 
 	private ModelChecker modelChecker;
+	private Messenger messenger;
 
-	public KBoundAnalyzer(DataLayer appModel, int k, ModelChecker modelChecker)
+	public KBoundAnalyzer(DataLayer appModel, int k, ModelChecker modelChecker, Messenger messenger)
 	{
 		this.k = k;
 		this.appModel = appModel;
 		this.modelChecker = modelChecker;
+		this.messenger = messenger;
 	}
 
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker) {
-		return new RunKBoundAnalysis(modelChecker);
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker, Messenger messenger) {
+		return new RunKBoundAnalysis(modelChecker, messenger);
 	}
 
 	public void analyze()
@@ -39,7 +42,7 @@ public class KBoundAnalyzer
 		TAPNQuery query = getBoundednessQuery(model.getNumberOfTokens());
 		VerifytaOptions options = verificationOptions();
 
-		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker);
+		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker, messenger);
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());	
 		dialog.setupListeners(analyzer);
 

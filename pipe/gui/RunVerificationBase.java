@@ -2,9 +2,9 @@ package pipe.gui;
 
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import dk.aau.cs.Messenger;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.verification.ModelChecker;
@@ -19,10 +19,12 @@ public abstract class RunVerificationBase extends
 	private TimedArcPetriNet model;
 	private long verificationTime = 0;
 	private TAPNQuery query;
+	protected Messenger messenger;
 	
-	public RunVerificationBase(ModelChecker modelChecker) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
 		super();
 		this.modelChecker = modelChecker;
+		this.messenger = messenger;
 	}
 	
 	public void execute(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query){
@@ -57,8 +59,8 @@ public abstract class RunVerificationBase extends
 			showResult(result, verificationTime);
 		}else{
 			modelChecker.kill();			
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "Verification was interupted by the user. No result found!",
-					"Verification Cancelled", JOptionPane.INFORMATION_MESSAGE);
+			messenger.displayInfoMessage("Verification was interupted by the user. No result found!",
+					"Verification Cancelled");
 		}
 	}
 

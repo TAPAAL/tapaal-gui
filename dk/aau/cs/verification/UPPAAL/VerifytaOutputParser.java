@@ -1,8 +1,5 @@
 package dk.aau.cs.verification.UPPAAL;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
 import dk.aau.cs.verification.QueryResult;
 
 public class VerifytaOutputParser {
@@ -14,28 +11,23 @@ public class VerifytaOutputParser {
 		return error;
 	}	
 
-	public QueryResult parseOutput(BufferedReader reader) {
-		String line=null;
+	public QueryResult parseOutput(String output) {
+		String[] lines = output.split(System.getProperty("line.separator"));
 		try {
-			while ( (line = reader.readLine()) != null){
+			for(int i = 0; i < lines.length; i++){
+				String line = lines[i];
 				if (line.contains(PROPERTY_IS_SATISFIED_STRING)) {
-					reader.mark(250);
-
-					if((line = reader.readLine()) != null && line.contains("sup")){
-						line = reader.readLine();
+					if(i+1 < lines.length && lines[i+1].contains("sup")){
+						line = lines[i+1];
 						String number = line.substring(line.lastIndexOf(" ")).trim();
 						return new QueryResult(Integer.parseInt(number));
-					}else{
-						reader.reset();
 					}
 					return new QueryResult(true);
 				}else if(line.contains(PROPERTY_IS_NOT_SATISFIED_STRING)){
 					return new QueryResult(false);
 				}
 			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			error=true;
+		}catch(Exception e){
 		}
 		return null;
 	}
