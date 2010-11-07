@@ -934,12 +934,13 @@ extends javax.swing.JPanel {
 			}
 
 			view.getUndoManager().addEdit(place.setInvariant(newInvariant));
-
-			if (newMarking != marking) {
-				view.getUndoManager().addEdit(place.setCurrentMarking(newMarking));            
-			}
-
 		}
+
+		if (newMarking != marking) {
+			view.getUndoManager().addEdit(place.setCurrentMarking(newMarking));            
+		}
+
+		
 
 		if (attributesCheckBox != null && attributesVisible != attributesCheckBox.isSelected()){
 			place.toggleAttributesVisible();
