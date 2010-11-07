@@ -686,8 +686,12 @@ EOC */
 			deleteAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
-
-			timeAction.setEnabled(true);
+			
+			//Only enable this if it is not an untimed net.
+			if (CreateGui.getModel().netType() != NetType.UNTIMED){
+				timeAction.setEnabled(true);
+			}
+			
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);
 
