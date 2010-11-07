@@ -122,16 +122,6 @@ public class Pipe {
    public static final int DEFAULT_OFFSET_X = -5;
    public static final int DEFAULT_OFFSET_Y = 35;
    
-      /** X-Axis Scale Value */
-   public static final int DISPLAY_SCALE_FACTORX = 7; // Scale factors for loading other Petri-Nets (not yet implemented)
-   /** Y-Axis Scale Value */
-   public static final int DISPLAY_SCALE_FACTORY = 7; // Scale factors for loading other Petri-Nets (not yet implemented)
-   /** X-Axis Shift Value */
-   public static final int DISPLAY_SHIFT_FACTORX = 270; // Scale factors for loading other Petri-Nets (not yet implemented)
-   /** Y-Axis Shift Value */
-   public static final int DISPLAY_SHIFT_FACTORY = 120; // Scale factors for loading other Petri-Nets (not yet implemented)
-   
-   
    public static final int NAMELABEL_OFFSET = 12;
 
    public static int DEFAULT_BUFFER_CAPACITY = 50;
