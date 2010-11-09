@@ -240,33 +240,35 @@ public class TimedPlace extends Place {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D)g;
+		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
+			Graphics2D g2 = (Graphics2D)g;
 
-		if (hasCapacity()){
-			g2.setStroke(new BasicStroke(2.0f));
-		} else {
+			if (hasCapacity()){
+				g2.setStroke(new BasicStroke(2.0f));
+			} else {
+				g2.setStroke(new BasicStroke(1.0f));
+			}
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+					RenderingHints.VALUE_ANTIALIAS_ON);
+
+			if(selected && !ignoreSelection){
+				g2.setColor(Pipe.SELECTION_FILL_COLOUR);
+			} else{
+				g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
+			}
+			g2.fill(place);
+
+			if (selected && !ignoreSelection){
+				g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+			} else{
+				g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+			}
+			g2.draw(place);
+
 			g2.setStroke(new BasicStroke(1.0f));
+
+			paintTokens(g);
 		}
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-				RenderingHints.VALUE_ANTIALIAS_ON);
-
-		if(selected && !ignoreSelection){
-			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
-		} else{
-			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
-		}
-		g2.fill(place);
-
-		if (selected && !ignoreSelection){
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-		} else{
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-		}
-		g2.draw(place);
-
-		g2.setStroke(new BasicStroke(1.0f));
-
-		paintTokens(g);
 	}
 
 	protected void paintTokens(Graphics g) {
@@ -281,49 +283,41 @@ public class TimedPlace extends Place {
 
 		int marking = getCurrentMarking();
 
-		if(CreateGui.getModel().netType().equals(NetType.UNTIMED)){
-			if(marking > 0){
-				String toDraw = String.format("#%1$d", marking);
-				g.drawString(toDraw, x + 2, y + 20);
+		// structure sees how many markings there are and fills the place in with 
+		// the appropriate number.
+		switch(marking) {
+		case 2: 
+			if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
+				g.setFont(new Font("new font", Font.PLAIN, 11));
+				g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
+			}else{
+				g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
 			}
-		}else{
-
-			// structure sees how many markings there are and fills the place in with 
-			// the appropriate number.
-			switch(marking) {
-			case 2: 
-				if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
-					g.setFont(new Font("new font", Font.PLAIN, 11));
-					g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
-				}else{
-					g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
-				}
-				//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
-				/* falls through */
-			case 1:
-				if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
-					g.setFont(new Font("new font", Font.PLAIN, 11));
-					g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
-				}else{
-					g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);
-				}
-				//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
-				break;
-			case 0:
-				break;
-			default:
-				if (marking > 999){
-					//XXX could be better...
-					g.drawString("#"+String.valueOf(marking), x, y + 20);
-				} else if (marking > 99){
-					g.drawString("#"+String.valueOf(marking), x, y + 20);
-				} else if (marking > 9){
-					g.drawString("#"+String.valueOf(marking), x + 2, y + 20);
-				} else {
-					g.drawString("#"+String.valueOf(marking), x + 6, y + 20);
-				}
-				break;
+			//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
+			/* falls through */
+		case 1:
+			if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
+				g.setFont(new Font("new font", Font.PLAIN, 11));
+				g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
+			}else{
+				g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);
 			}
+			//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
+			break;
+		case 0:
+			break;
+		default:
+			if (marking > 999){
+				//XXX could be better...
+				g.drawString("#"+String.valueOf(marking), x, y + 20);
+			} else if (marking > 99){
+				g.drawString("#"+String.valueOf(marking), x, y + 20);
+			} else if (marking > 9){
+				g.drawString("#"+String.valueOf(marking), x + 2, y + 20);
+			} else {
+				g.drawString("#"+String.valueOf(marking), x + 6, y + 20);
+			}
+			break;
 		}
 	}
 

@@ -237,13 +237,13 @@ extends PlaceTransitionObject {
 			break;
 		default:
 			if (marking > 999){
-				g.drawString(String.valueOf(marking), x, y + 20);
+				g.drawString("#"+String.valueOf(marking), x, y + 20);
 			} else if (marking > 99){
-				g.drawString(String.valueOf(marking), x + 3, y + 20);
+				g.drawString("#"+String.valueOf(marking), x, y + 20);
 			} else if (marking > 9){
-				g.drawString(String.valueOf(marking), x + 7, y + 20);
+				g.drawString("#"+String.valueOf(marking), x + 2, y + 20);
 			} else {
-				g.drawString(String.valueOf(marking), x + 12, y + 20);
+				g.drawString("#"+String.valueOf(marking), x + 6, y + 20);
 			}
 			break;
 		}
