@@ -19,18 +19,21 @@ public class PetriNet {
 	}
 	
 	public void add(Place place){
+		Require.that(place != null, "Argument must be a non-null place");
 		Require.that(!isNameUsed(place.name()), "A place or transition with the specified name already exists in the petri net.");
 
 		places.add(place);
 	}
 	
 	public void add(Transition transition){
+		Require.that(transition != null, "Argument must be a non-null transition");
 		Require.that(!isNameUsed(transition.name()), "A place or transition with the specified name already exists in the petri net.");
 		
 		transitions.add(transition);
 	}
 	
 	public void add(InputArc arc){
+		Require.that(arc != null, "Argument must be a non-null input arc.");
 		Require.that(places.contains(arc.source()), "The source place must be part of the petri net.");
 		Require.that(transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
 		Require.that(!inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
@@ -41,6 +44,7 @@ public class PetriNet {
 	}
 	
 	public void add(OutputArc arc){
+		Require.that(arc != null, "Argument must be a non-null output arc.");
 		Require.that(places.contains(arc.destination()), "The destination place must be part of the petri net.");
 		Require.that(transitions.contains(arc.source()), "The source transition must be part of the petri net");
 		Require.that(!outputArcs.contains(arc), "The specified arc is already a part of the petri net.");

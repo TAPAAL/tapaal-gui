@@ -1,12 +1,12 @@
-package dk.aau.cs.model.petriNet;
+package dk.aau.cs.model.tapn;
 
 import dk.aau.cs.util.Require;
 
-public class OutputArc {
-	private Transition source;
-	private Place destination;
-
-	public OutputArc(Transition source, Place destination){
+public class TimedOutputArc {
+	private TimedTransition source;
+	private TimedPlace destination;
+	
+	public TimedOutputArc(TimedTransition source, TimedPlace destination){
 		Require.that(source != null, "An arc must have a non-null source transition");
 		Require.that(destination != null, "An arc must have a non-null destination place");
 		
@@ -14,11 +14,11 @@ public class OutputArc {
 		this.destination = destination;
 	}
 	
-	public Transition destination() {
+	public TimedTransition destination() {
 		return source;
 	}
 
-	public Place source() {
+	public TimedPlace source() {
 		return destination;
 	}
 }
