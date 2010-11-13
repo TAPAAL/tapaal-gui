@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import pipe.dataLayer.PetriNetObject;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 import pipe.gui.action.DeletePetriNetObjectAction;
 
@@ -88,7 +88,7 @@ public void mousePressed(MouseEvent e) {
       if (CreateGui.getApp().getMode() == Pipe.SELECT) {
          if (!myObject.isSelected()) {
             if (!e.isShiftDown()) {
-               ((GuiView)contentPane).getSelectionObject().clearSelection();
+               ((DrawingSurface)contentPane).getSelectionObject().clearSelection();
             }
             myObject.select();
             justSelected = true;
@@ -118,7 +118,7 @@ public void mouseReleased(MouseEvent e) {
          if (isDragging) {
             isDragging = false;
             CreateGui.getView().getUndoManager().translateSelection(
-                        ((GuiView)contentPane).getSelectionObject().getSelection(),
+                        ((DrawingSurface)contentPane).getSelectionObject().getSelection(),
                         totalX,
                         totalY);
             totalX = 0;
@@ -128,7 +128,7 @@ public void mouseReleased(MouseEvent e) {
                if (e.isShiftDown()) {
                   myObject.deselect();
                } else {
-                  ((GuiView)contentPane).getSelectionObject().clearSelection();
+                  ((DrawingSurface)contentPane).getSelectionObject().clearSelection();
                   myObject.select();
                }
             }
@@ -160,7 +160,7 @@ public void mouseDragged(MouseEvent e) {
          int transY = Grid.getModifiedY(e.getY() - dragInit.y);
          totalX += transX;
          totalY += transY;
-         ((GuiView)contentPane).getSelectionObject().translateSelection(
+         ((DrawingSurface)contentPane).getSelectionObject().translateSelection(
                  transX, transY);
       }
    }

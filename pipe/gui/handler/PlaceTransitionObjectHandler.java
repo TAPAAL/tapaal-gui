@@ -23,7 +23,7 @@ import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
@@ -183,7 +183,7 @@ public void mouseReleased(MouseEvent e) {
       
       String error_message_two_arcs = "We do not allow two arcs from a place to a transition or a transition to a place.";
       
-      GuiView view = CreateGui.getView();
+      DrawingSurface view = CreateGui.getView();
       DataLayer model = CreateGui.getModel();
       UndoManager undoManager = view.getUndoManager();
       GuiFrame app = CreateGui.getApp();

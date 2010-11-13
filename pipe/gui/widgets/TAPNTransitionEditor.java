@@ -11,7 +11,7 @@ import javax.swing.event.CaretListener;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 
 
 /**
@@ -32,14 +32,14 @@ extends javax.swing.JPanel {
 	Integer priority = 0;
 	String name;   
 	DataLayer pnmlData;
-	GuiView view;
+	DrawingSurface view;
 	JRootPane rootPane;
 
 	/**
 	 * Creates new form TransitionEditor
 	 */
 	public TAPNTransitionEditor(JRootPane _rootPane, Transition _transition, 
-			DataLayer _pnmlData, GuiView _view) {
+			DataLayer _pnmlData, DrawingSurface _view) {
 		rootPane = _rootPane;
 		transition = _transition;
 		pnmlData = _pnmlData;

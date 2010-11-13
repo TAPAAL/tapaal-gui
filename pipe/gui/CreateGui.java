@@ -47,7 +47,7 @@ public class CreateGui {
 	private static class TabData { // a structure for holding a tab's data
 		public DataLayer appModel;
 		public HashMap<PetriNetObject, String> oldGuards;
-		public GuiView appView;
+		public DrawingSurface appView;
 		public File appFile;
 	}
 
@@ -144,7 +144,7 @@ public class CreateGui {
 	}
 
 
-	public static GuiView getView(int index) {
+	public static DrawingSurface getView(int index) {
 		if (index < 0) {
 			return null;
 		}
@@ -152,7 +152,7 @@ public class CreateGui {
 		TabData tab = (tabs.get(index));
 		while (tab.appView == null) {
 			try {
-				tab.appView = new GuiView(tab.appModel);
+				tab.appView = new DrawingSurface(tab.appModel);
 			} catch (Exception e){
 				e.printStackTrace();
 			}
@@ -161,7 +161,7 @@ public class CreateGui {
 	}
 
 
-	public static GuiView getView() {
+	public static DrawingSurface getView() {
 		return getView(appTab.getSelectedIndex());
 	}
 

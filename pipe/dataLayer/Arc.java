@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 import javax.swing.JLayeredPane;
 
 import pipe.gui.CreateGui;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcWeightEdit;
@@ -297,8 +297,8 @@ public void addedToGui() {
       deleted = false;    
       markedAsDeleted = false;
       
-      if (getParent() instanceof GuiView) { 
-         myPath.addPointsToGui((GuiView)getParent());
+      if (getParent() instanceof DrawingSurface) { 
+         myPath.addPointsToGui((DrawingSurface)getParent());
       } else { 
          myPath.addPointsToGui((JLayeredPane)getParent());
       }
@@ -401,7 +401,7 @@ public int getLayerOffset() {
    
    
    @Override
-public void undelete(DataLayer model, GuiView view) {
+public void undelete(DataLayer model, DrawingSurface view) {
       if (this.isDeleted()) {
          model.addPetriNetObject(this);
          view.add(this);

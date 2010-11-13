@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.swing.JLayeredPane;
 
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.ArcPathPointHandler;
@@ -596,7 +596,7 @@ public class ArcPath
    }
    
    
-   public void addPointsToGui(GuiView editWindow) {
+   public void addPointsToGui(DrawingSurface editWindow) {
       ArcPathPoint pathPoint;
       ArcPathPointHandler pointHandler;
       
@@ -720,8 +720,8 @@ public class ArcPath
     */
    public void insertPoint(int index, ArcPathPoint newpoint) {
       pathPoints.add(index, newpoint);
-      if (myArc.getParent() instanceof GuiView) {
-         addPointsToGui((GuiView)myArc.getParent());
+      if (myArc.getParent() instanceof DrawingSurface) {
+         addPointsToGui((DrawingSurface)myArc.getParent());
       } else {
          addPointsToGui((JLayeredPane)myArc.getParent());
       }

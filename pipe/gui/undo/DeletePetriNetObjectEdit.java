@@ -5,7 +5,7 @@ package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 
 
 /**
@@ -17,12 +17,12 @@ public class DeletePetriNetObjectEdit
    
    PetriNetObject pnObject;
    DataLayer model;
-   GuiView view;
+   DrawingSurface view;
    Object[] objects;
    
    /** Creates a new instance of placeWeightEdit */
    public DeletePetriNetObjectEdit(PetriNetObject _pnObject,
-            GuiView _view, DataLayer _model) {
+            DrawingSurface _view, DataLayer _model) {
       pnObject = _pnObject;
       view = _view;
       model = _model;

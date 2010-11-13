@@ -51,7 +51,7 @@ import pipe.gui.undo.UndoManager;
 /**
  * The petrinet is drawn onto this frame.
  */
-public class GuiView 
+public class DrawingSurface 
 extends JLayeredPane 
 implements Observer, Printable {
 
@@ -99,7 +99,7 @@ implements Observer, Printable {
 
 	
 
-	public GuiView(DataLayer _model) {
+	public DrawingSurface(DataLayer _model) {
 		model = _model;
 		setLayout(null);
 		setOpaque(true);
@@ -501,14 +501,14 @@ EOC*/
 
 		private PetriNetObject pnObject;
 
-		private GuiView view;
+		private DrawingSurface view;
 
 		private DataLayer model;
 
 		private Point dragStart;
 
 
-		public MouseHandler(GuiView _view, DataLayer _model){
+		public MouseHandler(DrawingSurface _view, DataLayer _model){
 			super();
 			view = _view;
 			model = _model;

@@ -13,7 +13,7 @@ import javax.swing.JComponent;
 
 import pipe.gui.CopyPasteable;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
@@ -169,7 +169,7 @@ protected final static int COMPONENT_DRAW_OFFSET = 5;
    }
    
    
-   public void undelete(DataLayer model, GuiView view) {
+   public void undelete(DataLayer model, DrawingSurface view) {
       model.addPetriNetObject(this);
       view.add(this);
    }

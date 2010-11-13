@@ -11,11 +11,15 @@ public class TimedPlace {
 	private TimeInvariant invariant;
 	private List<TimedOutputArc> preset;
 	private List<TimedInputArc> postset;
+	private List<TransportArc> presetTransportArcs;
+	private List<TransportArc> postsetTransportArcs;
 
 	public TimedPlace(String name){
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
 		preset = new ArrayList<TimedOutputArc>();
 		postset = new ArrayList<TimedInputArc>();
+		presetTransportArcs = new ArrayList<TransportArc>();
+		postsetTransportArcs = new ArrayList<TransportArc>();
 	}
 	
 	public TimedPlace(String name, TimeInvariant invariant) {
@@ -47,8 +51,19 @@ public class TimedPlace {
 		preset.add(arc);
 	}
 	
+	public void addToPreset(TransportArc arc) {
+		Require.that(arc != null, "Cannot add null to preset");
+		presetTransportArcs.add(arc);	
+	}
+	
+	
 	public void addToPostset(TimedInputArc arc){
 		Require.that(arc != null, "Cannot add null to postset");
 		postset.add(arc);
+	}
+
+	public void addToPostset(TransportArc arc) {
+		Require.that(arc != null, "Cannot add null to postset");
+		postsetTransportArcs.add(arc);	
 	}
 }

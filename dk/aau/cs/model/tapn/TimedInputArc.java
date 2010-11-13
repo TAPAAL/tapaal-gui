@@ -10,11 +10,10 @@ public class TimedInputArc {
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
-		Require.that(interval != null, "A timed input arc cannot have a null interval");
-				
+						
 		this.source = source;
 		this.destination = destination;
-		this.interval = interval;
+		setTimeInterval(interval);
 	}
 	
 	public TimedPlace source(){
@@ -23,6 +22,12 @@ public class TimedInputArc {
 	
 	public TimeInterval interval(){
 		return interval;
+	}
+	
+	public void setTimeInterval(TimeInterval interval){
+		Require.that(interval != null, "A timed input arc cannot have a null interval");
+		
+		this.interval = interval;
 	}
 	
 	public TimedTransition destination(){

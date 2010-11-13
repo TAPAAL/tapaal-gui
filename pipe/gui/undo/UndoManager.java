@@ -13,7 +13,7 @@ import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.GuiFrame;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 
 
@@ -32,7 +32,7 @@ public class UndoManager {
 
    private ArrayList<ArrayList<UndoableEdit>> edits = new ArrayList<ArrayList<UndoableEdit>>(UNDO_BUFFER_CAPACITY);
    
-   private GuiView view;
+   private DrawingSurface view;
    private DataLayer model;
    private GuiFrame app;
 
@@ -40,7 +40,7 @@ public class UndoManager {
    /**
     * Creates a new instance of UndoManager
     */
-   public UndoManager(GuiView _view, DataLayer _model, GuiFrame _app) {
+   public UndoManager(DrawingSurface _view, DataLayer _model, GuiFrame _app) {
       view = _view;
       model = _model;
       app = _app;

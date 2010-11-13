@@ -22,7 +22,7 @@ import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
-import pipe.gui.GuiView;
+import pipe.gui.DrawingSurface;
 import pipe.gui.Pipe;
 import pipe.gui.action.EditWeightAction;
 import pipe.gui.action.InsertPointAction;
@@ -259,7 +259,7 @@ extends PetriNetObjectHandler {
 			// Calculate translation in mouse
 			int transX = (Grid.getModifiedX(e.getX() - dragInit.x));
 			int transY = (Grid.getModifiedY(e.getY() - dragInit.y));
-			((GuiView)contentPane).getSelectionObject().translateSelection(
+			((DrawingSurface)contentPane).getSelectionObject().translateSelection(
 					transX, transY);
 			dragInit.translate(
 					-(currentObject.getLocation().x - oldLocation.x - transX),

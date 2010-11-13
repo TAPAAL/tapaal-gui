@@ -14,11 +14,11 @@ public class TimedOutputArc {
 		this.destination = destination;
 	}
 	
-	public TimedTransition destination() {
+	public TimedTransition source() {
 		return source;
 	}
 
-	public TimedPlace source() {
+	public TimedPlace destination() {
 		return destination;
 	}
 }
