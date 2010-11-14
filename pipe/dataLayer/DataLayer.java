@@ -1426,8 +1426,8 @@ implements Cloneable {
 						((TimedPlace)p).setAgeOfTokens(markingOfP);
 						setChanged();
 						notifyObservers(p);
-
 					}
+					placeMarkingStorageMap = null;
 				}
 			}else{
 				if(coloredPlaceMarkingStorageMap != null){
@@ -1438,6 +1438,7 @@ implements Cloneable {
 						notifyObservers(p);
 
 					}
+					placeMarkingStorageMap = null;
 				}
 			}
 		}else{
@@ -1452,6 +1453,7 @@ implements Cloneable {
 
 					}
 				}
+				markingVectorAnimationStorage = null;
 			}
 		}
 	}

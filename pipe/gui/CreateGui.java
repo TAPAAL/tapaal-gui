@@ -31,6 +31,7 @@ import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
@@ -40,27 +41,9 @@ public class CreateGui {
 	public static GuiFrame appGui;
 	private static Animator animator;
 	private static JTabbedPane appTab;
-	private static ArrayList<TabData> tabs = new ArrayList<TabData>();
+	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 
 	public static String imgPath, userPath; // useful for stuff
-
-	private static class TabData { // a structure for holding a tab's data
-		public DataLayer appModel;
-		public HashMap<PetriNetObject, String> oldGuards;
-		public DrawingSurface appView;
-		public File appFile;
-	}
-
-	/** The Module will go in the top pane, the animation window in the bottom pane */
-	private static JSplitPane leftPane;
-	private static AnimationHistory animBox;
-	static AnimationController animControlerBox;
-	private static JScrollPane scroller;
-	private static JScrollPane scroller2;
-	private static LeftQueryPane queries;
-	private static LeftConstantsPane leftBottomPanel;
-	private static JSplitPane pane;
-	private static AnimationHistory abstractAnimationPane=null;
 	
 	public static void init() {
 		imgPath = "Images" + System.getProperty("file.separator");
@@ -81,28 +64,12 @@ public class CreateGui {
 		appGui.setTab();   // sets Tab properties
 
 
-		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
-		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		leftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
-		leftPane.setMinimumSize(new Dimension(175,100));
-		createLeftPane();
-		pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
-		
-		
-		pane.setContinuousLayout(true);
-		pane.setOneTouchExpandable(true);
-		pane.setBorder(null); // avoid multiple borders
-
-		pane.setDividerSize(8);
-
-
-		appGui.getContentPane().add(pane);
+		appGui.getContentPane().add(appTab);
 
 		//appGui.createNewTabFromFile(null);
 
 		appGui.setVisible(true);
 		appGui.init();
-		emptyLeftPane();
 		Verifyta.trySetupFromEnvironmentVariable();
 
 		VersionChecker versionChecker = new VersionChecker();
@@ -136,39 +103,39 @@ public class CreateGui {
 			return null;
 		}
 
-		TabData tab = (tabs.get(index));
-		if (tab.appModel == null) {
-			tab.appModel = new DataLayer();
+		TabContent tab = (tabs.get(index));
+		if (tab.getModel() == null) {
+			tab.setModel(new DataLayer());
 		}
-		return tab.appModel;
+		return tab.getModel();
 	}
 
 
-	public static DrawingSurface getView(int index) {
+	public static DrawingSurface getDrawingSurface(int index) {
 		if (index < 0) {
 			return null;
 		}
 
-		TabData tab = (tabs.get(index));
-		while (tab.appView == null) {
+		TabContent tab = (tabs.get(index));
+		while (tab.getDrawingSurface() == null) {
 			try {
-				tab.appView = new DrawingSurface(tab.appModel);
+				tab.setDrawingSurface(new DrawingSurface(tab.getModel()));
 			} catch (Exception e){
 				e.printStackTrace();
 			}
 		}
-		return tab.appView;
+		return tab.getDrawingSurface();
 	}
 
 
 	public static DrawingSurface getView() {
-		return getView(appTab.getSelectedIndex());
+		return getDrawingSurface(appTab.getSelectedIndex());
 	}
 
 
 	public static File getFile() {
-		TabData tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.appFile;
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getFile();
 	}
 
 
@@ -176,27 +143,28 @@ public class CreateGui {
 		if (fileNo >= tabs.size()) {
 			return;
 		}
-		TabData tab = (tabs.get(fileNo));
-		tab.appFile = modelfile;
+		TabContent tab = (tabs.get(fileNo));
+		tab.setFile(modelfile);
 	}
 
 
 	public static int getFreeSpace() {
-		tabs.add(new TabData());
+		tabs.add(new TabContent());
 		return tabs.size() - 1;
 	}
 
 
 	public static void removeTab(int index) {
 		tabs.remove(index);
-		if(tabs.isEmpty()){
-			emptyLeftPane();
-		}
 	}
 
 
 	public static JTabbedPane getTab() {
 		return appTab;
+	}
+	
+	public static TabContent getTab(int index) {
+		return tabs.get(index);
 	}
 
 	public static Animator getAnimator() {
@@ -209,289 +177,92 @@ public class CreateGui {
 		if (appTab.getSelectedIndex() < 0) {
 			return null;
 		}
-		TabData tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.appModel;
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getModel();
 	}
 
 	public static void setupModelForSimulation(){
 		if (appTab.getSelectedIndex() >= 0) {
-			TabData tab = (tabs.get(appTab.getSelectedIndex()));
-			//DataLayer model = tab.appModel.clone();
-			if(!tab.appModel.isUsingColors()){
-				HashMap<PetriNetObject, String> oldGuards = transformToModelWithoutConstants(tab.appModel);
-				tab.oldGuards = oldGuards;
-			}else{
-				configureNetToShowValues(tab.appModel, true);
-			}
-		}
-	}
-
-	private static void configureNetToShowValues(DataLayer model, boolean showValues) {
-		for(Place tp : model.getPlaces()){
-			ColoredTimedPlace place = (ColoredTimedPlace)tp;
-			place.displayValues(showValues);
-		}		
-
-		for(Arc arc : model.getArcs()){
-			if(arc instanceof ColoredTransportArc){
-				((ColoredTransportArc)arc).displayValues(showValues);
-			}else if(arc instanceof ColoredInputArc){
-				((ColoredInputArc)arc).displayValues(showValues);
-			}else if(arc instanceof ColoredInhibitorArc){
-				((ColoredInhibitorArc)arc).displayValues(showValues);
-			}else if(arc instanceof ColoredOutputArc){
-				((ColoredOutputArc)arc).displayValues(showValues);
-			}
+			TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+			tab.setupModelForSimulation();
 		}
 	}
 
 
 	public static void restoreModelForEditing(){
 		if (appTab.getSelectedIndex() >= 0) {
-			TabData tab = (tabs.get(appTab.getSelectedIndex()));
-			if(tab.appModel.isUsingColors()){
-				configureNetToShowValues(tab.appModel, false);
-			}else{
-				if(tab.oldGuards != null){
-					setupModelWithOldGuards(tab.appModel, tab.oldGuards);
-					tab.oldGuards = null;
-				}
-			}
+			TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+			tab.restoreModelForEditing();
 		}
-	}
-
-	private static void setupModelWithOldGuards(DataLayer model,
-			HashMap<PetriNetObject, String> oldGuards) {
-		for(Place p : model.getPlaces()){
-			if(p instanceof TimedPlace){
-				String inv = oldGuards.get(p);
-				((TimedPlace)p).setInvariant(inv);
-			}
-		}
-
-		for(Arc arc : model.getArcs()){
-			if(arc instanceof TimedArc || arc instanceof TransportArc){
-				TimedArc tarc = (TimedArc)arc;
-				String guard = oldGuards.get(arc);
-				tarc.setGuard(guard);
-			}
-		}
-	}
-
-
-	private static HashMap<PetriNetObject, String> transformToModelWithoutConstants(DataLayer model) {
-		HashMap<PetriNetObject, String> oldGuards = new HashMap<PetriNetObject, String>();
-
-		for(Place p : model.getPlaces()){
-			if(p instanceof TimedPlace){
-				oldGuards.put(p, ((TimedPlace) p).getInvariant());
-				String inv = getInvariant(p, model);
-				((TimedPlace)p).setInvariant(inv);
-			}
-		}
-
-		for(Arc arc : model.getArcs()){
-			if(arc instanceof TimedArc || arc instanceof TransportArc){
-				oldGuards.put(arc, ((TimedArc) arc).getGuard());
-				TimedArc tarc = (TimedArc)arc;
-				String guard = getGuard(tarc, model);
-				tarc.setGuard(guard);
-			}
-		}
-
-		return oldGuards;
-	}
-
-	private static String getGuard(TimedArc arc, DataLayer model) {
-		String guard = arc.getGuard();
-		String leftDelim = guard.substring(0,1);
-		String rightDelim = guard.substring(guard.length()-1, guard.length());
-		String first = guard.substring(1, guard.indexOf(","));
-		String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
-
-		boolean isFirstConstant = false;
-		boolean isSecondConstant = false;
-
-		try{
-			Integer.parseInt(first);
-		}catch(NumberFormatException e){
-			isFirstConstant = true;
-		}
-
-		try{
-			Integer.parseInt(second);
-		}catch(NumberFormatException e){
-			if(!second.equals("inf")) isSecondConstant = true;
-		}
-
-		if(isFirstConstant){
-			first = String.valueOf(model.getConstantValue(first));
-		}
-
-		if(isSecondConstant){
-			second = String.valueOf(model.getConstantValue(second));
-		}
-
-		return leftDelim + first + "," + second + rightDelim;
-	}
-
-	private static String getInvariant(Place place, DataLayer model) {
-		String inv = ((TimedPlace)place).getInvariant();
-		String operator = inv.contains("<=") ? "<=" : "<";
-
-		String bound = inv.substring(operator.length());
-
-		boolean isConstant = false;
-		try{
-			Integer.parseInt(bound);
-		}catch(NumberFormatException e){
-			if(!bound.equals("inf")) isConstant = true;
-		}
-
-		if(isConstant)
-			bound = String.valueOf(model.getConstantValue(bound));
-
-		return operator + bound;
 	}
 
 
 	/** Creates a new animationHistory text area, and returns a reference to it*/
 	public static void addAnimationHistory() {
-		try {
-			animBox = new AnimationHistory("Simulation history\n");
-			animBox.setEditable(false);
-
-			scroller = new JScrollPane(animBox);
-			scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
-			leftPane.setBottomComponent(scroller);
-
-			//         leftPane.setDividerLocation(0.5);
-			leftPane.setResizeWeight(0.05f);
-
-			leftPane.setDividerSize(8);
-		} catch (javax.swing.text.BadLocationException be) {
-			be.printStackTrace();
-		}
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.addAnimationHistory();
 	}
 
 	public static AnimationHistory getAbstractAnimationPane(){
-		return abstractAnimationPane;
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getAbstractAnimationPane();
 	}
 
 	public static void addAbstractAnimationPane() {
-		
-
-		try {
-			abstractAnimationPane=new AnimationHistory("Untimed Trace\n");
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//abstractAnimationPane.setVerticalAlignment(SwingConstants.TOP);
-
-		//Create a new empty animBox
-		try {
-			animBox = new AnimationHistory("Simulation history\n");
-			animBox.setEditable(false);
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		JSplitPane pane2 = 
-			new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,animBox,abstractAnimationPane);
-
-		pane2.setContinuousLayout(true);
-		pane2.setOneTouchExpandable(true);
-		pane2.setBorder(null); // avoid multiple borders
-
-		pane2.setDividerSize(8);
-
-		leftPane.setBottomComponent(pane2);
-		abstractAnimationPane.setBorder(new LineBorder(Color.black));
-
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.addAbstractAnimationPane();
+	}
+	
+	public static AnimationController getAnimationController()
+	{
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getAnimationController();
 	}
 
 	public static void removeAbstractAnimationPane() {
-		abstractAnimationPane=null;
-		scroller = new JScrollPane(animBox);
-		scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-		leftPane.setBottomComponent(scroller);
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.removeAbstractAnimationPane();
 	}
 
-	public static void addAnimationControler() {
-		try {
-			animControlerBox = new AnimationController("Simulation Controler\n");
-
-			scroller2 = new JScrollPane(animControlerBox);
-			scroller2.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
-			leftPane.setTopComponent(scroller2);
-
-			//         leftPane.setDividerLocation(0.5);
-			leftPane.setDividerSize(8);
-			leftPane.resetToPreferredSizes();
-			//shortcutBottons should be usable from start of
-			animControlerBox.requestFocus(true);
-		} catch (javax.swing.text.BadLocationException be) {
-			be.printStackTrace();
-			System.out.println("There where an error in creating the AnimationControler");
-		}
+	public static void addAnimationController() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.addAnimationController();
 	}
 
 	public static void removeAnimationHistory() {
-		if (scroller != null) {
-			leftPane.remove(scroller);
-			leftPane.setDividerLocation(DIVIDER_LOCATION);
-			leftPane.setDividerSize(0);
-		}
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.removeAnimationHistory();
 	}
-	public static void removeAnimationControler() {
-		if (scroller != null) {
-			leftPane.remove(scroller2);
-			leftPane.setDividerLocation(DIVIDER_LOCATION);
-			leftPane.setDividerSize(0);
-		}
+	
+	public static void removeAnimationController() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.removeAnimationController();
 	}
 
 
 	public static AnimationHistory getAnimationHistory() {
-		return animBox;
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getAnimationHistory();
 	}
 
 	public static void createLeftPane(){
-		DataLayer model = CreateGui.getModel();
-		boolean enableAddButton = model == null ? true : !model.netType().equals(NetType.UNTIMED);
-		leftBottomPanel = new LeftConstantsPane(enableAddButton);
-		queries = new LeftQueryPane(
-				getModel() == null ? new ArrayList<TAPNQuery>() : getModel().getQueries()
-		);
-		leftPane.setDividerLocation(DIVIDER_LOCATION);
-		leftPane.setResizeWeight(0.5);
-		leftPane.setTopComponent(queries);
-		leftPane.setBottomComponent(leftBottomPanel);
-		leftPane.setContinuousLayout(true);
-		leftPane.setDividerSize(0);
-		updateLeftPanel();
-	}
-
-	public static void emptyLeftPane(){
-		leftPane.setTopComponent(null);
-		leftPane.setBottomComponent(null);
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.createLeftPane();
 	}
 
 	public static void updateConstantsList(){
-		leftBottomPanel.showConstants();
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));	
+		tab.updateConstantsList();
 	}
 
 	public static void updateLeftPanel() {
-		leftPane.validate();
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.updateLeftPanel();
 	}
 
 
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size()-1);
 	}
+
 }

@@ -66,6 +66,7 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
@@ -764,7 +765,7 @@ EOC */
 	//set frame objects by array index
 	private void setObjects(int index){
 		appModel = CreateGui.getModel(index);
-		appView = CreateGui.getView(index);
+		appView = CreateGui.getDrawingSurface(index);
 	}
 
 
@@ -935,10 +936,8 @@ EOC */
 			name = "New Petri net " + (newNameCounter++) + ".xml";
 		}
 
-		JScrollPane scroller = new JScrollPane(appView);
-		// make it less bad on XP
-		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		appTab.addTab(name,null,scroller,null);
+		TabContent tab = CreateGui.getTab(freeSpace);
+		appTab.addTab(name,null,tab,null);
 		appTab.setSelectedIndex(freeSpace);
 
 
@@ -974,10 +973,8 @@ EOC */
 			name = file.getName();
 		}
 
-		JScrollPane scroller = new JScrollPane(appView);
-		// make it less bad on XP
-		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		appTab.addTab(name,null,scroller,null);
+		TabContent tab = CreateGui.getTab(freeSpace);
+		appTab.addTab(name,null,tab,null);
 		appTab.setSelectedIndex(freeSpace);
 
 
@@ -1047,63 +1044,6 @@ EOC */
 
 	}
 
-
-	// XXX - testting kyrke
-	/**
-	 * Creates a new tab with a given AppModel 
-	 * @param model Appmodel of a PN
-	 * @author kyrke@cs.aau.dk
-	 */
-	public void createNewTab(TAPN model) {
-		int freeSpace = CreateGui.getFreeSpace();
-		String name="";
-
-
-		setObjects(freeSpace);
-
-		appModel.addObserver((Observer)appView); // Add the view as Observer
-		appModel.addObserver((Observer)appGui);  // Add the app window as observer
-
-		appModel.addPetriNetObject(new Place(100.0, 100.0));
-		try {
-
-
-
-			appModel.createFromTAPN(model);
-
-			appView.scrollRectToVisible(new Rectangle(0,0,1,1));
-
-			name = "Converted";
-		} catch(Exception e) {
-			JOptionPane.showMessageDialog(
-					GuiFrame.this,
-					"Error loading file:\n" + name + "\nGuru meditation:\n"
-					+ e.toString(),
-					"File load error",
-					JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			return;
-		}
-
-
-		appView.setNetChanged(false);   // Status is unchanged
-
-		JScrollPane scroller = new JScrollPane(appView);
-		// make it less bad on XP
-		scroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		appTab.addTab(name,null,scroller,null);
-		appTab.setSelectedIndex(freeSpace);
-
-		appView.updatePreferredSize();
-		//appView.add( new ViewExpansionComponent(appView.getWidth(),
-		//        appView.getHeight());
-
-		setTitle(name);// Change the program caption
-		appTab.setTitleAt(freeSpace, name);
-		selectAction.actionPerformed(null);
-
-	}
-
 	/**
 	 * If current net has modifications, asks if you want to save and does it if
 	 * you want.
@@ -1155,7 +1095,7 @@ EOC */
 			stepbackwardAction.setEnabled(
 					CreateGui.getAnimationHistory().isStepBackAllowed());
 
-			CreateGui.animControlerBox.setAnimationButtonsEnabled();
+			CreateGui.getAnimationController().setAnimationButtonsEnabled();
 
 		} else {
 			stepbackwardAction.setEnabled(false);
@@ -1229,7 +1169,7 @@ EOC */
 			CreateGui.currentPNMLData().setEnabledTransitions();
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			CreateGui.addAnimationHistory();
-			CreateGui.addAnimationControler();
+			CreateGui.addAnimationController();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 
@@ -1239,6 +1179,7 @@ EOC */
 
 			//Set a light blue backgound color for animation mode
 			CreateGui.getView().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			
 			//Disable all draw actions
 			break;
 		case noNet:
@@ -1458,7 +1399,7 @@ EOC */
 				break;
 
 			case Pipe.TIMEPASS:
-				CreateGui.animControlerBox.addTimeDelayToHistory(new BigDecimal(1));
+				CreateGui.getAnimationController().addTimeDelayToHistory(new BigDecimal(1));
 				break;
 
 			case Pipe.RANDOM:
@@ -1470,7 +1411,7 @@ EOC */
 						((TimedPlace)p).showAgeOfTokens(true);
 					}
 				}
-				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case Pipe.STEPFORWARD:
@@ -1482,7 +1423,7 @@ EOC */
 						((TimedPlace)p).showAgeOfTokens(true);
 					}
 				}
-				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case Pipe.STEPBACKWARD:
@@ -1494,7 +1435,7 @@ EOC */
 						((TimedPlace)p).showAgeOfTokens(true);
 					}
 				}
-				CreateGui.animControlerBox.setAnimationButtonsEnabled();
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case Pipe.ANIMATE:

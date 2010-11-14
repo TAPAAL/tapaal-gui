@@ -544,7 +544,7 @@ public class Animator {
 		actionHistory.add(dfa); // newAction = the transition to fire
 		CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
 
-		CreateGui.animControlerBox.setAnimationButtonsEnabled();
+		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
 
 	public void manipulatehistory(DiscreetFiringAction dfa){
@@ -555,7 +555,7 @@ public class Animator {
 		actionHistory.add(dfa); // newAction = the transition to fire
 		CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
 
-		CreateGui.animControlerBox.setAnimationButtonsEnabled();
+		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
 	public void manipulatehistory(BigDecimal delay){
 		markingHistory.add(null); 
@@ -563,7 +563,7 @@ public class Animator {
 
 		CreateGui.getAnimationHistory().addHistoryItemDontChange("Time delay: "+ delay);
 
-		CreateGui.animControlerBox.setAnimationButtonsEnabled();
+		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
 
 	public Firingmode getFiringmode() {
@@ -614,7 +614,7 @@ public class Animator {
 			System.err.println("Iligal firing mode mode: " + t + " not found.");
 		}
 
-		CreateGui.animControlerBox.updateFiringModeComboBox();
+		CreateGui.getAnimationController().updateFiringModeComboBox();
 	}
 
 	public interface Firingmode {
