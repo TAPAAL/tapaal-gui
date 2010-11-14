@@ -114,7 +114,6 @@ public class NewTemplatePanel extends JPanel {
 
 	private void initChoicePanel() {
 		JPanel choicePanel = new JPanel(new GridBagLayout());
-		choicePanel.setBorder(BorderFactory.createTitledBorder("Net type"));
 		
 		JLabel nameLabel = new JLabel("Name:");
 		GridBagConstraints gbc = new GridBagConstraints();
