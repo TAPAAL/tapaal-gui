@@ -10,24 +10,24 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import pipe.dataLayer.NetType;
-import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
-import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.JSplitPaneFix;
 
 public class TemplateExplorer extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2334464984237161208L;
+
 	private static int templateNumber = 0;
 
 	private JSplitPane splitPane;
@@ -37,7 +37,6 @@ public class TemplateExplorer extends JPanel {
 	private JLabel templateLabel;
 	private JScrollPane scrollpane;
 	private JTree templateExplorer;
-	private DefaultTreeModel treeModel;
 	
 	// Template button panel items
 	private JPanel buttonPanel;

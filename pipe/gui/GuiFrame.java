@@ -42,7 +42,6 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
@@ -57,7 +56,6 @@ import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.gui.action.GuiAction;
@@ -66,8 +64,8 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
+import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
@@ -502,7 +500,6 @@ EOC */
 		toolBar.add(openAction);
 		toolBar.add(saveAction);
 		toolBar.add(saveAsAction);
-		toolBar.add(closeAction);
 
 		//Print
 		toolBar.addSeparator();	
@@ -929,7 +926,6 @@ EOC */
 		int freeSpace = CreateGui.getFreeSpace();
 
 		setObjects(freeSpace);
-		appTab.getSelectedIndex();
 		CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
@@ -937,7 +933,8 @@ EOC */
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
-		appTab.addTab(name,null,tab,null);
+		appTab.addTab(name,tab);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
 
@@ -975,6 +972,7 @@ EOC */
 
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name,null,tab,null);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
 

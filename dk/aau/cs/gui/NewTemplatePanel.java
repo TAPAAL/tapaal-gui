@@ -6,18 +6,15 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 
 public class NewTemplatePanel extends JPanel {
 

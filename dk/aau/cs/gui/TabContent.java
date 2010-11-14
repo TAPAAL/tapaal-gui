@@ -29,7 +29,6 @@ import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistory;
-import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
@@ -37,6 +36,11 @@ import pipe.gui.widgets.LeftQueryPane;
 
 public class TabContent extends JSplitPane {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -648006317150905097L;
+
 	private static final double DIVIDER_LOCATION = 0.5;
 	
 	private DataLayer appModel;
@@ -51,7 +55,6 @@ public class TabContent extends JSplitPane {
 	private LeftQueryPane queries;
 	private LeftConstantsPane leftBottomPanel;
 	private TemplateExplorer templates;
-	private JSplitPane pane;
 	
 	/// Animation
 	private AnimationHistory animBox;
