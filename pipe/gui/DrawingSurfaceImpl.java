@@ -46,14 +46,16 @@ import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.gui.TimedPlaceControl;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 
 /**
  * The petrinet is drawn onto this frame.
  */
-public class DrawingSurface 
+public class DrawingSurfaceImpl 
 extends JLayeredPane 
-implements Observer, Printable {
+implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 
 	/**
 	 * 
@@ -81,6 +83,7 @@ implements Observer, Printable {
 	private UndoManager undoManager;
 
 	private DataLayer model;
+	private TimedArcPetriNet net = new TimedArcPetriNet();
 
 	private ArrayList <PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
 
@@ -99,7 +102,7 @@ implements Observer, Printable {
 
 	
 
-	public DrawingSurface(DataLayer _model) {
+	public DrawingSurfaceImpl(DataLayer _model) {
 		model = _model;
 		setLayout(null);
 		setOpaque(true);
@@ -132,20 +135,26 @@ implements Observer, Printable {
 				if (newObject instanceof Place) {
 					// XXX - kyrke
 					if (newObject instanceof TimedPlace) {
-
-						LabelHandler labelHandler =
-							new LabelHandler(((Place)newObject).getNameLabel(),
-									(Place)newObject);
-						((Place)newObject).getNameLabel().addMouseListener(labelHandler);
-						((Place)newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						((Place)newObject).getNameLabel().addMouseWheelListener(labelHandler);
-
-						PlaceHandler placeHandler =
-							new PlaceHandler(this, (Place)newObject);
-						newObject.addMouseListener(placeHandler);
-						newObject.addMouseWheelListener(placeHandler);
-						newObject.addMouseMotionListener(placeHandler);
-						add(newObject);
+						dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace(((TimedPlace)newObject).getName());
+						Point position = new Point((int)((TimedPlace)newObject).getPositionX(), (int)((TimedPlace)newObject).getPositionY());
+						net.add(tp);
+						TimedPlaceControl tpc = new TimedPlaceControl(this, tp, position);
+						setLayer(tpc, DEFAULT_LAYER.intValue() + Pipe.PLACE_TRANSITION_LAYER_OFFSET);
+						add(tpc);
+//
+//						LabelHandler labelHandler =
+//							new LabelHandler(((Place)newObject).getNameLabel(),
+//									(Place)newObject);
+//						((Place)newObject).getNameLabel().addMouseListener(labelHandler);
+//						((Place)newObject).getNameLabel().addMouseMotionListener(labelHandler);
+//						((Place)newObject).getNameLabel().addMouseWheelListener(labelHandler);
+//
+//						PlaceHandler placeHandler =
+//							new PlaceHandler(this, (Place)newObject);
+//						newObject.addMouseListener(placeHandler);
+//						newObject.addMouseWheelListener(placeHandler);
+//						newObject.addMouseMotionListener(placeHandler);
+//						add(newObject);
 
 					}else{
 
@@ -501,14 +510,14 @@ EOC*/
 
 		private PetriNetObject pnObject;
 
-		private DrawingSurface view;
+		private DrawingSurfaceImpl view;
 
 		private DataLayer model;
 
 		private Point dragStart;
 
 
-		public MouseHandler(DrawingSurface _view, DataLayer _model){
+		public MouseHandler(DrawingSurfaceImpl _view, DataLayer _model){
 			super();
 			view = _view;
 			model = _model;

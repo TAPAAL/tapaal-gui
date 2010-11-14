@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.TransportArc;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurface;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 
 
@@ -36,12 +36,12 @@ public void keyPressed(KeyEvent e) {
             // Windows key under linux, so the space key is used as a provisional
             // solution
          case KeyEvent.VK_SPACE: //provisional
-            ((DrawingSurface)arcBeingDrawn.getParent()).setMetaDown(true);
+            ((DrawingSurfaceImpl)arcBeingDrawn.getParent()).setMetaDown(true);
             break;
             
          case KeyEvent.VK_ESCAPE:
          case KeyEvent.VK_DELETE:
-            DrawingSurface aView = ((DrawingSurface)arcBeingDrawn.getParent());
+            DrawingSurfaceImpl aView = ((DrawingSurfaceImpl)arcBeingDrawn.getParent());
             aView.createArc = null;
             arcBeingDrawn.delete();
             
@@ -71,7 +71,7 @@ public void keyReleased(KeyEvent e) {
          case KeyEvent.VK_META:
          case KeyEvent.VK_WINDOWS:
          case KeyEvent.VK_SPACE: //provisional
-            ((DrawingSurface)arcBeingDrawn.getParent()).setMetaDown(false);
+            ((DrawingSurfaceImpl)arcBeingDrawn.getParent()).setMetaDown(false);
             break;
             
          default:

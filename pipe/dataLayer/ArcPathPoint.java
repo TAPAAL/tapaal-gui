@@ -14,7 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-import pipe.gui.DrawingSurface;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
@@ -306,7 +306,7 @@ public int getLayerOffset() {
 
    
    @Override
-public void undelete(DataLayer model, DrawingSurface view) {
+public void undelete(DataLayer model, DrawingSurfaceImpl view) {
       ;
    }
    

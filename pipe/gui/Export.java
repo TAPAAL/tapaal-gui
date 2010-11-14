@@ -136,7 +136,7 @@ public class Export {
 	}
 
 
-	public static void exportGuiView(DrawingSurface g,int format, DataLayer model) {
+	public static void exportGuiView(DrawingSurfaceImpl g,int format, DataLayer model) {
 		if (g.getComponentCount() == 0) {
 			return;
 		}
@@ -226,7 +226,7 @@ public class Export {
 	}
 
 
-	private static void resetViewAfterExport(DrawingSurface g, boolean gridEnabled) {
+	private static void resetViewAfterExport(DrawingSurfaceImpl g, boolean gridEnabled) {
 		if (gridEnabled) {
 			Grid.enableGrid();
 		}
@@ -235,7 +235,7 @@ public class Export {
 	}
 
 
-	private static void setupViewForExport(DrawingSurface g, boolean gridEnabled) {
+	private static void setupViewForExport(DrawingSurfaceImpl g, boolean gridEnabled) {
 		// Stuff to make it export properly
 		g.updatePreferredSize();
 		PetriNetObject.ignoreSelection(true);

@@ -38,11 +38,11 @@ private Point startPoint;
    private boolean isSelecting;
    private static final Color selectionColor = new Color(000, 000, 255, 030);
    private static final Color selectionColorOutline = new Color(000, 000, 100);
-   private DrawingSurface view;
+   private DrawingSurfaceImpl view;
    private boolean enabled = true;
 
    
-   public SelectionManager(DrawingSurface _view) {
+   public SelectionManager(DrawingSurfaceImpl _view) {
       addMouseListener(this);
       addMouseMotionListener(this);
       addMouseWheelListener(this);

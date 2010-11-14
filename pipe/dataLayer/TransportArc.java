@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
-import pipe.gui.DrawingSurface;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.undo.TransportArcGroupEdit;
 import pipe.gui.undo.UndoableEdit;
 
@@ -91,7 +91,7 @@ public class TransportArc extends TimedArc {
 	}
 	
 	@Override
-	public void undelete(DataLayer model, DrawingSurface view) {
+	public void undelete(DataLayer model, DrawingSurfaceImpl view) {
 		super.undelete(model, view);
 		
 		TransportArc a = connectedTo;

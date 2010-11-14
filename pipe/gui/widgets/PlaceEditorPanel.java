@@ -52,7 +52,7 @@ import pipe.dataLayer.colors.IntOrConstant;
 import pipe.dataLayer.colors.IntOrConstantRange;
 import pipe.dataLayer.colors.IntervalBound;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurface;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.undo.UndoableEdit;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 
@@ -72,7 +72,7 @@ extends javax.swing.JPanel {
 	Integer marking;
 	String name;
 	DataLayer pnmlData;
-	DrawingSurface view;
+	DrawingSurfaceImpl view;
 	JRootPane rootPane;
 
 
@@ -81,7 +81,7 @@ extends javax.swing.JPanel {
 	 * Creates new form PlaceEditor
 	 */
 	public PlaceEditorPanel(JRootPane _rootPane, TimedPlace _place, 
-			DataLayer _pnmlData, DrawingSurface _view) {
+			DataLayer _pnmlData, DrawingSurfaceImpl _view) {
 		place = _place;
 		pnmlData = _pnmlData;
 		view = _view;

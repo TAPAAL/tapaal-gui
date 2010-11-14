@@ -16,15 +16,15 @@ public class TimedPlace {
 
 	public TimedPlace(String name){
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
-		preset = new ArrayList<TimedOutputArc>();
-		postset = new ArrayList<TimedInputArc>();
-		presetTransportArcs = new ArrayList<TransportArc>();
-		postsetTransportArcs = new ArrayList<TransportArc>();
 	}
 	
 	public TimedPlace(String name, TimeInvariant invariant) {
 		setName(name);
 		setInvariant(invariant);
+		preset = new ArrayList<TimedOutputArc>();
+		postset = new ArrayList<TimedInputArc>();
+		presetTransportArcs = new ArrayList<TransportArc>();
+		postsetTransportArcs = new ArrayList<TransportArc>();
 	}
 	
 	public String name(){

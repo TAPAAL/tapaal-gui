@@ -103,7 +103,7 @@ implements ActionListener, Observer {
 	private String frameTitle;  //Frame title
 	private DataLayer appModel;
 	private GuiFrame appGui;
-	private DrawingSurface appView;
+	private DrawingSurfaceImpl appView;
 	private int mode, prev_mode, old_mode;             // *** mode WAS STATIC ***
 	private int newNameCounter = 1;
 	private JTabbedPane appTab;

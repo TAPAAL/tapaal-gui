@@ -111,7 +111,8 @@ public class CreateGui {
 	}
 
 
-	public static DrawingSurface getDrawingSurface(int index) {
+
+	public static DrawingSurfaceImpl getDrawingSurface(int index) {
 		if (index < 0) {
 			return null;
 		}
@@ -119,7 +120,7 @@ public class CreateGui {
 		TabContent tab = (tabs.get(index));
 		while (tab.getDrawingSurface() == null) {
 			try {
-				tab.setDrawingSurface(new DrawingSurface(tab.getModel()));
+				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel()));
 			} catch (Exception e){
 				e.printStackTrace();
 			}
@@ -128,7 +129,7 @@ public class CreateGui {
 	}
 
 
-	public static DrawingSurface getView() {
+	public static DrawingSurfaceImpl getView() {
 		return getDrawingSurface(appTab.getSelectedIndex());
 	}
 

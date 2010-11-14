@@ -30,7 +30,7 @@ import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistory;
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurface;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
@@ -42,7 +42,7 @@ public class TabContent extends JSplitPane {
 	private DataLayer appModel;
 	private HashMap<PetriNetObject, String> oldGuards;
 	private JScrollPane drawingSurfaceScroller;
-	private DrawingSurface drawingSurface;
+	private DrawingSurfaceImpl drawingSurface;
 	private File appFile;
 	
 	// Normal mode
@@ -69,7 +69,7 @@ public class TabContent extends JSplitPane {
 		appModel = new DataLayer();
 		
 		
-		drawingSurface = new DrawingSurface(appModel);
+		drawingSurface = new DrawingSurfaceImpl(appModel);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -117,12 +117,12 @@ public class TabContent extends JSplitPane {
 		appModel = model;
 	}
 	
-	public DrawingSurface getDrawingSurface()
+	public DrawingSurfaceImpl getDrawingSurface()
 	{
 		return drawingSurface; 
 	}
 	
-	public void setDrawingSurface(DrawingSurface drawingSurface) {
+	public void setDrawingSurface(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface; 		
 	}
 	
