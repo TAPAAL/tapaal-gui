@@ -29,7 +29,6 @@ import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistory;
-import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
@@ -37,6 +36,11 @@ import pipe.gui.widgets.LeftQueryPane;
 
 public class TabContent extends JSplitPane {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -648006317150905097L;
+
 	private static final double DIVIDER_LOCATION = 0.5;
 	
 	private DataLayer appModel;
@@ -47,9 +51,10 @@ public class TabContent extends JSplitPane {
 	
 	// Normal mode
 	private JSplitPane leftPane;
+	private JSplitPane queryConstantsSplit;
 	private LeftQueryPane queries;
 	private LeftConstantsPane leftBottomPanel;
-	private JSplitPane pane;
+	private TemplateExplorer templates;
 	
 	/// Animation
 	private AnimationHistory animBox;
@@ -60,10 +65,13 @@ public class TabContent extends JSplitPane {
 	
 	public TabContent()
 	{
-		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
 		leftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		leftPane.setMinimumSize(new Dimension(175,100));
+		
+		queryConstantsSplit = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+		queryConstantsSplit.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
+		queryConstantsSplit.setMinimumSize(new Dimension(175,100));
 		createLeftPane();
 		
 		appModel = new DataLayer();
@@ -90,12 +98,24 @@ public class TabContent extends JSplitPane {
 		queries = new LeftQueryPane(
 				appModel == null ? new ArrayList<TAPNQuery>() : appModel.getQueries()
 		);
-		leftPane.setDividerLocation(DIVIDER_LOCATION);
+		templates = new TemplateExplorer();
+		
+		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
+		queryConstantsSplit.setResizeWeight(0.5);
+		queryConstantsSplit.setTopComponent(queries);
+		queryConstantsSplit.setBottomComponent(leftBottomPanel);
+		queryConstantsSplit.setContinuousLayout(true);
+		queryConstantsSplit.setDividerSize(0);
+		
+		leftPane.setDividerLocation(0.3);
 		leftPane.setResizeWeight(0.5);
-		leftPane.setTopComponent(queries);
-		leftPane.setBottomComponent(leftBottomPanel);
+		leftPane.setTopComponent(templates);
+		leftPane.setBottomComponent(queryConstantsSplit);
 		leftPane.setContinuousLayout(true);
 		leftPane.setDividerSize(0);
+		
+		
+		
 		updateLeftPanel();
 	}
 

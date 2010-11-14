@@ -63,6 +63,7 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
+import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
@@ -498,7 +499,6 @@ EOC */
 		toolBar.add(openAction);
 		toolBar.add(saveAction);
 		toolBar.add(saveAsAction);
-		toolBar.add(closeAction);
 
 		//Print
 		toolBar.addSeparator();	
@@ -925,7 +925,6 @@ EOC */
 		int freeSpace = CreateGui.getFreeSpace();
 
 		setObjects(freeSpace);
-		appTab.getSelectedIndex();
 		CreateGui.getModel(freeSpace).setNetType(netType);
 
 		if (name == null || name.isEmpty()) {
@@ -933,7 +932,8 @@ EOC */
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
-		appTab.addTab(name,null,tab,null);
+		appTab.addTab(name,tab);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
 
@@ -971,6 +971,7 @@ EOC */
 
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name,null,tab,null);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
 
