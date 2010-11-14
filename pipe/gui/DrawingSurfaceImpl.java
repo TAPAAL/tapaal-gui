@@ -46,6 +46,7 @@ import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.gui.PetriNetElementControl;
 import dk.aau.cs.gui.TimedPlaceControl;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -355,6 +356,8 @@ implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 		for (int i = 0; i < children.length; i++) {
 			if (children[i] instanceof Zoomable) {
 				((Zoomable)children[i]).zoomUpdate(zoomControl.getPercent());
+			}else if(children[i] instanceof PetriNetElementControl){
+				((PetriNetElementControl)children[i]).zoom(zoomControl.getPercent());
 			}
 		}
 		doSetViewPosition = true;

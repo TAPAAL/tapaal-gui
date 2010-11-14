@@ -35,14 +35,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.parsers.DocumentBuilder;
@@ -57,7 +55,6 @@ import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
 import pipe.gui.action.GuiAction;
@@ -67,7 +64,6 @@ import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
@@ -1721,8 +1717,8 @@ EOC */
 			try {
 				String actionName = (String)getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
-				JViewport thisView =
-					((JScrollPane)appTab.getSelectedComponent()).getViewport();
+				TabContent tabContent = (TabContent)appTab.getSelectedComponent();
+				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
 				String selection = null, strToTest = null;
 
 				double midpointX = Zoomer.getUnzoomedValue(

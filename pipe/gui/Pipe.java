@@ -86,6 +86,8 @@ public class Pipe {
    public static final Color ELEMENT_FILL_COLOUR = Color.WHITE;
    public static final Color SELECTION_LINE_COLOUR = new Color(0,0,192);
    public static final Color SELECTION_FILL_COLOUR = new Color(192,192,255);
+   public static final Color SELECTION_TEXT_COLOUR = SELECTION_LINE_COLOUR;
+   public static final Color ELEMENT_TEXT_COLOUR = ELEMENT_LINE_COLOUR;
    
    // For ArcPath:
    public static final int ARC_CONTROL_POINT_CONSTANT = 3;

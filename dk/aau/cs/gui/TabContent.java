@@ -379,5 +379,9 @@ public class TabContent extends JSplitPane {
 	public AnimationHistory getAnimationHistory() {
 		return animBox;
 	}
+	
+	public JScrollPane drawingSurfaceScrollPane(){
+		return drawingSurfaceScroller;
+	}
 
 }

@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
+import dk.aau.cs.gui.PetriNetElementControl;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPath;
 import pipe.dataLayer.PetriNetObject;
@@ -112,12 +114,20 @@ public void paintComponent(Graphics g) {
    
    public void clearSelection() {
       // Get all the objects in the current window
-      ArrayList <PetriNetObject> pnObjects = view.getPNObjects();
-      for (PetriNetObject pnObject : pnObjects) {    
-         if (pnObject.isSelectable()) {
-            pnObject.deselect();
-         }
-      }
+	  for(Component component: view.getComponents()){
+		  if(component instanceof PetriNetElementControl){
+			  ((PetriNetElementControl) component).deselect();
+		  }else if(component instanceof PetriNetObject){
+			  ((PetriNetObject) component).deselect();
+		  }
+	  }
+	   
+	   //      ArrayList <PetriNetObject> pnObjects = view.getPNObjects();
+//      for (PetriNetObject pnObject : pnObjects) {    
+//         if (pnObject.isSelectable()) {
+//            pnObject.deselect();
+//         }
+//      }
    }
 
    
