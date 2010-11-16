@@ -32,15 +32,15 @@ public class TextLabel extends JLabel {
 		setText(text);
 		setLocation(locationRelativeTo.x - getPreferredSize().width, locationRelativeTo.y);
 		updateSize();
-
-		addMouseListeners();
 	}
 
 	public void addMouseListeners() {
+		removeMouseListeners();
+		
 		MouseWheelAndClickPassThroughHandler clickAndWheelHandler = new MouseWheelAndClickPassThroughHandler(owner);
 		addMouseListener(clickAndWheelHandler);
 		addMouseWheelListener(clickAndWheelHandler);
-		addMouseMotionListener(new DragHandler(this, drawingSurface));
+		addMouseMotionListener(new DragHandler(this, drawingSurface, false));
 	}
 	
 	public void removeMouseListeners(){

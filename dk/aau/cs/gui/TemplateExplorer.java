@@ -93,8 +93,6 @@ public class TemplateExplorer extends JPanel {
 		newTemplateButton.setPreferredSize(dimension);
 		
 		newTemplateButton.addActionListener(new ActionListener() {
-			
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
 				
@@ -112,8 +110,6 @@ public class TemplateExplorer extends JPanel {
 		removeTemplateButton.setPreferredSize(dimension);
 		
 		removeTemplateButton.addActionListener(new ActionListener() {
-			
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				

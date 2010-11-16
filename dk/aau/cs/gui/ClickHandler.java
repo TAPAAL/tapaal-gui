@@ -6,6 +6,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
+import pipe.dataLayer.Place;
+import pipe.gui.Zoomer;
+
 public class ClickHandler extends MouseInputAdapter {
 	private PetriNetElementControl control;
 	
@@ -26,7 +29,7 @@ public class ClickHandler extends MouseInputAdapter {
 			}
 		}else if(SwingUtilities.isRightMouseButton(e)){
 			//if not animation mode
-			JOptionPane.showMessageDialog(null, "popup menu");
+			control.showPopupMenu(e.getX(), e.getY());
 		}
 	}
 }

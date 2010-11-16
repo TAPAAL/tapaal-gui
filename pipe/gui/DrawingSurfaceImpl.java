@@ -14,6 +14,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -57,21 +58,15 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class DrawingSurfaceImpl 
 extends JLayeredPane 
 implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4434596266503933386L;
 
 	private boolean netChanged = false;
-
 	private boolean animationmode = false;
 
 	public Arc createArc;  //no longer static
 	public TransportArc transportArcPart1;  //used when creating transport arcs
 
 	public PlaceTransitionObject createPTO;
-
 	private AnimationHandler animationHandler = new AnimationHandler();
 
 	// When i'm using GNU/Linux, isMetaDown() doesn't return true when I press 
@@ -80,16 +75,13 @@ implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 	boolean metaDown = false; 
 
 	private SelectionManager selection;
-
 	private UndoManager undoManager;
 
 	private DataLayer model;
 	private TimedArcPetriNet net = new TimedArcPetriNet();
 
-	private ArrayList <PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
-
+	
 	private GuiFrame app = CreateGui.getApp();
-
 	private Zoomer zoomControl;
 
 	// flag used in fast mode to know if a new PetriNetObject has been created
@@ -100,6 +92,9 @@ implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 
 	// position where the viewport must be set
 	private Point viewPosition = new Point(0,0);
+
+	private List<PetriNetElementControl> controls = new ArrayList<PetriNetElementControl>();
+	private ArrayList <PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
 
 	
 
@@ -142,6 +137,7 @@ implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 						TimedPlaceControl tpc = new TimedPlaceControl(this, tp, position);
 						setLayer(tpc, DEFAULT_LAYER.intValue() + Pipe.PLACE_TRANSITION_LAYER_OFFSET);
 						add(tpc);
+						controls.add(tpc);
 //
 //						LabelHandler labelHandler =
 //							new LabelHandler(((Place)newObject).getNameLabel(),
@@ -319,8 +315,30 @@ implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 	}
 
 
-	public void changeAnimationMode(boolean status) {
-		animationmode = status;
+	public void changeAnimationMode(boolean animationmode) {
+		this.animationmode = animationmode;
+		if(animationmode){
+			selection.clearSelection();
+			remove(selection);
+			disableAllControls();
+		}else{
+			add(selection);
+			enableAllControls();
+		}
+	}
+
+
+	private void disableAllControls() {
+		for(PetriNetElementControl control : controls){
+			control.removeMouseListeners();
+		}
+	}
+
+
+	private void enableAllControls() {
+		for(PetriNetElementControl control : controls){
+			control.addMouseListeners();
+		}		
 	}
 
 
@@ -505,6 +523,15 @@ EOC*/
 
 	public int getZoom() {
 		return zoomControl.getPercent();
+	}
+	
+
+	public void surfaceChanged(){
+		repaint();
+	}
+	
+	public Iterable<PetriNetElementControl> controls(){
+		return controls;
 	}
 
 
@@ -896,5 +923,4 @@ EOC*/
 			}
 		}
 	}
-
 }

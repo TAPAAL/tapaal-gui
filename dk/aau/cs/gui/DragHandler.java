@@ -14,10 +14,12 @@ extends javax.swing.event.MouseInputAdapter {
 	private Point anchorPoint;
 	private JComponent draggableComponent;
 	private DrawingSurface drawingSurface;
+	private boolean snapToGrid;
 
-	public DragHandler(JComponent draggableComponent, DrawingSurface drawingSurface){
+	public DragHandler(JComponent draggableComponent, DrawingSurface drawingSurface, boolean snapToGrid){
 		this.draggableComponent = draggableComponent;
 		this.drawingSurface = drawingSurface;
+		this.snapToGrid = snapToGrid;
 	}
 
 	@Override
@@ -36,7 +38,12 @@ extends javax.swing.event.MouseInputAdapter {
 		int x = Math.max(0, mouseOnScreen.x - parentOnScreen.x - anchorX);
 		int y = Math.max(0, mouseOnScreen.y - parentOnScreen.y - anchorY);
 				
-		Point position = new Point(Grid.getModifiedX(x), Grid.getModifiedY(y));
+		if(snapToGrid){
+			x = Grid.getModifiedX(x);
+			y = Grid.getModifiedY(y);
+		}
+		
+		Point position = new Point(x, y);
 		draggableComponent.setLocation(position);
 		
 		drawingSurface.updatePreferredSize();
