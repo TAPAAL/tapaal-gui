@@ -1,11 +1,13 @@
 package dk.aau.cs.gui;
 
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -14,7 +16,12 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import pipe.dataLayer.NetType;
+import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
+import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.QueryDialogue;
+import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 
 public class NewTemplatePanel extends JPanel {
 
@@ -26,12 +33,21 @@ public class NewTemplatePanel extends JPanel {
 	private TemplateExplorer templates;
 	private JRootPane rootPane;
 	private JTextField nameTextBox;
-	private NetType netType;
+	private String currentName = null;
+	private boolean renaming = false;
 	
-	public NewTemplatePanel(JRootPane rootpane, TemplateExplorer templates, NetType netType){
+	public NewTemplatePanel(JRootPane rootpane, TemplateExplorer templates){
 		this.templates = templates;
 		this.rootPane = rootpane;
-		this.netType = netType;
+		
+		initComponents();
+	}
+	
+	public NewTemplatePanel(JRootPane rootpane, TemplateExplorer templates, String currentName){
+		this.templates = templates;
+		this.rootPane = rootpane;
+		this.currentName = currentName;
+		this.renaming = true;
 		
 		initComponents();
 	}
@@ -104,7 +120,10 @@ public class NewTemplatePanel extends JPanel {
 			return;
 		}
 		
-		templates.createNewTemplate(name, netType);
+		if(!renaming)
+			templates.createNewTemplate(name);
+		else
+			templates.renameTemplate(currentName,name);
 		
 		exit();
 	}
@@ -122,7 +141,7 @@ public class NewTemplatePanel extends JPanel {
 		choicePanel.add(nameLabel, gbc);
 		
 		String defaultName = "New Petri net template";
-		nameTextBox = new JTextField(defaultName, 12);
+		nameTextBox = new JTextField((renaming) ? currentName : defaultName, 12);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -140,4 +159,6 @@ public class NewTemplatePanel extends JPanel {
 		gbc.insets = new Insets(5,5,5,5);
 		add(choicePanel, gbc);
 	}
+	
+	
 }

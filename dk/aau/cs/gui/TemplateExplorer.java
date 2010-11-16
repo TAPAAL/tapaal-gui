@@ -2,23 +2,33 @@ package dk.aau.cs.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
 
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
-import pipe.dataLayer.NetType;
+import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
+import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.JSplitPaneFix;
 
 public class TemplateExplorer extends JPanel {
@@ -27,8 +37,8 @@ public class TemplateExplorer extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -2334464984237161208L;
-
-	private static int templateNumber = 0;
+	
+	private HashMap<TimedArcPetriNet, String> tapnNameMap;
 
 	private JSplitPane splitPane;
 	
@@ -36,16 +46,21 @@ public class TemplateExplorer extends JPanel {
 	private JPanel templatePanel;
 	private JLabel templateLabel;
 	private JScrollPane scrollpane;
-	private JTree templateExplorer;
+	private JList templateList;
+	private DefaultListModel listModel;
 	
 	// Template button panel items
 	private JPanel buttonPanel;
 	private JButton newTemplateButton;
 	private JButton removeTemplateButton;
+	private JButton renameButton;
+	private JButton copyButton;
 	
 	
 	public TemplateExplorer()
 	{
+		tapnNameMap = new HashMap<TimedArcPetriNet, String>();
+		
 		this.setLayout(new BorderLayout());
 		init();
 	}
@@ -66,20 +81,52 @@ public class TemplateExplorer extends JPanel {
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new BorderLayout());
 		
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Templates");
-		root.add(new DefaultMutableTreeNode("New Template class"));
+		listModel = new DefaultListModel();
+		templateList = new JList(listModel);
+		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		templateList.setVisibleRowCount(-1);
+		templateList.setLayoutOrientation(JList.VERTICAL);
+		templateList.setAlignmentX(Component.LEFT_ALIGNMENT);
+		templateList.setAlignmentY(Component.TOP_ALIGNMENT);
+		templateList.addListSelectionListener(new ListSelectionListener(){
+			public void valueChanged(ListSelectionEvent e){
+				if (e.getValueIsAdjusting() == false) {
+					if (templateList.getSelectedIndex() == -1) {
+						removeTemplateButton.setEnabled(false);
+						renameButton.setEnabled(false);
+						copyButton.setEnabled(false);
+					} else {
+						removeTemplateButton.setEnabled(true);
+						renameButton.setEnabled(true);
+						copyButton.setEnabled(true);
+					}
+				}
+			}
+		});
+		templateList.addMouseListener(new MouseAdapter(){
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(!templateList.isSelectionEmpty()){
+					if(arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2){
+						int index = templateList.locationToIndex(arg0.getPoint());
+						templateList.ensureIndexIsVisible(index);						
+						
+						// save current model
+						// close current model
+						// open selected model on DrawinSurface 
+					}	
+				}				
+			}
+		});
 		
-		templateExplorer = new JTree(root);
-		templateExplorer.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		templateExplorer.setAlignmentX(Component.LEFT_ALIGNMENT);
-		templateExplorer.setAlignmentY(Component.TOP_ALIGNMENT);
 		
 		templateLabel = new JLabel("Templates:");
 		templateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		templateLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 		templatePanel.add(templateLabel, BorderLayout.PAGE_START);
 		
-		scrollpane = new JScrollPane(templateExplorer);
+		scrollpane = new JScrollPane(templateList);
 		templatePanel.add(scrollpane, BorderLayout.CENTER);
 		
 	}
@@ -94,9 +141,11 @@ public class TemplateExplorer extends JPanel {
 		
 		newTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
+				ShowNewTemplateDialog(false);
+				showTemplates();
 			}
+
+			
 		});
 		
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -111,7 +160,12 @@ public class TemplateExplorer extends JPanel {
 		
 		removeTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
+				
+				// remove tapn from model
+				
+				tapnNameMap.remove(tapn);
+				showTemplates();
 				
 			}
 		});
@@ -121,14 +175,104 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(removeTemplateButton,gbc);
+		
+		renameButton = new JButton("Rename");
+		renameButton.setEnabled(false);
+		renameButton.setPreferredSize(dimension);
+		
+		renameButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				ShowNewTemplateDialog(true);
+				showTemplates();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonPanel.add(renameButton,gbc);
+		
+		copyButton = new JButton("Copy");
+		copyButton.setEnabled(false);
+		copyButton.setPreferredSize(dimension);
+		
+		copyButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
+				
+				// copy tapn
+				// add copy
+				// update UI
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonPanel.add(copyButton,gbc);
 	}
 
 
-	public void createNewTemplate(String name, NetType netType) {
+	private void ShowNewTemplateDialog(boolean renaming) {
+		EscapableDialog guiDialog = 
+			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+	
+		Container contentPane = guiDialog.getContentPane();
+	
+		// 1 Set layout
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
+	
+		// 2 Add query editor
+		NewTemplatePanel tp;
+		if(!renaming)
+			tp = new NewTemplatePanel(guiDialog.getRootPane(), this);
+		else {
+			TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
+			String name = tapnNameMap.get(tapn);
+			tp = new NewTemplatePanel(guiDialog.getRootPane(), this, name);
+		}
+		contentPane.add( tp );
+	
+		guiDialog.setResizable(false); 
+	
+	
+		// Make window fit contents' preferred size
+		guiDialog.pack();
+	
+		// Move window to the middle of the screen
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+	}
+	
+	public void createNewTemplate(String name)
+	{
+		DataLayer model = CreateGui.getModel();
+		TimedArcPetriNet tapn = new TimedArcPetriNet();
+	//	model.addTimedArcPetriNet(tapn);
+		tapnNameMap.put(tapn, name);
+	}
+	
+	private void showTemplates() {
+		DataLayer model = CreateGui.getModel();
 		
+		// add tapns from model to UI
 		
 	}
 
+	public void renameTemplate(String oldName, String newName) {
+		TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
+		
+		tapnNameMap.remove(tapn);
+		tapnNameMap.put(tapn, newName);
+		
+	}
 
 	
 }

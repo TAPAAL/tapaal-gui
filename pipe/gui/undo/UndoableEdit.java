@@ -6,8 +6,7 @@ package pipe.gui.undo;
 /**
  * @author Pere Bonet
  */
-public abstract class UndoableEdit
-implements dk.aau.cs.gui.undo.Command {
+public abstract class UndoableEdit {
    
    
    public abstract void undo();
