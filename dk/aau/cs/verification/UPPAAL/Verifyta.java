@@ -55,7 +55,9 @@ public class Verifyta implements ModelChecker {
 
 			try {
 				File file = fileFinder.ShowFileBrowserDialog("Uppaal Verifyta","");
-				verifytapath=file.getAbsolutePath();
+				
+				if(file != null)
+				 verifytapath=file.getAbsolutePath();
 			} catch (Exception e) {
 				messenger.displayErrorMessage(
 						"There were errors performing the requested action:\n" + e,
