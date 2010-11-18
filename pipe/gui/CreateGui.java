@@ -111,6 +111,9 @@ public class CreateGui {
 	}
 
 
+	public static DrawingSurfaceImpl getDrawingSurface() {
+		return getDrawingSurface(appTab.getSelectedIndex());
+	}
 
 	public static DrawingSurfaceImpl getDrawingSurface(int index) {
 		if (index < 0) {

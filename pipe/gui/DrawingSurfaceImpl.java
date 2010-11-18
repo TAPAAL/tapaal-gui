@@ -50,6 +50,7 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.PetriNetElementControl;
 import dk.aau.cs.gui.TimedPlaceControl;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 
 /**
@@ -79,6 +80,7 @@ implements Observer, Printable, dk.aau.cs.gui.DrawingSurface {
 
 	private DataLayer model;
 	private TimedArcPetriNet net = new TimedArcPetriNet();
+	private TimedArcPetriNetNetwork tapns = new TimedArcPetriNetNetwork();
 
 	
 	private GuiFrame app = CreateGui.getApp();
@@ -922,5 +924,16 @@ EOC*/
 				}
 			}
 		}
+	}
+
+
+	public TimedArcPetriNetNetwork getTAPNTemplates() {
+		return tapns;
+	}
+
+
+	public void openTAPNTemplate(TimedArcPetriNet tapn) {
+		//this.net = tapn;
+		//this.validate();
 	}
 }

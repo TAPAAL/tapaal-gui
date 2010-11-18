@@ -6,6 +6,10 @@ import java.util.List;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNet {
+	
+	private static int uniqueId = 0;
+	private String name;
+	
 	private List<TimedPlace> places;
 	private List<TimedTransition> transitions;
 	private List<TimedInputArc> inputArcs;
@@ -14,6 +18,11 @@ public class TimedArcPetriNet {
 	private List<TransportArc> transportArcs;
 	
 	public TimedArcPetriNet(){
+		this("New Timed Arc Petri Net" + uniqueId++);
+	}
+	
+	public TimedArcPetriNet(String name) {
+		this.name = name;
 		places = new ArrayList<TimedPlace>();
 		transitions = new ArrayList<TimedTransition>();
 		inputArcs = new ArrayList<TimedInputArc>();
@@ -107,5 +116,19 @@ public class TimedArcPetriNet {
 		for(TimedPlace place : places) if (place.name().equals(name)) return true;
 		for(TimedTransition transition : transitions) if(transition.name().equals(name)) return true;
 		return false;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	public void setName(String newName) {
+		if(name != null && name != "")
+			name = newName;
 	}
 }

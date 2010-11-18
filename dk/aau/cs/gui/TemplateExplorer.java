@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -25,8 +25,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.JSplitPaneFix;
@@ -37,8 +37,6 @@ public class TemplateExplorer extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -2334464984237161208L;
-	
-	private HashMap<TimedArcPetriNet, String> tapnNameMap;
 
 	private JSplitPane splitPane;
 	
@@ -59,7 +57,6 @@ public class TemplateExplorer extends JPanel {
 	
 	public TemplateExplorer()
 	{
-		tapnNameMap = new HashMap<TimedArcPetriNet, String>();
 		
 		this.setLayout(new BorderLayout());
 		init();
@@ -112,9 +109,8 @@ public class TemplateExplorer extends JPanel {
 						int index = templateList.locationToIndex(arg0.getPoint());
 						templateList.ensureIndexIsVisible(index);						
 						
-						// save current model
-						// close current model
-						// open selected model on DrawinSurface 
+						openSelectedTemplate();
+						
 					}	
 				}				
 			}
@@ -160,13 +156,10 @@ public class TemplateExplorer extends JPanel {
 		
 		removeTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
 				
-				// remove tapn from model
-				
-				tapnNameMap.remove(tapn);
+				// TODO: check if any local places are used in queries and if so warn user that these queries are removed too.
+				removeTemplate();
 				showTemplates();
-				
 			}
 		});
 		
@@ -235,7 +228,7 @@ public class TemplateExplorer extends JPanel {
 			tp = new NewTemplatePanel(guiDialog.getRootPane(), this);
 		else {
 			TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
-			String name = tapnNameMap.get(tapn);
+			String name = tapn.getName();
 			tp = new NewTemplatePanel(guiDialog.getRootPane(), this, name);
 		}
 		contentPane.add( tp );
@@ -253,24 +246,44 @@ public class TemplateExplorer extends JPanel {
 	
 	public void createNewTemplate(String name)
 	{
-		DataLayer model = CreateGui.getModel();
-		TimedArcPetriNet tapn = new TimedArcPetriNet();
-	//	model.addTimedArcPetriNet(tapn);
-		tapnNameMap.put(tapn, name);
+		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
+		
+		drawingSurface.getTAPNTemplates().add(tapn);
+		drawingSurface.openTAPNTemplate(tapn);
 	}
 	
 	private void showTemplates() {
-		DataLayer model = CreateGui.getModel();
+		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
 		
-		// add tapns from model to UI
+		List<TimedArcPetriNet> templates = drawingSurface.getTAPNTemplates().templates();
 		
+		listModel.removeAllElements();
+		for(TimedArcPetriNet tapn : templates)
+		{
+			listModel.addElement(tapn);
+		}
+		templateList.validate();
 	}
 
-	public void renameTemplate(String oldName, String newName) {
+	public void renameTemplate(String newName) {
 		TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
 		
-		tapnNameMap.remove(tapn);
-		tapnNameMap.put(tapn, newName);
+		tapn.setName(newName);
+	}
+	
+	private void removeTemplate() {
+		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
+		TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
+		
+		drawingSurface.getTAPNTemplates().remove(tapn);
+	}
+	
+	private void openSelectedTemplate() {
+		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
+		TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
+		
+		drawingSurface.openTAPNTemplate(tapn);
 		
 	}
 

@@ -15,6 +15,9 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
@@ -122,8 +125,10 @@ public class NewTemplatePanel extends JPanel {
 		
 		if(!renaming)
 			templates.createNewTemplate(name);
-		else
-			templates.renameTemplate(currentName,name);
+		else { // TODO: check if name is already used
+			templates.renameTemplate(name);
+		}
+			
 		
 		exit();
 	}
