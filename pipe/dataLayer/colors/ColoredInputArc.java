@@ -1,11 +1,11 @@
 package pipe.dataLayer.colors;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
 import pipe.gui.undo.ColoredInputArcColorGuardEdit;
 import pipe.gui.undo.ColoredInputArcTimeGuardEdit;
-import pipe.gui.undo.UndoableEdit;
 
 public class ColoredInputArc extends TimedArc {
 
@@ -69,7 +69,7 @@ public class ColoredInputArc extends TimedArc {
 	public ColorSet getColorGuard(){
 		return colorGuard;
 	}
-	public UndoableEdit setColorGuard(ColorSet newColorGuard) {
+	public Command setColorGuard(ColorSet newColorGuard) {
 		ColorSet old = this.colorGuard;
 		this.colorGuard = newColorGuard;
 
@@ -82,7 +82,7 @@ public class ColoredInputArc extends TimedArc {
 		return timeGuard;
 	}
 
-	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
+	public Command setTimeGuard(ColoredInterval newTimeGuard) {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
 		

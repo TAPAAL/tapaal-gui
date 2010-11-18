@@ -3,6 +3,7 @@
  */
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.NormalArc;
 
 
@@ -11,7 +12,7 @@ import pipe.dataLayer.NormalArc;
  * @author Pere Bonet
  */
 public class SetInverseArcEdit 
-        extends UndoableEdit {
+        extends Command {
    
    private NormalArc arc;
    private NormalArc inverse;

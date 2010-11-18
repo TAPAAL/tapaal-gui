@@ -7,6 +7,8 @@ import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -16,7 +18,6 @@ import pipe.gui.undo.JoinInverseArcEdit;
 import pipe.gui.undo.SetInverseArcEdit;
 import pipe.gui.undo.SplitInverseArcEdit;
 import pipe.gui.undo.TagArcEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -173,7 +174,7 @@ EOC*/
  EOC*/  
       
    @Override
-public UndoableEdit setWeight(int weightInput){
+public Command setWeight(int weightInput){
       int oldWeight = weight;
 
       weight = weightInput;
@@ -184,7 +185,7 @@ public UndoableEdit setWeight(int weightInput){
    
    
    /** Accessor function to set whether or not the Arc is tagged */             
-   public UndoableEdit setTagged(boolean flag){
+   public Command setTagged(boolean flag){
       /**Set the timed transition attribute (for GSPNs)*/
 
       tagged = flag;
@@ -247,7 +248,7 @@ public UndoableEdit setWeight(int weightInput){
    }
 
    
-   public UndoableEdit clearInverse() {
+   public Command clearInverse() {
       NormalArc oldInverse = inverse;
 
       inverse.inView = true;
@@ -276,7 +277,7 @@ public UndoableEdit setWeight(int weightInput){
    }
    
    
-   public UndoableEdit setInverse(NormalArc _inverse, boolean joined) {
+   public Command setInverse(NormalArc _inverse, boolean joined) {
       inverse = _inverse;
       inverse.inverse = this;
       updateArc(joined);
@@ -305,7 +306,7 @@ public UndoableEdit setWeight(int weightInput){
    }
 
    
-   public UndoableEdit split() {
+   public Command split() {
       //
       if (!this.inverse.inView) { 
          CreateGui.getView().add(inverse);
@@ -334,7 +335,7 @@ public UndoableEdit setWeight(int weightInput){
    }
 
    
-   public UndoableEdit join() {
+   public Command join() {
       this.updateArc(true);
       //((NormalArc)arc.getInverse()).setInView(false);
       //arc.getParent().remove(arc.getInverse());

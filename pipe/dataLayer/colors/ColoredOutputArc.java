@@ -1,9 +1,9 @@
 package pipe.dataLayer.colors;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.undo.ColoredOutputArcOutputValueEdit;
-import pipe.gui.undo.UndoableEdit;
 
 public class ColoredOutputArc extends NormalArc {
 	private IntOrConstant outputValue = new IntOrConstant();
@@ -36,7 +36,7 @@ public class ColoredOutputArc extends NormalArc {
 		updateWeightLabel();
 	}
 
-	public UndoableEdit setOutputValue(IntOrConstant newOutputValue) {
+	public Command setOutputValue(IntOrConstant newOutputValue) {
 		IntOrConstant old = this.outputValue;
 		this.outputValue = newOutputValue;
 		

@@ -40,9 +40,9 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.undo.UndoableEdit;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
 
@@ -2951,9 +2951,9 @@ implements Cloneable {
 		return constants.getConstants();
 	}
 
-	public UndoableEdit updateConstant(String oldName, Constant constant)
+	public Command updateConstant(String oldName, Constant constant)
 	{
-		UndoableEdit edit = constants.updateConstant(oldName, constant, this);
+		Command edit = constants.updateConstant(oldName, constant, this);
 		if(edit != null){
 			correctGuards(oldName, constant.getName());
 		}
@@ -3022,11 +3022,11 @@ implements Cloneable {
 	}
 
 
-	public UndoableEdit addConstant(String name, int value) {	
+	public Command addConstant(String name, int value) {	
 		return constants.addConstant(name, value);
 	}
 
-	public UndoableEdit removeConstant(String name){
+	public Command removeConstant(String name){
 		return constants.removeConstant(name);		
 	}
 

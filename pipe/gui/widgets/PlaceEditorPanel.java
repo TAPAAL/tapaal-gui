@@ -53,8 +53,8 @@ import pipe.dataLayer.colors.IntOrConstantRange;
 import pipe.dataLayer.colors.IntervalBound;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.undo.UndoableEdit;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
+import dk.aau.cs.gui.undo.Command;
 
 /**
  *
@@ -850,7 +850,7 @@ extends javax.swing.JPanel {
 
 			view.getUndoManager().addEdit(coloredTimedPlace.setTimeInvariant(timeInvariant));
 
-			UndoableEdit colorInvEdit = null;
+			Command colorInvEdit = null;
 			if(colorInvariantTextBox.getText().isEmpty()){
 				colorInvEdit = coloredTimedPlace.setColorInvariant(new ColorSet());
 			}else{
@@ -913,7 +913,7 @@ extends javax.swing.JPanel {
 				}
 			}
 
-			UndoableEdit edit = coloredTimedPlace.setColoredTokens(tokens);
+			Command edit = coloredTimedPlace.setColoredTokens(tokens);
 			view.getUndoManager().addEdit(edit);
 		}else if(pnmlData.netType().equals(NetType.TAPN)){
 			boolean isNormalInvariant = normalInvRadioButton.isSelected();

@@ -1,11 +1,11 @@
 package pipe.dataLayer.colors;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
 import pipe.gui.undo.ColoredInhibitorArcTimeGuardEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 public class ColoredInhibitorArc extends TAPNInhibitorArc {
@@ -63,7 +63,7 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		return colorGuard.toStringNoSetNotation();
 	}
 
-	public UndoableEdit setColorGuard(ColorSet newColorGuard) {
+	public Command setColorGuard(ColorSet newColorGuard) {
 		ColorSet old = this.colorGuard;
 		this.colorGuard = newColorGuard;
 
@@ -75,7 +75,7 @@ public class ColoredInhibitorArc extends TAPNInhibitorArc {
 		return timeGuard;
 	}
 
-	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
+	public Command setTimeGuard(ColoredInterval newTimeGuard) {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
 		

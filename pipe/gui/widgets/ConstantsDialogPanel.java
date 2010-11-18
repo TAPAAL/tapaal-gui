@@ -8,10 +8,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.SpinnerNumberModel;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
-import pipe.gui.undo.UndoableEdit;
 
 /*
  * LeftConstantsPane.java
@@ -108,7 +109,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     				nameTextField.setText(oldName);
     				return;
     			}
-  				UndoableEdit edit = model.updateConstant(oldName, new Constant(newName, val));
+  				Command edit = model.updateConstant(oldName, new Constant(newName, val));
     			if(edit == null){
     				JOptionPane.showMessageDialog(CreateGui.getApp(),
     						"The specified value is invalid for the current net.\n" +
@@ -122,7 +123,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     			}
     		}
     		else{
-    			UndoableEdit edit = model.addConstant(newName, val);
+    			Command edit = model.addConstant(newName, val);
     			if(edit == null){
     				JOptionPane.showMessageDialog(CreateGui.getApp(),
     						"A constant with the specified name already exists.",

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
@@ -21,7 +23,6 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
 import pipe.gui.undo.TransitionServerSemanticEdit;
 import pipe.gui.undo.TransitionTimingEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -285,7 +286,7 @@ extends PlaceTransitionObject {
 	/** 
 	 * Rotates the Transition through the specified angle around the midpoint 
 	 */
-	 public UndoableEdit rotate(int angleInc) {
+	 public Command rotate(int angleInc) {
 		angle = (angle + angleInc) % 360;
 		transition.transform(
 				AffineTransform.getRotateInstance(Math.toRadians(angleInc), 
@@ -354,7 +355,7 @@ extends PlaceTransitionObject {
 	 }
 
 
-	 public UndoableEdit setInfiniteServer(boolean status) {
+	 public Command setInfiniteServer(boolean status) {
 		 infiniteServer = status;
 		 repaint();
 		 return new TransitionServerSemanticEdit(this);
@@ -404,7 +405,7 @@ extends PlaceTransitionObject {
 	 }
 
 	 /**Set the timed transition attribute (for GSPNs)*/
-	 public UndoableEdit setTimed(boolean change) {
+	 public Command setTimed(boolean change) {
 		 timed = change;
 		 pnName.setText(getText());
 		 repaint();

@@ -3,10 +3,12 @@ package pipe.gui.undo;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.TimedPlace;
 
 
-public class TimedPlaceTokenEdit extends UndoableEdit {
+public class TimedPlaceTokenEdit extends Command {
 	private ArrayList<BigDecimal> oldValue;
 	private ArrayList<BigDecimal> newValue;
 	private TimedPlace place;

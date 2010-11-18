@@ -23,13 +23,13 @@ import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.JSplitPaneFix;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class TemplateExplorer extends JPanel {
 	
@@ -174,8 +174,6 @@ public class TemplateExplorer extends JPanel {
 		renameButton.setPreferredSize(dimension);
 		
 		renameButton.addActionListener(new ActionListener() {
-			
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
 				ShowNewTemplateDialog(true);
@@ -194,8 +192,6 @@ public class TemplateExplorer extends JPanel {
 		copyButton.setPreferredSize(dimension);
 		
 		copyButton.addActionListener(new ActionListener() {
-			
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
 				

@@ -4,6 +4,7 @@
 
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPath;
 import pipe.dataLayer.ArcPathPoint;
@@ -14,7 +15,7 @@ import pipe.dataLayer.ArcPathPoint;
  * @author Pere Bonet
  */
 public class AddArcPathPointEdit
-        extends UndoableEdit {
+        extends Command {
    
    ArcPath arcPath;
    ArcPathPoint point;

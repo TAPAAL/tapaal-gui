@@ -87,18 +87,20 @@ extends PetriNetElementControl {
 		}
 	}
 
+	@Override
 	public void addChildControls() {
 		parent().add(nameLabel);
 		parent().add(invariantLabel);
 		parent().surfaceChanged();
 	}
 
+	@Override
 	public void removeChildControls(){
 		parent().remove(nameLabel);
 		parent().remove(invariantLabel);
 		parent().surfaceChanged();
 	}
-
+		
 	@Override
 	public void setLocation(int x, int y) {
 		if(nameLabel != null) moveLabelRelativeToNewPlaceLocation(nameLabel, x, y);

@@ -1,8 +1,9 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.TimedPlace;
 
-public class TimedPlaceInvariantEdit extends UndoableEdit {
+public class TimedPlaceInvariantEdit extends Command {
 
 	private String oldvalue;
 	private String newvalue;

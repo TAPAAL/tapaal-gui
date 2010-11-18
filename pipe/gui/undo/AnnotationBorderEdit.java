@@ -4,6 +4,7 @@
 
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Note;
 
 /**
@@ -11,7 +12,7 @@ import pipe.dataLayer.Note;
  * @author corveau
  */
 public class AnnotationBorderEdit 
-        extends UndoableEdit {
+        extends Command {
    
    Note note;
    

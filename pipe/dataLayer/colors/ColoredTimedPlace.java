@@ -5,6 +5,8 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlace;
 import pipe.gui.CreateGui;
@@ -13,7 +15,6 @@ import pipe.gui.undo.ColoredPlaceRemoveTokenEdit;
 import pipe.gui.undo.ColoredPlaceTokensChangedEdit;
 import pipe.gui.undo.ColoredTimedPlaceTimeInvariantEdit;
 import pipe.gui.undo.PlaceColorInvariantEdit;
-import pipe.gui.undo.UndoableEdit;
 
 public class ColoredTimedPlace extends TimedPlace {
 
@@ -118,7 +119,7 @@ public class ColoredTimedPlace extends TimedPlace {
 		return colorInvariant.toStringNoSetNotation();
 	}
 
-	public UndoableEdit setColorInvariant(ColorSet newColorInvariant) {
+	public Command setColorInvariant(ColorSet newColorInvariant) {
 		ColorSet old = this.colorInvariant;
 		this.colorInvariant = newColorInvariant;
 
@@ -131,7 +132,7 @@ public class ColoredTimedPlace extends TimedPlace {
 		return tokens;
 	}
 
-	public UndoableEdit addColoredToken(ColoredToken token){
+	public Command addColoredToken(ColoredToken token){
 		tokens.add(token);
 		
 		update();
@@ -139,7 +140,7 @@ public class ColoredTimedPlace extends TimedPlace {
 		return new ColoredPlaceAddTokenEdit(this, token);
 	}
 
-	public UndoableEdit removeColoredToken(ColoredToken token){
+	public Command removeColoredToken(ColoredToken token){
 		tokens.remove(token);
 		
 		update();
@@ -147,7 +148,7 @@ public class ColoredTimedPlace extends TimedPlace {
 		return new ColoredPlaceRemoveTokenEdit(this,token);
 	}
 
-	public UndoableEdit setColoredTokens(List<ColoredToken> newTokens) {
+	public Command setColoredTokens(List<ColoredToken> newTokens) {
 		List<ColoredToken> old = this.tokens;
 		this.tokens = newTokens;
 		
@@ -186,7 +187,7 @@ public class ColoredTimedPlace extends TimedPlace {
 		return timeInvariant;
 	}
 
-	public UndoableEdit setTimeInvariant(ColoredTimeInvariant newTimeInvariant) {
+	public Command setTimeInvariant(ColoredTimeInvariant newTimeInvariant) {
 		ColoredTimeInvariant old = this.timeInvariant;
 		this.timeInvariant = newTimeInvariant;
 		

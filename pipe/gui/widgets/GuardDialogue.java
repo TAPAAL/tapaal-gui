@@ -29,6 +29,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNTransition;
@@ -45,7 +47,6 @@ import pipe.dataLayer.colors.IntervalBound;
 import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.undo.UndoableEdit;
 
 public class GuardDialogue extends JPanel /*implements ActionListener, PropertyChangeListener*/
 {
@@ -318,7 +319,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								return;
 							}
 							
-							UndoableEdit action = null;
+							Command action = null;
 							if(arc instanceof ColoredTransportArc){	
 								action = ((ColoredTransportArc)arc).setTimeGuard(timeGuard);
 							}else if(arc instanceof ColoredInhibitorArc){
@@ -359,11 +360,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								ColoredTransportArc tarc = (ColoredTransportArc)arc;
 
 								Preserve preserve = getPreservation();
-								UndoableEdit preserveEdit = tarc.setPreservation(preserve);
+								Command preserveEdit = tarc.setPreservation(preserve);
 								undoManager.addEdit(preserveEdit);
 
 								ColoredTransportArc connectedTo = (ColoredTransportArc)tarc.getConnectedTo();
-								UndoableEdit preserveEditConnectedTo = connectedTo.setPreservation(preserve);
+								Command preserveEditConnectedTo = connectedTo.setPreservation(preserve);
 								undoManager.addEdit(preserveEditConnectedTo);
 
 								IntOrConstant outputValue = null;
@@ -377,11 +378,11 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 									undoManager.undo();
 									return;
 								}
-								UndoableEdit outputEdit = tarc.setOutputValue(outputValue);
+								Command outputEdit = tarc.setOutputValue(outputValue);
 								undoManager.addEdit(outputEdit);
 
 								connectedTo = (ColoredTransportArc)tarc.getConnectedTo();
-								UndoableEdit outputEditConnectedTo =  connectedTo.setOutputValue(outputValue);
+								Command outputEditConnectedTo =  connectedTo.setOutputValue(outputValue);
 								undoManager.addEdit(outputEditConnectedTo);
 							}
 						}

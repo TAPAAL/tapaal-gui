@@ -1,8 +1,9 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredInterval;
 
-public abstract class TimeGuardEdit extends UndoableEdit {
+public abstract class TimeGuardEdit extends Command {
 
 	private ColoredInterval newInterval;
 	private ColoredInterval oldInterval;

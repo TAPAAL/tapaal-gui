@@ -4,6 +4,7 @@
 
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.PetriNetObject;
 
 
@@ -12,7 +13,7 @@ import pipe.dataLayer.PetriNetObject;
  * @author Pere Bonet
  */
 public class TranslatePetriNetObjectEdit 
-        extends UndoableEdit {
+        extends Command {
    
    PetriNetObject pnObject;
    Integer transX;

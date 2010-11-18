@@ -8,6 +8,8 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.simulation.Marking;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -15,7 +17,6 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.PlaceCapacityEdit;
 import pipe.gui.undo.PlaceMarkingEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -263,7 +264,7 @@ extends PlaceTransitionObject {
 	 * Set current marking
 	 * @param currentMarkingInput Integer value for current marking
 	 */
-	public UndoableEdit setCurrentMarking(int currentMarkingInput) {
+	public Command setCurrentMarking(int currentMarkingInput) {
 		int oldMarking = currentMarking;
 
 		if (capacity == 0){
@@ -285,7 +286,7 @@ extends PlaceTransitionObject {
 	 * This method doesn't check if marking fulfilles current capacity restriction
 	 * @param newCapacity Integer value for capacity restriction
 	 */
-	public UndoableEdit setCapacity(int newCapacity) {
+	public Command setCapacity(int newCapacity) {
 		int oldCapacity = capacity;
 
 		if (capacity != newCapacity) {

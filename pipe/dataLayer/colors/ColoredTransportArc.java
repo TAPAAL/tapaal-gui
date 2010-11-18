@@ -1,5 +1,6 @@
 package pipe.dataLayer.colors;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TransportArc;
@@ -7,7 +8,6 @@ import pipe.gui.undo.ColoredTransportArcColorGuardEdit;
 import pipe.gui.undo.ColoredTransportArcPreserveEdit;
 import pipe.gui.undo.ColoredTransportArcTimeGuardEdit;
 import pipe.gui.undo.ColoredTransportArcUpdateValueEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 public class ColoredTransportArc extends TransportArc {
@@ -101,7 +101,7 @@ public class ColoredTransportArc extends TransportArc {
 		return colorGuard.toStringNoSetNotation();
 	}
 
-	public UndoableEdit setColorGuard(ColorSet newColorGuard) {
+	public Command setColorGuard(ColorSet newColorGuard) {
 		ColorSet old = this.colorGuard;
 		this.colorGuard = newColorGuard;
 
@@ -118,7 +118,7 @@ public class ColoredTransportArc extends TransportArc {
 		return outputValue;
 	}
 
-	public UndoableEdit setOutputValue(IntOrConstant value){
+	public Command setOutputValue(IntOrConstant value){
 		IntOrConstant old = this.outputValue;
 		this.outputValue = value;
 
@@ -127,7 +127,7 @@ public class ColoredTransportArc extends TransportArc {
 		return new ColoredTransportArcUpdateValueEdit(this, old, value);
 	}
 
-	public UndoableEdit setPreservation(Preserve newPreserve) {
+	public Command setPreservation(Preserve newPreserve) {
 		Preserve old = this.preserves;
 		this.preserves = newPreserve;
 
@@ -140,7 +140,7 @@ public class ColoredTransportArc extends TransportArc {
 		return timeGuard;
 	}
 
-	public UndoableEdit setTimeGuard(ColoredInterval newTimeGuard) {
+	public Command setTimeGuard(ColoredInterval newTimeGuard) {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
 

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -19,7 +21,6 @@ import pipe.dataLayer.colors.IntOrConstant;
 import pipe.dataLayer.colors.IntOrConstantRange;
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.undo.UpdateConstantEdit;
 
 public class ConstantStore {
@@ -34,7 +35,7 @@ public class ConstantStore {
 		return constants.values();
 	}
 
-	public UndoableEdit updateConstant(String oldName, Constant constant, DataLayer model)
+	public Command updateConstant(String oldName, Constant constant, DataLayer model)
 	{
 		if(oldName.equals(constant.getName()) || !constants.containsKey(constant.getName())){
 			if(constants.containsKey(oldName)){
@@ -67,7 +68,7 @@ public class ConstantStore {
 		return name.toLowerCase().equals("inf");
 	}
 
-	public UndoableEdit addConstant(String name, int value) {	
+	public Command addConstant(String name, int value) {	
 		if(isNamedInf(name)) return null;
 
 		if(!constants.containsKey(name)){
@@ -78,7 +79,7 @@ public class ConstantStore {
 		return null;
 	}
 
-	public UndoableEdit removeConstant(String name){
+	public Command removeConstant(String name){
 		if(!isConstantInUse(name)){
 			if(constants.containsKey(name)){
 				Constant constant = constants.get(name);

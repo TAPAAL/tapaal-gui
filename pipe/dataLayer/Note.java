@@ -12,12 +12,13 @@ import java.awt.geom.RectangularShape;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AnnotationBorderEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 /** 
@@ -123,7 +124,7 @@ protected JTextArea note = new JTextArea();
    }
 
    
-   public UndoableEdit showBorder(boolean show){
+   public Command showBorder(boolean show){
       drawBorder = show;
       repaint();
       return new AnnotationBorderEdit(this);

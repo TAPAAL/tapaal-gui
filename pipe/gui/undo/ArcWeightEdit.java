@@ -4,6 +4,7 @@
 
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Arc;
 
 /**
@@ -11,7 +12,7 @@ import pipe.dataLayer.Arc;
  * @author Pere Bonet
  */
 public class ArcWeightEdit 
-        extends UndoableEdit {
+        extends Command {
    
    Arc arc;
    Integer newWeight;

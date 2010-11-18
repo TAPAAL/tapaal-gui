@@ -89,6 +89,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 		return place.equals(placeName);
 	}
 	
+	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return null;
 	}

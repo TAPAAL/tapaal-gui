@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -839,7 +840,7 @@ public class QueryDialogue extends JPanel{
 		//Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane.setVerticalScrollBarPolicy(
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		Dimension d = new Dimension(750, 56);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
@@ -1065,7 +1066,7 @@ public class QueryDialogue extends JPanel{
 								// current selection is child of an andList node => add new placeholder conjunct to it
 								andListNode = new TCTLAndListNode((TCTLAndListNode)parentNode);
 								andListNode.addConjunct(new TCTLStatePlaceHolder());
-								UndoableEdit edit = new QueryConstructionEdit((TCTLAndListNode)parentNode, andListNode);
+								UndoableEdit edit = new QueryConstructionEdit(parentNode, andListNode);
 								newProperty = newProperty.replace(parentNode, andListNode);
 								updateSelection(andListNode); 
 								undoSupport.postEdit(edit);
@@ -1114,7 +1115,7 @@ public class QueryDialogue extends JPanel{
 								// current selection is child of an orList node => add new placeholder disjunct to it
 								orListNode = new TCTLOrListNode((TCTLOrListNode)parentNode);
 								orListNode.addDisjunct(new TCTLStatePlaceHolder());
-								UndoableEdit edit = new QueryConstructionEdit((TCTLOrListNode)parentNode, orListNode);
+								UndoableEdit edit = new QueryConstructionEdit(parentNode, orListNode);
 								newProperty = newProperty.replace(parentNode, orListNode);
 								updateSelection(orListNode); 
 								undoSupport.postEdit(edit);
@@ -1791,16 +1792,20 @@ public class QueryDialogue extends JPanel{
 			this.replacement = replacement;
 		}
 
+		@Override
 		public void undo() throws CannotUndoException {
 			newProperty = newProperty.replace(replacement, original);
 		}
 
+		@Override
 		public void redo() throws CannotRedoException {
 			newProperty = newProperty.replace(original, replacement);
 		}
 
+		@Override
 		public boolean canUndo() { return true; }
 
+		@Override
 		public boolean canRedo() { return true; }
 
 	}

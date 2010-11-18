@@ -11,6 +11,8 @@ import java.util.EventListener;
 
 import javax.swing.JComponent;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.CopyPasteable;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
@@ -18,7 +20,6 @@ import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 import pipe.gui.undo.PetriNetObjectNameEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -184,7 +185,7 @@ protected final static int COMPONENT_DRAW_OFFSET = 5;
    }
    
    
-   public UndoableEdit setPNObjectName(String name){
+   public Command setPNObjectName(String name){
       String oldName = this.getName();
       this.setName(name);
       return new PetriNetObjectNameEdit(this, oldName, name);               

@@ -4,6 +4,7 @@
 
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Place;
 
 /**
@@ -11,7 +12,7 @@ import pipe.dataLayer.Place;
  * @author corveau
  */
 public class PlaceCapacityEdit 
-        extends UndoableEdit {
+        extends Command {
    
    Place place;
    Integer newCapacity;

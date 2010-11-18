@@ -6,9 +6,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.Pipe;
 import pipe.gui.undo.TokenValueEdit;
-import pipe.gui.undo.UndoableEdit;
 
 public class ColoredToken {
 	private BigDecimal age;
@@ -52,7 +53,7 @@ public class ColoredToken {
 		return age;
 	}
 	
-	public UndoableEdit setColor(IntOrConstant newValue) {
+	public Command setColor(IntOrConstant newValue) {
 		if(newValue.getValue() < 0) throw new IllegalArgumentException();
 		IntOrConstant old = this.color;
 		this.color = newValue;

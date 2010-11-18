@@ -14,12 +14,13 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 public class ArcPathPoint 
@@ -112,7 +113,7 @@ public static final boolean STRAIGHT = false;
    }
 
    
-   public UndoableEdit togglePointType() {
+   public Command togglePointType() {
       pointType = !pointType;
       myArcPath.createPath();
       myArcPath.getArc().updateArcPosition();
@@ -192,7 +193,7 @@ public void paintComponent(Graphics g) {
     * ArcPathPoints that an arcpath has. Then then a new point is created BEFORE 
     * this one in the list and offset by a small delta in the x direction.
     */
-   public UndoableEdit splitPoint() {
+   public Command splitPoint() {
       int i = getIndex(); // Get the index of this point
       
       ArcPathPoint newPoint = 

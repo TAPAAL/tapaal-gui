@@ -1,9 +1,10 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.IntOrConstant;
 
-public class TokenValueEdit extends UndoableEdit {
+public class TokenValueEdit extends Command {
 
 	private IntOrConstant oldValue;
 	private IntOrConstant newValue;

@@ -3,6 +3,7 @@
  */
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.gui.DrawingSurfaceImpl;
@@ -13,7 +14,7 @@ import pipe.gui.DrawingSurfaceImpl;
  * @author Pere Bonet
  */
 public class DeletePetriNetObjectEdit 
-        extends UndoableEdit {
+        extends Command {
    
    PetriNetObject pnObject;
    DataLayer model;

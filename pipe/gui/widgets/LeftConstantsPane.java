@@ -22,12 +22,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
-import pipe.gui.undo.UndoableEdit;
 
 public class LeftConstantsPane extends JPanel {
 	/**
@@ -198,7 +198,7 @@ public class LeftConstantsPane extends JPanel {
 
 	protected void removeConstant(String name) {
 		DataLayer model = CreateGui.getModel();
-		UndoableEdit edit = model.removeConstant(name);
+		Command edit = model.removeConstant(name);
 		if(edit == null){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"You cannot remove a constant that is used in the net.\nRemove all references " +

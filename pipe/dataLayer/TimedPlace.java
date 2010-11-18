@@ -21,6 +21,8 @@ import java.util.Iterator;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.simulation.Marking;
 import pipe.dataLayer.simulation.Token;
 import pipe.gui.CreateGui;
@@ -30,7 +32,6 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.PlaceMarkingEdit;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.undo.TimedPlaceTokenEdit;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
 
@@ -383,7 +384,7 @@ public class TimedPlace extends Place {
 		}
 	}
 
-	public UndoableEdit setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
+	public Command setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
 
 		if (newAgeOfTokens.size() == myTokens.size()){
 			ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
@@ -397,7 +398,7 @@ public class TimedPlace extends Place {
 
 	//overide, so that we can take care of the age of the tokens
 	@Override
-	public UndoableEdit setCurrentMarking(int currentMarkingInput) {
+	public Command setCurrentMarking(int currentMarkingInput) {
 		int oldMarking = currentMarking;
 		if (capacity == 0){
 			setNumberOfMyTokens(currentMarkingInput);
@@ -414,7 +415,7 @@ public class TimedPlace extends Place {
 		return new PlaceMarkingEdit(this, oldMarking, currentMarking);      
 	}
 
-	public UndoableEdit setInvariant(String invariant) {
+	public Command setInvariant(String invariant) {
 
 		String oldinvariant = this.invariant;
 		this.invariant = invariant;
@@ -442,7 +443,7 @@ public class TimedPlace extends Place {
 		}
 	}
 
-	public UndoableEdit setTokensAndAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
+	public Command setTokensAndAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
 
 		//if (newAgeOfTokens.size() == myTokens.size()){
 		this.setCurrentMarking(newAgeOfTokens.size());

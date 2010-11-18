@@ -58,6 +58,7 @@ extends JComponent {
 		setSize((int)width, (int)height);
 	}
 	
+	@Override
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		paintControl(g);
@@ -80,10 +81,13 @@ extends JComponent {
 	
 	protected void selectChildren() { }
 	protected void deselectChildren() { }
-	
+		
 	public void addMouseListeners() { }
 	public void removeMouseListeners() { }
 			
 	protected abstract void paintControl(Graphics g);
 	protected abstract JPopupMenu createPopupMenu();
+	
+	public void removeChildControls() { }
+	public void addChildControls() { }
 }

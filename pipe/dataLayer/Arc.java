@@ -5,12 +5,13 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JLayeredPane;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcWeightEdit;
-import pipe.gui.undo.UndoableEdit;
 
 
 /**
@@ -131,7 +132,7 @@ public abstract class  Arc
     * Set weight
     * @param weightInput String value for Arc weight;
     */
-   public UndoableEdit setWeight(int weightInput) {
+   public Command setWeight(int weightInput) {
       int oldWeight = weight;
       
       weight = weightInput;
@@ -327,7 +328,7 @@ public void delete() {
    }
 
    
-   public UndoableEdit split(Point2D.Float mouseposition) {
+   public Command split(Point2D.Float mouseposition) {
       ArcPathPoint newPoint = myPath.splitSegment(mouseposition);
       return new AddArcPathPointEdit(this, newPoint);
    }

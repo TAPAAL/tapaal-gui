@@ -4,9 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.undo.TransportArcGroupEdit;
-import pipe.gui.undo.UndoableEdit;
 
 public class TransportArc extends TimedArc {
 	/**
@@ -40,7 +41,7 @@ public class TransportArc extends TimedArc {
 		getGraphics().setColor(Color.RED);
 		repaint();
 	}
-	public UndoableEdit setGroupNr(int groupNr){
+	public Command setGroupNr(int groupNr){
 		int oldGroup = this.getGroup();
 		setGroup(groupNr);
 

@@ -1,13 +1,11 @@
 package dk.aau.cs.gui;
 
-import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -15,16 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-
-import pipe.dataLayer.NetType;
-import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.QueryDialogue;
-import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 
 public class NewTemplatePanel extends JPanel {
 

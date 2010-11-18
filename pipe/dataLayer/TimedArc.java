@@ -6,10 +6,11 @@ import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.undo.ArcTimeIntervalEdit;
-import pipe.gui.undo.UndoableEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
 
@@ -63,7 +64,7 @@ public class TimedArc extends NormalArc{
 		
 		return timeInterval;
 	}
-	public UndoableEdit setGuard(String timeInteval) {
+	public Command setGuard(String timeInteval) {
 	
 		String oldTimeInterval = this.timeInterval;
 		this.timeInterval = timeInteval;

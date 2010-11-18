@@ -1,9 +1,10 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.IntOrConstant;
 
-public class ColoredOutputArcOutputValueEdit extends UndoableEdit {
+public class ColoredOutputArcOutputValueEdit extends Command {
 
 	private IntOrConstant oldValue;
 	private IntOrConstant newValue;

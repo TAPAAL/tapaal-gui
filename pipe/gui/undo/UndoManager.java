@@ -6,6 +6,8 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import dk.aau.cs.gui.undo.Command;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
@@ -30,7 +32,7 @@ public class UndoManager {
    private int startOfBuffer  = 0;
    private int undoneEdits    = 0;
 
-   private ArrayList<ArrayList<UndoableEdit>> edits = new ArrayList<ArrayList<UndoableEdit>>(UNDO_BUFFER_CAPACITY);
+   private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
    
    private DrawingSurfaceImpl view;
    private DataLayer model;
@@ -59,7 +61,7 @@ public class UndoManager {
          checkMode();
 
          // The currentEdit to redo
-         Iterator<UndoableEdit> currentEdit = edits.get(indexOfNextAdd).iterator();         
+         Iterator<Command> currentEdit = edits.get(indexOfNextAdd).iterator();         
          while (currentEdit.hasNext()){
             currentEdit.next().redo();
          }
@@ -97,7 +99,7 @@ public class UndoManager {
          undoneEdits++;
          
          // The currentEdit to undo (reverse order)
-         ArrayList<UndoableEdit> currentEdit = edits.get(indexOfNextAdd);
+         ArrayList<Command> currentEdit = edits.get(indexOfNextAdd);
          for (int i = currentEdit.size()-1; i >= 0; i--) {
             currentEdit.get(i).undo();
          }
@@ -121,7 +123,7 @@ public class UndoManager {
    
    
    public void newEdit(){
-      ArrayList<UndoableEdit> lastEdit = edits.get(currentIndex());
+      ArrayList<Command> lastEdit = edits.get(currentIndex());
       if ((lastEdit != null) && (lastEdit.isEmpty())){
          return;
       }              
@@ -131,7 +133,7 @@ public class UndoManager {
       app.setRedoActionEnabled(false);
       view.setNetChanged(true);
       
-      ArrayList<UndoableEdit> compoundEdit = new ArrayList<UndoableEdit>();
+      ArrayList<Command> compoundEdit = new ArrayList<Command>();
       edits.set(indexOfNextAdd, compoundEdit);
       indexOfNextAdd = (indexOfNextAdd + 1) % UNDO_BUFFER_CAPACITY;
       if (sizeOfBuffer < UNDO_BUFFER_CAPACITY){
@@ -142,14 +144,14 @@ public class UndoManager {
    }
    
    
-   public void addEdit(UndoableEdit undoableEdit){
-      ArrayList<UndoableEdit> compoundEdit = edits.get(currentIndex());      
+   public void addEdit(Command undoableEdit){
+      ArrayList<Command> compoundEdit = edits.get(currentIndex());      
       compoundEdit.add(undoableEdit);
       //debug();
    }      
    
    
-   public void addNewEdit(UndoableEdit undoableEdit) {
+   public void addNewEdit(Command undoableEdit) {
        newEdit(); // mark for a new "transtaction""
        addEdit(undoableEdit);
     }

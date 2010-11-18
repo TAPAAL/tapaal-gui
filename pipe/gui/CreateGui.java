@@ -1,36 +1,10 @@
 package pipe.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.text.BadLocationException;
-
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
-import pipe.dataLayer.TransportArc;
-import pipe.dataLayer.colors.ColoredInhibitorArc;
-import pipe.dataLayer.colors.ColoredInputArc;
-import pipe.dataLayer.colors.ColoredOutputArc;
-import pipe.dataLayer.colors.ColoredTimedPlace;
-import pipe.dataLayer.colors.ColoredTransportArc;
-import pipe.gui.widgets.JSplitPaneFix;
-import pipe.gui.widgets.LeftConstantsPane;
-import pipe.gui.widgets.LeftQueryPane;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 

@@ -9,13 +9,14 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**
  *
  * @author corveau
  */
-public class PetriNetObjectNameEdit extends UndoableEdit {
+public class PetriNetObjectNameEdit extends Command {
 
 	PetriNetObject pno;
 	String oldName;

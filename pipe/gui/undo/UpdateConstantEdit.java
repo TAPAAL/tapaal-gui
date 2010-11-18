@@ -1,11 +1,12 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.ConstantStore;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 
-public class UpdateConstantEdit extends UndoableEdit {
+public class UpdateConstantEdit extends Command {
 
 	private Constant newConstant;
 	private ConstantStore store;

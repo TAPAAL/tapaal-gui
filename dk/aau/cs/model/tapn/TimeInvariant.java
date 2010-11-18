@@ -15,6 +15,7 @@ public class TimeInvariant {
 		this.upper = upper;
 	}
 	
+	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isUpperIncluded ? "<=" : "<");

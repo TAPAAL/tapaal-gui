@@ -1,9 +1,10 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 
-public class ColoredPlaceAddTokenEdit extends UndoableEdit {
+public class ColoredPlaceAddTokenEdit extends Command {
 
 	private ColoredTimedPlace place;
 	private ColoredToken addedToken;

@@ -1,8 +1,9 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.TimedArc;
 
-public class ArcTimeIntervalEdit extends UndoableEdit {
+public class ArcTimeIntervalEdit extends Command {
 	private TimedArc arc;
 	String oldTimeInterval;
 	String newTimeInterval;

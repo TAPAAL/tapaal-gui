@@ -3,6 +3,7 @@
  */
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Transition;
 
 
@@ -11,7 +12,7 @@ import pipe.dataLayer.Transition;
  * @author corveau
  */
 public class TransitionServerSemanticEdit
-        extends UndoableEdit {
+        extends Command {
    
    Transition transition;
    

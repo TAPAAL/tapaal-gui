@@ -1,8 +1,9 @@
 package pipe.gui.undo;
 
+import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.TransportArc;
 
-public class TransportArcGroupEdit extends UndoableEdit {
+public class TransportArcGroupEdit extends Command {
 	private TransportArc myArc;
 	int oldGroup;
 	int newGroup;
