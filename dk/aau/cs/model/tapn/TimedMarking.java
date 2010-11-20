@@ -35,4 +35,5 @@ public class TimedMarking {
 		if(!placesToTokensMap.containsKey(place)) return new ArrayList<TimedToken>();
 		return placesToTokensMap.get(place);
 	}
+
 }

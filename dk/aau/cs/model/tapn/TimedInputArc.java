@@ -33,4 +33,9 @@ public class TimedInputArc {
 	public TimedTransition destination(){
 		return destination;
 	}
+
+	public boolean isEnabled() {
+		return source.hasTokenSatisfyingInterval(interval);
+		
+	}
 }

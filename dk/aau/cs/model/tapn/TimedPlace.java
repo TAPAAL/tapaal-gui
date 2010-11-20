@@ -72,6 +72,17 @@ public class TimedPlace {
 		Require.that(arc != null, "Cannot add null to postset");
 		postsetTransportArcs.add(arc);	
 	}
+	public boolean hasTokenSatisfyingInterval(TimeInterval interval) {
+		List<TimedToken> tokens = currentMarking.getTokensFor(this);
+		
+		for(TimedToken t : tokens) {
+			if(interval.isIncluded(t.age()))
+				return true;
+		}
+		
+		return false;
+	}
+
 
 	public List<TimedToken> tokens() {
 		return currentMarking.getTokensFor(this);

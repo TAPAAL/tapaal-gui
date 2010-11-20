@@ -1,5 +1,7 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
+
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
@@ -39,5 +41,15 @@ public class TimeInterval {
 		buffer.append(upper);
 		buffer.append(isUpperIncluded ? "]" : ")");
 		return buffer.toString();
+	}
+
+	public boolean isIncluded(BigDecimal age) {
+		BigDecimal lowerBound = new BigDecimal(lower.value());
+		BigDecimal upperBound = new BigDecimal(upper.value());
+		
+		int lowerCompare = age.compareTo(lowerBound);
+		int upperCompare = age.compareTo(upperBound);
+		
+		return (isLowerIncluded ? (lowerCompare >= 0) : (lowerCompare > 0)) && (isUpperIncluded ? (upperCompare <= 0) : (upperCompare < 0));
 	}
 }

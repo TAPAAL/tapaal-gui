@@ -34,4 +34,13 @@ public class TimedTransition {
 		Require.that(arc != null, "Cannot add null to postset");
 		postset.add(arc);
 	}
+	
+	public boolean isEnabled() {
+		for(TimedInputArc arc : preset) {
+			if(!arc.isEnabled())
+				return false;
+		}
+		
+		return true;
+	}
 }

@@ -15,28 +15,22 @@ public class TAPNTransition extends Transition {
 
 	private static final long serialVersionUID = -2280012053262288174L;
 	
-	public TAPNTransition(Transition t) {
-		super(t);
-		
-	}
+	private static final String TAPNTRANSITION_NAME_PREFIX = "T";
+	
+	private dk.aau.cs.model.tapn.TimedTransition transition;
 
 	public TAPNTransition(double positionXInput, double positionYInput) {
 		super(positionXInput, positionYInput);
-		
+		transition = new dk.aau.cs.model.tapn.TimedTransition(TAPNTRANSITION_NAME_PREFIX + "0");
 	}
 
 	public TAPNTransition(double positionXInput, double positionYInput, String idInput, String nameInput, double nameOffsetXInput, double nameOffsetYInput, boolean timedTransition, boolean infServer, int angleInput, int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput,
 				nameOffsetYInput, timedTransition, infServer, angleInput,
 				priority);
-		
+		transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
 	}
 	
-
-	public TAPNTransition(String idInput, String nameInput) {
-		super(idInput, nameInput);
-		
-	}
 
 	@Override
 	public void showEditor(){
@@ -64,46 +58,10 @@ public class TAPNTransition extends Transition {
 	   }      
 	 
 	   @Override
-	public TAPNTransition copy(){
-
-		   TAPNTransition copy = new TAPNTransition(Zoomer.getUnzoomedValue(this.getX(), zoom),
-				   									Zoomer.getUnzoomedValue(this.getY(), zoom));      
-		      copy.setName(this.getName());
-		      copy.nameOffsetX = this.nameOffsetX;
-		      copy.nameOffsetY = this.nameOffsetY;
-		      copy.setOriginal(this);
-		      return copy;
-		   
-//		   TAPNTransition copy = new TAPNTransition(super.copy());      
-//		   return copy;
-	   }
-	   
-	   @Override
-	public TAPNTransition paste(double x, double y, boolean fromAnotherView){
-		   this.incrementCopyNumber();
-	      TAPNTransition copy = new TAPNTransition (
-	              Grid.getModifiedX(x + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
-	              Grid.getModifiedY(y + this.getY() + Pipe.PLACE_TRANSITION_HEIGHT/2));
-	      copy.pnName.setName(this.pnName.getName()  + "(" + this.getCopyNumber() +")");
-	      
-	      this.newCopy(copy);
-	      copy.nameOffsetX = this.nameOffsetX;
-	      copy.nameOffsetY = this.nameOffsetY;
-	      copy.attributesVisible = this.attributesVisible;
-
-	      return copy;
-	   }
-
-	   //Override by jokke
-	   @Override
 	public boolean isEnabled(boolean animationStatus){
 		   if (animationStatus) {
-			   if (enabled) {
-				   if (isEnabledByDelay()){					   
-					   highlighted = false;
-				   }else {
-					   highlighted = true;
-				   }
+			   if (transition.isEnabled()) {				 
+				   highlighted = true;
 				   return true;
 			   } else {
 				   highlighted = false;
@@ -112,8 +70,4 @@ public class TAPNTransition extends Transition {
 		   return false;
 	   }
 
-	private boolean isEnabledByDelay() {
-		
-		return false;
-	}
 }

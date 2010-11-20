@@ -69,6 +69,13 @@ public class TabContent extends JSplitPane {
 	
 	public TabContent()
 	{
+		appModel = new DataLayer();		
+		
+		drawingSurface = new DrawingSurfaceImpl(appModel);
+		drawingSurfaceScroller = new JScrollPane(drawingSurface);
+		// make it less bad on XP
+		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
 		leftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		leftPane.setMinimumSize(new Dimension(175,100));
@@ -78,13 +85,6 @@ public class TabContent extends JSplitPane {
 		queryConstantsSplit.setMinimumSize(new Dimension(175,100));
 		createLeftPane();
 		
-		appModel = new DataLayer();
-		
-		
-		drawingSurface = new DrawingSurfaceImpl(appModel);
-		drawingSurfaceScroller = new JScrollPane(drawingSurface);
-		// make it less bad on XP
-		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		
 		this.setOrientation(HORIZONTAL_SPLIT);
 		this.setLeftComponent(leftPane);
@@ -102,6 +102,7 @@ public class TabContent extends JSplitPane {
 		queries = new LeftQueryPane(
 				appModel == null ? new ArrayList<TAPNQuery>() : appModel.getQueries()
 		);
+
 		templates = new TemplateExplorer(this);
 		
 		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
