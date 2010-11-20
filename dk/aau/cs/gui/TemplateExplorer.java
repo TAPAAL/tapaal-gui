@@ -17,12 +17,14 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
@@ -38,7 +40,10 @@ public class TemplateExplorer extends JPanel {
 	 */
 	private static final long serialVersionUID = -2334464984237161208L;
 
+	private static long templateID = 0;
+	
 	private JSplitPane splitPane;
+	private DrawingSurfaceImpl drawingSurface;
 	
 	// Template explorer panel items
 	private JPanel templatePanel;
@@ -53,11 +58,13 @@ public class TemplateExplorer extends JPanel {
 	private JButton removeTemplateButton;
 	private JButton renameButton;
 	private JButton copyButton;
+
 	
 	
-	public TemplateExplorer()
+	
+	public TemplateExplorer(DrawingSurfaceImpl drawingSurface)
 	{
-		
+		this.drawingSurface = drawingSurface;
 		this.setLayout(new BorderLayout());
 		init();
 	}
@@ -210,39 +217,29 @@ public class TemplateExplorer extends JPanel {
 
 
 	private void ShowNewTemplateDialog(boolean renaming) {
-		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
-	
-		Container contentPane = guiDialog.getContentPane();
-	
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
-	
-		// 2 Add query editor
-		NewTemplatePanel tp;
-		if(!renaming)
-			tp = new NewTemplatePanel(guiDialog.getRootPane(), this);
-		else {
+		if(renaming){
 			TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
-			String name = tapn.getName();
-			tp = new NewTemplatePanel(guiDialog.getRootPane(), this, name);
+			
+			String newName = (String)JOptionPane.showInputDialog(drawingSurface, "Template name:", "Rename Template", JOptionPane.PLAIN_MESSAGE, null, null, tapn.getName());
+			
+			if(newName != null && newName.length() <= 0)
+				JOptionPane.showMessageDialog(drawingSurface, "TAPN template could not be renamed:\n\nYou must provide a proper name for the template", "Error Renaming Template", JOptionPane.ERROR_MESSAGE);
+			else if(newName != null && newName.length() > 0)
+				renameTemplate(newName);
 		}
-		contentPane.add( tp );
-	
-		guiDialog.setResizable(false); 
-	
-	
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-	
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
+		else
+		{
+			String templateName = (String)JOptionPane.showInputDialog(drawingSurface, "Template name:", "Rename Template", JOptionPane.PLAIN_MESSAGE, null, null, "New TAPN Template " + (++templateID));
+		
+			if(templateName != null && templateName.length() <= 0)
+				JOptionPane.showMessageDialog(drawingSurface, "New TAPN template could not be created:\n\nYou must provide a proper name for the template", "Error Creating Template", JOptionPane.ERROR_MESSAGE);
+			else if(templateName != null && templateName.length() > 0)
+				createNewTemplate(templateName);
+		}
 	}
 	
 	public void createNewTemplate(String name)
 	{
-		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		
 		drawingSurface.getTAPNTemplates().add(tapn);
@@ -250,8 +247,7 @@ public class TemplateExplorer extends JPanel {
 	}
 	
 	private void showTemplates() {
-		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
-		
+			
 		List<TimedArcPetriNet> templates = drawingSurface.getTAPNTemplates().templates();
 		
 		listModel.removeAllElements();
@@ -269,14 +265,13 @@ public class TemplateExplorer extends JPanel {
 	}
 	
 	private void removeTemplate() {
-		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
+		
 		TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
 		
 		drawingSurface.getTAPNTemplates().remove(tapn);
 	}
 	
 	private void openSelectedTemplate() {
-		DrawingSurfaceImpl drawingSurface = CreateGui.getDrawingSurface();
 		TimedArcPetriNet tapn = (TimedArcPetriNet)templateList.getSelectedValue();
 		
 		drawingSurface.openTAPNTemplate(tapn);
