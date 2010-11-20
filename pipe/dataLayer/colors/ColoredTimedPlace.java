@@ -8,7 +8,7 @@ import java.util.List;
 import dk.aau.cs.gui.undo.Command;
 
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.ColoredPlaceAddTokenEdit;
 import pipe.gui.undo.ColoredPlaceRemoveTokenEdit;
@@ -16,7 +16,7 @@ import pipe.gui.undo.ColoredPlaceTokensChangedEdit;
 import pipe.gui.undo.ColoredTimedPlaceTimeInvariantEdit;
 import pipe.gui.undo.PlaceColorInvariantEdit;
 
-public class ColoredTimedPlace extends TimedPlace {
+public class ColoredTimedPlace extends TimedPlaceComponent {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public class ColoredTimedPlace extends TimedPlace {
 	private ColoredTimeInvariant timeInvariant;
 
 	public ColoredTimedPlace(double positionXInput, double positionYInput) {
-		super(positionXInput, positionYInput);
+		super(positionXInput, positionYInput, null);
 
 		init();
 	}

@@ -23,7 +23,7 @@ public class DiscreetFiringAction implements FiringAction {
 	}
 	
 	public void addConsumedToken(Place p, BigDecimal token){
-		consumedTokens.add(new Token((TimedPlace)p, token));
+		consumedTokens.add(new Token((TimedPlaceComponent)p, token));
 	}
 	
 	public HashMap<Place, ArrayList<BigDecimal>> getConsumedTokensList(){

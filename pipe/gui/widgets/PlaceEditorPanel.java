@@ -43,7 +43,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredTimeInvariant;
 import pipe.dataLayer.colors.ColoredTimedPlace;
@@ -67,7 +67,7 @@ extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -4163767112591119036L;
-	TimedPlace place;
+	TimedPlaceComponent place;
 	Boolean attributesVisible;
 	Integer marking;
 	String name;
@@ -80,7 +80,7 @@ extends javax.swing.JPanel {
 	/**
 	 * Creates new form PlaceEditor
 	 */
-	public PlaceEditorPanel(JRootPane _rootPane, TimedPlace _place, 
+	public PlaceEditorPanel(JRootPane _rootPane, TimedPlaceComponent _place, 
 			DataLayer _pnmlData, DrawingSurfaceImpl _view) {
 		place = _place;
 		pnmlData = _pnmlData;
@@ -658,10 +658,10 @@ extends javax.swing.JPanel {
 
 		if (invariantToSet.contains("<=")){
 			invRelationNormal.setSelectedItem("<=");
-			substringStart = 2;
+			substringStart = 3;
 		}else {
 			invRelationNormal.setSelectedItem("<");
-			substringStart = 1;
+			substringStart = 2;
 		}
 
 		boolean isInf = false;

@@ -14,7 +14,7 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
 
@@ -195,7 +195,7 @@ public class TikZExporter {
 	}
 
 	protected String getTokenListStringFor(Place place) {
-		ArrayList<BigDecimal> tokens =((TimedPlace)place).getTokens();
+		ArrayList<BigDecimal> tokens =((TimedPlaceComponent)place).getTokens();
 		String tokensInPlace = "";
 		if(tokens.size() > 0)
 		{
@@ -213,8 +213,8 @@ public class TikZExporter {
 		if(net.netType().equals(NetType.UNTIMED)) return "";
 		String invariant = "";
 
-		if(!((TimedPlace)place).getInvariant().contains("inf"))
-			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlace)place).getInvariant())+",";
+		if(!((TimedPlaceComponent)place).getInvariant().contains("inf"))
+			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlaceComponent)place).getInvariant())+",";
 		return invariant;
 	}
 

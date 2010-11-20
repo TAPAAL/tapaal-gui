@@ -119,8 +119,8 @@ public class ConstantStore {
 
 		for(Place place : places){
 			if(!isUsingColors){
-				if(place instanceof TimedPlace){
-					buildConstraint((TimedPlace)place);
+				if(place instanceof TimedPlaceComponent){
+					buildConstraint((TimedPlaceComponent)place);
 				}
 			}else{
 				if(place instanceof ColoredTimedPlace){
@@ -148,7 +148,7 @@ public class ConstantStore {
 		}
 	}
 
-	private void buildConstraint(TimedPlace place) {
+	private void buildConstraint(TimedPlaceComponent place) {
 		String inv = place.getInvariant();
 		int substringStart = 0;
 		if (inv.contains("<=")){

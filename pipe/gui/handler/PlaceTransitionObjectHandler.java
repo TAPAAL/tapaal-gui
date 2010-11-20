@@ -14,7 +14,7 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
@@ -98,7 +98,7 @@ public void mousePressed(MouseEvent e) {
     			  // We only create a TAPNArc if source is not at TimedPlace
     			  //NormalArc tmparc =  new NormalArc(currentObject);
 
-    			  if (currentObject instanceof TimedPlace){
+    			  if (currentObject instanceof TimedPlaceComponent){
     				  Arc arc = useColors ? new ColoredInputArc(currentObject) : new TimedArc(currentObject);
     				  createArc(arc, currentObject);  
     			  }else {
@@ -622,7 +622,7 @@ public void mouseReleased(MouseEvent e) {
         				 }
 
         				 		 //Check if arc has leagal target
-    					 if (!(transportArcToCreate.getTarget() instanceof TimedPlace && transportArcToCreate.getTarget() !=null)){
+    					 if (!(transportArcToCreate.getTarget() instanceof TimedPlaceComponent && transportArcToCreate.getTarget() !=null)){
     						 System.err.println("Error creating transport arc, invalid target");
     						 transportArcToCreate.delete();
     						 view.transportArcPart1.delete();

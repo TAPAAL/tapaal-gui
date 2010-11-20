@@ -5,15 +5,15 @@ import java.util.ArrayList;
 
 import dk.aau.cs.gui.undo.Command;
 
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 
 
 public class TimedPlaceTokenEdit extends Command {
 	private ArrayList<BigDecimal> oldValue;
 	private ArrayList<BigDecimal> newValue;
-	private TimedPlace place;
+	private TimedPlaceComponent place;
 	
-	public TimedPlaceTokenEdit(	TimedPlace place, 
+	public TimedPlaceTokenEdit(	TimedPlaceComponent place, 
 								ArrayList<BigDecimal> oldAgeOfTokens, 
 								ArrayList<BigDecimal> arrayList){
 		this.place = place;

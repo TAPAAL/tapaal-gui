@@ -17,7 +17,7 @@ import pipe.dataLayer.Arc;
 import pipe.dataLayer.TAPNInhibitorArc;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -120,11 +120,11 @@ public class AnimationSelectmodeDialog extends JPanel{
 			df.setMinimumFractionDigits(1);
 			if (a instanceof TransportArc){
 				eligableToken= new ArrayList<String>();
-				TimedPlace p = (TimedPlace)a.getSource();
+				TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
 				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 
-				TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getConnectedTo().getTarget();
+				TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArc)a).getConnectedTo().getTarget();
 
 				for (int i=0; i< tokensOfPlace.size(); i++){
 					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
@@ -136,7 +136,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 				eligableToken = new ArrayList<String>();
 				//int indexOfOldestEligebleToken = 0;
 
-				TimedPlace p = (TimedPlace)a.getSource();
+				TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
 				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 				for (int i=0; i< tokensOfPlace.size(); i++){

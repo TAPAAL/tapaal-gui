@@ -2,22 +2,22 @@ package pipe.dataLayer.simulation;
 
 import java.math.BigDecimal;
 
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 
 public class Token {
-	private TimedPlace place;
+	private TimedPlaceComponent place;
 	private BigDecimal age;
 	
-	public Token(TimedPlace place, double age){
+	public Token(TimedPlaceComponent place, double age){
 		this(place, new BigDecimal(age));
 	}
 	
-	public Token(TimedPlace place, BigDecimal age){
+	public Token(TimedPlaceComponent place, BigDecimal age){
 		this.place = place;
 		this.age = age;
 	}
 	
-	public TimedPlace place(){
+	public TimedPlaceComponent place(){
 		return place;
 	}
 	

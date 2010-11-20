@@ -1,8 +1,12 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+
+import pipe.gui.Pipe;
 
 public class TimedMarking {
 	private Hashtable<TimedPlace, List<TimedToken>> placesToTokensMap;
@@ -25,5 +29,10 @@ public class TimedMarking {
 			List<TimedToken> tokens = placesToTokensMap.get(place);
 			tokens.remove(token);
 		}
+	}
+	
+	public List<TimedToken> getTokensFor(TimedPlace place){
+		if(!placesToTokensMap.containsKey(place)) return new ArrayList<TimedToken>();
+		return placesToTokensMap.get(place);
 	}
 }

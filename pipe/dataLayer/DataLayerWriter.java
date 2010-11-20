@@ -298,8 +298,8 @@ public class DataLayerWriter {
 					placeElement.appendChild(elem);
 				}
 			}else{
-				if (inputPlace instanceof TimedPlace){        	 
-					String invariantInput = ((TimedPlace)inputPlace).getInvariant();
+				if (inputPlace instanceof TimedPlaceComponent){        	 
+					String invariantInput = ((TimedPlaceComponent)inputPlace).getInvariant();
 					placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
 				}
 			}

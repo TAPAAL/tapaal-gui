@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 
 
@@ -44,7 +44,7 @@ extends AbstractAction {
 		boolean queriesAffected = false;
 		
 		for (PetriNetObject p : selection) {
-			if(p instanceof TimedPlace)
+			if(p instanceof TimedPlaceComponent)
 			{
 				for (TAPNQuery q : queries) {
 					if(q.getProperty().containsAtomicPropWithSpecificPlace(p.getName())){ 	// matches(".*" + p.getName() + "[^\\_a-zA-Z0-9].*")){

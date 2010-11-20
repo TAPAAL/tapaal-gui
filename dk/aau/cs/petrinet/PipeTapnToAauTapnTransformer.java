@@ -17,7 +17,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
 import dk.aau.cs.translations.ModelTranslator;
@@ -175,7 +175,7 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		return leftDelim + first + "," + second + rightDelim;
 	}
 	private String getInvariant(Place place) {
-		String inv = ((TimedPlace)place).getInvariant();
+		String inv = ((TimedPlaceComponent)place).getInvariant();
 		String operator = inv.contains("<=") ? "<=" : "<";
 		
 		String bound = inv.substring(operator.length());

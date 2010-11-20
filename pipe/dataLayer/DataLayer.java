@@ -2,6 +2,7 @@ package pipe.dataLayer;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,6 +44,8 @@ import pipe.gui.Pipe;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
 
@@ -107,10 +110,9 @@ extends Observable
 implements Cloneable {
 
 	private static Random randomNumber = new Random(); // Random number generator
-
+	
 	/** PNML File Name */
 	public String pnmlName = null;
-
 	/** List containing all the Place objects in the Petri-Net */
 	private ArrayList<Place> placesArray = null;
 	/** ArrayList containing all the Transition objects in the Petri-Net */
@@ -145,14 +147,14 @@ implements Cloneable {
 
 	private HashMap<Transition, HashMap<TransportArc, TransportArc> > transportArcMap;
 
-	private HashMap<TimedPlace, ArrayList<BigDecimal>> placeMarkingStorageMap = null;
+	private HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> placeMarkingStorageMap = null;
 
 	private ArrayList<TAPNQuery> queries = null;
 	private ConstantStore constants = new ConstantStore();
 	private NetType type = NetType.TAPN;
 
 	private HashMap<ColoredTimedPlace, List<ColoredToken>> coloredPlaceMarkingStorageMap;
-
+	private TimedArcPetriNet tapn = new TimedArcPetriNet();
 	/**
 	 * Create Petri-Net object from PNML file with URI pnmlFileName
 	 * @param pnmlFileName Name of PNML File
@@ -204,14 +206,17 @@ implements Cloneable {
 		inhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>>();
 		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>>();
 	}
-
-
+	
 	/**
 	 * Add placeInput to the back of the Place ArrayList
 	 * All observers are notified of this change (Model-View Architecture)
 	 * @param placeInput Place Object to add
 	 */
 	private void addPlace(Place placeInput) {
+		if(placeInput instanceof TimedPlaceComponent){
+			dk.aau.cs.model.tapn.TimedPlace tp = ((TimedPlaceComponent)placeInput).underlyingPlace();
+			tapn.add(tp);
+		}
 		boolean unique = true;
 
 		if (placeInput != null) {
@@ -404,7 +409,7 @@ implements Cloneable {
 				PlaceTransitionObject first = tmp.getSource();
 
 				if (tmp.getConnectedTo() == null){
-					if (first instanceof TimedPlace){
+					if (first instanceof TimedPlaceComponent){
 
 						for (Object o : tmp.getTarget().getPostset()){
 
@@ -1177,7 +1182,7 @@ implements Cloneable {
 
 		} else {
 
-			place = new TimedPlace(positionXInput, positionYInput,
+			place = new TimedPlaceComponent(positionXInput, positionYInput,
 					idInput,  
 					nameInput, 
 					nameOffsetXInput, nameOffsetYInput,
@@ -1368,9 +1373,9 @@ implements Cloneable {
 		boolean isTAPN = true;
 		if (isTAPN){
 			if(!isUsingColors()){
-				placeMarkingStorageMap = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
+				placeMarkingStorageMap = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
 				for (Place p : getPlaces()){
-					placeMarkingStorageMap.put( (TimedPlace)p, (ArrayList<BigDecimal>)((TimedPlace)p).getTokens().clone() );
+					placeMarkingStorageMap.put( (TimedPlaceComponent)p, (ArrayList<BigDecimal>)((TimedPlaceComponent)p).getTokens().clone() );
 				}
 			}else{
 				coloredPlaceMarkingStorageMap = new HashMap<ColoredTimedPlace, List<ColoredToken>>();
@@ -1399,13 +1404,13 @@ implements Cloneable {
 	}
 
 
-	public HashMap<TimedPlace, ArrayList<BigDecimal>> getCurrentMarking(){
+	public HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> getCurrentMarking(){
 		boolean isTAPN = true;
 
-		HashMap<TimedPlace, ArrayList<BigDecimal>> toReturn = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
+		HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> toReturn = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
 		if (isTAPN){
 			for (Place p : getPlaces()){
-				toReturn.put( (TimedPlace)p, (ArrayList<BigDecimal>)((TimedPlace)p).getTokens().clone() );
+				toReturn.put( (TimedPlaceComponent)p, (ArrayList<BigDecimal>)((TimedPlaceComponent)p).getTokens().clone() );
 			}
 		}
 		return toReturn;
@@ -1421,9 +1426,9 @@ implements Cloneable {
 			if(!isUsingColors()){
 				if (placeMarkingStorageMap!=null){
 					for (Place p : getPlaces()){
-						ArrayList<BigDecimal> markingOfP = placeMarkingStorageMap.get((TimedPlace)p);
+						ArrayList<BigDecimal> markingOfP = placeMarkingStorageMap.get((TimedPlaceComponent)p);
 						p.setCurrentMarking( markingOfP.size() );
-						((TimedPlace)p).setAgeOfTokens(markingOfP);
+						((TimedPlaceComponent)p).setAgeOfTokens(markingOfP);
 						setChanged();
 						notifyObservers(p);
 					}
@@ -1571,11 +1576,11 @@ implements Cloneable {
 						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 
 
-						TimedPlace p = (TimedPlace)a.getSource();
+						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
 						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 
-						TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getConnectedTo().getTarget();
+						TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArc)a).getConnectedTo().getTarget();
 
 						for (int i=0; i< tokensOfPlace.size(); i++){
 							if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
@@ -1602,7 +1607,7 @@ implements Cloneable {
 						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 						//int indexOfOldestEligebleToken = 0;
 
-						TimedPlace p = (TimedPlace)a.getSource();
+						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
 						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 						for (int i=0; i< tokensOfPlace.size(); i++){
@@ -1631,7 +1636,7 @@ implements Cloneable {
 
 				for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
 					if (a instanceof TransportArc){
-						TimedPlace p = (TimedPlace)a.getTarget();
+						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
 						int newNumberOfTokens = p.getTokens().size()+1;
 						p.setCurrentMarking(newNumberOfTokens);
 						ArrayList<BigDecimal> markingToBeSet = p.getTokens();
@@ -1641,7 +1646,7 @@ implements Cloneable {
 						p.setAgeOfTokens(markingToBeSet);
 					}
 					else{
-						TimedPlace p = (TimedPlace)a.getTarget();
+						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
 						int newNumberOfTokens = p.getTokens().size()+1;
 						p.setCurrentMarking(newNumberOfTokens);
 
@@ -1682,7 +1687,7 @@ implements Cloneable {
 					HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
 
 					for ( Arc a : (LinkedList<Arc>)transition.getPreset() ){
-						TimedPlace p = (TimedPlace)a.getSource();
+						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
 						if (a instanceof TransportArc){
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
@@ -1709,7 +1714,7 @@ implements Cloneable {
 
 					for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
 						if (a instanceof TransportArc){
-							TimedPlace p = (TimedPlace)a.getTarget();
+							TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
 							int newNumberOfTokens = p.getTokens().size()+1;
 							p.setCurrentMarking(newNumberOfTokens);
 							ArrayList<BigDecimal> markingToBeSet = p.getTokens();
@@ -1719,7 +1724,7 @@ implements Cloneable {
 							p.setAgeOfTokens(markingToBeSet);
 						}
 						else{
-							TimedPlace p = (TimedPlace)a.getTarget();
+							TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
 							int newNumberOfTokens = p.getTokens().size()+1;
 							p.setCurrentMarking(newNumberOfTokens);
 
@@ -1765,8 +1770,8 @@ implements Cloneable {
 	}
 
 
-	public void fireTimedTransitionBackwards(HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking, 
-			HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking, 
+	public void fireTimedTransitionBackwards(HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> presetMarking, 
+			HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> postsetMarking, 
 			TAPNTransition transition){
 		for (Arc a : (LinkedList<Arc>)transition.getPreset()){
 			if (! presetMarking.containsKey(a.getSource()) )
@@ -1779,7 +1784,7 @@ implements Cloneable {
 
 
 		for (Arc a : (LinkedList<Arc>)transition.getPreset()){
-			TimedPlace place = (TimedPlace)a.getSource();
+			TimedPlaceComponent place = (TimedPlaceComponent)a.getSource();
 			//place.setCurrentMarking( (presetMarking.get(place)).size() );
 			//place.setAgeOfTokens(presetMarking.get(place));
 
@@ -1788,7 +1793,7 @@ implements Cloneable {
 			place.setTokensAndAgeOfTokens(presetMarking.get(place));
 		}
 		for (Arc a : (LinkedList<Arc>)transition.getPostset()){
-			TimedPlace place = (TimedPlace)a.getTarget();
+			TimedPlaceComponent place = (TimedPlaceComponent)a.getTarget();
 			//place.setCurrentMarking( ((ArrayList<Float>)postsetMarking.get(place)).size() );
 			//place.setAgeOfTokens(postsetMarking.get(place));
 
@@ -1876,7 +1881,7 @@ implements Cloneable {
 		for ( Arc a : presetArcs ){
 
 			Place p = (Place)a.getSource();
-			if (p instanceof TimedPlace){
+			if (p instanceof TimedPlaceComponent){
 
 				boolean ageIsSatisfied;
 
@@ -1888,7 +1893,7 @@ implements Cloneable {
 
 				if (p.currentMarking > 0){
 
-					for ( BigDecimal token : ((TimedPlace)p).getTokens() ){
+					for ( BigDecimal token : ((TimedPlaceComponent)p).getTokens() ){
 						if(a instanceof TAPNInhibitorArc)
 						{
 							if(!((TimedArc)a).satisfiesGuard(token))
@@ -1908,7 +1913,7 @@ implements Cloneable {
 									for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
 										if (postsetArc instanceof TransportArc){
 											if ( ((TransportArc) postsetArc).getGroupNr() == ((TransportArc)a).getGroupNr()){
-												if ( ((TimedPlace)postsetArc.getTarget()).satisfiesInvariant(token) ){
+												if ( ((TimedPlaceComponent)postsetArc.getTarget()).satisfiesInvariant(token) ){
 													ageIsSatisfied = true;
 													break;
 												}
@@ -2891,8 +2896,8 @@ implements Cloneable {
 					token.doTimeDelay(timeToPass);
 				}
 			}else{
-				if (p instanceof TimedPlace){
-					TimedPlace place = (TimedPlace)p;
+				if (p instanceof TimedPlaceComponent){
+					TimedPlaceComponent place = (TimedPlaceComponent)p;
 					int sizeOfArray = place.getTokens().size();
 
 					for (int i = 0; i< sizeOfArray; i++){
@@ -2924,8 +2929,8 @@ implements Cloneable {
 					}
 				}
 			}else{
-				if (p instanceof TimedPlace){
-					TimedPlace timedPlace = (TimedPlace)p;
+				if (p instanceof TimedPlaceComponent){
+					TimedPlaceComponent timedPlace = (TimedPlaceComponent)p;
 
 					for (BigDecimal token : timedPlace.getTokens()){
 						if (!timedPlace.satisfiesInvariant(token.add(timeToPass))){   
@@ -2965,8 +2970,8 @@ implements Cloneable {
 		updateArcGuards(oldName, newName);
 		for(Place p : placesArray){
 			if(!isUsingColors()){
-				if(p instanceof TimedPlace){
-					TimedPlace tp = (TimedPlace)p;
+				if(p instanceof TimedPlaceComponent){
+					TimedPlaceComponent tp = (TimedPlaceComponent)p;
 					String inv = tp.getInvariant();
 
 					String operator = inv.contains("<=") ? "<=" : "<";
@@ -3125,8 +3130,8 @@ implements Cloneable {
 
 	public void redrawVisibleTokenLists() {
 		for (Place place : placesArray) {
-			if(place instanceof TimedPlace){
-				TimedPlace tp = (TimedPlace)place;
+			if(place instanceof TimedPlaceComponent){
+				TimedPlaceComponent tp = (TimedPlaceComponent)place;
 				if(tp.isAgeOfTokensShown()){
 					tp.showAgeOfTokens(true);
 				}

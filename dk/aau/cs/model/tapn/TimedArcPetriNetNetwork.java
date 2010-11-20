@@ -10,6 +10,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public TimedArcPetriNetNetwork(){
 		tapns = new ArrayList<TimedArcPetriNet>();
+		tapns.add(new TimedArcPetriNet());
 	}
 	
 	public void add(TimedArcPetriNet tapn){

@@ -1,6 +1,7 @@
 package dk.aau.cs.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -20,7 +23,7 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -44,6 +47,7 @@ public class TabContent extends JSplitPane {
 	private static final double DIVIDER_LOCATION = 0.5;
 	
 	private DataLayer appModel;
+	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<PetriNetObject, String> oldGuards;
 	private JScrollPane drawingSurfaceScroller;
 	private DrawingSurfaceImpl drawingSurface;
@@ -98,7 +102,7 @@ public class TabContent extends JSplitPane {
 		queries = new LeftQueryPane(
 				appModel == null ? new ArrayList<TAPNQuery>() : appModel.getQueries()
 		);
-		templates = new TemplateExplorer();
+		templates = new TemplateExplorer(this);
 		
 		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
 		queryConstantsSplit.setResizeWeight(0.5);
@@ -199,9 +203,9 @@ public class TabContent extends JSplitPane {
 
 	private void setupModelWithOldGuards() {
 		for(Place p : appModel.getPlaces()){
-			if(p instanceof TimedPlace){
+			if(p instanceof TimedPlaceComponent){
 				String inv = oldGuards.get(p);
-				((TimedPlace)p).setInvariant(inv);
+				((TimedPlaceComponent)p).setInvariant(inv);
 			}
 		}
 
@@ -219,10 +223,10 @@ public class TabContent extends JSplitPane {
 		HashMap<PetriNetObject, String> oldGuards = new HashMap<PetriNetObject, String>();
 
 		for(Place p : appModel.getPlaces()){
-			if(p instanceof TimedPlace){
-				oldGuards.put(p, ((TimedPlace) p).getInvariant());
+			if(p instanceof TimedPlaceComponent){
+				oldGuards.put(p, ((TimedPlaceComponent) p).getInvariant());
 				String inv = getInvariant(p);
-				((TimedPlace)p).setInvariant(inv);
+				((TimedPlaceComponent)p).setInvariant(inv);
 			}
 		}
 
@@ -272,7 +276,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	private String getInvariant(Place place) {
-		String inv = ((TimedPlace)place).getInvariant();
+		String inv = ((TimedPlaceComponent)place).getInvariant();
 		String operator = inv.contains("<=") ? "<=" : "<";
 
 		String bound = inv.substring(operator.length());
@@ -402,6 +406,14 @@ public class TabContent extends JSplitPane {
 	
 	public JScrollPane drawingSurfaceScrollPane(){
 		return drawingSurfaceScroller;
+	}
+
+	public TimedArcPetriNetNetwork network() {
+		return tapnNetwork;
+	}
+
+	public DrawingSurfaceImpl drawingSurface() {
+		return drawingSurface;
 	}
 
 }

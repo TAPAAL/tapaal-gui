@@ -7,7 +7,7 @@ import java.util.List;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 
 public class Marking {
 	private HashMap<Place, List<Token>> tokens;
@@ -60,7 +60,7 @@ public class Marking {
 		Marking marking = new Marking();
 		for(Place place : tapn.getPlaces()){
 			for(int i = 0; i < place.getCurrentMarking(); i++){
-				marking.addToken(new Token((TimedPlace)place, BigDecimal.ZERO));
+				marking.addToken(new Token((TimedPlaceComponent)place, BigDecimal.ZERO));
 			}
 		}
 

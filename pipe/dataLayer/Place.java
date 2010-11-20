@@ -70,10 +70,10 @@ extends PlaceTransitionObject {
 	public static int tHeight = 4;
 
 	/** Ellipse2D.Double place */
-	protected static Ellipse2D.Double place = 
+	protected static Ellipse2D.Double placeEllipse = 
 		new Ellipse2D.Double(0, 0, DIAMETER, DIAMETER);
 	protected static Shape proximityPlace =
-		(new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(place);
+		(new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 	
 	/**
 	 * Create Petri-Net Place object
@@ -199,14 +199,14 @@ extends PlaceTransitionObject {
 		} else{
 			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
 		}
-		g2.fill(place);
+		g2.fill(placeEllipse);
 
 		if (selected && !ignoreSelection){
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else{
 			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
 		}
-		g2.draw(place);
+		g2.draw(placeEllipse);
 
 		g2.setStroke(new BasicStroke(1.0f));
 		int marking = getCurrentMarking();
@@ -368,7 +368,7 @@ extends PlaceTransitionObject {
 		someArc = CreateGui.getView().createArc;
 		if (someArc != null){		// Must be drawing a new Arc if non-NULL.
 			if ((proximityPlace.contains((int)unZoomedX, (int)unZoomedY)
-					|| place.contains((int)unZoomedX, (int)unZoomedY))
+					|| placeEllipse.contains((int)unZoomedX, (int)unZoomedY))
 					&& areNotSameType(someArc.getSource())){
 				// assume we are only snapping the target...
 				if (someArc.getTarget() != this){
@@ -384,7 +384,7 @@ extends PlaceTransitionObject {
 				return false;
 			}
 		} else {
-			return place.contains((int)unZoomedX, (int)unZoomedY); 
+			return placeEllipse.contains((int)unZoomedX, (int)unZoomedY); 
 		}
 	}
 

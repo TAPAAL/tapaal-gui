@@ -63,7 +63,7 @@ public class TraceTransformer {
 		ArrayList<pipe.dataLayer.simulation.Token> tokens = new ArrayList<pipe.dataLayer.simulation.Token>(consumedTokens.size());
 
 		for(dk.aau.cs.petrinet.Token aauToken : consumedTokens){
-			pipe.dataLayer.TimedPlace place = (pipe.dataLayer.TimedPlace)model.getPlaceByName(aauToken.place().getName());
+			pipe.dataLayer.TimedPlaceComponent place = (pipe.dataLayer.TimedPlaceComponent)model.getPlaceByName(aauToken.place().getName());
 			BigDecimal age = aauToken.age();
 			pipe.dataLayer.simulation.Token pipeToken = new pipe.dataLayer.simulation.Token(place, age);
 			tokens.add(pipeToken);

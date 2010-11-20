@@ -14,19 +14,18 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.simulation.Marking;
 import pipe.dataLayer.simulation.Token;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.PlaceMarkingEdit;
@@ -34,30 +33,28 @@ import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.undo.TimedPlaceTokenEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 
-public class TimedPlace extends Place {
-
+public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
 
-	private String invariant;
+	private dk.aau.cs.model.tapn.TimedPlace place;
 	private ArrayList<BigDecimal> myTokens;
 	private Window ageOfTokensWindow;
 
-	public TimedPlace(double positionXInput, double positionYInput) {
+
+	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
-		invariant = "<inf";
-
+		this.place = place;
 		attributesVisible = true;
-
-		//		pnName.zoomUpdate(zoom);
-		//		update();
-		//		repaint();
-
 		this.myTokens = new ArrayList<BigDecimal>();
 		ageOfTokensWindow = new Window(new Frame());
 	}
 
-	public TimedPlace(double positionXInput,  double positionYInput, 
+	public TimedPlaceComponent(double positionXInput,  double positionYInput, 
 			String idInput, 
 			String nameInput, 
 			Double nameOffsetXInput, Double nameOffsetYInput, 
@@ -69,23 +66,18 @@ public class TimedPlace extends Place {
 				initialMarkingInput, 
 				markingOffsetXInput,   markingOffsetYInput,
 				capacityInput);
-		this.invariant = invariant;
-
+		
 		// XXX  - Hack to get shown attributes 
 		attributesVisible = true;
 
-		if (invariant == "") {
-			this.invariant="<inf";
-		}
-
-		this.myTokens = new ArrayList<BigDecimal>();
+				this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
 			this.myTokens.add(newToken());
 		}
 		ageOfTokensWindow = new Window(new Frame());
 	}
 
-	public TimedPlace(Place place, String invariant){		
+	public TimedPlaceComponent(Place place, String invariant){		
 		super(place.getX(), place.getY(), 
 				place.id, 
 				place.getName(), 
@@ -93,7 +85,6 @@ public class TimedPlace extends Place {
 				place.getInitialMarking(), 
 				place.getMarkingOffsetXObject(),  place.getMarkingOffsetYObject(),
 				place.capacity);
-		this.invariant = invariant;
 		attributesVisible = true;
 
 		this.myTokens = new ArrayList<BigDecimal>();
@@ -103,7 +94,7 @@ public class TimedPlace extends Place {
 		ageOfTokensWindow = new Window(new Frame());
 	}
 
-	public TimedPlace(String idInput, 
+	public TimedPlaceComponent(String idInput, 
 			String nameInput, 
 			int initialMarkingInput, 
 			int capacityInput, String invariant){
@@ -114,11 +105,7 @@ public class TimedPlace extends Place {
 				0.0,   0.0,
 				capacityInput);
 
-		this.invariant = invariant;
-
-		if (invariant == "") {
-			this.invariant="<inf";
-		}
+		
 
 		this.myTokens = new ArrayList<BigDecimal>();
 		for (int i=0; i<initialMarkingInput; i++){
@@ -130,8 +117,8 @@ public class TimedPlace extends Place {
 
 
 	@Override
-	public TimedPlace clone(){
-		TimedPlace toReturn = (TimedPlace)super.clone();
+	public TimedPlaceComponent clone(){
+		TimedPlaceComponent toReturn = (TimedPlaceComponent)super.clone();
 
 		toReturn.setInvariant(this.getInvariant());
 		return toReturn;
@@ -140,12 +127,12 @@ public class TimedPlace extends Place {
 
 
 	@Override
-	public TimedPlace copy(){
+	public TimedPlaceComponent copy(){
 		//TimedPlace copy = new TimedPlace(super.copy(), this.invariant);
 		//		copy.setOriginal(this);
 
-		TimedPlace copy = new TimedPlace (Zoomer.getUnzoomedValue(this.getX(), zoom), 
-				Zoomer.getUnzoomedValue(this.getY(), zoom));
+		TimedPlaceComponent copy = new TimedPlaceComponent (Zoomer.getUnzoomedValue(this.getX(), zoom), 
+				Zoomer.getUnzoomedValue(this.getY(), zoom), this.place);
 		copy.pnName.setName(this.getName());
 		copy.nameOffsetX = this.nameOffsetX;
 		copy.nameOffsetY = this.nameOffsetY;
@@ -161,66 +148,24 @@ public class TimedPlace extends Place {
 
 	public String getInvariant(){
 
-		return invariant;
+		return place.invariant().toString();
 	}
 
 	public String getStringOfTokens() {		
-		String stringArrayOfTokens = "{";
-		Iterator<BigDecimal> iterator = myTokens.iterator();
+		StringBuffer buffer = new StringBuffer("{");
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		int i = 0;
-		while (iterator.hasNext()){
-			BigDecimal intToInsert = iterator.next();
-			if (myTokens.size()<20){
-				if (i-((i/4)*4) == 3){
-					if ( ! iterator.hasNext() ){
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert);
-					}else{
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert) + ",\n ";
-					}	
-				}else {
-					if ( ! iterator.hasNext() ){
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert);
-					}else{
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert) + ", ";
-					}	
-				}	
-			}else if (myTokens.size()<40){
-				if (i-((i/6)*6) == 5){
-					if ( ! iterator.hasNext() ){
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert);
-					}else{
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert) + ",\n ";
-					}	
-				}else {
-					if ( ! iterator.hasNext() ){
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert);
-					}else{
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert) + ", ";
-					}	
-				}
-			}else{
-				if (i-((i/10)*10) == 9){
-					if ( ! iterator.hasNext() ){
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert);
-					}else{
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert) + ",\n ";
-					}	
-				}else {
-					if ( ! iterator.hasNext() ){
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert);
-					}else{
-						stringArrayOfTokens = stringArrayOfTokens + df.format(intToInsert) + ", ";
-					}	
-				}
-			}
-
-			i++;
+		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+		Iterable<TimedToken> tokens = place.tokens();
+		boolean first = true;
+		for(TimedToken token : tokens){
+			if(!first) buffer.append(", ");
+			buffer.append(df.format(token.age()));
+			first = false;
 		}
-		stringArrayOfTokens = stringArrayOfTokens + "}";
+		buffer.append("}");
 
-		return stringArrayOfTokens;
+		return buffer.toString();
 	}
 
 	public ArrayList<BigDecimal> getTokens(){
@@ -241,7 +186,6 @@ public class TimedPlace extends Place {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
 			Graphics2D g2 = (Graphics2D)g;
 
 			if (hasCapacity()){
@@ -257,19 +201,18 @@ public class TimedPlace extends Place {
 			} else{
 				g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
 			}
-			g2.fill(place);
+			g2.fill(placeEllipse);
 
 			if (selected && !ignoreSelection){
 				g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 			} else{
 				g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
 			}
-			g2.draw(place);
+			g2.draw(placeEllipse);
 
 			g2.setStroke(new BasicStroke(1.0f));
 
 			paintTokens(g);
-		}
 	}
 
 	protected void paintTokens(Graphics g) {
@@ -282,26 +225,28 @@ public class TimedPlace extends Place {
 		int x = insets.left;
 		int y = insets.top;
 
-		int marking = getCurrentMarking();
-
+		//int marking = getCurrentMarking();
+		List<TimedToken> myTokens = place.tokens();
+		int marking = place.numberOfTokens();
+		
 		// structure sees how many markings there are and fills the place in with 
 		// the appropriate number.
 		switch(marking) {
 		case 2: 
-			if (myTokens.get(1).compareTo(BigDecimal.valueOf(9)) > 0){
+			if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0){
 				g.setFont(new Font("new font", Font.PLAIN, 11));
-				g.drawString(df.format(myTokens.get(1)), x + 17-12, y + 13+1);
+				g.drawString(df.format(myTokens.get(1).age()), x + 17-12, y + 13+1);
 			}else{
-				g.drawString(df.format(myTokens.get(1)), x + 17-10, y + 13+1);
+				g.drawString(df.format(myTokens.get(1).age()), x + 17-10, y + 13+1);
 			}
 			//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
 			/* falls through */
 		case 1:
-			if (myTokens.get(0).compareTo(BigDecimal.valueOf(9)) > 0){
+			if (myTokens.get(0).age().compareTo(BigDecimal.valueOf(9)) > 0){
 				g.setFont(new Font("new font", Font.PLAIN, 11));
-				g.drawString(df.format(myTokens.get(0)), x + 11-6, y + 20+6);
+				g.drawString(df.format(myTokens.get(0).age()), x + 11-6, y + 20+6);
 			}else{
-				g.drawString(df.format(myTokens.get(0)), x + 11-4, y + 20+6);
+				g.drawString(df.format(myTokens.get(0).age()), x + 11-4, y + 20+6);
 			}
 			//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
 			break;
@@ -322,32 +267,7 @@ public class TimedPlace extends Place {
 		}
 	}
 
-	@Override
-	public TimedPlace paste(double despX, double despY, boolean toAnotherView){
-		//TimedPlace copy = new TimedPlace (super.paste(despX, despY, toAnotherView), this.invariant );
-		//		copy.setOriginal(this);
-		//copy.set
-
-		this.incrementCopyNumber();
-		TimedPlace copy = new TimedPlace (
-				Grid.getModifiedX(despX + this.getX() + Pipe.PLACE_TRANSITION_HEIGHT/2),
-				Grid.getModifiedY(despY + this.getY() + Pipe.PLACE_TRANSITION_HEIGHT/2));
-		copy.pnName.setName(this.pnName.getName()  
-				+ "(" + this.getCopyNumber() +")");
-		this.newCopy(copy);
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
-		copy.update();
-
-		return copy;
-	}
-
+	
 	public void removeTokenofAge(BigDecimal tokenage) {
 		boolean ableToRemoveToken = false;
 		BigDecimal tokenToRemove = null;
@@ -369,6 +289,7 @@ public class TimedPlace extends Place {
 	}
 
 	public boolean satisfiesInvariant(BigDecimal token) {
+		String invariant = getInvariant();
 		if (invariant.contains("inf")){
 			return true;
 		}else if (invariant.contains("<=")){
@@ -416,13 +337,13 @@ public class TimedPlace extends Place {
 	}
 
 	public Command setInvariant(String invariant) {
-
-		String oldinvariant = this.invariant;
-		this.invariant = invariant;
+		TimeInvariant old = place.invariant();
+		TimeInvariant newInv = TimeInvariant.parse(invariant);
+		place.setInvariant(newInv);
 
 		update();
 
-		return new TimedPlaceInvariantEdit(this, oldinvariant, this.invariant);
+		return new TimedPlaceInvariantEdit(this, old, newInv);
 	}
 
 	private void setNumberOfMyTokens(int currentMarkingInput){
@@ -453,16 +374,8 @@ public class TimedPlace extends Place {
 		update();
 
 		return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
-		//} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
 	}
 
-
-	//	public void removeToken(int indexOfTokenToBeRemoved) {
-	//		myTokens.remove(indexOfTokenToBeRemoved);
-	//		Collections.sort(myTokens);
-	//		myTokens.trimToSize();
-	//		currentMarking--;
-	//	}
 
 
 	public void showAgeOfTokens(boolean show) {
@@ -538,7 +451,7 @@ public class TimedPlace extends Place {
 
 	protected String getInvariantString() {
 		String value = "";
-
+		String invariant = getInvariant();
 		//Dont show invariant if its default	
 		if (!invariant.equals("<inf")){ 
 
@@ -568,5 +481,9 @@ public class TimedPlace extends Place {
 	@Override
 	public String toString() {
 		return getName();
+	}
+
+	public TimedPlace underlyingPlace() {
+		return place;
 	}
 }

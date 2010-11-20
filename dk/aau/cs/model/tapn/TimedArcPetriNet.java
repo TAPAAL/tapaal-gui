@@ -17,8 +17,11 @@ public class TimedArcPetriNet {
 	private List<TimedInhibitorArc> inhibitorArcs;
 	private List<TransportArc> transportArcs;
 	
+	private TimedMarking currentMarking;
+	
 	public TimedArcPetriNet(){
 		this("New Timed Arc Petri Net" + uniqueId++);
+		
 	}
 	
 	public TimedArcPetriNet(String name) {
@@ -29,6 +32,15 @@ public class TimedArcPetriNet {
 		outputArcs = new ArrayList<TimedOutputArc>();
 		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 		transportArcs = new ArrayList<TransportArc>();
+		
+		setCurrentMarking(new TimedMarking());
+	}
+
+	private void setCurrentMarking(TimedMarking marking) {
+		currentMarking = marking;
+		for(TimedPlace place : places){
+			place.setCurrentMarking(marking);
+		}
 	}
 	
 	public void add(TimedPlace place){
@@ -36,6 +48,7 @@ public class TimedArcPetriNet {
 		Require.that(!isNameUsed(place.name()), "A place or transition with the specified name already exists in the petri net.");
 
 		places.add(place);
+		place.setCurrentMarking(currentMarking);
 	}
 	
 	public void add(TimedTransition transition){
@@ -91,6 +104,14 @@ public class TimedArcPetriNet {
 		transportArcs.add(arc);
 		arc.source().addToPostset(arc);
 		arc.destination().addToPreset(arc);
+	}
+	
+	public void addToken(TimedPlace place, TimedToken token){
+		currentMarking.add(place, token);
+	}
+	
+	public void removeToken(TimedPlace place, TimedToken token){
+		currentMarking.remove(place, token);
 	}
 	
 	private boolean hasArcFromPlaceToTransition(TimedPlace source,

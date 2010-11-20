@@ -9,7 +9,7 @@ public class ConstantBound implements Bound {
 		Require.that(constant != null, "Argument must be a non-null constant");
 		this.constant = constant;
 	}
-	
+		
 	public int value() {
 		return constant.value();
 	}

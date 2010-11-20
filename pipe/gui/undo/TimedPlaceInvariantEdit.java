@@ -1,15 +1,16 @@
 package pipe.gui.undo;
 
 import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.TimedPlace;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import pipe.dataLayer.TimedPlaceComponent;
 
 public class TimedPlaceInvariantEdit extends Command {
 
-	private String oldvalue;
-	private String newvalue;
-	private TimedPlace place;
+	private TimeInvariant oldvalue;
+	private TimeInvariant newvalue;
+	private TimedPlaceComponent place;
 	
-	public TimedPlaceInvariantEdit(TimedPlace place, String oldvalue, String newvalue) {
+	public TimedPlaceInvariantEdit(TimedPlaceComponent place, TimeInvariant oldvalue, TimeInvariant newvalue) {
 	
 		this.oldvalue = oldvalue;
 		this.newvalue = newvalue;
@@ -19,14 +20,13 @@ public class TimedPlaceInvariantEdit extends Command {
 	
 	@Override
 	public void redo() {
-		place.setInvariant(newvalue); 
+		place.setInvariant(newvalue.toString()); 
 
 	}
 
 	@Override
 	public void undo() {
-		place.setInvariant(oldvalue);
-
+		place.setInvariant(oldvalue.toString());
 	}
 
 }

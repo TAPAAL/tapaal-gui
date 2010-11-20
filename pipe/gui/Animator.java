@@ -26,7 +26,7 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNTrace;
 import pipe.dataLayer.TAPNTransition;
 import pipe.dataLayer.TimeDelayFiringAction;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.exception.InvariantViolatedAnimationException;
@@ -70,7 +70,7 @@ public class Animator {
 	int numberSequences;   
 	private ArrayList<FiringAction> actionHistory;
 	private int currentAction;
-	private ArrayList<HashMap<TimedPlace, ArrayList<BigDecimal>>> markingHistory;
+	private ArrayList<HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>> markingHistory;
 
 	public Firingmode firingmode = new RandomFiringmode();
 
@@ -90,7 +90,7 @@ public class Animator {
 			}
 		});
 		currentAction = -1;
-		markingHistory = new ArrayList<HashMap<TimedPlace,ArrayList<BigDecimal>>>();
+		markingHistory = new ArrayList<HashMap<TimedPlaceComponent,ArrayList<BigDecimal>>>();
 
 	}
 
@@ -273,21 +273,21 @@ public class Animator {
 
 			if (actionHistory.get(currentAction) instanceof DiscreetFiringAction){
 				TAPNTransition transition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast
-				HashMap<TimedPlace, ArrayList<BigDecimal>> markingToGoBackTo = markingHistory.get(currentAction);
+				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> markingToGoBackTo = markingHistory.get(currentAction);
 
 				if (markingToGoBackTo == null){
 					System.err.println("No marking to go back to, ERROR!");
 				}
 
-				HashMap<TimedPlace, ArrayList<BigDecimal>> presetMarking = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
+				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> presetMarking = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
 				for (Arc a : transition.getPreset() ){
-					TimedPlace place = (TimedPlace)a.getSource();
+					TimedPlaceComponent place = (TimedPlaceComponent)a.getSource();
 					presetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
 				}
 
-				HashMap<TimedPlace, ArrayList<BigDecimal>> postsetMarking = new HashMap<TimedPlace, ArrayList<BigDecimal>>();
+				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> postsetMarking = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
 				for (Arc a : transition.getPostset() ){
-					TimedPlace place = (TimedPlace)a.getTarget();
+					TimedPlaceComponent place = (TimedPlaceComponent)a.getTarget();
 					postsetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
 				}
 
@@ -357,7 +357,7 @@ public class Animator {
 				if (markingHistory.get(currentAction+1)==null){
 					Logger.log("Marking is null, we will fix it");
 
-					HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+					HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
 					markingHistory.set(currentAction+1, currentmakring);
 				}
 
@@ -398,7 +398,7 @@ public class Animator {
 				if (markingHistory.get(currentAction+1)==null){
 					Logger.log("Marking is null, we will fix it");
 
-					HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+					HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
 					markingHistory.set(currentAction+1, currentmakring);
 				}
 
@@ -437,7 +437,7 @@ public class Animator {
 
 		Animator animator = CreateGui.getAnimator();
 
-		HashMap<TimedPlace, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+		HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
 
 		//If untimed simulation
 		if (CreateGui.getAbstractAnimationPane() != null){
@@ -587,7 +587,7 @@ public class Animator {
 		this.numberSequences = numberSequences;
 	}
 
-	private void addToHistory(FiringAction newAction, HashMap<TimedPlace, ArrayList<BigDecimal>> currentMarking){
+	private void addToHistory(FiringAction newAction, HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentMarking){
 		actionHistory.add(newAction);
 		markingHistory.add(currentMarking);
 		currentAction++;

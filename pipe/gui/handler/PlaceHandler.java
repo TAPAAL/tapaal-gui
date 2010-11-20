@@ -13,7 +13,7 @@ import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
@@ -74,7 +74,7 @@ extends PlaceTransitionObjectHandler {
 					CreateGui.getApp().isEditionAllowed() &&
 					(CreateGui.getApp().getMode() == Pipe.PLACE || 
 							CreateGui.getApp().getMode() == Pipe.SELECT)) {
-				((TimedPlace)myObject).showAgeOfTokens(false);
+				((TimedPlaceComponent)myObject).showAgeOfTokens(false);
 				((Place)myObject).showEditor(); 
 			} else {
 				int currentMarking = ((Place)myObject).getCurrentMarking();
@@ -213,23 +213,23 @@ extends PlaceTransitionObjectHandler {
 	@Override
 	public void mouseEntered(MouseEvent e){
 		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
-			if ((myObject instanceof TimedPlace) && !isDragging){//&& CreateGui.getView().isInAnimationMode()){		   
+			if ((myObject instanceof TimedPlaceComponent) && !isDragging){//&& CreateGui.getView().isInAnimationMode()){		   
 				if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
-					((TimedPlace) myObject).showAgeOfTokens(true);
+					((TimedPlaceComponent) myObject).showAgeOfTokens(true);
 				}
 			}
 		}
 
 		if(isDragging){
-			((TimedPlace) myObject).showAgeOfTokens(false);
+			((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 		}
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e){
-		if ((myObject instanceof TimedPlace)){// && CreateGui.getView().isInAnimationMode()){
+		if ((myObject instanceof TimedPlaceComponent)){// && CreateGui.getView().isInAnimationMode()){
 			if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
-				((TimedPlace) myObject).showAgeOfTokens(false);
+				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 			}
 		}
 	}

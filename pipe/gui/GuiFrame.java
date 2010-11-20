@@ -56,7 +56,7 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedPlace;
+import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -1404,8 +1404,8 @@ EOC */
 				CreateGui.getAnimator().doRandomFiring();
 				//update mouseOverView
 				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-					if (((TimedPlace)p).isAgeOfTokensShown()){
-						((TimedPlace)p).showAgeOfTokens(true);
+					if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
+						((TimedPlaceComponent)p).showAgeOfTokens(true);
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -1416,8 +1416,8 @@ EOC */
 				CreateGui.getAnimator().stepForward();
 				//update mouseOverView
 				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-					if (((TimedPlace)p).isAgeOfTokensShown()){
-						((TimedPlace)p).showAgeOfTokens(true);
+					if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
+						((TimedPlaceComponent)p).showAgeOfTokens(true);
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -1428,8 +1428,8 @@ EOC */
 				CreateGui.getAnimator().stepBack();
 				//update mouseOverView
 				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-					if (((TimedPlace)p).isAgeOfTokensShown()){
-						((TimedPlace)p).showAgeOfTokens(true);
+					if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
+						((TimedPlaceComponent)p).showAgeOfTokens(true);
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
@@ -1508,7 +1508,7 @@ EOC */
 
 			boolean queriesAffected = false;
 			for (PetriNetObject pn : selection) {
-				if(pn instanceof TimedPlace)
+				if(pn instanceof TimedPlaceComponent)
 				{
 					for (TAPNQuery q : queries) {
 						if(q.getProperty().containsAtomicPropWithSpecificPlace(pn.getName())){
