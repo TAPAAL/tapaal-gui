@@ -5,9 +5,7 @@ import java.awt.Container;
 import javax.swing.BoxLayout;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomer;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 

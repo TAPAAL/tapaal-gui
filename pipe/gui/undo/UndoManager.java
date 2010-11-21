@@ -35,16 +35,19 @@ public class UndoManager {
    private ArrayList<ArrayList<Command>> edits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
    
    private DrawingSurfaceImpl view;
-   private DataLayer model;
+   private DataLayer guiModel;
    private GuiFrame app;
 
+   public void setModel(DataLayer guiModel){
+	   this.guiModel = guiModel;
+   }
    
    /**
     * Creates a new instance of UndoManager
     */
    public UndoManager(DrawingSurfaceImpl _view, DataLayer _model, GuiFrame _app) {
       view = _view;
-      model = _model;
+      guiModel = _model;
       app = _app;
       app.setUndoActionEnabled(false);
       app.setRedoActionEnabled(false);
@@ -223,7 +226,7 @@ public class UndoManager {
             while (arcsTo.hasNext()) {
                Arc anArc = arcsTo.next();
                if (!anArc.isDeleted()){  
-                  addEdit(new DeletePetriNetObjectEdit(anArc, view, model));
+                  addEdit(new DeletePetriNetObjectEdit(anArc, view, guiModel));
                }
             }            
             //
@@ -232,7 +235,7 @@ public class UndoManager {
             while (arcsFrom.hasNext()) {
                Arc anArc = arcsFrom.next();
                if (!anArc.isDeleted()){
-                  addEdit(new DeletePetriNetObjectEdit(anArc, view, model));
+                  addEdit(new DeletePetriNetObjectEdit(anArc, view, guiModel));
                }
             }
 
@@ -242,7 +245,7 @@ public class UndoManager {
                   addEdit(((NormalArc)pnObject).split());
                   NormalArc inverse = ((NormalArc)pnObject).getInverse();
                   addEdit(((NormalArc)pnObject).clearInverse());
-                  addEdit(new DeletePetriNetObjectEdit(inverse, view, model));
+                  addEdit(new DeletePetriNetObjectEdit(inverse, view, guiModel));
                   inverse.delete();
                } else {
                   addEdit(((NormalArc)pnObject).clearInverse());
@@ -251,7 +254,7 @@ public class UndoManager {
          }
 
          if (!pnObject.isDeleted()){
-            addEdit(new DeletePetriNetObjectEdit(pnObject, view, model));
+            addEdit(new DeletePetriNetObjectEdit(pnObject, view, guiModel));
             pnObject.delete();
          }
       }

@@ -2,7 +2,6 @@ package pipe.dataLayer;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,8 +43,6 @@ import pipe.gui.Pipe;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
 
@@ -154,7 +151,6 @@ implements Cloneable {
 	private NetType type = NetType.TAPN;
 
 	private HashMap<ColoredTimedPlace, List<ColoredToken>> coloredPlaceMarkingStorageMap;
-	private TimedArcPetriNet tapn = new TimedArcPetriNet();
 	/**
 	 * Create Petri-Net object from PNML file with URI pnmlFileName
 	 * @param pnmlFileName Name of PNML File
@@ -213,10 +209,6 @@ implements Cloneable {
 	 * @param placeInput Place Object to add
 	 */
 	private void addPlace(Place placeInput) {
-		if(placeInput instanceof TimedPlaceComponent){
-			dk.aau.cs.model.tapn.TimedPlace tp = ((TimedPlaceComponent)placeInput).underlyingPlace();
-			tapn.add(tp);
-		}
 		boolean unique = true;
 
 		if (placeInput != null) {
@@ -936,13 +928,13 @@ implements Cloneable {
 	 * Returns an iterator of all PetriNetObjects - the order of these cannot be guaranteed.
 	 * @return An iterator of all PetriNetObjects
 	 */
-	public Iterator<PetriNetObject> getPetriNetObjects(){
+	public Iterable<PetriNetObject> getPetriNetObjects(){
 		ArrayList<PetriNetObject> all = new ArrayList<PetriNetObject>(placesArray);
 		all.addAll(transitionsArray);
 		all.addAll(arcsArray);
 		all.addAll(labelsArray);
 
-		return all.iterator();
+		return all;
 	}
 
 

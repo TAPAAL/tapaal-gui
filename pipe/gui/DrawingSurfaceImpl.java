@@ -46,6 +46,9 @@ import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.gui.DrawingSurface;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 
 /**
@@ -53,11 +56,7 @@ import pipe.gui.undo.UndoManager;
  */
 public class DrawingSurfaceImpl 
 extends JLayeredPane 
-implements Observer, Printable {
-
-	/**
-	 * 
-	 */
+implements Observer, Printable, DrawingSurface {
 	private static final long serialVersionUID = 4434596266503933386L;
 
 	private boolean netChanged = false;
@@ -77,15 +76,9 @@ implements Observer, Printable {
 	boolean metaDown = false; 
 
 	private SelectionManager selection;
-
 	private UndoManager undoManager;
-
-	private DataLayer model;
-
 	private ArrayList <PetriNetObject> petriNetObjects = new ArrayList<PetriNetObject>();
-
 	private GuiFrame app = CreateGui.getApp();
-
 	private Zoomer zoomControl;
 
 	// flag used in fast mode to know if a new PetriNetObject has been created
@@ -97,10 +90,13 @@ implements Observer, Printable {
 	// position where the viewport must be set
 	private Point viewPosition = new Point(0,0);
 
-	
+	private DataLayer guiModel;
+	private TabContent parent;
+	private MouseHandler mouseHandler;
 
-	public DrawingSurfaceImpl(DataLayer _model) {
-		model = _model;
+	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent parent) {
+		guiModel = dataLayer;
+		this.parent = parent;
 		setLayout(null);
 		setOpaque(true);
 		setDoubleBuffered(true);
@@ -109,23 +105,31 @@ implements Observer, Printable {
 
 		zoomControl = new Zoomer(100, app);
 
-		MouseHandler handler = new MouseHandler(this, model);
+		
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
-		addMouseListener(handler);
-		addMouseMotionListener(handler);
-		try {
-			addMouseWheelListener(handler);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		mouseHandler = new MouseHandler(this, guiModel);
+		addMouseListener(mouseHandler);
+		addMouseMotionListener(mouseHandler);
+		addMouseWheelListener(mouseHandler);
+		
 		selection = new SelectionManager(this);
-		undoManager = new UndoManager(this, model, app);
+		undoManager = new UndoManager(this, guiModel, app);
 	}
-
-
+	
+	public void setModel(DataLayer guiModel, TimedArcPetriNet model){
+		this.mouseHandler.setModel(guiModel, model);
+		this.undoManager.setModel(guiModel);
+		this.guiModel = guiModel;
+		
+		this.removeAll();
+		for(PetriNetObject pnObject : guiModel.getPetriNetObjects()){
+			add(pnObject);
+		}
+		repaint();
+	}
+	
 	public void addNewPetriNetObject(PetriNetObject newObject) {
 		if (newObject != null) {
 			if (newObject.getMouseListeners().length == 0) {
@@ -503,15 +507,22 @@ EOC*/
 
 		private DrawingSurfaceImpl view;
 
-		private DataLayer model;
+		private DataLayer guiModel;
 
 		private Point dragStart;
+
+		private TimedArcPetriNet model;
+		
+		public void setModel(DataLayer newGuiModel, TimedArcPetriNet newModel){
+			this.guiModel = newGuiModel;
+			this.model = newModel;
+		}
 
 
 		public MouseHandler(DrawingSurfaceImpl _view, DataLayer _model){
 			super();
 			view = _view;
-			model = _model;
+			guiModel = _model;
 		}
 
 
@@ -531,7 +542,7 @@ EOC*/
 			p = adjustPoint(p, view.getZoom());
 
 			pnObject = new Place(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y));
-			model.addPetriNetObject(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
 		}
@@ -541,7 +552,8 @@ EOC*/
 			dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace("P0");
 			pnObject = CreateGui.getModel().isUsingColors() ? new ColoredTimedPlace(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y)) 
 				: new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y), tp);
-			model.addPetriNetObject(pnObject);
+			model.add(tp); // TODO: fix me
+			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
 		}
@@ -553,7 +565,7 @@ EOC*/
 			pnObject = new Transition(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y));
 			((Transition)pnObject).setTimed(timed);
-			model.addPetriNetObject(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
 		}
@@ -564,7 +576,7 @@ EOC*/
 			pnObject = new TAPNTransition(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y));
 			((Transition)pnObject).setTimed(timed);
-			model.addPetriNetObject(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
 		}
@@ -574,7 +586,7 @@ EOC*/
 
 			pnObject = new TAPNTransition(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y));
-			model.addPetriNetObject(pnObject);
+			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
 		}
@@ -589,7 +601,7 @@ EOC*/
 				case Pipe.PLACE:
 					PlaceTransitionObject pto = newPlace(e.getPoint());
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, model));
+							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
 						app.setFastMode(Pipe.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
@@ -599,7 +611,7 @@ EOC*/
 				case Pipe.TAPNPLACE:
 					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto2, view, model));
+							new AddPetriNetObjectEdit(pto2, view, guiModel));
 					if (e.isControlDown()) {
 						app.setFastMode(Pipe.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
@@ -611,7 +623,7 @@ EOC*/
 					boolean timed = (mode == Pipe.TIMEDTRANS ? true : false);
 					pto = newTransition(e.getPoint(), timed);
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, model));
+							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
 						app.setFastMode(Pipe.FAST_PLACE);
 						pnObject.dispatchEvent(e);
@@ -620,7 +632,7 @@ EOC*/
 				case Pipe.TAPNTRANS:
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, model));
+							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
 						app.setFastMode(Pipe.FAST_PLACE);
 						pnObject.dispatchEvent(e);
@@ -642,10 +654,10 @@ EOC*/
 					p = adjustPoint(e.getPoint(), view.getZoom());
 
 					pnObject = new AnnotationNote(p.x, p.y);
-					model.addPetriNetObject(pnObject);
+					guiModel.addPetriNetObject(pnObject);
 					view.addNewPetriNetObject(pnObject);
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pnObject, view, model));
+							new AddPetriNetObjectEdit(pnObject, view, guiModel));
 					((AnnotationNote)pnObject).enableEditMode();
 					break;
 				case Pipe.FAST_PLACE:
@@ -663,7 +675,7 @@ EOC*/
 
 						createPTO = newPlace(e.getPoint());
 						getUndoManager().addNewEdit(
-								new AddPetriNetObjectEdit(createPTO, view, model));
+								new AddPetriNetObjectEdit(createPTO, view, guiModel));
 						pnObject.getMouseListeners()[0].mouseReleased(e);
 						if (e.isControlDown()){
 							// keep "fast mode"
@@ -691,7 +703,7 @@ EOC*/
 
 						createPTO = newTransition(e.getPoint(), e.isAltDown());
 						getUndoManager().addNewEdit(
-								new AddPetriNetObjectEdit(createPTO, view, model));
+								new AddPetriNetObjectEdit(createPTO, view, guiModel));
 						pnObject.getMouseListeners()[0].mouseReleased(e);
 						if (e.isControlDown()){
 							// keep "fast mode"
@@ -721,7 +733,7 @@ EOC*/
 
 						createPTO = newTimedPlace(e.getPoint());
 						getUndoManager().addNewEdit(
-								new AddPetriNetObjectEdit(createPTO, view, model));
+								new AddPetriNetObjectEdit(createPTO, view, guiModel));
 						pnObject.getMouseListeners()[0].mouseReleased(e);
 						if (e.isControlDown()){
 
@@ -752,7 +764,7 @@ EOC*/
 
 						createPTO = newTAPNTransition(e.getPoint(), e.isAltDown());
 						getUndoManager().addNewEdit(
-								new AddPetriNetObjectEdit(createPTO, view, model));
+								new AddPetriNetObjectEdit(createPTO, view, guiModel));
 						pnObject.getMouseListeners()[0].mouseReleased(e);
 						if (e.isControlDown()){
 							// keep "fast mode"
@@ -783,7 +795,7 @@ EOC*/
 							view.newPNO = true;
 							createPTO = newTAPNTransition(e.getPoint(), false);
 							getUndoManager().addNewEdit(
-									new AddPetriNetObjectEdit(createPTO, view, model));
+									new AddPetriNetObjectEdit(createPTO, view, guiModel));
 
 							//XXX - Race condistion!!!! 
 							pnObject.getMouseListeners()[0].mouseReleased(e);
@@ -804,7 +816,7 @@ EOC*/
 							view.newPNO = true;
 							createPTO = newTimedPlace(e.getPoint());
 							getUndoManager().addNewEdit(
-									new AddPetriNetObjectEdit(createPTO, view, model));
+									new AddPetriNetObjectEdit(createPTO, view, guiModel));
 							pnObject.getMouseListeners()[0].mouseReleased(e);
 
 							app.setMode(Pipe.TRANSPORTARC);
@@ -884,5 +896,4 @@ EOC*/
 			}
 		}
 	}
-
 }

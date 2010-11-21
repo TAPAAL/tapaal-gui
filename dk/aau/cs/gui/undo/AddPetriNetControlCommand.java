@@ -18,13 +18,13 @@ extends Command
 	public void redo() {
 		control.addChildControls();
 		surface.add(control);
-		surface.surfaceChanged();
+		//surface.surfaceChanged();
 	}
 
 	@Override
 	public void undo() {
 		control.removeChildControls();
 		surface.remove(control);
-		surface.surfaceChanged();
+		//surface.surfaceChanged();
 	}
 }

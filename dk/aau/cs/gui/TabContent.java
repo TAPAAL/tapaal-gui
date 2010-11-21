@@ -1,12 +1,10 @@
 package dk.aau.cs.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
@@ -14,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 import pipe.dataLayer.Arc;
@@ -22,6 +21,7 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TransportArc;
@@ -38,16 +38,13 @@ import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
 
 public class TabContent extends JSplitPane {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -648006317150905097L;
 
 	private static final double DIVIDER_LOCATION = 0.5;
 	
 	private DataLayer appModel;
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
+	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<PetriNetObject, String> oldGuards;
 	private JScrollPane drawingSurfaceScroller;
 	private DrawingSurfaceImpl drawingSurface;
@@ -58,7 +55,7 @@ public class TabContent extends JSplitPane {
 	private JSplitPane queryConstantsSplit;
 	private LeftQueryPane queries;
 	private LeftConstantsPane leftBottomPanel;
-	private TemplateExplorer templates;
+	private TemplateExplorer templateExplorer;
 	
 	/// Animation
 	private AnimationHistory animBox;
@@ -66,12 +63,18 @@ public class TabContent extends JSplitPane {
 	private JScrollPane scroller;
 	private JScrollPane scroller2;
 	private AnimationHistory abstractAnimationPane=null;
-	
+		
 	public TabContent()
 	{
 		appModel = new DataLayer();		
 		
-		drawingSurface = new DrawingSurfaceImpl(appModel);
+		for(TimedArcPetriNet net : tapnNetwork.templates()){
+			guiModels.put(net, new DataLayer());
+		}
+				
+		drawingSurface = new DrawingSurfaceImpl(appModel, this);
+		TimedArcPetriNet net = tapnNetwork.templates().get(0);
+		drawingSurface.setModel(guiModels.get(net), net);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -103,7 +106,7 @@ public class TabContent extends JSplitPane {
 				appModel == null ? new ArrayList<TAPNQuery>() : appModel.getQueries()
 		);
 
-		templates = new TemplateExplorer(this);
+		templateExplorer = new TemplateExplorer(this);
 		
 		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
 		queryConstantsSplit.setResizeWeight(0.5);
@@ -114,7 +117,7 @@ public class TabContent extends JSplitPane {
 		
 		leftPane.setDividerLocation(0.3);
 		leftPane.setResizeWeight(0.5);
-		leftPane.setTopComponent(templates);
+		leftPane.setTopComponent(templateExplorer);
 		leftPane.setBottomComponent(queryConstantsSplit);
 		leftPane.setContinuousLayout(true);
 		leftPane.setDividerSize(0);
@@ -415,6 +418,14 @@ public class TabContent extends JSplitPane {
 
 	public DrawingSurfaceImpl drawingSurface() {
 		return drawingSurface;
+	}
+
+	public Iterable<Template<TimedArcPetriNet>> templates() {
+		ArrayList<Template<TimedArcPetriNet>> list = new ArrayList<Template<TimedArcPetriNet>>();
+		for(TimedArcPetriNet net : tapnNetwork.templates()){
+			list.add(new Template<TimedArcPetriNet>(net, guiModels.get(net)));
+		}
+		return list;
 	}
 
 }

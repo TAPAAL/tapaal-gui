@@ -91,14 +91,14 @@ extends PetriNetElementControl {
 	public void addChildControls() {
 		parent().add(nameLabel);
 		parent().add(invariantLabel);
-		parent().surfaceChanged();
+		//		parent().surfaceChanged();
 	}
 
 	@Override
 	public void removeChildControls(){
 		parent().remove(nameLabel);
 		parent().remove(invariantLabel);
-		parent().surfaceChanged();
+		//parent().surfaceChanged();
 	}
 		
 	@Override
