@@ -299,7 +299,7 @@ public class DataLayerWriter {
 				}
 			}else{
 				if (inputPlace instanceof TimedPlaceComponent){        	 
-					String invariantInput = ((TimedPlaceComponent)inputPlace).getInvariant();
+					String invariantInput = ((TimedPlaceComponent)inputPlace).getInvariantAsString();
 					placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
 				}
 			}
@@ -445,13 +445,13 @@ public class DataLayerWriter {
 			}else{
 				if (inputArc instanceof NormalArc ){
 
-					if (inputArc instanceof TimedArc){
+					if (inputArc instanceof TimedInputArcComponent){
 						if (inputArc instanceof TransportArc) {
 							arcElement.setAttribute("type", "transport");
 							if (inputArc.getSource() instanceof Place){
-								arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
+								arcElement.setAttribute("inscription", "" + ((TimedInputArcComponent)inputArc).getGuardAsString() + ":" + ((TransportArc)inputArc).getGroupNr() );
 							}else {
-								arcElement.setAttribute("inscription", "" + ((TimedArc)inputArc).getGuard() + ":" + ((TransportArc)inputArc).getGroupNr() );
+								arcElement.setAttribute("inscription", "" + ((TimedInputArcComponent)inputArc).getGuardAsString() + ":" + ((TransportArc)inputArc).getGroupNr() );
 							}
 							//it is not a TransportArc
 
@@ -460,7 +460,7 @@ public class DataLayerWriter {
 						{
 							arcElement.setAttribute("type", "tapnInhibitor");
 							if (inputArc.getSource() instanceof Place)
-								arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
+								arcElement.setAttribute("inscription", ((TimedInputArcComponent)inputArc).getGuardAsString());
 							else
 								System.err.println("There is an TAPNInhibitorArc coming from a transition");
 						}
@@ -468,7 +468,7 @@ public class DataLayerWriter {
 						{
 							arcElement.setAttribute("type", "timed");
 							if (inputArc.getSource() instanceof Place){
-								arcElement.setAttribute("inscription", ((TimedArc)inputArc).getGuard());
+								arcElement.setAttribute("inscription", ((TimedInputArcComponent)inputArc).getGuardAsString());
 							}else {
 								System.err.println("There is a TimedArc coming from a transition");
 							}

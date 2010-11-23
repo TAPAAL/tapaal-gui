@@ -30,11 +30,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.IntBound;
 
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.TAPNTransition;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
@@ -102,7 +104,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			if(objectToBeEdited instanceof TransportArc){
 				initTransportArcFeaturesPanel();
 				TransportArc arc = (TransportArc)objectToBeEdited;
-				if(arc.getConnectedTo() != null && arc.getSource() instanceof TAPNTransition){
+				if(arc.getConnectedTo() != null && arc.getSource() instanceof TimedTransitionComponent){
 					objectToBeEdited = arc.getConnectedTo();
 				}
 			}
@@ -112,13 +114,13 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		myRootPane.setDefaultButton(okButton);
 
 		if(CreateGui.getModel().isUsingColors()){
-			setColoredInitialState((TimedArc)objectToBeEdited);
+			setColoredInitialState((TimedInputArcComponent)objectToBeEdited);
 		}else{
-			setNoncoloredInitialState((TimedArc)objectToBeEdited);	
+			setNoncoloredInitialState((TimedInputArcComponent)objectToBeEdited);	
 		}
 	}
 
-	private void setColoredInitialState(TimedArc timedArc) {
+	private void setColoredInitialState(TimedInputArcComponent timedArc) {
 		ColoredInterval timeGuard = null;
 
 		if(timedArc instanceof ColoredInputArc){
@@ -298,12 +300,12 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		okButton.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						TimedArc arc = (TimedArc) objectToBeEdited;
+						TimedInputArcComponent arc = (TimedInputArcComponent) objectToBeEdited;
 						UndoManager undoManager = CreateGui.getView().getUndoManager();
 						undoManager.newEdit();
 						
 						if(!CreateGui.getModel().isUsingColors()){
-							String guard = composeGuard(arc.getGuard());
+							dk.aau.cs.model.tapn.TimeInterval guard = composeGuard(arc.getGuard());
 							undoManager.addEdit( arc.setGuard(guard) );
 						}else{
 							ColoredInterval timeGuard = null;
@@ -441,7 +443,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 					}
 
 
-					private String composeGuard(String oldGuard) {
+					private dk.aau.cs.model.tapn.TimeInterval composeGuard(dk.aau.cs.model.tapn.TimeInterval oldGuard) {
 						boolean useConstantLeft = leftUseConstant.isSelected();
 						boolean useConstantRight = rightUseConstant.isSelected();
 
@@ -462,9 +464,9 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 						else
 							rightInterval = secondIntervalNumber.getValue().toString();
 
-						if (TimedArc.validateTimeInterval(leftDelim, leftInterval, rightInterval, rightDelim)){
+						if (TimedInputArcComponent.validateTimeInterval(leftDelim, leftInterval, rightInterval, rightDelim)){
 							//XXX send error messsage
-							return leftDelim + leftInterval + "," + rightInterval + rightDelim;
+							return new dk.aau.cs.model.tapn.TimeInterval((leftDelim == "[" ? true : false), new IntBound(Integer.parseInt(leftInterval)), (inf.isSelected() ? Bound.Infinity : new IntBound(Integer.parseInt(rightInterval))), (rightDelim == "]" ? true : false));
 						}else {
 							return oldGuard;
 						}
@@ -784,8 +786,8 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 
 
-	private void setNoncoloredInitialState(TimedArc arc) {
-		String timeInterval = arc.getGuard();
+	private void setNoncoloredInitialState(TimedInputArcComponent arc) {
+		String timeInterval = arc.getGuardAsString();
 
 		String[] partedTimeInterval = timeInterval.split(",");
 		String firstNumber = partedTimeInterval[0].substring(1, partedTimeInterval[0].length() );

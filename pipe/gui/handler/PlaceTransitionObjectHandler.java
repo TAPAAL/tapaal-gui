@@ -6,6 +6,11 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedInputArc;
+
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
@@ -13,7 +18,8 @@ import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
@@ -99,7 +105,7 @@ public void mousePressed(MouseEvent e) {
     			  //NormalArc tmparc =  new NormalArc(currentObject);
 
     			  if (currentObject instanceof TimedPlaceComponent){
-    				  Arc arc = useColors ? new ColoredInputArc(currentObject) : new TimedArc(currentObject);
+    				  Arc arc = useColors ? new ColoredInputArc(currentObject) : new TimedInputArcComponent(currentObject);
     				  createArc(arc, currentObject);  
     			  }else {
     				  Arc arc = useColors ? new ColoredOutputArc(currentObject) : new NormalArc(currentObject);
@@ -402,7 +408,6 @@ public void mouseReleased(MouseEvent e) {
         			 NormalArc inverse = null;
         			 if (isNewArc == true) {
         				 createArc.setTarget(currentObject);
-
         				 //check if there is an inverse arc
         				 Iterator<Arc> arcsFromTarget =
         					 createArc.getTarget().getConnectFromIterator();
@@ -735,7 +740,7 @@ public void mouseReleased(MouseEvent e) {
         			 timedArcToCreate.setSelectable(true);
         			 
         			 //We create NormalArcs when source of arc is Transition( since there are no intervals on output arcs.) ...except if the arc is a TransportArc
-        			 if (!(timedArcToCreate instanceof TimedArc)){
+        			 if (!(timedArcToCreate instanceof TimedInputArcComponent)){
         				 boolean toDrawNewArc = true;
         				 Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
         				 Arc someArc = null;
@@ -879,8 +884,22 @@ public void mouseReleased(MouseEvent e) {
     					 if (existsArc){    						 
     						 break;
     					 }
-        				 
-        				 currentObject.addConnectTo(timedArcToCreate);
+    					 
+    					 // Set underlying TimedInputArc
+    					 TimedInputArcComponent timedArc = (TimedInputArcComponent)timedArcToCreate;
+    					 if(timedArc.getSource() instanceof TimedPlaceComponent && timedArc.getTarget() instanceof TimedTransitionComponent) {
+    						 TimedPlaceComponent place = (TimedPlaceComponent)timedArc.getSource();
+    						 TimedTransitionComponent transition = (TimedTransitionComponent)timedArc.getTarget();
+    						 
+    						 timedArc.SetTimedInputArc(new dk.aau.cs.model.tapn.TimedInputArc(place.underlyingPlace(), transition.underlyingTransition(), new TimeInterval(true, new IntBound(0), Bound.Infinity, false)));
+    						 timedArc.updateWeightLabel();
+    					 }
+    					 else
+    					 {
+    						 JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while drawing the input arc.");
+    					 }
+    					 
+    					 currentObject.addConnectTo(timedArcToCreate);
         				 timedArcToCreate.getTransition().updateConnected();
         				 
         				 // Evil hack to prevent the arc being added to GuiView twice        				 

@@ -650,7 +650,7 @@ extends javax.swing.JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		invariantGroup.add(constantInvRadioButton,gbc);
 
-		String invariantToSet = place.getInvariant();
+		String invariantToSet = place.getInvariantAsString();
 		int invariantValue = 0;
 		int substringStart = 0;
 
@@ -933,7 +933,7 @@ extends javax.swing.JPanel {
 				newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
 			}
 
-			view.getUndoManager().addEdit(place.setInvariant(newInvariant));
+			view.getUndoManager().addEdit(place.setInvariantFromString(newInvariant));
 		}
 
 		if (newMarking != marking) {

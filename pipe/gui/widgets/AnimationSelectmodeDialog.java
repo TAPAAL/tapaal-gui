@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.dataLayer.TAPNTransition;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
@@ -31,7 +31,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 	private static final long serialVersionUID = 7852107237344005547L;
 
-	TAPNTransition firedtransition = null;
+	TimedTransitionComponent firedtransition = null;
 
 	public ArrayList<JComboBox> presetPanels = new ArrayList<JComboBox>();
 
@@ -55,7 +55,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 		c.gridy = 0;
 
 
-		firedtransition = (TAPNTransition)t; // XXX - unsafe cast (ok by contract)
+		firedtransition = (TimedTransitionComponent)t; // XXX - unsafe cast (ok by contract)
 
 		namePanel = new JPanel(new FlowLayout());
 		namePanel.add(new JLabel("Select tokens to Fire in Transition " + t.getName()));
@@ -127,12 +127,12 @@ public class AnimationSelectmodeDialog extends JPanel{
 				TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArc)a).getConnectedTo().getTarget();
 
 				for (int i=0; i< tokensOfPlace.size(); i++){
-					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
+					if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
 						eligableToken.add(df.format(tokensOfPlace.get(i)));
 					}
 				}	
 
-			}else if (a instanceof TimedArc){
+			}else if (a instanceof TimedInputArcComponent){
 				eligableToken = new ArrayList<String>();
 				//int indexOfOldestEligebleToken = 0;
 
@@ -140,7 +140,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 				for (int i=0; i< tokensOfPlace.size(); i++){
-					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
+					if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i))){
 						eligableToken.add(df.format(tokensOfPlace.get(i)));
 					}
 				}						   

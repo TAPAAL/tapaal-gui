@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
-public class TAPNInhibitorArc extends TimedArc {
+public class TAPNInhibitorArc extends TimedInputArcComponent {
 	
 	/**
 	 * 

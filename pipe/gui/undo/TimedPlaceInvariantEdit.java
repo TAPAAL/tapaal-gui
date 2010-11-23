@@ -20,13 +20,13 @@ public class TimedPlaceInvariantEdit extends Command {
 	
 	@Override
 	public void redo() {
-		place.setInvariant(newvalue.toString()); 
+		place.setInvariantFromString(newvalue.toString()); 
 
 	}
 
 	@Override
 	public void undo() {
-		place.setInvariant(oldvalue.toString());
+		place.setInvariantFromString(oldvalue.toString());
 	}
 
 }

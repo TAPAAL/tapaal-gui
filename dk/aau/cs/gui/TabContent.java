@@ -12,6 +12,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
+import com.sun.org.apache.bcel.internal.generic.ISUB;
+
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
@@ -21,8 +28,8 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedArc;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
@@ -45,7 +52,8 @@ public class TabContent extends JSplitPane {
 	private DataLayer appModel;
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	private HashMap<PetriNetObject, String> oldGuards;
+	private HashMap<PetriNetObject, TimeInterval> oldGuards;
+	private HashMap<PetriNetObject, TimeInvariant> oldInvariants;
 	private JScrollPane drawingSurfaceScroller;
 	private DrawingSurfaceImpl drawingSurface;
 	private File appFile;
@@ -166,8 +174,7 @@ public class TabContent extends JSplitPane {
 
 	public void setupModelForSimulation(){
 			if(!appModel.isUsingColors()){
-				HashMap<PetriNetObject, String> oldGuards = transformToModelWithoutConstants();
-				this.oldGuards = oldGuards;
+				transformToModelWithoutConstants();
 			}else{
 				configureNetToShowValues(true);
 			}
@@ -208,94 +215,86 @@ public class TabContent extends JSplitPane {
 	private void setupModelWithOldGuards() {
 		for(Place p : appModel.getPlaces()){
 			if(p instanceof TimedPlaceComponent){
-				String inv = oldGuards.get(p);
+				TimeInvariant inv = oldInvariants.get(p);
 				((TimedPlaceComponent)p).setInvariant(inv);
 			}
 		}
 
 		for(Arc arc : appModel.getArcs()){
-			if(arc instanceof TimedArc || arc instanceof TransportArc){
-				TimedArc tarc = (TimedArc)arc;
-				String guard = oldGuards.get(arc);
+			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
+				TimeInterval guard = oldGuards.get(arc);
 				tarc.setGuard(guard);
 			}
 		}
 	}
 
 
-	private HashMap<PetriNetObject, String> transformToModelWithoutConstants() {
-		HashMap<PetriNetObject, String> oldGuards = new HashMap<PetriNetObject, String>();
-
+	private void transformToModelWithoutConstants() {
+		this.oldGuards = new HashMap<PetriNetObject, TimeInterval>();
+		this.oldInvariants = new HashMap<PetriNetObject, TimeInvariant>();
+		
 		for(Place p : appModel.getPlaces()){
 			if(p instanceof TimedPlaceComponent){
-				oldGuards.put(p, ((TimedPlaceComponent) p).getInvariant());
-				String inv = getInvariant(p);
+				oldInvariants.put(p, ((TimedPlaceComponent) p).getInvariant());
+				TimeInvariant inv = getInvariant(p);
 				((TimedPlaceComponent)p).setInvariant(inv);
 			}
 		}
 
 		for(Arc arc : appModel.getArcs()){
-			if(arc instanceof TimedArc || arc instanceof TransportArc){
-				oldGuards.put(arc, ((TimedArc) arc).getGuard());
-				TimedArc tarc = (TimedArc)arc;
-				String guard = getGuard(tarc);
+			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+				oldGuards.put(arc, ((TimedInputArcComponent) arc).getGuard());
+				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
+				TimeInterval guard = getGuard(tarc);
 				tarc.setGuard(guard);
 			}
 		}
-
-		return oldGuards;
 	}
 
-	private String getGuard(TimedArc arc) {
-		String guard = arc.getGuard();
-		String leftDelim = guard.substring(0,1);
-		String rightDelim = guard.substring(guard.length()-1, guard.length());
-		String first = guard.substring(1, guard.indexOf(","));
-		String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
-
-		boolean isFirstConstant = false;
-		boolean isSecondConstant = false;
-
-		try{
-			Integer.parseInt(first);
-		}catch(NumberFormatException e){
-			isFirstConstant = true;
+	private TimeInterval getGuard(TimedInputArcComponent arc) {
+		TimeInterval interval = arc.getGuard();
+		
+		boolean lowerIncluded = false;
+		Bound lower;
+		Bound upper;
+		boolean upperIncluded = false;
+		
+		if(interval.lowerBound() instanceof ConstantBound){
+			ConstantBound cBound = (ConstantBound)interval.lowerBound();
+			lower = new IntBound(cBound.value());
+		} 
+		else {
+			lower = interval.lowerBound();
 		}
-
-		try{
-			Integer.parseInt(second);
-		}catch(NumberFormatException e){
-			if(!second.equals("inf")) isSecondConstant = true;
+		lowerIncluded = interval.IsLowerBoundNonStrict();
+		
+		if(interval.upperBound() instanceof ConstantBound) {
+			ConstantBound cBound = (ConstantBound)interval.upperBound();
+			upper = new IntBound(cBound.value());
 		}
-
-		if(isFirstConstant){
-			first = String.valueOf(appModel.getConstantValue(first));
+		else {
+			upper = interval.upperBound();
 		}
+		upperIncluded = interval.IsUpperBoundNonStrict();
 
-		if(isSecondConstant){
-			second = String.valueOf(appModel.getConstantValue(second));
-		}
-
-		return leftDelim + first + "," + second + rightDelim;
+		return new TimeInterval(lowerIncluded, lower, upper, upperIncluded);
 	}
 
-	private String getInvariant(Place place) {
-		String inv = ((TimedPlaceComponent)place).getInvariant();
-		String operator = inv.contains("<=") ? "<=" : "<";
-
-		String bound = inv.substring(operator.length());
-
-		boolean isConstant = false;
-		try{
-			Integer.parseInt(bound);
-		}catch(NumberFormatException e){
-			if(!bound.equals("inf")) isConstant = true;
+	private TimeInvariant getInvariant(Place place) {
+		TimeInvariant inv = ((TimedPlaceComponent)place).getInvariant();
+		
+		Bound bound;
+		
+		if(inv.upperBound() instanceof ConstantBound) {
+			ConstantBound cBound = (ConstantBound)inv.upperBound();
+			bound = new IntBound(cBound.value());
 		}
-
-		if(isConstant)
-			bound = String.valueOf(appModel.getConstantValue(bound));
-
-		return operator + bound;
+		else {
+			bound = inv.upperBound();
+		}
+		
+		return new TimeInvariant(inv.isUpperNonstrict(), bound);
 	}
 	
 	/** Creates a new animationHistory text area, and returns a reference to it*/

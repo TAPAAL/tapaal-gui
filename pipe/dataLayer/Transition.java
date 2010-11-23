@@ -73,7 +73,7 @@ extends PlaceTransitionObject {
 
 	private int angle;
 	protected boolean enabled = false;
-	private boolean enabledBackwards = false;
+//	private boolean enabledBackwards = false;
 	public boolean highlighted = false;
 
 	private boolean infiniteServer = false;
@@ -81,7 +81,7 @@ extends PlaceTransitionObject {
 	/**
 	 * The delay before this transition fires.
 	 */
-	private double delay;
+//	private double delay;
 
 	/**
 	 * A boolean to track whether the delay is valid or not.
@@ -152,17 +152,17 @@ extends PlaceTransitionObject {
 	}   
 
 
-	public Transition(String idInput, 
-			String nameInput){
-
-		this(0.0, 0.0, idInput, 
-				nameInput,
-				0.0, 0.0,
-				false, 
-				false, 
-				0,
-				0);
-	}   
+//	public Transition(String idInput, 
+//			String nameInput){
+//
+//		this(0.0, 0.0, idInput, 
+//				nameInput,
+//				0.0, 0.0,
+//				false, 
+//				false, 
+//				0,
+//				0);
+//	}   
 
 
 	/**
@@ -335,9 +335,9 @@ extends PlaceTransitionObject {
 	  * Determines whether Transition is enabled backwards
 	  * @return True if enabled
 	  */
-	 public boolean isEnabledBackwards(){
-		 return enabledBackwards;
-	 }
+//	 public boolean isEnabledBackwards(){
+//		 return enabledBackwards;
+//	 }
 
 
 	 /**
@@ -350,9 +350,9 @@ extends PlaceTransitionObject {
 	 }
 
 
-	 public void setHighlighted(boolean status) {
-		 highlighted = status;
-	 }
+//	 public void setHighlighted(boolean status) {
+//		 highlighted = status;
+//	 }
 
 
 	 public Command setInfiniteServer(boolean status) {
@@ -384,9 +384,9 @@ extends PlaceTransitionObject {
 	  * Sets whether Transition is enabled
 	  * @return enabled if True
 	  */
-	 public void setEnabledBackwards(boolean status){
-		 enabledBackwards = status;
-	 }
+//	 public void setEnabledBackwards(boolean status){
+//		 enabledBackwards = status;
+//	 }
 
 
 	 /* Called at the end of animation to reset Transitions to false*/
@@ -427,10 +427,10 @@ extends PlaceTransitionObject {
 	  * 
 	  * @param _delay the time until this transition will fire
 	  */
-	 public void setDelay( double _delay ) {
-		 delay = _delay;
-		 delayValid = true;
-	 }
+//	 public void setDelay( double _delay ) {
+//		 delay = _delay;
+//		 delayValid = true;
+//	 }
 
 
 	 /**
@@ -442,9 +442,9 @@ extends PlaceTransitionObject {
 	  * @return a double with the amount of delay
 	  *
 	  */
-	 public double getDelay() {
-		 return delay;
-	 }
+//	 public double getDelay() {
+//		 return delay;
+//	 }
 
 
 	 /**
@@ -457,9 +457,9 @@ extends PlaceTransitionObject {
 	  * @return the delayValid a boolean that is true if the delay is valid,
 	  * and false otherwise
 	  */
-	 public boolean isDelayValid() { 
-		 return delayValid; 
-	 }
+//	 public boolean isDelayValid() { 
+//		 return delayValid; 
+//	 }
 
 
 	 /**
@@ -473,9 +473,9 @@ extends PlaceTransitionObject {
 	  * otherwise
 	  *  
 	  */
-	 public void setDelayValid ( boolean _delayValid ) {
-		 delayValid = _delayValid;
-	 }
+//	 public void setDelayValid ( boolean _delayValid ) {
+//		 delayValid = _delayValid;
+//	 }
 
 
 	 private void constructTransition() {
@@ -771,32 +771,32 @@ extends PlaceTransitionObject {
 
 	 }
 
-	 @Override
-	 public Transition clone() {
-		 Transition toReturn=null;
-		 toReturn = (Transition)super.clone();
-
-		 toReturn.positionX = positionX;
-
-
-		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
-		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-		 toReturn.timed = timed;
-		 toReturn.infiniteServer = infiniteServer;
-		 toReturn.constructTransition();
-		 toReturn.angle = 0;
-		 toReturn.setCentre((int)positionX, (int)positionY);
-		 toReturn.rotate(getAngle());
-		 toReturn.updateBounds();
-
-
-		 //this.updateEndPoints();
-		 toReturn.priority = priority;
-
-		 return toReturn;
-
-
-
-	 }
+//	 @Override
+//	 public Transition clone() {
+//		 Transition toReturn=null;
+//		 toReturn = (Transition)super.clone();
+//
+//		 toReturn.positionX = positionX;
+//
+//
+//		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
+//		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
+//		 toReturn.timed = timed;
+//		 toReturn.infiniteServer = infiniteServer;
+//		 toReturn.constructTransition();
+//		 toReturn.angle = 0;
+//		 toReturn.setCentre((int)positionX, (int)positionY);
+//		 toReturn.rotate(getAngle());
+//		 toReturn.updateBounds();
+//
+//
+//		 //this.updateEndPoints();
+//		 toReturn.priority = priority;
+//
+//		 return toReturn;
+//
+//
+//
+//	 }
 
 }

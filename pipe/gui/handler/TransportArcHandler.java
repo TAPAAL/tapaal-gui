@@ -10,7 +10,7 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.gui.action.SplitArcAction;
 
@@ -50,9 +50,9 @@ public class TransportArcHandler extends TimedArcHandler {
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 
-			if (((TimedArc)myObject).hasInverse()){
+			if (((TimedInputArcComponent)myObject).hasInverse()){
 				menuItem = new JMenuItem(
-						new SplitArcsAction((TimedArc)myObject, false));
+						new SplitArcsAction((TimedInputArcComponent)myObject, false));
 
 				menuItem.setText("Join Arcs (PT / TP)");
 				popup.insert(menuItem, popupIndex++);            

@@ -7,6 +7,10 @@ import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedInputArc;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
@@ -14,34 +18,40 @@ import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
 
-public class TimedArc extends NormalArc{
+public class TimedInputArcComponent extends NormalArc{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8263782840119274756L;
+	private TimedInputArc inputArc;
 	protected String timeInterval; 
 	
-	public TimedArc(PlaceTransitionObject source){
+	public TimedInputArcComponent(PlaceTransitionObject source){
 		super(source);
 		init();
 	}
 
 	private void init() {
-		timeInterval="[0,inf)";
-		
 		updateWeightLabel();
 	}
 	
-	public TimedArc(NormalArc arc){
+	
+	public TimedInputArcComponent(NormalArc arc){
 		super(arc);
 		init();
 	}
 
-	public TimedArc(NormalArc arc, String guard) {
+	
+	public TimedInputArcComponent(NormalArc arc, String guard) {
 		super(arc);
 		timeInterval = guard;
 		updateWeightLabel();
+	}
+	
+	
+	public void SetTimedInputArc(TimedInputArc inputArc) {
+		this.inputArc = inputArc;
 	}
 
 	public static boolean validateTimeInterval(String timeInterval) {
@@ -60,26 +70,36 @@ public class TimedArc extends NormalArc{
 		}
 		return false;
 	}
-	public String getGuard() {
-		
-		return timeInterval;
-	}
-	public Command setGuard(String timeInteval) {
 	
-		String oldTimeInterval = this.timeInterval;
-		this.timeInterval = timeInteval;
+	public String getGuardAsString() {
+		
+		return inputArc.interval().toString();
+	}
+	
+	public TimeInterval getGuard() {
+		return inputArc.interval();
+	}
+	
+	
+	public Command setGuard(TimeInterval guard) {
+	
+		TimeInterval oldTimeInterval = inputArc.interval();
+		inputArc.setTimeInterval(guard);
 
 		//hacks - I use the weight to display the TimeInterval
 		updateWeightLabel();
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, this.timeInterval);
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, inputArc.interval());
 	}
 	//hacks - I use the weight to display the TimeInterval
 	@Override
 	public void updateWeightLabel(){   
 		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
-			weightLabel.setText(timeInterval);
+			if(inputArc == null)
+				weightLabel.setText("");
+			else
+				weightLabel.setText(inputArc.interval().toString());
 
 			this.setWeightLabelPosition();	
 		}
@@ -87,20 +107,20 @@ public class TimedArc extends NormalArc{
 	
 	
 	@Override
-	public TimedArc copy(){
+	public TimedInputArcComponent copy(){
 		NormalArc copy = new NormalArc(this);
 		copy.setSource(this.getSource());
 		copy.setTarget(this.getTarget());
-		TimedArc timedCopy = new TimedArc(copy.copy(), this.timeInterval);
+		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.copy(), this.timeInterval);
 		return timedCopy;
 	}
 	
 	@Override
-	public TimedArc paste(double despX, double despY, boolean toAnotherView){
+	public TimedInputArcComponent paste(double despX, double despY, boolean toAnotherView){
 		NormalArc copy = new NormalArc(this);
 		copy.setSource(this.getSource());
 		copy.setTarget(this.getTarget());
-		TimedArc timedCopy = new TimedArc(copy.paste(despX, despY, toAnotherView), this.timeInterval);
+		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), this.timeInterval);
 		return timedCopy;
 	}
 
@@ -128,37 +148,38 @@ public class TimedArc extends NormalArc{
 	}
 
 	public boolean satisfiesGuard(BigDecimal token) {
-		boolean satisfies = true;
-		String[] partedTimeInteval = timeInterval.split(",");
-		if ((""+partedTimeInteval[0].charAt(0)).contains("[") ){
-			if (token.compareTo(BigDecimal.valueOf(Long.parseLong( partedTimeInteval[0].substring(1) ))) < 0){
-				return false;
-			}
-		}else {
-			if ( token.compareTo(BigDecimal.valueOf(Long.parseLong( partedTimeInteval[0].substring(1) )))  <= 0){
-				return false;
-			}
-		}
-		int guardMaxValue = 0;
-		
-		int lastIndexOfNumber = partedTimeInteval[1].length()-1;
-		if ( partedTimeInteval[1].substring(0, lastIndexOfNumber).contains("inf") ){
-			guardMaxValue = Integer.MAX_VALUE;
-		} else {
-			guardMaxValue = Integer.parseInt( partedTimeInteval[1].substring(0, lastIndexOfNumber) );
-		}
-		
-		if ((""+partedTimeInteval[1].charAt(lastIndexOfNumber)).contains("]") ){
-			if ( token.compareTo(BigDecimal.valueOf((Long.parseLong(""+guardMaxValue)))) > 0 ){
-				return false;
-			}
-		}else {
-			if ( token.compareTo(BigDecimal.valueOf((Long.parseLong(""+guardMaxValue)))) >= 0){
-				return false;
-			}
-		}
-		
-		return satisfies;
+//		boolean satisfies = true;
+//		String[] partedTimeInteval = timeInterval.split(",");
+//		if ((""+partedTimeInteval[0].charAt(0)).contains("[") ){
+//			if (token.compareTo(BigDecimal.valueOf(Long.parseLong( partedTimeInteval[0].substring(1) ))) < 0){
+//				return false;
+//			}
+//		}else {
+//			if ( token.compareTo(BigDecimal.valueOf(Long.parseLong( partedTimeInteval[0].substring(1) )))  <= 0){
+//				return false;
+//			}
+//		}
+//		int guardMaxValue = 0;
+//		
+//		int lastIndexOfNumber = partedTimeInteval[1].length()-1;
+//		if ( partedTimeInteval[1].substring(0, lastIndexOfNumber).contains("inf") ){
+//			guardMaxValue = Integer.MAX_VALUE;
+//		} else {
+//			guardMaxValue = Integer.parseInt( partedTimeInteval[1].substring(0, lastIndexOfNumber) );
+//		}
+//		
+//		if ((""+partedTimeInteval[1].charAt(lastIndexOfNumber)).contains("]") ){
+//			if ( token.compareTo(BigDecimal.valueOf((Long.parseLong(""+guardMaxValue)))) > 0 ){
+//				return false;
+//			}
+//		}else {
+//			if ( token.compareTo(BigDecimal.valueOf((Long.parseLong(""+guardMaxValue)))) >= 0){
+//				return false;
+//			}
+//		}
+//		
+//		return satisfies;
+		return inputArc.isEnabledBy(token);
 	}
 	
 	@Override
@@ -198,5 +219,9 @@ public class TimedArc extends NormalArc{
 		}
 		
 		return firstValue <= secondValue;
+	}
+
+	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {
+		return inputArc;
 	}
 }

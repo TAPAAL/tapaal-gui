@@ -29,8 +29,8 @@ import pipe.dataLayer.Note;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TAPNTransition;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
@@ -170,7 +170,7 @@ implements Observer, Printable, DrawingSurface {
 					}
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
-					if (newObject instanceof TAPNTransition){
+					if (newObject instanceof TimedTransitionComponent){
 						transitionHandler =
 							new TAPNTransitionHandler(this, (Transition)newObject);
 					}else {
@@ -196,7 +196,7 @@ implements Observer, Printable, DrawingSurface {
 				} else if (newObject instanceof Arc) {
 					add(newObject);
 					/* CB - Joakim Byg add timed arcs*/
-					if (newObject instanceof TimedArc){
+					if (newObject instanceof TimedInputArcComponent){
 						if (newObject instanceof TransportArc){ 
 							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc)newObject);
 							newObject.addMouseListener(transportArcHandler);
@@ -573,7 +573,7 @@ EOC*/
 		private PlaceTransitionObject newTAPNTransition(Point p, boolean timed){
 			p = adjustPoint(p, view.getZoom());
 
-			pnObject = new TAPNTransition(Grid.getModifiedX(p.x),
+			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y));
 			((Transition)pnObject).setTimed(timed);
 			guiModel.addPetriNetObject(pnObject);
@@ -584,7 +584,7 @@ EOC*/
 		private PlaceTransitionObject newTAPNTransition(Point p){
 			p = adjustPoint(p, view.getZoom());
 
-			pnObject = new TAPNTransition(Grid.getModifiedX(p.x),
+			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y));
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);

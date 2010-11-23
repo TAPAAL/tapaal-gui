@@ -3,11 +3,11 @@ package pipe.dataLayer.colors;
 import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.gui.undo.ColoredInputArcColorGuardEdit;
 import pipe.gui.undo.ColoredInputArcTimeGuardEdit;
 
-public class ColoredInputArc extends TimedArc {
+public class ColoredInputArc extends TimedInputArcComponent {
 
 	private ColorSet colorGuard;
 	private ColoredInterval timeGuard;

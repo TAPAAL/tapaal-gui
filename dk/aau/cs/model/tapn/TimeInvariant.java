@@ -17,6 +17,14 @@ public class TimeInvariant {
 		this.isUpperIncluded = isUpperIncluded;
 		this.upper = upper;
 	}
+	
+	public Bound upperBound() {
+		return upper;
+	}
+	
+	public boolean isUpperNonstrict(){
+		return isUpperIncluded;
+	}
 		
 	@Override
 	public String toString() {

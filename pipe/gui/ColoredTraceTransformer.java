@@ -19,7 +19,7 @@ public class ColoredTraceTransformer extends TraceTransformer {
 		if(action instanceof dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction){
 			dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction transitionFiringAction = (dk.aau.cs.petrinet.trace.ColoredTransitionFiringAction)action;
 
-			pipe.dataLayer.TAPNTransition transition = (pipe.dataLayer.TAPNTransition)model().getTransitionByName(transitionFiringAction.transition());
+			pipe.dataLayer.TimedTransitionComponent transition = (pipe.dataLayer.TimedTransitionComponent)model().getTransitionByName(transitionFiringAction.transition());
 			firingAction = new pipe.dataLayer.ColoredDiscreteFiringAction(transition);
 
 			if(isConcreteTrace){

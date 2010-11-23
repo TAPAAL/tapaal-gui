@@ -17,7 +17,7 @@ import pipe.dataLayer.Arc;
 import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.gui.CreateGui;
@@ -68,7 +68,7 @@ extends PetriNetObjectHandler {
 
 			popup.insert(new JPopupMenu.Separator(), popupIndex++);         
 			/*CB Joakim Byg - timed arcs should not be handled here*/         
-		} else if (myObject instanceof NormalArc && !(myObject instanceof TimedArc) && !(myObject instanceof TransportArc)) {
+		} else if (myObject instanceof NormalArc && !(myObject instanceof TimedInputArcComponent) && !(myObject instanceof TransportArc)) {
 			/*EOC*/
 			if (((NormalArc)myObject).isJoined()){
 				NormalArc PTArc;

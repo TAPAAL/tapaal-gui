@@ -21,6 +21,15 @@ public class TimeInterval {
 		Require.that(isValidInterval(), "The constructed interval " + toString() + " is empty.");
 	}
 	
+	public TimeInterval(TimeInterval interval) {
+		Require.that(interval != null, "Interval cannot be null");
+		
+		this.isLowerIncluded = interval.isLowerIncluded;
+		this.isUpperIncluded = interval.isUpperIncluded;
+		this.lower = interval.lower.copy();
+		this.upper = interval.upper.copy();
+	}
+	
 	private boolean isValidInterval() {
 		boolean canBoundsBeEqual = isLowerIncluded && isUpperIncluded;
 		boolean upperIsInfinity = upper == Bound.Infinity;
@@ -51,5 +60,21 @@ public class TimeInterval {
 		int upperCompare = age.compareTo(upperBound);
 		
 		return (isLowerIncluded ? (lowerCompare >= 0) : (lowerCompare > 0)) && (isUpperIncluded ? (upperCompare <= 0) : (upperCompare < 0));
+	}
+
+	public Bound lowerBound() {
+		return lower;
+	}
+	
+	public Bound upperBound() {
+		return upper;
+	}
+	
+	public boolean IsLowerBoundNonStrict() {
+		return isLowerIncluded;
+	}
+	
+	public boolean IsUpperBoundNonStrict() {
+		return isUpperIncluded;
 	}
 }

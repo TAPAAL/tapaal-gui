@@ -120,7 +120,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent clone(){
 		TimedPlaceComponent toReturn = (TimedPlaceComponent)super.clone();
 
-		toReturn.setInvariant(this.getInvariant());
+		toReturn.setInvariantFromString(this.getInvariantAsString());
 		return toReturn;
 
 	}
@@ -146,10 +146,16 @@ public class TimedPlaceComponent extends Place {
 		return copy; 
 	}
 
-	public String getInvariant(){
+	public String getInvariantAsString(){
 
 		return place.invariant().toString();
 	}
+	
+	public TimeInvariant getInvariant() {
+		return place.invariant();
+	}
+	
+	
 
 	public String getStringOfTokens() {		
 		StringBuffer buffer = new StringBuffer("{");
@@ -289,7 +295,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public boolean satisfiesInvariant(BigDecimal token) {
-		String invariant = getInvariant();
+		String invariant = getInvariantAsString();
 		if (invariant.contains("inf")){
 			return true;
 		}else if (invariant.contains("<=")){
@@ -336,7 +342,7 @@ public class TimedPlaceComponent extends Place {
 		return new PlaceMarkingEdit(this, oldMarking, currentMarking);      
 	}
 
-	public Command setInvariant(String invariant) {
+	public Command setInvariantFromString(String invariant) {
 		TimeInvariant old = place.invariant();
 		TimeInvariant newInv = TimeInvariant.parse(invariant);
 		place.setInvariant(newInv);
@@ -344,6 +350,15 @@ public class TimedPlaceComponent extends Place {
 		update();
 
 		return new TimedPlaceInvariantEdit(this, old, newInv);
+	}
+	
+	public Command setInvariant(TimeInvariant inv){
+		TimeInvariant old = place.invariant();
+		place.setInvariant(inv);
+		
+		update();
+		
+		return new TimedPlaceInvariantEdit(this, old, inv);
 	}
 
 	private void setNumberOfMyTokens(int currentMarkingInput){
@@ -451,7 +466,7 @@ public class TimedPlaceComponent extends Place {
 
 	protected String getInvariantString() {
 		String value = "";
-		String invariant = getInvariant();
+		String invariant = getInvariantAsString();
 		//Dont show invariant if its default	
 		if (!invariant.equals("<inf")){ 
 

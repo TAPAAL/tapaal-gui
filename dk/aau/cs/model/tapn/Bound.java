@@ -3,6 +3,8 @@ package dk.aau.cs.model.tapn;
 public interface Bound {
 	int value();
 	
+	public Bound copy();
+	
 	public static Bound Infinity = new InfBound();
 	
 	public class InfBound implements Bound{
@@ -24,5 +26,12 @@ public interface Bound {
 		public boolean equals(Object arg0) {
 			return arg0 instanceof InfBound;
 		}
+
+		@Override
+		public Bound copy() {
+			return new InfBound();
+		}
+		
+		
 	}
 }

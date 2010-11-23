@@ -24,7 +24,7 @@ import pipe.dataLayer.DiscreetFiringAction;
 import pipe.dataLayer.FiringAction;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNTrace;
-import pipe.dataLayer.TAPNTransition;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
@@ -272,7 +272,7 @@ public class Animator {
 		if ( ! actionHistory.isEmpty() ){
 
 			if (actionHistory.get(currentAction) instanceof DiscreetFiringAction){
-				TAPNTransition transition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast
+				TimedTransitionComponent transition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast
 				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> markingToGoBackTo = markingHistory.get(currentAction);
 
 				if (markingToGoBackTo == null){
@@ -344,7 +344,7 @@ public class Animator {
 			//We do this using hacked firingmode. 
 
 			if ( actionHistory.get(currentAction+1) instanceof DiscreetFiringAction){
-				TAPNTransition nextTransition = (TAPNTransition)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
+				TimedTransitionComponent nextTransition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
 
 				// Before we firer the transition we need to setup Select firing mode, and 
 				// firer the transition with the same tokens as in the DiscreetFiringAction

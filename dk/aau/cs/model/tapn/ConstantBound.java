@@ -13,5 +13,10 @@ public class ConstantBound implements Bound {
 	public int value() {
 		return constant.value();
 	}
+	
+	public ConstantBound copy()
+	{
+		return new ConstantBound(constant.copy());
+	}
 
 }

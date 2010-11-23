@@ -131,8 +131,8 @@ public class ConstantStore {
 
 		for(Arc arc : arcs){
 			if(!isUsingColors){
-				if(arc instanceof TimedArc || arc instanceof TransportArc){
-					buildConstraint((TimedArc)arc);
+				if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+					buildConstraint((TimedInputArcComponent)arc);
 				}
 			}else{
 				if(arc instanceof ColoredInputArc){
@@ -149,7 +149,7 @@ public class ConstantStore {
 	}
 
 	private void buildConstraint(TimedPlaceComponent place) {
-		String inv = place.getInvariant();
+		String inv = place.getInvariantAsString();
 		int substringStart = 0;
 		if (inv.contains("<=")){
 			substringStart = 2;
@@ -277,8 +277,8 @@ public class ConstantStore {
 		processColorGuards(colorGuard);
 	}
 
-	public void buildConstraint(TimedArc arc) {
-		String guard = arc.getGuard();
+	public void buildConstraint(TimedInputArcComponent arc) {
+		String guard = arc.getGuardAsString();
 
 		boolean isFirstNumber = true;
 		boolean isSecondNumber = true;

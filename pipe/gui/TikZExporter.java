@@ -12,8 +12,8 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.dataLayer.TAPNTransition;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
@@ -102,7 +102,7 @@ public class TikZExporter {
 			else if(arc instanceof TransportArc){
 				arrowType = "transportArc";
 			}
-			else if(arc instanceof TimedArc){
+			else if(arc instanceof TimedInputArcComponent){
 				arrowType = "arc";
 			}
 			else{
@@ -129,11 +129,11 @@ public class TikZExporter {
 
 	protected String getArcLabels(Arc arc) {
 		String arcLabel ="";
-		if(arc instanceof TimedArc && !net.netType().equals(NetType.UNTIMED))
+		if(arc instanceof TimedInputArcComponent && !net.netType().equals(NetType.UNTIMED))
 		{
-			if(!(arc.getSource() instanceof TAPNTransition)){
+			if(!(arc.getSource() instanceof TimedTransitionComponent)){
 				arcLabel = "node[midway,auto] {";
-				arcLabel += replaceWithMathLatex(((TimedArc)arc).getGuard());
+				arcLabel += replaceWithMathLatex(((TimedInputArcComponent)arc).getGuardAsString());
 
 				if(arc instanceof TransportArc)
 					arcLabel += ":"+ ((TransportArc)arc).getGroupNr();
@@ -213,8 +213,8 @@ public class TikZExporter {
 		if(net.netType().equals(NetType.UNTIMED)) return "";
 		String invariant = "";
 
-		if(!((TimedPlaceComponent)place).getInvariant().contains("inf"))
-			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlaceComponent)place).getInvariant())+",";
+		if(!((TimedPlaceComponent)place).getInvariantAsString().contains("inf"))
+			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlaceComponent)place).getInvariantAsString())+",";
 		return invariant;
 	}
 

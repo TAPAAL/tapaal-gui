@@ -13,6 +13,15 @@ public class Constant {
 		setValue(value);
 		reset();
 	}
+	
+	public Constant(Constant constant) {
+		Require.that(constant != null, "Constant cannot be null");
+		
+		this.name = constant.name;
+		this.value = constant.value;
+		this.lowerBound = constant.lowerBound;
+		this.upperBound = constant.upperBound;
+	}
 
 	public void setName(String name) {
 		Require.that(name != null && !name.isEmpty(), "A constant must have a name");
@@ -60,5 +69,9 @@ public class Constant {
 	public void reset() {
 		lowerBound = 0;
 		upperBound = Integer.MAX_VALUE;
+	}
+
+	public Constant copy() {
+		return new Constant(this);
 	}
 }

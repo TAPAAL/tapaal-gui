@@ -16,7 +16,7 @@ import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArc;
@@ -47,8 +47,8 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 				transformTransportArc((TransportArc)arc);
 			}else if(arc instanceof pipe.dataLayer.TAPNInhibitorArc){
 					transformInhibitorArc((pipe.dataLayer.TAPNInhibitorArc)arc);
-			}else if (arc instanceof TimedArc){
-				transformTimedArc((TimedArc)arc);
+			}else if (arc instanceof TimedInputArcComponent){
+				transformTimedArc((TimedInputArcComponent)arc);
 			}else if (arc instanceof NormalArc){
 				transformNormalArc((NormalArc)arc);
 			}
@@ -73,7 +73,7 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 	}
 	
-	protected void transformTimedArc(TimedArc arc) throws Exception {
+	protected void transformTimedArc(TimedInputArcComponent arc) throws Exception {
 		dk.aau.cs.petrinet.Arc aAUArc;
 		aAUArc = new TAPNArc(getGuard(arc));
 		if (aAUArc != null){
@@ -142,8 +142,8 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 	}
 	
-	private String getGuard(TimedArc arc) {
-		String guard = arc.getGuard();
+	private String getGuard(TimedInputArcComponent arc) {
+		String guard = arc.getGuardAsString();
 		String leftDelim = guard.substring(0,1);
 		String rightDelim = guard.substring(guard.length()-1, guard.length());
 		String first = guard.substring(1, guard.indexOf(","));
@@ -175,7 +175,7 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		return leftDelim + first + "," + second + rightDelim;
 	}
 	private String getInvariant(Place place) {
-		String inv = ((TimedPlaceComponent)place).getInvariant();
+		String inv = ((TimedPlaceComponent)place).getInvariantAsString();
 		String operator = inv.contains("<=") ? "<=" : "<";
 		
 		String bound = inv.substring(operator.length());

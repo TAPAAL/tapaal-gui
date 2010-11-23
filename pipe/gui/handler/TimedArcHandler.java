@@ -11,7 +11,7 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
@@ -28,12 +28,12 @@ public class TimedArcHandler extends ArcHandler{
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TimedArc && ! (myObject instanceof TransportArc) ){
+		if (myObject instanceof TimedInputArcComponent && ! (myObject instanceof TransportArc) ){
 			if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
 				menuItem = new JMenuItem("Properties");      
 				menuItem.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e) {
-						((TimedArc)myObject).showTimeIntervalEditor();
+						((TimedInputArcComponent)myObject).showTimeIntervalEditor();
 					}
 				}); 
 				popup.insert(menuItem, popupIndex++);
@@ -47,9 +47,9 @@ public class TimedArcHandler extends ArcHandler{
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 
-			if (((TimedArc)myObject).hasInverse()){
+			if (((TimedInputArcComponent)myObject).hasInverse()){
 				menuItem = new JMenuItem(
-						new SplitArcsAction((TimedArc)myObject, false));
+						new SplitArcsAction((TimedInputArcComponent)myObject, false));
 
 				menuItem.setText("Join Arcs (PT / TP)");
 				popup.insert(menuItem, popupIndex++);            
@@ -69,7 +69,7 @@ public class TimedArcHandler extends ArcHandler{
 									new Point2D.Float(arc.getX() + e.getX(), 
 											arc.getY() + e.getY()), e.isAltDown()));
 				}else if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
-					((TimedArc)myObject).showTimeIntervalEditor();
+					((TimedInputArcComponent)myObject).showTimeIntervalEditor();
 				}
 			}else{
 				getPopup(e);

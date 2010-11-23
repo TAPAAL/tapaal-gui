@@ -8,9 +8,9 @@ import pipe.dataLayer.colors.ColoredToken;
 public class ColoredDiscreteFiringAction implements FiringAction {
 	private HashMap<ColoredTimedPlace, ColoredToken> consumedTokens = new HashMap<ColoredTimedPlace, ColoredToken>();
 	private HashMap<ColoredTimedPlace, ColoredToken> producedTokens = new HashMap<ColoredTimedPlace, ColoredToken>();
-	private TAPNTransition transition;
+	private TimedTransitionComponent transition;
 	
-	public ColoredDiscreteFiringAction(TAPNTransition transition){
+	public ColoredDiscreteFiringAction(TimedTransitionComponent transition){
 		this.transition = transition;
 	}
 		
@@ -26,7 +26,7 @@ public class ColoredDiscreteFiringAction implements FiringAction {
 		return consumedTokens;
 	}
 	
-	public TAPNTransition getTransition(){
+	public TimedTransitionComponent getTransition(){
 		return transition;
 	}
 

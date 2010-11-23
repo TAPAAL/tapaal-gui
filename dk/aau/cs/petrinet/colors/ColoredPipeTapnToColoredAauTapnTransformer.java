@@ -4,7 +4,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.dataLayer.TimedArc;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
@@ -96,7 +96,7 @@ PipeTapnToAauTapnTransformer {
 	}
 	
 	@Override
-	protected void transformTimedArc(TimedArc arc) throws Exception {
+	protected void transformTimedArc(TimedInputArcComponent arc) throws Exception {
 		pipe.dataLayer.colors.ColoredInputArc cia = (pipe.dataLayer.colors.ColoredInputArc)arc;
 		
 		ColoredInterval timeGuard = new ColoredInterval(cia.getTimeGuard().toStringWithoutConstants());

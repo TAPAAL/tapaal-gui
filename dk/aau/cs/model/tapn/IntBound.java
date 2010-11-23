@@ -10,6 +10,12 @@ public class IntBound implements Bound {
 		this.bound = bound;
 	}
 	
+	public IntBound(IntBound bound) {
+		Require.that(bound != null, "Integer bound cannot be null");
+		
+		this.bound = bound.bound;
+	}
+	
 	public int value() {
 		return bound;
 	}
@@ -17,5 +23,10 @@ public class IntBound implements Bound {
 	@Override
 	public String toString() {
 		return Integer.toString(bound);
+	}
+
+	@Override
+	public IntBound copy() {
+		return new IntBound(this);
 	}
 }

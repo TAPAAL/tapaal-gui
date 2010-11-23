@@ -9,7 +9,7 @@ import dk.aau.cs.gui.undo.Command;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.undo.TransportArcGroupEdit;
 
-public class TransportArc extends TimedArc {
+public class TransportArc extends TimedInputArcComponent {
 	/**
 	 * 
 	 */
@@ -26,8 +26,8 @@ public class TransportArc extends TimedArc {
 		//hack to reprint the label of the arc
 		updateWeightLabel();
 	}
-	public TransportArc(TimedArc timedArc, int group, boolean isInPreSet) {
-		super(timedArc, timedArc.getGuard());
+	public TransportArc(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
+		super(timedArc, timedArc.getGuardAsString());
 		this.isInPreSet = isInPreSet;
 		setHead();
 		this.setGroup(group);

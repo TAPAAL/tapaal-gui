@@ -43,6 +43,9 @@ import pipe.gui.Pipe;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
 
@@ -1080,7 +1083,7 @@ implements Cloneable {
 		Transition transition = null;
 		{
 			transition =  
-				new TAPNTransition(positionXInput, positionYInput,     
+				new TimedTransitionComponent(positionXInput, positionYInput,     
 						idInput, 
 						nameInput, 
 						nameOffsetXInput, nameOffsetYInput, 
@@ -1279,14 +1282,14 @@ implements Cloneable {
 					/*EOC*/                                    
 					idInput);
 		} else if (type.equals("tapnInhibitor")){
-			tempArc = new TAPNInhibitorArc(new TimedArc(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
+			tempArc = new TAPNInhibitorArc(new TimedInputArcComponent(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
 		} else {
 
 
 
 			//XXX - cant check for if arc is timed, check pn-type instead
 			if (type.equals("timed")){
-				tempArc = new TimedArc(new NormalArc (_startx, _starty,
+				tempArc = new TimedInputArcComponent(new NormalArc (_startx, _starty,
 						_endx, _endy,
 						sourceIn,
 						targetIn,
@@ -1302,7 +1305,7 @@ implements Cloneable {
 				if ( sourceIn instanceof Place ) {
 					isInPreSet = true;
 				}
-				tempArc = new TransportArc( new TimedArc( new NormalArc(_startx, _starty,
+				tempArc = new TransportArc( new TimedInputArcComponent( new NormalArc(_startx, _starty,
 						_endx, _endy,
 						sourceIn,
 						targetIn,
@@ -1481,7 +1484,7 @@ implements Cloneable {
 
 	private FiringAction fireTransitionInColoredTAPN(
 			Transition transition) {
-		ColoredDiscreteFiringAction firingAction = new ColoredDiscreteFiringAction((TAPNTransition)transition);
+		ColoredDiscreteFiringAction firingAction = new ColoredDiscreteFiringAction((TimedTransitionComponent)transition);
 
 		setEnabledTransitions();
 		if(transition.isEnabled()){
@@ -1575,7 +1578,7 @@ implements Cloneable {
 						TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArc)a).getConnectedTo().getTarget();
 
 						for (int i=0; i< tokensOfPlace.size(); i++){
-							if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
+							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
 								eligableToken.add(tokensOfPlace.get(i));
 							}
 						}	
@@ -1595,7 +1598,7 @@ implements Cloneable {
 					{
 
 					}
-					else if (a instanceof TimedArc){
+					else if (a instanceof TimedInputArcComponent){
 						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 						//int indexOfOldestEligebleToken = 0;
 
@@ -1603,7 +1606,7 @@ implements Cloneable {
 
 						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
 						for (int i=0; i< tokensOfPlace.size(); i++){
-							if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
+							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i))){
 								eligableToken.add(tokensOfPlace.get(i));
 							}
 						}						   
@@ -1691,7 +1694,7 @@ implements Cloneable {
 							p.removeTokenofAge(tokenToRemove);
 
 						}
-						else if (a instanceof TimedArc && !(a instanceof TAPNInhibitorArc)){
+						else if (a instanceof TimedInputArcComponent && !(a instanceof TAPNInhibitorArc)){
 							//Select torken to remove based on firing mode
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
 
@@ -1764,7 +1767,7 @@ implements Cloneable {
 
 	public void fireTimedTransitionBackwards(HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> presetMarking, 
 			HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> postsetMarking, 
-			TAPNTransition transition){
+			TimedTransitionComponent transition){
 		for (Arc a : (LinkedList<Arc>)transition.getPreset()){
 			if (! presetMarking.containsKey(a.getSource()) )
 				throw new IllegalArgumentException("Incorrect Preset for transition argument!");
@@ -1888,7 +1891,7 @@ implements Cloneable {
 					for ( BigDecimal token : ((TimedPlaceComponent)p).getTokens() ){
 						if(a instanceof TAPNInhibitorArc)
 						{
-							if(!((TimedArc)a).satisfiesGuard(token))
+							if(!((TimedInputArcComponent)a).satisfiesGuard(token))
 							{
 								ageIsSatisfied = false;
 								break;
@@ -1898,7 +1901,7 @@ implements Cloneable {
 						}
 						else
 						{
-							if ( ((TimedArc)a).satisfiesGuard(token) ){
+							if ( ((TimedInputArcComponent)a).satisfiesGuard(token) ){
 
 								//make sure no invariants are violated
 								if (a instanceof TransportArc){
@@ -2463,7 +2466,7 @@ implements Cloneable {
 
 		}else if(type.equals("ColoredTransportArc")){
 			ColoredTransportArc cta = new ColoredTransportArc(
-					new TimedArc( new NormalArc(_startx, _starty,
+					new TimedInputArcComponent( new NormalArc(_startx, _starty,
 							_endx, _endy,
 							sourceIn,
 							targetIn,
@@ -2964,7 +2967,7 @@ implements Cloneable {
 			if(!isUsingColors()){
 				if(p instanceof TimedPlaceComponent){
 					TimedPlaceComponent tp = (TimedPlaceComponent)p;
-					String inv = tp.getInvariant();
+					String inv = tp.getInvariantAsString();
 
 					String operator = inv.contains("<=") ? "<=" : "<";
 					String first = inv.substring(operator.length());
@@ -2973,7 +2976,7 @@ implements Cloneable {
 						first = newName;
 					}
 
-					tp.setInvariant(operator + first);
+					tp.setInvariantFromString(operator + first);
 				}
 			}else{
 				((ColoredTimedPlace)p).updateConstantName(oldName, newName);
@@ -2984,38 +2987,39 @@ implements Cloneable {
 
 
 	private void updateArcGuards(String oldName, String newName) {
-		for(Arc arc : arcsArray){
-			if(!isUsingColors()){
-				if(arc instanceof TimedArc || arc instanceof TransportArc){
-					TimedArc tarc = (TimedArc)arc;
-					String guard = tarc.getGuard();
-					String leftDelim = guard.substring(0,1);
-					String rightDelim = guard.substring(guard.length()-1, guard.length());
-					String first = guard.substring(1, guard.indexOf(","));
-					String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
-
-					if(first.equals(oldName)){
-						first = newName;
-					}
-					if(second.equals(oldName)){
-						second = newName;
-					}
-
-					tarc.setGuard(leftDelim + first + "," + second + rightDelim);
-				}
-			}else{
-				if(arc instanceof ColoredTransportArc){
-					ColoredTransportArc cta = (ColoredTransportArc)arc;
-					cta.updateConstantName(oldName, newName);
-				}else if(arc instanceof ColoredInhibitorArc){
-					((ColoredInhibitorArc)arc).updateConstantName(oldName, newName);
-				}else if(arc instanceof ColoredInputArc){
-					((ColoredInputArc)arc).updateConstantName(oldName, newName);
-				}else if(arc instanceof ColoredOutputArc){
-					((ColoredOutputArc)arc).updateConstantName(oldName, newName);
-				}
-			}
-		}
+//		for(Arc arc : arcsArray){
+//			if(!isUsingColors()){
+//				if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+//					TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
+//					
+//					String guard = tarc.getGuard();
+//					String leftDelim = guard.substring(0,1);
+//					String rightDelim = guard.substring(guard.length()-1, guard.length());
+//					String first = guard.substring(1, guard.indexOf(","));
+//					String second = guard.substring(guard.indexOf(",")+1, guard.length()-1);
+//
+//					if(first.equals(oldName)){
+//						first = newName;
+//					}
+//					if(second.equals(oldName)){
+//						second = newName;
+//					}
+//
+//					tarc.setGuard(leftDelim + first + "," + second + rightDelim);
+//				}
+//			}else{
+//				if(arc instanceof ColoredTransportArc){
+//					ColoredTransportArc cta = (ColoredTransportArc)arc;
+//					cta.updateConstantName(oldName, newName);
+//				}else if(arc instanceof ColoredInhibitorArc){
+//					((ColoredInhibitorArc)arc).updateConstantName(oldName, newName);
+//				}else if(arc instanceof ColoredInputArc){
+//					((ColoredInputArc)arc).updateConstantName(oldName, newName);
+//				}else if(arc instanceof ColoredOutputArc){
+//					((ColoredOutputArc)arc).updateConstantName(oldName, newName);
+//				}
+//			}
+//		}
 	}
 
 

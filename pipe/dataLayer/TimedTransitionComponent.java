@@ -4,12 +4,16 @@ import java.awt.Container;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.model.tapn.TimedTransition;
+
 import pipe.gui.CreateGui;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
+import pipe.gui.Zoomer;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 
-public class TAPNTransition extends Transition {
+public class TimedTransitionComponent extends Transition {
 
 	private static final long serialVersionUID = -2280012053262288174L;
 	
@@ -17,16 +21,18 @@ public class TAPNTransition extends Transition {
 	
 	private dk.aau.cs.model.tapn.TimedTransition transition;
 
-	public TAPNTransition(double positionXInput, double positionYInput) {
+	public TimedTransitionComponent(double positionXInput, double positionYInput) {
 		super(positionXInput, positionYInput);
 		transition = new dk.aau.cs.model.tapn.TimedTransition(TAPNTRANSITION_NAME_PREFIX + "0");
+		//TODO: setup preset and postset
 	}
 
-	public TAPNTransition(double positionXInput, double positionYInput, String idInput, String nameInput, double nameOffsetXInput, double nameOffsetYInput, boolean timedTransition, boolean infServer, int angleInput, int priority) {
+	public TimedTransitionComponent(double positionXInput, double positionYInput, String idInput, String nameInput, double nameOffsetXInput, double nameOffsetYInput, boolean timedTransition, boolean infServer, int angleInput, int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput,
 				nameOffsetYInput, timedTransition, infServer, angleInput,
 				priority);
 		transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
+		//TODO: setup preset and postset
 	}
 	
 
@@ -67,5 +73,9 @@ public class TAPNTransition extends Transition {
 		   } 
 		   return false;
 	   }
+
+	public dk.aau.cs.model.tapn.TimedTransition underlyingTransition() {
+		return transition;
+	}
 
 }
