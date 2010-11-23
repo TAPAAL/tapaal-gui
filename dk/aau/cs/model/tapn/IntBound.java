@@ -25,7 +25,6 @@ public class IntBound implements Bound {
 		return Integer.toString(bound);
 	}
 
-	@Override
 	public IntBound copy() {
 		return new IntBound(this);
 	}

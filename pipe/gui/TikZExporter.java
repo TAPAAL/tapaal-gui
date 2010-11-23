@@ -11,7 +11,7 @@ import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TAPNInhibitorArc;
+import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
@@ -96,7 +96,7 @@ public class TikZExporter {
 				arcPoints += "-- ("+point.getX()*scale+","+point.getY()*scale*(-1)+") ";
 			}
 			String arrowType ="";
-			if(arc instanceof TAPNInhibitorArc){
+			if(arc instanceof TimedInhibitorArcComponent){
 				arrowType = "-o";
 			}
 			else if(arc instanceof TransportArc){

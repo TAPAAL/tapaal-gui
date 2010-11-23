@@ -47,6 +47,7 @@ import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.DrawingSurface;
+import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -91,8 +92,10 @@ implements Observer, Printable, DrawingSurface {
 	private Point viewPosition = new Point(0,0);
 
 	private DataLayer guiModel;
+	private TimedArcPetriNet model;
 	private TabContent parent;
 	private MouseHandler mouseHandler;
+	private NameGenerator<TimedArcPetriNet> nameGenerator = new NameGenerator<TimedArcPetriNet>();
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent parent) {
 		guiModel = dataLayer;
@@ -108,7 +111,6 @@ implements Observer, Printable, DrawingSurface {
 		
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-
 		mouseHandler = new MouseHandler(this, guiModel);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
@@ -119,9 +121,11 @@ implements Observer, Printable, DrawingSurface {
 	}
 	
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model){
+		nameGenerator.add(model);
 		this.mouseHandler.setModel(guiModel, model);
 		this.undoManager.setModel(guiModel);
 		this.guiModel = guiModel;
+		this.model = model;
 		
 		this.removeAll();
 		for(PetriNetObject pnObject : guiModel.getPetriNetObjects()){
@@ -145,7 +149,7 @@ implements Observer, Printable, DrawingSurface {
 						((Place)newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 						PlaceHandler placeHandler =
-							new PlaceHandler(this, (Place)newObject);
+							new PlaceHandler(this, (Place)newObject, this.guiModel, this.model);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -172,7 +176,7 @@ implements Observer, Printable, DrawingSurface {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent){
 						transitionHandler =
-							new TAPNTransitionHandler(this, (Transition)newObject);
+							new TAPNTransitionHandler(this, (Transition)newObject, guiModel, model);
 					}else {
 						transitionHandler =
 							new TransitionHandler(this, (Transition)newObject);	
@@ -549,10 +553,10 @@ EOC*/
 
 		private PlaceTransitionObject newTimedPlace(Point p){
 			p = adjustPoint(p, view.getZoom());
-			dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace("P0");
+			dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace(nameGenerator.getNewPlaceName(model));
 			pnObject = CreateGui.getModel().isUsingColors() ? new ColoredTimedPlace(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y)) 
 				: new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid.getModifiedY(p.y), tp);
-			model.add(tp); // TODO: fix me
+			model.add(tp);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
@@ -572,23 +576,19 @@ EOC*/
 
 		private PlaceTransitionObject newTAPNTransition(Point p, boolean timed){
 			p = adjustPoint(p, view.getZoom());
-
+			dk.aau.cs.model.tapn.TimedTransition transition = new dk.aau.cs.model.tapn.TimedTransition(nameGenerator.getNewTransitionName(model));
+			
 			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
-					Grid.getModifiedY(p.y));
+					Grid.getModifiedY(p.y), transition);
 			((Transition)pnObject).setTimed(timed);
+			model.add(transition);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject)pnObject;
 		}
 
 		private PlaceTransitionObject newTAPNTransition(Point p){
-			p = adjustPoint(p, view.getZoom());
-
-			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
-					Grid.getModifiedY(p.y));
-			guiModel.addPetriNetObject(pnObject);
-			view.addNewPetriNetObject(pnObject);
-			return (PlaceTransitionObject)pnObject;
+			return newTAPNTransition(p, false);
 		}
 
 		@Override

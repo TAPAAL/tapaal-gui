@@ -7,41 +7,40 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.math.BigDecimal;
 
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
-public class TAPNInhibitorArc extends TimedInputArcComponent {
-	
-	/**
-	 * 
-	 */
+public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
+	private TimedInhibitorArc inhibitorArc;
 
-
-	public TAPNInhibitorArc(NormalArc arc)
+	public TimedInhibitorArcComponent(NormalArc arc)
 	{
 		super(arc);
 	}
-	public TAPNInhibitorArc(NormalArc arc, String guard)
+	
+	public TimedInhibitorArcComponent(NormalArc arc, String guard)
 	{
 		super(arc,guard);
 	}
 	
-	
-	public TAPNInhibitorArc(PlaceTransitionObject source) {
+	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
 		super(source);
 	}
+	
 	@Override
 	public boolean satisfiesGuard(BigDecimal token)
 	{
 		return !super.satisfiesGuard(token);
 	}
 	
+	public void setUnderlyingArc(TimedInhibitorArc arc){
+		this.inhibitorArc = arc;
+	}
 	
-	/**
-	 * @version 1.0
-	 * @author Pere Bonet
-	 */
+	
 	@Override
 	public void paintComponent(Graphics g) {
 	      //super.paintComponent(g);

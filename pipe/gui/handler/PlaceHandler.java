@@ -11,11 +11,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
@@ -30,10 +34,15 @@ import pipe.gui.widgets.RemoveTokenPanel;
  */
 public class PlaceHandler 
 extends PlaceTransitionObjectHandler {
-
-
+	
 	public PlaceHandler(Container contentpane, Place obj) {
 		super(contentpane, obj);
+	}
+
+
+	public PlaceHandler(DrawingSurfaceImpl drawingSurfaceImpl, Place newObject,
+			DataLayer guiModel, TimedArcPetriNet model) {
+		super(drawingSurfaceImpl, newObject, guiModel, model);
 	}
 
 

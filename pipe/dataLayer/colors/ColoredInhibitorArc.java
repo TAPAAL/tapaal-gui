@@ -3,12 +3,12 @@ package pipe.dataLayer.colors;
 import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TAPNInhibitorArc;
+import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
 import pipe.gui.undo.ColoredInhibitorArcTimeGuardEdit;
 
 
-public class ColoredInhibitorArc extends TAPNInhibitorArc {
+public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 
 	/**
 	 * 

@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.TAPNInhibitorArc;
+import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
@@ -77,7 +77,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 
 		for (Arc a : t.getPreset()){
-			if(!(a instanceof TAPNInhibitorArc)){
+			if(!(a instanceof TimedInhibitorArcComponent)){
 				JPanel presetPanel = createDropDownForArc(a);
 				presetPanelContainer.add(presetPanel);
 			}

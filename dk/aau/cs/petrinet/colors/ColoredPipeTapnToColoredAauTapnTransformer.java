@@ -3,7 +3,7 @@ package dk.aau.cs.petrinet.colors;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TAPNInhibitorArc;
+import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
@@ -80,7 +80,7 @@ PipeTapnToAauTapnTransformer {
 	}
 	
 	@Override
-	protected void transformInhibitorArc(TAPNInhibitorArc arc) throws Exception {
+	protected void transformInhibitorArc(TimedInhibitorArcComponent arc) throws Exception {
 		pipe.dataLayer.colors.ColoredInhibitorArc cia = (pipe.dataLayer.colors.ColoredInhibitorArc)arc;
 		
 		ColoredInterval timeGuard = new ColoredInterval(cia.getTimeGuard().toStringWithoutConstants());

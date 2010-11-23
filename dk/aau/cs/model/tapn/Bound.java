@@ -27,7 +27,6 @@ public interface Bound {
 			return arg0 instanceof InfBound;
 		}
 
-		@Override
 		public Bound copy() {
 			return new InfBound();
 		}

@@ -456,7 +456,7 @@ public class DataLayerWriter {
 							//it is not a TransportArc
 
 						}
-						else if (inputArc instanceof TAPNInhibitorArc)
+						else if (inputArc instanceof TimedInhibitorArcComponent)
 						{
 							arcElement.setAttribute("type", "tapnInhibitor");
 							if (inputArc.getSource() instanceof Place)

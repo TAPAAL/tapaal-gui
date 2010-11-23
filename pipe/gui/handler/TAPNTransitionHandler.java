@@ -6,8 +6,12 @@ import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JPopupMenu;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 
 public class TAPNTransitionHandler extends TransitionHandler {
 
@@ -16,6 +20,11 @@ public class TAPNTransitionHandler extends TransitionHandler {
 		
 	}
 	
+	public TAPNTransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl,
+			Transition newObject, DataLayer guiModel, TimedArcPetriNet model) {
+		super(drawingSurfaceImpl, newObject, guiModel, model);
+	}
+
 	//overwrite to remove shift behaviour
 	@Override
 	public void mouseWheelMoved (MouseWheelEvent e) {

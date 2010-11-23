@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
+	public static final TimeInterval ZERO_INF = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
 	private boolean isLowerIncluded;
 	private Bound lower;
 	private Bound upper;

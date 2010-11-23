@@ -21,10 +21,9 @@ public class TimedTransitionComponent extends Transition {
 	
 	private dk.aau.cs.model.tapn.TimedTransition transition;
 
-	public TimedTransitionComponent(double positionXInput, double positionYInput) {
+	public TimedTransitionComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
-		transition = new dk.aau.cs.model.tapn.TimedTransition(TAPNTRANSITION_NAME_PREFIX + "0");
-		//TODO: setup preset and postset
+		this.transition = transition;
 	}
 
 	public TimedTransitionComponent(double positionXInput, double positionYInput, String idInput, String nameInput, double nameOffsetXInput, double nameOffsetYInput, boolean timedTransition, boolean infServer, int angleInput, int priority) {

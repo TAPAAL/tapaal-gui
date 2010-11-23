@@ -45,8 +45,8 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		for ( Arc arc : appModel.getArcs() ){
 			if (arc instanceof TransportArc){
 				transformTransportArc((TransportArc)arc);
-			}else if(arc instanceof pipe.dataLayer.TAPNInhibitorArc){
-					transformInhibitorArc((pipe.dataLayer.TAPNInhibitorArc)arc);
+			}else if(arc instanceof pipe.dataLayer.TimedInhibitorArcComponent){
+					transformInhibitorArc((pipe.dataLayer.TimedInhibitorArcComponent)arc);
 			}else if (arc instanceof TimedInputArcComponent){
 				transformTimedArc((TimedInputArcComponent)arc);
 			}else if (arc instanceof NormalArc){
@@ -83,7 +83,7 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 	}
 	
-	protected void transformInhibitorArc(pipe.dataLayer.TAPNInhibitorArc arc) throws Exception {
+	protected void transformInhibitorArc(pipe.dataLayer.TimedInhibitorArcComponent arc) throws Exception {
 		dk.aau.cs.petrinet.Arc aAUArc;
 		aAUArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(getGuard(arc));	
 		if (aAUArc != null){

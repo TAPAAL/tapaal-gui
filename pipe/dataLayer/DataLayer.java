@@ -143,7 +143,7 @@ implements Cloneable {
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
 	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
-	private Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>> tapnInhibitorsMap = null;
+	private Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = null;
 
 	private HashMap<Transition, HashMap<TransportArc, TransportArc> > transportArcMap;
 
@@ -203,7 +203,7 @@ implements Cloneable {
 		// may as well do the hashtable here as well
 		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<NormalArc>>();
 		inhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>>();
-		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TAPNInhibitorArc>>();
+		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>>();
 	}
 	
 	/**
@@ -457,7 +457,7 @@ implements Cloneable {
 		}
 	}
 
-	public void addArc(TAPNInhibitorArc inhibitorArcInput) {
+	public void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
 		boolean unique = true;
 
 		if (inhibitorArcInput != null) {
@@ -601,18 +601,18 @@ implements Cloneable {
 	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
 	 * @param arcInput New Arc
 	 */
-	private void addInhibitorArcToInhibitorsMap(TAPNInhibitorArc inhibitorArcInput) {
+	private void addInhibitorArcToInhibitorsMap(TimedInhibitorArcComponent inhibitorArcInput) {
 		// now we want to add the inhibitor arc to the list of inhibitor arcs for
 		// it's source and target
 		PlaceTransitionObject source = inhibitorArcInput.getSource();
 		PlaceTransitionObject target = inhibitorArcInput.getTarget();
-		ArrayList<TAPNInhibitorArc> newList = null;
+		ArrayList<TimedInhibitorArcComponent> newList = null;
 
 		if (source != null) {
 			if (tapnInhibitorsMap.get(source) != null) {
 				tapnInhibitorsMap.get(source).add(inhibitorArcInput);
 			} else {
-				newList = new ArrayList<TAPNInhibitorArc>();
+				newList = new ArrayList<TimedInhibitorArcComponent>();
 				newList.add(inhibitorArcInput);
 				tapnInhibitorsMap.put(source, newList);
 			}
@@ -622,7 +622,7 @@ implements Cloneable {
 			if (tapnInhibitorsMap.get(target) != null) {
 				tapnInhibitorsMap.get(target).add(inhibitorArcInput);
 			} else {
-				newList = new ArrayList<TAPNInhibitorArc>();
+				newList = new ArrayList<TimedInhibitorArcComponent>();
 				newList.add(inhibitorArcInput);
 				tapnInhibitorsMap.put(target, newList);
 			} 
@@ -678,9 +678,9 @@ implements Cloneable {
 			} else if (pnObject instanceof InhibitorArc) {
 				addInhibitorArcToInhibitorsMap((InhibitorArc)pnObject);
 				addArc((InhibitorArc)pnObject);
-			} else if (pnObject instanceof TAPNInhibitorArc) {
-				addInhibitorArcToInhibitorsMap((TAPNInhibitorArc)pnObject);
-				addArc((TAPNInhibitorArc)pnObject);
+			} else if (pnObject instanceof TimedInhibitorArcComponent) {
+				addInhibitorArcToInhibitorsMap((TimedInhibitorArcComponent)pnObject);
+				addArc((TimedInhibitorArcComponent)pnObject);
 			} else if (pnObject instanceof Place) {
 				addPlace((Place)pnObject);
 				//			} else if (pnObject instanceof TAPNTransition){
@@ -831,13 +831,13 @@ implements Cloneable {
 						}
 						//						attached.updateConnected(); //causing null pointer exceptions (?)
 					}
-				}else if (pnObject instanceof TAPNInhibitorArc) {
+				}else if (pnObject instanceof TimedInhibitorArcComponent) {
 
 					// get source and target of the arc
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList<TAPNInhibitorArc> a=tapnInhibitorsMap.get(attached);
+						ArrayList<TimedInhibitorArcComponent> a=tapnInhibitorsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -908,7 +908,7 @@ implements Cloneable {
 			changeArrayList = placesArray;
 			return true;
 		}
-		else if (pnObject instanceof TAPNInhibitorArc) {
+		else if (pnObject instanceof TimedInhibitorArcComponent) {
 			changeArrayList = arcsArray;
 			return true;
 		}	
@@ -1282,7 +1282,7 @@ implements Cloneable {
 					/*EOC*/                                    
 					idInput);
 		} else if (type.equals("tapnInhibitor")){
-			tempArc = new TAPNInhibitorArc(new TimedInputArcComponent(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
+			tempArc = new TimedInhibitorArcComponent(new TimedInputArcComponent(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
 		} else {
 
 
@@ -1594,7 +1594,7 @@ implements Cloneable {
 						p.removeTokenofAge(tokenToRemove);
 					}
 					// if arc is an inhibitor arc then do nothing.
-					else if(a instanceof TAPNInhibitorArc)
+					else if(a instanceof TimedInhibitorArcComponent)
 					{
 
 					}
@@ -1694,7 +1694,7 @@ implements Cloneable {
 							p.removeTokenofAge(tokenToRemove);
 
 						}
-						else if (a instanceof TimedInputArcComponent && !(a instanceof TAPNInhibitorArc)){
+						else if (a instanceof TimedInputArcComponent && !(a instanceof TimedInhibitorArcComponent)){
 							//Select torken to remove based on firing mode
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
 
@@ -1880,7 +1880,7 @@ implements Cloneable {
 
 				boolean ageIsSatisfied;
 
-				if(a instanceof TAPNInhibitorArc)
+				if(a instanceof TimedInhibitorArcComponent)
 					ageIsSatisfied = true;
 				else
 					ageIsSatisfied = false;
@@ -1889,7 +1889,7 @@ implements Cloneable {
 				if (p.currentMarking > 0){
 
 					for ( BigDecimal token : ((TimedPlaceComponent)p).getTokens() ){
-						if(a instanceof TAPNInhibitorArc)
+						if(a instanceof TimedInhibitorArcComponent)
 						{
 							if(!((TimedInputArcComponent)a).satisfiesGuard(token))
 							{
@@ -2055,21 +2055,21 @@ implements Cloneable {
 		return returnArray;
 	}
 
-	public TAPNInhibitorArc[] getTAPNInhibitors() {
+	public TimedInhibitorArcComponent[] getTAPNInhibitors() {
 		int numInhibArcs = 0;
 		for (int i = 0; i < arcsArray.size(); i++){
-			if(arcsArray.get(i) instanceof TAPNInhibitorArc)
+			if(arcsArray.get(i) instanceof TimedInhibitorArcComponent)
 				numInhibArcs++;
 		}
 
-		TAPNInhibitorArc[] returnArray = new TAPNInhibitorArc[numInhibArcs];
+		TimedInhibitorArcComponent[] returnArray = new TimedInhibitorArcComponent[numInhibArcs];
 
 		for(int i = 0; i < numInhibArcs; i++)
 		{
 			for (int j = 0; j < arcsArray.size(); j++)
 			{
-				if(arcsArray.get(j) instanceof TAPNInhibitorArc)
-					returnArray[i] = (TAPNInhibitorArc)arcsArray.get(j);
+				if(arcsArray.get(j) instanceof TimedInhibitorArcComponent)
+					returnArray[i] = (TimedInhibitorArcComponent)arcsArray.get(j);
 			}
 		}
 
@@ -2364,8 +2364,8 @@ implements Cloneable {
 				Arc newArc = createColoredArc(element);
 				if (newArc instanceof InhibitorArc) {
 					addArc((InhibitorArc) newArc);
-				} else if (newArc instanceof TAPNInhibitorArc) {
-					addArc((TAPNInhibitorArc) newArc);
+				} else if (newArc instanceof TimedInhibitorArcComponent) {
+					addArc((TimedInhibitorArcComponent) newArc);
 				} else {
 					addArc((NormalArc) newArc);
 					checkForInverseArc((NormalArc) newArc);
@@ -2621,8 +2621,8 @@ implements Cloneable {
 				Arc newArc = createArc(element);
 				if (newArc instanceof InhibitorArc) {
 					addArc((InhibitorArc) newArc);
-				} else if (newArc instanceof TAPNInhibitorArc) {
-					addArc((TAPNInhibitorArc) newArc);
+				} else if (newArc instanceof TimedInhibitorArcComponent) {
+					addArc((TimedInhibitorArcComponent) newArc);
 				} else {
 					addArc((NormalArc) newArc);
 					checkForInverseArc((NormalArc) newArc);
@@ -3059,7 +3059,7 @@ implements Cloneable {
 
 	public boolean hasTAPNInhibitorArcs(){ // TODO: Fix this to make it faster
 		for(Arc arc : arcsArray){
-			if(arc instanceof TAPNInhibitorArc){
+			if(arc instanceof TimedInhibitorArcComponent){
 				return true;
 			}
 		}

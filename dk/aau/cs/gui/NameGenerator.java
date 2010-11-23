@@ -14,7 +14,7 @@ public class NameGenerator<TNet> {
 	}
 	
 	public void add(TNet net){
-		if(!placeIDs.contains(net) && !transitionIDs.contains(net)){
+		if(!placeIDs.containsKey(net) && !transitionIDs.containsKey(net)){
 			placeIDs.put(net, 0);
 			transitionIDs.put(net, 0);
 		}

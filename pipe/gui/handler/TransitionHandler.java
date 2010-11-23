@@ -10,8 +10,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
@@ -29,7 +33,13 @@ public class TransitionHandler
    }
 
    
-   @Override
+   public TransitionHandler(DrawingSurfaceImpl drawingSurfaceImpl,
+		Transition newObject, DataLayer guiModel, TimedArcPetriNet model) {
+	super(drawingSurfaceImpl, newObject, guiModel, model);
+}
+
+
+@Override
 public void mouseWheelMoved (MouseWheelEvent e) {
 
       if (CreateGui.getApp().isEditionAllowed() == false || 
