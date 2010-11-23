@@ -31,6 +31,7 @@ import javax.swing.event.ChangeListener;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
 
 import pipe.dataLayer.Constant;
@@ -449,24 +450,29 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 						String leftDelim = leftDelimiter.getSelectedItem().toString();
 						String rightDelim = rightDelimiter.getSelectedItem().toString();
-						String leftInterval = null;
-						String rightInterval = null;
+						Bound leftInterval = null;
+						Bound rightInterval = null;
 
-						if(useConstantLeft)
-							leftInterval = leftConstantsComboBox.getSelectedItem().toString();
+						if(useConstantLeft) {
+							JOptionPane.showMessageDialog(CreateGui.getDrawingSurface(), "Not Yet implemented");
+							//String constantName = leftConstantsComboBox.getSelectedItem().toString();
+							//leftInterval = new ConstantBound();
+						}
 						else
-							leftInterval = firstIntervalNumber.getValue().toString();
+							leftInterval = new IntBound((Integer)firstIntervalNumber.getValue());
 
-						if(useConstantRight)
-							rightInterval = rightConstantsComboBox.getSelectedItem().toString();
+						if(useConstantRight){
+							JOptionPane.showMessageDialog(CreateGui.getDrawingSurface(), "Not Yet implemented");
+							//String constantName = rightConstantsComboBox.getSelectedItem().toString();
+							//rightInterval = new ConstantBound();
+						}
 						else if ( inf.isSelected())
-							rightInterval = "inf";
+							rightInterval = Bound.Infinity;
 						else
-							rightInterval = secondIntervalNumber.getValue().toString();
+							rightInterval = new IntBound((Integer)secondIntervalNumber.getValue());
 
-						if (TimedInputArcComponent.validateTimeInterval(leftDelim, leftInterval, rightInterval, rightDelim)){
-							//XXX send error messsage
-							return new dk.aau.cs.model.tapn.TimeInterval((leftDelim == "[" ? true : false), new IntBound(Integer.parseInt(leftInterval)), (inf.isSelected() ? Bound.Infinity : new IntBound(Integer.parseInt(rightInterval))), (rightDelim == "]" ? true : false));
+						if (leftInterval.value() <= rightInterval.value()){
+							return new dk.aau.cs.model.tapn.TimeInterval((leftDelim == "[" ? true : false), leftInterval, rightInterval, (rightDelim == "]" ? true : false));
 						}else {
 							return oldGuard;
 						}

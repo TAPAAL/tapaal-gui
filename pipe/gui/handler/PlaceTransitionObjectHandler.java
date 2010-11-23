@@ -854,79 +854,86 @@ extends PetriNetObjectHandler {
 							break;
 						}
 
-						boolean existsArc = false;
-						Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
-						Arc someArc = null;
-
-						while ( arcsFromTranasition.hasNext() ){        					 
-							someArc = arcsFromTranasition.next();
-							if (someArc == timedArcToCreate){
-								//break;
-								continue;
-							}
-							if( someArc.getSource() == timedArcToCreate.getSource()
-									&& someArc.getTarget() == currentObject) {
-								existsArc = true;
-
-								if (someArc instanceof TimedInhibitorArcComponent) {
-									//user has drawn a timed arc where there is 
-									//an inhibitor arc already - this does not make sense
-									System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
-									JOptionPane.showMessageDialog(CreateGui.getApp(),
-											"It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
-											"Error",
-											JOptionPane.ERROR_MESSAGE);
-								} else if (someArc instanceof TransportArc) {
-									// user has drawn a timed arc where there is 
-									// a transport arc already - We do not allow that.
-									System.out.println(error_message_two_arcs);
-									JOptionPane.showMessageDialog(CreateGui.getApp(),
-											error_message_two_arcs,
-											"Error",
-											JOptionPane.ERROR_MESSAGE);
-
-								} else if (someArc instanceof NormalArc) {
-									// user has drawn a normal arc where there is 
-									// a normal arc already - we increment arc's weight
-									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
-										int weightToInsert = someArc.getWeight()+1;
-										someArc.setWeight(weightToInsert);
-									}
-									else{
-										System.out.println(error_message_two_arcs);
-										JOptionPane.showMessageDialog(CreateGui.getApp(),
-												error_message_two_arcs,
-												"Error",
-												JOptionPane.ERROR_MESSAGE);
-									}
-
-								} else{
-									//This should not happen - since all types of arcs are listed above.
-								}
-								timedArcToCreate.delete();
-								break;
-							}
-
-						}
-
-						if (existsArc){    						 
-							break;
-						}
+//						boolean existsArc = false;
+//						Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
+//						Arc someArc = null;
+//
+//						while ( arcsFromTranasition.hasNext() ){        					 
+//							someArc = arcsFromTranasition.next();
+//							if (someArc == timedArcToCreate){
+//								//break;
+//								continue;
+//							}
+//							if( someArc.getSource() == timedArcToCreate.getSource()
+//									&& someArc.getTarget() == currentObject) {
+//								existsArc = true;
+//
+//								if (someArc instanceof TimedInhibitorArcComponent) {
+//									//user has drawn a timed arc where there is 
+//									//an inhibitor arc already - this does not make sense
+//									System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+//									JOptionPane.showMessageDialog(CreateGui.getApp(),
+//											"It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+//											"Error",
+//											JOptionPane.ERROR_MESSAGE);
+//								} else if (someArc instanceof TransportArc) {
+//									// user has drawn a timed arc where there is 
+//									// a transport arc already - We do not allow that.
+//									System.out.println(error_message_two_arcs);
+//									JOptionPane.showMessageDialog(CreateGui.getApp(),
+//											error_message_two_arcs,
+//											"Error",
+//											JOptionPane.ERROR_MESSAGE);
+//
+//								} else if (someArc instanceof NormalArc) {
+//									// user has drawn a normal arc where there is 
+//									// a normal arc already - we increment arc's weight
+//									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
+//										int weightToInsert = someArc.getWeight()+1;
+//										someArc.setWeight(weightToInsert);
+//									}
+//									else{
+//										System.out.println(error_message_two_arcs);
+//										JOptionPane.showMessageDialog(CreateGui.getApp(),
+//												error_message_two_arcs,
+//												"Error",
+//												JOptionPane.ERROR_MESSAGE);
+//									}
+//
+//								} else{
+//									//This should not happen - since all types of arcs are listed above.
+//								}
+//								timedArcToCreate.delete();
+//								break;
+//							}
+//
+//						}
+//
+//						if (existsArc){    						 
+//							break;
+//						}
 
 						// Set underlying TimedInputArc
 						TimedInputArcComponent timedArc = (TimedInputArcComponent)timedArcToCreate;
-						if(timedArc.getSource() instanceof TimedPlaceComponent && timedArc.getTarget() instanceof TimedTransitionComponent) {
-							TimedPlaceComponent place = (TimedPlaceComponent)timedArc.getSource();
-							TimedTransitionComponent transition = (TimedTransitionComponent)timedArc.getTarget();
-
-							timedArc.SetTimedInputArc(new dk.aau.cs.model.tapn.TimedInputArc(place.underlyingPlace(), transition.underlyingTransition(), new TimeInterval(true, new IntBound(0), Bound.Infinity, false)));
+						try{
+							dk.aau.cs.model.tapn.TimedInputArc tia = new TimedInputArc(
+								((TimedPlaceComponent)timedArc.getSource()).underlyingPlace(),
+								((TimedTransitionComponent)timedArc.getTarget()).underlyingTransition(),
+								TimeInterval.ZERO_INF
+								);
+							model.add(tia);
+							timedArc.setUnderlyingArc(tia);
 							timedArc.updateWeightLabel();
+						}catch(RequireException ex){
+							timedArcToCreate.delete();
+							JOptionPane.showMessageDialog(CreateGui.getApp(), 
+									"There was an error drawing the arc. Possible problems:\n" +
+									" - There is already an arc between the selected place and transition",
+									"Error",
+									JOptionPane.ERROR_MESSAGE);
+							break;
 						}
-						else
-						{
-							JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while drawing the input arc.");
-						}
-
+						
 						currentObject.addConnectTo(timedArcToCreate);
 						timedArcToCreate.getTransition().updateConnected();
 

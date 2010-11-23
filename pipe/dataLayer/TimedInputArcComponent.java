@@ -8,6 +8,7 @@ import javax.swing.BoxLayout;
 
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -189,39 +190,11 @@ public class TimedInputArcComponent extends NormalArc{
 				(int)(myPath.midPoint.y) - ((zoom/55)*(zoom/55)) );
 	}
 
-	public static boolean validateTimeInterval(String leftDelim,
-			String leftInterval, String rightInterval, String rightDelim) {
-		boolean isFirstNumber = true;
-		boolean isSecondNumber = true;
-		int firstValue = 0;
-		int secondValue = 0;
-	
-		try{
-			firstValue = Integer.parseInt(leftInterval);
-		}catch(NumberFormatException e){
-			isFirstNumber = false;
-		}
-		try{
-			secondValue = Integer.parseInt(rightInterval);
-		}catch(NumberFormatException e){
-			isSecondNumber = false;
-		}
-		
-		if(!isFirstNumber){
-			firstValue = CreateGui.getModel().getConstantValue(leftInterval);
-		}
-		
-		if(!isSecondNumber){
-			if(rightInterval.equals("inf"))
-				secondValue = Integer.MAX_VALUE;
-			else
-				secondValue = CreateGui.getModel().getConstantValue(rightInterval);
-		}
-		
-		return firstValue <= secondValue;
-	}
-
 	public dk.aau.cs.model.tapn.TimedInputArc underlyingTimedInputArc() {
 		return inputArc;
+	}
+	
+	public void setUnderlyingArc(dk.aau.cs.model.tapn.TimedInputArc ia) {
+		this.inputArc = ia;
 	}
 }

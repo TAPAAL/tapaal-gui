@@ -31,7 +31,6 @@ public class TimedTransitionComponent extends Transition {
 				nameOffsetYInput, timedTransition, infServer, angleInput,
 				priority);
 		transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
-		//TODO: setup preset and postset
 	}
 	
 
