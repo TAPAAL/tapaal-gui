@@ -5,20 +5,19 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TransportArc;
 
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.undo.TransportArcGroupEdit;
 
-public class TransportArc extends TimedInputArcComponent {
-	/**
-	 * 
-	 */
+public class TransportArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 3728885532894319528L;
 	private int group;
 	private boolean isInPreSet; 
-	private TransportArc connectedTo=null;
+	private TransportArcComponent connectedTo=null;
+	private TransportArc underlyingTransportArc;
 	
-	public TransportArc(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
+	public TransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
 		super(new NormalArc(newSource));
 		this.isInPreSet = isInPreSet;
 		setHead();
@@ -26,7 +25,8 @@ public class TransportArc extends TimedInputArcComponent {
 		//hack to reprint the label of the arc
 		updateWeightLabel();
 	}
-	public TransportArc(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
+	
+	public TransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
 		super(timedArc, timedArc.getGuardAsString());
 		this.isInPreSet = isInPreSet;
 		setHead();
@@ -34,13 +34,24 @@ public class TransportArc extends TimedInputArcComponent {
 		//hack to reprint the label of the arc
 		updateWeightLabel();
 	}
+	
+	public void setUnderlyingArc(TransportArc arc){
+		this.underlyingTransportArc = arc;
+		if(connectedTo != null){
+			connectedTo.underlyingTransportArc = arc;
+		}
+	}
+	
 	private void setHead(){
 		head = new Polygon(new int[]{0, 5, 0, -5}, new int[]{0, -11, -18, -11}, 4);
 	}
+	
+	
 	public void setColor(){
 		getGraphics().setColor(Color.RED);
 		repaint();
 	}
+	
 	public Command setGroupNr(int groupNr){
 		int oldGroup = this.getGroup();
 		setGroup(groupNr);
@@ -51,6 +62,7 @@ public class TransportArc extends TimedInputArcComponent {
 		
 		return new TransportArcGroupEdit(this, oldGroup, this.getGroup());
 	}
+	
 	public int getGroupNr(){
 		return getGroup();
 	}
@@ -58,15 +70,15 @@ public class TransportArc extends TimedInputArcComponent {
 	@Override
 	public void updateWeightLabel(){   
 		if (isInPreSet){
-		weightLabel.setText(timeInterval+" : "+getGroup());
+		weightLabel.setText(underlyingTransportArc.timeInterval().toString() + " : " + getGroup());
 		} else {
-			weightLabel.setText(""+getGroup());
+			weightLabel.setText(String.valueOf(getGroup()));
 		}
 		this.setWeightLabelPosition();
 	}
 	
 	@Override
-	public TransportArc copy() {
+	public TransportArcComponent copy() {
 		
 		return null;
 	}
@@ -81,7 +93,7 @@ public class TransportArc extends TimedInputArcComponent {
 		
 		// xxx - hack to awoid delete loop
 		
-		TransportArc a = connectedTo;
+		TransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a != null && a.connectedTo != null){
 			a.delete();
@@ -95,7 +107,7 @@ public class TransportArc extends TimedInputArcComponent {
 	public void undelete(DataLayer model, DrawingSurfaceImpl view) {
 		super.undelete(model, view);
 		
-		TransportArc a = connectedTo;
+		TransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a.connectedTo != null){
 			a.undelete(model,view);
@@ -105,7 +117,7 @@ public class TransportArc extends TimedInputArcComponent {
 	}
 
 	@Override
-	public TransportArc paste(double despX, double despY, boolean toAnotherView) {
+	public TransportArcComponent paste(double despX, double despY, boolean toAnotherView) {
 		
 		return null;
 	}
@@ -133,11 +145,11 @@ public class TransportArc extends TimedInputArcComponent {
 	public boolean isInPreSet() {
 		return isInPreSet;
 	}
-	public TransportArc getConnectedTo() {
+	public TransportArcComponent getConnectedTo() {
 		return connectedTo;
 	}
 	
-	public void setConnectedTo(TransportArc connectedTo) {
+	public void setConnectedTo(TransportArcComponent connectedTo) {
 		this.connectedTo = connectedTo;
 	}
 	

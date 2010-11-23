@@ -25,7 +25,7 @@ import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredOutputArc;
@@ -175,7 +175,7 @@ extends PetriNetObjectHandler {
 				if (currentObject instanceof Place) {
 					isInPreSet = true;
 					Arc arc = useColors ? new ColoredTransportArc(currentObject, 1, isInPreSet) 
-					: new TransportArc(currentObject, 1, isInPreSet);
+					: new TransportArcComponent(currentObject, 1, isInPreSet);
 					createArc(arc, currentObject);
 				} else {
 					//Do nothing this is not supported
@@ -576,7 +576,7 @@ extends PetriNetObjectHandler {
 											"Error",
 											JOptionPane.ERROR_MESSAGE);
 
-								} else if (someArc instanceof TransportArc) {
+								} else if (someArc instanceof TransportArcComponent) {
 									// user has drawn a transport arc where there is 
 									// a transport arc already - We do not allow that.
 									System.out.println(error_message_two_arcs);
@@ -609,14 +609,14 @@ extends PetriNetObjectHandler {
 						int groupMaxCounter = 0;
 
 						for (Object pt : transportArcToCreate.getTarget().getPostset()){
-							if (pt instanceof TransportArc) {
-								if (((TransportArc)pt).getGroupNr() > groupMaxCounter){
-									groupMaxCounter = ((TransportArc)pt).getGroupNr();
+							if (pt instanceof TransportArcComponent) {
+								if (((TransportArcComponent)pt).getGroupNr() > groupMaxCounter){
+									groupMaxCounter = ((TransportArcComponent)pt).getGroupNr();
 								}
 							}
 						}
 
-						((TransportArc) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
+						((TransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
 
 						currentObject.addConnectTo(transportArcToCreate);
 
@@ -635,12 +635,12 @@ extends PetriNetObjectHandler {
 						keyHandler = null;
 						view.createArc = null;
 
-						view.transportArcPart1 = (TransportArc)transportArcToCreate;
+						view.transportArcPart1 = (TransportArcComponent)transportArcToCreate;
 
 						//Create the next arc
 						boolean useColors = CreateGui.getModel().isUsingColors();
 						Arc arc = useColors ? new ColoredTransportArc(currentObject,groupMaxCounter+1,false) 
-						: new TransportArc(currentObject, groupMaxCounter+1, false);
+						: new TransportArcComponent(currentObject, groupMaxCounter+1, false);
 						createArc(arc, currentObject);
 
 					} else if (transportArcToCreate.getSource() instanceof Transition) {
@@ -679,7 +679,7 @@ extends PetriNetObjectHandler {
 
 								if (someArc instanceof TimedInhibitorArcComponent) {
 									//mikaelhm - This can never be the case, since the user is trying to draw the 2. step of an transport arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
-								} else if (someArc instanceof TransportArc) {
+								} else if (someArc instanceof TransportArcComponent) {
 									// user has drawn a transport arc where there is 
 									// a transport arc already - We do not allow that.
 									System.out.println(error_message_two_arcs);
@@ -739,11 +739,11 @@ extends PetriNetObjectHandler {
 						/* */
 						view.createArc = null;
 
-						((TransportArc)transportArcToCreate).setGroupNr(view.transportArcPart1.getGroupNr());
+						((TransportArcComponent)transportArcToCreate).setGroupNr(view.transportArcPart1.getGroupNr());
 
 						//Ekstra suff
-						view.transportArcPart1.setConnectedTo(((TransportArc)transportArcToCreate));
-						((TransportArc)transportArcToCreate).setConnectedTo(view.transportArcPart1);
+						view.transportArcPart1.setConnectedTo(((TransportArcComponent)transportArcToCreate));
+						((TransportArcComponent)transportArcToCreate).setConnectedTo(view.transportArcPart1);
 						view.transportArcPart1 = null;
 
 
@@ -785,7 +785,7 @@ extends PetriNetObjectHandler {
 
 								if (someArc instanceof TimedInhibitorArcComponent) {
 									//mikaelhm - This can never be the case, since the user is trying to draw a normal arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
-								} else if (someArc instanceof TransportArc) {
+								} else if (someArc instanceof TransportArcComponent) {
 									// user has drawn a normal arc where there is 
 									// a transport arc already - We do not allow that.
 									System.out.println(error_message_two_arcs);

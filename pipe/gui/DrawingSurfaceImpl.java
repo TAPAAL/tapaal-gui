@@ -33,7 +33,7 @@ import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
@@ -65,7 +65,7 @@ implements Observer, Printable, DrawingSurface {
 	private boolean animationmode = false;
 
 	public Arc createArc;  //no longer static
-	public TransportArc transportArcPart1;  //used when creating transport arcs
+	public TransportArcComponent transportArcPart1;  //used when creating transport arcs
 
 	public PlaceTransitionObject createPTO;
 
@@ -201,7 +201,7 @@ implements Observer, Printable, DrawingSurface {
 					add(newObject);
 					/* CB - Joakim Byg add timed arcs*/
 					if (newObject instanceof TimedInputArcComponent){
-						if (newObject instanceof TransportArc){ 
+						if (newObject instanceof TransportArcComponent){ 
 							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc)newObject);
 							newObject.addMouseListener(transportArcHandler);
 							newObject.addMouseWheelListener(transportArcHandler);

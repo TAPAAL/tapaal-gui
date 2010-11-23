@@ -4,7 +4,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
@@ -45,7 +45,7 @@ public void keyPressed(KeyEvent e) {
             aView.createArc = null;
             arcBeingDrawn.delete();
             
-            if (arcBeingDrawn instanceof TransportArc){
+            if (arcBeingDrawn instanceof TransportArcComponent){
             	if (aView.transportArcPart1 != null){
             		aView.transportArcPart1.delete();
             		aView.transportArcPart1 = null;

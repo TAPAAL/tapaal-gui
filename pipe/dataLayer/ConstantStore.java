@@ -131,7 +131,7 @@ public class ConstantStore {
 
 		for(Arc arc : arcs){
 			if(!isUsingColors){
-				if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+				if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
 					buildConstraint((TimedInputArcComponent)arc);
 				}
 			}else{

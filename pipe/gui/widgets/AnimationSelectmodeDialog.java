@@ -19,7 +19,7 @@ import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
@@ -118,13 +118,13 @@ public class AnimationSelectmodeDialog extends JPanel{
 			DecimalFormat df = new DecimalFormat();
 			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			df.setMinimumFractionDigits(1);
-			if (a instanceof TransportArc){
+			if (a instanceof TransportArcComponent){
 				eligableToken= new ArrayList<String>();
 				TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
 				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 
-				TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArc)a).getConnectedTo().getTarget();
+				TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArcComponent)a).getConnectedTo().getTarget();
 
 				for (int i=0; i< tokensOfPlace.size(); i++){
 					if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {

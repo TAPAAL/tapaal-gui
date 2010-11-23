@@ -5,7 +5,7 @@ import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
@@ -47,7 +47,7 @@ PipeTapnToAauTapnTransformer {
 	}
 
 	@Override
-	protected void transformTransportArc(TransportArc arc) throws Exception {
+	protected void transformTransportArc(TransportArcComponent arc) throws Exception {
 		if(arc.getSource() instanceof Place){
 			ColoredTransportArc cta = (ColoredTransportArc)arc;
 

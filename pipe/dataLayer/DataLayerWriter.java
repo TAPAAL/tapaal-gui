@@ -446,12 +446,12 @@ public class DataLayerWriter {
 				if (inputArc instanceof NormalArc ){
 
 					if (inputArc instanceof TimedInputArcComponent){
-						if (inputArc instanceof TransportArc) {
+						if (inputArc instanceof TransportArcComponent) {
 							arcElement.setAttribute("type", "transport");
 							if (inputArc.getSource() instanceof Place){
-								arcElement.setAttribute("inscription", "" + ((TimedInputArcComponent)inputArc).getGuardAsString() + ":" + ((TransportArc)inputArc).getGroupNr() );
+								arcElement.setAttribute("inscription", "" + ((TimedInputArcComponent)inputArc).getGuardAsString() + ":" + ((TransportArcComponent)inputArc).getGroupNr() );
 							}else {
-								arcElement.setAttribute("inscription", "" + ((TimedInputArcComponent)inputArc).getGuardAsString() + ":" + ((TransportArc)inputArc).getGroupNr() );
+								arcElement.setAttribute("inscription", "" + ((TimedInputArcComponent)inputArc).getGuardAsString() + ":" + ((TransportArcComponent)inputArc).getGroupNr() );
 							}
 							//it is not a TransportArc
 

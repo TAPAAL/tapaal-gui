@@ -38,7 +38,7 @@ import pipe.dataLayer.Constant;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -102,9 +102,9 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 		if(CreateGui.getModel().isUsingColors()){
 			initColorGuardPanel();
-			if(objectToBeEdited instanceof TransportArc){
+			if(objectToBeEdited instanceof TransportArcComponent){
 				initTransportArcFeaturesPanel();
-				TransportArc arc = (TransportArc)objectToBeEdited;
+				TransportArcComponent arc = (TransportArcComponent)objectToBeEdited;
 				if(arc.getConnectedTo() != null && arc.getSource() instanceof TimedTransitionComponent){
 					objectToBeEdited = arc.getConnectedTo();
 				}

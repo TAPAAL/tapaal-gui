@@ -31,7 +31,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredOutputArc;
@@ -221,7 +221,7 @@ public class TabContent extends JSplitPane {
 		}
 
 		for(Arc arc : appModel.getArcs()){
-			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
 				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
 				TimeInterval guard = oldGuards.get(arc);
 				tarc.setGuard(guard);
@@ -243,7 +243,7 @@ public class TabContent extends JSplitPane {
 		}
 
 		for(Arc arc : appModel.getArcs()){
-			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArc){
+			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
 				oldGuards.put(arc, ((TimedInputArcComponent) arc).getGuard());
 				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
 				TimeInterval guard = getGuard(tarc);

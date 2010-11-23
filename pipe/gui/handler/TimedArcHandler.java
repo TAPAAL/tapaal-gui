@@ -12,7 +12,7 @@ import javax.swing.JPopupMenu;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
 
@@ -28,7 +28,7 @@ public class TimedArcHandler extends ArcHandler{
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TimedInputArcComponent && ! (myObject instanceof TransportArc) ){
+		if (myObject instanceof TimedInputArcComponent && ! (myObject instanceof TransportArcComponent) ){
 			if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
 				menuItem = new JMenuItem("Properties");      
 				menuItem.addActionListener(new ActionListener(){

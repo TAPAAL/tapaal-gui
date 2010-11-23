@@ -145,7 +145,7 @@ implements Cloneable {
 	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
 	private Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = null;
 
-	private HashMap<Transition, HashMap<TransportArc, TransportArc> > transportArcMap;
+	private HashMap<Transition, HashMap<TransportArcComponent, TransportArcComponent> > transportArcMap;
 
 	private HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> placeMarkingStorageMap = null;
 
@@ -166,7 +166,7 @@ implements Cloneable {
 		File temp = new File(pnmlFileName);
 		pnmlName = temp.getName();
 		createFromPNML(transform.transformPNML(pnmlFileName));
-		transportArcMap = new HashMap<Transition, HashMap<TransportArc,TransportArc> >();
+		transportArcMap = new HashMap<Transition, HashMap<TransportArcComponent,TransportArcComponent> >();
 	}  
 	
 	/**
@@ -399,8 +399,8 @@ implements Cloneable {
 			}
 
 			//Transportarc fix boddy
-			if (arcInput instanceof TransportArc){
-				TransportArc tmp = (TransportArc)arcInput;
+			if (arcInput instanceof TransportArcComponent){
+				TransportArcComponent tmp = (TransportArcComponent)arcInput;
 				PlaceTransitionObject first = tmp.getSource();
 
 				if (tmp.getConnectedTo() == null){
@@ -408,12 +408,12 @@ implements Cloneable {
 
 						for (Object o : tmp.getTarget().getPostset()){
 
-							if (o instanceof TransportArc){
-								if (tmp.getGroupNr() == ((TransportArc)o).getGroupNr()){
+							if (o instanceof TransportArcComponent){
+								if (tmp.getGroupNr() == ((TransportArcComponent)o).getGroupNr()){
 									//Found partner
 
-									tmp.setConnectedTo(((TransportArc)o));
-									((TransportArc)o).setConnectedTo(tmp); 
+									tmp.setConnectedTo(((TransportArcComponent)o));
+									((TransportArcComponent)o).setConnectedTo(tmp); 
 
 									break;
 								}
@@ -423,16 +423,16 @@ implements Cloneable {
 
 					} else{
 						// First is TimedTransition
-						tmp = (TransportArc)arcInput;
+						tmp = (TransportArcComponent)arcInput;
 
 						for (Object o : tmp.getSource().getPreset()){
 
-							if (o instanceof TransportArc){
-								if (tmp.getGroupNr() == ((TransportArc)o).getGroupNr()){
+							if (o instanceof TransportArcComponent){
+								if (tmp.getGroupNr() == ((TransportArcComponent)o).getGroupNr()){
 									//Found partner
 
-									tmp.setConnectedTo(((TransportArc)o));
-									((TransportArc)o).setConnectedTo(tmp); 
+									tmp.setConnectedTo(((TransportArcComponent)o));
+									((TransportArcComponent)o).setConnectedTo(tmp); 
 
 									break;
 								}
@@ -1305,7 +1305,7 @@ implements Cloneable {
 				if ( sourceIn instanceof Place ) {
 					isInPreSet = true;
 				}
-				tempArc = new TransportArc( new TimedInputArcComponent( new NormalArc(_startx, _starty,
+				tempArc = new TransportArcComponent( new TimedInputArcComponent( new NormalArc(_startx, _starty,
 						_endx, _endy,
 						sourceIn,
 						targetIn,
@@ -1567,7 +1567,7 @@ implements Cloneable {
 
 
 
-					if (a instanceof TransportArc){
+					if (a instanceof TransportArcComponent){
 						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
 
 
@@ -1575,7 +1575,7 @@ implements Cloneable {
 
 						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
 
-						TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArc)a).getConnectedTo().getTarget();
+						TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArcComponent)a).getConnectedTo().getTarget();
 
 						for (int i=0; i< tokensOfPlace.size(); i++){
 							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
@@ -1587,7 +1587,7 @@ implements Cloneable {
 						//							XXX  - This will break if two tokens from the same place is consumed
 						toReturn.addConsumedToken(p, tokenToRemove);
 
-						tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
+						tokensConsumedByTransportArcs.put(((TransportArcComponent) a).getGroupNr(), tokenToRemove);
 
 
 
@@ -1630,12 +1630,12 @@ implements Cloneable {
 
 
 				for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
-					if (a instanceof TransportArc){
+					if (a instanceof TransportArcComponent){
 						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
 						int newNumberOfTokens = p.getTokens().size()+1;
 						p.setCurrentMarking(newNumberOfTokens);
 						ArrayList<BigDecimal> markingToBeSet = p.getTokens();
-						BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
+						BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArcComponent) a).getGroupNr() );
 						markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
 
 						p.setAgeOfTokens(markingToBeSet);
@@ -1684,12 +1684,12 @@ implements Cloneable {
 					for ( Arc a : (LinkedList<Arc>)transition.getPreset() ){
 						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
 
-						if (a instanceof TransportArc){
+						if (a instanceof TransportArcComponent){
 							BigDecimal tokenToRemove = consumedTokens.get(p).get(0);
 
 							//XXX  - This will break if two tokens from the same place is consumed
 
-							tokensConsumedByTransportArcs.put(((TransportArc) a).getGroupNr(), tokenToRemove);
+							tokensConsumedByTransportArcs.put(((TransportArcComponent) a).getGroupNr(), tokenToRemove);
 
 							p.removeTokenofAge(tokenToRemove);
 
@@ -1708,12 +1708,12 @@ implements Cloneable {
 
 
 					for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
-						if (a instanceof TransportArc){
+						if (a instanceof TransportArcComponent){
 							TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
 							int newNumberOfTokens = p.getTokens().size()+1;
 							p.setCurrentMarking(newNumberOfTokens);
 							ArrayList<BigDecimal> markingToBeSet = p.getTokens();
-							BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArc) a).getGroupNr() );
+							BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArcComponent) a).getGroupNr() );
 							markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
 
 							p.setAgeOfTokens(markingToBeSet);
@@ -1904,10 +1904,10 @@ implements Cloneable {
 							if ( ((TimedInputArcComponent)a).satisfiesGuard(token) ){
 
 								//make sure no invariants are violated
-								if (a instanceof TransportArc){
+								if (a instanceof TransportArcComponent){
 									for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
-										if (postsetArc instanceof TransportArc){
-											if ( ((TransportArc) postsetArc).getGroupNr() == ((TransportArc)a).getGroupNr()){
+										if (postsetArc instanceof TransportArcComponent){
+											if ( ((TransportArcComponent) postsetArc).getGroupNr() == ((TransportArcComponent)a).getGroupNr()){
 												if ( ((TimedPlaceComponent)postsetArc.getTarget()).satisfiesInvariant(token) ){
 													ageIsSatisfied = true;
 													break;
@@ -2874,7 +2874,7 @@ implements Cloneable {
 	}
 
 
-	public HashMap<Transition, HashMap<TransportArc, TransportArc> > getTransportArcMap() {
+	public HashMap<Transition, HashMap<TransportArcComponent, TransportArcComponent> > getTransportArcMap() {
 		return transportArcMap;
 	}
 

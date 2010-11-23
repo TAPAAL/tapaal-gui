@@ -19,7 +19,7 @@ import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import dk.aau.cs.translations.ModelTranslator;
 
 public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, TimedArcPetriNet> {
@@ -43,8 +43,8 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 		
 		for ( Arc arc : appModel.getArcs() ){
-			if (arc instanceof TransportArc){
-				transformTransportArc((TransportArc)arc);
+			if (arc instanceof TransportArcComponent){
+				transformTransportArc((TransportArcComponent)arc);
 			}else if(arc instanceof pipe.dataLayer.TimedInhibitorArcComponent){
 					transformInhibitorArc((pipe.dataLayer.TimedInhibitorArcComponent)arc);
 			}else if (arc instanceof TimedInputArcComponent){
@@ -93,16 +93,16 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 	}
 	
-	protected void transformTransportArc(TransportArc arc) throws Exception {
-		TransportArc end=null;
+	protected void transformTransportArc(TransportArcComponent arc) throws Exception {
+		TransportArcComponent end=null;
 		
 		//We only handel arcs gowing from a place
 		if (arc.getSource() instanceof Place) {			
 			for (Arc tmpend : appModel.getArcs()){ // TODO: can we do this better, by not searching all arcs?
-				if (tmpend instanceof TransportArc){ // must be a transport arc
-					if (tmpend.getSource() == arc.getTarget() && arc.getGroupNr() == ((TransportArc)(tmpend)).getGroupNr()){
+				if (tmpend instanceof TransportArcComponent){ // must be a transport arc
+					if (tmpend.getSource() == arc.getTarget() && arc.getGroupNr() == ((TransportArcComponent)(tmpend)).getGroupNr()){
 						// The arc is connected and is the same
-						end=(TransportArc)tmpend;
+						end=(TransportArcComponent)tmpend;
 						break;
 					}	
 				}
