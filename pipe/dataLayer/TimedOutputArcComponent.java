@@ -148,7 +148,11 @@ extends Arc {
 		setWeightLabelPosition();
 	}
 
-
+	@Override
+	public void delete() {
+		if(outputArc != null) outputArc.delete();
+		super.delete();
+	}
 
 	@Override
 	public void paintComponent(Graphics g) {

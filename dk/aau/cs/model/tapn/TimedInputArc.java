@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import dk.aau.cs.util.Require;
 
-public class TimedInputArc {
+public class TimedInputArc extends TAPNElement {
 	private TimedPlace source;
 	private TimeInterval interval;
 	private TimedTransition destination;
@@ -43,5 +43,9 @@ public class TimedInputArc {
 
 	public boolean isEnabledBy(BigDecimal token) {
 		return interval.isIncluded(token);
+	}
+
+	public void delete() {
+		model().remove(this);		
 	}
 }

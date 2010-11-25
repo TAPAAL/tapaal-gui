@@ -145,7 +145,12 @@ public class TimedPlaceComponent extends Place {
 		copy.setOriginal(this);
 		return copy; 
 	}
-
+	
+	@Override
+	public void delete() {
+		if(place != null) place.delete();
+		super.delete();
+	}
 	public String getInvariantAsString(){
 
 		return place.invariant().toString();

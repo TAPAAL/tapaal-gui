@@ -1,8 +1,10 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 
 public class TimeInvariant {
@@ -34,6 +36,13 @@ public class TimeInvariant {
 		buffer.append(upper);
 		return buffer.toString();
 	};
+	
+	public boolean isSatisfied(BigDecimal age){
+		if(upper instanceof InfBound) return true;
+		int comparison = age.compareTo(new BigDecimal(upper.value()));
+		
+		return isUpperIncluded ? comparison <= 0 : comparison < 0;
+	}
 	
 	public static TimeInvariant parse(String invariant){
 		Pattern pattern = Pattern.compile("^(<|<=)\\s*(\\d+|inf)$");

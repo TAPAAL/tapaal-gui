@@ -2,7 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import dk.aau.cs.util.Require;
 
-public class TimedOutputArc {
+public class TimedOutputArc extends TAPNElement {
 	private TimedTransition source;
 	private TimedPlace destination;
 	
@@ -20,5 +20,10 @@ public class TimedOutputArc {
 
 	public TimedPlace destination() {
 		return destination;
+	}
+
+	@Override
+	public void delete() {
+		model().remove(this);
 	}
 }

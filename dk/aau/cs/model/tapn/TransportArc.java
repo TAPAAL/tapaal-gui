@@ -2,7 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import dk.aau.cs.util.Require;
 
-public class TransportArc {
+public class TransportArc extends TAPNElement {
 	private TimedPlace source;
 	private TimedTransition transition;
 	private TimedPlace destination;
@@ -41,5 +41,18 @@ public class TransportArc {
 		Require.that(interval != null, "A transport arc must have an associated interval");
 		
 		this.interval = interval;
+	}
+
+	public boolean isEnabled() {
+		Iterable<TimedToken> tokens = source.tokensSatisfyingInterval(interval);
+		for(TimedToken token : tokens){
+			if(destination.invariant().isSatisfied(token.age())) return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void delete() {
+		model().remove(this);
 	}
 }

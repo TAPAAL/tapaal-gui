@@ -84,7 +84,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	
 	@Override
 	public void delete() {
-		
+		if(underlyingTransportArc != null) underlyingTransportArc.delete();
 		
 		// kyrke - do ekstra suff when deleting a transport arc
 		

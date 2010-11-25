@@ -6,7 +6,7 @@ import java.util.List;
 import dk.aau.cs.util.Require;
 
 
-public class TimedPlace {
+public class TimedPlace extends TAPNElement {
 	private String name;
 	private TimeInvariant invariant;
 	private List<TimedOutputArc> preset;
@@ -72,6 +72,7 @@ public class TimedPlace {
 		Require.that(arc != null, "Cannot add null to postset");
 		postsetTransportArcs.add(arc);	
 	}
+	
 	public boolean hasTokenSatisfyingInterval(TimeInterval interval) {
 		List<TimedToken> tokens = currentMarking.getTokensFor(this);
 		
@@ -81,6 +82,16 @@ public class TimedPlace {
 		}
 		
 		return false;
+	}
+	
+	public Iterable<TimedToken> tokensSatisfyingInterval(TimeInterval interval) {
+		List<TimedToken> tokens = currentMarking.getTokensFor(this);
+		ArrayList<TimedToken> toReturn = new ArrayList<TimedToken>();
+		for(TimedToken t : tokens) {
+			if(interval.isIncluded(t.age())) toReturn.add(t);
+		}
+		
+		return toReturn;
 	}
 
 
@@ -120,5 +131,25 @@ public class TimedPlace {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public void removeFromPostset(TimedInputArc arc) {
+		postset.remove(arc);
+	}
+
+	public void removeFromPostset(TransportArc arc) {
+		postsetTransportArcs.remove(arc);		
+	}
+
+	public void removeFromPreset(TransportArc arc) {
+		presetTransportArcs.remove(arc);
+	}
+
+	public void removeFromPreset(TimedOutputArc arc) {
+		preset.remove(arc);
+	}
+
+	public void delete() {
+		model().remove(this);
 	}
 }

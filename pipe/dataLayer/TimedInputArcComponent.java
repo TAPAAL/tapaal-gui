@@ -49,6 +49,12 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 		updateWeightLabel();
 	}
 	
+	@Override
+	public void delete() {
+		if(inputArc != null) inputArc.delete();
+		super.delete();
+	}
+	
 	
 	public void SetTimedInputArc(TimedInputArc inputArc) {
 		this.inputArc = inputArc;

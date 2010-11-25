@@ -33,11 +33,17 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public boolean satisfiesGuard(BigDecimal token)
 	{
-		return !super.satisfiesGuard(token);
+		return inhibitorArc.isEnabledBy(token);
 	}
 	
 	public void setUnderlyingArc(TimedInhibitorArc arc){
 		this.inhibitorArc = arc;
+	}
+	
+	@Override
+	public void delete() {
+		if(inhibitorArc != null) inhibitorArc.delete();
+		super.delete();
 	}
 	
 	

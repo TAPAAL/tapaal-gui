@@ -33,6 +33,12 @@ public class TimedTransitionComponent extends Transition {
 		transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
 	}
 	
+	@Override
+	public void delete() {
+		if(transition != null) transition.delete();
+		super.delete();
+	}
+	
 
 	@Override
 	public void showEditor(){
