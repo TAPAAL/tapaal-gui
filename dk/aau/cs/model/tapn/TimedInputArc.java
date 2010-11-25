@@ -14,9 +14,7 @@ public class TimedInputArc {
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 						
 		this.source = source;
-		this.source.addToPostset(this);
 		this.destination = destination;
-		this.destination.addToPreset(this);
 		setTimeInterval(interval);
 	}
 	

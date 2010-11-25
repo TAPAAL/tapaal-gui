@@ -19,7 +19,7 @@ import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
 
-public class TimedInputArcComponent extends NormalArc{
+public class TimedInputArcComponent extends TimedOutputArcComponent{
 
 	/**
 	 * 
@@ -38,15 +38,14 @@ public class TimedInputArcComponent extends NormalArc{
 	}
 	
 	
-	public TimedInputArcComponent(NormalArc arc){
+	public TimedInputArcComponent(TimedOutputArcComponent arc){
 		super(arc);
 		init();
 	}
 
 	
-	public TimedInputArcComponent(NormalArc arc, String guard) {
+	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc);
-		timeInterval = guard;
 		updateWeightLabel();
 	}
 	
@@ -109,7 +108,7 @@ public class TimedInputArcComponent extends NormalArc{
 	
 	@Override
 	public TimedInputArcComponent copy(){
-		NormalArc copy = new NormalArc(this);
+		TimedOutputArcComponent copy = new TimedOutputArcComponent(this);
 		copy.setSource(this.getSource());
 		copy.setTarget(this.getTarget());
 		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.copy(), this.timeInterval);
@@ -118,7 +117,7 @@ public class TimedInputArcComponent extends NormalArc{
 	
 	@Override
 	public TimedInputArcComponent paste(double despX, double despY, boolean toAnotherView){
-		NormalArc copy = new NormalArc(this);
+		TimedOutputArcComponent copy = new TimedOutputArcComponent(this);
 		copy.setSource(this.getSource());
 		copy.setTarget(this.getTarget());
 		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), this.timeInterval);

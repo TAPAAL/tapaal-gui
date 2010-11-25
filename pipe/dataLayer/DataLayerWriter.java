@@ -443,7 +443,7 @@ public class DataLayerWriter {
 					arcElement.setAttribute("colorGuard", cia.getColorGuardStringWithoutSetNotation());
 				}
 			}else{
-				if (inputArc instanceof NormalArc ){
+				if (inputArc instanceof TimedOutputArcComponent ){
 
 					if (inputArc instanceof TimedInputArcComponent){
 						if (inputArc instanceof TransportArcComponent) {
@@ -484,12 +484,7 @@ public class DataLayerWriter {
 				} 
 				/*EOC*/           
 				// arcElement.setAttribute("inscriptionOffsetX", (inscriptionPositionXInput != null ? String.valueOf(inscriptionPositionXInput) : ""));
-				// arcElement.setAttribute("inscriptionOffsetY", (inscriptionPositionYInput != null ? String.valueOf(inscriptionPositionYInput) : ""));
-
-				if (inputArc instanceof NormalArc) {
-					boolean tagged = ((NormalArc)inputArc).isTagged();
-					arcElement.setAttribute("tagged", tagged ? "true" : "false");
-				}         
+				// arcElement.setAttribute("inscriptionOffsetY", (inscriptionPositionYInput != null ? String.valueOf(inscriptionPositionYInput) : ""));         
 			}
 		}
 		return arcElement;

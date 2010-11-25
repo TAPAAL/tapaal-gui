@@ -11,7 +11,7 @@ import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.GuiFrame;
@@ -239,19 +239,7 @@ public class UndoManager {
                }
             }
 
-         } else if (pnObject instanceof NormalArc) {
-            if (((NormalArc)pnObject).hasInverse()) {
-               if (((NormalArc)pnObject).hasInvisibleInverse()) {
-                  addEdit(((NormalArc)pnObject).split());
-                  NormalArc inverse = ((NormalArc)pnObject).getInverse();
-                  addEdit(((NormalArc)pnObject).clearInverse());
-                  addEdit(new DeletePetriNetObjectEdit(inverse, view, guiModel));
-                  inverse.delete();
-               } else {
-                  addEdit(((NormalArc)pnObject).clearInverse());
-               }
-            }            
-         }
+         } 
 
          if (!pnObject.isDeleted()){
             addEdit(new DeletePetriNetObjectEdit(pnObject, view, guiModel));

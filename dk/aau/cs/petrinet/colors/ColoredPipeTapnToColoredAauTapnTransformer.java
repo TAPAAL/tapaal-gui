@@ -1,7 +1,7 @@
 package dk.aau.cs.petrinet.colors;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
@@ -112,7 +112,7 @@ PipeTapnToAauTapnTransformer {
 	}
 	
 	@Override
-	protected void transformNormalArc(NormalArc arc) throws Exception {
+	protected void transformNormalArc(TimedOutputArcComponent arc) throws Exception {
 		pipe.dataLayer.colors.ColoredOutputArc coa = (pipe.dataLayer.colors.ColoredOutputArc)arc;
 		
 		ColoredOutputArc newArc = new ColoredOutputArc(

@@ -15,7 +15,7 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.InhibitorArc;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArcComponent;
@@ -68,129 +68,25 @@ extends PetriNetObjectHandler {
 
 			popup.insert(new JPopupMenu.Separator(), popupIndex++);         
 			/*CB Joakim Byg - timed arcs should not be handled here*/         
-		} else if (myObject instanceof NormalArc && !(myObject instanceof TimedInputArcComponent) && !(myObject instanceof TransportArcComponent)) {
+		} else if (myObject instanceof TimedOutputArcComponent && !(myObject instanceof TimedInputArcComponent) && !(myObject instanceof TransportArcComponent)) {
 			/*EOC*/
-			if (((NormalArc)myObject).isJoined()){
-				NormalArc PTArc;
-				NormalArc TPArc;
-
-				if (((NormalArc)myObject).getSource() instanceof Place){
-					PTArc = (NormalArc)myObject;
-					TPArc = ((NormalArc)myObject).getInverse();
-				} else {
-					PTArc = ((NormalArc)myObject).getInverse();
-					TPArc = (NormalArc)myObject;               
-				}
-
-				//            if (!PTArc.isTagged()) { //pendentnou
-					menuItem = new JMenuItem(new EditWeightAction(contentPane, PTArc));
-					menuItem.setText("Edit Weight (PT Arc)");
-					popup.insert(menuItem, popupIndex++);
-					//               menuItem = new JMenuItem(
-					//                       new EditTaggedAction(contentPane, PTArc));
-					//               menuItem.setText("Make Tagged (PT Arc)");               
-					//               popup.insert(menuItem, popupIndex++);
-					//            } else {
-					//               menuItem = new JMenuItem(
-					//                       new EditTaggedAction(contentPane, PTArc));
-					//               menuItem.setText("Make Non-Tagged (PT Arc)");               
-					//               popup.insert(menuItem, popupIndex++);               
-					//            }
-					popup.insert(new JPopupMenu.Separator(), popupIndex++);
-
-					//            if (!TPArc.isTagged()) {
-					menuItem = new JMenuItem(new EditWeightAction(contentPane, TPArc));
-					menuItem.setText("Edit Weight (TP Arc)");
-					popup.insert(menuItem, popupIndex++);  
-					//               menuItem = new JMenuItem(
-					//                       new EditTaggedAction(contentPane, TPArc));
-					//               menuItem.setText("Make Tagged (TP Arc)");               
-					//               popup.insert(menuItem, popupIndex++);               
-					//            } else {
-					//               menuItem = new JMenuItem(
-					//                       new EditTaggedAction(contentPane, TPArc));
-					//               menuItem.setText("Make Non-Tagged (TP Arc)");               
-					//               popup.insert(menuItem, popupIndex++);  
-					//            }
-
-					popup.insert(new JPopupMenu.Separator(), popupIndex++);
-
-					menuItem = new JMenuItem(new InsertPointAction((Arc)myObject, 
-							e.getPoint()));            
-					menuItem.setText("Insert Point");
-					/*                        
-            menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
-                                                         e.getPoint()));
-            menuItem.setText("Split Arc Segment");
-					 */
-					popup.insert(menuItem, popupIndex++);
-
-					menuItem = new JMenuItem(
-							new SplitArcsAction((NormalArc)myObject, true));
-					menuItem.setText("Split Arcs (PT / TP)");
-					popup.insert(menuItem, popupIndex++);            
-
-					popup.insert(new JPopupMenu.Separator(), popupIndex++);   
-
-					menuItem = new JMenuItem(new DeleteInverseArcAction(PTArc));
-					menuItem.setText("Delete (PT Arc)");
-					popup.insert(menuItem, popupIndex++);  
-
-					menuItem = new JMenuItem(new DeleteInverseArcAction(TPArc));
-					menuItem.setText("Delete (TP Arc)");
-					popup.insert(menuItem, popupIndex++);
-					/*
-            menuItem = new JMenuItem(new DeleteBothAction((NormalArc)myObject));
-            menuItem.setText("Delete Both");
-            popup.insert(menuItem, 8);                                    
-					 */
-			} else {
-				//            if(!((NormalArc)myObject).isTagged()) {
-				//menuItem = new JMenuItem(new EditWeightAction(contentPane, 
-				//		(Arc)myObject));
-				//menuItem.setText("Edit Weight");
-				//popup.insert(menuItem, popupIndex++);
-				//            }
-
-				//            menuItem = new JMenuItem(
-				//                    new EditTaggedAction(contentPane,(NormalArc)myObject));
-				//            if (((NormalArc)myObject).isTagged()) {
-				//               menuItem.setText("Make Non-Tagged");
-				//            } else { 
-				//               menuItem.setText("Make Tagged");
-				//            }
-				//            popup.insert(menuItem, popupIndex++);            
-
-				//menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
-				//                                             e.getPoint()));
-				//menuItem.setText("Split Arc Segment");
-
-				if(CreateGui.getModel().isUsingColors() && myObject instanceof ColoredOutputArc){
-					menuItem = new JMenuItem();            
-					menuItem.setText("Properties");
-					menuItem.addActionListener(new ActionListener(){
-						public void actionPerformed(ActionEvent e) {
-							showOutputValueEditor((ColoredOutputArc)myObject);
-						}
-					}); 
-					popup.insert(menuItem, popupIndex++);
-				}
-				
-				menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
-						e.getPoint()));            
-				menuItem.setText("Insert Point");
+			if(CreateGui.getModel().isUsingColors() && myObject instanceof ColoredOutputArc){
+				menuItem = new JMenuItem();            
+				menuItem.setText("Properties");
+				menuItem.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e) {
+						showOutputValueEditor((ColoredOutputArc)myObject);
+					}
+				}); 
 				popup.insert(menuItem, popupIndex++);
-
-				
-				if (((NormalArc)myObject).hasInverse()){
-					menuItem = new JMenuItem(
-							new SplitArcsAction((NormalArc)myObject, false));
-
-					menuItem.setText("Join Arcs (PT / TP)");
-					popup.insert(menuItem, popupIndex++);            
-				}
-				popup.insert(new JPopupMenu.Separator(), popupIndex);
 			}
+
+			menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
+					e.getPoint()));            
+			menuItem.setText("Insert Point");
+			popup.insert(menuItem, popupIndex++);
+
+			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}
 		return popup;
 	}
@@ -276,7 +172,7 @@ extends PetriNetObjectHandler {
 		}
 
 		Arc arc = ((Arc)myObject);
-		if (arc instanceof NormalArc){
+		if (arc instanceof TimedOutputArcComponent){
 
 			//         if (e.isControlDown()) {
 			//            if (arc.getWeight() == 1) {
@@ -321,67 +217,5 @@ extends PetriNetObjectHandler {
          arc.repaint();
       }*/
 	}
-
-
-
-	class SplitArcsAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 6647793002696424279L;
-		NormalArc arc;
-		boolean joined;
-
-
-		public SplitArcsAction(NormalArc _arc, boolean _joined){
-			arc = _arc;
-			joined = _joined;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			if (joined) {
-				CreateGui.getView().getUndoManager().addNewEdit(
-						arc.split());
-			} else {         
-				CreateGui.getView().getUndoManager().addNewEdit(
-						arc.join());
-			}
-		}
-
-	}
-
-
-
-	class DeleteInverseArcAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -7956567157135376160L;
-		NormalArc arc, inverse;
-		boolean switchArcs;
-
-
-		public DeleteInverseArcAction(NormalArc _arc){
-			arc = _arc;
-			inverse = arc.getInverse();
-			switchArcs = arc.inView();
-		}
-
-
-		public void actionPerformed(ActionEvent e) {
-			UndoManager undoManager = CreateGui.getView().getUndoManager();
-
-			if (switchArcs) {
-				undoManager.addNewEdit(arc.split());
-			} else {
-				undoManager.addNewEdit(inverse.split());
-			}
-			undoManager.deleteSelection(arc);
-
-			arc.delete();   
-		}
-	}   
 
 }

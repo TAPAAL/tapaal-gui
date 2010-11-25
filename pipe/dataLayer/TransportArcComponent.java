@@ -18,7 +18,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	private TransportArc underlyingTransportArc;
 	
 	public TransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) {
-		super(new NormalArc(newSource));
+		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
 		setHead();
 		setGroup(groupNr);

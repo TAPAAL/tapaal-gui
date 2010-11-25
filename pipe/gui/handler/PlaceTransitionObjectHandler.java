@@ -5,11 +5,17 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
 import javax.swing.JOptionPane;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.util.RequireException;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInhibitorArcComponent;
@@ -28,12 +34,6 @@ import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.util.RequireException;
-
 /**
  * Class used to implement methods corresponding to mouse events on places.
  *
@@ -54,7 +54,7 @@ extends PetriNetObjectHandler {
 		this.guiModel = guiModel;
 		this.model = model;
 	}
-	
+
 	// constructor passing in all required objects
 	public PlaceTransitionObjectHandler(Container contentpane,
 			PlaceTransitionObject obj) {
@@ -116,7 +116,7 @@ extends PetriNetObjectHandler {
 						Arc arc = useColors ? new ColoredInputArc(currentObject) : new TimedInputArcComponent(currentObject);
 						createArc(arc, currentObject);  
 					}else {
-						Arc arc = useColors ? new ColoredOutputArc(currentObject) : new NormalArc(currentObject);
+						Arc arc = useColors ? new ColoredOutputArc(currentObject) : new TimedOutputArcComponent(currentObject);
 						createArc(arc, currentObject);
 					}
 				}else {
@@ -155,7 +155,7 @@ extends PetriNetObjectHandler {
 					}
 				} 
 				//        		 else if (CreateGui.getApp().getMode() == Pipe.TAPNARC){
-					//        			 // XXX - kyrke - create only a TimedArc if source is not at TimedPlace
+				//        			 // XXX - kyrke - create only a TimedArc if source is not at TimedPlace
 				//        			 NormalArc tmparc =  new NormalArc(currentObject);
 				//
 				//        			 if (tmparc.getSource() instanceof TimedPlace){
@@ -270,10 +270,10 @@ extends PetriNetObjectHandler {
 					//                  {
 					try{
 						dk.aau.cs.model.tapn.TimedInhibitorArc tia = new TimedInhibitorArc(
-							((TimedPlaceComponent)createTAPNInhibitorArc.getSource()).underlyingPlace(),
-							((TimedTransitionComponent)createTAPNInhibitorArc.getTarget()).underlyingTransition(),
-							TimeInterval.ZERO_INF
-							);
+								((TimedPlaceComponent)createTAPNInhibitorArc.getSource()).underlyingPlace(),
+								((TimedTransitionComponent)createTAPNInhibitorArc.getTarget()).underlyingTransition(),
+								TimeInterval.ZERO_INF
+						);
 						model.add(tia);
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
 					}catch(RequireException ex){
@@ -307,7 +307,7 @@ extends PetriNetObjectHandler {
 							new AddPetriNetObjectEdit(createTAPNInhibitorArc,
 									view, guiModel));
 					//                     if(createTAPNInhibitorArc.getTarget() == null)
-						//                    	 JOptionPane.showMessageDialog(CreateGui.getApp(),
+					//                    	 JOptionPane.showMessageDialog(CreateGui.getApp(),
 					//									 "Whooops, target was not set on last arc, please redraw. DEBUG",
 					//									 "Error",
 					//									 JOptionPane.ERROR_MESSAGE);
@@ -343,7 +343,7 @@ extends PetriNetObjectHandler {
 						} else if (someArc.getTarget() == currentObject &&
 								someArc.getSource() == createInhibitorArc.getSource()) {
 							isNewArc = false;
-							if (someArc instanceof NormalArc){
+							if (someArc instanceof TimedOutputArcComponent){
 								// user has drawn an inhibitor arc where there is 
 								// a normal arc already - nothing to do
 							} else if (someArc instanceof InhibitorArc) {
@@ -403,7 +403,7 @@ extends PetriNetObjectHandler {
 								someArc.getTarget() == currentObject) {
 							isNewArc = false;
 
-							if (someArc instanceof NormalArc) {
+							if (someArc instanceof TimedOutputArcComponent) {
 								// user has drawn a normal arc where there is 
 								// a normal arc already - we increment arc's weight
 
@@ -430,49 +430,13 @@ extends PetriNetObjectHandler {
 						}
 					}
 
-					NormalArc inverse = null;
-					if (isNewArc == true) {
-						createArc.setTarget(currentObject);
-						//check if there is an inverse arc
-						Iterator<Arc> arcsFromTarget =
-							createArc.getTarget().getConnectFromIterator();
-						while (arcsFromTarget.hasNext()) {
-							Arc anArc = arcsFromTarget.next();
-							if (anArc.getTarget() == createArc.getSource()) {
-								if (anArc instanceof NormalArc) {
-									inverse = (NormalArc)anArc;
-									// inverse arc found
-									if (inverse.hasInverse()){
-										// if inverse arc has an inverse arc, it means
-										System.out.println(error_message_two_arcs);
-										JOptionPane.showMessageDialog(CreateGui.getApp(),
-												error_message_two_arcs,
-												"Error",
-												JOptionPane.ERROR_MESSAGE);
-										isNewArc = false;
-										int weightInverse =
-											inverse.getInverse().getWeight();
-										undoManager.addNewEdit(
-												inverse.getInverse().setWeight(
-														++weightInverse));
-										createArc.delete();
-										inverse.getTransition().removeArcCompareObject(
-												createArc);
-										inverse.getTransition().updateConnected();
-									}
-									break;
-								}
-							}
-						}
-					}
-
 					if (isNewArc == true) {
 						currentObject.addConnectTo(createArc);
 
 						// Evil hack to prevent the arc being added to GuiView twice
 						contentPane.remove(createArc);
 
-						guiModel.addArc((NormalArc)createArc);
+						guiModel.addArc((TimedOutputArcComponent)createArc);
 						view.addNewPetriNetObject(createArc);
 						if (!fastMode) {
 							// we are not in fast mode so we have to set a new edit
@@ -481,11 +445,6 @@ extends PetriNetObjectHandler {
 						}
 						undoManager.addEdit(
 								new AddPetriNetObjectEdit(createArc, view, guiModel));
-						if (inverse != null) {
-							undoManager.addEdit(
-									inverse.setInverse((NormalArc)createArc,
-											Pipe.JOIN_ARCS));
-						}
 					}
 
 					// arc is drawn, remove handler:
@@ -582,7 +541,7 @@ extends PetriNetObjectHandler {
 											"Error",
 											JOptionPane.ERROR_MESSAGE);
 
-								} else if (someArc instanceof NormalArc) {
+								} else if (someArc instanceof TimedOutputArcComponent) {
 									// user has drawn a transport arc where there is 
 									// a normal arc already - we increment arc's weight
 									System.out.println(error_message_two_arcs);
@@ -620,7 +579,7 @@ extends PetriNetObjectHandler {
 						// Evil hack to prevent the arc being added to GuiView twice
 						contentPane.remove(transportArcToCreate);
 
-						guiModel.addArc((NormalArc)transportArcToCreate);
+						guiModel.addArc((TimedOutputArcComponent)transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
 						undoManager.newEdit();
 
@@ -721,6 +680,7 @@ extends PetriNetObjectHandler {
 								view.transportArcPart1.updateWeightLabel();
 								((TransportArcComponent)transportArcToCreate).updateWeightLabel();
 						}catch(RequireException ex){
+
 							transportArcToCreate.delete();
 							view.transportArcPart1.delete();
 							JOptionPane.showMessageDialog(CreateGui.getApp(), 
@@ -736,7 +696,7 @@ extends PetriNetObjectHandler {
 						// Evil hack to prevent the arc being added to GuiView twice
 						contentPane.remove(transportArcToCreate);
 
-						guiModel.addArc((NormalArc)transportArcToCreate);
+						guiModel.addArc((TimedOutputArcComponent)transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
 						undoManager.newEdit();
 
@@ -781,75 +741,40 @@ extends PetriNetObjectHandler {
 
 					//We create NormalArcs when source of arc is Transition( since there are no intervals on output arcs.) ...except if the arc is a TransportArc
 					if (!(timedArcToCreate instanceof TimedInputArcComponent)){
-						boolean toDrawNewArc = true;
-						Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
-						Arc someArc = null;
 
-						while ( arcsFromTranasition.hasNext() ){        					 
-							someArc = arcsFromTranasition.next();
-							if (someArc == timedArcToCreate){
-								break;
-								//continue;
-							}
-							if( someArc.getSource() == timedArcToCreate.getSource()
-									&& someArc.getTarget() == currentObject) {
-								toDrawNewArc = false;
-
-								if (someArc instanceof TimedInhibitorArcComponent) {
-									//mikaelhm - This can never be the case, since the user is trying to draw a normal arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
-								} else if (someArc instanceof TransportArcComponent) {
-									// user has drawn a normal arc where there is 
-									// a transport arc already - We do not allow that.
-									System.out.println(error_message_two_arcs);
-									JOptionPane.showMessageDialog(CreateGui.getApp(),
-											error_message_two_arcs,
-											"Error",
-											JOptionPane.ERROR_MESSAGE);
-
-								} else if (someArc instanceof NormalArc) {
-									// user has drawn a normal arc where there is 
-									// a normal arc already - we increment arc's weight
-									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
-										int weightToInsert = someArc.getWeight()+1;
-										someArc.setWeight(weightToInsert);
-									}
-									else{
-										System.out.println(error_message_two_arcs);
-										JOptionPane.showMessageDialog(CreateGui.getApp(),
-												error_message_two_arcs,
-												"Error",
-												JOptionPane.ERROR_MESSAGE);
-									}
-
-								} else{
-									//This should not happen - since all types of arcs are listed above.
-								}    							 
-								break;
-							}
-
-						}
-						if( ! toDrawNewArc) {
+						// Set underlying TimedInputArc
+						TimedOutputArcComponent outputArc = (TimedOutputArcComponent)timedArcToCreate;
+						try{
+							dk.aau.cs.model.tapn.TimedOutputArc timedOutputArc = new TimedOutputArc(
+									((TimedTransitionComponent)outputArc.getSource()).underlyingTransition(),
+									((TimedPlaceComponent)outputArc.getTarget()).underlyingPlace()
+							);
+							model.add(timedOutputArc);
+							outputArc.setUnderlyingArc(timedOutputArc);
+							outputArc.updateWeightLabel();
+						}catch(RequireException ex){
 							timedArcToCreate.delete();
-							someArc.getTransition().removeArcCompareObject(timedArcToCreate);
-							someArc.getTransition().updateConnected();
-						}else {
-
-
-							currentObject.addConnectTo(timedArcToCreate);
-
-							// Evil hack to prevent the arc being added to GuiView twice
-							contentPane.remove(timedArcToCreate);
-
-							guiModel.addArc((NormalArc)timedArcToCreate);
-							view.addNewPetriNetObject(timedArcToCreate);
-							if (!fastMode) {
-								// we are not in fast mode so we have to set a new edit
-								// in undoManager for adding the new arc
-								undoManager.newEdit(); // new "transaction""
-							}
-							undoManager.addEdit(
-									new AddPetriNetObjectEdit(timedArcToCreate, view, guiModel));
+							JOptionPane.showMessageDialog(CreateGui.getApp(), 
+									"There was an error drawing the arc. Possible problems:\n" +
+									" - There is already an arc between the selected place and transition",
+									"Error",
+									JOptionPane.ERROR_MESSAGE);
+							break;
 						}
+						currentObject.addConnectTo(timedArcToCreate);
+
+						// Evil hack to prevent the arc being added to GuiView twice
+						contentPane.remove(timedArcToCreate);
+
+						guiModel.addArc((TimedOutputArcComponent)timedArcToCreate);
+						view.addNewPetriNetObject(timedArcToCreate);
+						if (!fastMode) {
+							// we are not in fast mode so we have to set a new edit
+							// in undoManager for adding the new arc
+							undoManager.newEdit(); // new "transaction""
+						}
+						undoManager.addEdit(
+								new AddPetriNetObjectEdit(timedArcToCreate, view, guiModel));
 
 						//else source is a place (not transition)
 					} else{
@@ -866,73 +791,15 @@ extends PetriNetObjectHandler {
 							break;
 						}
 
-//						boolean existsArc = false;
-//						Iterator<Arc> arcsFromTranasition = timedArcToCreate.getSource().getConnectFromIterator();
-//						Arc someArc = null;
-//
-//						while ( arcsFromTranasition.hasNext() ){        					 
-//							someArc = arcsFromTranasition.next();
-//							if (someArc == timedArcToCreate){
-//								//break;
-//								continue;
-//							}
-//							if( someArc.getSource() == timedArcToCreate.getSource()
-//									&& someArc.getTarget() == currentObject) {
-//								existsArc = true;
-//
-//								if (someArc instanceof TimedInhibitorArcComponent) {
-//									//user has drawn a timed arc where there is 
-//									//an inhibitor arc already - this does not make sense
-//									System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
-//									JOptionPane.showMessageDialog(CreateGui.getApp(),
-//											"It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
-//											"Error",
-//											JOptionPane.ERROR_MESSAGE);
-//								} else if (someArc instanceof TransportArc) {
-//									// user has drawn a timed arc where there is 
-//									// a transport arc already - We do not allow that.
-//									System.out.println(error_message_two_arcs);
-//									JOptionPane.showMessageDialog(CreateGui.getApp(),
-//											error_message_two_arcs,
-//											"Error",
-//											JOptionPane.ERROR_MESSAGE);
-//
-//								} else if (someArc instanceof NormalArc) {
-//									// user has drawn a normal arc where there is 
-//									// a normal arc already - we increment arc's weight
-//									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
-//										int weightToInsert = someArc.getWeight()+1;
-//										someArc.setWeight(weightToInsert);
-//									}
-//									else{
-//										System.out.println(error_message_two_arcs);
-//										JOptionPane.showMessageDialog(CreateGui.getApp(),
-//												error_message_two_arcs,
-//												"Error",
-//												JOptionPane.ERROR_MESSAGE);
-//									}
-//
-//								} else{
-//									//This should not happen - since all types of arcs are listed above.
-//								}
-//								timedArcToCreate.delete();
-//								break;
-//							}
-//
-//						}
-//
-//						if (existsArc){    						 
-//							break;
-//						}
 
 						// Set underlying TimedInputArc
 						TimedInputArcComponent timedArc = (TimedInputArcComponent)timedArcToCreate;
 						try{
 							dk.aau.cs.model.tapn.TimedInputArc tia = new TimedInputArc(
-								((TimedPlaceComponent)timedArc.getSource()).underlyingPlace(),
-								((TimedTransitionComponent)timedArc.getTarget()).underlyingTransition(),
-								TimeInterval.ZERO_INF
-								);
+									((TimedPlaceComponent)timedArc.getSource()).underlyingPlace(),
+									((TimedTransitionComponent)timedArc.getTarget()).underlyingTransition(),
+									TimeInterval.ZERO_INF
+							);
 							model.add(tia);
 							timedArc.setUnderlyingArc(tia);
 							timedArc.updateWeightLabel();
@@ -945,13 +812,13 @@ extends PetriNetObjectHandler {
 									JOptionPane.ERROR_MESSAGE);
 							break;
 						}
-						
+
 						currentObject.addConnectTo(timedArcToCreate);
 						timedArcToCreate.getTransition().updateConnected();
 
 						// Evil hack to prevent the arc being added to GuiView twice        				 
 						contentPane.remove(timedArcToCreate);
-						guiModel.addArc((NormalArc)timedArcToCreate);
+						guiModel.addArc((TimedOutputArcComponent)timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 						if (!fastMode) {
 							// we are not in fast mode so we have to set a new edit

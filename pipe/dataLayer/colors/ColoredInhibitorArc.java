@@ -1,7 +1,7 @@
 package pipe.dataLayer.colors;
 
 import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
@@ -17,12 +17,12 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 	private ColorSet colorGuard;
 	private ColoredInterval timeGuard;
 
-	public ColoredInhibitorArc(NormalArc arc)
+	public ColoredInhibitorArc(TimedOutputArcComponent arc)
 	{
 		super(arc);
 		initialize();
 	}
-	public ColoredInhibitorArc(NormalArc arc, String guard)
+	public ColoredInhibitorArc(TimedOutputArcComponent arc, String guard)
 	{
 		super(arc, guard);
 		initialize();

@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
@@ -49,8 +49,8 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 					transformInhibitorArc((pipe.dataLayer.TimedInhibitorArcComponent)arc);
 			}else if (arc instanceof TimedInputArcComponent){
 				transformTimedArc((TimedInputArcComponent)arc);
-			}else if (arc instanceof NormalArc){
-				transformNormalArc((NormalArc)arc);
+			}else if (arc instanceof TimedOutputArcComponent){
+				transformNormalArc((TimedOutputArcComponent)arc);
 			}
 		}
 		
@@ -63,7 +63,7 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		aAUPetriNet = new TAPN();
 	}
 
-	protected void transformNormalArc(NormalArc arc) throws Exception {
+	protected void transformNormalArc(TimedOutputArcComponent arc) throws Exception {
 		dk.aau.cs.petrinet.Arc aAUArc;
 		aAUArc = new dk.aau.cs.petrinet.Arc();
 		if (aAUArc != null){

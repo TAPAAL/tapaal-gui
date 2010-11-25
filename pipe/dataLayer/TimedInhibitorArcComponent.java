@@ -16,12 +16,12 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
 	private TimedInhibitorArc inhibitorArc;
 
-	public TimedInhibitorArcComponent(NormalArc arc)
+	public TimedInhibitorArcComponent(TimedOutputArcComponent arc)
 	{
 		super(arc);
 	}
 	
-	public TimedInhibitorArcComponent(NormalArc arc, String guard)
+	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard)
 	{
 		super(arc,guard);
 	}

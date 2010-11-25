@@ -1,7 +1,7 @@
 package pipe.dataLayer.colors;
 
 import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.gui.undo.ColoredInputArcColorGuardEdit;
@@ -22,13 +22,13 @@ public class ColoredInputArc extends TimedInputArcComponent {
 		initialize();
 	}
 
-	public ColoredInputArc(NormalArc arc) {
+	public ColoredInputArc(TimedOutputArcComponent arc) {
 		super(arc);
 		
 		initialize();
 	}
 
-	public ColoredInputArc(NormalArc arc, String guard) {
+	public ColoredInputArc(TimedOutputArcComponent arc, String guard) {
 		super(arc,guard);
 		
 		initialize();

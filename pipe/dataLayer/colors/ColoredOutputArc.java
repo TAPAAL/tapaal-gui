@@ -1,11 +1,11 @@
 package pipe.dataLayer.colors;
 
 import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.NormalArc;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.undo.ColoredOutputArcOutputValueEdit;
 
-public class ColoredOutputArc extends NormalArc {
+public class ColoredOutputArc extends TimedOutputArcComponent {
 	private IntOrConstant outputValue = new IntOrConstant();
 	private boolean displayValues = false;
 	/**
@@ -31,7 +31,7 @@ public class ColoredOutputArc extends NormalArc {
 	}
 
 
-	public ColoredOutputArc(NormalArc arc) {
+	public ColoredOutputArc(TimedOutputArcComponent arc) {
 		super(arc);
 		updateWeightLabel();
 	}

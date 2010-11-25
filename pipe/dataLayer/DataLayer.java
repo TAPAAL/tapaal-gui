@@ -139,7 +139,7 @@ implements Cloneable {
 	static boolean currentMarkingVectorChanged = true;
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
-	private Hashtable<PlaceTransitionObject, ArrayList<NormalArc>> arcsMap = null;
+	private Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>> arcsMap = null;
 
 	/** Hashtable which maps PlaceTransitionObjects to their list of connected arcs */
 	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
@@ -201,7 +201,7 @@ implements Cloneable {
 
 
 		// may as well do the hashtable here as well
-		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<NormalArc>>();
+		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>>();
 		inhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>>();
 		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>>();
 	}
@@ -354,7 +354,7 @@ implements Cloneable {
 	 * All observers are notified of this change (Model-View Architecture)
 	 * @param arcInput Arc Object to add
 	 */
-	public void addArc(NormalArc arcInput) {
+	public void addArc(TimedOutputArcComponent arcInput) {
 		boolean unique = true;
 
 		//Check if the arcs have a valid source and target
@@ -561,11 +561,11 @@ implements Cloneable {
 	/** Update the arcsMap hashtable to reflect the new arc
 	 * @param arcInput New Arc
 	 * */
-	private void addArcToArcsMap(NormalArc arcInput) {
+	private void addArcToArcsMap(TimedOutputArcComponent arcInput) {
 		// now we want to add the arc to the list of arcs for it's source and target
 		PlaceTransitionObject source = arcInput.getSource();
 		PlaceTransitionObject target = arcInput.getTarget();
-		ArrayList<NormalArc> newList = null;
+		ArrayList<TimedOutputArcComponent> newList = null;
 
 		if (source != null) {
 			//			Pete: Place/Transitions now always moveable
@@ -575,7 +575,7 @@ implements Cloneable {
 				arcsMap.get(source).add(arcInput);
 			} else {
 				//				System.out.println("creating new arc list");
-				newList = new ArrayList<NormalArc>();
+				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(source,newList);
 			}
@@ -589,7 +589,7 @@ implements Cloneable {
 				arcsMap.get(target).add(arcInput);
 			} else {
 				//				System.out.println("creating new arc list2");
-				newList = new ArrayList<NormalArc>();
+				newList = new ArrayList<TimedOutputArcComponent>();
 				newList.add(arcInput);
 				arcsMap.put(target,newList);
 			}
@@ -672,9 +672,9 @@ implements Cloneable {
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
 		if (setPetriNetObjectArrayList(pnObject)) {
-			if (pnObject instanceof NormalArc) {
-				addArcToArcsMap((NormalArc)pnObject);
-				addArc((NormalArc)pnObject);
+			if (pnObject instanceof TimedOutputArcComponent) {
+				addArcToArcsMap((TimedOutputArcComponent)pnObject);
+				addArc((TimedOutputArcComponent)pnObject);
 			} else if (pnObject instanceof InhibitorArc) {
 				addInhibitorArcToInhibitorsMap((InhibitorArc)pnObject);
 				addArc((InhibitorArc)pnObject);
@@ -767,13 +767,13 @@ implements Cloneable {
 						}
 						tapnInhibitorsMap.remove(pnObject);
 					}
-				} else if (pnObject instanceof NormalArc) {
+				} else if (pnObject instanceof TimedOutputArcComponent) {
 
 					// get source and target of the arc
 					PlaceTransitionObject attached = ((Arc)pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList<NormalArc> a = arcsMap.get(attached);
+						ArrayList<TimedOutputArcComponent> a = arcsMap.get(attached);
 						if (a!=null) {
 							a.remove(pnObject);
 						}
@@ -912,7 +912,7 @@ implements Cloneable {
 			changeArrayList = arcsArray;
 			return true;
 		}	
-		else if (pnObject instanceof NormalArc) {
+		else if (pnObject instanceof TimedOutputArcComponent) {
 			changeArrayList = arcsArray;
 			return true;
 		} else if (pnObject instanceof InhibitorArc) {
@@ -1282,14 +1282,14 @@ implements Cloneable {
 					/*EOC*/                                    
 					idInput);
 		} else if (type.equals("tapnInhibitor")){
-			tempArc = new TimedInhibitorArcComponent(new TimedInputArcComponent(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
+			tempArc = new TimedInhibitorArcComponent(new TimedInputArcComponent(new TimedOutputArcComponent(_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput, taggedArc)), (inscriptionTempStorage!=null ? inscriptionTempStorage : ""));
 		} else {
 
 
 
 			//XXX - cant check for if arc is timed, check pn-type instead
 			if (type.equals("timed")){
-				tempArc = new TimedInputArcComponent(new NormalArc (_startx, _starty,
+				tempArc = new TimedInputArcComponent(new TimedOutputArcComponent (_startx, _starty,
 						_endx, _endy,
 						sourceIn,
 						targetIn,
@@ -1305,7 +1305,7 @@ implements Cloneable {
 				if ( sourceIn instanceof Place ) {
 					isInPreSet = true;
 				}
-				tempArc = new TransportArcComponent( new TimedInputArcComponent( new NormalArc(_startx, _starty,
+				tempArc = new TransportArcComponent( new TimedInputArcComponent( new TimedOutputArcComponent(_startx, _starty,
 						_endx, _endy,
 						sourceIn,
 						targetIn,
@@ -1313,7 +1313,7 @@ implements Cloneable {
 						idInput,
 						taggedArc), inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet );
 			}else {
-				tempArc = new NormalArc(	_startx, _starty,
+				tempArc = new TimedOutputArcComponent(	_startx, _starty,
 						_endx, _endy,
 						sourceIn,
 						targetIn,
@@ -2367,8 +2367,7 @@ implements Cloneable {
 				} else if (newArc instanceof TimedInhibitorArcComponent) {
 					addArc((TimedInhibitorArcComponent) newArc);
 				} else {
-					addArc((NormalArc) newArc);
-					checkForInverseArc((NormalArc) newArc);
+					addArc((TimedOutputArcComponent) newArc);
 				}                  
 			} else if( "queries".equals(element.getNodeName()) ){
 				TAPNQuery query = createQuery(element);
@@ -2441,7 +2440,7 @@ implements Cloneable {
 		Arc arc = null;
 
 		if(type.equals("ColoredInputArc")){
-			ColoredInputArc cia = new ColoredInputArc(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc));
+			ColoredInputArc cia = new ColoredInputArc(new TimedOutputArcComponent(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc));
 			ColoredInterval timeGuard = new ColoredInterval(inputArcElement.getAttribute("timeGuard"));
 			cia.setTimeGuard(timeGuard);
 
@@ -2455,7 +2454,7 @@ implements Cloneable {
 
 			arc = coa;
 		}else if(type.equals("ColoredInhibitorArc")){
-			ColoredInhibitorArc cia = new ColoredInhibitorArc(new NormalArc(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc));
+			ColoredInhibitorArc cia = new ColoredInhibitorArc(new TimedOutputArcComponent(_startx, _starty, _endx, _endy, sourceIn, targetIn,1,idInput, taggedArc));
 			ColoredInterval timeGuard = new ColoredInterval(inputArcElement.getAttribute("timeGuard"));
 			cia.setTimeGuard(timeGuard);
 
@@ -2466,7 +2465,7 @@ implements Cloneable {
 
 		}else if(type.equals("ColoredTransportArc")){
 			ColoredTransportArc cta = new ColoredTransportArc(
-					new TimedInputArcComponent( new NormalArc(_startx, _starty,
+					new TimedInputArcComponent( new TimedOutputArcComponent(_startx, _starty,
 							_endx, _endy,
 							sourceIn,
 							targetIn,
@@ -2624,8 +2623,7 @@ implements Cloneable {
 				} else if (newArc instanceof TimedInhibitorArcComponent) {
 					addArc((TimedInhibitorArcComponent) newArc);
 				} else {
-					addArc((NormalArc) newArc);
-					checkForInverseArc((NormalArc) newArc);
+					addArc((TimedOutputArcComponent) newArc);
 				}                  
 			} else if( "queries".equals(element.getNodeName()) ){
 				TAPNQuery query = createQuery(element);
@@ -2669,7 +2667,7 @@ implements Cloneable {
 
 
 		for (Arc a:m.getArcs()){
-			NormalArc tmp = (NormalArc)a.clone();
+			TimedOutputArcComponent tmp = (TimedOutputArcComponent)a.clone();
 
 			PlaceTransitionObject source = getPlaceTransitionObject(tmp.getSource().getName());
 			PlaceTransitionObject target =  getPlaceTransitionObject(tmp.getTarget().getName());
@@ -2847,26 +2845,6 @@ implements Cloneable {
 		}
 		return false;
 	}   
-
-
-
-
-	private void checkForInverseArc(NormalArc newArc) {
-		Iterator<Arc> iterator = newArc.getSource().getConnectToIterator();
-
-		Arc anArc;
-		while (iterator.hasNext()){
-			anArc = iterator.next();
-			if (anArc.getTarget() == newArc.getSource() && 
-					anArc.getSource() == newArc.getTarget()) {
-				if (anArc.getClass() == NormalArc.class) {
-					if (!newArc.hasInverse()) {
-						((NormalArc)anArc).setInverse(newArc, Pipe.JOIN_ARCS);
-					}               
-				}
-			}
-		}
-	}
 
 
 	public String getTransitionName(int i) {

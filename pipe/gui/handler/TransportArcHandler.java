@@ -50,13 +50,6 @@ public class TransportArcHandler extends TimedArcHandler {
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 
-			if (((TimedInputArcComponent)myObject).hasInverse()){
-				menuItem = new JMenuItem(
-						new SplitArcsAction((TimedInputArcComponent)myObject, false));
-
-				menuItem.setText("Join Arcs (PT / TP)");
-				popup.insert(menuItem, popupIndex++);            
-			}
 			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}
 		return popup;
