@@ -6,14 +6,6 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.util.RequireException;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
@@ -21,9 +13,9 @@ import pipe.dataLayer.NormalArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
@@ -31,11 +23,16 @@ import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.util.RequireException;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -662,59 +659,76 @@ extends PetriNetObjectHandler {
 							break;
 						}
 
-						//Check that there is not an other arc
-						boolean existsArc = false;
-						Iterator<Arc> arcsFromTranasition = transportArcToCreate.getSource().getConnectFromIterator();
-						Arc someArc = null;
+//						//Check that there is not an other arc
+//						boolean existsArc = false;
+//						Iterator<Arc> arcsFromTranasition = transportArcToCreate.getSource().getConnectFromIterator();
+//						Arc someArc = null;
+//
+//						while ( arcsFromTranasition.hasNext() ){        					 
+//							someArc = arcsFromTranasition.next();
+//							if (someArc == transportArcToCreate){
+//								break;
+//								//continue;
+//							}
+//							if( someArc.getSource() == transportArcToCreate.getSource()
+//									&& someArc.getTarget() == currentObject) {
+//								existsArc = true;
+//
+//								if (someArc instanceof TimedInhibitorArcComponent) {
+//									//mikaelhm - This can never be the case, since the user is trying to draw the 2. step of an transport arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
+//								} else if (someArc instanceof TransportArcComponent) {
+//									// user has drawn a transport arc where there is 
+//									// a transport arc already - We do not allow that.
+//									System.out.println(error_message_two_arcs);
+//									JOptionPane.showMessageDialog(CreateGui.getApp(),
+//											error_message_two_arcs,
+//											"Error",
+//											JOptionPane.ERROR_MESSAGE);
+//
+//								} else if (someArc instanceof NormalArc) {
+//									// user htransportas drawn a transport arc where there is 
+//									// a normal arc already - we increment arc's weight
+//									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
+//										int weightToInsert = someArc.getWeight()+1;
+//										someArc.setWeight(weightToInsert);
+//									}
+//									else{
+//										System.out.println("We dont allow more than one transport arc from a transition to a place.");
+//										JOptionPane.showMessageDialog(CreateGui.getApp(),
+//												"We dont allow more than one transport arc from a transition to a place.",
+//												"Error",
+//												JOptionPane.ERROR_MESSAGE);
+//									}
+//
+//								} else{
+//									//This should not happen - since all types of arcs are listed above.
+//								}    	
+//
+//								break;
+//							}
+//						}
 
-						while ( arcsFromTranasition.hasNext() ){        					 
-							someArc = arcsFromTranasition.next();
-							if (someArc == transportArcToCreate){
-								break;
-								//continue;
-							}
-							if( someArc.getSource() == transportArcToCreate.getSource()
-									&& someArc.getTarget() == currentObject) {
-								existsArc = true;
-
-								if (someArc instanceof TimedInhibitorArcComponent) {
-									//mikaelhm - This can never be the case, since the user is trying to draw the 2. step of an transport arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
-								} else if (someArc instanceof TransportArcComponent) {
-									// user has drawn a transport arc where there is 
-									// a transport arc already - We do not allow that.
-									System.out.println(error_message_two_arcs);
-									JOptionPane.showMessageDialog(CreateGui.getApp(),
-											error_message_two_arcs,
-											"Error",
-											JOptionPane.ERROR_MESSAGE);
-
-								} else if (someArc instanceof NormalArc) {
-									// user htransportas drawn a transport arc where there is 
-									// a normal arc already - we increment arc's weight
-									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
-										int weightToInsert = someArc.getWeight()+1;
-										someArc.setWeight(weightToInsert);
-									}
-									else{
-										System.out.println("We dont allow more than one transport arc from a transition to a place.");
-										JOptionPane.showMessageDialog(CreateGui.getApp(),
-												"We dont allow more than one transport arc from a transition to a place.",
-												"Error",
-												JOptionPane.ERROR_MESSAGE);
-									}
-
-								} else{
-									//This should not happen - since all types of arcs are listed above.
-								}    	
-
-								break;
-							}
-						}
-						if (existsArc){
+						try{
+							dk.aau.cs.model.tapn.TransportArc ta = new dk.aau.cs.model.tapn.TransportArc(
+									((TimedPlaceComponent)view.transportArcPart1.getSource()).underlyingPlace(),
+									((TimedTransitionComponent)transportArcToCreate.getSource()).underlyingTransition(),
+									((TimedPlaceComponent)transportArcToCreate.getTarget()).underlyingPlace(),
+									TimeInterval.ZERO_INF
+									);
+								model.add(ta);
+								((TransportArcComponent)transportArcToCreate).setUnderlyingArc(ta);		
+								((TransportArcComponent)view.transportArcPart1).setUnderlyingArc(ta);
+								view.transportArcPart1.updateWeightLabel();
+								((TransportArcComponent)transportArcToCreate).updateWeightLabel();
+						}catch(RequireException ex){
 							transportArcToCreate.delete();
-
-							// remove first part of transport arc
 							view.transportArcPart1.delete();
+							JOptionPane.showMessageDialog(CreateGui.getApp(), 
+									"There was an error drawing the arc. Possible problems:\n" +
+									" - There is already an arc between the source place and transition\n" + 
+									" - There is already an arc between the transtion and the target place",
+									"Error",
+									JOptionPane.ERROR_MESSAGE);
 							break;
 						}
 						currentObject.addConnectTo(transportArcToCreate);
@@ -740,13 +754,11 @@ extends PetriNetObjectHandler {
 						view.createArc = null;
 
 						((TransportArcComponent)transportArcToCreate).setGroupNr(view.transportArcPart1.getGroupNr());
-
+						
 						//Ekstra suff
 						view.transportArcPart1.setConnectedTo(((TransportArcComponent)transportArcToCreate));
 						((TransportArcComponent)transportArcToCreate).setConnectedTo(view.transportArcPart1);
 						view.transportArcPart1 = null;
-
-
 					}
 
 				}

@@ -1538,7 +1538,8 @@ EOC */
 				}
 
 				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-				appView.getSelectionObject().deleteSelection();			
+				appView.getSelectionObject().deleteSelection();	
+				appView.repaint();
 				CreateGui.getModel().buildConstraints();
 			}
 		}

@@ -105,7 +105,7 @@ public class TimedArcPetriNet {
 		arc.source().addToPostset(arc);
 		arc.destination().addToPreset(arc);
 	}
-	
+		
 	public void addToken(TimedPlace place, TimedToken token){
 		currentMarking.add(place, token);
 	}

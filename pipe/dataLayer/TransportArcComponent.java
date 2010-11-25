@@ -36,10 +36,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	}
 	
 	public void setUnderlyingArc(TransportArc arc){
-		this.underlyingTransportArc = arc;
-		if(connectedTo != null){
-			connectedTo.underlyingTransportArc = arc;
-		}
+		this.underlyingTransportArc = arc; // must explicitly set underlying arc on connected to
 	}
 	
 	private void setHead(){
@@ -69,10 +66,12 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	
 	@Override
 	public void updateWeightLabel(){   
-		if (isInPreSet){
+		if (isInPreSet && underlyingTransportArc != null){
 		weightLabel.setText(underlyingTransportArc.timeInterval().toString() + " : " + getGroup());
-		} else {
+		} else if(!isInPreSet) {
 			weightLabel.setText(String.valueOf(getGroup()));
+		}else{
+			weightLabel.setText("");
 		}
 		this.setWeightLabelPosition();
 	}

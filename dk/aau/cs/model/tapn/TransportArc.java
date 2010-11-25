@@ -10,7 +10,7 @@ public class TransportArc {
 	private TimeInterval interval;
 
 	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination,
-			TimeInterval interval, int group){
+			TimeInterval interval){
 		Require.that(source != null, "The source place cannot be null");
 		Require.that(transition != null, "The associated transition cannot be null");
 		Require.that(destination != null, "The destination place cannot be null");
