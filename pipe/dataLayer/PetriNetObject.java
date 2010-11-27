@@ -12,6 +12,7 @@ import java.util.EventListener;
 import javax.swing.JComponent;
 
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TAPNElement;
 
 import pipe.gui.CopyPasteable;
 import pipe.gui.CreateGui;

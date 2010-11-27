@@ -3,8 +3,6 @@ package dk.aau.cs.model.tapn;
 import java.util.ArrayList;
 import java.util.List;
 
-import pipe.dataLayer.simulation.Marking;
-
 import dk.aau.cs.util.Require;
 
 
@@ -154,7 +152,7 @@ public class TimedPlace extends TAPNElement {
 	public void delete() {
 		model().remove(this);
 	}
-
+		
 	public void addToken(TimedToken timedToken) {
 		currentMarking.add(this, timedToken);
 	}

@@ -11,10 +11,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
@@ -25,11 +21,13 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
-import pipe.gui.undo.PlaceMarkingEdit;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.AddTokenPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.RemoveTokenPanel;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 
 /**

@@ -45,6 +45,8 @@ import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.AddPetriNetObjectEdit;
+import pipe.gui.undo.AddTimedPlaceCommand;
+import pipe.gui.undo.AddTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.NameGenerator;
@@ -611,7 +613,7 @@ EOC*/
 				case Pipe.TAPNPLACE:
 					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto2, view, guiModel));
+							new AddTimedPlaceCommand((TimedPlaceComponent)pto2, model, guiModel, view));
 					if (e.isControlDown()) {
 						app.setFastMode(Pipe.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
@@ -632,7 +634,7 @@ EOC*/
 				case Pipe.TAPNTRANS:
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
-							new AddPetriNetObjectEdit(pto, view, guiModel));
+							new AddTimedTransitionCommand((TimedTransitionComponent)pto, model, guiModel, view));
 					if (e.isControlDown()) {
 						app.setFastMode(Pipe.FAST_PLACE);
 						pnObject.dispatchEvent(e);

@@ -6,18 +6,14 @@ import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedInputArc;
-
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.GuardDialogue;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedInputArc;
 
 public class TimedInputArcComponent extends TimedOutputArcComponent{
 
