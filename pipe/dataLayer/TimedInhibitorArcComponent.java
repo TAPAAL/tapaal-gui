@@ -40,12 +40,25 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		this.inhibitorArc = arc;
 	}
 	
+	public TimedInhibitorArc underlyingTimedInhibitorArc(){
+		return inhibitorArc;
+	}
+	
 	@Override
 	public void delete() {
 		if(inhibitorArc != null) inhibitorArc.delete();
 		super.delete();
 	}
 	
+	@Override
+	public void updateWeightLabel() {
+		if(inhibitorArc != null){
+			weightLabel.setText(inhibitorArc.interval().toString());
+		}else{
+			weightLabel.setText("");
+		}
+		this.setWeightLabelPosition();	
+	}
 	
 	@Override
 	public void paintComponent(Graphics g) {

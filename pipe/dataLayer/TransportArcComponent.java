@@ -39,6 +39,10 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		this.underlyingTransportArc = arc; // must explicitly set underlying arc on connected to
 	}
 	
+	public TransportArc underlyingTransportArc(){
+		return underlyingTransportArc;
+	}
+	
 	private void setHead(){
 		head = new Polygon(new int[]{0, 5, 0, -5}, new int[]{0, -11, -18, -11}, 4);
 	}

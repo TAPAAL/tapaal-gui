@@ -33,6 +33,10 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddPetriNetObjectEdit;
+import pipe.gui.undo.AddTimedInhibitorArcCommand;
+import pipe.gui.undo.AddTimedInputArcCommand;
+import pipe.gui.undo.AddTimedOutputArcCommand;
+import pipe.gui.undo.AddTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -232,6 +236,7 @@ extends PetriNetObjectHandler {
 						);
 						model.add(tia);
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
+						createTAPNInhibitorArc.updateWeightLabel();
 					}catch(RequireException ex){
 						createTAPNInhibitorArc.delete();
 						JOptionPane.showMessageDialog(CreateGui.getApp(), 
@@ -256,8 +261,7 @@ extends PetriNetObjectHandler {
 					view.addNewPetriNetObject(createTAPNInhibitorArc);
 
 					undoManager.addNewEdit(
-							new AddPetriNetObjectEdit(createTAPNInhibitorArc,
-									view, guiModel));
+							new AddTimedInhibitorArcCommand(createTAPNInhibitorArc, model, guiModel, view));
 					
 					// arc is drawn, remove handler:
 					createTAPNInhibitorArc.removeKeyListener(keyHandler);
@@ -563,9 +567,9 @@ extends PetriNetObjectHandler {
 							break;
 						}
 
-
+						dk.aau.cs.model.tapn.TransportArc ta;
 						try{
-							dk.aau.cs.model.tapn.TransportArc ta = new dk.aau.cs.model.tapn.TransportArc(
+							ta = new dk.aau.cs.model.tapn.TransportArc(
 									((TimedPlaceComponent)view.transportArcPart1.getSource()).underlyingPlace(),
 									((TimedTransitionComponent)transportArcToCreate.getSource()).underlyingTransition(),
 									((TimedPlaceComponent)transportArcToCreate.getTarget()).underlyingPlace(),
@@ -598,7 +602,7 @@ extends PetriNetObjectHandler {
 						undoManager.newEdit();
 
 						undoManager.addEdit(
-								new AddPetriNetObjectEdit(transportArcToCreate, view, guiModel));
+								new AddTransportArcCommand((TransportArcComponent)transportArcToCreate, ta, model, guiModel, view));
 
 						//arc is drawn, remove handler:
 						transportArcToCreate.removeKeyListener(keyHandler);
@@ -671,7 +675,7 @@ extends PetriNetObjectHandler {
 							undoManager.newEdit(); // new "transaction""
 						}
 						undoManager.addEdit(
-								new AddPetriNetObjectEdit(timedArcToCreate, view, guiModel));
+								new AddTimedOutputArcCommand((TimedOutputArcComponent)timedArcToCreate, model, guiModel, view));
 
 						//else source is a place (not transition)
 					} else{
@@ -723,7 +727,7 @@ extends PetriNetObjectHandler {
 							undoManager.newEdit(); // new "transaction""
 						}
 						undoManager.addEdit(
-								new AddPetriNetObjectEdit(timedArcToCreate, view, guiModel));
+								new AddTimedInputArcCommand((TimedInputArcComponent)timedArcToCreate, model, guiModel, view));
 
 					}
 					//arc is drawn, remove handler:
