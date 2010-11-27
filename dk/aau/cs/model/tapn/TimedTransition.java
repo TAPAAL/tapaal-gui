@@ -17,6 +17,7 @@ public class TimedTransition extends TAPNElement {
 		preset = new ArrayList<TimedInputArc>();
 		postset = new ArrayList<TimedOutputArc>();
 		transportArcsGoingThrough = new ArrayList<TransportArc>();
+		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	}
 	
 	public void setName(String name){

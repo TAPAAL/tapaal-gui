@@ -224,50 +224,6 @@ extends PetriNetObjectHandler {
 						break;
 					}
 
-					//            	   Arc someArc = null;
-					//                  Iterator<Arc> arcsFrom =
-					//                	  createTAPNInhibitorArc.getSource().getConnectFromIterator();
-					//                  // search for pre-existent arcs from createInhibitorArc's 
-					//                  // source to createInhibitorArc's target
-					//                  while(arcsFrom.hasNext()) {
-					//                     someArc = (arcsFrom.next());
-					//                     if (someArc == createTAPNInhibitorArc) {
-					//                        break;
-					//                     } else if (someArc.getTarget() == currentObject &&
-					//                             someArc.getSource() == createTAPNInhibitorArc.getSource()) {
-					//                        isNewArc = false;
-					//                        
-					//                        if (someArc instanceof TimedInhibitorArcComponent) {
-					//                            // user has drawn an inhibitor arc where there is 
-					//                            // an inhibitor arc already - 
-					//                        	isNewArc = true;
-					//                        } 
-					//                        else if (someArc instanceof TransportArc){
-					//                        	// user has drawn an inhibitor arc where there is 
-					//                            // a transport arc already - mikael: this does not make sense
-					//                        	System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
-					//  							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-					//  									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
-					//  									 "Error",
-					//  									 JOptionPane.ERROR_MESSAGE);
-					//                        }
-					//                        else if (someArc instanceof NormalArc){
-					//                           // user has drawn an inhibitor arc where there is 
-					//                           // a normal arc already - mikael: this does not make sense
-					//       						 System.out.println("It does not make sense to have both a normal arc and an inhibitor arc from a place to a transition.");
-					//   							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-					//   									 "It does not make sense to have both a normal arc and an inhibitor arc from a place to a transition.",
-					//   									 "Error",
-					//   									 JOptionPane.ERROR_MESSAGE);
-					//       					} else  {
-					//                           // This is not supposed to happen
-					//                        }
-					//                        
-					//                        break;
-					//                     }
-					//                  }
-					//                  if(!isNewArc)
-					//                  {
 					try{
 						dk.aau.cs.model.tapn.TimedInhibitorArc tia = new TimedInhibitorArc(
 								((TimedPlaceComponent)createTAPNInhibitorArc.getSource()).underlyingPlace(),
@@ -286,10 +242,6 @@ extends PetriNetObjectHandler {
 						break;
 					}
 
-					//                      someArc.getTransition().removeArcCompareObject(createTAPNInhibitorArc);
-					//                      someArc.getTransition().updateConnected();
-					//                  }
-					//                  else {
 					createTAPNInhibitorArc.setSelectable(true);
 					createTAPNInhibitorArc.setTarget(currentObject);
 
@@ -306,14 +258,7 @@ extends PetriNetObjectHandler {
 					undoManager.addNewEdit(
 							new AddPetriNetObjectEdit(createTAPNInhibitorArc,
 									view, guiModel));
-					//                     if(createTAPNInhibitorArc.getTarget() == null)
-					//                    	 JOptionPane.showMessageDialog(CreateGui.getApp(),
-					//									 "Whooops, target was not set on last arc, please redraw. DEBUG",
-					//									 "Error",
-					//									 JOptionPane.ERROR_MESSAGE);
-
-					//  }
-
+					
 					// arc is drawn, remove handler:
 					createTAPNInhibitorArc.removeKeyListener(keyHandler);
 					keyHandler = null;
@@ -618,54 +563,6 @@ extends PetriNetObjectHandler {
 							break;
 						}
 
-//						//Check that there is not an other arc
-//						boolean existsArc = false;
-//						Iterator<Arc> arcsFromTranasition = transportArcToCreate.getSource().getConnectFromIterator();
-//						Arc someArc = null;
-//
-//						while ( arcsFromTranasition.hasNext() ){        					 
-//							someArc = arcsFromTranasition.next();
-//							if (someArc == transportArcToCreate){
-//								break;
-//								//continue;
-//							}
-//							if( someArc.getSource() == transportArcToCreate.getSource()
-//									&& someArc.getTarget() == currentObject) {
-//								existsArc = true;
-//
-//								if (someArc instanceof TimedInhibitorArcComponent) {
-//									//mikaelhm - This can never be the case, since the user is trying to draw the 2. step of an transport arc from a trans to a place, and this is not possible for a inhibitor arc.            						 
-//								} else if (someArc instanceof TransportArcComponent) {
-//									// user has drawn a transport arc where there is 
-//									// a transport arc already - We do not allow that.
-//									System.out.println(error_message_two_arcs);
-//									JOptionPane.showMessageDialog(CreateGui.getApp(),
-//											error_message_two_arcs,
-//											"Error",
-//											JOptionPane.ERROR_MESSAGE);
-//
-//								} else if (someArc instanceof NormalArc) {
-//									// user htransportas drawn a transport arc where there is 
-//									// a normal arc already - we increment arc's weight
-//									if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)){
-//										int weightToInsert = someArc.getWeight()+1;
-//										someArc.setWeight(weightToInsert);
-//									}
-//									else{
-//										System.out.println("We dont allow more than one transport arc from a transition to a place.");
-//										JOptionPane.showMessageDialog(CreateGui.getApp(),
-//												"We dont allow more than one transport arc from a transition to a place.",
-//												"Error",
-//												JOptionPane.ERROR_MESSAGE);
-//									}
-//
-//								} else{
-//									//This should not happen - since all types of arcs are listed above.
-//								}    	
-//
-//								break;
-//							}
-//						}
 
 						try{
 							dk.aau.cs.model.tapn.TransportArc ta = new dk.aau.cs.model.tapn.TransportArc(
