@@ -11,6 +11,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 import pipe.dataLayer.DataLayer;
@@ -23,6 +25,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
+import pipe.gui.undo.PlaceMarkingEdit;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.AddTokenPanel;
 import pipe.gui.widgets.EscapableDialog;
@@ -34,7 +37,7 @@ import pipe.gui.widgets.RemoveTokenPanel;
  */
 public class PlaceHandler 
 extends PlaceTransitionObjectHandler {
-	
+
 	public PlaceHandler(Container contentpane, Place obj) {
 		super(contentpane, obj);
 	}
@@ -92,15 +95,25 @@ extends PlaceTransitionObjectHandler {
 				switch(CreateGui.getApp().getMode()) {
 				case Pipe.ADDTOKEN:
 					if(!CreateGui.getModel().isUsingColors()){
-						undoManager.addNewEdit(
-								((Place)myObject).setCurrentMarking(++currentMarking));
+						if(myObject instanceof TimedPlaceComponent){
+							Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent)myObject, 1);
+							command.redo();
+							undoManager.addNewEdit(command);
+						}else{
+							undoManager.addNewEdit(
+									((Place)myObject).setCurrentMarking(++currentMarking));
+						}
 					}else{
 						showAddTokenDialog((ColoredTimedPlace)myObject);
 					}
 					break;
 				case Pipe.DELTOKEN:
 					if(!CreateGui.getModel().isUsingColors()){
-						if (currentMarking > 0) {
+						if(myObject instanceof TimedPlaceComponent){
+							Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent)myObject, -1);
+							command.redo();
+							undoManager.addNewEdit(command);
+						}else if (currentMarking > 0) {
 							undoManager.addNewEdit(
 									((Place)myObject).setCurrentMarking(--currentMarking));
 						}
@@ -207,15 +220,23 @@ extends PlaceTransitionObjectHandler {
     	  }*/
 		} else {
 			if(!CreateGui.getModel().isUsingColors()){
-				int oldMarking = ((Place)myObject).getCurrentMarking();
-				int newMarking = oldMarking - e.getWheelRotation();
+				if(myObject instanceof TimedPlaceComponent){
+					int clicks = -e.getWheelRotation();
 
-				if (newMarking < 0) {
-					newMarking = 0;
+					Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent)myObject, clicks);
+					command.redo();
+					undoManager.addNewEdit(command);
+				}else{
+					int oldMarking = ((Place)myObject).getCurrentMarking();
+					int newMarking = oldMarking - e.getWheelRotation();
+
+					if (newMarking < 0) {
+						newMarking = 0;
+					}
+					if (oldMarking != newMarking) {            
+						undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));            
+					} 
 				}
-				if (oldMarking != newMarking) {            
-					undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));            
-				} 
 			}
 		}
 	}

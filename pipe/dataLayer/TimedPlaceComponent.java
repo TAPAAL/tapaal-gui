@@ -300,20 +300,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public boolean satisfiesInvariant(BigDecimal token) {
-		String invariant = getInvariantAsString();
-		if (invariant.contains("inf")){
-			return true;
-		}else if (invariant.contains("<=")){
-			String upperBound = invariant.split("=")[1];
-			if (token.compareTo(BigDecimal.valueOf(Long.parseLong(upperBound))) <= 0){
-				return true;
-			}else return false;
-		}else{
-			String upperBound = invariant.split("<")[1];
-			if (token.compareTo(BigDecimal.valueOf(Long.parseLong(upperBound))) < 0){
-				return true;
-			}else return false;
-		}
+		return place.invariant().isSatisfied(token);
 	}
 
 	public Command setAgeOfTokens(ArrayList<BigDecimal> newAgeOfTokens) {
@@ -505,5 +492,17 @@ public class TimedPlaceComponent extends Place {
 
 	public TimedPlace underlyingPlace() {
 		return place;
+	}
+
+	public void addTokens(int numberOfTokensToAdd) {
+		for(int i = 0; i < numberOfTokensToAdd; i++){
+			place.addToken(new TimedToken(place, BigDecimal.ZERO));
+		}
+	}
+
+	public void removeTokens(int numberOfTokensToRemove) {
+		for(int i = 0; i < numberOfTokensToRemove; i++){
+			place.removeToken();
+		}
 	}
 }

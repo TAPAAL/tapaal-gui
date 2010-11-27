@@ -32,4 +32,8 @@ public class TimedMarking {
 		return placesToTokensMap.get(place);
 	}
 
+	public void removeArbitraryTokenFrom(TimedPlace timedPlace) {
+		placesToTokensMap.get(timedPlace).remove(0);
+	}
+
 }
