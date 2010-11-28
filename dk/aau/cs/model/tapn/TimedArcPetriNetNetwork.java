@@ -28,4 +28,9 @@ public class TimedArcPetriNetNetwork {
 	public List<TimedArcPetriNet> templates(){
 		return tapns;
 	}
+
+	public boolean hasTAPNCalled(String newName) {
+		for(TimedArcPetriNet tapn : tapns) if(tapn.getName().equals(newName)) return true;
+		return false;
+	}
 }

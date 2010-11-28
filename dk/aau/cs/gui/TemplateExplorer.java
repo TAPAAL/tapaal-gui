@@ -241,10 +241,13 @@ public class TemplateExplorer extends JPanel {
 		Template<TimedArcPetriNet> template = selectedModel();
 
 		String newName = (String)JOptionPane.showInputDialog(parent.drawingSurface(), "Template name:", "Rename Template", JOptionPane.PLAIN_MESSAGE, null, null, template.model().getName());
-
+		if(template.model().getName().equals(newName)) return;
+		
 		if(newName != null && newName.length() <= 0)
 			JOptionPane.showMessageDialog(parent.drawingSurface(), "TAPN template could not be renamed:\n\nYou must provide a proper name for the template", "Error Renaming Template", JOptionPane.ERROR_MESSAGE);
-		else if(newName != null && newName.length() > 0){
+		else if(parent.network().hasTAPNCalled(newName)){
+			JOptionPane.showMessageDialog(parent.drawingSurface(), "There is already a template with that name. Try another name.", "Error", JOptionPane.ERROR_MESSAGE);
+		}else{
 			Command command = new RenameTemplateCommand(this, template.model(), template.model().getName(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();
