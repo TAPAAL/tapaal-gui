@@ -65,4 +65,8 @@ public class TimedToken {
 			return false;
 		return true;
 	}
+	
+	public TimedToken clone(){
+		return new TimedToken(place, age); // age is immutable so ok to pass it to constructor
+	}
 }

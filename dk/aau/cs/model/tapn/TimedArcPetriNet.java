@@ -201,9 +201,17 @@ public class TimedArcPetriNet {
 	public String toString() {
 		return name;
 	}
+	
+	public TimedMarking marking(){
+		return currentMarking;
+	}
 
 	public void setName(String newName) {
 		if(name != null && name != "")
 			name = newName;
+	}
+
+	public void setMarking(TimedMarking marking) {
+		this.currentMarking = marking;		
 	}
 }

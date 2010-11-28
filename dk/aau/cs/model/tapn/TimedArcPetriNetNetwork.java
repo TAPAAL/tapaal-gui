@@ -7,6 +7,7 @@ import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetwork {
 	private List<TimedArcPetriNet> tapns;
+	private NetworkMarking currentMarking;
 	
 	public TimedArcPetriNetNetwork(){
 		tapns = new ArrayList<TimedArcPetriNet>();

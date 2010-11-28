@@ -785,7 +785,7 @@ EOC */
 		appTab.addChangeListener(new ChangeListener() {
 
 			public void stateChanged(ChangeEvent e) {
-
+				
 				int index = appTab.getSelectedIndex();
 				setObjects(index);
 				if (appView != null) {
@@ -793,13 +793,13 @@ EOC */
 					appView.repaint();
 					updateZoomCombo();
 
-					//					enableActions(!appView.isInAnimationMode());
+					// enableActions(!appView.isInAnimationMode());
 					//					CreateGui.getAnimator().restoreModel();
 					//					CreateGui.removeAnimationHistory();
 
 					setTitle(appTab.getTitleAt(index));
-
-					setAnimationMode(false);
+					setGUIMode(GUIMode.draw);
+					//setAnimationMode(false);
 
 					// TODO: change this code... it's ugly :)
 					if (appGui.getMode() == Pipe.SELECT) {
@@ -1133,9 +1133,6 @@ EOC */
 	 * @author Kenneth Yrke Joergensen (kyrke) 
 	 */
 	public void setGUIMode(GUIMode mode){
-
-		this.guiMode = mode; 
-
 		switch (mode) {
 		case draw:
 			//Enable all draw actions
@@ -1145,7 +1142,7 @@ EOC */
 
 			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
-			CreateGui.getAnimator().restoreModel();
+			if(this.guiMode.equals(GUIMode.animation)) CreateGui.getAnimator().restoreModel();
 			//         CreateGui.removeAnimationHistory();
 			//         CreateGui.removeAnimationControler();
 
@@ -1159,6 +1156,8 @@ EOC */
 
 			break;
 		case animation:
+			TabContent tab = (TabContent)appTab.getSelectedComponent();
+			CreateGui.getAnimator().setTemplate(tab.activeTemplate());
 			CreateGui.getAnimator().setNumberSequences(0);
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);
@@ -1187,7 +1186,7 @@ EOC */
 		default:
 			break;
 		}
-
+		this.guiMode = mode;
 		//Enable actions based on GUI mode
 		enableGUIActions();
 

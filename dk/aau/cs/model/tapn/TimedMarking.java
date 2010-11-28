@@ -1,14 +1,15 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class TimedMarking {
-	private Hashtable<TimedPlace, List<TimedToken>> placesToTokensMap;
+	private HashMap<TimedPlace, List<TimedToken>> placesToTokensMap;
 
 	public TimedMarking(){
-		placesToTokensMap = new Hashtable<TimedPlace, List<TimedToken>>();
+		placesToTokensMap = new HashMap<TimedPlace, List<TimedToken>>();
 	}
 
 	public void add(TimedPlace place, TimedToken token){
@@ -34,6 +35,21 @@ public class TimedMarking {
 
 	public void removeArbitraryTokenFrom(TimedPlace timedPlace) {
 		placesToTokensMap.get(timedPlace).remove(0);
+	}
+	
+	public TimedMarking clone(){
+		TimedMarking clone = new TimedMarking();
+		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(placesToTokensMap.size());
+		for(Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()){
+			ArrayList<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
+			for(TimedToken token : entry.getValue()){
+				newTokens.add(token.clone());
+			}
+			newMap.put(entry.getKey(), newTokens);
+		}
+		
+		clone.placesToTokensMap = newMap;
+		return clone;
 	}
 
 }

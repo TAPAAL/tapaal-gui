@@ -24,6 +24,7 @@ import pipe.dataLayer.DiscreetFiringAction;
 import pipe.dataLayer.FiringAction;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNTrace;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlaceComponent;
@@ -33,6 +34,8 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedMarking;
 
 
 /**
@@ -73,7 +76,9 @@ public class Animator {
 	private ArrayList<HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>> markingHistory;
 
 	public Firingmode firingmode = new RandomFiringmode();
-
+	private Template<TimedArcPetriNet> template;
+	private TimedMarking initialMarking;
+	
 	public Animator(){
 		actionHistory = new ArrayList<FiringAction>();
 
@@ -91,7 +96,10 @@ public class Animator {
 		});
 		currentAction = -1;
 		markingHistory = new ArrayList<HashMap<TimedPlaceComponent,ArrayList<BigDecimal>>>();
-
+	}
+	
+	public void setTemplate(Template<TimedArcPetriNet> template){
+		this.template = template;
 	}
 
 	public void SetTrace(TAPNTrace trace){
@@ -142,7 +150,7 @@ public class Animator {
 	 */
 	public void highlightEnabledTransitions(){
 		/* rewritten by wjk 03/10/2007 */
-		DataLayer current = CreateGui.currentPNMLData();
+		DataLayer current = template.guiModel();//CreateGui.currentPNMLData();
 
 		//current.setEnabledTransitions();      
 
@@ -161,7 +169,7 @@ public class Animator {
 	 * Called during animation to unhighlight previously highlighted transitions
 	 */
 	public void unhighlightDisabledTransitions(){
-		DataLayer current = CreateGui.currentPNMLData();
+		DataLayer current = template.guiModel();//CreateGui.currentPNMLData();
 
 		//current.setEnabledTransitions();      
 
@@ -181,8 +189,8 @@ public class Animator {
 	 * unhighlighted
 	 */
 	private void disableTransitions(){
-		Iterator<Transition> transitionIterator = 
-			CreateGui.currentPNMLData().returnTransitions();
+		Iterator<Transition> transitionIterator = template.guiModel().returnTransitions();
+			//CreateGui.currentPNMLData().returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
 			tempTransition.setEnabledFalse();
@@ -196,8 +204,9 @@ public class Animator {
 	 * Stores model at start of animation
 	 */
 	public void storeModel(){
-		CreateGui.setupModelForSimulation();
-		CreateGui.currentPNMLData().storeState();
+		initialMarking = template.model().marking();
+		//CreateGui.setupModelForSimulation();
+		//CreateGui.currentPNMLData().storeState();
 	}
 
 
@@ -206,9 +215,10 @@ public class Animator {
 	 * unhighlighted
 	 */
 	public void restoreModel(){
-		CreateGui.restoreModelForEditing();
-		CreateGui.currentPNMLData().restoreState();
+		//CreateGui.restoreModelForEditing();
+		//CreateGui.currentPNMLData().restoreState();
 		disableTransitions();
+		template.model().setMarking(initialMarking);
 		currentAction = -1;
 	}
 
@@ -482,14 +492,14 @@ public class Animator {
 
 	public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
 		Animator animator = CreateGui.getAnimator();
-
-		if (CreateGui.currentPNMLData().canTimePass(timeToPass)){
+		DataLayer guiModel = template.guiModel();
+		if (guiModel.canTimePass(timeToPass)){
 
 			if ( currentAction < actionHistory.size()-1 ){
 				removeStoredActions(currentAction+1);
-				addToHistory( new TimeDelayFiringAction(timeToPass), CreateGui.currentPNMLData().getCurrentMarking() );
+				addToHistory( new TimeDelayFiringAction(timeToPass), guiModel.getCurrentMarking() );
 			}else{
-				addToHistory( new TimeDelayFiringAction(timeToPass), CreateGui.currentPNMLData().getCurrentMarking() );  
+				addToHistory( new TimeDelayFiringAction(timeToPass), guiModel.getCurrentMarking() );  
 			}
 
 			try {
@@ -505,7 +515,7 @@ public class Animator {
 
 				BigDecimal strippedTimeDelay = new BigDecimal(timeToPass.toString(), new MathContext(Pipe.AGE_PRECISION));
 
-				CreateGui.currentPNMLData().letTimePass(strippedTimeDelay);
+				guiModel.letTimePass(strippedTimeDelay);
 
 				CreateGui.getAnimationHistory().addHistoryItem("Time delay: "+ df.format(strippedTimeDelay));
 
@@ -521,7 +531,7 @@ public class Animator {
 			}
 
 
-			CreateGui.currentPNMLData().setEnabledTransitions();
+			guiModel.setEnabledTransitions();
 			animator.highlightEnabledTransitions();
 			animator.unhighlightDisabledTransitions();
 

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
@@ -12,24 +13,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 
-import com.sun.org.apache.bcel.internal.generic.ISUB;
-
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.Template;
+import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
@@ -43,6 +34,13 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
@@ -425,6 +423,10 @@ public class TabContent extends JSplitPane {
 			list.add(new Template<TimedArcPetriNet>(net, guiModels.get(net)));
 		}
 		return list;
+	}
+
+	public Template<TimedArcPetriNet> activeTemplate() {
+		return templateExplorer.selectedModel();
 	}
 
 }

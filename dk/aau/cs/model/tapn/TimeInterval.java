@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
 
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
@@ -54,13 +55,19 @@ public class TimeInterval {
 	}
 
 	public boolean isIncluded(BigDecimal age) {
-		BigDecimal lowerBound = new BigDecimal(lower.value());
-		BigDecimal upperBound = new BigDecimal(upper.value());
+		return satisfiesLowerBound(age) && satisfiesUpperBound(age);
+	}
+	
+	private boolean satisfiesLowerBound(BigDecimal value){
+		int compare = value.compareTo(new BigDecimal(lower.value()));
+		return isLowerIncluded ? (compare >= 0) : (compare > 0);
+	}
+	
+	private boolean satisfiesUpperBound(BigDecimal value){
+		if(upper instanceof InfBound) return true;
 		
-		int lowerCompare = age.compareTo(lowerBound);
-		int upperCompare = age.compareTo(upperBound);
-		
-		return (isLowerIncluded ? (lowerCompare >= 0) : (lowerCompare > 0)) && (isUpperIncluded ? (upperCompare <= 0) : (upperCompare < 0));
+		int compare = value.compareTo(new BigDecimal(upper.value()));
+		return isUpperIncluded ? (compare <= 0) : (compare < 0);
 	}
 
 	public Bound lowerBound() {

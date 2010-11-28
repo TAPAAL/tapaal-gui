@@ -235,26 +235,26 @@ extends PlaceTransitionObject {
 			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
 		}
 
-		if (timed) {
-			if (infiniteServer) {
-				for (int i=2; i>=1; i--) {
-					g2.translate(2*i,-2*i);
-					g2.fill(transition);
-					Paint pen = g2.getPaint();
-					if (highlighted) {
-						g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-					} else if (selected && !ignoreSelection){
-						g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-					} else {
-						g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-					}
-					g2.draw(transition);
-					g2.setPaint(pen);
-					g2.translate(-2*i,2*i);
-				}
-			}         
-			g2.fill(transition);
-		}
+//		if (timed) {
+//			if (infiniteServer) {
+//				for (int i=2; i>=1; i--) {
+//					g2.translate(2*i,-2*i);
+//					g2.fill(transition);
+//					Paint pen = g2.getPaint();
+//					if (highlighted) {
+//						g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
+//					} else if (selected && !ignoreSelection){
+//						g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+//					} else {
+//						g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+//					}
+//					g2.draw(transition);
+//					g2.setPaint(pen);
+//					g2.translate(-2*i,2*i);
+//				}
+//			}         
+//			g2.fill(transition);
+//		}
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
@@ -265,21 +265,22 @@ extends PlaceTransitionObject {
 		}
 
 		g2.draw(transition);
-		if (!timed) {
-			if (infiniteServer) {
-				for (int i=2; i>=1; i--) {
-					g2.translate(2*i,-2*i);
-					Paint pen = g2.getPaint();
-					g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
-					g2.fill(transition);
-					g2.setPaint(pen);
-					g2.draw(transition);
-					g2.translate(-2*i,2*i);
-				}
-			}
-			g2.draw(transition);
-			g2.fill(transition);
-		}
+		g2.fill(transition);
+//		if (!timed) {
+//			if (infiniteServer) {
+//				for (int i=2; i>=1; i--) {
+//					g2.translate(2*i,-2*i);
+//					Paint pen = g2.getPaint();
+//					g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
+//					g2.fill(transition);
+//					g2.setPaint(pen);
+//					g2.draw(transition);
+//					g2.translate(-2*i,2*i);
+//				}
+//			}
+//			g2.draw(transition);
+
+		//}
 	}
 
 
