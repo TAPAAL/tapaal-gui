@@ -22,7 +22,7 @@ public class AddTimedInhibitorArcCommand extends AddTAPNElementCommand {
 	
 	@Override
 	public void redo() {
-		inhibitorArc.undelete(guiModel, view);
+		inhibitorArc.undelete(view);
 		tapn.add(inhibitorArc.underlyingTimedInhibitorArc());
 		view.repaint();
 	}

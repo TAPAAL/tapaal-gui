@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,7 +24,12 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.undo.AddTemplateCommand;
+import pipe.gui.undo.RemoveTemplateCommand;
+import pipe.gui.undo.RenameTemplateCommand;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.JSplitPaneFix;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class TemplateExplorer extends JPanel {
@@ -49,10 +55,12 @@ public class TemplateExplorer extends JPanel {
 
 
 	private TabContent parent;
+	private UndoManager undoManager;
 
 	public TemplateExplorer(TabContent parent)
 	{
 		this.parent = parent;
+		undoManager = parent.drawingSurface().getUndoManager();
 		this.setLayout(new BorderLayout());
 		init();
 	}
@@ -143,7 +151,9 @@ public class TemplateExplorer extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				Template<TimedArcPetriNet> template = ShowNewTemplateDialog();
 				if(template != null){
+					int index = listModel.size();
 					listModel.addElement(template);
+					undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
 				}
 			}
 		});
@@ -161,8 +171,14 @@ public class TemplateExplorer extends JPanel {
 		removeTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: check if any local places are used in queries and if so warn user that these queries are removed too.
-				removeTemplate();
-				listModel.remove(templateList.getSelectedIndex());
+				//removeSelectedTemplate();
+				//listModel.remove(templateList.getSelectedIndex());
+				int index = templateList.getSelectedIndex();
+				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>)templateList.getSelectedValue();
+				
+				Command command = new RemoveTemplateCommand(TemplateExplorer.this, template, index);
+				undoManager.addNewEdit(command);
+				command.redo();
 			}
 		});
 
@@ -214,8 +230,10 @@ public class TemplateExplorer extends JPanel {
 
 		if(templateName != null && templateName.length() <= 0)
 			JOptionPane.showMessageDialog(parent.drawingSurface(), "New TAPN template could not be created:\n\nYou must provide a proper name for the template", "Error Creating Template", JOptionPane.ERROR_MESSAGE);
-		else if(templateName != null && templateName.length() > 0)
-			return createNewTemplate(templateName);
+		else if(templateName != null && templateName.length() > 0){
+			Template<TimedArcPetriNet> template = createNewTemplate(templateName);
+			return template;
+		}
 		return null;
 	}
 
@@ -226,8 +244,12 @@ public class TemplateExplorer extends JPanel {
 
 		if(newName != null && newName.length() <= 0)
 			JOptionPane.showMessageDialog(parent.drawingSurface(), "TAPN template could not be renamed:\n\nYou must provide a proper name for the template", "Error Renaming Template", JOptionPane.ERROR_MESSAGE);
-		else if(newName != null && newName.length() > 0)
-			renameTemplate(newName);
+		else if(newName != null && newName.length() > 0){
+			Command command = new RenameTemplateCommand(this, template.model(), template.model().getName(), newName);
+			undoManager.addNewEdit(command);
+			command.redo();
+		}
+		
 	}
 
 	public Template<TimedArcPetriNet> createNewTemplate(String name)
@@ -237,17 +259,15 @@ public class TemplateExplorer extends JPanel {
 
 		return new Template<TimedArcPetriNet>(tapn, new DataLayer());
 	}
-
-	public void renameTemplate(String newName) {
-		Template<TimedArcPetriNet> template = selectedModel();
-
-		template.model().setName(newName);
-		templateList.repaint();
-	}
-
-	private void removeTemplate() {
-		Template<TimedArcPetriNet> template = selectedModel();
+	
+	public void removeTemplate(int index, Template<TimedArcPetriNet> template) {
+		listModel.remove(index);
 		parent.network().remove(template.model());
+	}
+	
+	public void addTemplate(int index, Template<TimedArcPetriNet> template){
+		listModel.add(index, template);
+		parent.network().add(template.model());
 	}
 
 	private void openSelectedTemplate() {

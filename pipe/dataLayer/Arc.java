@@ -402,10 +402,9 @@ public int getLayerOffset() {
    
    
    @Override
-public void undelete(DataLayer model, DrawingSurfaceImpl view) {
+public void undelete(DrawingSurfaceImpl view) {
       if (this.isDeleted()) {
-         model.addPetriNetObject(this);
-         view.add(this);
+         super.undelete(view);
          getSource().addConnectFrom(this);
          getTarget().addConnectTo(this);
       }

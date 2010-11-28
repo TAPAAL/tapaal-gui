@@ -23,7 +23,7 @@ public class AddTimedOutputArcCommand extends AddTAPNElementCommand {
 	
 	@Override
 	public void redo() {
-		outputArc.undelete(guiModel, view);
+		outputArc.undelete(view);
 		tapn.add(outputArc.underlyingArc());
 		view.repaint();
 	}

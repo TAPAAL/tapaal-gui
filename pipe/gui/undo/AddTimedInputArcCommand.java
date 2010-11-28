@@ -23,7 +23,7 @@ extends AddTAPNElementCommand {
 	
 	@Override
 	public void redo() {
-		timedArc.undelete(guiModel, view);
+		timedArc.undelete(view);
 		tapn.add(timedArc.underlyingTimedInputArc());
 		view.repaint();
 	}

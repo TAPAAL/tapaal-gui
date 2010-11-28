@@ -20,7 +20,7 @@ public class AddTimedPlaceCommand extends AddTAPNElementCommand {
 	
 	@Override
 	public void redo() {
-		timedPlace.undelete(guiModel, view);
+		timedPlace.undelete(view);
 		tapn.add(timedPlace.underlyingPlace());
 		view.repaint();
 	}

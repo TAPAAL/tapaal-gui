@@ -40,7 +40,7 @@ public void undo() {
    /** */
    @Override
 public void redo() {
-      pnObject.undelete(model, view);
+      pnObject.undelete(view);
    }
    
    

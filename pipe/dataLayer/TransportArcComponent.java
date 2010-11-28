@@ -111,13 +111,13 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	}
 	
 	@Override
-	public void undelete(DataLayer model, DrawingSurfaceImpl view) {
-		super.undelete(model, view);
+	public void undelete(DrawingSurfaceImpl view) {
+		super.undelete(view);
 		
 		TransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a.connectedTo != null){
-			a.undelete(model,view);
+			a.undelete(view);
 			a.connectedTo = this;
 		}
 		connectedTo = a;

@@ -307,7 +307,7 @@ public int getLayerOffset() {
 
    
    @Override
-public void undelete(DataLayer model, DrawingSurfaceImpl view) {
+public void undelete(DrawingSurfaceImpl view) {
       ;
    }
    

@@ -23,7 +23,7 @@ public class AddTimedTransitionCommand extends AddTAPNElementCommand {
 	
 	@Override
 	public void redo() {
-		transition.undelete(guiModel, view);
+		transition.undelete(view);
 		tapn.add(transition.underlyingTransition());
 		view.repaint();
 	}

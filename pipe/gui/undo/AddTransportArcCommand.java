@@ -27,7 +27,7 @@ public class AddTransportArcCommand extends AddTAPNElementCommand {
 	public void redo() {
 		transportArcComponent.setUnderlyingArc(transportArc);
 		transportArcComponent.getConnectedTo().setUnderlyingArc(transportArc);
-		transportArcComponent.undelete(guiModel, view);
+		transportArcComponent.undelete(view);
 		tapn.add(transportArc);
 		view.repaint();
 	}

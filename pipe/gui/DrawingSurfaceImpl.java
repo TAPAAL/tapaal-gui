@@ -235,6 +235,7 @@ implements Observer, Printable, DrawingSurface {
 					newObject.zoomUpdate(getZoom());
 				}
 			}
+			newObject.setGuiModel(guiModel);
 		}
 		validate();
 		repaint();
@@ -853,5 +854,11 @@ EOC*/
 				}
 			}
 		}
+	}
+
+
+
+	public boolean isCurrentGuiModel(DataLayer dataLayer) {
+		return guiModel.equals(dataLayer);
 	}
 }
