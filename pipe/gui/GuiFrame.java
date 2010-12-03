@@ -1233,6 +1233,7 @@ EOC */
 
 			break;
 		case animation:
+			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().setNumberSequences(0);
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);

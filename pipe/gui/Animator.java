@@ -770,4 +770,10 @@ public class Animator {
 		
 		return !animationSelectmodeDialog.cancelled();
 	}
+	
+	public void reset(){
+		currentAction = -1;
+		actionHistory.clear();
+		markingHistory.clear();
+	}
 }
