@@ -44,7 +44,7 @@ public class CreateGui {
 
 	public static String imgPath, userPath; // useful for stuff
 
-	private static class TabData { // a structure for holding a tab's data
+	public static class TabData { // a structure for holding a tab's data
 		public DataLayer appModel;
 		public HashMap<PetriNetObject, String> oldGuards;
 		public GuiView appView;
@@ -136,11 +136,16 @@ public class CreateGui {
 			return null;
 		}
 
-		TabData tab = (tabs.get(index));
+		TabData tab = (getTabDataForTab(index));
 		if (tab.appModel == null) {
 			tab.appModel = new DataLayer();
 		}
 		return tab.appModel;
+	}
+
+
+	static TabData getTabDataForTab(int index) {
+		return tabs.get(index);
 	}
 
 
@@ -149,7 +154,7 @@ public class CreateGui {
 			return null;
 		}
 
-		TabData tab = (tabs.get(index));
+		TabData tab = (getTabDataForTab(index));
 		while (tab.appView == null) {
 			try {
 				tab.appView = new GuiView(tab.appModel);
@@ -176,7 +181,7 @@ public class CreateGui {
 		if (fileNo >= tabs.size()) {
 			return;
 		}
-		TabData tab = (tabs.get(fileNo));
+		TabData tab = (getTabDataForTab(fileNo));
 		tab.appFile = modelfile;
 	}
 
@@ -260,7 +265,7 @@ public class CreateGui {
 		}
 	}
 
-	private static void setupModelWithOldGuards(DataLayer model,
+	static void setupModelWithOldGuards(DataLayer model,
 			HashMap<PetriNetObject, String> oldGuards) {
 		for(Place p : model.getPlaces()){
 			if(p instanceof TimedPlace){
@@ -279,7 +284,7 @@ public class CreateGui {
 	}
 
 
-	private static HashMap<PetriNetObject, String> transformToModelWithoutConstants(DataLayer model) {
+	public static HashMap<PetriNetObject, String> transformToModelWithoutConstants(DataLayer model) {
 		HashMap<PetriNetObject, String> oldGuards = new HashMap<PetriNetObject, String>();
 
 		for(Place p : model.getPlaces()){

@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
@@ -60,6 +61,7 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlace;
+import pipe.gui.CreateGui.TabData;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -903,10 +905,19 @@ EOC */
 		try{
 			// BK 10/02/07:
 			// changed way of saving to accomodate new DataLayerWriter class
+			TabData tab = null;
+			if(getGUIMode().equals(GUIMode.animation) && !appModel.isUsingColors()){
+				tab = CreateGui.getTabDataForTab(CreateGui.getTab().getSelectedIndex());
+				CreateGui.setupModelWithOldGuards(appModel, tab.oldGuards);
+			}
 			DataLayerWriter saveModel = new DataLayerWriter(appModel);
 			saveModel.savePNML(outFile);
 			//appModel.savePNML(outFile);
 
+			if(getGUIMode().equals(GUIMode.animation) && !appModel.isUsingColors()){
+				tab.oldGuards = CreateGui.transformToModelWithoutConstants(appModel);
+			}
+			
 			CreateGui.setFile(outFile,appTab.getSelectedIndex());
 			appView.setNetChanged(false);
 			appTab.setTitleAt(appTab.getSelectedIndex(),outFile.getName());
