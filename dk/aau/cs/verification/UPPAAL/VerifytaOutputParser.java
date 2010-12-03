@@ -18,7 +18,7 @@ public class VerifytaOutputParser {
 				String line = lines[i];
 				if (line.contains(PROPERTY_IS_SATISFIED_STRING)) {
 					if(i+1 < lines.length && lines[i+1].contains("sup")){
-						line = lines[i+1];
+						line = lines[i+2];
 						String number = line.substring(line.lastIndexOf(" ")).trim();
 						return new QueryResult(Integer.parseInt(number));
 					}
