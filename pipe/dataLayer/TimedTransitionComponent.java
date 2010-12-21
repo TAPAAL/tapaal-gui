@@ -4,6 +4,8 @@ import java.awt.Container;
 
 import javax.swing.BoxLayout;
 
+import dk.aau.cs.model.tapn.TimedTransition;
+
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.EscapableDialog;
@@ -72,6 +74,10 @@ public class TimedTransitionComponent extends Transition {
 
 	public dk.aau.cs.model.tapn.TimedTransition underlyingTransition() {
 		return transition;
+	}
+
+	public void setUnderlyingTransition(TimedTransition transition) {
+		this.transition = transition;	
 	}
 
 }

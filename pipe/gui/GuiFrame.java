@@ -49,6 +49,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DataLayerWriter;
@@ -56,6 +57,7 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
@@ -65,6 +67,8 @@ import pipe.gui.widgets.QueryDialogue;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
@@ -983,16 +987,38 @@ EOC */
 				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 				Document doc = builder.parse(file);
 
+				
 				Node top = doc.getElementsByTagName("net").item(0);
 				NetType type = parseNetType(((Element)top).getAttribute("type"));
-
-				if(!type.equals(NetType.COLORED)){
-					PNMLTransformer transformer = new PNMLTransformer();
-					doc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
+				
+//				if(!type.equals(NetType.COLORED)){
+//					PNMLTransformer transformer = new PNMLTransformer();
+//					doc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
+//				}
+				
+				
+				NodeList nets = doc.getElementsByTagName("net");
+				TabContent currentTab = (TabContent)appTab.getSelectedComponent();
+				if (CreateGui.getApp()!=null) {
+					// Notifies used to indicate new instances.
+					CreateGui.getApp().setMode(Pipe.CREATING); 
 				}
-				appModel.createFromPNML(doc, type);
+				
+				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory();
+				for(int i = 0; i < nets.getLength(); i++) {
+					
+					Template<TimedArcPetriNet> template = factory.createTimedArcPetriNetFromPNML(nets.item(i));
+					currentTab.addTemplate(template);
+				}
+				
+				if (CreateGui.getApp()!=null) {
+					CreateGui.getApp().restoreMode();
+				}
+				
+				
+//				appModel.createFromPNML(doc, type);
 
-				appView.scrollRectToVisible(new Rectangle(0,0,1,1));
+				//appView.scrollRectToVisible(new Rectangle(0,0,1,1));
 
 				CreateGui.setFile(file,freeSpace);
 			} catch(Exception e) {

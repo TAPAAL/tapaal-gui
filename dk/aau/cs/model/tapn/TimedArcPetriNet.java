@@ -210,6 +210,24 @@ public class TimedArcPetriNet {
 		if(name != null && name != "")
 			name = newName;
 	}
+	
+	public TimedPlace getPlaceByName(String placeName) {
+		for(TimedPlace p : places) {
+			if(p.name() == placeName) {
+				return p;
+			}
+		}
+		return null;
+	}
+
+	public TimedTransition getTransitionByName(String transitionName) {
+		for(TimedTransition t : transitions) {
+			if(t.name() == transitionName) {
+				return t;
+			}
+		}
+		return null;
+	}
 
 	public void setMarking(TimedMarking marking) {
 		this.currentMarking = marking;		

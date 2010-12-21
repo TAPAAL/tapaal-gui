@@ -425,6 +425,13 @@ public class TabContent extends JSplitPane {
 		return list;
 	}
 
+
+	public void addTemplate(Template<TimedArcPetriNet> template) {
+		tapnNetwork.add(template.model());
+		guiModels.put(template.model(), template.guiModel());
+	}
+
+
 	public Template<TimedArcPetriNet> activeTemplate() {
 		return templateExplorer.selectedModel();
 	}

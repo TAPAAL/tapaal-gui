@@ -30,6 +30,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 	}
 
 	private void init() {
+		timeInterval = "[0,inf)";
 		updateWeightLabel();
 	}
 	
@@ -42,6 +43,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 	
 	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc);
+		timeInterval = guard;
 		updateWeightLabel();
 	}
 	

@@ -1,6 +1,12 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
+
+import pipe.gui.CreateGui;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
@@ -84,5 +90,40 @@ public class TimeInterval {
 	
 	public boolean IsUpperBoundNonStrict() {
 		return isUpperIncluded;
+	}
+
+	public static TimeInterval parse(String interval) {
+		Pattern pattern = Pattern.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
+		Matcher matcher = pattern.matcher(interval);
+		matcher.find();
+		
+		String leftBracket = matcher.group(1);
+		String lowerBoundAsString = matcher.group(2);
+		String upperBoundAsString = matcher.group(3);
+		String rightBracket = matcher.group(4);
+		
+		if(!(leftBracket.equals("[") || leftBracket.equals("("))) return null;
+		if(!(rightBracket.equals("]") || rightBracket.equals(")"))) return null;
+		
+		Bound lowerBound = null;
+		try{
+			int intLower = Integer.parseInt(lowerBoundAsString);
+			lowerBound = new IntBound(intLower);
+		} catch(NumberFormatException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Parsing time interval from string containing constants not yet implemented");
+		}
+		
+		Bound upperBound = null;
+		if(upperBoundAsString.equals("inf")) upperBound = Bound.Infinity;
+		else{
+			try{
+				int intBound = Integer.parseInt(upperBoundAsString);
+				upperBound = new IntBound(intBound);
+			}catch(NumberFormatException e){
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "Parsing time interval from string containing constants not yet implemented");
+			}
+		}
+		
+		return new TimeInterval(leftBracket.equals("[") ? true : false, lowerBound, upperBound, rightBracket.equals("]") ? true : false);	
 	}
 }

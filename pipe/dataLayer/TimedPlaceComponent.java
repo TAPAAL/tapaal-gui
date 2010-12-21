@@ -494,6 +494,11 @@ public class TimedPlaceComponent extends Place {
 		return place;
 	}
 
+	
+	public void setUnderlyingPlace(TimedPlace place) {
+		this.place = place;
+	}
+
 	public void addTokens(int numberOfTokensToAdd) {
 		for(int i = 0; i < numberOfTokensToAdd; i++){
 			place.addToken(new TimedToken(place, BigDecimal.ZERO));

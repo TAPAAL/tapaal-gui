@@ -27,7 +27,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	}
 	
 	public TransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
-		super(timedArc, timedArc.getGuardAsString());
+		super(timedArc, "");
 		this.isInPreSet = isInPreSet;
 		setHead();
 		this.setGroup(group);

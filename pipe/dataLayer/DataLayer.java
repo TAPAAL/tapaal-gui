@@ -211,7 +211,7 @@ implements Cloneable {
 	 * All observers are notified of this change (Model-View Architecture)
 	 * @param placeInput Place Object to add
 	 */
-	private void addPlace(Place placeInput) {
+	public void addPlace(Place placeInput) {
 		boolean unique = true;
 
 		if (placeInput != null) {
@@ -276,7 +276,7 @@ implements Cloneable {
 	 * All observers are notified of this change (Model-View Architecture)
 	 * @param labelInput AnnotationNote Object to add
 	 */
-	private void addAnnotation(AnnotationNote labelInput) {
+	public void addAnnotation(AnnotationNote labelInput) {
 		labelsArray.add(labelInput);
 		setChanged();
 		notifyObservers(labelInput);
@@ -287,7 +287,7 @@ implements Cloneable {
 	 * All observers are notified of this change (Model-View Architecture)
 	 * @param transitionInput Transition Object to add
 	 */
-	private void addTransition(Transition transitionInput) {
+	public void addTransition(Transition transitionInput) {
 		boolean unique = true;
 
 		if (transitionInput != null) {
@@ -455,6 +455,13 @@ implements Cloneable {
 			//notifyObservers(arcInput.getBounds());
 			notifyObservers(arcInput);
 		}
+	}
+	
+	public void addTransportArc(TransportArcComponent transportArc) {
+		arcsArray.add(transportArc);
+		addArcToArcsMap(transportArc);
+		setChanged();
+		notifyObservers();
 	}
 
 	public void addArc(TimedInhibitorArcComponent inhibitorArcInput) {
@@ -951,7 +958,7 @@ implements Cloneable {
 	 * @param inputLabelElement Input Label DOM Element
 	 * @return Label Object
 	 */
-	private AnnotationNote createAnnotation (Element inputLabelElement) {
+	public AnnotationNote createAnnotation (Element inputLabelElement) {
 		int positionXInput = 0;
 		int positionYInput = 0;
 		int widthInput = 0;
@@ -2040,6 +2047,14 @@ implements Cloneable {
 		}
 		return returnArray;
 	}
+	
+	public int getArcsCount() {
+		if (arcsArray == null) {
+			return 0;
+		} else {
+			return arcsArray.size();
+		}	  
+	}   
 
 
 	/**
@@ -2722,7 +2737,7 @@ implements Cloneable {
 
 
 
-	private TAPNQuery createQuery(Element queryElement) {
+	public TAPNQuery createQuery(Element queryElement) {
 
 		String comment;
 		try{
