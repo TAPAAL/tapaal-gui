@@ -17,7 +17,6 @@ public abstract class RunVerificationBase extends
 	private ModelChecker modelChecker;
 	private VerificationOptions options;
 	private TimedArcPetriNet model;
-	private long verificationTime = 0;
 	private TAPNQuery query;
 	protected Messenger messenger;
 	
@@ -36,11 +35,7 @@ public abstract class RunVerificationBase extends
 	
 	@Override
 	protected VerificationResult doInBackground() throws Exception {
-		long startMS = System.currentTimeMillis();
 		VerificationResult result = modelChecker.verify(options, model, query);
-		long endMS = System.currentTimeMillis();
-		
-		verificationTime = endMS - startMS;
 		return result;
 	}
 	
@@ -56,7 +51,7 @@ public abstract class RunVerificationBase extends
 				e.printStackTrace();
 			}
 			
-			showResult(result, verificationTime);
+			showResult(result, result.verificationTime());
 		}else{
 			modelChecker.kill();			
 			messenger.displayInfoMessage("Verification was interupted by the user. No result found!",
