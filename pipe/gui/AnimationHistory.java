@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Style;
@@ -41,13 +42,14 @@ public class AnimationHistory
    public AnimationHistory(String text) throws 
            javax.swing.text.BadLocationException {
       super();
-      initText = text;
+      this.setBorder(new EmptyBorder(0,0,0,0));
+      //initText = text;
       initStyles();
       doc = getDocument();
-      doc.insertString(doc.getLength(),text,bold);
+      //doc.insertString(doc.getLength(),"",bold);
       fSeq = new Vector<String>();
       fSeq.add("Initial Marking");
-      currentItem = 1;
+      currentItem = 0;
       updateText();
    }
    
@@ -87,10 +89,10 @@ public class AnimationHistory
    /** Method reinserts the text highlighting the currentItem */
    private void updateText() {
       String newS;
-      int count=1;
+      int count=0;
       Enumeration<String> e = fSeq.elements();
       try {
-         doc.remove(initText.length(),doc.getLength()-initText.length());
+         doc.remove(0,doc.getLength());
          
          while (e.hasMoreElements()) {
             newS = e.nextElement();

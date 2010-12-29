@@ -491,7 +491,6 @@ public class Animator {
 	}
 
 	public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
-		Animator animator = CreateGui.getAnimator();
 		DataLayer guiModel = template.guiModel();
 		if (guiModel.canTimePass(timeToPass)){
 
@@ -532,9 +531,8 @@ public class Animator {
 
 
 			guiModel.setEnabledTransitions();
-			animator.highlightEnabledTransitions();
-			animator.unhighlightDisabledTransitions();
-
+			highlightEnabledTransitions();
+			unhighlightDisabledTransitions();
 		}
 
 

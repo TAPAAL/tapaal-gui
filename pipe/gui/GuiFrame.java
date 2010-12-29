@@ -1167,14 +1167,16 @@ EOC */
 			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
 			if(this.guiMode.equals(GUIMode.animation)) CreateGui.getAnimator().restoreModel();
-			CreateGui.removeAnimationHistory();
-			CreateGui.removeAnimationController();
+			
+			CreateGui.switchToEditorComponents();
+			//CreateGui.removeAnimationHistory();
+			//CreateGui.removeAnimationController();
 
 			//If abstract animation pane is shown, remove it when 
 			// Gowing out of animation mode.
-			CreateGui.removeAbstractAnimationPane();
+			//CreateGui.removeAbstractAnimationPane();
 
-			CreateGui.createLeftPane();
+			//CreateGui.createLeftPane();
 
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
@@ -1188,8 +1190,9 @@ EOC */
 			CreateGui.getAnimator().storeModel();
 			CreateGui.currentPNMLData().setEnabledTransitions();
 			CreateGui.getAnimator().highlightEnabledTransitions();
-			CreateGui.addAnimationHistory();
-			CreateGui.addAnimationController();
+			//CreateGui.addAnimationHistory();
+			//CreateGui.addAnimationController();
+			CreateGui.switchToAnimationComponents();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 

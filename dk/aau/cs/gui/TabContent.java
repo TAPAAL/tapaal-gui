@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
@@ -57,7 +58,7 @@ public class TabContent extends JSplitPane {
 	private File appFile;
 	
 	// Normal mode
-	private JSplitPane leftPane;
+	private JSplitPane editorLeftPane;
 	private JSplitPane queryConstantsSplit;
 	private LeftQueryPane queries;
 	private LeftConstantsPane leftBottomPanel;
@@ -66,8 +67,8 @@ public class TabContent extends JSplitPane {
 	/// Animation
 	private AnimationHistory animBox;
 	private AnimationController animControlerBox;
-	private JScrollPane scroller;
-	private JScrollPane scroller2;
+	private JScrollPane animationHistoryScrollPane;
+	private JScrollPane animationControllerScrollPane;
 	private AnimationHistory abstractAnimationPane=null;
 		
 	public TabContent()
@@ -85,18 +86,10 @@ public class TabContent extends JSplitPane {
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		
-		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		leftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
-		leftPane.setMinimumSize(new Dimension(175,100));
-		
-		queryConstantsSplit = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		queryConstantsSplit.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
-		queryConstantsSplit.setMinimumSize(new Dimension(175,100));
-		createLeftPane();
-		
-		
+		createEditorLeftPane();
+				
 		this.setOrientation(HORIZONTAL_SPLIT);
-		this.setLeftComponent(leftPane);
+		this.setLeftComponent(editorLeftPane);
 		this.setRightComponent(drawingSurfaceScroller);
 		
 		this.setContinuousLayout(true);
@@ -105,7 +98,10 @@ public class TabContent extends JSplitPane {
 		this.setDividerSize(8);
 	}
 	
-	public void createLeftPane(){
+	public void createEditorLeftPane(){
+		editorLeftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+		editorLeftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
+		editorLeftPane.setMinimumSize(new Dimension(175,100));
 		boolean enableAddButton = appModel == null ? true : !appModel.netType().equals(NetType.UNTIMED);
 		leftBottomPanel = new LeftConstantsPane(enableAddButton);
 		queries = new LeftQueryPane(
@@ -114,6 +110,9 @@ public class TabContent extends JSplitPane {
 
 		templateExplorer = new TemplateExplorer(this);
 		
+		queryConstantsSplit = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+//		queryConstantsSplit.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
+//		queryConstantsSplit.setMinimumSize(new Dimension(175,100));
 		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
 		queryConstantsSplit.setResizeWeight(0.5);
 		queryConstantsSplit.setTopComponent(queries);
@@ -121,12 +120,12 @@ public class TabContent extends JSplitPane {
 		queryConstantsSplit.setContinuousLayout(true);
 		queryConstantsSplit.setDividerSize(0);
 		
-		leftPane.setDividerLocation(0.3);
-		leftPane.setResizeWeight(0.5);
-		leftPane.setTopComponent(templateExplorer);
-		leftPane.setBottomComponent(queryConstantsSplit);
-		leftPane.setContinuousLayout(true);
-		leftPane.setDividerSize(0);
+		editorLeftPane.setDividerLocation(0.3);
+		editorLeftPane.setResizeWeight(0.5);
+		editorLeftPane.setTopComponent(templateExplorer);
+		editorLeftPane.setBottomComponent(queryConstantsSplit);
+		editorLeftPane.setContinuousLayout(true);
+		editorLeftPane.setDividerSize(0);
 		
 		updateLeftPanel();
 	}
@@ -136,7 +135,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void updateLeftPanel() {
-		leftPane.validate();
+		editorLeftPane.validate();
 	}
 	
 	public DataLayer getModel()
@@ -294,23 +293,53 @@ public class TabContent extends JSplitPane {
 	}
 	
 	/** Creates a new animationHistory text area, and returns a reference to it*/
-	public void addAnimationHistory() {
+	private void createAnimationHistory() {
 		try {
 			animBox = new AnimationHistory("Simulation history\n");
 			animBox.setEditable(false);
 
-			scroller = new JScrollPane(animBox);
-			scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
-			leftPane.setBottomComponent(scroller);
-
-			//         leftPane.setDividerLocation(0.5);
-			leftPane.setResizeWeight(0.05f);
-
-			leftPane.setDividerSize(8);
+			animationHistoryScrollPane = new JScrollPane(animBox);
+			animationHistoryScrollPane.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Simulation History"),
+				BorderFactory.createEmptyBorder(3,3,3,3)
+			)); 
+//			leftPane.setBottomComponent(scroller);
+//
+//			//         leftPane.setDividerLocation(0.5);
+//			leftPane.setResizeWeight(0.05f);
+//
+//			leftPane.setDividerSize(8);
 		} catch (javax.swing.text.BadLocationException be) {
 			be.printStackTrace();
 		}
+	}
+	
+	public void switchToAnimationComponents(){
+		createAnimationHistory();
+		createAnimationController();
+		
+		JSplitPane animatorLeftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+		//animatorLeftPane.setLayout(new BorderLayout());
+		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
+		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
+		
+		animatorLeftPane.setDividerLocation(0.25);
+		animatorLeftPane.setResizeWeight(0);
+		animatorLeftPane.setTopComponent(new TemplateExplorer(this, true));
+		
+		JSplitPane panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		panel.setResizeWeight(0);
+		panel.setDividerLocation(-1);
+		panel.setTopComponent(animControlerBox);
+		panel.setBottomComponent(animationHistoryScrollPane);
+		
+		animatorLeftPane.setBottomComponent(panel);
+		this.setLeftComponent(animatorLeftPane);
+		this.setDividerLocation(-1);
+	}
+	
+	public void switchToEditorComponents(){
+		this.setLeftComponent(editorLeftPane);
 	}
 
 	public AnimationHistory getAbstractAnimationPane(){
@@ -351,52 +380,47 @@ public class TabContent extends JSplitPane {
 
 		pane2.setDividerSize(8);
 
-		leftPane.setBottomComponent(pane2);
+		editorLeftPane.setBottomComponent(pane2);
 		abstractAnimationPane.setBorder(new LineBorder(Color.black));
 
 	}
 
 	public void removeAbstractAnimationPane() {
 		abstractAnimationPane=null;
-		scroller = new JScrollPane(animBox);
-		scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-		leftPane.setBottomComponent(scroller);
+		animationHistoryScrollPane = new JScrollPane(animBox);
+		animationHistoryScrollPane.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+		editorLeftPane.setBottomComponent(animationHistoryScrollPane);
 	}
 
-	public void addAnimationController() {
-		try {
-			animControlerBox = new AnimationController("Simulation Controler\n");
+	private void createAnimationController() {
+			animControlerBox = new AnimationController();
 
-			scroller2 = new JScrollPane(animControlerBox);
-			scroller2.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
-			leftPane.setTopComponent(scroller2);
-
-			//         leftPane.setDividerLocation(0.5);
-			leftPane.setDividerSize(8);
-			leftPane.resetToPreferredSizes();
-			//shortcutBottons should be usable from start of
+			animationControllerScrollPane = new JScrollPane(animControlerBox);
+			animationControllerScrollPane.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+//
+//			leftPane.setTopComponent(scroller2);
+//
+//			//         leftPane.setDividerLocation(0.5);
+//			leftPane.setDividerSize(8);
+//			leftPane.resetToPreferredSizes();
+//			//shortcutBottons should be usable from start of
 			animControlerBox.requestFocus(true);
-		} catch (javax.swing.text.BadLocationException be) {
-			be.printStackTrace();
-			System.out.println("There where an error in creating the AnimationControler");
-		}
 	}
 
-	public void removeAnimationHistory() {
-		if (scroller != null) {
-			leftPane.remove(scroller);
-			leftPane.setDividerLocation(DIVIDER_LOCATION);
-			leftPane.setDividerSize(0);
-		}
-	}
-	public void removeAnimationController() {
-		if (scroller != null) {
-			leftPane.remove(scroller2);
-			leftPane.setDividerLocation(DIVIDER_LOCATION);
-			leftPane.setDividerSize(0);
-		}
-	}
+//	public void removeAnimationHistory() {
+//		if (scroller != null) {
+//			leftPane.remove(scroller);
+//			leftPane.setDividerLocation(DIVIDER_LOCATION);
+//			leftPane.setDividerSize(0);
+//		}
+//	}
+//	public void removeAnimationController() {
+//		if (scroller != null) {
+//			leftPane.remove(scroller2);
+//			leftPane.setDividerLocation(DIVIDER_LOCATION);
+//			leftPane.setDividerSize(0);
+//		}
+//	}
 
 
 	public AnimationHistory getAnimationHistory() {

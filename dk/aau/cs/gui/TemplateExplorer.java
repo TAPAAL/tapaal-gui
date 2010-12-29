@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -41,7 +42,6 @@ public class TemplateExplorer extends JPanel {
 
 	// Template explorer panel items
 	private JPanel templatePanel;
-	private JLabel templateLabel;
 	private JScrollPane scrollpane;
 	private JList templateList;
 	private DefaultListModel listModel;
@@ -53,44 +53,53 @@ public class TemplateExplorer extends JPanel {
 	private JButton renameButton;
 	private JButton copyButton;
 
-
 	private TabContent parent;
 	private UndoManager undoManager;
 
-	public TemplateExplorer(TabContent parent)
-	{
+	public TemplateExplorer(TabContent parent) {
+		this(parent, false);
+	}
+
+	public TemplateExplorer(TabContent parent, boolean hideButtons) {
 		this.parent = parent;
 		undoManager = parent.drawingSurface().getUndoManager();
 		this.setLayout(new BorderLayout());
-		init();
+		init(hideButtons);
 	}
 
-	private void init()
-	{
+	private void init(boolean hideButtons) {
 		initExplorerPanel();
-		initButtonsPanel();
 
-		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, templatePanel, buttonPanel);
-		splitPane.setContinuousLayout(true);
-		splitPane.setDividerSize(0);
-		splitPane.setDividerLocation(0.8);
-		splitPane.setResizeWeight(1.0);
-		this.add(splitPane);
+		if (!hideButtons) {
+			initButtonsPanel();
+			splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
+					templatePanel, buttonPanel);
+			splitPane.setContinuousLayout(true);
+			splitPane.setDividerSize(0);
+			splitPane.setDividerLocation(0.8);
+			splitPane.setResizeWeight(1.0);
+			this.add(splitPane);
+		} else {
+			this.add(templatePanel);
+		}
+		setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createTitledBorder("Templates"), 
+			BorderFactory.createEmptyBorder(3,3,3,3))
+		);
 	}
 
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new BorderLayout());
-
 		listModel = new DefaultListModel();
-		for(Template<?> net : parent.templates()){
+		for (Template<?> net : parent.templates()) {
 			listModel.addElement(net);
 		}
 
-		listModel.addListDataListener(new ListDataListener(){
+		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if(listModel.size() == 1){
+				if (listModel.size() == 1) {
 					removeTemplateButton.setEnabled(false);
-				}else{
+				} else {
 					removeTemplateButton.setEnabled(true);
 				}
 			}
@@ -100,7 +109,8 @@ public class TemplateExplorer extends JPanel {
 			}
 
 			public void intervalRemoved(ListDataEvent arg0) {
-				templateList.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0()-1);		
+				templateList.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0
+						.getIndex0() - 1);
 			}
 		});
 
@@ -111,28 +121,29 @@ public class TemplateExplorer extends JPanel {
 		templateList.setLayoutOrientation(JList.VERTICAL);
 		templateList.setAlignmentX(Component.LEFT_ALIGNMENT);
 		templateList.setAlignmentY(Component.TOP_ALIGNMENT);
-		templateList.addListSelectionListener(new ListSelectionListener(){
-			public void valueChanged(ListSelectionEvent e){
+		templateList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
 					if (templateList.getSelectedIndex() == -1) {
 						removeTemplateButton.setEnabled(false);
 						renameButton.setEnabled(false);
 						copyButton.setEnabled(false);
 					} else {
-						if(listModel.size() > 1) removeTemplateButton.setEnabled(true);
+						if (listModel.size() > 1)
+							removeTemplateButton.setEnabled(true);
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
-						templateList.ensureIndexIsVisible(e.getFirstIndex());						
+						templateList.ensureIndexIsVisible(e.getFirstIndex());
 						openSelectedTemplate();
 					}
 				}
 			}
 		});
 
-		templateLabel = new JLabel("Templates:");
-		templateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		templateLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-		templatePanel.add(templateLabel, BorderLayout.PAGE_START);
+		// templateLabel = new JLabel("Templates:");
+		// templateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		// templateLabel.setAlignmentY(Component.TOP_ALIGNMENT);
+		// templatePanel.add(templateLabel, BorderLayout.PAGE_START);
 
 		scrollpane = new JScrollPane(templateList);
 		templatePanel.add(scrollpane, BorderLayout.CENTER);
@@ -142,7 +153,7 @@ public class TemplateExplorer extends JPanel {
 	private void initButtonsPanel() {
 		buttonPanel = new JPanel(new GridBagLayout());
 
-		Dimension dimension = new Dimension(82,23);
+		Dimension dimension = new Dimension(82, 23);
 		newTemplateButton = new JButton("New");
 		newTemplateButton.setEnabled(true);
 		newTemplateButton.setPreferredSize(dimension);
@@ -150,10 +161,11 @@ public class TemplateExplorer extends JPanel {
 		newTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Template<TimedArcPetriNet> template = ShowNewTemplateDialog();
-				if(template != null){
+				if (template != null) {
 					int index = listModel.size();
 					listModel.addElement(template);
-					undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+					undoManager.addNewEdit(new AddTemplateCommand(
+							TemplateExplorer.this, template, index));
 				}
 			}
 		});
@@ -162,7 +174,7 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		buttonPanel.add(newTemplateButton,gbc);
+		buttonPanel.add(newTemplateButton, gbc);
 
 		removeTemplateButton = new JButton("Remove");
 		removeTemplateButton.setEnabled(false);
@@ -170,13 +182,16 @@ public class TemplateExplorer extends JPanel {
 
 		removeTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: check if any local places are used in queries and if so warn user that these queries are removed too.
-				//removeSelectedTemplate();
-				//listModel.remove(templateList.getSelectedIndex());
+				// TODO: check if any local places are used in queries and if so
+				// warn user that these queries are removed too.
+				// removeSelectedTemplate();
+				// listModel.remove(templateList.getSelectedIndex());
 				int index = templateList.getSelectedIndex();
-				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>)templateList.getSelectedValue();
-				
-				Command command = new RemoveTemplateCommand(TemplateExplorer.this, template, index);
+				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>) templateList
+				.getSelectedValue();
+
+				Command command = new RemoveTemplateCommand(
+						TemplateExplorer.this, template, index);
 				undoManager.addNewEdit(command);
 				command.redo();
 			}
@@ -186,7 +201,7 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		buttonPanel.add(removeTemplateButton,gbc);
+		buttonPanel.add(removeTemplateButton, gbc);
 
 		renameButton = new JButton("Rename");
 		renameButton.setEnabled(false);
@@ -203,7 +218,7 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		buttonPanel.add(renameButton,gbc);
+		buttonPanel.add(renameButton, gbc);
 
 		copyButton = new JButton("Copy");
 		copyButton.setEnabled(false);
@@ -221,16 +236,23 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		buttonPanel.add(copyButton,gbc);
+		buttonPanel.add(copyButton, gbc);
 	}
 
-
 	private Template<TimedArcPetriNet> ShowNewTemplateDialog() {
-		String templateName = (String)JOptionPane.showInputDialog(parent.drawingSurface(), "Template name:", "Rename Template", JOptionPane.PLAIN_MESSAGE, null, null, "New TAPN Template " + (++templateID));
+		String templateName = (String) JOptionPane.showInputDialog(parent
+				.drawingSurface(), "Template name:", "Rename Template",
+				JOptionPane.PLAIN_MESSAGE, null, null, "New TAPN Template "
+				+ (++templateID));
 
-		if(templateName != null && templateName.length() <= 0)
-			JOptionPane.showMessageDialog(parent.drawingSurface(), "New TAPN template could not be created:\n\nYou must provide a proper name for the template", "Error Creating Template", JOptionPane.ERROR_MESSAGE);
-		else if(templateName != null && templateName.length() > 0){
+		if (templateName != null && templateName.length() <= 0)
+			JOptionPane
+			.showMessageDialog(
+					parent.drawingSurface(),
+					"New TAPN template could not be created:\n\nYou must provide a proper name for the template",
+					"Error Creating Template",
+					JOptionPane.ERROR_MESSAGE);
+		else if (templateName != null && templateName.length() > 0) {
 			Template<TimedArcPetriNet> template = createNewTemplate(templateName);
 			return template;
 		}
@@ -240,35 +262,48 @@ public class TemplateExplorer extends JPanel {
 	private void showRenameTemplateDialog() {
 		Template<TimedArcPetriNet> template = selectedModel();
 
-		String newName = (String)JOptionPane.showInputDialog(parent.drawingSurface(), "Template name:", "Rename Template", JOptionPane.PLAIN_MESSAGE, null, null, template.model().getName());
-		if(template.model().getName().equals(newName)) return;
-		
-		if(newName != null && newName.length() <= 0)
-			JOptionPane.showMessageDialog(parent.drawingSurface(), "TAPN template could not be renamed:\n\nYou must provide a proper name for the template", "Error Renaming Template", JOptionPane.ERROR_MESSAGE);
-		else if(parent.network().hasTAPNCalled(newName)){
-			JOptionPane.showMessageDialog(parent.drawingSurface(), "There is already a template with that name. Try another name.", "Error", JOptionPane.ERROR_MESSAGE);
-		}else{
-			Command command = new RenameTemplateCommand(this, template.model(), template.model().getName(), newName);
+		String newName = (String) JOptionPane.showInputDialog(parent
+				.drawingSurface(), "Template name:", "Rename Template",
+				JOptionPane.PLAIN_MESSAGE, null, null, template.model()
+				.getName());
+		if (template.model().getName().equals(newName))
+			return;
+
+		if (newName != null && newName.length() <= 0)
+			JOptionPane
+			.showMessageDialog(
+					parent.drawingSurface(),
+					"TAPN template could not be renamed:\n\nYou must provide a proper name for the template",
+					"Error Renaming Template",
+					JOptionPane.ERROR_MESSAGE);
+		else if (parent.network().hasTAPNCalled(newName)) {
+			JOptionPane
+			.showMessageDialog(
+					parent.drawingSurface(),
+					"There is already a template with that name. Try another name.",
+					"Error", JOptionPane.ERROR_MESSAGE);
+		} else {
+			Command command = new RenameTemplateCommand(this, template.model(),
+					template.model().getName(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();
 		}
-		
+
 	}
 
-	public Template<TimedArcPetriNet> createNewTemplate(String name)
-	{
+	public Template<TimedArcPetriNet> createNewTemplate(String name) {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		parent.network().add(tapn);
 
 		return new Template<TimedArcPetriNet>(tapn, new DataLayer());
 	}
-	
+
 	public void removeTemplate(int index, Template<TimedArcPetriNet> template) {
 		listModel.remove(index);
 		parent.network().remove(template.model());
 	}
-	
-	public void addTemplate(int index, Template<TimedArcPetriNet> template){
+
+	public void addTemplate(int index, Template<TimedArcPetriNet> template) {
 		listModel.add(index, template);
 		parent.network().add(template.model());
 	}
@@ -279,6 +314,6 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public Template<TimedArcPetriNet> selectedModel() {
-		return (Template<TimedArcPetriNet>)templateList.getSelectedValue();
+		return (Template<TimedArcPetriNet>) templateList.getSelectedValue();
 	}
 }

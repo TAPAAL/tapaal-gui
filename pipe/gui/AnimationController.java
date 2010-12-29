@@ -1,5 +1,7 @@
 package pipe.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,6 +16,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,6 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
 import pipe.exception.InvariantViolatedAnimationException;
@@ -84,10 +88,7 @@ public class AnimationController extends JPanel {
 	AnimateAction startAction, stepforwardAction, stepbackwardAction,
 	randomAction, randomAnimateAction, timeAction;
 
-	public AnimationController(String text) throws 
-	javax.swing.text.BadLocationException {
-
-
+	public AnimationController() {
 		startAction = new AnimateAction("Simulation mode", 
 				Pipe.START, "Toggle Simulation Mode", "Ctrl A", true);
 
@@ -120,14 +121,6 @@ public class AnimationController extends JPanel {
 		//Use the default FlowLayout.
 		//Create everything.
 
-		JLabel label = new JLabel("Simulator");
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 0;
-		add(label, c);
-
 		firermodebox = new JComboBox(FIRINGMODES);
 		updateFiringModeComboBox();
 
@@ -141,6 +134,7 @@ public class AnimationController extends JPanel {
 		
 		JToolBar animationToolBar = new JToolBar();
 		animationToolBar.setFloatable(false);
+		animationToolBar.setBorder(new EmptyBorder(0,0,0,0));
 		addButton(animationToolBar, stepbackwardAction);
 		addButton(animationToolBar, stepforwardAction);
 
@@ -149,13 +143,13 @@ public class AnimationController extends JPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 0;
-		c.gridy = 2;
+		c.gridy = 1;
 		add(animationToolBar, c);    
 		
 		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
 			JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-			label = new JLabel("Token selection mode: ");
+			JLabel label = new JLabel("Token selection mode: ");
 
 			firemode.add(label);
 			firemode.add(firermodebox);
@@ -164,7 +158,7 @@ public class AnimationController extends JPanel {
 
 			c.weightx = 0.5;
 			c.gridx = 0;
-			c.gridy = 1;
+			c.gridy = 0;
 			add(firemode, c);
 			
 
@@ -219,6 +213,13 @@ public class AnimationController extends JPanel {
 			//		      add(timedelayPanel, c);
 			animationToolBar.add(timedelayPanel);		
 		}  
+		
+		setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createTitledBorder("Simulation Control"), 
+			BorderFactory.createEmptyBorder(3,3,3,3)
+		));
+		this.setPreferredSize(new Dimension(275,100));
+		this.setMinimumSize(new Dimension(275,100));
 	}
 
 	public void updateFiringModeComboBox() {

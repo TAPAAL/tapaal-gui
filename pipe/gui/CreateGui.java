@@ -178,9 +178,14 @@ public class CreateGui {
 
 
 	/** Creates a new animationHistory text area, and returns a reference to it*/
-	public static void addAnimationHistory() {
+	public static void switchToAnimationComponents() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.addAnimationHistory();
+		tab.switchToAnimationComponents();
+	}
+	
+	public static void switchToEditorComponents() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.switchToEditorComponents();
 	}
 
 	public static AnimationHistory getAbstractAnimationPane(){
@@ -204,20 +209,20 @@ public class CreateGui {
 		tab.removeAbstractAnimationPane();
 	}
 
-	public static void addAnimationController() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.addAnimationController();
-	}
+//	public static void addAnimationController() {
+//		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+//		//tab.addAnimationController();
+//	}
 
-	public static void removeAnimationHistory() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.removeAnimationHistory();
-	}
-	
-	public static void removeAnimationController() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.removeAnimationController();
-	}
+//	public static void removeAnimationHistory() {
+//		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+//		tab.removeAnimationHistory();
+//	}
+//	
+//	public static void removeAnimationController() {
+//		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+//		tab.removeAnimationController();
+//	}
 
 
 	public static AnimationHistory getAnimationHistory() {
@@ -227,7 +232,7 @@ public class CreateGui {
 
 	public static void createLeftPane(){
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.createLeftPane();
+		tab.createEditorLeftPane();
 	}
 
 	public static void updateConstantsList(){
@@ -244,5 +249,4 @@ public class CreateGui {
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size()-1);
 	}
-
 }

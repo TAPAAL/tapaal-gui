@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -37,7 +38,6 @@ public class LeftConstantsPane extends JPanel {
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
 	private JPanel addConstantPanel;
-	private JLabel constantsLabel;
 
 	private JList constantsList;
 	private DefaultListModel listModel;
@@ -103,7 +103,12 @@ public class LeftConstantsPane extends JPanel {
 		splitPane.setDividerLocation(0.9);
 		splitPane.setResizeWeight(1.0);
 		this.add(splitPane);
-
+		
+		setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Constants"), 
+				BorderFactory.createEmptyBorder(3,3,3,3))
+			);
+		
 		showConstants();
 	}
 
@@ -159,17 +164,10 @@ public class LeftConstantsPane extends JPanel {
 
 	private void addConstantsComponents()
 	{
-		addConstantsLabel();
 		constantsScroller = new JScrollPane(constantsList);
 		constantsPanel.add(constantsScroller, BorderLayout.CENTER);
 	}
 
-	private void addConstantsLabel() {
-		constantsLabel = new JLabel("Constants:");
-		constantsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		constantsLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-		constantsPanel.add(constantsLabel, BorderLayout.PAGE_START);
-	}
 
 	private void showEditConstantDialog(Constant constant) {
 		EscapableDialog guiDialog = 

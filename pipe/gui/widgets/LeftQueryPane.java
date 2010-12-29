@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -43,7 +44,6 @@ public class LeftQueryPane extends JPanel {
 	private JButton editQueryButton;
 	private JButton verifyButton;
 	
-	private JLabel verifyLabel;
 	private JButton removeQueryButton;
 	
 	public LeftQueryPane(ArrayList<TAPNQuery> queriesToSet) {		
@@ -100,15 +100,15 @@ public class LeftQueryPane extends JPanel {
 		splitPane.setResizeWeight(1.0);
 		this.add(splitPane);
 		
+		setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Queries"), 
+				BorderFactory.createEmptyBorder(3,3,3,3))
+			);
+		
 		showQueries();
 	}
 
 	private void addQueriesComponents() {
-		verifyLabel = new JLabel("Queries:");
-		verifyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		verifyLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-		queryCollectionPanel.add(verifyLabel, BorderLayout.PAGE_START);
-		
 		queryScroller = new JScrollPane(queryList);
 		queryCollectionPanel.add(queryScroller, BorderLayout.CENTER);
 	}
