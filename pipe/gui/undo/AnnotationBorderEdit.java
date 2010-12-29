@@ -4,8 +4,8 @@
 
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Note;
+import dk.aau.cs.gui.undo.Command;
 
 /**
  *

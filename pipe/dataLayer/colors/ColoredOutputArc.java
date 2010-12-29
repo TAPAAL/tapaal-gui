@@ -1,9 +1,9 @@
 package pipe.dataLayer.colors;
 
-import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PlaceTransitionObject;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.gui.undo.ColoredOutputArcOutputValueEdit;
+import dk.aau.cs.gui.undo.Command;
 
 public class ColoredOutputArc extends TimedOutputArcComponent {
 	private IntOrConstant outputValue = new IntOrConstant();

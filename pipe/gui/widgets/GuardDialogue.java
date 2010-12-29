@@ -29,15 +29,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.ConstantBound;
-import dk.aau.cs.model.tapn.IntBound;
-
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
@@ -50,6 +45,10 @@ import pipe.dataLayer.colors.IntervalBound;
 import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 
 public class GuardDialogue extends JPanel /*implements ActionListener, PropertyChangeListener*/
 {
@@ -471,7 +470,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 						else
 							rightInterval = new IntBound((Integer)secondIntervalNumber.getValue());
 
-						if (leftInterval.value() <= rightInterval.value()){
+						if (rightInterval instanceof InfBound || leftInterval.value() <= rightInterval.value()){
 							return new dk.aau.cs.model.tapn.TimeInterval((leftDelim == "[" ? true : false), leftInterval, rightInterval, (rightDelim == "]" ? true : false));
 						}else {
 							return oldGuard;

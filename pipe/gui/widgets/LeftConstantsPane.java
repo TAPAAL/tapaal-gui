@@ -22,12 +22,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import dk.aau.cs.gui.undo.Command;
 
 public class LeftConstantsPane extends JPanel {
 	/**

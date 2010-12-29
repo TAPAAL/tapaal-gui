@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
+import pipe.dataLayer.TimedInputArcComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
-import pipe.dataLayer.TimedInputArcComponent;
 
 public class ArcTimeIntervalEdit extends Command {
 	private TimedInputArcComponent arc;

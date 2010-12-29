@@ -2,8 +2,10 @@ package pipe.gui;
 
 import java.io.File;
 import java.util.ArrayList;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
+
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;

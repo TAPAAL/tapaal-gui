@@ -1,9 +1,9 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.ConstantStore;
 import pipe.gui.CreateGui;
+import dk.aau.cs.gui.undo.Command;
 
 public class AddConstantEdit extends Command {
 	private Constant constant;

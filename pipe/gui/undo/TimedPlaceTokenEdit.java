@@ -3,9 +3,8 @@ package pipe.gui.undo;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.TimedPlaceComponent;
+import dk.aau.cs.gui.undo.Command;
 
 
 public class TimedPlaceTokenEdit extends Command {

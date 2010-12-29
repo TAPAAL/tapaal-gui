@@ -5,21 +5,15 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
 import javax.swing.JOptionPane;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.util.RequireException;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
-import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
@@ -38,6 +32,12 @@ import pipe.gui.undo.AddTimedInputArcCommand;
 import pipe.gui.undo.AddTimedOutputArcCommand;
 import pipe.gui.undo.AddTransportArcCommand;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.util.RequireException;
 /**
  * Class used to implement methods corresponding to mouse events on places.
  *

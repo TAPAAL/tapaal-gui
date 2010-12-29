@@ -3,7 +3,6 @@ package pipe.dataLayer;
 import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -14,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
@@ -23,6 +20,7 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
 import pipe.gui.undo.TransitionServerSemanticEdit;
 import pipe.gui.undo.TransitionTimingEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

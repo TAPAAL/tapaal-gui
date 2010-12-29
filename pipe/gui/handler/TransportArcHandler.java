@@ -10,7 +10,6 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.action.SplitArcAction;
 

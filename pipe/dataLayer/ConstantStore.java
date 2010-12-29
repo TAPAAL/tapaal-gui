@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.colors.ColorSet;
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
@@ -22,6 +20,7 @@ import pipe.dataLayer.colors.IntOrConstantRange;
 import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
 import pipe.gui.undo.UpdateConstantEdit;
+import dk.aau.cs.gui.undo.Command;
 
 public class ConstantStore {
 	private TreeMap<String, Constant> constants = new TreeMap<String, Constant>();

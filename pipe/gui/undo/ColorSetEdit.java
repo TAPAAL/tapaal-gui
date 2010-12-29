@@ -1,7 +1,7 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColorSet;
+import dk.aau.cs.gui.undo.Command;
 
 public abstract class ColorSetEdit extends Command {
 

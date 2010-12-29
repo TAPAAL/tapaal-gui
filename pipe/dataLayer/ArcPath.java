@@ -17,13 +17,12 @@ import java.util.List;
 
 import javax.swing.JLayeredPane;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.ArcPathPointHandler;
 import pipe.gui.undo.AddArcPathPointEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

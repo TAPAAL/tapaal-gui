@@ -1,7 +1,7 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.TransportArcComponent;
+import dk.aau.cs.gui.undo.Command;
 
 public class TransportArcGroupEdit extends Command {
 	private TransportArcComponent myArc;

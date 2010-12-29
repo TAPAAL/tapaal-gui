@@ -8,8 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.simulation.Marking;
 import pipe.gui.CreateGui;
 import pipe.gui.Grid;
@@ -17,6 +15,7 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.PlaceCapacityEdit;
 import pipe.gui.undo.PlaceMarkingEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

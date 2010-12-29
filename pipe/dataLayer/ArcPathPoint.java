@@ -14,13 +14,12 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcPathPointTypeEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 public class ArcPathPoint 

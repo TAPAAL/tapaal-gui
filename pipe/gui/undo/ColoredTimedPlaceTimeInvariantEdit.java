@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredTimeInvariant;
 import pipe.dataLayer.colors.ColoredTimedPlace;
+import dk.aau.cs.gui.undo.Command;
 
 public class ColoredTimedPlaceTimeInvariantEdit extends Command {
 

@@ -4,10 +4,10 @@
 
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPath;
 import pipe.dataLayer.ArcPathPoint;
+import dk.aau.cs.gui.undo.Command;
 
 /**
  *

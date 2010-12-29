@@ -8,26 +8,22 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
-import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.InhibitorArc;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.action.EditWeightAction;
-import pipe.gui.action.InsertPointAction;
 import pipe.gui.action.SplitArcAction;
-import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.OutputValueEditorPanel;
 

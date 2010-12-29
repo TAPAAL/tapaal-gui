@@ -6,10 +6,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.gui.Pipe;
 import pipe.gui.undo.TokenValueEdit;
+import dk.aau.cs.gui.undo.Command;
 
 public class ColoredToken {
 	private BigDecimal age;

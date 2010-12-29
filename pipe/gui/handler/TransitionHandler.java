@@ -10,8 +10,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
@@ -19,6 +17,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
  * Class used to implement methods corresponding to mouse events on transitions.

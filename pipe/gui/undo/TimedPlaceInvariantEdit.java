@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
+import pipe.dataLayer.TimedPlaceComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInvariant;
-import pipe.dataLayer.TimedPlaceComponent;
 
 public class TimedPlaceInvariantEdit extends Command {
 

@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.TransportArc;
-
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.TransportArcGroupEdit;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TransportArc;
 
 public class TransportArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 3728885532894319528L;
@@ -171,6 +172,29 @@ public class TransportArcComponent extends TimedInputArcComponent {
 
 	public int getGroup() {
 		return group;
+	}
+	
+	@Override
+	public String getGuardAsString() {
+		return underlyingTransportArc.timeInterval().toString();
+	}
+	
+	@Override
+	public TimeInterval getGuard() {
+		return underlyingTransportArc.timeInterval();
+	}
+	
+	@Override
+	public Command setGuard(TimeInterval guard) {
+		
+		TimeInterval oldTimeInterval = underlyingTransportArc.timeInterval();
+		underlyingTransportArc.setTimeInterval(guard);
+
+		//hacks - I use the weight to display the TimeInterval
+		updateWeightLabel();
+		repaint();
+
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, underlyingTransportArc.timeInterval());
 	}
 	
 }

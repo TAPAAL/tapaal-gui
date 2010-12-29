@@ -7,10 +7,12 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.math.BigDecimal;
 
-import dk.aau.cs.model.tapn.TimedInhibitorArc;
-
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.undo.ArcTimeIntervalEdit;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
 
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
@@ -59,6 +61,30 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		}
 		this.setWeightLabelPosition();	
 	}
+	
+	@Override
+	public String getGuardAsString() {
+		return inhibitorArc.interval().toString();
+	}
+	
+	@Override
+	public Command setGuard(TimeInterval guard) {
+		
+		TimeInterval oldTimeInterval = inhibitorArc.interval();
+		inhibitorArc.setTimeInterval(guard);
+
+		//hacks - I use the weight to display the TimeInterval
+		updateWeightLabel();
+		repaint();
+
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval());
+	}
+	
+	@Override
+	public TimeInterval getGuard() {
+		return inhibitorArc.interval();
+	}
+	
 	
 	@Override
 	public void paintComponent(Graphics g) {

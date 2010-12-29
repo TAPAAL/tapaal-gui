@@ -6,17 +6,15 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.PlaceTransitionObject;
-import pipe.gui.GuiFrame;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

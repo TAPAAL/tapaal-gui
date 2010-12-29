@@ -1,6 +1,5 @@
 package pipe.dataLayer.colors;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TransportArcComponent;
@@ -8,6 +7,7 @@ import pipe.gui.undo.ColoredTransportArcColorGuardEdit;
 import pipe.gui.undo.ColoredTransportArcPreserveEdit;
 import pipe.gui.undo.ColoredTransportArcTimeGuardEdit;
 import pipe.gui.undo.ColoredTransportArcUpdateValueEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 public class ColoredTransportArc extends TransportArcComponent {

@@ -1,11 +1,11 @@
 package pipe.dataLayer.colors;
 
-import dk.aau.cs.gui.undo.Command;
-import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInhibitorArcComponent;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
 import pipe.gui.undo.ColoredInhibitorArcTimeGuardEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 public class ColoredInhibitorArc extends TimedInhibitorArcComponent {

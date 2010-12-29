@@ -11,16 +11,13 @@ import java.util.EventListener;
 
 import javax.swing.JComponent;
 
-import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.TAPNElement;
-
 import pipe.gui.CopyPasteable;
-import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 import pipe.gui.undo.PetriNetObjectNameEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

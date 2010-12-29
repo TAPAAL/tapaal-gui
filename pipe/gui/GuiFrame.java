@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,7 +53,6 @@ import org.w3c.dom.NodeList;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.PNMLTransformer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -1169,8 +1167,8 @@ EOC */
 			setEditionAllowed(true);
 			statusBar.changeText(statusBar.textforDrawing);
 			if(this.guiMode.equals(GUIMode.animation)) CreateGui.getAnimator().restoreModel();
-			//         CreateGui.removeAnimationHistory();
-			//         CreateGui.removeAnimationControler();
+			CreateGui.removeAnimationHistory();
+			CreateGui.removeAnimationController();
 
 			//If abstract animation pane is shown, remove it when 
 			// Gowing out of animation mode.

@@ -76,7 +76,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 	}
 	
 	public String getGuardAsString() {
-		
 		return inputArc.interval().toString();
 	}
 	

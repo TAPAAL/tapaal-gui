@@ -5,8 +5,6 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
@@ -15,6 +13,7 @@ import pipe.gui.undo.ColoredPlaceRemoveTokenEdit;
 import pipe.gui.undo.ColoredPlaceTokensChangedEdit;
 import pipe.gui.undo.ColoredTimedPlaceTimeInvariantEdit;
 import pipe.gui.undo.PlaceColorInvariantEdit;
+import dk.aau.cs.gui.undo.Command;
 
 public class ColoredTimedPlace extends TimedPlaceComponent {
 

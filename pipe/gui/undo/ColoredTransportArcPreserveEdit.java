@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.Preserve;
+import dk.aau.cs.gui.undo.Command;
 
 public class ColoredTransportArcPreserveEdit extends Command {
 

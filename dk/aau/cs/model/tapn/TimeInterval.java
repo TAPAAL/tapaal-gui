@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 import pipe.gui.CreateGui;
-
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 

@@ -3,8 +3,8 @@
  */
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.Transition;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

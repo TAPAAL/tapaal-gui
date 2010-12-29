@@ -128,8 +128,6 @@ public class TabContent extends JSplitPane {
 		leftPane.setContinuousLayout(true);
 		leftPane.setDividerSize(0);
 		
-		
-		
 		updateLeftPanel();
 	}
 

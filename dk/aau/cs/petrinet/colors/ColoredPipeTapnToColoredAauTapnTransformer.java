@@ -1,10 +1,10 @@
 package dk.aau.cs.petrinet.colors;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;

@@ -212,7 +212,7 @@ public class Verifyta implements ModelChecker {
 				return new VerificationResult(errorOutput + System.getProperty("line.separator") + standardOutput);
 			}else{
 				TAPNTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
-				return new VerificationResult(queryResult, tapnTrace);
+				return new VerificationResult(queryResult, tapnTrace, runner.getRunningTime());
 			}
 		}
 	}

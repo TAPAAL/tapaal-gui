@@ -15,9 +15,9 @@ import javax.swing.JPanel;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColoredInputArc;

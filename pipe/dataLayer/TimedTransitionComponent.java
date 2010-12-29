@@ -4,12 +4,11 @@ import java.awt.Container;
 
 import javax.swing.BoxLayout;
 
-import dk.aau.cs.model.tapn.TimedTransition;
-
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
+import dk.aau.cs.model.tapn.TimedTransition;
 
 public class TimedTransitionComponent extends Transition {
 	private static final long serialVersionUID = -2280012053262288174L;

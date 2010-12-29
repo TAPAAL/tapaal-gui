@@ -6,11 +6,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.InhibitorArc;
-import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNQuery;
@@ -20,9 +17,7 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
-import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 

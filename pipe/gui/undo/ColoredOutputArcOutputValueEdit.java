@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
-import dk.aau.cs.gui.undo.Command;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.IntOrConstant;
+import dk.aau.cs.gui.undo.Command;
 
 public class ColoredOutputArcOutputValueEdit extends Command {
 

@@ -5,13 +5,12 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JLayeredPane;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddArcPathPointEdit;
 import pipe.gui.undo.ArcWeightEdit;
+import dk.aau.cs.gui.undo.Command;
 
 
 /**

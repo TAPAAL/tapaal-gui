@@ -8,11 +8,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.SpinnerNumberModel;
 
-import dk.aau.cs.gui.undo.Command;
-
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
+import dk.aau.cs.gui.undo.Command;
 
 /*
  * LeftConstantsPane.java
