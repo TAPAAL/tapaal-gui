@@ -230,6 +230,10 @@ public class TimedArcPetriNet {
 	}
 
 	public void setMarking(TimedMarking marking) {
-		this.currentMarking = marking;		
+		this.currentMarking = marking;
+		
+		for (TimedPlace p : places) {
+			p.setCurrentMarking(marking);
+		}
 	}
 }

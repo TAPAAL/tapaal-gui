@@ -316,4 +316,11 @@ public class TemplateExplorer extends JPanel {
 	public Template<TimedArcPetriNet> selectedModel() {
 		return (Template<TimedArcPetriNet>) templateList.getSelectedValue();
 	}
+	
+	public void updateTemplateList(){
+		listModel.clear();
+		for(Template<?> net : parent.templates()){
+			listModel.addElement(net);
+		}
+	}
 }

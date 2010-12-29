@@ -67,6 +67,7 @@ import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 
@@ -900,12 +901,16 @@ EOC */
 
 	private void saveNet(File outFile){
 		try{
-			// BK 10/02/07:
-			// changed way of saving to accomodate new DataLayerWriter class
-			DataLayerWriter saveModel = new DataLayerWriter(appModel);
-			saveModel.savePNML(outFile);
+			
+			//DataLayerWriter saveModel = new DataLayerWriter(appModel);
+			//saveModel.savePNML(outFile);
 			//appModel.savePNML(outFile);
 
+			TabContent currentTab = (TabContent)appTab.getSelectedComponent();
+			TimedArcPetriNetNetworkWriter tapnWriter = new TimedArcPetriNetNetworkWriter(currentTab.templates(), currentTab.queries());
+			
+			tapnWriter.savePNML(outFile);
+			
 			CreateGui.setFile(outFile,appTab.getSelectedIndex());
 			appView.setNetChanged(false);
 			appTab.setTitleAt(appTab.getSelectedIndex(),outFile.getName());
@@ -938,7 +943,11 @@ EOC */
 		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
-
+		Template<TimedArcPetriNet> template = new Template<TimedArcPetriNet>(new TimedArcPetriNet(), new DataLayer());
+		tab.addTemplate(template);
+		
+		tab.setActiveTemplate(template);
+		
 		appModel.addObserver((Observer)appView); // Add the view as Observer
 		appModel.addObserver((Observer)appGui);  // Add the app window as observer
 
@@ -1002,12 +1011,16 @@ EOC */
 					CreateGui.getApp().setMode(Pipe.CREATING); 
 				}
 				
+				Template<TimedArcPetriNet> template = null;
 				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory();
 				for(int i = 0; i < nets.getLength(); i++) {
 					
-					Template<TimedArcPetriNet> template = factory.createTimedArcPetriNetFromPNML(nets.item(i));
+					template = factory.createTimedArcPetriNetFromPNML(nets.item(i));
 					currentTab.addTemplate(template);
 				}
+				
+				if(template != null)
+					currentTab.setActiveTemplate(template);
 				
 				if (CreateGui.getApp()!=null) {
 					CreateGui.getApp().restoreMode();

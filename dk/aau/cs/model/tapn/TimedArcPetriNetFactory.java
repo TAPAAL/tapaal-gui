@@ -1,11 +1,18 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+
+import javax.swing.JOptionPane;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.translations.ReductionOption;
 
+import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Place;
@@ -18,6 +25,11 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
+import pipe.dataLayer.TAPNQuery.HashTableSize;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 
@@ -28,16 +40,24 @@ public class TimedArcPetriNetFactory {
 	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals;
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
+	private TimedMarking initialMarking;
 	
 	public TimedArcPetriNetFactory()
 	{
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
+		initialMarking = new TimedMarking();
 	}
 	
 	public Template<TimedArcPetriNet> createTimedArcPetriNetFromPNML(Node tapnNode) {
-		tapn = new TimedArcPetriNet();
+		if(tapnNode instanceof Element) {
+			String name = getTAPNName((Element)tapnNode);
+			tapn = new TimedArcPetriNet(name);
+		}
+		else {
+			tapn = new TimedArcPetriNet();
+		}
 		guiModel = new DataLayer();
 		
 		Node node = null;
@@ -50,7 +70,8 @@ public class TimedArcPetriNetFactory {
 				node = nodeList.item(i);
 					parseElement(node);
 			}
-
+			
+			tapn.setMarking(initialMarking);
 			guiModel.buildConstraints();
 			
 
@@ -60,6 +81,16 @@ public class TimedArcPetriNetFactory {
 		}
 		
 		return new Template<TimedArcPetriNet>(tapn,guiModel);
+	}
+
+
+	private String getTAPNName(Element tapnNode) {
+			String name = tapnNode.getAttribute("name");
+			
+			if(name == null || name.equals(""))
+				name = tapnNode.getAttribute("id");
+			
+			return name;
 	}
 
 	private void parseElement(Node node) {
@@ -75,7 +106,7 @@ public class TimedArcPetriNetFactory {
 			} else if ("arc".equals(element.getNodeName())) {
 				createAndAddArc(element);         
 			} else if( "queries".equals(element.getNodeName()) ){
-				TAPNQuery query = guiModel.createQuery(element);
+				TAPNQuery query = createQuery(element);
 				if(query != null)
 					guiModel.addQuery(query);
 			} else if ("constant".equals(element.getNodeName())){
@@ -268,6 +299,11 @@ public class TimedArcPetriNetFactory {
 					markingOffsetXInput, markingOffsetYInput,  
 					capacityInput, invariant);
 			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant));
+			
+			for(int i = 0; i < initialMarkingInput; i++){
+				initialMarking.add(p, new TimedToken(p, new BigDecimal(0.0)));
+			}
+			
 			((TimedPlaceComponent)place).setUnderlyingPlace(p);
 			guiModel.addPlace(place);
 			tapn.add(p);
@@ -375,7 +411,9 @@ public class TimedArcPetriNetFactory {
 						TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval);
 						
 						((TransportArcComponent)tempArc).setUnderlyingArc(transArc);
+						postsetTransportArc.setUnderlyingArc(transArc);
 						guiModel.addTransportArc((TransportArcComponent)tempArc);
+						guiModel.addTransportArc(postsetTransportArc);
 						tapn.add(transArc);
 						
 						postsetArcs.remove((TimedTransitionComponent)targetIn);
@@ -399,6 +437,8 @@ public class TimedArcPetriNetFactory {
 						TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval);
 						
 						((TransportArcComponent)tempArc).setUnderlyingArc(transArc);
+						presetTransportArc.setUnderlyingArc(transArc);
+						guiModel.addTransportArc(presetTransportArc);
 						guiModel.addTransportArc((TransportArcComponent)tempArc);
 						tapn.add(transArc);
 						
@@ -456,6 +496,103 @@ public class TimedArcPetriNetFactory {
 				}
 			}
 		}
+	}
+	
+	public TAPNQuery createQuery(Element queryElement) {
+		String comment = getQueryComment(queryElement);
+		TraceOption traceOption = getQueryTraceOption(queryElement);
+		SearchOption searchOption = getQuerySearchOption(queryElement);
+		HashTableSize hashTableSize = getQueryHashTableSize(queryElement);
+		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
+		ReductionOption reductionOption = getQueryReductionOption(queryElement);
+		int capacity = getQueryCapacity(queryElement);
+		
+		TCTLAbstractProperty query;
+		query = parseQuery(queryElement);
+
+		if(query != null)
+			return new TAPNQuery(comment, capacity, query, traceOption, searchOption, reductionOption, hashTableSize, extrapolationOption);
+		else
+			return null;
+	}
+
+	private TCTLAbstractProperty parseQuery(Element queryElement) {
+		TCTLAbstractProperty query = null;
+		TAPAALQueryParser queryParser = new TAPAALQueryParser();
+		
+		String queryToParse = getValueChildNodeContentAsString(queryElement,"query");
+		
+		try{
+			query = queryParser.parse(queryToParse);
+		}catch (Exception e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.", "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			System.err.println("No query was specified: " + e.getStackTrace());
+		}
+		return query;
+	}
+
+	private int getQueryCapacity(Element queryElement) {
+		return getValueChildNodeContentAsInt(queryElement, "capacity");
+	}
+
+	private ReductionOption getQueryReductionOption(Element queryElement) {
+		ReductionOption reductionOption;
+		try{
+			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
+		}catch (Exception e) {
+			reductionOption = ReductionOption.STANDARD;
+		}
+		return reductionOption;
+	}
+
+	private ExtrapolationOption getQueryExtrapolationOption(Element queryElement) {
+		ExtrapolationOption extrapolationOption;
+		try{
+			extrapolationOption = ExtrapolationOption.valueOf(queryElement.getAttribute("extrapolationOption"));		
+		}catch (Exception e) {
+			extrapolationOption = ExtrapolationOption.AUTOMATIC;
+		}
+		return extrapolationOption;
+	}
+
+	private HashTableSize getQueryHashTableSize(Element queryElement) {
+		HashTableSize hashTableSize;
+		try{
+			hashTableSize = HashTableSize.valueOf(queryElement.getAttribute("hashTableSize"));		
+		}catch (Exception e) {
+			hashTableSize = HashTableSize.MB_16;
+		}
+		return hashTableSize;
+	}
+
+	private SearchOption getQuerySearchOption(Element queryElement) {
+		SearchOption searchOption;
+		try{
+			searchOption = SearchOption.valueOf(queryElement.getAttribute("searchOption"));
+		}catch (Exception e) {
+			searchOption = SearchOption.BFS;
+		}
+		return searchOption;
+	}
+
+	private TraceOption getQueryTraceOption(Element queryElement) {
+		TraceOption traceOption;
+		try{
+			traceOption = TraceOption.valueOf(queryElement.getAttribute("traceOption"));
+		}catch (Exception e) {
+			traceOption = TraceOption.NONE;
+		}
+		return traceOption;
+	}
+
+	private String getQueryComment(Element queryElement) {
+		String comment;
+		try{
+			comment = queryElement.getAttribute("name");
+		}catch (Exception e) {
+			comment = "No comment specified";
+		}
+		return comment;
 	}
 
 }

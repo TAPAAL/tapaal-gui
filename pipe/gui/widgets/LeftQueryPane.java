@@ -202,4 +202,14 @@ public class LeftQueryPane extends JPanel {
 	private void updateQuery(TAPNQuery oldQuery, TAPNQuery newQuery) {
 		oldQuery.set(newQuery);	
 	}
+	
+	public Iterable<TAPNQuery> getQueries(){
+		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
+		
+		for(int i = 0; i < listModel.size(); ++i) {
+			queries.add((TAPNQuery)listModel.get(i));
+		}
+		
+		return queries;
+	}
 }

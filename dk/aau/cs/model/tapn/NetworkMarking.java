@@ -3,6 +3,8 @@ package dk.aau.cs.model.tapn;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import dk.aau.cs.util.Require;
+
 public class NetworkMarking {
 	private HashMap<TimedArcPetriNet, TimedMarking> markings = new HashMap<TimedArcPetriNet, TimedMarking>();
 	
@@ -25,5 +27,12 @@ public class NetworkMarking {
 		}
 		clone.markings = newMarkings;
 		return clone;
+	}
+
+	public void removeMarkingFor(TimedArcPetriNet tapn) {
+		Require.that(tapn != null, "tapn must be non-null");
+		
+		if(markings.containsKey(tapn))
+			markings.remove(tapn);
 	}
 }

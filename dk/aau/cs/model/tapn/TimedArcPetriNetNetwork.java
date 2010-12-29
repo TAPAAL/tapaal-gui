@@ -11,18 +11,22 @@ public class TimedArcPetriNetNetwork {
 	
 	public TimedArcPetriNetNetwork(){
 		tapns = new ArrayList<TimedArcPetriNet>();
-		tapns.add(new TimedArcPetriNet());
+		currentMarking = new NetworkMarking();
 	}
 	
 	public void add(TimedArcPetriNet tapn){
 		Require.that(tapn != null, "tapn must be non-null");
+		Require.that(tapn.marking() != null, "Marking must be non-null");
 		
 		tapns.add(tapn);
+		currentMarking.addMarking(tapn, tapn.marking());
 	}
 	
 	public void remove(TimedArcPetriNet tapn){
 		if(tapn != null){
 			tapns.remove(tapn);
+			currentMarking.removeMarkingFor(tapn);
+			
 		}
 	}
 	

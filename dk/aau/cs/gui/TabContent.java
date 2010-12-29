@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
@@ -80,8 +81,6 @@ public class TabContent extends JSplitPane {
 		}
 				
 		drawingSurface = new DrawingSurfaceImpl(appModel, this);
-		TimedArcPetriNet net = tapnNetwork.templates().get(0);
-		drawingSurface.setModel(guiModels.get(net), net);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -451,6 +450,7 @@ public class TabContent extends JSplitPane {
 	public void addTemplate(Template<TimedArcPetriNet> template) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
+		templateExplorer.updateTemplateList();
 	}
 
 
@@ -458,4 +458,11 @@ public class TabContent extends JSplitPane {
 		return templateExplorer.selectedModel();
 	}
 
+	public void setActiveTemplate(Template<TimedArcPetriNet> template){
+		drawingSurface.setModel(template.guiModel(), template.model());
+	}
+
+	public Iterable<TAPNQuery> queries() {
+		return queries.getQueries();
+	}
 }
