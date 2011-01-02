@@ -17,11 +17,14 @@ import pipe.gui.ExtensionFilter;
  * to have a static instance. This is an ugly hack to handle speed problems with the java-reimplementation
  * of the GTKJFileChooser. The java-reimplementation of GTKJFileChooser is needed as the default implementation
  * is completly useless. 
+ * 2011-01-02: Kenneth Yrke Jørgensen: Changed back to orginal behaviour as GTKJFileChooser seems to be fixed. 
+ * We might want to change this class so the save/load dialog remembers the last folder it was in (like it did
+ * when it was static)
  */
 public class FileBrowser 
          {
    
-   static JFileChooser fc = new JFileChooser();
+   JFileChooser fc = new JFileChooser();
    private String ext;
    
    

@@ -165,9 +165,17 @@ implements ActionListener, Observer {
 			//If the native look and feel is GTK replace the useless open dialog, 
 			//with a java-reimplementation. 		
 
-			//if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
-			//	UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
-			//}
+			if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
+				try {
+					//Load class to see if its there
+					Class.forName("eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
+					
+					UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
+				} catch (ClassNotFoundException exc){
+					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
+				}
+				
+			}
 
 		} catch (Exception exc) {
 			System.err.println("Error loading L&F: " + exc);
