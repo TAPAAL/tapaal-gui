@@ -34,8 +34,11 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedMarking;
+import dk.aau.cs.util.RequireException;
 
 
 /**
@@ -74,10 +77,12 @@ public class Animator {
 	private ArrayList<FiringAction> actionHistory;
 	private int currentAction;
 	private ArrayList<HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>> markingHistory;
+	private ArrayList<NetworkMarking> markings;
+	private int currentMarkingIndex;
 
 	public Firingmode firingmode = new RandomFiringmode();
-	private Template<TimedArcPetriNet> template;
-	private TimedMarking initialMarking;
+	private TabContent tab;
+	private NetworkMarking initialMarking;
 	
 	public Animator(){
 		actionHistory = new ArrayList<FiringAction>();
@@ -96,12 +101,17 @@ public class Animator {
 		});
 		currentAction = -1;
 		markingHistory = new ArrayList<HashMap<TimedPlaceComponent,ArrayList<BigDecimal>>>();
+		markings = new ArrayList<NetworkMarking>();
 	}
 	
-	public void setTemplate(Template<TimedArcPetriNet> template){
-		this.template = template;
+	public void setTabContent(TabContent tab){
+		this.tab = tab;
 	}
 
+	private NetworkMarking currentMarking(){
+		return markings.get(currentMarkingIndex);
+	}
+	
 	public void SetTrace(TAPNTrace trace){
 		if(trace.isConcreteTrace()){
 			setTimedTrace(trace);
@@ -150,7 +160,7 @@ public class Animator {
 	 */
 	public void highlightEnabledTransitions(){
 		/* rewritten by wjk 03/10/2007 */
-		DataLayer current = template.guiModel();//CreateGui.currentPNMLData();
+		DataLayer current = activeGuiModel();//CreateGui.currentPNMLData();
 
 		//current.setEnabledTransitions();      
 
@@ -169,7 +179,7 @@ public class Animator {
 	 * Called during animation to unhighlight previously highlighted transitions
 	 */
 	public void unhighlightDisabledTransitions(){
-		DataLayer current = template.guiModel();//CreateGui.currentPNMLData();
+		DataLayer current = activeGuiModel();//CreateGui.currentPNMLData();
 
 		//current.setEnabledTransitions();      
 
@@ -189,7 +199,7 @@ public class Animator {
 	 * unhighlighted
 	 */
 	private void disableTransitions(){
-		Iterator<Transition> transitionIterator = template.guiModel().returnTransitions();
+		Iterator<Transition> transitionIterator = activeGuiModel().returnTransitions();
 			//CreateGui.currentPNMLData().returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
@@ -204,7 +214,8 @@ public class Animator {
 	 * Stores model at start of animation
 	 */
 	public void storeModel(){
-		initialMarking = template.model().marking();
+		initialMarking = tab.network().marking();
+		markings.add(initialMarking);
 		//CreateGui.setupModelForSimulation();
 		//CreateGui.currentPNMLData().storeState();
 	}
@@ -218,7 +229,7 @@ public class Animator {
 		//CreateGui.restoreModelForEditing();
 		//CreateGui.currentPNMLData().restoreState();
 		disableTransitions();
-		template.model().setMarking(initialMarking);
+		tab.network().setMarking(initialMarking);
 		currentAction = -1;
 	}
 
@@ -280,65 +291,67 @@ public class Animator {
 	public void stepBack(){
 
 		if ( ! actionHistory.isEmpty() ){
+//
+//			if (actionHistory.get(currentAction) instanceof DiscreetFiringAction){
+//				TimedTransitionComponent transition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast
+//				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> markingToGoBackTo = markingHistory.get(currentAction);
+//
+//				if (markingToGoBackTo == null){
+//					System.err.println("No marking to go back to, ERROR!");
+//				}
+//
+//				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> presetMarking = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
+//				for (Arc a : transition.getPreset() ){
+//					TimedPlaceComponent place = (TimedPlaceComponent)a.getSource();
+//					presetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
+//				}
+//
+//				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> postsetMarking = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
+//				for (Arc a : transition.getPostset() ){
+//					TimedPlaceComponent place = (TimedPlaceComponent)a.getTarget();
+//					postsetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
+//				}
+//
+//				CreateGui.currentPNMLData().fireTimedTransitionBackwards(presetMarking, postsetMarking, transition);
+//
+//				//If untimed simulation
+//				if (CreateGui.getAbstractAnimationPane() != null){
+//
+//					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+//					int current = untimedAnimationHistory.getCurrentItem();
+//					if ((untimedAnimationHistory.getElement(current-1)).trim().equals(transition.getName())){ //Possible null pointer exception
+//						//It is fired
+//						untimedAnimationHistory.stepBackwards();	 
+//					}
+//
+//				}
+//
+//			}else if(actionHistory.get(currentAction) instanceof ColoredDiscreteFiringAction){
+//				CreateGui.currentPNMLData().fireColoredTransitionBackwards((ColoredDiscreteFiringAction)actionHistory.get(currentAction));
+//			}else if ( actionHistory.get(currentAction) instanceof TimeDelayFiringAction){
+//				BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction)).getDealy();
+//				try {
+//					tab.network().setMarking(markings.get(currentMarkingIndex-1));//CreateGui.getModel().letTimePass(timeDelay.negate());
+//				} catch (RequireException e) {
+//					e.printStackTrace();
+//				}
+//			}else{
+//				System.err.println("problem in Animator");
+//			}
 
-			if (actionHistory.get(currentAction) instanceof DiscreetFiringAction){
-				TimedTransitionComponent transition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction)).getTransition(); // XXX - unsafe cast
-				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> markingToGoBackTo = markingHistory.get(currentAction);
 
-				if (markingToGoBackTo == null){
-					System.err.println("No marking to go back to, ERROR!");
-				}
-
-				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> presetMarking = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
-				for (Arc a : transition.getPreset() ){
-					TimedPlaceComponent place = (TimedPlaceComponent)a.getSource();
-					presetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
-				}
-
-				HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> postsetMarking = new HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>();
-				for (Arc a : transition.getPostset() ){
-					TimedPlaceComponent place = (TimedPlaceComponent)a.getTarget();
-					postsetMarking.put(place, (ArrayList<BigDecimal>)markingToGoBackTo.get(place).clone());
-				}
-
-				CreateGui.currentPNMLData().fireTimedTransitionBackwards(presetMarking, postsetMarking, transition);
-
-				//If untimed simulation
-				if (CreateGui.getAbstractAnimationPane() != null){
-
-					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
-					int current = untimedAnimationHistory.getCurrentItem();
-					if ((untimedAnimationHistory.getElement(current-1)).trim().equals(transition.getName())){ //Possible null pointer exception
-						//It is fired
-						untimedAnimationHistory.stepBackwards();	 
-					}
-
-				}
-
-			}else if(actionHistory.get(currentAction) instanceof ColoredDiscreteFiringAction){
-				CreateGui.currentPNMLData().fireColoredTransitionBackwards((ColoredDiscreteFiringAction)actionHistory.get(currentAction));
-			}else if (actionHistory.get(currentAction) instanceof Transition ){
-
-			}else if ( actionHistory.get(currentAction) instanceof TimeDelayFiringAction){
-				BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction)).getDealy();
-				try {
-					CreateGui.getModel().letTimePass(timeDelay.negate());
-				} catch (InvariantViolatedAnimationException e) {
-					//					 XXX - kyrke, An error can not come here as this is valid states stored in animator
-					e.printStackTrace();
-				}
-
-			}else{
-				System.err.println("problem in Animator");
+			try {
+				tab.network().setMarking(markings.get(currentMarkingIndex-1));
+			} catch (RequireException e) {
+				e.printStackTrace();
 			}
 
-
-
-
+			activeGuiModel().repaintPlaces();
 			CreateGui.currentPNMLData().setEnabledTransitions();
 			unhighlightDisabledTransitions();
 			highlightEnabledTransitions();
 			currentAction--;
+			currentMarkingIndex--;
 		}
 	}
 
@@ -348,11 +361,6 @@ public class Animator {
 	 */
 	public void stepForward(){
 		if ( currentAction < actionHistory.size()-1 ) {
-
-
-			//Marking history did not contain anything, so we must calculate the next marking
-			//We do this using hacked firingmode. 
-
 			if ( actionHistory.get(currentAction+1) instanceof DiscreetFiringAction){
 				TimedTransitionComponent nextTransition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
 
@@ -375,10 +383,10 @@ public class Animator {
 
 				CreateGui.currentPNMLData().fireTransition(nextTransition, consumedTokens);
 
-				CreateGui.currentPNMLData().setEnabledTransitions();
-				unhighlightDisabledTransitions();
-				highlightEnabledTransitions();
-				currentAction++;
+//				CreateGui.currentPNMLData().setEnabledTransitions();
+//				unhighlightDisabledTransitions();
+//				highlightEnabledTransitions();
+//				currentAction++;
 
 				//If untimed simulation
 				if (CreateGui.getAbstractAnimationPane() != null){
@@ -396,33 +404,35 @@ public class Animator {
 			}else if(actionHistory.get(currentAction+1) instanceof ColoredDiscreteFiringAction){
 				ColoredDiscreteFiringAction action = (ColoredDiscreteFiringAction)actionHistory.get(currentAction+1);
 				CreateGui.currentPNMLData().fireTransition(action);
-				CreateGui.currentPNMLData().setEnabledTransitions();
-				unhighlightDisabledTransitions();
-				highlightEnabledTransitions();
-				currentAction++;
+//				CreateGui.currentPNMLData().setEnabledTransitions();
+//				unhighlightDisabledTransitions();
+//				highlightEnabledTransitions();
+//				currentAction++;
 			}else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
 				BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
 
 				//If this marking is not saved in marking history (e.g. its a uppaal trace)
 
-				if (markingHistory.get(currentAction+1)==null){
+				if (markings.get(currentMarkingIndex+1) == null){
 					Logger.log("Marking is null, we will fix it");
-
-					HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
-					markingHistory.set(currentAction+1, currentmakring);
+					markings.set(currentMarkingIndex+1, currentMarking().delay(timeDelay));
 				}
 
 				try {
-					CreateGui.getModel().letTimePass(timeDelay);
-				} catch (InvariantViolatedAnimationException e) {
+					tab.network().setMarking(markings.get(currentMarkingIndex+1));
+				} catch (RequireException e) {
 					// XXX - kyrke, An error can con come here as this is valid states stored in animator 
 					e.printStackTrace();
 				}
-				CreateGui.currentPNMLData().setEnabledTransitions();
-				unhighlightDisabledTransitions();
-				highlightEnabledTransitions();
-				currentAction++;
+				
 			}
+			
+			activeGuiModel().repaintPlaces();
+			CreateGui.currentPNMLData().setEnabledTransitions();
+			unhighlightDisabledTransitions();
+			highlightEnabledTransitions();
+			currentAction++;
+			currentMarkingIndex++;
 			CreateGui.currentPNMLData().redrawVisibleTokenLists();
 		}
 	}
@@ -490,16 +500,14 @@ public class Animator {
 
 	}
 
-	public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException{
-		DataLayer guiModel = template.guiModel();
-		if (guiModel.canTimePass(timeToPass)){
-
+	public void letTimePass(BigDecimal timeToPass) throws InvariantViolatedAnimationException {
+		if (canTimePass(timeToPass)){//guiModel.canTimePass(timeToPass)){
 			if ( currentAction < actionHistory.size()-1 ){
 				removeStoredActions(currentAction+1);
-				addToHistory( new TimeDelayFiringAction(timeToPass), guiModel.getCurrentMarking() );
-			}else{
-				addToHistory( new TimeDelayFiringAction(timeToPass), guiModel.getCurrentMarking() );  
 			}
+			
+			//addToHistory( new TimeDelayFiringAction(timeToPass), guiModel.getCurrentMarking() );  
+			addMarking(new TimeDelayFiringAction(timeToPass), currentMarking().delay(timeToPass));
 
 			try {
 
@@ -513,29 +521,35 @@ public class Animator {
 				df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
 				BigDecimal strippedTimeDelay = new BigDecimal(timeToPass.toString(), new MathContext(Pipe.AGE_PRECISION));
-
-				guiModel.letTimePass(strippedTimeDelay);
-
+				
+				//guiModel.letTimePass(strippedTimeDelay);
+				tab.network().setMarking(currentMarking());
 				CreateGui.getAnimationHistory().addHistoryItem("Time delay: "+ df.format(strippedTimeDelay));
 
 
-			} catch (InvariantViolatedAnimationException e) {
+			} catch (RequireException e) {
 				throw e;
 			} 
 
 
 
-			for (Place p : CreateGui.getModel().getPlaces()){
-				p.repaint();
-			}
+			
 
-
-			guiModel.setEnabledTransitions();
+			activeGuiModel().repaintPlaces();
+			activeGuiModel().setEnabledTransitions();
 			highlightEnabledTransitions();
 			unhighlightDisabledTransitions();
 		}
 
 
+	}
+
+	private DataLayer activeGuiModel() {
+		return tab.activeTemplate().guiModel();
+	}
+	
+	private boolean canTimePass(BigDecimal delay){
+		return currentMarking().isDelayPossible(delay);
 	}
 
 	public void resethistory(){
@@ -595,6 +609,13 @@ public class Animator {
 		this.numberSequences = numberSequences;
 	}
 
+	private void addMarking(FiringAction action, NetworkMarking marking){
+		actionHistory.add(action);
+		markings.add(marking);
+		currentAction++;
+		currentMarkingIndex++;
+	}
+	
 	private void addToHistory(FiringAction newAction, HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentMarking){
 		actionHistory.add(newAction);
 		markingHistory.add(currentMarking);

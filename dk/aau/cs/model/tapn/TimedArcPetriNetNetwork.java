@@ -38,4 +38,15 @@ public class TimedArcPetriNetNetwork {
 		for(TimedArcPetriNet tapn : tapns) if(tapn.getName().equals(newName)) return true;
 		return false;
 	}
+
+	public NetworkMarking marking() {
+		return currentMarking;
+	}
+	
+	public void setMarking(NetworkMarking marking) {
+		currentMarking = marking;
+		for(TimedArcPetriNet tapn : tapns){
+			tapn.setMarking(marking.getMarkingFor(tapn));
+		}
+	}
 }

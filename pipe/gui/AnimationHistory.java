@@ -70,7 +70,7 @@ public class AnimationHistory
    
    public void addHistoryItem(String transitionName) {
       fSeq.add(transitionName);
-      currentItem = fSeq.size();
+      currentItem = fSeq.size()-1;
       updateText();
    }
    
@@ -82,7 +82,7 @@ public class AnimationHistory
    
    
    public void clearStepsForward() {
-      fSeq.setSize(currentItem);
+      fSeq.setSize(currentItem+1);
    }
    
    
@@ -123,12 +123,12 @@ public class AnimationHistory
    
    
    public boolean isStepForwardAllowed(){
-      return currentItem < fSeq.size();
+      return currentItem < fSeq.size()-1;
    }
    
    
    public boolean isStepBackAllowed(){
-      return currentItem > 1;
+      return currentItem > 0;
    }
    
    public int getCurrentItem(){
@@ -139,6 +139,6 @@ public class AnimationHistory
 	   if (i >= fSeq.size()){
 		   return "";
 	   }
-	   return fSeq.get(i);    
+	   return fSeq.get(i-1);    
    }
 }

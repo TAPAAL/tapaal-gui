@@ -1196,7 +1196,7 @@ EOC */
 			break;
 		case animation:
 			TabContent tab = (TabContent)appTab.getSelectedComponent();
-			CreateGui.getAnimator().setTemplate(tab.activeTemplate());
+			CreateGui.getAnimator().setTabContent(tab);
 			CreateGui.getAnimator().setNumberSequences(0);
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);

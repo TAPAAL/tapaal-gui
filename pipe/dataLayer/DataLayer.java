@@ -2914,15 +2914,14 @@ implements Cloneable {
 					}
 				}
 			}else{
-				if (p instanceof TimedPlaceComponent){
-					TimedPlaceComponent timedPlace = (TimedPlaceComponent)p;
-
-					for (BigDecimal token : timedPlace.getTokens()){
-						if (!timedPlace.satisfiesInvariant(token.add(timeToPass))){   
-							return false;
-						}
-					}
-				}
+//				if (p instanceof TimedPlaceComponent){
+//					TimedPlaceComponent timedPlace = (TimedPlaceComponent)p;
+//					for (BigDecimal token : timedPlace.getTokens()){
+//						if (!timedPlace.satisfiesInvariant(token.add(timeToPass))){   
+//							return false;
+//						}
+//					}
+//				}
 			}
 		}
 		return true;
@@ -3122,6 +3121,12 @@ implements Cloneable {
 					tp.showAgeOfTokens(true);
 				}
 			}
+		}
+	}
+
+	public void repaintPlaces() {
+		for (Place p : placesArray){
+			p.repaint();
 		}
 	}
 }

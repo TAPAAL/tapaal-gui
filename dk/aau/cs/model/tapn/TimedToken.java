@@ -69,4 +69,8 @@ public class TimedToken {
 	public TimedToken clone(){
 		return new TimedToken(place, age); // age is immutable so ok to pass it to constructor
 	}
+
+	public TimedToken delay(BigDecimal delay) {
+		return new TimedToken(place, age.add(delay));
+	}
 }

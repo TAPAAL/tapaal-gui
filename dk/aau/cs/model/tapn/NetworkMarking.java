@@ -1,5 +1,6 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -20,13 +21,7 @@ public class NetworkMarking {
 	}
 	
 	public NetworkMarking clone(){
-		NetworkMarking clone = new NetworkMarking();
-		HashMap<TimedArcPetriNet, TimedMarking> newMarkings = new HashMap<TimedArcPetriNet, TimedMarking>(markings.size());
-		for(Entry<TimedArcPetriNet, TimedMarking> entry : markings.entrySet()){
-			newMarkings.put(entry.getKey(), entry.getValue().clone());
-		}
-		clone.markings = newMarkings;
-		return clone;
+		return delay(BigDecimal.ZERO);
 	}
 
 	public void removeMarkingFor(TimedArcPetriNet tapn) {
@@ -34,5 +29,24 @@ public class NetworkMarking {
 		
 		if(markings.containsKey(tapn))
 			markings.remove(tapn);
+	}
+	
+	public boolean isDelayPossible(BigDecimal delay){
+		for(TimedMarking marking : markings.values()){
+			if(!marking.isDelayPossible(delay)) return false;
+		}
+		return true;
+	}
+
+	public NetworkMarking delay(BigDecimal amount) {
+		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
+		
+		NetworkMarking newMarking = new NetworkMarking();
+		HashMap<TimedArcPetriNet, TimedMarking> newMarkings = new HashMap<TimedArcPetriNet, TimedMarking>(markings.size());
+		for(Entry<TimedArcPetriNet, TimedMarking> entry : markings.entrySet()){
+			newMarkings.put(entry.getKey(), entry.getValue().delay(amount));
+		}
+		newMarking.markings = newMarkings;
+		return newMarking;
 	}
 }

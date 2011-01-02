@@ -1,5 +1,6 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +38,29 @@ public class TimedMarking {
 		placesToTokensMap.get(timedPlace).remove(0);
 	}
 	
+	public boolean isDelayPossible(BigDecimal delay){
+		for(Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()){
+			for(TimedToken token : entry.getValue()){
+				TimeInvariant invariant = token.place().invariant();
+				if(!invariant.isSatisfied(token.age().add(delay))){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
 	public TimedMarking clone(){
+		return delay(BigDecimal.ZERO);
+	}
+
+	public TimedMarking delay(BigDecimal amount) {
 		TimedMarking clone = new TimedMarking();
 		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(placesToTokensMap.size());
 		for(Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()){
 			ArrayList<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
 			for(TimedToken token : entry.getValue()){
-				newTokens.add(token.clone());
+				newTokens.add(token.delay(amount));
 			}
 			newMap.put(entry.getKey(), newTokens);
 		}
