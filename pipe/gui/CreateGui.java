@@ -368,7 +368,6 @@ public class CreateGui {
 
 			scroller = new JScrollPane(animBox);
 			scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
 			leftPane.setBottomComponent(scroller);
 
 			//         leftPane.setDividerLocation(0.5);
@@ -432,7 +431,8 @@ public class CreateGui {
 
 			scroller2 = new JScrollPane(animControlerBox);
 			scroller2.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
-
+			scroller2.setMinimumSize(new Dimension(200,95));
+			scroller2.setPreferredSize(new Dimension(200,95));
 			leftPane.setTopComponent(scroller2);
 
 			//         leftPane.setDividerLocation(0.5);
