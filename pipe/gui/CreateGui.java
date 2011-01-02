@@ -479,6 +479,7 @@ public class CreateGui {
 		leftPane.setBottomComponent(leftBottomPanel);
 		leftPane.setContinuousLayout(true);
 		leftPane.setDividerSize(0);
+		leftPane.setPreferredSize(new Dimension(290,400));
 		updateLeftPanel();
 	}
 
