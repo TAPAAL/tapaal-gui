@@ -9,7 +9,6 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
@@ -252,11 +251,7 @@ public class Verifyta implements ModelChecker {
 		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 
 		
-		if(trace == null){
-			if(((VerifytaOptions)options).trace() != TraceOption.NONE){
-				messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
-			}
-		}else{
+		if(trace != null){
 			if(exportedModel.namingScheme() == null){ // TODO: get rid of
 				messenger.displayErrorMessage("Traces are currently not supported on the chosen translation");
 			}else{

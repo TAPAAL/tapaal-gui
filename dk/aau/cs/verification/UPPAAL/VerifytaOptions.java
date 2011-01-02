@@ -64,4 +64,12 @@ public class VerifytaOptions implements VerificationOptions {
 	public ReductionOption getReduction() {
 		return reduction;
 	}
+	
+	public String getOption(String option){
+		if(option.equalsIgnoreCase("trace")) return traceOption.toString();
+		if(option.equalsIgnoreCase("search-strategy")) return searchOption.toString();
+		if(option.equalsIgnoreCase("untimed-trace")) return String.valueOf(untimedTrace);
+
+		return null;
+	}
 }

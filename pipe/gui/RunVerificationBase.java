@@ -15,9 +15,9 @@ public abstract class RunVerificationBase extends
 		SwingWorker<VerificationResult, Void> {
 
 	private ModelChecker modelChecker;
-	private VerificationOptions options;
+	protected VerificationOptions options;
 	private TimedArcPetriNet model;
-	private TAPNQuery query;
+	protected TAPNQuery query;
 	protected Messenger messenger;
 	
 	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
