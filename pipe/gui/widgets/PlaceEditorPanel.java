@@ -559,9 +559,9 @@ extends javax.swing.JPanel {
 		gbc.insets = new Insets(3,3,3,3);
 		invariantGroup.add(invRelationConstant, gbc);
 
-		invariantSpinner.setMaximumSize(new Dimension(50,30));
-		invariantSpinner.setMinimumSize(new Dimension(50,30));
-		invariantSpinner.setPreferredSize(new Dimension(50,30));
+		invariantSpinner.setMaximumSize(new Dimension(120,30));
+		invariantSpinner.setMinimumSize(new Dimension(120,30));
+		invariantSpinner.setPreferredSize(new Dimension(120,30));
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -598,8 +598,8 @@ extends javax.swing.JPanel {
 
 		Set<String> constants = CreateGui.getModel().getConstantNames();
 		invConstantsComboBox = new JComboBox(constants.toArray());
-		invConstantsComboBox.setMinimumSize(new Dimension(80,30));
-		invConstantsComboBox.setPreferredSize(new Dimension(80,30));
+		invConstantsComboBox.setMinimumSize(new Dimension(120,30));
+		invConstantsComboBox.setPreferredSize(new Dimension(120,30));
 		invConstantsComboBox.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e){
 				if(e.getStateChange() == ItemEvent.SELECTED){

@@ -1,7 +1,5 @@
 package pipe.gui;
 
-import java.awt.Color;
-import java.awt.SystemColor;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -9,8 +7,6 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 
 
 /** Class to represent the history of the net animation
