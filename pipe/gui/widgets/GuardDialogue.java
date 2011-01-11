@@ -584,7 +584,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 
 	private void initColoredTimeIntervalControls() {
 		JPanel lowerPanel = new JPanel(new GridBagLayout());
-		Dimension txtBoxDims = new Dimension(50,25);
+		Dimension txtBoxDims = new Dimension(90,25);
 
 		lowerScaleTextbox = new JTextField();
 		lowerScaleTextbox.setMinimumSize(txtBoxDims);
@@ -673,7 +673,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	}
 
 	private void initNonColoredTimeIntervalControls() {
-		Dimension intervalBoxDims = new Dimension(90,25);
+		Dimension intervalBoxDims = new Dimension(120,25);
 		firstIntervalNumber = new JSpinner();
 		firstIntervalNumber.setMaximumSize(intervalBoxDims);
 		firstIntervalNumber.setMinimumSize(intervalBoxDims);

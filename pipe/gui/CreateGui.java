@@ -2,14 +2,18 @@ package pipe.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.SystemColor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
@@ -85,10 +89,10 @@ public class CreateGui {
 		leftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
 		leftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		leftPane.setMinimumSize(new Dimension(175,100));
+		
 		createLeftPane();
 		pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPane,appTab);
-		
-		
+				
 		pane.setContinuousLayout(true);
 		pane.setOneTouchExpandable(true);
 		pane.setBorder(null); // avoid multiple borders
@@ -363,20 +367,23 @@ public class CreateGui {
 	/** Creates a new animationHistory text area, and returns a reference to it*/
 	public static void addAnimationHistory() {
 		try {
-			animBox = new AnimationHistory("Simulation history\n");
-			animBox.setEditable(false);
+			animBox = new AnimationHistory();
+			//animBox.setEditable(false);
 
 			scroller = new JScrollPane(animBox);
-			scroller.setBorder(new EmptyBorder(0,0,0,0)); // make it less bad on XP
+			scroller.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("Simulation History"),
+					BorderFactory.createEmptyBorder(3,3,3,3)));
 			leftPane.setBottomComponent(scroller);
-
+			//animBox.setScroller(scroller);
 			//         leftPane.setDividerLocation(0.5);
 			leftPane.setResizeWeight(0.05f);
 
-			leftPane.setDividerSize(8);
+			leftPane.setDividerSize(8);		
 		} catch (javax.swing.text.BadLocationException be) {
 			be.printStackTrace();
 		}
+		
 	}
 
 	public static AnimationHistory getAbstractAnimationPane(){
@@ -387,7 +394,7 @@ public class CreateGui {
 		
 
 		try {
-			abstractAnimationPane=new AnimationHistory("Untimed Trace\n");
+			abstractAnimationPane=new AnimationHistory();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -396,8 +403,8 @@ public class CreateGui {
 
 		//Create a new empty animBox
 		try {
-			animBox = new AnimationHistory("Simulation history\n");
-			animBox.setEditable(false);
+			animBox = new AnimationHistory();
+			//animBox.setEditable(false);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

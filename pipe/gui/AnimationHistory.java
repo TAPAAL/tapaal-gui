@@ -1,15 +1,16 @@
 package pipe.gui;
 
 import java.awt.Color;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.awt.SystemColor;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 
 
 /** Class to represent the history of the net animation
@@ -22,121 +23,90 @@ import javax.swing.text.StyleContext;
  * These actions are no longer allowed after the fix.
  * */
 public class AnimationHistory
-        extends JTextPane {
-   
-   /**
+extends JList {
+
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4284885450021683552L;
-/** Holds all the transitions in the sequence */
-   public Vector<String> fSeq;
-   private String initText;
-   private Document doc;
-   private Style emph;
-   private Style bold;
-   private Style regular;
-   private int currentItem;
-   
-   
-   public AnimationHistory(String text) throws 
-           javax.swing.text.BadLocationException {
-      super();
-      initText = text;
-      initStyles();
-      doc = getDocument();
-      doc.insertString(doc.getLength(),text,bold);
-      fSeq = new Vector<String>();
-      fSeq.add("Initial Marking");
-      currentItem = 1;
-      updateText();
-   }
-   
-   
-   private void initStyles() {
-      Style def = StyleContext.getDefaultStyleContext().getStyle(
-              StyleContext.DEFAULT_STYLE);
-      regular = addStyle("regular", def);
-      StyleConstants.setFontFamily(def, "SansSerif");
-      
-      emph = addStyle("currentTransition",regular);
-      StyleConstants.setBackground(emph,Color.LIGHT_GRAY);
-      
-      bold = addStyle("title",regular);
-      StyleConstants.setBold(bold,true);
-   }
-   
-   
-   public void addHistoryItem(String transitionName) {
-      fSeq.add(transitionName);
-      currentItem = fSeq.size();
-      updateText();
-   }
-   
-   public void addHistoryItemDontChange(String transitionName) {
-	      fSeq.add(transitionName);
-	      //currentItem = fSeq.size();
-	      updateText();
-	   }
-   
-   
-   public void clearStepsForward() {
-      fSeq.setSize(currentItem);
-   }
-   
-   
-   /** Method reinserts the text highlighting the currentItem */
-   private void updateText() {
-      String newS;
-      int count=1;
-      Enumeration<String> e = fSeq.elements();
-      try {
-         doc.remove(initText.length(),doc.getLength()-initText.length());
-         
-         while (e.hasMoreElements()) {
-            newS = e.nextElement();
-            doc.insertString(doc.getLength(), newS+"\n",
-                    (count ==currentItem) ?emph :regular);
-            count++;
-         }
-      } catch (BadLocationException b) {
-         System.err.println(b.toString());
-      }
-   }
-   
-   
-   public void stepForward() {
-      if (isStepForwardAllowed()) {
-         currentItem++;
-      }
-      updateText();
-   }
-   
-   
-   public void stepBackwards() {
-      if (isStepBackAllowed()){
-         currentItem--;
-      }
-      updateText();
-   }
-   
-   
-   public boolean isStepForwardAllowed(){
-      return currentItem < fSeq.size();
-   }
-   
-   
-   public boolean isStepBackAllowed(){
-      return currentItem > 1;
-   }
-   
-   public int getCurrentItem(){
-	   return currentItem;
-   }
-   
-   public String getElement(int i){
-	   if (i >= fSeq.size()){
-		   return "";
-	   }
-	   return fSeq.get(i);    
-   }
+	/** Holds all the transitions in the sequence */
+
+
+	public AnimationHistory() throws 
+	javax.swing.text.BadLocationException {
+		super();
+		setModel(new DefaultListModel());
+		getListModel().addElement("Initial Marking");
+		setSelectedIndex(0);
+		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		for(MouseListener listener : getMouseListeners()){ removeMouseListener(listener); }
+		for(MouseMotionListener listener : getMouseMotionListeners()){ removeMouseMotionListener(listener); }
+		for(KeyListener listener : getKeyListeners()){ removeKeyListener(listener); }
+	}
+
+
+	public void addHistoryItem(String transitionName) {
+		getListModel().addElement(transitionName);
+		setSelectedIndex(getListModel().size()-1);
+	}
+
+	public void addHistoryItemDontChange(String transitionName) {
+		getListModel().addElement(transitionName);
+	}
+
+
+	public void clearStepsForward() {
+		DefaultListModel listModel = getListModel();
+		int lastIndex = listModel.size()-1;
+		
+		if(listModel.size() > 1 && getSelectedIndex() < lastIndex){
+			listModel.removeRange(getSelectedIndex()+1, lastIndex);
+		}
+	}
+
+
+	public void stepForward() {
+		if (isStepForwardAllowed()) {
+			int nextIndex = getSelectedIndex()+1;
+			setSelectedIndex(nextIndex);
+		}
+	}
+
+
+	public void stepBackwards() {
+		if (isStepBackAllowed()){
+			int indexToMoveTo = getSelectedIndex()-1;
+			setSelectedIndex(indexToMoveTo);
+		}
+	}
+
+
+	public boolean isStepForwardAllowed(){
+		return getSelectedIndex() < getListModel().size()-1;
+	}
+
+
+	public boolean isStepBackAllowed(){
+		return getSelectedIndex() > 0;
+	}
+
+	public int getCurrentItem(){
+		return getSelectedIndex();
+	}
+
+	public String getElement(int i){
+		return (String)getListModel().get(i);   
+	}
+
+
+	DefaultListModel getListModel(){
+		return (DefaultListModel)getModel();
+	}
+	
+	@Override
+	public void setSelectedIndex(int index) {
+		super.setSelectedIndex(index);
+		ensureIndexIsVisible(index);
+	}
 }

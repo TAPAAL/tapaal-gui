@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
@@ -156,7 +155,6 @@ implements ActionListener, Observer {
 		// to be appended to basic window title
 		frameTitle = title;
 		setTitle(null);
-
 		try {
 			//Set the Look and Feel native for the system.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

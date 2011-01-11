@@ -24,7 +24,6 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import pipe.gui.undo.UndoableEdit;
