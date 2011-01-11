@@ -22,6 +22,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.util.Require;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
@@ -144,8 +146,7 @@ public class LeftQueryPane extends JPanel {
 		removeQueryButton.setPreferredSize(dimension);
 		removeQueryButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();	
-				CreateGui.getModel().getQueries().remove(q);
+				listModel.remove(queryList.getSelectedIndex());
 				showQueries();
 			}
 		});
@@ -178,25 +179,13 @@ public class LeftQueryPane extends JPanel {
 	}
 	
 	private void showQueries() {
-		DataLayer model = CreateGui.getModel();
-		if(model == null) return;
-		
-		listModel.removeAllElements();
-		addQueriesToPanel(model);
 		queryList.validate();
 		
 	}
+
 	
-	private void addQueriesToPanel(DataLayer model) {
-		for(TAPNQuery query : model.getQueries())
-		{
-			listModel.addElement(query);
-		}
-	}
-	
-	private void addQuery(TAPNQuery query) {
-		DataLayer model = CreateGui.getModel();
-		model.addQuery(query);		
+	private void addQuery(TAPNQuery query) {	
+		listModel.addElement(query);
 	}
 
 	private void updateQuery(TAPNQuery oldQuery, TAPNQuery newQuery) {
@@ -211,5 +200,21 @@ public class LeftQueryPane extends JPanel {
 		}
 		
 		return queries;
+	}
+
+	public void setQueries(Iterable<TAPNQuery> queries) {
+		Require.that(queries != null, "Queries cannot be null");
+		
+		listModel.removeAllElements();
+		
+		for(TAPNQuery query : queries) {
+			listModel.addElement(query);
+		}
+		showQueries();
+	}
+
+	public void removeQuery(TAPNQuery queryToCreateFrom) {
+		listModel.removeElementAt(queryList.getSelectedIndex());
+		showQueries();	
 	}
 }

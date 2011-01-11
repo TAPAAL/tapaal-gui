@@ -53,6 +53,7 @@ import org.w3c.dom.NodeList;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.NetType;
+import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -101,7 +102,6 @@ implements ActionListener, Observer {
 	private final String[] zoomExamples = {"40%","60%","80%","100%","120%",
 			"140%","160%","180%","200%","300%"};
 	private String frameTitle;  //Frame title
-	private DataLayer appModel;
 	private GuiFrame appGui;
 	private DrawingSurfaceImpl appView;
 	private int mode, prev_mode, old_mode;             // *** mode WAS STATIC ***
@@ -763,16 +763,15 @@ EOC */
 
 	//set frame objects by array index
 	private void setObjects(int index){
-		appModel = CreateGui.getModel(index);
 		appView = CreateGui.getDrawingSurface(index);
 	}
-
-
-	//HAK set current objects in Frame
-	public void setObjects(){
-		appModel = CreateGui.getModel();
-		appView = CreateGui.getView();
-	}
+//
+//
+//	//HAK set current objects in Frame
+//	public void setObjects(){
+//		appModel = CreateGui.getModel();
+//		appView = CreateGui.getView();
+//	}
 
 
 	private void setObjectsNull(int index){
@@ -907,7 +906,7 @@ EOC */
 			//appModel.savePNML(outFile);
 
 			TabContent currentTab = (TabContent)appTab.getSelectedComponent();
-			TimedArcPetriNetNetworkWriter tapnWriter = new TimedArcPetriNetNetworkWriter(currentTab.templates(), currentTab.queries());
+			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(currentTab.templates(), currentTab.queries());
 			
 			tapnWriter.savePNML(outFile);
 			
@@ -948,8 +947,8 @@ EOC */
 		
 		tab.setActiveTemplate(template);
 		
-		appModel.addObserver((Observer)appView); // Add the view as Observer
-		appModel.addObserver((Observer)appGui);  // Add the app window as observer
+//		appModel.addObserver((Observer)appView); // Add the view as Observer
+//		appModel.addObserver((Observer)appGui);  // Add the app window as observer
 
 		appView.setNetChanged(false);   // Status is unchanged
 		appView.updatePreferredSize();
@@ -986,8 +985,8 @@ EOC */
 		appTab.setSelectedIndex(freeSpace);
 
 
-		appModel.addObserver((Observer)appView); // Add the view as Observer
-		appModel.addObserver((Observer)appGui);  // Add the app window as observer
+//		appModel.addObserver((Observer)appView); // Add the view as Observer
+//		appModel.addObserver((Observer)appGui);  // Add the app window as observer
 
 		if(file != null){
 			try {
@@ -1012,7 +1011,7 @@ EOC */
 				}
 				
 				Template<TimedArcPetriNet> template = null;
-				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory();
+				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(currentTab.drawingSurface());
 				for(int i = 0; i < nets.getLength(); i++) {
 					
 					template = factory.createTimedArcPetriNetFromPNML(nets.item(i));
@@ -1021,11 +1020,14 @@ EOC */
 				
 				if(template != null)
 					currentTab.setActiveTemplate(template);
+
+				currentTab.setQueries(factory.getQueries());
 				
 				if (CreateGui.getApp()!=null) {
 					CreateGui.getApp().restoreMode();
 				}
 				
+
 				
 //				appModel.createFromPNML(doc, type);
 
@@ -1045,10 +1047,11 @@ EOC */
 				return;
 			}
 		}
-
+		
+		
 		appView.setNetChanged(false);   // Status is unchanged
 
-
+		
 
 		appView.updatePreferredSize();
 
@@ -1541,7 +1544,7 @@ EOC */
 		public void actionPerformed(ActionEvent e){
 			// check if queries need to be removed
 			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
-			ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+			Iterable<TAPNQuery> queries = ((TabContent)appTab.getSelectedComponent()).queries();
 			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
 
@@ -1572,7 +1575,11 @@ EOC */
 				appView.getUndoManager().newEdit(); // new "transaction""
 
 				if(queriesAffected){
-					CreateGui.getModel().getQueries().removeAll(queriesToDelete);
+					TabContent currentTab = ((TabContent)CreateGui.getTab().getSelectedComponent());
+					for(TAPNQuery q : queriesToDelete) {
+						currentTab.removeQuery(q);	
+					}
+					
 					CreateGui.createLeftPane();	
 				}
 
@@ -1895,7 +1902,7 @@ EOC */
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);
 			} else if (this == exportToTikZAction) {
-				Export.exportGuiView(appView, Export.TIKZ, appModel);
+				Export.exportGuiView(appView, Export.TIKZ, appView.getGuiModel());
 			} else if (this == exportPSAction) {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
 			} else if (this == printAction) {

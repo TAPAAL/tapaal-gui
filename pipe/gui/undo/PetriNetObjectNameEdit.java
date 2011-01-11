@@ -9,6 +9,7 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.CreateGui;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 
 
@@ -37,7 +38,7 @@ public class PetriNetObjectNameEdit extends Command {
 	public void undo() {
 		pno.setName(oldName);
 
-		ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+		Iterable<TAPNQuery> queries = ((TabContent)CreateGui.getTab().getSelectedComponent()).queries();
 
 		RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(newName, oldName);
 		for (TAPNQuery q : queries) {
@@ -51,7 +52,7 @@ public class PetriNetObjectNameEdit extends Command {
 	public void redo() {
 		pno.setName(newName);
 
-		ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+		Iterable<TAPNQuery> queries = ((TabContent)CreateGui.getTab().getSelectedComponent()).queries();
 
 		RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(oldName, newName);
 		for (TAPNQuery q : queries) {

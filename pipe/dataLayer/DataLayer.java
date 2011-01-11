@@ -2653,84 +2653,84 @@ implements Cloneable {
 	}   
 
 
-	/**  
-	 * This method creates a new datalayer based on a datalayer,
-	 * this can be used for drawing a datalayer after having modyfied it
-	 * by some external code.
-	 * 
-	 *  This method is used for drawing a datalayer after it has been
-	 *  transformed by dk.aau.cs.TAPN.transformer
-	 *  
-	 * @author Kenneth Yrke Joergensen (kyrke@cs.aau.dk)  **/ 
-
-	public void createFromDataLayer(DataLayer m){
-		if (CreateGui.getApp()!=null) {
-			// Notifies used to indicate new instances.
-			CreateGui.getApp().setMode(Pipe.CREATING); 
-		}
-
-		for (Transition t : m.getTransitions()){
-			addTransition(new Transition(t));		   
-		}
-
-		for (Place p : m.getPlaces()){
-			addPlace(p.clone());
-		}
-
-
-		for (Arc a:m.getArcs()){
-			TimedOutputArcComponent tmp = (TimedOutputArcComponent)a.clone();
-
-			PlaceTransitionObject source = getPlaceTransitionObject(tmp.getSource().getName());
-			PlaceTransitionObject target =  getPlaceTransitionObject(tmp.getTarget().getName());
-
-			target.addConnectTo(tmp);
-			source.addConnectFrom(tmp);
-
-
-			/* */
-
-			/*	      
-		         if (getPlaceTransitionObject(sourceInput) != null) {
-//		        System.out.println("PNMLDATA: sourceInput is not null");
-		            startX = getPlaceTransitionObject(sourceInput).getPositionX();
-		            startX += getPlaceTransitionObject(sourceInput).centreOffsetLeft();
-		            startY = getPlaceTransitionObject(sourceInput).getPositionY();
-		            startY += getPlaceTransitionObject(sourceInput).centreOffsetTop();
-		         }
-
-		         if (getPlaceTransitionObject(targetInput) != null) {
-//		        System.out.println("PNMLDATA: targetInput is not null");
-		            endX = getPlaceTransitionObject(targetInput).getPositionX();
-		            endY = getPlaceTransitionObject(targetInput).getPositionY();
-		         }
-
-
-		      PlaceTransitionObject sourceIn = getPlaceTransitionObject(sourceInput);
-		      PlaceTransitionObject targetIn = getPlaceTransitionObject(targetInput);
-
-		      // add the insets and offset
-		      int aStartx = sourceIn.getX() + sourceIn.centreOffsetLeft();
-		      int aStarty = sourceIn.getY() + sourceIn.centreOffsetTop();
-
-		      int aEndx = targetIn.getX() + targetIn.centreOffsetLeft();
-		      int aEndy = targetIn.getY() + targetIn.centreOffsetTop();
-
-
-		      double _startx = aStartx;
-		      double _starty = aStarty;
-		      double _endx = aEndx;
-		      double _endy = aEndy; */
-			/* */
-
-			addArc(tmp);
-		}
-
-
-		if (CreateGui.getApp()!=null) {
-			CreateGui.getApp().restoreMode();
-		} 
-	}
+//	/**  
+//	 * This method creates a new datalayer based on a datalayer,
+//	 * this can be used for drawing a datalayer after having modyfied it
+//	 * by some external code.
+//	 * 
+//	 *  This method is used for drawing a datalayer after it has been
+//	 *  transformed by dk.aau.cs.TAPN.transformer
+//	 *  
+//	 * @author Kenneth Yrke Joergensen (kyrke@cs.aau.dk)  **/ 
+//
+//	public void createFromDataLayer(DataLayer m){
+//		if (CreateGui.getApp()!=null) {
+//			// Notifies used to indicate new instances.
+//			CreateGui.getApp().setMode(Pipe.CREATING); 
+//		}
+//
+//		for (Transition t : m.getTransitions()){
+//			addTransition(new Transition(t));		   
+//		}
+//
+//		for (Place p : m.getPlaces()){
+//			addPlace(p.clone());
+//		}
+//
+//
+//		for (Arc a:m.getArcs()){
+//			TimedOutputArcComponent tmp = (TimedOutputArcComponent)a.clone();
+//
+//			PlaceTransitionObject source = getPlaceTransitionObject(tmp.getSource().getName());
+//			PlaceTransitionObject target =  getPlaceTransitionObject(tmp.getTarget().getName());
+//
+//			target.addConnectTo(tmp);
+//			source.addConnectFrom(tmp);
+//
+//
+//			/* */
+//
+//			/*	      
+//		         if (getPlaceTransitionObject(sourceInput) != null) {
+////		        System.out.println("PNMLDATA: sourceInput is not null");
+//		            startX = getPlaceTransitionObject(sourceInput).getPositionX();
+//		            startX += getPlaceTransitionObject(sourceInput).centreOffsetLeft();
+//		            startY = getPlaceTransitionObject(sourceInput).getPositionY();
+//		            startY += getPlaceTransitionObject(sourceInput).centreOffsetTop();
+//		         }
+//
+//		         if (getPlaceTransitionObject(targetInput) != null) {
+////		        System.out.println("PNMLDATA: targetInput is not null");
+//		            endX = getPlaceTransitionObject(targetInput).getPositionX();
+//		            endY = getPlaceTransitionObject(targetInput).getPositionY();
+//		         }
+//
+//
+//		      PlaceTransitionObject sourceIn = getPlaceTransitionObject(sourceInput);
+//		      PlaceTransitionObject targetIn = getPlaceTransitionObject(targetInput);
+//
+//		      // add the insets and offset
+//		      int aStartx = sourceIn.getX() + sourceIn.centreOffsetLeft();
+//		      int aStarty = sourceIn.getY() + sourceIn.centreOffsetTop();
+//
+//		      int aEndx = targetIn.getX() + targetIn.centreOffsetLeft();
+//		      int aEndy = targetIn.getY() + targetIn.centreOffsetTop();
+//
+//
+//		      double _startx = aStartx;
+//		      double _starty = aStarty;
+//		      double _endx = aEndx;
+//		      double _endy = aEndy; */
+//			/* */
+//
+//			addArc(tmp);
+//		}
+//
+//
+//		if (CreateGui.getApp()!=null) {
+//			CreateGui.getApp().restoreMode();
+//		} 
+//	}
 
 
 
@@ -2927,14 +2927,6 @@ implements Cloneable {
 		return true;
 	}
 
-	public void setQueries(ArrayList<TAPNQuery> queries) {
-		this.queries = queries;
-
-	}
-	public ArrayList<TAPNQuery> getQueries(){
-		return queries;
-	}
-
 	public Collection<Constant> getConstants()
 	{
 		return constants.getConstants();
@@ -3020,10 +3012,10 @@ implements Cloneable {
 		return constants.removeConstant(name);		
 	}
 
-	public void addQuery(TAPNQuery query) {
-		queries.add(query);
-
-	}
+//	public void addQuery(TAPNQuery query) {
+//		queries.add(query);
+//
+//	}
 
 
 	public Set<String> getConstantNames() {

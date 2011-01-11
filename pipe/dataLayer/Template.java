@@ -1,5 +1,7 @@
 package pipe.dataLayer;
 
+import dk.aau.cs.util.Require;
+
 
 public class Template<TNet> {
 	private TNet net;
@@ -21,5 +23,10 @@ public class Template<TNet> {
 	
 	public TNet model(){
 		return net;
+	}
+
+	public void setGuiModel(DataLayer guiModel) {
+		Require.that(guiModel != null, "GuiModel cannot be null");
+		this.guiModel = guiModel;
 	}
 }

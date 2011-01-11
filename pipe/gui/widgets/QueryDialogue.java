@@ -75,6 +75,7 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.translations.ReductionOption;
 
 public class QueryDialogue extends JPanel{
@@ -157,7 +158,6 @@ public class QueryDialogue extends JPanel{
 	private JButton cancelButton;
 	private JButton saveButton;
 	private JButton saveAndVerifyButton;
-	private JButton removeButton;
 	private JButton saveUppaalXMLButton;
 
 	// Private Members
@@ -1629,7 +1629,6 @@ public class QueryDialogue extends JPanel{
 			saveButton = new JButton("Save");
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
-			removeButton = new JButton("Remove");
 			saveUppaalXMLButton = new JButton("Save UPPAAL XML");
 
 			saveButton.addActionListener(	
@@ -1659,16 +1658,7 @@ public class QueryDialogue extends JPanel{
 						}
 					}
 			);
-			removeButton.addActionListener(
-					new ActionListener(){
-						public void actionPerformed(ActionEvent evt) {
 
-							datalayer.getQueries().remove(queryToCreateFrom);
-							CreateGui.createLeftPane();
-							exit();
-						}
-					}
-			);
 			saveUppaalXMLButton.addActionListener(
 					new ActionListener(){
 						public void actionPerformed(ActionEvent e) {
@@ -1721,10 +1711,6 @@ public class QueryDialogue extends JPanel{
 		}
 		if (option == QueryDialogueOption.Save){
 			buttonPanel.add(cancelButton);
-
-			if (queryToCreateFrom!=null){
-				buttonPanel.add(removeButton);	
-			}
 
 			buttonPanel.add(saveButton);
 

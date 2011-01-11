@@ -29,6 +29,7 @@ import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.NetType;
+import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -45,7 +46,7 @@ import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
 
-public class TimedArcPetriNetNetworkWriter {
+public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 	private Iterable<Template<TimedArcPetriNet>> templates;
 	private Iterable<TAPNQuery> queries;

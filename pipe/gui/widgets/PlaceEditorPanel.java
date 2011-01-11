@@ -54,6 +54,7 @@ import pipe.dataLayer.colors.IntervalBound;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 
 /**
@@ -821,7 +822,7 @@ extends javax.swing.JPanel {
 
 				view.getUndoManager().addEdit(place.setPNObjectName(newName));
 
-				ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+				Iterable<TAPNQuery> queries = ((TabContent)CreateGui.getTab().getSelectedComponent()).queries();
 
 				RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(name, newName);
 				for (TAPNQuery q : queries) {

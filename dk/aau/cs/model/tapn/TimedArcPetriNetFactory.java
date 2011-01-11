@@ -1,7 +1,9 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Observer;
 
 import javax.swing.JOptionPane;
 
@@ -15,6 +17,8 @@ import dk.aau.cs.translations.ReductionOption;
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.Note;
+import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNQuery;
@@ -24,14 +28,27 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
+import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
+import pipe.gui.Zoomable;
+import pipe.gui.handler.AnimationHandler;
+import pipe.gui.handler.AnnotationNoteHandler;
+import pipe.gui.handler.ArcHandler;
+import pipe.gui.handler.LabelHandler;
+import pipe.gui.handler.PlaceHandler;
+import pipe.gui.handler.TAPNTransitionHandler;
+import pipe.gui.handler.TimedArcHandler;
+import pipe.gui.handler.TransitionHandler;
+import pipe.gui.handler.TransportArcHandler;
 
 public class TimedArcPetriNetFactory {
 	
@@ -41,16 +58,21 @@ public class TimedArcPetriNetFactory {
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
 	private TimedMarking initialMarking;
+	private ArrayList<TAPNQuery> queries;
+	private DrawingSurfaceImpl drawingSurface;
 	
-	public TimedArcPetriNetFactory()
+	public TimedArcPetriNetFactory(DrawingSurfaceImpl drawingSurfaceImpl)
 	{
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
 		initialMarking = new TimedMarking();
+		queries = new ArrayList<TAPNQuery>();
+		this.drawingSurface = drawingSurfaceImpl;
 	}
 	
 	public Template<TimedArcPetriNet> createTimedArcPetriNetFromPNML(Node tapnNode) {
+		initialMarking = new TimedMarking();
 		if(tapnNode instanceof Element) {
 			String name = getTAPNName((Element)tapnNode);
 			tapn = new TimedArcPetriNet(name);
@@ -82,6 +104,10 @@ public class TimedArcPetriNetFactory {
 		
 		return new Template<TimedArcPetriNet>(tapn,guiModel);
 	}
+	
+	public Iterable<TAPNQuery> getQueries(){
+		return queries;
+	}
 
 
 	private String getTAPNName(Element tapnNode) {
@@ -98,7 +124,7 @@ public class TimedArcPetriNetFactory {
 		if(node instanceof Element) {
 			element = (Element)node;
 			if ("labels".equals(element.getNodeName())){
-				guiModel.addAnnotation(guiModel.createAnnotation(element));
+				createAndAddAnnotation(element);
 			}  else if("place".equals(element.getNodeName())){
 				createAndAddPlace(element);
 			} else if ("transition".equals(element.getNodeName())){
@@ -108,7 +134,7 @@ public class TimedArcPetriNetFactory {
 			} else if( "queries".equals(element.getNodeName()) ){
 				TAPNQuery query = createQuery(element);
 				if(query != null)
-					guiModel.addQuery(query);
+					queries.add(query);
 			} else if ("constant".equals(element.getNodeName())){
 				String name = element.getAttribute("name");
 				int value = Integer.parseInt(element.getAttribute("value"));
@@ -118,15 +144,57 @@ public class TimedArcPetriNetFactory {
 				System.out.println("!" + element.getNodeName());
 			}
 		}
-	}   
+	} 
+	
+	public void createAndAddAnnotation (Element inputLabelElement) {
+		int positionXInput = 0;
+		int positionYInput = 0;
+		int widthInput = 0;
+		int heightInput = 0;
+		boolean borderInput = true;
+
+		String positionXTempStorage = inputLabelElement.getAttribute("x");
+		String positionYTempStorage = inputLabelElement.getAttribute("y");
+		String widthTemp = inputLabelElement.getAttribute("width");
+		String heightTemp = inputLabelElement.getAttribute("height");
+		String borderTemp = inputLabelElement.getAttribute("border");
+		
+		String text = getNode(inputLabelElement, "text").getTextContent();
+
+		if (positionXTempStorage.length() > 0) {
+			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
+		}
+
+		if (positionYTempStorage.length() > 0){
+			positionYInput = Integer.valueOf(positionYTempStorage).intValue() + 1;
+		}
+
+		if (widthTemp.length() > 0) {
+			widthInput = Integer.valueOf(widthTemp).intValue() + 1;
+		}
+
+		if (heightTemp.length() > 0) {
+			heightInput = Integer.valueOf(heightTemp).intValue() + 1;
+		}
+
+		if (borderTemp.length()>0) {
+			borderInput = Boolean.valueOf(borderTemp).booleanValue();
+		} else {
+			borderInput = true;
+		}
+		AnnotationNote an = new AnnotationNote(text, positionXInput, positionYInput, 
+				widthInput, heightInput, borderInput);
+		guiModel.addPetriNetObject(an);
+		drawingSurface.addNewPetriNetObject(an);
+	} 
 	
 	private void createAndAddTransition(Element element){
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getValueChildNodeContentAsString(element, "name");
-		double nameOffsetYInput = getNameOffsetAttribute(element, "x");
-		double nameOffsetXInput = getNameOffsetAttribute(element, "y");
+		double nameOffsetXInput= getNameOffsetAttribute(element, "x");
+		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
 		boolean timedTransition = getValueChildNodeContentAsBoolean(element, "timed");
 		boolean infiniteServer = getValueChildNodeContentAsBoolean(element, "infiniteServer");
 		int angle = getValueChildNodeContentAsInt(element, "orientation");
@@ -154,10 +222,103 @@ public class TimedArcPetriNetFactory {
 					priority);
 		TimedTransition t = new TimedTransition(nameInput);
 		transition.setUnderlyingTransition(t);
-		guiModel.addTransition(transition);
+		guiModel.addPetriNetObject(transition);
+		addListeners(transition);
 		tapn.add(t);
 	}
 
+	private void addListeners(PetriNetObject newObject) {
+		if (newObject != null) {
+			if (newObject.getMouseListeners().length == 0) {
+				if (newObject instanceof Place) {
+					// XXX - kyrke
+					if (newObject instanceof TimedPlaceComponent) {
+
+						LabelHandler labelHandler =
+							new LabelHandler(((Place)newObject).getNameLabel(),
+									(Place)newObject);
+						((Place)newObject).getNameLabel().addMouseListener(labelHandler);
+						((Place)newObject).getNameLabel().addMouseMotionListener(labelHandler);
+						((Place)newObject).getNameLabel().addMouseWheelListener(labelHandler);
+
+						PlaceHandler placeHandler =
+							new PlaceHandler(drawingSurface, (Place)newObject, guiModel, tapn);
+						newObject.addMouseListener(placeHandler);
+						newObject.addMouseWheelListener(placeHandler);
+						newObject.addMouseMotionListener(placeHandler);
+					}else{
+
+						LabelHandler labelHandler =
+							new LabelHandler(((Place)newObject).getNameLabel(),
+									(Place)newObject);
+						((Place)newObject).getNameLabel().addMouseListener(labelHandler);
+						((Place)newObject).getNameLabel().addMouseMotionListener(labelHandler);
+						((Place)newObject).getNameLabel().addMouseWheelListener(labelHandler);
+
+						PlaceHandler placeHandler =
+							new PlaceHandler(drawingSurface, (Place)newObject);
+						newObject.addMouseListener(placeHandler);
+						newObject.addMouseWheelListener(placeHandler);
+						newObject.addMouseMotionListener(placeHandler);
+
+					}
+				} else if (newObject instanceof Transition) {
+					TransitionHandler transitionHandler;
+					if (newObject instanceof TimedTransitionComponent){
+						transitionHandler =
+							new TAPNTransitionHandler(drawingSurface, (Transition)newObject, guiModel, tapn);
+					}else {
+						transitionHandler =
+							new TransitionHandler(drawingSurface, (Transition)newObject);	
+					}
+
+					LabelHandler labelHandler =
+						new LabelHandler(((Transition)newObject).getNameLabel(),
+								(Transition)newObject);
+					((Transition)newObject).getNameLabel().addMouseListener(labelHandler);
+					((Transition)newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Transition)newObject).getNameLabel().addMouseWheelListener(labelHandler);
+
+					newObject.addMouseListener(transitionHandler);
+					newObject.addMouseMotionListener(transitionHandler);
+					newObject.addMouseWheelListener(transitionHandler);
+
+
+					newObject.addMouseListener(new AnimationHandler());
+
+				} else if (newObject instanceof Arc) {
+					/* CB - Joakim Byg add timed arcs*/
+					if (newObject instanceof TimedInputArcComponent){
+						if (newObject instanceof TransportArcComponent){ 
+							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc)newObject);
+							newObject.addMouseListener(transportArcHandler);
+							newObject.addMouseWheelListener(transportArcHandler);
+							newObject.addMouseMotionListener(transportArcHandler);
+						}else {
+							TimedArcHandler timedArcHandler = new TimedArcHandler(drawingSurface, (Arc)newObject);
+							newObject.addMouseListener(timedArcHandler);
+							newObject.addMouseWheelListener(timedArcHandler);
+							newObject.addMouseMotionListener(timedArcHandler);
+						}
+					}else {
+						/*EOC*/            	
+						ArcHandler arcHandler = new ArcHandler(drawingSurface, (Arc)newObject);
+						newObject.addMouseListener(arcHandler);
+						newObject.addMouseWheelListener(arcHandler);
+						newObject.addMouseMotionListener(arcHandler);
+					}
+				} else if (newObject instanceof AnnotationNote) {
+					AnnotationNoteHandler noteHandler =
+						new AnnotationNoteHandler(drawingSurface, (AnnotationNote)newObject);
+					newObject.addMouseListener(noteHandler);
+					newObject.addMouseMotionListener(noteHandler);
+					((Note)newObject).getNote().addMouseListener(noteHandler);
+					((Note)newObject).getNote().addMouseMotionListener(noteHandler);
+				} 
+			}
+			newObject.setGuiModel(guiModel);
+		}
+	}
 	
 	private boolean getValueChildNodeContentAsBoolean(Element element, String childNodeName) {
 		Node node = getNode(element,childNodeName);
@@ -259,8 +420,8 @@ public class TimedArcPetriNetFactory {
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getValueChildNodeContentAsString(element, "name");
-		double nameOffsetYInput = getNameOffsetAttribute(element, "x");
-		double nameOffsetXInput = getNameOffsetAttribute(element, "y");
+		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
+		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
 		int initialMarkingInput = getValueChildNodeContentAsInt(element, "initialMarking");
 		double markingOffsetXInput = getMarkingOffsetAttribute(element,"x");
 		double markingOffsetYInput = getMarkingOffsetAttribute(element,"y");
@@ -305,7 +466,9 @@ public class TimedArcPetriNetFactory {
 			}
 			
 			((TimedPlaceComponent)place).setUnderlyingPlace(p);
-			guiModel.addPlace(place);
+			guiModel.addPetriNetObject(place);
+			//drawingSurface.addNewPetriNetObject(place);
+			addListeners(place);
 			tapn.add(p);
 			
 		}
@@ -353,8 +516,12 @@ public class TimedArcPetriNetFactory {
 			TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
 			
 			((TimedInhibitorArcComponent)tempArc).setUnderlyingArc(inhibArc);
-			guiModel.addArc((TimedInhibitorArcComponent)tempArc);
+			guiModel.addPetriNetObject(tempArc);
+			addListeners(tempArc);
 			tapn.add(inhibArc);
+			
+			sourceIn.addConnectFrom(tempArc);
+			targetIn.addConnectTo(tempArc);
 
 		} else {
 
@@ -376,8 +543,12 @@ public class TimedArcPetriNetFactory {
 				
 				TimedInputArc inputArc = new TimedInputArc(place, transition, interval);
 				((TimedInputArcComponent)tempArc).setUnderlyingArc(inputArc);
-				guiModel.addArc((TimedInputArcComponent)tempArc);
+				guiModel.addPetriNetObject(tempArc);
+				addListeners(tempArc);
 				tapn.add(inputArc);
+				
+				sourceIn.addConnectFrom(tempArc);
+				targetIn.addConnectTo(tempArc);
 				
 			}else if (type.equals("transport")){
 				String[] inscriptionSplit = {};
@@ -396,6 +567,9 @@ public class TimedArcPetriNetFactory {
 						idInput,
 						taggedArc), inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet );
 				
+				sourceIn.addConnectFrom(tempArc);
+				targetIn.addConnectTo(tempArc);
+				
 				if(isInPreSet) {
 					if(postsetArcs.containsKey((TimedTransitionComponent)targetIn)){
 						TransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent)targetIn);
@@ -412,9 +586,12 @@ public class TimedArcPetriNetFactory {
 						
 						((TransportArcComponent)tempArc).setUnderlyingArc(transArc);
 						postsetTransportArc.setUnderlyingArc(transArc);
-						guiModel.addTransportArc((TransportArcComponent)tempArc);
-						guiModel.addTransportArc(postsetTransportArc);
+						guiModel.addPetriNetObject(tempArc);
+						addListeners(tempArc);
+						guiModel.addPetriNetObject(postsetTransportArc);
+						addListeners(postsetTransportArc);
 						tapn.add(transArc);
+	
 						
 						postsetArcs.remove((TimedTransitionComponent)targetIn);
 					} else {
@@ -438,8 +615,10 @@ public class TimedArcPetriNetFactory {
 						
 						((TransportArcComponent)tempArc).setUnderlyingArc(transArc);
 						presetTransportArc.setUnderlyingArc(transArc);
-						guiModel.addTransportArc(presetTransportArc);
-						guiModel.addTransportArc((TransportArcComponent)tempArc);
+						guiModel.addPetriNetObject(presetTransportArc);
+						addListeners(presetTransportArc);
+						guiModel.addPetriNetObject(tempArc);
+						addListeners(tempArc);
 						tapn.add(transArc);
 						
 						presetArcs.remove((TimedTransitionComponent)sourceIn);
@@ -464,12 +643,16 @@ public class TimedArcPetriNetFactory {
 				
 				TimedOutputArc outputArc = new TimedOutputArc(transition, place);
 				((TimedOutputArcComponent)tempArc).setUnderlyingArc(outputArc);
-				guiModel.addArc((TimedOutputArcComponent)tempArc);
-				tapn.add(outputArc);	
+				guiModel.addPetriNetObject(tempArc);
+				addListeners(tempArc);
+				tapn.add(outputArc);
+				
+				sourceIn.addConnectFrom(tempArc);
+				targetIn.addConnectTo(tempArc);
 			}
 
 		}
-
+		
 		//		**********************************************************************************
 		//		The following section attempts to load and display arcpath details****************
 

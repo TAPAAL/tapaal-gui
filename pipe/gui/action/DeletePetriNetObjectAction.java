@@ -12,6 +12,8 @@ import java.util.HashSet;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.gui.TabContent;
+
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlaceComponent;
@@ -39,7 +41,7 @@ extends AbstractAction {
 	{
 		// check if queries need to be removed
 		ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
-		ArrayList<TAPNQuery> queries = CreateGui.getModel().getQueries();
+		Iterable<TAPNQuery> queries = ((TabContent)CreateGui.getTab().getSelectedComponent()).queries();
 		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 		boolean queriesAffected = false;
 		
@@ -71,7 +73,10 @@ extends AbstractAction {
 			if(CreateGui.getView().getSelectionObject().getSelectionCount() <= 1)
 			{
 				if(queriesAffected){
-					CreateGui.getModel().getQueries().removeAll(queriesToDelete);
+					TabContent currentTab = ((TabContent)CreateGui.getTab().getSelectedComponent());
+					for(TAPNQuery q : queriesToDelete) {
+						currentTab.removeQuery(q);
+					}
 					CreateGui.createLeftPane();
 				}
 
@@ -81,7 +86,10 @@ extends AbstractAction {
 			else
 			{
 				if(queriesAffected){
-					CreateGui.getModel().getQueries().removeAll(queriesToDelete);
+					TabContent currentTab = ((TabContent)CreateGui.getTab().getSelectedComponent());
+					for(TAPNQuery q : queriesToDelete) {
+						currentTab.removeQuery(q);
+					}
 					CreateGui.createLeftPane();
 				}
 				CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());

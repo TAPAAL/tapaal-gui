@@ -80,9 +80,6 @@ public class CreateGui {
 		}
 
 		TabContent tab = (tabs.get(index));
-		if (tab.getModel() == null) {
-			tab.setModel(new DataLayer());
-		}
 		return tab.getModel();
 	}
 
@@ -97,14 +94,14 @@ public class CreateGui {
 		}
 
 		TabContent tab = (tabs.get(index));
-		while (tab.getDrawingSurface() == null) {
+		while (tab.drawingSurface() == null) {
 			try {
 				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel(), tab));
 			} catch (Exception e){
 				e.printStackTrace();
 			}
 		}
-		return tab.getDrawingSurface();
+		return tab.drawingSurface();
 	}
 
 

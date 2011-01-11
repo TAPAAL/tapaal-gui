@@ -317,6 +317,10 @@ public class TemplateExplorer extends JPanel {
 		return (Template<TimedArcPetriNet>) templateList.getSelectedValue();
 	}
 	
+	public void setSelectedGuiModel(DataLayer guiModel){
+		((Template<TimedArcPetriNet>)templateList.getSelectedValue()).setGuiModel(guiModel);
+	}
+	
 	public void updateTemplateList(){
 		listModel.clear();
 		for(Template<?> net : parent.templates()){

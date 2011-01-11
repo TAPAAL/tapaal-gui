@@ -113,13 +113,17 @@ implements Observer, Printable, DrawingSurface {
 
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		mouseHandler = new MouseHandler(this, guiModel);
+		mouseHandler = new MouseHandler(this, dataLayer);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
 		addMouseWheelListener(mouseHandler);
 
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
+	}
+	
+	public DataLayer getGuiModel() {
+		return guiModel;
 	}
 
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model){

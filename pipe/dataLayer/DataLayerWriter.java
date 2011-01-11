@@ -23,12 +23,15 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import dk.aau.cs.gui.TabContent;
+
 import pipe.dataLayer.colors.ColoredInhibitorArc;
 import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
 import pipe.dataLayer.colors.ColoredTransportArc;
+import pipe.gui.CreateGui;
 
 
 /**
@@ -37,7 +40,7 @@ import pipe.dataLayer.colors.ColoredTransportArc;
  * @author Ben Kirby
  * @author Pere Bonet (minor changes)
  */
-public class DataLayerWriter {
+public class DataLayerWriter implements PNMLWriter {
 
 	/** DataLayer object passed in to save */
 	private DataLayer netModel;
@@ -156,8 +159,8 @@ public class DataLayerWriter {
 				NET.appendChild(newArc);
 			}
 
-
-			ArrayList<TAPNQuery> queries = netModel.getQueries();
+			TabContent tab = (TabContent)CreateGui.getTab().getSelectedComponent();
+			Iterable<TAPNQuery> queries = tab.queries();
 			for (TAPNQuery query : queries){
 				Element newQuery = createQueryElement(query, pnDOM);
 				NET.appendChild(newQuery);

@@ -49,7 +49,6 @@ public class TabContent extends JSplitPane {
 
 	private static final double DIVIDER_LOCATION = 0.5;
 	
-	private DataLayer appModel;
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
 	private HashMap<PetriNetObject, TimeInterval> oldGuards;
@@ -74,13 +73,12 @@ public class TabContent extends JSplitPane {
 		
 	public TabContent()
 	{
-		appModel = new DataLayer();		
 		
 		for(TimedArcPetriNet net : tapnNetwork.templates()){
 			guiModels.put(net, new DataLayer());
 		}
 				
-		drawingSurface = new DrawingSurfaceImpl(appModel, this);
+		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -101,11 +99,9 @@ public class TabContent extends JSplitPane {
 		editorLeftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
 		editorLeftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		editorLeftPane.setMinimumSize(new Dimension(175,100));
-		boolean enableAddButton = appModel == null ? true : !appModel.netType().equals(NetType.UNTIMED);
+		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 		leftBottomPanel = new LeftConstantsPane(enableAddButton);
-		queries = new LeftQueryPane(
-				appModel == null ? new ArrayList<TAPNQuery>() : appModel.getQueries()
-		);
+		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
 
 		templateExplorer = new TemplateExplorer(this);
 		
@@ -139,17 +135,7 @@ public class TabContent extends JSplitPane {
 	
 	public DataLayer getModel()
 	{
-		return appModel;
-	}
-	
-	public void setModel(DataLayer model)
-	{
-		appModel = model;
-	}
-	
-	public DrawingSurfaceImpl getDrawingSurface()
-	{
-		return drawingSurface; 
+		return drawingSurface.getGuiModel();
 	}
 	
 	public void setDrawingSurface(DrawingSurfaceImpl drawingSurface) {
@@ -167,7 +153,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void setupModelForSimulation(){
-			if(!appModel.isUsingColors()){
+			if(!getModel().isUsingColors()){
 				transformToModelWithoutConstants();
 			}else{
 				configureNetToShowValues(true);
@@ -176,12 +162,12 @@ public class TabContent extends JSplitPane {
 	}
 	
 	private void configureNetToShowValues(boolean showValues) {
-		for(Place tp : appModel.getPlaces()){
+		for(Place tp : getModel().getPlaces()){
 			ColoredTimedPlace place = (ColoredTimedPlace)tp;
 			place.displayValues(showValues);
 		}		
 
-		for(Arc arc : appModel.getArcs()){
+		for(Arc arc : getModel().getArcs()){
 			if(arc instanceof ColoredTransportArc){
 				((ColoredTransportArc)arc).displayValues(showValues);
 			}else if(arc instanceof ColoredInputArc){
@@ -196,7 +182,7 @@ public class TabContent extends JSplitPane {
 
 
 	public void restoreModelForEditing(){
-			if(appModel.isUsingColors()){
+			if(getModel().isUsingColors()){
 				configureNetToShowValues(false);
 			}else{
 				if(this.oldGuards != null){
@@ -207,14 +193,14 @@ public class TabContent extends JSplitPane {
 	}
 
 	private void setupModelWithOldGuards() {
-		for(Place p : appModel.getPlaces()){
+		for(Place p : getModel().getPlaces()){
 			if(p instanceof TimedPlaceComponent){
 				TimeInvariant inv = oldInvariants.get(p);
 				((TimedPlaceComponent)p).setInvariant(inv);
 			}
 		}
 
-		for(Arc arc : appModel.getArcs()){
+		for(Arc arc : getModel().getArcs()){
 			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
 				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
 				TimeInterval guard = oldGuards.get(arc);
@@ -228,7 +214,7 @@ public class TabContent extends JSplitPane {
 		this.oldGuards = new HashMap<PetriNetObject, TimeInterval>();
 		this.oldInvariants = new HashMap<PetriNetObject, TimeInvariant>();
 		
-		for(Place p : appModel.getPlaces()){
+		for(Place p : getModel().getPlaces()){
 			if(p instanceof TimedPlaceComponent){
 				oldInvariants.put(p, ((TimedPlaceComponent) p).getInvariant());
 				TimeInvariant inv = getInvariant(p);
@@ -236,7 +222,7 @@ public class TabContent extends JSplitPane {
 			}
 		}
 
-		for(Arc arc : appModel.getArcs()){
+		for(Arc arc : getModel().getArcs()){
 			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
 				oldGuards.put(arc, ((TimedInputArcComponent) arc).getGuard());
 				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
@@ -464,5 +450,15 @@ public class TabContent extends JSplitPane {
 
 	public Iterable<TAPNQuery> queries() {
 		return queries.getQueries();
+	}
+
+	public void setQueries(Iterable<TAPNQuery> queries) {
+		this.queries.setQueries(queries);
+		
+	}
+
+	public void removeQuery(TAPNQuery queryToCreateFrom) {
+		queries.removeQuery(queryToCreateFrom);
+		
 	}
 }
