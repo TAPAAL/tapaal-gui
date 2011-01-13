@@ -298,7 +298,7 @@ public class Animator {
 
 					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
 					int current = untimedAnimationHistory.getCurrentItem();
-					if ((untimedAnimationHistory.getElement(current-1)).trim().equals(transition.getName())){ //Possible null pointer exception
+					if ((untimedAnimationHistory.getElement(current)).trim().equals(transition.getName())){ //Possible null pointer exception
 						//It is fired
 						untimedAnimationHistory.stepBackwards();	 
 					}
@@ -375,7 +375,7 @@ public class Animator {
 
 					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
 					int current = untimedAnimationHistory.getCurrentItem();
-					if ((untimedAnimationHistory.getElement(current)).trim().equals(nextTransition.getName())){ //Possible null pointer exception
+					if ((untimedAnimationHistory.getElement(current+1)).trim().equals(nextTransition.getName())){ //Possible null pointer exception
 						//It is fired
 						untimedAnimationHistory.stepForward();
 					}
@@ -444,20 +444,24 @@ public class Animator {
 
 			AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
 			int current = untimedAnimationHistory.getCurrentItem();
-			if ((untimedAnimationHistory.getElement(current)).trim().equals(transition.getName())){ //Possible null pointer exception
-				//It is fired
-				untimedAnimationHistory.stepForward();	 
-			}else{
-				int fireTransition = JOptionPane.showConfirmDialog( CreateGui.getApp().getRootPane(),
-						"Are you sure you want to fire a transition which does not follow the untimed trace?\n" +
-						"Firing this transition will discard the untimed trace and revert to standard simulation.",
-						"Discrading Untimed Trace",
-						JOptionPane.YES_NO_OPTION );
-				if (fireTransition > 0){
-					return;
+			
+			//Only make this check if we have more steps in the untimed trace, if we dont the user can do whatever he like
+			if (untimedAnimationHistory.isStepForwardAllowed()){
+				if ((untimedAnimationHistory.getElement(current+1)).trim().equals(transition.getName())){ //Possible null pointer exception
+					//It is fired
+					untimedAnimationHistory.stepForward();	 
 				}else{
-					CreateGui.removeAbstractAnimationPane();
-					CreateGui.updateLeftPanel();
+					int fireTransition = JOptionPane.showConfirmDialog( CreateGui.getApp().getRootPane(),
+							"Are you sure you want to fire a transition which does not follow the untimed trace?\n" +
+							"Firing this transition will discard the untimed trace and revert to standard simulation.",
+							"Discrading Untimed Trace",
+							JOptionPane.YES_NO_OPTION );
+					if (fireTransition > 0){
+						return;
+					}else{
+						CreateGui.removeAbstractAnimationPane();
+						CreateGui.updateLeftPanel();
+					}
 				}
 			}
 		}
