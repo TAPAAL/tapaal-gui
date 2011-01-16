@@ -181,7 +181,7 @@ public void mouseReleased(MouseEvent e) {
       boolean isNewArc = true; // true if we have to add a new arc to the Petri Net
       boolean fastMode = false;
       
-      String error_message_two_arcs = "We do not allow two arcs from a place to a transition or a transition to a place.";
+      String error_message_two_arcs = "More than one arc from a place to a transition or a transition to a place is not allowed.";
       
       GuiView view = CreateGui.getView();
       DataLayer model = CreateGui.getModel();
@@ -231,18 +231,18 @@ public void mouseReleased(MouseEvent e) {
                         else if (someArc instanceof TransportArc){
                         	// user has drawn an inhibitor arc where there is 
                             // a transport arc already - mikael: this does not make sense
-                        	System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+                        	System.out.println("It is not allowed to have both a transport arc and an inhibitor arc from a place to a transition.");
   							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-  									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+  									 "It is not allowed to have both a transport arc and an inhibitor arc from a place to a transition.",
   									 "Error",
   									 JOptionPane.ERROR_MESSAGE);
                         }
                         else if (someArc instanceof NormalArc){
                            // user has drawn an inhibitor arc where there is 
                            // a normal arc already - mikael: this does not make sense
-       						 System.out.println("It does not make sense to have both a normal arc and an inhibitor arc from a place to a transition.");
+       						 System.out.println("It is not allowed to have both a normal arc and an inhibitor arc from a place to a transition.");
    							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-   									 "It does not make sense to have both a normal arc and an inhibitor arc from a place to a transition.",
+   									 "It is not allowed to have both a normal arc and an inhibitor arc from a place to a transition.",
    									 "Error",
    									 JOptionPane.ERROR_MESSAGE);
        					} else  {
@@ -537,9 +537,9 @@ public void mouseReleased(MouseEvent e) {
             					 if (someArc instanceof TAPNInhibitorArc) {
             						 // user has drawn a transport arc where there is 
             						 // a TAPNInhibitorArc arc already - This does not make sense.
-            						 System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+            						 System.out.println("It is not allowed to have both a transport arc and an inhibitor arc from a place to a transition.");
           							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-          									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+          									 "It is not allowed to have both a transport arc and an inhibitor arc from a place to a transition.",
           									 "Error",
           									 JOptionPane.ERROR_MESSAGE);
             						 
@@ -613,7 +613,7 @@ public void mouseReleased(MouseEvent e) {
         			 } else if (transportArcToCreate.getSource() instanceof Transition) {
         				 //Step 2 
         				 if (view.transportArcPart1 == null ){
-        					 System.err.println("There where a error, cant creat a transport arc without part one");
+        					 System.err.println("There where a error, cannot create a transport arc without part one");
 //      					 arc is drawn, remove handler:
         					 transportArcToCreate.removeKeyListener(keyHandler);
         					 keyHandler = null;
@@ -663,9 +663,9 @@ public void mouseReleased(MouseEvent e) {
             							 someArc.setWeight(weightToInsert);
         		                      }
             						 else{
-            						 System.out.println("We dont allow more than one transport arc from a transition to a place.");
+            						 System.out.println("More than one transport arc from a transition to a place is not allowed.");
             						 JOptionPane.showMessageDialog(CreateGui.getApp(),
-            									"We dont allow more than one transport arc from a transition to a place.",
+            									"More than one transport arc from a transition to a place is not allowed.",
             									"Error",
             									JOptionPane.ERROR_MESSAGE);
             						 }
@@ -838,9 +838,9 @@ public void mouseReleased(MouseEvent e) {
     							 if (someArc instanceof TAPNInhibitorArc) {
     								 //user has drawn a timed arc where there is 
             						 //an inhibitor arc already - this does not make sense
-    								 System.out.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
+    								 System.out.println("It is not allowed to have both a transport arc and an inhibitor arc from a place to a transition.");
     	  							 JOptionPane.showMessageDialog(CreateGui.getApp(),
-    	  									 "It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+    	  									 "It is not allowed to have both a transport arc and an inhibitor arc from a place to a transition.",
     	  									 "Error",
     	  									 JOptionPane.ERROR_MESSAGE);
             					 } else if (someArc instanceof TransportArc) {
