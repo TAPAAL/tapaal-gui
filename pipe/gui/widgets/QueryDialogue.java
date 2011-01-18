@@ -323,7 +323,7 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void enableColorsReductionOptions() {
-		String[] options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
+		String[] options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
 
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
 		boolean selectedOptionStillAvailable = false;
@@ -345,9 +345,9 @@ public class QueryDialogue extends JPanel{
 	private void enableOnlyLivenessReductionOptions(){
 		String[] options = null;
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			options = new String[]{name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
+			options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
 		}else{
-			options = new String[]{name_BROADCAST, name_BROADCASTDEG2};
+			options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
 		}
 
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
@@ -372,7 +372,7 @@ public class QueryDialogue extends JPanel{
 		String reductionOptionString = ""+reductionOption.getSelectedItem();
 		reductionOption.removeAllItems();
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			String[] options = {name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2};
+			String[] options = {name_ADVNOSYM, name_NAIVE, name_BROADCAST, name_BROADCASTDEG2};
 
 			for (String s : options){
 				reductionOption.addItem(s);
@@ -391,7 +391,7 @@ public class QueryDialogue extends JPanel{
 			//reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
 
-		reductionOption.setSelectedItem(reductionOptionString);
+		reductionOption.setSelectedItem("" + name_ADVNOSYM);
 
 
 	}
