@@ -154,11 +154,11 @@ public class TimedPlace extends TAPNElement {
 	}
 		
 	public void addToken(TimedToken timedToken) {
-		currentMarking.add(this, timedToken);
+		currentMarking.add(timedToken);
 	}
 	
 	public void removeToken(TimedToken timedToken){
-		currentMarking.remove(this, timedToken);
+		currentMarking.remove(timedToken);
 	}
 
 	public void removeToken() {

@@ -185,7 +185,7 @@ public class CreateGui {
 		tab.switchToEditorComponents();
 	}
 
-	public static AnimationHistory getAbstractAnimationPane(){
+	public static AnimationHistoryComponent getAbstractAnimationPane(){
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getAbstractAnimationPane();
 	}
@@ -222,7 +222,7 @@ public class CreateGui {
 //	}
 
 
-	public static AnimationHistory getAnimationHistory() {
+	public static AnimationHistoryComponent getAnimationHistory() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getAnimationHistory();
 	}

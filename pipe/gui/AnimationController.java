@@ -1,6 +1,5 @@
 package pipe.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -29,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 import pipe.dataLayer.NetType;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.action.GuiAction;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
 
 /**
  * Implementes af class handling drawing of animation functions
@@ -127,8 +127,7 @@ public class AnimationController extends JPanel {
 
 		firermodebox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-
-				CreateGui.getAnimator().setFiringmode(firermodebox.getSelectedItem().toString());
+				CreateGui.getAnimator().setFiringmode((String)firermodebox.getSelectedItem());
 			}
 		});
 		
@@ -223,12 +222,17 @@ public class AnimationController extends JPanel {
 	}
 
 	public void updateFiringModeComboBox() {
-		String currentFiringMode = CreateGui.getAnimator().getFiringmode().getName();
-		firermodebox.setSelectedItem(currentFiringMode);
+		FiringMode currentFiringMode = CreateGui.getAnimator().getFiringmode();
+		if(currentFiringMode == null){
+			firermodebox.setSelectedItem("Manual");
+		}else{
+			firermodebox.setSelectedItem(currentFiringMode.toString());
+		}
+		
 	}
 
 	public void addTimeDelayToHistory(BigDecimal delay){
-		AnimationHistory animBox = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
 		try {
 
@@ -253,7 +257,7 @@ public class AnimationController extends JPanel {
 	}
 
 	private void addTimeDelayToHistory(){
-		AnimationHistory animBox = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
 		try {
 
@@ -301,7 +305,7 @@ public class AnimationController extends JPanel {
 		 */
 		private static final long serialVersionUID = -4066032248332540289L;
 		private int typeID;
-		private AnimationHistory animBox;
+		private AnimationHistoryComponent animBox;
 
 
 		AnimateAction(String name, int typeID, String tooltip, String keystroke){
@@ -390,7 +394,7 @@ public class AnimationController extends JPanel {
 	}
 
 	public void setAnimationButtonsEnabled(){
-		AnimationHistory animationHistory = CreateGui.getAnimationHistory();
+		AnimationHistoryComponent animationHistory = CreateGui.getAnimationHistory();
 
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
@@ -404,5 +408,5 @@ public class AnimationController extends JPanel {
 
 	JTextField TimeDelayField = new JTextField();
 	JComboBox firermodebox = null;
-	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
+	private final String[] FIRINGMODES = {"Random", "Oldest", "Youngest",  };
 }

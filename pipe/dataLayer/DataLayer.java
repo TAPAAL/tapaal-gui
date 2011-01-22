@@ -1463,200 +1463,200 @@ implements Cloneable {
 	}
 
 
-	/**
-	 * Fire a specified transition, no affect if transtions not enabled
-	 * @param transition Reference of specifiec Transition
-	 *
-	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk> Changed to handeling
-	 * firing modes when working with TAPN.
-	 */
-	public FiringAction fireTransition(Transition transition) {
-		FiringAction toReturn = null;
-
-		// If it is a TAPN
-		if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
-			if(!isUsingColors()){
-				toReturn = fireTransitionInNonColoredTAPN(transition);	
-			}else{
-				toReturn = fireTransitionInColoredTAPN(transition);
-			}
-		}
-
-		return toReturn;
-	}
-
-
-	private FiringAction fireTransitionInColoredTAPN(
-			Transition transition) {
-		ColoredDiscreteFiringAction firingAction = new ColoredDiscreteFiringAction((TimedTransitionComponent)transition);
-
-		setEnabledTransitions();
-		if(transition.isEnabled()){
-			HashMap<Integer, ColoredToken> tokensConsumedByTransportArcs = new HashMap<Integer, ColoredToken>();
-
-			for(Arc arc : transition.getPreset()){				
-				if(arc instanceof ColoredTransportArc){
-					ColoredTransportArc tarc = (ColoredTransportArc)arc;
-					ArrayList<ColoredToken> possibleTokens = new ArrayList<ColoredToken>();
-					ColoredTimedPlace source = (ColoredTimedPlace)arc.getSource();
-					ColoredTimedPlace target = (ColoredTimedPlace)tarc.getConnectedTo().getTarget();
-
-					for(ColoredToken token : source.getColoredTokens()){
-						if(tarc.satisfiesGuard(token) && target.satisfiesInvariant(token)){
-							possibleTokens.add(token);
-						}
-					}
-
-					ColoredToken usedToken = CreateGui.getAnimator().firingmode.fire(possibleTokens);
-					firingAction.addConsumedToken(source, usedToken);
-					tokensConsumedByTransportArcs.put(tarc.getGroupNr(), usedToken);
-					source.removeColoredToken(usedToken);
-				}else if(arc instanceof ColoredInputArc){
-					ColoredInputArc inputArc = (ColoredInputArc)arc;
-					ArrayList<ColoredToken> possibleTokens = new ArrayList<ColoredToken>();
-					ColoredTimedPlace source = (ColoredTimedPlace)arc.getSource();
-
-					for(ColoredToken token : source.getColoredTokens()){
-						if(inputArc.satisfiesGuard(token)){
-							possibleTokens.add(token);
-						}
-					}
-
-					ColoredToken usedToken = CreateGui.getAnimator().firingmode.fire(possibleTokens);
-					firingAction.addConsumedToken(source, usedToken);
-					source.removeColoredToken(usedToken);
-				}
-			}
-
-			for(Arc arc : transition.getPostset()){
-				if(arc instanceof ColoredTransportArc){
-					ColoredTransportArc tarc = (ColoredTransportArc)arc;
-					ColoredToken consumed = tokensConsumedByTransportArcs.get(tarc.getGroupNr());
-					ColoredToken newToken = tarc.generateOutputToken(consumed);
-
-					ColoredTimedPlace target = (ColoredTimedPlace)tarc.getTarget();
-					firingAction.addProducedToken(target, newToken);
-					target.addColoredToken(newToken);
-				}else if(arc instanceof ColoredOutputArc){
-					ColoredOutputArc outputArc = (ColoredOutputArc)arc;
-					ColoredToken token = outputArc.generateOutputToken();
-					ColoredTimedPlace target = (ColoredTimedPlace)outputArc.getTarget();
-
-					firingAction.addProducedToken(target, token);
-					target.addColoredToken(token);
-				}
-			}
-		}		
-
-		return firingAction;
-	}
-
-
-	private FiringAction fireTransitionInNonColoredTAPN(Transition transition) {
-		DiscreetFiringAction toReturn = new DiscreetFiringAction(transition);
-		if (transition != null){
-			setEnabledTransitions();
-
-			// Index:
-			// Check transition is enables
-			//Find the tokens valid to fire (check guard)
-			// - If transportarc check if invariant is ok
-			// Select the tokens to consume, based on firing stradegy
-			// Consume the tokens and create the tokens
-
-			if (transition.isEnabled()){
-				HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
-
-				for (Arc a : (LinkedList<Arc>)transition.getPreset() ){
-
-
-
-					if (a instanceof TransportArcComponent){
-						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-
-
-						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
-
-						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-
-						TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArcComponent)a).getConnectedTo().getTarget();
-
-						for (int i=0; i< tokensOfPlace.size(); i++){
-							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
-								eligableToken.add(tokensOfPlace.get(i));
-							}
-						}	
-						BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
-
-						//							XXX  - This will break if two tokens from the same place is consumed
-						toReturn.addConsumedToken(p, tokenToRemove);
-
-						tokensConsumedByTransportArcs.put(((TransportArcComponent) a).getGroupNr(), tokenToRemove);
-
-
-
-						p.removeTokenofAge(tokenToRemove);
-					}
-					// if arc is an inhibitor arc then do nothing.
-					else if(a instanceof TimedInhibitorArcComponent)
-					{
-
-					}
-					else if (a instanceof TimedInputArcComponent){
-						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
-						//int indexOfOldestEligebleToken = 0;
-
-						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
-
-						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
-						for (int i=0; i< tokensOfPlace.size(); i++){
-							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i))){
-								eligableToken.add(tokensOfPlace.get(i));
-							}
-						}						   
-
-						//Select torken to remove based on firing mode
-						BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
-
-						//							XXX  - This will break if two tokens from the same place is consumed
-						toReturn.addConsumedToken(p, tokenToRemove);
-
-						p.removeTokenofAge(tokenToRemove);
-
-
-
-					} 
-					else {
-						//Should not be possible
-					}
-				}
-
-
-
-				for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
-					if (a instanceof TransportArcComponent){
-						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
-						int newNumberOfTokens = p.getTokens().size()+1;
-						p.setCurrentMarking(newNumberOfTokens);
-						ArrayList<BigDecimal> markingToBeSet = p.getTokens();
-						BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArcComponent) a).getGroupNr() );
-						markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
-
-						p.setAgeOfTokens(markingToBeSet);
-					}
-					else{
-						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
-						int newNumberOfTokens = p.getTokens().size()+1;
-						p.setCurrentMarking(newNumberOfTokens);
-
-					}
-				}
-
-			}
-		}
-
-		return toReturn;
-	}
+//	/**
+//	 * Fire a specified transition, no affect if transtions not enabled
+//	 * @param transition Reference of specifiec Transition
+//	 *
+//	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk> Changed to handeling
+//	 * firing modes when working with TAPN.
+//	 */
+//	public FiringAction fireTransition(Transition transition) {
+//		FiringAction toReturn = null;
+//
+//		// If it is a TAPN
+//		if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET){
+//			if(!isUsingColors()){
+//				toReturn = fireTransitionInNonColoredTAPN(transition);	
+//			}else{
+//				toReturn = fireTransitionInColoredTAPN(transition);
+//			}
+//		}
+//
+//		return toReturn;
+//	}
+//
+//
+//	private FiringAction fireTransitionInColoredTAPN(
+//			Transition transition) {
+//		ColoredDiscreteFiringAction firingAction = new ColoredDiscreteFiringAction((TimedTransitionComponent)transition);
+//
+//		setEnabledTransitions();
+//		if(transition.isEnabled()){
+//			HashMap<Integer, ColoredToken> tokensConsumedByTransportArcs = new HashMap<Integer, ColoredToken>();
+//
+//			for(Arc arc : transition.getPreset()){				
+//				if(arc instanceof ColoredTransportArc){
+//					ColoredTransportArc tarc = (ColoredTransportArc)arc;
+//					ArrayList<ColoredToken> possibleTokens = new ArrayList<ColoredToken>();
+//					ColoredTimedPlace source = (ColoredTimedPlace)arc.getSource();
+//					ColoredTimedPlace target = (ColoredTimedPlace)tarc.getConnectedTo().getTarget();
+//
+//					for(ColoredToken token : source.getColoredTokens()){
+//						if(tarc.satisfiesGuard(token) && target.satisfiesInvariant(token)){
+//							possibleTokens.add(token);
+//						}
+//					}
+//
+//					ColoredToken usedToken = CreateGui.getAnimator().firingmode.fire(possibleTokens);
+//					firingAction.addConsumedToken(source, usedToken);
+//					tokensConsumedByTransportArcs.put(tarc.getGroupNr(), usedToken);
+//					source.removeColoredToken(usedToken);
+//				}else if(arc instanceof ColoredInputArc){
+//					ColoredInputArc inputArc = (ColoredInputArc)arc;
+//					ArrayList<ColoredToken> possibleTokens = new ArrayList<ColoredToken>();
+//					ColoredTimedPlace source = (ColoredTimedPlace)arc.getSource();
+//
+//					for(ColoredToken token : source.getColoredTokens()){
+//						if(inputArc.satisfiesGuard(token)){
+//							possibleTokens.add(token);
+//						}
+//					}
+//
+//					ColoredToken usedToken = CreateGui.getAnimator().firingmode.fire(possibleTokens);
+//					firingAction.addConsumedToken(source, usedToken);
+//					source.removeColoredToken(usedToken);
+//				}
+//			}
+//
+//			for(Arc arc : transition.getPostset()){
+//				if(arc instanceof ColoredTransportArc){
+//					ColoredTransportArc tarc = (ColoredTransportArc)arc;
+//					ColoredToken consumed = tokensConsumedByTransportArcs.get(tarc.getGroupNr());
+//					ColoredToken newToken = tarc.generateOutputToken(consumed);
+//
+//					ColoredTimedPlace target = (ColoredTimedPlace)tarc.getTarget();
+//					firingAction.addProducedToken(target, newToken);
+//					target.addColoredToken(newToken);
+//				}else if(arc instanceof ColoredOutputArc){
+//					ColoredOutputArc outputArc = (ColoredOutputArc)arc;
+//					ColoredToken token = outputArc.generateOutputToken();
+//					ColoredTimedPlace target = (ColoredTimedPlace)outputArc.getTarget();
+//
+//					firingAction.addProducedToken(target, token);
+//					target.addColoredToken(token);
+//				}
+//			}
+//		}		
+//
+//		return firingAction;
+//	}
+//
+//
+//	private FiringAction fireTransitionInNonColoredTAPN(Transition transition) {
+//		DiscreetFiringAction toReturn = new DiscreetFiringAction(transition);
+//		if (transition != null){
+//			setEnabledTransitions();
+//
+//			// Index:
+//			// Check transition is enables
+//			//Find the tokens valid to fire (check guard)
+//			// - If transportarc check if invariant is ok
+//			// Select the tokens to consume, based on firing stradegy
+//			// Consume the tokens and create the tokens
+//
+//			if (transition.isEnabled()){
+//				HashMap<Integer, BigDecimal> tokensConsumedByTransportArcs = new HashMap<Integer, BigDecimal>();
+//
+//				for (Arc a : (LinkedList<Arc>)transition.getPreset() ){
+//
+//
+//
+//					if (a instanceof TransportArcComponent){
+//						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
+//
+//
+//						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
+//
+//						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
+//
+//						TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArcComponent)a).getConnectedTo().getTarget();
+//
+//						for (int i=0; i< tokensOfPlace.size(); i++){
+//							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
+//								eligableToken.add(tokensOfPlace.get(i));
+//							}
+//						}	
+//						BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
+//
+//						//							XXX  - This will break if two tokens from the same place is consumed
+//						toReturn.addConsumedToken(p, tokenToRemove);
+//
+//						tokensConsumedByTransportArcs.put(((TransportArcComponent) a).getGroupNr(), tokenToRemove);
+//
+//
+//
+//						p.removeTokenofAge(tokenToRemove);
+//					}
+//					// if arc is an inhibitor arc then do nothing.
+//					else if(a instanceof TimedInhibitorArcComponent)
+//					{
+//
+//					}
+//					else if (a instanceof TimedInputArcComponent){
+//						ArrayList<BigDecimal> eligableToken = new ArrayList<BigDecimal>();
+//						//int indexOfOldestEligebleToken = 0;
+//
+//						TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
+//
+//						ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
+//						for (int i=0; i< tokensOfPlace.size(); i++){
+//							if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i))){
+//								eligableToken.add(tokensOfPlace.get(i));
+//							}
+//						}						   
+//
+//						//Select torken to remove based on firing mode
+//						BigDecimal tokenToRemove = CreateGui.getAnimator().firingmode.fire(eligableToken);
+//
+//						//							XXX  - This will break if two tokens from the same place is consumed
+//						toReturn.addConsumedToken(p, tokenToRemove);
+//
+//						p.removeTokenofAge(tokenToRemove);
+//
+//
+//
+//					} 
+//					else {
+//						//Should not be possible
+//					}
+//				}
+//
+//
+//
+//				for (Arc a : (LinkedList<Arc>)transition.getPostset() ){
+//					if (a instanceof TransportArcComponent){
+//						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
+//						int newNumberOfTokens = p.getTokens().size()+1;
+//						p.setCurrentMarking(newNumberOfTokens);
+//						ArrayList<BigDecimal> markingToBeSet = p.getTokens();
+//						BigDecimal ageOfTokenToSet = tokensConsumedByTransportArcs.get( ((TransportArcComponent) a).getGroupNr() );
+//						markingToBeSet.set(markingToBeSet.size()-1,ageOfTokenToSet);
+//
+//						p.setAgeOfTokens(markingToBeSet);
+//					}
+//					else{
+//						TimedPlaceComponent p = (TimedPlaceComponent)a.getTarget();
+//						int newNumberOfTokens = p.getTokens().size()+1;
+//						p.setCurrentMarking(newNumberOfTokens);
+//
+//					}
+//				}
+//
+//			}
+//		}
+//
+//		return toReturn;
+//	}
 
 
 	/**

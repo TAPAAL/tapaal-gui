@@ -114,12 +114,12 @@ public class TimedArcPetriNet {
 		arc.destination().addToPreset(arc);
 	}
 
-	public void addToken(TimedPlace place, TimedToken token){
-		currentMarking.add(place, token);
+	public void addToken(TimedToken token){
+		currentMarking.add(token);
 	}
 
-	public void removeToken(TimedPlace place, TimedToken token){
-		currentMarking.remove(place, token);
+	public void removeToken(TimedToken token){
+		currentMarking.remove(token);
 	}
 
 	public void remove(TimedPlace place){

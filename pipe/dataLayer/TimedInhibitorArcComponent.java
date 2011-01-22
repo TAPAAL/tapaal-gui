@@ -35,7 +35,8 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public boolean satisfiesGuard(BigDecimal token)
 	{
-		return inhibitorArc.isEnabledBy(token);
+		throw new RuntimeException("Not Implemented");
+		//return inhibitorArc.isEnabledBy(token);
 	}
 	
 	public void setUnderlyingArc(TimedInhibitorArc arc){

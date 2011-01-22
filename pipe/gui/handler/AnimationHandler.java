@@ -36,7 +36,7 @@ public void mouseClicked(MouseEvent e){
                  && (transition.isEnabled(/*true*/))) {
         	 
         	 // If animation mode is Select we need to show the animation menu
-        	 if (CreateGui.getAnimator().firingmode.getName().equals("Manual")){
+        	 if (CreateGui.getAnimator().firingmode == null){
         		 boolean proceed = CreateGui.getAnimator().showSelectSimulatorDialogue(transition);
         		 if(!proceed) return;
         	 }

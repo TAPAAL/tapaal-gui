@@ -18,7 +18,7 @@ import javax.swing.ListSelectionModel;
  * transitions in the animation history. 
  * These actions are no longer allowed after the fix.
  * */
-public class AnimationHistory
+public class AnimationHistoryComponent
 extends JList {
 
 	/**
@@ -28,7 +28,7 @@ extends JList {
 	/** Holds all the transitions in the sequence */
 
 
-	public AnimationHistory() throws 
+	public AnimationHistoryComponent() throws 
 	javax.swing.text.BadLocationException {
 		super();
 		setModel(new DefaultListModel());

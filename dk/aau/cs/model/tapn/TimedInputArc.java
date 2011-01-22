@@ -1,7 +1,5 @@
 package dk.aau.cs.model.tapn;
 
-import java.math.BigDecimal;
-
 import dk.aau.cs.util.Require;
 
 public class TimedInputArc extends TAPNElement {
@@ -41,8 +39,9 @@ public class TimedInputArc extends TAPNElement {
 		
 	}
 
-	public boolean isEnabledBy(BigDecimal token) {
-		return interval.isIncluded(token);
+	public boolean isEnabledBy(TimedToken token) {
+		Require.that(source.equals(token.place()), "This token is from a different place");
+		return interval.isIncluded(token.age());
 	}
 
 	public void delete() {

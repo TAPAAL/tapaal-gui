@@ -1382,7 +1382,7 @@ EOC */
 		 */
 		private static final long serialVersionUID = 8582324286370859664L;
 		private int typeID;
-		private AnimationHistory animBox;
+		private AnimationHistoryComponent animBox;
 
 
 		AnimateAction(String name, int typeID, String tooltip, String keystroke){

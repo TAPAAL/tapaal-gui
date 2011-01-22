@@ -1,6 +1,5 @@
 package dk.aau.cs.model.tapn;
 
-import java.math.BigDecimal;
 
 public class TimedInhibitorArc extends TimedInputArc {
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
@@ -13,7 +12,7 @@ public class TimedInhibitorArc extends TimedInputArc {
 	}
 	
 	@Override
-	public boolean isEnabledBy(BigDecimal token) {
+	public boolean isEnabledBy(TimedToken token) {
 		return !super.isEnabledBy(token);
 	}
 	

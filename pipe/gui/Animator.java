@@ -17,14 +17,12 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.ColoredDiscreteFiringAction;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DiscreetFiringAction;
 import pipe.dataLayer.FiringAction;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNTrace;
-import pipe.dataLayer.Template;
 import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
@@ -36,8 +34,11 @@ import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedMarking;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.RequireException;
 
 
@@ -80,7 +81,7 @@ public class Animator {
 	private ArrayList<NetworkMarking> markings;
 	private int currentMarkingIndex;
 
-	public Firingmode firingmode = new RandomFiringmode();
+	public FiringMode firingmode = new RandomFiringMode();
 	private TabContent tab;
 	private NetworkMarking initialMarking;
 	
@@ -122,7 +123,7 @@ public class Animator {
 
 	private void setUntimedTrace(TAPNTrace trace) {
 		CreateGui.addAbstractAnimationPane();
-		AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
 		for(FiringAction action : trace){
 			String transitionName = action instanceof ColoredDiscreteFiringAction ? ((ColoredDiscreteFiringAction)action).getTransition().getName() : ((DiscreetFiringAction)action).getTransition().getName();
 			untimedAnimationHistory.addHistoryItemDontChange(transitionName);
@@ -391,7 +392,7 @@ public class Animator {
 				//If untimed simulation
 				if (CreateGui.getAbstractAnimationPane() != null){
 
-					AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+					AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
 					int current = untimedAnimationHistory.getCurrentItem();
 					if ((untimedAnimationHistory.getElement(current)).trim().equals(nextTransition.getName())){ //Possible null pointer exception
 						//It is fired
@@ -474,7 +475,13 @@ public class Animator {
 //				}
 //			}
 //		}
-
+		TimedTransition timedTransition = ((TimedTransitionComponent)transition).underlyingTransition();
+		if(firingmode != null){
+			NetworkMarking next = currentMarking().fireTransition(timedTransition, firingmode);
+		}else{
+			throw new RuntimeException("Not implemented");
+		}
+		
 		CreateGui.getAnimationHistory().addHistoryItem(transition.getName());
 //		FiringAction fired;
 //		fired = CreateGui.currentPNMLData().fireTransition(transition);
@@ -581,7 +588,7 @@ public class Animator {
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
 
-	public Firingmode getFiringmode() {
+	public FiringMode getFiringmode() {
 		return firingmode;
 	}
 
@@ -625,13 +632,13 @@ public class Animator {
 	public void setFiringmode(String t){
 
 		if (t.equals("Random")){
-			firingmode = new RandomFiringmode();
+			firingmode = new RandomFiringMode();
 		} else if (t.equals("Youngest")){
-			firingmode = new YoungestFiringmode();
+			firingmode = new YoungestFiringMode();
 		} else if (t.equals("Oldest")){
-			firingmode = new OldestFiringmode();
+			firingmode = new OldestFiringMode();
 		} else if (t.equals("Manual")){
-			firingmode = new SelectFiringmode();
+			firingmode = null;
 		} else {
 			System.err.println("Iligal firing mode mode: " + t + " not found.");
 		}

@@ -3,16 +3,12 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Observer;
 
 import javax.swing.JOptionPane;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
-import dk.aau.cs.translations.ReductionOption;
 
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
@@ -37,9 +33,7 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
-import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomable;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -49,6 +43,9 @@ import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.translations.ReductionOption;
 
 public class TimedArcPetriNetFactory {
 	
@@ -462,7 +459,7 @@ public class TimedArcPetriNetFactory {
 			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant));
 			
 			for(int i = 0; i < initialMarkingInput; i++){
-				initialMarking.add(p, new TimedToken(p, new BigDecimal(0.0)));
+				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));
 			}
 			
 			((TimedPlaceComponent)place).setUnderlyingPlace(p);

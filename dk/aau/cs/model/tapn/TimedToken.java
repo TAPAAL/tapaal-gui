@@ -9,6 +9,10 @@ public class TimedToken {
 	private TimedPlace place;
 	private BigDecimal age;
 	
+	public TimedToken(TimedPlace place){
+		this(place, BigDecimal.ZERO);
+	}
+	
 	public TimedToken(TimedPlace place, BigDecimal age){
 		this.place = place;
 		this.age = age;

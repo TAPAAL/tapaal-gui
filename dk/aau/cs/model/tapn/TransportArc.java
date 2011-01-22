@@ -46,9 +46,15 @@ public class TransportArc extends TAPNElement {
 	public boolean isEnabled() {
 		Iterable<TimedToken> tokens = source.tokensSatisfyingInterval(interval);
 		for(TimedToken token : tokens){
-			if(destination.invariant().isSatisfied(token.age())) return true;
+			if(interval.isIncluded(token.age()) && destination.invariant().isSatisfied(token.age())) return true;
 		}
 		return false;
+	}
+	
+	public boolean isEnabledBy(TimedToken token){
+		Require.that(source.equals(token.place()), "Token must be in the correct place");
+		
+		return interval.isIncluded(token.age()) && destination.invariant().isSatisfied(token.age());
 	}
 
 	@Override

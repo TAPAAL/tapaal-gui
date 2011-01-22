@@ -182,7 +182,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 //		}
 //		
 //		return satisfies;
-		return inputArc.isEnabledBy(token);
+		throw new RuntimeException("Not Implemented");
+//		return inputArc.isEnabledBy(token);
 	}
 	
 	@Override

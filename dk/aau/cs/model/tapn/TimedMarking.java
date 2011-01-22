@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.util.Require;
+
+// This class must remain immutable wrt. delays and transition firings!
 public class TimedMarking {
 	private HashMap<TimedPlace, List<TimedToken>> placesToTokensMap;
 
@@ -13,19 +17,31 @@ public class TimedMarking {
 		placesToTokensMap = new HashMap<TimedPlace, List<TimedToken>>();
 	}
 
-	public void add(TimedPlace place, TimedToken token){
-		if(!placesToTokensMap.containsKey(place)){
-			placesToTokensMap.put(place, new ArrayList<TimedToken>());
+	public void add(TimedToken token){
+		if(!placesToTokensMap.containsKey(token.place())){
+			placesToTokensMap.put(token.place(), new ArrayList<TimedToken>());
 		}
 
-		List<TimedToken> tokens = placesToTokensMap.get(place);
+		List<TimedToken> tokens = placesToTokensMap.get(token.place());
 		tokens.add(token);
 	}
 
-	public void remove(TimedPlace place, TimedToken token){
-		if(placesToTokensMap.containsKey(place)){
-			List<TimedToken> tokens = placesToTokensMap.get(place);
+	public void remove(TimedToken token){
+		if(placesToTokensMap.containsKey(token.place())){
+			List<TimedToken> tokens = placesToTokensMap.get(token.place());
 			tokens.remove(token);
+		}
+	}
+	
+	private void add(List<TimedToken> producedTokens) {
+		for(TimedToken token : producedTokens){
+			add(token);
+		}
+	}
+
+	private void remove(List<TimedToken> tokensToConsume) {
+		for(TimedToken token : tokensToConsume){
+			remove(token);
 		}
 	}
 	
@@ -35,6 +51,7 @@ public class TimedMarking {
 	}
 
 	public void removeArbitraryTokenFrom(TimedPlace timedPlace) {
+		Require.that(placesToTokensMap.get(timedPlace).size() > 0, "No tokens to remove");
 		placesToTokensMap.get(timedPlace).remove(0);
 	}
 	
@@ -69,4 +86,26 @@ public class TimedMarking {
 		return clone;
 	}
 
+	public TimedMarking fireTransition(TimedTransition transition,
+			List<TimedToken> tokensToConsume) {
+		Require.that(transition != null, "transition must not be null");
+		Require.that(transition.isEnabledBy(tokensToConsume), "Tokens does not enable transition");
+		
+		TimedMarking clone = clone();
+				
+		List<TimedToken> producedTokens = transition.calculateProducedTokensFrom(tokensToConsume);
+		clone.remove(tokensToConsume);
+		clone.add(producedTokens);
+		
+		return clone;
+	}
+
+	public TimedMarking fireTransition(TimedTransition transition, FiringMode firingMode) {
+		Require.that(transition != null, "transition must not be null");
+		Require.that(transition.isEnabled(), "Transition must be enabled");
+		
+		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(this, firingMode);
+		
+		return fireTransition(transition, tokensToConsume);
+	}
 }

@@ -30,7 +30,7 @@ import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.AnimationController;
-import pipe.gui.AnimationHistory;
+import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
@@ -64,11 +64,11 @@ public class TabContent extends JSplitPane {
 	private TemplateExplorer templateExplorer;
 	
 	/// Animation
-	private AnimationHistory animBox;
+	private AnimationHistoryComponent animBox;
 	private AnimationController animControlerBox;
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
-	private AnimationHistory abstractAnimationPane=null;
+	private AnimationHistoryComponent abstractAnimationPane=null;
 		
 	public TabContent()
 	{
@@ -279,7 +279,7 @@ public class TabContent extends JSplitPane {
 	/** Creates a new animationHistory text area, and returns a reference to it*/
 	private void createAnimationHistory() {
 		try {
-			animBox = new AnimationHistory();
+			animBox = new AnimationHistoryComponent();
 
 			animationHistoryScrollPane = new JScrollPane(animBox);
 			animationHistoryScrollPane.setBorder(BorderFactory.createCompoundBorder(
@@ -325,7 +325,7 @@ public class TabContent extends JSplitPane {
 		this.setLeftComponent(editorLeftPane);
 	}
 
-	public AnimationHistory getAbstractAnimationPane(){
+	public AnimationHistoryComponent getAbstractAnimationPane(){
 		return abstractAnimationPane;
 	}
 	
@@ -337,7 +337,7 @@ public class TabContent extends JSplitPane {
 		
 
 		try {
-			abstractAnimationPane=new AnimationHistory();
+			abstractAnimationPane=new AnimationHistoryComponent();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -346,7 +346,7 @@ public class TabContent extends JSplitPane {
 
 		//Create a new empty animBox
 		try {
-			animBox = new AnimationHistory();
+			animBox = new AnimationHistoryComponent();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -405,7 +405,7 @@ public class TabContent extends JSplitPane {
 //	}
 
 
-	public AnimationHistory getAnimationHistory() {
+	public AnimationHistoryComponent getAnimationHistory() {
 		return animBox;
 	}
 	
