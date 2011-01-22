@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
@@ -280,8 +279,7 @@ public class TabContent extends JSplitPane {
 	/** Creates a new animationHistory text area, and returns a reference to it*/
 	private void createAnimationHistory() {
 		try {
-			animBox = new AnimationHistory("Simulation history\n");
-			animBox.setEditable(false);
+			animBox = new AnimationHistory();
 
 			animationHistoryScrollPane = new JScrollPane(animBox);
 			animationHistoryScrollPane.setBorder(BorderFactory.createCompoundBorder(
@@ -339,7 +337,7 @@ public class TabContent extends JSplitPane {
 		
 
 		try {
-			abstractAnimationPane=new AnimationHistory("Untimed Trace\n");
+			abstractAnimationPane=new AnimationHistory();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -348,8 +346,7 @@ public class TabContent extends JSplitPane {
 
 		//Create a new empty animBox
 		try {
-			animBox = new AnimationHistory("Simulation history\n");
-			animBox.setEditable(false);
+			animBox = new AnimationHistory();
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

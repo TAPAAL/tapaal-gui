@@ -404,10 +404,6 @@ public class Animator {
 			}else if(actionHistory.get(currentAction+1) instanceof ColoredDiscreteFiringAction){
 				ColoredDiscreteFiringAction action = (ColoredDiscreteFiringAction)actionHistory.get(currentAction+1);
 				CreateGui.currentPNMLData().fireTransition(action);
-//				CreateGui.currentPNMLData().setEnabledTransitions();
-//				unhighlightDisabledTransitions();
-//				highlightEnabledTransitions();
-//				currentAction++;
 			}else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
 				BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
 
@@ -454,49 +450,46 @@ public class Animator {
 	 * 
 	 */
 	public void fireTransition(Transition transition){
-
-		Animator animator = CreateGui.getAnimator();
-
-		HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
-
-		//If untimed simulation
-		if (CreateGui.getAbstractAnimationPane() != null){
-
-			AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
-			int current = untimedAnimationHistory.getCurrentItem();
-			if ((untimedAnimationHistory.getElement(current)).trim().equals(transition.getName())){ //Possible null pointer exception
-				//It is fired
-				untimedAnimationHistory.stepForward();	 
-			}else{
-				int fireTransition = JOptionPane.showConfirmDialog( CreateGui.getApp().getRootPane(),
-						"Are you sure you want to fire a transition which does not follow the untimed trace?\n" +
-						"Firing this transition will discard the untimed trace and revert to standard simulation.",
-						"Discrading Untimed Trace",
-						JOptionPane.YES_NO_OPTION );
-				if (fireTransition > 0){
-					return;
-				}else{
-					CreateGui.removeAbstractAnimationPane();
-					CreateGui.updateLeftPanel();
-				}
-			}
-		}
+//		HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+//
+//		//If untimed simulation
+//		if (CreateGui.getAbstractAnimationPane() != null){
+//
+//			AnimationHistory untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+//			int current = untimedAnimationHistory.getCurrentItem();
+//			if ((untimedAnimationHistory.getElement(current)).trim().equals(transition.getName())){ //Possible null pointer exception
+//				//It is fired
+//				untimedAnimationHistory.stepForward();	 
+//			}else{
+//				int fireTransition = JOptionPane.showConfirmDialog( CreateGui.getApp().getRootPane(),
+//						"Are you sure you want to fire a transition which does not follow the untimed trace?\n" +
+//						"Firing this transition will discard the untimed trace and revert to standard simulation.",
+//						"Discrading Untimed Trace",
+//						JOptionPane.YES_NO_OPTION );
+//				if (fireTransition > 0){
+//					return;
+//				}else{
+//					CreateGui.removeAbstractAnimationPane();
+//					CreateGui.updateLeftPanel();
+//				}
+//			}
+//		}
 
 		CreateGui.getAnimationHistory().addHistoryItem(transition.getName());
-		FiringAction fired;
-		fired = CreateGui.currentPNMLData().fireTransition(transition);
-
-
-		if ( currentAction < actionHistory.size()-1 ){
-			removeStoredActions(currentAction+1);
-			addToHistory( fired,  currentmakring);
-		}else{
-			addToHistory( fired, currentmakring );  
-		}
+//		FiringAction fired;
+//		fired = CreateGui.currentPNMLData().fireTransition(transition);
+//
+//
+//		if ( currentAction < actionHistory.size()-1 ){
+//			removeStoredActions(currentAction+1);
+//			addToHistory( fired,  currentmakring);
+//		}else{
+//			addToHistory( fired, currentmakring );  
+//		}
 
 		CreateGui.currentPNMLData().setEnabledTransitions();
-		animator.highlightEnabledTransitions();
-		animator.unhighlightDisabledTransitions();
+		highlightEnabledTransitions();
+		unhighlightDisabledTransitions();
 
 	}
 

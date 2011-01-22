@@ -159,7 +159,7 @@ implements ActionListener, Observer {
 		try {
 			//Set the Look and Feel native for the system.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
+			
 			//2010-05-07, Kenneth Yrke Jørgensen:
 			//If the native look and feel is GTK replace the useless open dialog, 
 			//with a java-reimplementation. 		

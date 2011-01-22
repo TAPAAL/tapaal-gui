@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import dk.aau.cs.util.Require;
@@ -39,6 +40,7 @@ public class NetworkMarking {
 	}
 
 	public NetworkMarking delay(BigDecimal amount) {
+		Require.that(amount != null, "Delay must not be null");
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
 		
 		NetworkMarking newMarking = new NetworkMarking();
@@ -48,5 +50,17 @@ public class NetworkMarking {
 		}
 		newMarking.markings = newMarkings;
 		return newMarking;
+	}
+	
+	public NetworkMarking fireTransition(TimedTransition transition){
+		Require.that(transition != null, "transition cannot be null");
+		
+		NetworkMarking clone = clone();
+		TimedMarking markingToEdit = clone.getMarkingFor(transition.model());
+		
+		
+		
+		
+		return clone;
 	}
 }
