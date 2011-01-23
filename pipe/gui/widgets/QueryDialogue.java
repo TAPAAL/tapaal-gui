@@ -579,7 +579,11 @@ public class QueryDialogue extends JPanel{
 			saveUppaalXMLButton.setEnabled(false);
 		}
 	}
-
+	private void setEnabledReductionOptions(boolean keepSelection) {
+		String reductionOptionString = ""+reductionOption.getSelectedItem();
+		setEnabledReductionOptions();
+		reductionOption.setSelectedItem(reductionOptionString);
+	}
 	private void setEnabledReductionOptions() {
 		if(this.datalayer.isUsingColors()) {
 			enableColorsReductionOptions();
@@ -707,7 +711,7 @@ public class QueryDialogue extends JPanel{
 		undoSupport.addUndoableEditListener(new UndoAdapter());
 		refreshUndoRedo();
 
-		setEnabledReductionOptions();
+		setEnabledReductionOptions(true);
 		refreshTraceOptions();
 
 	}
