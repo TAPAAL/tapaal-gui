@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -58,7 +59,9 @@ import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedPlaceComponent;
+import pipe.dataLayer.Transition;
 import pipe.gui.action.GuiAction;
+import pipe.gui.handler.AnimationHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
@@ -140,7 +143,7 @@ implements ActionListener, Observer {
 
 	private boolean editionAllowed = true;
 
-	enum GUIMode {
+	public enum GUIMode {
 		draw, animation, noNet 
 	}
 
@@ -1204,7 +1207,7 @@ EOC */
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);
 			CreateGui.getAnimator().storeModel();
-			CreateGui.currentPNMLData().setEnabledTransitions();
+			tab.activeTemplate().guiModel().setEnabledTransitions();
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			//CreateGui.addAnimationHistory();
 			//CreateGui.addAnimationController();
@@ -1213,7 +1216,6 @@ EOC */
 
 
 			setEditionAllowed(false);
-
 			statusBar.changeText(statusBar.textforAnimation);
 
 			//Set a light blue backgound color for animation mode

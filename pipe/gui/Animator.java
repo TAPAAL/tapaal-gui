@@ -9,8 +9,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -21,17 +19,14 @@ import pipe.dataLayer.ColoredDiscreteFiringAction;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.DiscreetFiringAction;
 import pipe.dataLayer.FiringAction;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNTrace;
 import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.colors.ColoredToken;
 import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -340,12 +335,8 @@ public class Animator {
 //				System.err.println("problem in Animator");
 //			}
 
+			tab.network().setMarking(markings.get(currentMarkingIndex-1));
 
-			try {
-				tab.network().setMarking(markings.get(currentMarkingIndex-1));
-			} catch (RequireException e) {
-				e.printStackTrace();
-			}
 
 			activeGuiModel().repaintPlaces();
 			CreateGui.currentPNMLData().setEnabledTransitions();
@@ -362,75 +353,76 @@ public class Animator {
 	 */
 	public void stepForward(){
 		if ( currentAction < actionHistory.size()-1 ) {
-			if ( actionHistory.get(currentAction+1) instanceof DiscreetFiringAction){
-				TimedTransitionComponent nextTransition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
-
-				// Before we firer the transition we need to setup Select firing mode, and 
-				// firer the transition with the same tokens as in the DiscreetFiringAction
-				// IT IS A HACK TO USE FIRING MODEL SELECT TO THIS !!! -- kyrke
-
-				//Setup firingmode
-
-				//If this marking is not saved in marking history (e.g. its a uppaal trace)
-
-				if (markingHistory.get(currentAction+1)==null){
-					Logger.log("Marking is null, we will fix it");
-
-					HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
-					markingHistory.set(currentAction+1, currentmakring);
-				}
-
-				HashMap<Place, ArrayList<BigDecimal>> consumedTokens = ((DiscreetFiringAction)actionHistory.get(currentAction+1)).getConsumedTokensList();
-
-				CreateGui.currentPNMLData().fireTransition(nextTransition, consumedTokens);
-
-//				CreateGui.currentPNMLData().setEnabledTransitions();
-//				unhighlightDisabledTransitions();
-//				highlightEnabledTransitions();
-//				currentAction++;
-
-				//If untimed simulation
-				if (CreateGui.getAbstractAnimationPane() != null){
-
-					AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
-					int current = untimedAnimationHistory.getCurrentItem();
-					if ((untimedAnimationHistory.getElement(current)).trim().equals(nextTransition.getName())){ //Possible null pointer exception
-						//It is fired
-						untimedAnimationHistory.stepForward();
-					}
-
-				}
-
-
-			}else if(actionHistory.get(currentAction+1) instanceof ColoredDiscreteFiringAction){
-				ColoredDiscreteFiringAction action = (ColoredDiscreteFiringAction)actionHistory.get(currentAction+1);
-				CreateGui.currentPNMLData().fireTransition(action);
-			}else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
-				BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
-
-				//If this marking is not saved in marking history (e.g. its a uppaal trace)
-
-				if (markings.get(currentMarkingIndex+1) == null){
-					Logger.log("Marking is null, we will fix it");
-					markings.set(currentMarkingIndex+1, currentMarking().delay(timeDelay));
-				}
-
-				try {
-					tab.network().setMarking(markings.get(currentMarkingIndex+1));
-				} catch (RequireException e) {
-					// XXX - kyrke, An error can con come here as this is valid states stored in animator 
-					e.printStackTrace();
-				}
-				
-			}
+			tab.network().setMarking(markings.get(currentMarkingIndex+1));
+//			if ( actionHistory.get(currentAction+1) instanceof DiscreetFiringAction){
+//				TimedTransitionComponent nextTransition = (TimedTransitionComponent)((DiscreetFiringAction)actionHistory.get(currentAction+1)).getTransition(); // XXX - unsafe cast
+//
+//				// Before we firer the transition we need to setup Select firing mode, and 
+//				// firer the transition with the same tokens as in the DiscreetFiringAction
+//				// IT IS A HACK TO USE FIRING MODEL SELECT TO THIS !!! -- kyrke
+//
+//				//Setup firingmode
+//
+//				//If this marking is not saved in marking history (e.g. its a uppaal trace)
+//
+////				if (markingHistory.get(currentAction+1)==null){
+////					Logger.log("Marking is null, we will fix it");
+////
+////					HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring = CreateGui.currentPNMLData().getCurrentMarking();
+////					markingHistory.set(currentAction+1, currentmakring);
+////				}
+////
+////				HashMap<Place, ArrayList<BigDecimal>> consumedTokens = ((DiscreetFiringAction)actionHistory.get(currentAction+1)).getConsumedTokensList();
+////
+////				CreateGui.currentPNMLData().fireTransition(nextTransition, consumedTokens);
+////
+//////				CreateGui.currentPNMLData().setEnabledTransitions();
+//////				unhighlightDisabledTransitions();
+//////				highlightEnabledTransitions();
+//////				currentAction++;
+////
+////				//If untimed simulation
+////				if (CreateGui.getAbstractAnimationPane() != null){
+////
+////					AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+////					int current = untimedAnimationHistory.getCurrentItem();
+////					if ((untimedAnimationHistory.getElement(current)).trim().equals(nextTransition.getName())){ //Possible null pointer exception
+////						//It is fired
+////						untimedAnimationHistory.stepForward();
+////					}
+////
+////				}
+//				tab.network().setMarking(markings.get(currentMarkingIndex+1));
+//
+//			}else if(actionHistory.get(currentAction+1) instanceof ColoredDiscreteFiringAction){
+//				ColoredDiscreteFiringAction action = (ColoredDiscreteFiringAction)actionHistory.get(currentAction+1);
+//				CreateGui.currentPNMLData().fireTransition(action);
+//			}else if (actionHistory.get(currentAction+1) instanceof TimeDelayFiringAction){
+//				BigDecimal timeDelay = ((TimeDelayFiringAction)actionHistory.get(currentAction+1)).getDealy();
+//
+//				//If this marking is not saved in marking history (e.g. its a uppaal trace)
+//
+//				if (markings.get(currentMarkingIndex+1) == null){
+//					Logger.log("Marking is null, we will fix it");
+//					markings.set(currentMarkingIndex+1, currentMarking().delay(timeDelay));
+//				}
+//
+//				try {
+//					tab.network().setMarking(markings.get(currentMarkingIndex+1));
+//				} catch (RequireException e) {
+//					// XXX - kyrke, An error can con come here as this is valid states stored in animator 
+//					e.printStackTrace();
+//				}
+//				
+//			}
 			
 			activeGuiModel().repaintPlaces();
-			CreateGui.currentPNMLData().setEnabledTransitions();
+			activeGuiModel().setEnabledTransitions();
 			unhighlightDisabledTransitions();
 			highlightEnabledTransitions();
 			currentAction++;
 			currentMarkingIndex++;
-			CreateGui.currentPNMLData().redrawVisibleTokenLists();
+			activeGuiModel().redrawVisibleTokenLists();
 		}
 	}
 
@@ -476,13 +468,18 @@ public class Animator {
 //			}
 //		}
 		TimedTransition timedTransition = ((TimedTransitionComponent)transition).underlyingTransition();
+		NetworkMarking next = null;
 		if(firingmode != null){
-			NetworkMarking next = currentMarking().fireTransition(timedTransition, firingmode);
+			next = currentMarking().fireTransition(timedTransition, firingmode);
 		}else{
 			throw new RuntimeException("Not implemented");
 		}
 		
 		CreateGui.getAnimationHistory().addHistoryItem(transition.getName());
+		if ( currentAction < actionHistory.size()-1 ) removeStoredActions(currentAction+1);
+		
+		addMarking(new DiscreetFiringAction(transition), next);
+		
 //		FiringAction fired;
 //		fired = CreateGui.currentPNMLData().fireTransition(transition);
 //
@@ -493,8 +490,9 @@ public class Animator {
 //		}else{
 //			addToHistory( fired, currentmakring );  
 //		}
-
-		CreateGui.currentPNMLData().setEnabledTransitions();
+		tab.network().setMarking(currentMarking());
+		activeGuiModel().repaintPlaces();
+		activeGuiModel().setEnabledTransitions();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
 
@@ -616,15 +614,11 @@ public class Animator {
 		currentMarkingIndex++;
 	}
 	
-	private void addToHistory(FiringAction newAction, HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentMarking){
-		actionHistory.add(newAction);
-		markingHistory.add(currentMarking);
-		currentAction++;
-	}
 
 	private void removeLastHistoryStep(){
 		actionHistory.remove(actionHistory.size()-1);
-		markingHistory.remove(markingHistory.size()-1);
+		//markingHistory.remove(markingHistory.size()-1);
+		markings.remove(markings.size()-1);
 	}
 
 
@@ -640,132 +634,11 @@ public class Animator {
 		} else if (t.equals("Manual")){
 			firingmode = null;
 		} else {
-			System.err.println("Iligal firing mode mode: " + t + " not found.");
+			System.err.println("Illegal firing mode mode: " + t + " not found.");
 		}
 
 		CreateGui.getAnimationController().updateFiringModeComboBox();
 	}
-
-	public interface Firingmode {
-
-		public ColoredToken fire(List<ColoredToken> tokens);
-		public BigDecimal fire(List<BigDecimal> tokens);
-		public String getName();
-
-	}
-
-	public class OldestFiringmode implements Firingmode {
-
-		public BigDecimal fire(List<BigDecimal> tokens) {
-			BigDecimal max=tokens.get(0);
-			for (BigDecimal a : tokens){
-				if (a.compareTo(max) > 0){
-					max = a;
-				}
-			}
-			return max;
-		}
-
-		public String getName() {
-			return "Oldest";
-		}
-
-		public ColoredToken fire(List<ColoredToken> tokens) {
-			ColoredToken oldest = tokens.get(0);
-			for(ColoredToken token : tokens){
-				if(token.getAge().compareTo(oldest.getAge()) > 0){
-					oldest = token;
-				}
-			}
-
-			return oldest;
-		}
-
-	}
-
-	public class YoungestFiringmode implements Firingmode {
-
-		public BigDecimal fire(List<BigDecimal> tokens) {
-			BigDecimal min=tokens.get(0);
-			for (BigDecimal a : tokens){
-				if (a.compareTo(min) < 0){
-					min = a;
-				}
-			}
-			return min;
-		}
-
-		public String getName() {
-			return "Youngest";
-		}
-
-		public ColoredToken fire(List<ColoredToken> tokens) {
-			ColoredToken youngest = tokens.get(0);
-			for(ColoredToken token : tokens){
-				if(token.getAge().compareTo(youngest.getAge()) < 0){
-					youngest = token;
-				}
-			}
-
-			return youngest;
-		}			 
-	}
-
-
-
-	public class RandomFiringmode implements Firingmode {
-
-		public BigDecimal fire(List<BigDecimal> tokens) {
-			Random generator = new Random();
-
-			int random = generator.nextInt(tokens.size());
-
-			return tokens.get(random);
-		}
-
-		public String getName() {
-			return "Random";
-		}
-
-		public ColoredToken fire(List<ColoredToken> tokens) {
-			Random generator = new Random();
-			int random = generator.nextInt(tokens.size());
-			return tokens.get(random);
-		}
-
-	}
-	public class SelectFiringmode implements Firingmode {
-
-		ArrayList<Integer> tokensToFire = new ArrayList<Integer>();
-
-
-
-
-		public void setTokensToFire( ArrayList<Integer> a){
-			tokensToFire = a;
-		}
-
-
-		public BigDecimal fire(List<BigDecimal> tokens) {
-
-			BigDecimal toReturn = tokens.get(tokensToFire.get(0));
-			tokensToFire.remove(0);
-
-			return toReturn;
-		}
-
-		public String getName() {
-			return "Manual";
-		}
-
-		public ColoredToken fire(List<ColoredToken> tokens) {
-			ColoredToken token = tokens.get(tokensToFire.get(0));
-			tokensToFire.remove(0);
-
-			return token;
-		}
-	}
-
 
 	public boolean showSelectSimulatorDialogue(Transition t){
 		EscapableDialog guiDialog = 
@@ -794,7 +667,7 @@ public class Animator {
 			for (JComboBox jb : animationSelectmodeDialog.presetPanels){
 				intlist.add(jb.getSelectedIndex());
 			}
-			((SelectFiringmode)firingmode).setTokensToFire(intlist);
+			//((SelectFiringmode)firingmode).setTokensToFire(intlist);
 		}
 		
 		return !animationSelectmodeDialog.cancelled();

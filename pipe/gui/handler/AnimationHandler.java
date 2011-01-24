@@ -6,6 +6,7 @@ import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 
 
 /**
@@ -28,7 +29,7 @@ public class AnimationHandler
    
    @Override
 public void mouseClicked(MouseEvent e){      
-      if (e.getComponent() instanceof Transition) {
+      if (e.getComponent() instanceof Transition && CreateGui.getApp().getGUIMode().equals(GuiFrame.GUIMode.animation)) {
          Transition transition = (Transition)e.getComponent();
 //Edited by Joakim Byg - It seems enough to check if it is enabled 
 //and not if it enabled and do side-effects at the same time (the true argument).          
