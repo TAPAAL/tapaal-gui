@@ -43,7 +43,7 @@ public class TimedArcPetriNetNetwork {
 		return currentMarking;
 	}
 	
-	public void setMarking(NetworkMarking marking) {
+	public void setMarking(NetworkMarking marking) {		
 		currentMarking = marking;
 		for(TimedArcPetriNet tapn : tapns){
 			tapn.setMarking(marking.getMarkingFor(tapn));
