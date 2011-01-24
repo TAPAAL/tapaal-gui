@@ -175,15 +175,8 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 			pnDOM.normalize();
 			// Create Transformer with XSL Source File
-			if(!usingColors){
-				xsltSource = new StreamSource(Thread.currentThread().
-						getContextClassLoader().getResourceAsStream("xslt" + 
-								System.getProperty("file.separator") + "GeneratePNML.xsl"));
-				transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
-			}else{
 				transformer = TransformerFactory.newInstance().newTransformer();
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			}
 			// Write file and do XSLT transformation to generate correct PNML
 			File outputObjectArrayList = file;//new File(filename); // Output for XSLT Transformation
 			DOMSource source = new DOMSource(pnDOM);

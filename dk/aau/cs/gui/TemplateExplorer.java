@@ -166,6 +166,8 @@ public class TemplateExplorer extends JPanel {
 					listModel.addElement(template);
 					undoManager.addNewEdit(new AddTemplateCommand(
 							TemplateExplorer.this, template, index));
+					parent.addTemplate(template);
+					parent.drawingSurface().setModel(template.guiModel(), template.model());
 				}
 			}
 		});
@@ -293,7 +295,6 @@ public class TemplateExplorer extends JPanel {
 
 	public Template<TimedArcPetriNet> createNewTemplate(String name) {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
-		parent.network().add(tapn);
 
 		return new Template<TimedArcPetriNet>(tapn, new DataLayer());
 	}

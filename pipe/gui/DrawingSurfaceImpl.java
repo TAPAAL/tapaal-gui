@@ -125,6 +125,10 @@ implements Observer, Printable, DrawingSurface {
 	public DataLayer getGuiModel() {
 		return guiModel;
 	}
+	
+	public TimedArcPetriNet getModel() {
+		return model;
+	}
 
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model){
 		nameGenerator.add(model);

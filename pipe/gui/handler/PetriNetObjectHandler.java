@@ -10,6 +10,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.PetriNetObject;
+import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -81,7 +82,7 @@ public void mousePressed(MouseEvent e) {
          checkForPopup(e);
       }
       
-      if (!SwingUtilities.isLeftMouseButton(e)){ 
+      if (!SwingUtilities.isLeftMouseButton(e)){
          return;
       }
       
@@ -162,6 +163,8 @@ public void mouseDragged(MouseEvent e) {
          totalY += transY;
          ((DrawingSurfaceImpl)contentPane).getSelectionObject().translateSelection(
                  transX, transY);
+         
+         //System.out.println("Init: (" + dragInit.x + ", " + dragInit.y + "), e: (" + e.getX() + ", " + e.getY() + "), trans: (" + transX + ", " + transY + ")" );
       }
    }
    

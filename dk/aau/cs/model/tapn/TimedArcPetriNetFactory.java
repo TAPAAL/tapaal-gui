@@ -34,6 +34,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
+import pipe.gui.Zoomable;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -156,7 +157,7 @@ public class TimedArcPetriNetFactory {
 		String heightTemp = inputLabelElement.getAttribute("height");
 		String borderTemp = inputLabelElement.getAttribute("border");
 		
-		String text = getNode(inputLabelElement, "text").getTextContent();
+		String text = getFirstChildNodeByName(inputLabelElement, "text").getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
@@ -189,13 +190,13 @@ public class TimedArcPetriNetFactory {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
-		String nameInput = getValueChildNodeContentAsString(element, "name");
+		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
 		double nameOffsetXInput= getNameOffsetAttribute(element, "x");
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
-		boolean timedTransition = getValueChildNodeContentAsBoolean(element, "timed");
-		boolean infiniteServer = getValueChildNodeContentAsBoolean(element, "infiniteServer");
-		int angle = getValueChildNodeContentAsInt(element, "orientation");
-		int priority = getValueChildNodeContentAsInt(element, "priority");
+		boolean timedTransition = getChildNodesContentOfValueChildNodeAsBoolean(element, "timed");
+		boolean infiniteServer = getChildNodesContentOfValueChildNodeAsBoolean(element, "infiniteServer");
+		int angle = getChildNodesContentOfValueChildNodeAsInt(element, "orientation");
+		int priority = getChildNodesContentOfValueChildNodeAsInt(element, "priority");
 
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
@@ -208,6 +209,9 @@ public class TimedArcPetriNetFactory {
 			nameInput = idInput;
 		}
 
+		
+		TimedTransition t = new TimedTransition(nameInput);
+		
 		TimedTransitionComponent transition =  
 			new TimedTransitionComponent(positionXInput, positionYInput,     
 					idInput, 
@@ -217,8 +221,8 @@ public class TimedArcPetriNetFactory {
 					infiniteServer,
 					angle,
 					priority);
-		TimedTransition t = new TimedTransition(nameInput);
 		transition.setUnderlyingTransition(t);
+		transition.setTimed(true);
 		guiModel.addPetriNetObject(transition);
 		addListeners(transition);
 		tapn.add(t);
@@ -312,18 +316,21 @@ public class TimedArcPetriNetFactory {
 					((Note)newObject).getNote().addMouseListener(noteHandler);
 					((Note)newObject).getNote().addMouseMotionListener(noteHandler);
 				} 
+				if (newObject instanceof Zoomable) {
+					newObject.zoomUpdate(drawingSurface.getZoom());
+				}
 			}
 			newObject.setGuiModel(guiModel);
 		}
 	}
 	
-	private boolean getValueChildNodeContentAsBoolean(Element element, String childNodeName) {
-		Node node = getNode(element,childNodeName);
+	private boolean getChildNodesContentOfValueChildNodeAsBoolean(Element element, String childNodeName) {
+		Node node = getFirstChildNodeByName(element,childNodeName);
 		
 		if(node instanceof Element) {
 			Element e = (Element)node;
 			
-			String value = getValueChildNodeContent(e);
+			String value = getContentOfValueChildNode(e);
 			
 			return Boolean.parseBoolean(value);
 		}
@@ -332,13 +339,13 @@ public class TimedArcPetriNetFactory {
 	}
 
 	private double getNameOffsetAttribute(Element element, String coordinateName) {
-		Node node = getNode(element,"name");
+		Node node = getFirstChildNodeByName(element,"name");
 		
 		if(node instanceof Element) {
 			Element e = (Element)node;
 			
-			Element graphics = ((Element)getNode(e,"graphics"));
-			String offsetCoordinate = ((Element)getNode(graphics,"offset")).getAttribute(coordinateName);
+			Element graphics = ((Element)getFirstChildNodeByName(e,"graphics"));
+			String offsetCoordinate = ((Element)getFirstChildNodeByName(graphics,"offset")).getAttribute(coordinateName);
 			if (offsetCoordinate.length() > 0) {
 				return Double.valueOf(offsetCoordinate).doubleValue();
 			}
@@ -347,33 +354,33 @@ public class TimedArcPetriNetFactory {
 		return 0.0;
 	}
 
-	private Node getNode(Element element, String childNodeName) {
+	private Node getFirstChildNodeByName(Element element, String childNodeName) {
 		return element.getElementsByTagName(childNodeName).item(0);
 	}
 	
-	private String getValueChildNodeContent(Element element) {
-		return ((Element)getNode(element,"value")).getTextContent();
+	private String getContentOfValueChildNode(Element element) {
+		return ((Element)getFirstChildNodeByName(element,"value")).getTextContent();
 	}
 
-	private String getValueChildNodeContentAsString(Element element, String childNodeName) {
-		Node node = getNode(element,childNodeName);
+	private String getChildNodesContentOfValueChildNodeAsString(Element element, String childNodeName) {
+		Node node = getFirstChildNodeByName(element,childNodeName);
 		
 		if(node instanceof Element) {
 			Element e = (Element)node;
 			
-			return getValueChildNodeContent(e);
+			return getContentOfValueChildNode(e);
 		}
 		
 		return "";
 	}
 
 	private double getPositionAttribute(Element element, String coordinateName) {
-		Node node = getNode(element,"graphics");
+		Node node = getFirstChildNodeByName(element,"graphics");
 		
 		if(node instanceof Element){
 			Element e = (Element)node;
 			
-			String posCoordinate = ((Element)getNode(e,"position")).getAttribute(coordinateName);
+			String posCoordinate = ((Element)getFirstChildNodeByName(e,"position")).getAttribute(coordinateName);
 			if (posCoordinate.length() > 0) {
 				return Double.valueOf(posCoordinate).doubleValue();
 			}
@@ -382,13 +389,13 @@ public class TimedArcPetriNetFactory {
 		return 0.0;
 	}
 	
-	private int getValueChildNodeContentAsInt(Element element,String childNodeName) {
-		Node node = getNode(element,childNodeName);
+	private int getChildNodesContentOfValueChildNodeAsInt(Element element,String childNodeName) {
+		Node node = getFirstChildNodeByName(element,childNodeName);
 		
 		if(node instanceof Element) {
 			Element e = (Element)node;
 			
-			String value = getValueChildNodeContent(e);
+			String value = getContentOfValueChildNode(e);
 			
 			if(value.length() > 0)
 				return Integer.parseInt(value);
@@ -398,13 +405,13 @@ public class TimedArcPetriNetFactory {
 	}
 
 	private double getMarkingOffsetAttribute(Element element, String coordinateName) {
-		Node node = getNode(element,"initialMarking");
+		Node node = getFirstChildNodeByName(element,"initialMarking");
 		
 		if(node instanceof Element) {
 			Element e = (Element)node;
 			
-			Element graphics = ((Element)getNode(e,"graphics"));
-			String offsetCoordinate = ((Element)getNode(graphics,"offset")).getAttribute(coordinateName);
+			Element graphics = ((Element)getFirstChildNodeByName(e,"graphics"));
+			String offsetCoordinate = ((Element)getFirstChildNodeByName(graphics,"offset")).getAttribute(coordinateName);
 			if (offsetCoordinate.length() > 0)
 				return Double.parseDouble(offsetCoordinate);
 		}
@@ -416,14 +423,14 @@ public class TimedArcPetriNetFactory {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
-		String nameInput = getValueChildNodeContentAsString(element, "name");
+		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
 		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
-		int initialMarkingInput = getValueChildNodeContentAsInt(element, "initialMarking");
+		int initialMarkingInput = getChildNodesContentOfValueChildNodeAsInt(element, "initialMarking");
 		double markingOffsetXInput = getMarkingOffsetAttribute(element,"x");
 		double markingOffsetYInput = getMarkingOffsetAttribute(element,"y");
-		int capacityInput = getValueChildNodeContentAsInt(element, "capacity");
-		String invariant = getValueChildNodeContentAsString(element, "invariant");
+		int capacityInput = getChildNodesContentOfValueChildNodeAsInt(element, "capacity");
+		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
 
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
@@ -477,8 +484,8 @@ public class TimedArcPetriNetFactory {
 		String idInput = inputArcElement.getAttribute("id");
 		String sourceInput = inputArcElement.getAttribute("source");
 		String targetInput = inputArcElement.getAttribute("target");
-		boolean taggedArc = getValueChildNodeContentAsBoolean(inputArcElement, "tagged");
-		String inscriptionTempStorage = getValueChildNodeContentAsString(inputArcElement, "inscription");
+		boolean taggedArc = getChildNodesContentOfValueChildNodeAsBoolean(inputArcElement, "tagged");
+		String inscriptionTempStorage = getChildNodesContentOfValueChildNodeAsString(inputArcElement, "inscription");
 		
 		PlaceTransitionObject sourceIn = guiModel.getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = guiModel.getPlaceTransitionObject(targetInput);
@@ -501,7 +508,7 @@ public class TimedArcPetriNetFactory {
 
 
 		String type = "normal";
-		type = ((Element)getNode(inputArcElement,"type")).getAttribute("value");
+		type = ((Element)getFirstChildNodeByName(inputArcElement,"type")).getAttribute("value");
 
 
 		if (type.equals("tapnInhibitor")){
@@ -700,7 +707,7 @@ public class TimedArcPetriNetFactory {
 		TCTLAbstractProperty query = null;
 		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 		
-		String queryToParse = getValueChildNodeContentAsString(queryElement,"query");
+		String queryToParse = getChildNodesContentOfValueChildNodeAsString(queryElement,"query");
 		
 		try{
 			query = queryParser.parse(queryToParse);
@@ -712,7 +719,7 @@ public class TimedArcPetriNetFactory {
 	}
 
 	private int getQueryCapacity(Element queryElement) {
-		return getValueChildNodeContentAsInt(queryElement, "capacity");
+		return getChildNodesContentOfValueChildNodeAsInt(queryElement, "capacity");
 	}
 
 	private ReductionOption getQueryReductionOption(Element queryElement) {
