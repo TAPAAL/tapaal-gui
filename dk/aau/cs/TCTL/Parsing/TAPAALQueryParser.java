@@ -1,4 +1,4 @@
-﻿package dk.aau.cs.TCTL.Parsing;
+package dk.aau.cs.TCTL.Parsing;
 
 import goldengine.java.GOLDParser;
 import goldengine.java.GPMessageConstants;
