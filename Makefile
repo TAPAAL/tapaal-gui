@@ -20,11 +20,11 @@ OUTPUT_DIR  := classes
 
 PROJECTNAME := TAPAAL
 
-JAVA_HOME := /usr/lib/jvm/java-6-sun/
+JAVA_HOME := /usr/lib/jvm/default-java
 JAVA_LIB  := $(JAVA_HOME)/lib
 
 
-DEPEND := jpowergraph-0.2-common.jar:jpowergraph-0.2-swing.jar:gtkjfilechooser.jar
+DEPEND := jpowergraph-0.2-common.jar:jpowergraph-0.2-swing.jar:gtkjfilechooser.jar:gtkjfilechooser.jar:GOLDEngine.jar:commons-cli-1.2.jar
 
 
 JFLAGS      := -sourcepath $(SOURCE_DIR) \
@@ -85,6 +85,9 @@ clean:
 
 release: clean 
 	@mkdir $(OUTPUT_DIR)
-	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ RunGui.java
+	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ TAPAAL.java
 
-	
+
+#Remove BYTE ORDER MARK
+removeBOM:  
+	sed -i '1 s/^\xef\xbb\xbf//' $*.java
