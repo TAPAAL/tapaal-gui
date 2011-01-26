@@ -114,7 +114,7 @@ public class TAPAALQueryParser implements GPMessageConstants
 	public TCTLAbstractProperty parse(String query) throws ParseException
 	{
 
-		String textToParse = query, compiledGrammar = getClass().getResource("/dk/aau/cs/TCTL/Parsing/TAPAALQuery.cgt").getFile();
+		String textToParse = query, compiledGrammar = this.getClass().getResource("/dk/aau/cs/TCTL/Parsing/TAPAALQuery.cgt").getFile();
 
 		GOLDParser parser = new GOLDParser();
 		
