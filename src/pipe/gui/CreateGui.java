@@ -64,7 +64,7 @@ public class CreateGui {
 	private static AnimationHistory abstractAnimationPane=null;
 	
 	public static void init() {
-		imgPath = "Images" + System.getProperty("file.separator");
+		imgPath = "resources/Images" + System.getProperty("file.separator");
 
 		// make the initial dir for browsing be My Documents (win), ~ (*nix), etc
 		userPath = null; 

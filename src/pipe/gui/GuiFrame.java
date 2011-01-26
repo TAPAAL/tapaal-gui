@@ -275,7 +275,7 @@ implements ActionListener, Observer {
 		// Example files menu
 		try {
 			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
-			getResource("Example nets" + System.getProperty("file.separator"));
+			getResource("resources/Example nets" + System.getProperty("file.separator"));
 
 
 			File examplesDir = new File(examplesDirURL.toURI());
