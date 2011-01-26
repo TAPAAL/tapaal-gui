@@ -24,15 +24,20 @@ public class VersionChecker {
 	}
 
 	public boolean checkForNewVersion(){
-		if(url != null){
+		//Disable the version check for DEV versions
+		if (!Pipe.VERSION.equalsIgnoreCase("DEV")){
+			if(url != null){
 
-			getNewestVersion();
+				getNewestVersion();
 
-			if(newestVersion != null && !newestVersion.isEmpty()){
-				return compareVersions();
+				if(newestVersion != null && !newestVersion.isEmpty()){
+					return compareVersions();
+				}
 			}
+			return false;
+		}else {
+			return false;
 		}
-		return false;
 	}
 
 	private boolean compareVersions() {
