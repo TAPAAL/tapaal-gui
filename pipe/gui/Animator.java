@@ -74,7 +74,7 @@ public class Animator {
 	private int currentAction;
 	private ArrayList<HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>> markingHistory;
 	private ArrayList<NetworkMarking> markings;
-	private int currentMarkingIndex;
+	private int currentMarkingIndex = 0;
 
 	public FiringMode firingmode = new RandomFiringMode();
 	private TabContent tab;
@@ -211,6 +211,7 @@ public class Animator {
 	 */
 	public void storeModel(){
 		initialMarking = tab.network().marking();
+		resethistory();
 		markings.add(initialMarking);
 		//CreateGui.setupModelForSimulation();
 		//CreateGui.currentPNMLData().storeState();
@@ -475,7 +476,7 @@ public class Animator {
 			throw new RuntimeException("Not implemented");
 		}
 		
-		CreateGui.getAnimationHistory().addHistoryItem(transition.getName());
+		CreateGui.getAnimationHistory().addHistoryItem(timedTransition.model().getName() + "." + timedTransition.name());
 		if ( currentAction < actionHistory.size()-1 ) removeStoredActions(currentAction+1);
 		
 		addMarking(new DiscreetFiringAction(transition), next);
@@ -553,7 +554,9 @@ public class Animator {
 	public void resethistory(){
 		markingHistory.clear();
 		actionHistory.clear();
+		markings.clear();
 		currentAction = -1;
+		currentMarkingIndex = 0;
 	}
 
 	public void manipulatehistory(ColoredDiscreteFiringAction dfa){

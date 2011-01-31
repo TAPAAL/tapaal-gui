@@ -80,12 +80,12 @@ public class FileBrowser
             if (!f.getName().endsWith("." + ext)) {
                f = new File(f.getCanonicalPath() + "." + ext); // force extension
             }
-            if (f.exists() && 
-                    JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + 
-                    "\nDo you want to overwrite this file?") !=
-                    JOptionPane.YES_OPTION) {
-               return null;
-            }
+//            if (f.exists() && 
+//                    JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + 
+//                    "\nDo you want to overwrite this file?") !=
+//                    JOptionPane.YES_OPTION) {
+//               return null;
+//            }
             return f.getCanonicalPath();
          } catch (IOException e) {
             /* gulp */

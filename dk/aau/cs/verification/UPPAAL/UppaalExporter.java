@@ -78,17 +78,22 @@ public class UppaalExporter {
 	}
 
 	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){
-		File xmlfile = createTempFile(".xml");
-		File qfile = createTempFile(".q");
-		if(xmlfile == null || qfile == null) return null;
-
+		File modelFile = createTempFile(".xml");
+		File queryFile = createTempFile(".q");
+		
+		return export(model, query, reduction, modelFile, queryFile);
+	}
+	
+	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction, File modelFile, File queryFile){
+		if(modelFile == null || queryFile == null) return null;
+		
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
 		TranslationNamingScheme namingScheme = null;
 		if (reduction == ReductionOption.STANDARDSYMMETRY){
 
 			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
-				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
+				t.autoTransform((TAPN)model, new PrintStream(modelFile), new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -97,7 +102,7 @@ public class UppaalExporter {
 		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS){
 			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
-				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
+				t.autoTransform((TAPN)model, new PrintStream(modelFile), new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -105,7 +110,7 @@ public class UppaalExporter {
 		}else if (reduction == ReductionOption.OPTIMIZEDSTANDARD){
 			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
 			try {
-				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
+				t.autoTransform((TAPN)model, new PrintStream(modelFile), new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -116,9 +121,9 @@ public class UppaalExporter {
 			namingScheme = broadcastTransformer.namingScheme();
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				nta.outputToUPPAALXML(new PrintStream(modelFile));
 				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(qfile));
+				uppaalQuery.output(new PrintStream(queryFile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
 				return null;
@@ -131,9 +136,9 @@ public class UppaalExporter {
 			namingScheme = broadcastTransformer.namingScheme();
 			try{
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				nta.outputToUPPAALXML(new PrintStream(modelFile));
 				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(qfile));
+				uppaalQuery.output(new PrintStream(queryFile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
 				return null;
@@ -146,9 +151,9 @@ public class UppaalExporter {
 
 			try{
 				dk.aau.cs.TA.NTA nta = transformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+				nta.outputToUPPAALXML(new PrintStream(modelFile));
 				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(qfile));
+				uppaalQuery.output(new PrintStream(queryFile));
 			}catch(FileNotFoundException e){
 				e.printStackTrace();
 				return null;
@@ -177,9 +182,9 @@ public class UppaalExporter {
 
 			//Create uppaal xml file
 			try {
-				StandardTranslation t2 = new StandardTranslation((TAPN)model, new PrintStream(xmlfile), extraTokens);
+				StandardTranslation t2 = new StandardTranslation((TAPN)model, new PrintStream(modelFile), extraTokens);
 				t2.transform();
-				t2.transformQueriesToUppaal(extraTokens, query, new PrintStream(qfile));
+				t2.transformQueriesToUppaal(extraTokens, query, new PrintStream(queryFile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -190,7 +195,7 @@ public class UppaalExporter {
 
 			namingScheme = new StandardNamingScheme();
 		}
-		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), namingScheme);
+		return new ExportedModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), namingScheme);
 	}
 
 	private File createTempFile(String ending) {

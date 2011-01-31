@@ -42,7 +42,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append(atomicPropositionNode.getN());
 		}else{
 			append("(");
-			for(int i = 0; i < totalTokens-1; i++){
+			for(int i = 0; i < totalTokens; i++){
 				if(i > 0){
 					append(" + ");
 				}

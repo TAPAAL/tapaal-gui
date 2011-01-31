@@ -129,10 +129,12 @@ public class TemplateExplorer extends JPanel {
 						renameButton.setEnabled(false);
 						copyButton.setEnabled(false);
 					} else {
-						if (listModel.size() > 1)
-							removeTemplateButton.setEnabled(true);
-						renameButton.setEnabled(true);
-						copyButton.setEnabled(true);
+						if(buttonPanel != null){
+							if (listModel.size() > 1)
+								removeTemplateButton.setEnabled(true);
+							renameButton.setEnabled(true);
+							copyButton.setEnabled(true);
+						}
 						templateList.ensureIndexIsVisible(e.getFirstIndex());
 						openSelectedTemplate();
 					}

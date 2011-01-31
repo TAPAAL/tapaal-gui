@@ -14,6 +14,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -56,7 +57,6 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
-import pipe.gui.Export;
 import pipe.gui.Pipe;
 import pipe.gui.Verifier;
 import dk.aau.cs.TCTL.StringPosition;
@@ -75,8 +75,10 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
-import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
+import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 
 public class QueryDialogue extends JPanel{
 
@@ -1666,7 +1668,8 @@ public class QueryDialogue extends JPanel{
 
 							String xmlFile = null, queryFile = null;
 							try {
-								xmlFile = new FileBrowser("Uppaal XML","xml",xmlFile).saveFile();
+								FileBrowser browser = new FileBrowser("Uppaal XML","xml",xmlFile);
+								xmlFile = browser.saveFile();
 								if(xmlFile != null)
 								{
 									String[] a = xmlFile.split(".xml");
@@ -1681,7 +1684,21 @@ public class QueryDialogue extends JPanel{
 							}
 
 							if(xmlFile != null && queryFile != null){
-								Export.exportUppaalXMLFromQuery(CreateGui.getModel(), getQuery(), xmlFile, queryFile);
+								PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
+
+								TAPN model=null;
+								try {
+									model = transformer.getAAUTAPN(CreateGui.getModel(), 0);
+								} catch (Exception ex) {
+									JOptionPane.showMessageDialog(QueryDialogue.this, "An error occured during export.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
+								
+								UppaalExporter exporter = new UppaalExporter();
+								TAPNQuery query = getQuery();
+								dk.aau.cs.petrinet.TAPNQuery tapnQuery = new dk.aau.cs.petrinet.TAPNQuery(query.getProperty(), query.getCapacity() + model.getNumberOfTokens());
+								exporter.export(model, tapnQuery, query.getReductionOption(), new File(xmlFile), new File(queryFile));
+								//Export.exportUppaalXMLFromQuery(CreateGui.getModel(), getQuery(), xmlFile, queryFile);
 							}else{
 								JOptionPane.showMessageDialog(CreateGui.getApp(), "No Uppaal XML file saved.");
 							}
