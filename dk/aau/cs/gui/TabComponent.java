@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
+
 package dk.aau.cs.gui;
 
 import java.awt.BasicStroke;
@@ -52,6 +53,12 @@ import javax.swing.JTabbedPane;
 import pipe.gui.action.GuiAction;
 import dk.aau.cs.util.Require;
 
+/** 
+ * This class represents the component inside the "head" of a tab.
+ * That is, it is the component that displays the name of the model,
+ * as well as the "x" button for closing the tab.
+ *
+ */
 public class TabComponent extends JPanel {
 	/**
 	 * 

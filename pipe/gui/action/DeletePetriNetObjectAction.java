@@ -77,7 +77,6 @@ extends AbstractAction {
 					for(TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);
 					}
-					CreateGui.createLeftPane();
 				}
 
 				CreateGui.getView().getUndoManager().deleteSelection(selected);
@@ -90,7 +89,6 @@ extends AbstractAction {
 					for(TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);
 					}
-					CreateGui.createLeftPane();
 				}
 				CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());
 				CreateGui.getView().getSelectionObject().deleteSelection();

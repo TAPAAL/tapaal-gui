@@ -227,19 +227,9 @@ public class CreateGui {
 		return tab.getAnimationHistory();
 	}
 
-	public static void createLeftPane(){
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.createEditorLeftPane();
-	}
-
 	public static void updateConstantsList(){
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));	
 		tab.updateConstantsList();
-	}
-
-	public static void updateLeftPanel() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.updateLeftPanel();
 	}
 
 

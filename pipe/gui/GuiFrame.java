@@ -898,6 +898,10 @@ EOC */
 				saveNet(new File(filename));
 			}
 		}
+		
+		// resize "header" of current tab immediately to fit the length of the model name
+		appTab.getTabComponentAt(appTab.getSelectedIndex()).doLayout(); 
+		
 	}
 
 
@@ -1000,30 +1004,21 @@ EOC */
 				Node top = doc.getElementsByTagName("net").item(0);
 				NetType type = parseNetType(((Element)top).getAttribute("type"));
 				
-//				if(!type.equals(NetType.COLORED)){
-//					PNMLTransformer transformer = new PNMLTransformer();
-//					doc = transformer.transformPNML(file.getPath()); // TODO: loads the file a second time
-//				}
 				
-				
-				NodeList nets = doc.getElementsByTagName("net");
+				//NodeList nets = doc.getElementsByTagName("net");
 				TabContent currentTab = (TabContent)appTab.getSelectedComponent();
 				if (CreateGui.getApp()!=null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(Pipe.CREATING); 
 				}
 				
-				Template<TimedArcPetriNet> template = null;
 				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(currentTab.drawingSurface());
-				for(int i = 0; i < nets.getLength(); i++) {
-					
-					template = factory.createTimedArcPetriNetFromPNML(nets.item(i));
-					currentTab.addTemplate(template);
+				
+				Iterable<Template<TimedArcPetriNet>> templates = factory.parseTimedArcPetriNetsFromPNML(doc);
+				for(Template<TimedArcPetriNet> t : templates) {
+					currentTab.addTemplate(t);
 				}
 				
-				if(template != null)
-					currentTab.setActiveTemplate(template);
-
 				currentTab.setQueries(factory.getQueries());
 				
 				if (CreateGui.getApp()!=null) {
@@ -1195,7 +1190,6 @@ EOC */
 			// Gowing out of animation mode.
 			//CreateGui.removeAbstractAnimationPane();
 
-			//CreateGui.createLeftPane();
 
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
@@ -1523,7 +1517,6 @@ EOC */
 
 		public void actionPerformed(ActionEvent e){
 			createNewTabFromFile(filename);
-			CreateGui.createLeftPane();
 		}
 
 	}
@@ -1581,8 +1574,6 @@ EOC */
 					for(TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);	
 					}
-					
-					CreateGui.createLeftPane();	
 				}
 
 				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
@@ -1885,7 +1876,7 @@ EOC */
 					createNewTabFromFile(filePath);
 
 					//TODO make update leftPane work better
-					CreateGui.createLeftPane();
+					//CreateGui.updateLeftPanel();
 				}
 			} else if (this == createAction) {
 				showNewPNDialog();

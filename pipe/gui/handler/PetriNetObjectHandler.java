@@ -163,8 +163,6 @@ public void mouseDragged(MouseEvent e) {
          totalY += transY;
          ((DrawingSurfaceImpl)contentPane).getSelectionObject().translateSelection(
                  transX, transY);
-         
-         //System.out.println("Init: (" + dragInit.x + ", " + dragInit.y + "), e: (" + e.getX() + ", " + e.getY() + "), trans: (" + transX + ", " + transY + ")" );
       }
    }
    

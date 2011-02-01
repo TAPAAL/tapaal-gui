@@ -214,7 +214,7 @@ public class LeftQueryPane extends JPanel {
 	}
 
 	public void removeQuery(TAPNQuery queryToCreateFrom) {
-		listModel.removeElementAt(queryList.getSelectedIndex());
+		listModel.removeElement(queryToCreateFrom);
 		showQueries();	
 	}
 }

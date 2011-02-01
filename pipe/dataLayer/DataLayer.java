@@ -677,13 +677,13 @@ implements Cloneable {
 	public void addPetriNetObject(PetriNetObject pnObject) {
 		if (setPetriNetObjectArrayList(pnObject)) {
 			if (pnObject instanceof TimedOutputArcComponent) {
-				addArcToArcsMap((TimedOutputArcComponent)pnObject);
+				//addArcToArcsMap((TimedOutputArcComponent)pnObject);
 				addArc((TimedOutputArcComponent)pnObject);
 			} else if (pnObject instanceof InhibitorArc) {
-				addInhibitorArcToInhibitorsMap((InhibitorArc)pnObject);
+				//addInhibitorArcToInhibitorsMap((InhibitorArc)pnObject);
 				addArc((InhibitorArc)pnObject);
 			} else if (pnObject instanceof TimedInhibitorArcComponent) {
-				addInhibitorArcToInhibitorsMap((TimedInhibitorArcComponent)pnObject);
+				//addInhibitorArcToInhibitorsMap((TimedInhibitorArcComponent)pnObject);
 				addArc((TimedInhibitorArcComponent)pnObject);
 			} else if (pnObject instanceof Place) {
 				addPlace((Place)pnObject);

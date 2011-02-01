@@ -168,7 +168,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 			for (TAPNQuery query : queries){
 				Element newQuery = createQueryElement(query, pnDOM);
-				pnDOM.appendChild(newQuery);
+				PNML.appendChild(newQuery);
 			}
 
 			//stateGroups = null;         
