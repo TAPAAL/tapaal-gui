@@ -75,6 +75,7 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
@@ -165,7 +166,8 @@ public class QueryDialogue extends JPanel{
 	// Private Members
 	private StringPosition currentSelection = null;
 
-	private DataLayer datalayer;
+	private DataLayer datalayer; // TODO: Get rid of
+	private final TimedArcPetriNetNetwork tapnNetwork;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 
@@ -177,8 +179,8 @@ public class QueryDialogue extends JPanel{
 
 	private TCTLAbstractProperty newProperty;
 
-	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom){
-
+	public QueryDialogue (EscapableDialog me, DataLayer datalayer, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork){
+		this.tapnNetwork = tapnNetwork;
 		this.datalayer = datalayer;
 		this.newProperty = queryToCreateFrom==null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
@@ -401,7 +403,7 @@ public class QueryDialogue extends JPanel{
 
 
 
-	public static TAPNQuery ShowUppaalQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent){
+	public static TAPNQuery ShowUppaalQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork){
 		EscapableDialog guiDialog = 
 			new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
 
@@ -411,7 +413,7 @@ public class QueryDialogue extends JPanel{
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
 
 		// 2 Add query editor
-		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent); 
+		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent, tapnNetwork); 
 		contentPane.add( queryDialogue );
 
 		guiDialog.setResizable(false); 
@@ -776,7 +778,7 @@ public class QueryDialogue extends JPanel{
 		kbounded.addActionListener(	
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						Verifier.analyseKBounded(CreateGui.getModel(), getCapacity());
+						Verifier.analyseKBounded(tapnNetwork, getCapacity());
 					}
 
 				}
@@ -787,7 +789,7 @@ public class QueryDialogue extends JPanel{
 		kboundedOptimize.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent evt){
-						Verifier.analyzeAndOptimizeKBound(CreateGui.getModel(), getCapacity(), numberOfExtraTokensInNet);
+						Verifier.analyzeAndOptimizeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
 					}
 				}
 		);
@@ -1648,7 +1650,7 @@ public class QueryDialogue extends JPanel{
 						public void actionPerformed(ActionEvent evt) {
 							querySaved = true;
 							exit();
-							Verifier.runUppaalVerification(CreateGui.getModel(), getQuery());
+							Verifier.runUppaalVerification(tapnNetwork, getQuery());
 						}
 					}
 			);

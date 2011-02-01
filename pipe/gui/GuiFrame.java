@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -49,24 +48,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.DataLayerWriter;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.Transition;
 import pipe.gui.action.GuiAction;
-import pipe.gui.handler.AnimationHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
-import pipe.gui.widgets.QueryDialogue;
-import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -1845,7 +1838,7 @@ EOC */
 
 		public void actionPerformed(ActionEvent e) {
 			if (this == runUppaalVerification) {
-				QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.VerifyNow, null);
+				throw new RuntimeException("Dont think this is used");//QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.VerifyNow, null);
 			}
 		}
 

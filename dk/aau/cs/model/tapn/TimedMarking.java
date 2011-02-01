@@ -108,4 +108,12 @@ public class TimedMarking {
 		
 		return fireTransition(transition, tokensToConsume);
 	}
+
+	public int size() {
+		int size = 0;
+		for(List<TimedToken> tokens : placesToTokensMap.values()){
+			size += tokens.size();
+		}
+		return size;
+	}
 }

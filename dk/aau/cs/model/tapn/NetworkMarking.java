@@ -92,4 +92,12 @@ public class NetworkMarking {
 		
 		return shallowCopy;
 	}
+
+	public int size() {
+		int size = 0;
+		for(TimedMarking marking : markings.values()){
+			size += marking.size();
+		}
+		return size;
+	}
 }

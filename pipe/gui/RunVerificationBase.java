@@ -5,9 +5,14 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.NewModelToOldModelTransformer;
+import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -16,7 +21,7 @@ public abstract class RunVerificationBase extends
 
 	private ModelChecker modelChecker;
 	private VerificationOptions options;
-	private TimedArcPetriNet model;
+	private TimedArcPetriNetNetwork model;
 	private TAPNQuery query;
 	protected Messenger messenger;
 	
@@ -26,7 +31,7 @@ public abstract class RunVerificationBase extends
 		this.messenger = messenger;
 	}
 	
-	public void execute(VerificationOptions options, TimedArcPetriNet model, TAPNQuery query){
+	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query){
 		this.model = model;
 		this.options = options;
 		this.query = query;
@@ -35,7 +40,16 @@ public abstract class RunVerificationBase extends
 	
 	@Override
 	protected VerificationResult doInBackground() throws Exception {
-		VerificationResult result = modelChecker.verify(options, model, query);
+		TAPNComposer composer = new TAPNComposer();
+		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
+		
+		// TODO: Get rid of this step by changing the underlying translations etc.
+		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
+		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
+		
+		// TODO: update query with new place names
+		
+		VerificationResult result = modelChecker.verify(options, tapn, query);
 		return result;
 	}
 	

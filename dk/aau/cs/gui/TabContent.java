@@ -100,7 +100,7 @@ public class TabContent extends JSplitPane {
 		editorLeftPane.setMinimumSize(new Dimension(175,100));
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 		leftBottomPanel = new LeftConstantsPane(enableAddButton);
-		queries = new LeftQueryPane(new ArrayList<TAPNQuery>());
+		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
 
 		templateExplorer = new TemplateExplorer(this);
 		

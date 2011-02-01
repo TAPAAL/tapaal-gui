@@ -6,6 +6,7 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
@@ -40,9 +41,14 @@ public class TAPNComposer {
 		for(TimedArcPetriNet tapn : model.templates()){
 			for(TimedPlace timedPlace : tapn.places()){
 				String uniquePlaceName = getUniquePlaceName();
-
-				constructedModel.add(new TimedPlace(uniquePlaceName, timedPlace.invariant()));
+				
+				TimedPlace place = new TimedPlace(uniquePlaceName, timedPlace.invariant());
+				constructedModel.add(place);
 				mapping.addMapping(tapn.getName(), timedPlace.name(), uniquePlaceName);
+				
+				for(TimedToken token : timedPlace.tokens()){
+					place.addToken(new TimedToken(place, token.age()));
+				}
 			}
 		}
 	}
@@ -82,8 +88,8 @@ public class TAPNComposer {
 	private void CreateOutputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for(TimedArcPetriNet tapn : model.templates()){
 			for(TimedOutputArc arc : tapn.outputArcs()){
-				TimedTransition source = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.destination().name()));
-				TimedPlace target = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.source().name()));
+				TimedTransition source = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.source().name()));
+				TimedPlace target = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.destination().name()));
 
 				constructedModel.add(new TimedOutputArc(source, target));
 			}

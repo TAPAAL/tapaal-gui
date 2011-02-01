@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -22,13 +21,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import dk.aau.cs.util.Require;
-
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
-import pipe.gui.CreateGui;
 import pipe.gui.Verifier;
 import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
+import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.util.Require;
 
 public class LeftQueryPane extends JPanel {
 	/**
@@ -47,8 +44,10 @@ public class LeftQueryPane extends JPanel {
 	private JButton verifyButton;
 	
 	private JButton removeQueryButton;
+	private TabContent tabContent;
 	
-	public LeftQueryPane(ArrayList<TAPNQuery> queriesToSet) {		
+	public LeftQueryPane(ArrayList<TAPNQuery> queriesToSet, TabContent tabContent) {	
+		this.tabContent = tabContent;
 		queryCollectionPanel = new JPanel(new BorderLayout());
 		buttonsPanel = new JPanel(new GridLayout(2,1));
 		listModel = new DefaultListModel();
@@ -134,7 +133,7 @@ public class LeftQueryPane extends JPanel {
 		verifyButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
-				Verifier.runUppaalVerification(CreateGui.getModel(), q);
+				Verifier.runUppaalVerification(tabContent.network(), q);
 			}			
 		});
 		p1.add(verifyButton);
@@ -156,7 +155,7 @@ public class LeftQueryPane extends JPanel {
 		addQueryButton.setPreferredSize(dimension);
 		addQueryButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				TAPNQuery q = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, null);
+				TAPNQuery q = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());
 				if (q != null){
 					addQuery(q);
 					showQueries();
@@ -170,7 +169,7 @@ public class LeftQueryPane extends JPanel {
 		
 	private void showEditDialog() {
 		TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
-		TAPNQuery newQuery = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, q);
+		TAPNQuery newQuery = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, q, tabContent.network());
 		
 		if(newQuery != null)
 			updateQuery(q, newQuery);

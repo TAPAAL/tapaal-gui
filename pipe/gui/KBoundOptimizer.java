@@ -2,10 +2,10 @@ package pipe.gui;
 
 import javax.swing.JSpinner;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
@@ -19,9 +19,9 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 		return minBound;
 	}
 
-	public KBoundOptimizer(DataLayer appModel, int k, ModelChecker modelChecker, Messenger messenger, JSpinner spinner)
+	public KBoundOptimizer(TimedArcPetriNetNetwork tapnNetwork, int k, ModelChecker modelChecker, Messenger messenger, JSpinner spinner)
 	{
-		super(appModel, k, modelChecker, messenger);
+		super(tapnNetwork, k, modelChecker, messenger);
 		this.spinner = spinner;
 	}
 
