@@ -277,10 +277,10 @@ public class TemplateExplorer extends JPanel {
 				.drawingSurface(), "Template name:", "Rename Template",
 				JOptionPane.PLAIN_MESSAGE, null, null, template.model()
 				.getName());
-		if (template.model().getName().equals(newName))
+		if (newName == null || template.model().getName().equals(newName))
 			return;
 
-		if (newName != null && newName.length() <= 0)
+		if (newName.length() <= 0)
 			JOptionPane
 			.showMessageDialog(
 					parent.drawingSurface(),
