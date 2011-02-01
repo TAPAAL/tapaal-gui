@@ -236,4 +236,28 @@ public class TimedArcPetriNet {
 			p.setCurrentMarking(marking);
 		}
 	}
+
+	public Iterable<TimedPlace> places() {
+		return places;
+	}
+
+	public Iterable<TimedTransition> transitions() {
+		return transitions;
+	}
+
+	public Iterable<TimedInputArc> inputArcs() {
+		return inputArcs;
+	}
+
+	public Iterable<TimedOutputArc> outputArcs() {
+		return outputArcs;
+	}
+	
+	public Iterable<TransportArc> transportArcs() {
+		return transportArcs;
+	}
+	
+	public Iterable<TimedInhibitorArc> inhibitorArcs() {
+		return inhibitorArcs;
+	}
 }
