@@ -308,7 +308,8 @@ public class TabContent extends JSplitPane {
 		
 		animatorLeftPane.setDividerLocation(0.25);
 		animatorLeftPane.setResizeWeight(0);
-		animatorLeftPane.setTopComponent(new TemplateExplorer(this, true));
+		templateExplorer.hideButtons();
+		animatorLeftPane.setTopComponent(templateExplorer);
 		
 		JSplitPane panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		panel.setResizeWeight(0);
@@ -322,6 +323,8 @@ public class TabContent extends JSplitPane {
 	}
 	
 	public void switchToEditorComponents(){
+		templateExplorer.showButtons();
+		editorLeftPane.setTopComponent(templateExplorer);
 		this.setLeftComponent(editorLeftPane);
 	}
 
@@ -438,7 +441,11 @@ public class TabContent extends JSplitPane {
 
 
 	public Template<TimedArcPetriNet> activeTemplate() {
-		return templateExplorer.selectedModel();
+//		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
+//			return animationTemplateExplorer.selectedModel();
+//		}else{
+			return templateExplorer.selectedModel();
+		//}
 	}
 
 	public void setActiveTemplate(Template<TimedArcPetriNet> template){

@@ -136,6 +136,11 @@ implements Observer, Printable, DrawingSurface {
 		this.undoManager.setModel(guiModel);
 		this.guiModel = guiModel;
 		this.model = model;
+		
+		if(animationmode){
+			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.getAnimator().unhighlightDisabledTransitions();
+		}
 
 		this.removeAll();
 		for(PetriNetObject pnObject : guiModel.getPetriNetObjects()){

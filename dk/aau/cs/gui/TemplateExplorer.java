@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -70,22 +69,30 @@ public class TemplateExplorer extends JPanel {
 	private void init(boolean hideButtons) {
 		initExplorerPanel();
 
-		if (!hideButtons) {
-			initButtonsPanel();
-			splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
-					templatePanel, buttonPanel);
-			splitPane.setContinuousLayout(true);
-			splitPane.setDividerSize(0);
-			splitPane.setDividerLocation(0.8);
-			splitPane.setResizeWeight(1.0);
+		initButtonsPanel();
+		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
+				templatePanel, buttonPanel);
+		splitPane.setContinuousLayout(true);
+		splitPane.setDividerSize(0);
+		splitPane.setDividerLocation(0.8);
+		splitPane.setResizeWeight(1.0);
+
+		setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Templates"), 
+				BorderFactory.createEmptyBorder(3,3,3,3))
+		);
+		
+		addCreatedComponents(hideButtons);
+	}
+
+	private void addCreatedComponents(boolean hideButtons) {
+		this.removeAll();
+		if(!hideButtons){
+			splitPane.setTopComponent(templatePanel);
 			this.add(splitPane);
-		} else {
+		}else{
 			this.add(templatePanel);
 		}
-		setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createTitledBorder("Templates"), 
-			BorderFactory.createEmptyBorder(3,3,3,3))
-		);
 	}
 
 	private void initExplorerPanel() {
@@ -311,23 +318,35 @@ public class TemplateExplorer extends JPanel {
 		parent.network().add(template.model());
 	}
 
-	private void openSelectedTemplate() {
+	public void openSelectedTemplate() {
 		Template<TimedArcPetriNet> tapn = selectedModel();
-		parent.drawingSurface().setModel(tapn.guiModel(), tapn.model());
+		if(tapn != null){
+			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model());
+		}
 	}
 
 	public Template<TimedArcPetriNet> selectedModel() {
 		return (Template<TimedArcPetriNet>) templateList.getSelectedValue();
 	}
-	
+
 	public void setSelectedGuiModel(DataLayer guiModel){
-		((Template<TimedArcPetriNet>)templateList.getSelectedValue()).setGuiModel(guiModel);
+		selectedModel().setGuiModel(guiModel);
 	}
-	
+
 	public void updateTemplateList(){
 		listModel.clear();
 		for(Template<?> net : parent.templates()){
 			listModel.addElement(net);
 		}
+	}
+
+	public void hideButtons() {
+		this.removeAll();
+		addCreatedComponents(true);
+	}
+
+	public void showButtons(){
+		this.removeAll();
+		addCreatedComponents(false);
 	}
 }
