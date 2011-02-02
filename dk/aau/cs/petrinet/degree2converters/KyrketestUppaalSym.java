@@ -59,7 +59,7 @@ public class KyrketestUppaalSym {
 			oldToNewPlacesMap.put((TAPNPlace)p, tmp);
 			toReturn.addPlace(tmp);
 			
-			toReturn.locations.put(tmp, new Location(model.locations.get(p).getX(), model.locations.get(p).getY()));
+			//toReturn.locations.put(tmp, new Location(model.locations.get(p).getX(), model.locations.get(p).getY()));
 		}
 
 //		Create the P_lock place.
@@ -92,7 +92,7 @@ public class KyrketestUppaalSym {
 					}
 				}
 				
-				toReturn.locations.put(transition, new Location(model.locations.get(t).getX(), model.locations.get(t).getY()));
+				//toReturn.locations.put(transition, new Location(model.locations.get(t).getX(), model.locations.get(t).getY()));
 				continue;
 			} else{
 				// The normal way
@@ -127,20 +127,20 @@ public class KyrketestUppaalSym {
 				}
 
 				//Some styling stuff
-				float x, y;
-				float transitionSizeX = 80;
-				float transitionSizeY = 50;
-
-				x = model.locations.get(t).getX();
-				y = model.locations.get(t).getY();
-
-				// Move the start x and y cord a little to the right
-				// based on the size of the preset
-				int sizeOfPreset = t.getPreset().size();
-
-				// Ajust the start location
-				x = x - (transitionSizeX * (sizeOfPreset/2)); 
-				y = y-transitionSizeY;
+//				float x, y;
+//				float transitionSizeX = 80;
+//				float transitionSizeY = 50;
+//
+//				x = model.locations.get(t).getX();
+//				y = model.locations.get(t).getY();
+//
+//				// Move the start x and y cord a little to the right
+//				// based on the size of the preset
+//				int sizeOfPreset = t.getPreset().size();
+//
+//				// Ajust the start location
+//				x = x - (transitionSizeX * (sizeOfPreset/2)); 
+//				y = y-transitionSizeY;
 
 				//List of normal Arcs in the postset
 				ArrayList<Arc> postsetNormalArcs = new ArrayList<Arc>();
@@ -169,7 +169,7 @@ public class KyrketestUppaalSym {
 					lastTransition = new TAPNTransition(t.getName() + "_T0");
 					toReturn.addTransition(lastTransition);
 					//Style the place
-					toReturn.locations.put(lastTransition, new Location(x, y));
+					//toReturn.locations.put(lastTransition, new Location(x, y));
 
 					toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
@@ -194,8 +194,8 @@ public class KyrketestUppaalSym {
 					toReturn.addPlace(holdingplace);
 
 //					//Do some styling of the places 
-					toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
-					x = x + transitionSizeX;
+					//toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
+					//x = x + transitionSizeX;
 
 					holdingplacesTransport.add(holdingplace);
 
@@ -238,11 +238,11 @@ public class KyrketestUppaalSym {
 
 						//Do some styling of the places 
 
-						toReturn.locations.put(lastTransition, new Location(x, y));
-						toReturn.locations.put(holdingplace, new Location(x, y + transitionSizeY));
-						toReturn.locations.put(imPlace, new Location(x - transitionSizeX/2, y));
-
-						x = x + transitionSizeX;
+//						toReturn.locations.put(lastTransition, new Location(x, y));
+//						toReturn.locations.put(holdingplace, new Location(x, y + transitionSizeY));
+//						toReturn.locations.put(imPlace, new Location(x - transitionSizeX/2, y));
+//
+//						x = x + transitionSizeX;
 
 					}
 
@@ -254,7 +254,7 @@ public class KyrketestUppaalSym {
 					toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
 					//Styling
-					toReturn.locations.put(lastTransition, new Location(x, y));
+					//toReturn.locations.put(lastTransition, new Location(x, y));
 
 					//Special attension if the preset only has cone
 					if (t.preset.size() == 1){
@@ -274,8 +274,8 @@ public class KyrketestUppaalSym {
 
 //					//Do some styling of the places 
 
-					toReturn.locations.put(holdingplace, new Location(x, y+transitionSizeY));
-					x=x+transitionSizeX;
+//					toReturn.locations.put(holdingplace, new Location(x, y+transitionSizeY));
+//					x=x+transitionSizeX;
 
 					holdingplacesNormal.add(holdingplace);
 					toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
@@ -317,11 +317,11 @@ public class KyrketestUppaalSym {
 						lastTransition=newtrans;
 
 //						Do some styling of the places 
-						toReturn.locations.put(lastTransition, new Location(x,y));
-						toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
-						toReturn.locations.put(imPlace, new Location(x-transitionSizeX/2,y));
-
-						x= x+transitionSizeX;
+//						toReturn.locations.put(lastTransition, new Location(x,y));
+//						toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
+//						toReturn.locations.put(imPlace, new Location(x-transitionSizeX/2,y));
+//
+//						x= x+transitionSizeX;
 
 
 					}
@@ -359,8 +359,8 @@ public class KyrketestUppaalSym {
 					lastTransition=newtrans;
 
 //					Do some styling of the places 
-					toReturn.locations.put(lastTransition, new Location(x, y+transitionSizeY));
-					toReturn.locations.put(imPlace, new Location(x-transitionSizeX/2,y));
+//					toReturn.locations.put(lastTransition, new Location(x, y+transitionSizeY));
+//					toReturn.locations.put(imPlace, new Location(x-transitionSizeX/2,y));
 
 					//Go backwared to each holdingplaces
 					for (i=0;i<holdingplacesNormal.size();i++){ // One holding place is skiped as we use and direct connection above
@@ -382,9 +382,9 @@ public class KyrketestUppaalSym {
 
 						lastTransition=newtrans;
 
-						//Do some styling of the places 
-						toReturn.locations.put(lastTransition, toReturn.locations.get(holdingplace).yadd(transitionSizeY));
-						toReturn.locations.put(imPlace, toReturn.locations.get(holdingplace).xyadd(transitionSizeX/2,transitionSizeY));
+//						//Do some styling of the places 
+//						toReturn.locations.put(lastTransition, toReturn.locations.get(holdingplace).yadd(transitionSizeY));
+//						toReturn.locations.put(imPlace, toReturn.locations.get(holdingplace).xyadd(transitionSizeX/2,transitionSizeY));
 
 					}
 				}
@@ -419,9 +419,9 @@ public class KyrketestUppaalSym {
 						toReturn.add(new TAPNArc(imPlace, newtrans,""));
 						lastTransition=newtrans;
 
-//						Do some styling of the places 
-						toReturn.locations.put(lastTransition, toReturn.locations.get(holdingplace).yadd(transitionSizeY));
-						toReturn.locations.put(imPlace, toReturn.locations.get(holdingplace).xyadd(transitionSizeX/2, transitionSizeY));
+////						Do some styling of the places 
+//						toReturn.locations.put(lastTransition, toReturn.locations.get(holdingplace).yadd(transitionSizeY));
+//						toReturn.locations.put(imPlace, toReturn.locations.get(holdingplace).xyadd(transitionSizeX/2, transitionSizeY));
 
 					}
 

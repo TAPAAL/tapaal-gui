@@ -48,14 +48,14 @@ public abstract class RunVerificationBase extends
 		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
 		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
 		
-		// TODO: update query with new place names
-		MapQueryToNewNames(transformedModel.value2());
+		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
+		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 		
-		VerificationResult result = modelChecker.verify(options, tapn, query);
+		VerificationResult result = modelChecker.verify(options, tapn, clonedQuery);
 		return result;
 	}
 	
-	private void MapQueryToNewNames(NameMapping mapping) {
+	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
 		query.getProperty().accept(visitor,null);
 	}

@@ -144,5 +144,12 @@ public class TimedArcPetriNetNetwork {
 		}
 	}
 
+	public TimedArcPetriNet getTAPNByName(String name) {
+		for(TimedArcPetriNet tapn : tapns){
+			if(tapn.getName().equals(name)) return tapn;
+		}
+		return null;
+	}
+
 	
 }

@@ -71,11 +71,11 @@ public class Verifier {
 			return;
 		}
 
-//		TCTLAbstractProperty inputQuery = input.getProperty();
-//
-//		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption());
-//
-//		if (inputQuery == null) {return;}
+		TCTLAbstractProperty inputQuery = input.getProperty();
+
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption());
+
+		if (inputQuery == null) {return;}
 
 
 //		//Handle problems with liveness checking 
@@ -115,18 +115,18 @@ public class Verifier {
 //
 //		TAPN model = convertModelToAAUTAPN(timedArcPetriNetNetwork);
 
-//		if(model != null){
-//			RunVerificationBase thread = new RunVerification(verifyta, new MessengerImpl());
-//			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
-//			dialog.setupListeners(thread);
-//			thread.execute(verifytaOptions, model, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), input.getCapacity() + model.getNumberOfTokens()));
-//			dialog.setVisible(true);
-//		}else{
-//			JOptionPane.showMessageDialog(CreateGui.getApp(),
-//					"There was an error converting the model.",
-//					"Conversion error",
-//					JOptionPane.ERROR_MESSAGE);
-//		}
+		if(timedArcPetriNetNetwork != null){
+			RunVerificationBase thread = new RunVerification(verifyta, new MessengerImpl());
+			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
+			dialog.setupListeners(thread);
+			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), input.getCapacity() + timedArcPetriNetNetwork.marking().size()));
+			dialog.setVisible(true);
+		}else{
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"There was an error converting the model.",
+					"Conversion error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 
 		return;
 	}

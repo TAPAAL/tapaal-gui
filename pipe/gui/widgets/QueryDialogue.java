@@ -520,6 +520,7 @@ public class QueryDialogue extends JPanel{
 			// change the selection in the atomic proposition comboboxes etc. because a different
 			// atomic proposition was selected
 			userChangedAtomicPropSelection = false;
+			templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
 			placesBox.setSelectedItem(node.getPlace());
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(node.getN());

@@ -43,7 +43,9 @@ public class RenameAllPlacesVisitor implements ITCTLVisitor {
 	
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 		String mappedName = mapping.map(atomicPropositionNode.getTemplate(), atomicPropositionNode.getPlace());
-		atomicPropositionNode.setPlace(mappedName);
-		atomicPropositionNode.setTemplate("");
+		if(mappedName != null){
+			atomicPropositionNode.setPlace(mappedName);
+			atomicPropositionNode.setTemplate("");
+		}
 	}
 }

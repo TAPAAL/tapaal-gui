@@ -23,7 +23,7 @@ public class NewModelToOldModelTransformer {
 
 	private void CreatePlaces(dk.aau.cs.model.tapn.TimedArcPetriNet model, dk.aau.cs.petrinet.TAPN constructedModel) {
 		for(dk.aau.cs.model.tapn.TimedPlace place : model.places()){
-			dk.aau.cs.petrinet.TAPNPlace tapnPlace = new TAPNPlace(place.name(), place.invariant().toString(), 0);
+			dk.aau.cs.petrinet.TAPNPlace tapnPlace = new TAPNPlace(place.name(), ConvertToLegacyGuardString(place.invariant().toString()), 0);
 			constructedModel.addPlace(tapnPlace);
 
 			for(dk.aau.cs.model.tapn.TimedToken token: place.tokens()){
@@ -44,7 +44,7 @@ public class NewModelToOldModelTransformer {
 			dk.aau.cs.petrinet.TAPNPlace source = constructedModel.getPlaceByName(arc.source().name());
 			dk.aau.cs.petrinet.TAPNTransition target = constructedModel.getTransitionsByName(arc.destination().name());
 
-			dk.aau.cs.petrinet.TAPNArc tapnArc = new dk.aau.cs.petrinet.TAPNArc(source, target, arc.interval().toString());
+			dk.aau.cs.petrinet.TAPNArc tapnArc = new dk.aau.cs.petrinet.TAPNArc(source, target, ConvertToLegacyGuardString(arc.interval().toString()));
 			constructedModel.add(tapnArc);
 		}
 	}
@@ -65,7 +65,7 @@ public class NewModelToOldModelTransformer {
 			dk.aau.cs.petrinet.TAPNTransition transition = constructedModel.getTransitionsByName(arc.transition().name());
 			dk.aau.cs.petrinet.TAPNPlace target = constructedModel.getPlaceByName(arc.destination().name());
 
-			dk.aau.cs.petrinet.TAPNTransportArc transportArc = new dk.aau.cs.petrinet.TAPNTransportArc(source, transition, target, arc.interval().toString());
+			dk.aau.cs.petrinet.TAPNTransportArc transportArc = new dk.aau.cs.petrinet.TAPNTransportArc(source, transition, target, ConvertToLegacyGuardString(arc.interval().toString()));
 			constructedModel.add(transportArc);
 		}
 	}
@@ -75,8 +75,12 @@ public class NewModelToOldModelTransformer {
 			dk.aau.cs.petrinet.TAPNPlace source = constructedModel.getPlaceByName(arc.source().name());
 			dk.aau.cs.petrinet.TAPNTransition target = constructedModel.getTransitionsByName(arc.destination().name());
 
-			dk.aau.cs.petrinet.TAPNInhibitorArc inhibitorArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(source, target, arc.interval().toString());
+			dk.aau.cs.petrinet.TAPNInhibitorArc inhibitorArc = new dk.aau.cs.petrinet.TAPNInhibitorArc(source, target, ConvertToLegacyGuardString(arc.interval().toString()));
 			constructedModel.add(inhibitorArc);
 		}
+	}
+	
+	private String ConvertToLegacyGuardString(String guard){
+		return guard.replace(" ", "");
 	}
 }
