@@ -199,5 +199,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 	
 	public void setUnderlyingArc(dk.aau.cs.model.tapn.TimedInputArc ia) {
 		this.inputArc = ia;
+		updateWeightLabel();
 	}
 }
