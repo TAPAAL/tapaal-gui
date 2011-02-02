@@ -382,6 +382,12 @@ implements Observer, Printable, DrawingSurface {
 		pnObject.addedToGui();
 		petriNetObjects.add(pnObject);
 	}
+	
+	@Override
+	public void removeAll() {
+		petriNetObjects.clear();
+		super.removeAll();
+	}
 
 
 	//
