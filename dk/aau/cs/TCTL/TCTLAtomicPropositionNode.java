@@ -8,12 +8,17 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	
 	// TODO: make this more object oriented, i.e. use something like TAPNPlace instead of String for places.
+	private String template;
 	private String place;
 	private String op;
 	private int n;
 	
 	public String getPlace() {
 		return place;
+	}
+	
+	public String getTemplate(){
+		return template;
 	}
 
 	public void setPlace(String place) {
@@ -37,6 +42,11 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	}
 	
 	public TCTLAtomicPropositionNode(String place, String op, int n) {
+		this("", place, op, n);
+	}
+	
+	public TCTLAtomicPropositionNode(String template, String place, String op, int n) {
+		this.template = template;
 		this.place = place;
 		this.op = op;
 		this.n = n;
@@ -45,14 +55,15 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public TCTLAbstractStateProperty copy() {
-		return new TCTLAtomicPropositionNode(place, op, n);
+		return new TCTLAtomicPropositionNode(template, place, op, n);
 	}
 	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)o;
-			return this.place == node.getPlace() && this.op == node.getOp() && this.n == node.getN();
+			// TODO: Not sure if this is intentional but this is reference equals and not equality
+			return this.template == node.template && this.place == node.getPlace() && this.op == node.getOp() && this.n == node.getN();
 		}
 		return false;
 	}
@@ -70,7 +81,8 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 
 	@Override
 	public String toString() {
-		return place + "" + op + "" + n;
+		String value = place + "" + op + "" + n;
+		return template == null || template.isEmpty() ? value : template + "." + value;
 	}
 	
 	@Override
@@ -92,6 +104,10 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return null;
+	}
+
+	public void setTemplate(String string) {
+		this.template = string;		
 	}
 
 }

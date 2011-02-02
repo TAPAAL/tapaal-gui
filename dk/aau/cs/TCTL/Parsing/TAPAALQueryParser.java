@@ -39,33 +39,34 @@ public class TAPAALQueryParser implements GPMessageConstants
 		   final int SYMBOL_AMPAMP            =  4;  // '&&'
 		   final int SYMBOL_LPARAN            =  5;  // '('
 		   final int SYMBOL_RPARAN            =  6;  // ')'
-		   final int SYMBOL_PIPEPIPE          =  7;  // '||'
-		   final int SYMBOL_LT                =  8;  // '<'
-		   final int SYMBOL_LTEQ              =  9;  // '<='
-		   final int SYMBOL_EQ                = 10;  // '='
-		   final int SYMBOL_EQEQ              = 11;  // '=='
-		   final int SYMBOL_GT                = 12;  // '>'
-		   final int SYMBOL_GTEQ              = 13;  // '>='
-		   final int SYMBOL_ALBRACKETRBRACKET = 14;  // 'A[]'
-		   final int SYMBOL_ALTGT             = 15;  // 'A<>'
-		   final int SYMBOL_AF                = 16;  // AF
-		   final int SYMBOL_AG                = 17;  // AG
-		   final int SYMBOL_AND               = 18;  // and
-		   final int SYMBOL_ELBRACKETRBRACKET = 19;  // 'E[]'
-		   final int SYMBOL_ELTGT             = 20;  // 'E<>'
-		   final int SYMBOL_EF                = 21;  // EF
-		   final int SYMBOL_EG                = 22;  // EG
-		   final int SYMBOL_IDENTIFIER        = 23;  // Identifier
-		   final int SYMBOL_NOT               = 24;  // not
-		   final int SYMBOL_NUM               = 25;  // Num
-		   final int SYMBOL_OR                = 26;  // or
-		   final int SYMBOL_ABSTRACTPROPERTY  = 27;  // <AbstractProperty>
-		   final int SYMBOL_AND2              = 28;  // <And>
-		   final int SYMBOL_ATOMICPROPOSITION = 29;  // <AtomicProposition>
-		   final int SYMBOL_EXPR              = 30;  // <Expr>
-		   final int SYMBOL_FACTOR            = 31;  // <Factor>
-		   final int SYMBOL_NOT2              = 32;  // <Not>
-		   final int SYMBOL_OR2               = 33;  // <Or>
+		   final int SYMBOL_DOT               =  7;  // '.'
+		   final int SYMBOL_PIPEPIPE          =  8;  // '||'
+		   final int SYMBOL_LT                =  9;  // '<'
+		   final int SYMBOL_LTEQ              = 10;  // '<='
+		   final int SYMBOL_EQ                = 11;  // '='
+		   final int SYMBOL_EQEQ              = 12;  // '=='
+		   final int SYMBOL_GT                = 13;  // '>'
+		   final int SYMBOL_GTEQ              = 14;  // '>='
+		   final int SYMBOL_ALBRACKETRBRACKET = 15;  // 'A[]'
+		   final int SYMBOL_ALTGT             = 16;  // 'A<>'
+		   final int SYMBOL_AF                = 17;  // AF
+		   final int SYMBOL_AG                = 18;  // AG
+		   final int SYMBOL_AND               = 19;  // and
+		   final int SYMBOL_ELBRACKETRBRACKET = 20;  // 'E[]'
+		   final int SYMBOL_ELTGT             = 21;  // 'E<>'
+		   final int SYMBOL_EF                = 22;  // EF
+		   final int SYMBOL_EG                = 23;  // EG
+		   final int SYMBOL_IDENTIFIER        = 24;  // Identifier
+		   final int SYMBOL_NOT               = 25;  // not
+		   final int SYMBOL_NUM               = 26;  // Num
+		   final int SYMBOL_OR                = 27;  // or
+		   final int SYMBOL_ABSTRACTPROPERTY  = 28;  // <AbstractProperty>
+		   final int SYMBOL_AND2              = 29;  // <And>
+		   final int SYMBOL_ATOMICPROPOSITION = 30;  // <AtomicProposition>
+		   final int SYMBOL_EXPR              = 31;  // <Expr>
+		   final int SYMBOL_FACTOR            = 32;  // <Factor>
+		   final int SYMBOL_NOT2              = 33;  // <Not>
+		   final int SYMBOL_OR2               = 34;  // <Or>
 		};
 	
 
@@ -91,12 +92,12 @@ public class TAPAALQueryParser implements GPMessageConstants
 		   final int RULE_NOT                                   = 17;  // <Not> ::= <Factor>
 		   final int RULE_FACTOR                                = 18;  // <Factor> ::= <AtomicProposition>
 		   final int RULE_FACTOR_LPARAN_RPARAN                  = 19;  // <Factor> ::= '(' <Expr> ')'
-		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_LT_NUM   = 20;  // <AtomicProposition> ::= Identifier '<' Num
-		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_LTEQ_NUM = 21;  // <AtomicProposition> ::= Identifier '<=' Num
-		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_EQ_NUM   = 22;  // <AtomicProposition> ::= Identifier '=' Num
-		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_EQEQ_NUM = 23;  // <AtomicProposition> ::= Identifier '==' Num
-		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_GTEQ_NUM = 24;  // <AtomicProposition> ::= Identifier '>=' Num
-		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_GT_NUM   = 25;  // <AtomicProposition> ::= Identifier '>' Num
+		   final int RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_LT_NUM   = 20;  // <AtomicProposition> ::= Identifier '.' Identifier '<' Num
+	       final int RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_LTEQ_NUM = 21;  // <AtomicProposition> ::= Identifier '.' Identifier '<=' Num
+	       final int RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_EQ_NUM   = 22;  // <AtomicProposition> ::= Identifier '.' Identifier '=' Num
+	       final int RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_EQEQ_NUM = 23;  // <AtomicProposition> ::= Identifier '.' Identifier '==' Num
+	       final int RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_GTEQ_NUM = 24;  // <AtomicProposition> ::= Identifier '.' Identifier '>=' Num
+	       final int RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_GT_NUM   = 25;  // <AtomicProposition> ::= Identifier '.' Identifier '>' Num
 		};
 
 
@@ -275,16 +276,17 @@ public class TAPAALQueryParser implements GPMessageConstants
 				case RuleConstants.RULE_FACTOR: // <Factor> ::= <AtomicProposition>
 				case RuleConstants.RULE_FACTOR_LPARAN_RPARAN: // <Factor> ::= '(' <Expr> ')'
 					break;
-				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_LT_NUM: // <AtomicProposition> ::= Identifier '<' Num
-				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_LTEQ_NUM: // <AtomicProposition> ::= Identifier '<=' Num
-				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_EQ_NUM: // <AtomicProposition> ::= Identifier '=' Num
-				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_EQEQ_NUM: // <AtomicProposition> ::= Identifier '==' Num
-				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_GTEQ_NUM: // <AtomicProposition> ::= Identifier '>=' Num
-				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_GT_NUM: // <AtomicProposition> ::= Identifier '>' Num
-					String place = (String)createObjectFromTerminal(parser.currentReduction().getToken(0));
-					String op = (String)createObjectFromTerminal(parser.currentReduction().getToken(1));
-					Integer n = (Integer)createObjectFromTerminal(parser.currentReduction().getToken(2));
-					parseStack.push(new TCTLAtomicPropositionNode(place, op, n));
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_LT_NUM: // <AtomicProposition> ::= Identifier '.' Identifier '<' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_LTEQ_NUM: // <AtomicProposition> ::= Identifier '.' Identifier '<=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_EQ_NUM: // <AtomicProposition> ::= Identifier '.' Identifier '=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_EQEQ_NUM: // <AtomicProposition> ::= Identifier '.' Identifier '==' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_GTEQ_NUM: // <AtomicProposition> ::= Identifier '.' Identifier '>=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION_IDENTIFIER_DOT_IDENTIFIER_GT_NUM: // <AtomicProposition> ::= Identifier '.' Identifier '>' Num
+					String template = (String)createObjectFromTerminal(parser.currentReduction().getToken(0));
+					String place = (String)createObjectFromTerminal(parser.currentReduction().getToken(2));
+					String op = (String)createObjectFromTerminal(parser.currentReduction().getToken(3));
+					Integer n = (Integer)createObjectFromTerminal(parser.currentReduction().getToken(4));
+					parseStack.push(new TCTLAtomicPropositionNode(template, place, op, n));
 					break;
 				}
 				

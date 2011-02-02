@@ -1,14 +1,21 @@
 package pipe.gui;
 
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.widgets.RunningVerificationDialog;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification

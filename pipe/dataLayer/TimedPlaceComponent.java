@@ -460,7 +460,7 @@ public class TimedPlaceComponent extends Place {
 		String value = "";
 		String invariant = getInvariantAsString();
 		//Dont show invariant if its default	
-		if (!invariant.equals("<inf")){ 
+		if (!invariant.equals(TimeInvariant.LESS_THAN_INFINITY.toString())){ 
 
 			if(CreateGui.getModel().isUsingColors()){
 				int offset = 1;
@@ -497,6 +497,8 @@ public class TimedPlaceComponent extends Place {
 	
 	public void setUnderlyingPlace(TimedPlace place) {
 		this.place = place;
+		this.setName(place.name());
+		this.repaint();
 	}
 
 	public void addTokens(int numberOfTokensToAdd) {
@@ -509,5 +511,15 @@ public class TimedPlaceComponent extends Place {
 		for(int i = 0; i < numberOfTokensToRemove; i++){
 			place.removeToken();
 		}
+	}
+	
+	public int getNumberOfTokens(){
+		return place.numberOfTokens(); // TODO: This may fail if saving while in animation mode?
+	}
+	
+	@Override
+	public void setName(String nameInput) {
+		place.setName(nameInput);
+		super.setName(nameInput);
 	}
 }

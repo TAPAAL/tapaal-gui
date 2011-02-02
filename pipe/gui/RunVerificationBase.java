@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.petrinet.TAPNQuery;
@@ -48,11 +49,17 @@ public abstract class RunVerificationBase extends
 		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
 		
 		// TODO: update query with new place names
+		MapQueryToNewNames(transformedModel.value2());
 		
 		VerificationResult result = modelChecker.verify(options, tapn, query);
 		return result;
 	}
 	
+	private void MapQueryToNewNames(NameMapping mapping) {
+		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
+		query.getProperty().accept(visitor,null);
+	}
+
 	@Override
 	protected void done() {						
 		if(!isCancelled()){

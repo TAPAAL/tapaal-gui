@@ -82,7 +82,7 @@ implements Cloneable {
 		nameOffsetX = nameOffsetXInput;
 		nameOffsetY = nameOffsetYInput;
 		pnName.setPosition((int)nameOffsetX, (int)nameOffsetY);
-		setName(nameInput);
+//		setName(nameInput);
 	}
 
 
@@ -443,8 +443,7 @@ implements Cloneable {
 		addLabelToContainer();
 		update();
 	}
-
-
+	
 	public boolean areNotSameType(PlaceTransitionObject o) {
 		return (this.getClass() != o.getClass());
 	}   

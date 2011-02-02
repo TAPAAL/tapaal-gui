@@ -81,7 +81,15 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public void setUnderlyingTransition(TimedTransition transition) {
-		this.transition = transition;	
+		this.transition = transition;
+		this.setName(transition.name());
+		repaint();
+	}
+	
+	@Override
+	public void setName(String nameInput) {
+		transition.setName(nameInput);
+		super.setName(nameInput);
 	}
 
 }

@@ -122,7 +122,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 				Place[] places = netModel.getPlaces();
 				for (int i = 0 ; i < places.length ; i++) {
-					NET.appendChild(createPlaceElement(places[i], netModel, pnDOM));
+					NET.appendChild(createPlaceElement((TimedPlaceComponent)places[i], netModel, pnDOM));
 				}
 
 				Transition[] transitions = netModel.getTransitions();
@@ -258,7 +258,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	 * @param document Any DOM to enable creation of Elements and Attributes
 	 * @return Place Element for a PNML Petri-Net DOM
 	 */
-	private Element createPlaceElement(Place inputPlace, DataLayer netModel, Document document) {
+	private Element createPlaceElement(TimedPlaceComponent inputPlace, DataLayer netModel, Document document) {
 		Element placeElement = null;
 
 		if (document != null) {
@@ -272,7 +272,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			String nameInput = inputPlace.getName();
 			Double nameOffsetXInput = inputPlace.getNameOffsetXObject();
 			Double nameOffsetYInput = inputPlace.getNameOffsetYObject();
-			Integer initialMarkingInput = inputPlace.getCurrentMarkingObject();
+			Integer initialMarkingInput = inputPlace.getNumberOfTokens();
 			Double markingOffsetXInput = inputPlace.getMarkingOffsetXObject();
 			Double markingOffsetYInput = inputPlace.getMarkingOffsetYObject();
 			Integer capacityInput = inputPlace.getCapacity();

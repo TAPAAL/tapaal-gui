@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -75,7 +76,9 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
@@ -127,6 +130,7 @@ public class QueryDialogue extends JPanel{
 
 	private JPanel predicatePanel;
 	private JButton addPredicateButton;
+	private JComboBox templateBox;
 	private JComboBox placesBox;
 	private JComboBox relationalOperatorBox;
 	private JSpinner placeMarking;
@@ -475,7 +479,7 @@ public class QueryDialogue extends JPanel{
 
 
 
-	
+
 
 	// update selection based on some change to the query.
 	// If the query contains place holders we want to select 
@@ -503,15 +507,15 @@ public class QueryDialogue extends JPanel{
 		} else {
 			disableAllQueryButtons();
 		}
-		
+
 		updateQueryButtonsAccordingToSelection();
 	}
-	
+
 	private void updateQueryButtonsAccordingToSelection() {
 		if(currentSelection.getObject() instanceof TCTLAtomicPropositionNode)
 		{
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode)currentSelection.getObject();
-			
+
 			// bit of a hack to prevent posting edits to the undo manager when we programmatically
 			// change the selection in the atomic proposition comboboxes etc. because a different
 			// atomic proposition was selected
@@ -605,6 +609,7 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);
+		templateBox.setEnabled(false);
 		placesBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
@@ -620,6 +625,7 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.setEnabled(false);
 		disjunctionButton.setEnabled(false);
 		negationButton.setEnabled(false);	
+		templateBox.setEnabled(false);
 		placesBox.setEnabled(false);
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
@@ -634,14 +640,21 @@ public class QueryDialogue extends JPanel{
 		conjunctionButton.setEnabled(true);
 		disjunctionButton.setEnabled(true);
 		negationButton.setEnabled(true);
+		templateBox.setEnabled(true);
 		placesBox.setEnabled(true);
 		relationalOperatorBox.setEnabled(true);
 		placeMarking.setEnabled(true);
+		setEnablednessOfAddPredicateButton();
+
+	}
+
+
+
+	private void setEnablednessOfAddPredicateButton() {
 		if(placesBox.getSelectedItem() == null)
 			addPredicateButton.setEnabled(false);
 		else
 			addPredicateButton.setEnabled(true);
-
 	}
 
 	private void disableEditingButtons() {
@@ -679,8 +692,8 @@ public class QueryDialogue extends JPanel{
 	}
 
 	private void updateQueryOnAtomicPropositionChange() {
-		if(currentSelection.getObject() instanceof TCTLAtomicPropositionNode){
-			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode((String)placesBox.getSelectedItem(), (String)relationalOperatorBox.getSelectedItem(), (Integer) placeMarking.getValue());
+		if(currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode){
+			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(templateBox.getSelectedItem().toString(), (String)placesBox.getSelectedItem(), (String)relationalOperatorBox.getSelectedItem(), (Integer) placeMarking.getValue());
 			if(!property.equals(currentSelection.getObject())) {
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
@@ -1158,21 +1171,43 @@ public class QueryDialogue extends JPanel{
 		predicatePanel = new JPanel(new GridBagLayout());
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
-		String[] places = new String[datalayer.getPlaces().length];
-		for (int i=0; i< places.length; i++){
-			places[i] = datalayer.getPlaces()[i].getName();
-		}
-		placesBox = new JComboBox(new DefaultComboBoxModel(places));
-
-		Dimension d = placesBox.getMaximumSize();		
-		d.width = 150;
+		placesBox = new JComboBox();
+		Dimension d = new Dimension(150,27);		
 		placesBox.setMaximumSize(d);
 
+		templateBox = new JComboBox(new DefaultComboBoxModel(tapnNetwork.templates().toArray()));
+		templateBox.addActionListener(new ActionListener(){
+			private TimedArcPetriNet currentlySelected = null;
+			public void actionPerformed(ActionEvent e) {
+				TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getSelectedItem();
+				if(!tapn.equals(currentlySelected)){
+					Vector<String> placeNames = new Vector<String>();
+					for(TimedPlace place : tapn.places()){
+						placeNames.add(place.name());
+					}
+					placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
+					currentlySelected = tapn;
+					setEnablednessOfAddPredicateButton();
+					if(userChangedAtomicPropSelection && placeNames.size() > 0) updateQueryOnAtomicPropositionChange();
+				}
+			}
+		});	
+		Dimension dim = new Dimension(200,27);
+		templateBox.setMaximumSize(dim);
+		templateBox.setMinimumSize(dim);
+		templateBox.setPreferredSize(dim);
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.gridwidth = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		predicatePanel.add(templateBox,gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		predicatePanel.add(placesBox,gbc);
 
@@ -1195,7 +1230,7 @@ public class QueryDialogue extends JPanel{
 
 		addPredicateButton = new JButton("Add Predicate to Query");
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		gbc.gridwidth = 3;
 		predicatePanel.add(addPredicateButton,gbc);
 
@@ -1210,7 +1245,7 @@ public class QueryDialogue extends JPanel{
 				new ActionListener() {
 
 					public void actionPerformed(ActionEvent e) {
-						TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode((String)placesBox.getSelectedItem(), (String)relationalOperatorBox.getSelectedItem(), (Integer) placeMarking.getValue());
+						TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(templateBox.getSelectedItem().toString(), (String)placesBox.getSelectedItem(), (String)relationalOperatorBox.getSelectedItem(), (Integer) placeMarking.getValue());
 						UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
 						newProperty = newProperty.replace(currentSelection.getObject(), property);
 						updateSelection(property);
@@ -1236,7 +1271,7 @@ public class QueryDialogue extends JPanel{
 						if(userChangedAtomicPropSelection) {
 							updateQueryOnAtomicPropositionChange();
 						}
-						
+
 					}
 				}
 		);
@@ -1250,8 +1285,9 @@ public class QueryDialogue extends JPanel{
 					}
 				}
 		);
-	}
 
+		templateBox.setSelectedIndex(0); // Fills placesBox with correct places. Must be called here to ensure addPredicateButton is not null
+	}
 
 
 	private void initQueryEditingPanel() {
@@ -1695,7 +1731,7 @@ public class QueryDialogue extends JPanel{
 									JOptionPane.showMessageDialog(QueryDialogue.this, "An error occured during export.", "Error", JOptionPane.ERROR_MESSAGE);
 									return;
 								}
-								
+
 								UppaalExporter exporter = new UppaalExporter();
 								TAPNQuery query = getQuery();
 								dk.aau.cs.petrinet.TAPNQuery tapnQuery = new dk.aau.cs.petrinet.TAPNQuery(query.getProperty(), query.getCapacity() + model.getNumberOfTokens());
