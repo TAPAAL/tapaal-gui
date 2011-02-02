@@ -81,6 +81,7 @@ public class Constant {
 	public void reset() {
 		lowerBound = 0;
 		upperBound = Integer.MAX_VALUE;
+		isUsed = false;
 	}
 
 	public Constant copy() {

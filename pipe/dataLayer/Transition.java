@@ -664,7 +664,7 @@ extends PlaceTransitionObject {
 	 @Override
 	 public void addedToGui(){
 		 super.addedToGui();
-		 update();
+		 update(true);
 	 }
 
 
@@ -676,7 +676,7 @@ extends PlaceTransitionObject {
 	 @Override
 	 public void setCentre(double x,double y) {
 		 super.setCentre(x,y);
-		 update();
+		 update(true);
 	 }
 
 
@@ -697,10 +697,10 @@ extends PlaceTransitionObject {
 
 
 	 @Override
-	 public void update() {
+	 public void update(boolean displayConstantNames) {
 		 pnName.setText(getText());
 		 pnName.zoomUpdate(zoom);    
-		 super.update();
+		 super.update(displayConstantNames);
 		 this.repaint();
 	 }   
 

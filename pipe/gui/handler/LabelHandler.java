@@ -55,7 +55,7 @@ public void mouseDragged(MouseEvent e){
       obj.setNameOffsetX((p.x - dragInit.x));
       obj.setNameOffsetY((p.y - dragInit.y));
       dragInit = p;
-      obj.update();
+      obj.update(true);
    }   
    
    @Override

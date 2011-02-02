@@ -143,7 +143,7 @@ extends Arc {
 	}  
 
 
-	public void updateWeightLabel(){   
+	public void updateWeightLabel(boolean displayConstantNames){   
 		weightLabel.setText("");
 		setWeightLabelPosition();
 	}

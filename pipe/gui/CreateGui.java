@@ -162,21 +162,6 @@ public class CreateGui {
 		return tab.getModel();
 	}
 
-	public static void setupModelForSimulation(){
-		if (appTab.getSelectedIndex() >= 0) {
-			TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-			tab.setupModelForSimulation();
-		}
-	}
-
-
-	public static void restoreModelForEditing(){
-		if (appTab.getSelectedIndex() >= 0) {
-			TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-			tab.restoreModelForEditing();
-		}
-	}
-
 
 	/** Creates a new animationHistory text area, and returns a reference to it*/
 	public static void switchToAnimationComponents() {

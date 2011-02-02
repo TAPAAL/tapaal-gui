@@ -236,7 +236,7 @@ extends PetriNetObjectHandler {
 						);
 						model.add(tia);
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
-						createTAPNInhibitorArc.updateWeightLabel();
+						createTAPNInhibitorArc.updateWeightLabel(true);
 					}catch(RequireException ex){
 						createTAPNInhibitorArc.delete();
 						JOptionPane.showMessageDialog(CreateGui.getApp(), 
@@ -578,8 +578,8 @@ extends PetriNetObjectHandler {
 								model.add(ta);
 								((TransportArcComponent)transportArcToCreate).setUnderlyingArc(ta);		
 								((TransportArcComponent)view.transportArcPart1).setUnderlyingArc(ta);
-								view.transportArcPart1.updateWeightLabel();
-								((TransportArcComponent)transportArcToCreate).updateWeightLabel();
+								view.transportArcPart1.updateWeightLabel(true);
+								((TransportArcComponent)transportArcToCreate).updateWeightLabel(true);
 						}catch(RequireException ex){
 
 							transportArcToCreate.delete();
@@ -652,7 +652,7 @@ extends PetriNetObjectHandler {
 							);
 							model.add(timedOutputArc);
 							outputArc.setUnderlyingArc(timedOutputArc);
-							outputArc.updateWeightLabel();
+							outputArc.updateWeightLabel(true);
 						}catch(RequireException ex){
 							timedArcToCreate.delete();
 							JOptionPane.showMessageDialog(CreateGui.getApp(), 
@@ -703,7 +703,7 @@ extends PetriNetObjectHandler {
 							);
 							model.add(tia);
 							timedArc.setUnderlyingArc(tia);
-							timedArc.updateWeightLabel();
+							timedArc.updateWeightLabel(true);
 						}catch(RequireException ex){
 							timedArcToCreate.delete();
 							JOptionPane.showMessageDialog(CreateGui.getApp(), 

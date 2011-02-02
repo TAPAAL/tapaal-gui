@@ -233,7 +233,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	private Element createQueryElement(TAPNQuery query, Document document) {
 		Element queryElement = null;
 		if (document != null){
-			queryElement = document.createElement("queries");
+			queryElement = document.createElement("query");
 		}
 
 		if (query != null){

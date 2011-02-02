@@ -22,25 +22,25 @@ public class ColoredOutputArc extends TimedOutputArcComponent {
 		super(startPositionXInput, startPositionYInput, endPositionXInput,
 				endPositionYInput, sourceInput, targetInput, weightInput, idInput,
 				taggedInput);
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 	public ColoredOutputArc(PlaceTransitionObject newSource) {
 		super(newSource);
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 
 	public ColoredOutputArc(TimedOutputArcComponent arc) {
 		super(arc);
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 	public Command setOutputValue(IntOrConstant newOutputValue) {
 		IntOrConstant old = this.outputValue;
 		this.outputValue = newOutputValue;
 		
-		updateWeightLabel();
+		updateWeightLabel(true);
 		
 		return new ColoredOutputArcOutputValueEdit(this, old, newOutputValue);
 	}
@@ -57,7 +57,7 @@ public class ColoredOutputArc extends TimedOutputArcComponent {
 	}
 	
 	@Override
-	public void updateWeightLabel(){ 		
+	public void updateWeightLabel(boolean displayConstantNames){ 		
 		weightLabel.setText(getOutputString());
 		
 		this.setWeightLabelPosition();
@@ -69,11 +69,11 @@ public class ColoredOutputArc extends TimedOutputArcComponent {
 
 	public void displayValues(boolean showValues) {
 		this.displayValues  = showValues;		
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 	public void updateConstantName(String oldName, String newName) {
 		outputValue.updateConstantName(oldName, newName);
-		updateWeightLabel();		
+		updateWeightLabel(true);		
 	}
 }

@@ -37,6 +37,14 @@ public class TimeInvariant {
 		return buffer.toString();
 	};
 	
+	public String toString(boolean displayConstantNames) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(isUpperIncluded ? "<=" : "<");
+		buffer.append(" ");
+		buffer.append(displayConstantNames || upper instanceof InfBound ? upper : upper.value());
+		return buffer.toString();
+	}
+	
 	public boolean isSatisfied(BigDecimal age){
 		if(upper instanceof InfBound) return true;
 		int comparison = age.compareTo(new BigDecimal(upper.value()));
@@ -69,4 +77,6 @@ public class TimeInvariant {
 		
 		return new TimeInvariant(operator.equals("<="), bound); 	
 	}
+
+	
 }

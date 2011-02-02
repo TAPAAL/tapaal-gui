@@ -58,6 +58,16 @@ public class TimeInterval {
 		buffer.append(isUpperIncluded ? "]" : ")");
 		return buffer.toString();
 	}
+	
+	public String toString(boolean displayConstantNames) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(isLowerIncluded ? "[" : "(");
+		buffer.append(displayConstantNames ? lower : lower.value());
+		buffer.append(",");
+		buffer.append(displayConstantNames || upper instanceof InfBound ? upper : upper.value());
+		buffer.append(isUpperIncluded ? "]" : ")");
+		return buffer.toString();
+	}
 
 	public boolean isIncluded(BigDecimal age) {
 		return satisfiesLowerBound(age) && satisfiesUpperBound(age);
@@ -125,4 +135,6 @@ public class TimeInterval {
 		
 		return new TimeInterval(leftBracket.equals("[") ? true : false, lowerBound, upperBound, rightBracket.equals("]") ? true : false);	
 	}
+
+	
 }

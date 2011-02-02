@@ -31,7 +31,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 
 	private void init() {
 		timeInterval = "[0,inf)";
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 	
 	
@@ -44,7 +44,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc);
 		timeInterval = guard;
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 	
 	@Override
@@ -90,19 +90,19 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 		inputArc.setTimeInterval(guard);
 
 		//hacks - I use the weight to display the TimeInterval
-		updateWeightLabel();
+		updateWeightLabel(true);
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval, inputArc.interval());
 	}
 	//hacks - I use the weight to display the TimeInterval
 	@Override
-	public void updateWeightLabel(){   
+	public void updateWeightLabel(boolean showConstantNames){   
 		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
 			if(inputArc == null)
 				weightLabel.setText("");
 			else
-				weightLabel.setText(inputArc.interval().toString());
+				weightLabel.setText(inputArc.interval().toString(showConstantNames));
 
 			this.setWeightLabelPosition();	
 		}
@@ -199,6 +199,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent{
 	
 	public void setUnderlyingArc(dk.aau.cs.model.tapn.TimedInputArc ia) {
 		this.inputArc = ia;
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 }

@@ -1016,6 +1016,7 @@ EOC */
 				currentTab.setConstants(factory.getConstants());
 				currentTab.network().buildConstraints();
 				
+				
 				if (CreateGui.getApp()!=null) {
 					CreateGui.getApp().restoreMode();
 				}

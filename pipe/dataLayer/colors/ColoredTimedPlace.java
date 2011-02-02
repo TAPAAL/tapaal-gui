@@ -122,7 +122,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		ColorSet old = this.colorInvariant;
 		this.colorInvariant = newColorInvariant;
 
-		update();
+		update(true);
 
 		return new PlaceColorInvariantEdit(this, old, newColorInvariant);		
 	}
@@ -134,7 +134,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 	public Command addColoredToken(ColoredToken token){
 		tokens.add(token);
 		
-		update();
+		update(true);
 
 		return new ColoredPlaceAddTokenEdit(this, token);
 	}
@@ -142,7 +142,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 	public Command removeColoredToken(ColoredToken token){
 		tokens.remove(token);
 		
-		update();
+		update(true);
 
 		return new ColoredPlaceRemoveTokenEdit(this,token);
 	}
@@ -151,7 +151,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		List<ColoredToken> old = this.tokens;
 		this.tokens = newTokens;
 		
-		update();
+		update(true);
 
 		return new ColoredPlaceTokensChangedEdit(this,old,newTokens);
 	}
@@ -190,7 +190,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		ColoredTimeInvariant old = this.timeInvariant;
 		this.timeInvariant = newTimeInvariant;
 		
-		update();
+		update(true);
 		
 		return new ColoredTimedPlaceTimeInvariantEdit(this, old, newTimeInvariant);
 	}
@@ -202,7 +202,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		for(ColoredToken token : tokens){
 			token.displayValues(showValues);
 		}
-		update();		
+		update(true);		
 	}
 
 	public void updateConstantName(String oldName, String newName) {
@@ -213,7 +213,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 			token.updateConstantName(oldName, newName);
 		}
 		
-		update();		
+		update(true);		
 	}
 
 }

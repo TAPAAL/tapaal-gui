@@ -258,6 +258,10 @@ public String getName() {
       updateBounds();
       repaint();
    }
+   
+   public void updateWeightLabel(boolean displayConstantNames){
+	   
+   }
 
    
    /** Updates the bounding box of the arc component based on the arcs bounds*/

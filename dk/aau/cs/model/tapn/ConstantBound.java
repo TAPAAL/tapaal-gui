@@ -28,5 +28,10 @@ public class ConstantBound implements Bound {
 		
 		this.constant = newConstant;	
 	}
+	
+	public String toString() {
+		
+		return constant.name();
+	}
 
 }

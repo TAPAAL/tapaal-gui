@@ -24,7 +24,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		setHead();
 		setGroup(groupNr);
 		//hack to reprint the label of the arc
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 	
 	public TransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) {
@@ -33,11 +33,12 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		setHead();
 		this.setGroup(group);
 		//hack to reprint the label of the arc
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 	
 	public void setUnderlyingArc(TransportArc arc){
 		this.underlyingTransportArc = arc; // must explicitly set underlying arc on connected to
+		updateWeightLabel(true);
 	}
 	
 	public TransportArc underlyingTransportArc(){
@@ -59,7 +60,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		setGroup(groupNr);
 
 		//hacks - I use the weight to display the TimeInterval
-		updateWeightLabel();
+		updateWeightLabel(true);
 		repaint();
 		
 		return new TransportArcGroupEdit(this, oldGroup, this.getGroup());
@@ -70,9 +71,9 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	}
 	
 	@Override
-	public void updateWeightLabel(){   
+	public void updateWeightLabel(boolean displayConstantNames){   
 		if (isInPreSet && underlyingTransportArc != null){
-		weightLabel.setText(underlyingTransportArc.interval().toString() + " : " + getGroup());
+		weightLabel.setText(underlyingTransportArc.interval().toString(displayConstantNames) + " : " + getGroup());
 		} else if(!isInPreSet) {
 			weightLabel.setText(String.valueOf(getGroup()));
 		}else{
@@ -191,7 +192,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		underlyingTransportArc.setTimeInterval(guard);
 
 		//hacks - I use the weight to display the TimeInterval
-		updateWeightLabel();
+		updateWeightLabel(true);
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval, underlyingTransportArc.interval());

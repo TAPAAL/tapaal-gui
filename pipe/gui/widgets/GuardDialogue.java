@@ -47,6 +47,7 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 
@@ -453,17 +454,15 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 						Bound rightInterval = null;
 
 						if(useConstantLeft) {
-							JOptionPane.showMessageDialog(CreateGui.getDrawingSurface(), "Not Yet implemented");
-							//String constantName = leftConstantsComboBox.getSelectedItem().toString();
-							//leftInterval = new ConstantBound();
+							String constantName = leftConstantsComboBox.getSelectedItem().toString();
+							leftInterval = new ConstantBound(CreateGui.getCurrentTab().network().getConstant(constantName));
 						}
 						else
 							leftInterval = new IntBound((Integer)firstIntervalNumber.getValue());
 
 						if(useConstantRight){
-							JOptionPane.showMessageDialog(CreateGui.getDrawingSurface(), "Not Yet implemented");
-							//String constantName = rightConstantsComboBox.getSelectedItem().toString();
-							//rightInterval = new ConstantBound();
+							String constantName = rightConstantsComboBox.getSelectedItem().toString();
+							rightInterval = new ConstantBound(CreateGui.getCurrentTab().network().getConstant(constantName));
 						}
 						else if ( inf.isSelected())
 							rightInterval = Bound.Infinity;

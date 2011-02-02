@@ -149,7 +149,7 @@ extends PlaceTransitionObject {
 		copy.currentMarking = this.currentMarking;
 		copy.markingOffsetX = this.markingOffsetX;
 		copy.markingOffsetY = this.markingOffsetY;
-		copy.update();
+		copy.update(true);
 		return copy;
 	}
 
@@ -290,7 +290,7 @@ extends PlaceTransitionObject {
 
 		if (capacity != newCapacity) {
 			capacity = newCapacity;
-			update();  
+			update(true);  
 		}
 		return new PlaceCapacityEdit(this, oldCapacity, newCapacity);
 	}   
@@ -419,7 +419,7 @@ extends PlaceTransitionObject {
 	@Override
 	public void toggleAttributesVisible(){
 		attributesVisible = !attributesVisible;
-		update();  
+		update(true);  
 	}
 
 
@@ -431,7 +431,7 @@ extends PlaceTransitionObject {
 	@Override
 	public void addedToGui(){
 		super.addedToGui();
-		update();
+		update(true);
 	}   
 
 
@@ -442,7 +442,7 @@ extends PlaceTransitionObject {
 
 
 	@Override
-	public void update() {
+	public void update(boolean displayConstantNames) {
 		if (attributesVisible == true){
 			pnName.setText("\nk=" + (capacity > 0 ? capacity :"\u221E"));
 
@@ -450,7 +450,7 @@ extends PlaceTransitionObject {
 			pnName.setText("");
 		}          
 		pnName.zoomUpdate(zoom);
-		super.update();
+		super.update(displayConstantNames);
 		repaint();
 	}
 

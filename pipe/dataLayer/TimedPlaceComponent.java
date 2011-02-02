@@ -309,7 +309,7 @@ public class TimedPlaceComponent extends Place {
 			ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
 			this.myTokens = newAgeOfTokens;
 
-			update();
+			update(true);
 
 			return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
 		} else throw new IllegalArgumentException("the argument size does not match the number of tokens in this place");
@@ -339,7 +339,7 @@ public class TimedPlaceComponent extends Place {
 		TimeInvariant newInv = TimeInvariant.parse(invariant);
 		place.setInvariant(newInv);
 
-		update();
+		update(true);
 
 		return new TimedPlaceInvariantEdit(this, old, newInv);
 	}
@@ -348,7 +348,7 @@ public class TimedPlaceComponent extends Place {
 		TimeInvariant old = place.invariant();
 		place.setInvariant(inv);
 		
-		update();
+		update(true);
 		
 		return new TimedPlaceInvariantEdit(this, old, inv);
 	}
@@ -378,7 +378,7 @@ public class TimedPlaceComponent extends Place {
 		ArrayList<BigDecimal> oldAgeOfTokens = this.myTokens;
 		this.myTokens = newAgeOfTokens;
 
-		update();
+		update(true);
 
 		return new TimedPlaceTokenEdit(this, oldAgeOfTokens, this.myTokens);
 	}
@@ -439,10 +439,10 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	@Override
-	public void update() {
+	public void update(boolean displayConstantNames) {
 		if (attributesVisible == true){
-			String value = getInvariantString();
-			pnName.setText(value);
+			//String value = getInvariantString();
+			pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
 
 		} else {
 			pnName.setText("");

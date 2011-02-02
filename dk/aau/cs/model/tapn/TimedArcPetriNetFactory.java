@@ -82,7 +82,7 @@ public class TimedArcPetriNetFactory {
 		}
 		
 		if(isModelInNewFormat) {
-			NodeList queryNodes = tapnDoc.getElementsByTagName("queries");
+			NodeList queryNodes = tapnDoc.getElementsByTagName("query");
 			for(int i = 0; i < queryNodes.getLength(); i++) {
 				Node q = queryNodes.item(i);
 				

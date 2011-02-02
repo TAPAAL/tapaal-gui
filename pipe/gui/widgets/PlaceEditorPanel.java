@@ -56,6 +56,8 @@ import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.TimeInvariant;
 
 /**
  *
@@ -72,7 +74,7 @@ extends javax.swing.JPanel {
 	Boolean attributesVisible;
 	Integer marking;
 	String name;
-	DataLayer pnmlData;
+	DataLayer guiModel;
 	DrawingSurfaceImpl view;
 	JRootPane rootPane;
 
@@ -84,7 +86,7 @@ extends javax.swing.JPanel {
 	public PlaceEditorPanel(JRootPane _rootPane, TimedPlaceComponent _place, 
 			DataLayer _pnmlData, DrawingSurfaceImpl _view) {
 		place = _place;
-		pnmlData = _pnmlData;
+		guiModel = _pnmlData;
 		view = _view;
 		attributesVisible = place.getAttributesVisible();
 		marking = place.getCurrentMarking();
@@ -125,7 +127,7 @@ extends javax.swing.JPanel {
 		//gridBagConstraints.insets = new java.awt.Insets(3,3,3,3);
 		placeEditorPanel.add(basicPropertiesPanel, gridBagConstraints);
 
-		if(pnmlData.netType().equals(NetType.COLORED)){
+		if(guiModel.netType().equals(NetType.COLORED)){
 			initColoredTimeInvariantPanel();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -153,7 +155,7 @@ extends javax.swing.JPanel {
 			gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 			//gridBagConstraints.insets = new Insets(0,0,0,5);
 			placeEditorPanel.add(tokenPanel, gridBagConstraints);
-		}else if(pnmlData.netType().equals(NetType.TAPN)){
+		}else if(guiModel.netType().equals(NetType.TAPN)){
 			initTimeInvariantPanel();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -436,7 +438,7 @@ extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(nameTextField, gridBagConstraints);
 
-		if(!pnmlData.isUsingColors()){
+		if(!guiModel.isUsingColors()){
 			markingLabel = new javax.swing.JLabel();
 			markingLabel.setText("Marking:");
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -475,7 +477,7 @@ extends javax.swing.JPanel {
 		}
 
 
-		if(!pnmlData.netType().equals(NetType.UNTIMED)){
+		if(!guiModel.netType().equals(NetType.UNTIMED)){
 			attributesCheckBox = new javax.swing.JCheckBox();
 			attributesCheckBox.setSelected(place.getAttributesVisible());
 			attributesCheckBox.setText("Show place attributes");
@@ -786,7 +788,7 @@ extends javax.swing.JPanel {
 
 	private void doOK(){
 		Integer newMarking = marking;
-		if(!pnmlData.isUsingColors()){
+		if(!guiModel.isUsingColors()){
 			try {
 				newMarking = (Integer)markingSpinner.getValue();
 			} catch (Exception e){
@@ -811,7 +813,7 @@ extends javax.swing.JPanel {
 						"Error",
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
-			} else if ( (pnmlData.getPlaceByNameIgnoreGiven(place,newName) != null) || (pnmlData.getTransitionByName(newName) != null) ){
+			} else if ( (guiModel.getPlaceByNameIgnoreGiven(place,newName) != null) || (guiModel.getTransitionByName(newName) != null) ){
 				System.err.println("Places cannot be called the same as an other Place or Transition.");
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"Places cannot be called the same as another Place or Transition.",
@@ -833,7 +835,7 @@ extends javax.swing.JPanel {
 
 
 
-		if(pnmlData.isUsingColors()){
+		if(guiModel.isUsingColors()){
 			ColoredTimedPlace coloredTimedPlace = (ColoredTimedPlace)place;
 
 			ColoredTimeInvariant timeInvariant = null;
@@ -916,25 +918,27 @@ extends javax.swing.JPanel {
 
 			Command edit = coloredTimedPlace.setColoredTokens(tokens);
 			view.getUndoManager().addEdit(edit);
-		}else if(pnmlData.netType().equals(NetType.TAPN)){
+		}else if(guiModel.netType().equals(NetType.TAPN)){
 			boolean isNormalInvariant = normalInvRadioButton.isSelected();
-			String newInvariant = "";
+			TimeInvariant newInvariant;
 
 			if(isNormalInvariant)
 			{
-				newInvariant = (String)invRelationNormal.getSelectedItem();
+				 
 				if ( ! invariantInf.isSelected()){
-					newInvariant = newInvariant + invariantSpinner.getValue();
+					newInvariant = TimeInvariant.parse((String)invRelationNormal.getSelectedItem() + invariantSpinner.getValue());
 				} else {
-					newInvariant = newInvariant + "inf";
+					newInvariant = TimeInvariant.parse("<" + "inf");
 				}
+				
+				
 			}
 			else{
 				String constantName = (String)invConstantsComboBox.getSelectedItem();
-				newInvariant = (String)invRelationConstant.getSelectedItem() + constantName;
+				boolean upperIncluded = ((String)invRelationConstant.getSelectedItem()).equals("<=");
+				newInvariant = new TimeInvariant(upperIncluded, new ConstantBound(CreateGui.getCurrentTab().network().getConstant(constantName)));
 			}
-
-			view.getUndoManager().addEdit(place.setInvariantFromString(newInvariant));
+			view.getUndoManager().addEdit(place.setInvariant(newInvariant));
 		}
 
 		if (newMarking != marking) {

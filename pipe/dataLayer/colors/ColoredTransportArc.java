@@ -37,7 +37,7 @@ public class ColoredTransportArc extends TransportArcComponent {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
 
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 	public boolean satisfiesGuard(ColoredToken token) {
@@ -66,7 +66,7 @@ public class ColoredTransportArc extends TransportArcComponent {
 	}
 
 	@Override
-	public void updateWeightLabel(){ 
+	public void updateWeightLabel(boolean displayConstantNames){ 
 		String guard = null;
 		if (isInPreSet()){
 			guard = "age \u2208 " + timeGuard + " : " + getGroup();
@@ -105,7 +105,7 @@ public class ColoredTransportArc extends TransportArcComponent {
 		ColorSet old = this.colorGuard;
 		this.colorGuard = newColorGuard;
 
-		updateWeightLabel();
+		updateWeightLabel(true);
 
 		return new ColoredTransportArcColorGuardEdit(this, old, newColorGuard);	
 	}
@@ -122,7 +122,7 @@ public class ColoredTransportArc extends TransportArcComponent {
 		IntOrConstant old = this.outputValue;
 		this.outputValue = value;
 
-		updateWeightLabel();
+		updateWeightLabel(true);
 
 		return new ColoredTransportArcUpdateValueEdit(this, old, value);
 	}
@@ -131,7 +131,7 @@ public class ColoredTransportArc extends TransportArcComponent {
 		Preserve old = this.preserves;
 		this.preserves = newPreserve;
 
-		updateWeightLabel();
+		updateWeightLabel(true);
 
 		return new ColoredTransportArcPreserveEdit(this, old, newPreserve);
 	}
@@ -144,7 +144,7 @@ public class ColoredTransportArc extends TransportArcComponent {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
 
-		updateWeightLabel();
+		updateWeightLabel(true);
 
 		return new ColoredTransportArcTimeGuardEdit(this, old, newTimeGuard);
 	}
@@ -167,14 +167,14 @@ public class ColoredTransportArc extends TransportArcComponent {
 		this.displayValues = showValues;		
 		this.timeGuard.displayValues(showValues);
 		this.colorGuard.displayValues(showValues);
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 	public void updateConstantName(String oldName, String newName) {
 		colorGuard.updateConstantName(oldName, newName);
 		timeGuard.updateConstantName(oldName, newName);
 		outputValue.updateConstantName(oldName, newName);
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 
 }

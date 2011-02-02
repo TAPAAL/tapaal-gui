@@ -374,7 +374,7 @@ implements Cloneable {
 	public void translate(int x, int y) {
 		setPositionX(positionX + x);
 		setPositionY(positionY + y);  
-		update();
+		update(true);
 	}
 
 
@@ -382,11 +382,11 @@ implements Cloneable {
 	public void setCentre(double x,double y) {
 		setPositionX(x - (getWidth()/2.0));
 		setPositionY(y - (getHeight()/2.0));
-		update();
+		update(true);
 	}
 
 
-	public void update() {
+	public void update(boolean displayConstantNames) {
 		updateBounds();
 		updateLabelLocation();
 		updateConnected();
@@ -441,7 +441,7 @@ implements Cloneable {
 		deleted = false;
 		markedAsDeleted = false;
 		addLabelToContainer();
-		update();
+		update(true);
 	}
 	
 	public boolean areNotSameType(PlaceTransitionObject o) {
@@ -538,7 +538,7 @@ implements Cloneable {
 
 	public void zoomUpdate(int value) {
 		zoom = value;
-		update();
+		update(true);
 	}
 
 

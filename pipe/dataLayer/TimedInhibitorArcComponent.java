@@ -41,6 +41,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	
 	public void setUnderlyingArc(TimedInhibitorArc arc){
 		this.inhibitorArc = arc;
+		updateWeightLabel(true);
 	}
 	
 	public TimedInhibitorArc underlyingTimedInhibitorArc(){
@@ -54,9 +55,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 	
 	@Override
-	public void updateWeightLabel() {
+	public void updateWeightLabel(boolean displayConstantNames) {
 		if(inhibitorArc != null){
-			weightLabel.setText(inhibitorArc.interval().toString());
+			weightLabel.setText(inhibitorArc.interval().toString(displayConstantNames));
 		}else{
 			weightLabel.setText("");
 		}
@@ -75,7 +76,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		inhibitorArc.setTimeInterval(guard);
 
 		//hacks - I use the weight to display the TimeInterval
-		updateWeightLabel();
+		updateWeightLabel(true);
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval());

@@ -61,7 +61,7 @@ public class TabContent extends JSplitPane {
 	private JSplitPane editorLeftPane;
 	private JSplitPane queryConstantsSplit;
 	private LeftQueryPane queries;
-	private LeftConstantsPane leftBottomPanel;
+	private LeftConstantsPane constantsPanel;
 	private TemplateExplorer templateExplorer;
 	
 	/// Animation
@@ -100,7 +100,7 @@ public class TabContent extends JSplitPane {
 		editorLeftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		editorLeftPane.setMinimumSize(new Dimension(175,100));
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
-		leftBottomPanel = new LeftConstantsPane(enableAddButton,this);
+		constantsPanel = new LeftConstantsPane(enableAddButton,this);
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
 
 		templateExplorer = new TemplateExplorer(this);
@@ -111,7 +111,7 @@ public class TabContent extends JSplitPane {
 		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
 		queryConstantsSplit.setResizeWeight(0.5);
 		queryConstantsSplit.setTopComponent(queries);
-		queryConstantsSplit.setBottomComponent(leftBottomPanel);
+		queryConstantsSplit.setBottomComponent(constantsPanel);
 		queryConstantsSplit.setContinuousLayout(true);
 		queryConstantsSplit.setDividerSize(0);
 		
@@ -126,7 +126,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void updateConstantsList(){
-		leftBottomPanel.showConstants();
+		constantsPanel.showConstants();
 	}
 
 	public void updateLeftPanel() {
@@ -152,131 +152,6 @@ public class TabContent extends JSplitPane {
 		appFile = file;
 	}
 
-	public void setupModelForSimulation(){
-			if(!getModel().isUsingColors()){
-				transformToModelWithoutConstants();
-			}else{
-				configureNetToShowValues(true);
-			}
-		
-	}
-	
-	private void configureNetToShowValues(boolean showValues) {
-		for(Place tp : getModel().getPlaces()){
-			ColoredTimedPlace place = (ColoredTimedPlace)tp;
-			place.displayValues(showValues);
-		}		
-
-		for(Arc arc : getModel().getArcs()){
-			if(arc instanceof ColoredTransportArc){
-				((ColoredTransportArc)arc).displayValues(showValues);
-			}else if(arc instanceof ColoredInputArc){
-				((ColoredInputArc)arc).displayValues(showValues);
-			}else if(arc instanceof ColoredInhibitorArc){
-				((ColoredInhibitorArc)arc).displayValues(showValues);
-			}else if(arc instanceof ColoredOutputArc){
-				((ColoredOutputArc)arc).displayValues(showValues);
-			}
-		}
-	}
-
-
-	public void restoreModelForEditing(){
-			if(getModel().isUsingColors()){
-				configureNetToShowValues(false);
-			}else{
-				if(this.oldGuards != null){
-					setupModelWithOldGuards();
-					this.oldGuards = null;
-				}
-			}
-	}
-
-	private void setupModelWithOldGuards() {
-		for(Place p : getModel().getPlaces()){
-			if(p instanceof TimedPlaceComponent){
-				TimeInvariant inv = oldInvariants.get(p);
-				((TimedPlaceComponent)p).setInvariant(inv);
-			}
-		}
-
-		for(Arc arc : getModel().getArcs()){
-			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
-				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
-				TimeInterval guard = oldGuards.get(arc);
-				tarc.setGuard(guard);
-			}
-		}
-	}
-
-
-	private void transformToModelWithoutConstants() {
-		this.oldGuards = new HashMap<PetriNetObject, TimeInterval>();
-		this.oldInvariants = new HashMap<PetriNetObject, TimeInvariant>();
-		
-		for(Place p : getModel().getPlaces()){
-			if(p instanceof TimedPlaceComponent){
-				oldInvariants.put(p, ((TimedPlaceComponent) p).getInvariant());
-				TimeInvariant inv = getInvariant(p);
-				((TimedPlaceComponent)p).setInvariant(inv);
-			}
-		}
-
-		for(Arc arc : getModel().getArcs()){
-			if(arc instanceof TimedInputArcComponent || arc instanceof TransportArcComponent){
-				oldGuards.put(arc, ((TimedInputArcComponent) arc).getGuard());
-				TimedInputArcComponent tarc = (TimedInputArcComponent)arc;
-				TimeInterval guard = getGuard(tarc);
-				tarc.setGuard(guard);
-			}
-		}
-	}
-
-	private TimeInterval getGuard(TimedInputArcComponent arc) {
-		TimeInterval interval = arc.getGuard();
-		
-		boolean lowerIncluded = false;
-		Bound lower;
-		Bound upper;
-		boolean upperIncluded = false;
-		
-		if(interval.lowerBound() instanceof ConstantBound){
-			ConstantBound cBound = (ConstantBound)interval.lowerBound();
-			lower = new IntBound(cBound.value());
-		} 
-		else {
-			lower = interval.lowerBound();
-		}
-		lowerIncluded = interval.IsLowerBoundNonStrict();
-		
-		if(interval.upperBound() instanceof ConstantBound) {
-			ConstantBound cBound = (ConstantBound)interval.upperBound();
-			upper = new IntBound(cBound.value());
-		}
-		else {
-			upper = interval.upperBound();
-		}
-		upperIncluded = interval.IsUpperBoundNonStrict();
-
-		return new TimeInterval(lowerIncluded, lower, upper, upperIncluded);
-	}
-
-	private TimeInvariant getInvariant(Place place) {
-		TimeInvariant inv = ((TimedPlaceComponent)place).getInvariant();
-		
-		Bound bound;
-		
-		if(inv.upperBound() instanceof ConstantBound) {
-			ConstantBound cBound = (ConstantBound)inv.upperBound();
-			bound = new IntBound(cBound.value());
-		}
-		else {
-			bound = inv.upperBound();
-		}
-		
-		return new TimeInvariant(inv.isUpperNonstrict(), bound);
-	}
-	
 	/** Creates a new animationHistory text area, and returns a reference to it*/
 	private void createAnimationHistory() {
 		try {
@@ -321,12 +196,16 @@ public class TabContent extends JSplitPane {
 		animatorLeftPane.setBottomComponent(panel);
 		this.setLeftComponent(animatorLeftPane);
 		this.setDividerLocation(-1);
+		
+		drawingSurface.repaintAll();
 	}
 	
 	public void switchToEditorComponents(){
 		templateExplorer.showButtons();
 		editorLeftPane.setTopComponent(templateExplorer);
 		this.setLeftComponent(editorLeftPane);
+		
+		drawingSurface.repaintAll();
 	}
 
 	public AnimationHistoryComponent getAbstractAnimationPane(){
@@ -469,6 +348,6 @@ public class TabContent extends JSplitPane {
 
 	public void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
-		
+		constantsPanel.showConstants();
 	}
 }

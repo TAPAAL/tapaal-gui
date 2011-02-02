@@ -129,7 +129,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
     						JOptionPane.ERROR_MESSAGE);
     				return;
     			}else{
-    				CreateGui.getView().getUndoManager().addNewEdit(edit);
+    				CreateGui.getCurrentTab().drawingSurface().getUndoManager().addNewEdit(edit);
+    				CreateGui.getCurrentTab().drawingSurface().repaintAll();
     			}
     		}
     		else{

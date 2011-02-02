@@ -36,7 +36,7 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
 		
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
@@ -46,7 +46,7 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 	}
 
 	@Override
-	public void updateWeightLabel(){ 
+	public void updateWeightLabel(boolean displayConstantNames){ 
 
 		String guard = "age \u2208 " + timeGuard;
 
@@ -67,7 +67,7 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 		ColorSet old = this.colorGuard;
 		this.colorGuard = newColorGuard;
 
-		updateWeightLabel();
+		updateWeightLabel(true);
 
 		return new ColoredInhibArcColorGuardEdit(this, old, newColorGuard);	
 	}
@@ -79,7 +79,7 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
 		
-		updateWeightLabel();
+		updateWeightLabel(true);
 		
 		return new ColoredInhibitorArcTimeGuardEdit(this, old, newTimeGuard);
 	}
@@ -90,12 +90,12 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 	public void displayValues(boolean showValues) {
 		timeGuard.displayValues(showValues);
 		colorGuard.displayValues(showValues);
-		updateWeightLabel();
+		updateWeightLabel(true);
 	}
 	public void updateConstantName(String oldName, String newName) {
 		timeGuard.updateConstantName(oldName, newName);
 		colorGuard.updateConstantName(oldName, newName);
-		updateWeightLabel();		
+		updateWeightLabel(true);		
 	}
 
 
