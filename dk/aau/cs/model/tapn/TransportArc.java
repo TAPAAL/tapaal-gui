@@ -33,7 +33,7 @@ public class TransportArc extends TAPNElement {
 		return destination;
 	}
 
-	public TimeInterval timeInterval(){
+	public TimeInterval interval(){
 		return interval;
 	}
 	

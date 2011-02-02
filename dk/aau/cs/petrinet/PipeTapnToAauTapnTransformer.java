@@ -20,6 +20,7 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
+import pipe.gui.CreateGui;
 import dk.aau.cs.translations.ModelTranslator;
 
 public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, TimedArcPetriNet> {
@@ -165,11 +166,11 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 		
 		if(isFirstConstant){
-			first = String.valueOf(appModel.getConstantValue(first));
+			first = String.valueOf(CreateGui.getCurrentTab().network().getConstantValue(first));
 		}
 		
 		if(isSecondConstant){
-			second = String.valueOf(appModel.getConstantValue(second));
+			second = String.valueOf(CreateGui.getCurrentTab().network().getConstantValue(second));
 		}
 		
 		return leftDelim + first + "," + second + rightDelim;
@@ -188,7 +189,7 @@ public class PipeTapnToAauTapnTransformer implements ModelTranslator<DataLayer, 
 		}
 		
 		if(isConstant)
-			bound = String.valueOf(appModel.getConstantValue(bound));
+			bound = String.valueOf(CreateGui.getCurrentTab().network().getConstantValue(bound));
 		
 		return operator + bound;
 	}

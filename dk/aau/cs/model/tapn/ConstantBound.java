@@ -14,9 +14,19 @@ public class ConstantBound implements Bound {
 		return constant.value();
 	}
 	
+	public String name() {
+		return constant.name();
+	}
+	
 	public ConstantBound copy()
 	{
 		return new ConstantBound(constant.copy());
+	}
+
+	public void setConstant(Constant newConstant) {
+		Require.that(newConstant != null, "Constant cannot be null");
+		
+		this.constant = newConstant;	
 	}
 
 }

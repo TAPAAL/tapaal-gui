@@ -104,7 +104,7 @@ public class TAPNComposer {
 				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.transition().name()));
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.destination().name()));
 
-				constructedModel.add(new TransportArc(source, transition, target, arc.timeInterval()));
+				constructedModel.add(new TransportArc(source, transition, target, arc.interval()));
 			}
 		}
 	}

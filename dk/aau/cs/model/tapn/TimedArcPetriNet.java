@@ -236,7 +236,6 @@ public class TimedArcPetriNet {
 			p.setCurrentMarking(marking);
 		}
 	}
-
 	public Iterable<TimedPlace> places() {
 		return places;
 	}
@@ -260,4 +259,5 @@ public class TimedArcPetriNet {
 	public Iterable<TimedInhibitorArc> inhibitorArcs() {
 		return inhibitorArcs;
 	}
+
 }

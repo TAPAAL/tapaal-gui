@@ -36,6 +36,7 @@ import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.LeftConstantsPane;
 import pipe.gui.widgets.LeftQueryPane;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -99,7 +100,7 @@ public class TabContent extends JSplitPane {
 		editorLeftPane.setPreferredSize(new Dimension(262, 100)); // height is ignored because the component is stretched
 		editorLeftPane.setMinimumSize(new Dimension(175,100));
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
-		leftBottomPanel = new LeftConstantsPane(enableAddButton);
+		leftBottomPanel = new LeftConstantsPane(enableAddButton,this);
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
 
 		templateExplorer = new TemplateExplorer(this);
@@ -463,6 +464,11 @@ public class TabContent extends JSplitPane {
 
 	public void removeQuery(TAPNQuery queryToCreateFrom) {
 		queries.removeQuery(queryToCreateFrom);
+		
+	}
+
+	public void setConstants(Iterable<Constant> constants) {
+		tapnNetwork.setConstants(constants);
 		
 	}
 }

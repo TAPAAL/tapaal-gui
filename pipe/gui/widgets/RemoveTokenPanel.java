@@ -19,6 +19,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.undo.UndoManager;
@@ -32,7 +34,7 @@ public class RemoveTokenPanel extends JPanel {
 	private JRootPane rootPane;
 	private ColoredTimedPlace place;
 	private UndoManager undoManager;
-	private DataLayer model;
+	private TimedArcPetriNetNetwork model;
 	private JPanel tokenPanel;
 	private JLabel tokenHelpLabel;
 	private JLabel tokenHelpLabel2;
@@ -42,7 +44,7 @@ public class RemoveTokenPanel extends JPanel {
 	private JButton okButton;
 	private JButton cancelButton;
 	
-	public RemoveTokenPanel(JRootPane rootPane, ColoredTimedPlace place, DataLayer model,UndoManager undoManager){
+	public RemoveTokenPanel(JRootPane rootPane, ColoredTimedPlace place, TimedArcPetriNetNetwork model,UndoManager undoManager){
 		this.rootPane = rootPane;
 		this.place = place;
 		this.undoManager = undoManager;

@@ -597,7 +597,7 @@ extends javax.swing.JPanel {
 		gbc.gridy = 0;
 		invariantGroup.add(invariantInf, gbc);
 
-		Set<String> constants = CreateGui.getModel().getConstantNames();
+		Set<String> constants = CreateGui.getCurrentTab().network().getConstantNames();
 		invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMinimumSize(new Dimension(80,30));
 		invConstantsComboBox.setPreferredSize(new Dimension(80,30));
@@ -724,7 +724,7 @@ extends javax.swing.JPanel {
 	}
 
 	private void setRelationModelForConstants() {
-		int value = CreateGui.getModel().getConstantValue(
+		int value = CreateGui.getCurrentTab().network().getConstantValue(
 				invConstantsComboBox.getSelectedItem().toString());
 
 		String selected = invRelationConstant.getSelectedItem().toString();
@@ -901,7 +901,7 @@ extends javax.swing.JPanel {
 					if(token.getColor().isUsingConstant()){
 						msg += String.format("\n \"%1$s\" is a constant with value %2$d.",
 								token.getColor(),
-								CreateGui.getModel().getConstantValue(token.getColor().getConstantName()));
+								CreateGui.getCurrentTab().network().getConstantValue(token.getColor().getConstantName()));
 					}
 
 					JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -948,7 +948,7 @@ extends javax.swing.JPanel {
 		}    
 		place.repaint();
 
-		CreateGui.getModel().buildConstraints();
+		CreateGui.getCurrentTab().network().buildConstraints();
 		exit();
 	}
 

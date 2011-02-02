@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.Constant;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.NetType;
@@ -50,12 +49,14 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 	private Iterable<Template<TimedArcPetriNet>> templates;
 	private Iterable<TAPNQuery> queries;
+	private Iterable<Constant> constants;
 	
 	
 
-	public TimedArcPetriNetNetworkWriter(Iterable<Template<TimedArcPetriNet>> templates, Iterable<TAPNQuery> queries){
+	public TimedArcPetriNetNetworkWriter(Iterable<Template<TimedArcPetriNet>> templates, Iterable<TAPNQuery> queries, Iterable<Constant> constants){
 		this.templates = templates;
 		this.queries = queries;
+		this.constants = constants;
 	}
 
 	public void savePNML(File file) throws NullPointerException, IOException,
@@ -119,13 +120,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 					NET.appendChild(createAnnotationNoteElement(labels[i], pnDOM));
 				}
 
-				Collection<Constant> constants = netModel.getConstants();
-				for(Constant constant : constants)
-				{
-					Element elem = createConstantElement(constant, pnDOM);
-					NET.appendChild(elem);
-				}
-
 				Place[] places = netModel.getPlaces();
 				for (int i = 0 ; i < places.length ; i++) {
 					NET.appendChild(createPlaceElement(places[i], netModel, pnDOM));
@@ -169,6 +163,12 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			for (TAPNQuery query : queries){
 				Element newQuery = createQueryElement(query, pnDOM);
 				PNML.appendChild(newQuery);
+			}
+			
+			for(Constant constant : constants)
+			{
+				Element elem = createConstantElement(constant, pnDOM);
+				PNML.appendChild(elem);
 			}
 
 			//stateGroups = null;         
@@ -222,8 +222,8 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		}
 
 		if(constant != null){
-			constantElement.setAttribute("name", constant.getName());
-			constantElement.setAttribute("value", String.valueOf(constant.getValue()));
+			constantElement.setAttribute("name", constant.name());
+			constantElement.setAttribute("value", String.valueOf(constant.value()));
 		}
 
 		return constantElement;

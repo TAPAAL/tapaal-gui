@@ -19,7 +19,7 @@ public class IntOrConstant {
 			value = Integer.parseInt(intOrConstant);
 			if(value < 0) throw new IllegalArgumentException(intOrConstant);
 		}catch(IllegalArgumentException e){
-			if(checkUsage && !CreateGui.getModel().isConstantNameUsed(intOrConstant)){
+			if(checkUsage && !CreateGui.getCurrentTab().network().isConstantNameUsed(intOrConstant)){
 				throw new IllegalArgumentException(intOrConstant);
 			}else{
 				name = intOrConstant;
@@ -78,7 +78,7 @@ public class IntOrConstant {
 	}
 
 	public int getConstantValue() {
-		return CreateGui.getModel().getConstantValue(name);
+		return CreateGui.getCurrentTab().network().getConstantValue(name);
 	}
 
 	public int getValue() {

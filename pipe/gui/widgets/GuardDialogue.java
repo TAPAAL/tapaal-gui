@@ -29,7 +29,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import pipe.dataLayer.Constant;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedTransitionComponent;
@@ -47,6 +46,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 
@@ -388,7 +388,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 								undoManager.addEdit(outputEditConnectedTo);
 							}
 						}
-						CreateGui.getModel().buildConstraints();
+						CreateGui.getCurrentTab().network().buildConstraints();
 
 						exit();
 					}
@@ -716,7 +716,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add( secondIntervalNumber, gridBagConstraints);
 
-		Set<String> constants = CreateGui.getModel().getConstantNames();
+		Set<String> constants = CreateGui.getCurrentTab().network().getConstantNames();
 		boolean enableConstantsCheckBoxes = !constants.isEmpty();
 		leftUseConstant = new JCheckBox("Use Constant");
 		leftUseConstant.setEnabled(enableConstantsCheckBoxes);
@@ -931,7 +931,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	private int getSecondValue() {
 		int secondValue;
 		if(rightUseConstant.isSelected()){
-			secondValue = CreateGui.getModel().getConstantValue(
+			secondValue = CreateGui.getCurrentTab().network().getConstantValue(
 					rightConstantsComboBox.getSelectedItem().toString());
 		}
 		else if(inf.isSelected()){
@@ -945,7 +945,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 	private int getFirstValue() {
 		int firstValue;
 		if(leftUseConstant.isSelected()){
-			firstValue = CreateGui.getModel().getConstantValue(
+			firstValue = CreateGui.getCurrentTab().network().getConstantValue(
 					leftConstantsComboBox.getSelectedItem().toString());
 		}
 		else{
@@ -960,10 +960,10 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 		String oldRight = rightConstantsComboBox.getSelectedItem() != null ? 
 				rightConstantsComboBox.getSelectedItem().toString() : null;
 				rightConstantsComboBox.removeAllItems();
-				Collection<Constant> constants = CreateGui.getModel().getConstants();
+				Collection<Constant> constants = CreateGui.getCurrentTab().network().constants();
 				for(Constant c : constants){
-					if(c.getValue() >= value){
-						rightConstantsComboBox.addItem(c.getName());
+					if(c.value() >= value){
+						rightConstantsComboBox.addItem(c.name());
 					}
 				}
 
@@ -982,7 +982,7 @@ public class GuardDialogue extends JPanel /*implements ActionListener, PropertyC
 			rightUseConstant.setSelected(false);
 			updateRightComponents();
 		}
-		if(firstValue > CreateGui.getModel().getLargestConstantValue())
+		if(firstValue > CreateGui.getCurrentTab().network().getLargestConstantValue())
 			rightUseConstant.setEnabled(false);
 		else{
 			rightUseConstant.setEnabled(true);

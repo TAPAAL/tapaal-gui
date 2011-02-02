@@ -8,10 +8,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.SpinnerNumberModel;
 
-import pipe.dataLayer.Constant;
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 /*
  * LeftConstantsPane.java
@@ -29,7 +29,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	 */
 	private static final long serialVersionUID = 6734583459331431789L;
 	private JRootPane rootPane;
-	private DataLayer model;
+	private TimedArcPetriNetNetwork model;
 	
 	private String oldName;
 
@@ -38,17 +38,17 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
         initComponents();
     }
     
-    public ConstantsDialogPanel(JRootPane pane, DataLayer model, Constant constant) {
-        initComponents();
+    public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) {
+    	initComponents();
         
         rootPane = pane;
         this.model = model;
  
-        this.oldName = constant.getName();
+        this.oldName = "";
         
         // Set up initial values
        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
-    		   constant.getValue(), constant.getLowerBound(),	constant.getUpperBound(), 1);
+    		   0, 0,	Integer.MAX_VALUE, 1);
        valueSpinner.setModel(spinnerModel);
        nameTextField.setText(oldName);
       
@@ -68,6 +68,17 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
        });
        
        rootPane.setDefaultButton(okButton);
+    }
+    
+    public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model, Constant constant) {
+    	this(pane,model);
+        
+    	this.oldName = constant.name();
+    	
+    	 SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
+      		   constant.value(), constant.lowerBound(),	constant.upperBound(), 1);
+         valueSpinner.setModel(spinnerModel);
+         nameTextField.setText(oldName);
     }
     
     public void onOK()

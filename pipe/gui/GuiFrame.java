@@ -906,7 +906,7 @@ EOC */
 			//appModel.savePNML(outFile);
 
 			TabContent currentTab = (TabContent)appTab.getSelectedComponent();
-			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(currentTab.templates(), currentTab.queries());
+			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(currentTab.templates(), currentTab.queries(), currentTab.network().constants());
 			
 			tapnWriter.savePNML(outFile);
 			
@@ -1013,6 +1013,8 @@ EOC */
 				}
 				
 				currentTab.setQueries(factory.getQueries());
+				currentTab.setConstants(factory.getConstants());
+				currentTab.network().buildConstraints();
 				
 				if (CreateGui.getApp()!=null) {
 					CreateGui.getApp().restoreMode();
@@ -1572,7 +1574,7 @@ EOC */
 				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
 				appView.getSelectionObject().deleteSelection();	
 				appView.repaint();
-				CreateGui.getModel().buildConstraints();
+				CreateGui.getCurrentTab().network().buildConstraints();
 			}
 		}
 
@@ -1932,10 +1934,10 @@ EOC */
 					appGui.getCopyPasteManager().startPaste(appView);
 				} else*/ if (this == undoAction) {
 					appView.getUndoManager().undo();
-					CreateGui.getModel().buildConstraints();
+					CreateGui.getCurrentTab().network().buildConstraints();
 				} else if (this == redoAction) {
 					appView.getUndoManager().redo();
-					CreateGui.getModel().buildConstraints();
+					CreateGui.getCurrentTab().network().buildConstraints();
 				}
 			}
 		}

@@ -72,7 +72,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateWeightLabel(){   
 		if (isInPreSet && underlyingTransportArc != null){
-		weightLabel.setText(underlyingTransportArc.timeInterval().toString() + " : " + getGroup());
+		weightLabel.setText(underlyingTransportArc.interval().toString() + " : " + getGroup());
 		} else if(!isInPreSet) {
 			weightLabel.setText(String.valueOf(getGroup()));
 		}else{
@@ -176,25 +176,25 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	
 	@Override
 	public String getGuardAsString() {
-		return underlyingTransportArc.timeInterval().toString();
+		return underlyingTransportArc.interval().toString();
 	}
 	
 	@Override
 	public TimeInterval getGuard() {
-		return underlyingTransportArc.timeInterval();
+		return underlyingTransportArc.interval();
 	}
 	
 	@Override
 	public Command setGuard(TimeInterval guard) {
 		
-		TimeInterval oldTimeInterval = underlyingTransportArc.timeInterval();
+		TimeInterval oldTimeInterval = underlyingTransportArc.interval();
 		underlyingTransportArc.setTimeInterval(guard);
 
 		//hacks - I use the weight to display the TimeInterval
 		updateWeightLabel();
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, underlyingTransportArc.timeInterval());
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, underlyingTransportArc.interval());
 	}
 	
 }

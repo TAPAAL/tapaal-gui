@@ -18,6 +18,8 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.dataLayer.colors.IntOrConstant;
@@ -33,7 +35,7 @@ public class OutputValueEditorPanel extends JPanel {
 	private JRootPane rootPane;
 	private ColoredOutputArc arc;
 	private UndoManager undoManager;
-	private DataLayer model;
+	private TimedArcPetriNetNetwork model;
 	
 	private JPanel outputValuePanel;
 	private JRadioButton normalRadioButton;
@@ -45,7 +47,7 @@ public class OutputValueEditorPanel extends JPanel {
 	private JButton okButton;
 	private JButton cancelButton;
 	
-	public OutputValueEditorPanel(JRootPane rootPane, ColoredOutputArc arc, DataLayer model, UndoManager undoManager){
+	public OutputValueEditorPanel(JRootPane rootPane, ColoredOutputArc arc, TimedArcPetriNetNetwork model, UndoManager undoManager){
 		this.rootPane = rootPane;
 		this.arc = arc;
 		this.undoManager = undoManager;

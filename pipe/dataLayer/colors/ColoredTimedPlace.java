@@ -77,7 +77,7 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		IntOrConstant val = token.getColor();
 		int value = 0;
 		if(val.isUsingConstant()){
-			value = CreateGui.getModel().getConstantValue(val.getConstantName());
+			value = CreateGui.getCurrentTab().network().getConstantValue(val.getConstantName());
 		}else{
 			value = val.getIntegerValue();
 		}

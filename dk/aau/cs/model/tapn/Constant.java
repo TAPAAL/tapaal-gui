@@ -7,13 +7,15 @@ public class Constant {
 	private int value;
 	private int lowerBound;
 	private int upperBound;
+	private boolean isUsed;
 		
 	public Constant(String name, int value){
 		setName(name);
 		setValue(value);
+		setIsUsed(false);
 		reset();
 	}
-	
+
 	public Constant(Constant constant) {
 		Require.that(constant != null, "Constant cannot be null");
 		
@@ -21,6 +23,7 @@ public class Constant {
 		this.value = constant.value;
 		this.lowerBound = constant.lowerBound;
 		this.upperBound = constant.upperBound;
+		this.isUsed = constant.isUsed;
 	}
 
 	public void setName(String name) {
@@ -64,6 +67,15 @@ public class Constant {
 		if(value >= 0 && value < upperBound){
 			upperBound = value;
 		}
+	}
+	
+	public boolean isUsed() {
+		return isUsed;
+	}
+	
+	public void setIsUsed(boolean isUsed) {
+		this.isUsed = isUsed;
+		
 	}
 	
 	public void reset() {

@@ -65,7 +65,7 @@ public class NewModelToOldModelTransformer {
 			dk.aau.cs.petrinet.TAPNTransition transition = constructedModel.getTransitionsByName(arc.transition().name());
 			dk.aau.cs.petrinet.TAPNPlace target = constructedModel.getPlaceByName(arc.destination().name());
 
-			dk.aau.cs.petrinet.TAPNTransportArc transportArc = new dk.aau.cs.petrinet.TAPNTransportArc(source, transition, target, arc.timeInterval().toString());
+			dk.aau.cs.petrinet.TAPNTransportArc transportArc = new dk.aau.cs.petrinet.TAPNTransportArc(source, transition, target, arc.interval().toString());
 			constructedModel.add(transportArc);
 		}
 	}

@@ -126,7 +126,7 @@ extends PetriNetObjectHandler {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
 
 		// 2 Add Place editor
-		contentPane.add( new OutputValueEditorPanel(guiDialog.getRootPane(), arc, CreateGui.getModel(), CreateGui.getView().getUndoManager()));
+		contentPane.add( new OutputValueEditorPanel(guiDialog.getRootPane(), arc, CreateGui.getCurrentTab().network(), CreateGui.getView().getUndoManager()));
 
 		guiDialog.setResizable(false);     
 

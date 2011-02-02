@@ -23,11 +23,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.dataLayer.Constant;
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class LeftConstantsPane extends JPanel {
 	/**
@@ -43,12 +44,12 @@ public class LeftConstantsPane extends JPanel {
 	private DefaultListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
-
-	public LeftConstantsPane(){
-		this(true);
-	}
-
-	public LeftConstantsPane(boolean enableAddButton){
+	
+	private TabContent parent;
+	
+	public LeftConstantsPane(boolean enableAddButton, TabContent parent){
+		this.parent = parent;
+		
 		constantsPanel = new JPanel(new BorderLayout());
 		addConstantPanel = new JPanel();
 
@@ -127,7 +128,7 @@ public class LeftConstantsPane extends JPanel {
 		removeBtn.setEnabled(false);
 		removeBtn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				String constName = ((Constant)constantsList.getSelectedValue()).getName();
+				String constName = ((Constant)constantsList.getSelectedValue()).name();
 				removeConstant(constName);
 			}
 		});
@@ -137,7 +138,7 @@ public class LeftConstantsPane extends JPanel {
 		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				showEditConstantDialog(new Constant());
+				showEditConstantDialog(null);
 			}
 		});
 		addConstantPanel.add(addConstantButton);
@@ -145,7 +146,7 @@ public class LeftConstantsPane extends JPanel {
 
 	public void showConstants()
 	{
-		DataLayer model = CreateGui.getModel();
+		TimedArcPetriNetNetwork model = parent.network();
 		if(model == null) return;
 
 		listModel.removeAllElements();
@@ -154,8 +155,8 @@ public class LeftConstantsPane extends JPanel {
 
 	}
 
-	private void addConstantsToPanel(DataLayer model) {
-		for(Constant constant : model.getConstants())
+	private void addConstantsToPanel(TimedArcPetriNetNetwork model) {
+		for(Constant constant : model.constants())
 		{
 			listModel.addElement(constant);
 		}
@@ -179,8 +180,11 @@ public class LeftConstantsPane extends JPanel {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
 
 		// 2 Add Place editor
-		contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), CreateGui.getModel(), constant) );
-
+		if(constant != null) 
+			contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), parent.network(), constant));
+		else
+			contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), parent.network()));
+			
 		guiDialog.setResizable(false);     
 
 		// Make window fit contents' preferred size
@@ -194,7 +198,7 @@ public class LeftConstantsPane extends JPanel {
 	}
 
 	protected void removeConstant(String name) {
-		DataLayer model = CreateGui.getModel();
+		TimedArcPetriNetNetwork model = parent.network();
 		Command edit = model.removeConstant(name);
 		if(edit == null){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -204,7 +208,7 @@ public class LeftConstantsPane extends JPanel {
 					JOptionPane.ERROR_MESSAGE);
 		}
 		else
-			CreateGui.getView().getUndoManager().addNewEdit(edit);
+			parent.drawingSurface().getUndoManager().addNewEdit(edit);
 		
 		showConstants();
 	}

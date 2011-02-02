@@ -18,6 +18,8 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.dataLayer.colors.ColoredToken;
@@ -34,7 +36,7 @@ public class AddTokenPanel extends JPanel {
 	private JRootPane rootPane;
 	private ColoredTimedPlace place;
 	private UndoManager undoManager;
-	private DataLayer model;
+	private TimedArcPetriNetNetwork model;
 	
 	private JPanel outputValuePanel;
 	private JRadioButton normalRadioButton;
@@ -46,7 +48,7 @@ public class AddTokenPanel extends JPanel {
 	private JButton okButton;
 	private JButton cancelButton;
 	
-	public AddTokenPanel(JRootPane rootPane, ColoredTimedPlace place, DataLayer model, UndoManager undoManager){
+	public AddTokenPanel(JRootPane rootPane, ColoredTimedPlace place, TimedArcPetriNetNetwork model, UndoManager undoManager){
 		this.rootPane = rootPane;
 		this.place = place;
 		this.undoManager = undoManager;

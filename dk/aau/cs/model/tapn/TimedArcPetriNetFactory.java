@@ -58,6 +58,7 @@ public class TimedArcPetriNetFactory {
 	private DataLayer guiModel;
 	private TimedMarking initialMarking;
 	private ArrayList<TAPNQuery> queries;
+	private ArrayList<Constant> constants;
 	private DrawingSurfaceImpl drawingSurface;
 	private boolean isModelInNewFormat = true;
 	
@@ -68,28 +69,8 @@ public class TimedArcPetriNetFactory {
 		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
 		initialMarking = new TimedMarking();
 		queries = new ArrayList<TAPNQuery>();
+		constants = new ArrayList<Constant>();
 		this.drawingSurface = drawingSurfaceImpl;
-	}
-	
-	public Template<TimedArcPetriNet> parseTimedArcPetriNetFromPNML(Node tapnNode) {
-		if(isModelInNewFormat) {
-			try {
-				return createTimedArcPetriNetFromPNML(tapnNode);
-			} catch (Exception e) {
-				isModelInNewFormat = false;
-			}
-		}
-		
-		if(!isModelInNewFormat) {
-			try {
-				return createTimedArcPetriNetFromPNMLOldFormat(tapnNode);
-			} catch (Exception e2) {
-				System.out.println("There was an error parsing the chosen model.");
-				throw new RuntimeException("An error occurred while trying to parse the chosen model.");
-			}
-		}
-		
-		throw new RuntimeException("An error occurred while trying to parse the chosen model.");
 	}
 	
 	public Iterable<Template<TimedArcPetriNet>> parseTimedArcPetriNetsFromPNML(Document tapnDoc) {
@@ -112,9 +93,39 @@ public class TimedArcPetriNetFactory {
 						queries.add(query);
 				}
 			}
+			
+			NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
+			for(int i = 0; i < constantNodes.getLength(); i++) {
+				Node c = constantNodes.item(i);
+				
+				if(c instanceof Element){
+					parseAndAddConstant((Element)c);
+				}
+			}
 		}
 		
 		return templates;
+	}
+
+	private Template<TimedArcPetriNet> parseTimedArcPetriNetFromPNML(Node tapnNode) {
+		if(isModelInNewFormat) {
+			try {
+				return createTimedArcPetriNetFromPNML(tapnNode);
+			} catch (Exception e) {
+				isModelInNewFormat = false;
+			}
+		}
+		
+		if(!isModelInNewFormat) {
+			try {
+				return createTimedArcPetriNetFromPNMLOldFormat(tapnNode);
+			} catch (Exception e2) {
+				System.out.println("There was an error parsing the chosen model.");
+				throw new RuntimeException("An error occurred while trying to parse the chosen model.");
+			}
+		}
+		
+		throw new RuntimeException("An error occurred while trying to parse the chosen model.");
 	}
 	
 	
@@ -140,7 +151,6 @@ public class TimedArcPetriNetFactory {
 		}
 		
 		tapn.setMarking(initialMarking);
-		guiModel.buildConstraints();
 		
 		return new Template<TimedArcPetriNet>(tapn,guiModel);
 	}
@@ -150,6 +160,10 @@ public class TimedArcPetriNetFactory {
 
 	public Iterable<TAPNQuery> getQueries(){
 		return queries;
+	}
+	
+	public Iterable<Constant> getConstants() {
+		return constants;
 	}
 
 
@@ -174,17 +188,6 @@ public class TimedArcPetriNetFactory {
 				parseAndAddTransition(element);
 			} else if ("arc".equals(element.getNodeName())) {
 				parseAndAddArc(element);         
-			} else if( "queries".equals(element.getNodeName()) ){
-				TAPNQuery query = parseTAPNQuery(element);
-				if(query != null)
-					queries.add(query);
-			} else if ("constant".equals(element.getNodeName())){
-				String name = element.getAttribute("name");
-				int value = Integer.parseInt(element.getAttribute("value"));
-				if(!name.isEmpty() && value >= 0)
-					guiModel.addConstant(name, value);
-			} else {
-				System.out.println("!" + element.getNodeName());
 			}
 		}
 		
@@ -630,6 +633,13 @@ public class TimedArcPetriNetFactory {
 		return comment;
 	}
 	
+	private void parseAndAddConstant(Element constantElement) {
+		String name = constantElement.getAttribute("name");
+		int value = Integer.parseInt(constantElement.getAttribute("value"));
+		
+		if(!name.isEmpty() && !name.equals(""))
+			constants.add(new Constant(name,value));
+	}
 	
 	////////////////////////////////////////////////////////////
 	// Legacy support for old format
@@ -655,7 +665,6 @@ public class TimedArcPetriNetFactory {
 		}
 		
 		tapn.setMarking(initialMarking);
-		guiModel.buildConstraints();
 
 		
 		return new Template<TimedArcPetriNet>(tapn,guiModel);
@@ -681,7 +690,7 @@ public class TimedArcPetriNetFactory {
 				String name = element.getAttribute("name");
 				int value = Integer.parseInt(element.getAttribute("value"));
 				if(!name.isEmpty() && value >= 0)
-					guiModel.addConstant(name, value);
+					constants.add(new Constant(name, value));
 			} else {
 				System.out.println("!" + element.getNodeName());
 			}
@@ -1274,5 +1283,7 @@ public class TimedArcPetriNetFactory {
 			newObject.setGuiModel(guiModel);
 		}
 	}
+
+
 
 }

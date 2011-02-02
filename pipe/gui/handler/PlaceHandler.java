@@ -152,7 +152,7 @@ extends PlaceTransitionObjectHandler {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
 
 		// 2 Add Place editor
-		contentPane.add( new RemoveTokenPanel(guiDialog.getRootPane(), place, CreateGui.getModel(), CreateGui.getView().getUndoManager()));
+		contentPane.add( new RemoveTokenPanel(guiDialog.getRootPane(), place, CreateGui.getCurrentTab().network(), CreateGui.getView().getUndoManager()));
 
 		guiDialog.setResizable(false);     
 
@@ -175,7 +175,7 @@ extends PlaceTransitionObjectHandler {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
 
 		// 2 Add Place editor
-		contentPane.add( new AddTokenPanel(guiDialog.getRootPane(), place, CreateGui.getModel(), CreateGui.getView().getUndoManager()));
+		contentPane.add( new AddTokenPanel(guiDialog.getRootPane(), place, CreateGui.getCurrentTab().network(), CreateGui.getView().getUndoManager()));
 
 		guiDialog.setResizable(false);     
 

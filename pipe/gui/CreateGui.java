@@ -143,6 +143,10 @@ public class CreateGui {
 	public static TabContent getTab(int index) {
 		return tabs.get(index);
 	}
+	
+	public static TabContent getCurrentTab() {
+		return tabs.get(appTab.getSelectedIndex());
+	}
 
 	public static Animator getAnimator() {
 		return animator;

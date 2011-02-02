@@ -1,9 +1,9 @@
 package pipe.gui.undo;
 
-import pipe.dataLayer.Constant;
-import pipe.dataLayer.ConstantStore;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantStore;
 
 public class RemoveConstantEdit extends Command {
 
