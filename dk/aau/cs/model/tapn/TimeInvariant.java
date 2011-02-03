@@ -1,6 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,8 +53,8 @@ public class TimeInvariant {
 		return isUpperIncluded ? comparison <= 0 : comparison < 0;
 	}
 	
-	public static TimeInvariant parse(String invariant){
-		Pattern pattern = Pattern.compile("^(<|<=)\\s*(\\d+|inf)$");
+	public static TimeInvariant parse(String invariant, TreeMap<String,Constant> constants){
+		Pattern pattern = Pattern.compile("^(<|<=)\\s*(\\w+)$");
 		Matcher matcher = pattern.matcher(invariant);
 		matcher.find();
 		
@@ -71,11 +72,20 @@ public class TimeInvariant {
 				int intBound = Integer.parseInt(boundAsString);
 				bound = new IntBound(intBound);
 			}catch(NumberFormatException e){
-				//bound = new ConstantBound()
+				if(constants.containsKey(boundAsString)) {
+					bound = new ConstantBound(constants.get(boundAsString));
+				}
+				else
+					throw new RuntimeException("A constant which was not declared was used in an invariant.");
 			}
 		}
 		
 		return new TimeInvariant(operator.equals("<="), bound); 	
+	}
+
+	
+	public static TimeInvariant parseInvariantWithoutConstant(String invariant) {
+		return TimeInvariant.parse(invariant, new TreeMap<String,Constant>());
 	}
 
 	

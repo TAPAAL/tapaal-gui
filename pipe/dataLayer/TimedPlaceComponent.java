@@ -37,6 +37,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 
 public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
@@ -120,7 +121,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent clone(){
 		TimedPlaceComponent toReturn = (TimedPlaceComponent)super.clone();
 
-		toReturn.setInvariantFromString(this.getInvariantAsString());
+		toReturn.setInvariant(this.getInvariant());
 		return toReturn;
 
 	}
@@ -334,16 +335,6 @@ public class TimedPlaceComponent extends Place {
 		return new PlaceMarkingEdit(this, oldMarking, currentMarking);      
 	}
 
-	public Command setInvariantFromString(String invariant) {
-		TimeInvariant old = place.invariant();
-		TimeInvariant newInv = TimeInvariant.parse(invariant);
-		place.setInvariant(newInv);
-
-		update(true);
-
-		return new TimedPlaceInvariantEdit(this, old, newInv);
-	}
-	
 	public Command setInvariant(TimeInvariant inv){
 		TimeInvariant old = place.invariant();
 		place.setInvariant(inv);
@@ -442,7 +433,10 @@ public class TimedPlaceComponent extends Place {
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible == true){
 			//String value = getInvariantString();
-			pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+			if(!(place.invariant().upperBound() instanceof InfBound))
+				pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+			else
+				pnName.setText("");
 
 		} else {
 			pnName.setText("");

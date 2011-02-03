@@ -91,6 +91,13 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			PNML.setAttributeNode(pnmlAttr);
 
 			boolean usingColors = false;
+			
+			for(Constant constant : constants)
+			{
+				Element elem = createConstantElement(constant, pnDOM);
+				PNML.appendChild(elem);
+			}
+			
 			for (Template<TimedArcPetriNet> tapn : templates) {
 				
 				DataLayer netModel = tapn.guiModel();
@@ -163,12 +170,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			for (TAPNQuery query : queries){
 				Element newQuery = createQueryElement(query, pnDOM);
 				PNML.appendChild(newQuery);
-			}
-			
-			for(Constant constant : constants)
-			{
-				Element elem = createConstantElement(constant, pnDOM);
-				PNML.appendChild(elem);
 			}
 
 			//stateGroups = null;         

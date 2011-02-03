@@ -926,9 +926,9 @@ extends javax.swing.JPanel {
 			{
 				 
 				if ( ! invariantInf.isSelected()){
-					newInvariant = TimeInvariant.parse((String)invRelationNormal.getSelectedItem() + invariantSpinner.getValue());
+					newInvariant = TimeInvariant.parseInvariantWithoutConstant((String)invRelationNormal.getSelectedItem() + invariantSpinner.getValue());
 				} else {
-					newInvariant = TimeInvariant.parse("<" + "inf");
+					newInvariant = TimeInvariant.parseInvariantWithoutConstant("<" + "inf");
 				}
 				
 				
