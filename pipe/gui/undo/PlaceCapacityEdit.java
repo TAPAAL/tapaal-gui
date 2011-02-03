@@ -8,39 +8,35 @@ import pipe.dataLayer.Place;
 import dk.aau.cs.gui.undo.Command;
 
 /**
- *
+ * 
  * @author corveau
  */
-public class PlaceCapacityEdit 
-        extends Command {
-   
-   Place place;
-   Integer newCapacity;
-   Integer oldCapacity;
-   
-   
-   /**
-    * Creates a new instance of PlaceCapacityEdit
-    */
-   public PlaceCapacityEdit(Place _place,
-                            Integer _oldCapacity, Integer _newCapacity) {
-      place = _place;
-      oldCapacity = _oldCapacity;      
-      newCapacity = _newCapacity;
-   }
+public class PlaceCapacityEdit extends Command {
 
-   
-   /** */
-   @Override
-public void undo() {
-      place.setCapacity(oldCapacity);
-   }
-   
+	Place place;
+	Integer newCapacity;
+	Integer oldCapacity;
 
-   /** */
-   @Override
-public void redo() {
-      place.setCapacity(newCapacity);
-   }
-   
+	/**
+	 * Creates a new instance of PlaceCapacityEdit
+	 */
+	public PlaceCapacityEdit(Place _place, Integer _oldCapacity,
+			Integer _newCapacity) {
+		place = _place;
+		oldCapacity = _oldCapacity;
+		newCapacity = _newCapacity;
+	}
+
+	/** */
+	@Override
+	public void undo() {
+		place.setCapacity(oldCapacity);
+	}
+
+	/** */
+	@Override
+	public void redo() {
+		place.setCapacity(newCapacity);
+	}
+
 }

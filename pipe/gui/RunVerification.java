@@ -18,25 +18,31 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TapaalTrace> result, long verificationTime) {
-		if(result != null && !result.error()){
-			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
-			JOptionPane.showMessageDialog(CreateGui.getApp(), 
-					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime/1000.0),
+	protected void showResult(VerificationResult<TapaalTrace> result,
+			long verificationTime) {
+		if (result != null && !result.error()) {
+			String satisfaction = result.isQuerySatisfied() ? "satisfied"
+					: "not satisfied";
+			JOptionPane.showMessageDialog(CreateGui.getApp(), String.format(
+					"Property is %1$s.\nEstimated verification time: %2$.2fs",
+					satisfaction, verificationTime / 1000.0),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
-			
-			if(result.getTrace() != null){
-//				DataLayer model = CreateGui.getModel();
-//				TraceTransformer interpreter =  model.isUsingColors() ? new ColoredTraceTransformer(model) : new TraceTransformer(model);
-//				TAPNTrace trace = interpreter.interpretTrace(result.getTrace());
+
+			if (result.getTrace() != null) {
+				// DataLayer model = CreateGui.getModel();
+				// TraceTransformer interpreter = model.isUsingColors() ? new
+				// ColoredTraceTransformer(model) : new TraceTransformer(model);
+				// TAPNTrace trace =
+				// interpreter.interpretTrace(result.getTrace());
 				CreateGui.getApp().setGUIMode(GUIMode.animation);
 				CreateGui.getAnimator().SetTrace(result.getTrace());
 			}
-		}else{
-			messenger.displayWrappedErrorMessage("An error occured during the verification." +
-					System.getProperty("line.separator") + 	
-					System.getProperty("line.separator") + 
-					"UPPAAL output:\n" + result.errorMessage(), 
+		} else {
+			messenger.displayWrappedErrorMessage(
+					"An error occured during the verification."
+							+ System.getProperty("line.separator")
+							+ System.getProperty("line.separator")
+							+ "UPPAAL output:\n" + result.errorMessage(),
 					"Error during verification");
 		}
 	}

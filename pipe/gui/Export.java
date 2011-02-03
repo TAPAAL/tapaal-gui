@@ -51,10 +51,9 @@ import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
 
-
-
 /**
  * Class for exporting things to other formats, as well as printing.
+ * 
  * @author Maxim
  */
 public class Export {
@@ -64,20 +63,19 @@ public class Export {
 	public static final int PRINTER = 3;
 	public static final int TIKZ = 5;
 
-
-	public static void toPostScript(Object g,String filename) 
-	throws PrintException, IOException {
+	public static void toPostScript(Object g, String filename)
+			throws PrintException, IOException {
 		// Input document type
 		DocFlavor flavour = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
 		// Output stream MIME type
 		String psMimeType = DocFlavor.BYTE_ARRAY.POSTSCRIPT.getMimeType();
 
 		// Look up a print service factory that can handle this job
-		StreamPrintServiceFactory[] factories = 
-			StreamPrintServiceFactory.lookupStreamPrintServiceFactories(
-					flavour, psMimeType);
+		StreamPrintServiceFactory[] factories = StreamPrintServiceFactory
+				.lookupStreamPrintServiceFactories(flavour, psMimeType);
 		if (factories.length == 0) {
-			throw new RuntimeException("No suitable factory found for export to PS");
+			throw new RuntimeException(
+					"No suitable factory found for export to PS");
 		}
 
 		FileOutputStream f = new FileOutputStream(filename);
@@ -88,74 +86,72 @@ public class Export {
 		f.close();
 	}
 
-
-	public static void toPNG(JComponent g,String filename) throws IOException {
+	public static void toPNG(JComponent g, String filename) throws IOException {
 		Iterator<ImageWriter> i = ImageIO.getImageWritersBySuffix("png");
 		if (!i.hasNext()) {
 			throw new RuntimeException("No ImageIO exporters can handle PNG");
 		}
 
 		File f = new File(filename);
-		BufferedImage img = new BufferedImage(g.getPreferredSize().width,
-				g.getPreferredSize().height,
-				BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage img = new BufferedImage(g.getPreferredSize().width, g
+				.getPreferredSize().height, BufferedImage.TYPE_3BYTE_BGR);
 		g.print(img.getGraphics());
 		ImageIO.write(img, "png", f);
 	}
 
 	private static void toPrinter(Object g) throws PrintException {
-		///* The Swing way
+		// /* The Swing way
 		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
 		DocFlavor flavour = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
-		PrintService printService[] = PrintServiceLookup.lookupPrintServices(flavour, pras);
+		PrintService printService[] = PrintServiceLookup.lookupPrintServices(
+				flavour, pras);
 
 		if (printService.length == 0) {
-			throw new PrintException("\nUnable to locate a compatible printer service." +
-			"\nTry exporting to PostScript.");
+			throw new PrintException(
+					"\nUnable to locate a compatible printer service."
+							+ "\nTry exporting to PostScript.");
 		}
-		PrintService defaultService = PrintServiceLookup.lookupDefaultPrintService();
-		PrintService service = 
-			ServiceUI.printDialog(null, 200, 200, printService, defaultService, flavour, pras);
+		PrintService defaultService = PrintServiceLookup
+				.lookupDefaultPrintService();
+		PrintService service = ServiceUI.printDialog(null, 200, 200,
+				printService, defaultService, flavour, pras);
 		if (service != null) {
 			DocPrintJob job = service.createPrintJob();
 			DocAttributeSet das = new HashDocAttributeSet();
 			Doc doc = new SimpleDoc(g, flavour, das);
 			job.print(doc, pras);
 		}
-		//*/
-		/* The AWT way:
-    PrinterJob pjob = PrinterJob.getPrinterJob();
-    PageFormat pf = pjob.defaultPage();
-    pjob.setPrintable(g, pf);
-    try {
-      if (pjob.printDialog()) pjob.print();
-    } catch (PrinterException e) {
-      error=e.toString();
-    }
-    //*/
+		// */
+		/*
+		 * The AWT way: PrinterJob pjob = PrinterJob.getPrinterJob(); PageFormat
+		 * pf = pjob.defaultPage(); pjob.setPrintable(g, pf); try { if
+		 * (pjob.printDialog()) pjob.print(); } catch (PrinterException e) {
+		 * error=e.toString(); } //
+		 */
 	}
 
-
-	public static void exportGuiView(DrawingSurfaceImpl g,int format, DataLayer model) {
+	public static void exportGuiView(DrawingSurfaceImpl g, int format,
+			DataLayer model) {
 		if (g.getComponentCount() == 0) {
 			return;
 		}
 
 		String filename = null;
 		if (CreateGui.getFile() != null) {
-			filename=CreateGui.getFile().getAbsolutePath();
+			filename = CreateGui.getFile().getAbsolutePath();
 			// change file extension
 			int dotpos = filename.lastIndexOf('.');
-			if (dotpos > filename.lastIndexOf(System.getProperty("file.separator"))) {
+			if (dotpos > filename.lastIndexOf(System
+					.getProperty("file.separator"))) {
 				// dot is for extension
-				filename = filename.substring(0,dotpos+1);
+				filename = filename.substring(0, dotpos + 1);
 				switch (format) {
-				case PNG:        
-					filename += "png"; 
+				case PNG:
+					filename += "png";
 					break;
-				case POSTSCRIPT: 
+				case POSTSCRIPT:
 					filename += "ps";
-					break;  
+					break;
 				case TIKZ:
 					filename += "tex";
 				}
@@ -168,46 +164,49 @@ public class Export {
 		try {
 			switch (format) {
 			case PNG:
-				filename = new FileBrowser("PNG image","png",filename).saveFile();
+				filename = new FileBrowser("PNG image", "png", filename)
+						.saveFile();
 				if (filename != null) {
 					toPNG(g, filename);
 				}
 				break;
 			case POSTSCRIPT:
-				filename = new FileBrowser("PostScript file","ps",filename).saveFile();
+				filename = new FileBrowser("PostScript file", "ps", filename)
+						.saveFile();
 				if (filename != null) {
 					toPostScript(g, filename);
 				}
 				break;
 			case PRINTER:
 				toPrinter(g);
-				break;  
+				break;
 			case TIKZ:
-				Object[] possibilities = {"Only the TikZ figure", "Full compilable LaTex including your figure"};
-				String figureOptions = (String)JOptionPane.showInputDialog(
-						CreateGui.getApp(),
-						"Choose how you would like your TikZ figure outputted: \n",
-						"Export to TikZ",
-						JOptionPane.PLAIN_MESSAGE,
-						null,
-						possibilities,
-						"Only the TikZ figure");
-				TikZExporter.TikZOutputOption tikZOption  = TikZExporter.TikZOutputOption.FIGURE_ONLY;
-				if(figureOptions == null)
+				Object[] possibilities = { "Only the TikZ figure",
+						"Full compilable LaTex including your figure" };
+				String figureOptions = (String) JOptionPane
+						.showInputDialog(
+								CreateGui.getApp(),
+								"Choose how you would like your TikZ figure outputted: \n",
+								"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
+								null, possibilities, "Only the TikZ figure");
+				TikZExporter.TikZOutputOption tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
+				if (figureOptions == null)
 					return;
 
-				if(figureOptions == possibilities[0])
+				if (figureOptions == possibilities[0])
 					tikZOption = TikZExporter.TikZOutputOption.FIGURE_ONLY;
-				if(figureOptions == possibilities[1])
+				if (figureOptions == possibilities[1])
 					tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
 
-				filename=new FileBrowser("TikZ figure","tex",filename).saveFile();
-				if (filename!=null) {
+				filename = new FileBrowser("TikZ figure", "tex", filename)
+						.saveFile();
+				if (filename != null) {
 					TikZExporter output;
-					if(!model.isUsingColors()){
-						output = new TikZExporter(model,filename,tikZOption);
-					}else{
-						output = new TikZExporterForColoredTAPN(model, filename, tikZOption);
+					if (!model.isUsingColors()) {
+						output = new TikZExporter(model, filename, tikZOption);
+					} else {
+						output = new TikZExporterForColoredTAPN(model,
+								filename, tikZOption);
 					}
 					output.ExportToTikZ();
 				}
@@ -216,8 +215,7 @@ public class Export {
 			// There was some problem with the action
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"There were errors performing the requested action:\n" + e,
-					"Error", JOptionPane.ERROR_MESSAGE
-			);
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 
 		resetViewAfterExport(g, gridEnabled);
@@ -225,8 +223,8 @@ public class Export {
 		return;
 	}
 
-
-	private static void resetViewAfterExport(DrawingSurfaceImpl g, boolean gridEnabled) {
+	private static void resetViewAfterExport(DrawingSurfaceImpl g,
+			boolean gridEnabled) {
 		if (gridEnabled) {
 			Grid.enableGrid();
 		}
@@ -234,8 +232,8 @@ public class Export {
 		g.repaint();
 	}
 
-
-	private static void setupViewForExport(DrawingSurfaceImpl g, boolean gridEnabled) {
+	private static void setupViewForExport(DrawingSurfaceImpl g,
+			boolean gridEnabled) {
 		// Stuff to make it export properly
 		g.updatePreferredSize();
 		PetriNetObject.ignoreSelection(true);
@@ -244,9 +242,9 @@ public class Export {
 		}
 	}
 
-	
-	public static void exportUppaalXMLFromQuery(DataLayer appModel, TAPNQuery input, String modelFile, String queryFile) {
-		File xmlfile=null, qfile=null;
+	public static void exportUppaalXMLFromQuery(DataLayer appModel,
+			TAPNQuery input, String modelFile, String queryFile) {
+		File xmlfile = null, qfile = null;
 		try {
 			xmlfile = new File(modelFile);
 			qfile = new File(queryFile);
@@ -255,17 +253,17 @@ public class Export {
 			e2.printStackTrace();
 			return;
 		}
-	
-		//Create transformer
+
+		// Create transformer
 		PipeTapnToAauTapnTransformer transformer = null;
 
-		if(appModel.isUsingColors()){
+		if (appModel.isUsingColors()) {
 			transformer = new ColoredPipeTapnToColoredAauTapnTransformer();
-		}else{
+		} else {
 			transformer = new PipeTapnToAauTapnTransformer();
 		}
 
-		TAPN model=null;
+		TAPN model = null;
 		try {
 			model = transformer.getAAUTAPN(appModel, 0);
 		} catch (Exception e) {
@@ -276,7 +274,6 @@ public class Export {
 			return;
 		}
 
-
 		int capacity;
 		capacity = input.getCapacity();
 		String inputQuery = input.getQuery();
@@ -284,97 +281,128 @@ public class Export {
 		SearchOption searchOption = input.getSearchOption();
 		String verifytaOptions = "";
 
-		if (traceOption == TraceOption.SOME){
+		if (traceOption == TraceOption.SOME) {
 			verifytaOptions = "-t0";
-		}else if (traceOption == TraceOption.FASTEST){
+		} else if (traceOption == TraceOption.FASTEST) {
 			verifytaOptions = "-t2";
-		}else if (traceOption == TraceOption.NONE){
+		} else if (traceOption == TraceOption.NONE) {
 			verifytaOptions = "";
 		}
 
-		if (searchOption == SearchOption.BFS){
+		if (searchOption == SearchOption.BFS) {
 			verifytaOptions += "-o0";
-		}else if (searchOption == SearchOption.DFS ){
+		} else if (searchOption == SearchOption.DFS) {
 			verifytaOptions += "-o1";
-		}else if (searchOption == SearchOption.RDFS ){
+		} else if (searchOption == SearchOption.RDFS) {
 			verifytaOptions += "-o2";
-		}else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST){
+		} else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST) {
 			verifytaOptions += "-o6";
 		}
 
-		if (inputQuery == null) {return;}
+		if (inputQuery == null) {
+			return;
+		}
 
-		// TODO: Refactor so translation to dk.aau.cs.petrinet.TAPNQuery happens exactly once
-		
+		// TODO: Refactor so translation to dk.aau.cs.petrinet.TAPNQuery happens
+		// exactly once
+
 		// Select the model based on selected export option.
-		if (input.getReductionOption() == ReductionOption.STANDARDSYMMETRY){
+		if (input.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
 
 			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
+				t
+						.autoTransform(model, new PrintStream(xmlfile),
+								new PrintStream(qfile),
+								new dk.aau.cs.petrinet.TAPNQuery(input
+										.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY){
+		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
 
 			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
+				t
+						.autoTransform(model, new PrintStream(xmlfile),
+								new PrintStream(qfile),
+								new dk.aau.cs.petrinet.TAPNQuery(input
+										.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD){
+		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
 			Logger.log("Using ADV_NOSYMQ");
 			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
 			try {
-				t.autoTransform(model, new PrintStream(xmlfile), new PrintStream(qfile), new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
+				t
+						.autoTransform(model, new PrintStream(xmlfile),
+								new PrintStream(qfile),
+								new dk.aau.cs.petrinet.TAPNQuery(input
+										.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}	
+			}
 
-
-		} else if(input.getReductionOption() == ReductionOption.BROADCAST || input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY){
+		} else if (input.getReductionOption() == ReductionOption.BROADCAST
+				|| input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY) {
 			BroadcastTranslation broadcastTransformer = null;
-			if(appModel.isUsingColors()){
-				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
-			}else{
-				broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
+			if (appModel.isUsingColors()) {
+				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation(
+						capacity,
+						input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
+			} else {
+				broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(
+						capacity,
+						input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
 			}
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+			try {
+				dk.aau.cs.TA.NTA nta = broadcastTransformer
+						.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer
+						.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input
+								.getProperty(), capacity + 1
+								+ model.getTokens().size()));
 				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else if(input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY || input.getReductionOption() == ReductionOption.DEGREE2BROADCAST){
+		} else if (input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY
+				|| input.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			Degree2BroadcastTranslation broadcastTransformer = null;
-			if(appModel.isUsingColors()){
-				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
-			}else{
-				broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+			if (appModel.isUsingColors()) {
+				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation(
+						capacity,
+						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+			} else {
+				broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(
+						capacity,
+						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			}
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+			try {
+				dk.aau.cs.TA.NTA nta = broadcastTransformer
+						.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer
+						.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input
+								.getProperty(), capacity + 1
+								+ model.getTokens().size()));
 				query.output(new PrintStream(qfile));
-			}catch(FileNotFoundException e){
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		else {
+		} else {
 
 			try {
 				model.convertToConservative();
@@ -391,13 +419,16 @@ public class Export {
 				e1.printStackTrace();
 			}
 
-
-
-			//Create uppaal xml file
+			// Create uppaal xml file
 			try {
-				StandardTranslation t2 = new StandardTranslation(model, new PrintStream(xmlfile), capacity);
+				StandardTranslation t2 = new StandardTranslation(model,
+						new PrintStream(xmlfile), capacity);
 				t2.transform();
-				t2.transformQueriesToUppaal(capacity, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), new PrintStream(qfile));
+				t2
+						.transformQueriesToUppaal(capacity,
+								new dk.aau.cs.petrinet.TAPNQuery(input
+										.getProperty(), 0), new PrintStream(
+										qfile));
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -406,5 +437,5 @@ public class Export {
 				e.printStackTrace();
 			}
 		}
-	}	
+	}
 }

@@ -28,55 +28,66 @@ public abstract class RunVerificationBase extends
 	private TimedArcPetriNetNetwork model;
 	private TAPNQuery query;
 	protected Messenger messenger;
-	
+
 	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
 	}
-	
-	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query){
+
+	public void execute(VerificationOptions options,
+			TimedArcPetriNetNetwork model, TAPNQuery query) {
 		this.model = model;
 		this.options = options;
 		this.query = query;
 		execute();
 	}
-	
+
 	@Override
 	protected VerificationResult<TapaalTrace> doInBackground() throws Exception {
 		TAPNComposer composer = new TAPNComposer();
-		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
-		
-		// TODO: Get rid of this step by changing the underlying translations etc.
+		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer
+				.transformModel(model);
+
+		// TODO: Get rid of this step by changing the underlying translations
+		// etc.
 		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
-		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
-		
-		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
+		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer
+				.transformModel(transformedModel.value1());
+
+		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query
+				.getTotalTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
-		
-		VerificationResult<TAPNTrace> result = modelChecker.verify(options, tapn, clonedQuery);
-		if(result.error()){
+
+		VerificationResult<TAPNTrace> result = modelChecker.verify(options,
+				tapn, clonedQuery);
+		if (result.error()) {
 			return new VerificationResult<TapaalTrace>(result.errorMessage());
-		}else{
-			return new VerificationResult<TapaalTrace>(result.getQueryResult(), decomposeTrace(result.getTrace(), transformedModel.value2()), result.verificationTime());
+		} else {
+			return new VerificationResult<TapaalTrace>(
+					result.getQueryResult(),
+					decomposeTrace(result.getTrace(), transformedModel.value2()),
+					result.verificationTime());
 		}
 	}
-	
+
 	private TapaalTrace decomposeTrace(TAPNTrace trace, NameMapping mapping) {
-		if(trace == null) return null;
-			
-		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model, mapping);
+		if (trace == null)
+			return null;
+
+		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model,
+				mapping);
 		return decomposer.decompose();
 	}
 
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
-		query.getProperty().accept(visitor,null);
+		query.getProperty().accept(visitor, null);
 	}
 
 	@Override
-	protected void done() {						
-		if(!isCancelled()){
+	protected void done() {
+		if (!isCancelled()) {
 			VerificationResult<TapaalTrace> result = null;
 			try {
 				result = get();
@@ -85,14 +96,17 @@ public abstract class RunVerificationBase extends
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			
+
 			showResult(result, result.verificationTime());
-		}else{
-			modelChecker.kill();			
-			messenger.displayInfoMessage("Verification was interupted by the user. No result found!",
-					"Verification Cancelled");
+		} else {
+			modelChecker.kill();
+			messenger
+					.displayInfoMessage(
+							"Verification was interupted by the user. No result found!",
+							"Verification Cancelled");
 		}
 	}
 
-	protected abstract void showResult(VerificationResult<TapaalTrace> result, long verificationTime);
+	protected abstract void showResult(VerificationResult<TapaalTrace> result,
+			long verificationTime);
 }

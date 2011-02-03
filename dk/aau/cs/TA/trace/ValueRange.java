@@ -7,51 +7,52 @@ public class ValueRange {
 	private BigDecimal lower = BigDecimal.ZERO;
 	private BigDecimal upper = new BigDecimal(Long.MAX_VALUE);
 	private boolean upperStrict = false;
-	
-	public ValueRange(){
-		
+
+	public ValueRange() {
+
 	}
-	
-	public ValueRange(boolean lowerStrict, BigDecimal lower, BigDecimal upper, boolean upperStrict){
+
+	public ValueRange(boolean lowerStrict, BigDecimal lower, BigDecimal upper,
+			boolean upperStrict) {
 		this.lowerStrict = lowerStrict;
 		this.lower = lower;
 		this.upper = upper;
-		this.upperStrict = upperStrict;	
+		this.upperStrict = upperStrict;
 	}
-	
-	public boolean hasExactValue(){
+
+	public boolean hasExactValue() {
 		return lower.equals(upper);
 	}
-	
-	public boolean lowerIncluded(){
+
+	public boolean lowerIncluded() {
 		return !lowerStrict;
 	}
-		
-	public BigDecimal lower(){
+
+	public BigDecimal lower() {
 		return lower;
 	}
-	
-	public BigDecimal upper(){
+
+	public BigDecimal upper() {
 		return upper;
 	}
-		
-	public boolean upperIncluded(){
+
+	public boolean upperIncluded() {
 		return !upperStrict;
 	}
-	
-	public void setLowerIncluded(boolean included){
+
+	public void setLowerIncluded(boolean included) {
 		lowerStrict = !included;
 	}
-	
-	public void setLower(BigDecimal lower){
+
+	public void setLower(BigDecimal lower) {
 		this.lower = lower;
 	}
-	
-	public void setUpper(BigDecimal upper){
+
+	public void setUpper(BigDecimal upper) {
 		this.upper = upper;
 	}
-	
-	public void setUpperIncluded(boolean included){
+
+	public void setUpperIncluded(boolean included) {
 		upperStrict = !included;
 	}
 }

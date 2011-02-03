@@ -17,73 +17,76 @@ import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.Transition;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
-All rights reserved.
+ All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of the <ORGANIZATION> nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of the <ORGANIZATION> nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
 public class NaiveDegree2Converter implements Degree2Converter {
 
 	public TAPN transform(TAPN model) throws Exception {
-		if(model.getInhibitorArcs().size() > 0) throw new Exception("Inhibitor arcs are not supported in this converter.");
+		if (model.getInhibitorArcs().size() > 0)
+			throw new Exception(
+					"Inhibitor arcs are not supported in this converter.");
 		HashMap<TAPNPlace, TAPNPlace> oldToNewPlacesMap = new HashMap<TAPNPlace, TAPNPlace>();
 
 		TAPN toReturn = new TAPN();
 
 		// Add all old places
-		for (Place p : model.getPlaces()){
-			TAPNPlace tmp = new TAPNPlace(p.getName(), ((TAPNPlace)p).getInvariant(), p.getCapacity());
+		for (Place p : model.getPlaces()) {
+			TAPNPlace tmp = new TAPNPlace(p.getName(), ((TAPNPlace) p)
+					.getInvariant(), p.getCapacity());
 
-			oldToNewPlacesMap.put((TAPNPlace)p, tmp);
+			oldToNewPlacesMap.put((TAPNPlace) p, tmp);
 			toReturn.addPlace(tmp);
 		}
 
-//		Create the P_lock place.
+		// Create the P_lock place.
 		TAPNPlace lock = new TAPNPlace("P_lock", "", 0);
-		toReturn.addPlace(lock);	
+		toReturn.addPlace(lock);
 
-		// Add a tonek to the lock place 
+		// Add a tonek to the lock place
 		toReturn.tokens.add(lock);
 
 		// Styling
 		toReturn.locations.put(lock, new Location(100, 10));
 
-
 		// For each transitions make the changes
-		for (Transition t : model.getTransitions()){
-			// Counter for new places names 
-			int j=0;
+		for (Transition t : model.getTransitions()) {
+			// Counter for new places names
+			int j = 0;
 
-			//List of normal arcs in the preset.
+			// List of normal arcs in the preset.
 			ArrayList<TAPNPlace> holdingplacesNormal = new ArrayList<TAPNPlace>();
 			ArrayList<TAPNPlace> holdingplacesTransport = new ArrayList<TAPNPlace>();
 
-			//List of normal arcs in the preset.
+			// List of normal arcs in the preset.
 			ArrayList<TAPNArc> presetNormalArcs = new ArrayList<TAPNArc>();
 
-			//List of Transarcs in the preset 
+			// List of Transarcs in the preset
 			ArrayList<TAPNTransportArc> presetTransportArcs = new ArrayList<TAPNTransportArc>();
 
-			// HashMap that telles where a transportArc is connected to, based on an holdingplace
+			// HashMap that telles where a transportArc is connected to, based
+			// on an holdingplace
 			HashMap<TAPNPlace, TAPNPlace> connectTo = new HashMap<TAPNPlace, TAPNPlace>();
 
-			//Put stuff in the lists
-			for (Arc a : t.getPreset()){
+			// Put stuff in the lists
+			for (Arc a : t.getPreset()) {
 
-				if (a instanceof TAPNTransportArc){
-					presetTransportArcs.add((TAPNTransportArc)a);
-				}else{
-					presetNormalArcs.add((TAPNArc)a);
+				if (a instanceof TAPNTransportArc) {
+					presetTransportArcs.add((TAPNTransportArc) a);
+				} else {
+					presetNormalArcs.add((TAPNArc) a);
 				}
 
 			}
 
-			//Some styling stuff
+			// Some styling stuff
 			float x, y;
 			float transitionSizeX = 80;
 			float transitionSizeY = 50;
@@ -96,310 +99,357 @@ public class NaiveDegree2Converter implements Degree2Converter {
 			int sizeOfPreset = t.getPreset().size();
 
 			// Ajust the start location
-			x = x - (transitionSizeX * (sizeOfPreset/2)); 
-			y = y-transitionSizeY;
+			x = x - (transitionSizeX * (sizeOfPreset / 2));
+			y = y - transitionSizeY;
 
-			//List of normal Arcs in the postset
+			// List of normal Arcs in the postset
 			ArrayList<Arc> postsetNormalArcs = new ArrayList<Arc>();
 
-			for (Arc a:t.getPostset()){
-				if (!(a instanceof TAPNTransportArc)){ // If not a transport arc
+			for (Arc a : t.getPostset()) {
+				if (!(a instanceof TAPNTransportArc)) { // If not a transport
+														// arc
 					postsetNormalArcs.add(a);
 				}
 			}
-			Collections.reverse(postsetNormalArcs); // Revers the list of these places
+			Collections.reverse(postsetNormalArcs); // Revers the list of these
+													// places
 
 			//
 			// START THE REDUCTION
 			//
 
-			//Setup 
+			// Setup
 			TAPNPlace imPlace = null;
-			TAPNTransition lastTransition= null;
+			TAPNTransition lastTransition = null;
 			TAPNPlace holdingplace = null;
 
-			int i=0;
+			int i = 0;
 
-//			If there are any transfortarcs
-			if (presetTransportArcs.size() > 0){
+			// If there are any transfortarcs
+			if (presetTransportArcs.size() > 0) {
 
 				lastTransition = new TAPNTransition(t.getName() + "_T0");
 				toReturn.addTransition(lastTransition);
-				//Style the place
+				// Style the place
 				toReturn.locations.put(lastTransition, new Location(x, y));
 
 				toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
-//				Special attension if the preset only has cone
-				if (t.preset.size() == 1){
+				// Special attension if the preset only has cone
+				if (t.preset.size() == 1) {
 
 					toReturn.add(new Arc(lastTransition, lock));
 
-					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap.get(presetTransportArcs.get(0).getSource()), 
-							lastTransition, 
-							oldToNewPlacesMap.get(t.getPostset().get(0).getTarget()),
-							((TAPNArc)t.getPreset().get(0)).getGuard()
-					)
+					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap
+							.get(presetTransportArcs.get(0).getSource()),
+							lastTransition, oldToNewPlacesMap.get(t
+									.getPostset().get(0).getTarget()),
+							((TAPNArc) t.getPreset().get(0)).getGuard())
 
-					);				
+					);
 					continue;
 				}
 
-
-
-				holdingplace = new TAPNPlace(t.getName() +"_hp_0","",0);
+				holdingplace = new TAPNPlace(t.getName() + "_hp_0", "", 0);
 				toReturn.addPlace(holdingplace);
 
-//				//Do some styling of the places 
-				toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
+				// //Do some styling of the places
+				toReturn.locations.put(holdingplace, new Location(x, y
+						+ transitionSizeY));
 				x = x + transitionSizeX;
 
 				holdingplacesTransport.add(holdingplace);
 
-				toReturn.add(new TAPNTransportArc(
-						oldToNewPlacesMap.get(presetTransportArcs.get(0).getSource()), 
-						lastTransition, 
-						holdingplace,
-						((TAPNArc)presetTransportArcs.get(0)).getGuard()
-				));
+				toReturn.add(new TAPNTransportArc(oldToNewPlacesMap
+						.get(presetTransportArcs.get(0).getSource()),
+						lastTransition, holdingplace,
+						((TAPNArc) presetTransportArcs.get(0)).getGuard()));
 
-				connectTo.put(holdingplace, oldToNewPlacesMap.get(presetTransportArcs.get(0).getTarget()));
+				connectTo.put(holdingplace, oldToNewPlacesMap
+						.get(presetTransportArcs.get(0).getTarget()));
 
-				for (i=1;i<presetTransportArcs.size();i++){
+				for (i = 1; i < presetTransportArcs.size(); i++) {
 					j++;
 					TAPNPlace orgplace = presetTransportArcs.get(i).getSource();
 
-					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
+					TAPNTransition newtrans = new TAPNTransition(t.getName()
+							+ "_T" + j);
 					toReturn.addTransition(newtrans);
 
-					//Special handling if it is the last arc and there are no 
+					// Special handling if it is the last arc and there are no
 					// arcs in the normal preset
-					if (i==presetTransportArcs.size()-1 && postsetNormalArcs.size() == 0){
-						holdingplace = oldToNewPlacesMap.get(presetTransportArcs.get(i).getTarget());
+					if (i == presetTransportArcs.size() - 1
+							&& postsetNormalArcs.size() == 0) {
+						holdingplace = oldToNewPlacesMap
+								.get(presetTransportArcs.get(i).getTarget());
 					} else {
-						holdingplace = new TAPNPlace(t.getName() + "_hp"+j, "",0);
+						holdingplace = new TAPNPlace(t.getName() + "_hp" + j,
+								"", 0);
 						toReturn.addPlace(holdingplace);
 						holdingplacesTransport.add(holdingplace);
 					}
 
-					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap.get(orgplace), newtrans, holdingplace, presetTransportArcs.get(i).getGuard()));
-					connectTo.put(holdingplace, oldToNewPlacesMap.get(presetTransportArcs.get(i).getTarget()));
+					toReturn.add(new TAPNTransportArc(oldToNewPlacesMap
+							.get(orgplace), newtrans, holdingplace,
+							presetTransportArcs.get(i).getGuard()));
+					connectTo.put(holdingplace, oldToNewPlacesMap
+							.get(presetTransportArcs.get(i).getTarget()));
 
-					//The im places
-					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
+					// The im places
+					imPlace = new TAPNPlace(t.getName() + "_im" + j, "<=0", 0);
 					toReturn.addPlace(imPlace);
-					toReturn.add(new Arc(lastTransition,imPlace));
-					toReturn.add(new TAPNArc(imPlace, newtrans,""));
+					toReturn.add(new Arc(lastTransition, imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
-					lastTransition=newtrans;
+					lastTransition = newtrans;
 
-					//Do some styling of the places 
+					// Do some styling of the places
 
 					toReturn.locations.put(lastTransition, new Location(x, y));
-					toReturn.locations.put(holdingplace, new Location(x, y + transitionSizeY));
-					toReturn.locations.put(imPlace, new Location(x - transitionSizeX/2, y));
+					toReturn.locations.put(holdingplace, new Location(x, y
+							+ transitionSizeY));
+					toReturn.locations.put(imPlace, new Location(x
+							- transitionSizeX / 2, y));
 
 					x = x + transitionSizeX;
 
 				}
 
-
 			} else {
-				//No transport arcs setup for normal arcs
+				// No transport arcs setup for normal arcs
 				lastTransition = new TAPNTransition(t.getName() + "_T0");
 				toReturn.addTransition(lastTransition);
 				toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
-				//Styling
+				// Styling
 				toReturn.locations.put(lastTransition, new Location(x, y));
 
-				//Special attension if the preset only has cone
-				if (t.preset.size() == 1){
+				// Special attension if the preset only has cone
+				if (t.preset.size() == 1) {
 
 					toReturn.add(new Arc(lastTransition, lock));
 
-					toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
-					toReturn.add(new Arc(lastTransition, oldToNewPlacesMap.get(t.getPostset().get(0).getTarget())));
+					toReturn
+							.add(new TAPNArc(oldToNewPlacesMap
+									.get(presetNormalArcs.get(0).getSource()),
+									lastTransition, presetNormalArcs.get(0)
+											.getGuard()));
+					toReturn.add(new Arc(lastTransition, oldToNewPlacesMap
+							.get(t.getPostset().get(0).getTarget())));
 					continue;
 				}
 
-
-
-
-				holdingplace = new TAPNPlace(t.getName() +"_hp_0","",0);
+				holdingplace = new TAPNPlace(t.getName() + "_hp_0", "", 0);
 				toReturn.addPlace(holdingplace);
 
-//				//Do some styling of the places 
+				// //Do some styling of the places
 
-				toReturn.locations.put(holdingplace, new Location(x, y+transitionSizeY));
-				x=x+transitionSizeX;
+				toReturn.locations.put(holdingplace, new Location(x, y
+						+ transitionSizeY));
+				x = x + transitionSizeX;
 
 				holdingplacesNormal.add(holdingplace);
-				toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs.get(0).getSource()), lastTransition, presetNormalArcs.get(0).getGuard()));
+				toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs
+						.get(0).getSource()), lastTransition, presetNormalArcs
+						.get(0).getGuard()));
 				toReturn.add(new Arc(lastTransition, holdingplace));
 
 			}
 
 			// If there are any normal arcs?
-			if (presetNormalArcs.size() > 0){
+			if (presetNormalArcs.size() > 0) {
 
-				if (presetTransportArcs.size() == 0){ // Have we no transport arcs we need can skip the first place, as this is done
-					i=1;
-				}else {
-					i=0;
+				if (presetTransportArcs.size() == 0) { // Have we no transport
+														// arcs we need can skip
+														// the first place, as
+														// this is done
+					i = 1;
+				} else {
+					i = 0;
 				}
 
-				for (; i < presetNormalArcs.size()-1;i++){
+				for (; i < presetNormalArcs.size() - 1; i++) {
 					j++;
 
-					TAPNPlace orgplace = oldToNewPlacesMap.get(presetNormalArcs.get(i).getSource());
+					TAPNPlace orgplace = oldToNewPlacesMap.get(presetNormalArcs
+							.get(i).getSource());
 
-					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
+					TAPNTransition newtrans = new TAPNTransition(t.getName()
+							+ "_T" + j);
 					toReturn.addTransition(newtrans);
 
-
-					holdingplace = new TAPNPlace(t.getName() + "_hp"+j, "",0);
+					holdingplace = new TAPNPlace(t.getName() + "_hp" + j, "", 0);
 					toReturn.addPlace(holdingplace);
 					holdingplacesNormal.add(holdingplace);
 
-					toReturn.add(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
+					toReturn.add(new TAPNArc(orgplace, newtrans,
+							presetNormalArcs.get(i).getGuard()));
 					toReturn.add(new Arc(newtrans, holdingplace));
 
-					//The im places
-					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
+					// The im places
+					imPlace = new TAPNPlace(t.getName() + "_im" + j, "<=0", 0);
 					toReturn.addPlace(imPlace);
-					toReturn.add(new Arc(lastTransition,imPlace));
+					toReturn.add(new Arc(lastTransition, imPlace));
 					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
-					lastTransition=newtrans;
+					lastTransition = newtrans;
 
-//					Do some styling of the places 
-					toReturn.locations.put(lastTransition, new Location(x,y));
-					toReturn.locations.put(holdingplace, new Location(x,y+transitionSizeY));
-					toReturn.locations.put(imPlace, new Location(x-transitionSizeX/2,y));
+					// Do some styling of the places
+					toReturn.locations.put(lastTransition, new Location(x, y));
+					toReturn.locations.put(holdingplace, new Location(x, y
+							+ transitionSizeY));
+					toReturn.locations.put(imPlace, new Location(x
+							- transitionSizeX / 2, y));
 
-					x= x+transitionSizeX;
-
+					x = x + transitionSizeX;
 
 				}
 
-				// XXX - hacked 
-				//If the loop dit not run once i will be 1, so we need to set i to 2
-				/*if (i==1){
-				i=2;
-			}*/
+				// XXX - hacked
+				// If the loop dit not run once i will be 1, so we need to set i
+				// to 2
+				/*
+				 * if (i==1){ i=2; }
+				 */
 				TAPNPlace orgplace;
 				TAPNTransition newtrans;
 
-//				Reverse list of holdingplaces
+				// Reverse list of holdingplaces
 				Collections.reverse(holdingplacesNormal);
 
-				/*	if (i > 0){
-				--i;
-			}*/
-				orgplace = oldToNewPlacesMap.get(presetNormalArcs.get(i).getSource());
+				/*
+				 * if (i > 0){ --i; }
+				 */
+				orgplace = oldToNewPlacesMap.get(presetNormalArcs.get(i)
+						.getSource());
 				j++;
-				newtrans = new TAPNTransition(t.getName() + "_T"+j);
+				newtrans = new TAPNTransition(t.getName() + "_T" + j);
 				toReturn.addTransition(newtrans);
 
-				holdingplace = oldToNewPlacesMap.get(postsetNormalArcs.get(0).getTarget());
+				holdingplace = oldToNewPlacesMap.get(postsetNormalArcs.get(0)
+						.getTarget());
 
-				toReturn.add(new TAPNArc(orgplace, newtrans,presetNormalArcs.get(i).getGuard()));
+				toReturn.add(new TAPNArc(orgplace, newtrans, presetNormalArcs
+						.get(i).getGuard()));
 				toReturn.add(new Arc(newtrans, holdingplace));
 
-				//The im places
-				imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
+				// The im places
+				imPlace = new TAPNPlace(t.getName() + "_im" + j, "<=0", 0);
 				toReturn.addPlace(imPlace);
-				toReturn.add(new Arc(lastTransition,imPlace));
+				toReturn.add(new Arc(lastTransition, imPlace));
 				toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
-				lastTransition=newtrans;
+				lastTransition = newtrans;
 
-//				Do some styling of the places 
-				toReturn.locations.put(lastTransition, new Location(x, y+transitionSizeY));
-				toReturn.locations.put(imPlace, new Location(x-transitionSizeX/2,y));
+				// Do some styling of the places
+				toReturn.locations.put(lastTransition, new Location(x, y
+						+ transitionSizeY));
+				toReturn.locations.put(imPlace, new Location(x
+						- transitionSizeX / 2, y));
 
-				//Go backwared to each holdingplaces
-				for (i=0;i<holdingplacesNormal.size();i++){ // One holding place is skiped as we use and direct connection above
+				// Go backwared to each holdingplaces
+				for (i = 0; i < holdingplacesNormal.size(); i++) { // One
+																	// holding
+																	// place is
+																	// skiped as
+																	// we use
+																	// and
+																	// direct
+																	// connection
+																	// above
 					j++;
 					holdingplace = holdingplacesNormal.get(i);
-					orgplace = oldToNewPlacesMap.get(postsetNormalArcs.get(i+1).getTarget()); // Use 1 one as we have connected place 0 above
+					orgplace = oldToNewPlacesMap.get(postsetNormalArcs.get(
+							i + 1).getTarget()); // Use 1 one as we have
+													// connected place 0 above
 
-					newtrans = new TAPNTransition(t.getName() + "_T"+j);
+					newtrans = new TAPNTransition(t.getName() + "_T" + j);
 					toReturn.addTransition(newtrans);
 
-					toReturn.add(new TAPNArc(holdingplace, newtrans,""));
+					toReturn.add(new TAPNArc(holdingplace, newtrans, ""));
 					toReturn.add(new Arc(newtrans, orgplace));
 
-					//The im places
-					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
+					// The im places
+					imPlace = new TAPNPlace(t.getName() + "_im" + j, "<=0", 0);
 					toReturn.addPlace(imPlace);
-					toReturn.add(new Arc(lastTransition,imPlace));
-					toReturn.add(new TAPNArc(imPlace, newtrans,""));
+					toReturn.add(new Arc(lastTransition, imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
-					lastTransition=newtrans;
+					lastTransition = newtrans;
 
-					//Do some styling of the places 
-					toReturn.locations.put(lastTransition, toReturn.locations.get(holdingplace).yadd(transitionSizeY));
-					toReturn.locations.put(imPlace, toReturn.locations.get(holdingplace).xyadd(transitionSizeX/2,transitionSizeY));
+					// Do some styling of the places
+					toReturn.locations.put(lastTransition, toReturn.locations
+							.get(holdingplace).yadd(transitionSizeY));
+					toReturn.locations.put(imPlace, toReturn.locations.get(
+							holdingplace).xyadd(transitionSizeX / 2,
+							transitionSizeY));
 
 				}
 			}
 
 			int sizeOfpresetTransportArcs = presetTransportArcs.size();
 
-			i=0;
-			if (sizeOfpresetTransportArcs > 0){
+			i = 0;
+			if (sizeOfpresetTransportArcs > 0) {
 
-				if (presetNormalArcs.size() == 0){
-					sizeOfpresetTransportArcs=sizeOfpresetTransportArcs-1; // We have already handled the last
+				if (presetNormalArcs.size() == 0) {
+					sizeOfpresetTransportArcs = sizeOfpresetTransportArcs - 1; // We
+																				// have
+																				// already
+																				// handled
+																				// the
+																				// last
 				}
 
 				Collections.reverse(holdingplacesTransport);
 
-				for (i=0;i<sizeOfpresetTransportArcs;i++){
+				for (i = 0; i < sizeOfpresetTransportArcs; i++) {
 					j++;
-
 
 					holdingplace = holdingplacesTransport.get(i);
 					TAPNPlace target = connectTo.get(holdingplace);
 
-					TAPNTransition newtrans = new TAPNTransition(t.getName() + "_T"+j);
+					TAPNTransition newtrans = new TAPNTransition(t.getName()
+							+ "_T" + j);
 					toReturn.addTransition(newtrans);
 
-					toReturn.add(new TAPNTransportArc(holdingplace, newtrans,target));
+					toReturn.add(new TAPNTransportArc(holdingplace, newtrans,
+							target));
 
-					//The im places
-					imPlace = new TAPNPlace(t.getName()+"_im"+j,"<=0",0);
+					// The im places
+					imPlace = new TAPNPlace(t.getName() + "_im" + j, "<=0", 0);
 					toReturn.addPlace(imPlace);
-					toReturn.add(new Arc(lastTransition,imPlace));
-					toReturn.add(new TAPNArc(imPlace, newtrans,""));
-					lastTransition=newtrans;
+					toReturn.add(new Arc(lastTransition, imPlace));
+					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
+					lastTransition = newtrans;
 
-//					Do some styling of the places 
-					toReturn.locations.put(lastTransition, toReturn.locations.get(holdingplace).yadd(transitionSizeY));
-					toReturn.locations.put(imPlace, toReturn.locations.get(holdingplace).xyadd(transitionSizeX/2, transitionSizeY));
+					// Do some styling of the places
+					toReturn.locations.put(lastTransition, toReturn.locations
+							.get(holdingplace).yadd(transitionSizeY));
+					toReturn.locations.put(imPlace, toReturn.locations.get(
+							holdingplace).xyadd(transitionSizeX / 2,
+							transitionSizeY));
 
 				}
 
 			}
-			toReturn.add(new Arc(lastTransition,lock));
-
+			toReturn.add(new Arc(lastTransition, lock));
 
 		}
 
-
-		// Move tokesn 
-		for (Place p : model.tokens){
+		// Move tokesn
+		for (Place p : model.tokens) {
 			toReturn.tokens.add(oldToNewPlacesMap.get(p));
 		}
 
 		// Do Grafical stuff
-		for (Map.Entry<TAPNPlace, TAPNPlace> entry : oldToNewPlacesMap.entrySet()){
+		for (Map.Entry<TAPNPlace, TAPNPlace> entry : oldToNewPlacesMap
+				.entrySet()) {
 			// XXX - Unsafe cast but ok by assumption
-			toReturn.addLocation(entry.getValue(), model.locations.get(entry.getKey()));
-		}		
-		
+			toReturn.addLocation(entry.getValue(), model.locations.get(entry
+					.getKey()));
+		}
+
 		return toReturn;
 	}
 

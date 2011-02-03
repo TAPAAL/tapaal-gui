@@ -13,33 +13,33 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
-public class KBoundAnalyzer 
-{
+public class KBoundAnalyzer {
 	protected TimedArcPetriNetNetwork tapnNetwork;
 	protected int k;
 
 	private ModelChecker modelChecker;
 	private Messenger messenger;
 
-	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k, ModelChecker modelChecker, Messenger messenger)
-	{
+	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k,
+			ModelChecker modelChecker, Messenger messenger) {
 		this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
 	}
 
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker, Messenger messenger) {
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker,
+			Messenger messenger) {
 		return new RunKBoundAnalysis(modelChecker, messenger);
 	}
 
-	public void analyze()
-	{
+	public void analyze() {
 		TAPNQuery query = getBoundednessQuery(tapnNetwork.marking().size());
 		VerifytaOptions options = verificationOptions();
 
 		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker, messenger);
-		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());	
+		RunningVerificationDialog dialog = new RunningVerificationDialog(
+				CreateGui.getApp());
 		dialog.setupListeners(analyzer);
 
 		analyzer.execute(options, tapnNetwork, query);
@@ -47,16 +47,15 @@ public class KBoundAnalyzer
 	}
 
 	protected VerifytaOptions verificationOptions() {
-		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS);
+		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false,
+				ReductionOption.KBOUNDANALYSIS);
 	}
 
 	protected TAPNQuery getBoundednessQuery(int tokensInModel) {
 		TCTLAbstractProperty property = null;
 
-		property = new TCTLEFNode(
-				new TCTLAtomicPropositionNode("P_capacity", "=", 0)
-		);		
-
+		property = new TCTLEFNode(new TCTLAtomicPropositionNode("P_capacity",
+				"=", 0));
 
 		return new TAPNQuery(property, k + 1 + tokensInModel);
 	}

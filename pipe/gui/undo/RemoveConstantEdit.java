@@ -9,12 +9,12 @@ public class RemoveConstantEdit extends Command {
 
 	private Constant constant;
 	private ConstantStore store;
-	
-	public RemoveConstantEdit(Constant constant, ConstantStore store){
+
+	public RemoveConstantEdit(Constant constant, ConstantStore store) {
 		this.constant = constant;
 		this.store = store;
 	}
-	
+
 	@Override
 	public void redo() {
 		store.remove(constant);

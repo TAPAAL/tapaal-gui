@@ -8,8 +8,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class AddTimedOutputArcCommand extends AddTAPNElementCommand {
 	private final TimedOutputArcComponent outputArc;
 
-	public AddTimedOutputArcCommand(TimedOutputArcComponent outputArc, TimedArcPetriNet tapn, DataLayer guiModel,
-			DrawingSurfaceImpl view) {
+	public AddTimedOutputArcCommand(TimedOutputArcComponent outputArc,
+			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		// TODO Auto-generated constructor stub
 		this.outputArc = outputArc;
@@ -20,7 +20,7 @@ public class AddTimedOutputArcCommand extends AddTAPNElementCommand {
 		outputArc.delete();
 		view.repaint();
 	}
-	
+
 	@Override
 	public void redo() {
 		outputArc.undelete(view);

@@ -2,7 +2,6 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-
 public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	private TCTLAbstractStateProperty property;
@@ -16,12 +15,10 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 		return property;
 	}
 
-
 	public TCTLAGNode(TCTLAbstractStateProperty property) {
 		this.property = property;
 		this.property.setParent(this);
 	}
-
 
 	public TCTLAGNode() {
 		this.property = new TCTLStatePlaceHolder();
@@ -44,11 +41,10 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 		return children;
 	}
 
-
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof TCTLAGNode) {
-			TCTLAGNode node = (TCTLAGNode)o;
+		if (o instanceof TCTLAGNode) {
+			TCTLAGNode node = (TCTLAGNode) o;
 			return property.equals(node.getProperty());
 		}
 		return false;
@@ -56,7 +52,8 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public String toString() {
-		String s = property.isSimpleProperty() ? property.toString() : "(" + property.toString() + ")";
+		String s = property.isSimpleProperty() ? property.toString() : "("
+				+ property.toString() + ")";
 		return "AG " + s;
 	}
 
@@ -66,24 +63,21 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 	}
 
 	@Override
-	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
+	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1,
+			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
-			return (TCTLAbstractPathProperty)object2;
+			return (TCTLAbstractPathProperty) object2;
 		} else {
 			property = property.replace(object1, object2);
 			return this;
 		}
 	}
 
-
-
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
 
 	}
-
-
 
 	@Override
 	public boolean containsPlaceHolder() {
@@ -94,7 +88,7 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
-	
+
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();

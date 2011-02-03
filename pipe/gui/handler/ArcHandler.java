@@ -27,23 +27,19 @@ import pipe.gui.action.SplitArcAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.OutputValueEditorPanel;
 
-
 /**
  * Class used to implement methods corresponding to mouse events on arcs.
  */
-public class ArcHandler 
-extends PetriNetObjectHandler {
-
+public class ArcHandler extends PetriNetObjectHandler {
 
 	public ArcHandler(Container contentpane, Arc obj) {
 		super(contentpane, obj);
 		enablePopup = true;
 	}
 
-
-	/** 
-	 * Creates the popup menu that the user will see when they right click on a 
-	 * component 
+	/**
+	 * Creates the popup menu that the user will see when they right click on a
+	 * component
 	 */
 	@Override
 	public JPopupMenu getPopup(MouseEvent e) {
@@ -53,32 +49,35 @@ extends PetriNetObjectHandler {
 
 		if (myObject instanceof InhibitorArc) {
 			menuItem = new JMenuItem(new EditWeightAction(contentPane,
-					(Arc)myObject));
+					(Arc) myObject));
 			menuItem.setText("Edit Weight");
 			popup.insert(menuItem, popupIndex++);
 
-			menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
-					e.getPoint()));
+			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
+					.getPoint()));
 			menuItem.setText("Split Arc Segment");
 			popup.insert(menuItem, popupIndex++);
 
-			popup.insert(new JPopupMenu.Separator(), popupIndex++);         
-			/*CB Joakim Byg - timed arcs should not be handled here*/         
-		} else if (myObject instanceof TimedOutputArcComponent && !(myObject instanceof TimedInputArcComponent) && !(myObject instanceof TransportArcComponent)) {
-			/*EOC*/
-			if(CreateGui.getModel().isUsingColors() && myObject instanceof ColoredOutputArc){
-				menuItem = new JMenuItem();            
+			popup.insert(new JPopupMenu.Separator(), popupIndex++);
+			/* CB Joakim Byg - timed arcs should not be handled here */
+		} else if (myObject instanceof TimedOutputArcComponent
+				&& !(myObject instanceof TimedInputArcComponent)
+				&& !(myObject instanceof TransportArcComponent)) {
+			/* EOC */
+			if (CreateGui.getModel().isUsingColors()
+					&& myObject instanceof ColoredOutputArc) {
+				menuItem = new JMenuItem();
 				menuItem.setText("Properties");
-				menuItem.addActionListener(new ActionListener(){
+				menuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						showOutputValueEditor((ColoredOutputArc)myObject);
+						showOutputValueEditor((ColoredOutputArc) myObject);
 					}
-				}); 
+				});
 				popup.insert(menuItem, popupIndex++);
 			}
 
-			menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, 
-					e.getPoint()));            
+			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
+					.getPoint()));
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 
@@ -87,26 +86,26 @@ extends PetriNetObjectHandler {
 		return popup;
 	}
 
-
 	@Override
 	public void mousePressed(MouseEvent e) {
 		super.mousePressed(e);
-		if (CreateGui.getApp().isEditionAllowed() == false){
+		if (CreateGui.getApp().isEditionAllowed() == false) {
 			return;
-		}      
-		if (e.getClickCount() == 2){
-			Arc arc = (Arc)myObject;
-			if (e.isControlDown()){
+		}
+		if (e.getClickCount() == 2) {
+			Arc arc = (Arc) myObject;
+			if (e.isControlDown()) {
 				CreateGui.getView().getUndoManager().addNewEdit(
 						arc.getArcPath().insertPoint(
-								new Point2D.Float(arc.getX() + e.getX(), 
-										arc.getY() + e.getY()), e.isAltDown()));
+								new Point2D.Float(arc.getX() + e.getX(), arc
+										.getY()
+										+ e.getY()), e.isAltDown()));
 			} else {
-				if(CreateGui.getModel().isUsingColors()){
-					if(arc instanceof ColoredOutputArc){
-						showOutputValueEditor((ColoredOutputArc)arc);
+				if (CreateGui.getModel().isUsingColors()) {
+					if (arc instanceof ColoredOutputArc) {
+						showOutputValueEditor((ColoredOutputArc) arc);
 					}
-				}else{
+				} else {
 					arc.getSource().select();
 					arc.getTarget().select();
 					justSelected = true;
@@ -115,20 +114,21 @@ extends PetriNetObjectHandler {
 		}
 	}
 
-
 	private void showOutputValueEditor(ColoredOutputArc arc) {
-		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
+				Pipe.TOOL + " " + Pipe.VERSION, true);
 
 		Container contentPane = guiDialog.getContentPane();
 
 		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add( new OutputValueEditorPanel(guiDialog.getRootPane(), arc, CreateGui.getCurrentTab().network(), CreateGui.getView().getUndoManager()));
+		contentPane.add(new OutputValueEditorPanel(guiDialog.getRootPane(),
+				arc, CreateGui.getCurrentTab().network(), CreateGui.getView()
+						.getUndoManager()));
 
-		guiDialog.setResizable(false);     
+		guiDialog.setResizable(false);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
@@ -138,80 +138,68 @@ extends PetriNetObjectHandler {
 		guiDialog.setVisible(true);
 	}
 
-
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		switch (CreateGui.getApp().getMode()) {
 		case Pipe.SELECT:
-			if (!isDragging){
+			if (!isDragging) {
 				break;
 			}
-			Arc currentObject = (Arc)myObject;
+			Arc currentObject = (Arc) myObject;
 			Point oldLocation = currentObject.getLocation();
 			// Calculate translation in mouse
 			int transX = (Grid.getModifiedX(e.getX() - dragInit.x));
 			int transY = (Grid.getModifiedY(e.getY() - dragInit.y));
-			((DrawingSurfaceImpl)contentPane).getSelectionObject().translateSelection(
-					transX, transY);
+			((DrawingSurfaceImpl) contentPane).getSelectionObject()
+					.translateSelection(transX, transY);
 			dragInit.translate(
 					-(currentObject.getLocation().x - oldLocation.x - transX),
 					-(currentObject.getLocation().y - oldLocation.y - transY));
 		}
 	}
 
-
 	@Override
-	public void mouseWheelMoved (MouseWheelEvent e) {
+	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (CreateGui.getApp().isEditionAllowed() == false){
+		if (CreateGui.getApp().isEditionAllowed() == false) {
 			return;
 		}
 
-		Arc arc = ((Arc)myObject);
-		if (arc instanceof TimedOutputArcComponent){
+		Arc arc = ((Arc) myObject);
+		if (arc instanceof TimedOutputArcComponent) {
 
-			//         if (e.isControlDown()) {
-			//            if (arc.getWeight() == 1) {
-			//               if (((NormalArc)arc).hasInvisibleInverse()) {
-			//                  if (arc.getSource() instanceof Place){
-			//                     if (e.isShiftDown()) {
-			//                        arc = ((NormalArc)arc).getInverse();
-			//                     }
-			//                  } else {
-			//                     if (!e.isShiftDown()) {
-			//                        arc = ((NormalArc)arc).getInverse();
-			//                     }
-			//                  }
-			//               }
-			//               CreateGui.getView().getUndoManager().addNewEdit(
-			//                       ((NormalArc)arc).setTagged(!((NormalArc)arc).isTagged()));
-			//            }
-			//            return;
-			//         }
-			/*   
-         if (((NormalArc)arc).hasInvisibleInverse()) {
-            if (arc.getSource() instanceof Place){
-               if (e.isShiftDown()) {
-                  arc = ((NormalArc)arc).getInverse();                  
-               }
-            } else {
-               if (!e.isShiftDown()) {
-                  arc = ((NormalArc)arc).getInverse();                  
-               }
-            }
-         }*/
-		}      
+			// if (e.isControlDown()) {
+			// if (arc.getWeight() == 1) {
+			// if (((NormalArc)arc).hasInvisibleInverse()) {
+			// if (arc.getSource() instanceof Place){
+			// if (e.isShiftDown()) {
+			// arc = ((NormalArc)arc).getInverse();
+			// }
+			// } else {
+			// if (!e.isShiftDown()) {
+			// arc = ((NormalArc)arc).getInverse();
+			// }
+			// }
+			// }
+			// CreateGui.getView().getUndoManager().addNewEdit(
+			// ((NormalArc)arc).setTagged(!((NormalArc)arc).isTagged()));
+			// }
+			// return;
+			// }
+			/*
+			 * if (((NormalArc)arc).hasInvisibleInverse()) { if (arc.getSource()
+			 * instanceof Place){ if (e.isShiftDown()) { arc =
+			 * ((NormalArc)arc).getInverse(); } } else { if (!e.isShiftDown()) {
+			 * arc = ((NormalArc)arc).getInverse(); } } }
+			 */
+		}
 		/*
-      int oldWeight = arc.getWeight();
-      int newWeight = oldWeight - e.getWheelRotation();
-      if (newWeight < 1) {
-         newWeight = 1;
-      }
-      if (newWeight != oldWeight) {
-         CreateGui.getView().getUndoManager().addNewEdit(
-               arc.setWeight(newWeight));
-         arc.repaint();
-      }*/
+		 * int oldWeight = arc.getWeight(); int newWeight = oldWeight -
+		 * e.getWheelRotation(); if (newWeight < 1) { newWeight = 1; } if
+		 * (newWeight != oldWeight) {
+		 * CreateGui.getView().getUndoManager().addNewEdit(
+		 * arc.setWeight(newWeight)); arc.repaint(); }
+		 */
 	}
 
 }

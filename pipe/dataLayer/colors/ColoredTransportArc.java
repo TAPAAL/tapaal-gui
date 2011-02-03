@@ -9,7 +9,6 @@ import pipe.gui.undo.ColoredTransportArcTimeGuardEdit;
 import pipe.gui.undo.ColoredTransportArcUpdateValueEdit;
 import dk.aau.cs.gui.undo.Command;
 
-
 public class ColoredTransportArc extends TransportArcComponent {
 
 	private ColorSet colorGuard;
@@ -28,7 +27,8 @@ public class ColoredTransportArc extends TransportArcComponent {
 		initialize();
 	}
 
-	public ColoredTransportArc(TimedInputArcComponent timedArc, int group, boolean isInPreset){
+	public ColoredTransportArc(TimedInputArcComponent timedArc, int group,
+			boolean isInPreset) {
 		super(timedArc, group, isInPreset);
 		initialize();
 	}
@@ -54,24 +54,24 @@ public class ColoredTransportArc extends TransportArcComponent {
 	}
 
 	private ColoredTimedPlace getTargetPlace() {
-		if(getTarget() instanceof ColoredTimedPlace)
-			return (ColoredTimedPlace)getTarget();
-		else{
-			return (ColoredTimedPlace)getConnectedTo().getTarget();
+		if (getTarget() instanceof ColoredTimedPlace)
+			return (ColoredTimedPlace) getTarget();
+		else {
+			return (ColoredTimedPlace) getConnectedTo().getTarget();
 		}
 	}
 
-	public String getOutputString(){
+	public String getOutputString() {
 		return "val := " + outputValue.toString(displayValues);
 	}
 
 	@Override
-	public void updateWeightLabel(boolean displayConstantNames){ 
+	public void updateWeightLabel(boolean displayConstantNames) {
 		String guard = null;
-		if (isInPreSet()){
+		if (isInPreSet()) {
 			guard = "age \u2208 " + timeGuard + " : " + getGroup();
 
-			if(colorGuard != null && !colorGuard.isEmpty()){
+			if (colorGuard != null && !colorGuard.isEmpty()) {
 				guard += "\n val \u2208 " + colorGuard.toString();
 			}
 		} else {
@@ -84,14 +84,14 @@ public class ColoredTransportArc extends TransportArcComponent {
 
 	public String getPreservationString() {
 		String guard;
-		if(preserves == null){
+		if (preserves == null) {
 			preserves = Preserve.AgeAndValue;
 		}
-		if(preserves.equals(Preserve.Age)){
+		if (preserves.equals(Preserve.Age)) {
 			guard = "preserve age : " + getGroup() + "\n" + getOutputString();
-		}else if(preserves.equals(Preserve.Value)){
+		} else if (preserves.equals(Preserve.Value)) {
 			guard = "age := 0 : " + getGroup() + "\n preserve val";
-		}else{
+		} else {
 			guard = "preserve age : " + getGroup() + "\n preserve val";
 		}
 		return guard;
@@ -107,18 +107,18 @@ public class ColoredTransportArc extends TransportArcComponent {
 
 		updateWeightLabel(true);
 
-		return new ColoredTransportArcColorGuardEdit(this, old, newColorGuard);	
+		return new ColoredTransportArcColorGuardEdit(this, old, newColorGuard);
 	}
 
 	public Preserve getPreservation() {
 		return preserves;
 	}
 
-	public IntOrConstant getOutputValue(){
+	public IntOrConstant getOutputValue() {
 		return outputValue;
 	}
 
-	public Command setOutputValue(IntOrConstant value){
+	public Command setOutputValue(IntOrConstant value) {
 		IntOrConstant old = this.outputValue;
 		this.outputValue = value;
 
@@ -154,17 +154,18 @@ public class ColoredTransportArc extends TransportArcComponent {
 	}
 
 	public ColoredToken generateOutputToken(ColoredToken consumedToken) {
-		if(preserves.equals(Preserve.Age)){
-			return new ColoredToken(consumedToken.getAge(),getOutputValue());
-		}else if(preserves.equals(Preserve.Value)){
+		if (preserves.equals(Preserve.Age)) {
+			return new ColoredToken(consumedToken.getAge(), getOutputValue());
+		} else if (preserves.equals(Preserve.Value)) {
 			return new ColoredToken(consumedToken.getColor());
-		}else{
-			return new ColoredToken(consumedToken.getAge(), consumedToken.getColor());
+		} else {
+			return new ColoredToken(consumedToken.getAge(), consumedToken
+					.getColor());
 		}
 	}
 
 	public void displayValues(boolean showValues) {
-		this.displayValues = showValues;		
+		this.displayValues = showValues;
 		this.timeGuard.displayValues(showValues);
 		this.colorGuard.displayValues(showValues);
 		updateWeightLabel(true);

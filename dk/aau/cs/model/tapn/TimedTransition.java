@@ -13,7 +13,7 @@ public class TimedTransition extends TAPNElement {
 	private List<TransportArc> transportArcsGoingThrough;
 	private List<TimedInhibitorArc> inhibitorArcs;
 
-	public TimedTransition(String name){
+	public TimedTransition(String name) {
 		setName(name);
 		preset = new ArrayList<TimedInputArc>();
 		postset = new ArrayList<TimedOutputArc>();
@@ -21,34 +21,38 @@ public class TimedTransition extends TAPNElement {
 		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	}
 
-	public void setName(String name){
-		Require.that(name != null && !name.isEmpty(), "A timed transition must have a name");
+	public void setName(String name) {
+		Require.that(name != null && !name.isEmpty(),
+				"A timed transition must have a name");
 		this.name = name;
 	}
 
-	public String name(){
+	public String name() {
 		return name;
 	}
 
-	public void addToPreset(TimedInputArc arc){
+	public void addToPreset(TimedInputArc arc) {
 		Require.that(arc != null, "Cannot add null to preset");
 		preset.add(arc);
 	}
 
-	public void addToPostset(TimedOutputArc arc){
+	public void addToPostset(TimedOutputArc arc) {
 		Require.that(arc != null, "Cannot add null to postset");
 		postset.add(arc);
 	}
 
 	public boolean isEnabled() {
-		for(TimedInputArc arc : preset) {
-			if(!arc.isEnabled()) return false;
+		for (TimedInputArc arc : preset) {
+			if (!arc.isEnabled())
+				return false;
 		}
-		for(TransportArc arc : transportArcsGoingThrough){
-			if(!arc.isEnabled()) return false;
+		for (TransportArc arc : transportArcsGoingThrough) {
+			if (!arc.isEnabled())
+				return false;
 		}
-		for(TimedInhibitorArc arc : inhibitorArcs){
-			if(!arc.isEnabled()) return false;
+		for (TimedInhibitorArc arc : inhibitorArcs) {
+			if (!arc.isEnabled())
+				return false;
 		}
 		return true;
 	}
@@ -63,14 +67,14 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public void removeTransportArcGoingThrough(TransportArc arc) {
-		transportArcsGoingThrough.remove(arc);		
+		transportArcsGoingThrough.remove(arc);
 	}
 
 	public void removeFromPostset(TimedOutputArc arc) {
-		postset.remove(arc);		
+		postset.remove(arc);
 	}
 
-	public void addInhibitorArc(TimedInhibitorArc arc){
+	public void addInhibitorArc(TimedInhibitorArc arc) {
 		inhibitorArcs.add(arc);
 	}
 
@@ -80,90 +84,96 @@ public class TimedTransition extends TAPNElement {
 
 	@Override
 	public void delete() {
-		model().remove(this);	
+		model().remove(this);
 	}
 
 	public int presetSize() {
 		return preset.size() + transportArcsGoingThrough.size();
 	}
 
-
-	public boolean isEnabledBy(List<TimedToken> tokens){
-		if(presetSize() != tokens.size()) return false;
+	public boolean isEnabledBy(List<TimedToken> tokens) {
+		if (presetSize() != tokens.size())
+			return false;
 
 		boolean validToken = false;
-		for(TimedToken token : tokens){
-			for(TimedInputArc inputArc : preset){
-				if(inputArc.source().equals(token.place()) && inputArc.isEnabledBy(token)){
+		for (TimedToken token : tokens) {
+			for (TimedInputArc inputArc : preset) {
+				if (inputArc.source().equals(token.place())
+						&& inputArc.isEnabledBy(token)) {
 					validToken = true;
 					break;
 				}
 			}
 
-			for(TransportArc transportArc : transportArcsGoingThrough){
-				if(transportArc.source().equals(token.place()) && transportArc.isEnabledBy(token)){
+			for (TransportArc transportArc : transportArcsGoingThrough) {
+				if (transportArc.source().equals(token.place())
+						&& transportArc.isEnabledBy(token)) {
 					validToken = true;
 					break;
 				}
 			}
 
-			if(!validToken) return false;
+			if (!validToken)
+				return false;
 		}
 
 		return true;
 	}
-	
-	public List<TimedToken> calculateProducedTokensFrom(
-			List<TimedToken> tokens) {
+
+	public List<TimedToken> calculateProducedTokensFrom(List<TimedToken> tokens) {
 		// Assume that tokens enables transition
-		
+
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
-		for(TimedOutputArc arc : postset){
+		for (TimedOutputArc arc : postset) {
 			producedTokens.add(new TimedToken(arc.destination()));
 		}
-		
-		for(TransportArc transportArc : transportArcsGoingThrough){
-			for(TimedToken token : tokens){
-				if(token.place().equals(transportArc.source())){
-					producedTokens.add(new TimedToken(transportArc.destination(), token.age()));
+
+		for (TransportArc transportArc : transportArcsGoingThrough) {
+			for (TimedToken token : tokens) {
+				if (token.place().equals(transportArc.source())) {
+					producedTokens.add(new TimedToken(transportArc
+							.destination(), token.age()));
 				}
 			}
 		}
-		
+
 		return producedTokens;
 	}
 
-	public List<TimedToken> calculateConsumedTokens(TimedMarking timedMarking, FiringMode firingMode) {
+	public List<TimedToken> calculateConsumedTokens(TimedMarking timedMarking,
+			FiringMode firingMode) {
 		List<TimedToken> tokensToConsume = new ArrayList<TimedToken>();
-		
-		for(TimedInputArc arc : preset){
+
+		for (TimedInputArc arc : preset) {
 			List<TimedToken> tokens = timedMarking.getTokensFor(arc.source());
 			List<TimedToken> elligibleTokens = new ArrayList<TimedToken>();
-			
-			for(TimedToken token : tokens){
-				if(arc.isEnabledBy(token)) elligibleTokens.add(token);
+
+			for (TimedToken token : tokens) {
+				if (arc.isEnabledBy(token))
+					elligibleTokens.add(token);
 			}
-			
+
 			tokensToConsume.add(firingMode.pickTokenFrom(elligibleTokens));
 		}
-		
-		for(TransportArc arc : transportArcsGoingThrough){
+
+		for (TransportArc arc : transportArcsGoingThrough) {
 			List<TimedToken> tokens = timedMarking.getTokensFor(arc.source());
 			List<TimedToken> elligibleTokens = new ArrayList<TimedToken>();
-			
-			for(TimedToken token : tokens){
-				if(arc.isEnabledBy(token)) elligibleTokens.add(token);
+
+			for (TimedToken token : tokens) {
+				if (arc.isEnabledBy(token))
+					elligibleTokens.add(token);
 			}
-			
+
 			tokensToConsume.add(firingMode.pickTokenFrom(elligibleTokens));
 		}
-		
+
 		return tokensToConsume;
 	}
-	
+
 	@Override
 	public String toString() {
-		if(model() != null) 
+		if (model() != null)
 			return model().getName() + "." + name;
 		else
 			return name;

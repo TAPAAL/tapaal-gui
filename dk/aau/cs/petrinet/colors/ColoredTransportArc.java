@@ -9,19 +9,18 @@ public class ColoredTransportArc extends TAPNTransportArc {
 	private ColoredInterval timeGuard;
 	private Preservation preserves;
 	private int outputValue;
-	
+
 	public ColoredTransportArc(ColoredPlace source,
 			TAPNTransition intermediateTransition, ColoredPlace target,
 			ColoredInterval timeGuard, ColorSet colorGuard,
 			Preservation preserves, int outputValue) {
 		super(source, intermediateTransition, target);
-		
+
 		this.timeGuard = timeGuard;
 		this.colorGuard = colorGuard;
 		this.preserves = preserves;
 		this.outputValue = outputValue;
 	}
-
 
 	public ColoredInterval getTimeGuard() {
 		return timeGuard;
@@ -35,7 +34,7 @@ public class ColoredTransportArc extends TAPNTransportArc {
 		return preserves;
 	}
 
-	public int getOutputValue(){
+	public int getOutputValue() {
 		return outputValue;
 	}
 }

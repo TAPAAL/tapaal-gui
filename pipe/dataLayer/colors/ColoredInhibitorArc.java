@@ -7,7 +7,6 @@ import pipe.gui.undo.ColoredInhibArcColorGuardEdit;
 import pipe.gui.undo.ColoredInhibitorArcTimeGuardEdit;
 import dk.aau.cs.gui.undo.Command;
 
-
 public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 
 	/**
@@ -17,13 +16,12 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 	private ColorSet colorGuard;
 	private ColoredInterval timeGuard;
 
-	public ColoredInhibitorArc(TimedOutputArcComponent arc)
-	{
+	public ColoredInhibitorArc(TimedOutputArcComponent arc) {
 		super(arc);
 		initialize();
 	}
-	public ColoredInhibitorArc(TimedOutputArcComponent arc, String guard)
-	{
+
+	public ColoredInhibitorArc(TimedOutputArcComponent arc, String guard) {
 		super(arc, guard);
 		initialize();
 	}
@@ -32,25 +30,27 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 		super(source);
 		initialize();
 	}
+
 	private void initialize() {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
-		
+
 		updateWeightLabel(true);
 	}
+
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
 		int value = val.getValue();
-		
+
 		return !(colorGuard.contains(value) && timeGuard.contains(token));
 	}
 
 	@Override
-	public void updateWeightLabel(boolean displayConstantNames){ 
+	public void updateWeightLabel(boolean displayConstantNames) {
 
 		String guard = "age \u2208 " + timeGuard;
 
-		if(colorGuard != null && !colorGuard.isEmpty()){
+		if (colorGuard != null && !colorGuard.isEmpty()) {
 			guard += "\n val \u2208 " + colorGuard.toString();
 		}
 
@@ -58,7 +58,7 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 
 		this.setWeightLabelPosition();
 	}
-	
+
 	public String getColorGuardStringWithoutSetNotation() {
 		return colorGuard.toStringNoSetNotation();
 	}
@@ -69,8 +69,9 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 
 		updateWeightLabel(true);
 
-		return new ColoredInhibArcColorGuardEdit(this, old, newColorGuard);	
+		return new ColoredInhibArcColorGuardEdit(this, old, newColorGuard);
 	}
+
 	public ColoredInterval getTimeGuard() {
 		return timeGuard;
 	}
@@ -78,26 +79,26 @@ public class ColoredInhibitorArc extends TimedInhibitorArcComponent {
 	public Command setTimeGuard(ColoredInterval newTimeGuard) {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
-		
+
 		updateWeightLabel(true);
-		
+
 		return new ColoredInhibitorArcTimeGuardEdit(this, old, newTimeGuard);
 	}
+
 	public ColorSet getColorGuard() {
 		return colorGuard;
 	}
-	
+
 	public void displayValues(boolean showValues) {
 		timeGuard.displayValues(showValues);
 		colorGuard.displayValues(showValues);
 		updateWeightLabel(true);
 	}
+
 	public void updateConstantName(String oldName, String newName) {
 		timeGuard.updateConstantName(oldName, newName);
 		colorGuard.updateConstantName(oldName, newName);
-		updateWeightLabel(true);		
+		updateWeightLabel(true);
 	}
-
-
 
 }

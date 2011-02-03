@@ -8,11 +8,12 @@ import dk.aau.cs.util.Require;
 public class YoungestFiringMode implements FiringMode {
 
 	public TimedToken pickTokenFrom(List<TimedToken> elligibleTokens) {
-		Require.that(elligibleTokens.size() > 0, "There has to be at least one token");
+		Require.that(elligibleTokens.size() > 0,
+				"There has to be at least one token");
 		TimedToken youngest = elligibleTokens.get(0);
-		
-		for(TimedToken token : elligibleTokens){
-			if(token.age().compareTo(youngest.age()) < 0){
+
+		for (TimedToken token : elligibleTokens) {
+			if (token.age().compareTo(youngest.age()) < 0) {
 				youngest = token;
 			}
 		}

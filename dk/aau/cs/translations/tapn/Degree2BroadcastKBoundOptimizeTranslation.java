@@ -12,7 +12,8 @@ import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 
-public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastTranslation {
+public class Degree2BroadcastKBoundOptimizeTranslation extends
+		Degree2BroadcastTranslation {
 	private final String usedExtraTokens = "usedExtraTokens";
 	private int tokens = 0;
 	private final int SUBTRACT = 0;
@@ -27,8 +28,8 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 		tokens = model.getTokens().size();
 		NTA nta = super.transformModel(model);
 
-		for(TimedAutomaton ta : nta.getTimedAutomata()){
-			if(ta.getName().equals("Token")){
+		for (TimedAutomaton ta : nta.getTimedAutomata()) {
+			if (ta.getName().equals("Token")) {
 				addKBoundUpdates(ta);
 			}
 		}
@@ -39,13 +40,14 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 	private void addKBoundUpdates(TimedAutomaton ta) {
 		Location pcapacity = getLocationByName("P_capacity");
 
-		for(Edge e : ta.getTransitions()){
-			if(e.getSource() == pcapacity && isNotInitializationEdge(e) && isNotTestingEdge(e)){
+		for (Edge e : ta.getTransitions()) {
+			if (e.getSource() == pcapacity && isNotInitializationEdge(e)
+					&& isNotTestingEdge(e)) {
 
-				String newUpdate = createUpdate(e.getUpdate(),ADD);
+				String newUpdate = createUpdate(e.getUpdate(), ADD);
 				e.setUpdate(newUpdate);
-			}else if(e.getDestination() == pcapacity && isNotTestingEdge(e)){
-				String newUpdate = createUpdate(e.getUpdate(),SUBTRACT);
+			} else if (e.getDestination() == pcapacity && isNotTestingEdge(e)) {
+				String newUpdate = createUpdate(e.getUpdate(), SUBTRACT);
 				e.setUpdate(newUpdate);
 			}
 		}
@@ -65,32 +67,34 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 
 	private String createUpdate(String update, int method) {
 		String newUpdate = update;
-		if(update != null && !update.isEmpty()){
+		if (update != null && !update.isEmpty()) {
 			newUpdate += ",";
 		}
 		newUpdate += usedExtraTokens;
-		if(method == ADD){
+		if (method == ADD) {
 			newUpdate += "++";
-		}else{
+		} else {
 			newUpdate += "--";
 		}
-		
+
 		return newUpdate;
 	}
 
 	@Override
-	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel) {
-		StringBuilder builder = new StringBuilder("int["); 
-		builder.append(-(tokens+extraTokens));
+	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net,
+			TimedArcPetriNet originalModel) {
+		StringBuilder builder = new StringBuilder("int[");
+		builder.append(-(tokens + extraTokens));
 		builder.append(",");
-		builder.append(tokens+extraTokens);
+		builder.append(tokens + extraTokens);
 		builder.append("] ");
 		builder.append(usedExtraTokens);
 		builder.append(" = 0;\n");
-		builder.append(super.createGlobalDeclarations(degree2Net, originalModel));
+		builder.append(super
+				.createGlobalDeclarations(degree2Net, originalModel));
 		return builder.toString();
 	}
-	
+
 	@Override
 	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
 		return new SupQuery(usedExtraTokens);

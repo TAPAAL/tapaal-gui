@@ -9,14 +9,15 @@ public class RenameTemplateCommand extends Command {
 	private TimedArcPetriNet tapn;
 	private String oldName;
 	private String newName;
-	
-	public RenameTemplateCommand(TemplateExplorer templateExplorer, TimedArcPetriNet tapn, String oldName, String newName) {
+
+	public RenameTemplateCommand(TemplateExplorer templateExplorer,
+			TimedArcPetriNet tapn, String oldName, String newName) {
 		this.templateExplorer = templateExplorer;
 		this.tapn = tapn;
 		this.oldName = oldName;
 		this.newName = newName;
 	}
-	
+
 	@Override
 	public void redo() {
 		tapn.setName(newName);

@@ -11,10 +11,11 @@ public abstract class AddTAPNElementCommand extends Command {
 	protected final TimedArcPetriNet tapn;
 	protected final DataLayer guiModel;
 
-	public AddTAPNElementCommand(TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
+	public AddTAPNElementCommand(TimedArcPetriNet tapn, DataLayer guiModel,
+			DrawingSurfaceImpl view) {
 		super();
 		this.tapn = tapn;
 		this.guiModel = guiModel;
-		this.view = view;		
+		this.view = view;
 	}
 }

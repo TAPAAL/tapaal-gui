@@ -7,12 +7,12 @@ import dk.aau.cs.petrinet.Token;
 
 public class ColoredToken extends Token {
 	private int color;
-	
-	public ColoredToken(TAPNPlace place, BigDecimal age){
+
+	public ColoredToken(TAPNPlace place, BigDecimal age) {
 		this(place, age, 0);
 	}
-	
-	public ColoredToken(TAPNPlace place, BigDecimal age, int color){
+
+	public ColoredToken(TAPNPlace place, BigDecimal age, int color) {
 		super(place, age);
 		this.color = color;
 	}
@@ -25,9 +25,10 @@ public class ColoredToken extends Token {
 	public int getColor() {
 		return color;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "(" + place().getName() + ", age: " + age() + ", val: " + color + ")";
+		return "(" + place().getName() + ", age: " + age() + ", val: " + color
+				+ ")";
 	}
 }

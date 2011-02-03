@@ -1,6 +1,5 @@
 package dk.aau.cs.verification;
 
-
 public class VerificationResult<TTrace> {
 	private QueryResult queryResult;
 	private TTrace trace;
@@ -10,7 +9,7 @@ public class VerificationResult<TTrace> {
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
 	}
-		
+
 	public VerificationResult(QueryResult queryResult, TTrace trace,
 			long verificationTime) {
 		this.queryResult = queryResult;
@@ -22,24 +21,23 @@ public class VerificationResult<TTrace> {
 		this.errorMessage = outputMessage;
 	}
 
-
 	public QueryResult getQueryResult() {
 		return queryResult;
-	}		
-	
-	public TTrace getTrace(){
+	}
+
+	public TTrace getTrace() {
 		return trace;
 	}
-	
-	public String errorMessage(){
+
+	public String errorMessage() {
 		return errorMessage;
 	}
-	
-	public boolean error(){
+
+	public boolean error() {
 		return errorMessage != null;
 	}
-	
-	public long verificationTime(){
+
+	public long verificationTime() {
 		return verificationTime;
 	}
 }

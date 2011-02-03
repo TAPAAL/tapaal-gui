@@ -9,52 +9,59 @@ public class TransportArc extends TAPNElement {
 
 	private TimeInterval interval;
 
-	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination,
-			TimeInterval interval){
+	public TransportArc(TimedPlace source, TimedTransition transition,
+			TimedPlace destination, TimeInterval interval) {
 		Require.that(source != null, "The source place cannot be null");
-		Require.that(transition != null, "The associated transition cannot be null");
-		Require.that(destination != null, "The destination place cannot be null");
-			
+		Require.that(transition != null,
+				"The associated transition cannot be null");
+		Require.that(destination != null,
+				"The destination place cannot be null");
+
 		this.source = source;
 		this.transition = transition;
 		this.destination = destination;
 		setTimeInterval(interval);
 	}
-	
-	public TimedPlace source(){
+
+	public TimedPlace source() {
 		return source;
 	}
-	
-	public TimedTransition transition(){
+
+	public TimedTransition transition() {
 		return transition;
 	}
-	
-	public TimedPlace destination(){
+
+	public TimedPlace destination() {
 		return destination;
 	}
 
-	public TimeInterval interval(){
+	public TimeInterval interval() {
 		return interval;
 	}
-	
-	public void setTimeInterval(TimeInterval interval){
-		Require.that(interval != null, "A transport arc must have an associated interval");
-		
+
+	public void setTimeInterval(TimeInterval interval) {
+		Require.that(interval != null,
+				"A transport arc must have an associated interval");
+
 		this.interval = interval;
 	}
 
 	public boolean isEnabled() {
 		Iterable<TimedToken> tokens = source.tokensSatisfyingInterval(interval);
-		for(TimedToken token : tokens){
-			if(interval.isIncluded(token.age()) && destination.invariant().isSatisfied(token.age())) return true;
+		for (TimedToken token : tokens) {
+			if (interval.isIncluded(token.age())
+					&& destination.invariant().isSatisfied(token.age()))
+				return true;
 		}
 		return false;
 	}
-	
-	public boolean isEnabledBy(TimedToken token){
-		Require.that(source.equals(token.place()), "Token must be in the correct place");
-		
-		return interval.isIncluded(token.age()) && destination.invariant().isSatisfied(token.age());
+
+	public boolean isEnabledBy(TimedToken token) {
+		Require.that(source.equals(token.place()),
+				"Token must be in the correct place");
+
+		return interval.isIncluded(token.age())
+				&& destination.invariant().isSatisfied(token.age());
 	}
 
 	@Override

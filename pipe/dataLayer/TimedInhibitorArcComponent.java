@@ -18,115 +18,115 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
 	private TimedInhibitorArc inhibitorArc;
 
-	public TimedInhibitorArcComponent(TimedOutputArcComponent arc)
-	{
+	public TimedInhibitorArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
 	}
-	
-	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard)
-	{
-		super(arc,guard);
+
+	public TimedInhibitorArcComponent(TimedOutputArcComponent arc, String guard) {
+		super(arc, guard);
 	}
-	
+
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
 		super(source);
 	}
-	
+
 	@Override
-	public boolean satisfiesGuard(BigDecimal token)
-	{
+	public boolean satisfiesGuard(BigDecimal token) {
 		throw new RuntimeException("Not Implemented");
-		//return inhibitorArc.isEnabledBy(token);
+		// return inhibitorArc.isEnabledBy(token);
 	}
-	
-	public void setUnderlyingArc(TimedInhibitorArc arc){
+
+	public void setUnderlyingArc(TimedInhibitorArc arc) {
 		this.inhibitorArc = arc;
 		updateWeightLabel(true);
 	}
-	
-	public TimedInhibitorArc underlyingTimedInhibitorArc(){
+
+	public TimedInhibitorArc underlyingTimedInhibitorArc() {
 		return inhibitorArc;
 	}
-	
+
 	@Override
 	public void delete() {
-		if(inhibitorArc != null) inhibitorArc.delete();
+		if (inhibitorArc != null)
+			inhibitorArc.delete();
 		super.delete();
 	}
-	
+
 	@Override
 	public void updateWeightLabel(boolean displayConstantNames) {
-		if(inhibitorArc != null){
-			weightLabel.setText(inhibitorArc.interval().toString(displayConstantNames));
-		}else{
+		if (inhibitorArc != null) {
+			weightLabel.setText(inhibitorArc.interval().toString(
+					displayConstantNames));
+		} else {
 			weightLabel.setText("");
 		}
-		this.setWeightLabelPosition();	
+		this.setWeightLabelPosition();
 	}
-	
+
 	@Override
 	public String getGuardAsString() {
 		return inhibitorArc.interval().toString();
 	}
-	
+
 	@Override
 	public Command setGuard(TimeInterval guard) {
-		
+
 		TimeInterval oldTimeInterval = inhibitorArc.interval();
 		inhibitorArc.setTimeInterval(guard);
 
-		//hacks - I use the weight to display the TimeInterval
+		// hacks - I use the weight to display the TimeInterval
 		updateWeightLabel(true);
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval());
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc
+				.interval());
 	}
-	
+
 	@Override
 	public TimeInterval getGuard() {
 		return inhibitorArc.interval();
 	}
-	
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
-	      //super.paintComponent(g);
-	      Graphics2D g2 = (Graphics2D)g;   
-	      
-	      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-	                          RenderingHints.VALUE_ANTIALIAS_ON);
-	      
-	      g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow - myPath.getBounds().getX(),
-	               COMPONENT_DRAW_OFFSET + zoomGrow - myPath.getBounds().getY());
-	      
-	      if (selected && !ignoreSelection){
-	         g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-	      } else{
-	         g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-	      }
-	     
-	      g2.setStroke(new BasicStroke(0.01f * zoom));
-	      g2.draw(myPath);
-	      
-	      g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(),
-	               myPath.getPoint(myPath.getEndIndex()).getY());
-	        
-	      g2.rotate(myPath.getEndAngle()+Math.PI);
-	      g2.setColor(java.awt.Color.WHITE);
-	            
-	      AffineTransform reset = g2.getTransform();
-	      g2.transform(Zoomer.getTransform(zoom));   
-	  
-	      g2.setStroke(new BasicStroke(0.8f));      
-	      g2.fillOval(-4,-8, 8, 8);
-	  
-	      if (selected && !ignoreSelection){
-	         g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-	      } else{
-	         g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-	      }
-	      g2.drawOval(-4,-8, 8, 8);
-	      
-	      g2.setTransform(reset);
-	   }   
+		// super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
+
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+
+		g2.translate(COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getX(), COMPONENT_DRAW_OFFSET + zoomGrow
+				- myPath.getBounds().getY());
+
+		if (selected && !ignoreSelection) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+		}
+
+		g2.setStroke(new BasicStroke(0.01f * zoom));
+		g2.draw(myPath);
+
+		g2.translate(myPath.getPoint(myPath.getEndIndex()).getX(), myPath
+				.getPoint(myPath.getEndIndex()).getY());
+
+		g2.rotate(myPath.getEndAngle() + Math.PI);
+		g2.setColor(java.awt.Color.WHITE);
+
+		AffineTransform reset = g2.getTransform();
+		g2.transform(Zoomer.getTransform(zoom));
+
+		g2.setStroke(new BasicStroke(0.8f));
+		g2.fillOval(-4, -8, 8, 8);
+
+		if (selected && !ignoreSelection) {
+			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
+		} else {
+			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
+		}
+		g2.drawOval(-4, -8, 8, 8);
+
+		g2.setTransform(reset);
+	}
 }

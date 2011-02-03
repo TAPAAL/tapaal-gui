@@ -9,16 +9,17 @@ import dk.aau.cs.model.tapn.TimedTransition;
 public class TimedTransitionStep implements TapaalTraceStep {
 	private TimedTransition transition;
 	private List<TimedToken> consumedTokens;
-	
-	public TimedTransitionStep(TimedTransition transition, List<TimedToken> consumedTokens){
+
+	public TimedTransitionStep(TimedTransition transition,
+			List<TimedToken> consumedTokens) {
 		this.transition = transition;
 		this.consumedTokens = consumedTokens;
 	}
 
 	public NetworkMarking performStepFrom(NetworkMarking marking) {
 		return marking.fireTransition(transition, consumedTokens);
-	}	
-	
+	}
+
 	@Override
 	public String toString() {
 		return transition.toString();

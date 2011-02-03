@@ -18,64 +18,65 @@ public class ColoredInputArc extends TimedInputArcComponent {
 
 	public ColoredInputArc(PlaceTransitionObject source) {
 		super(source);
-		
+
 		initialize();
 	}
 
 	public ColoredInputArc(TimedOutputArcComponent arc) {
 		super(arc);
-		
+
 		initialize();
 	}
 
 	public ColoredInputArc(TimedOutputArcComponent arc, String guard) {
-		super(arc,guard);
-		
+		super(arc, guard);
+
 		initialize();
 	}
-	
+
 	private void initialize() {
 		colorGuard = new ColorSet();
 		timeGuard = new ColoredInterval();
-		
+
 		updateWeightLabel(true);
 	}
-		
+
 	public boolean satisfiesGuard(ColoredToken token) {
 		IntOrConstant val = token.getColor();
 		int value = val.getValue();
-		
+
 		return colorGuard.contains(value) && timeGuard.contains(token);
 	}
-	
+
 	@Override
-	public void updateWeightLabel(boolean displayConstantNames){ 
-		
+	public void updateWeightLabel(boolean displayConstantNames) {
+
 		String guard = "age \u2208 " + timeGuard;
-		
-		if(colorGuard != null && !colorGuard.isEmpty()){
+
+		if (colorGuard != null && !colorGuard.isEmpty()) {
 			guard += "\n val \u2208 " + colorGuard.toString();
 		}
-		
+
 		weightLabel.setText(guard);
-		
+
 		this.setWeightLabelPosition();
 	}
-	
+
 	public String getColorGuardStringWithoutSetNotation() {
 		return colorGuard.toStringNoSetNotation();
 	}
 
-	public ColorSet getColorGuard(){
+	public ColorSet getColorGuard() {
 		return colorGuard;
 	}
+
 	public Command setColorGuard(ColorSet newColorGuard) {
 		ColorSet old = this.colorGuard;
 		this.colorGuard = newColorGuard;
 
 		updateWeightLabel(true);
 
-		return new ColoredInputArcColorGuardEdit(this, old, newColorGuard);	
+		return new ColoredInputArcColorGuardEdit(this, old, newColorGuard);
 	}
 
 	public ColoredInterval getTimeGuard() {
@@ -85,9 +86,9 @@ public class ColoredInputArc extends TimedInputArcComponent {
 	public Command setTimeGuard(ColoredInterval newTimeGuard) {
 		ColoredInterval old = this.timeGuard;
 		this.timeGuard = newTimeGuard;
-		
+
 		updateWeightLabel(true);
-		
+
 		return new ColoredInputArcTimeGuardEdit(this, old, newTimeGuard);
 	}
 
@@ -100,6 +101,6 @@ public class ColoredInputArc extends TimedInputArcComponent {
 	public void updateConstantName(String oldName, String newName) {
 		timeGuard.updateConstantName(oldName, newName);
 		colorGuard.updateConstantName(oldName, newName);
-		updateWeightLabel(true);		
+		updateWeightLabel(true);
 	}
 }

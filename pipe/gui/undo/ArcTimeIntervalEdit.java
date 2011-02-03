@@ -8,13 +8,14 @@ public class ArcTimeIntervalEdit extends Command {
 	private TimedInputArcComponent arc;
 	TimeInterval oldTimeInterval;
 	TimeInterval newTimeInterval;
-	
-	public ArcTimeIntervalEdit(TimedInputArcComponent arc, TimeInterval oldTimeInterval, TimeInterval newTimeInterval){
+
+	public ArcTimeIntervalEdit(TimedInputArcComponent arc,
+			TimeInterval oldTimeInterval, TimeInterval newTimeInterval) {
 		this.arc = arc;
 		this.oldTimeInterval = oldTimeInterval;
 		this.newTimeInterval = newTimeInterval;
 	}
-	
+
 	@Override
 	public void redo() {
 		arc.setGuard(newTimeInterval);
@@ -24,11 +25,11 @@ public class ArcTimeIntervalEdit extends Command {
 	public void undo() {
 		arc.setGuard(oldTimeInterval);
 	}
-	
+
 	@Override
-	public String toString(){
-		return super.toString() + " " + arc.getName() + ", oldTimeInterval: " 
-		+ oldTimeInterval + ", newTimeInterval: " + newTimeInterval;   		
+	public String toString() {
+		return super.toString() + " " + arc.getName() + ", oldTimeInterval: "
+				+ oldTimeInterval + ", newTimeInterval: " + newTimeInterval;
 	}
 
 }

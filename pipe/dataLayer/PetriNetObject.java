@@ -19,17 +19,21 @@ import pipe.gui.Zoomable;
 import pipe.gui.undo.PetriNetObjectNameEdit;
 import dk.aau.cs.gui.undo.Command;
 
-
 /**
  * <b>PetriNetObject</b> - Petri-Net Object Class<b> - <i>Abstract</i></b>
- * @see <p><a href="..\PNMLSchema\index.html">PNML  -  Petri-Net XMLSchema (stNet.xsd)</a>
- * @see </p><p><a href="..\..\..\UML\dataLayer.html">UML  -  PNML Package </a></p>
+ * 
+ * @see <p>
+ *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
+ *      (stNet.xsd)</a>
+ * @see </p>
+ *      <p>
+ *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
+ *      </p>
  * @version 1.0
  * @author James D Bloom
  */
-public abstract class PetriNetObject 
-extends JComponent 
-implements Zoomable, CopyPasteable, Cloneable, Translatable {
+public abstract class PetriNetObject extends JComponent implements Zoomable,
+		CopyPasteable, Cloneable, Translatable {
 
 	/**
 	 * 
@@ -41,14 +45,15 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 	/** Id */
 	protected String id = null;
 
-	/** Name Label for displaying name*/
+	/** Name Label for displaying name */
 	protected NameLabel pnName;
 	protected Color objectColour = Pipe.ELEMENT_LINE_COLOUR;
 	protected Color selectionBorderColour = Pipe.SELECTION_LINE_COLOUR;
-	protected boolean selected = false;	// True if part of the current selection.
-	protected boolean selectable = true;	// True if object can be selected.
-	protected boolean draggable = true;	// True if object can be dragged.
-	protected boolean copyPasteable  = true;	// True if object can be cloned.
+	protected boolean selected = false; // True if part of the current
+										// selection.
+	protected boolean selectable = true; // True if object can be selected.
+	protected boolean draggable = true; // True if object can be dragged.
+	protected boolean copyPasteable = true; // True if object can be cloned.
 	protected static boolean ignoreSelection = false;
 	protected Rectangle bounds = new Rectangle();
 
@@ -56,50 +61,51 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 	protected boolean markedAsDeleted = false;
 
 	// Integer value which represents a zoom percentage
-	protected int zoom = 100;   
+	protected int zoom = 100;
 	private DataLayer guiModel;
 
 	/**
 	 * Create PetriNetObject
 	 */
-	public PetriNetObject(){    
+	public PetriNetObject() {
 	}
 
-	public void setGuiModel(DataLayer guiModel){
+	public void setGuiModel(DataLayer guiModel) {
 		this.guiModel = guiModel;
 	}
 
-	public DataLayer getGuiModel(){
+	public DataLayer getGuiModel() {
 		return guiModel;
 	}
 
-
 	/**
 	 * Set id
-	 * @param idInput String value for id;
+	 * 
+	 * @param idInput
+	 *            String value for id;
 	 */
 	public void setId(String idInput) {
 		id = idInput;
 	}
 
-
 	/**
 	 * Get id returns null if value not yet entered
+	 * 
 	 * @return String value for id;
 	 */
 	public String getId() {
 		return id;
 	}
 
-
 	/**
 	 * Returns Name Label - is used by GuiView
-	 * @return PetriNetObject's Name Label (Model View Controller Design Pattern)
+	 * 
+	 * @return PetriNetObject's Name Label (Model View Controller Design
+	 *         Pattern)
 	 */
-	public NameLabel getNameLabel(){
+	public NameLabel getNameLabel() {
 		return pnName;
 	}
-
 
 	public void addLabelToContainer() {
 		if (getParent() != null && pnName.getParent() == null) {
@@ -107,11 +113,9 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 		}
 	}
 
-
 	public boolean isSelected() {
 		return selected;
 	}
-
 
 	public void select() {
 		if (selectable && !selected) {
@@ -120,7 +124,6 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 		}
 	}
 
-
 	public void deselect() {
 		if (selected) {
 			selected = false;
@@ -128,44 +131,35 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 		}
 	}
 
-
 	public boolean isSelectable() {
 		return selectable;
 	}
-
 
 	public void setSelectable(boolean allow) {
 		selectable = allow;
 	}
 
-
 	public static void ignoreSelection(boolean ignore) {
 		ignoreSelection = ignore;
 	}
-
 
 	public boolean isDraggable() {
 		return draggable;
 	}
 
-
 	public void setDraggable(boolean allow) {
 		draggable = allow;
 	}
-
 
 	public void setObjectColour(Color c) {
 		objectColour = c;
 	}
 
-
 	public void setSelectionBorderColour(Color c) {
 		selectionBorderColour = c;
 	}
 
-
 	public abstract void addedToGui();
-
 
 	public void delete() {
 		deleted = true;
@@ -174,38 +168,33 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 		removeAll();
 	}
 
-
 	public void undelete(DrawingSurfaceImpl view) {
 		guiModel.addPetriNetObject(this);
-		if(view.isCurrentGuiModel(guiModel)) view.add(this);
+		if (view.isCurrentGuiModel(guiModel))
+			view.add(this);
 	}
-
 
 	protected void removeFromContainer() {
 		Container c = getParent();
 
-		if (c != null){
+		if (c != null) {
 			c.remove(this);
 		}
 	}
 
-
-	public Command setPNObjectName(String name){
+	public Command setPNObjectName(String name) {
 		String oldName = this.getName();
 		this.setName(name);
-		return new PetriNetObjectNameEdit(this, oldName, name);               
+		return new PetriNetObjectNameEdit(this, oldName, name);
 	}
-
 
 	public boolean isDeleted() {
 		return deleted || markedAsDeleted;
 	}
 
-
 	public void markAsDeleted() {
 		markedAsDeleted = true;
 	}
-
 
 	public void select(Rectangle selectionRectangle) {
 		if (selectionRectangle.intersects(this.getBounds())) {
@@ -213,26 +202,20 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 		}
 	}
 
-
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 	}
 
-
 	public boolean isCopyPasteable() {
 		return copyPasteable;
-	}   
-
-
+	}
 
 	public abstract int getLayerOffset();
-
 
 	public int getZoom() {
 		return zoom;
 	}
-
 
 	@Override
 	public PetriNetObject clone() {
@@ -240,21 +223,27 @@ implements Zoomable, CopyPasteable, Cloneable, Translatable {
 			PetriNetObject pnObjectCopy = (PetriNetObject) super.clone();
 
 			// Remove all mouse listeners on the new object
-			EventListener[] mouseListeners = pnObjectCopy.getListeners(MouseListener.class);
-			for (int i = 0; i < mouseListeners.length; i++){
-				pnObjectCopy.removeMouseListener((MouseListener) mouseListeners[i]);
+			EventListener[] mouseListeners = pnObjectCopy
+					.getListeners(MouseListener.class);
+			for (int i = 0; i < mouseListeners.length; i++) {
+				pnObjectCopy
+						.removeMouseListener((MouseListener) mouseListeners[i]);
 			}
 
-			mouseListeners = pnObjectCopy.getListeners(MouseMotionListener.class);
+			mouseListeners = pnObjectCopy
+					.getListeners(MouseMotionListener.class);
 
 			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
+				pnObjectCopy
+						.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
 			}
 
-			mouseListeners = pnObjectCopy.getListeners(MouseWheelListener.class);
+			mouseListeners = pnObjectCopy
+					.getListeners(MouseWheelListener.class);
 
 			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy.removeMouseWheelListener((MouseWheelListener) mouseListeners[i]);
+				pnObjectCopy
+						.removeMouseWheelListener((MouseWheelListener) mouseListeners[i]);
 			}
 
 			return pnObjectCopy;

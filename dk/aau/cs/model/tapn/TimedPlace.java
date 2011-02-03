@@ -5,7 +5,6 @@ import java.util.List;
 
 import dk.aau.cs.util.Require;
 
-
 public class TimedPlace extends TAPNElement {
 	private String name;
 	private TimeInvariant invariant;
@@ -13,13 +12,13 @@ public class TimedPlace extends TAPNElement {
 	private List<TimedInputArc> postset;
 	private List<TransportArc> presetTransportArcs;
 	private List<TransportArc> postsetTransportArcs;
-	
+
 	private TimedMarking currentMarking;
 
-	public TimedPlace(String name){
+	public TimedPlace(String name) {
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
 	}
-	
+
 	public TimedPlace(String name, TimeInvariant invariant) {
 		setName(name);
 		setInvariant(invariant);
@@ -28,72 +27,73 @@ public class TimedPlace extends TAPNElement {
 		presetTransportArcs = new ArrayList<TransportArc>();
 		postsetTransportArcs = new ArrayList<TransportArc>();
 	}
-	
-	public void setCurrentMarking(TimedMarking currentMarking){
+
+	public void setCurrentMarking(TimedMarking currentMarking) {
 		this.currentMarking = currentMarking;
 	}
-	
-	public String name(){
+
+	public String name() {
 		return name;
 	}
-	
-	public void setName(String name){
-		Require.that(name != null && !name.isEmpty(), "A timed place must have a valid name");
-		
+
+	public void setName(String name) {
+		Require.that(name != null && !name.isEmpty(),
+				"A timed place must have a valid name");
+
 		this.name = name;
 	}
-	
-	public TimeInvariant invariant(){
+
+	public TimeInvariant invariant() {
 		return invariant;
 	}
-	
-	public void setInvariant(TimeInvariant invariant){
-		Require.that(invariant != null, "A timed place must have a non-null invariant");
+
+	public void setInvariant(TimeInvariant invariant) {
+		Require.that(invariant != null,
+				"A timed place must have a non-null invariant");
 		this.invariant = invariant;
 	}
-	
-	public void addToPreset(TimedOutputArc arc){
+
+	public void addToPreset(TimedOutputArc arc) {
 		Require.that(arc != null, "Cannot add null to preset");
 		preset.add(arc);
 	}
-	
+
 	public void addToPreset(TransportArc arc) {
 		Require.that(arc != null, "Cannot add null to preset");
-		presetTransportArcs.add(arc);	
+		presetTransportArcs.add(arc);
 	}
-	
-	
-	public void addToPostset(TimedInputArc arc){
+
+	public void addToPostset(TimedInputArc arc) {
 		Require.that(arc != null, "Cannot add null to postset");
 		postset.add(arc);
 	}
 
 	public void addToPostset(TransportArc arc) {
 		Require.that(arc != null, "Cannot add null to postset");
-		postsetTransportArcs.add(arc);	
+		postsetTransportArcs.add(arc);
 	}
-	
+
 	public boolean hasTokenSatisfyingInterval(TimeInterval interval) {
 		List<TimedToken> tokens = currentMarking.getTokensFor(this);
-		
-		for(TimedToken t : tokens) {
-			if(interval.isIncluded(t.age()))
+
+		for (TimedToken t : tokens) {
+			if (interval.isIncluded(t.age()))
 				return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public Iterable<TimedToken> tokensSatisfyingInterval(TimeInterval interval) {
 		List<TimedToken> tokens = currentMarking.getTokensFor(this);
 		ArrayList<TimedToken> toReturn = new ArrayList<TimedToken>();
-		for(TimedToken t : tokens) {
-			if(interval.isIncluded(t.age())) toReturn.add(t);
+		for (TimedToken t : tokens) {
+			if (interval.isIncluded(t.age()))
+				toReturn.add(t);
 		}
-		
+
 		return toReturn;
 	}
-
 
 	public List<TimedToken> tokens() {
 		return currentMarking.getTokensFor(this);
@@ -102,12 +102,12 @@ public class TimedPlace extends TAPNElement {
 	public int numberOfTokens() {
 		return currentMarking.getTokensFor(this).size();
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -138,7 +138,7 @@ public class TimedPlace extends TAPNElement {
 	}
 
 	public void removeFromPostset(TransportArc arc) {
-		postsetTransportArcs.remove(arc);		
+		postsetTransportArcs.remove(arc);
 	}
 
 	public void removeFromPreset(TransportArc arc) {
@@ -152,18 +152,19 @@ public class TimedPlace extends TAPNElement {
 	public void delete() {
 		model().remove(this);
 	}
-		
+
 	public void addToken(TimedToken timedToken) {
 		currentMarking.add(timedToken);
 	}
-	
-	public void removeToken(TimedToken timedToken){
+
+	public void removeToken(TimedToken timedToken) {
 		currentMarking.remove(timedToken);
 	}
 
 	public void removeToken() {
-		if(numberOfTokens() > 0){
+		if (numberOfTokens() > 0) {
 			currentMarking.removeArbitraryTokenFrom(this);
 		}
 	}
+
 }

@@ -16,40 +16,37 @@ public class JSplitPaneFix extends JSplitPane {
 	private boolean hasProportionalLocation;
 	private double proportionalLocation;
 
-	public JSplitPaneFix(int verticalSplit, JScrollPane panel1,
-			JPanel panel2) {
+	public JSplitPaneFix(int verticalSplit, JScrollPane panel1, JPanel panel2) {
 		super(verticalSplit, panel1, panel2);
-		
+
 	}
-	
-	public JSplitPaneFix(int verticalSplit, JPanel panel1,
-			JPanel panel2) {
+
+	public JSplitPaneFix(int verticalSplit, JPanel panel1, JPanel panel2) {
 		super(verticalSplit, panel1, panel2);
-		
+
 	}
-	
+
 	public JSplitPaneFix(int verticalSplit) {
 		super(verticalSplit);
 	}
 
 	@Override
 	public void setDividerLocation(double proportionalLocation) {
-        if (!isPainted) {       
-            hasProportionalLocation = true;
-            this.proportionalLocation = proportionalLocation;
-        }
-        else
-            super.setDividerLocation(proportionalLocation);
-    }
+		if (!isPainted) {
+			hasProportionalLocation = true;
+			this.proportionalLocation = proportionalLocation;
+		} else
+			super.setDividerLocation(proportionalLocation);
+	}
 
-    @Override
+	@Override
 	public void paint(Graphics g) {
-        if (!isPainted) {       
-            if (hasProportionalLocation)
-                super.setDividerLocation(proportionalLocation);
-            isPainted = true;
-        }
-        super.paint(g);
-    } 
+		if (!isPainted) {
+			if (hasProportionalLocation)
+				super.setDividerLocation(proportionalLocation);
+			isPainted = true;
+		}
+		super.paint(g);
+	}
 
 }

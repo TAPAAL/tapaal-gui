@@ -9,11 +9,12 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String CONTROL = "Control";
 	protected static final String FINISH = "finish";
 	protected static final String LOCK_BOOL = "lock";
-	
+
 	protected static final String TOKEN_TEMPLATE_NAME = "P";
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+			Object context) {
 		append("(sum(i:");
 		append(ID_TYPE);
 		append(")");
@@ -28,12 +29,13 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 
 	@Override
 	protected void addEnding(QueryType type) {
-		if(type == QueryType.EF || type == QueryType.AF){
+		if (type == QueryType.EF || type == QueryType.AF) {
 			append(" && ");
-		}else{
+		} else {
 			append(" || !");
 		}
-		append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1 && %5$s == 0)", LOCK_TEMPLATE, PLOCK, CONTROL, FINISH, LOCK_BOOL));
+		append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1 && %5$s == 0)",
+				LOCK_TEMPLATE, PLOCK, CONTROL, FINISH, LOCK_BOOL));
 	}
 
 }

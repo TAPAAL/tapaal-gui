@@ -10,38 +10,35 @@ import java.awt.geom.Point2D;
 import pipe.dataLayer.Arc;
 import pipe.gui.CreateGui;
 
-
 /**
- * This class is used to split an arc in two at the
- * point the user clicks the mouse button.
+ * This class is used to split an arc in two at the point the user clicks the
+ * mouse button.
+ * 
  * @author Pere
  */
-public class InsertPointAction 
-        extends javax.swing.AbstractAction{
-   
-   /**
+public class InsertPointAction extends javax.swing.AbstractAction {
+
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -6718916328220594869L;
-private Arc selected;
-   Point2D.Float mouseposition;
-   
-   
-   public InsertPointAction(Arc arc, Point mousepos) {
-      selected = arc;
-      
-      // Mousepos is relative to selected component i.e. the arc
-      // Need to convert this into actual coordinates
-      Point2D.Float offset = new Point2D.Float(selected.getX(), 
-                                               selected.getY());
-      mouseposition = new Point2D.Float(mousepos.x + offset.x, 
-                                        mousepos.y + offset.y);
-   }
-   
-   
-   public void actionPerformed(ActionEvent arg0) {
-      CreateGui.getView().getUndoManager().addNewEdit(
-               selected.getArcPath().insertPoint(mouseposition, false));
-   }
-   
+	private Arc selected;
+	Point2D.Float mouseposition;
+
+	public InsertPointAction(Arc arc, Point mousepos) {
+		selected = arc;
+
+		// Mousepos is relative to selected component i.e. the arc
+		// Need to convert this into actual coordinates
+		Point2D.Float offset = new Point2D.Float(selected.getX(), selected
+				.getY());
+		mouseposition = new Point2D.Float(mousepos.x + offset.x, mousepos.y
+				+ offset.y);
+	}
+
+	public void actionPerformed(ActionEvent arg0) {
+		CreateGui.getView().getUndoManager().addNewEdit(
+				selected.getArcPath().insertPoint(mouseposition, false));
+	}
+
 }

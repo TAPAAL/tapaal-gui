@@ -8,35 +8,37 @@ public class IntervalBound {
 	private IntOrConstant a;
 	private IntOrConstant b;
 
-	public IntervalBound(IntOrConstant a, IntOrConstant b){
+	public IntervalBound(IntOrConstant a, IntOrConstant b) {
 		this.a = a;
 		this.b = b;
 	}
 
-	public IntervalBound(boolean infinity){
+	public IntervalBound(boolean infinity) {
 		this.a = new IntOrConstant();
 
-		if(infinity){
+		if (infinity) {
 			this.b = new IntOrConstant(-1);
-		}else{
+		} else {
 			this.b = new IntOrConstant();
 		}
 	}
 
 	public IntervalBound(String upperBound) {
-		if(upperBound.equals("inf")){
+		if (upperBound.equals("inf")) {
 			this.a = new IntOrConstant();
 			this.b = new IntOrConstant(-1);
-		}else{
-			if(upperBound.contains("*")){
-				this.a = new IntOrConstant(upperBound.substring(0, upperBound.indexOf("*")));
-				
-				if(upperBound.contains("+")){
-					this.b = new IntOrConstant(upperBound.substring(upperBound.lastIndexOf("+")+1));
-				}else{
+		} else {
+			if (upperBound.contains("*")) {
+				this.a = new IntOrConstant(upperBound.substring(0, upperBound
+						.indexOf("*")));
+
+				if (upperBound.contains("+")) {
+					this.b = new IntOrConstant(upperBound.substring(upperBound
+							.lastIndexOf("+") + 1));
+				} else {
 					this.b = new IntOrConstant();
 				}
-			}else{
+			} else {
 				this.a = new IntOrConstant();
 				this.b = new IntOrConstant(upperBound);
 			}
@@ -45,29 +47,30 @@ public class IntervalBound {
 
 	@Override
 	public String toString() {
-		if(goesToInfinity()){
+		if (goesToInfinity()) {
 			return "inf";
-		}else if(!a.isUsingConstant() && a.getValue() == 0){
+		} else if (!a.isUsingConstant() && a.getValue() == 0) {
 			return String.valueOf(b);
-		}else if(!b.isUsingConstant() && b.getValue() == 0){
+		} else if (!b.isUsingConstant() && b.getValue() == 0) {
 			return String.format("%1$s*val", a);
-		}
-		else{
+		} else {
 			return String.format("%1$s*val+%2$s", a, b);
 		}
 	}
 
 	public boolean isLessThanOrEqual(ColoredToken token) {
-		if(goesToInfinity()) return false;
-		
+		if (goesToInfinity())
+			return false;
+
 		int lower = token.getColor().getValue() * a.getValue() + b.getValue();
 
 		return new BigDecimal(lower).compareTo(token.getAge()) <= 0;
 	}
 
 	public boolean isGreaterThanOrEqual(ColoredToken token) {
-		if(goesToInfinity()) return true;
-		
+		if (goesToInfinity())
+			return true;
+
 		int upper = token.getColor().getValue() * a.getValue() + b.getValue();
 
 		return new BigDecimal(upper).compareTo(token.getAge()) >= 0;
@@ -81,21 +84,21 @@ public class IntervalBound {
 		return a;
 	}
 
-	public IntOrConstant getOffset(){
+	public IntOrConstant getOffset() {
 		return b;
 	}
 
-	public boolean equals(ColoredToken token){
+	public boolean equals(ColoredToken token) {
 		return isLessThanOrEqual(token) && isGreaterThanOrEqual(token);
 	}
 
 	public List<String> getUsedConstants() {
 		List<String> list = new ArrayList<String>();
-		if(a.isUsingConstant()){
+		if (a.isUsingConstant()) {
 			list.add(a.getConstantName());
 		}
 
-		if(b.isUsingConstant()){
+		if (b.isUsingConstant()) {
 			list.add(b.getConstantName());
 		}
 
@@ -103,20 +106,19 @@ public class IntervalBound {
 	}
 
 	public String toStringWithoutConstants() {
-		if(goesToInfinity()){
+		if (goesToInfinity()) {
 			return "inf";
-		}else if(!a.isUsingConstant() && a.getValue() == 0){
+		} else if (!a.isUsingConstant() && a.getValue() == 0) {
 			return String.valueOf(b.getValue());
-		}else if(!b.isUsingConstant() && b.getValue() == 0){
+		} else if (!b.isUsingConstant() && b.getValue() == 0) {
 			return String.format("%1$d*val", a.getValue());
-		}
-		else{
+		} else {
 			return String.format("%1$d*val+%2$d", a.getValue(), b.getValue());
 		}
 	}
 
 	public void updateConstantName(String oldName, String newName) {
 		a.updateConstantName(oldName, newName);
-		b.updateConstantName(oldName, newName);		
+		b.updateConstantName(oldName, newName);
 	}
 }

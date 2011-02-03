@@ -6,5 +6,6 @@ public interface DrawingSurface {
 	void updatePreferredSize();
 
 	Component add(Component component);
+
 	void remove(Component component);
 }

@@ -9,13 +9,14 @@ public class TokenValueEdit extends Command {
 	private IntOrConstant oldValue;
 	private IntOrConstant newValue;
 	private ColoredToken token;
-	
-	public TokenValueEdit(ColoredToken token, IntOrConstant oldValue, IntOrConstant newValue){
+
+	public TokenValueEdit(ColoredToken token, IntOrConstant oldValue,
+			IntOrConstant newValue) {
 		this.token = token;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
-	
+
 	@Override
 	public void redo() {
 		token.setColor(newValue);

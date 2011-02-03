@@ -8,7 +8,7 @@ public abstract class ColorSetEdit extends Command {
 	private ColorSet oldColorSet;
 	private ColorSet newColorSet;
 
-	public ColorSetEdit(ColorSet oldColorSet, ColorSet newColorSet){
+	public ColorSetEdit(ColorSet oldColorSet, ColorSet newColorSet) {
 		this.oldColorSet = oldColorSet;
 		this.newColorSet = newColorSet;
 	}

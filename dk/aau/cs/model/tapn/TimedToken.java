@@ -8,29 +8,29 @@ import pipe.gui.Pipe;
 public class TimedToken {
 	private TimedPlace place;
 	private BigDecimal age;
-	
-	public TimedToken(TimedPlace place){
+
+	public TimedToken(TimedPlace place) {
 		this(place, BigDecimal.ZERO);
 	}
-	
-	public TimedToken(TimedPlace place, BigDecimal age){
+
+	public TimedToken(TimedPlace place, BigDecimal age) {
 		this.place = place;
 		this.age = age;
 	}
-	
-	public TimedPlace place(){
+
+	public TimedPlace place() {
 		return place;
 	}
-	
-	public BigDecimal age(){
+
+	public BigDecimal age() {
 		return age;
 	}
-	
+
 	@Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-				
+
 		StringBuffer buffer = new StringBuffer("(");
 		buffer.append(place.toString());
 		buffer.append(", ");
@@ -69,9 +69,10 @@ public class TimedToken {
 			return false;
 		return true;
 	}
-	
-	public TimedToken clone(){
-		return new TimedToken(place, age); // age is immutable so ok to pass it to constructor
+
+	public TimedToken clone() {
+		return new TimedToken(place, age); // age is immutable so ok to pass it
+											// to constructor
 	}
 
 	public TimedToken delay(BigDecimal delay) {

@@ -2,37 +2,28 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-
-
 public class TCTLEFNode extends TCTLAbstractPathProperty {
 
 	private TCTLAbstractStateProperty property;
-	
+
 	public void setProperty(TCTLAbstractStateProperty property) {
 		this.property = property;
 		this.property.setParent(this);
 	}
 
-
-
 	public TCTLAbstractStateProperty getProperty() {
 		return property;
 	}
-	
-	
-	
+
 	public TCTLEFNode(TCTLAbstractStateProperty property) {
 		this.property = property;
 		this.property.setParent(this);
 	}
 
-
 	public TCTLEFNode() {
 		this.property = new TCTLStatePlaceHolder();
 		this.property.setParent(this);
 	}
-
-
 
 	@Override
 	public boolean isSimpleProperty() {
@@ -45,16 +36,15 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 		start = start + 3;
 		int end = start + property.toString().length();
 		StringPosition position = new StringPosition(start, end, property);
-		
+
 		StringPosition[] children = { position };
 		return children;
 	}
 
-	
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof TCTLEFNode) {
-			TCTLEFNode node = (TCTLEFNode)o;
+		if (o instanceof TCTLEFNode) {
+			TCTLEFNode node = (TCTLEFNode) o;
 			return property.equals(node.getProperty());
 		}
 		return false;
@@ -62,7 +52,8 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public String toString() {
-		String s = property.isSimpleProperty() ? property.toString() : "(" + property.toString() + ")";
+		String s = property.isSimpleProperty() ? property.toString() : "("
+				+ property.toString() + ")";
 		return "EF " + s;
 	}
 
@@ -72,9 +63,10 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	}
 
 	@Override
-	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
+	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1,
+			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
-			return (TCTLAbstractPathProperty)object2;
+			return (TCTLAbstractPathProperty) object2;
 		} else {
 			property = property.replace(object1, object2);
 			return this;
@@ -86,22 +78,20 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 		visitor.visit(this, context);
 	}
 
-
-
 	@Override
 	public boolean containsPlaceHolder() {
 		return property.containsPlaceHolder();
 	}
-	
+
 	@Override
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-			return property.containsAtomicPropWithSpecificPlace(placeName);
+		return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
-	
+
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return property.findFirstPlaceHolder();
-		
+
 	}
 
 }

@@ -11,47 +11,49 @@ import dk.aau.cs.util.Require;
 public class TimedArcPetriNetNetwork {
 	private List<TimedArcPetriNet> tapns;
 	private NetworkMarking currentMarking;
-	
+
 	private ConstantStore constants;
-	
-	public TimedArcPetriNetNetwork(){
+
+	public TimedArcPetriNetNetwork() {
 		tapns = new ArrayList<TimedArcPetriNet>();
 		currentMarking = new NetworkMarking();
 		constants = new ConstantStore();
 	}
-	
-	public void add(TimedArcPetriNet tapn){
+
+	public void add(TimedArcPetriNet tapn) {
 		Require.that(tapn != null, "tapn must be non-null");
 		Require.that(tapn.marking() != null, "Marking must be non-null");
-		
+
 		tapns.add(tapn);
 		currentMarking.addMarking(tapn, tapn.marking());
 	}
-	
-	public void remove(TimedArcPetriNet tapn){
-		if(tapn != null){
+
+	public void remove(TimedArcPetriNet tapn) {
+		if (tapn != null) {
 			tapns.remove(tapn);
 			currentMarking.removeMarkingFor(tapn);
-			
+
 		}
 	}
-	
-	public List<TimedArcPetriNet> templates(){
+
+	public List<TimedArcPetriNet> templates() {
 		return tapns;
 	}
 
 	public boolean hasTAPNCalled(String newName) {
-		for(TimedArcPetriNet tapn : tapns) if(tapn.getName().equals(newName)) return true;
+		for (TimedArcPetriNet tapn : tapns)
+			if (tapn.getName().equals(newName))
+				return true;
 		return false;
 	}
 
 	public NetworkMarking marking() {
 		return currentMarking;
 	}
-	
-	public void setMarking(NetworkMarking marking) {		
+
+	public void setMarking(NetworkMarking marking) {
 		currentMarking = marking;
-		for(TimedArcPetriNet tapn : tapns){
+		for (TimedArcPetriNet tapn : tapns) {
 			tapn.setMarking(marking.getMarkingFor(tapn));
 		}
 	}
@@ -65,58 +67,60 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public Command addConstant(String name, int val) {
-		return constants.addConstant(name,val);
+		return constants.addConstant(name, val);
 	}
-	
+
 	public Command removeConstant(String name) {
 		return constants.removeConstant(name);
 	}
 
 	public Command updateConstant(String oldName, Constant constant) {
 		Command edit = constants.updateConstant(oldName, constant, this);
-		
-		if(edit != null) {
-			updateGuardsWithNewConstant(oldName,constant);
+
+		if (edit != null) {
+			updateGuardsWithNewConstant(oldName, constant);
 		}
-		
+
 		return edit;
 	}
 
 	public void updateGuardsWithNewConstant(String oldName, Constant newConstant) {
-		for(TimedArcPetriNet tapn : templates()) {
-			for(TimedPlace place : tapn.places()) {
+		for (TimedArcPetriNet tapn : templates()) {
+			for (TimedPlace place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}
-			
-			for(TimedInputArc inputArc : tapn.inputArcs()) {
+
+			for (TimedInputArc inputArc : tapn.inputArcs()) {
 				updateTimeInterval(oldName, newConstant, inputArc.interval());
 			}
-			
-			for(TransportArc transArc : tapn.transportArcs()) {
+
+			for (TransportArc transArc : tapn.transportArcs()) {
 				updateTimeInterval(oldName, newConstant, transArc.interval());
 			}
-			
-			for(TimedInhibitorArc inhibArc : tapn.inhibitorArcs()) {
-				updateTimeInterval(oldName,newConstant, inhibArc.interval());
+
+			for (TimedInhibitorArc inhibArc : tapn.inhibitorArcs()) {
+				updateTimeInterval(oldName, newConstant, inhibArc.interval());
 			}
 		}
-		
-	}
-	
-	private void updatePlaceInvariant(String oldName, Constant newConstant, TimedPlace place) {
-		updateBound(oldName,newConstant,place.invariant().upperBound());
+
 	}
 
-	private void updateTimeInterval(String oldName, Constant newConstant, TimeInterval interval) {
-		updateBound(oldName,newConstant,interval.lowerBound());
-		updateBound(oldName,newConstant,interval.upperBound());
+	private void updatePlaceInvariant(String oldName, Constant newConstant,
+			TimedPlace place) {
+		updateBound(oldName, newConstant, place.invariant().upperBound());
+	}
+
+	private void updateTimeInterval(String oldName, Constant newConstant,
+			TimeInterval interval) {
+		updateBound(oldName, newConstant, interval.lowerBound());
+		updateBound(oldName, newConstant, interval.upperBound());
 	}
 
 	private void updateBound(String oldName, Constant newConstant, Bound bound) {
-		if(bound instanceof ConstantBound) {
-			ConstantBound cb = (ConstantBound)bound;
-			
-			if(cb.name().equals(oldName)) {
+		if (bound instanceof ConstantBound) {
+			ConstantBound cb = (ConstantBound) bound;
+
+			if (cb.name().equals(oldName)) {
 				cb.setConstant(newConstant);
 			}
 		}
@@ -139,22 +143,21 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void setConstants(Iterable<Constant> constants) {
-		for(Constant c : constants) {
+		for (Constant c : constants) {
 			this.constants.add(c);
 		}
 	}
-
 
 	public Constant getConstant(String constantName) {
 		return constants.getConstant(constantName);
 	}
 
-
 	public TimedArcPetriNet getTAPNByName(String name) {
-		for(TimedArcPetriNet tapn : tapns){
-			if(tapn.getName().equals(name)) return tapn;
+		for (TimedArcPetriNet tapn : tapns) {
+			if (tapn.getName().equals(name))
+				return tapn;
 		}
 		return null;
 	}
-	
+
 }

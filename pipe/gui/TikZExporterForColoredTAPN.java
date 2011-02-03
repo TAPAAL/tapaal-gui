@@ -18,7 +18,7 @@ import pipe.dataLayer.colors.Preserve;
 public class TikZExporterForColoredTAPN extends TikZExporter {
 
 	private final int MULTILINE_SHIFT_VALUE = 3;
-	
+
 	public TikZExporterForColoredTAPN(DataLayer net, String fullpath,
 			TikZOutputOption option) {
 		super(net, fullpath, option);
@@ -27,27 +27,30 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 	@Override
 	protected String getPlaceInvariantString(Place place) {
 		StringBuffer invariant = new StringBuffer("");
-		ColoredTimedPlace ctp = (ColoredTimedPlace)place;
+		ColoredTimedPlace ctp = (ColoredTimedPlace) place;
 
 		String timeInvariant = ctp.getTimeInvariant().toString();
-		String colorInvariant = "\\{" + ctp.getColorInvariantStringWithoutSetNotation() + "\\}";
+		String colorInvariant = "\\{"
+				+ ctp.getColorInvariantStringWithoutSetNotation() + "\\}";
 		boolean shiftColorInvariant = false;
-		if(!timeInvariant.contains("inf")){
+		if (!timeInvariant.contains("inf")) {
 			invariant.append("label=below:");
-			invariant.append(replaceWithMathLatex("\\mathit{age}" + timeInvariant));
+			invariant.append(replaceWithMathLatex("\\mathit{age}"
+					+ timeInvariant));
 			invariant.append(",");
 			shiftColorInvariant = true;
-		}	
-		
-		if(!colorInvariant.equals("\\{\\}")){
+		}
+
+		if (!colorInvariant.equals("\\{\\}")) {
 			invariant.append("label={");
-			if(shiftColorInvariant){
+			if (shiftColorInvariant) {
 				invariant.append("[yshift=-");
 				invariant.append(MULTILINE_SHIFT_VALUE);
 				invariant.append("mm]");
 			}
 			invariant.append("below: ");
-			invariant.append(replaceWithMathLatex("\\mathit{val} \\in " + colorInvariant));
+			invariant.append(replaceWithMathLatex("\\mathit{val} \\in "
+					+ colorInvariant));
 			invariant.append("},");
 		}
 
@@ -56,10 +59,10 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 
 	@Override
 	protected String getTokenListStringFor(Place place) {
-		List<ColoredToken> tokens =((ColoredTimedPlace)place).getColoredTokens();
+		List<ColoredToken> tokens = ((ColoredTimedPlace) place)
+				.getColoredTokens();
 		String tokensInPlace = "";
-		if(tokens.size() > 0)
-		{
+		if (tokens.size() > 0) {
 			StringBuffer out = new StringBuffer();
 
 			out.append("structured tokens={\\#");
@@ -77,60 +80,64 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 
 		}
 		return tokensInPlace;
-	}	
-	
+	}
+
 	@Override
-	protected String getArcLabels(Arc arc){
+	protected String getArcLabels(Arc arc) {
 		StringBuffer result = new StringBuffer("");
-		
+
 		ColorSet colorGuard = new ColorSet();
 		ColoredInterval timeGuard = new ColoredInterval();
-		
-		if(arc instanceof ColoredInputArc){
-			ColoredInputArc cia = (ColoredInputArc)arc;
+
+		if (arc instanceof ColoredInputArc) {
+			ColoredInputArc cia = (ColoredInputArc) arc;
 			timeGuard = cia.getTimeGuard();
 			colorGuard = cia.getColorGuard();
-		}else if(arc instanceof ColoredTransportArc){
-			ColoredTransportArc cta = (ColoredTransportArc)arc;
+		} else if (arc instanceof ColoredTransportArc) {
+			ColoredTransportArc cta = (ColoredTransportArc) arc;
 			timeGuard = cta.getTimeGuard();
 			colorGuard = cta.getColorGuard();
-		}else if(arc instanceof ColoredInhibitorArc){
-			ColoredInhibitorArc cia = (ColoredInhibitorArc)arc;
+		} else if (arc instanceof ColoredInhibitorArc) {
+			ColoredInhibitorArc cia = (ColoredInhibitorArc) arc;
 			timeGuard = cia.getTimeGuard();
 			colorGuard = cia.getColorGuard();
 		}
-		
-		String line1 = null; 
+
+		String line1 = null;
 		String line2 = null;
 		boolean usesLine2 = false;
-		
-		if(arc instanceof ColoredOutputArc){
-			line1 = ((ColoredOutputArc)arc).getOutputString();
-		}else if(arc instanceof ColoredTransportArc && !((ColoredTransportArc)arc).isInPreSet()){
-			ColoredTransportArc cta = (ColoredTransportArc)arc;
+
+		if (arc instanceof ColoredOutputArc) {
+			line1 = ((ColoredOutputArc) arc).getOutputString();
+		} else if (arc instanceof ColoredTransportArc
+				&& !((ColoredTransportArc) arc).isInPreSet()) {
+			ColoredTransportArc cta = (ColoredTransportArc) arc;
 			usesLine2 = true;
 			Preserve preserves = cta.getPreservation();
-			if(preserves == null){
+			if (preserves == null) {
 				preserves = Preserve.AgeAndValue;
 			}
-			if(preserves.equals(Preserve.Age)){
+			if (preserves.equals(Preserve.Age)) {
 				line1 = "\\text{preserve } \\mathit{age} : " + cta.getGroup();
 				line2 = cta.getOutputString();
-			}else if(preserves.equals(Preserve.Value)){
+			} else if (preserves.equals(Preserve.Value)) {
 				line1 = "\\mathit{age} := 0 : " + cta.getGroup();
 				line2 = "\\text{preserve }\\mathit{val}";
-			}else{
+			} else {
 				line1 = "\\text{preserve } \\mathit{age} : " + cta.getGroup();
 				line2 = "\\text{preserve } \\mathit{val}";
 			}
-		}else{
-			line1 = "\\mathit{age} \\in" +timeGuard.toString();;
-			line2 = "\\mathit{val} \\in \\{" + colorGuard.toStringNoSetNotation() + "\\}";
-			usesLine2 = !colorGuard.isEmpty();;
+		} else {
+			line1 = "\\mathit{age} \\in" + timeGuard.toString();
+			;
+			line2 = "\\mathit{val} \\in \\{"
+					+ colorGuard.toStringNoSetNotation() + "\\}";
+			usesLine2 = !colorGuard.isEmpty();
+			;
 		}
-		
+
 		result.append("node[midway,auto");
-		if(usesLine2){
+		if (usesLine2) {
 			result.append(",yshift=");
 			result.append(MULTILINE_SHIFT_VALUE);
 			result.append("mm");
@@ -138,14 +145,14 @@ public class TikZExporterForColoredTAPN extends TikZExporter {
 		result.append("] {");
 		result.append(replaceWithMathLatex(line1));
 		result.append("}");
-		
-		if(usesLine2){
+
+		if (usesLine2) {
 			result.append("node[midway,auto");
 			result.append("] {");
 			result.append(replaceWithMathLatex(line2));
 			result.append("}");
 		}
-		
+
 		return result.toString();
 	}
 }

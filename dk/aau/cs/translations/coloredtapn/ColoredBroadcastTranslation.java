@@ -27,29 +27,32 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 	}
 
 	@Override
-	protected String createLocalDeclarations(TimedArcPetriNet model, Token token){
-		String decl = super.createLocalDeclarations(model,token);
+	protected String createLocalDeclarations(TimedArcPetriNet model, Token token) {
+		String decl = super.createLocalDeclarations(model, token);
 
-		int value = token instanceof ColoredToken ? ((ColoredToken)token).getColor() : 0; // Hack -- Capacity tokens are ordinary tokens
+		int value = token instanceof ColoredToken ? ((ColoredToken) token)
+				.getColor() : 0; // Hack -- Capacity tokens are ordinary tokens
 		String init = useSymmetry ? "" : " = " + value;
-		
-		ColoredTimedArcPetriNet ctapn = (ColoredTimedArcPetriNet)model;
-		decl += String.format("\nint[%1$d,%2$d] %3$s%4$s;", ctapn.getLowerBoundForColor(), ctapn.getUpperBoundForColor(), 
+
+		ColoredTimedArcPetriNet ctapn = (ColoredTimedArcPetriNet) model;
+		decl += String.format("\nint[%1$d,%2$d] %3$s%4$s;", ctapn
+				.getLowerBoundForColor(), ctapn.getUpperBoundForColor(),
 				VALUE_VAR_NAME, init);
 		return decl;
 	}
 
 	@Override
-	protected String createTransitionGuard(TAPNArc inputArc, Arc outputArc, TAPNPlace target,
-			boolean isTransportArc) {
+	protected String createTransitionGuard(TAPNArc inputArc, Arc outputArc,
+			TAPNPlace target, boolean isTransportArc) {
 
-		if(inputArc instanceof ColoredTransportArc){
-			return createTransitionGuardForTransportArc((ColoredTransportArc)inputArc);
-		}else if(inputArc instanceof ColoredInputArc){
-			return createTransitionGuardForInputArc((ColoredInputArc)inputArc, (ColoredOutputArc)outputArc);
-		}else if(inputArc instanceof ColoredInhibitorArc){
-			return createTransitionGuardForInhibitorArc((ColoredInhibitorArc)inputArc);
-		}else{
+		if (inputArc instanceof ColoredTransportArc) {
+			return createTransitionGuardForTransportArc((ColoredTransportArc) inputArc);
+		} else if (inputArc instanceof ColoredInputArc) {
+			return createTransitionGuardForInputArc((ColoredInputArc) inputArc,
+					(ColoredOutputArc) outputArc);
+		} else if (inputArc instanceof ColoredInhibitorArc) {
+			return createTransitionGuardForInhibitorArc((ColoredInhibitorArc) inputArc);
+		} else {
 			throw new IllegalArgumentException("unknown arc type");
 		}
 	}
@@ -58,16 +61,19 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 			ColoredOutputArc outputArc) {
 		StringBuilder builder = new StringBuilder();
 
-		ColorSet colorInvariant = ((ColoredPlace)outputArc.getTarget()).getColorInvariant();
-		if(!colorInvariant.contains(outputArc.getOutputValue())){
+		ColorSet colorInvariant = ((ColoredPlace) outputArc.getTarget())
+				.getColorInvariant();
+		if (!colorInvariant.contains(outputArc.getOutputValue())) {
 			builder.append("false");
-		}else{
+		} else {
 			ColoredInterval timeGuard = inputArc.getTimeGuard();
-			builder.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME));
+			builder.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME,
+					VALUE_VAR_NAME));
 
 			ColorSet colorGuard = inputArc.getColorGuard();
-			String colorGuardString = colorGuard.convertToTAGuardString(VALUE_VAR_NAME);
-			if(builder.length() > 0 && !colorGuardString.isEmpty()){
+			String colorGuardString = colorGuard
+					.convertToTAGuardString(VALUE_VAR_NAME);
+			if (builder.length() > 0 && !colorGuardString.isEmpty()) {
 				builder.append(" && ");
 			}
 
@@ -82,16 +88,17 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 		StringBuilder builder = new StringBuilder();
 
 		ColoredInterval timeGuard = inputArc.getTimeGuard();
-		builder.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME));
+		builder.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME,
+				VALUE_VAR_NAME));
 
 		ColorSet colorGuard = inputArc.getColorGuard();
-		String colorGuardString = colorGuard.convertToTAGuardString(VALUE_VAR_NAME);
-		if(builder.length() > 0 && !colorGuardString.isEmpty()){
+		String colorGuardString = colorGuard
+				.convertToTAGuardString(VALUE_VAR_NAME);
+		if (builder.length() > 0 && !colorGuardString.isEmpty()) {
 			builder.append(" && ");
 		}
 
 		builder.append(colorGuardString);
-
 
 		return builder.toString();
 	}
@@ -100,21 +107,26 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 			ColoredTransportArc inputArc) {
 		StringBuilder guard = new StringBuilder();
 
-		ColoredPlace target = (ColoredPlace)inputArc.getTarget();
+		ColoredPlace target = (ColoredPlace) inputArc.getTarget();
 		ColorSet colorInvariant = target.getColorInvariant();
-		if(inputArc.getPreservation().equals(Preservation.Age) && !colorInvariant.contains(inputArc.getOutputValue())){
+		if (inputArc.getPreservation().equals(Preservation.Age)
+				&& !colorInvariant.contains(inputArc.getOutputValue())) {
 			guard.append("false");
-		}else{
+		} else {
 			ColoredInterval timeGuard = inputArc.getTimeGuard();
-			ColoredTimeInvariant targetTimeInvariant = target.getTimeInvariant();
+			ColoredTimeInvariant targetTimeInvariant = target
+					.getTimeInvariant();
 
-			guard.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME));
+			guard.append(timeGuard.convertToTAGuardString(TOKEN_CLOCK_NAME,
+					VALUE_VAR_NAME));
 
-			if(!inputArc.getPreservation().equals(Preservation.Value)){
-				String invString = targetTimeInvariant.convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
-				if(guard.length() > 0 && !invString.isEmpty()){
+			if (!inputArc.getPreservation().equals(Preservation.Value)) {
+				String invString = targetTimeInvariant
+						.convertToTAInvariantString(TOKEN_CLOCK_NAME,
+								VALUE_VAR_NAME);
+				if (guard.length() > 0 && !invString.isEmpty()) {
 					guard.append(" && ");
-				}		
+				}
 				guard.append(invString);
 			}
 
@@ -122,14 +134,16 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 
 			ColorSet combined = null;
 
-			if(inputArc.getPreservation().equals(Preservation.AgeAndValue) || inputArc.getPreservation().equals(Preservation.Value)){
+			if (inputArc.getPreservation().equals(Preservation.AgeAndValue)
+					|| inputArc.getPreservation().equals(Preservation.Value)) {
 				combined = colorGuard.intersect(colorInvariant);
-			}else{
+			} else {
 				combined = colorGuard;
 			}
 
-			String colorGuardString = combined.convertToTAGuardString(VALUE_VAR_NAME);
-			if(guard.length() > 0 && !colorGuardString.isEmpty()){
+			String colorGuardString = combined
+					.convertToTAGuardString(VALUE_VAR_NAME);
+			if (guard.length() > 0 && !colorGuardString.isEmpty()) {
 				guard.append(" && ");
 			}
 
@@ -138,24 +152,25 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 		return guard.toString();
 	}
 
-
 	@Override
 	protected String createResetExpressionIfNormalArc(Arc arc) {
 		String clockReset = String.format("%1$s := 0", TOKEN_CLOCK_NAME);
 
-		if(arc instanceof ColoredOutputArc){
-			int value = ((ColoredOutputArc)arc).getOutputValue();
-			String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
+		if (arc instanceof ColoredOutputArc) {
+			int value = ((ColoredOutputArc) arc).getOutputValue();
+			String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME,
+					value);
 			return clockReset + ", " + valueReset;
-		}else {
-			ColoredTransportArc tarc = (ColoredTransportArc)arc;
-			if(tarc.getPreservation().equals(Preservation.Age)){
+		} else {
+			ColoredTransportArc tarc = (ColoredTransportArc) arc;
+			if (tarc.getPreservation().equals(Preservation.Age)) {
 				int value = tarc.getOutputValue();
-				String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
+				String valueReset = String.format("%1$s := %2$d",
+						VALUE_VAR_NAME, value);
 				return valueReset;
-			}else if(tarc.getPreservation().equals(Preservation.Value)){
+			} else if (tarc.getPreservation().equals(Preservation.Value)) {
 				return clockReset;
-			}else{
+			} else {
 				return "";
 			}
 		}
@@ -163,13 +178,15 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 
 	@Override
 	protected String convertInvariant(TAPNPlace place) {
-		ColoredPlace cp = (ColoredPlace)place;
+		ColoredPlace cp = (ColoredPlace) place;
 
-		String timeInvariant = cp.getTimeInvariant().convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
-		String colorInvariant = cp.getColorInvariant().convertToTAGuardString(VALUE_VAR_NAME);
+		String timeInvariant = cp.getTimeInvariant()
+				.convertToTAInvariantString(TOKEN_CLOCK_NAME, VALUE_VAR_NAME);
+		String colorInvariant = cp.getColorInvariant().convertToTAGuardString(
+				VALUE_VAR_NAME);
 
 		String invariant = timeInvariant;
-		if(!invariant.isEmpty() && !colorInvariant.isEmpty()){
+		if (!invariant.isEmpty() && !colorInvariant.isEmpty()) {
 			invariant += " && ";
 		}
 		invariant += colorInvariant;
@@ -177,22 +194,20 @@ public class ColoredBroadcastTranslation extends BroadcastTranslation {
 		return invariant;
 	}
 
-
 	@Override
 	protected String createUpdateExpressionForTokenInitialization(Token token) {
-		ColoredToken ct = (ColoredToken)token;
+		ColoredToken ct = (ColoredToken) token;
 
 		return String.format("%1$s := %2$d", VALUE_VAR_NAME, ct.getColor());
 	}
-	
+
 	@Override
 	public ColoredTranslationNamingScheme namingScheme() {
 		return new ColoredBroadcastNamingScheme();
 	}
-	
+
 	private class ColoredBroadcastNamingScheme extends BroadcastNamingScheme
-		implements ColoredTranslationNamingScheme
-	{
+			implements ColoredTranslationNamingScheme {
 		public String colorVariableName() {
 			return VALUE_VAR_NAME;
 		}

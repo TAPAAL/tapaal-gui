@@ -9,13 +9,14 @@ public class ColoredTimedPlaceTimeInvariantEdit extends Command {
 	private ColoredTimedPlace place;
 	private ColoredTimeInvariant oldInvariant;
 	private ColoredTimeInvariant newInvariant;
-	
-	public ColoredTimedPlaceTimeInvariantEdit(ColoredTimedPlace place, ColoredTimeInvariant oldInvariant, ColoredTimeInvariant newInvariant){
+
+	public ColoredTimedPlaceTimeInvariantEdit(ColoredTimedPlace place,
+			ColoredTimeInvariant oldInvariant, ColoredTimeInvariant newInvariant) {
 		this.place = place;
 		this.oldInvariant = oldInvariant;
 		this.newInvariant = newInvariant;
 	}
-	
+
 	@Override
 	public void redo() {
 		place.setTimeInvariant(newInvariant);

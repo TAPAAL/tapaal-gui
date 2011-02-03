@@ -28,9 +28,9 @@ public class MessengerImpl implements Messenger {
 		showMessageBox(message, title, JOptionPane.ERROR_MESSAGE);
 	}
 
-
 	private void showMessageBox(Object message, String title, int messageType) {
-		JOptionPane.showMessageDialog(CreateGui.getApp(), message, title, messageType);
+		JOptionPane.showMessageDialog(CreateGui.getApp(), message, title,
+				messageType);
 	}
 
 	public void displayWrappedErrorMessage(String message, String title) {
@@ -38,13 +38,13 @@ public class MessengerImpl implements Messenger {
 		textArea.setEditable(false);
 		textArea.setEnabled(false);
 		textArea.setDisabledTextColor(Color.BLACK);
-		textArea.setLineWrap(true);  
-		textArea.setWrapStyleWord(true);  
-		textArea.setMargin(new Insets(5,5,5,5));  
-		JScrollPane scrollPane = new JScrollPane(); 
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		textArea.setMargin(new Insets(5, 5, 5, 5));
+		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setPreferredSize(new Dimension(400, 100));
-		scrollPane.getViewport().setView(textArea);  
+		scrollPane.getViewport().setView(textArea);
 
-		showMessageBox(scrollPane, title, JOptionPane.ERROR_MESSAGE);		
+		showMessageBox(scrollPane, title, JOptionPane.ERROR_MESSAGE);
 	}
 }

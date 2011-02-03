@@ -7,21 +7,21 @@ import pipe.dataLayer.TimedPlaceComponent;
 public class Token {
 	private TimedPlaceComponent place;
 	private BigDecimal age;
-	
-	public Token(TimedPlaceComponent place, double age){
+
+	public Token(TimedPlaceComponent place, double age) {
 		this(place, new BigDecimal(age));
 	}
-	
-	public Token(TimedPlaceComponent place, BigDecimal age){
+
+	public Token(TimedPlaceComponent place, BigDecimal age) {
 		this.place = place;
 		this.age = age;
 	}
-	
-	public TimedPlaceComponent place(){
+
+	public TimedPlaceComponent place() {
 		return place;
 	}
-	
-	public BigDecimal age(){
+
+	public BigDecimal age() {
 		return age;
 	}
 }

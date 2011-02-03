@@ -9,23 +9,24 @@ public class ColoredTransportArcUpdateValueEdit extends Command {
 	private IntOrConstant oldValue;
 	private IntOrConstant newValue;
 	private ColoredTransportArc arc;
-	
-	public ColoredTransportArcUpdateValueEdit(ColoredTransportArc arc, IntOrConstant oldValue, IntOrConstant newValue){
+
+	public ColoredTransportArcUpdateValueEdit(ColoredTransportArc arc,
+			IntOrConstant oldValue, IntOrConstant newValue) {
 		this.arc = arc;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
-	
+
 	@Override
 	public void redo() {
 		arc.setOutputValue(newValue);
-		((ColoredTransportArc)arc.getConnectedTo()).setOutputValue(newValue);
+		((ColoredTransportArc) arc.getConnectedTo()).setOutputValue(newValue);
 	}
 
 	@Override
 	public void undo() {
 		arc.setOutputValue(oldValue);
-		((ColoredTransportArc)arc.getConnectedTo()).setOutputValue(oldValue);
+		((ColoredTransportArc) arc.getConnectedTo()).setOutputValue(oldValue);
 	}
 
 }

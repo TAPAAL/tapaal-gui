@@ -11,12 +11,14 @@ public class ColoredPlaceTokensChangedEdit extends Command {
 	private ColoredTimedPlace place;
 	private List<ColoredToken> oldTokens;
 	private List<ColoredToken> newTokens;
-	
-	public ColoredPlaceTokensChangedEdit(ColoredTimedPlace place, List<ColoredToken> oldTokens, List<ColoredToken> newTokens){
+
+	public ColoredPlaceTokensChangedEdit(ColoredTimedPlace place,
+			List<ColoredToken> oldTokens, List<ColoredToken> newTokens) {
 		this.place = place;
 		this.oldTokens = oldTokens;
 		this.newTokens = newTokens;
 	}
+
 	@Override
 	public void redo() {
 		place.setColoredTokens(newTokens);

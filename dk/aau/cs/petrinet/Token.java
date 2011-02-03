@@ -5,25 +5,25 @@ import java.math.BigDecimal;
 public class Token {
 	private TAPNPlace place;
 	private BigDecimal age;
-	
-	public Token(TAPNPlace place){
+
+	public Token(TAPNPlace place) {
 		this(place, BigDecimal.ZERO);
 	}
-	
-	public Token(TAPNPlace place, BigDecimal age){
+
+	public Token(TAPNPlace place, BigDecimal age) {
 		this.place = place;
 		this.age = age;
-		
+
 	}
-	
-	public TAPNPlace place(){
+
+	public TAPNPlace place() {
 		return place;
 	}
-	
-	public BigDecimal age(){
+
+	public BigDecimal age() {
 		return age;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "(" + place.getName() + ", age:" + age + ")";

@@ -10,12 +10,12 @@ public class RemoveTemplateCommand extends AddTemplateCommand {
 			Template<TimedArcPetriNet> template, int listIndex) {
 		super(templateExplorer, template, listIndex);
 	}
-	
+
 	@Override
 	public void redo() {
 		super.undo(); // Just the opposite of adding a template
 	}
-	
+
 	@Override
 	public void undo() {
 		super.redo(); // Just the opposite of adding a template

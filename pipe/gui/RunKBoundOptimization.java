@@ -12,22 +12,24 @@ public class RunKBoundOptimization extends RunKBoundAnalysis {
 
 	private JSpinner spinner;
 	private int extraTokens;
-	
-	public RunKBoundOptimization(ModelChecker modelChecker, Messenger messenger, int extraTokens, JSpinner spinner) {
+
+	public RunKBoundOptimization(ModelChecker modelChecker,
+			Messenger messenger, int extraTokens, JSpinner spinner) {
 		super(modelChecker, messenger);
 		this.extraTokens = extraTokens;
 		this.spinner = spinner;
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TapaalTrace> result, long verificationTime) {
-		if(result.getQueryResult().integerResult() == extraTokens+1){
+	protected void showResult(VerificationResult<TapaalTrace> result,
+			long verificationTime) {
+		if (result.getQueryResult().integerResult() == extraTokens + 1) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					getAnswerNotBoundedString(), 
-					"Analysis Result", JOptionPane.INFORMATION_MESSAGE);
-		}else{
+					getAnswerNotBoundedString(), "Analysis Result",
+					JOptionPane.INFORMATION_MESSAGE);
+		} else {
 			spinner.setValue(result.getQueryResult().integerResult());
 		}
 	}
-	
+
 }

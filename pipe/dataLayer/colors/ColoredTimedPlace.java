@@ -31,32 +31,28 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		init();
 	}
 
-	public ColoredTimedPlace(double positionXInput,  double positionYInput, 
-			String idInput, 
-			String nameInput, 
-			Double nameOffsetXInput, Double nameOffsetYInput, 
-			int initialMarkingInput, 
-			double markingOffsetXInput,  double markingOffsetYInput,
-			int capacityInput, String invariant){
+	public ColoredTimedPlace(double positionXInput, double positionYInput,
+			String idInput, String nameInput, Double nameOffsetXInput,
+			Double nameOffsetYInput, int initialMarkingInput,
+			double markingOffsetXInput, double markingOffsetYInput,
+			int capacityInput, String invariant) {
 
-		super(positionXInput, positionYInput, idInput, nameInput, 
-				nameOffsetXInput, nameOffsetYInput,
-				initialMarkingInput, markingOffsetXInput, markingOffsetYInput,
-				capacityInput, invariant);
+		super(positionXInput, positionYInput, idInput, nameInput,
+				nameOffsetXInput, nameOffsetYInput, initialMarkingInput,
+				markingOffsetXInput, markingOffsetYInput, capacityInput,
+				invariant);
 
 		init();
 	}
 
-	public ColoredTimedPlace(Place place, String invariant){		
+	public ColoredTimedPlace(Place place, String invariant) {
 		super(place, invariant);
 
 		init();
 	}
 
-	public ColoredTimedPlace(String idInput, 
-			String nameInput, 
-			int initialMarkingInput, 
-			int capacityInput, String invariant){
+	public ColoredTimedPlace(String idInput, String nameInput,
+			int initialMarkingInput, int capacityInput, String invariant) {
 		super(idInput, nameInput, initialMarkingInput, capacityInput, invariant);
 
 		init();
@@ -68,17 +64,17 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		tokens = new ArrayList<ColoredToken>();
 	}
 
-	public String getColorInvariantString(){
+	public String getColorInvariantString() {
 		return colorInvariant.toString();
 	}
-
 
 	public boolean satisfiesInvariant(ColoredToken token) {
 		IntOrConstant val = token.getColor();
 		int value = 0;
-		if(val.isUsingConstant()){
-			value = CreateGui.getCurrentTab().network().getConstantValue(val.getConstantName());
-		}else{
+		if (val.isUsingConstant()) {
+			value = CreateGui.getCurrentTab().network().getConstantValue(
+					val.getConstantName());
+		} else {
 			value = val.getIntegerValue();
 		}
 
@@ -90,8 +86,8 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 		StringBuilder builder = new StringBuilder("{");
 
 		boolean first = true;
-		for(ColoredToken token : tokens){
-			if(!first){
+		for (ColoredToken token : tokens) {
+			if (!first) {
 				builder.append(", ");
 			}
 			builder.append(token.toString());
@@ -112,50 +108,48 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 
 		update(true);
 
-		return new PlaceColorInvariantEdit(this, old, newColorInvariant);		
+		return new PlaceColorInvariantEdit(this, old, newColorInvariant);
 	}
 
-	public List<ColoredToken> getColoredTokens(){
+	public List<ColoredToken> getColoredTokens() {
 		return tokens;
 	}
 
-	public Command addColoredToken(ColoredToken token){
+	public Command addColoredToken(ColoredToken token) {
 		tokens.add(token);
-		
+
 		update(true);
 
 		return new ColoredPlaceAddTokenEdit(this, token);
 	}
 
-	public Command removeColoredToken(ColoredToken token){
+	public Command removeColoredToken(ColoredToken token) {
 		tokens.remove(token);
-		
+
 		update(true);
 
-		return new ColoredPlaceRemoveTokenEdit(this,token);
+		return new ColoredPlaceRemoveTokenEdit(this, token);
 	}
 
 	public Command setColoredTokens(List<ColoredToken> newTokens) {
 		List<ColoredToken> old = this.tokens;
 		this.tokens = newTokens;
-		
+
 		update(true);
 
-		return new ColoredPlaceTokensChangedEdit(this,old,newTokens);
+		return new ColoredPlaceTokensChangedEdit(this, old, newTokens);
 	}
-
 
 	@Override
 	public int getCurrentMarking() {
 		return tokens.size();
 	}
 
-
 	@Override
 	protected void paintTokens(Graphics g) {
 		int numberOfTokens = getCurrentMarking();
 
-		if(numberOfTokens > 0){
+		if (numberOfTokens > 0) {
 			String toDraw = String.format("#%1$d", numberOfTokens);
 
 			Insets insets = getInsets();
@@ -177,31 +171,32 @@ public class ColoredTimedPlace extends TimedPlaceComponent {
 	public Command setTimeInvariant(ColoredTimeInvariant newTimeInvariant) {
 		ColoredTimeInvariant old = this.timeInvariant;
 		this.timeInvariant = newTimeInvariant;
-		
+
 		update(true);
-		
-		return new ColoredTimedPlaceTimeInvariantEdit(this, old, newTimeInvariant);
+
+		return new ColoredTimedPlaceTimeInvariantEdit(this, old,
+				newTimeInvariant);
 	}
 
 	public void displayValues(boolean showValues) {
 		timeInvariant.displayValues(showValues);
 		colorInvariant.displayValues(showValues);
-		
-		for(ColoredToken token : tokens){
+
+		for (ColoredToken token : tokens) {
 			token.displayValues(showValues);
 		}
-		update(true);		
+		update(true);
 	}
 
 	public void updateConstantName(String oldName, String newName) {
 		timeInvariant.updateConstantName(oldName, newName);
 		colorInvariant.updateConstantName(oldName, newName);
-		
-		for(ColoredToken token : tokens){
+
+		for (ColoredToken token : tokens) {
 			token.updateConstantName(oldName, newName);
 		}
-		
-		update(true);		
+
+		update(true);
 	}
 
 }

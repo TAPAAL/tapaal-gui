@@ -14,22 +14,22 @@ public class ColoredToken {
 	private BigDecimal age;
 	private IntOrConstant color = new IntOrConstant();
 	private boolean displayValues = false;
-	
-	public ColoredToken(){
+
+	public ColoredToken() {
 		age = new BigDecimal(0, new MathContext(Pipe.AGE_DECIMAL_PRECISION));
 	}
-	
-	public ColoredToken(int color){
+
+	public ColoredToken(int color) {
 		this();
 		this.setColor(new IntOrConstant(color));
 	}
-	
-	public ColoredToken(IntOrConstant color){
+
+	public ColoredToken(IntOrConstant color) {
 		this();
 		this.setColor(color);
 	}
-	
-	public ColoredToken(BigDecimal age, int color){
+
+	public ColoredToken(BigDecimal age, int color) {
 		this.setAge(age);
 		this.setColor(new IntOrConstant(color));
 	}
@@ -51,38 +51,40 @@ public class ColoredToken {
 	public BigDecimal getAge() {
 		return age;
 	}
-	
+
 	public Command setColor(IntOrConstant newValue) {
-		if(newValue.getValue() < 0) throw new IllegalArgumentException();
+		if (newValue.getValue() < 0)
+			throw new IllegalArgumentException();
 		IntOrConstant old = this.color;
 		this.color = newValue;
-		
-		return new TokenValueEdit(this,old,newValue);		
+
+		return new TokenValueEdit(this, old, newValue);
 	}
 
 	public IntOrConstant getColor() {
 		return color;
 	}
-	
+
 	@Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
-		return String.format("(%1$s,%2$s)", df.format(getAge()), getColor().toString(displayValues));
+		return String.format("(%1$s,%2$s)", df.format(getAge()), getColor()
+				.toString(displayValues));
 	}
-	
-	public void doTimeDelay(BigDecimal delay){
+
+	public void doTimeDelay(BigDecimal delay) {
 		this.age = age.add(delay);
 	}
 
 	public void displayValues(boolean showValues) {
 		this.displayValues = showValues;
-		
+
 	}
 
 	public void updateConstantName(String oldName, String newName) {
-		color.updateConstantName(oldName, newName);		
+		color.updateConstantName(oldName, newName);
 	}
 
 	@Override
@@ -115,6 +117,5 @@ public class ColoredToken {
 			return false;
 		return true;
 	}
-	
 
 }

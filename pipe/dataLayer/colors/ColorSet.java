@@ -10,24 +10,25 @@ public class ColorSet {
 	private SortedSet<IntOrConstantRange> ranges;
 	private boolean displayValues = false;
 
-	public ColorSet(){
+	public ColorSet() {
 		ranges = new TreeSet<IntOrConstantRange>();
 	}
 
 	public ColorSet(String colorSet) {
 		this();
-		if(colorSet != null && !colorSet.isEmpty()){
+		if (colorSet != null && !colorSet.isEmpty()) {
 			String[] ranges = colorSet.split(",");
-			for(String range : ranges){
-				IntOrConstantRange ir = IntOrConstantRange.parse(range.trim(), true);
+			for (String range : ranges) {
+				IntOrConstantRange ir = IntOrConstantRange.parse(range.trim(),
+						true);
 				add(ir);
 			}
 		}
 	}
 
-	public boolean contains(IntOrConstantRange range){
-		for(IntOrConstantRange ir : ranges){
-			if(ir.overlaps(range)){
+	public boolean contains(IntOrConstantRange range) {
+		for (IntOrConstantRange ir : ranges) {
+			if (ir.overlaps(range)) {
 				return true;
 			}
 		}
@@ -35,31 +36,34 @@ public class ColorSet {
 		return false;
 	}
 
-	public void add(IntOrConstantRange range){
+	public void add(IntOrConstantRange range) {
 		ranges.add(range);
 	}
 
-	public void remove(IntOrConstantRange range){
+	public void remove(IntOrConstantRange range) {
 		ranges.remove(range);
 	}
 
 	public boolean contains(int color) {
-		if(isEmpty()) return true;
+		if (isEmpty())
+			return true;
 
-		for(IntOrConstantRange ir : ranges){
-			if(ir.isInRange(color)) return true;
+		for (IntOrConstantRange ir : ranges) {
+			if (ir.isInRange(color))
+				return true;
 		}
 
 		return false;
 	}
 
-	public String toStringNoSetNotation(){
-		if(ranges.isEmpty()) return "";
+	public String toStringNoSetNotation() {
+		if (ranges.isEmpty())
+			return "";
 		StringBuilder builder = new StringBuilder("");
 
 		boolean first = true;
-		for(IntOrConstantRange ir : ranges){
-			if(!first){
+		for (IntOrConstantRange ir : ranges) {
+			if (!first) {
 				builder.append(", ");
 			}
 
@@ -73,9 +77,9 @@ public class ColorSet {
 	@Override
 	public String toString() {
 		String str = toStringNoSetNotation();
-		if(!str.isEmpty()){
+		if (!str.isEmpty()) {
 			return String.format("{%1s}", str);
-		}else{
+		} else {
 			return "";
 		}
 	}
@@ -87,24 +91,24 @@ public class ColorSet {
 	public List<String> getUsedConstants() {
 		List<String> list = new ArrayList<String>();
 
-		for(IntOrConstantRange range : ranges){
+		for (IntOrConstantRange range : ranges) {
 			list.addAll(range.getUsedConstants());
 		}
 
-		return list;		
+		return list;
 	}
 
 	public Set<IntOrConstantRange> getRanges() {
 		return ranges;
 	}
-	
-	public void displayValues(boolean display){
+
+	public void displayValues(boolean display) {
 		this.displayValues = display;
 	}
 
 	public void updateConstantName(String oldName, String newName) {
-		for(IntOrConstantRange range : ranges){
+		for (IntOrConstantRange range : ranges) {
 			range.updateConstantName(oldName, newName);
-		}		
+		}
 	}
 }

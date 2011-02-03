@@ -8,27 +8,27 @@ public class Logger {
 
 	static PrintStream logDevice = System.out;
 	static boolean enableDebug = false;
-	
-	public static void changeLogDevice(PrintStream l){
+
+	public static void changeLogDevice(PrintStream l) {
 		logDevice = l;
 	}
-	
-	public static void enableLogging(boolean b){
+
+	public static void enableLogging(boolean b) {
 		enableDebug = b;
 	}
-	
-	public static void log(String log){
-		if (enableDebug){
+
+	public static void log(String log) {
+		if (enableDebug) {
 			logDevice.println(log);
 		}
-		
+
 	}
-	public static void log(Object log){
-		if (enableDebug){
+
+	public static void log(Object log) {
+		if (enableDebug) {
 			logDevice.println(log.toString());
 		}
-		
+
 	}
-	
-	
+
 }

@@ -6,46 +6,46 @@ import java.util.TreeSet;
 public class ColorSet {
 	private SortedSet<IntegerRange> ranges;
 
-	public ColorSet(){
+	public ColorSet() {
 		this(false);
 	}
 
-	public ColorSet(boolean isEmpty){
-		if(!isEmpty){
+	public ColorSet(boolean isEmpty) {
+		if (!isEmpty) {
 			ranges = new TreeSet<IntegerRange>();
 		}
 	}
 
-
 	public ColorSet(ColorSet other) {
-		if(other.ranges != null){
+		if (other.ranges != null) {
 			ranges = new TreeSet<IntegerRange>();
 
-			for(IntegerRange range : other.ranges){
+			for (IntegerRange range : other.ranges) {
 				ranges.add(new IntegerRange(range));
 			}
 		}
 	}
 
-	public void addRange(IntegerRange range){
-		if(ranges == null){
+	public void addRange(IntegerRange range) {
+		if (ranges == null) {
 			ranges = new TreeSet<IntegerRange>();
 		}
 		ranges.add(range);
 	}
 
 	public ColorSet intersect(ColorSet colorInvariant) {
-		if(ranges != null && ranges.size() == 0 
-				&& colorInvariant.ranges != null && colorInvariant.ranges.size() == 0){
+		if (ranges != null && ranges.size() == 0
+				&& colorInvariant.ranges != null
+				&& colorInvariant.ranges.size() == 0) {
 			return new ColorSet();
-		}else{
+		} else {
 			ColorSet newSet = new ColorSet(true);
 
-			for(IntegerRange range : ranges){
-				for(IntegerRange other : colorInvariant.ranges){
+			for (IntegerRange range : ranges) {
+				for (IntegerRange other : colorInvariant.ranges) {
 					IntegerRange intersection = range.intersect(other);
 
-					if(!intersection.isEmpty()){
+					if (!intersection.isEmpty()) {
 						newSet.addRange(intersection);
 					}
 				}
@@ -55,23 +55,28 @@ public class ColorSet {
 	}
 
 	public boolean contains(int outputValue) {
-		if(ranges == null) return false;
-		if(ranges.isEmpty()) return true;
-		for(IntegerRange range : ranges){
-			if(range.contains(outputValue)) return true;
+		if (ranges == null)
+			return false;
+		if (ranges.isEmpty())
+			return true;
+		for (IntegerRange range : ranges) {
+			if (range.contains(outputValue))
+				return true;
 		}
 
 		return false;
 	}
 
 	public String convertToTAGuardString(String valueVarName) {
-		if(ranges == null) return "false";
-		if(ranges.isEmpty()) return "";
+		if (ranges == null)
+			return "false";
+		if (ranges.isEmpty())
+			return "";
 
 		StringBuilder builder = new StringBuilder("(");
 		boolean first = true;
-		for(IntegerRange range : ranges){
-			if(!first){
+		for (IntegerRange range : ranges) {
+			if (!first) {
 				builder.append(" || ");
 			}
 			builder.append("(");

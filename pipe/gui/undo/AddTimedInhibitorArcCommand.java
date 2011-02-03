@@ -8,8 +8,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class AddTimedInhibitorArcCommand extends AddTAPNElementCommand {
 	private final TimedInhibitorArcComponent inhibitorArc;
 
-	public AddTimedInhibitorArcCommand(TimedInhibitorArcComponent inhibitorArc, TimedArcPetriNet tapn,
-			DataLayer guiModel, DrawingSurfaceImpl view) {
+	public AddTimedInhibitorArcCommand(TimedInhibitorArcComponent inhibitorArc,
+			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		this.inhibitorArc = inhibitorArc;
 	}
@@ -19,7 +19,7 @@ public class AddTimedInhibitorArcCommand extends AddTAPNElementCommand {
 		inhibitorArc.delete();
 		view.repaint();
 	}
-	
+
 	@Override
 	public void redo() {
 		inhibitorArc.undelete(view);

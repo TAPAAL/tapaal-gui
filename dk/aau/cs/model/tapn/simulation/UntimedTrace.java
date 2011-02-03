@@ -6,16 +6,16 @@ import java.util.List;
 
 public class UntimedTrace implements TapaalTrace {
 	private List<TapaalTraceStep> steps = new ArrayList<TapaalTraceStep>();
-	
-	public void add(TimedTransitionStep step){
+
+	public void add(TimedTransitionStep step) {
 		steps.add(step);
 	}
-		
+
 	public Iterator<TapaalTraceStep> iterator() {
 		return steps.iterator();
 	}
-	
-	public int length(){
+
+	public int length() {
 		return steps.size();
 	}
 

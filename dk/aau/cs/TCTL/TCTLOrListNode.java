@@ -7,10 +7,10 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	private ArrayList<TCTLAbstractStateProperty> properties;
-	
+
 	public void setProperties(ArrayList<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
-		
+
 		for (TCTLAbstractStateProperty p : properties) {
 			p.setParent(this);
 		}
@@ -19,30 +19,31 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 	public ArrayList<TCTLAbstractStateProperty> getProperties() {
 		return properties;
 	}
-	
+
 	public TCTLOrListNode(ArrayList<TCTLAbstractStateProperty> properties) {
 		this.properties = properties;
-		
+
 		for (TCTLAbstractStateProperty p : properties) {
 			p.setParent(this);
-		}		
-	}
-	
-	public TCTLOrListNode(TCTLOrListNode orListNode) {
-		this.properties = new ArrayList<TCTLAbstractStateProperty>();
-		
-		for (TCTLAbstractStateProperty p : orListNode.properties) {
-			addDisjunct(p.copy());		
 		}
 	}
-	
-	public TCTLOrListNode(TCTLAbstractStateProperty property1, TCTLAbstractStateProperty property2) {
+
+	public TCTLOrListNode(TCTLOrListNode orListNode) {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
-		
+
+		for (TCTLAbstractStateProperty p : orListNode.properties) {
+			addDisjunct(p.copy());
+		}
+	}
+
+	public TCTLOrListNode(TCTLAbstractStateProperty property1,
+			TCTLAbstractStateProperty property2) {
+		this.properties = new ArrayList<TCTLAbstractStateProperty>();
+
 		addDisjunct(property1);
 		addDisjunct(property2);
 	}
-	
+
 	public TCTLOrListNode() {
 		this.properties = new ArrayList<TCTLAbstractStateProperty>();
 		TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
@@ -52,78 +53,78 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 		ph.setParent(this);
 		this.properties.add(ph);
 	}
-	
+
 	public void addDisjunct(TCTLAbstractStateProperty disjunct) {
 		disjunct.setParent(this);
 		properties.add(disjunct);
 	}
-	
+
 	@Override
 	public boolean isSimpleProperty() {
 		return false;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		
+
 		boolean firstTime = true;
-		
+
 		for (TCTLAbstractStateProperty prop : properties) {
-			
-			if(!firstTime){
+
+			if (!firstTime) {
 				s.append(" or ");
 			}
-			
-			s.append(prop.isSimpleProperty() ? prop.toString()
-                    : "(" + prop.toString() + ")");
+
+			s.append(prop.isSimpleProperty() ? prop.toString() : "("
+					+ prop.toString() + ")");
 			firstTime = false;
 		}
-		
+
 		return s.toString();
 	}
-	
+
 	@Override
 	public StringPosition[] getChildren() {
 		StringPosition[] children = new StringPosition[properties.size()];
-		
+
 		int i = 0;
 		int endPrev = 0;
 		boolean wasPrevSimple = false;
 		for (TCTLAbstractStateProperty p : properties) {
-			
+
 			int start = 0;
 			int end = 0;
-			
-			if(i == 0) {
+
+			if (i == 0) {
 				wasPrevSimple = p.isSimpleProperty();
 				start = wasPrevSimple ? 0 : 1;
 				end = start + p.toString().length();
-				
+
 				endPrev = end;
-				
-			}
-			else {
-				start = endPrev + 4 + (p.isSimpleProperty() ? 0 : 1) + (wasPrevSimple ? 0 : 1);
+
+			} else {
+				start = endPrev + 4 + (p.isSimpleProperty() ? 0 : 1)
+						+ (wasPrevSimple ? 0 : 1);
 				end = start + p.toString().length();
-				
+
 				endPrev = end;
 				wasPrevSimple = p.isSimpleProperty();
 			}
-			
+
 			StringPosition pos = new StringPosition(start, end, p);
-			
+
 			children[i] = pos;
 			i++;
 		}
-		
+
 		return children;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLOrListNode) {
-			TCTLOrListNode node = (TCTLOrListNode)o;
+			TCTLOrListNode node = (TCTLOrListNode) o;
 			return properties.equals(node.properties);
 		}
 		return false;
@@ -132,22 +133,22 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 	@Override
 	public TCTLAbstractStateProperty copy() {
 		ArrayList<TCTLAbstractStateProperty> copy = new ArrayList<TCTLAbstractStateProperty>();
-		
+
 		for (TCTLAbstractStateProperty p : properties) {
 			copy.add(p.copy());
 		}
-		
+
 		return new TCTLOrListNode(copy);
 	}
 
 	@Override
-	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
+	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
+			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
-			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
+			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
 			obj2.setParent(this.parent);
 			return obj2;
-		} 
-		else {
+		} else {
 			for (int i = 0; i < properties.size(); i++) {
 				properties.set(i, properties.get(i).replace(object1, object2));
 			}
@@ -158,40 +159,41 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
-		
+
 	}
 
 	@Override
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		boolean atomicPropFound = false;
-		
+
 		for (TCTLAbstractStateProperty p : properties) {
-			atomicPropFound = atomicPropFound || p.containsAtomicPropWithSpecificPlace(placeName);
+			atomicPropFound = atomicPropFound
+					|| p.containsAtomicPropWithSpecificPlace(placeName);
 		}
-		
+
 		return atomicPropFound;
 	}
 
 	@Override
 	public boolean containsPlaceHolder() {
 		boolean placeHolderFound = false;
-		
+
 		for (TCTLAbstractStateProperty p : properties) {
 			placeHolderFound = placeHolderFound || p.containsPlaceHolder();
 		}
-		
+
 		return placeHolderFound;
 	}
-	
+
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		TCTLAbstractProperty ph = null;
 		for (TCTLAbstractStateProperty p : properties) {
-			if(p.containsPlaceHolder()) {
+			if (p.containsPlaceHolder()) {
 				ph = p.findFirstPlaceHolder();
 				break;
 			}
-				
+
 		}
 		return ph;
 	}

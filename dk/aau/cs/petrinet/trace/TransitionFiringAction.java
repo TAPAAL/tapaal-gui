@@ -10,21 +10,22 @@ public class TransitionFiringAction implements TAPNFiringAction {
 
 	private TAPNTransition firedtransition;
 	private List<Token> consumedTokens;
-		
+
 	public TransitionFiringAction(TAPNTransition transition) {
 		this(transition, new ArrayList<Token>());
 	}
-	
-	public TransitionFiringAction(TAPNTransition transition, List<Token> consumedTokens) {
+
+	public TransitionFiringAction(TAPNTransition transition,
+			List<Token> consumedTokens) {
 		firedtransition = transition;
 		this.consumedTokens = consumedTokens;
 	}
-	
-	public String transition(){
+
+	public String transition() {
 		return firedtransition.getName();
 	}
-	
-	public List<Token> consumedTokens(){
+
+	public List<Token> consumedTokens() {
 		return consumedTokens;
 	}
 }

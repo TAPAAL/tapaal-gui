@@ -12,7 +12,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -44,12 +43,12 @@ public class LeftConstantsPane extends JPanel {
 	private DefaultListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
-	
+
 	private TabContent parent;
-	
-	public LeftConstantsPane(boolean enableAddButton, TabContent parent){
+
+	public LeftConstantsPane(boolean enableAddButton, TabContent parent) {
 		this.parent = parent;
-		
+
 		constantsPanel = new JPanel(new BorderLayout());
 		addConstantPanel = new JPanel();
 
@@ -60,8 +59,8 @@ public class LeftConstantsPane extends JPanel {
 		constantsList.setLayoutOrientation(JList.VERTICAL);
 		constantsList.setAlignmentX(Component.LEFT_ALIGNMENT);
 		constantsList.setAlignmentY(Component.TOP_ALIGNMENT);
-		constantsList.addListSelectionListener(new ListSelectionListener(){
-			public void valueChanged(ListSelectionEvent e){
+		constantsList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
 					if (constantsList.getSelectedIndex() == -1) {
 						editBtn.setEnabled(false);
@@ -74,29 +73,32 @@ public class LeftConstantsPane extends JPanel {
 				}
 			}
 		});
-		
-		constantsList.addMouseListener(new MouseAdapter(){
+
+		constantsList.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(!constantsList.isSelectionEmpty()){
-					if(arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2){
-						int index = constantsList.locationToIndex(arg0.getPoint());
-					    ListModel dlm = constantsList.getModel();
-					    Constant c = (Constant)dlm.getElementAt(index);;
-					    constantsList.ensureIndexIsVisible(index);						
-						
+				if (!constantsList.isSelectionEmpty()) {
+					if (arg0.getButton() == MouseEvent.BUTTON1
+							&& arg0.getClickCount() == 2) {
+						int index = constantsList.locationToIndex(arg0
+								.getPoint());
+						ListModel dlm = constantsList.getModel();
+						Constant c = (Constant) dlm.getElementAt(index);
+						;
+						constantsList.ensureIndexIsVisible(index);
+
 						showEditConstantDialog(c);
-					}	
+					}
 				}
 			}
 		});
 
-
 		addConstantsComponents();
 		addConstantsButtons(enableAddButton);
 
-		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, constantsPanel, addConstantPanel);
+		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
+				constantsPanel, addConstantPanel);
 		setLayout(new BorderLayout());
 
 		splitPane.setContinuousLayout(true);
@@ -104,21 +106,20 @@ public class LeftConstantsPane extends JPanel {
 		splitPane.setDividerLocation(0.9);
 		splitPane.setResizeWeight(1.0);
 		this.add(splitPane);
-		
-		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Constants"), 
-				BorderFactory.createEmptyBorder(3,3,3,3))
-			);
-		
+
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory
+				.createTitledBorder("Constants"), BorderFactory
+				.createEmptyBorder(3, 3, 3, 3)));
+
 		showConstants();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
-		editBtn.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				Constant c = (Constant)constantsList.getSelectedValue();
+		editBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Constant c = (Constant) constantsList.getSelectedValue();
 				showEditConstantDialog(c);
 			}
 		});
@@ -126,9 +127,10 @@ public class LeftConstantsPane extends JPanel {
 
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
-		removeBtn.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				String constName = ((Constant)constantsList.getSelectedValue()).name();
+		removeBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String constName = ((Constant) constantsList.getSelectedValue())
+						.name();
 				removeConstant(constName);
 			}
 		});
@@ -136,7 +138,7 @@ public class LeftConstantsPane extends JPanel {
 
 		JButton addConstantButton = new JButton("Add..");
 		addConstantButton.setEnabled(enableAddButton);
-		addConstantButton.addActionListener(new ActionListener(){
+		addConstantButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showEditConstantDialog(null);
 			}
@@ -144,10 +146,10 @@ public class LeftConstantsPane extends JPanel {
 		addConstantPanel.add(addConstantButton);
 	}
 
-	public void showConstants()
-	{
+	public void showConstants() {
 		TimedArcPetriNetNetwork model = parent.network();
-		if(model == null) return;
+		if (model == null)
+			return;
 
 		listModel.removeAllElements();
 		addConstantsToPanel(model);
@@ -156,36 +158,35 @@ public class LeftConstantsPane extends JPanel {
 	}
 
 	private void addConstantsToPanel(TimedArcPetriNetNetwork model) {
-		for(Constant constant : model.constants())
-		{
+		for (Constant constant : model.constants()) {
 			listModel.addElement(constant);
 		}
-		
+
 	}
 
-	private void addConstantsComponents()
-	{
+	private void addConstantsComponents() {
 		constantsScroller = new JScrollPane(constantsList);
 		constantsPanel.add(constantsScroller, BorderLayout.CENTER);
 	}
 
-
 	private void showEditConstantDialog(Constant constant) {
-		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
+				Pipe.TOOL + " " + Pipe.VERSION, true);
 
 		Container contentPane = guiDialog.getContentPane();
 
 		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		if(constant != null) 
-			contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), parent.network(), constant));
+		if (constant != null)
+			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
+					parent.network(), constant));
 		else
-			contentPane.add( new ConstantsDialogPanel(guiDialog.getRootPane(), parent.network()));
-			
-		guiDialog.setResizable(false);     
+			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
+					parent.network()));
+
+		guiDialog.setResizable(false);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
@@ -200,16 +201,14 @@ public class LeftConstantsPane extends JPanel {
 	protected void removeConstant(String name) {
 		TimedArcPetriNetNetwork model = parent.network();
 		Command edit = model.removeConstant(name);
-		if(edit == null){
+		if (edit == null) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"You cannot remove a constant that is used in the net.\nRemove all references " +
-					"to the constant in the net and try again.",
-					"Constant in use",
-					JOptionPane.ERROR_MESSAGE);
-		}
-		else
+					"You cannot remove a constant that is used in the net.\nRemove all references "
+							+ "to the constant in the net and try again.",
+					"Constant in use", JOptionPane.ERROR_MESSAGE);
+		} else
 			parent.drawingSurface().getUndoManager().addNewEdit(edit);
-		
+
 		showConstants();
 	}
 

@@ -10,65 +10,56 @@ import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
-
 public class CreateGui {
 
-	private static final double DIVIDER_LOCATION = 0.5;
 	public static GuiFrame appGui;
 	private static Animator animator;
 	private static JTabbedPane appTab;
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 
 	public static String imgPath, userPath; // useful for stuff
-	
+
 	public static void init() {
 		imgPath = "Images" + System.getProperty("file.separator");
 
-		// make the initial dir for browsing be My Documents (win), ~ (*nix), etc
-		userPath = null; 
-
+		// make the initial dir for browsing be My Documents (win), ~ (*nix),
+		// etc
+		userPath = null;
 
 		appGui = new GuiFrame(Pipe.TOOL + " " + Pipe.VERSION);
-
-
 
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
 
 		animator = new Animator();
-		appGui.setTab();   // sets Tab properties
-
+		appGui.setTab(); // sets Tab properties
 
 		appGui.getContentPane().add(appTab);
 
-		//appGui.createNewTabFromFile(null);
+		// appGui.createNewTabFromFile(null);
 
 		appGui.setVisible(true);
 		appGui.init();
 		Verifyta.trySetupFromEnvironmentVariable();
 
 		VersionChecker versionChecker = new VersionChecker();
-		if(versionChecker.checkForNewVersion()){
+		if (versionChecker.checkForNewVersion()) {
 			StringBuffer message = new StringBuffer(
-			"There is a new version of TAPAAL available at www.tapaal.net.");
+					"There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
 			message.append(Pipe.VERSION);
 			message.append("\nNew version: ");
-			message.append(versionChecker.getNewVersionNumber());			
+			message.append(versionChecker.getNewVersionNumber());
 
-			JOptionPane.showMessageDialog(appGui, 
-					message .toString(),
-					"New version available!",
-					JOptionPane.INFORMATION_MESSAGE);			
+			JOptionPane.showMessageDialog(appGui, message.toString(),
+					"New version available!", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
-
-	public static GuiFrame getApp() {  //returns a reference to the application
+	public static GuiFrame getApp() { // returns a reference to the application
 		return appGui;
 	}
-
 
 	public static DataLayer getModel() {
 		return getModel(appTab.getSelectedIndex());
@@ -83,7 +74,6 @@ public class CreateGui {
 		return tab.getModel();
 	}
 
-
 	public static DrawingSurfaceImpl getDrawingSurface() {
 		return getDrawingSurface(appTab.getSelectedIndex());
 	}
@@ -96,25 +86,23 @@ public class CreateGui {
 		TabContent tab = (tabs.get(index));
 		while (tab.drawingSurface() == null) {
 			try {
-				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel(), tab));
-			} catch (Exception e){
+				tab.setDrawingSurface(new DrawingSurfaceImpl(tab.getModel(),
+						tab));
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		return tab.drawingSurface();
 	}
 
-
 	public static DrawingSurfaceImpl getView() {
 		return getDrawingSurface(appTab.getSelectedIndex());
 	}
-
 
 	public static File getFile() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getFile();
 	}
-
 
 	public static void setFile(File modelfile, int fileNo) {
 		if (fileNo >= tabs.size()) {
@@ -124,26 +112,23 @@ public class CreateGui {
 		tab.setFile(modelfile);
 	}
 
-
 	public static int getFreeSpace() {
 		tabs.add(new TabContent());
 		return tabs.size() - 1;
 	}
 
-
 	public static void removeTab(int index) {
 		tabs.remove(index);
 	}
 
-
 	public static JTabbedPane getTab() {
 		return appTab;
 	}
-	
+
 	public static TabContent getTab(int index) {
 		return tabs.get(index);
 	}
-	
+
 	public static TabContent getCurrentTab() {
 		return tabs.get(appTab.getSelectedIndex());
 	}
@@ -152,8 +137,10 @@ public class CreateGui {
 		return animator;
 	}
 
-	/** returns the current dataLayer object - 
-	 *  used to get a reference to pass to the modules */
+	/**
+	 * returns the current dataLayer object - used to get a reference to pass to
+	 * the modules
+	 */
 	public static DataLayer currentPNMLData() {
 		if (appTab.getSelectedIndex() < 0) {
 			return null;
@@ -162,19 +149,18 @@ public class CreateGui {
 		return tab.getModel();
 	}
 
-
-	/** Creates a new animationHistory text area, and returns a reference to it*/
+	/** Creates a new animationHistory text area, and returns a reference to it */
 	public static void switchToAnimationComponents() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		tab.switchToAnimationComponents();
 	}
-	
+
 	public static void switchToEditorComponents() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		tab.switchToEditorComponents();
 	}
 
-	public static AnimationHistoryComponent getAbstractAnimationPane(){
+	public static AnimationHistoryComponent getAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getAbstractAnimationPane();
 	}
@@ -183,9 +169,8 @@ public class CreateGui {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		tab.addAbstractAnimationPane();
 	}
-	
-	public static AnimationController getAnimationController()
-	{
+
+	public static AnimationController getAnimationController() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getAnimationController();
 	}
@@ -195,34 +180,32 @@ public class CreateGui {
 		tab.removeAbstractAnimationPane();
 	}
 
-//	public static void addAnimationController() {
-//		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-//		//tab.addAnimationController();
-//	}
+	// public static void addAnimationController() {
+	// TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+	// //tab.addAnimationController();
+	// }
 
-//	public static void removeAnimationHistory() {
-//		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-//		tab.removeAnimationHistory();
-//	}
-//	
-//	public static void removeAnimationController() {
-//		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-//		tab.removeAnimationController();
-//	}
-
+	// public static void removeAnimationHistory() {
+	// TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+	// tab.removeAnimationHistory();
+	// }
+	//	
+	// public static void removeAnimationController() {
+	// TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+	// tab.removeAnimationController();
+	// }
 
 	public static AnimationHistoryComponent getAnimationHistory() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getAnimationHistory();
 	}
 
-	public static void updateConstantsList(){
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));	
+	public static void updateConstantsList() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		tab.updateConstantsList();
 	}
 
-
 	public static void undoGetFreeSpace() {
-		tabs.remove(tabs.size()-1);
+		tabs.remove(tabs.size() - 1);
 	}
 }

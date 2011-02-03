@@ -19,11 +19,9 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.undo.UndoManager;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class RemoveTokenPanel extends JPanel {
 
@@ -43,17 +41,18 @@ public class RemoveTokenPanel extends JPanel {
 	private JPanel buttonPanel;
 	private JButton okButton;
 	private JButton cancelButton;
-	
-	public RemoveTokenPanel(JRootPane rootPane, ColoredTimedPlace place, TimedArcPetriNetNetwork model,UndoManager undoManager){
+
+	public RemoveTokenPanel(JRootPane rootPane, ColoredTimedPlace place,
+			TimedArcPetriNetNetwork model, UndoManager undoManager) {
 		this.rootPane = rootPane;
 		this.place = place;
 		this.undoManager = undoManager;
 		this.model = model;
-		
+
 		initComponents();
 	}
-	
-	private void initComponents(){
+
+	private void initComponents() {
 		setLayout(new GridBagLayout());
 		initTokenPanel();
 		initButtonPanel();
@@ -72,24 +71,26 @@ public class RemoveTokenPanel extends JPanel {
 		rootPane.setDefaultButton(okButton);
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				if(tokenTable.getSelectedRowCount() > 0){
+				if (tokenTable.getSelectedRowCount() > 0) {
 					int[] rows = tokenTable.getSelectedRows();
 					int[] modelIndices = new int[rows.length];
-					for(int i = 0; i < rows.length; i++){
-						modelIndices[i] = tokenTable.convertRowIndexToModel(rows[i]);
+					for (int i = 0; i < rows.length; i++) {
+						modelIndices[i] = tokenTable
+								.convertRowIndexToModel(rows[i]);
 					}
-					
-					for(int i = modelIndices.length-1; i >= 0; i--){
+
+					for (int i = modelIndices.length - 1; i >= 0; i--) {
 						tokenTableModel.removeColoredToken(modelIndices[i]);
 					}
-					
-					undoManager.addNewEdit(place.setColoredTokens(tokenTableModel.getTokens()));
+
+					undoManager.addNewEdit(place
+							.setColoredTokens(tokenTableModel.getTokens()));
 					model.buildConstraints();
 				}
 				exit();
 			}
 		});
-	
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -112,7 +113,7 @@ public class RemoveTokenPanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 10);
 		buttonPanel.add(cancelButton, gridBagConstraints);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -135,7 +136,7 @@ public class RemoveTokenPanel extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(3,3,0,3);
+		gbc.insets = new Insets(3, 3, 0, 3);
 		tokenPanel.add(tokenHelpLabel, gbc);
 
 		tokenHelpLabel2 = new JLabel("Hold CTRL to select multiple tokens.");
@@ -144,30 +145,32 @@ public class RemoveTokenPanel extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(0,3,3,3);
+		gbc.insets = new Insets(0, 3, 3, 3);
 		tokenPanel.add(tokenHelpLabel2, gbc);
 
 		tokenTableModel = new TokenTableModel(place);
 		tokenTable = new JTable(tokenTableModel);
-		Dimension dims = new Dimension(150,133);
+		Dimension dims = new Dimension(150, 133);
 		tokenTable.setPreferredScrollableViewportSize(dims);
 
 		DefaultTableCellRenderer render = new DefaultTableCellRenderer();
 		render.setHorizontalAlignment(SwingConstants.RIGHT);
 		tokenTable.getColumn("Value").setCellRenderer(render);
 		DefaultTableCellRenderer notEditableRenderer = new DefaultTableCellRenderer();
-		Color color = (Color)UIManager.get("TextField.disabledBackground");
+		Color color = (Color) UIManager.get("TextField.disabledBackground");
 		notEditableRenderer.setBackground(color);
 		tokenTable.getColumn("Age").setCellRenderer(notEditableRenderer);
-		tokenTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		tokenTable
+				.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
 		JScrollPane pane = new JScrollPane(tokenTable);
-		pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		pane
+				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.BOTH;
-		//gbc.insets = new Insets(3,3,3,3);
+		// gbc.insets = new Insets(3,3,3,3);
 		tokenPanel.add(pane, gbc);
 
 		gbc = new GridBagConstraints();
@@ -175,7 +178,7 @@ public class RemoveTokenPanel extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.VERTICAL;
-		//gridBagConstraints.insets = new Insets(0,0,0,5);
+		// gridBagConstraints.insets = new Insets(0,0,0,5);
 		add(tokenPanel, gbc);
-	}	
+	}
 }

@@ -8,12 +8,13 @@ public class ColoredPlaceAddTokenEdit extends Command {
 
 	private ColoredTimedPlace place;
 	private ColoredToken addedToken;
-	
-	public ColoredPlaceAddTokenEdit(ColoredTimedPlace place, ColoredToken addedToken){
+
+	public ColoredPlaceAddTokenEdit(ColoredTimedPlace place,
+			ColoredToken addedToken) {
 		this.place = place;
 		this.addedToken = addedToken;
 	}
-	
+
 	@Override
 	public void redo() {
 		place.addColoredToken(addedToken);

@@ -2,16 +2,15 @@ package pipe.dataLayer;
 
 import dk.aau.cs.util.Require;
 
-
 public class Template<TNet> {
 	private TNet net;
 	private DataLayer guiModel;
-	
+
 	public Template(TNet net, DataLayer guiModel) {
 		this.net = net;
 		this.guiModel = guiModel;
 	}
-	
+
 	@Override
 	public String toString() {
 		return net.toString();
@@ -20,8 +19,8 @@ public class Template<TNet> {
 	public DataLayer guiModel() {
 		return guiModel;
 	}
-	
-	public TNet model(){
+
+	public TNet model() {
 		return net;
 	}
 

@@ -31,42 +31,50 @@ import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
 
 public class UppaalExporter {
-	public ExportedModel export(ColoredTimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){
+	public ExportedModel export(ColoredTimedArcPetriNet model, TAPNQuery query,
+			ReductionOption reduction) {
 		File xmlfile = createTempFile(".xml");
 		File qfile = createTempFile(".q");
-		if(xmlfile == null || qfile == null) return null;
+		if (xmlfile == null || qfile == null)
+			return null;
 
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
 
 		ModelTranslator<TimedArcPetriNet, NTA> modelTransformer = null;
 		QueryTranslator<TAPNQuery, UPPAALQuery> queryTransformer = null;
 		ColoredTranslationNamingScheme namingScheme = null;
-		if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
-			ColoredBroadcastTranslation transformer = new ColoredBroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
+		if (reduction == ReductionOption.BROADCAST
+				|| reduction == ReductionOption.BROADCASTSYMMETRY) {
+			ColoredBroadcastTranslation transformer = new ColoredBroadcastTranslation(
+					extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			modelTransformer = transformer;
 			queryTransformer = transformer;
 			namingScheme = transformer.namingScheme();
-		}  else if(reduction == ReductionOption.KBOUNDANALYSIS){
-			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(extraTokens, true);
+		} else if (reduction == ReductionOption.KBOUNDANALYSIS) {
+			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(
+					extraTokens, true);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
-		}else if(reduction == ReductionOption.KBOUNDOPTMIZATION){
-			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastKBoundOptimizationTransformer(extraTokens);
+		} else if (reduction == ReductionOption.KBOUNDOPTMIZATION) {
+			Degree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastKBoundOptimizationTransformer(
+					extraTokens);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
-		}else{
-			ColoredDegree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+		} else {
+			ColoredDegree2BroadcastTranslation broadcastTransformer = new ColoredDegree2BroadcastTranslation(
+					extraTokens,
+					reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			modelTransformer = broadcastTransformer;
 			queryTransformer = broadcastTransformer;
 			namingScheme = broadcastTransformer.namingScheme();
 		}
-		
-		try{
+
+		try {
 			NTA nta = modelTransformer.transformModel(model);
 			nta.outputToUPPAALXML(new PrintStream(xmlfile));
 			UPPAALQuery uppaalQuery = queryTransformer.transformQuery(query);
 			uppaalQuery.output(new PrintStream(qfile));
-		}catch(FileNotFoundException e){
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
 		} catch (Exception e) {
@@ -74,94 +82,113 @@ public class UppaalExporter {
 			return null;
 		}
 
-		return new ExportedModel(xmlfile.getAbsolutePath(), qfile.getAbsolutePath(), namingScheme);
+		return new ExportedModel(xmlfile.getAbsolutePath(), qfile
+				.getAbsolutePath(), namingScheme);
 	}
 
-	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction){
+	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query,
+			ReductionOption reduction) {
 		File modelFile = createTempFile(".xml");
 		File queryFile = createTempFile(".q");
-		
+
 		return export(model, query, reduction, modelFile, queryFile);
 	}
-	
-	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction, File modelFile, File queryFile){
-		if(modelFile == null || queryFile == null) return null;
-		
+
+	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query,
+			ReductionOption reduction, File modelFile, File queryFile) {
+		if (modelFile == null || queryFile == null)
+			return null;
+
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
 		TranslationNamingScheme namingScheme = null;
-		if (reduction == ReductionOption.STANDARDSYMMETRY){
+		if (reduction == ReductionOption.STANDARDSYMMETRY) {
 
 			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
-				t.autoTransform((TAPN)model, new PrintStream(modelFile), new PrintStream(queryFile), query, extraTokens);
+				t.autoTransform((TAPN) model, new PrintStream(modelFile),
+						new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
 			}
 
-		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS){
+		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY
+				|| reduction == ReductionOption.KBOUNDANALYSIS) {
 			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
-				t.autoTransform((TAPN)model, new PrintStream(modelFile), new PrintStream(queryFile), query, extraTokens);
+				t.autoTransform((TAPN) model, new PrintStream(modelFile),
+						new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
 			}
-		}else if (reduction == ReductionOption.OPTIMIZEDSTANDARD){
+		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARD) {
 			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
 			try {
-				t.autoTransform((TAPN)model, new PrintStream(modelFile), new PrintStream(queryFile), query, extraTokens);
+				t.autoTransform((TAPN) model, new PrintStream(modelFile),
+						new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
-			}	
+			}
 			namingScheme = new OptimizedStandardNamingScheme();
-		} else if(reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY){
-			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
+		} else if (reduction == ReductionOption.BROADCAST
+				|| reduction == ReductionOption.BROADCASTSYMMETRY) {
+			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(
+					extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+			try {
+				dk.aau.cs.TA.NTA nta = broadcastTransformer
+						.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer
+						.transformQuery(query);
 				uppaalQuery.output(new PrintStream(queryFile));
-			}catch(FileNotFoundException e){
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-		} else if(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST){
-			Degree2BroadcastTranslation broadcastTransformer = new Degree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+		} else if (reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY
+				|| reduction == ReductionOption.DEGREE2BROADCAST) {
+			Degree2BroadcastTranslation broadcastTransformer = new Degree2BroadcastTranslation(
+					extraTokens,
+					reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
-			try{
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+			try {
+				dk.aau.cs.TA.NTA nta = broadcastTransformer
+						.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer
+						.transformQuery(query);
 				uppaalQuery.output(new PrintStream(queryFile));
-			}catch(FileNotFoundException e){
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-		} else if(reduction == ReductionOption.KBOUNDOPTMIZATION){
-			Degree2BroadcastKBoundOptimizeTranslation transformer = new Degree2BroadcastKBoundOptimizeTranslation(extraTokens);
+		} else if (reduction == ReductionOption.KBOUNDOPTMIZATION) {
+			Degree2BroadcastKBoundOptimizeTranslation transformer = new Degree2BroadcastKBoundOptimizeTranslation(
+					extraTokens);
 
-			try{
+			try {
 				dk.aau.cs.TA.NTA nta = transformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer.transformQuery(query);
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer
+						.transformQuery(query);
 				uppaalQuery.output(new PrintStream(queryFile));
-			}catch(FileNotFoundException e){
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
-		}else {
+		} else {
 
 			try {
 				model.convertToConservative();
@@ -172,19 +199,19 @@ public class UppaalExporter {
 
 			try {
 				NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
-				model = deg2Converter.transform((TAPN)model);
+				model = deg2Converter.transform((TAPN) model);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				return null;
 			}
 
-
-
-			//Create uppaal xml file
+			// Create uppaal xml file
 			try {
-				StandardTranslation t2 = new StandardTranslation((TAPN)model, new PrintStream(modelFile), extraTokens);
+				StandardTranslation t2 = new StandardTranslation((TAPN) model,
+						new PrintStream(modelFile), extraTokens);
 				t2.transform();
-				t2.transformQueriesToUppaal(extraTokens, query, new PrintStream(queryFile));
+				t2.transformQueriesToUppaal(extraTokens, query,
+						new PrintStream(queryFile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -195,11 +222,12 @@ public class UppaalExporter {
 
 			namingScheme = new StandardNamingScheme();
 		}
-		return new ExportedModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), namingScheme);
+		return new ExportedModel(modelFile.getAbsolutePath(), queryFile
+				.getAbsolutePath(), namingScheme);
 	}
 
 	private File createTempFile(String ending) {
-		File file=null;
+		File file = null;
 		try {
 			file = File.createTempFile("verifyta", ending);
 

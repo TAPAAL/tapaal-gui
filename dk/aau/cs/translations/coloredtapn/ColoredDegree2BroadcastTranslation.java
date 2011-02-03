@@ -21,14 +21,13 @@ import dk.aau.cs.translations.ColoredTranslationNamingScheme;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 
 public class ColoredDegree2BroadcastTranslation extends
-Degree2BroadcastTranslation {
+		Degree2BroadcastTranslation {
 	private static final String VALUE_VAR_NAME = "value";
 
 	public ColoredDegree2BroadcastTranslation(int extraTokens,
 			boolean useSymmetry) {
 		super(extraTokens, useSymmetry);
 	}
-
 
 	@Override
 	protected Degree2Converter getDegree2Converter() {
@@ -39,11 +38,14 @@ Degree2BroadcastTranslation {
 	protected String createLocalDeclarations(TimedArcPetriNet model, Token token) {
 		String decl = super.createLocalDeclarations(model, token);
 
-		int value = token instanceof ColoredToken ? ((ColoredToken)token).getColor() : 0; // Hack -- Capacity tokens are ordinary tokens
+		int value = token instanceof ColoredToken ? ((ColoredToken) token)
+				.getColor() : 0; // Hack -- Capacity tokens are ordinary tokens
 		String init = useSymmetry ? "" : " = " + value;
-		
-		ColoredTimedArcPetriNet ctapn = (ColoredTimedArcPetriNet)model;
-		decl += String.format("\nint[%1$d,%2$d] %3$s%4$s;", ctapn.getLowerBoundForColor(), ctapn.getUpperBoundForColor(), VALUE_VAR_NAME, init);
+
+		ColoredTimedArcPetriNet ctapn = (ColoredTimedArcPetriNet) model;
+		decl += String.format("\nint[%1$d,%2$d] %3$s%4$s;", ctapn
+				.getLowerBoundForColor(), ctapn.getUpperBoundForColor(),
+				VALUE_VAR_NAME, init);
 		return decl;
 	}
 
@@ -51,19 +53,21 @@ Degree2BroadcastTranslation {
 	protected String CreateResetExpressionIfNormalArc(Arc arc) {
 		String clockReset = String.format("%1$s := 0", CLOCK_NAME);
 
-		if(arc instanceof ColoredOutputArc){
-			int value = ((ColoredOutputArc)arc).getOutputValue();
-			String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
+		if (arc instanceof ColoredOutputArc) {
+			int value = ((ColoredOutputArc) arc).getOutputValue();
+			String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME,
+					value);
 			return clockReset + ", " + valueReset;
-		}else {
-			ColoredTransportArc tarc = (ColoredTransportArc)arc;
-			if(tarc.getPreservation().equals(Preservation.Age)){
+		} else {
+			ColoredTransportArc tarc = (ColoredTransportArc) arc;
+			if (tarc.getPreservation().equals(Preservation.Age)) {
 				int value = tarc.getOutputValue();
-				String valueReset = String.format("%1$s := %2$d", VALUE_VAR_NAME, value);
+				String valueReset = String.format("%1$s := %2$d",
+						VALUE_VAR_NAME, value);
 				return valueReset;
-			}else if(tarc.getPreservation().equals(Preservation.Value)){
+			} else if (tarc.getPreservation().equals(Preservation.Value)) {
 				return clockReset;
-			}else{
+			} else {
 				return "";
 			}
 		}
@@ -74,68 +78,70 @@ Degree2BroadcastTranslation {
 			boolean isTransportArc) {
 		ColoredInterval timeGuard = null;
 		ColorSet colorGuard = null;
-		if(arc instanceof ColoredTransportArc){
-			ColoredTransportArc cta = (ColoredTransportArc)arc;
+		if (arc instanceof ColoredTransportArc) {
+			ColoredTransportArc cta = (ColoredTransportArc) arc;
 			timeGuard = cta.getTimeGuard();
 			colorGuard = cta.getColorGuard();
-		}else if(arc instanceof ColoredInputArc){
-			ColoredInputArc cia = (ColoredInputArc)arc;
+		} else if (arc instanceof ColoredInputArc) {
+			ColoredInputArc cia = (ColoredInputArc) arc;
 			timeGuard = cia.getTimeGuard();
-			colorGuard = cia.getColorGuard();		
-		}else if(arc instanceof ColoredInhibitorArc){
-			ColoredInhibitorArc cia = (ColoredInhibitorArc)arc;
+			colorGuard = cia.getColorGuard();
+		} else if (arc instanceof ColoredInhibitorArc) {
+			ColoredInhibitorArc cia = (ColoredInhibitorArc) arc;
 			timeGuard = cia.getTimeGuard();
-			colorGuard = cia.getColorGuard();	
-		}else{
+			colorGuard = cia.getColorGuard();
+		} else {
 			throw new IllegalArgumentException("unknown arc type");
 		}
-		
-		String guard = timeGuard.convertToTAGuardString(CLOCK_NAME, VALUE_VAR_NAME);
-		String colorGuardString = colorGuard.convertToTAGuardString(VALUE_VAR_NAME);
-		if(!guard.isEmpty() && !colorGuardString.isEmpty()){
+
+		String guard = timeGuard.convertToTAGuardString(CLOCK_NAME,
+				VALUE_VAR_NAME);
+		String colorGuardString = colorGuard
+				.convertToTAGuardString(VALUE_VAR_NAME);
+		if (!guard.isEmpty() && !colorGuardString.isEmpty()) {
 			guard += " && ";
 		}
-		
+
 		guard += colorGuardString;
-		
+
 		return guard;
 	}
-	
+
 	@Override
 	protected String createUpdateExpressionForTokenInitialization(Token token) {
-		ColoredToken ct = (ColoredToken)token;
-		
+		ColoredToken ct = (ColoredToken) token;
+
 		return String.format("%1$s := %2$d", VALUE_VAR_NAME, ct.getColor());
 	}
-	
-	
+
 	@Override
 	protected String convertInvariant(TAPNPlace place) {
-		ColoredPlace cp = (ColoredPlace)place;
-		String invariant = cp.getTimeInvariant().convertToTAInvariantString(CLOCK_NAME, VALUE_VAR_NAME);
-		String colorInvariant = cp.getColorInvariant().convertToTAGuardString(VALUE_VAR_NAME);
-		
-		if(!invariant.isEmpty() && !colorInvariant.isEmpty()){
+		ColoredPlace cp = (ColoredPlace) place;
+		String invariant = cp.getTimeInvariant().convertToTAInvariantString(
+				CLOCK_NAME, VALUE_VAR_NAME);
+		String colorInvariant = cp.getColorInvariant().convertToTAGuardString(
+				VALUE_VAR_NAME);
+
+		if (!invariant.isEmpty() && !colorInvariant.isEmpty()) {
 			invariant += " && ";
 		}
-		
+
 		invariant += colorInvariant;
-		
+
 		return invariant;
 	}
-	
+
 	@Override
 	public ColoredTranslationNamingScheme namingScheme() {
 		return new ColoredDegree2BroadcastNamingScheme();
 	}
-	
-	private class ColoredDegree2BroadcastNamingScheme extends Degree2BroadcastNamingScheme
-		implements ColoredTranslationNamingScheme
-	{
+
+	private class ColoredDegree2BroadcastNamingScheme extends
+			Degree2BroadcastNamingScheme implements
+			ColoredTranslationNamingScheme {
 		public String colorVariableName() {
 			return VALUE_VAR_NAME;
 		}
 	}
-	
-	
+
 }

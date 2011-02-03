@@ -8,8 +8,8 @@ public class Constant {
 	private int lowerBound;
 	private int upperBound;
 	private boolean isUsed;
-		
-	public Constant(String name, int value){
+
+	public Constant(String name, int value) {
 		setName(name);
 		setValue(value);
 		setIsUsed(false);
@@ -18,7 +18,7 @@ public class Constant {
 
 	public Constant(Constant constant) {
 		Require.that(constant != null, "Constant cannot be null");
-		
+
 		this.name = constant.name;
 		this.value = constant.value;
 		this.lowerBound = constant.lowerBound;
@@ -27,7 +27,8 @@ public class Constant {
 	}
 
 	public void setName(String name) {
-		Require.that(name != null && !name.isEmpty(), "A constant must have a name");
+		Require.that(name != null && !name.isEmpty(),
+				"A constant must have a name");
 		this.name = name;
 	}
 
@@ -43,41 +44,41 @@ public class Constant {
 	public int value() {
 		return value;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return name + " = " + value;
 	}
-	
-	public int lowerBound(){
+
+	public int lowerBound() {
 		return lowerBound;
 	}
-	
-	public void setLowerBound(int value){
-		if(value > lowerBound){
+
+	public void setLowerBound(int value) {
+		if (value > lowerBound) {
 			lowerBound = value;
 		}
 	}
-	
-	public int upperBound(){
+
+	public int upperBound() {
 		return upperBound;
 	}
-	
-	public void setUpperBound(int value){
-		if(value >= 0 && value < upperBound){
+
+	public void setUpperBound(int value) {
+		if (value >= 0 && value < upperBound) {
 			upperBound = value;
 		}
 	}
-	
+
 	public boolean isUsed() {
 		return isUsed;
 	}
-	
+
 	public void setIsUsed(boolean isUsed) {
 		this.isUsed = isUsed;
-		
+
 	}
-	
+
 	public void reset() {
 		lowerBound = 0;
 		upperBound = Integer.MAX_VALUE;

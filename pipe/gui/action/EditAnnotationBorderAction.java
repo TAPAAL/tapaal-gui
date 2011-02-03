@@ -11,26 +11,22 @@ import javax.swing.AbstractAction;
 import pipe.dataLayer.AnnotationNote;
 import pipe.gui.CreateGui;
 
+public class EditAnnotationBorderAction extends AbstractAction {
 
-public class EditAnnotationBorderAction
-        extends AbstractAction {
-
-   /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2849415077610764209L;
-private AnnotationNote selected;
-   
+	private AnnotationNote selected;
 
-   public EditAnnotationBorderAction(AnnotationNote component) {
-      selected = component;
-   }
+	public EditAnnotationBorderAction(AnnotationNote component) {
+		selected = component;
+	}
 
-      
-   /** Action for editing the text in an AnnotationNote */
-   public void actionPerformed(ActionEvent e) {
-      CreateGui.getView().getUndoManager().addNewEdit(
-               selected.showBorder(!selected.isShowingBorder()));
-   }
+	/** Action for editing the text in an AnnotationNote */
+	public void actionPerformed(ActionEvent e) {
+		CreateGui.getView().getUndoManager().addNewEdit(
+				selected.showBorder(!selected.isShowingBorder()));
+	}
 
 }

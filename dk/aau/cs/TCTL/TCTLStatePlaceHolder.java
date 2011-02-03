@@ -2,12 +2,11 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-
 public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 
 	public TCTLStatePlaceHolder() {
 	}
-	
+
 	@Override
 	public TCTLAbstractStateProperty copy() {
 		return new TCTLStatePlaceHolder();
@@ -21,12 +20,12 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 	public String toString() {
 		return "<*>";
 	}
-	
+
 	@Override
 	public boolean containsPlaceHolder() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof TCTLStatePlaceHolder) {
@@ -34,30 +33,30 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 		}
 		return false;
 	}
-	
+
 	@Override
-	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {		
+	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1,
+			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
-			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty)object2;
+			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
 			obj2.setParent(this.parent);
 			return obj2;
 		} else {
 			return this;
 		}
 	}
-	
 
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
-		
+
 	}
-	
+
 	@Override
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-			return false;
+		return false;
 	}
-	
+
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {
 		return this;

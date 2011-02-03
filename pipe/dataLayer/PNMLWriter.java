@@ -11,6 +11,6 @@ import org.w3c.dom.DOMException;
 
 public interface PNMLWriter {
 	public void savePNML(File file) throws NullPointerException, IOException,
-	ParserConfigurationException, DOMException, 
-	TransformerConfigurationException, TransformerException;
+			ParserConfigurationException, DOMException,
+			TransformerConfigurationException, TransformerException;
 }

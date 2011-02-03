@@ -9,18 +9,19 @@ public class TimedPlaceInvariantEdit extends Command {
 	private TimeInvariant oldvalue;
 	private TimeInvariant newvalue;
 	private TimedPlaceComponent place;
-	
-	public TimedPlaceInvariantEdit(TimedPlaceComponent place, TimeInvariant oldvalue, TimeInvariant newvalue) {
-	
+
+	public TimedPlaceInvariantEdit(TimedPlaceComponent place,
+			TimeInvariant oldvalue, TimeInvariant newvalue) {
+
 		this.oldvalue = oldvalue;
 		this.newvalue = newvalue;
 		this.place = place;
-	
+
 	}
-	
+
 	@Override
 	public void redo() {
-		place.setInvariant(newvalue); 
+		place.setInvariant(newvalue);
 
 	}
 

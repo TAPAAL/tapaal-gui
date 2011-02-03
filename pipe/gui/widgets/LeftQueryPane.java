@@ -38,28 +38,29 @@ public class LeftQueryPane extends JPanel {
 	private JList queryList;
 	private JSplitPane splitPane;
 	private JScrollPane queryScroller;
-	
+
 	private JButton addQueryButton;
 	private JButton editQueryButton;
 	private JButton verifyButton;
-	
+
 	private JButton removeQueryButton;
 	private TabContent tabContent;
-	
-	public LeftQueryPane(ArrayList<TAPNQuery> queriesToSet, TabContent tabContent) {	
+
+	public LeftQueryPane(ArrayList<TAPNQuery> queriesToSet,
+			TabContent tabContent) {
 		this.tabContent = tabContent;
 		queryCollectionPanel = new JPanel(new BorderLayout());
-		buttonsPanel = new JPanel(new GridLayout(2,1));
+		buttonsPanel = new JPanel(new GridLayout(2, 1));
 		listModel = new DefaultListModel();
-		
+
 		queryList = new JList(listModel);
 		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		queryList.setVisibleRowCount(-1);
 		queryList.setLayoutOrientation(JList.VERTICAL);
 		queryList.setAlignmentX(Component.LEFT_ALIGNMENT);
 		queryList.setAlignmentY(Component.TOP_ALIGNMENT);
-		queryList.addListSelectionListener(new ListSelectionListener(){
-			public void valueChanged(ListSelectionEvent e){
+		queryList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
 					if (queryList.getSelectedIndex() == -1) {
 						editQueryButton.setEnabled(false);
@@ -74,38 +75,39 @@ public class LeftQueryPane extends JPanel {
 				}
 			}
 		});
-		queryList.addMouseListener(new MouseAdapter(){
+		queryList.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(!queryList.isSelectionEmpty()){
-					if(arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2){
+				if (!queryList.isSelectionEmpty()) {
+					if (arg0.getButton() == MouseEvent.BUTTON1
+							&& arg0.getClickCount() == 2) {
 						int index = queryList.locationToIndex(arg0.getPoint());
-					    queryList.ensureIndexIsVisible(index);						
-						
+						queryList.ensureIndexIsVisible(index);
+
 						showEditDialog();
-					}	
-				}				
+					}
+				}
 			}
 		});
-	
+
 		addQueriesComponents();
 		addButtons();
-		
-		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, queryCollectionPanel, buttonsPanel);
+
+		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
+				queryCollectionPanel, buttonsPanel);
 		setLayout(new BorderLayout());
-				
+
 		splitPane.setContinuousLayout(true);
 		splitPane.setDividerSize(0);
 		splitPane.setDividerLocation(0.8);
 		splitPane.setResizeWeight(1.0);
 		this.add(splitPane);
-		
-		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Queries"), 
-				BorderFactory.createEmptyBorder(3,3,3,3))
-			);
-		
+
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory
+				.createTitledBorder("Queries"), BorderFactory
+				.createEmptyBorder(3, 3, 3, 3)));
+
 		showQueries();
 	}
 
@@ -118,45 +120,46 @@ public class LeftQueryPane extends JPanel {
 		JPanel p1 = new JPanel();
 		editQueryButton = new JButton("Edit");
 		editQueryButton.setEnabled(false);
-		Dimension dimension = new Dimension(82,23);
+		Dimension dimension = new Dimension(82, 23);
 		editQueryButton.setPreferredSize(dimension);
-		editQueryButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		editQueryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				showEditDialog();
 			}
 		});
 		p1.add(editQueryButton);
-		
+
 		verifyButton = new JButton("Verify");
 		verifyButton.setEnabled(false);
 		verifyButton.setPreferredSize(dimension);
-		verifyButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
+		verifyButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
 				Verifier.runUppaalVerification(tabContent.network(), q);
-			}			
+			}
 		});
 		p1.add(verifyButton);
 		buttonsPanel.add(p1);
-		
+
 		JPanel p2 = new JPanel();
 		removeQueryButton = new JButton("Remove");
 		removeQueryButton.setEnabled(false);
 		removeQueryButton.setPreferredSize(dimension);
-		removeQueryButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		removeQueryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				listModel.remove(queryList.getSelectedIndex());
 				showQueries();
 			}
 		});
 		p2.add(removeQueryButton);
-		
+
 		addQueryButton = new JButton("New..");
 		addQueryButton.setPreferredSize(dimension);
-		addQueryButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				TAPNQuery q = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());
-				if (q != null){
+		addQueryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TAPNQuery q = QueryDialogue.ShowUppaalQueryDialogue(
+						QueryDialogueOption.Save, null, tabContent.network());
+				if (q != null) {
 					addQuery(q);
 					showQueries();
 				}
@@ -166,47 +169,47 @@ public class LeftQueryPane extends JPanel {
 		p2.add(addQueryButton);
 		buttonsPanel.add(p2);
 	}
-		
+
 	private void showEditDialog() {
-		TAPNQuery q = (TAPNQuery)queryList.getSelectedValue();
-		TAPNQuery newQuery = QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.Save, q, tabContent.network());
-		
-		if(newQuery != null)
+		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
+		TAPNQuery newQuery = QueryDialogue.ShowUppaalQueryDialogue(
+				QueryDialogueOption.Save, q, tabContent.network());
+
+		if (newQuery != null)
 			updateQuery(q, newQuery);
-		
+
 		showQueries();
 	}
-	
+
 	private void showQueries() {
 		queryList.validate();
-		
+
 	}
 
-	
-	private void addQuery(TAPNQuery query) {	
+	private void addQuery(TAPNQuery query) {
 		listModel.addElement(query);
 	}
 
 	private void updateQuery(TAPNQuery oldQuery, TAPNQuery newQuery) {
-		oldQuery.set(newQuery);	
+		oldQuery.set(newQuery);
 	}
-	
-	public Iterable<TAPNQuery> getQueries(){
+
+	public Iterable<TAPNQuery> getQueries() {
 		ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
-		
-		for(int i = 0; i < listModel.size(); ++i) {
-			queries.add((TAPNQuery)listModel.get(i));
+
+		for (int i = 0; i < listModel.size(); ++i) {
+			queries.add((TAPNQuery) listModel.get(i));
 		}
-		
+
 		return queries;
 	}
 
 	public void setQueries(Iterable<TAPNQuery> queries) {
 		Require.that(queries != null, "Queries cannot be null");
-		
+
 		listModel.removeAllElements();
-		
-		for(TAPNQuery query : queries) {
+
+		for (TAPNQuery query : queries) {
 			listModel.addElement(query);
 		}
 		showQueries();
@@ -214,6 +217,6 @@ public class LeftQueryPane extends JPanel {
 
 	public void removeQuery(TAPNQuery queryToRemove) {
 		listModel.removeElement(queryToRemove);
-		showQueries();	
+		showQueries();
 	}
 }

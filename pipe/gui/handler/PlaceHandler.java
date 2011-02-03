@@ -29,246 +29,251 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
-
 /**
  * Class used to implement methods corresponding to mouse events on places.
  */
-public class PlaceHandler 
-extends PlaceTransitionObjectHandler {
+public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 	public PlaceHandler(Container contentpane, Place obj) {
 		super(contentpane, obj);
 	}
-
 
 	public PlaceHandler(DrawingSurfaceImpl drawingSurfaceImpl, Place newObject,
 			DataLayer guiModel, TimedArcPetriNet model) {
 		super(drawingSurfaceImpl, newObject, guiModel, model);
 	}
 
-
-	/** 
-	 * Creates the popup menu that the user will see when they right click on a 
-	 * component 
+	/**
+	 * Creates the popup menu that the user will see when they right click on a
+	 * component
 	 */
 	@Override
 	public JPopupMenu getPopup(MouseEvent e) {
 		int index = 0;
-		JPopupMenu popup = super.getPopup(e);      
+		JPopupMenu popup = super.getPopup(e);
 
-		JMenuItem menuItem = new JMenuItem("Edit Place");      
-		menuItem.addActionListener(new ActionListener(){
+		JMenuItem menuItem = new JMenuItem("Edit Place");
+		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				((Place)myObject).showEditor();
+				((Place) myObject).showEditor();
 			}
-		}); 
+		});
 		popup.insert(menuItem, index++);
 
-		menuItem = new JMenuItem(new ShowHideInfoAction((Place)myObject));      
-		if (((Place)myObject).getAttributesVisible() == true){
+		menuItem = new JMenuItem(new ShowHideInfoAction((Place) myObject));
+		if (((Place) myObject).getAttributesVisible() == true) {
 			menuItem.setText("Hide Attributes");
 		} else {
 			menuItem.setText("Show Attributes");
 		}
-		popup.insert(menuItem,index++);
-		popup.insert(new JPopupMenu.Separator(),index);      
+		popup.insert(menuItem, index++);
+		popup.insert(new JPopupMenu.Separator(), index);
 
 		return popup;
 	}
 
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (SwingUtilities.isLeftMouseButton(e)){
-			if (e.getClickCount() == 2 &&
-					CreateGui.getApp().isEditionAllowed() &&
-					(CreateGui.getApp().getMode() == Pipe.PLACE || 
-							CreateGui.getApp().getMode() == Pipe.SELECT)) {
-				((TimedPlaceComponent)myObject).showAgeOfTokens(false);
-				((Place)myObject).showEditor(); 
+		if (SwingUtilities.isLeftMouseButton(e)) {
+			if (e.getClickCount() == 2
+					&& CreateGui.getApp().isEditionAllowed()
+					&& (CreateGui.getApp().getMode() == Pipe.PLACE || CreateGui
+							.getApp().getMode() == Pipe.SELECT)) {
+				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
+				((Place) myObject).showEditor();
 			} else {
-				int currentMarking = ((Place)myObject).getCurrentMarking();
+				int currentMarking = ((Place) myObject).getCurrentMarking();
 				UndoManager undoManager = CreateGui.getView().getUndoManager();
 
-				switch(CreateGui.getApp().getMode()) {
+				switch (CreateGui.getApp().getMode()) {
 				case Pipe.ADDTOKEN:
-					if(!CreateGui.getModel().isUsingColors()){
-						if(myObject instanceof TimedPlaceComponent){
-							Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent)myObject, 1);
+					if (!CreateGui.getModel().isUsingColors()) {
+						if (myObject instanceof TimedPlaceComponent) {
+							Command command = new TimedPlaceMarkingEdit(
+									(TimedPlaceComponent) myObject, 1);
 							command.redo();
 							undoManager.addNewEdit(command);
-						}else{
-							undoManager.addNewEdit(
-									((Place)myObject).setCurrentMarking(++currentMarking));
+						} else {
+							undoManager.addNewEdit(((Place) myObject)
+									.setCurrentMarking(++currentMarking));
 						}
-					}else{
-						showAddTokenDialog((ColoredTimedPlace)myObject);
+					} else {
+						showAddTokenDialog((ColoredTimedPlace) myObject);
 					}
 					break;
 				case Pipe.DELTOKEN:
-					if(!CreateGui.getModel().isUsingColors()){
-						if(myObject instanceof TimedPlaceComponent){
-							Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent)myObject, -1);
+					if (!CreateGui.getModel().isUsingColors()) {
+						if (myObject instanceof TimedPlaceComponent) {
+							Command command = new TimedPlaceMarkingEdit(
+									(TimedPlaceComponent) myObject, -1);
 							command.redo();
 							undoManager.addNewEdit(command);
-						}else if (currentMarking > 0) {
-							undoManager.addNewEdit(
-									((Place)myObject).setCurrentMarking(--currentMarking));
+						} else if (currentMarking > 0) {
+							undoManager.addNewEdit(((Place) myObject)
+									.setCurrentMarking(--currentMarking));
 						}
-					}else{
-						showRemoveTokenDialog((ColoredTimedPlace)myObject);
+					} else {
+						showRemoveTokenDialog((ColoredTimedPlace) myObject);
 					}
 					break;
 				default:
 					break;
 				}
 			}
-		}else if (SwingUtilities.isRightMouseButton(e)){
-			if (CreateGui.getApp().isEditionAllowed() && enablePopup) { 
+		} else if (SwingUtilities.isRightMouseButton(e)) {
+			if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
 				JPopupMenu m = getPopup(e);
-				if (m != null) {           
-					int x = Zoomer.getZoomedValue(
-							((Place)myObject).getNameOffsetXObject().intValue(),
-							myObject.getZoom());
-					int y = Zoomer.getZoomedValue(
-							((Place)myObject).getNameOffsetYObject().intValue(),
-							myObject.getZoom());
+				if (m != null) {
+					int x = Zoomer.getZoomedValue(((Place) myObject)
+							.getNameOffsetXObject().intValue(), myObject
+							.getZoom());
+					int y = Zoomer.getZoomedValue(((Place) myObject)
+							.getNameOffsetYObject().intValue(), myObject
+							.getZoom());
 					m.show(myObject, x, y);
 				}
 			}
-		}/* else if (SwingUtilities.isMiddleMouseButton(e)){
-         // TODO - middelclick draw a arrow 
-      } */
+		}/*
+		 * else if (SwingUtilities.isMiddleMouseButton(e)){ // TODO -
+		 * middelclick draw a arrow }
+		 */
 	}
-
 
 	private void showRemoveTokenDialog(ColoredTimedPlace place) {
-		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
+				Pipe.TOOL + " " + Pipe.VERSION, true);
 
 		Container contentPane = guiDialog.getContentPane();
 
 		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add( new RemoveTokenPanel(guiDialog.getRootPane(), place, CreateGui.getCurrentTab().network(), CreateGui.getView().getUndoManager()));
+		contentPane.add(new RemoveTokenPanel(guiDialog.getRootPane(), place,
+				CreateGui.getCurrentTab().network(), CreateGui.getView()
+						.getUndoManager()));
 
-		guiDialog.setResizable(false);     
+		guiDialog.setResizable(false);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);	
+		guiDialog.setVisible(true);
 	}
-
 
 	private void showAddTokenDialog(ColoredTimedPlace place) {
-		EscapableDialog guiDialog = 
-			new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
+				Pipe.TOOL + " " + Pipe.VERSION, true);
 
 		Container contentPane = guiDialog.getContentPane();
 
 		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));      
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add( new AddTokenPanel(guiDialog.getRootPane(), place, CreateGui.getCurrentTab().network(), CreateGui.getView().getUndoManager()));
+		contentPane.add(new AddTokenPanel(guiDialog.getRootPane(), place,
+				CreateGui.getCurrentTab().network(), CreateGui.getView()
+						.getUndoManager()));
 
-		guiDialog.setResizable(false);     
+		guiDialog.setResizable(false);
 
 		// Make window fit contents' preferred size
 		guiDialog.pack();
 
 		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);	
+		guiDialog.setVisible(true);
 	}
-
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		// 
-		if (CreateGui.getApp().isEditionAllowed() == false || 
-				e.isControlDown()) {
+		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
 			return;
 		}
 
 		UndoManager undoManager = CreateGui.getView().getUndoManager();
 		if (e.isShiftDown()) {
-			/* if ((myObject instanceof TimedPlace)==false){
-    		  int oldCapacity = ((Place)myObject).getCapacity();
-    		  int oldMarking = ((Place)myObject).getCurrentMarking();
-
-    		  int newCapacity = oldCapacity - e.getWheelRotation();
-    		  if (newCapacity < 0) {
-    			  newCapacity = 0;
-    		  }
-
-    		  undoManager.newEdit(); // new "transaction""
-    		  if ((newCapacity > 0) && (oldMarking > newCapacity)){
-    			  if (((Place)myObject).getMarkingParameter() != null) {
-    				  undoManager.addEdit(((Place)myObject).clearMarkingParameter());
-    			  }
-    			  undoManager.addEdit(((Place)myObject).setCurrentMarking(newCapacity));
-    		  }
-    		  undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
-    	  }*/
+			/*
+			 * if ((myObject instanceof TimedPlace)==false){ int oldCapacity =
+			 * ((Place)myObject).getCapacity(); int oldMarking =
+			 * ((Place)myObject).getCurrentMarking();
+			 * 
+			 * int newCapacity = oldCapacity - e.getWheelRotation(); if
+			 * (newCapacity < 0) { newCapacity = 0; }
+			 * 
+			 * undoManager.newEdit(); // new "transaction"" if ((newCapacity >
+			 * 0) && (oldMarking > newCapacity)){ if
+			 * (((Place)myObject).getMarkingParameter() != null) {
+			 * undoManager.addEdit(((Place)myObject).clearMarkingParameter()); }
+			 * undoManager
+			 * .addEdit(((Place)myObject).setCurrentMarking(newCapacity)); }
+			 * undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
+			 * }
+			 */
 		} else {
-			if(!CreateGui.getModel().isUsingColors()){
-				if(myObject instanceof TimedPlaceComponent){
+			if (!CreateGui.getModel().isUsingColors()) {
+				if (myObject instanceof TimedPlaceComponent) {
 					int clicks = -e.getWheelRotation();
 
-					Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent)myObject, clicks);
+					Command command = new TimedPlaceMarkingEdit(
+							(TimedPlaceComponent) myObject, clicks);
 					command.redo();
 					undoManager.addNewEdit(command);
-				}else{
-					int oldMarking = ((Place)myObject).getCurrentMarking();
+				} else {
+					int oldMarking = ((Place) myObject).getCurrentMarking();
 					int newMarking = oldMarking - e.getWheelRotation();
 
 					if (newMarking < 0) {
 						newMarking = 0;
 					}
-					if (oldMarking != newMarking) {            
-						undoManager.addNewEdit(((Place)myObject).setCurrentMarking(newMarking));            
-					} 
+					if (oldMarking != newMarking) {
+						undoManager.addNewEdit(((Place) myObject)
+								.setCurrentMarking(newMarking));
+					}
 				}
 			}
 		}
 	}
+
 	@Override
-	public void mouseEntered(MouseEvent e){
-		if(!CreateGui.getModel().netType().equals(NetType.UNTIMED)){
-			if ((myObject instanceof TimedPlaceComponent) && !isDragging){//&& CreateGui.getView().isInAnimationMode()){		   
-				if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
+	public void mouseEntered(MouseEvent e) {
+		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+			if ((myObject instanceof TimedPlaceComponent) && !isDragging) {// &&
+																			// CreateGui.getView().isInAnimationMode()){
+				if (CreateGui.getModel().isUsingColors()
+						|| CreateGui.getView().isInAnimationMode()) {
 					((TimedPlaceComponent) myObject).showAgeOfTokens(true);
 				}
 			}
 		}
 
-		if(isDragging){
+		if (isDragging) {
 			((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 		}
 	}
 
 	@Override
-	public void mouseExited(MouseEvent e){
-		if ((myObject instanceof TimedPlaceComponent)){// && CreateGui.getView().isInAnimationMode()){
-			if(CreateGui.getModel().isUsingColors() || CreateGui.getView().isInAnimationMode()){
+	public void mouseExited(MouseEvent e) {
+		if ((myObject instanceof TimedPlaceComponent)) {// &&
+														// CreateGui.getView().isInAnimationMode()){
+			if (CreateGui.getModel().isUsingColors()
+					|| CreateGui.getView().isInAnimationMode()) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 			}
 		}
 	}
 
-	//Override
+	// Override
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (CreateGui.getApp().isEditionAllowed()){
+		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
-		}else{
-			//do nothing except the things that one do in the simulator (handled somewhere else).
+		} else {
+			// do nothing except the things that one do in the simulator
+			// (handled somewhere else).
 		}
 
 	}

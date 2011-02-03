@@ -8,8 +8,8 @@ public class ColoredInputArc extends TAPNArc {
 	private ColoredInterval timeGuard;
 	private ColorSet colorGuard;
 
-	public ColoredInputArc(ColoredPlace source,
-			TAPNTransition target, ColoredInterval timeGuard, ColorSet colorGuard) {
+	public ColoredInputArc(ColoredPlace source, TAPNTransition target,
+			ColoredInterval timeGuard, ColorSet colorGuard) {
 		super(source, target, "");
 		this.timeGuard = timeGuard;
 		this.colorGuard = colorGuard;

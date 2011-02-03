@@ -5,17 +5,17 @@ import pipe.dataLayer.TimedPlaceComponent;
 public class TimedPlaceMarkingEdit extends Command {
 	private int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;
-	
-	public TimedPlaceMarkingEdit(TimedPlaceComponent tpc, int numberOfTokens){
+
+	public TimedPlaceMarkingEdit(TimedPlaceComponent tpc, int numberOfTokens) {
 		this.timedPlaceComponent = tpc;
 		this.numberOfTokens = numberOfTokens;
 	}
-	
+
 	@Override
 	public void redo() {
-		if(numberOfTokens > 0){
+		if (numberOfTokens > 0) {
 			timedPlaceComponent.addTokens(Math.abs(numberOfTokens));
-		}else{
+		} else {
 			timedPlaceComponent.removeTokens(Math.abs(numberOfTokens));
 		}
 		timedPlaceComponent.repaint();
@@ -23,9 +23,9 @@ public class TimedPlaceMarkingEdit extends Command {
 
 	@Override
 	public void undo() {
-		if(numberOfTokens > 0){
+		if (numberOfTokens > 0) {
 			timedPlaceComponent.removeTokens(Math.abs(numberOfTokens));
-		}else{
+		} else {
 			timedPlaceComponent.addTokens(Math.abs(numberOfTokens));
 		}
 		timedPlaceComponent.repaint();

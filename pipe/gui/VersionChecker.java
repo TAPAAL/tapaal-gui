@@ -14,7 +14,7 @@ public class VersionChecker {
 	private URL url;
 	private String newestVersion;
 
-	public VersionChecker(){
+	public VersionChecker() {
 		try {
 			url = new URL(versionURL);
 		} catch (MalformedURLException e) {
@@ -23,12 +23,12 @@ public class VersionChecker {
 		}
 	}
 
-	public boolean checkForNewVersion(){
-		if(url != null){
+	public boolean checkForNewVersion() {
+		if (url != null) {
 
 			getNewestVersion();
 
-			if(newestVersion != null && !newestVersion.isEmpty()){
+			if (newestVersion != null && !newestVersion.isEmpty()) {
 				return compareVersions();
 			}
 		}
@@ -42,39 +42,42 @@ public class VersionChecker {
 
 		int currentLength = currentVersionNumbers.length;
 		int newestLength = newestVersionNumbers.length;
-		
-		int length = currentLength > newestLength ? 
-				currentLength : newestLength;
-		
+
+		int length = currentLength > newestLength ? currentLength
+				: newestLength;
+
 		for (int i = 0; i < length; i++) {
-				int current = i >= currentLength ? 0 : Integer.parseInt(currentVersionNumbers[i]);
-				int newest = 0;
-			try{ // in case a version like a.0.3 is given, we catch this and return false
-				newest = i >= newestLength ? 0 : Integer.parseInt(newestVersionNumbers[i]);
-			}catch(NumberFormatException e){
+			int current = i >= currentLength ? 0 : Integer
+					.parseInt(currentVersionNumbers[i]);
+			int newest = 0;
+			try { // in case a version like a.0.3 is given, we catch this and
+					// return false
+				newest = i >= newestLength ? 0 : Integer
+						.parseInt(newestVersionNumbers[i]);
+			} catch (NumberFormatException e) {
 				return false;
 			}
-			
-			if(newest > current) return true;
+
+			if (newest > current)
+				return true;
 		}
 
 		return false;
 	}
 
 	private void getNewestVersion() {
-		try{
+		try {
 			URLConnection conn = url.openConnection();
 
 			conn.setConnectTimeout(timeoutMs);
 			conn.setReadTimeout(timeoutMs);
 
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(conn.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn
+					.getInputStream()));
 
 			newestVersion = in.readLine();
 			in.close();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			Logger.log("Could not check for new version.");
 		}
 	}

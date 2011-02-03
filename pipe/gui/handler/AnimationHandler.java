@@ -8,45 +8,46 @@ import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 
-
 /**
- * This class handles mouse clicks by the user. 
+ * This class handles mouse clicks by the user.
  * 
- * @author unknown 
+ * @author unknown
  * @author David Patterson
  * 
- * Change by David Patterson was to fire the selected 
- * transition in the DataLayer, and then record the firing
- * in the animator.
+ *         Change by David Patterson was to fire the selected transition in the
+ *         DataLayer, and then record the firing in the animator.
  * 
  * @author Pere Bonet reverted the above change.
  */
 
+public class AnimationHandler extends javax.swing.event.MouseInputAdapter {
 
-public class AnimationHandler 
-        extends javax.swing.event.MouseInputAdapter {
-   
-   
-   @Override
-public void mouseClicked(MouseEvent e){      
-      if (e.getComponent() instanceof Transition && CreateGui.getApp().getGUIMode().equals(GuiFrame.GUIMode.animation)) {
-         Transition transition = (Transition)e.getComponent();
-//Edited by Joakim Byg - It seems enough to check if it is enabled 
-//and not if it enabled and do side-effects at the same time (the true argument).          
-         if (SwingUtilities.isLeftMouseButton(e)
-                 && (transition.isEnabled(/*true*/))) {
-        	 
-        	 // If animation mode is Select we need to show the animation menu
-        	 if (CreateGui.getAnimator().firingmode == null){
-        		 boolean proceed = CreateGui.getAnimator().showSelectSimulatorDialogue(transition);
-        		 if(!proceed) return;
-        	 }
-        	 
-            CreateGui.getAnimationHistory().clearStepsForward();
-            CreateGui.getAnimator().fireTransition(transition);            
-            CreateGui.getApp().setRandomAnimationMode(false);
-         }
-      }
-   }
-   
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (e.getComponent() instanceof Transition
+				&& CreateGui.getApp().getGUIMode().equals(
+						GuiFrame.GUIMode.animation)) {
+			Transition transition = (Transition) e.getComponent();
+			// Edited by Joakim Byg - It seems enough to check if it is enabled
+			// and not if it enabled and do side-effects at the same time (the
+			// true argument).
+			if (SwingUtilities.isLeftMouseButton(e)
+					&& (transition.isEnabled(/* true */))) {
+
+				// If animation mode is Select we need to show the animation
+				// menu
+				if (CreateGui.getAnimator().firingmode == null) {
+					boolean proceed = CreateGui.getAnimator()
+							.showSelectSimulatorDialogue(transition);
+					if (!proceed)
+						return;
+				}
+
+				CreateGui.getAnimationHistory().clearStepsForward();
+				CreateGui.getAnimator().fireTransition(transition);
+				CreateGui.getApp().setRandomAnimationMode(false);
+			}
+		}
+	}
+
 }

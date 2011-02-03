@@ -24,20 +24,21 @@ public class VerifytaTraceInterpreter {
 	private final TimedArcPetriNet tapn;
 	private final TranslationNamingScheme namingScheme;
 
-	public VerifytaTraceInterpreter(TimedArcPetriNet tapn, TranslationNamingScheme namingScheme){
+	public VerifytaTraceInterpreter(TimedArcPetriNet tapn,
+			TranslationNamingScheme namingScheme) {
 		this.tapn = tapn;
 		this.namingScheme = namingScheme;
 	}
 
-	protected TimedArcPetriNet tapn(){
+	protected TimedArcPetriNet tapn() {
 		return tapn;
 	}
 
-	protected TranslationNamingScheme namingScheme(){
+	protected TranslationNamingScheme namingScheme() {
 		return namingScheme;
 	}
 
-	public TAPNTrace interpretTrace(UppaalTrace trace){
+	public TAPNTrace interpretTrace(UppaalTrace trace) {
 		return interpretTimedTrace(trace);
 	}
 
@@ -47,28 +48,30 @@ public class VerifytaTraceInterpreter {
 
 		Iterator<TAFiringAction> iterator = trace.iterator();
 		TAFiringAction action = null;
-		
-		while(iterator.hasNext()){
+
+		while (iterator.hasNext()) {
 			List<TransitionFiring> firingSequence = new ArrayList<TransitionFiring>();
 			List<String> firingSequenceNames = new ArrayList<String>();
 
-			while(iterator.hasNext() && 
-					(action = iterator.next()) instanceof TransitionFiring){
-				firingSequence.add((TransitionFiring)action);
-				firingSequenceNames.add(((TransitionFiring)action).channel());
+			while (iterator.hasNext()
+					&& (action = iterator.next()) instanceof TransitionFiring) {
+				firingSequence.add((TransitionFiring) action);
+				firingSequenceNames.add(((TransitionFiring) action).channel());
 			}
 
-			TransitionTranslation[] transitions = namingScheme.interpretTransitionSequence(firingSequenceNames);
+			TransitionTranslation[] transitions = namingScheme
+					.interpretTransitionSequence(firingSequenceNames);
 
-			for(TransitionTranslation transitionTranslation : transitions){
-				TAPNFiringAction firingAction = interpretTransitionFiring(firingSequence, transitionTranslation, isConcreteTrace);
+			for (TransitionTranslation transitionTranslation : transitions) {
+				TAPNFiringAction firingAction = interpretTransitionFiring(
+						firingSequence, transitionTranslation, isConcreteTrace);
 				result.addFiringAction(firingAction);
 			}
 
-
-			if(action != null && action instanceof TimeDelayFiringAction){
-				BigDecimal delay = ((TimeDelayFiringAction)action).getDelay();
-				TAPNFiringAction delayAction = new dk.aau.cs.petrinet.trace.TimeDelayFiringAction(delay);
+			if (action != null && action instanceof TimeDelayFiringAction) {
+				BigDecimal delay = ((TimeDelayFiringAction) action).getDelay();
+				TAPNFiringAction delayAction = new dk.aau.cs.petrinet.trace.TimeDelayFiringAction(
+						delay);
 				result.addFiringAction(delayAction);
 			}
 		}
@@ -76,43 +79,48 @@ public class VerifytaTraceInterpreter {
 		return result;
 	}
 
-	protected TAPNFiringAction interpretTransitionFiring
-	(
+	protected TAPNFiringAction interpretTransitionFiring(
 			List<TransitionFiring> firingSequence,
-			TransitionTranslation transitionTranslation,
-			boolean isConcreteTrace
-	) {
-		TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
+			TransitionTranslation transitionTranslation, boolean isConcreteTrace) {
+		TAPNTransition transition = tapn
+				.getTransitionsByName(transitionTranslation
+						.originalTransitionName());
 		List<Token> tokens = null;
-		if(isConcreteTrace){
-			if(transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)){
-				tokens = parseConsumedTokens(
-						firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt()+1)
-				);
-			}else if(transitionTranslation.sequenceInfo().equals(SequenceInfo.END)){
-				TransitionFiring start = firingSequence.get(transitionTranslation.startsAt());
-				TransitionFiring end = firingSequence.get(transitionTranslation.endsAt());
+		if (isConcreteTrace) {
+			if (transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)) {
+				tokens = parseConsumedTokens(firingSequence.subList(
+						transitionTranslation.startsAt(), transitionTranslation
+								.endsAt() + 1));
+			} else if (transitionTranslation.sequenceInfo().equals(
+					SequenceInfo.END)) {
+				TransitionFiring start = firingSequence
+						.get(transitionTranslation.startsAt());
+				TransitionFiring end = firingSequence.get(transitionTranslation
+						.endsAt());
 				tokens = parseConsumedTokens(start, end);
 			}
 		}
 
-		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
+		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition,
+				tokens);
 	}
 
 	private List<Token> parseConsumedTokens(List<TransitionFiring> actions) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
-		for(int i = 0; i < actions.size(); i++){
+		for (int i = 0; i < actions.size(); i++) {
 			TransitionFiring action = actions.get(i);
 
-			for(Participant participant : action.participants()){
+			for (Participant participant : action.participants()) {
 				String automata = participant.automata();
 				String sourceLocation = participant.location();
 
-				if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
+				if (!namingScheme.isIgnoredAutomata(automata)
+						&& !namingScheme.isIgnoredPlace(sourceLocation)) {
 					TAPNPlace place = tapn.getPlaceByName(sourceLocation);
-					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName()).lower();
-					Token token = new Token(place, clockValue); 
+					BigDecimal clockValue = participant.clockOrVariableValue(
+							namingScheme().tokenClockName()).lower();
+					Token token = new Token(place, clockValue);
 					tokens.add(token);
 				}
 			}
@@ -121,17 +129,21 @@ public class VerifytaTraceInterpreter {
 		return tokens;
 	}
 
-	private List<Token> parseConsumedTokens(TransitionFiring start, TransitionFiring end) {
+	private List<Token> parseConsumedTokens(TransitionFiring start,
+			TransitionFiring end) {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 
-		for(Participant participant : end.participants()){
+		for (Participant participant : end.participants()) {
 			String automata = participant.automata();
 			String sourceLocation = start.sourceState().locationFor(automata);
 
-			if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
+			if (!namingScheme.isIgnoredAutomata(automata)
+					&& !namingScheme.isIgnoredPlace(sourceLocation)) {
 				TAPNPlace place = tapn.getPlaceByName(sourceLocation);
-				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName()).lower();
-				Token token = new Token(place, clockValue); 
+				BigDecimal clockValue = start.sourceState()
+						.getLocalClockOrVariable(automata,
+								namingScheme().tokenClockName()).lower();
+				Token token = new Token(place, clockValue);
 				tokens.add(token);
 			}
 		}

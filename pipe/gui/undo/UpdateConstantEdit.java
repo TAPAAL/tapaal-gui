@@ -1,6 +1,5 @@
 package pipe.gui.undo;
 
-
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
@@ -13,15 +12,15 @@ public class UpdateConstantEdit extends Command {
 	private ConstantStore store;
 	private Constant oldConstant;
 	private TimedArcPetriNetNetwork model;
-	
-	public UpdateConstantEdit(Constant oldConstant, Constant newConstant, 
-			ConstantStore store, TimedArcPetriNetNetwork model){
+
+	public UpdateConstantEdit(Constant oldConstant, Constant newConstant,
+			ConstantStore store, TimedArcPetriNetNetwork model) {
 		this.oldConstant = oldConstant;
 		this.newConstant = newConstant;
 		this.store = store;
 		this.model = model;
 	}
-	
+
 	@Override
 	public void redo() {
 		store.remove(oldConstant);

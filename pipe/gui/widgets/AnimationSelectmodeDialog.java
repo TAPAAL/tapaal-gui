@@ -27,7 +27,7 @@ import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 
-public class AnimationSelectmodeDialog extends JPanel{
+public class AnimationSelectmodeDialog extends JPanel {
 
 	private static final long serialVersionUID = 7852107237344005547L;
 
@@ -39,12 +39,12 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 	private JButton okButton;
 	private boolean cancelled = true;
-	
-	public boolean cancelled(){
+
+	public boolean cancelled() {
 		return cancelled;
 	}
-	
-	public AnimationSelectmodeDialog(Transition t){
+
+	public AnimationSelectmodeDialog(Transition t) {
 
 		setLayout(new GridBagLayout());
 
@@ -54,30 +54,26 @@ public class AnimationSelectmodeDialog extends JPanel{
 		c.gridx = 0;
 		c.gridy = 0;
 
-
-		firedtransition = (TimedTransitionComponent)t; // XXX - unsafe cast (ok by contract)
+		firedtransition = (TimedTransitionComponent) t; // XXX - unsafe cast (ok
+														// by contract)
 
 		namePanel = new JPanel(new FlowLayout());
-		namePanel.add(new JLabel("Select tokens to Fire in Transition " + t.getName()));
-
+		namePanel.add(new JLabel("Select tokens to Fire in Transition "
+				+ t.getName()));
 
 		add(namePanel, c);
 
-
-
-		//Start adding the stuff
+		// Start adding the stuff
 		JPanel presetPanelContainer;
 		presetPanelContainer = new JPanel(new FlowLayout());
-
 
 		c.gridx = 0;
 		c.gridy = 1;
 
 		add(presetPanelContainer, c);
 
-
-		for (Arc a : t.getPreset()){
-			if(!(a instanceof TimedInhibitorArcComponent)){
+		for (Arc a : t.getPreset()) {
+			if (!(a instanceof TimedInhibitorArcComponent)) {
 				JPanel presetPanel = createDropDownForArc(a);
 				presetPanelContainer.add(presetPanel);
 			}
@@ -86,7 +82,7 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 		c.gridx = 0;
 		c.gridy = 2;
-		//OK
+		// OK
 		okButton = new javax.swing.JButton();
 
 		okButton.setText("OK");
@@ -96,54 +92,61 @@ public class AnimationSelectmodeDialog extends JPanel{
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				cancelled = false;
-				exit(); 
+				exit();
 			}
 		});
 
-
-		add(okButton,c);
+		add(okButton, c);
 	}
+
 	private JPanel createDropDownForArc(Arc a) {
 		JPanel presetPanel;
 		presetPanel = new JPanel(new FlowLayout());
 
-		//For each place in the preset create a box for selecting tokens
+		// For each place in the preset create a box for selecting tokens
 
-		presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + a.getSource().getName()));
-		presetPanel.add(new JLabel("Select token from Place " + a.getSource().getName()));
+		presetPanel.setBorder(BorderFactory.createTitledBorder("Place "
+				+ a.getSource().getName()));
+		presetPanel.add(new JLabel("Select token from Place "
+				+ a.getSource().getName()));
 
-		if(!CreateGui.getModel().isUsingColors()){
+		if (!CreateGui.getModel().isUsingColors()) {
 			ArrayList<String> eligableToken = null;
 
 			DecimalFormat df = new DecimalFormat();
 			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 			df.setMinimumFractionDigits(1);
-			if (a instanceof TransportArcComponent){
-				eligableToken= new ArrayList<String>();
-				TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
-
-				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-
-				TimedPlaceComponent targetPlace = (TimedPlaceComponent)((TransportArcComponent)a).getConnectedTo().getTarget();
-
-				for (int i=0; i< tokensOfPlace.size(); i++){
-					if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
-						eligableToken.add(df.format(tokensOfPlace.get(i)));
-					}
-				}	
-
-			}else if (a instanceof TimedInputArcComponent){
+			if (a instanceof TransportArcComponent) {
 				eligableToken = new ArrayList<String>();
-				//int indexOfOldestEligebleToken = 0;
+				TimedPlaceComponent p = (TimedPlaceComponent) a.getSource();
 
-				TimedPlaceComponent p = (TimedPlaceComponent)a.getSource();
+				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();
 
-				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
-				for (int i=0; i< tokensOfPlace.size(); i++){
-					if ( ((TimedInputArcComponent)a).satisfiesGuard(tokensOfPlace.get(i))){
+				TimedPlaceComponent targetPlace = (TimedPlaceComponent) ((TransportArcComponent) a)
+						.getConnectedTo().getTarget();
+
+				for (int i = 0; i < tokensOfPlace.size(); i++) {
+					if (((TimedInputArcComponent) a)
+							.satisfiesGuard(tokensOfPlace.get(i))
+							&& targetPlace.satisfiesInvariant(tokensOfPlace
+									.get(i))) {
 						eligableToken.add(df.format(tokensOfPlace.get(i)));
 					}
-				}						   
+				}
+
+			} else if (a instanceof TimedInputArcComponent) {
+				eligableToken = new ArrayList<String>();
+				// int indexOfOldestEligebleToken = 0;
+
+				TimedPlaceComponent p = (TimedPlaceComponent) a.getSource();
+
+				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();
+				for (int i = 0; i < tokensOfPlace.size(); i++) {
+					if (((TimedInputArcComponent) a)
+							.satisfiesGuard(tokensOfPlace.get(i))) {
+						eligableToken.add(df.format(tokensOfPlace.get(i)));
+					}
+				}
 			}
 
 			JComboBox selectTokenBox = new JComboBox(eligableToken.toArray());
@@ -151,30 +154,30 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 			presetPanel.add(selectTokenBox);
 			presetPanels.add(selectTokenBox);
-		}else{
-			ColoredTimedPlace place = (ColoredTimedPlace)a.getSource();
-			
+		} else {
+			ColoredTimedPlace place = (ColoredTimedPlace) a.getSource();
+
 			ArrayList<ColoredToken> eligibleTokens = new ArrayList<ColoredToken>();
-			
-			if(a instanceof ColoredTransportArc){
-				ColoredTransportArc cta = (ColoredTransportArc)a;
-				
-				for(ColoredToken token : place.getColoredTokens()){
-					if(cta.satisfiesGuard(token) 
-							&& cta.satisfiesTargetInvariant(token)){
+
+			if (a instanceof ColoredTransportArc) {
+				ColoredTransportArc cta = (ColoredTransportArc) a;
+
+				for (ColoredToken token : place.getColoredTokens()) {
+					if (cta.satisfiesGuard(token)
+							&& cta.satisfiesTargetInvariant(token)) {
 						eligibleTokens.add(token);
 					}
 				}
-			}else if(a instanceof ColoredInputArc){
-				ColoredInputArc cia = (ColoredInputArc)a;
-				
-				for(ColoredToken token : place.getColoredTokens()){
-					if(cia.satisfiesGuard(token)){
+			} else if (a instanceof ColoredInputArc) {
+				ColoredInputArc cia = (ColoredInputArc) a;
+
+				for (ColoredToken token : place.getColoredTokens()) {
+					if (cia.satisfiesGuard(token)) {
 						eligibleTokens.add(token);
 					}
 				}
 			}
-			
+
 			JComboBox selectTokenBox = new JComboBox(eligibleTokens.toArray());
 			selectTokenBox.setSelectedIndex(0);
 
@@ -183,8 +186,9 @@ public class AnimationSelectmodeDialog extends JPanel{
 		}
 		return presetPanel;
 	}
-	private void exit(){
-		this.getRootPane().getParent().setVisible(false); 
+
+	private void exit() {
+		this.getRootPane().getParent().setVisible(false);
 	}
 
 }

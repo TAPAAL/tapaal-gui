@@ -7,36 +7,36 @@ import java.util.List;
 public class UppaalTrace implements Iterable<TAFiringAction> {
 	private List<TAFiringAction> firingActions;
 	private List<SymbolicState> states;
-	
-	public UppaalTrace(){
+
+	public UppaalTrace() {
 		firingActions = new ArrayList<TAFiringAction>();
 		states = new ArrayList<SymbolicState>();
 	}
 
-	public void addState(SymbolicState state){
+	public void addState(SymbolicState state) {
 		states.add(state);
 	}
-	
-	public void addFiringAction(TAFiringAction action){
+
+	public void addFiringAction(TAFiringAction action) {
 		firingActions.add(action);
 	}
-	
+
 	public Iterator<TAFiringAction> iterator() {
 		return firingActions.iterator();
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer("Trace:\n");
-		for(int i = 0; i < states.size()-1; i++){
+		for (int i = 0; i < states.size() - 1; i++) {
 			buffer.append(states.get(i).toString());
 			buffer.append("\n\n");
 			buffer.append(firingActions.get(i).toString());
 			buffer.append("\n\n");
 		}
-		
-		buffer.append(states.get(states.size()-1).toString());
-				
+
+		buffer.append(states.get(states.size() - 1).toString());
+
 		return buffer.toString();
 	}
 
@@ -57,8 +57,8 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 	}
 
 	public boolean isConcreteTrace() {
-		for(SymbolicState state : states){
-			if(!state.IsConcreteState()){
+		for (SymbolicState state : states) {
+			if (!state.IsConcreteState()) {
 				return false;
 			}
 		}

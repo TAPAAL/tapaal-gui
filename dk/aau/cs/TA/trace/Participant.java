@@ -10,21 +10,22 @@ public class Participant {
 	private String location;
 	private HashMap<String, ValueRange> localClocksAndVariables;
 
-	public Participant(String automata, String location, HashMap<String,ValueRange> localClocksAndVariables){
+	public Participant(String automata, String location,
+			HashMap<String, ValueRange> localClocksAndVariables) {
 		this.automata = automata;
 		this.location = location;
 		this.localClocksAndVariables = localClocksAndVariables;
 	}
 
-	public String location(){
+	public String location() {
 		return location;
 	}
-	
-	public String automata(){
+
+	public String automata() {
 		return automata;
 	}
 
-	public ValueRange clockOrVariableValue(String name){
+	public ValueRange clockOrVariableValue(String name) {
 		return localClocksAndVariables.get(name);
 	}
 }

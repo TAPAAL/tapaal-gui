@@ -8,7 +8,8 @@ public class ExportedModel {
 	private final String modelFile;
 	private TranslationNamingScheme namingScheme;
 
-	ExportedModel(String modelFile, String queryFile, TranslationNamingScheme namingScheme) {
+	ExportedModel(String modelFile, String queryFile,
+			TranslationNamingScheme namingScheme) {
 		this.modelFile = modelFile;
 		this.queryFile = queryFile;
 		this.namingScheme = namingScheme;
@@ -21,8 +22,8 @@ public class ExportedModel {
 	public String queryFile() {
 		return queryFile;
 	}
-	
-	public TranslationNamingScheme namingScheme(){
+
+	public TranslationNamingScheme namingScheme() {
 		return namingScheme;
 	}
 }

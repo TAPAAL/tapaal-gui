@@ -9,15 +9,14 @@ public class TAPNQuery {
 	public TCTLAbstractProperty getProperty() {
 		return property;
 	}
-	
-	public TAPNQuery(TCTLAbstractProperty inputProperty, int totalTokens)
-	{
+
+	public TAPNQuery(TCTLAbstractProperty inputProperty, int totalTokens) {
 		this.property = inputProperty;
 		this.totalTokens = totalTokens;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return property.toString();
 	}
 

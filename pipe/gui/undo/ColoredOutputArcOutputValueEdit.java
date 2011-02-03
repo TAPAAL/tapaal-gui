@@ -10,12 +10,13 @@ public class ColoredOutputArcOutputValueEdit extends Command {
 	private IntOrConstant newValue;
 	private ColoredOutputArc arc;
 
-	public ColoredOutputArcOutputValueEdit(ColoredOutputArc arc, IntOrConstant oldValue, IntOrConstant newValue){
+	public ColoredOutputArcOutputValueEdit(ColoredOutputArc arc,
+			IntOrConstant oldValue, IntOrConstant newValue) {
 		this.arc = arc;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
-	
+
 	@Override
 	public void redo() {
 		arc.setOutputValue(newValue);

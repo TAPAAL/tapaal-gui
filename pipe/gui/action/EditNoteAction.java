@@ -9,25 +9,21 @@ import javax.swing.AbstractAction;
 
 import pipe.dataLayer.Note;
 
+public class EditNoteAction extends AbstractAction {
 
-public class EditNoteAction 
-        extends AbstractAction {
-
-   /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4438126438814153880L;
-private Note selected;
-   
+	private Note selected;
 
-   public EditNoteAction(Note component) {
-      selected = component;
-   }
+	public EditNoteAction(Note component) {
+		selected = component;
+	}
 
-   
-   /** Action for editing the text in a Note */
-   public void actionPerformed(ActionEvent e) {
-      selected.enableEditMode();
-   }
+	/** Action for editing the text in a Note */
+	public void actionPerformed(ActionEvent e) {
+		selected.enableEditMode();
+	}
 
 }
