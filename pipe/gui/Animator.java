@@ -15,12 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
-import pipe.dataLayer.ColoredDiscreteFiringAction;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.DiscreetFiringAction;
-import pipe.dataLayer.FiringAction;
-import pipe.dataLayer.TAPNTrace;
-import pipe.dataLayer.TimeDelayFiringAction;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
@@ -28,11 +23,15 @@ import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.TapaalTrace;
+import dk.aau.cs.model.TapaalTraceStep;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.RequireException;
 
@@ -70,7 +69,7 @@ public class Animator {
 
 	Timer timer;
 	int numberSequences;   
-	private ArrayList<FiringAction> actionHistory;
+	private ArrayList<TapaalTraceStep> actionHistory;
 	private int currentAction;
 	private ArrayList<HashMap<TimedPlaceComponent, ArrayList<BigDecimal>>> markingHistory;
 	private ArrayList<NetworkMarking> markings;
@@ -81,7 +80,7 @@ public class Animator {
 	private NetworkMarking initialMarking;
 	
 	public Animator(){
-		actionHistory = new ArrayList<FiringAction>();
+		actionHistory = new ArrayList<TapaalTraceStep>();
 
 		timer = new Timer(0, new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -108,45 +107,46 @@ public class Animator {
 		return markings.get(currentMarkingIndex);
 	}
 	
-	public void SetTrace(TAPNTrace trace){
-		if(trace.isConcreteTrace()){
+	public void SetTrace(TapaalTrace trace){
+//		if(trace.isConcreteTrace()){
 			setTimedTrace(trace);
-		}else{
-			setUntimedTrace(trace);
-		}
+//		}else{
+//			setUntimedTrace(trace);
+//		}
 	}
 
-	private void setUntimedTrace(TAPNTrace trace) {
-		CreateGui.addAbstractAnimationPane();
-		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
-		for(FiringAction action : trace){
-			String transitionName = action instanceof ColoredDiscreteFiringAction ? ((ColoredDiscreteFiringAction)action).getTransition().getName() : ((DiscreetFiringAction)action).getTransition().getName();
-			untimedAnimationHistory.addHistoryItemDontChange(transitionName);
-		}
-		setFiringmode("Manual");
+//	private void setUntimedTrace(TapaalTrace trace) {
+//		CreateGui.addAbstractAnimationPane();
+//		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
+//		for(FiringAction action : trace){
+//			String transitionName = action instanceof ColoredDiscreteFiringAction ? ((ColoredDiscreteFiringAction)action).getTransition().getName() : ((DiscreetFiringAction)action).getTransition().getName();
+//			untimedAnimationHistory.addHistoryItemDontChange(transitionName);
+//		}
+//		setFiringmode("Manual");
+//
+//		JOptionPane.showMessageDialog(CreateGui.getApp(),
+//				"The verification process returned an untimed trace.\n\n"+
+//				"This means that with appropriate time delays the displayed\n"+
+//				"sequence of discrete transitions can become a concrete trace.\n"+
+//				"In case of liveness properties (EG, AF) the untimed trace\n"+
+//				"either ends in a deadlock, or time divergent computation without\n" +
+//				"any discrete transitions, or it loops back to some earlier configuration.\n"+
+//				"The user may experiment in the simulator with different time delays\n"+
+//				"in order to realize the suggested untimed trace in the model.",
+//				"Verification Information",
+//				JOptionPane.INFORMATION_MESSAGE);
+//	}
 
-		JOptionPane.showMessageDialog(CreateGui.getApp(),
-				"The verification process returned an untimed trace.\n\n"+
-				"This means that with appropriate time delays the displayed\n"+
-				"sequence of discrete transitions can become a concrete trace.\n"+
-				"In case of liveness properties (EG, AF) the untimed trace\n"+
-				"either ends in a deadlock, or time divergent computation without\n" +
-				"any discrete transitions, or it loops back to some earlier configuration.\n"+
-				"The user may experiment in the simulator with different time delays\n"+
-				"in order to realize the suggested untimed trace in the model.",
-				"Verification Information",
-				JOptionPane.INFORMATION_MESSAGE);
-	}
-
-	private void setTimedTrace(TAPNTrace trace) {
-		for(FiringAction action : trace){
-			if(action instanceof TimeDelayFiringAction)
-				manipulatehistory(((TimeDelayFiringAction)action).getDealy());
-			else if(action instanceof DiscreetFiringAction){
-				manipulatehistory((DiscreetFiringAction)action);
-			}else if(action instanceof ColoredDiscreteFiringAction){
-				manipulatehistory((ColoredDiscreteFiringAction)action);
-			}
+	private void setTimedTrace(TapaalTrace trace) {
+		for(TapaalTraceStep step : trace){
+			addMarking(step, step.performStepFrom(currentMarking()));
+//			if(action instanceof TimeDelayFiringAction)
+//				manipulatehistory(((TimeDelayFiringAction)action).getDealy());
+//			else if(action instanceof DiscreetFiringAction){
+//				manipulatehistory((DiscreetFiringAction)action);
+//			}else if(action instanceof ColoredDiscreteFiringAction){
+//				manipulatehistory((ColoredDiscreteFiringAction)action);
+//			}
 		}
 	}
 
@@ -479,7 +479,7 @@ public class Animator {
 		CreateGui.getAnimationHistory().addHistoryItem(timedTransition.model().getName() + "." + timedTransition.name());
 		if ( currentAction < actionHistory.size()-1 ) removeStoredActions(currentAction+1);
 		
-		addMarking(new DiscreetFiringAction(transition), next);
+		addMarking(new TimedTransitionStep(timedTransition, null), next);
 		
 //		FiringAction fired;
 //		fired = CreateGui.currentPNMLData().fireTransition(transition);
@@ -506,7 +506,7 @@ public class Animator {
 			}
 			
 			//addToHistory( new TimeDelayFiringAction(timeToPass), guiModel.getCurrentMarking() );  
-			addMarking(new TimeDelayFiringAction(timeToPass), currentMarking().delay(timeToPass));
+			addMarking(new TimeDelayStep(timeToPass), currentMarking().delay(timeToPass));
 
 			try {
 
@@ -559,35 +559,36 @@ public class Animator {
 		currentMarkingIndex = 0;
 	}
 
-	public void manipulatehistory(ColoredDiscreteFiringAction dfa){
+//	public void manipulatehistory(ColoredDiscreteFiringAction dfa){
+//
+//
+//		markingHistory.add(null);
+//
+//		actionHistory.add(dfa); // newAction = the transition to fire
+//		CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
+//
+//		CreateGui.getAnimationController().setAnimationButtonsEnabled();
+//	}
 
-
-		markingHistory.add(null);
-
-		actionHistory.add(dfa); // newAction = the transition to fire
-		CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
-
-		CreateGui.getAnimationController().setAnimationButtonsEnabled();
-	}
-
-	public void manipulatehistory(DiscreetFiringAction dfa){
-
-
-		markingHistory.add(null);
-
-		actionHistory.add(dfa); // newAction = the transition to fire
-		CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
-
-		CreateGui.getAnimationController().setAnimationButtonsEnabled();
-	}
-	public void manipulatehistory(BigDecimal delay){
-		markingHistory.add(null); 
-		actionHistory.add(new TimeDelayFiringAction(delay)); 
-
-		CreateGui.getAnimationHistory().addHistoryItemDontChange("Time delay: "+ delay);
-
-		CreateGui.getAnimationController().setAnimationButtonsEnabled();
-	}
+//	public void manipulatehistory(DiscreetFiringAction dfa){
+//
+//
+//		markingHistory.add(null);
+//
+//		actionHistory.add(dfa); // newAction = the transition to fire
+//		CreateGui.getAnimationHistory().addHistoryItemDontChange(dfa.getTransition().getName()); 
+//
+//		CreateGui.getAnimationController().setAnimationButtonsEnabled();
+//	}
+//	
+//	public void manipulatehistory(BigDecimal delay){
+//		markingHistory.add(null); 
+//		actionHistory.add(new TimeDelayStep(delay)); 
+//
+//		CreateGui.getAnimationHistory().addHistoryItemDontChange("Time delay: "+ delay);
+//
+//		CreateGui.getAnimationController().setAnimationButtonsEnabled();
+//	}
 
 	public FiringMode getFiringmode() {
 		return firingmode;
@@ -610,7 +611,7 @@ public class Animator {
 		this.numberSequences = numberSequences;
 	}
 
-	private void addMarking(FiringAction action, NetworkMarking marking){
+	private void addMarking(TapaalTraceStep action, NetworkMarking marking){
 		actionHistory.add(action);
 		markings.add(marking);
 		currentAction++;

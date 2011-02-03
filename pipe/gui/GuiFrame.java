@@ -1197,7 +1197,7 @@ EOC */
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);
 			CreateGui.getAnimator().storeModel();
-			tab.activeTemplate().guiModel().setEnabledTransitions();
+			//tab.activeTemplate().guiModel().setEnabledTransitions();
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			//CreateGui.addAnimationHistory();
 			//CreateGui.addAnimationController();

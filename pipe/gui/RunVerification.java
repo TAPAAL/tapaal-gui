@@ -30,7 +30,7 @@ public class RunVerification extends RunVerificationBase {
 //				TraceTransformer interpreter =  model.isUsingColors() ? new ColoredTraceTransformer(model) : new TraceTransformer(model);
 //				TAPNTrace trace = interpreter.interpretTrace(result.getTrace());
 				CreateGui.getApp().setGUIMode(GUIMode.animation);
-//				CreateGui.getAnimator().SetTrace(trace);
+				CreateGui.getAnimator().SetTrace(result.getTrace());
 			}
 		}else{
 			messenger.displayWrappedErrorMessage("An error occured during the verification." +

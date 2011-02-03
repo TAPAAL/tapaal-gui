@@ -1,8 +1,8 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -80,7 +80,7 @@ public class NetworkMarking {
 	}
 
 	public NetworkMarking fireTransition(TimedTransition transition,
-			ArrayList<TimedToken> tokensToConsume) {
+			List<TimedToken> tokensToConsume) {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(tokensToConsume != null, "Must specify a list of tokens");
 						
