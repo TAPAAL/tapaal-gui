@@ -6,9 +6,9 @@ import javax.swing.SwingWorker;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.model.TapaalTrace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.simulation.TapaalTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.util.Tuple;

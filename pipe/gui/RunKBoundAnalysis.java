@@ -3,7 +3,7 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 
 import dk.aau.cs.Messenger;
-import dk.aau.cs.model.TapaalTrace;
+import dk.aau.cs.model.tapn.simulation.TapaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 

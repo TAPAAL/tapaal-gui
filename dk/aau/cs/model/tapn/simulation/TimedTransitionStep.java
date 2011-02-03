@@ -2,7 +2,6 @@ package dk.aau.cs.model.tapn.simulation;
 
 import java.util.List;
 
-import dk.aau.cs.model.TapaalTraceStep;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;

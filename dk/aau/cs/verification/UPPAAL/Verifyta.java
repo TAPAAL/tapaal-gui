@@ -14,7 +14,7 @@ import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.trace.UppaalTrace;
-import dk.aau.cs.model.TapaalTrace;
+import dk.aau.cs.model.tapn.simulation.TapaalTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.colors.ColoredTimedArcPetriNet;

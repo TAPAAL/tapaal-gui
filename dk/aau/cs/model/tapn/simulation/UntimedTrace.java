@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-public class TimedTrace implements TapaalTrace {
+public class UntimedTrace implements TapaalTrace {
 	private List<TapaalTraceStep> steps = new ArrayList<TapaalTraceStep>();
 	
-	public void add(TapaalTraceStep step){
+	public void add(TimedTransitionStep step){
 		steps.add(step);
 	}
 		
@@ -21,6 +20,6 @@ public class TimedTrace implements TapaalTrace {
 	}
 
 	public boolean isConcreteTrace() {
-		return true;
+		return false;
 	}
 }

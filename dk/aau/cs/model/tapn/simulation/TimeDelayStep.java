@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import pipe.gui.Pipe;
-import dk.aau.cs.model.TapaalTraceStep;
 import dk.aau.cs.model.tapn.NetworkMarking;
 
 public class TimeDelayStep implements TapaalTraceStep {

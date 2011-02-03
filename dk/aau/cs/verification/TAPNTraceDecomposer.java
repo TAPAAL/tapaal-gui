@@ -2,12 +2,12 @@ package dk.aau.cs.verification;
 
 import java.util.ArrayList;
 
-import dk.aau.cs.model.TapaalTrace;
-import dk.aau.cs.model.TapaalTraceStep;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.TapaalTrace;
+import dk.aau.cs.model.tapn.simulation.TapaalTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;

@@ -1,4 +1,4 @@
-package dk.aau.cs.model;
+package dk.aau.cs.model.tapn.simulation;
 
 import dk.aau.cs.model.tapn.NetworkMarking;
 
