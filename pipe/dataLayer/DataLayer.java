@@ -877,157 +877,158 @@ implements Cloneable {
 	/**
 	 * Fire a random transition, takes rate (probability) of Transitions into account
 	 */
-	public Transition fireRandomTransition() {
-
-		setEnabledTransitions();
-		// All the enabled transitions are of the same type:
-		// a) all are immediate transitions; or 
-		// b) all are timed transitions.
-
-		ArrayList<Transition> enabledTransitions = new ArrayList<Transition>();
-
-		for (int i = 0; i < transitionsArray.size(); i++) {
-			Transition transition = (Transition)transitionsArray.get(i);
-			if (transition.isEnabled()) {
-				enabledTransitions.add(transition);
-			}
-		}
-
-		// if there is only one enabled transition, return this transition
-		if (enabledTransitions.size() == 1) {
-			return enabledTransitions.get(0);
-		}      
-
-		int random = randomNumber.nextInt(enabledTransitions.size());
-
-		// no enabled transition found, so no transition can be fired
-		return enabledTransitions.get(random);
-	}
-
-
-	public void setEnabledTransitions(){
-		for ( Transition t : getTransitions() ){
-			boolean isEnabled = false;
-
-			if(!isUsingColors()){
-				isEnabled = isTransitionEnabledNonColored(t);
-			}else{
-				isEnabled = isTransitionEnabledColored(t);
-			}
-			t.setEnabled(isEnabled);
-			setChanged();
-			notifyObservers(t);
-		}
-	}
+//	public Transition fireRandomTransition() {
+//
+//		setEnabledTransitions();
+//		// All the enabled transitions are of the same type:
+//		// a) all are immediate transitions; or 
+//		// b) all are timed transitions.
+//
+//		ArrayList<Transition> enabledTransitions = new ArrayList<Transition>();
+//
+//		for (int i = 0; i < transitionsArray.size(); i++) {
+//			Transition transition = (Transition)transitionsArray.get(i);
+//			if (transition.isEnabled()) {
+//				enabledTransitions.add(transition);
+//			}
+//		}
+//
+//		// if there is only one enabled transition, return this transition
+//		if (enabledTransitions.size() == 1) {
+//			return enabledTransitions.get(0);
+//		}      
+//
+//		int random = randomNumber.nextInt(enabledTransitions.size());
+//
+//		// no enabled transition found, so no transition can be fired
+//		return enabledTransitions.get(random);
+//	}
 
 
-	private boolean isTransitionEnabledColored(Transition t) {
-		boolean enabled = true;
-		for(Arc arc : t.getPreset()){
-			boolean arcEnabled = false;
-			ColoredTimedPlace inputPlace = (ColoredTimedPlace)arc.getSource();
-
-			for(ColoredToken token : inputPlace.getColoredTokens()){
-				if(arc instanceof ColoredInputArc){
-					arcEnabled = arcEnabled || ((ColoredInputArc)arc).satisfiesGuard(token);
-				}else if(arc instanceof ColoredTransportArc){
-					boolean guardSatisfied = ((ColoredTransportArc)arc).satisfiesGuard(token);
-					boolean targetInvariantSatisfied = ((ColoredTransportArc)arc).satisfiesTargetInvariant(token);
-
-					arcEnabled = arcEnabled || (guardSatisfied && targetInvariantSatisfied);
-				}else if(arc instanceof ColoredInhibitorArc){
-					arcEnabled = arcEnabled || ((ColoredInhibitorArc)arc).satisfiesGuard(token);
-				}
-
-				if(arcEnabled){
-					break;
-				}
-			}
-
-			enabled = enabled && arcEnabled;
-		}
-
-		for(Arc arc : t.getPostset()){
-			if(arc instanceof ColoredOutputArc){
-				int value = ((ColoredOutputArc)arc).getOutputValue().getValue();
-				ColorSet colorInvariant = ((ColoredTimedPlace)arc.getTarget()).getColorInvariant();
-				enabled = enabled && colorInvariant.contains(value);
-
-			}
-		}
-
-		return enabled;
-	}
+//	public void setEnabledTransitions(){
+//		for ( Transition t : getTransitions() ){
+//			
+////			boolean isEnabled = false;
+////
+////			if(!isUsingColors()){
+////				isEnabled = isTransitionEnabledNonColored(t);
+////			}else{
+////				isEnabled = isTransitionEnabledColored(t);
+////			}
+////			t.setEnabled(isEnabled);
+//			setChanged();
+//			notifyObservers(t);
+//		}
+//	}
 
 
-	private boolean isTransitionEnabledNonColored(Transition t) {
-		boolean isEnabled = true;
-
-		Collection<Arc> presetArcs = t.getPreset();
-		for ( Arc a : presetArcs ){
-
-			Place p = (Place)a.getSource();
-			if (p instanceof TimedPlaceComponent){
-
-				boolean ageIsSatisfied;
-
-				if(a instanceof TimedInhibitorArcComponent)
-					ageIsSatisfied = true;
-				else
-					ageIsSatisfied = false;
-
-
-				if (p.currentMarking > 0){
-
-					for ( BigDecimal token : ((TimedPlaceComponent)p).getTokens() ){
-						if(a instanceof TimedInhibitorArcComponent)
-						{
-							if(!((TimedInputArcComponent)a).satisfiesGuard(token))
-							{
-								ageIsSatisfied = false;
-								break;
-							}
-
-
-						}
-						else
-						{
-							if ( ((TimedInputArcComponent)a).satisfiesGuard(token) ){
-
-								//make sure no invariants are violated
-								if (a instanceof TransportArcComponent){
-									for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
-										if (postsetArc instanceof TransportArcComponent){
-											if ( ((TransportArcComponent) postsetArc).getGroupNr() == ((TransportArcComponent)a).getGroupNr()){
-												if ( ((TimedPlaceComponent)postsetArc.getTarget()).satisfiesInvariant(token) ){
-													ageIsSatisfied = true;
-													break;
-												}
-											}
-										}
-									}
-									//invariants are not violated, if it is not a transport arc
-								}else {
-									ageIsSatisfied = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-
-				isEnabled = ageIsSatisfied;
-
-				if (!isEnabled){
-					break;
-				}
-
-			}else {
-				//p should always be a TimedPlace unless we have introduced hybrid nets
-			}
-		}
-		return isEnabled;
-	}
+//	private boolean isTransitionEnabledColored(Transition t) {
+//		boolean enabled = true;
+//		for(Arc arc : t.getPreset()){
+//			boolean arcEnabled = false;
+//			ColoredTimedPlace inputPlace = (ColoredTimedPlace)arc.getSource();
+//
+//			for(ColoredToken token : inputPlace.getColoredTokens()){
+//				if(arc instanceof ColoredInputArc){
+//					arcEnabled = arcEnabled || ((ColoredInputArc)arc).satisfiesGuard(token);
+//				}else if(arc instanceof ColoredTransportArc){
+//					boolean guardSatisfied = ((ColoredTransportArc)arc).satisfiesGuard(token);
+//					boolean targetInvariantSatisfied = ((ColoredTransportArc)arc).satisfiesTargetInvariant(token);
+//
+//					arcEnabled = arcEnabled || (guardSatisfied && targetInvariantSatisfied);
+//				}else if(arc instanceof ColoredInhibitorArc){
+//					arcEnabled = arcEnabled || ((ColoredInhibitorArc)arc).satisfiesGuard(token);
+//				}
+//
+//				if(arcEnabled){
+//					break;
+//				}
+//			}
+//
+//			enabled = enabled && arcEnabled;
+//		}
+//
+//		for(Arc arc : t.getPostset()){
+//			if(arc instanceof ColoredOutputArc){
+//				int value = ((ColoredOutputArc)arc).getOutputValue().getValue();
+//				ColorSet colorInvariant = ((ColoredTimedPlace)arc.getTarget()).getColorInvariant();
+//				enabled = enabled && colorInvariant.contains(value);
+//
+//			}
+//		}
+//
+//		return enabled;
+//	}
+//
+//
+//	private boolean isTransitionEnabledNonColored(Transition t) {
+//		boolean isEnabled = true;
+//
+//		Collection<Arc> presetArcs = t.getPreset();
+//		for ( Arc a : presetArcs ){
+//
+//			Place p = (Place)a.getSource();
+//			if (p instanceof TimedPlaceComponent){
+//
+//				boolean ageIsSatisfied;
+//
+//				if(a instanceof TimedInhibitorArcComponent)
+//					ageIsSatisfied = true;
+//				else
+//					ageIsSatisfied = false;
+//
+//
+//				if (p.currentMarking > 0){
+//
+//					for ( BigDecimal token : ((TimedPlaceComponent)p).getTokens() ){
+//						if(a instanceof TimedInhibitorArcComponent)
+//						{
+//							if(!((TimedInputArcComponent)a).satisfiesGuard(token))
+//							{
+//								ageIsSatisfied = false;
+//								break;
+//							}
+//
+//
+//						}
+//						else
+//						{
+//							if ( ((TimedInputArcComponent)a).satisfiesGuard(token) ){
+//
+//								//make sure no invariants are violated
+//								if (a instanceof TransportArcComponent){
+//									for ( Arc postsetArc : (LinkedList<Arc>)t.getPostset() ){
+//										if (postsetArc instanceof TransportArcComponent){
+//											if ( ((TransportArcComponent) postsetArc).getGroupNr() == ((TransportArcComponent)a).getGroupNr()){
+//												if ( ((TimedPlaceComponent)postsetArc.getTarget()).satisfiesInvariant(token) ){
+//													ageIsSatisfied = true;
+//													break;
+//												}
+//											}
+//										}
+//									}
+//									//invariants are not violated, if it is not a transport arc
+//								}else {
+//									ageIsSatisfied = true;
+//									break;
+//								}
+//							}
+//						}
+//					}
+//				}
+//
+//				isEnabled = ageIsSatisfied;
+//
+//				if (!isEnabled){
+//					break;
+//				}
+//
+//			}else {
+//				//p should always be a TimedPlace unless we have introduced hybrid nets
+//			}
+//		}
+//		return isEnabled;
+//	}
 
 
 

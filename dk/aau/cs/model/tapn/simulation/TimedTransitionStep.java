@@ -19,4 +19,9 @@ public class TimedTransitionStep implements TapaalTraceStep {
 	public NetworkMarking performStepFrom(NetworkMarking marking) {
 		return marking.fireTransition(transition, consumedTokens);
 	}	
+	
+	@Override
+	public String toString() {
+		return transition.toString();
+	}
 }

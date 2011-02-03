@@ -125,7 +125,7 @@ public class TimedTransition extends TAPNElement {
 		for(TransportArc transportArc : transportArcsGoingThrough){
 			for(TimedToken token : tokens){
 				if(token.place().equals(transportArc.source())){
-					producedTokens.add(new TimedToken(token.place(), token.age()));
+					producedTokens.add(new TimedToken(transportArc.destination(), token.age()));
 				}
 			}
 		}
@@ -159,5 +159,13 @@ public class TimedTransition extends TAPNElement {
 		}
 		
 		return tokensToConsume;
+	}
+	
+	@Override
+	public String toString() {
+		if(model() != null) 
+			return model().getName() + "." + name;
+		else
+			return name;
 	}
 }

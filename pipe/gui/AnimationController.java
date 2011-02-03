@@ -26,7 +26,6 @@ import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
-import pipe.exception.InvariantViolatedAnimationException;
 import pipe.gui.action.GuiAction;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
@@ -248,10 +247,7 @@ public class AnimationController extends JPanel {
 			}
 		} catch (NumberFormatException e) {
 			//Do nothing, invalud number 
-		} catch (InvariantViolatedAnimationException e) {
-			// TODO Auto-generated catch block
-			System.err.println("Invariant Violated, TimeDelay Not allowed");
-		} 
+		}
 
 		setAnimationButtonsEnabled();
 	}
@@ -286,10 +282,7 @@ public class AnimationController extends JPanel {
 			}
 		} catch (NumberFormatException e) {
 			//Do nothing, invalud number 
-		} catch (InvariantViolatedAnimationException e) {
-			// TODO Auto-generated catch block
-			System.err.println("Invariant Violated, TimeDelay Not allowed");
-		} catch (ParseException e) {
+		}  catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -333,23 +326,19 @@ public class AnimationController extends JPanel {
 			switch(typeID){
 			case Pipe.TIMEPASS:
 				animBox.clearStepsForward();
-				try {
-					CreateGui.getAnimator().letTimePass(new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
-				} catch (InvariantViolatedAnimationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				CreateGui.getAnimator().letTimePass(new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
+
 
 				setAnimationButtonsEnabled();
 
 				break;
 
-			case Pipe.RANDOM:
-				animBox.clearStepsForward();
-				CreateGui.getAnimator().doRandomFiring();
-
-				setAnimationButtonsEnabled();
-				break;
+//			case Pipe.RANDOM:
+//				animBox.clearStepsForward();
+//				CreateGui.getAnimator().doRandomFiring();
+//
+//				setAnimationButtonsEnabled();
+//				break;
 
 			case Pipe.STEPFORWARD:
 				animBox.stepForward();
@@ -363,20 +352,7 @@ public class AnimationController extends JPanel {
 				setAnimationButtonsEnabled();
 				break;
 
-			case Pipe.ANIMATE:
-				Animator a = CreateGui.getAnimator();
-				if (a.getNumberSequences() > 0) {
-					a.setNumberSequences(0); // stop animation
-					setSelected(false);
-				} else {
-					setAnimationButtonsEnabled();
-					randomAction.setEnabled(false);
-					setSelected(true);
-					animBox.clearStepsForward();
-					CreateGui.getAnimator().startRandomFiring();
-				}
-				break;
-
+			
 			default:
 				break;
 			}

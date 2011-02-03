@@ -61,7 +61,7 @@ public class TimedTransitionComponent extends Transition {
 	   @Override
 	public boolean isEnabled(boolean animationStatus){
 		   if (animationStatus) {
-			   if (transition.isEnabled()) {				 
+			   if (isEnabled()) {				 
 				   highlighted = true;
 				   return true;
 			   } else {

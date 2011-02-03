@@ -35,10 +35,10 @@ Num     = {Number}+
 
 <Not>     ::= 'not' '(' <Expr> ')'  | '!' '(' <Expr> ')' | <Factor>
 
-<Factor>      ::=  <AtomicProposition> | '(' <Expr> ')'
+<Factor>      ::=  <AtomicProposition1> | <AtomicProposition2> | '(' <Expr> ')'
 
-
-<AtomicProposition>   ::=   Identifier '.' Identifier '<' Num | Identifier '.' Identifier '<=' Num | Identifier '.' Identifier '=' Num | Identifier '.' Identifier '==' Num | Identifier '.' Identifier '>=' Num | Identifier '.' Identifier '>' Num
+<AtomicProposition1>   ::=  Identifier '<' Num | Identifier '<=' Num | Identifier '=' Num | Identifier '==' Num | Identifier '>=' Num | Identifier '>' Num
+<AtomicProposition2>   ::=   Identifier '.' <AtomicProposition1>
 
 
 

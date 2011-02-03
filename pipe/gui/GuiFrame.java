@@ -1170,7 +1170,6 @@ EOC */
 		switch (mode) {
 		case draw:
 			//Enable all draw actions
-			CreateGui.getAnimator().setNumberSequences(0);
 			startAction.setSelected(false);
 			CreateGui.getView().changeAnimationMode(false);
 
@@ -1179,28 +1178,16 @@ EOC */
 			if(this.guiMode.equals(GUIMode.animation)) CreateGui.getAnimator().restoreModel();
 			
 			CreateGui.switchToEditorComponents();
-			//CreateGui.removeAnimationHistory();
-			//CreateGui.removeAnimationController();
-
-			//If abstract animation pane is shown, remove it when 
-			// Gowing out of animation mode.
-			//CreateGui.removeAbstractAnimationPane();
-
-
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
 			break;
 		case animation:
 			TabContent tab = (TabContent)appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
-			CreateGui.getAnimator().setNumberSequences(0);
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);
 			CreateGui.getAnimator().storeModel();
-			//tab.activeTemplate().guiModel().setEnabledTransitions();
 			CreateGui.getAnimator().highlightEnabledTransitions();
-			//CreateGui.addAnimationHistory();
-			//CreateGui.addAnimationController();
 			CreateGui.switchToAnimationComponents();
 			CreateGui.getAnimator().setFiringmode("Random");
 
@@ -1433,17 +1420,17 @@ EOC */
 				CreateGui.getAnimationController().addTimeDelayToHistory(new BigDecimal(1));
 				break;
 
-			case Pipe.RANDOM:
-				animBox.clearStepsForward();
-				CreateGui.getAnimator().doRandomFiring();
-				//update mouseOverView
-				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-					if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
-						((TimedPlaceComponent)p).showAgeOfTokens(true);
-					}
-				}
-				CreateGui.getAnimationController().setAnimationButtonsEnabled();
-				break;
+//			case Pipe.RANDOM:
+//				animBox.clearStepsForward();
+//				CreateGui.getAnimator().doRandomFiring();
+//				//update mouseOverView
+//				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
+//					if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
+//						((TimedPlaceComponent)p).showAgeOfTokens(true);
+//					}
+//				}
+//				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+//				break;
 
 			case Pipe.STEPFORWARD:
 				animBox.stepForward();
@@ -1468,23 +1455,6 @@ EOC */
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
-
-			case Pipe.ANIMATE:
-				Animator a = CreateGui.getAnimator();
-
-				if (a.getNumberSequences() > 0) {
-					a.setNumberSequences(0); // stop animation
-					setSelected(false);
-				} else {
-					stepbackwardAction.setEnabled(false);
-					stepforwardAction.setEnabled(false);
-					randomAction.setEnabled(false);
-					setSelected(true);
-					animBox.clearStepsForward();
-					CreateGui.getAnimator().startRandomFiring();
-				}
-				break;
-
 			default:
 				break;
 			}

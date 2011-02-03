@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.management.RuntimeErrorException;
 import javax.swing.JOptionPane;
 
 import org.w3c.dom.Document;
@@ -51,6 +48,7 @@ import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;
 import dk.aau.cs.translations.ReductionOption;
 
 public class TimedArcPetriNetFactory {
@@ -715,7 +713,7 @@ public class TimedArcPetriNetFactory {
 		nodeList = tapnNode.getChildNodes();
 		for(int i = 0 ; i < nodeList.getLength() ; i++) {
 			node = nodeList.item(i);
-				parseElementAsOldFormat(node);
+				parseElementAsOldFormat(node, tapn.getName());
 		}
 		
 		tapn.setMarking(initialMarking);
@@ -724,7 +722,7 @@ public class TimedArcPetriNetFactory {
 		return new Template<TimedArcPetriNet>(tapn,guiModel);
 	}
 	
-	private void parseElementAsOldFormat(Node node) {
+	private void parseElementAsOldFormat(Node node, String templateName) {
 		Element element;
 		if(node instanceof Element) {
 			element = (Element)node;
@@ -738,6 +736,7 @@ public class TimedArcPetriNetFactory {
 				createAndAddArcAsOldFormat(element);         
 			} else if( "queries".equals(element.getNodeName()) ){
 				TAPNQuery query = createQueryAsOldFormat(element);
+				query.getProperty().accept(new AddTemplateVisitor(templateName), null);
 				if(query != null)
 					queries.add(query);
 			} 
