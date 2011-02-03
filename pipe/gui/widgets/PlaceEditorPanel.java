@@ -57,7 +57,9 @@ import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 
 /**
  *
@@ -653,63 +655,42 @@ extends javax.swing.JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		invariantGroup.add(constantInvRadioButton,gbc);
 
-		String invariantToSet = place.getInvariantAsString();
-		int invariantValue = 0;
-		int substringStart = 0;
+		TimeInvariant invariantToSet = place.getInvariant();
 
-		String constantName ="";
-
-		if (invariantToSet.contains("<=")){
+		if (invariantToSet.isUpperNonstrict()){
 			invRelationNormal.setSelectedItem("<=");
-			substringStart = 3;
 		}else {
 			invRelationNormal.setSelectedItem("<");
-			substringStart = 2;
 		}
 
-		boolean isInf = false;
-		if (invariantToSet.substring(substringStart).equals("inf")){
-			isInf = true;
+		if (invariantToSet.upperBound() instanceof InfBound){
 			invariantSpinner.setEnabled(false);
 			invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<"}));
 			invariantInf.setSelected(true);
 			invRelationNormal.setSelectedItem("<");
-		}
-
-		if(!isInf)
-		{
-			boolean isNumber = true;
-			try{
-				invariantValue = Integer.parseInt(invariantToSet.substring(substringStart));
-			}catch(NumberFormatException e){
-				isNumber = false;
-			}
-
-			if(!isNumber){
-				constantName = invariantToSet.substring(substringStart);
-			}
-		}
+		} 
 
 		disableInvariantComponents();
-		if(!constantName.isEmpty()){
+		if(invariantToSet.upperBound() instanceof ConstantBound){
 			enableConstantInvariantComponents();
 			constantInvRadioButton.setSelected(true);
-			invConstantsComboBox.setSelectedItem(constantName);
+			invConstantsComboBox.setSelectedItem(((ConstantBound)invariantToSet.upperBound()).name());
+			invRelationConstant.setSelectedItem(invariantToSet.isUpperNonstrict() ? "<=" : "<");
 			//setRelationModelForConstants();
 		}
 		else{
 			enableNormalInvariantComponents();
 			normalInvRadioButton.setSelected(true);
-			if(!isInf){ 
+			if(invariantToSet.upperBound() instanceof IntBound){ 
 				if ((Integer)invariantSpinner.getValue() < 1){
 					invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<="}));
 				}
 				else{
 					invRelationNormal.setModel(new DefaultComboBoxModel(new String[]{"<=", "<"}));
 				}
-				invariantSpinner.setValue(invariantValue);
+				invariantSpinner.setValue(invariantToSet.upperBound().value());
 				invariantSpinner.setEnabled(true);
-				invRelationNormal.setSelectedItem(invariantToSet.substring(0, substringStart));
+				invRelationNormal.setSelectedItem(invariantToSet.isUpperNonstrict() ? "<=" : "<");
 
 				invariantInf.setSelected(false);
 			}

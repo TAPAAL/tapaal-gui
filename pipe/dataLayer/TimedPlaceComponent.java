@@ -280,26 +280,6 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	
-	public void removeTokenofAge(BigDecimal tokenage) {
-		boolean ableToRemoveToken = false;
-		BigDecimal tokenToRemove = null;
-		for (BigDecimal bd : myTokens){
-			if (tokenage.compareTo(bd) == 0){
-				ableToRemoveToken = true;
-				tokenToRemove = bd;
-				break;
-			}
-		}
-		if (ableToRemoveToken){
-			myTokens.remove(tokenToRemove);
-			Collections.sort(myTokens);
-			myTokens.trimToSize();
-			currentMarking--;	
-		}else {
-			System.err.println(getName() + " has no token with that age");
-		}
-	}
-
 	public boolean satisfiesInvariant(BigDecimal token) {
 		return place.invariant().isSatisfied(token);
 	}
@@ -448,35 +428,6 @@ public class TimedPlaceComponent extends Place {
 		updateConnected();
 
 		repaint();
-	}
-
-	protected String getInvariantString() {
-		String value = "";
-		String invariant = getInvariantAsString();
-		//Dont show invariant if its default	
-		if (!invariant.equals(TimeInvariant.LESS_THAN_INFINITY.toString())){ 
-
-			if(CreateGui.getModel().isUsingColors()){
-				int offset = 1;
-				if(invariant.contains("<=")) offset = 2;
-
-				value = String.format("\n age \u2208 [0, %1$s%2$s", invariant.substring(offset).trim(),
-						offset == 2 ? "]" : ")");
-			}else{
-				value = "\nInv: " + invariant;
-			}
-		}
-
-		return value;
-	}
-
-	@Override
-	public void showMarking(Marking marking) {
-		myTokens.clear();
-		for(Token token : marking.getTokensInPlace(this)){
-			myTokens.add(token.age());
-		}
-		super.showMarking(marking);
 	}
 
 	@Override
