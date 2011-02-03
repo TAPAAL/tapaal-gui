@@ -3,6 +3,7 @@ package pipe.gui;
 import javax.swing.JOptionPane;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.TapaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -13,7 +14,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult result, long verificationTime) {
+	protected void showResult(VerificationResult<TapaalTrace> result, long verificationTime) {
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				result.isQuerySatisfied() ? getAnswerNotBoundedString() : getAnswerBoundedString(), 
 				"Analysis Result", JOptionPane.INFORMATION_MESSAGE);

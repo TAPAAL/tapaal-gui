@@ -29,6 +29,10 @@ public class TAPNTrace implements Iterable<TAPNFiringAction> {
 	public Iterator<TAPNFiringAction> iterator() {
 		return firingActions.iterator();
 	}
+	
+	public Iterable<TAPNFiringAction> firingActions(){
+		return firingActions;
+	}
 
 	public int length() {
 		return firingActions.size();

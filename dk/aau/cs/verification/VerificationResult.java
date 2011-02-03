@@ -1,10 +1,9 @@
 package dk.aau.cs.verification;
 
-import dk.aau.cs.petrinet.trace.TAPNTrace;
 
-public class VerificationResult {
+public class VerificationResult<TTrace> {
 	private QueryResult queryResult;
-	private TAPNTrace trace;
+	private TTrace trace;
 	private String errorMessage = null;
 	private long verificationTime;
 
@@ -12,7 +11,7 @@ public class VerificationResult {
 		return queryResult.isQuerySatisfied();
 	}
 		
-	public VerificationResult(QueryResult queryResult, TAPNTrace trace,
+	public VerificationResult(QueryResult queryResult, TTrace trace,
 			long verificationTime) {
 		this.queryResult = queryResult;
 		this.trace = trace;
@@ -28,7 +27,7 @@ public class VerificationResult {
 		return queryResult;
 	}		
 	
-	public TAPNTrace getTrace(){
+	public TTrace getTrace(){
 		return trace;
 	}
 	

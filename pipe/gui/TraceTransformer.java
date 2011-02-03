@@ -7,6 +7,7 @@ import java.util.List;
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
 
+// TODO: Maybe delete me?
 public class TraceTransformer {
 	private final DataLayer model;
 

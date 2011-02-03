@@ -6,19 +6,22 @@ import javax.swing.SwingWorker;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.model.TapaalTrace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.NewModelToOldModelTransformer;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
 public abstract class RunVerificationBase extends
-		SwingWorker<VerificationResult, Void> {
+		SwingWorker<VerificationResult<TapaalTrace>, Void> {
 
 	private ModelChecker modelChecker;
 	private VerificationOptions options;
@@ -40,7 +43,7 @@ public abstract class RunVerificationBase extends
 	}
 	
 	@Override
-	protected VerificationResult doInBackground() throws Exception {
+	protected VerificationResult<TapaalTrace> doInBackground() throws Exception {
 		TAPNComposer composer = new TAPNComposer();
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
@@ -51,10 +54,21 @@ public abstract class RunVerificationBase extends
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 		
-		VerificationResult result = modelChecker.verify(options, tapn, clonedQuery);
-		return result;
+		VerificationResult<TAPNTrace> result = modelChecker.verify(options, tapn, clonedQuery);
+		if(result.error()){
+			return new VerificationResult<TapaalTrace>(result.errorMessage());
+		}else{
+			return new VerificationResult<TapaalTrace>(result.getQueryResult(), decomposeTrace(result.getTrace(), transformedModel.value2()), result.verificationTime());
+		}
 	}
 	
+	private TapaalTrace decomposeTrace(TAPNTrace trace, NameMapping mapping) {
+		if(trace == null) return null;
+			
+		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model, mapping);
+		return decomposer.decompose();
+	}
+
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
 		query.getProperty().accept(visitor,null);
@@ -63,7 +77,7 @@ public abstract class RunVerificationBase extends
 	@Override
 	protected void done() {						
 		if(!isCancelled()){
-			VerificationResult result = null;
+			VerificationResult<TapaalTrace> result = null;
 			try {
 				result = get();
 			} catch (InterruptedException e) {
@@ -80,5 +94,5 @@ public abstract class RunVerificationBase extends
 		}
 	}
 
-	protected abstract void showResult(VerificationResult result, long verificationTime);
+	protected abstract void showResult(VerificationResult<TapaalTrace> result, long verificationTime);
 }

@@ -5,10 +5,9 @@ package pipe.gui;
 
 import javax.swing.JOptionPane;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNTrace;
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.model.TapaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -19,7 +18,7 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult result, long verificationTime) {	
+	protected void showResult(VerificationResult<TapaalTrace> result, long verificationTime) {
 		if(result != null && !result.error()){
 			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
@@ -27,11 +26,11 @@ public class RunVerification extends RunVerificationBase {
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 			
 			if(result.getTrace() != null){
-				DataLayer model = CreateGui.getModel();
-				TraceTransformer interpreter =  model.isUsingColors() ? new ColoredTraceTransformer(model) : new TraceTransformer(model);
-				TAPNTrace trace = interpreter.interpretTrace(result.getTrace());
+//				DataLayer model = CreateGui.getModel();
+//				TraceTransformer interpreter =  model.isUsingColors() ? new ColoredTraceTransformer(model) : new TraceTransformer(model);
+//				TAPNTrace trace = interpreter.interpretTrace(result.getTrace());
 				CreateGui.getApp().setGUIMode(GUIMode.animation);
-				CreateGui.getAnimator().SetTrace(trace);
+//				CreateGui.getAnimator().SetTrace(trace);
 			}
 		}else{
 			messenger.displayWrappedErrorMessage("An error occured during the verification." +
