@@ -63,6 +63,7 @@ public class TabContent extends JSplitPane {
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		drawingSurfaceScroller.setWheelScrollingEnabled(true);
 
 		createEditorLeftPane();
 
@@ -94,9 +95,6 @@ public class TabContent extends JSplitPane {
 		templateExplorer = new TemplateExplorer(this);
 
 		queryConstantsSplit = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		// queryConstantsSplit.setPreferredSize(new Dimension(262, 100)); //
-		// height is ignored because the component is stretched
-		// queryConstantsSplit.setMinimumSize(new Dimension(175,100));
 		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
 		queryConstantsSplit.setResizeWeight(0.5);
 		queryConstantsSplit.setTopComponent(queries);
@@ -148,12 +146,6 @@ public class TabContent extends JSplitPane {
 					.createCompoundBorder(BorderFactory
 							.createTitledBorder("Simulation History"),
 							BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-			// leftPane.setBottomComponent(scroller);
-			//
-			// // leftPane.setDividerLocation(0.5);
-			// leftPane.setResizeWeight(0.05f);
-			//
-			// leftPane.setDividerSize(8);
 		} catch (javax.swing.text.BadLocationException be) {
 			be.printStackTrace();
 		}
@@ -165,7 +157,6 @@ public class TabContent extends JSplitPane {
 
 		JSplitPane animatorLeftPane = new JSplitPaneFix(
 				JSplitPane.VERTICAL_SPLIT);
-		// animatorLeftPane.setLayout(new BorderLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height
 																				// is
 																				// ignored
@@ -215,16 +206,13 @@ public class TabContent extends JSplitPane {
 		try {
 			abstractAnimationPane = new AnimationHistoryComponent();
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// abstractAnimationPane.setVerticalAlignment(SwingConstants.TOP);
 
 		// Create a new empty animBox
 		try {
 			animBox = new AnimationHistoryComponent();
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -264,30 +252,9 @@ public class TabContent extends JSplitPane {
 																				// bad
 																				// on
 																				// XP
-		//
-		// leftPane.setTopComponent(scroller2);
-		//
-		// // leftPane.setDividerLocation(0.5);
-		// leftPane.setDividerSize(8);
-		// leftPane.resetToPreferredSizes();
-		// //shortcutBottons should be usable from start of
+	
 		animControlerBox.requestFocus(true);
 	}
-
-	// public void removeAnimationHistory() {
-	// if (scroller != null) {
-	// leftPane.remove(scroller);
-	// leftPane.setDividerLocation(DIVIDER_LOCATION);
-	// leftPane.setDividerSize(0);
-	// }
-	// }
-	// public void removeAnimationController() {
-	// if (scroller != null) {
-	// leftPane.remove(scroller2);
-	// leftPane.setDividerLocation(DIVIDER_LOCATION);
-	// leftPane.setDividerSize(0);
-	// }
-	// }
 
 	public AnimationHistoryComponent getAnimationHistory() {
 		return animBox;
@@ -320,11 +287,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public Template<TimedArcPetriNet> activeTemplate() {
-		// if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)){
-		// return animationTemplateExplorer.selectedModel();
-		// }else{
 		return templateExplorer.selectedModel();
-		// }
 	}
 
 	public void setActiveTemplate(Template<TimedArcPetriNet> template) {

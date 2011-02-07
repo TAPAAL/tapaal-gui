@@ -257,18 +257,25 @@ public class TemplateExplorer extends JPanel {
 						+ (++templateID));
 
 		if (templateName != null && templateName.length() <= 0)
-			JOptionPane
-					.showMessageDialog(
+			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
-							"New TAPN template could not be created:\n\nYou must provide a proper name for the template",
+							"A new TAPN template could not be created:\n\nYou must provide a proper name for the template",
 							"Error Creating Template",
 							JOptionPane.ERROR_MESSAGE);
+		else if (parent.network().hasTAPNCalled(templateName)) {
+			JOptionPane.showMessageDialog(
+					parent.drawingSurface(),
+					"A template named \"" + templateName + "\" already exists.\n\nThe new template could not be created.",
+					"Error Creating Template",
+					JOptionPane.ERROR_MESSAGE);
+		}
 		else if (templateName != null && templateName.length() > 0) {
 			Template<TimedArcPetriNet> template = createNewTemplate(templateName);
 			return template;
 		}
 		return null;
 	}
+
 
 	private void showRenameTemplateDialog() {
 		Template<TimedArcPetriNet> template = selectedModel();

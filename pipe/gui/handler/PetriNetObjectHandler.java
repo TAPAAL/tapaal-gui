@@ -162,7 +162,6 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		;
 	}
 
 }
