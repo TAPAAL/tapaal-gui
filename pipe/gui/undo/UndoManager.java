@@ -6,11 +6,18 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.PlaceTransitionObject;
+import pipe.dataLayer.TimedInhibitorArcComponent;
+import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedOutputArcComponent;
+import pipe.dataLayer.TimedPlaceComponent;
+import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
@@ -63,7 +70,7 @@ public class UndoManager {
 
 			// The currentEdit to redo
 			Iterator<Command> currentEdit = edits.get(indexOfNextAdd)
-					.iterator();
+			.iterator();
 			while (currentEdit.hasNext()) {
 				currentEdit.next().redo();
 			}
@@ -154,12 +161,24 @@ public class UndoManager {
 	}
 
 	public void deleteSelection(PetriNetObject pnObject) {
+		if(pnObject instanceof PlaceTransitionObject){
+			PlaceTransitionObject pto = (PlaceTransitionObject)pnObject;
+
+			for(Arc arc : pto.getPreset()){
+				deleteObject(arc);
+			}
+
+			for(Arc arc : pto.getPostset()){
+				deleteObject(arc);
+			}
+		}
+
 		deleteObject(pnObject);
 	}
 
 	public void deleteSelection(ArrayList<PetriNetObject> selection) {
 		for (PetriNetObject pnObject : selection) {
-			deleteObject(pnObject);
+			deleteSelection(pnObject);
 		}
 	}
 
@@ -206,36 +225,54 @@ public class UndoManager {
 						.getArcPath().getArc(), (ArcPathPoint) pnObject,
 						((ArcPathPoint) pnObject).getIndex()));
 			}
-		} else {
-			if (pnObject instanceof PlaceTransitionObject) {
-				//
-				Iterator<Arc> arcsTo = ((PlaceTransitionObject) pnObject)
-						.getConnectToIterator();
-				while (arcsTo.hasNext()) {
-					Arc anArc = arcsTo.next();
-					if (!anArc.isDeleted()) {
-						addEdit(new DeletePetriNetObjectEdit(anArc, view,
-								guiModel));
-					}
-				}
-				//
-				Iterator<Arc> arcsFrom = ((PlaceTransitionObject) pnObject)
-						.getConnectFromIterator();
-				while (arcsFrom.hasNext()) {
-					Arc anArc = arcsFrom.next();
-					if (!anArc.isDeleted()) {
-						addEdit(new DeletePetriNetObjectEdit(anArc, view,
-								guiModel));
-					}
-				}
-
-			}
+		}else{
+			//		} else if (pnObject instanceof PlaceTransitionObject) {
+			//			//
+			//			Iterator<Arc> arcsTo = ((PlaceTransitionObject) pnObject)
+			//			.getConnectToIterator();
+			//			while (arcsTo.hasNext()) {
+			//				Arc anArc = arcsTo.next();
+			//				if (!anArc.isDeleted()) {
+			//					addEdit(new DeletePetriNetObjectEdit(anArc, view, guiModel));
+			//				}
+			//			}
+			//			//
+			//			Iterator<Arc> arcsFrom = ((PlaceTransitionObject) pnObject)
+			//			.getConnectFromIterator();
+			//			while (arcsFrom.hasNext()) {
+			//				Arc anArc = arcsFrom.next();
+			//				if (!anArc.isDeleted()) {
+			//					addEdit(new DeletePetriNetObjectEdit(anArc, view, guiModel));
+			//				}
+			//			}
+			//		}
 
 			if (!pnObject.isDeleted()) {
-				addEdit(new DeletePetriNetObjectEdit(pnObject, view, guiModel));
+				if(pnObject instanceof TimedPlaceComponent){
+					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
+					addEdit(new DeleteTimedPlaceCommand(tp, tp.underlyingPlace().model(), guiModel, view));
+				}else if(pnObject instanceof TimedTransitionComponent){
+					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
+					addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view));
+				}else if(pnObject instanceof TimedInputArcComponent){
+					TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
+					addEdit(new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view));
+				}else if(pnObject instanceof TimedOutputArcComponent){
+					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
+					addEdit(new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel, view));
+				}else if(pnObject instanceof TransportArcComponent){
+					TransportArcComponent transportArc = (TransportArcComponent)pnObject;
+					addEdit(new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view));
+				}else if(pnObject instanceof TimedInhibitorArcComponent){
+					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
+					addEdit(new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view));
+				}else if(pnObject instanceof AnnotationNote){
+					addEdit(new DeletePetriNetObjectEdit(pnObject, view, guiModel));
+				}else{
+					throw new RuntimeException("This should not be possible");
+				}
 				pnObject.delete();
 			}
 		}
 	}
-
 }

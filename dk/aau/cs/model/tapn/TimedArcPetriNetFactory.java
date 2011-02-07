@@ -232,8 +232,7 @@ public class TimedArcPetriNetFactory {
 		AnnotationNote an = new AnnotationNote(text, positionXInput,
 				positionYInput, widthInput, heightInput, borderInput);
 		guiModel.addPetriNetObject(an);
-		drawingSurface.addNewPetriNetObject(an);
-
+		addListeners(an);
 	}
 
 	private void parseAndAddTransition(Element transition) {
@@ -803,7 +802,7 @@ public class TimedArcPetriNetFactory {
 		AnnotationNote an = new AnnotationNote(text, positionXInput,
 				positionYInput, widthInput, heightInput, borderInput);
 		guiModel.addPetriNetObject(an);
-		drawingSurface.addNewPetriNetObject(an);
+		addListeners(an);
 	}
 
 	private void createAndAddTransitionAsOldFormat(Element element) {

@@ -5,13 +5,12 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
-public class AddTimedOutputArcCommand extends AddTAPNElementCommand {
+public class AddTimedOutputArcCommand extends TAPNElementCommand {
 	private final TimedOutputArcComponent outputArc;
 
 	public AddTimedOutputArcCommand(TimedOutputArcComponent outputArc,
 			TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
-		// TODO Auto-generated constructor stub
 		this.outputArc = outputArc;
 	}
 

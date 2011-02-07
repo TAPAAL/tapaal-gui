@@ -657,7 +657,7 @@ public class DataLayer extends Observable implements Cloneable {
 			} else if (pnObject instanceof Transition) {
 				addTransition((Transition) pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
-				labelsArray.add((AnnotationNote) pnObject);
+				addAnnotation((AnnotationNote)pnObject);				
 			} else { // arrows, other labels.
 				changeArrayList.add(pnObject);
 				setChanged();
