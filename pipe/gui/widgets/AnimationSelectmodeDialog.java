@@ -55,7 +55,7 @@ public class AnimationSelectmodeDialog extends JPanel {
 		c.gridy = 0;
 
 		firedtransition = (TimedTransitionComponent) t; // XXX - unsafe cast (ok
-														// by contract)
+		// by contract)
 
 		namePanel = new JPanel(new FlowLayout());
 		namePanel.add(new JLabel("Select tokens to Fire in Transition "
@@ -110,80 +110,49 @@ public class AnimationSelectmodeDialog extends JPanel {
 		presetPanel.add(new JLabel("Select token from Place "
 				+ a.getSource().getName()));
 
-		if (!CreateGui.getModel().isUsingColors()) {
-			ArrayList<String> eligableToken = null;
+		ArrayList<String> eligableToken = null;
 
-			DecimalFormat df = new DecimalFormat();
-			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-			df.setMinimumFractionDigits(1);
-			if (a instanceof TransportArcComponent) {
-				eligableToken = new ArrayList<String>();
-				TimedPlaceComponent p = (TimedPlaceComponent) a.getSource();
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(1);
+		if (a instanceof TransportArcComponent) {
+			eligableToken = new ArrayList<String>();
+			TimedPlaceComponent p = (TimedPlaceComponent) a.getSource();
 
-				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();
+			ArrayList<BigDecimal> tokensOfPlace = p.getTokens();
 
-				TimedPlaceComponent targetPlace = (TimedPlaceComponent) ((TransportArcComponent) a)
-						.getConnectedTo().getTarget();
+			TimedPlaceComponent targetPlace = (TimedPlaceComponent) ((TransportArcComponent) a)
+			.getConnectedTo().getTarget();
 
-				for (int i = 0; i < tokensOfPlace.size(); i++) {
-					if (((TimedInputArcComponent) a)
-							.satisfiesGuard(tokensOfPlace.get(i))
-							&& targetPlace.satisfiesInvariant(tokensOfPlace
-									.get(i))) {
-						eligableToken.add(df.format(tokensOfPlace.get(i)));
-					}
-				}
-
-			} else if (a instanceof TimedInputArcComponent) {
-				eligableToken = new ArrayList<String>();
-				// int indexOfOldestEligebleToken = 0;
-
-				TimedPlaceComponent p = (TimedPlaceComponent) a.getSource();
-
-				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();
-				for (int i = 0; i < tokensOfPlace.size(); i++) {
-					if (((TimedInputArcComponent) a)
-							.satisfiesGuard(tokensOfPlace.get(i))) {
-						eligableToken.add(df.format(tokensOfPlace.get(i)));
-					}
+			for (int i = 0; i < tokensOfPlace.size(); i++) {
+				if (((TimedInputArcComponent) a)
+						.satisfiesGuard(tokensOfPlace.get(i))
+						&& targetPlace.satisfiesInvariant(tokensOfPlace
+								.get(i))) {
+					eligableToken.add(df.format(tokensOfPlace.get(i)));
 				}
 			}
 
-			JComboBox selectTokenBox = new JComboBox(eligableToken.toArray());
-			selectTokenBox.setSelectedIndex(0);
+		} else if (a instanceof TimedInputArcComponent) {
+			eligableToken = new ArrayList<String>();
+			// int indexOfOldestEligebleToken = 0;
 
-			presetPanel.add(selectTokenBox);
-			presetPanels.add(selectTokenBox);
-		} else {
-			ColoredTimedPlace place = (ColoredTimedPlace) a.getSource();
+			TimedPlaceComponent p = (TimedPlaceComponent) a.getSource();
 
-			ArrayList<ColoredToken> eligibleTokens = new ArrayList<ColoredToken>();
-
-			if (a instanceof ColoredTransportArc) {
-				ColoredTransportArc cta = (ColoredTransportArc) a;
-
-				for (ColoredToken token : place.getColoredTokens()) {
-					if (cta.satisfiesGuard(token)
-							&& cta.satisfiesTargetInvariant(token)) {
-						eligibleTokens.add(token);
-					}
-				}
-			} else if (a instanceof ColoredInputArc) {
-				ColoredInputArc cia = (ColoredInputArc) a;
-
-				for (ColoredToken token : place.getColoredTokens()) {
-					if (cia.satisfiesGuard(token)) {
-						eligibleTokens.add(token);
-					}
+			ArrayList<BigDecimal> tokensOfPlace = p.getTokens();
+			for (int i = 0; i < tokensOfPlace.size(); i++) {
+				if (((TimedInputArcComponent) a)
+						.satisfiesGuard(tokensOfPlace.get(i))) {
+					eligableToken.add(df.format(tokensOfPlace.get(i)));
 				}
 			}
-
-			JComboBox selectTokenBox = new JComboBox(eligibleTokens.toArray());
-			selectTokenBox.setSelectedIndex(0);
-
-			presetPanel.add(selectTokenBox);
-			presetPanels.add(selectTokenBox);
 		}
+
+		JComboBox selectTokenBox = new JComboBox(eligableToken.toArray());
+		selectTokenBox.setSelectedIndex(0);
+
+		presetPanel.add(selectTokenBox);
+		presetPanels.add(selectTokenBox);
 		return presetPanel;
 	}
 

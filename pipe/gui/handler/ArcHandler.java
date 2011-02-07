@@ -64,18 +64,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 				&& !(myObject instanceof TimedInputArcComponent)
 				&& !(myObject instanceof TransportArcComponent)) {
 			/* EOC */
-			if (CreateGui.getModel().isUsingColors()
-					&& myObject instanceof ColoredOutputArc) {
-				menuItem = new JMenuItem();
-				menuItem.setText("Properties");
-				menuItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						showOutputValueEditor((ColoredOutputArc) myObject);
-					}
-				});
-				popup.insert(menuItem, popupIndex++);
-			}
-
+			
 			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
 					.getPoint()));
 			menuItem.setText("Insert Point");
@@ -101,43 +90,14 @@ public class ArcHandler extends PetriNetObjectHandler {
 										.getY()
 										+ e.getY()), e.isAltDown()));
 			} else {
-				if (CreateGui.getModel().isUsingColors()) {
-					if (arc instanceof ColoredOutputArc) {
-						showOutputValueEditor((ColoredOutputArc) arc);
-					}
-				} else {
-					arc.getSource().select();
-					arc.getTarget().select();
-					justSelected = true;
-				}
+				arc.getSource().select();
+				arc.getTarget().select();
+				justSelected = true;
 			}
 		}
 	}
 
-	private void showOutputValueEditor(ColoredOutputArc arc) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.TOOL + " " + Pipe.VERSION, true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add Place editor
-		contentPane.add(new OutputValueEditorPanel(guiDialog.getRootPane(),
-				arc, CreateGui.getCurrentTab().network(), CreateGui.getView()
-						.getUndoManager()));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-	}
-
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		switch (CreateGui.getApp().getMode()) {

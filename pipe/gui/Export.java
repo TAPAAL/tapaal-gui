@@ -201,13 +201,7 @@ public class Export {
 				filename = new FileBrowser("TikZ figure", "tex", filename)
 						.saveFile();
 				if (filename != null) {
-					TikZExporter output;
-					if (!model.isUsingColors()) {
-						output = new TikZExporter(model, filename, tikZOption);
-					} else {
-						output = new TikZExporterForColoredTAPN(model,
-								filename, tikZOption);
-					}
+					TikZExporter output = new TikZExporter(model, filename, tikZOption);
 					output.ExportToTikZ();
 				}
 			}
@@ -255,13 +249,7 @@ public class Export {
 		}
 
 		// Create transformer
-		PipeTapnToAauTapnTransformer transformer = null;
-
-		if (appModel.isUsingColors()) {
-			transformer = new ColoredPipeTapnToColoredAauTapnTransformer();
-		} else {
-			transformer = new PipeTapnToAauTapnTransformer();
-		}
+		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
 
 		TAPN model = null;
 		try {

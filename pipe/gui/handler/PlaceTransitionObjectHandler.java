@@ -116,13 +116,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					// NormalArc tmparc = new NormalArc(currentObject);
 
 					if (currentObject instanceof TimedPlaceComponent) {
-						Arc arc = useColors ? new ColoredInputArc(currentObject)
-								: new TimedInputArcComponent(currentObject);
+						Arc arc = new TimedInputArcComponent(currentObject);
 						createArc(arc, currentObject);
 					} else {
-						Arc arc = useColors ? new ColoredOutputArc(
-								currentObject) : new TimedOutputArcComponent(
-								currentObject);
+						Arc arc = new TimedOutputArcComponent(currentObject);
 						createArc(arc, currentObject);
 					}
 				} else {
@@ -156,9 +153,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				} else if (CreateGui.getApp().getMode() == Pipe.TAPNINHIBITOR_ARC) {
 					if (currentObject instanceof Place) {
 
-						Arc arc = useColors ? new ColoredInhibitorArc(
-								currentObject)
-								: new TimedInhibitorArcComponent(currentObject);
+						Arc arc = new TimedInhibitorArcComponent(currentObject);
 
 						createArc(arc, currentObject);
 					}
