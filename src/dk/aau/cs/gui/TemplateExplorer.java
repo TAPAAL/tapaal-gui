@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -31,6 +32,7 @@ import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.JSplitPaneFix;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.util.Require;
 
 public class TemplateExplorer extends JPanel {
 	private static final long serialVersionUID = -2334464984237161208L;
@@ -148,11 +150,6 @@ public class TemplateExplorer extends JPanel {
 			}
 		});
 
-		// templateLabel = new JLabel("Templates:");
-		// templateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		// templateLabel.setAlignmentY(Component.TOP_ALIGNMENT);
-		// templatePanel.add(templateLabel, BorderLayout.PAGE_START);
-
 		scrollpane = new JScrollPane(templateList);
 		templatePanel.add(scrollpane, BorderLayout.CENTER);
 
@@ -198,8 +195,7 @@ public class TemplateExplorer extends JPanel {
 				// removeSelectedTemplate();
 				// listModel.remove(templateList.getSelectedIndex());
 				int index = templateList.getSelectedIndex();
-				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>) templateList
-						.getSelectedValue();
+				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>) templateList.getSelectedValue();
 
 				Command command = new RemoveTemplateCommand(
 						TemplateExplorer.this, template, index);
@@ -256,12 +252,12 @@ public class TemplateExplorer extends JPanel {
 				JOptionPane.PLAIN_MESSAGE, null, null, "New TAPN Template "
 						+ (++templateID));
 
-		if (templateName != null && templateName.length() <= 0)
+		if (!isNameAllowed(templateName))
 			JOptionPane.showMessageDialog(
-							parent.drawingSurface(),
-							"A new TAPN template could not be created:\n\nYou must provide a proper name for the template",
-							"Error Creating Template",
-							JOptionPane.ERROR_MESSAGE);
+					parent.drawingSurface(),
+					"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][  _a-zA-Z0-9]*\n\nThe new template could not be created.",
+					"Error Creating Template",
+					JOptionPane.ERROR_MESSAGE);
 		else if (parent.network().hasTAPNCalled(templateName)) {
 			JOptionPane.showMessageDialog(
 					parent.drawingSurface(),
@@ -277,6 +273,12 @@ public class TemplateExplorer extends JPanel {
 	}
 
 
+	private boolean isNameAllowed(String templateName) {
+		Require.that(templateName != null, "The template name cannot be null");
+		
+		return !templateName.isEmpty() && Pattern.matches("[a-zA-Z](\\s|[_a-zA-Z0-9])*", templateName);
+	}
+
 	private void showRenameTemplateDialog() {
 		Template<TimedArcPetriNet> template = selectedModel();
 
@@ -287,18 +289,19 @@ public class TemplateExplorer extends JPanel {
 		if (newName == null || template.model().getName().equals(newName))
 			return;
 
-		if (newName.length() <= 0)
+		if (!isNameAllowed(newName))
 			JOptionPane
 					.showMessageDialog(
 							parent.drawingSurface(),
-							"TAPN template could not be renamed:\n\nYou must provide a proper name for the template",
+							"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][  _a-zA-Z0-9]*.\n\nThe template could not be renamed.",
 							"Error Renaming Template",
 							JOptionPane.ERROR_MESSAGE);
+		
 		else if (parent.network().hasTAPNCalled(newName)) {
 			JOptionPane
 					.showMessageDialog(
 							parent.drawingSurface(),
-							"There is already a template with that name. Try another name.",
+							"A template named \"" + newName + "\" already exists. Please try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
 			Command command = new RenameTemplateCommand(this, template.model(),

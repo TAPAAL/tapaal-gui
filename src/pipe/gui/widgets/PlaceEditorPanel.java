@@ -489,20 +489,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		if (!newName.equals(name)) {
 			if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
-				System.err
-				.println("Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
-				JOptionPane
-				.showMessageDialog(
+				System.err.println("Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+				JOptionPane.showMessageDialog(
 						CreateGui.getApp(),
 						"Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 						"Error", JOptionPane.INFORMATION_MESSAGE);
 				return;
-			} else if ((guiModel.getPlaceByNameIgnoreGiven(place, newName) != null)
-					|| (guiModel.getTransitionByName(newName) != null)) {
-				System.err
-				.println("Places cannot be called the same as an other Place or Transition.");
-				JOptionPane
-				.showMessageDialog(
+			} else if ((guiModel.getPlaceByNameIgnoreGiven(place, newName) != null)	|| (guiModel.getTransitionByName(newName) != null)) {
+				System.err.println("Places cannot be called the same as an other Place or Transition.");
+				JOptionPane.showMessageDialog(
 						CreateGui.getApp(),
 						"Places cannot be called the same as another Place or Transition.",
 						"Error", JOptionPane.INFORMATION_MESSAGE);
