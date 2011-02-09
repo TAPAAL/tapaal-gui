@@ -27,7 +27,6 @@ public class NewTAPNPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -4598172555484557945L;
 	private JRootPane rootPane;
-	private JRadioButton coloredTAPNRadioButton;
 	private JRadioButton standardTAPNRadioButton;
 	private JRadioButton untimedRadioButton;
 	private GuiFrame frame;
@@ -58,9 +57,7 @@ public class NewTAPNPanel extends JPanel {
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				NetType type = NetType.TAPN;
-				if (coloredTAPNRadioButton.isSelected()) {
-					type = NetType.COLORED;
-				} else if (untimedRadioButton.isSelected()) {
+				if (untimedRadioButton.isSelected()) {
 					type = NetType.UNTIMED;
 				}
 
@@ -175,16 +172,7 @@ public class NewTAPNPanel extends JPanel {
 		gbc.insets = new Insets(3, 3, 3, 3);
 		choice.add(standardTAPNRadioButton, gbc);
 
-		coloredTAPNRadioButton = new JRadioButton("Colored TAPN");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		// choice.add(coloredTAPNRadioButton, gbc);
-
 		ButtonGroup btnGroup = new ButtonGroup();
-		btnGroup.add(coloredTAPNRadioButton);
 		btnGroup.add(standardTAPNRadioButton);
 		btnGroup.add(untimedRadioButton);
 

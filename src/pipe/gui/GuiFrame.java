@@ -1026,9 +1026,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	}
 
 	private NetType parseNetType(String attribute) {
-		if (attribute.equals("Colored P/T net")) {
-			return NetType.COLORED;
-		} else if (attribute.equals("Untimed P/T net")) {
+		if (attribute.equals("Untimed P/T net")) {
 			return NetType.UNTIMED;
 		} else {
 			return NetType.TAPN;

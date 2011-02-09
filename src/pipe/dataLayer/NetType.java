@@ -1,5 +1,5 @@
 package pipe.dataLayer;
 
 public enum NetType {
-	UNTIMED, TAPN, COLORED
+	UNTIMED, TAPN
 }

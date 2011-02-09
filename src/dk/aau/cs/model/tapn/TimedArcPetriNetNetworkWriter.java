@@ -96,9 +96,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 				Attr netAttrType = pnDOM.createAttribute("type");
 				switch (netModel.netType()) {
-				case COLORED:
-					netAttrType.setValue("Colored P/T net");
-					break;
 				case UNTIMED:
 					netAttrType.setValue("Untimed P/T net");
 					break;
