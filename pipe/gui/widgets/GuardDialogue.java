@@ -34,8 +34,6 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.dataLayer.colors.ColorSet;
-import pipe.dataLayer.colors.ColoredInhibitorArc;
-import pipe.dataLayer.colors.ColoredInputArc;
 import pipe.dataLayer.colors.ColoredInterval;
 import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.dataLayer.colors.IntOrConstant;

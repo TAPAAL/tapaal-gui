@@ -41,7 +41,6 @@ import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.colors.ColoredPipeTapnToColoredAauTapnTransformer;
 import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;

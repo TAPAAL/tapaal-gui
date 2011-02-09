@@ -17,7 +17,6 @@ import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TransportArcComponent;
-import pipe.dataLayer.colors.ColoredOutputArc;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -25,7 +24,6 @@ import pipe.gui.Pipe;
 import pipe.gui.action.EditWeightAction;
 import pipe.gui.action.SplitArcAction;
 import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.OutputValueEditorPanel;
 
 /**
  * Class used to implement methods corresponding to mouse events on arcs.
