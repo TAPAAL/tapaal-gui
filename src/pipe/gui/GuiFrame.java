@@ -966,22 +966,18 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name, null, tab, null);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,
-				closeAction));
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab, closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
 		if (file != null) {
 			try {
-				DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-						.newDocumentBuilder();
+				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 				Document doc = builder.parse(file);
 
 				Node top = doc.getElementsByTagName("net").item(0);
-				NetType type = parseNetType(((Element) top)
-						.getAttribute("type"));
+				NetType type = parseNetType(((Element) top).getAttribute("type"));
 
-				TabContent currentTab = (TabContent) appTab
-						.getSelectedComponent();
+				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(Pipe.CREATING);
@@ -990,8 +986,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(
 						currentTab.drawingSurface());
 
-				Iterable<Template<TimedArcPetriNet>> templates = factory
-						.parseTimedArcPetriNetsFromPNML(doc);
+				Iterable<Template<TimedArcPetriNet>> templates = factory.parseTimedArcPetriNetsFromPNML(doc);
 				for (Template<TimedArcPetriNet> t : templates) {
 					currentTab.addTemplate(t);
 				}
