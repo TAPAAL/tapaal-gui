@@ -3,7 +3,6 @@ package pipe.gui;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 

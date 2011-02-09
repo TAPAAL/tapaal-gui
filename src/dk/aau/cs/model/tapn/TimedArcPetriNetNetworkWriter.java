@@ -13,7 +13,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -23,7 +22,6 @@ import org.w3c.dom.Element;
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
@@ -34,6 +32,7 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
+import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
@@ -43,128 +42,42 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 	public TimedArcPetriNetNetworkWriter(
 			Iterable<Template<TimedArcPetriNet>> templates,
-			Iterable<TAPNQuery> queries, Iterable<Constant> constants) {
+			Iterable<TAPNQuery> queries, 
+			Iterable<Constant> constants) {
 		this.templates = templates;
 		this.queries = queries;
 		this.constants = constants;
 	}
 
-	public void savePNML(File file) throws NullPointerException, IOException,
-			ParserConfigurationException, DOMException,
-			TransformerConfigurationException, TransformerException {
-
-		// Error checking
-		if (file == null) {
-			throw new NullPointerException("Null file in savePNML");
-		}
+	// TODO: refactor this code to make it more readable
+	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+		Require.that(file != null, "Error: file to save to was null");
 
 		Document pnDOM = null;
-
-		StreamSource xsltSource = null;
 		Transformer transformer = null;
+		
 		try {
 			// Build a Petri Net XML Document
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
 			pnDOM = builder.newDocument();
 
 			Element PNML = pnDOM.createElement("pnml"); // PNML Top Level
-														// Element
 			pnDOM.appendChild(PNML);
-
 			Attr pnmlAttr = pnDOM.createAttribute("xmlns"); // PNML "xmlns"
-															// Attribute
-			pnmlAttr
-					.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
+			pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
 			PNML.setAttributeNode(pnmlAttr);
 
-			for (Constant constant : constants) {
-				Element elem = createConstantElement(constant, pnDOM);
-				PNML.appendChild(elem);
-			}
-
-			for (Template<TimedArcPetriNet> tapn : templates) {
-
-				DataLayer netModel = tapn.guiModel();
-
-				Element NET = pnDOM.createElement("net");
-				PNML.appendChild(NET);
-				Attr netAttrId = pnDOM.createAttribute("id");
-				netAttrId.setValue(tapn.model().getName());
-				NET.setAttributeNode(netAttrId);
-
-				Attr netAttrType = pnDOM.createAttribute("type");
-				switch (netModel.netType()) {
-				case UNTIMED:
-					netAttrType.setValue("Untimed P/T net");
-					break;
-				default:
-					netAttrType.setValue("P/T net");
-				}
-				NET.setAttributeNode(netAttrType);
-
-				AnnotationNote[] labels = netModel.getLabels();
-				for (int i = 0; i < labels.length; i++) {
-					NET.appendChild(createAnnotationNoteElement(labels[i],
-							pnDOM));
-				}
-
-				Place[] places = netModel.getPlaces();
-				for (int i = 0; i < places.length; i++) {
-					NET.appendChild(createPlaceElement(
-							(TimedPlaceComponent) places[i], netModel, pnDOM));
-				}
-
-				Transition[] transitions = netModel.getTransitions();
-				for (int i = 0; i < transitions.length; i++) {
-					NET.appendChild(createTransitionElement(transitions[i],
-							pnDOM));
-				}
-
-				Arc[] arcs = netModel.getArcs();
-				for (int i = 0; i < arcs.length; i++) {
-					Element newArc = createArcElement(arcs[i], netModel, pnDOM);
-
-					int arcPoints = arcs[i].getArcPath().getArcPathDetails().length;
-					String[][] point = arcs[i].getArcPath().getArcPathDetails();
-					for (int j = 0; j < arcPoints; j++) {
-						newArc.appendChild(createArcPoint(point[j][0],
-								point[j][1], point[j][2], pnDOM, j));
-					}
-					NET.appendChild(newArc);
-				}
-
-				InhibitorArc[] inhibitorArcs = netModel.getInhibitors();
-				for (int i = 0; i < inhibitorArcs.length; i++) {
-					Element newArc = createArcElement(inhibitorArcs[i],
-							netModel, pnDOM);
-
-					int arcPoints = inhibitorArcs[i].getArcPath()
-							.getArcPathDetails().length;
-					String[][] point = inhibitorArcs[i].getArcPath()
-							.getArcPathDetails();
-					for (int j = 0; j < arcPoints; j++) {
-						newArc.appendChild(createArcPoint(point[j][0],
-								point[j][1], point[j][2], pnDOM, j));
-					}
-					NET.appendChild(newArc);
-				}
-
-			}
-
-			for (TAPNQuery query : queries) {
-				Element newQuery = createQueryElement(query, pnDOM);
-				PNML.appendChild(newQuery);
-			}
+			AppendConstants(pnDOM);
+			appendTemplates(pnDOM, PNML);
+			appendQueries(pnDOM, PNML);
 
 			pnDOM.normalize();
 			// Create Transformer with XSL Source File
 			transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			// Write file and do XSLT transformation to generate correct PNML
-			File outputObjectArrayList = file;// new File(filename); // Output
-												// for XSLT Transformation
+			File outputObjectArrayList = file;
 			DOMSource source = new DOMSource(pnDOM);
 
 			StreamResult result = new StreamResult(outputObjectArrayList);
@@ -178,340 +91,242 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			System.out
 					.println("DOMException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
-							+ file.getCanonicalPath() + "\" xslt=\""
-							+ xsltSource.getSystemId() + "\" transformer=\""
+							+ file.getCanonicalPath() + "\" transformer=\""
 							+ transformer.getURIResolver() + "\"");
 		} catch (TransformerConfigurationException e) {
 			System.out
 					.println("TransformerConfigurationException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath()
-							+ "\" xslt=\""
-							+ xsltSource.getSystemId()
 							+ "\" transformer=\""
 							+ transformer.getURIResolver() + "\"");
 		} catch (TransformerException e) {
 			System.out
 					.println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath()
-							+ "\" xslt=\""
-							+ xsltSource.getSystemId()
 							+ "\" transformer=\""
 							+ transformer.getURIResolver() + "\"" + e);
 		}
 	}
+	
+	private void AppendConstants(Document document) {
+		for (Constant constant : constants) {
+			Element elem = createConstantElement(constant, document);
+			document.appendChild(elem);
+		}
+	}
+
+	
+
+	private void appendTemplates(Document document, Element root) {
+		for (Template<TimedArcPetriNet> tapn : templates) {
+			DataLayer guiModel = tapn.guiModel();
+
+			Element NET = document.createElement("net");
+			root.appendChild(NET);
+			Attr netAttrId = document.createAttribute("id");
+			netAttrId.setValue(tapn.model().getName());
+			NET.setAttributeNode(netAttrId);
+
+			Attr netAttrType = document.createAttribute("type");
+			switch (guiModel.netType()) {
+			case UNTIMED:
+				netAttrType.setValue("Untimed P/T net");
+				break;
+			default:
+				netAttrType.setValue("P/T net");
+			}
+			NET.setAttributeNode(netAttrType);
+
+			appendAnnotationNotes(document, guiModel, NET);
+			appendPlaces(document, guiModel, NET);
+			appendTransitions(document, guiModel, NET);
+			appendArcs(document, guiModel, NET);
+		}
+	}
+
+	private void appendAnnotationNotes(Document document, DataLayer guiModel, Element NET) {
+		AnnotationNote[] labels = guiModel.getLabels();
+		for (int i = 0; i < labels.length; i++) {
+			NET.appendChild(createAnnotationNoteElement(labels[i], document));
+		}
+	}
+
+	private void appendPlaces(Document document, DataLayer guiModel, Element NET) {
+		Place[] places = guiModel.getPlaces();
+		for (int i = 0; i < places.length; i++) {
+			NET.appendChild(createPlaceElement((TimedPlaceComponent) places[i], guiModel, document));
+		}
+	}
+
+	private void appendTransitions(Document document, DataLayer guiModel, Element NET) {
+		Transition[] transitions = guiModel.getTransitions();
+		for (int i = 0; i < transitions.length; i++) {
+			NET.appendChild(createTransitionElement(transitions[i],	document));
+		}
+	}
+	
+	private void appendArcs(Document document, DataLayer guiModel, Element NET) {
+		Arc[] arcs = guiModel.getArcs();
+		for (int i = 0; i < arcs.length; i++) {
+			Element newArc = createArcElement(arcs[i], guiModel, document);
+
+			int arcPoints = arcs[i].getArcPath().getArcPathDetails().length;
+			String[][] point = arcs[i].getArcPath().getArcPathDetails();
+			for (int j = 0; j < arcPoints; j++) {
+				newArc.appendChild(createArcPoint(point[j][0],
+						point[j][1], point[j][2], document, j));
+			}
+			NET.appendChild(newArc);
+		}
+	}
+	
+	private void appendQueries(Document document, Element root) {
+		for (TAPNQuery query : queries) {
+			Element newQuery = createQueryElement(query, document);
+			root.appendChild(newQuery);
+		}
+	}
 
 	private Element createConstantElement(Constant constant, Document document) {
-		Element constantElement = null;
-
-		if (document != null) {
-			constantElement = document.createElement("constant");
-		}
-
-		if (constant != null) {
-			constantElement.setAttribute("name", constant.name());
-			constantElement.setAttribute("value", String.valueOf(constant
-					.value()));
-		}
-
+		Require.that(constant != null, "Error: constant was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element constantElement = document.createElement("constant");
+		
+		constantElement.setAttribute("name", constant.name());
+		constantElement.setAttribute("value", String.valueOf(constant.value()));
+	
 		return constantElement;
 	}
 
 	private Element createQueryElement(TAPNQuery query, Document document) {
-		Element queryElement = null;
-		if (document != null) {
-			queryElement = document.createElement("query");
-		}
-
-		if (query != null) {
-			queryElement.setAttribute("name", query.getName());
-			queryElement.setAttribute("capacity", "" + query.getCapacity());
-			queryElement.setAttribute("query", query.getProperty().toString());
-			queryElement.setAttribute("traceOption", ""
-					+ query.getTraceOption());
-			queryElement.setAttribute("searchOption", ""
-					+ query.getSearchOption());
-			queryElement.setAttribute("hashTableSize", ""
-					+ query.getHashTableSize());
-			queryElement.setAttribute("extrapolationOption", ""
-					+ query.getExtrapolationOption());
-			queryElement.setAttribute("reductionOption", ""
-					+ query.getReductionOption());
-
-		}
-
+		Require.that(query != null, "Error: query was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element queryElement = document.createElement("query");
+	
+		queryElement.setAttribute("name", query.getName());
+		queryElement.setAttribute("capacity", "" + query.getCapacity());
+		queryElement.setAttribute("query", query.getProperty().toString());
+		queryElement.setAttribute("traceOption", ""	+ query.getTraceOption());
+		queryElement.setAttribute("searchOption", "" + query.getSearchOption());
+		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
+		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
+		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+		
 		return queryElement;
 	}
 
-	/**
-	 * Creates a Place Element for a PNML Petri-Net DOM
-	 * 
-	 * @param inputPlace
-	 *            Input Place
-	 * @param document
-	 *            Any DOM to enable creation of Elements and Attributes
-	 * @return Place Element for a PNML Petri-Net DOM
-	 */
-	private Element createPlaceElement(TimedPlaceComponent inputPlace,
-			DataLayer netModel, Document document) {
-		Element placeElement = null;
+	private Element createPlaceElement(TimedPlaceComponent inputPlace, DataLayer guiModel, Document document) {
+		Require.that(inputPlace != null, "Error: inputPlace was null");
+		Require.that(guiModel != null, "Error: guiModel was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element placeElement = document.createElement("place");
 
-		if (document != null) {
-			placeElement = document.createElement("place");
-		}
+		placeElement.setAttribute("positionX", (inputPlace.getPositionXObject() != null ? String.valueOf(inputPlace.getPositionXObject()) : ""));
+		placeElement.setAttribute("positionY", (inputPlace.getPositionYObject() != null ? String.valueOf(inputPlace.getPositionYObject())	: ""));
+		placeElement.setAttribute("name", (inputPlace.getName() != null ? inputPlace.getName() : (inputPlace.getId() != null && inputPlace.getId().length() > 0 ? inputPlace.getId() : "")));
+		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
+		placeElement.setAttribute("nameOffsetX", (inputPlace.getNameOffsetXObject() != null ? String.valueOf(inputPlace.getNameOffsetXObject()) : ""));
+		placeElement.setAttribute("nameOffsetY", (inputPlace.getNameOffsetYObject() != null ? String.valueOf(inputPlace.getNameOffsetYObject()) : ""));
+		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
+		placeElement.setAttribute("markingOffsetX",	(inputPlace.getMarkingOffsetXObject() != null ? String.valueOf(inputPlace.getMarkingOffsetXObject()) : ""));
+		placeElement.setAttribute("markingOffsetY",	(inputPlace.getMarkingOffsetYObject() != null ? String.valueOf(inputPlace.getMarkingOffsetYObject()) : ""));
+		placeElement.setAttribute("capacity", ((Integer) inputPlace.getCapacity() != null ? String.valueOf((Integer) inputPlace.getCapacity()) : ""));
 
-		if (inputPlace != null) {
-			Double positionXInput = inputPlace.getPositionXObject();
-			Double positionYInput = inputPlace.getPositionYObject();
-			String idInput = inputPlace.getId();
-			String nameInput = inputPlace.getName();
-			Double nameOffsetXInput = inputPlace.getNameOffsetXObject();
-			Double nameOffsetYInput = inputPlace.getNameOffsetYObject();
-			Integer initialMarkingInput = inputPlace.getNumberOfTokens();
-			Double markingOffsetXInput = inputPlace.getMarkingOffsetXObject();
-			Double markingOffsetYInput = inputPlace.getMarkingOffsetYObject();
-			Integer capacityInput = inputPlace.getCapacity();
-
-			placeElement.setAttribute("positionX",
-					(positionXInput != null ? String.valueOf(positionXInput)
-							: ""));
-			placeElement.setAttribute("positionY",
-					(positionYInput != null ? String.valueOf(positionYInput)
-							: ""));
-			placeElement
-					.setAttribute("name",
-							(nameInput != null ? nameInput : (idInput != null
-									&& idInput.length() > 0 ? idInput : "")));
-			placeElement.setAttribute("id", (idInput != null ? idInput
-					: "error"));
-			placeElement.setAttribute("nameOffsetX",
-					(nameOffsetXInput != null ? String
-							.valueOf(nameOffsetXInput) : ""));
-			placeElement.setAttribute("nameOffsetY",
-					(nameOffsetYInput != null ? String
-							.valueOf(nameOffsetYInput) : ""));
-			placeElement.setAttribute("initialMarking",
-					(initialMarkingInput != null ? String
-							.valueOf(initialMarkingInput) : "0"));
-			placeElement.setAttribute("markingOffsetX",
-					(markingOffsetXInput != null ? String
-							.valueOf(markingOffsetXInput) : ""));
-			placeElement.setAttribute("markingOffsetY",
-					(markingOffsetYInput != null ? String
-							.valueOf(markingOffsetYInput) : ""));
-			placeElement
-					.setAttribute("capacity", (capacityInput != null ? String
-							.valueOf(capacityInput) : ""));
-
-			if (inputPlace instanceof TimedPlaceComponent) {
-				String invariantInput = ((TimedPlaceComponent) inputPlace)
-						.getInvariantAsString();
-				placeElement.setAttribute("invariant",
-						invariantInput != null ? invariantInput : "");
-			}
+		if (inputPlace instanceof TimedPlaceComponent) {
+			String invariantInput = ((TimedPlaceComponent) inputPlace).getInvariantAsString();
+			placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
 		}
 
 		return placeElement;
 	}
 
-	/**
-	 * Creates a label Element for a PNML Petri-Net DOM
-	 * 
-	 * @param inputLabel
-	 *            input label
-	 * @param document
-	 *            Any DOM to enable creation of Elements and Attributes
-	 * @return label Element for a PNML Petri-Net DOM
-	 */
-	private Element createAnnotationNoteElement(AnnotationNote inputLabel,
-			Document document) {
-		Element labelElement = null;
 
-		if (document != null) {
-			labelElement = document.createElement("labels");
-		}
+	private Element createAnnotationNoteElement(AnnotationNote inputLabel, Document document) {
+		Require.that(inputLabel != null, "Error: inputLabel was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element labelElement = document.createElement("labels");
 
-		if (inputLabel != null) {
-			int positionXInput = inputLabel.getOriginalX();
-			int positionYInput = inputLabel.getOriginalY();
-			int widthInput = inputLabel.getNoteWidth();
-			int heightInput = inputLabel.getNoteHeight();
-			String nameInput = inputLabel.getNoteText();
-			boolean borderInput = inputLabel.isShowingBorder();
-
-			labelElement.setAttribute("positionX",
-					(positionXInput >= 0.0 ? String.valueOf(positionXInput)
-							: ""));
-			labelElement.setAttribute("positionY",
-					(positionYInput >= 0.0 ? String.valueOf(positionYInput)
-							: ""));
-			labelElement.setAttribute("width", (widthInput >= 0.0 ? String
-					.valueOf(widthInput) : ""));
-			labelElement.setAttribute("height", (heightInput >= 0.0 ? String
-					.valueOf(heightInput) : ""));
-			labelElement.setAttribute("border", String.valueOf(borderInput));
-			labelElement.setAttribute("text", (nameInput != null ? nameInput
-					: ""));
-		}
+		labelElement.setAttribute("positionX", (inputLabel.getOriginalX() >= 0.0 ? String.valueOf(inputLabel.getOriginalX()) : ""));
+		labelElement.setAttribute("positionY", (inputLabel.getOriginalY() >= 0.0 ? String.valueOf(inputLabel.getOriginalY()) : ""));
+		labelElement.setAttribute("width", (inputLabel.getNoteWidth() >= 0.0 ? String.valueOf(inputLabel.getNoteWidth()) : ""));
+		labelElement.setAttribute("height", (inputLabel.getNoteHeight() >= 0.0 ? String.valueOf(inputLabel.getNoteHeight()) : ""));
+		labelElement.setAttribute("border", String.valueOf(inputLabel.isShowingBorder()));
+		labelElement.setAttribute("text", (inputLabel.getNoteText() != null ? inputLabel.getNoteText() : ""));
+		
 		return labelElement;
 	}
 
-	/**
-	 * Creates a Transition Element for a PNML Petri-Net DOM
-	 * 
-	 * @param inputTransition
-	 *            Input Transition
-	 * @param document
-	 *            Any DOM to enable creation of Elements and Attributes
-	 * @return Transition Element for a PNML Petri-Net DOM
-	 */
-	private Element createTransitionElement(Transition inputTransition,
-			Document document) {
-		Element transitionElement = null;
+	private Element createTransitionElement(Transition inputTransition, Document document) {
+		Require.that(inputTransition != null, "Error: inputTransition was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element transitionElement = document.createElement("transition");
 
-		if (document != null) {
-			transitionElement = document.createElement("transition");
-		}
+		transitionElement.setAttribute("positionX", (inputTransition.getPositionXObject() != null ? String.valueOf(inputTransition.getPositionXObject()) : ""));
+		transitionElement.setAttribute("positionY",	(inputTransition.getPositionYObject() != null ? String.valueOf(inputTransition.getPositionYObject()) : ""));
+		transitionElement.setAttribute("nameOffsetX", (inputTransition.getNameOffsetXObject() != null ? String.valueOf(inputTransition.getNameOffsetXObject()) : ""));
+		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
+		transitionElement.setAttribute("name", (inputTransition.getName() != null ? inputTransition.getName() : (inputTransition.getId() != null && inputTransition.getId().length() > 0 ? inputTransition.getId() : "")));
+		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
+		transitionElement.setAttribute("timed", String.valueOf(inputTransition.isTimed()));
+		transitionElement.setAttribute("infiniteServer", String.valueOf(inputTransition.isInfiniteServer()));
+		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
+		transitionElement.setAttribute("priority", String.valueOf(inputTransition.getPriority()));
 
-		if (inputTransition != null) {
-			Double positionXInput = inputTransition.getPositionXObject();
-			Double positionYInput = inputTransition.getPositionYObject();
-			Double nameOffsetXInput = inputTransition.getNameOffsetXObject();
-			Double nameOffsetYInput = inputTransition.getNameOffsetYObject();
-			String idInput = inputTransition.getId();
-			String nameInput = inputTransition.getName();
-			boolean timedTrans = inputTransition.isTimed();
-			boolean infiniteServer = inputTransition.isInfiniteServer();
-			int orientation = inputTransition.getAngle();
-			int priority = inputTransition.getPriority();
-
-			transitionElement.setAttribute("positionX",
-					(positionXInput != null ? String.valueOf(positionXInput)
-							: ""));
-			transitionElement.setAttribute("positionY",
-					(positionYInput != null ? String.valueOf(positionYInput)
-							: ""));
-			transitionElement.setAttribute("nameOffsetX",
-					(nameOffsetXInput != null ? String
-							.valueOf(nameOffsetXInput) : ""));
-			transitionElement.setAttribute("nameOffsetY",
-					(nameOffsetYInput != null ? String
-							.valueOf(nameOffsetYInput) : ""));
-			transitionElement.setAttribute("name",
-					(nameInput != null ? nameInput : (idInput != null
-							&& idInput.length() > 0 ? idInput : "")));
-			transitionElement.setAttribute("id", (idInput != null ? idInput
-					: "error"));
-			transitionElement.setAttribute("timed", String.valueOf(timedTrans));
-			transitionElement.setAttribute("infiniteServer", String
-					.valueOf(infiniteServer));
-			transitionElement
-					.setAttribute("angle", String.valueOf(orientation));
-			transitionElement
-					.setAttribute("priority", String.valueOf(priority));
-		}
 		return transitionElement;
 	}
 
-	/**
-	 * Creates a Arc Element for a PNML Petri-Net DOM
-	 * 
-	 * @param inputArc
-	 *            Input Arc
-	 * @param document
-	 *            Any DOM to enable creation of Elements and Attributes
-	 * @return Arc Element for a PNML Petri-Net DOM
-	 */
-	private Element createArcElement(Arc inputArc, DataLayer netModel,
-			Document document) {
-		Element arcElement = null;
+	private Element createArcElement(Arc inputArc, DataLayer guiModel, Document document) {
+		Require.that(inputArc != null, "Error: inputArc was null");
+		Require.that(guiModel != null, "Error: guiModel was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element arcElement = document.createElement("arc");
+		
+		arcElement.setAttribute("id", (inputArc.getId() != null ? inputArc.getId() : "error"));
+		arcElement.setAttribute("source", (inputArc.getSource().getId() != null ? inputArc.getSource().getId() : ""));
+		arcElement.setAttribute("target", (inputArc.getTarget().getId() != null ? inputArc.getTarget().getId() : ""));
 
-		if (document != null) {
-			arcElement = document.createElement("arc");
-		}
-
-		if (inputArc != null) {
-			String idInput = inputArc.getId();
-			String sourceInput = inputArc.getSource().getId();
-			String targetInput = inputArc.getTarget().getId();
-			int inscriptionInput = (inputArc != null ? inputArc.getWeight() : 1);
-			arcElement
-					.setAttribute("id", (idInput != null ? idInput : "error"));
-			arcElement.setAttribute("source",
-					(sourceInput != null ? sourceInput : ""));
-			arcElement.setAttribute("target",
-					(targetInput != null ? targetInput : ""));
-
-			if (inputArc instanceof TimedOutputArcComponent) {
-
-				if (inputArc instanceof TimedInputArcComponent) {
-					if (inputArc instanceof TransportArcComponent) {
-						arcElement.setAttribute("type", "transport");
-						if (inputArc.getSource() instanceof Place) {
-							arcElement.setAttribute("inscription", ""
-									+ ((TimedInputArcComponent) inputArc)
-											.getGuardAsString()
-									+ ":"
-									+ ((TransportArcComponent) inputArc)
-											.getGroupNr());
-						} else {
-							arcElement.setAttribute("inscription", ""
-									+ ((TimedInputArcComponent) inputArc)
-											.getGuardAsString()
-									+ ":"
-									+ ((TransportArcComponent) inputArc)
-											.getGroupNr());
-						}
-
-					} else if (inputArc instanceof TimedInhibitorArcComponent) {
-						arcElement.setAttribute("type", "tapnInhibitor");
-						if (inputArc.getSource() instanceof Place)
-							arcElement.setAttribute("inscription",
-									((TimedInputArcComponent) inputArc)
-											.getGuardAsString());
-						else
-							System.err
-									.println("There is an TAPNInhibitorArc coming from a transition");
-					} else {
-						arcElement.setAttribute("type", "timed");
-						if (inputArc.getSource() instanceof Place) {
-							arcElement.setAttribute("inscription",
-									((TimedInputArcComponent) inputArc)
-											.getGuardAsString());
-						} else {
-							System.err
-									.println("There is a TimedArc coming from a transition");
-						}
-					}
-
-					// Else the arc is not a TimedArc
-				} else {
-					arcElement.setAttribute("type", "normal");
-					arcElement.setAttribute("inscription", Integer
-							.toString(inscriptionInput));
-				}
-			} else if (inputArc instanceof InhibitorArc) {
-				arcElement.setAttribute("type", "inhibitor");
+		if (inputArc instanceof TimedOutputArcComponent) {
+			if (inputArc instanceof TimedInputArcComponent) {
+				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
+				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
+			} else {
+				arcElement.setAttribute("type", "normal");
+				arcElement.setAttribute("inscription", Integer.toString((inputArc != null ? inputArc.getWeight() : 1)));
 			}
-		}
+		} 
 		return arcElement;
 	}
 
-	private Element createArcPoint(String x, String y, String type,
-			Document document, int id) {
-		Element arcPoint = null;
+	private String getInputArcTypeAsString(TimedInputArcComponent inputArc) {
+		if (inputArc instanceof TransportArcComponent) {
+			return "transport";
+		} else if (inputArc instanceof TimedInhibitorArcComponent) {
+			return "tapnInhibitor";
+		} else {
+			return "timed";
+		}
+	}
 
-		if (document != null) {
-			arcPoint = document.createElement("arcpath");
+	private String getGuardAsString(TimedInputArcComponent inputArc) {
+		if(inputArc instanceof TransportArcComponent)
+			return inputArc.getGuardAsString() + ":" + ((TransportArcComponent) inputArc).getGroupNr();
+		else {
+			return inputArc.getGuardAsString();
 		}
-		String pointId = String.valueOf(id);
-		if (pointId.length() < 3) {
-			pointId = "0" + pointId;
-		}
-		if (pointId.length() < 3) {
-			pointId = "0" + pointId;
-		}
-		arcPoint.setAttribute("id", pointId);
+	}
+
+	private Element createArcPoint(String x, String y, String type, Document document, int id) {
+		Require.that(document != null, "Error: document was null");
+		Element arcPoint = document.createElement("arcpath");
+		
+		arcPoint.setAttribute("id", String.valueOf(id));
 		arcPoint.setAttribute("xCoord", x);
 		arcPoint.setAttribute("yCoord", y);
 		arcPoint.setAttribute("arcPointType", type);

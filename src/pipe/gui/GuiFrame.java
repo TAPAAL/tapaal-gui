@@ -54,10 +54,8 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
-
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedPlaceComponent;
-
 import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;

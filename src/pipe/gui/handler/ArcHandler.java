@@ -2,13 +2,10 @@ package pipe.gui.handler;
 
 import java.awt.Container;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
-import javax.swing.BoxLayout;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -23,7 +20,6 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.action.EditWeightAction;
 import pipe.gui.action.SplitArcAction;
-import pipe.gui.widgets.EscapableDialog;
 
 /**
  * Class used to implement methods corresponding to mouse events on arcs.
