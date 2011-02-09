@@ -163,7 +163,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 	public void delete() {
 		deleted = true;
-		guiModel.removePetriNetObject(this);
+		if(guiModel != null) guiModel.removePetriNetObject(this);
 		removeFromContainer();
 		removeAll();
 	}

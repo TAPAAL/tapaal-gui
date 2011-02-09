@@ -4,12 +4,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 
-import dk.aau.cs.model.tapn.TimedTransition;
-
 import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
+import dk.aau.cs.model.tapn.TimedTransition;
 
 /**
  * This class handles mouse clicks by the user.

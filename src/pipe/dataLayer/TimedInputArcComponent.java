@@ -52,10 +52,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		super.delete();
 	}
 
-	public void SetTimedInputArc(TimedInputArc inputArc) {
-		this.inputArc = inputArc;
-	}
-
 	public static boolean validateTimeInterval(String timeInterval) {
 		if (Pattern.matches(
 				"((\\(\\d+)|(\\[\\d+)),((inf\\))|((\\d+\\))|(\\d+\\])))",

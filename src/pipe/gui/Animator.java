@@ -10,7 +10,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;

@@ -7,8 +7,6 @@ import javax.swing.JOptionPane;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.simulation.TapaalTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
