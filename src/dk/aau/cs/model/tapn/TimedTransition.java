@@ -92,22 +92,19 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public boolean isEnabledBy(List<TimedToken> tokens) {
-		if (presetSize() != tokens.size())
-			return false;
+		if (presetSize() != tokens.size()) return false;
 
 		boolean validToken = false;
 		for (TimedToken token : tokens) {
 			for (TimedInputArc inputArc : preset) {
-				if (inputArc.source().equals(token.place())
-						&& inputArc.isEnabledBy(token)) {
+				if (inputArc.source().equals(token.place()) && inputArc.isEnabledBy(token)) {
 					validToken = true;
 					break;
 				}
 			}
 
 			for (TransportArc transportArc : transportArcsGoingThrough) {
-				if (transportArc.source().equals(token.place())
-						&& transportArc.isEnabledBy(token)) {
+				if (transportArc.source().equals(token.place()) && transportArc.isEnabledBy(token)) {
 					validToken = true;
 					break;
 				}
@@ -120,7 +117,7 @@ public class TimedTransition extends TAPNElement {
 		return true;
 	}
 
-	public List<TimedToken> calculateProducedTokensFrom(List<TimedToken> tokens) {
+	public List<TimedToken> calculateProducedTokensFrom(List<TimedToken> consumedTokens) {
 		// Assume that tokens enables transition
 
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
@@ -129,48 +126,40 @@ public class TimedTransition extends TAPNElement {
 		}
 
 		for (TransportArc transportArc : transportArcsGoingThrough) {
-			for (TimedToken token : tokens) {
+			for (TimedToken token : consumedTokens) {
 				if (token.place().equals(transportArc.source())) {
-					producedTokens.add(new TimedToken(transportArc
-							.destination(), token.age()));
+					producedTokens.add(new TimedToken(transportArc.destination(), token.age()));
 				}
 			}
 		}
 
 		return producedTokens;
 	}
-
-	public List<TimedToken> calculateConsumedTokens(TimedMarking timedMarking,
-			FiringMode firingMode) {
+	
+	public List<TimedToken> calculateConsumedTokens(TimedMarking timedMarking, FiringMode firingMode) {
 		List<TimedToken> tokensToConsume = new ArrayList<TimedToken>();
 
 		for (TimedInputArc arc : preset) {
-			List<TimedToken> tokens = timedMarking.getTokensFor(arc.source());
-			List<TimedToken> elligibleTokens = new ArrayList<TimedToken>();
-
-			for (TimedToken token : tokens) {
-				if (arc.isEnabledBy(token))
-					elligibleTokens.add(token);
-			}
-
-			tokensToConsume.add(firingMode.pickTokenFrom(elligibleTokens));
+			TimedToken token = firingMode.pickTokenFrom(arc.getElligibleTokens());
+			tokensToConsume.add(token);
 		}
 
 		for (TransportArc arc : transportArcsGoingThrough) {
-			List<TimedToken> tokens = timedMarking.getTokensFor(arc.source());
-			List<TimedToken> elligibleTokens = new ArrayList<TimedToken>();
-
-			for (TimedToken token : tokens) {
-				if (arc.isEnabledBy(token))
-					elligibleTokens.add(token);
-			}
-
-			tokensToConsume.add(firingMode.pickTokenFrom(elligibleTokens));
+			TimedToken token = firingMode.pickTokenFrom(arc.getElligibleTokens());
+			tokensToConsume.add(token);
 		}
 
 		return tokensToConsume;
 	}
 
+	public Iterable<TimedInputArc> getInputArcs(){
+		return preset;
+	}
+	
+	public Iterable<TransportArc> getTransportArcsGoingThrough(){
+		return transportArcsGoingThrough;
+	}
+	
 	@Override
 	public String toString() {
 		if (model() != null)

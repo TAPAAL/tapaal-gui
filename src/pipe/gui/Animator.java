@@ -4,9 +4,9 @@ import java.awt.Container;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
@@ -16,6 +16,7 @@ import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
@@ -25,6 +26,7 @@ import dk.aau.cs.model.tapn.simulation.TapaalTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
+import dk.aau.cs.util.RequireException;
 
 /**
  * This class is used to process clicks by the user to manually step through
@@ -392,7 +394,7 @@ public class Animator {
 	 * 
 	 */
 
-	public void fireTransition(Transition transition) {
+	public void fireTransition(TimedTransition transition) {
 		// HashMap<TimedPlaceComponent, ArrayList<BigDecimal>> currentmakring =
 		// CreateGui.currentPNMLData().getCurrentMarking();
 		//
@@ -423,16 +425,22 @@ public class Animator {
 		// }
 		// }
 		// }
-		TimedTransition timedTransition = ((TimedTransitionComponent) transition)
-				.underlyingTransition();
+		//TimedTransition timedTransition = ((TimedTransitionComponent) transition).underlyingTransition();
 		NetworkMarking next = null;
+		try{
 		if (getFiringmode() != null) {
-			next = currentMarking().fireTransition(timedTransition, firingmode);
+			next = currentMarking().fireTransition(transition, firingmode);
 		} else {
-			throw new RuntimeException("Not implemented");
+			List<TimedToken> tokensToConsume = showSelectSimulatorDialogue(transition);
+			if(tokensToConsume == null) return; // Cancelled
+			next = currentMarking().fireTransition(transition, tokensToConsume);
+		}
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 
-		addMarking(new TimedTransitionStep(timedTransition, null), next);
+		addMarking(new TimedTransitionStep(transition, null), next);
 		tab.network().setMarking(currentMarking());
 
 		activeGuiModel().repaintPlaces();
@@ -441,10 +449,9 @@ public class Animator {
 
 	}
 
-	public void letTimePass(BigDecimal timeToPass) {
-		if (canTimePass(timeToPass)) {
-			addMarking(new TimeDelayStep(timeToPass), currentMarking().delay(
-					timeToPass));
+	public void letTimePass(BigDecimal delay) {
+		if (currentMarking().isDelayPossible(delay)) {
+			addMarking(new TimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
 		}
 
@@ -455,10 +462,6 @@ public class Animator {
 
 	private DataLayer activeGuiModel() {
 		return tab.activeTemplate().guiModel();
-	}
-
-	private boolean canTimePass(BigDecimal delay) {
-		return currentMarking().isDelayPossible(delay);
 	}
 
 	public void resethistory() {
@@ -515,18 +518,13 @@ public class Animator {
 		CreateGui.getAnimationController().updateFiringModeComboBox();
 	}
 
-	public boolean showSelectSimulatorDialogue(Transition t) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
 
 		Container contentPane = guiDialog.getContentPane();
-
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		AnimationSelectmodeDialog animationSelectmodeDialog = new AnimationSelectmodeDialog(
-				t);
+		AnimationSelectmodeDialog animationSelectmodeDialog = new AnimationSelectmodeDialog(transition);
 		contentPane.add(animationSelectmodeDialog);
-
 		guiDialog.setResizable(true);
 
 		// Make window fit contents' preferred size
@@ -536,15 +534,7 @@ public class Animator {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 
-		if (!animationSelectmodeDialog.cancelled()) {
-			ArrayList<Integer> intlist = new ArrayList<Integer>();
-			for (JComboBox jb : animationSelectmodeDialog.presetPanels) {
-				intlist.add(jb.getSelectedIndex());
-			}
-			// ((SelectFiringmode)firingmode).setTokensToFire(intlist);
-		}
-
-		return !animationSelectmodeDialog.cancelled();
+		return animationSelectmodeDialog.getTokens();
 	}
 	
 	public void reset(){

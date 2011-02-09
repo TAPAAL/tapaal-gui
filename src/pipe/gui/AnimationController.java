@@ -215,29 +215,6 @@ public class AnimationController extends JPanel {
 
 	}
 
-	public void addTimeDelayToHistory(BigDecimal delay) {
-		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
-		animBox.clearStepsForward();
-		try {
-
-			BigDecimal timeDelayToSet = delay;
-
-			// BigDecimal timeDelayToSet = new
-			// BigDecimal(TimeDelayField.getText(), new
-			// MathContext(Pipe.AGE_PRECISION));
-			if (timeDelayToSet.compareTo(new BigDecimal(0l)) <= 0) {
-				// Nothing to do, illegal value
-				System.err.println("Illegal value");
-			} else {
-				CreateGui.getAnimator().letTimePass(timeDelayToSet);
-			}
-		} catch (NumberFormatException e) {
-			// Do nothing, invalud number
-		}
-
-		setAnimationButtonsEnabled();
-	}
-
 	private void addTimeDelayToHistory() {
 		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
 		animBox.clearStepsForward();
@@ -358,22 +335,16 @@ public class AnimationController extends JPanel {
 	}
 
 	public void setAnimationButtonsEnabled() {
-		AnimationHistoryComponent animationHistory = CreateGui
-				.getAnimationHistory();
+		AnimationHistoryComponent animationHistory = CreateGui.getAnimationHistory();
 
 		setEnabledStepforwardAction(animationHistory.isStepForwardAllowed());
 		setEnabledStepbackwardAction(animationHistory.isStepBackAllowed());
 
-		CreateGui.appGui.setEnabledStepForwardAction(animationHistory
-				.isStepForwardAllowed());
-		CreateGui.appGui.setEnabledStepBackwardAction(animationHistory
-				.isStepBackAllowed());
-
-		// setEnabledStepforwardAction(false);
-		// setEnabledStepbackwardAction(false);
+		CreateGui.appGui.setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
+		CreateGui.appGui.setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
 	}
 
 	JTextField TimeDelayField = new JTextField();
 	JComboBox firermodebox = null;
-	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", };
+	private final String[] FIRINGMODES = { "Random", "Oldest", "Youngest", "Manual" };
 }

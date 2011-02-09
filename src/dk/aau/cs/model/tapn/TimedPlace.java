@@ -84,7 +84,7 @@ public class TimedPlace extends TAPNElement {
 		return false;
 	}
 
-	public Iterable<TimedToken> tokensSatisfyingInterval(TimeInterval interval) {
+	public List<TimedToken> tokensSatisfyingInterval(TimeInterval interval) {
 		List<TimedToken> tokens = currentMarking.getTokensFor(this);
 		ArrayList<TimedToken> toReturn = new ArrayList<TimedToken>();
 		for (TimedToken t : tokens) {

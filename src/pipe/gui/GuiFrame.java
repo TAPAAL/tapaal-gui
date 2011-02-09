@@ -1375,8 +1375,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				break;
 
 			case Pipe.TIMEPASS:
-				CreateGui.getAnimationController().addTimeDelayToHistory(
-						new BigDecimal(1));
+				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				break;
 
 			// case Pipe.RANDOM:

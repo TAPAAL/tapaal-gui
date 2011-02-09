@@ -213,26 +213,27 @@ public class TimedArcPetriNet {
 		return false;
 	}
 
-	private boolean hasArcFromTransitionToPlace(TimedTransition source,
-			TimedPlace destination) {
-		for (TimedOutputArc arc : outputArcs)
-			if (arc.source().equals(source)
-					&& arc.destination().equals(destination))
+	private boolean hasArcFromTransitionToPlace(TimedTransition source, TimedPlace destination) {
+		for (TimedOutputArc arc : outputArcs){
+			if (arc.source().equals(source) && arc.destination().equals(destination))
 				return true;
-		for (TransportArc arc : transportArcs)
-			if (arc.transition().equals(source)
-					&& arc.destination().equals(destination))
+		}
+		for (TransportArc arc : transportArcs){
+			if (arc.transition().equals(source) && arc.destination().equals(destination))
 				return true;
+		}
 		return false;
 	}
 
 	private boolean isNameUsed(String name) {
-		for (TimedPlace place : places)
+		for (TimedPlace place : places){
 			if (place.name().equals(name))
 				return true;
-		for (TimedTransition transition : transitions)
+		}
+		for (TimedTransition transition : transitions){
 			if (transition.name().equals(name))
 				return true;
+		}
 		return false;
 	}
 
