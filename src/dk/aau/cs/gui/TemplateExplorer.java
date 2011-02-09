@@ -37,8 +37,6 @@ import dk.aau.cs.util.Require;
 public class TemplateExplorer extends JPanel {
 	private static final long serialVersionUID = -2334464984237161208L;
 
-	private static long templateID = 0;
-
 	private JSplitPane splitPane;
 
 	// Template explorer panel items
@@ -247,15 +245,15 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	private Template<TimedArcPetriNet> ShowNewTemplateDialog() {
-		String templateName = (String) JOptionPane.showInputDialog(parent
-				.drawingSurface(), "Template name:", "Rename Template",
-				JOptionPane.PLAIN_MESSAGE, null, null, "New TAPN Template "
-						+ (++templateID));
+		String templateName = (String) JOptionPane.showInputDialog(
+				parent.drawingSurface(), "Template name:", "Rename Template",
+				JOptionPane.PLAIN_MESSAGE, null, null, 
+				parent.drawingSurface().getNameGenerator().getNewTemplateName());
 
-		if (!isNameAllowed(templateName))
+		if (templateName != null && !isNameAllowed(templateName))
 			JOptionPane.showMessageDialog(
 					parent.drawingSurface(),
-					"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][  _a-zA-Z0-9]*\n\nThe new template could not be created.",
+					"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new template could not be created.",
 					"Error Creating Template",
 					JOptionPane.ERROR_MESSAGE);
 		else if (parent.network().hasTAPNCalled(templateName)) {
@@ -276,7 +274,7 @@ public class TemplateExplorer extends JPanel {
 	private boolean isNameAllowed(String templateName) {
 		Require.that(templateName != null, "The template name cannot be null");
 		
-		return !templateName.isEmpty() && Pattern.matches("[a-zA-Z](\\s|[_a-zA-Z0-9])*", templateName);
+		return !templateName.isEmpty() && Pattern.matches("[a-zA-Z]([_a-zA-Z0-9])*", templateName);
 	}
 
 	private void showRenameTemplateDialog() {
@@ -284,8 +282,7 @@ public class TemplateExplorer extends JPanel {
 
 		String newName = (String) JOptionPane.showInputDialog(parent
 				.drawingSurface(), "Template name:", "Rename Template",
-				JOptionPane.PLAIN_MESSAGE, null, null, template.model()
-						.getName());
+				JOptionPane.PLAIN_MESSAGE, null, null, template.model().getName());
 		if (newName == null || template.model().getName().equals(newName))
 			return;
 
@@ -293,7 +290,7 @@ public class TemplateExplorer extends JPanel {
 			JOptionPane
 					.showMessageDialog(
 							parent.drawingSurface(),
-							"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][  _a-zA-Z0-9]*.\n\nThe template could not be renamed.",
+							"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*.\n\nThe template could not be renamed.",
 							"Error Renaming Template",
 							JOptionPane.ERROR_MESSAGE);
 		

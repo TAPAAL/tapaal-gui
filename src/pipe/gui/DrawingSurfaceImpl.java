@@ -94,7 +94,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 	private DataLayer guiModel;
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
-	private NameGenerator<TimedArcPetriNet> nameGenerator = new NameGenerator<TimedArcPetriNet>();
+	private NameGenerator nameGenerator = new NameGenerator();
 
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent parent) {
 		guiModel = dataLayer;
@@ -114,6 +114,10 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
+	}
+	
+	public NameGenerator getNameGenerator() {
+		return nameGenerator;
 	}
 
 	public DataLayer getGuiModel() {

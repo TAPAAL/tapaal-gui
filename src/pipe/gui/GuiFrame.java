@@ -931,8 +931,9 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				closeAction));
 		appTab.setSelectedIndex(freeSpace);
 
+		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
 		Template<TimedArcPetriNet> template = new Template<TimedArcPetriNet>(
-				new TimedArcPetriNet(), new DataLayer());
+				new TimedArcPetriNet(templateName), new DataLayer());
 		tab.addTemplate(template);
 
 		tab.setActiveTemplate(template);

@@ -19,11 +19,6 @@ public class TimedArcPetriNet {
 
 	private TimedMarking currentMarking;
 
-	public TimedArcPetriNet() {
-		this("New Timed Arc Petri Net" + uniqueId++);
-
-	}
-
 	public TimedArcPetriNet(String name) {
 		this.name = name;
 		places = new ArrayList<TimedPlace>();

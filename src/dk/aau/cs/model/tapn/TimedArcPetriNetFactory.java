@@ -141,7 +141,7 @@ public class TimedArcPetriNetFactory {
 			String name = getTAPNName((Element) tapnNode);
 			tapn = new TimedArcPetriNet(name);
 		} else {
-			tapn = new TimedArcPetriNet();
+			tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		}
 		guiModel = new DataLayer();
 
@@ -722,7 +722,7 @@ public class TimedArcPetriNetFactory {
 			String name = getTAPNName((Element) tapnNode);
 			tapn = new TimedArcPetriNet(name);
 		} else {
-			tapn = new TimedArcPetriNet();
+			tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		}
 		guiModel = new DataLayer();
 

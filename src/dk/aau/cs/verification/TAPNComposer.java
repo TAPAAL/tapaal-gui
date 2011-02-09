@@ -22,7 +22,7 @@ public class TAPNComposer {
 			TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
 		nextTransitionIndex = -1;
-		TimedArcPetriNet tapn = new TimedArcPetriNet();
+		TimedArcPetriNet tapn = new TimedArcPetriNet("ComposedModel");
 		NameMapping mapping = new NameMapping();
 
 		CreatePlaces(model, tapn, mapping);
