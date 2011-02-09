@@ -18,7 +18,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JLayeredPane;
-import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -35,7 +34,6 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
-import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -559,11 +557,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPoint(p, view.getZoom());
-			dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace(
-					nameGenerator.getNewPlaceName(model));
-			pnObject = CreateGui.getModel().isUsingColors() ? new ColoredTimedPlace(
-					Grid.getModifiedX(p.x), Grid.getModifiedY(p.y))
-					: new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid
+			dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace(nameGenerator.getNewPlaceName(model));
+			pnObject = new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid
 							.getModifiedY(p.y), tp);
 			model.add(tp);
 			guiModel.addPetriNetObject(pnObject);

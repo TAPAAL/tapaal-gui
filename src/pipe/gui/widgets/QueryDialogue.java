@@ -190,7 +190,7 @@ public class QueryDialogue extends JPanel {
 		this.tapnNetwork = tapnNetwork;
 		this.datalayer = datalayer;
 		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder()
-				: queryToCreateFrom.getProperty();
+		: queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		setLayout(new GridBagLayout());
 
@@ -265,7 +265,7 @@ public class QueryDialogue extends JPanel {
 
 	private int getCapacity() {
 		return (Integer) ((JSpinner) boundednessCheckPanel.getComponent(1))
-				.getValue();
+		.getValue();
 	}
 
 	private String getQueryComment() {
@@ -330,26 +330,6 @@ public class QueryDialogue extends JPanel {
 		} else {
 			return "";
 		}
-	}
-
-	private void enableColorsReductionOptions() {
-
-		String[] options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
-
-		String reductionOptionString = "" + reductionOption.getSelectedItem();
-		boolean selectedOptionStillAvailable = false;
-
-		reductionOption.removeAllItems();
-
-		for (String s : options) {
-			reductionOption.addItem(s);
-			if (s.equals(reductionOptionString)) {
-				selectedOptionStillAvailable = true;
-			}
-		}
-
-		if (selectedOptionStillAvailable)
-			reductionOption.setSelectedItem(reductionOptionString);
 	}
 
 	private void enableOnlyLivenessReductionOptions() {
@@ -512,7 +492,7 @@ public class QueryDialogue extends JPanel {
 	private void updateQueryButtonsAccordingToSelection() {
 		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection
-					.getObject();
+			.getObject();
 
 			// bit of a hack to prevent posting edits to the undo manager when
 			// we programmatically
@@ -574,7 +554,7 @@ public class QueryDialogue extends JPanel {
 	private void setSaveButtonsEnabled() {
 		if (!queryField.isEditable()) {
 			boolean isQueryOk = getQueryComment().length() > 0
-					&& !newProperty.containsPlaceHolder();
+			&& !newProperty.containsPlaceHolder();
 			saveButton.setEnabled(isQueryOk);
 			saveAndVerifyButton.setEnabled(isQueryOk);
 			saveUppaalXMLButton.setEnabled(isQueryOk);
@@ -590,9 +570,7 @@ public class QueryDialogue extends JPanel {
 		reductionOption.setSelectedItem(reductionOptionString);
 	}
 	private void setEnabledReductionOptions() {
-		if (this.datalayer.isUsingColors()) {
-			enableColorsReductionOptions();
-		} else if (getQuantificationSelection().equals("E[]")
+		if (getQuantificationSelection().equals("E[]")
 				|| getQuantificationSelection().equals("A<>")) {
 			enableOnlyLivenessReductionOptions();
 		} else {
@@ -822,8 +800,8 @@ public class QueryDialogue extends JPanel {
 	private void initQueryPanel(final TAPNQuery queryToCreateFrom) {
 		queryPanel = new JPanel(new GridBagLayout());
 		queryPanel
-				.setBorder(BorderFactory
-						.createTitledBorder("Query (click on the part of the query you want to change)"));
+		.setBorder(BorderFactory
+				.createTitledBorder("Query (click on the part of the query you want to change)"));
 
 		initQueryField();
 		initQuantificationPanel(queryToCreateFrom);
@@ -860,7 +838,7 @@ public class QueryDialogue extends JPanel {
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane
-				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		Dimension d = new Dimension(750, 56);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
@@ -904,8 +882,8 @@ public class QueryDialogue extends JPanel {
 				} else {
 					if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 						resetButton.doClick(); // we are in manual edit mode, so
-												// the reset button is now the
-												// Parse Query button
+						// the reset button is now the
+						// Parse Query button
 						e.consume();
 					}
 				}
@@ -930,11 +908,11 @@ public class QueryDialogue extends JPanel {
 		quantificationRadioButtonGroup = new ButtonGroup();
 
 		existsDiamond = new JRadioButton(
-				"(EF) There exists some reachable marking that satisifies:");
+		"(EF) There exists some reachable marking that satisifies:");
 		existsBox = new JRadioButton(
-				"(EG) There exists a trace on which every marking satisfies:");
+		"(EG) There exists a trace on which every marking satisfies:");
 		forAllDiamond = new JRadioButton(
-				"(AF) On all traces there is eventually a marking that satisfies:");
+		"(AF) On all traces there is eventually a marking that satisfies:");
 		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
 
 		quantificationRadioButtonGroup.add(existsDiamond);
@@ -1090,7 +1068,7 @@ public class QueryDialogue extends JPanel {
 				} else if (currentSelection.getObject() instanceof TCTLOrListNode) {
 					andListNode = new TCTLAndListNode(
 							((TCTLOrListNode) currentSelection.getObject())
-									.getProperties());
+							.getProperties());
 					UndoableEdit edit = new QueryConstructionEdit(
 							currentSelection.getObject(), andListNode);
 					newProperty = newProperty.replace(currentSelection
@@ -1099,7 +1077,7 @@ public class QueryDialogue extends JPanel {
 					undoSupport.postEdit(edit);
 				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
 					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
-							.getObject();
+					.getObject();
 					TCTLAbstractProperty parentNode = prop.getParent();
 
 					if (parentNode instanceof TCTLAndListNode) {
@@ -1149,7 +1127,7 @@ public class QueryDialogue extends JPanel {
 				} else if (currentSelection.getObject() instanceof TCTLAndListNode) {
 					orListNode = new TCTLOrListNode(
 							((TCTLAndListNode) currentSelection.getObject())
-									.getProperties());
+							.getProperties());
 					UndoableEdit edit = new QueryConstructionEdit(
 							currentSelection.getObject(), orListNode);
 					newProperty = newProperty.replace(currentSelection
@@ -1158,7 +1136,7 @@ public class QueryDialogue extends JPanel {
 					undoSupport.postEdit(edit);
 				} else if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
 					TCTLAbstractStateProperty prop = (TCTLAbstractStateProperty) currentSelection
-							.getObject();
+					.getObject();
 					TCTLAbstractProperty parentNode = prop.getParent();
 
 					if (parentNode instanceof TCTLOrListNode) {
@@ -1208,7 +1186,7 @@ public class QueryDialogue extends JPanel {
 		// Predicate specification panel
 		predicatePanel = new JPanel(new GridBagLayout());
 		predicatePanel
-				.setBorder(BorderFactory.createTitledBorder("Predicates"));
+		.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
 		placesBox = new JComboBox();
 		Dimension d = new Dimension(150, 27);
@@ -1221,7 +1199,7 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox
-						.getSelectedItem();
+				.getSelectedItem();
 				if (!tapn.equals(currentlySelected)) {
 					Vector<String> placeNames = new Vector<String>();
 					for (TimedPlace place : tapn.places()) {
@@ -1331,8 +1309,8 @@ public class QueryDialogue extends JPanel {
 		});
 
 		templateBox.setSelectedIndex(0); // Fills placesBox with correct places.
-											// Must be called here to ensure
-											// addPredicateButton is not null
+		// Must be called here to ensure
+		// addPredicateButton is not null
 	}
 
 	private void initQueryEditingPanel() {
@@ -1387,9 +1365,9 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				if (queryField.isEditable()) { // in edit mode, this button is
-												// now the parse query button.
-												// User has potentially altered
-												// the query, so try to parse it
+					// now the parse query button.
+					// User has potentially altered
+					// the query, so try to parse it
 					TAPAALQueryParser queryParser = new TAPAALQueryParser();
 					TCTLAbstractProperty newQuery = null;
 
@@ -1397,12 +1375,12 @@ public class QueryDialogue extends JPanel {
 						newQuery = queryParser.parse(queryField.getText());
 					} catch (Exception ex) {
 						int choice = JOptionPane
-								.showConfirmDialog(
-										CreateGui.getApp(),
-										"TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
-										"Error Parsing Query",
-										JOptionPane.YES_NO_OPTION,
-										JOptionPane.ERROR_MESSAGE);
+						.showConfirmDialog(
+								CreateGui.getApp(),
+								"TAPAAL encountered an error trying to parse the specified query.\n\nWe recommend using the query construction buttons unless you are an experienced user.\n\n The specified query has not been saved. Do you want to edit it again?",
+								"Error Parsing Query",
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.ERROR_MESSAGE);
 						if (choice == JOptionPane.NO_OPTION) {
 							returnFromManualEdit(null);
 						}
@@ -1421,12 +1399,12 @@ public class QueryDialogue extends JPanel {
 								places);
 
 						VerifyPlaceNamesVisitor.Context c = nameChecker
-								.VerifyPlaceNames(newQuery);
+						.VerifyPlaceNames(newQuery);
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();
 							s
-									.append("The following places was used in the query, but are not present in your model:\n\n");
+							.append("The following places was used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
@@ -1434,7 +1412,7 @@ public class QueryDialogue extends JPanel {
 							}
 
 							s
-									.append("\nThe specified query has not been saved. Do you want to edit it again?");
+							.append("\nThe specified query has not been saved. Do you want to edit it again?");
 							int choice = JOptionPane.showConfirmDialog(
 									CreateGui.getApp(), s.toString(),
 									"Error Parsing Query",
@@ -1453,7 +1431,7 @@ public class QueryDialogue extends JPanel {
 						returnFromManualEdit(null);
 					}
 				} else { // we are not in edit mode so the button should reset
-							// the query
+					// the query
 
 					TCTLPathPlaceHolder ph = new TCTLPathPlaceHolder();
 					UndoableEdit edit = new QueryConstructionEdit(newProperty,
@@ -1473,7 +1451,7 @@ public class QueryDialogue extends JPanel {
 
 				if (edit instanceof QueryConstructionEdit) {
 					TCTLAbstractProperty original = ((QueryConstructionEdit) edit)
-							.getOriginal();
+					.getOriginal();
 					undoManager.undo();
 					refreshUndoRedo();
 					updateSelection(original);
@@ -1488,7 +1466,7 @@ public class QueryDialogue extends JPanel {
 				UndoableEdit edit = undoManager.GetNextEditToRedo();
 				if (edit instanceof QueryConstructionEdit) {
 					TCTLAbstractProperty replacement = ((QueryConstructionEdit) edit)
-							.getReplacement();
+					.getReplacement();
 					undoManager.redo();
 					refreshUndoRedo();
 					updateSelection(replacement);
@@ -1500,7 +1478,7 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent arg0) {
 				if (queryField.isEditable()) { // we are in edit mode so the
-												// user pressed cancel
+					// user pressed cancel
 					returnFromManualEdit(null);
 				} else { // user wants to edit query manually
 					changeToEditMode();
@@ -1540,7 +1518,7 @@ public class QueryDialogue extends JPanel {
 		dFS = new JRadioButton("Depth First Search");
 		rDFS = new JRadioButton("Random Depth First Search");
 		closestToTargetFirst = new JRadioButton(
-				"Search by Closest To Target First");
+		"Search by Closest To Target First");
 		searchRadioButtonGroup.add(bFS);
 		searchRadioButtonGroup.add(dFS);
 		searchRadioButtonGroup.add(rDFS);
@@ -1583,9 +1561,9 @@ public class QueryDialogue extends JPanel {
 				.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
 		some = new JRadioButton(
-				"Some encountered trace (only without symmetry reduction)");
+		"Some encountered trace (only without symmetry reduction)");
 		fastest = new JRadioButton(
-				"Fastest trace (only without symmetry reduction)");
+		"Fastest trace (only without symmetry reduction)");
 		none = new JRadioButton("No trace");
 		traceRadioButtonGroup.add(some);
 		traceRadioButtonGroup.add(fastest);
@@ -1757,10 +1735,10 @@ public class QueryDialogue extends JPanel {
 
 					} catch (Exception ex) {
 						JOptionPane
-								.showMessageDialog(CreateGui.getApp(),
-										"There were errors performing the requested action:\n"
-												+ e, "Error",
-										JOptionPane.ERROR_MESSAGE);
+						.showMessageDialog(CreateGui.getApp(),
+								"There were errors performing the requested action:\n"
+								+ e, "Error",
+								JOptionPane.ERROR_MESSAGE);
 					}
 
 					if (xmlFile != null && queryFile != null) {
@@ -1781,7 +1759,7 @@ public class QueryDialogue extends JPanel {
 						TAPNQuery query = getQuery();
 						dk.aau.cs.petrinet.TAPNQuery tapnQuery = new dk.aau.cs.petrinet.TAPNQuery(
 								query.getProperty(), query.getCapacity()
-										+ model.getNumberOfTokens());
+								+ model.getNumberOfTokens());
 						exporter.export(model, tapnQuery, query
 								.getReductionOption(), new File(xmlFile),
 								new File(queryFile));
@@ -1789,7 +1767,7 @@ public class QueryDialogue extends JPanel {
 						// getQuery(), xmlFile, queryFile);
 					} else {
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
-								"No Uppaal XML file saved.");
+						"No Uppaal XML file saved.");
 					}
 				}
 			});

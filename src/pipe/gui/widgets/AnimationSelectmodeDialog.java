@@ -20,10 +20,6 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
-import pipe.dataLayer.colors.ColoredTimedPlace;
-import pipe.dataLayer.colors.ColoredToken;
-import pipe.dataLayer.colors.ColoredTransportArc;
-import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 
 public class AnimationSelectmodeDialog extends JPanel {

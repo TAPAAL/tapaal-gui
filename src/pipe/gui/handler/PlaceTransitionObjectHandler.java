@@ -18,7 +18,6 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
-import pipe.dataLayer.colors.ColoredTransportArc;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
@@ -87,8 +86,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
-		boolean useColors = CreateGui.getModel().isUsingColors();
-
+		
 		switch (CreateGui.getApp().getMode()) {
 
 		case Pipe.FAST_TAPNPLACE:
@@ -174,9 +172,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				boolean isInPreSet = false;
 				if (currentObject instanceof Place) {
 					isInPreSet = true;
-					Arc arc = useColors ? new ColoredTransportArc(
-							currentObject, 1, isInPreSet)
-							: new TransportArcComponent(currentObject, 1,
+					Arc arc = new TransportArcComponent(currentObject, 1,
 									isInPreSet);
 					createArc(arc, currentObject);
 				} else {
@@ -574,11 +570,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						view.transportArcPart1 = (TransportArcComponent) transportArcToCreate;
 
 						// Create the next arc
-						boolean useColors = CreateGui.getModel()
-								.isUsingColors();
-						Arc arc = useColors ? new ColoredTransportArc(
-								currentObject, groupMaxCounter + 1, false)
-								: new TransportArcComponent(currentObject,
+						Arc arc = new TransportArcComponent(currentObject,
 										groupMaxCounter + 1, false);
 						createArc(arc, currentObject);
 

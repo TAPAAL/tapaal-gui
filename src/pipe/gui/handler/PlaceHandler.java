@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import javax.swing.BoxLayout;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -15,16 +14,12 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.colors.ColoredTimedPlace;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.AddTokenPanel;
-import pipe.gui.widgets.EscapableDialog;
-import pipe.gui.widgets.RemoveTokenPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -87,34 +82,27 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 				switch (CreateGui.getApp().getMode()) {
 				case Pipe.ADDTOKEN:
-					if (!CreateGui.getModel().isUsingColors()) {
-						if (myObject instanceof TimedPlaceComponent) {
-							Command command = new TimedPlaceMarkingEdit(
-									(TimedPlaceComponent) myObject, 1);
-							command.redo();
-							undoManager.addNewEdit(command);
-						} else {
-							undoManager.addNewEdit(((Place) myObject)
-									.setCurrentMarking(++currentMarking));
-						}
+					if (myObject instanceof TimedPlaceComponent) {
+						Command command = new TimedPlaceMarkingEdit(
+								(TimedPlaceComponent) myObject, 1);
+						command.redo();
+						undoManager.addNewEdit(command);
 					} else {
-						showAddTokenDialog((ColoredTimedPlace) myObject);
+						undoManager.addNewEdit(((Place) myObject)
+								.setCurrentMarking(++currentMarking));
 					}
 					break;
 				case Pipe.DELTOKEN:
-					if (!CreateGui.getModel().isUsingColors()) {
-						if (myObject instanceof TimedPlaceComponent) {
-							Command command = new TimedPlaceMarkingEdit(
-									(TimedPlaceComponent) myObject, -1);
-							command.redo();
-							undoManager.addNewEdit(command);
-						} else if (currentMarking > 0) {
-							undoManager.addNewEdit(((Place) myObject)
-									.setCurrentMarking(--currentMarking));
-						}
-					} else {
-						showRemoveTokenDialog((ColoredTimedPlace) myObject);
+					if (myObject instanceof TimedPlaceComponent) {
+						Command command = new TimedPlaceMarkingEdit(
+								(TimedPlaceComponent) myObject, -1);
+						command.redo();
+						undoManager.addNewEdit(command);
+					} else if (currentMarking > 0) {
+						undoManager.addNewEdit(((Place) myObject)
+								.setCurrentMarking(--currentMarking));
 					}
+
 					break;
 				default:
 					break;
@@ -137,54 +125,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		 * else if (SwingUtilities.isMiddleMouseButton(e)){ // TODO -
 		 * middelclick draw a arrow }
 		 */
-	}
-
-	private void showRemoveTokenDialog(ColoredTimedPlace place) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.TOOL + " " + Pipe.VERSION, true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add Place editor
-		contentPane.add(new RemoveTokenPanel(guiDialog.getRootPane(), place,
-				CreateGui.getCurrentTab().network(), CreateGui.getView()
-						.getUndoManager()));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-	}
-
-	private void showAddTokenDialog(ColoredTimedPlace place) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.TOOL + " " + Pipe.VERSION, true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add Place editor
-		contentPane.add(new AddTokenPanel(guiDialog.getRootPane(), place,
-				CreateGui.getCurrentTab().network(), CreateGui.getView()
-						.getUndoManager()));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
 	}
 
 	@Override
@@ -214,7 +154,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			 * }
 			 */
 		} else {
-			if (!CreateGui.getModel().isUsingColors()) {
 				if (myObject instanceof TimedPlaceComponent) {
 					int clicks = -e.getWheelRotation();
 
@@ -222,18 +161,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 							(TimedPlaceComponent) myObject, clicks);
 					command.redo();
 					undoManager.addNewEdit(command);
-				} else {
-					int oldMarking = ((Place) myObject).getCurrentMarking();
-					int newMarking = oldMarking - e.getWheelRotation();
-
-					if (newMarking < 0) {
-						newMarking = 0;
-					}
-					if (oldMarking != newMarking) {
-						undoManager.addNewEdit(((Place) myObject)
-								.setCurrentMarking(newMarking));
-					}
-				}
 			}
 		}
 	}
@@ -242,9 +169,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if ((myObject instanceof TimedPlaceComponent) && !isDragging) {// &&
-																			// CreateGui.getView().isInAnimationMode()){
-				if (CreateGui.getModel().isUsingColors()
-						|| CreateGui.getView().isInAnimationMode()) {
+				if (CreateGui.getView().isInAnimationMode()) {
 					((TimedPlaceComponent) myObject).showAgeOfTokens(true);
 				}
 			}
@@ -258,9 +183,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if ((myObject instanceof TimedPlaceComponent)) {// &&
-														// CreateGui.getView().isInAnimationMode()){
-			if (CreateGui.getModel().isUsingColors()
-					|| CreateGui.getView().isInAnimationMode()) {
+			if (CreateGui.getView().isInAnimationMode()) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 			}
 		}

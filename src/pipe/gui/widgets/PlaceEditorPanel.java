@@ -191,45 +191,41 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(nameTextField, gridBagConstraints);
 
-		if (!guiModel.isUsingColors()) {
-			markingLabel = new javax.swing.JLabel();
-			markingLabel.setText("Marking:");
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 1;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-			gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-			basicPropertiesPanel.add(markingLabel, gridBagConstraints);
+		markingLabel = new javax.swing.JLabel();
+		markingLabel.setText("Marking:");
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(markingLabel, gridBagConstraints);
 
-			markingSpinner = new javax.swing.JSpinner();
-			markingSpinner.setModel(new SpinnerNumberModel(place
-					.getNumberOfTokens(), 0, Integer.MAX_VALUE, 1));
-			markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
-			markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
+		markingSpinner = new javax.swing.JSpinner();
+		markingSpinner.setModel(new SpinnerNumberModel(place
+				.getNumberOfTokens(), 0, Integer.MAX_VALUE, 1));
+		markingSpinner.setMinimumSize(new java.awt.Dimension(50, 20));
+		markingSpinner.setPreferredSize(new java.awt.Dimension(50, 20));
 
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = 1;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-			basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
-		}
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(markingSpinner, gridBagConstraints);
 
-		if (!guiModel.netType().equals(NetType.UNTIMED)) {
-			attributesCheckBox = new javax.swing.JCheckBox();
-			attributesCheckBox.setSelected(place.getAttributesVisible());
-			attributesCheckBox.setText("Show place attributes");
-			attributesCheckBox.setBorder(javax.swing.BorderFactory
-					.createEmptyBorder(0, 0, 0, 0));
-			attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = 3;
-			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-			gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-			basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
-		}
+		attributesCheckBox = new javax.swing.JCheckBox();
+		attributesCheckBox.setSelected(place.getAttributesVisible());
+		attributesCheckBox.setText("Show place attributes");
+		attributesCheckBox.setBorder(javax.swing.BorderFactory
+				.createEmptyBorder(0, 0, 0, 0));
+		attributesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
 	}
 
 	private void initTimeInvariantPanel() {
@@ -313,7 +309,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantGroup.add(invariantInf, gbc);
 
 		Set<String> constants = CreateGui.getCurrentTab().network()
-				.getConstantNames();
+		.getConstantNames();
 		invConstantsComboBox = new JComboBox(constants.toArray());
 
 		invConstantsComboBox.setMinimumSize(new Dimension(80, 30));
@@ -387,8 +383,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			enableConstantInvariantComponents();
 			constantInvRadioButton.setSelected(true);
 			invConstantsComboBox
-					.setSelectedItem(((ConstantBound) invariantToSet
-							.upperBound()).name());
+			.setSelectedItem(((ConstantBound) invariantToSet
+					.upperBound()).name());
 			invRelationConstant.setSelectedItem(invariantToSet
 					.isUpperNonstrict() ? "<=" : "<");
 		} else {
@@ -476,17 +472,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private void doOK() {
 		Integer newMarking = marking;
-		if (!guiModel.isUsingColors()) {
-			try {
-				newMarking = (Integer) markingSpinner.getValue();
-			} catch (Exception e) {
-				JSpinner.NumberEditor numberEditor = ((JSpinner.NumberEditor) markingSpinner
-						.getEditor());
-				numberEditor.getTextField().setBackground(new Color(255, 0, 0));
-				markingSpinner.addChangeListener(changeListener);
-				markingSpinner.requestFocusInWindow();
-				return;
-			}
+		try {
+			newMarking = (Integer) markingSpinner.getValue();
+		} catch (Exception e) {
+			JSpinner.NumberEditor numberEditor = ((JSpinner.NumberEditor) markingSpinner
+					.getEditor());
+			numberEditor.getTextField().setBackground(new Color(255, 0, 0));
+			markingSpinner.addChangeListener(changeListener);
+			markingSpinner.requestFocusInWindow();
+			return;
 		}
 
 		view.getUndoManager().newEdit(); // new "transaction""
@@ -496,22 +490,22 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		if (!newName.equals(name)) {
 			if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
 				System.err
-						.println("Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+				.println("Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
 				JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-								"Error", JOptionPane.INFORMATION_MESSAGE);
+				.showMessageDialog(
+						CreateGui.getApp(),
+						"Acceptable names for places are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+						"Error", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			} else if ((guiModel.getPlaceByNameIgnoreGiven(place, newName) != null)
 					|| (guiModel.getTransitionByName(newName) != null)) {
 				System.err
-						.println("Places cannot be called the same as an other Place or Transition.");
+				.println("Places cannot be called the same as an other Place or Transition.");
 				JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"Places cannot be called the same as another Place or Transition.",
-								"Error", JOptionPane.INFORMATION_MESSAGE);
+				.showMessageDialog(
+						CreateGui.getApp(),
+						"Places cannot be called the same as another Place or Transition.",
+						"Error", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			} else {
 
@@ -536,17 +530,17 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 				if (!invariantInf.isSelected()) {
 					newInvariant = TimeInvariant
-							.parseInvariantWithoutConstant((String) invRelationNormal
-									.getSelectedItem()
-									+ invariantSpinner.getValue());
+					.parseInvariantWithoutConstant((String) invRelationNormal
+							.getSelectedItem()
+							+ invariantSpinner.getValue());
 				} else {
 					newInvariant = TimeInvariant
-							.parseInvariantWithoutConstant("<" + "inf");
+					.parseInvariantWithoutConstant("<" + "inf");
 				}
 
 			} else {
 				String constantName = (String) invConstantsComboBox
-						.getSelectedItem();
+				.getSelectedItem();
 				boolean upperIncluded = ((String) invRelationConstant
 						.getSelectedItem()).equals("<=");
 				newInvariant = new TimeInvariant(upperIncluded,

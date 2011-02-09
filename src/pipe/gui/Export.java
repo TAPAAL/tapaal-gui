@@ -337,16 +337,10 @@ public class Export {
 
 		} else if (input.getReductionOption() == ReductionOption.BROADCAST
 				|| input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY) {
-			BroadcastTranslation broadcastTransformer = null;
-			if (appModel.isUsingColors()) {
-				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredBroadcastTranslation(
+			BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(
 						capacity,
 						input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
-			} else {
-				broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(
-						capacity,
-						input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
-			}
+
 			try {
 				dk.aau.cs.TA.NTA nta = broadcastTransformer
 						.transformModel(model);
@@ -364,16 +358,10 @@ public class Export {
 			}
 		} else if (input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY
 				|| input.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
-			Degree2BroadcastTranslation broadcastTransformer = null;
-			if (appModel.isUsingColors()) {
-				broadcastTransformer = new dk.aau.cs.translations.coloredtapn.ColoredDegree2BroadcastTranslation(
+			Degree2BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(
 						capacity,
 						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
-			} else {
-				broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(
-						capacity,
-						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
-			}
+			
 			try {
 				dk.aau.cs.TA.NTA nta = broadcastTransformer
 						.transformModel(model);

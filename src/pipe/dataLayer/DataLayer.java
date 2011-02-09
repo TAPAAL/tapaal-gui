@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Random;
 
-import pipe.dataLayer.colors.ColoredTimedPlace;
 
 /**
  * <b>DataLayer</b> - Encapsulates entire Petri-Net, also contains functions to
@@ -71,9 +70,6 @@ import pipe.dataLayer.colors.ColoredTimedPlace;
  * 
  **/
 public class DataLayer extends Observable implements Cloneable {
-
-	private static Random randomNumber = new Random(); // Random number
-														// generator
 
 	/** PNML File Name */
 	public String pnmlName = null;
@@ -685,10 +681,6 @@ public class DataLayer extends Observable implements Cloneable {
 				didSomething = changeArrayList.remove(pnObject);
 				// we want to remove all attached arcs also
 				if (pnObject instanceof PlaceTransitionObject) {
-					if (pnObject instanceof ColoredTimedPlace) {
-						((ColoredTimedPlace) pnObject).showAgeOfTokens(false);
-					}
-
 					if (arcsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are
@@ -1328,10 +1320,6 @@ public class DataLayer extends Observable implements Cloneable {
 			}
 		}
 		return false;
-	}
-
-	public boolean isUsingColors() {
-		return type.equals(NetType.COLORED);
 	}
 
 	public NetType netType() {

@@ -12,37 +12,23 @@ import java.util.Collection;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TransportArcComponent;
-import pipe.dataLayer.colors.ColorSet;
-import pipe.dataLayer.colors.ColoredInterval;
-import pipe.dataLayer.colors.ColoredTransportArc;
-import pipe.dataLayer.colors.IntOrConstant;
-import pipe.dataLayer.colors.IntOrConstantRange;
-import pipe.dataLayer.colors.IntervalBound;
-import pipe.dataLayer.colors.Preserve;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -50,9 +36,9 @@ import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 
 public class GuardDialogue extends JPanel /*
-										 * implements ActionListener,
-										 * PropertyChangeListener
-										 */
+ * implements ActionListener,
+ * PropertyChangeListener
+ */
 {
 	/**
 	 * 
@@ -60,15 +46,7 @@ public class GuardDialogue extends JPanel /*
 	private static final long serialVersionUID = 4582651236913407101L;
 	private JRootPane myRootPane;
 	private JPanel guardEditPanel;
-	private JPanel colorGuardPanel;
-	private JPanel transportArcFeaturesPanel;
 	private JPanel buttonPanel;
-
-	private JRadioButton preserveAgeRadioBtn;
-	private JRadioButton preserveValueRadioBtn;
-	private JRadioButton preserveBothRadioBtn;
-	private JLabel updateExprLabel;
-	private JTextField updateExprTextbox;
 
 	private JButton okButton;
 	private JButton cancelButton;
@@ -87,31 +65,11 @@ public class GuardDialogue extends JPanel /*
 	private JCheckBox rightUseConstant;
 	private JComboBox rightConstantsComboBox;
 
-	private JLabel colorGuardLabel;
-	private JTextField colorGuardTextBox;
-	private JLabel colorExampleLabel;
-	private JTextField lowerScaleTextbox;
-	private JTextField lowerOffsetTextbox;
-	private JTextField upperScaleTextbox;
-	private JTextField upperOffsetTextbox;
-
 	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
 		myRootPane = rootPane;
 		setLayout(new GridBagLayout());
 
 		initTimeGuardPanel();
-
-		if (CreateGui.getModel().isUsingColors()) {
-			initColorGuardPanel();
-			if (objectToBeEdited instanceof TransportArcComponent) {
-				initTransportArcFeaturesPanel();
-				TransportArcComponent arc = (TransportArcComponent) objectToBeEdited;
-				if (arc.getConnectedTo() != null
-						&& arc.getSource() instanceof TimedTransitionComponent) {
-					objectToBeEdited = arc.getConnectedTo();
-				}
-			}
-		}
 		initButtonPanel(objectToBeEdited);
 
 		myRootPane.setDefaultButton(okButton);
@@ -119,120 +77,6 @@ public class GuardDialogue extends JPanel /*
 		setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
 	}
 
-
-	private void initTransportArcFeaturesPanel() {
-		transportArcFeaturesPanel = new JPanel(new GridBagLayout());
-		transportArcFeaturesPanel.setBorder(BorderFactory
-				.createTitledBorder("Transport Arc Features"));
-
-		ActionListener listener = new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				if (preserveAgeRadioBtn.isSelected()) {
-					updateExprTextbox.setEnabled(true);
-				} else {
-					updateExprTextbox.setEnabled(false);
-				}
-			}
-		};
-
-		preserveBothRadioBtn = new JRadioButton("Preserve age and value");
-		preserveBothRadioBtn.addActionListener(listener);
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		transportArcFeaturesPanel.add(preserveBothRadioBtn, gridBagConstraints);
-
-		preserveAgeRadioBtn = new JRadioButton("Preserve age");
-		preserveAgeRadioBtn.addActionListener(listener);
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		transportArcFeaturesPanel.add(preserveAgeRadioBtn, gridBagConstraints);
-
-		preserveValueRadioBtn = new JRadioButton("Preserve value");
-		preserveValueRadioBtn.addActionListener(listener);
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		transportArcFeaturesPanel
-				.add(preserveValueRadioBtn, gridBagConstraints);
-
-		ButtonGroup btnGroup = new ButtonGroup();
-		btnGroup.add(preserveBothRadioBtn);
-		btnGroup.add(preserveAgeRadioBtn);
-		btnGroup.add(preserveValueRadioBtn);
-
-		updateExprLabel = new JLabel("Update value:");
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		transportArcFeaturesPanel.add(updateExprLabel, gridBagConstraints);
-
-		updateExprTextbox = new JTextField();
-		updateExprTextbox.setEnabled(false);
-		Dimension intervalBoxDims = new Dimension(90, 25);
-		updateExprTextbox.setMaximumSize(intervalBoxDims);
-		updateExprTextbox.setMinimumSize(intervalBoxDims);
-		updateExprTextbox.setPreferredSize(intervalBoxDims);
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		transportArcFeaturesPanel.add(updateExprTextbox, gridBagConstraints);
-
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.insets = new Insets(0, 5, 5, 5);
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		add(transportArcFeaturesPanel, gridBagConstraints);
-	}
-
-	private void initColorGuardPanel() {
-		colorGuardPanel = new JPanel(new GridBagLayout());
-		colorGuardPanel.setBorder(BorderFactory
-				.createTitledBorder("Color Guard"));
-
-		colorGuardLabel = new JLabel("Color Guard:");
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		colorGuardPanel.add(colorGuardLabel, gridBagConstraints);
-
-		colorGuardTextBox = new JTextField();
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		colorGuardPanel.add(colorGuardTextBox, gridBagConstraints);
-
-		colorExampleLabel = new JLabel("Example: 1, 3, 4-6, 8, 12-");
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		colorGuardPanel.add(colorExampleLabel, gridBagConstraints);
-
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.insets = new Insets(0, 5, 5, 5);
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		add(colorGuardPanel, gridBagConstraints);
-	}
 
 	private void initButtonPanel(final PetriNetObject objectToBeEdited) {
 		buttonPanel = new JPanel(new GridBagLayout());
@@ -252,60 +96,6 @@ public class GuardDialogue extends JPanel /*
 				exit();
 			}
 
-			private ColoredInterval composeTimeGuard() {
-				String openParenthesis = (String) leftDelimiter
-						.getSelectedItem();
-				String closeParenthesis = (String) rightDelimiter
-						.getSelectedItem();
-
-				IntOrConstant lowerScale = new IntOrConstant(lowerScaleTextbox
-						.getText());
-				IntOrConstant lowerOffset = new IntOrConstant(
-						lowerOffsetTextbox.getText());
-				IntervalBound a = new IntervalBound(lowerScale, lowerOffset);
-				boolean goesToInf = inf.isSelected();
-
-				IntervalBound b = null;
-				if (goesToInf) {
-					b = new IntervalBound(true);
-				} else {
-					IntOrConstant upperScale = new IntOrConstant(
-							upperScaleTextbox.getText());
-					IntOrConstant upperOffset = new IntOrConstant(
-							upperOffsetTextbox.getText());
-
-					b = new IntervalBound(upperScale, upperOffset);
-				}
-
-				return new ColoredInterval(openParenthesis, a, b,
-						closeParenthesis);
-			}
-
-			private Preserve getPreservation() {
-				if (preserveAgeRadioBtn.isSelected()) {
-					return Preserve.Age;
-				} else if (preserveValueRadioBtn.isSelected()) {
-					return Preserve.Value;
-				} else {
-					return Preserve.AgeAndValue;
-				}
-			}
-
-			private ColorSet createColorGuard() {
-				ColorSet colorSet = new ColorSet();
-				String[] ranges = colorGuardTextBox.getText().split(",");
-				for (String range : ranges) {
-					try {
-						IntOrConstantRange ir = IntOrConstantRange.parse(range
-								.trim());
-						colorSet.add(ir);
-					} catch (IllegalArgumentException e) {
-						throw new IllegalArgumentException(range, e);
-					}
-				}
-				return colorSet;
-			}
-
 			private dk.aau.cs.model.tapn.TimeInterval composeGuard(
 					dk.aau.cs.model.tapn.TimeInterval oldGuard) {
 				boolean useConstantLeft = leftUseConstant.isSelected();
@@ -318,7 +108,7 @@ public class GuardDialogue extends JPanel /*
 
 				if (useConstantLeft) {
 					String constantName = leftConstantsComboBox
-							.getSelectedItem().toString();
+					.getSelectedItem().toString();
 					leftInterval = new ConstantBound(CreateGui.getCurrentTab()
 							.network().getConstant(constantName));
 				} else
@@ -327,7 +117,7 @@ public class GuardDialogue extends JPanel /*
 
 				if (useConstantRight) {
 					String constantName = rightConstantsComboBox
-							.getSelectedItem().toString();
+					.getSelectedItem().toString();
 					rightInterval = new ConstantBound(CreateGui.getCurrentTab()
 							.network().getConstant(constantName));
 				} else if (inf.isSelected())
@@ -375,7 +165,7 @@ public class GuardDialogue extends JPanel /*
 	private void initTimeGuardPanel() {
 		guardEditPanel = new JPanel(new GridBagLayout());
 		guardEditPanel
-				.setBorder(BorderFactory.createTitledBorder("Time Guard"));
+		.setBorder(BorderFactory.createTitledBorder("Time Guard"));
 
 		label = new JLabel("Time Interval:");
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -409,40 +199,21 @@ public class GuardDialogue extends JPanel /*
 		inf = new JCheckBox("inf", true);
 		inf.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				if (!CreateGui.getModel().isUsingColors()) {
-					if (inf.isSelected()) {
-						secondIntervalNumber.setEnabled(false);
-						rightDelimiter.setEnabled(false);
-					} else {
-						secondIntervalNumber.setEnabled(true);
-						rightDelimiter.setEnabled(true);
-					}
-					setDelimiterModels();
+				if (inf.isSelected()) {
+					secondIntervalNumber.setEnabled(false);
+					rightDelimiter.setEnabled(false);
 				} else {
-					if (inf.isSelected()) {
-						upperOffsetTextbox.setEnabled(false);
-						upperScaleTextbox.setEnabled(false);
-						rightDelimiter.setEnabled(false);
-						rightDelimiter.setSelectedItem(")");
-					} else {
-						upperOffsetTextbox.setEnabled(true);
-						upperScaleTextbox.setEnabled(true);
-						rightDelimiter.setEnabled(true);
-						rightDelimiter.setSelectedItem("]");
-					}
+					secondIntervalNumber.setEnabled(true);
+					rightDelimiter.setEnabled(true);
 				}
+				setDelimiterModels();
 			}
-
 		});
 		gridBagConstraints.gridx = 6;
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(inf, gridBagConstraints);
 
-		if (CreateGui.getModel().isUsingColors()) {
-			initColoredTimeIntervalControls();
-		} else {
-			initNonColoredTimeIntervalControls();
-		}
+		initNonColoredTimeIntervalControls();
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -451,97 +222,6 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		add(guardEditPanel, gridBagConstraints);
-	}
-
-	private void initColoredTimeIntervalControls() {
-		JPanel lowerPanel = new JPanel(new GridBagLayout());
-
-		Dimension txtBoxDims = new Dimension(50, 25);
-
-		lowerScaleTextbox = new JTextField();
-		lowerScaleTextbox.setMinimumSize(txtBoxDims);
-		lowerScaleTextbox.setMaximumSize(txtBoxDims);
-		lowerScaleTextbox.setPreferredSize(txtBoxDims);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		lowerPanel.add(lowerScaleTextbox, gbc);
-
-		String mathExprString = "* val +";
-		JLabel label = new JLabel(mathExprString);
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		lowerPanel.add(label, gbc);
-
-		lowerOffsetTextbox = new JTextField();
-		lowerOffsetTextbox.setMinimumSize(txtBoxDims);
-		lowerOffsetTextbox.setMaximumSize(txtBoxDims);
-		lowerOffsetTextbox.setPreferredSize(txtBoxDims);
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		lowerPanel.add(lowerOffsetTextbox, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(0, 0, 0, 0);
-		gbc.gridx = 3;
-		gbc.gridy = 1;
-		guardEditPanel.add(new JLabel(" , "), gbc);
-
-		JPanel upperPanel = new JPanel(new GridBagLayout());
-
-		upperScaleTextbox = new JTextField();
-		upperScaleTextbox.setMinimumSize(txtBoxDims);
-		upperScaleTextbox.setMaximumSize(txtBoxDims);
-		upperScaleTextbox.setPreferredSize(txtBoxDims);
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		upperPanel.add(upperScaleTextbox, gbc);
-
-		label = new JLabel(mathExprString);
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		upperPanel.add(label, gbc);
-
-		upperOffsetTextbox = new JTextField();
-		upperOffsetTextbox.setMinimumSize(txtBoxDims);
-		upperOffsetTextbox.setMaximumSize(txtBoxDims);
-		upperOffsetTextbox.setPreferredSize(txtBoxDims);
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		upperPanel.add(upperOffsetTextbox, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 4;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		guardEditPanel.add(upperPanel, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(3, 3, 3, 3);
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		guardEditPanel.add(lowerPanel, gbc);
 	}
 
 	private void initNonColoredTimeIntervalControls() {
@@ -583,7 +263,7 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(secondIntervalNumber, gridBagConstraints);
 
 		Set<String> constants = CreateGui.getCurrentTab().network()
-				.getConstantNames();
+		.getConstantNames();
 		boolean enableConstantsCheckBoxes = !constants.isEmpty();
 		leftUseConstant = new JCheckBox("Use Constant");
 		leftUseConstant.setEnabled(enableConstantsCheckBoxes);
@@ -824,21 +504,21 @@ public class GuardDialogue extends JPanel /*
 		String oldRight = rightConstantsComboBox.getSelectedItem() != null ? rightConstantsComboBox
 				.getSelectedItem().toString()
 				: null;
-		rightConstantsComboBox.removeAllItems();
-		Collection<Constant> constants = CreateGui.getCurrentTab().network()
+				rightConstantsComboBox.removeAllItems();
+				Collection<Constant> constants = CreateGui.getCurrentTab().network()
 				.constants();
-		for (Constant c : constants) {
-			if (c.value() >= value) {
-				rightConstantsComboBox.addItem(c.name());
-			}
-		}
+				for (Constant c : constants) {
+					if (c.value() >= value) {
+						rightConstantsComboBox.addItem(c.name());
+					}
+				}
 
-		// if(rightConstantsComboBox.getItemCount() == 0){
-		// rightUseConstant.setEnabled(false);
-		// }
+				// if(rightConstantsComboBox.getItemCount() == 0){
+				// rightUseConstant.setEnabled(false);
+				// }
 
-		if (oldRight != null)
-			rightConstantsComboBox.setSelectedItem(oldRight);
+				if (oldRight != null)
+					rightConstantsComboBox.setSelectedItem(oldRight);
 	}
 
 	private void firstSpinnerStateChanged(ChangeEvent evt) {
