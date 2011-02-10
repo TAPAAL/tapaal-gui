@@ -215,7 +215,26 @@ public class Animator {
 		}
 	}
 
+	
+	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
+		NetworkMarking next = null;
+		try{
+			if (getFiringmode() != null) {
+				next = currentMarking().fireTransition(transition, getFiringmode());
+			} else {
+				List<TimedToken> tokensToConsume = showSelectSimulatorDialogue(transition);
+				if(tokensToConsume == null) return; // Cancelled
+				next = currentMarking().fireTransition(transition, tokensToConsume);
+			}
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// It is important that this comes after the above, since 
+		// cancelling the token selection dialogue above should not result in changes 
+		// to the untimed animation history
 		if (isDisplayingUntimedTrace){
 			AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 			if(untimedAnimationHistory.isStepForwardAllowed()){
@@ -239,20 +258,6 @@ public class Animator {
 			}
 		}
 		
-		NetworkMarking next = null;
-		try{
-			if (getFiringmode() != null) {
-				next = currentMarking().fireTransition(transition, getFiringmode());
-			} else {
-				List<TimedToken> tokensToConsume = showSelectSimulatorDialogue(transition);
-				if(tokensToConsume == null) return; // Cancelled
-				next = currentMarking().fireTransition(transition, tokensToConsume);
-			}
-		}catch(RequireException e){
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "There was an error firing the transition. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
 		addMarking(new TimedTransitionStep(transition, null), next);
 		tab.network().setMarking(currentMarking());
 
