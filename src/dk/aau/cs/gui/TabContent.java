@@ -180,7 +180,7 @@ public class TabContent extends JSplitPane {
 		drawingSurface.repaintAll();
 	}
 
-	public AnimationHistoryComponent getAbstractAnimationPane() {
+	public AnimationHistoryComponent getUntimedAnimationHistory() {
 		return abstractAnimationPane;
 	}
 
@@ -197,7 +197,7 @@ public class TabContent extends JSplitPane {
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 		
-		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(animBox);
+		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
 		untimedAnimationHistoryScrollPane.setBorder(BorderFactory
 				.createCompoundBorder(BorderFactory
 						.createTitledBorder("Untimed Trace"),

@@ -168,7 +168,7 @@ public class CreateGui {
 
 	public static AnimationHistoryComponent getAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getAbstractAnimationPane();
+		return tab.getUntimedAnimationHistory();
 
 	}
 

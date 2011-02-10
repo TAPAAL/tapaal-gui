@@ -69,8 +69,8 @@ public class AnimationHistoryComponent extends JList {
 		return getSelectedIndex() > 0;
 	}
 
-	public int getCurrentItem() {
-		return getSelectedIndex();
+	public String getCurrentItem() {
+		return getElement(getSelectedIndex());
 	}
 
 	public String getElement(int i) {
