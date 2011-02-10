@@ -173,7 +173,6 @@ public class CreateGui {
 	}
 
 	public static void addAbstractAnimationPane() {
-
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		tab.addAbstractAnimationPane();
 	}

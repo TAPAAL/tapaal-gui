@@ -11,6 +11,7 @@ import dk.aau.cs.model.tapn.simulation.TapaalTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
+import dk.aau.cs.model.tapn.simulation.UntimedTrace;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.trace.TAPNFiringAction;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
@@ -23,17 +24,31 @@ public class TAPNTraceDecomposer {
 	private final NameMapping mapping;
 	private final TimedArcPetriNetNetwork tapnNetwork;
 
-	public TAPNTraceDecomposer(TAPNTrace trace,
-			TimedArcPetriNetNetwork tapnNetwork, NameMapping mapping) {
+	public TAPNTraceDecomposer(TAPNTrace trace, TimedArcPetriNetNetwork tapnNetwork, NameMapping mapping) {
 		this.trace = trace;
 		this.tapnNetwork = tapnNetwork;
 		this.mapping = mapping;
 	}
 
 	public TapaalTrace decompose() {
-		if (!trace.isConcreteTrace())
-			throw new RuntimeException("Untimed Traces not yet implemented");
+		if (!trace.isConcreteTrace()){
+			return decomposeUntimedTrace();
+		} else {
+			return decomposeTimedTrace();
+		}
+	}
 
+	private TapaalTrace decomposeUntimedTrace() {
+		UntimedTrace decomposedTrace = new UntimedTrace();
+
+		for (TAPNFiringAction action : trace.firingActions()) {
+			decomposedTrace.add((TimedTransitionStep)decomposeAction(action));
+		}
+
+		return decomposedTrace;
+	}
+
+	private TapaalTrace decomposeTimedTrace() {
 		TimedTrace decomposedTrace = new TimedTrace();
 
 		for (TAPNFiringAction action : trace.firingActions()) {
@@ -49,29 +64,24 @@ public class TAPNTraceDecomposer {
 			TransitionFiringAction transitionFiring = (TransitionFiringAction) action;
 			decomposedAction = decomposeTransitionFiring(transitionFiring);
 		} else if (action instanceof TimeDelayFiringAction) {
-			decomposedAction = new TimeDelayStep(
-					((TimeDelayFiringAction) action).delay());
+			decomposedAction = new TimeDelayStep(((TimeDelayFiringAction) action).delay());
 		}
 		return decomposedAction;
 	}
 
-	private TapaalTraceStep decomposeTransitionFiring(
-			TransitionFiringAction transitionFiring) {
-		Tuple<String, String> originalName = mapping.map(transitionFiring
-				.transition());
-		TimedTransition transition = tapnNetwork.getTAPNByName(
-				originalName.value1()).getTransitionByName(
-				originalName.value2());
+	private TapaalTraceStep decomposeTransitionFiring(TransitionFiringAction transitionFiring) {
+		Tuple<String, String> originalName = mapping.map(transitionFiring.transition());
+		TimedTransition transition = tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
 
-		ArrayList<TimedToken> convertedTokens = new ArrayList<TimedToken>(
-				transitionFiring.consumedTokens().size());
-		for (Token token : transitionFiring.consumedTokens()) {
-			Tuple<String, String> remappedName = mapping.map(token.place()
-					.getName());
-			TimedPlace place = tapnNetwork.getTAPNByName(remappedName.value1())
-					.getPlaceByName(remappedName.value2());
+		ArrayList<TimedToken> convertedTokens = null;
+		if(trace.isConcreteTrace()){
+			convertedTokens = new ArrayList<TimedToken>(transitionFiring.consumedTokens().size());
+			for (Token token : transitionFiring.consumedTokens()) {
+				Tuple<String, String> remappedName = mapping.map(token.place().getName());
+				TimedPlace place = tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
 
-			convertedTokens.add(new TimedToken(place, token.age()));
+				convertedTokens.add(new TimedToken(place, token.age()));
+			}
 		}
 		return new TimedTransitionStep(transition, convertedTokens);
 	}

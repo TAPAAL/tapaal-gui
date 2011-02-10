@@ -8,27 +8,10 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
-/**
- * Class to represent the history of the net animation
- * 
- * @author Pere Bonet changed and added a number of new functions to fix the
- *         unexpected behaviour observed during animation playback. Previously,
- *         under certain circumstances, it is possible to step back to state(s)
- *         before the initial state and step forward to state(s) after the last
- *         recorded transitions in the animation history. These actions are no
- *         longer allowed after the fix.
- * */
 public class AnimationHistoryComponent extends JList {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4284885450021683552L;
 
-	/** Holds all the transitions in the sequence */
-
-	public AnimationHistoryComponent()
-			throws javax.swing.text.BadLocationException {
+	public AnimationHistoryComponent() {
 		super();
 		setModel(new DefaultListModel());
 		getListModel().addElement("Initial Marking");

@@ -1,9 +1,8 @@
 package pipe.gui.widgets;
 
+import java.awt.Component;
 import java.awt.Graphics;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 public class JSplitPaneFix extends JSplitPane {
@@ -16,13 +15,8 @@ public class JSplitPaneFix extends JSplitPane {
 	private boolean hasProportionalLocation;
 	private double proportionalLocation;
 
-	public JSplitPaneFix(int verticalSplit, JScrollPane panel1, JPanel panel2) {
-		super(verticalSplit, panel1, panel2);
-
-	}
-
-	public JSplitPaneFix(int verticalSplit, JPanel panel1, JPanel panel2) {
-		super(verticalSplit, panel1, panel2);
+	public JSplitPaneFix(int verticalSplit, Component component1, Component component2) {
+		super(verticalSplit, component1, component2);
 
 	}
 

@@ -21,11 +21,9 @@ public class RunVerification extends RunVerificationBase {
 	protected void showResult(VerificationResult<TapaalTrace> result,
 			long verificationTime) {
 		if (result != null && !result.error()) {
-			String satisfaction = result.isQuerySatisfied() ? "satisfied"
-					: "not satisfied";
-			JOptionPane.showMessageDialog(CreateGui.getApp(), String.format(
-					"Property is %1$s.\nEstimated verification time: %2$.2fs",
-					satisfaction, verificationTime / 1000.0),
+			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
+			JOptionPane.showMessageDialog(CreateGui.getApp(), 
+					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime / 1000.0),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 
 			if (result.getTrace() != null) {

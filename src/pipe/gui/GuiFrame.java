@@ -1149,7 +1149,6 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			CreateGui.getAnimator().setTabContent(tab);
 
 			CreateGui.getAnimator().reset();
-
 			startAction.setSelected(true);
 			CreateGui.getView().changeAnimationMode(true);
 			CreateGui.getAnimator().storeModel();

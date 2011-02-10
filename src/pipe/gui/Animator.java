@@ -95,7 +95,7 @@ public class Animator {
 	}
 
 	private void setUntimedTrace(TapaalTrace trace) {
-		// CreateGui.addAbstractAnimationPane();
+		 tab.addAbstractAnimationPane();
 		// AnimationHistoryComponent untimedAnimationHistory =
 		// CreateGui.getAbstractAnimationPane();
 		// for(FiringAction action : trace){

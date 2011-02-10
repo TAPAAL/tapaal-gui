@@ -1,6 +1,5 @@
 package dk.aau.cs.gui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
@@ -11,8 +10,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.text.BadLocationException;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -52,6 +49,8 @@ public class TabContent extends JSplitPane {
 	private JScrollPane animationHistoryScrollPane;
 	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryComponent abstractAnimationPane = null;
+
+	private JSplitPane controllerAndHistoryPanel;
 
 	public TabContent() {
 
@@ -138,7 +137,6 @@ public class TabContent extends JSplitPane {
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	private void createAnimationHistory() {
-		try {
 			animBox = new AnimationHistoryComponent();
 
 			animationHistoryScrollPane = new JScrollPane(animBox);
@@ -146,25 +144,14 @@ public class TabContent extends JSplitPane {
 					.createCompoundBorder(BorderFactory
 							.createTitledBorder("Simulation History"),
 							BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		} catch (javax.swing.text.BadLocationException be) {
-			be.printStackTrace();
-		}
 	}
 
 	public void switchToAnimationComponents() {
 		createAnimationHistory();
 		createAnimationController();
 
-		JSplitPane animatorLeftPane = new JSplitPaneFix(
-				JSplitPane.VERTICAL_SPLIT);
-		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height
-																				// is
-																				// ignored
-																				// because
-																				// the
-																				// component
-																				// is
-																				// stretched
+		JSplitPane animatorLeftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
 
 		animatorLeftPane.setDividerLocation(0.25);
@@ -172,13 +159,13 @@ public class TabContent extends JSplitPane {
 		templateExplorer.hideButtons();
 		animatorLeftPane.setTopComponent(templateExplorer);
 
-		JSplitPane panel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		panel.setResizeWeight(0);
-		panel.setDividerLocation(-1);
-		panel.setTopComponent(animControlerBox);
-		panel.setBottomComponent(animationHistoryScrollPane);
+		controllerAndHistoryPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		controllerAndHistoryPanel.setResizeWeight(0);
+		controllerAndHistoryPanel.setDividerLocation(-1);
+		controllerAndHistoryPanel.setTopComponent(animControlerBox);
+		controllerAndHistoryPanel.setBottomComponent(animationHistoryScrollPane);
 
-		animatorLeftPane.setBottomComponent(panel);
+		animatorLeftPane.setBottomComponent(controllerAndHistoryPanel);
 		this.setLeftComponent(animatorLeftPane);
 		this.setDividerLocation(-1);
 
@@ -202,44 +189,38 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void addAbstractAnimationPane() {
-
-		try {
-			abstractAnimationPane = new AnimationHistoryComponent();
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
-
-		// Create a new empty animBox
-		try {
-			animBox = new AnimationHistoryComponent();
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
-
-		JSplitPane pane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, animBox,
-				abstractAnimationPane);
+		abstractAnimationPane = new AnimationHistoryComponent();
+		animBox = new AnimationHistoryComponent();
+		animationHistoryScrollPane = new JScrollPane(animBox);
+		animationHistoryScrollPane.setBorder(BorderFactory
+				.createCompoundBorder(BorderFactory
+						.createTitledBorder("Simulation History"),
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		
+		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(animBox);
+		untimedAnimationHistoryScrollPane.setBorder(BorderFactory
+				.createCompoundBorder(BorderFactory
+						.createTitledBorder("Untimed Trace"),
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		JSplitPane pane2 = new JSplitPaneFix(JSplitPane.HORIZONTAL_SPLIT, animationHistoryScrollPane, untimedAnimationHistoryScrollPane);
 
 		pane2.setContinuousLayout(true);
 		pane2.setOneTouchExpandable(true);
 		pane2.setBorder(null); // avoid multiple borders
-
 		pane2.setDividerSize(8);
+		pane2.setDividerLocation(0.5);
 
-		editorLeftPane.setBottomComponent(pane2);
-		abstractAnimationPane.setBorder(new LineBorder(Color.black));
-
+		controllerAndHistoryPanel.setBottomComponent(pane2);
 	}
 
 	public void removeAbstractAnimationPane() {
 		abstractAnimationPane = null;
 		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0)); // make
-																			// it
-																			// less
-																			// bad
-																			// on
-																			// XP
-		editorLeftPane.setBottomComponent(animationHistoryScrollPane);
+		animationHistoryScrollPane.setBorder(BorderFactory
+				.createCompoundBorder(BorderFactory
+						.createTitledBorder("Simulation History"),
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		controllerAndHistoryPanel.setBottomComponent(animationHistoryScrollPane);
 	}
 
 	private void createAnimationController() {

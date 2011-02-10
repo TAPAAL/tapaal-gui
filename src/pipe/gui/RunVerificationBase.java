@@ -48,21 +48,17 @@ public abstract class RunVerificationBase extends
 	@Override
 	protected VerificationResult<TapaalTrace> doInBackground() throws Exception {
 		TAPNComposer composer = new TAPNComposer();
-		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer
-				.transformModel(model);
+		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 
 		// TODO: Get rid of this step by changing the underlying translations
 		// etc.
 		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
-		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer
-				.transformModel(transformedModel.value1());
+		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
 
-		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query
-				.getTotalTokens());
+		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
-		VerificationResult<TAPNTrace> result = modelChecker.verify(options,
-				tapn, clonedQuery);
+		VerificationResult<TAPNTrace> result = modelChecker.verify(options, tapn, clonedQuery);
 		if (result.error()) {
 			return new VerificationResult<TapaalTrace>(result.errorMessage());
 		} else {
@@ -77,8 +73,7 @@ public abstract class RunVerificationBase extends
 		if (trace == null)
 			return null;
 
-		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model,
-				mapping);
+		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model, mapping);
 		return decomposer.decompose();
 	}
 
