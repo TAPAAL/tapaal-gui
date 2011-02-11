@@ -38,6 +38,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -49,7 +51,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import pipe.gui.action.GuiAction;
+import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.util.Require;
 
 /**
@@ -64,23 +67,19 @@ public class TabComponent extends JPanel {
 	 */
 	private static final long serialVersionUID = 2036995080253347710L;
 
-	private final GuiAction closeAction;
+	private final JTabbedPane pane;
 
-	public TabComponent(final JTabbedPane pane, final GuiAction closeAction) {
+	public TabComponent(final JTabbedPane pane) {
 		super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
 		Require.that(pane != null, "TabbedPane is null");
-		Require.that(closeAction != null, "CloseAction is null");
-		this.closeAction = closeAction;
-
+		
+		this.pane = pane;
 		setOpaque(false);
 
 		// make JLabel read titles from JTabbedPane
 		JLabel label = new JLabel() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 5863442510356859481L;
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String getText() {
@@ -95,17 +94,12 @@ public class TabComponent extends JPanel {
 		add(label);
 		label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 
-		// tab button
 		JButton button = new TabButton();
 		add(button);
-		// add more space to the top of the component
 		setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
 	}
 
 	private class TabButton extends JButton {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 396272450859168050L;
 
 		public TabButton() {
@@ -119,7 +113,17 @@ public class TabComponent extends JPanel {
 			setBorderPainted(false);
 			addMouseListener(buttonMouseListener);
 			setRolloverEnabled(true);
-			addActionListener(closeAction);
+			addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent arg0) {
+					int index = pane.indexOfTabComponent(TabComponent.this);
+					if(pane.getTabCount() > 0 && CreateGui.getApp().checkForSave(index)){
+						CreateGui.getApp().setGUIMode(GUIMode.noNet);
+
+						CreateGui.removeTab(index);
+						pane.removeTabAt(index);
+					}
+				}
+			});
 		}
 
 		// paint the cross

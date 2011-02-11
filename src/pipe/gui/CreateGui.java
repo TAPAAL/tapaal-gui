@@ -103,8 +103,7 @@ public class CreateGui {
 	}
 
 	public static File getFile() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getFile();
+		return getFile(appTab.getSelectedIndex());
 	}
 
 	public static void setFile(File modelfile, int fileNo) {
@@ -215,5 +214,10 @@ public class CreateGui {
 
 	public static void undoGetFreeSpace() {
 		tabs.remove(tabs.size() - 1);
+	}
+
+	public static File getFile(int index) {
+		TabContent tab = tabs.get(index);
+		return tab.getFile();
 	}
 }

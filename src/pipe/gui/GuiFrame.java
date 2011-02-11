@@ -109,19 +109,19 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 	// XXX kyrke testing
 	private FileAction createAction, openAction, closeAction, saveAction,
-			saveAsAction, exitAction, printAction, exportPNGAction,
-			exportPSAction, exportToTikZAction;
+	saveAsAction, exitAction, printAction, exportPNGAction,
+	exportPSAction, exportToTikZAction;
 
 	private VerificationAction runUppaalVerification;
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction,
-			redoAction;
+	redoAction;
 	private GridAction toggleGrid;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
-			placeAction, transAction, timedtransAction, tokenAction,
-			selectAction, deleteTokenAction, dragAction, timedPlaceAction;
+	placeAction, transAction, timedtransAction, tokenAction,
+	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	/* CB Joakim Byg - tries both */
 	private TypeAction timedArcAction;
 
@@ -129,7 +129,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 	/* EOC */
 	private AnimateAction startAction, stepforwardAction, stepbackwardAction,
-			randomAction, randomAnimateAction, timeAction;
+	randomAction, randomAnimateAction, timeAction;
 
 	public boolean dragging = false;
 
@@ -161,12 +161,12 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				try {
 					//Load class to see if its there
 					Class.forName("eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-					
+
 					UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
 				}
-				
+
 			}
 
 
@@ -224,7 +224,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		addMenuItem(fileMenu, createAction = new FileAction("New",
 				"Create a new Petri net", "ctrl N"));
 		addMenuItem(fileMenu, openAction = new FileAction("Open", "Open",
-				"ctrl O"));
+		"ctrl O"));
 		addMenuItem(fileMenu, closeAction = new FileAction("Close",
 				"Close the current tab", "ctrl W"));
 		fileMenu.addSeparator();
@@ -233,7 +233,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		 * "Import from Timenet",""));
 		 */
 		addMenuItem(fileMenu, saveAction = new FileAction("Save", "Save",
-				"ctrl S"));
+		"ctrl S"));
 		addMenuItem(fileMenu, saveAsAction = new FileAction("Save as",
 				"Save as...", "shift ctrl S"));
 
@@ -267,7 +267,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
-				"ctrl P"));
+		"ctrl P"));
 		fileMenu.addSeparator();
 
 		// Example files menu
@@ -356,148 +356,148 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		 * EditAction("Copy", "Copy (Ctrl-C)","ctrl C")); addMenuItem(editMenu,
 		 * pasteAction = new EditAction("Paste", "Paste (Ctrl-V)","ctrl V"));
 		 */addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
-				"Delete selection", "DELETE"));
+				 "Delete selection", "DELETE"));
 
-		// Bind delete to backspace also
-		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
-		editMenu.getActionMap().put("Delete", deleteAction);
+		 // Bind delete to backspace also
+		 editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				 KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
+		 editMenu.getActionMap().put("Delete", deleteAction);
 
-		JMenu drawMenu = new JMenu("Draw");
-		drawMenu.setMnemonic('D');
-		addMenuItem(drawMenu, selectAction = new TypeAction("Select",
-				Pipe.SELECT, "Select components", "S", true));
-		drawMenu.addSeparator();
+		 JMenu drawMenu = new JMenu("Draw");
+		 drawMenu.setMnemonic('D');
+		 addMenuItem(drawMenu, selectAction = new TypeAction("Select",
+				 Pipe.SELECT, "Select components", "S", true));
+		 drawMenu.addSeparator();
 
-		// kyrke inserted timed place
-		addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
-				Pipe.TAPNPLACE, "Add a place", "L", true));
-		// jokke removed normal places
-		// addMenuItem(drawMenu, placeAction =
-		// new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
+		 // kyrke inserted timed place
+		 addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
+				 Pipe.TAPNPLACE, "Add a place", "L", true));
+		 // jokke removed normal places
+		 // addMenuItem(drawMenu, placeAction =
+		 // new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
 
-		addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-				Pipe.TAPNTRANS, "Add a transition", "I", true));
+		 addMenuItem(drawMenu, transAction = new TypeAction("Transition",
+				 Pipe.TAPNTRANS, "Add a transition", "I", true));
 
-		/*
-		 * addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-		 * Pipe.IMMTRANS, "Add an immediate transition","I",true));
-		 */
-		/*
-		 * CB Joakim Byg - Not part of the model addMenuItem(drawMenu,
-		 * timedtransAction = new TypeAction("Timed transition",
-		 * Pipe.TIMEDTRANS, "Add a timed transition","T",true)); EOC
-		 */
-		/*
-		 * CB Jiri Srba - Not part of the model addMenuItem(drawMenu, arcAction
-		 * = new TypeAction("Arc", Pipe.ARC, "Add an arc","A",true));" + EOC
-		 */
+		 /*
+		  * addMenuItem(drawMenu, transAction = new TypeAction("Transition",
+		  * Pipe.IMMTRANS, "Add an immediate transition","I",true));
+		  */
+		 /*
+		  * CB Joakim Byg - Not part of the model addMenuItem(drawMenu,
+		  * timedtransAction = new TypeAction("Timed transition",
+		  * Pipe.TIMEDTRANS, "Add a timed transition","T",true)); EOC
+		  */
+		 /*
+		  * CB Jiri Srba - Not part of the model addMenuItem(drawMenu, arcAction
+		  * = new TypeAction("Arc", Pipe.ARC, "Add an arc","A",true));" + EOC
+		  */
 
-		/* CB Joakim Byg - Adding timed arcs */
-		addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
-				Pipe.TAPNARC, "Add an arc", "R", true));
+		 /* CB Joakim Byg - Adding timed arcs */
+		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
+				 Pipe.TAPNARC, "Add an arc", "R", true));
 
-		addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				"Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "",
-				true));
-		/* EOC */
+		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
+				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "",
+				 true));
+		 /* EOC */
 
-		addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
-				Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc", "H", true));
+		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
+				 Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc", "H", true));
 
-		addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
-				Pipe.ANNOTATION, "Add an annotation", "N", true));
-		drawMenu.addSeparator();
-		addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
-				Pipe.ADDTOKEN, "Add a token", "ADD", true));
-		addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
-				"Delete token", Pipe.DELTOKEN, "Delete a token", "SUBTRACT",
-				true));
+		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
+				 Pipe.ANNOTATION, "Add an annotation", "N", true));
+		 drawMenu.addSeparator();
+		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
+				 Pipe.ADDTOKEN, "Add a token", "ADD", true));
+		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
+				 "Delete token", Pipe.DELTOKEN, "Delete a token", "SUBTRACT",
+				 true));
 
-		/* drawMenu.addSeparator(); */
-		/*
-		 * addMenuItem(drawMenu, rateAction = new TypeAction("Rate Parameter",
-		 * Pipe.RATE, "Rate Parameter", "R",true));
-		 */
-		/*
-		 * addMenuItem(drawMenu, markingAction = new
-		 * TypeAction("Marking Parameter", Pipe.MARKING, "Marking Parameter",
-		 * "M",true));
-		 */
+		 /* drawMenu.addSeparator(); */
+		 /*
+		  * addMenuItem(drawMenu, rateAction = new TypeAction("Rate Parameter",
+		  * Pipe.RATE, "Rate Parameter", "R",true));
+		  */
+		 /*
+		  * addMenuItem(drawMenu, markingAction = new
+		  * TypeAction("Marking Parameter", Pipe.MARKING, "Marking Parameter",
+		  * "M",true));
+		  */
 
-		JMenu viewMenu = new JMenu("View");
-		viewMenu.setMnemonic('V');
+		 JMenu viewMenu = new JMenu("View");
+		 viewMenu.setMnemonic('V');
 
-		zoomMenu = new JMenu("Zoom");
-		zoomMenu.setIcon(new ImageIcon(Thread.currentThread()
-				.getContextClassLoader().getResource(
-						CreateGui.imgPath + "Zoom.png")));
-		addZoomMenuItems(zoomMenu);
+		 zoomMenu = new JMenu("Zoom");
+		 zoomMenu.setIcon(new ImageIcon(Thread.currentThread()
+				 .getContextClassLoader().getResource(
+						 CreateGui.imgPath + "Zoom.png")));
+		 addZoomMenuItems(zoomMenu);
 
-		addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
-				"Zoom out by 10% ", "ctrl MINUS"));
-		addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
-				"Zoom in by 10% ", "ctrl PLUS"));
-		viewMenu.add(zoomMenu);
+		 addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
+				 "Zoom out by 10% ", "ctrl MINUS"));
+		 addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
+				 "Zoom in by 10% ", "ctrl PLUS"));
+		 viewMenu.add(zoomMenu);
 
-		viewMenu.addSeparator();
-		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
-				"Change the grid size", "G"));
-		addMenuItem(viewMenu, dragAction = new TypeAction("Drag", Pipe.DRAG,
-				"Drag the drawing", "D", true));
+		 viewMenu.addSeparator();
+		 addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
+				 "Change the grid size", "G"));
+		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", Pipe.DRAG,
+				 "Drag the drawing", "D", true));
 
-		JMenu animateMenu = new JMenu("Simulator");
-		animateMenu.setMnemonic('A');
-		addMenuItem(animateMenu, startAction = new AnimateAction(
-				"Simulation mode", Pipe.START, "Toggle Simulation Mode",
-				"Ctrl A", true));
-		animateMenu.addSeparator();
-		addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
-				Pipe.STEPBACKWARD, "Step backward a firing", "typed 4"));
-		addMenuItem(animateMenu,
-				stepforwardAction = new AnimateAction("Forward",
-						Pipe.STEPFORWARD, "Step forward a firing", "typed 6"));
+		 JMenu animateMenu = new JMenu("Simulator");
+		 animateMenu.setMnemonic('A');
+		 addMenuItem(animateMenu, startAction = new AnimateAction(
+				 "Simulation mode", Pipe.START, "Toggle Simulation Mode",
+				 "Ctrl A", true));
+		 animateMenu.addSeparator();
+		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
+				 Pipe.STEPBACKWARD, "Step backward a firing", "typed 4"));
+		 addMenuItem(animateMenu,
+				 stepforwardAction = new AnimateAction("Forward",
+						 Pipe.STEPFORWARD, "Step forward a firing", "typed 6"));
 
-		addMenuItem(animateMenu, timeAction = new AnimateAction("Delay 1",
-				Pipe.TIMEPASS, "Let time pass 1 unit", "_"));
+		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay 1",
+				 Pipe.TIMEPASS, "Let time pass 1 unit", "_"));
 
-		/*
-		 * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
-		 * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
-		 * addMenuItem(animateMenu, randomAnimateAction = new
-		 * AnimateAction("Simulate", Pipe.ANIMATE,
-		 * "Randomly fire a number of transitions", "typed 7",true));
-		 */
-		randomAction = new AnimateAction("Random", Pipe.RANDOM,
-				"Randomly fire a transition", "typed 5");
-		randomAnimateAction = new AnimateAction("Simulate", Pipe.ANIMATE,
-				"Randomly fire a number of transitions", "typed 7", true);
+		 /*
+		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
+		  * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
+		  * addMenuItem(animateMenu, randomAnimateAction = new
+		  * AnimateAction("Simulate", Pipe.ANIMATE,
+		  * "Randomly fire a number of transitions", "typed 7",true));
+		  */
+		 randomAction = new AnimateAction("Random", Pipe.RANDOM,
+				 "Randomly fire a transition", "typed 5");
+		 randomAnimateAction = new AnimateAction("Simulate", Pipe.ANIMATE,
+				 "Randomly fire a number of transitions", "typed 7", true);
 
-		JMenu helpMenu = new JMenu("Help");
-		helpMenu.setMnemonic('H');
+		 JMenu helpMenu = new JMenu("Help");
+		 helpMenu.setMnemonic('H');
 
-		JMenuItem aboutItem = helpMenu.add("About");
-		aboutItem.addActionListener(this); // Help - About is implemented
-											// differently
+		 JMenuItem aboutItem = helpMenu.add("About");
+		 aboutItem.addActionListener(this); // Help - About is implemented
+		 // differently
 
-		URL iconURL = Thread.currentThread().getContextClassLoader()
-				.getResource(CreateGui.imgPath + "About.png");
-		if (iconURL != null) {
-			aboutItem.setIcon(new ImageIcon(iconURL));
-		}
+		 URL iconURL = Thread.currentThread().getContextClassLoader()
+		 .getResource(CreateGui.imgPath + "About.png");
+		 if (iconURL != null) {
+			 aboutItem.setIcon(new ImageIcon(iconURL));
+		 }
 
-		new JMenu("Experiment");
+		 new JMenu("Experiment");
 
-		menuBar.add(fileMenu);
-		menuBar.add(editMenu);
-		menuBar.add(viewMenu);
-		menuBar.add(drawMenu);
+		 menuBar.add(fileMenu);
+		 menuBar.add(editMenu);
+		 menuBar.add(viewMenu);
+		 menuBar.add(drawMenu);
 
-		menuBar.add(animateMenu);
+		 menuBar.add(animateMenu);
 
-		// menuBar.add(experimentMenu);
-		menuBar.add(helpMenu);
-		setJMenuBar(menuBar);
+		 // menuBar.add(experimentMenu);
+		 menuBar.add(helpMenu);
+		 setJMenuBar(menuBar);
 
 	}
 
@@ -630,7 +630,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	private JMenuItem addMenuItem(JMenu menu, Action action) {
 		JMenuItem item = menu.add(action);
 		KeyStroke keystroke = (KeyStroke) action
-				.getValue(Action.ACCELERATOR_KEY);
+		.getValue(Action.ACCELERATOR_KEY);
 
 		if (keystroke != null) {
 			item.setAccelerator(keystroke);
@@ -821,7 +821,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		buffer.append("\n\n");
 		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
 		buffer
-				.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
+		.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
 		buffer.append("Aalborg University 2009 \n\n");
 		buffer.append("Read more at: www.tapaal.net \n\n");
 
@@ -859,50 +859,49 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		}
 	}
 
-	public void saveOperation(boolean forceSaveAs) {
+	public void saveOperation(boolean forceSave){
+		saveOperation(appTab.getSelectedIndex(), forceSave);
+	}
 
-		if (appView == null) {
-			return;
-		}
-
-		File modelFile = CreateGui.getFile();
+	public void saveOperation(int index, boolean forceSaveAs) {
+		File modelFile = CreateGui.getFile(index);
 		if (!forceSaveAs && modelFile != null) { // ordinary save
-
-			saveNet(modelFile);
+			saveNet(index, modelFile);
 		} else { // save as
 			String path = null;
 			if (modelFile != null) {
 				path = modelFile.toString();
 			} else {
-				path = appTab.getTitleAt(appTab.getSelectedIndex());
+				path = appTab.getTitleAt(index);
 			}
 			String filename = new FileBrowser(path).saveFile();
 			if (filename != null) {
-				saveNet(new File(filename));
+				saveNet(index, new File(filename));
 			}
 		}
 
 		// resize "header" of current tab immediately to fit the length of the
 		// model name
-		appTab.getTabComponentAt(appTab.getSelectedIndex()).doLayout();
-
+		appTab.getTabComponentAt(index).doLayout();
 	}
 
-	private void saveNet(File outFile) {
+	private void saveNet(int index, File outFile) {
 		try {
-			TabContent currentTab = (TabContent) appTab.getSelectedComponent();
+			TabContent currentTab = CreateGui.getTab(index);
 			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-					currentTab.templates(), currentTab.queries(), currentTab
-							.network().constants());
+				currentTab.templates(), 
+				currentTab.queries(), 
+				currentTab.network().constants()
+			);
 
 			tapnWriter.savePNML(outFile);
 
-			CreateGui.setFile(outFile, appTab.getSelectedIndex());
+			CreateGui.setFile(outFile, index);
 
-			appView.setNetChanged(false);
-			appTab.setTitleAt(appTab.getSelectedIndex(), outFile.getName());
-			setTitle(outFile.getName()); // Change the window title
-			appView.getUndoManager().clear();
+			CreateGui.getDrawingSurface(index).setNetChanged(false);
+			appTab.setTitleAt(index, outFile.getName());
+			if(index == appTab.getSelectedIndex()) setTitle(outFile.getName()); // Change the window title
+			CreateGui.getDrawingSurface(index).getUndoManager().clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 		} catch (Exception e) {
@@ -925,8 +924,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name, tab);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab,
-				closeAction));
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
 		appTab.setSelectedIndex(freeSpace);
 
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
@@ -966,7 +964,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		TabContent tab = CreateGui.getTab(freeSpace);
 		appTab.addTab(name, null, tab, null);
-		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab, closeAction));
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
 		appTab.setSelectedIndex(freeSpace);
 
 		if (file != null) {
@@ -1004,7 +1002,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
 						"Error loading file:\n" + name + "\nGuru meditation:\n"
-								+ e.toString(), "File load error",
+						+ e.toString(), "File load error",
 						JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 
@@ -1041,8 +1039,11 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	 * @return true if handled, false if cancelled
 	 */
 	private boolean checkForSave() {
+		return checkForSave(appTab.getSelectedIndex());
+	}
 
-		if (appView.getNetChanged()) {
+	public boolean checkForSave(int index) {
+		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"Current file has changed. Save current file?",
 					"Confirm Save Current File",
@@ -1050,7 +1051,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 					JOptionPane.WARNING_MESSAGE);
 			switch (result) {
 			case JOptionPane.YES_OPTION:
-				saveOperation(false);
+				saveOperation(index, false);
 				break;
 			case JOptionPane.CLOSED_OPTION:
 			case JOptionPane.CANCEL_OPTION:
@@ -1247,8 +1248,8 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 	public void setTitle(String title) {
 		super
-				.setTitle((title == null) ? frameTitle : frameTitle + ": "
-						+ title);
+		.setTitle((title == null) ? frameTitle : frameTitle + ": "
+				+ title);
 	}
 
 	public boolean isEditionAllowed() {
@@ -1370,17 +1371,17 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				break;
 
-			// case Pipe.RANDOM:
-			// animBox.clearStepsForward();
-			// CreateGui.getAnimator().doRandomFiring();
-			// //update mouseOverView
-			// for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-			// if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
-			// ((TimedPlaceComponent)p).showAgeOfTokens(true);
-			// }
-			// }
-			// CreateGui.getAnimationController().setAnimationButtonsEnabled();
-			// break;
+				// case Pipe.RANDOM:
+				// animBox.clearStepsForward();
+				// CreateGui.getAnimator().doRandomFiring();
+				// //update mouseOverView
+				// for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
+				// if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
+				// ((TimedPlaceComponent)p).showAgeOfTokens(true);
+				// }
+				// }
+				// CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				// break;
 
 			case Pipe.STEPFORWARD:
 				animBox.stepForward();
@@ -1449,7 +1450,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		public void actionPerformed(ActionEvent e) {
 			// check if queries need to be removed
 			ArrayList<PetriNetObject> selection = CreateGui.getView()
-					.getSelectionObject().getSelection();
+			.getSelectionObject().getSelection();
 			Iterable<TAPNQuery> queries = ((TabContent) appTab
 					.getSelectedComponent()).queries();
 			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
@@ -1469,36 +1470,36 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			}
 			StringBuilder s = new StringBuilder();
 			s
-					.append("The following queries are associated with the currently selected objects:\n\n");
+			.append("The following queries are associated with the currently selected objects:\n\n");
 			for (TAPNQuery q : queriesToDelete) {
 				s.append(q.getName());
 				s.append("\n");
 			}
 			s
-					.append("\nAre you sure you want to remove the current selection and all associated queries?");
+			.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
 			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
 					CreateGui.getApp(), s.toString(), "Warning",
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 					: JOptionPane.YES_OPTION;
 
-			if (choice == JOptionPane.YES_OPTION) {
-				appView.getUndoManager().newEdit(); // new "transaction""
+					if (choice == JOptionPane.YES_OPTION) {
+						appView.getUndoManager().newEdit(); // new "transaction""
 
-				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab()
-							.getSelectedComponent());
-					for (TAPNQuery q : queriesToDelete) {
-						currentTab.removeQuery(q);
+						if (queriesAffected) {
+							TabContent currentTab = ((TabContent) CreateGui.getTab()
+									.getSelectedComponent());
+							for (TAPNQuery q : queriesToDelete) {
+								currentTab.removeQuery(q);
+							}
+						}
+
+						appView.getUndoManager().deleteSelection(
+								appView.getSelectionObject().getSelection());
+						appView.getSelectionObject().deleteSelection();
+						appView.repaint();
+						CreateGui.getCurrentTab().network().buildConstraints();
 					}
-				}
-
-				appView.getUndoManager().deleteSelection(
-						appView.getSelectionObject().getSelection());
-				appView.getSelectionObject().deleteSelection();
-				appView.repaint();
-				CreateGui.getCurrentTab().network().buildConstraints();
-			}
 		}
 
 	}
@@ -1660,9 +1661,9 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				String actionName = (String) getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
 				TabContent tabContent = (TabContent) appTab
-						.getSelectedComponent();
+				.getSelectedComponent();
 				JViewport thisView = tabContent.drawingSurfaceScrollPane()
-						.getViewport();
+				.getViewport();
 				String selection = null, strToTest = null;
 
 				double midpointX = Zoomer.getUnzoomedValue(thisView
@@ -1746,7 +1747,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		public void actionPerformed(ActionEvent e) {
 			if (this == runUppaalVerification) {
 				throw new RuntimeException("Dont think this is used");// QueryDialogue.ShowUppaalQueryDialogue(QueryDialogueOption.VerifyNow,
-																		// null);
+				// null);
 			}
 		}
 
@@ -1839,12 +1840,12 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				 * appView.getSelectionObject().clearSelection();
 				 * appGui.getCopyPasteManager().startPaste(appView); } else
 				 */if (this == undoAction) {
-					appView.getUndoManager().undo();
-					CreateGui.getCurrentTab().network().buildConstraints();
-				} else if (this == redoAction) {
-					appView.getUndoManager().redo();
-					CreateGui.getCurrentTab().network().buildConstraints();
-				}
+					 appView.getUndoManager().undo();
+					 CreateGui.getCurrentTab().network().buildConstraints();
+				 } else if (this == redoAction) {
+					 appView.getUndoManager().redo();
+					 CreateGui.getCurrentTab().network().buildConstraints();
+				 }
 			}
 		}
 	}
