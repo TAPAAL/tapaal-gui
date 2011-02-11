@@ -51,8 +51,10 @@ public abstract class Note extends PetriNetObject implements Translatable {
 		note.setText("");
 		note.setFont(new Font(Pipe.ANNOTATION_DEFAULT_FONT, Font.PLAIN,
 				Pipe.ANNOTATION_DEFAULT_FONT_SIZE));
-		note.setSize(note.getPreferredSize().width,
-				note.getPreferredSize().height);
+		note.setSize(
+				note.getPreferredSize().width,
+				note.getPreferredSize().height
+		);
 		note.setMinimumSize(note.getPreferredSize());
 		note.setHighlighter(new DefaultHighlighter());
 		note.setDisabledTextColor(Pipe.NOTE_DISABLED_COLOUR);

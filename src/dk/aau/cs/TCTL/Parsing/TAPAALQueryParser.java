@@ -403,20 +403,6 @@ public class TAPAALQueryParser implements GPMessageConstants {
 
 				break;
 
-			case gpMsgLexicalError:
-				/*
-				 * Place code here to handle a illegal or unrecognized token To
-				 * recover, pop the token from the stack: Parser.PopInputToken
-				 */
-
-				// // ************************************** log file
-				// System.out.println("gpMsgLexicalError");
-				// // ************************************** end log
-
-				parser.popInputToken();
-
-				break;
-
 			case gpMsgNotLoadedError:
 				/* Load the Compiled Grammar Table file first. */
 
@@ -427,7 +413,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				throw new ParseException(
 						"TAPAAL countered an error trying to parse the query",
 						0);
-
+			case gpMsgLexicalError: /* Place code here to handle a illegal or unrecognized token To recover, pop the token from the stack: Parser.PopInputToken */
 			case gpMsgSyntaxError:
 				/*
 				 * This is a syntax error: the source has produced a token that

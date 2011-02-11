@@ -18,6 +18,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
@@ -255,7 +256,9 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		labelElement.setAttribute("width", (inputLabel.getNoteWidth() >= 0.0 ? String.valueOf(inputLabel.getNoteWidth()) : ""));
 		labelElement.setAttribute("height", (inputLabel.getNoteHeight() >= 0.0 ? String.valueOf(inputLabel.getNoteHeight()) : ""));
 		labelElement.setAttribute("border", String.valueOf(inputLabel.isShowingBorder()));
-		labelElement.setAttribute("text", (inputLabel.getNoteText() != null ? inputLabel.getNoteText() : ""));
+		Text text = document.createTextNode(inputLabel.getNoteText() != null ? inputLabel.getNoteText() : "");
+		labelElement.appendChild(text);
+		//labelElement.setAttribute("text", );
 		
 		return labelElement;
 	}

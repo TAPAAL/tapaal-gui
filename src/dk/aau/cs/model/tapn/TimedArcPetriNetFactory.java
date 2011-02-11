@@ -679,12 +679,7 @@ public class TimedArcPetriNetFactory {
 	// //////////////////////////////////////////////////////////
 	private Template<TimedArcPetriNet> createTimedArcPetriNetFromPNMLOldFormat(Node tapnNode) {
 		initialMarking = new TimedMarking();
-		if (tapnNode instanceof Element) {
-			String name = getTAPNName((Element) tapnNode);
-			tapn = new TimedArcPetriNet(name);
-		} else {
-			tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
-		}
+		tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		guiModel = new DataLayer();
 
 		Node node = null;
