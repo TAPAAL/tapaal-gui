@@ -29,6 +29,7 @@ import pipe.dataLayer.Note;
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
@@ -872,5 +873,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 	public void repaintAll() {
 		this.repaint();
 		guiModel.repaintAll(!isInAnimationMode());
+	}
+
+	public void setupNameGeneratorsFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
+		nameGenerator.setupNameGeneratorFromTemplates(templates);
 	}
 }

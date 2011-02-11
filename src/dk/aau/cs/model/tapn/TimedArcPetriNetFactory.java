@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
@@ -108,6 +110,9 @@ public class TimedArcPetriNetFactory {
 		return templates;
 	}
 	
+
+	
+
 	// TODO: the methods for loading nets in the old and the new format 
 	// contains a lot of duplicate code at the moment. The code moreover
 	// contains remnants of the pipe code which is not that readable and this 
@@ -1085,36 +1090,23 @@ public class TimedArcPetriNetFactory {
 					// XXX - kyrke
 					if (newObject instanceof TimedPlaceComponent) {
 
-						LabelHandler labelHandler = new LabelHandler(
-								((Place) newObject).getNameLabel(),
-								(Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(
-								labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseWheelListener(labelHandler);
+						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
+						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
-						PlaceHandler placeHandler = new PlaceHandler(
-								drawingSurface, (Place) newObject, guiModel,
-								tapn);
+						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject, guiModel, tapn);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 					} else {
 
-						LabelHandler labelHandler = new LabelHandler(
-								((Place) newObject).getNameLabel(),
-								(Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(
-								labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseWheelListener(labelHandler);
+						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
+						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
-						PlaceHandler placeHandler = new PlaceHandler(
-								drawingSurface, (Place) newObject);
+						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -1123,23 +1115,15 @@ public class TimedArcPetriNetFactory {
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(
-								drawingSurface, (Transition) newObject,
-								guiModel, tapn);
+						transitionHandler = new TAPNTransitionHandler(drawingSurface, (Transition) newObject, guiModel, tapn);
 					} else {
-						transitionHandler = new TransitionHandler(
-								drawingSurface, (Transition) newObject);
+						transitionHandler = new TransitionHandler(drawingSurface, (Transition) newObject);
 					}
 
-					LabelHandler labelHandler = new LabelHandler(
-							((Transition) newObject).getNameLabel(),
-							(Transition) newObject);
-					((Transition) newObject).getNameLabel().addMouseListener(
-							labelHandler);
-					((Transition) newObject).getNameLabel()
-							.addMouseMotionListener(labelHandler);
-					((Transition) newObject).getNameLabel()
-							.addMouseWheelListener(labelHandler);
+					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(), (Transition) newObject);
+					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
+					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 					newObject.addMouseListener(transitionHandler);
 					newObject.addMouseMotionListener(transitionHandler);
@@ -1151,36 +1135,29 @@ public class TimedArcPetriNetFactory {
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TransportArcComponent) {
-							TransportArcHandler transportArcHandler = new TransportArcHandler(
-									drawingSurface, (Arc) newObject);
+							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
-							newObject
-									.addMouseWheelListener(transportArcHandler);
-							newObject
-									.addMouseMotionListener(transportArcHandler);
+							newObject.addMouseWheelListener(transportArcHandler);
+							newObject.addMouseMotionListener(transportArcHandler);
 						} else {
-							TimedArcHandler timedArcHandler = new TimedArcHandler(
-									drawingSurface, (Arc) newObject);
+							TimedArcHandler timedArcHandler = new TimedArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(timedArcHandler);
 							newObject.addMouseWheelListener(timedArcHandler);
 							newObject.addMouseMotionListener(timedArcHandler);
 						}
 					} else {
 						/* EOC */
-						ArcHandler arcHandler = new ArcHandler(drawingSurface,
-								(Arc) newObject);
+						ArcHandler arcHandler = new ArcHandler(drawingSurface,(Arc) newObject);
 						newObject.addMouseListener(arcHandler);
 						newObject.addMouseWheelListener(arcHandler);
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
-					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(
-							drawingSurface, (AnnotationNote) newObject);
+					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(drawingSurface, (AnnotationNote) newObject);
 					newObject.addMouseListener(noteHandler);
 					newObject.addMouseMotionListener(noteHandler);
 					((Note) newObject).getNote().addMouseListener(noteHandler);
-					((Note) newObject).getNote().addMouseMotionListener(
-							noteHandler);
+					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 				if (newObject instanceof Zoomable) {
 					newObject.zoomUpdate(drawingSurface.getZoom());

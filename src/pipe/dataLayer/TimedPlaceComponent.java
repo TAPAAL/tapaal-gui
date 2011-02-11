@@ -346,14 +346,18 @@ public class TimedPlaceComponent extends Place {
 
 	@Override
 	public void update(boolean displayConstantNames) {
-		if (attributesVisible == true) {
-			if (!(place.invariant().upperBound() instanceof InfBound))
-				pnName.setText("\nInv: "
-						+ place.invariant().toString(displayConstantNames));
-			else
-				pnName.setText("");
-
+		if(place != null) {
+			if (attributesVisible == true) {
+				if (!(place.invariant().upperBound() instanceof InfBound)) {
+					pnName.setName(place.name());
+					pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+				}
+				else {
+					pnName.setName(place.name());
+				}
+			}
 		} else {
+			pnName.setName("");
 			pnName.setText("");
 		}
 		pnName.zoomUpdate(zoom);

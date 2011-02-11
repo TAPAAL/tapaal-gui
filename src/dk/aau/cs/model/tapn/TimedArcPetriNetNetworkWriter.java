@@ -30,6 +30,7 @@ import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
 import dk.aau.cs.util.Require;
@@ -162,7 +163,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	private void appendTransitions(Document document, DataLayer guiModel, Element NET) {
 		Transition[] transitions = guiModel.getTransitions();
 		for (int i = 0; i < transitions.length; i++) {
-			NET.appendChild(createTransitionElement(transitions[i],	document));
+			NET.appendChild(createTransitionElement((TimedTransitionComponent)transitions[i],	document));
 		}
 	}
 	
@@ -227,7 +228,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
 		placeElement.setAttribute("positionX", (inputPlace.getPositionXObject() != null ? String.valueOf(inputPlace.getPositionXObject()) : ""));
 		placeElement.setAttribute("positionY", (inputPlace.getPositionYObject() != null ? String.valueOf(inputPlace.getPositionYObject())	: ""));
-		placeElement.setAttribute("name", (inputPlace.getName() != null ? inputPlace.getName() : (inputPlace.getId() != null && inputPlace.getId().length() > 0 ? inputPlace.getId() : "")));
+		placeElement.setAttribute("name", inputPlace.underlyingPlace().name());
 		placeElement.setAttribute("id", (inputPlace.getId() != null ? inputPlace.getId() : "error"));
 		placeElement.setAttribute("nameOffsetX", (inputPlace.getNameOffsetXObject() != null ? String.valueOf(inputPlace.getNameOffsetXObject()) : ""));
 		placeElement.setAttribute("nameOffsetY", (inputPlace.getNameOffsetYObject() != null ? String.valueOf(inputPlace.getNameOffsetYObject()) : ""));
@@ -261,7 +262,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		return labelElement;
 	}
 
-	private Element createTransitionElement(Transition inputTransition, Document document) {
+	private Element createTransitionElement(TimedTransitionComponent inputTransition, Document document) {
 		Require.that(inputTransition != null, "Error: inputTransition was null");
 		Require.that(document != null, "Error: document was null");
 		
@@ -271,7 +272,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		transitionElement.setAttribute("positionY",	(inputTransition.getPositionYObject() != null ? String.valueOf(inputTransition.getPositionYObject()) : ""));
 		transitionElement.setAttribute("nameOffsetX", (inputTransition.getNameOffsetXObject() != null ? String.valueOf(inputTransition.getNameOffsetXObject()) : ""));
 		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
-		transitionElement.setAttribute("name", (inputTransition.getName() != null ? inputTransition.getName() : (inputTransition.getId() != null && inputTransition.getId().length() > 0 ? inputTransition.getId() : "")));
+		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
 		transitionElement.setAttribute("timed", String.valueOf(inputTransition.isTimed()));
 		transitionElement.setAttribute("infiniteServer", String.valueOf(inputTransition.isInfiniteServer()));

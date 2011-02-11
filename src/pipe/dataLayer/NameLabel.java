@@ -40,9 +40,7 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 
 	public NameLabel(int zoom) {
 		this("");
-		setFont(getFont().deriveFont(
-				Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE,
-						zoom)));
+		setFont(getFont().deriveFont(Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE, zoom)));
 	}
 
 	public NameLabel(String nameInput) {
@@ -54,11 +52,6 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 		setFocusable(false);
 		setOpaque(false);
 		setBackground(Pipe.BACKGROUND_COLOR);
-		// setAlignmentY(TOP_ALIGNMENT);
-		// setAlignmentX(RIGHT_ALIGNMENT);
-
-		// setHorizontalAlignment(RIGHT);
-		// setVerticalAlignment(TOP);
 	}
 
 	public void setPosition(int x, int y) {
@@ -75,8 +68,7 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 	}
 
 	public void updatePosition() {
-		setLocation(positionX - getPreferredSize().width, positionY
-				- Pipe.NAMELABEL_OFFSET);
+		setLocation(positionX - getPreferredSize().width, positionY	- Pipe.NAMELABEL_OFFSET);
 	}
 
 	public void translate(int x, int y) {
@@ -120,9 +112,7 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 	}
 
 	public void zoomUpdate(int value) {
-		setFont(getFont().deriveFont(
-				Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE,
-						value)));
+		setFont(getFont().deriveFont(Zoomer.getZoomedValue((float) Pipe.LABEL_DEFAULT_FONT_SIZE, value)));
 		updateSize();
 	}
 

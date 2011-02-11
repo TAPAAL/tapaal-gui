@@ -226,24 +226,19 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 			EventListener[] mouseListeners = pnObjectCopy
 					.getListeners(MouseListener.class);
 			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy
-						.removeMouseListener((MouseListener) mouseListeners[i]);
+				pnObjectCopy.removeMouseListener((MouseListener) mouseListeners[i]);
 			}
 
-			mouseListeners = pnObjectCopy
-					.getListeners(MouseMotionListener.class);
+			mouseListeners = pnObjectCopy.getListeners(MouseMotionListener.class);
 
 			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy
-						.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
+				pnObjectCopy.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
 			}
 
-			mouseListeners = pnObjectCopy
-					.getListeners(MouseWheelListener.class);
+			mouseListeners = pnObjectCopy.getListeners(MouseWheelListener.class);
 
 			for (int i = 0; i < mouseListeners.length; i++) {
-				pnObjectCopy
-						.removeMouseWheelListener((MouseWheelListener) mouseListeners[i]);
+				pnObjectCopy.removeMouseWheelListener((MouseWheelListener) mouseListeners[i]);
 			}
 
 			return pnObjectCopy;

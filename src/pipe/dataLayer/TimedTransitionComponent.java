@@ -97,5 +97,25 @@ public class TimedTransitionComponent extends Transition {
 		transition.setName(nameInput);
 		super.setName(nameInput);
 	}
+	
+	public String getName() {
+		return transition != null ? transition.name() : "";
+	}
+	
+	@Override
+	public void update(boolean displayConstantNames) {
+		if(transition != null) {
+			pnName.setName(transition.name());
+			pnName.zoomUpdate(zoom);
+		}
+		else {
+			pnName.setText("");
+		}
+		updateBounds();
+		updateLabelLocation();
+		updateConnected();
+		
+		repaint();
+	}
 
 }

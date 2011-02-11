@@ -984,17 +984,13 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 				Document doc = builder.parse(file);
 
-				Node top = doc.getElementsByTagName("net").item(0);
-				NetType type = parseNetType(((Element) top).getAttribute("type"));
-
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(Pipe.CREATING);
 				}
 
-				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(
-						currentTab.drawingSurface());
+				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(currentTab.drawingSurface());
 
 				Iterable<Template<TimedArcPetriNet>> templates = factory.parseTimedArcPetriNetsFromPNML(doc);
 				for (Template<TimedArcPetriNet> t : templates) {
@@ -1027,14 +1023,6 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
-	}
-
-	private NetType parseNetType(String attribute) {
-		if (attribute.equals("Untimed P/T net")) {
-			return NetType.UNTIMED;
-		} else {
-			return NetType.TAPN;
-		}
 	}
 
 	private void undoAddTab(int currentlySelected) {
@@ -1093,10 +1081,8 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	public void setRandomAnimationMode(boolean on) {
 
 		if (on == false) {
-			stepforwardAction.setEnabled(CreateGui.getAnimationHistory()
-					.isStepForwardAllowed());
-			stepbackwardAction.setEnabled(CreateGui.getAnimationHistory()
-					.isStepBackAllowed());
+			stepforwardAction.setEnabled(CreateGui.getAnimationHistory().isStepForwardAllowed());
+			stepbackwardAction.setEnabled(CreateGui.getAnimationHistory().isStepBackAllowed());
 
 			CreateGui.getAnimationController().setAnimationButtonsEnabled();
 
@@ -1294,9 +1280,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	public void updateZoomCombo() {
 		ActionListener zoomComboListener = (zoomComboBox.getActionListeners())[0];
 		zoomComboBox.removeActionListener(zoomComboListener);
-		zoomComboBox.setSelectedItem(String.valueOf(appView.getZoomController()
-				.getPercent())
-				+ "%");
+		zoomComboBox.setSelectedItem(String.valueOf(appView.getZoomController().getPercent()) + "%");
 		zoomComboBox.addActionListener(zoomComboListener);
 	}
 
@@ -1383,18 +1367,6 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				break;
 
-				// case Pipe.RANDOM:
-				// animBox.clearStepsForward();
-				// CreateGui.getAnimator().doRandomFiring();
-				// //update mouseOverView
-				// for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces() ){
-				// if (((TimedPlaceComponent)p).isAgeOfTokensShown()){
-				// ((TimedPlaceComponent)p).showAgeOfTokens(true);
-				// }
-				// }
-				// CreateGui.getAnimationController().setAnimationButtonsEnabled();
-				// break;
-
 			case Pipe.STEPFORWARD:
 				animBox.stepForward();
 				CreateGui.getAnimator().stepForward();
@@ -1461,19 +1433,16 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			// check if queries need to be removed
-			ArrayList<PetriNetObject> selection = CreateGui.getView()
-			.getSelectionObject().getSelection();
-			Iterable<TAPNQuery> queries = ((TabContent) appTab
-					.getSelectedComponent()).queries();
+			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
+			Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
 			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
 			boolean queriesAffected = false;
 			for (PetriNetObject pn : selection) {
 				if (pn instanceof TimedPlaceComponent) {
+					TimedPlaceComponent place = (TimedPlaceComponent)pn;
 					for (TAPNQuery q : queries) {
-						if (q.getProperty()
-								.containsAtomicPropWithSpecificPlace(
-										pn.getName())) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(place.underlyingPlace().model().getName(),place.underlyingPlace().name())) {
 							queriesAffected = true;
 							queriesToDelete.add(q);
 						}
@@ -1481,14 +1450,12 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				}
 			}
 			StringBuilder s = new StringBuilder();
-			s
-			.append("The following queries are associated with the currently selected objects:\n\n");
+			s.append("The following queries are associated with the currently selected objects:\n\n");
 			for (TAPNQuery q : queriesToDelete) {
 				s.append(q.getName());
 				s.append("\n");
 			}
-			s
-			.append("\nAre you sure you want to remove the current selection and all associated queries?");
+			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
 			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
 					CreateGui.getApp(), s.toString(), "Warning",
@@ -1499,15 +1466,13 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 						appView.getUndoManager().newEdit(); // new "transaction""
 
 						if (queriesAffected) {
-							TabContent currentTab = ((TabContent) CreateGui.getTab()
-									.getSelectedComponent());
+							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
 							for (TAPNQuery q : queriesToDelete) {
 								currentTab.removeQuery(q);
 							}
 						}
 
-						appView.getUndoManager().deleteSelection(
-								appView.getSelectionObject().getSelection());
+						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
 						appView.getSelectionObject().deleteSelection();
 						appView.repaint();
 						CreateGui.getCurrentTab().network().buildConstraints();

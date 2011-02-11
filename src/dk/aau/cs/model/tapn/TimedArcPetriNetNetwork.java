@@ -42,7 +42,7 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean hasTAPNCalled(String newName) {
 		for (TimedArcPetriNet tapn : tapns)
-			if (tapn.getName().equals(newName))
+			if (tapn.getName().toLowerCase().equals(newName.toLowerCase()))
 				return true;
 		return false;
 	}

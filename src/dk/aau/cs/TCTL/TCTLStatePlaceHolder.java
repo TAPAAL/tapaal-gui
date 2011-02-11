@@ -56,6 +56,10 @@ public class TCTLStatePlaceHolder extends TCTLAbstractStateProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		return false;
 	}
+	
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+		return false;
+	}
 
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {

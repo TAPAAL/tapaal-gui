@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
@@ -24,7 +25,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PetriNetObject;
+import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
+import pipe.dataLayer.TimedPlaceComponent;
+import pipe.gui.CreateGui;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
@@ -32,6 +37,7 @@ import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.JSplitPaneFix;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 
 public class TemplateExplorer extends JPanel {
@@ -167,11 +173,9 @@ public class TemplateExplorer extends JPanel {
 				if (template != null) {
 					int index = listModel.size();
 					listModel.addElement(template);
-					undoManager.addNewEdit(new AddTemplateCommand(
-							TemplateExplorer.this, template, index));
+					undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
 					parent.addTemplate(template);
-					parent.drawingSurface().setModel(template.guiModel(),
-							template.model());
+					parent.drawingSurface().setModel(template.guiModel(), template.model());
 				}
 			}
 		});
@@ -195,10 +199,54 @@ public class TemplateExplorer extends JPanel {
 				int index = templateList.getSelectedIndex();
 				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>) templateList.getSelectedValue();
 
-				Command command = new RemoveTemplateCommand(
-						TemplateExplorer.this, template, index);
-				undoManager.addNewEdit(command);
-				command.redo();
+				HashSet<TAPNQuery> queriesToDelete = findQueriesAffectedByRemoval(template);
+				
+				int choice = JOptionPane.NO_OPTION;
+				if(!queriesToDelete.isEmpty()){
+					StringBuilder warning = buildWarningMessage(queriesToDelete);
+		
+					choice = JOptionPane.showConfirmDialog(
+							CreateGui.getApp(), warning.toString(), "Warning",
+							JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		
+					if (choice == JOptionPane.YES_OPTION) {
+						for (TAPNQuery q : queriesToDelete) {
+							parent.removeQuery(q);
+						}
+					}
+				}
+				
+				if(queriesToDelete.isEmpty() || choice == JOptionPane.YES_OPTION) {
+					Command command = new RemoveTemplateCommand(TemplateExplorer.this, template, index);
+					undoManager.addNewEdit(command);
+					command.redo();
+				}
+				
+			}
+
+			private HashSet<TAPNQuery> findQueriesAffectedByRemoval(Template<TimedArcPetriNet> template) {
+				Iterable<TAPNQuery> queries = parent.queries();
+				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
+
+				for (TimedPlace p : template.model().places()) {
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(template.model().getName(), p.name())) {
+							queriesToDelete.add(q);
+						}
+					}
+				}
+				return queriesToDelete;
+			}
+			
+			private StringBuilder buildWarningMessage(HashSet<TAPNQuery> queriesToDelete) {
+				StringBuilder s = new StringBuilder();
+				s.append("The following queries are associated with the currently selected objects:\n\n");
+				for (TAPNQuery q : queriesToDelete) {
+					s.append(q.getName());
+					s.append("\n");
+				}
+				s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+				return s;
 			}
 		});
 
@@ -250,22 +298,23 @@ public class TemplateExplorer extends JPanel {
 				JOptionPane.PLAIN_MESSAGE, null, null, 
 				parent.drawingSurface().getNameGenerator().getNewTemplateName());
 
-		if (templateName != null && !isNameAllowed(templateName))
-			JOptionPane.showMessageDialog(
-					parent.drawingSurface(),
-					"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new template could not be created.",
-					"Error Creating Template",
-					JOptionPane.ERROR_MESSAGE);
-		else if (parent.network().hasTAPNCalled(templateName)) {
-			JOptionPane.showMessageDialog(
-					parent.drawingSurface(),
-					"A template named \"" + templateName + "\" already exists.\n\nThe new template could not be created.",
-					"Error Creating Template",
-					JOptionPane.ERROR_MESSAGE);
-		}
-		else if (templateName != null && templateName.length() > 0) {
-			Template<TimedArcPetriNet> template = createNewTemplate(templateName);
-			return template;
+		if (templateName != null) {
+			if(!isNameAllowed(templateName)) {
+				JOptionPane.showMessageDialog(parent.drawingSurface(),
+						"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new template could not be created.",
+						"Error Creating Template",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			else if (parent.network().hasTAPNCalled(templateName)) {
+				JOptionPane.showMessageDialog(parent.drawingSurface(),
+						"A template named \"" + templateName + "\" already exists.\n\nThe new template could not be created.",
+						"Error Creating Template",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			else {
+				Template<TimedArcPetriNet> template = createNewTemplate(templateName);
+				return template;
+			}
 		}
 		return null;
 	}
@@ -287,22 +336,19 @@ public class TemplateExplorer extends JPanel {
 			return;
 
 		if (!isNameAllowed(newName))
-			JOptionPane
-					.showMessageDialog(
+			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
 							"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*.\n\nThe template could not be renamed.",
 							"Error Renaming Template",
 							JOptionPane.ERROR_MESSAGE);
 		
 		else if (parent.network().hasTAPNCalled(newName)) {
-			JOptionPane
-					.showMessageDialog(
+			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
 							"A template named \"" + newName + "\" already exists. Please try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
-			Command command = new RenameTemplateCommand(this, template.model(),
-					template.model().getName(), newName);
+			Command command = new RenameTemplateCommand(this, template.model(),	template.model().getName(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();
 		}

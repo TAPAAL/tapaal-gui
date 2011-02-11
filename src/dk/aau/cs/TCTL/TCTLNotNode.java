@@ -79,6 +79,10 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
+	
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+		return containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+	}
 
 	@Override
 	public boolean containsPlaceHolder() {

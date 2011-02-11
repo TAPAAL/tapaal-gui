@@ -5,6 +5,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Observable;
 
+import dk.aau.cs.util.Require;
+
 
 /**
  * <b>DataLayer</b> - Encapsulates entire Petri-Net, also contains functions to
@@ -147,63 +149,11 @@ public class DataLayer extends Observable implements Cloneable {
 	 *            Place Object to add
 	 */
 	public void addPlace(Place placeInput) {
-		boolean unique = true;
+		Require.that(placeInput != null, "input place was null");
 
-		if (placeInput != null) {
-			if (placeInput.getId() != null && placeInput.getId().length() > 0) {
-				for (int i = 0; i < placesArray.size(); i++) {
-					if (placeInput.getId().equals((placesArray.get(i)).getId())) {
-						unique = false;
-					}
-				}
-			} else {
-				String id = null;
-				if (placesArray != null && placesArray.size() > 0) {
-					int no = placesArray.size();
-					// id = "P" + no;
-					do {
-						// System.out.println("in while loop"); //DBG
-						for (int i = 0; i < placesArray.size(); i++) {
-							id = "P" + no;
-							if (placesArray.get(i) != null) {
-								if (id.equals((placesArray.get(i)).getId())) {
-									// System.out.println("testing id: " + id);
-									// //DBG
-									unique = false;
-									no++;
-								} else {
-									unique = true;
-								}
-							}
-						}
-					} while (!unique);
-				} else {
-					id = "P0";
-				}
-
-				if (id != null) {
-					placeInput.setId(id);
-					if (getPlaceByName(placeInput.getName()) != null) {
-						boolean hasUniqueName = false;
-						int nameID = 0;
-						while (!hasUniqueName) {
-							if (getPlaceByName("P" + nameID) == null) {
-								placeInput.setName("P" + nameID);
-								hasUniqueName = true;
-							} else {
-								nameID++;
-							}
-						}
-					}
-				} else {
-					placeInput.setId("error");
-				}
-			}
-			placesArray.add(placeInput);
-			setChanged();
-			// notifyObservers(placeInput.getBounds());
-			notifyObservers(placeInput);
-		}
+		placesArray.add(placeInput);
+		setChanged();
+		notifyObservers(placeInput);
 	}
 
 	/**
@@ -227,65 +177,11 @@ public class DataLayer extends Observable implements Cloneable {
 	 *            Transition Object to add
 	 */
 	public void addTransition(Transition transitionInput) {
-		boolean unique = true;
-
-		if (transitionInput != null) {
-			if (transitionInput.getId() != null
-					&& transitionInput.getId().length() > 0) {
-				for (int i = 0; i < transitionsArray.size(); i++) {
-					if (transitionInput.getId().equals(
-							(transitionsArray.get(i)).getId())) {
-						unique = false;
-					}
-				}
-			} else {
-				String id = null;
-				if (transitionsArray != null && transitionsArray.size() > 0) {
-					int no = transitionsArray.size();
-					do {
-						// System.out.println("transition while loop");
-						for (int i = 0; i < transitionsArray.size(); i++) {
-							id = "T" + no;
-							if (transitionsArray.get(i) != null) {
-								if (id
-										.equals((transitionsArray.get(i))
-												.getId())) {
-									unique = false;
-									no++;
-								} else {
-									unique = true;
-								}
-							}
-						}
-					} while (!unique);
-				} else {
-					id = "T0";
-				}
-
-				if (id != null) {
-					transitionInput.setId(id);
-					if (getTransitionByName(transitionInput.getName()) != null) {
-						boolean hasUniqueName = false;
-						int nameID = 0;
-						while (!hasUniqueName) {
-							if (getTransitionByName("T" + nameID) == null) {
-								transitionInput.setName("T" + nameID);
-								hasUniqueName = true;
-							} else {
-								nameID++;
-							}
-						}
-					}
-				} else {
-					transitionInput.setId("error");
-				}
-			}
-			transitionsArray.add(transitionInput);
-			setChanged();
-
-			// notifyObservers(transitionInput.getBounds());
-			notifyObservers(transitionInput);
-		}
+		Require.that(transitionInput != null, "input transition was null");
+		
+		transitionsArray.add(transitionInput);
+		setChanged();
+		notifyObservers(transitionInput);
 	}
 
 	/**

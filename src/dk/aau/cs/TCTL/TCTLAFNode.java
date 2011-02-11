@@ -87,6 +87,10 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
 		return property.containsAtomicPropWithSpecificPlace(placeName);
 	}
+	
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
+	}
 
 	@Override
 	public TCTLAbstractProperty findFirstPlaceHolder() {

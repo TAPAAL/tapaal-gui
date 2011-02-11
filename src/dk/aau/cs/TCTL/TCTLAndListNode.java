@@ -167,8 +167,17 @@ public class TCTLAndListNode extends TCTLAbstractStateProperty {
 		boolean atomicPropFound = false;
 
 		for (TCTLAbstractStateProperty p : properties) {
-			atomicPropFound = atomicPropFound
-					|| p.containsAtomicPropWithSpecificPlace(placeName);
+			atomicPropFound = atomicPropFound || p.containsAtomicPropWithSpecificPlace(placeName);
+		}
+
+		return atomicPropFound;
+	}
+	
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+		boolean atomicPropFound = false;
+
+		for (TCTLAbstractStateProperty p : properties) {
+			atomicPropFound = atomicPropFound || p.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 		}
 
 		return atomicPropFound;

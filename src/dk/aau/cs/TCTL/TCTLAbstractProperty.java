@@ -54,6 +54,7 @@ public abstract class TCTLAbstractProperty {
 	public abstract void accept(ITCTLVisitor visitor, Object context);
 
 	public abstract boolean containsAtomicPropWithSpecificPlace(String placeName);
+	public abstract boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName);
 
 	public abstract boolean containsPlaceHolder();
 

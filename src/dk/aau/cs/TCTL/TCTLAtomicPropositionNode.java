@@ -115,5 +115,9 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	public void setTemplate(String string) {
 		this.template = string;
 	}
+	
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+		return template.equals(templateName) && place.equals(placeName);
+	}
 
 }

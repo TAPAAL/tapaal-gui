@@ -284,13 +284,18 @@ public class TabContent extends JSplitPane {
 
 	}
 
-	public void removeQuery(TAPNQuery queryToCreateFrom) {
-		queries.removeQuery(queryToCreateFrom);
+	public void removeQuery(TAPNQuery queryToRemove) {
+		queries.removeQuery(queryToRemove);
 
 	}
 
 	public void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
 		constantsPanel.showConstants();
+	}
+
+	public void setupNameGeneratorsFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
+		drawingSurface.setupNameGeneratorsFromTemplates(templates);
+		
 	}
 }
