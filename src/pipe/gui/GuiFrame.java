@@ -62,6 +62,7 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
@@ -865,6 +866,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 	public void saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getFile(index);
+				
 		if (!forceSaveAs && modelFile != null) { // ordinary save
 			saveNet(index, modelFile);
 		} else { // save as
@@ -876,10 +878,11 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			}
 			String filename = new FileBrowser(path).saveFile();
 			if (filename != null) {
-				saveNet(index, new File(filename));
+				modelFile = new File(filename);
+				saveNet(index, modelFile);
 			}
 		}
-
+		
 		// resize "header" of current tab immediately to fit the length of the
 		// model name
 		appTab.getTabComponentAt(index).doLayout();
@@ -888,6 +891,12 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	private void saveNet(int index, File outFile) {
 		try {
 			TabContent currentTab = CreateGui.getTab(index);
+			NetworkMarking currentMarking = null;
+			if(getGUIMode().equals(GUIMode.animation)){
+				 currentMarking = currentTab.network().marking();
+				 currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
+			}
+			
 			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 				currentTab.templates(), 
 				currentTab.queries(), 
@@ -904,6 +913,9 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			CreateGui.getDrawingSurface(index).getUndoManager().clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			if(getGUIMode().equals(GUIMode.animation)){
+				currentTab.network().setMarking(currentMarking);
+			}
 		} catch (Exception e) {
 			System.err.println(e);
 			JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),

@@ -95,6 +95,10 @@ public class Animator {
 		}
 	}
 
+	public NetworkMarking getInitialMarking(){
+		return initialMarking;
+	}
+	
 	/**
 	 * Highlights enabled transitions
 	 */
