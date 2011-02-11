@@ -54,32 +54,32 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
 		Require.that(file != null, "Error: file to save to was null");
 
-		Document pnDOM = null;
+		Document document = null;
 		Transformer transformer = null;
 		
 		try {
 			// Build a Petri Net XML Document
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			pnDOM = builder.newDocument();
+			document = builder.newDocument();
 
-			Element PNML = pnDOM.createElement("pnml"); // PNML Top Level
-			pnDOM.appendChild(PNML);
-			Attr pnmlAttr = pnDOM.createAttribute("xmlns"); // PNML "xmlns"
+			Element pnmlRootNode = document.createElement("pnml"); // PNML Top Level
+			document.appendChild(pnmlRootNode);
+			Attr pnmlAttr = document.createAttribute("xmlns"); // PNML "xmlns"
 			pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
-			PNML.setAttributeNode(pnmlAttr);
+			pnmlRootNode.setAttributeNode(pnmlAttr);
 
-			AppendConstants(pnDOM);
-			appendTemplates(pnDOM, PNML);
-			appendQueries(pnDOM, PNML);
+			AppendConstants(document, pnmlRootNode);
+			appendTemplates(document, pnmlRootNode);
+			appendQueries(document, pnmlRootNode);
 
-			pnDOM.normalize();
+			document.normalize();
 			// Create Transformer with XSL Source File
 			transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			// Write file and do XSLT transformation to generate correct PNML
 			File outputObjectArrayList = file;
-			DOMSource source = new DOMSource(pnDOM);
+			DOMSource source = new DOMSource(document);
 
 			StreamResult result = new StreamResult(outputObjectArrayList);
 			transformer.transform(source, result);
@@ -110,14 +110,24 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		}
 	}
 	
-	private void AppendConstants(Document document) {
+	private void AppendConstants(Document document, Element root) {
 		for (Constant constant : constants) {
 			Element elem = createConstantElement(constant, document);
-			document.appendChild(elem);
+			root.appendChild(elem);
 		}
 	}
-
 	
+	private Element createConstantElement(Constant constant, Document document) {
+		Require.that(constant != null, "Error: constant was null");
+		Require.that(document != null, "Error: document was null");
+		
+		Element constantElement = document.createElement("constant");
+		
+		constantElement.setAttribute("name", constant.name());
+		constantElement.setAttribute("value", String.valueOf(constant.value()));
+	
+		return constantElement;
+	}
 
 	private void appendTemplates(Document document, Element root) {
 		for (Template<TimedArcPetriNet> tapn : templates) {
@@ -187,18 +197,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			Element newQuery = createQueryElement(query, document);
 			root.appendChild(newQuery);
 		}
-	}
-
-	private Element createConstantElement(Constant constant, Document document) {
-		Require.that(constant != null, "Error: constant was null");
-		Require.that(document != null, "Error: document was null");
-		
-		Element constantElement = document.createElement("constant");
-		
-		constantElement.setAttribute("name", constant.name());
-		constantElement.setAttribute("value", String.valueOf(constant.value()));
-	
-		return constantElement;
 	}
 
 	private Element createQueryElement(TAPNQuery query, Document document) {
