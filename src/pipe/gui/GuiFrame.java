@@ -1000,6 +1000,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				currentTab.setQueries(factory.getQueries());
 				currentTab.setConstants(factory.getConstants());
 				currentTab.network().buildConstraints();
+				currentTab.setupNameGeneratorsFromTemplates(templates);
 
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();

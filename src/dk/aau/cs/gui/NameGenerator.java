@@ -47,8 +47,8 @@ public class NameGenerator {
 	}
 	
 	public void setupNameGeneratorFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
-		Pattern templatePattern = Pattern.compile("([tT][aA][pP][nN])(\\d+)");
-		
+		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
+
 		int templateNameCounter = 0;
 		for(Template<TimedArcPetriNet> tapn : templates) {
 			setupPlaceIDCounter(tapn);
@@ -56,7 +56,7 @@ public class NameGenerator {
 		
 			Matcher m = templatePattern.matcher(tapn.model().getName());
 			if(m.matches()) {
-				int number = Integer.parseInt(m.group(2));
+				int number = Integer.parseInt(m.group(1));
 				if(number > templateNameCounter) templateNameCounter = number;
 			}
 		}
@@ -64,12 +64,12 @@ public class NameGenerator {
 	}
 
 	private void setupTransitionIDCounter(Template<TimedArcPetriNet> tapn) {
-		Pattern transitionPattern = Pattern.compile("([tT])(\\d+)");
+		Pattern transitionPattern = Pattern.compile("^T(\\d+)$", Pattern.CASE_INSENSITIVE);
 		int nameCounter = 0;
 		for(TimedTransition t : tapn.model().transitions()) {
 			Matcher m = transitionPattern.matcher(t.name().toLowerCase());
 			if(m.matches()) {
-				int number = Integer.parseInt(m.group(2));
+				int number = Integer.parseInt(m.group(1));
 				if(number > nameCounter) nameCounter = number;
 			}
 		}
@@ -77,12 +77,12 @@ public class NameGenerator {
 	}
 
 	private void setupPlaceIDCounter(Template<TimedArcPetriNet> tapn) {
-		Pattern placePattern = Pattern.compile("([pP])(\\d+)");
+		Pattern placePattern = Pattern.compile("^P(\\d+)$", Pattern.CASE_INSENSITIVE);
 		int nameCounter = 0;
 		for(TimedPlace p : tapn.model().places()) {
 			Matcher m = placePattern.matcher(p.name().toLowerCase());
 			if(m.matches()) {
-				int number = Integer.parseInt(m.group(2));
+				int number = Integer.parseInt(m.group(1));
 				if(number > nameCounter) nameCounter = number;
 			}
 		}

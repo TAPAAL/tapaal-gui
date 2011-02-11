@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
@@ -213,8 +211,8 @@ public class TimedArcPetriNetFactory {
 		String heightTemp = annotation.getAttribute("height");
 		String borderTemp = annotation.getAttribute("border");
 
-		String text = annotation.getAttribute("text");
-
+		String text = annotation.getTextContent();
+			
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
 		}
