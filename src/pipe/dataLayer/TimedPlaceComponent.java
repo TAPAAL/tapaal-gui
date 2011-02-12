@@ -62,24 +62,6 @@ public class TimedPlaceComponent extends Place {
 		ageOfTokensWindow = new Window(new Frame());
 	}
 
-	public TimedPlaceComponent(Place place, String invariant) {
-		super(place.getX(), place.getY(), place.id, place.getName(),
-				place.nameOffsetX, place.nameOffsetY,
-				place.getInitialMarking(), place.getMarkingOffsetXObject(),
-				place.getMarkingOffsetYObject(), place.capacity);
-		attributesVisible = true;
-		ageOfTokensWindow = new Window(new Frame());
-	}
-
-	public TimedPlaceComponent(String idInput, String nameInput,
-			int initialMarkingInput, int capacityInput, String invariant) {
-
-		super(0.0, 0.0, idInput, nameInput, 0.0, 0.0, initialMarkingInput, 0.0,
-				0.0, capacityInput);
-
-		ageOfTokensWindow = new Window(new Frame());
-	}
-
 	@Override
 	public TimedPlaceComponent clone() {
 		TimedPlaceComponent toReturn = (TimedPlaceComponent) super.clone();
@@ -361,11 +343,6 @@ public class TimedPlaceComponent extends Place {
 			pnName.setText("");
 		}
 		pnName.zoomUpdate(zoom);
-
-		updateBounds();
-		updateLabelLocation();
-		updateConnected();
-
 		repaint();
 	}
 

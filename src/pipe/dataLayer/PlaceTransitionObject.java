@@ -84,27 +84,12 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 	public PlaceTransitionObject(double positionXInput, double positionYInput,
 			String idInput, String nameInput, double nameOffsetXInput,
 			double nameOffsetYInput) {
-		this(positionXInput, positionYInput, idInput);
+		this(positionXInput, positionYInput);
+		id = idInput;
 		nameOffsetX = nameOffsetXInput;
 		nameOffsetY = nameOffsetYInput;
 		pnName.setPosition((int) nameOffsetX, (int) nameOffsetY);
 		// setName(nameInput);
-	}
-
-	/**
-	 * Create Petri-Net Object
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 * @param idInput
-	 *            Place id
-	 */
-	public PlaceTransitionObject(double positionXInput, double positionYInput,
-			String idInput) {
-		this(positionXInput, positionYInput);
-		id = idInput;
 	}
 
 	/**
@@ -386,7 +371,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 	public void translate(int x, int y) {
 		setPositionX(positionX + x);
 		setPositionY(positionY + y);
-		update(true);
+		updateOnMove();
 	}
 
 	/** Sets the center of the component to position x, y */
@@ -447,6 +432,14 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 		markedAsDeleted = false;
 		addLabelToContainer();
 		update(true);
+		updateOnMove();
+	}
+
+	// TODO: Find a better name for this
+	public void updateOnMove() {
+		updateBounds();
+		updateConnected();
+		updateLabelLocation();
 	}
 
 	public boolean areNotSameType(PlaceTransitionObject o) {

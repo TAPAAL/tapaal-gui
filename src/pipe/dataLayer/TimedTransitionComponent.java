@@ -111,9 +111,9 @@ public class TimedTransitionComponent extends Transition {
 		else {
 			pnName.setText("");
 		}
-		updateBounds();
-		updateLabelLocation();
-		updateConnected();
+		//updateBounds();
+		//updateLabelLocation();
+		//updateConnected();
 		
 		repaint();
 	}

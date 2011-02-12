@@ -1237,7 +1237,9 @@ public class DataLayer extends Observable implements Cloneable {
 	}
 
 	public void repaintPlaces() {
-		repaintPlaces(true);
+		for (Place p : placesArray) {
+			p.repaint();
+		}
 	}
 
 	public void repaintPlaces(boolean displayConstantNames) {

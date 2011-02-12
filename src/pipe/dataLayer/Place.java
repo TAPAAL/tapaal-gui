@@ -135,11 +135,6 @@ public class Place extends PlaceTransitionObject {
 		// updateBounds();
 	}
 
-	public Place(String idInput, String nameInput, int initialMarkingInput,
-			int capacityInput) {
-		this(0.0, 0.0, idInput, nameInput, 0.0, 0.0, initialMarkingInput, 0.0,
-				0.0, capacityInput);
-	}
 
 	public Place paste(double x, double y, boolean fromAnotherView) {
 		this.incrementCopyNumber();
