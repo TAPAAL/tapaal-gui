@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultHighlighter;
 
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomer;
@@ -199,11 +200,11 @@ public abstract class Note extends PetriNetObject implements Translatable {
 	public String getText() {
 		return note.getText();
 	}
-
+	
 	@Override
-	public void delete() {
-		CreateGui.getModel().removePetriNetObject(this);
-		CreateGui.getView().remove(this);
+	public void undelete(DrawingSurfaceImpl view) {
+		add(note);
+		super.undelete(view);
 	}
 
 	@Override

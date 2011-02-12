@@ -33,12 +33,14 @@ public class DeletePetriNetObjectEdit extends Command {
 	@Override
 	public void redo() {
 		pnObject.delete();
+		view.repaint();
 	}
 
 	/** */
 	@Override
 	public void undo() {
 		pnObject.undelete(view);
+		view.repaint();
 	}
 
 	@Override
