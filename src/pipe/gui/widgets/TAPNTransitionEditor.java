@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Transition;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 
@@ -23,7 +23,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1744651413834659994L;
-	Transition transition;
+	TimedTransitionComponent transition;
 	boolean attributesVisible;
 	boolean timed;
 	boolean infiniteServer;
@@ -36,7 +36,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	/**
 	 * Creates new form TransitionEditor
 	 */
-	public TAPNTransitionEditor(JRootPane _rootPane, Transition _transition,
+	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition,
 			DataLayer _pnmlData, DrawingSurfaceImpl _view) {
 		rootPane = _rootPane;
 		transition = _transition;
@@ -223,28 +223,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 								"Error", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			} else {
-				view.getUndoManager().addEdit(
-						transition.setPNObjectName(newName));
+				view.getNameGenerator().updateTransitionIndex(transition.underlyingTransition().model(), newName);
+				view.getUndoManager().addEdit(transition.setPNObjectName(newName));
 			}
-			// if (!(newName.charAt(0)=='#')){
-			// if(newName.contains("*")){
-			// System.err.println("Transitions can't have names with *'s or +'s");
-			// JOptionPane.showMessageDialog(CreateGui.getApp(),
-			// "Transitions can't have names with *'s or +'s\n",
-			// "Error",
-			// JOptionPane.INFORMATION_MESSAGE);
-			// return;
-			// }else {
-			// view.getUndoManager().addEdit(transition.setPNObjectName(newName));
-			// }
-			// } else {
-			// System.err.println("Transition can't have a name starting with #");
-			// JOptionPane.showMessageDialog(CreateGui.getApp(),
-			// "Transition can't have a name starting with #\n",
-			// "Error",
-			// JOptionPane.INFORMATION_MESSAGE);
-			// return;
-			// }
 		}
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();

@@ -346,6 +346,7 @@ public class TemplateExplorer extends JPanel {
 							"A template named \"" + newName + "\" already exists. Please try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
+			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
 			Command command = new RenameTemplateCommand(this, template.model(),	template.model().getName(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();

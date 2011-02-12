@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import pipe.dataLayer.Template;
-
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -41,11 +40,11 @@ public class NameGenerator {
 		transitionIDs.put(net, newId + 1);
 		return TRANSITION_NAME_PREFIX + newId;
 	}
-	
+
 	public String getNewTemplateName() {
 		return TEMPLATE_NAME_PREFIX + (tapnId++); 
 	}
-	
+
 	public void setupNameGeneratorFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
 		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
 
@@ -53,7 +52,7 @@ public class NameGenerator {
 		for(Template<TimedArcPetriNet> tapn : templates) {
 			setupPlaceIDCounter(tapn);
 			setupTransitionIDCounter(tapn);
-		
+
 			Matcher m = templatePattern.matcher(tapn.model().getName());
 			if(m.matches()) {
 				int number = Integer.parseInt(m.group(1));
@@ -87,5 +86,35 @@ public class NameGenerator {
 			}
 		}
 		placeIDs.put(tapn.model(), ++nameCounter);
+	}
+
+	public void updateTemplateIndex(String newName){
+		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
+		Matcher m = templatePattern.matcher(newName);
+		if(m.matches()) {
+			int id = Integer.parseInt(m.group(1));
+			if(id >= tapnId)
+				tapnId = ++id;
+		}
+	}
+	
+	public void updateTransitionIndex(TimedArcPetriNet model, String newName) {
+		updateMap(model, newName, "^T(\\d+)$", transitionIDs);
+	}
+
+	public void updatePlaceIndex(TimedArcPetriNet model, String newName) {
+		updateMap(model, newName, "^P(\\d+)$", placeIDs);
+	}
+
+	private void updateMap(TimedArcPetriNet model, String newName, String pattern, Hashtable<TimedArcPetriNet, Integer> map) {
+		Pattern compiledPattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+		Matcher m = compiledPattern.matcher(newName.toLowerCase());
+		if(m.matches()){
+			int current = map.get(model);
+			int id = Integer.parseInt(m.group(1));
+			if(id >= current){
+				map.put(model, ++id);
+			}
+		}
 	}
 }

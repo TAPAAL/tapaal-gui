@@ -503,7 +503,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 						"Error", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			} else {
-
+				view.getNameGenerator().updatePlaceIndex(place.underlyingPlace().model(), newName);
 				view.getUndoManager().addEdit(place.setPNObjectName(newName));
 
 				Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTab()
