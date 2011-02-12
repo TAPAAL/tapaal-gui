@@ -556,7 +556,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						guiModel
 								.addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
-						undoManager.newEdit();
+						//undoManager.newEdit();
 
 						// undoManager.addEdit(
 						// new AddPetriNetObjectEdit(transportArcToCreate, view,
