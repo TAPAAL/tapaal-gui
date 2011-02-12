@@ -7,7 +7,6 @@ import java.util.Map;
 
 import dk.aau.cs.petrinet.Arc;
 import dk.aau.cs.petrinet.Degree2Converter;
-import dk.aau.cs.petrinet.Location;
 import dk.aau.cs.petrinet.Place;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.petrinet.TAPNArc;
@@ -53,9 +52,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 		// Add a tonek to the lock place
 		toReturn.tokens.add(lock);
 
-		// Styling
-		toReturn.locations.put(lock, new Location(100, 10));
-
 		// For each transitions make the changes
 		for (Transition t : model.getTransitions()) {
 			// Counter for new places names
@@ -86,22 +82,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 			}
 
-			// Some styling stuff
-			float x, y;
-			float transitionSizeX = 80;
-			float transitionSizeY = 50;
-
-			x = model.locations.get(t).getX();
-			y = model.locations.get(t).getY();
-
-			// Move the start x and y cord a little to the right
-			// based on the size of the preset
-			int sizeOfPreset = t.getPreset().size();
-
-			// Ajust the start location
-			x = x - (transitionSizeX * (sizeOfPreset / 2));
-			y = y - transitionSizeY;
-
 			// List of normal Arcs in the postset
 			ArrayList<Arc> postsetNormalArcs = new ArrayList<Arc>();
 
@@ -130,9 +110,7 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 				lastTransition = new TAPNTransition(t.getName() + "_T0");
 				toReturn.addTransition(lastTransition);
-				// Style the place
-				toReturn.locations.put(lastTransition, new Location(x, y));
-
+	
 				toReturn.add(new TAPNArc(lock, lastTransition, ""));
 
 				// Special attension if the preset only has cone
@@ -153,10 +131,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				holdingplace = new TAPNPlace(t.getName() + "_hp_0", "", 0);
 				toReturn.addPlace(holdingplace);
 
-				// //Do some styling of the places
-				toReturn.locations.put(holdingplace, new Location(x, y
-						+ transitionSizeY));
-				x = x + transitionSizeX;
 
 				holdingplacesTransport.add(holdingplace);
 
@@ -205,14 +179,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 					// Do some styling of the places
 
-					toReturn.locations.put(lastTransition, new Location(x, y));
-					toReturn.locations.put(holdingplace, new Location(x, y
-							+ transitionSizeY));
-					toReturn.locations.put(imPlace, new Location(x
-							- transitionSizeX / 2, y));
-
-					x = x + transitionSizeX;
-
 				}
 
 			} else {
@@ -220,9 +186,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				lastTransition = new TAPNTransition(t.getName() + "_T0");
 				toReturn.addTransition(lastTransition);
 				toReturn.add(new TAPNArc(lock, lastTransition, ""));
-
-				// Styling
-				toReturn.locations.put(lastTransition, new Location(x, y));
 
 				// Special attension if the preset only has cone
 				if (t.preset.size() == 1) {
@@ -243,10 +206,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 				toReturn.addPlace(holdingplace);
 
 				// //Do some styling of the places
-
-				toReturn.locations.put(holdingplace, new Location(x, y
-						+ transitionSizeY));
-				x = x + transitionSizeX;
 
 				holdingplacesNormal.add(holdingplace);
 				toReturn.add(new TAPNArc(oldToNewPlacesMap.get(presetNormalArcs
@@ -293,16 +252,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
 					lastTransition = newtrans;
-
-					// Do some styling of the places
-					toReturn.locations.put(lastTransition, new Location(x, y));
-					toReturn.locations.put(holdingplace, new Location(x, y
-							+ transitionSizeY));
-					toReturn.locations.put(imPlace, new Location(x
-							- transitionSizeX / 2, y));
-
-					x = x + transitionSizeX;
-
 				}
 
 				// XXX - hacked
@@ -341,12 +290,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 
 				lastTransition = newtrans;
 
-				// Do some styling of the places
-				toReturn.locations.put(lastTransition, new Location(x, y
-						+ transitionSizeY));
-				toReturn.locations.put(imPlace, new Location(x
-						- transitionSizeX / 2, y));
-
 				// Go backwared to each holdingplaces
 				for (i = 0; i < holdingplacesNormal.size(); i++) { // One
 																	// holding
@@ -376,14 +319,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 
 					lastTransition = newtrans;
-
-					// Do some styling of the places
-					toReturn.locations.put(lastTransition, toReturn.locations
-							.get(holdingplace).yadd(transitionSizeY));
-					toReturn.locations.put(imPlace, toReturn.locations.get(
-							holdingplace).xyadd(transitionSizeX / 2,
-							transitionSizeY));
-
 				}
 			}
 
@@ -422,14 +357,6 @@ public class NaiveDegree2Converter implements Degree2Converter {
 					toReturn.add(new Arc(lastTransition, imPlace));
 					toReturn.add(new TAPNArc(imPlace, newtrans, ""));
 					lastTransition = newtrans;
-
-					// Do some styling of the places
-					toReturn.locations.put(lastTransition, toReturn.locations
-							.get(holdingplace).yadd(transitionSizeY));
-					toReturn.locations.put(imPlace, toReturn.locations.get(
-							holdingplace).xyadd(transitionSizeX / 2,
-							transitionSizeY));
-
 				}
 
 			}
