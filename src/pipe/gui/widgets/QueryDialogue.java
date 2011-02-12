@@ -359,7 +359,6 @@ public class QueryDialogue extends JPanel {
 	}
 
 	private void enableAllReductionOptions() {
-		String reductionOptionString = "" + reductionOption.getSelectedItem();
 		reductionOption.removeAllItems();
 
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
@@ -369,18 +368,9 @@ public class QueryDialogue extends JPanel {
 			for (String s : options) {
 				reductionOption.addItem(s);
 			}
-		} else {
-			// reductionOption.addItem(name_INHIBSTANDARD);
-			// reductionOption.addItem(name_INHIBSYM);
+		} else {	
 			reductionOption.addItem(name_BROADCAST);
-			// reductionOption.addItem(name_BROADCASTSYM);
 			reductionOption.addItem(name_BROADCASTDEG2);
-			// reductionOption.addItem(name_BROADCASTDEG2SYM);
-			// reductionOption.addItem(name_ADVBROADCASTSYM);
-			// reductionOption.addItem(name_OPTBROADCAST);
-			// reductionOption.addItem(name_OPTBROADCASTSYM);
-			// reductionOption.addItem(name_SUPERBROADCAST);
-			// reductionOption.addItem(name_SUPERBROADCASTSYM);
 		}
 
 		reductionOption.setSelectedItem("" + name_ADVNOSYM);

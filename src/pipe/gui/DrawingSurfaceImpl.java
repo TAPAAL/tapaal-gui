@@ -155,18 +155,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 					// XXX - kyrke
 					if (newObject instanceof TimedPlaceComponent) {
 
-						LabelHandler labelHandler = new LabelHandler(
-								((Place) newObject).getNameLabel(),
-								(Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(
-								labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseWheelListener(labelHandler);
+						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
+						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
-						PlaceHandler placeHandler = new PlaceHandler(this,
-								(Place) newObject, this.guiModel, this.model);
+						PlaceHandler placeHandler = new PlaceHandler(this,(Place) newObject, this.guiModel, this.model);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -174,18 +168,12 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 
 					} else {
 
-						LabelHandler labelHandler = new LabelHandler(
-								((Place) newObject).getNameLabel(),
-								(Place) newObject);
-						((Place) newObject).getNameLabel().addMouseListener(
-								labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel()
-								.addMouseWheelListener(labelHandler);
+						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
+						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
-						PlaceHandler placeHandler = new PlaceHandler(this,
-								(Place) newObject);
+						PlaceHandler placeHandler = new PlaceHandler(this, (Place) newObject);
 						newObject.addMouseListener(placeHandler);
 						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
@@ -195,22 +183,15 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 				} else if (newObject instanceof Transition) {
 					TransitionHandler transitionHandler;
 					if (newObject instanceof TimedTransitionComponent) {
-						transitionHandler = new TAPNTransitionHandler(this,
-								(Transition) newObject, guiModel, model);
+						transitionHandler = new TAPNTransitionHandler(this,	(Transition) newObject, guiModel, model);
 					} else {
-						transitionHandler = new TransitionHandler(this,
-								(Transition) newObject);
+						transitionHandler = new TransitionHandler(this,	(Transition) newObject);
 					}
 
-					LabelHandler labelHandler = new LabelHandler(
-							((Transition) newObject).getNameLabel(),
-							(Transition) newObject);
-					((Transition) newObject).getNameLabel().addMouseListener(
-							labelHandler);
-					((Transition) newObject).getNameLabel()
-							.addMouseMotionListener(labelHandler);
-					((Transition) newObject).getNameLabel()
-							.addMouseWheelListener(labelHandler);
+					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(),(Transition) newObject);
+					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
+					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
+					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 					newObject.addMouseListener(transitionHandler);
 					newObject.addMouseMotionListener(transitionHandler);
@@ -224,37 +205,30 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
 						if (newObject instanceof TransportArcComponent) {
-							TransportArcHandler transportArcHandler = new TransportArcHandler(
-									this, (Arc) newObject);
+							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
-							newObject
-									.addMouseWheelListener(transportArcHandler);
-							newObject
-									.addMouseMotionListener(transportArcHandler);
+							newObject.addMouseWheelListener(transportArcHandler);
+							newObject.addMouseMotionListener(transportArcHandler);
 						} else {
-							TimedArcHandler timedArcHandler = new TimedArcHandler(
-									this, (Arc) newObject);
+							TimedArcHandler timedArcHandler = new TimedArcHandler(this, (Arc) newObject);
 							newObject.addMouseListener(timedArcHandler);
 							newObject.addMouseWheelListener(timedArcHandler);
 							newObject.addMouseMotionListener(timedArcHandler);
 						}
 					} else {
 						/* EOC */
-						ArcHandler arcHandler = new ArcHandler(this,
-								(Arc) newObject);
+						ArcHandler arcHandler = new ArcHandler(this,(Arc) newObject);
 						newObject.addMouseListener(arcHandler);
 						newObject.addMouseWheelListener(arcHandler);
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
 					add(newObject);
-					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(
-							this, (AnnotationNote) newObject);
+					AnnotationNoteHandler noteHandler = new AnnotationNoteHandler(this, (AnnotationNote) newObject);
 					newObject.addMouseListener(noteHandler);
 					newObject.addMouseMotionListener(noteHandler);
 					((Note) newObject).getNote().addMouseListener(noteHandler);
-					((Note) newObject).getNote().addMouseMotionListener(
-							noteHandler);
+					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 
 				if (newObject instanceof Zoomable) {

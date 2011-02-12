@@ -70,7 +70,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
 			pnmlRootNode.setAttributeNode(pnmlAttr);
 
-			AppendConstants(document, pnmlRootNode);
+			appendConstants(document, pnmlRootNode);
 			appendTemplates(document, pnmlRootNode);
 			appendQueries(document, pnmlRootNode);
 
@@ -111,7 +111,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		}
 	}
 	
-	private void AppendConstants(Document document, Element root) {
+	private void appendConstants(Document document, Element root) {
 		for (Constant constant : constants) {
 			Element elem = createConstantElement(constant, document);
 			root.appendChild(elem);

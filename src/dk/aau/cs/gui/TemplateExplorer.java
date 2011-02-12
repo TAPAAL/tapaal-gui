@@ -25,10 +25,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
