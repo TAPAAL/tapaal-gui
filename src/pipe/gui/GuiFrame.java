@@ -163,6 +163,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 					UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
+					CreateGui.setUsingGTKFileBrowser(false);
 				}
 
 			}

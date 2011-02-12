@@ -388,8 +388,7 @@ public class QueryDialogue extends JPanel {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add query editor
-		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui
-				.getModel(), option, queryToRepresent, tapnNetwork);
+		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -404,8 +403,7 @@ public class QueryDialogue extends JPanel {
 		return queryDialogue.getQuery();
 	}
 
-	private TCTLAbstractStateProperty getStateProperty(
-			TCTLAbstractProperty property) {
+	private TCTLAbstractStateProperty getStateProperty(TCTLAbstractProperty property) {
 		if (property instanceof TCTLAbstractStateProperty) {
 			return (TCTLAbstractStateProperty) property.copy();
 		} else {

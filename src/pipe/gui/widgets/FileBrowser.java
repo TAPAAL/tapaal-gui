@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
+import pipe.gui.CreateGui;
 import pipe.gui.ExtensionFilter;
 
 /**
@@ -77,17 +79,16 @@ public class FileBrowser {
 					f = new File(f.getCanonicalPath() + "." + ext); // force
 																	// extension
 				}
-				// if (f.exists() &&
-				// JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() +
-				// "\nDo you want to overwrite this file?") !=
-				// JOptionPane.YES_OPTION) {
-				// return null;
-				// }
+				 if (!CreateGui.usingGTKFileBrowser() && f.exists() &&
+				 JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() +
+				 "\nDo you want to overwrite this file?") !=
+				 JOptionPane.YES_OPTION) {
+				 return null;
+				 }
 				return f.getCanonicalPath();
 			} catch (IOException e) {
-				/* gulp */
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while trying to save the file. Please try again", "Error Saving File", JOptionPane.ERROR_MESSAGE);
 			}
-			;
 		}
 		return null;
 	}

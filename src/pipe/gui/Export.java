@@ -92,8 +92,7 @@ public class Export {
 		}
 
 		File f = new File(filename);
-		BufferedImage img = new BufferedImage(g.getPreferredSize().width, g
-				.getPreferredSize().height, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage img = new BufferedImage(g.getPreferredSize().width, g.getPreferredSize().height, BufferedImage.TYPE_3BYTE_BGR);
 		g.print(img.getGraphics());
 		ImageIO.write(img, "png", f);
 	}
@@ -140,8 +139,7 @@ public class Export {
 			filename = CreateGui.getFile().getAbsolutePath();
 			// change file extension
 			int dotpos = filename.lastIndexOf('.');
-			if (dotpos > filename.lastIndexOf(System
-					.getProperty("file.separator"))) {
+			if (dotpos > filename.lastIndexOf(System.getProperty("file.separator"))) {
 				// dot is for extension
 				filename = filename.substring(0, dotpos + 1);
 				switch (format) {
@@ -163,8 +161,7 @@ public class Export {
 		try {
 			switch (format) {
 			case PNG:
-				filename = new FileBrowser("PNG image", "png", filename)
-						.saveFile();
+				filename = new FileBrowser("PNG image", "png", filename).saveFile();
 				if (filename != null) {
 					toPNG(g, filename);
 				}
@@ -182,8 +179,7 @@ public class Export {
 			case TIKZ:
 				Object[] possibilities = { "Only the TikZ figure",
 						"Full compilable LaTex including your figure" };
-				String figureOptions = (String) JOptionPane
-						.showInputDialog(
+				String figureOptions = (String) JOptionPane.showInputDialog(
 								CreateGui.getApp(),
 								"Choose how you would like your TikZ figure outputted: \n",
 								"Export to TikZ", JOptionPane.PLAIN_MESSAGE,
@@ -197,8 +193,7 @@ public class Export {
 				if (figureOptions == possibilities[1])
 					tikZOption = TikZExporter.TikZOutputOption.FULL_LATEX;
 
-				filename = new FileBrowser("TikZ figure", "tex", filename)
-						.saveFile();
+				filename = new FileBrowser("TikZ figure", "tex", filename).saveFile();
 				if (filename != null) {
 					TikZExporter output = new TikZExporter(model, filename, tikZOption);
 					output.ExportToTikZ();
@@ -225,8 +220,7 @@ public class Export {
 		g.repaint();
 	}
 
-	private static void setupViewForExport(DrawingSurfaceImpl g,
-			boolean gridEnabled) {
+	private static void setupViewForExport(DrawingSurfaceImpl g, boolean gridEnabled) {
 		// Stuff to make it export properly
 		g.updatePreferredSize();
 		PetriNetObject.ignoreSelection(true);
@@ -235,14 +229,12 @@ public class Export {
 		}
 	}
 
-	public static void exportUppaalXMLFromQuery(DataLayer appModel,
-			TAPNQuery input, String modelFile, String queryFile) {
+	public static void exportUppaalXMLFromQuery(DataLayer appModel,	TAPNQuery input, String modelFile, String queryFile) {
 		File xmlfile = null, qfile = null;
 		try {
 			xmlfile = new File(modelFile);
 			qfile = new File(queryFile);
 		} catch (NullPointerException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 			return;
 		}
@@ -298,13 +290,10 @@ public class Export {
 
 			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
-				t
-						.autoTransform(model, new PrintStream(xmlfile),
-								new PrintStream(qfile),
-								new dk.aau.cs.petrinet.TAPNQuery(input
-										.getProperty(), 0), capacity);
+				t.autoTransform(model, new PrintStream(xmlfile), 
+								new PrintStream(qfile), 
+								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -312,64 +301,46 @@ public class Export {
 
 			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
-				t
-						.autoTransform(model, new PrintStream(xmlfile),
+				t.autoTransform(model, new PrintStream(xmlfile),
 								new PrintStream(qfile),
-								new dk.aau.cs.petrinet.TAPNQuery(input
-										.getProperty(), 0), capacity);
+								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
 			Logger.log("Using ADV_NOSYMQ");
 			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
 			try {
-				t
-						.autoTransform(model, new PrintStream(xmlfile),
+				t.autoTransform(model, new PrintStream(xmlfile),
 								new PrintStream(qfile),
-								new dk.aau.cs.petrinet.TAPNQuery(input
-										.getProperty(), 0), capacity);
+								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		} else if (input.getReductionOption() == ReductionOption.BROADCAST
 				|| input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY) {
-			BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(
-						capacity,
-						input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
+			BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
 
 			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer
-						.transformModel(model);
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer
-						.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input
-								.getProperty(), capacity + 1
-								+ model.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY
 				|| input.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
-			Degree2BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(
-						capacity,
+			Degree2BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(capacity,
 						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			
 			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer
-						.transformModel(model);
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
 				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer
-						.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input
-								.getProperty(), capacity + 1
-								+ model.getTokens().size()));
+				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
 				query.output(new PrintStream(qfile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -382,7 +353,6 @@ public class Export {
 			try {
 				model.convertToConservative();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -390,25 +360,17 @@ public class Export {
 				NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
 				model = deg2Converter.transform(model);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
 			// Create uppaal xml file
 			try {
-				StandardTranslation t2 = new StandardTranslation(model,
-						new PrintStream(xmlfile), capacity);
+				StandardTranslation t2 = new StandardTranslation(model, new PrintStream(xmlfile), capacity);
 				t2.transform();
-				t2
-						.transformQueriesToUppaal(capacity,
-								new dk.aau.cs.petrinet.TAPNQuery(input
-										.getProperty(), 0), new PrintStream(
-										qfile));
+				t2.transformQueriesToUppaal(capacity, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), new PrintStream(qfile));
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

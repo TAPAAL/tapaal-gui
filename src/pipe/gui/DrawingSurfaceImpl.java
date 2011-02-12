@@ -309,6 +309,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 			}
 		}
 		setPreferredSize(d);
+		validate();
+		repaint();
 		Container parent = getParent();
 		if (parent != null) {
 			parent.validate();

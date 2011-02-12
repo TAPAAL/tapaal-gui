@@ -16,6 +16,8 @@ public class CreateGui {
 	private static Animator animator;
 	private static JTabbedPane appTab;
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
+	
+	private static boolean usingGTKFileBrowser = true;
 
 	public static String imgPath, userPath; // useful for stuff
 
@@ -46,8 +48,7 @@ public class CreateGui {
 
 		VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion()) {
-			StringBuffer message = new StringBuffer(
-					"There is a new version of TAPAAL available at www.tapaal.net.");
+			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
 			message.append(Pipe.VERSION);
 			message.append("\nNew version: ");
@@ -219,5 +220,13 @@ public class CreateGui {
 	public static File getFile(int index) {
 		TabContent tab = tabs.get(index);
 		return tab.getFile();
+	}
+
+	public static void setUsingGTKFileBrowser(boolean useGTKFileBrowser) {
+		usingGTKFileBrowser = useGTKFileBrowser;
+	}
+	
+	public static boolean usingGTKFileBrowser() {
+		return usingGTKFileBrowser;
 	}
 }
