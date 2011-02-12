@@ -12,6 +12,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
+
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
@@ -50,6 +52,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetFactory {
 
@@ -128,15 +131,12 @@ public class TimedArcPetriNetFactory {
 			try {
 				return createTimedArcPetriNetFromPNMLOldFormat(tapnNode);
 			} catch (Exception e2) {
-				System.out
-						.println("There was an error parsing the chosen model.");
-				throw new RuntimeException(
-						"An error occurred while trying to parse the chosen model.");
+				System.out.println("There was an error parsing the chosen model.");
+				throw new RuntimeException("An error occurred while trying to parse the chosen model.");
 			}
 		}
 
-		throw new RuntimeException(
-				"An error occurred while trying to parse the chosen model.");
+		throw new RuntimeException("An error occurred while trying to parse the chosen model.");
 	}
 
 	private Template<TimedArcPetriNet> createTimedArcPetriNetFromPNML(
@@ -144,7 +144,10 @@ public class TimedArcPetriNetFactory {
 		initialMarking = new TimedMarking();
 		if (tapnNode instanceof Element) {
 			String name = getTAPNName((Element) tapnNode);
-			tapn = new TimedArcPetriNet(name);
+			if(isNameAllowed(name))
+				tapn = new TimedArcPetriNet(name);
+			else
+				tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		} else {
 			tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		}
@@ -162,6 +165,12 @@ public class TimedArcPetriNetFactory {
 		tapn.setMarking(initialMarking);
 
 		return new Template<TimedArcPetriNet>(tapn, guiModel);
+	}
+
+	private boolean isNameAllowed(String name) {
+		Require.that(name != null, "name was null");
+		
+		return !name.isEmpty() && java.util.regex.Pattern.matches("[a-zA-Z]([_a-zA-Z0-9])*", name);
 	}
 
 	public Iterable<TAPNQuery> getQueries() {
@@ -602,8 +611,7 @@ public class TimedArcPetriNetFactory {
 	private ReductionOption getQueryReductionOption(Element queryElement) {
 		ReductionOption reductionOption;
 		try {
-			reductionOption = ReductionOption.valueOf(queryElement
-					.getAttribute("reductionOption"));
+			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
 		} catch (Exception e) {
 			reductionOption = ReductionOption.STANDARD;
 		}
@@ -613,8 +621,7 @@ public class TimedArcPetriNetFactory {
 	private ExtrapolationOption getQueryExtrapolationOption(Element queryElement) {
 		ExtrapolationOption extrapolationOption;
 		try {
-			extrapolationOption = ExtrapolationOption.valueOf(queryElement
-					.getAttribute("extrapolationOption"));
+			extrapolationOption = ExtrapolationOption.valueOf(queryElement.getAttribute("extrapolationOption"));
 		} catch (Exception e) {
 			extrapolationOption = ExtrapolationOption.AUTOMATIC;
 		}
@@ -624,8 +631,7 @@ public class TimedArcPetriNetFactory {
 	private HashTableSize getQueryHashTableSize(Element queryElement) {
 		HashTableSize hashTableSize;
 		try {
-			hashTableSize = HashTableSize.valueOf(queryElement
-					.getAttribute("hashTableSize"));
+			hashTableSize = HashTableSize.valueOf(queryElement.getAttribute("hashTableSize"));
 		} catch (Exception e) {
 			hashTableSize = HashTableSize.MB_16;
 		}
@@ -635,8 +641,7 @@ public class TimedArcPetriNetFactory {
 	private SearchOption getQuerySearchOption(Element queryElement) {
 		SearchOption searchOption;
 		try {
-			searchOption = SearchOption.valueOf(queryElement
-					.getAttribute("searchOption"));
+			searchOption = SearchOption.valueOf(queryElement.getAttribute("searchOption"));
 		} catch (Exception e) {
 			searchOption = SearchOption.BFS;
 		}
@@ -646,8 +651,7 @@ public class TimedArcPetriNetFactory {
 	private TraceOption getQueryTraceOption(Element queryElement) {
 		TraceOption traceOption;
 		try {
-			traceOption = TraceOption.valueOf(queryElement
-					.getAttribute("traceOption"));
+			traceOption = TraceOption.valueOf(queryElement.getAttribute("traceOption"));
 		} catch (Exception e) {
 			traceOption = TraceOption.NONE;
 		}
