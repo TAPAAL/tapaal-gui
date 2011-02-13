@@ -3,7 +3,8 @@ package pipe.gui.widgets;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -28,9 +29,6 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.util.Require;
 
 public class LeftQueryPane extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4062539545170994654L;
 	private JPanel queryCollectionPanel;
 	private JPanel buttonsPanel;
@@ -50,7 +48,7 @@ public class LeftQueryPane extends JPanel {
 			TabContent tabContent) {
 		this.tabContent = tabContent;
 		queryCollectionPanel = new JPanel(new BorderLayout());
-		buttonsPanel = new JPanel(new GridLayout(2, 1));
+		buttonsPanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
 
 		queryList = new JList(listModel);
@@ -117,7 +115,6 @@ public class LeftQueryPane extends JPanel {
 	}
 
 	private void addButtons() {
-		JPanel p1 = new JPanel();
 		editQueryButton = new JButton("Edit");
 		editQueryButton.setEnabled(false);
 		Dimension dimension = new Dimension(82, 23);
@@ -127,7 +124,11 @@ public class LeftQueryPane extends JPanel {
 				showEditDialog();
 			}
 		});
-		p1.add(editQueryButton);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(editQueryButton, gbc);
 
 		verifyButton = new JButton("Verify");
 		verifyButton.setEnabled(false);
@@ -138,10 +139,12 @@ public class LeftQueryPane extends JPanel {
 				Verifier.runUppaalVerification(tabContent.network(), q);
 			}
 		});
-		p1.add(verifyButton);
-		buttonsPanel.add(p1);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(verifyButton, gbc);
 
-		JPanel p2 = new JPanel();
 		removeQueryButton = new JButton("Remove");
 		removeQueryButton.setEnabled(false);
 		removeQueryButton.setPreferredSize(dimension);
@@ -151,7 +154,11 @@ public class LeftQueryPane extends JPanel {
 				showQueries();
 			}
 		});
-		p2.add(removeQueryButton);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(removeQueryButton, gbc);
 
 		addQueryButton = new JButton("New..");
 		addQueryButton.setPreferredSize(dimension);
@@ -166,8 +173,11 @@ public class LeftQueryPane extends JPanel {
 			}
 		});
 
-		p2.add(addQueryButton);
-		buttonsPanel.add(p2);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(addQueryButton, gbc);
 	}
 
 	private void showEditDialog() {

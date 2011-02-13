@@ -3,6 +3,8 @@ package pipe.gui.widgets;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -30,14 +32,11 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class LeftConstantsPane extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7883351020889779067L;
 	private JSplitPane splitPane;
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
-	private JPanel addConstantPanel;
+	private JPanel buttonsPanel;
 
 	private JList constantsList;
 	private DefaultListModel listModel;
@@ -50,7 +49,7 @@ public class LeftConstantsPane extends JPanel {
 		this.parent = parent;
 
 		constantsPanel = new JPanel(new BorderLayout());
-		addConstantPanel = new JPanel();
+		buttonsPanel = new JPanel(new GridBagLayout());
 
 		listModel = new DefaultListModel();
 		constantsList = new JList(listModel);
@@ -98,7 +97,7 @@ public class LeftConstantsPane extends JPanel {
 		addConstantsButtons(enableAddButton);
 
 		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
-				constantsPanel, addConstantPanel);
+				constantsPanel, buttonsPanel);
 		setLayout(new BorderLayout());
 
 		splitPane.setContinuousLayout(true);
@@ -123,7 +122,10 @@ public class LeftConstantsPane extends JPanel {
 				showEditConstantDialog(c);
 			}
 		});
-		addConstantPanel.add(editBtn);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(editBtn, gbc);
 
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
@@ -134,7 +136,10 @@ public class LeftConstantsPane extends JPanel {
 				removeConstant(constName);
 			}
 		});
-		addConstantPanel.add(removeBtn);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(removeBtn, gbc);
 
 		JButton addConstantButton = new JButton("Add..");
 		addConstantButton.setEnabled(enableAddButton);
@@ -143,7 +148,10 @@ public class LeftConstantsPane extends JPanel {
 				showEditConstantDialog(null);
 			}
 		});
-		addConstantPanel.add(addConstantButton);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(addConstantButton, gbc);
 	}
 
 	public void showConstants() {
