@@ -66,7 +66,6 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	private void init(boolean hideButtons) {
-		setPreferredSize(new Dimension(230, 250));
 		setLayout(new BorderLayout());
 		initExplorerPanel();
 		initButtonsPanel();
