@@ -75,6 +75,7 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -82,6 +83,10 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
 import dk.aau.cs.petrinet.TAPN;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.NewModelToOldModelTransformer;
+import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 
 public class QueryDialogue extends JPanel {
@@ -1730,29 +1735,35 @@ public class QueryDialogue extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
-
-						TAPN model = null;
-						try {
-							model = transformer.getAAUTAPN(
-									CreateGui.getModel(), 0);
-						} catch (Exception ex) {
-							JOptionPane.showMessageDialog(QueryDialogue.this,
-									"An error occured during export.", "Error",
-									JOptionPane.ERROR_MESSAGE);
-							return;
-						}
+//						PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
+//
+//						TAPN model = null;
+//						try {
+//							model = transformer.getAAUTAPN(
+//									CreateGui.getModel(), 0);
+//						} catch (Exception ex) {
+//							JOptionPane.showMessageDialog(QueryDialogue.this,
+//									"An error occured during export.", "Error",
+//									JOptionPane.ERROR_MESSAGE);
+//							return;
+//						}
 
 						UppaalExporter exporter = new UppaalExporter();
-						TAPNQuery query = getQuery();
-						dk.aau.cs.petrinet.TAPNQuery tapnQuery = new dk.aau.cs.petrinet.TAPNQuery(
-								query.getProperty(), query.getCapacity()
-								+ model.getNumberOfTokens());
-						exporter.export(model, tapnQuery, query
-								.getReductionOption(), new File(xmlFile),
-								new File(queryFile));
-						// Export.exportUppaalXMLFromQuery(CreateGui.getModel(),
-						// getQuery(), xmlFile, queryFile);
+						TAPNComposer composer = new TAPNComposer();
+						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialogue.this.tapnNetwork);
+
+						// TODO: Get rid of this step by changing the underlying translations
+						// etc.
+						NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
+						dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
+						
+						TAPNQuery tapnQuery = getQuery();
+						dk.aau.cs.petrinet.TAPNQuery clonedQuery = new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity() + tapnNetwork.marking().size());
+						
+						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
+						clonedQuery.getProperty().accept(visitor, null);
+						
+						exporter.export(tapn, clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
 					} else {
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"No Uppaal XML file saved.");
