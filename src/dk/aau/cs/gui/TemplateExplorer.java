@@ -116,10 +116,6 @@ public class TemplateExplorer extends JPanel {
 		templateList = new JList(listModel);
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
-		templateList.setVisibleRowCount(-1);
-		templateList.setLayoutOrientation(JList.VERTICAL);
-		templateList.setAlignmentX(Component.LEFT_ALIGNMENT);
-		templateList.setAlignmentY(Component.TOP_ALIGNMENT);
 		templateList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {

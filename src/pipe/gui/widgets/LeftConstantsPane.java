@@ -1,7 +1,6 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -52,10 +51,6 @@ public class LeftConstantsPane extends JPanel {
 		listModel = new DefaultListModel();
 		constantsList = new JList(listModel);
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		constantsList.setVisibleRowCount(-1);
-		constantsList.setLayoutOrientation(JList.VERTICAL);
-		constantsList.setAlignmentX(Component.LEFT_ALIGNMENT);
-		constantsList.setAlignmentY(Component.TOP_ALIGNMENT);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
@@ -72,7 +67,6 @@ public class LeftConstantsPane extends JPanel {
 		});
 
 		constantsList.addMouseListener(new MouseAdapter() {
-
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!constantsList.isSelectionEmpty()) {
@@ -98,9 +92,10 @@ public class LeftConstantsPane extends JPanel {
 		this.add(constantsPanel, BorderLayout.CENTER);
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
-		setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createTitledBorder("Constants"), BorderFactory
-				.createEmptyBorder(3, 3, 3, 3)));
+		setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Constants"), 
+				BorderFactory.createEmptyBorder(3, 3, 3, 3))
+		);
 
 		showConstants();
 	}

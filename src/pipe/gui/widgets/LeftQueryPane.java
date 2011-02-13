@@ -1,7 +1,6 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -51,10 +50,6 @@ public class LeftQueryPane extends JPanel {
 
 		queryList = new JList(listModel);
 		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		queryList.setVisibleRowCount(-1);
-		queryList.setLayoutOrientation(JList.VERTICAL);
-		queryList.setAlignmentX(Component.LEFT_ALIGNMENT);
-		queryList.setAlignmentY(Component.TOP_ALIGNMENT);
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
@@ -72,7 +67,6 @@ public class LeftQueryPane extends JPanel {
 			}
 		});
 		queryList.addMouseListener(new MouseAdapter() {
-
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!queryList.isSelectionEmpty()) {
@@ -94,11 +88,10 @@ public class LeftQueryPane extends JPanel {
 		this.add(queryCollectionPanel, BorderLayout.CENTER);
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
-		setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createTitledBorder("Queries"), BorderFactory
-				.createEmptyBorder(3, 3, 3, 3)));
-
-		showQueries();
+		setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Queries"), 
+				BorderFactory.createEmptyBorder(3, 3, 3, 3))
+		);
 	}
 
 	private void addQueriesComponents() {
@@ -143,7 +136,6 @@ public class LeftQueryPane extends JPanel {
 		removeQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				listModel.remove(queryList.getSelectedIndex());
-				showQueries();
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -160,7 +152,6 @@ public class LeftQueryPane extends JPanel {
 						QueryDialogueOption.Save, null, tabContent.network());
 				if (q != null) {
 					addQuery(q);
-					showQueries();
 				}
 			}
 		});
@@ -179,13 +170,6 @@ public class LeftQueryPane extends JPanel {
 
 		if (newQuery != null)
 			updateQuery(q, newQuery);
-
-		showQueries();
-	}
-
-	private void showQueries() {
-		queryList.validate();
-
 	}
 
 	private void addQuery(TAPNQuery query) {
@@ -214,11 +198,9 @@ public class LeftQueryPane extends JPanel {
 		for (TAPNQuery query : queries) {
 			listModel.addElement(query);
 		}
-		showQueries();
 	}
 
 	public void removeQuery(TAPNQuery queryToRemove) {
 		listModel.removeElement(queryToRemove);
-		showQueries();
 	}
 }
