@@ -18,7 +18,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -33,7 +32,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class LeftConstantsPane extends JPanel {
 	private static final long serialVersionUID = -7883351020889779067L;
-	private JSplitPane splitPane;
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
 	private JPanel buttonsPanel;
@@ -96,15 +94,9 @@ public class LeftConstantsPane extends JPanel {
 		addConstantsComponents();
 		addConstantsButtons(enableAddButton);
 
-		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
-				constantsPanel, buttonsPanel);
 		setLayout(new BorderLayout());
-
-		splitPane.setContinuousLayout(true);
-		splitPane.setDividerSize(0);
-		splitPane.setDividerLocation(0.9);
-		splitPane.setResizeWeight(1.0);
-		this.add(splitPane);
+		this.add(constantsPanel, BorderLayout.CENTER);
+		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Constants"), BorderFactory

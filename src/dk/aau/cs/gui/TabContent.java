@@ -1,11 +1,14 @@
 package dk.aau.cs.gui;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.BevelBorder;
@@ -37,7 +40,7 @@ public class TabContent extends JSplitPane {
 	private File appFile;
 
 	// Normal mode
-	private JSplitPane editorLeftPane;
+	private JPanel editorLeftPane;
 	private JSplitPane queryConstantsSplit;
 	private LeftQueryPane queries;
 	private LeftConstantsPane constantsPanel;
@@ -77,46 +80,42 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void createEditorLeftPane() {
-		editorLeftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		editorLeftPane.setPreferredSize(new Dimension(262, 100)); // height is
-																	// ignored
-																	// because
-																	// the
-																	// component
-																	// is
-																	// stretched
-		editorLeftPane.setMinimumSize(new Dimension(230, 100));
-		boolean enableAddButton = getModel() == null ? true : !getModel()
-				.netType().equals(NetType.UNTIMED);
+		editorLeftPane = new JPanel(new GridBagLayout());
+		editorLeftPane.setPreferredSize(new Dimension(230, 100)); // height is ignored because the component is stretched
+		editorLeftPane.setMinimumSize(new Dimension(210, 100));
+		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
+		
 		constantsPanel = new LeftConstantsPane(enableAddButton, this);
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
-
 		templateExplorer = new TemplateExplorer(this);
 
-		queryConstantsSplit = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
-		queryConstantsSplit.setDividerLocation(DIVIDER_LOCATION);
-		queryConstantsSplit.setResizeWeight(0.5);
-		queryConstantsSplit.setTopComponent(queries);
-		queryConstantsSplit.setBottomComponent(constantsPanel);
-		queryConstantsSplit.setContinuousLayout(true);
-		queryConstantsSplit.setDividerSize(0);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.34;
+		editorLeftPane.add(templateExplorer, gbc);
 
-		editorLeftPane.setDividerLocation(0.3);
-		editorLeftPane.setResizeWeight(0.5);
-		editorLeftPane.setTopComponent(templateExplorer);
-		editorLeftPane.setBottomComponent(queryConstantsSplit);
-		editorLeftPane.setContinuousLayout(true);
-		editorLeftPane.setDividerSize(0);
-
-		updateLeftPanel();
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.33;
+		editorLeftPane.add(queries, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.33;
+		editorLeftPane.add(constantsPanel, gbc);
 	}
 
 	public void updateConstantsList() {
 		constantsPanel.showConstants();
-	}
-
-	public void updateLeftPanel() {
-		editorLeftPane.validate();
 	}
 
 	public DataLayer getModel() {
@@ -137,13 +136,13 @@ public class TabContent extends JSplitPane {
 
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	private void createAnimationHistory() {
-			animBox = new AnimationHistoryComponent();
+		animBox = new AnimationHistoryComponent();
 
-			animationHistoryScrollPane = new JScrollPane(animBox);
-			animationHistoryScrollPane.setBorder(BorderFactory
-					.createCompoundBorder(BorderFactory
-							.createTitledBorder("Simulation History"),
-							BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		animationHistoryScrollPane = new JScrollPane(animBox);
+		animationHistoryScrollPane.setBorder(BorderFactory
+				.createCompoundBorder(BorderFactory
+						.createTitledBorder("Simulation History"),
+						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 
 	public void switchToAnimationComponents() {
@@ -174,7 +173,13 @@ public class TabContent extends JSplitPane {
 
 	public void switchToEditorComponents() {
 		templateExplorer.showButtons();
-		editorLeftPane.setTopComponent(templateExplorer);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.34;
+		editorLeftPane.add(templateExplorer, gbc);
 		this.setLeftComponent(editorLeftPane);
 
 		drawingSurface.repaintAll();
@@ -196,7 +201,7 @@ public class TabContent extends JSplitPane {
 				.createCompoundBorder(BorderFactory
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		
+
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
 		untimedAnimationHistoryScrollPane.setBorder(BorderFactory
 				.createCompoundBorder(BorderFactory
@@ -228,12 +233,12 @@ public class TabContent extends JSplitPane {
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
 		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0)); // make
-																				// it
-																				// less
-																				// bad
-																				// on
-																				// XP
-	
+		// it
+		// less
+		// bad
+		// on
+		// XP
+
 		animControlerBox.requestFocus(true);
 	}
 
@@ -296,6 +301,6 @@ public class TabContent extends JSplitPane {
 
 	public void setupNameGeneratorsFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
 		drawingSurface.setupNameGeneratorsFromTemplates(templates);
-		
+
 	}
 }

@@ -17,7 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -34,7 +33,6 @@ public class LeftQueryPane extends JPanel {
 	private JPanel buttonsPanel;
 	private DefaultListModel listModel;
 	private JList queryList;
-	private JSplitPane splitPane;
 	private JScrollPane queryScroller;
 
 	private JButton addQueryButton;
@@ -92,15 +90,9 @@ public class LeftQueryPane extends JPanel {
 		addQueriesComponents();
 		addButtons();
 
-		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
-				queryCollectionPanel, buttonsPanel);
 		setLayout(new BorderLayout());
-
-		splitPane.setContinuousLayout(true);
-		splitPane.setDividerSize(0);
-		splitPane.setDividerLocation(0.8);
-		splitPane.setResizeWeight(1.0);
-		this.add(splitPane);
+		this.add(queryCollectionPanel, BorderLayout.CENTER);
+		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Queries"), BorderFactory

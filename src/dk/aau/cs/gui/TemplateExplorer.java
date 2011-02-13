@@ -17,7 +17,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -32,7 +31,6 @@ import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
 import pipe.gui.undo.UndoManager;
-import pipe.gui.widgets.JSplitPaneFix;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -40,8 +38,6 @@ import dk.aau.cs.util.Require;
 
 public class TemplateExplorer extends JPanel {
 	private static final long serialVersionUID = -2334464984237161208L;
-
-	private JSplitPane splitPane;
 
 	// Template explorer panel items
 	private JPanel templatePanel;
@@ -66,20 +62,13 @@ public class TemplateExplorer extends JPanel {
 	public TemplateExplorer(TabContent parent, boolean hideButtons) {
 		this.parent = parent;
 		undoManager = parent.drawingSurface().getUndoManager();
-		this.setLayout(new BorderLayout());
 		init(hideButtons);
 	}
 
 	private void init(boolean hideButtons) {
+		setLayout(new BorderLayout());
 		initExplorerPanel();
-
 		initButtonsPanel();
-		splitPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT, templatePanel,
-				buttonPanel);
-		splitPane.setContinuousLayout(true);
-		splitPane.setDividerSize(0);
-		splitPane.setDividerLocation(0.8);
-		splitPane.setResizeWeight(1.0);
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 				.createTitledBorder("Templates"), BorderFactory
@@ -91,10 +80,10 @@ public class TemplateExplorer extends JPanel {
 	private void addCreatedComponents(boolean hideButtons) {
 		this.removeAll();
 		if (!hideButtons) {
-			splitPane.setTopComponent(templatePanel);
-			this.add(splitPane);
+			this.add(templatePanel, BorderLayout.CENTER);
+			this.add(buttonPanel, BorderLayout.PAGE_END);
 		} else {
-			this.add(templatePanel);
+			this.add(templatePanel, BorderLayout.CENTER);
 		}
 	}
 
