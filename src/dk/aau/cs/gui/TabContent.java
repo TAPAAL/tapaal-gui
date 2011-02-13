@@ -30,8 +30,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
-
-	private static final double DIVIDER_LOCATION = 0.5;
+	private static final double RATIO = 0.2;
 
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -41,7 +40,6 @@ public class TabContent extends JSplitPane {
 
 	// Normal mode
 	private JPanel editorLeftPane;
-	private JSplitPane queryConstantsSplit;
 	private LeftQueryPane queries;
 	private LeftConstantsPane constantsPanel;
 	private TemplateExplorer templateExplorer;
@@ -53,7 +51,9 @@ public class TabContent extends JSplitPane {
 	private JScrollPane animationControllerScrollPane;
 	private AnimationHistoryComponent abstractAnimationPane = null;
 
-	private JSplitPane controllerAndHistoryPanel;
+	private JPanel animatorLeftPane;
+	private JSplitPane animationHistorySplitter;
+
 
 	public TabContent() {
 
@@ -146,27 +146,38 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void switchToAnimationComponents() {
-		createAnimationHistory();
-		createAnimationController();
-
-		JSplitPane animatorLeftPane = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT);
+		if(animBox == null) createAnimationHistory();
+		if(animControlerBox == null) createAnimationController();
+		
+		animatorLeftPane = new JPanel(new GridBagLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
-
-		animatorLeftPane.setDividerLocation(0.25);
-		animatorLeftPane.setResizeWeight(0);
 		templateExplorer.hideButtons();
-		animatorLeftPane.setTopComponent(templateExplorer);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = RATIO;
+		animatorLeftPane.add(templateExplorer, gbc);
 
-		controllerAndHistoryPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		controllerAndHistoryPanel.setResizeWeight(0);
-		controllerAndHistoryPanel.setDividerLocation(-1);
-		controllerAndHistoryPanel.setTopComponent(animControlerBox);
-		controllerAndHistoryPanel.setBottomComponent(animationHistoryScrollPane);
-
-		animatorLeftPane.setBottomComponent(controllerAndHistoryPanel);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		animatorLeftPane.add(animControlerBox, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1 - RATIO;
+		animatorLeftPane.add(animationHistoryScrollPane, gbc);
 		this.setLeftComponent(animatorLeftPane);
-		this.setDividerLocation(-1);
 
 		drawingSurface.repaintAll();
 	}
@@ -194,51 +205,48 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void addAbstractAnimationPane() {
+		animatorLeftPane.remove(animationHistoryScrollPane);
 		abstractAnimationPane = new AnimationHistoryComponent();
-		animBox = new AnimationHistoryComponent();
-		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(BorderFactory
-						.createTitledBorder("Simulation History"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
 		untimedAnimationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(BorderFactory
-						.createTitledBorder("Untimed Trace"),
+				.createCompoundBorder(BorderFactory.createTitledBorder("Untimed Trace"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		JSplitPane pane2 = new JSplitPaneFix(JSplitPane.HORIZONTAL_SPLIT, animationHistoryScrollPane, untimedAnimationHistoryScrollPane);
+		animationHistorySplitter = new JSplitPaneFix(JSplitPane.HORIZONTAL_SPLIT, animationHistoryScrollPane, untimedAnimationHistoryScrollPane);
 
-		pane2.setContinuousLayout(true);
-		pane2.setOneTouchExpandable(true);
-		pane2.setBorder(null); // avoid multiple borders
-		pane2.setDividerSize(8);
-		pane2.setDividerLocation(0.5);
+		animationHistorySplitter.setContinuousLayout(true);
+		animationHistorySplitter.setOneTouchExpandable(true);
+		animationHistorySplitter.setBorder(null); // avoid multiple borders
+		animationHistorySplitter.setDividerSize(8);
+		animationHistorySplitter.setDividerLocation(0.5);
 
-		controllerAndHistoryPanel.setBottomComponent(pane2);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1 - RATIO;
+		animatorLeftPane.add(animationHistorySplitter, gbc);
 	}
 
 	public void removeAbstractAnimationPane() {
+		animatorLeftPane.remove(animationHistorySplitter);
 		abstractAnimationPane = null;
-		animationHistoryScrollPane = new JScrollPane(animBox);
-		animationHistoryScrollPane.setBorder(BorderFactory
-				.createCompoundBorder(BorderFactory
-						.createTitledBorder("Simulation History"),
-						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		controllerAndHistoryPanel.setBottomComponent(animationHistoryScrollPane);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1 - RATIO;
+		animatorLeftPane.add(animationHistoryScrollPane);
 	}
 
 	private void createAnimationController() {
 		animControlerBox = new AnimationController();
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
-		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0)); // make
-		// it
-		// less
-		// bad
-		// on
-		// XP
-
+		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		animControlerBox.requestFocus(true);
 	}
 

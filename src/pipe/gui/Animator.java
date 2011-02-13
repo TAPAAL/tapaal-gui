@@ -291,6 +291,10 @@ public class Animator {
 		markings.clear();
 		currentAction = -1;
 		currentMarkingIndex = 0;
+		tab.getAnimationHistory().reset();
+		if(tab.getUntimedAnimationHistory() != null){
+			tab.getUntimedAnimationHistory().reset();
+		}
 	}
 
 	public FiringMode getFiringmode() {

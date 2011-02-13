@@ -86,4 +86,8 @@ public class AnimationHistoryComponent extends JList {
 		super.setSelectedIndex(index);
 		ensureIndexIsVisible(index);
 	}
+
+	public void reset() {
+		getListModel().clear();
+	}
 }

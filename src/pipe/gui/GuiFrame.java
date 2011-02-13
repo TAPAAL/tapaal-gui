@@ -1142,25 +1142,22 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 			break;
 		case animation:
-
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
+			tab.switchToAnimationComponents();
 
-			CreateGui.getAnimator().reset();
 			startAction.setSelected(true);
-			CreateGui.getView().changeAnimationMode(true);
+			tab.drawingSurface().changeAnimationMode(true);
+			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
-			CreateGui.switchToAnimationComponents();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 			setEditionAllowed(false);
 			statusBar.changeText(statusBar.textforAnimation);
 
 			// Set a light blue backgound color for animation mode
-			CreateGui.getView().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
-
-			// Disable all draw actions
+			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			break;
 		case noNet:
 			// Disable All Actions

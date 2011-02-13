@@ -66,6 +66,7 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	private void init(boolean hideButtons) {
+		setPreferredSize(new Dimension(230, 250));
 		setLayout(new BorderLayout());
 		initExplorerPanel();
 		initButtonsPanel();
@@ -382,12 +383,10 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public void hideButtons() {
-		this.removeAll();
 		addCreatedComponents(true);
 	}
 
 	public void showButtons() {
-		this.removeAll();
 		addCreatedComponents(false);
 	}
 }
