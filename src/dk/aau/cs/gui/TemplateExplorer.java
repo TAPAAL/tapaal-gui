@@ -70,9 +70,7 @@ public class TemplateExplorer extends JPanel {
 		initExplorerPanel();
 		initButtonsPanel();
 
-		setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createTitledBorder("Templates"), BorderFactory
-				.createEmptyBorder(3, 3, 3, 3)));
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Templates"),	BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 
 		addCreatedComponents(hideButtons);
 	}
@@ -90,7 +88,7 @@ public class TemplateExplorer extends JPanel {
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new BorderLayout());
 		listModel = new DefaultListModel();
-		for (Template<?> net : parent.templates()) {
+		for (Template net : parent.templates()) {
 			listModel.addElement(net);
 		}
 
@@ -152,7 +150,7 @@ public class TemplateExplorer extends JPanel {
 
 		newTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Template<TimedArcPetriNet> template = ShowNewTemplateDialog();
+				Template template = ShowNewTemplateDialog();
 				if (template != null) {
 					int index = listModel.size();
 					listModel.addElement(template);
@@ -175,12 +173,8 @@ public class TemplateExplorer extends JPanel {
 
 		removeTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: check if any local places are used in queries and if so
-				// warn user that these queries are removed too.
-				// removeSelectedTemplate();
-				// listModel.remove(templateList.getSelectedIndex());
 				int index = templateList.getSelectedIndex();
-				Template<TimedArcPetriNet> template = (Template<TimedArcPetriNet>) templateList.getSelectedValue();
+				Template template = selectedModel();
 
 				HashSet<TAPNQuery> queriesToDelete = findQueriesAffectedByRemoval(template);
 				
@@ -207,7 +201,7 @@ public class TemplateExplorer extends JPanel {
 				
 			}
 
-			private HashSet<TAPNQuery> findQueriesAffectedByRemoval(Template<TimedArcPetriNet> template) {
+			private HashSet<TAPNQuery> findQueriesAffectedByRemoval(Template template) {
 				Iterable<TAPNQuery> queries = parent.queries();
 				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
@@ -262,9 +256,8 @@ public class TemplateExplorer extends JPanel {
 
 		copyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// copy tapn
-				// add copy
-				// update UI
+				Template template = selectedModel().copy();
+				parent.addTemplate(template);
 			}
 		});
 
@@ -275,7 +268,7 @@ public class TemplateExplorer extends JPanel {
 		buttonPanel.add(copyButton, gbc);
 	}
 
-	private Template<TimedArcPetriNet> ShowNewTemplateDialog() {
+	private Template ShowNewTemplateDialog() {
 		String templateName = (String) JOptionPane.showInputDialog(
 				parent.drawingSurface(), "Template name:", "Rename Template",
 				JOptionPane.PLAIN_MESSAGE, null, null, 
@@ -295,7 +288,7 @@ public class TemplateExplorer extends JPanel {
 						JOptionPane.ERROR_MESSAGE);
 			}
 			else {
-				Template<TimedArcPetriNet> template = createNewTemplate(templateName);
+				Template template = createNewTemplate(templateName);
 				return template;
 			}
 		}
@@ -310,7 +303,7 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	private void showRenameTemplateDialog() {
-		Template<TimedArcPetriNet> template = selectedModel();
+		Template template = selectedModel();
 
 		String newName = (String) JOptionPane.showInputDialog(parent
 				.drawingSurface(), "Template name:", "Rename Template",
@@ -339,31 +332,31 @@ public class TemplateExplorer extends JPanel {
 
 	}
 
-	public Template<TimedArcPetriNet> createNewTemplate(String name) {
+	public Template createNewTemplate(String name) {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 
-		return new Template<TimedArcPetriNet>(tapn, new DataLayer());
+		return new Template(tapn, new DataLayer());
 	}
 
-	public void removeTemplate(int index, Template<TimedArcPetriNet> template) {
+	public void removeTemplate(int index, Template template) {
 		listModel.remove(index);
-		parent.network().remove(template.model());
+		parent.removeTemplate(template);
 	}
 
-	public void addTemplate(int index, Template<TimedArcPetriNet> template) {
+	public void addTemplate(int index, Template template) {
 		listModel.add(index, template);
-		parent.network().add(template.model());
+		parent.addTemplate(template);
 	}
 
 	public void openSelectedTemplate() {
-		Template<TimedArcPetriNet> tapn = selectedModel();
+		Template tapn = selectedModel();
 		if (tapn != null) {
 			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model());
 		}
 	}
 
-	public Template<TimedArcPetriNet> selectedModel() {
-		return (Template<TimedArcPetriNet>) templateList.getSelectedValue();
+	public Template selectedModel() {
+		return (Template) templateList.getSelectedValue();
 	}
 
 	public void setSelectedGuiModel(DataLayer guiModel) {
@@ -372,7 +365,7 @@ public class TemplateExplorer extends JPanel {
 
 	public void updateTemplateList() {
 		listModel.clear();
-		for (Template<?> net : parent.templates()) {
+		for (Template net : parent.templates()) {
 			listModel.addElement(net);
 		}
 	}

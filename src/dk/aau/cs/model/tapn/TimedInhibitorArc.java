@@ -20,4 +20,8 @@ public class TimedInhibitorArc extends TimedInputArc {
 	public void delete() {
 		model().remove(this);
 	}
+	
+	public TimedInhibitorArc copy(TimedArcPetriNet tapn) {
+		return new TimedInhibitorArc(tapn.getPlaceByName(source().name()), tapn.getTransitionByName(destination().name()), interval().copy());
+	}
 }

@@ -266,25 +266,31 @@ public class TabContent extends JSplitPane {
 		return drawingSurface;
 	}
 
-	public Iterable<Template<TimedArcPetriNet>> templates() {
-		ArrayList<Template<TimedArcPetriNet>> list = new ArrayList<Template<TimedArcPetriNet>>();
+	public Iterable<Template> templates() {
+		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.templates()) {
-			list.add(new Template<TimedArcPetriNet>(net, guiModels.get(net)));
+			list.add(new Template(net, guiModels.get(net)));
 		}
 		return list;
 	}
 
-	public void addTemplate(Template<TimedArcPetriNet> template) {
+	public void addTemplate(Template template) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
 		templateExplorer.updateTemplateList();
 	}
+	
+	public void removeTemplate(Template template) {
+		tapnNetwork.remove(template.model());
+		guiModels.remove(template.model());
+		templateExplorer.updateTemplateList();
+	}
 
-	public Template<TimedArcPetriNet> activeTemplate() {
+	public Template activeTemplate() {
 		return templateExplorer.selectedModel();
 	}
 
-	public void setActiveTemplate(Template<TimedArcPetriNet> template) {
+	public void setActiveTemplate(Template template) {
 		drawingSurface.setModel(template.guiModel(), template.model());
 	}
 
@@ -307,8 +313,10 @@ public class TabContent extends JSplitPane {
 		constantsPanel.showConstants();
 	}
 
-	public void setupNameGeneratorsFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
+	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
 		drawingSurface.setupNameGeneratorsFromTemplates(templates);
 
 	}
+
+	
 }

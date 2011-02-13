@@ -6,12 +6,11 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class AddTemplateCommand extends Command {
-	private Template<TimedArcPetriNet> template;
+	private Template template;
 	private final TemplateExplorer templateExplorer;
 	private int listIndex;
 
-	public AddTemplateCommand(TemplateExplorer templateExplorer,
-			Template<TimedArcPetriNet> template, int listIndex) {
+	public AddTemplateCommand(TemplateExplorer templateExplorer, Template template, int listIndex) {
 		this.templateExplorer = templateExplorer;
 		this.template = template;
 		this.listIndex = listIndex;

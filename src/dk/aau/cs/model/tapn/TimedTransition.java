@@ -167,4 +167,25 @@ public class TimedTransition extends TAPNElement {
 		else
 			return name;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TimedTransition))
+			return false;
+		TimedTransition other = (TimedTransition) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
+	public TimedTransition copy() {
+		return new TimedTransition(this.name);
+	}
 }

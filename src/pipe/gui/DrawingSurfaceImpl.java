@@ -851,7 +851,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		guiModel.repaintAll(!isInAnimationMode());
 	}
 
-	public void setupNameGeneratorsFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
+	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
 		nameGenerator.setupNameGeneratorFromTemplates(templates);
 	}
 }

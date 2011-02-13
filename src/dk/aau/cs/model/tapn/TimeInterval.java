@@ -157,4 +157,8 @@ public class TimeInterval {
 				lowerBound, upperBound, rightBracket.equals("]") ? true : false);
 	}
 
+	public TimeInterval copy() {
+		return new TimeInterval(this);
+	}
+
 }

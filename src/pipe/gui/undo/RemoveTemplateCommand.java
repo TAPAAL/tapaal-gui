@@ -7,7 +7,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class RemoveTemplateCommand extends AddTemplateCommand {
 
 	public RemoveTemplateCommand(TemplateExplorer templateExplorer,
-			Template<TimedArcPetriNet> template, int listIndex) {
+			Template template, int listIndex) {
 		super(templateExplorer, template, listIndex);
 	}
 

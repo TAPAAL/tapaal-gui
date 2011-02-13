@@ -166,5 +166,13 @@ public class TimedPlace extends TAPNElement {
 			currentMarking.removeArbitraryTokenFrom(this);
 		}
 	}
+	
+	public TimedPlace copy() {
+		TimedPlace p = new TimedPlace(this.name);
+		
+		p.invariant = this.invariant.copy();
+		
+		return p;
+	}
 
 }

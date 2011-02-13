@@ -45,11 +45,11 @@ public class NameGenerator {
 		return TEMPLATE_NAME_PREFIX + (tapnId++); 
 	}
 
-	public void setupNameGeneratorFromTemplates(Iterable<Template<TimedArcPetriNet>> templates) {
+	public void setupNameGeneratorFromTemplates(Iterable<Template> templates) {
 		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
 
 		int templateNameCounter = 0;
-		for(Template<TimedArcPetriNet> tapn : templates) {
+		for(Template tapn : templates) {
 			setupPlaceIDCounter(tapn);
 			setupTransitionIDCounter(tapn);
 
@@ -62,7 +62,7 @@ public class NameGenerator {
 		tapnId = ++templateNameCounter;
 	}
 
-	private void setupTransitionIDCounter(Template<TimedArcPetriNet> tapn) {
+	private void setupTransitionIDCounter(Template tapn) {
 		Pattern transitionPattern = Pattern.compile("^T(\\d+)$", Pattern.CASE_INSENSITIVE);
 		int nameCounter = 0;
 		for(TimedTransition t : tapn.model().transitions()) {
@@ -75,7 +75,7 @@ public class NameGenerator {
 		transitionIDs.put(tapn.model(), ++nameCounter);
 	}
 
-	private void setupPlaceIDCounter(Template<TimedArcPetriNet> tapn) {
+	private void setupPlaceIDCounter(Template tapn) {
 		Pattern placePattern = Pattern.compile("^P(\\d+)$", Pattern.CASE_INSENSITIVE);
 		int nameCounter = 0;
 		for(TimedPlace p : tapn.model().places()) {

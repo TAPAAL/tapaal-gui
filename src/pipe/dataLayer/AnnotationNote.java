@@ -17,9 +17,11 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JDialog;
 
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.undo.AnnotationTextEdit;
 import pipe.gui.widgets.AnnotationPanel;
 import pipe.gui.widgets.EscapableDialog;
@@ -166,10 +168,14 @@ public class AnnotationNote extends Note {
 	}
 
 	public AnnotationNote copy() {
-		return new AnnotationNote(this.note.getText(), Zoomer.getUnzoomedValue(
-				this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom),
-				this.note.getWidth(), this.note.getHeight(), this
-						.isShowingBorder());
+		AnnotationNote annotation = new AnnotationNote(this.note.getText(), Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom),	this.note.getWidth(), this.note.getHeight(), this.isShowingBorder());
+		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
+		annotation.addMouseListener(noteHandler);
+		annotation.addMouseMotionListener(noteHandler);
+		annotation.getNote().addMouseListener(noteHandler);
+		annotation.getNote().addMouseMotionListener(noteHandler);
+		
+		return annotation;
 	}
 
 	@Override

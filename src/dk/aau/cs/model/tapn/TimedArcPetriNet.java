@@ -28,14 +28,7 @@ public class TimedArcPetriNet {
 		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 		transportArcs = new ArrayList<TransportArc>();
 
-		setCurrentMarking(new TimedMarking());
-	}
-
-	private void setCurrentMarking(TimedMarking marking) {
-		currentMarking = marking;
-		for (TimedPlace place : places) {
-			place.setCurrentMarking(marking);
-		}
+		setMarking(new TimedMarking());
 	}
 
 	public void add(TimedPlace place) {
@@ -274,5 +267,63 @@ public class TimedArcPetriNet {
 	public Iterable<TimedInhibitorArc> inhibitorArcs() {
 		return inhibitorArcs;
 	}
+	
+	public TimedArcPetriNet copy() {
+		TimedArcPetriNet tapn = new TimedArcPetriNet(this.name);
+		
+		for(TimedPlace p : this.places)
+			tapn.add(p.copy());
+		
+		for(TimedTransition t : this.transitions)
+			tapn.add(t.copy());
+		
+		for(TimedInputArc inputArc : this.inputArcs)
+			tapn.add(inputArc.copy(tapn));
+		
+		for(TimedOutputArc outputArc : this.outputArcs)
+			tapn.add(outputArc.copy(tapn));
+		
+		for(TransportArc transArc : this.transportArcs)
+			tapn.add(transArc.copy(tapn));
+		
+		for(TimedInhibitorArc inhibArc : this.inhibitorArcs)
+			tapn.add(inhibArc.copy(tapn));
+		
+		tapn.setMarking(this.currentMarking.clone());
+		
+		return tapn;
+	}
 
+	public TimedInputArc getInputArcFromPlaceToTransition(TimedPlace place, TimedTransition transition) {
+		for(TimedInputArc inputArc : inputArcs) {
+			if(inputArc.source().equals(place) && inputArc.destination().equals(transition))
+				return inputArc;
+		}
+		return null;
+	}
+
+	public TimedOutputArc getOutputArcFromTransitionAndPlace(TimedTransition transition, TimedPlace place) {
+		for(TimedOutputArc outputArc : outputArcs) {
+			if(outputArc.source().equals(transition) && outputArc.destination().equals(place))
+				return outputArc;
+		}
+		return null;
+	}
+
+	public TransportArc getTransportArcFromPlaceTransitionAndPlace(TimedPlace sourcePlace, TimedTransition transition, TimedPlace destinationPlace) {
+		for(TransportArc transArc : transportArcs) {
+			if(transArc.source().equals(sourcePlace) && transArc.transition().equals(transition) && transArc.destination().equals(destinationPlace))
+				return transArc;
+		}
+		return null;
+	}
+
+	public TimedInhibitorArc getInhibitorArcFromPlaceAndTransition(TimedPlace place, TimedTransition transition) {
+		for(TimedInhibitorArc inhibArc : inhibitorArcs) {
+			if(inhibArc.source().equals(place) && inhibArc.destination().equals(transition))
+				return inhibArc;
+		}
+		
+		return null;
+	}
 }

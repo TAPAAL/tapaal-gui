@@ -3,12 +3,15 @@ package pipe.dataLayer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.util.Hashtable;
 
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.TransportArcGroupEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
 
 public class TransportArcComponent extends TimedInputArcComponent {
@@ -196,6 +199,26 @@ public class TransportArcComponent extends TimedInputArcComponent {
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval,
 				underlyingTransportArc.interval());
+	}
+	
+	public TransportArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+		TransportArcComponent arc = new TransportArcComponent(this, group, isInPreSet);
+		arc.setSource(oldToNewMapping.get(this.getSource()));
+		arc.setTarget(oldToNewMapping.get(this.getTarget()));
+		
+		arc.setUnderlyingArc(tapn.getTransportArcFromPlaceTransitionAndPlace(tapn.getPlaceByName(underlyingTransportArc.source().name()), 
+																			 tapn.getTransitionByName(underlyingTransportArc.transition().name()), 
+																			 tapn.getPlaceByName(underlyingTransportArc.destination().name())));
+		
+		arc.getSource().addConnectFrom(arc);
+		arc.getTarget().addConnectTo(arc);
+		
+		TransportArcHandler transportArcHandler = new TransportArcHandler((DrawingSurfaceImpl)getParent(), arc);
+		arc.addMouseListener(transportArcHandler);
+		arc.addMouseWheelListener(transportArcHandler);
+		arc.addMouseMotionListener(transportArcHandler);
+		
+		return arc;
 	}
 
 }

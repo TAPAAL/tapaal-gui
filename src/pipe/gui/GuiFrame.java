@@ -65,30 +65,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
-/**
- * @author Edwin Chung changed the code so that the firedTransitions array list
- *         is reset when the animation mode is turned off
- * 
- * @author Ben Kirby, 10 Feb 2007: Changed the saveNet() method so that it calls
- *         new DataLayerWriter class and passes in current net to save.
- * 
- * @author Ben Kirby, 10 Feb 2007: Changed the createNewTab method so that it
- *         loads an XML file using the new PNMLTransformer class and
- *         createFromPNML DataLayer method.
- * 
- * @author Edwin Chung modifed the createNewTab method so that it assigns the
- *         file name of the newly created DataLayer object in the dataLayer
- *         class (Mar 2007)
- * 
- * @author Oliver Haggarty modified initaliseActions to fix a bug that meant not
- *         all example nets were loaded if there was a non .xml file in the
- *         folder
- */
 public class GuiFrame extends JFrame implements ActionListener, Observer {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
 	private final String[] zoomExamples = { "40%", "60%", "80%", "100%",
@@ -248,20 +226,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				"Export the net to PostScript format", "ctrl T"));
 		addMenuItem(exportMenu, exportToTikZAction = new FileAction("TikZ",
 				"Export the net to PNG format", "ctrl L"));
-		/*
-		 * addMenuItem(exportMenu, exportTNAction = new
-		 * FileAction("Timenet","Export the net to Timenet format",""));
-		 * addMenuItem(exportMenu, exportToUppaal = new
-		 * FileAction("Export to Uppaal","Export the to Uppaal format",""));
-		 * addMenuItem(exportMenu, exportToUppaalAdvanced = new
-		 * FileAction("Export to Uppaal Advanced"
-		 * ,"Export the to Uppaal format","")); addMenuItem(exportMenu,
-		 * exportToUppaalSymetric = newFileAction("Export to Uppaal, Symetric",
-		 * "Export the to Uppaal format, with symetricreduction",""));
-		 * addMenuItem(exportMenu, exportToTest = new
-		 * FileAction("Export a Degree-2 net"
-		 * ,"Export the to Uppaal format",""));
-		 */
+
 		fileMenu.add(exportMenu);
 
 		fileMenu.addSeparator();
@@ -938,8 +903,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		appTab.setSelectedIndex(freeSpace);
 
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
-		Template<TimedArcPetriNet> template = new Template<TimedArcPetriNet>(
-				new TimedArcPetriNet(templateName), new DataLayer());
+		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer());
 		tab.addTemplate(template);
 
 		tab.setActiveTemplate(template);
@@ -990,8 +954,8 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(currentTab.drawingSurface());
 
-				Iterable<Template<TimedArcPetriNet>> templates = factory.parseTimedArcPetriNetsFromPNML(doc);
-				for (Template<TimedArcPetriNet> t : templates) {
+				Iterable<Template> templates = factory.parseTimedArcPetriNetsFromPNML(doc);
+				for (Template t : templates) {
 					currentTab.addTemplate(t);
 				}
 

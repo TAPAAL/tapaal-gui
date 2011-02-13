@@ -28,4 +28,8 @@ public class TimedOutputArc extends TAPNElement {
 	public void delete() {
 		model().remove(this);
 	}
+
+	public TimedOutputArc copy(TimedArcPetriNet tapn) {
+		return new TimedOutputArc(tapn.getTransitionByName(source.name()), tapn.getPlaceByName(destination.name()));
+	}
 }

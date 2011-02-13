@@ -22,14 +22,18 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.LabelHandler;
+import pipe.gui.handler.PlaceHandler;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -52,7 +56,7 @@ public class TimedPlaceComponent extends Place {
 			String idInput, String nameInput, Double nameOffsetXInput,
 			Double nameOffsetYInput, int initialMarkingInput,
 			double markingOffsetXInput, double markingOffsetYInput,
-			int capacityInput, String invariant) {
+			int capacityInput) {
 
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput, initialMarkingInput,
@@ -382,5 +386,22 @@ public class TimedPlaceComponent extends Place {
 	public void setName(String nameInput) {
 		place.setName(nameInput);
 		super.setName(nameInput);
+	}
+
+	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionX, positionY, id, place.name(), nameOffsetX, nameOffsetY, initialMarking, markingOffsetX, markingOffsetY, capacity);
+		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
+		
+		LabelHandler labelHandler = new LabelHandler(placeComponent.getNameLabel(), placeComponent);
+		placeComponent.getNameLabel().addMouseListener(labelHandler);
+		placeComponent.getNameLabel().addMouseMotionListener(labelHandler);
+		placeComponent.getNameLabel().addMouseWheelListener(labelHandler);
+
+		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent, getGuiModel(), tapn);
+		placeComponent.addMouseListener(placeHandler);
+		placeComponent.addMouseWheelListener(placeHandler);
+		placeComponent.addMouseMotionListener(placeHandler);
+		
+		return placeComponent;
 	}
 }

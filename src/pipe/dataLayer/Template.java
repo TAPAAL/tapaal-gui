@@ -1,12 +1,13 @@
 package pipe.dataLayer;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 
-public class Template<TNet> {
-	private TNet net;
+public class Template {
+	private TimedArcPetriNet net;
 	private DataLayer guiModel;
 
-	public Template(TNet net, DataLayer guiModel) {
+	public Template(TimedArcPetriNet net, DataLayer guiModel) {
 		this.net = net;
 		this.guiModel = guiModel;
 	}
@@ -20,12 +21,18 @@ public class Template<TNet> {
 		return guiModel;
 	}
 
-	public TNet model() {
+	public TimedArcPetriNet model() {
 		return net;
 	}
 
 	public void setGuiModel(DataLayer guiModel) {
 		Require.that(guiModel != null, "GuiModel cannot be null");
 		this.guiModel = guiModel;
+	}
+
+	public Template copy() {
+		TimedArcPetriNet tapn = net.copy();
+		tapn.setName(tapn.getName() + "Copy");
+		return new Template(tapn, guiModel.copy(tapn));
 	}
 }

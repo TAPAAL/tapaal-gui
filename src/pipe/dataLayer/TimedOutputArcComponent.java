@@ -6,9 +6,14 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.util.Hashtable;
 
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.ArcHandler;
 
 /**
  * <b>Arc</b> - Petri-Net Normal Arc Class
@@ -72,8 +77,7 @@ public class TimedOutputArcComponent extends Arc {
 		weightLabel = new NameLabel(zoom);
 
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
-			this.myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath
-					.getPoint(i).getY(), arc.myPath.getPointType(i));
+			this.myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
 		}
 		this.myPath.createPath();
 		this.updateBounds();
@@ -210,6 +214,23 @@ public class TimedOutputArcComponent extends Arc {
 
 	public void setUnderlyingArc(dk.aau.cs.model.tapn.TimedOutputArc outputArc) {
 		this.outputArc = outputArc;
+	}
+
+	public TimedOutputArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+		TimedOutputArcComponent arc = new TimedOutputArcComponent(this);
+		arc.setSource(oldToNewMapping.get(this.getSource()));
+		arc.setTarget(oldToNewMapping.get(this.getTarget()));
+		arc.setUnderlyingArc(tapn.getOutputArcFromTransitionAndPlace(tapn.getTransitionByName(outputArc.source().name()), tapn.getPlaceByName(outputArc.destination().name())));
+		
+		arc.getSource().addConnectFrom(arc);
+		arc.getTarget().addConnectTo(arc);
+		
+		ArcHandler arcHandler = new ArcHandler((DrawingSurfaceImpl)getParent(), arc);
+		arc.addMouseListener(arcHandler);
+		arc.addMouseWheelListener(arcHandler);
+		arc.addMouseMotionListener(arcHandler);
+		
+		return arc;
 	}
 
 }

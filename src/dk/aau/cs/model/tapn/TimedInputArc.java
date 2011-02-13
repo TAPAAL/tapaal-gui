@@ -53,4 +53,8 @@ public class TimedInputArc extends TAPNElement {
 	public void delete() {
 		model().remove(this);
 	}
+
+	public TimedInputArc copy(TimedArcPetriNet tapn) {
+		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy());
+	}
 }

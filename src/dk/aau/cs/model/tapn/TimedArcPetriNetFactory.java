@@ -12,8 +12,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
-
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
@@ -77,8 +75,8 @@ public class TimedArcPetriNetFactory {
 		this.drawingSurface = drawingSurfaceImpl;
 	}
 
-	public Iterable<Template<TimedArcPetriNet>> parseTimedArcPetriNetsFromPNML(Document tapnDoc) {
-		ArrayList<Template<TimedArcPetriNet>> templates = new ArrayList<Template<TimedArcPetriNet>>();
+	public Iterable<Template> parseTimedArcPetriNetsFromPNML(Document tapnDoc) {
+		ArrayList<Template> templates = new ArrayList<Template>();
 
 		NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
@@ -117,8 +115,8 @@ public class TimedArcPetriNetFactory {
 	// TODO: the methods for loading nets in the old and the new format 
 	// contains a lot of duplicate code at the moment. The code moreover
 	// contains remnants of the pipe code which is not that readable and this 
-	// whole class needs to be refactored.
-	private Template<TimedArcPetriNet> parseTimedArcPetriNetFromPNML(Node tapnNode) {
+	// whole class thus needs to be refactored.
+	private Template parseTimedArcPetriNetFromPNML(Node tapnNode) {
 		if (isModelInNewFormat) {
 			try {
 				return createTimedArcPetriNetFromPNML(tapnNode);
@@ -139,7 +137,7 @@ public class TimedArcPetriNetFactory {
 		throw new RuntimeException("An error occurred while trying to parse the chosen model.");
 	}
 
-	private Template<TimedArcPetriNet> createTimedArcPetriNetFromPNML(
+	private Template createTimedArcPetriNetFromPNML(
 			Node tapnNode) {
 		initialMarking = new TimedMarking();
 		if (tapnNode instanceof Element) {
@@ -164,7 +162,7 @@ public class TimedArcPetriNetFactory {
 
 		tapn.setMarking(initialMarking);
 
-		return new Template<TimedArcPetriNet>(tapn, guiModel);
+		return new Template(tapn, guiModel);
 	}
 
 	private boolean isNameAllowed(String name) {
@@ -323,7 +321,7 @@ public class TimedArcPetriNetFactory {
 			placeComponent = new TimedPlaceComponent(positionXInput,
 					positionYInput, idInput, nameInput, nameOffsetXInput,
 					nameOffsetYInput, initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, capacityInput, invariant);
+					markingOffsetYInput, capacityInput);
 
 			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(
 					invariant, constants));
@@ -679,7 +677,7 @@ public class TimedArcPetriNetFactory {
 	// //////////////////////////////////////////////////////////
 	// Legacy support for old format
 	// //////////////////////////////////////////////////////////
-	private Template<TimedArcPetriNet> createTimedArcPetriNetFromPNMLOldFormat(Node tapnNode) {
+	private Template createTimedArcPetriNetFromPNMLOldFormat(Node tapnNode) {
 		initialMarking = new TimedMarking();
 		tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		guiModel = new DataLayer();
@@ -695,7 +693,7 @@ public class TimedArcPetriNetFactory {
 
 		tapn.setMarking(initialMarking);
 
-		return new Template<TimedArcPetriNet>(tapn, guiModel);
+		return new Template(tapn, guiModel);
 	}
 
 	private void parseElementAsOldFormat(Node node, String templateName) {
@@ -836,7 +834,7 @@ public class TimedArcPetriNetFactory {
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
 					idInput, nameInput, nameOffsetXInput, nameOffsetYInput,
 					initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, capacityInput, invariant);
+					markingOffsetYInput, capacityInput);
 
 			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(
 					invariant, constants));

@@ -9,18 +9,15 @@ import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 
 public class TimeInvariant {
-	public static final TimeInvariant LESS_THAN_INFINITY = new TimeInvariant(
-			false, Bound.Infinity);
+	public static final TimeInvariant LESS_THAN_INFINITY = new TimeInvariant(false, Bound.Infinity);
 	private boolean isUpperIncluded;
 	private Bound upper;
 
 	public TimeInvariant(boolean isUpperIncluded, Bound upper) {
 		Require.that(upper != null, "bound cannot be null");
-		Require.that(isUpperIncluded
-				|| (!isUpperIncluded && upper.value() != 0),
-				"\"< 0\" is and invalid invariant.");
-		Require.that(upper != Bound.Infinity || !isUpperIncluded,
-				"\"<=inf\" is not a valid invariant");
+		Require.that(isUpperIncluded || (!isUpperIncluded && upper.value() != 0), "\"< 0\" is and invalid invariant.");
+		Require.that(upper != Bound.Infinity || !isUpperIncluded, "\"<=inf\" is not a valid invariant");
+		
 		this.isUpperIncluded = isUpperIncluded;
 		this.upper = upper;
 	}
@@ -46,8 +43,7 @@ public class TimeInvariant {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isUpperIncluded ? "<=" : "<");
 		buffer.append(" ");
-		buffer.append(displayConstantNames || upper instanceof InfBound ? upper
-				: upper.value());
+		buffer.append(displayConstantNames || upper instanceof InfBound ? upper	: upper.value());
 		return buffer.toString();
 	}
 
@@ -84,8 +80,7 @@ public class TimeInvariant {
 				if (constants.containsKey(boundAsString)) {
 					bound = new ConstantBound(constants.get(boundAsString));
 				} else
-					throw new RuntimeException(
-							"A constant which was not declared was used in an invariant.");
+					throw new RuntimeException("A constant which was not declared was used in an invariant.");
 			}
 		}
 
@@ -94,6 +89,10 @@ public class TimeInvariant {
 
 	public static TimeInvariant parseInvariantWithoutConstant(String invariant) {
 		return TimeInvariant.parse(invariant, new TreeMap<String, Constant>());
+	}
+	
+	public TimeInvariant copy() {
+		return new TimeInvariant(this.isUpperIncluded, upper.copy());
 	}
 
 }

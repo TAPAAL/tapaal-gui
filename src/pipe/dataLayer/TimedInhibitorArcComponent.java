@@ -5,13 +5,16 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.math.BigDecimal;
+import java.util.Hashtable;
 
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
@@ -28,12 +31,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
 		super(source);
-	}
-
-	@Override
-	public boolean satisfiesGuard(BigDecimal token) {
-		throw new RuntimeException("Not Implemented");
-		// return inhibitorArc.isEnabledBy(token);
 	}
 
 	public void setUnderlyingArc(TimedInhibitorArc arc) {
@@ -128,5 +125,23 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		g2.drawOval(-4, -8, 8, 8);
 
 		g2.setTransform(reset);
+	}
+	
+	public TimedInhibitorArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+		TimedInhibitorArcComponent arc = new TimedInhibitorArcComponent(this);
+		arc.setSource(oldToNewMapping.get(this.getSource()));
+		arc.setTarget(oldToNewMapping.get(this.getTarget()));
+		
+		arc.getSource().addConnectFrom(arc);
+		arc.getTarget().addConnectTo(arc);
+		
+		arc.setUnderlyingArc(tapn.getInhibitorArcFromPlaceAndTransition(tapn.getPlaceByName(inhibitorArc.source().name()), tapn.getTransitionByName(inhibitorArc.destination().name())));
+		
+		TimedArcHandler timedArcHandler = new TimedArcHandler((DrawingSurfaceImpl)getParent(), arc);
+		arc.addMouseListener(timedArcHandler);
+		arc.addMouseWheelListener(timedArcHandler);
+		arc.addMouseMotionListener(timedArcHandler);
+		
+		return arc;
 	}
 }

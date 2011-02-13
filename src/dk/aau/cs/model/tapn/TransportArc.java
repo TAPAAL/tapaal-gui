@@ -76,4 +76,11 @@ public class TransportArc extends TAPNElement {
 	public void delete() {
 		model().remove(this);
 	}
+
+	public TransportArc copy(TimedArcPetriNet tapn) {
+		return new TransportArc(tapn.getPlaceByName(source.name()), 
+								tapn.getTransitionByName(transition.name()), 
+								tapn.getPlaceByName(destination.name()), 
+								interval.copy());
+	}
 }

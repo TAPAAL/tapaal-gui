@@ -5,9 +5,15 @@ import java.awt.Container;
 import javax.swing.BoxLayout;
 
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
+import pipe.gui.handler.AnimationHandler;
+import pipe.gui.handler.LabelHandler;
+import pipe.gui.handler.TAPNTransitionHandler;
+import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class TimedTransitionComponent extends Transition {
@@ -116,6 +122,25 @@ public class TimedTransitionComponent extends Transition {
 		//updateConnected();
 		
 		repaint();
+	}
+
+	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(positionX, positionY, id, transition.name(), nameOffsetX, nameOffsetY, true, isInfiniteServer(), getAngle(), getPriority());
+		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
+		
+		LabelHandler labelHandler = new LabelHandler(transitionComponent.getNameLabel(), transitionComponent);
+		transitionComponent.getNameLabel().addMouseListener(labelHandler);
+		transitionComponent.getNameLabel().addMouseMotionListener(labelHandler);
+		transitionComponent.getNameLabel().addMouseWheelListener(labelHandler);
+		
+		TransitionHandler transitionHandler = new TAPNTransitionHandler((DrawingSurfaceImpl)getParent(), transitionComponent, getGuiModel(), tapn);
+		transitionComponent.addMouseListener(transitionHandler);
+		transitionComponent.addMouseMotionListener(transitionHandler);
+		transitionComponent.addMouseWheelListener(transitionHandler);
+
+		transitionComponent.addMouseListener(new AnimationHandler());
+	
+		return transitionComponent;
 	}
 
 }

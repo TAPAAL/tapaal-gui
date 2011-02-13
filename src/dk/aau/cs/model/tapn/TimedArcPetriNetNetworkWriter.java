@@ -38,12 +38,12 @@ import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 
-	private Iterable<Template<TimedArcPetriNet>> templates;
+	private Iterable<Template> templates;
 	private Iterable<TAPNQuery> queries;
 	private Iterable<Constant> constants;
 
 	public TimedArcPetriNetNetworkWriter(
-			Iterable<Template<TimedArcPetriNet>> templates,
+			Iterable<Template> templates,
 			Iterable<TAPNQuery> queries, 
 			Iterable<Constant> constants) {
 		this.templates = templates;
@@ -131,7 +131,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	}
 
 	private void appendTemplates(Document document, Element root) {
-		for (Template<TimedArcPetriNet> tapn : templates) {
+		for (Template tapn : templates) {
 			DataLayer guiModel = tapn.guiModel();
 
 			Element NET = document.createElement("net");
