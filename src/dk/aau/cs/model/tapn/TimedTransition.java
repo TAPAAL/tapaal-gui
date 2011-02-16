@@ -22,8 +22,7 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public void setName(String name) {
-		Require.that(name != null && !name.isEmpty(),
-				"A timed transition must have a name");
+		Require.that(name != null && !name.isEmpty(), "A timed transition must have a name");
 		this.name = name;
 	}
 

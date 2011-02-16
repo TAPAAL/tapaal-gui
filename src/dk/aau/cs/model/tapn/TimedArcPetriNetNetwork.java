@@ -10,12 +10,16 @@ import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetwork {
 	private List<TimedArcPetriNet> tapns;
+	private List<SharedPlace> sharedPlaces;
+	private List<SharedTransition> sharedTransitions;
 	private NetworkMarking currentMarking;
 
 	private ConstantStore constants;
 
 	public TimedArcPetriNetNetwork() {
 		tapns = new ArrayList<TimedArcPetriNet>();
+		sharedPlaces = new ArrayList<SharedPlace>();
+		sharedTransitions = new ArrayList<SharedTransition>();
 		currentMarking = new NetworkMarking();
 		constants = new ConstantStore();
 	}
@@ -158,6 +162,24 @@ public class TimedArcPetriNetNetwork {
 				return tapn;
 		}
 		return null;
+	}
+
+	
+	
+	public int numberOfSharedPlaces() {
+		return sharedPlaces.size();
+	}
+	
+	public int numberOfTransitionsPlaces() {
+		return sharedTransitions.size();
+	}
+
+	public SharedPlace getSharedPlaceByIndex(int index) {
+		return sharedPlaces.get(index);
+	}
+
+	public Object getSharedTransitionByIndex(int index) {
+		return sharedTransitions.get(index);
 	}
 
 }

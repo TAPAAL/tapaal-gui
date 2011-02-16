@@ -88,13 +88,14 @@ public class TabContent extends JSplitPane {
 		constantsPanel = new LeftConstantsPane(enableAddButton, this);
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
 		templateExplorer = new TemplateExplorer(this);
+		SharedPlacesAndTransitionsPanel sharedPTPanel = new SharedPlacesAndTransitionsPanel(tapnNetwork);
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.34;
+		gbc.weighty = 0.25;
 		editorLeftPane.add(templateExplorer, gbc);
 
 		gbc = new GridBagConstraints();
@@ -102,7 +103,7 @@ public class TabContent extends JSplitPane {
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.33;
+		gbc.weighty = 0.25;
 		editorLeftPane.add(queries, gbc);
 		
 		gbc = new GridBagConstraints();
@@ -110,8 +111,16 @@ public class TabContent extends JSplitPane {
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.33;
+		gbc.weighty = 0.25;
 		editorLeftPane.add(constantsPanel, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.25;
+		editorLeftPane.add(sharedPTPanel, gbc);
 	}
 
 	public void updateConstantsList() {

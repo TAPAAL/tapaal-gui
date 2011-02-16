@@ -58,8 +58,7 @@ public class TimedMarking {
 	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
-		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap
-				.entrySet()) {
+		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			for (TimedToken token : entry.getValue()) {
 				TimeInvariant invariant = token.place().invariant();
 				if (!invariant.isSatisfied(token.age().add(delay))) {
@@ -76,12 +75,9 @@ public class TimedMarking {
 
 	public TimedMarking delay(BigDecimal amount) {
 		TimedMarking clone = new TimedMarking();
-		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(
-				placesToTokensMap.size());
-		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap
-				.entrySet()) {
-			ArrayList<TimedToken> newTokens = new ArrayList<TimedToken>(entry
-					.getValue().size());
+		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(placesToTokensMap.size());
+		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
+			ArrayList<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
 			for (TimedToken token : entry.getValue()) {
 				newTokens.add(token.delay(amount));
 			}
@@ -92,29 +88,24 @@ public class TimedMarking {
 		return clone;
 	}
 
-	public TimedMarking fireTransition(TimedTransition transition,
-			List<TimedToken> tokensToConsume) {
+	public TimedMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume) {
 		Require.that(transition != null, "transition must not be null");
-		Require.that(transition.isEnabledBy(tokensToConsume),
-				"Tokens does not enable transition");
+		Require.that(transition.isEnabledBy(tokensToConsume), "Tokens does not enable transition");
 
 		TimedMarking clone = clone();
 
-		List<TimedToken> producedTokens = transition
-				.calculateProducedTokensFrom(tokensToConsume);
+		List<TimedToken> producedTokens = transition.calculateProducedTokensFrom(tokensToConsume);
 		clone.remove(tokensToConsume);
 		clone.add(producedTokens);
 
 		return clone;
 	}
 
-	public TimedMarking fireTransition(TimedTransition transition,
-			FiringMode firingMode) {
+	public TimedMarking fireTransition(TimedTransition transition, FiringMode firingMode) {
 		Require.that(transition != null, "transition must not be null");
 		Require.that(transition.isEnabled(), "Transition must be enabled");
 
-		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(
-				this, firingMode);
+		List<TimedToken> tokensToConsume = transition.calculateConsumedTokens(this, firingMode);
 
 		return fireTransition(transition, tokensToConsume);
 	}

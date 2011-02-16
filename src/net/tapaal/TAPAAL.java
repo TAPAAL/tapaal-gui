@@ -20,7 +20,6 @@ public class TAPAAL {
 	 * @author Kenneth Yrke Joergensen (kenneth@yrke.dk)
 	 */
 	public static void main(String[] args) {
-
 		// Create a CommandLineParser using Posix Style
 		CommandLineParser parser = new PosixParser();
 

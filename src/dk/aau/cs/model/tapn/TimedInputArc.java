@@ -9,8 +9,7 @@ public class TimedInputArc extends TAPNElement {
 	private TimeInterval interval;
 	private TimedTransition destination;
 
-	public TimedInputArc(TimedPlace source, TimedTransition destination,
-			TimeInterval interval) {
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		

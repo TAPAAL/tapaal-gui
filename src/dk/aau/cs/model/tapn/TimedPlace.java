@@ -37,8 +37,7 @@ public class TimedPlace extends TAPNElement {
 	}
 
 	public void setName(String name) {
-		Require.that(name != null && !name.isEmpty(),
-				"A timed place must have a valid name");
+		Require.that(name != null && !name.isEmpty(), "A timed place must have a valid name");
 
 		this.name = name;
 	}
@@ -48,8 +47,7 @@ public class TimedPlace extends TAPNElement {
 	}
 
 	public void setInvariant(TimeInvariant invariant) {
-		Require.that(invariant != null,
-				"A timed place must have a non-null invariant");
+		Require.that(invariant != null, "A timed place must have a non-null invariant");
 		this.invariant = invariant;
 	}
 
@@ -103,35 +101,6 @@ public class TimedPlace extends TAPNElement {
 		return currentMarking.getTokensFor(this).size();
 	}
 
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof TimedPlace))
-			return false;
-		TimedPlace other = (TimedPlace) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
 
 	public void removeFromPostset(TimedInputArc arc) {
 		postset.remove(arc);
@@ -175,4 +144,33 @@ public class TimedPlace extends TAPNElement {
 		return p;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TimedPlace))
+			return false;
+		TimedPlace other = (TimedPlace) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
 }

@@ -20,8 +20,7 @@ public class NetworkMarking {
 
 	public void addMarking(TimedArcPetriNet tapn, TimedMarking marking) {
 		Require.that(tapn != null, "tapn must not be null");
-		Require.that(!markings.containsKey(tapn),
-				"There is already a marking for that tapn");
+		Require.that(!markings.containsKey(tapn), "There is already a marking for that tapn");
 
 		markings.put(tapn, marking);
 	}
@@ -60,8 +59,7 @@ public class NetworkMarking {
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
 
 		NetworkMarking newMarking = new NetworkMarking();
-		HashMap<TimedArcPetriNet, TimedMarking> newMarkings = new HashMap<TimedArcPetriNet, TimedMarking>(
-				markings.size());
+		HashMap<TimedArcPetriNet, TimedMarking> newMarkings = new HashMap<TimedArcPetriNet, TimedMarking>(markings.size());
 		for (Entry<TimedArcPetriNet, TimedMarking> entry : markings.entrySet()) {
 			newMarkings.put(entry.getKey(), entry.getValue().delay(amount));
 		}
@@ -69,17 +67,11 @@ public class NetworkMarking {
 		return newMarking;
 	}
 
-	public NetworkMarking fireTransition(TimedTransition transition,
-			FiringMode firingMode) {
+	public NetworkMarking fireTransition(TimedTransition transition, FiringMode firingMode) {
 		Require.that(transition != null, "transition cannot be null");
 
-		NetworkMarking shallowCopy = shallowCopy(); // conserve memory be
-													// reusing unchanged
-													// markings (they are
-													// immutable wrt. transition
-													// firing and delay)
-		TimedMarking newMarking = getMarkingFor(transition.model())
-				.fireTransition(transition, firingMode);
+		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
+		TimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
 
 		shallowCopy.removeMarkingFor(transition.model());
 		shallowCopy.addMarking(transition.model(), newMarking);
@@ -87,18 +79,12 @@ public class NetworkMarking {
 		return shallowCopy;
 	}
 
-	public NetworkMarking fireTransition(TimedTransition transition,
-			List<TimedToken> tokensToConsume) {
+	public NetworkMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume) {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(tokensToConsume != null, "Must specify a list of tokens");
 
-		NetworkMarking shallowCopy = shallowCopy(); // conserve memory be
-													// reusing unchanged
-													// markings (they are
-													// immutable wrt. transition
-													// firing and delay)
-		TimedMarking newMarking = getMarkingFor(transition.model())
-				.fireTransition(transition, tokensToConsume);
+		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
+		TimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, tokensToConsume);
 
 		shallowCopy.removeMarkingFor(transition.model());
 		shallowCopy.addMarking(transition.model(), newMarking);
