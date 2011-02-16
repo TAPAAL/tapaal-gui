@@ -24,8 +24,7 @@ public class NameGenerator {
 
 	public void add(TimedArcPetriNet net) {
 		if (!placeIDs.containsKey(net) && !transitionIDs.containsKey(net)) {
-			placeIDs.put(net, 0);
-			transitionIDs.put(net, 0);
+			setupTemplate(net);
 		}
 	}
 
@@ -42,50 +41,52 @@ public class NameGenerator {
 	}
 
 	public String getNewTemplateName() {
-		return TEMPLATE_NAME_PREFIX + (tapnId++); 
+		return TEMPLATE_NAME_PREFIX + (++tapnId); 
 	}
 
 	public void setupNameGeneratorFromTemplates(Iterable<Template> templates) {
-		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
-
-		int templateNameCounter = 0;
 		for(Template tapn : templates) {
-			setupPlaceIDCounter(tapn);
-			setupTransitionIDCounter(tapn);
-
-			Matcher m = templatePattern.matcher(tapn.model().getName());
-			if(m.matches()) {
-				int number = Integer.parseInt(m.group(1));
-				if(number > templateNameCounter) templateNameCounter = number;
-			}
+			setupTemplate(tapn.model());
 		}
-		tapnId = ++templateNameCounter;
 	}
 
-	private void setupTransitionIDCounter(Template tapn) {
+	private void setupTemplate(TimedArcPetriNet tapn) {
+		Pattern templatePattern = Pattern.compile("^TAPN(\\d+)$", Pattern.CASE_INSENSITIVE);
+		
+		setupPlaceIDCounter(tapn);
+		setupTransitionIDCounter(tapn);
+
+		Matcher m = templatePattern.matcher(tapn.getName());
+		if(m.matches()) {
+			int number = Integer.parseInt(m.group(1));
+			if(number > tapnId) tapnId = number;
+		}
+	}
+
+	private void setupTransitionIDCounter(TimedArcPetriNet tapn) {
 		Pattern transitionPattern = Pattern.compile("^T(\\d+)$", Pattern.CASE_INSENSITIVE);
-		int nameCounter = 0;
-		for(TimedTransition t : tapn.model().transitions()) {
+		int nameCounter = -1;
+		for(TimedTransition t : tapn.transitions()) {
 			Matcher m = transitionPattern.matcher(t.name().toLowerCase());
 			if(m.matches()) {
 				int number = Integer.parseInt(m.group(1));
 				if(number > nameCounter) nameCounter = number;
 			}
 		}
-		transitionIDs.put(tapn.model(), ++nameCounter);
+		transitionIDs.put(tapn, ++nameCounter);
 	}
 
-	private void setupPlaceIDCounter(Template tapn) {
+	private void setupPlaceIDCounter(TimedArcPetriNet tapn) {
 		Pattern placePattern = Pattern.compile("^P(\\d+)$", Pattern.CASE_INSENSITIVE);
-		int nameCounter = 0;
-		for(TimedPlace p : tapn.model().places()) {
+		int nameCounter = -1;
+		for(TimedPlace p : tapn.places()) {
 			Matcher m = placePattern.matcher(p.name().toLowerCase());
 			if(m.matches()) {
 				int number = Integer.parseInt(m.group(1));
 				if(number > nameCounter) nameCounter = number;
 			}
 		}
-		placeIDs.put(tapn.model(), ++nameCounter);
+		placeIDs.put(tapn, ++nameCounter);
 	}
 
 	public void updateTemplateIndex(String newName){

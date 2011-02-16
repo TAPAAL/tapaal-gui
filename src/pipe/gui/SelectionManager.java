@@ -35,25 +35,25 @@ public class SelectionManager extends javax.swing.JComponent implements
 	private boolean isSelecting;
 	private static final Color selectionColor = new Color(000, 000, 255, 030);
 	private static final Color selectionColorOutline = new Color(000, 000, 100);
-	private DrawingSurfaceImpl view;
+	private DrawingSurfaceImpl drawingSurface;
 	private boolean enabled = true;
 
 	public SelectionManager(DrawingSurfaceImpl _view) {
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addMouseWheelListener(this);
-		this.view = _view;
+		this.drawingSurface = _view;
 	}
 
 	public void updateBounds() {
 		if (enabled == true) {
-			setBounds(0, 0, view.getWidth(), view.getHeight());
+			setBounds(0, 0, drawingSurface.getWidth(), drawingSurface.getHeight());
 		}
 	}
 
 	public void enableSelection() {
 		if (enabled == false) {
-			view.add(this);
+			drawingSurface.add(this);
 			enabled = true;
 			updateBounds();
 		}
@@ -61,7 +61,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	public void disableSelection() {
 		if (enabled == true) {
-			view.remove(this);
+			drawingSurface.remove(this);
 			enabled = false;
 		}
 	}
@@ -72,7 +72,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		}
 
 		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = view.getPNObjects();
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			pnObject.select(selectionRectangle);
 		}
@@ -90,18 +90,18 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	public void deleteSelection() {
 		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = view.getPNObjects();
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
 		for (int i = 0; i < pnObjects.size(); i++) {
 			if (pnObjects.get(i).isSelected()) {
 				pnObjects.get(i).delete();
 			}
 		}
-		view.updatePreferredSize();
+		drawingSurface.updatePreferredSize();
 	}
 
 	public void clearSelection() {
 		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = view.getPNObjects();
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			if (pnObject.isSelectable()) {
 				pnObject.deselect();
@@ -120,7 +120,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		Point topleft = null;
 
 		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = view.getPNObjects();
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			if (pnObject.isSelected()) {
 				point = pnObject.getLocation();
@@ -155,14 +155,14 @@ public class SelectionManager extends javax.swing.JComponent implements
 				pnObject.translate(transX, transY);
 			}
 		}
-		view.updatePreferredSize();
+		drawingSurface.updatePreferredSize();
 	}
 
 	public ArrayList<PetriNetObject> getSelection() {
 		ArrayList<PetriNetObject> selection = new ArrayList<PetriNetObject>();
 
 		// Get all the objects in the current window
-		ArrayList<PetriNetObject> pnObjects = view.getPNObjects();
+		ArrayList<PetriNetObject> pnObjects = drawingSurface.getPNObjects();
 		for (PetriNetObject pnObject : pnObjects) {
 			if (pnObject.isSelected()) {
 				selection.add(pnObject);
@@ -179,7 +179,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	public void mousePressed(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
-			view.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
+			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
 			startPoint = e.getPoint();
 			selectionRectangle.setRect(startPoint.getX(), startPoint.getY(), 0,
 					0);
@@ -202,7 +202,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
 			isSelecting = false;
-			view.setLayer(this, Pipe.LOWEST_LAYER_OFFSET);
+			drawingSurface.setLayer(this, Pipe.LOWEST_LAYER_OFFSET);
 			selectionRectangle.setRect(-1, -1, 0, 0);
 			repaint();
 		}
@@ -226,16 +226,16 @@ public class SelectionManager extends javax.swing.JComponent implements
 			processSelection(e);
 			repaint();
 		} else {
-			view.drag(startPoint, e.getPoint());
+			drawingSurface.drag(startPoint, e.getPoint());
 		}
 	}
 
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (e.isControlDown()) {
 			if (e.getWheelRotation() > 0) {
-				view.zoomIn();
+				drawingSurface.zoomIn();
 			} else {
-				view.zoomOut();
+				drawingSurface.zoomOut();
 			}
 		}
 	}
@@ -263,7 +263,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public int getSelectionCount() {
-		Component netObj[] = view.getComponents();
+		Component netObj[] = drawingSurface.getComponents();
 		int selectionCount = 0;
 		// Get all the objects in the current window
 		for (int i = 0; i < netObj.length; i++) {

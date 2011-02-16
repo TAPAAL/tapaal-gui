@@ -145,6 +145,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			add(pnObject);
 		}
+		this.add(selection);
+		
 		repaint();
 	}
 

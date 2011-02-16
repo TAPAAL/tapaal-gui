@@ -1518,7 +1518,6 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			}
 
 			appView.getSelectionObject().disableSelection();
-			// appView.getSelectionObject().clearSelection();
 
 			setMode(typeID);
 			statusBar.changeText(typeID);
