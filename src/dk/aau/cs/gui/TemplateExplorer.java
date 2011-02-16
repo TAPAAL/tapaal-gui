@@ -257,6 +257,16 @@ public class TemplateExplorer extends JPanel {
 		copyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Template template = selectedModel().copy();
+				String name = template.model().getName();
+				if(parent.network().hasTAPNCalled(name)) {
+					int i = 2;
+				
+					while(parent.network().hasTAPNCalled(name + i)) {
+						i++;
+					}
+					template.model().setName(name + i);
+				}
+				
 				parent.addTemplate(template);
 			}
 		});
