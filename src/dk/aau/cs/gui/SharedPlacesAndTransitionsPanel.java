@@ -56,7 +56,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				}
 			}		
 		});
-		comboBox.setSelectedIndex(0);
+		comboBox.setSelectedIndex(0); // Sets up the proper list model
 
 		JPanel buttonPanel = new JPanel();
 		JButton renameButton = new JButton("Rename");
@@ -104,7 +104,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		}
 
 		public int getSize() {
-			return network.numberOfSharedPlaces();
+			return network.numberOfSharedTransitions();
 		}
 
 	}

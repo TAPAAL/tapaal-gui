@@ -170,7 +170,7 @@ public class TimedArcPetriNetNetwork {
 		return sharedPlaces.size();
 	}
 	
-	public int numberOfTransitionsPlaces() {
+	public int numberOfSharedTransitions() {
 		return sharedTransitions.size();
 	}
 
