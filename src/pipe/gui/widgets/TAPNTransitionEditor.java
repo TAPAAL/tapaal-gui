@@ -1,8 +1,13 @@
 package pipe.gui.widgets;
 
 import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
@@ -12,40 +17,29 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-/**
- * 
- * @author Kenneth and Joakim on a base made by pere
- */
 public class TAPNTransitionEditor extends javax.swing.JPanel {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1744651413834659994L;
-	TimedTransitionComponent transition;
-	boolean attributesVisible;
-	boolean timed;
-	boolean infiniteServer;
-	Integer priority = 0;
-	String name;
-	DataLayer pnmlData;
-	DrawingSurfaceImpl view;
-	JRootPane rootPane;
+	private TimedTransitionComponent transition;
+	private boolean attributesVisible;
+	private String name;
+	private DataLayer pnmlData;
+	private DrawingSurfaceImpl view;
+	private JRootPane rootPane;
+	private final TimedArcPetriNetNetwork network;
 
 	/**
 	 * Creates new form TransitionEditor
 	 */
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition,
-			DataLayer _pnmlData, DrawingSurfaceImpl _view) {
+			DataLayer _pnmlData, DrawingSurfaceImpl _view, TimedArcPetriNetNetwork network) {
 		rootPane = _rootPane;
 		transition = _transition;
 		pnmlData = _pnmlData;
 		view = _view;
+		this.network = network;
 		name = transition.getName();
-		timed = transition.isTimed();
-		infiniteServer = transition.isInfiniteServer();
-
 		initComponents();
 
 		rootPane.setDefaultButton(okButton);
@@ -71,22 +65,41 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		buttonPanel = new javax.swing.JPanel();
 		cancelButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
-
+		sharedCheckBox = new JCheckBox("Shared");
+		sharedTransitionsComboBox = new JComboBox();
+		sharedTransitionsComboBox.setName("SHARED-DROP-DOWN");
+		nameTextField.setName("NAME-TEXT-FIELD");
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
-
-		transitionEditorPanel.setBorder(javax.swing.BorderFactory
-				.createTitledBorder("Transition Editor"));
+		transitionEditorPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Transition Editor"));
+		
+		sharedCheckBox.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				JCheckBox box = (JCheckBox)arg0.getSource();
+				if(box.isSelected()){
+					switchToNameDropDown();
+				}else{
+					switchToNameTextField();
+				}
+			}		
+		});
+		sharedCheckBox.setEnabled(network.numberOfSharedTransitions() > 0);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);
+				
 		nameLabel.setText("Name:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(nameLabel, gridBagConstraints);
 
-		nameTextField.setText(transition.getName());
 		nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
 			@Override
 			public void focusGained(java.awt.event.FocusEvent evt) {
@@ -98,32 +111,31 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				nameTextFieldFocusLost(evt);
 			}
 		});
-
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		transitionEditorPanel.add(nameTextField, gridBagConstraints);
+		
+		GridBagConstraints gbc = new java.awt.GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 3;
+		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(nameTextField, gbc);
 
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
-		rotationComboBox
-				.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
+		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
 						"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		rotationComboBox.setMaximumSize(new java.awt.Dimension(120, 20));
 		rotationComboBox.setMinimumSize(new java.awt.Dimension(120, 20));
 		rotationComboBox.setPreferredSize(new java.awt.Dimension(120, 20));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(rotationComboBox, gridBagConstraints);
@@ -169,7 +181,33 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(5, 0, 8, 3);
 		add(buttonPanel, gridBagConstraints);
 
+		nameTextField.setText(transition.getName());
+		sharedCheckBox.setSelected(transition.underlyingTransition().isShared());
 	}// </editor-fold>//GEN-END:initComponents
+
+	protected void switchToNameTextField() {
+		transitionEditorPanel.remove(sharedTransitionsComboBox);
+		GridBagConstraints gbc = new java.awt.GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 3;
+		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(nameTextField, gbc);		
+		transitionEditorPanel.repaint();
+	}
+
+	protected void switchToNameDropDown() {
+		transitionEditorPanel.remove(nameTextField);
+		GridBagConstraints gbc = new java.awt.GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 3;
+		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);		
+		transitionEditorPanel.repaint();
+	}
 
 	private void nameTextFieldFocusLost(java.awt.event.FocusEvent evt) {// GEN-FIRST:event_nameTextFieldFocusLost
 		focusLost(nameTextField);
@@ -270,6 +308,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JComboBox rotationComboBox;
 	private javax.swing.JLabel rotationLabel;
 	private javax.swing.JPanel transitionEditorPanel;
+	private javax.swing.JCheckBox sharedCheckBox;
+	private javax.swing.JComboBox sharedTransitionsComboBox;
 	// End of variables declaration//GEN-END:variables
 
 }

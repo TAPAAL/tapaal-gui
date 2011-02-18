@@ -2,10 +2,12 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Require;
 
 public class TimedPlace extends TAPNElement {
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	private String name;
 	private TimeInvariant invariant;
 	private List<TimedOutputArc> preset;
@@ -36,10 +38,14 @@ public class TimedPlace extends TAPNElement {
 		return name;
 	}
 
-	public void setName(String name) {
-		Require.that(name != null && !name.isEmpty(), "A timed place must have a valid name");
-
-		this.name = name;
+	public void setName(String newName) {
+		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
+		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
+		this.name = newName;
+	}
+	
+	private boolean isValid(String newName) {
+		return namePattern.matcher(newName).matches();
 	}
 
 	public TimeInvariant invariant() {

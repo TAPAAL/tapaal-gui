@@ -2,16 +2,20 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
 public class TimedTransition extends TAPNElement {
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	private String name;
 	private List<TimedOutputArc> postset;
 	private List<TimedInputArc> preset;
 	private List<TransportArc> transportArcsGoingThrough;
 	private List<TimedInhibitorArc> inhibitorArcs;
+	
+	private SharedTransition sharedTransition;
 
 	public TimedTransition(String name) {
 		setName(name);
@@ -21,13 +25,29 @@ public class TimedTransition extends TAPNElement {
 		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	}
 
-	public void setName(String name) {
-		Require.that(name != null && !name.isEmpty(), "A timed transition must have a name");
-		this.name = name;
+	public boolean isShared(){
+		return sharedTransition != null;
 	}
-
+	
+	public void makeShared(SharedTransition sharedTransition){
+		if(isShared()){
+			sharedTransition.unshare(this);
+		}
+		this.sharedTransition = sharedTransition;
+	}
+	
 	public String name() {
 		return name;
+	}
+	
+	public void setName(String newName) {
+		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
+		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
+		this.name = newName;
+	}
+	
+	private boolean isValid(String newName) {
+		return namePattern.matcher(newName).matches();
 	}
 
 	public void addToPreset(TimedInputArc arc) {
@@ -40,7 +60,54 @@ public class TimedTransition extends TAPNElement {
 		postset.add(arc);
 	}
 
+
+	public void removeFromPreset(TimedInputArc arc) {
+		preset.remove(arc);
+	}
+
+	public void removeFromPostset(TimedOutputArc arc) {
+		postset.remove(arc);
+	}
+
+	public void addTransportArcGoingThrough(TransportArc arc) {
+		Require.that(arc != null, "Cannot add null to preset");
+		transportArcsGoingThrough.add(arc);
+	}
+
+	public void removeTransportArcGoingThrough(TransportArc arc) {
+		transportArcsGoingThrough.remove(arc);
+	}
+
+	public void addInhibitorArc(TimedInhibitorArc arc) {
+		inhibitorArcs.add(arc);
+	}
+
+	public void removeInhibitorArc(TimedInhibitorArc arc) {
+		inhibitorArcs.remove(arc);
+	}
+
+	@Override
+	public void delete() {
+		if(isShared()){
+			sharedTransition.unshare(this);
+			sharedTransition = null; // TODO: check if this is problematic wrt. undo/redo
+		}
+		model().remove(this);
+	}
+
+	public int presetSize() {
+		return preset.size() + transportArcsGoingThrough.size();
+	}
+
 	public boolean isEnabled() {
+		if(isShared()){
+			return sharedTransition.isEnabled();
+		}else{
+			return isEnabledAlone();
+		}
+	}
+
+	public boolean isEnabledAlone() {
 		for (TimedInputArc arc : preset) {
 			if (!arc.isEnabled())
 				return false;
@@ -54,40 +121,6 @@ public class TimedTransition extends TAPNElement {
 				return false;
 		}
 		return true;
-	}
-
-	public void removeFromPreset(TimedInputArc arc) {
-		preset.remove(arc);
-	}
-
-	public void addTransportArcGoingThrough(TransportArc arc) {
-		Require.that(arc != null, "Cannot add null to preset");
-		transportArcsGoingThrough.add(arc);
-	}
-
-	public void removeTransportArcGoingThrough(TransportArc arc) {
-		transportArcsGoingThrough.remove(arc);
-	}
-
-	public void removeFromPostset(TimedOutputArc arc) {
-		postset.remove(arc);
-	}
-
-	public void addInhibitorArc(TimedInhibitorArc arc) {
-		inhibitorArcs.add(arc);
-	}
-
-	public void removeInhibitorArc(TimedInhibitorArc arc) {
-		inhibitorArcs.remove(arc);
-	}
-
-	@Override
-	public void delete() {
-		model().remove(this);
-	}
-
-	public int presetSize() {
-		return preset.size() + transportArcsGoingThrough.size();
 	}
 
 	public boolean isEnabledBy(List<TimedToken> tokens) {

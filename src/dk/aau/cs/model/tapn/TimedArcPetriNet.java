@@ -188,13 +188,13 @@ public class TimedArcPetriNet {
 		return false;
 	}
 
-	private boolean isNameUsed(String name) {
+	public boolean isNameUsed(String name) {
 		for (TimedPlace place : places){
-			if (place.name().equals(name))
+			if (place.name().equalsIgnoreCase(name))
 				return true;
 		}
 		for (TimedTransition transition : transitions){
-			if (transition.name().equals(name))
+			if (transition.name().equalsIgnoreCase(name))
 				return true;
 		}
 		return false;

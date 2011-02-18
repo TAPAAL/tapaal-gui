@@ -20,8 +20,7 @@ public class TimedTransitionComponent extends Transition {
 	private static final long serialVersionUID = -2280012053262288174L;
 	private dk.aau.cs.model.tapn.TimedTransition transition;
 
-	public TimedTransitionComponent(double positionXInput,
-			double positionYInput,
+	public TimedTransitionComponent(double positionXInput, double positionYInput,
 			dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
@@ -58,7 +57,7 @@ public class TimedTransitionComponent extends Transition {
 
 		// 2 Add Place editor
 		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this,
-				CreateGui.getModel(), CreateGui.getView()), this);
+				CreateGui.getModel(), CreateGui.getView(), CreateGui.getCurrentTab().network()), this);
 
 		guiDialog.setResizable(true);
 
@@ -70,18 +69,18 @@ public class TimedTransitionComponent extends Transition {
 		guiDialog.setVisible(true);
 	}
 
-	@Override
-	public boolean isEnabled(boolean animationStatus) {
-		if (animationStatus) {
-			if (isEnabled()) {
-				highlighted = true;
-				return true;
-			} else {
-				highlighted = false;
-			}
-		}
-		return false;
-	}
+//	@Override
+//	public boolean isEnabled(boolean animationStatus) {
+//		if (animationStatus) {
+//			if (isEnabled()) {
+//				highlighted = true;
+//				return true;
+//			} else {
+//				highlighted = false;
+//			}
+//		}
+//		return false;
+//	}
 
 	@Override
 	public boolean isEnabled() {

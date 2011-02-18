@@ -173,7 +173,7 @@ public class LeftConstantsPane extends JPanel {
 		// 1 Set layout
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-		// 2 Add Place editor
+		// 2 Add editor
 		if (constant != null)
 			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
 					parent.network(), constant));

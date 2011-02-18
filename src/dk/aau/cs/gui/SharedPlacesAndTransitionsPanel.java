@@ -1,18 +1,24 @@
 package dk.aau.cs.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 
+import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
+import pipe.gui.widgets.EscapableDialog;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
 
@@ -22,8 +28,9 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private static final String PLACES = "Places";
 
 	private JList list;
-	private ListModel sharedPlacesListModel;
-	private ListModel sharedTransitionsListModel;
+	private SharedPlacesListModel sharedPlacesListModel;
+	private SharedTransitionsListModel sharedTransitionsListModel;
+	private JComboBox placesTransitionsComboBox;
 
 	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network){
 		Require.that(network != null, "network cannot be null");
@@ -44,8 +51,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		list = new JList();
 		JScrollPane scrollPane = new JScrollPane(list);
 
-		JComboBox comboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
-		comboBox.addActionListener(new ActionListener(){
+		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
+		placesTransitionsComboBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
 				String selectedItem = (String)source.getSelectedItem();
@@ -56,23 +63,54 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				}
 			}		
 		});
-		comboBox.setSelectedIndex(0); // Sets up the proper list model
+		placesTransitionsComboBox.setSelectedIndex(0); // Sets up the proper list model
 
 		JPanel buttonPanel = new JPanel();
 		JButton renameButton = new JButton("Rename");
 		JButton removeButton = new JButton("Remove");
 		JButton addButton = new JButton("Add");
-		
+		addButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				showSharedTransitionNameDialog();
+			}		
+		});
+
 		buttonPanel.add(renameButton);
 		buttonPanel.add(removeButton);
 		buttonPanel.add(addButton);
 
-		add(comboBox, BorderLayout.PAGE_START);
+		add(placesTransitionsComboBox, BorderLayout.PAGE_START);
 		add(scrollPane, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.PAGE_END);
 	}
 
-	private class SharedPlacesListModel extends AbstractListModel {
+	private boolean isDisplayingTransitions(){
+		return placesTransitionsComboBox.getSelectedItem().equals(TRANSITIONS);
+	}
+
+	private void showSharedTransitionNameDialog() {
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+
+		Container contentPane = guiDialog.getContentPane();
+
+		// 1 Set layout
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+
+		// 2 Add editor
+		JPanel panel = isDisplayingTransitions() ? new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel) : new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel);
+		contentPane.add(panel);
+
+		guiDialog.setResizable(false);
+
+		// Make window fit contents' preferred size
+		guiDialog.pack();
+
+		// Move window to the middle of the screen
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+	}
+
+	public class SharedPlacesListModel extends AbstractListModel {
 		private static final long serialVersionUID = 1L;
 		private TimedArcPetriNetNetwork network;
 
@@ -88,9 +126,14 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public int getSize() {
 			return network.numberOfSharedPlaces();
 		}
+
+		public void addElement(SharedPlace place){
+			network.add(place);
+			fireIntervalAdded(this, network.numberOfSharedPlaces()-1, network.numberOfSharedPlaces());
+		}
 	}
 
-	private class SharedTransitionsListModel extends AbstractListModel {
+	public class SharedTransitionsListModel extends AbstractListModel {
 		private static final long serialVersionUID = 1L;
 		private TimedArcPetriNetNetwork network;
 
@@ -107,5 +150,9 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			return network.numberOfSharedTransitions();
 		}
 
+		public void addElement(SharedTransition transition){
+			network.add(transition);
+			fireIntervalAdded(this, network.numberOfSharedTransitions()-1, network.numberOfSharedTransitions());
+		}
 	}
 }

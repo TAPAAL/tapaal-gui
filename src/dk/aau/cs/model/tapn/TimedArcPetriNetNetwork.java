@@ -31,6 +31,35 @@ public class TimedArcPetriNetNetwork {
 		tapns.add(tapn);
 		currentMarking.addMarking(tapn, tapn.marking());
 	}
+	
+	public void add(SharedTransition sharedTransition){
+		Require.that(sharedTransition != null, "sharedTransition must not be null");
+		Require.that(!isNameUsed(sharedTransition.name()), "There is already a transition or place with that name");
+		
+		sharedTransitions.add(sharedTransition);
+	}
+	
+	public void add(SharedPlace sharedPlace) {
+		Require.that(sharedPlace != null, "sharedPlace must not be null");
+		Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
+		
+		sharedPlaces.add(sharedPlace);		
+	}
+
+	private boolean isNameUsed(String name) {
+		for(SharedTransition transition : sharedTransitions){
+			if(transition.name().equalsIgnoreCase(name)) return true;
+		}
+		
+		for(SharedPlace place : sharedPlaces){
+			if(place.name().equalsIgnoreCase(name)) return true;
+		}
+		
+		for(TimedArcPetriNet net : tapns){
+			if(net.isNameUsed(name)) return true;
+		}
+		return false;
+	}
 
 	public void remove(TimedArcPetriNet tapn) {
 		if (tapn != null) {
@@ -181,5 +210,4 @@ public class TimedArcPetriNetNetwork {
 	public Object getSharedTransitionByIndex(int index) {
 		return sharedTransitions.get(index);
 	}
-
 }
