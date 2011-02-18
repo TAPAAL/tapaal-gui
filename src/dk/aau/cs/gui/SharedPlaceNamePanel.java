@@ -14,7 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import pipe.gui.undo.UndoManager;
+
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
+import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.RequireException;
 
@@ -25,9 +28,12 @@ public class SharedPlaceNamePanel extends JPanel {
 	private final SharedPlacesListModel listModel;
 	private JTextField nameField;
 
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel) {
+	private final UndoManager undoManager;
+
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager) {
 		this.rootPane = rootPane;
 		this.listModel = SharedPlacesListModel;
+		this.undoManager = undoManager;
 		initComponents();		
 	}
 	
@@ -69,13 +75,23 @@ public class SharedPlaceNamePanel extends JPanel {
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else{
+					SharedPlace place = null;
 					try{
-						listModel.addElement(new SharedPlace(name));
-						exit();
+						place = new SharedPlace(name);
+					}catch(RequireException e){
+						JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					try{
+						listModel.addElement(place);
 					}catch(RequireException e){
 						JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
+					
+					undoManager.addNewEdit(new AddSharedPlaceCommand(listModel, place));
+					exit();
 				}
 			}
 		});

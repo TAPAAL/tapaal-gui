@@ -65,9 +65,23 @@ public class TimedArcPetriNetNetwork {
 		if (tapn != null) {
 			tapns.remove(tapn);
 			currentMarking.removeMarkingFor(tapn);
-
 		}
 	}
+	
+	public void remove(SharedPlace sharedPlace) {
+		if (sharedPlace != null) {
+			sharedPlaces.remove(sharedPlace);
+			sharedPlace.delete();
+		}
+	}
+	
+	public void remove(SharedTransition sharedTransition) {
+		if (sharedTransition != null) {
+			sharedTransitions.remove(sharedTransition);
+			sharedTransition.delete();
+		}
+	}
+	
 
 	public List<TimedArcPetriNet> templates() {
 		return tapns;
@@ -75,7 +89,7 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean hasTAPNCalled(String newName) {
 		for (TimedArcPetriNet tapn : tapns)
-			if (tapn.getName().toLowerCase().equals(newName.toLowerCase()))
+			if (tapn.getName().equalsIgnoreCase(newName))
 				return true;
 		return false;
 	}
@@ -209,5 +223,9 @@ public class TimedArcPetriNetNetwork {
 
 	public Object getSharedTransitionByIndex(int index) {
 		return sharedTransitions.get(index);
+	}
+
+	public Collection<SharedTransition> sharedTransitions() {
+		return sharedTransitions;
 	}
 }

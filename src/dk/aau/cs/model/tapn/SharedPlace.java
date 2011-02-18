@@ -55,6 +55,15 @@ public class SharedPlace {
 	public String name() {
 		return name;
 	}
+
+	public void delete() {
+		// place.delete() will call unshare and thus modify the place collection
+		// which won't work while we are iterating through it, so we copy it first.
+//		ArrayList<TimedTransition> copy = new ArrayList<TimedTransition>(transitions);
+//		for(TimedTransition transition : copy){
+//			transition.delete();
+//		}
+	}
 	
 	
 }

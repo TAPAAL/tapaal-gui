@@ -14,7 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
+import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
+import dk.aau.cs.gui.undo.AddSharedTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.RequireException;
 
@@ -25,9 +27,12 @@ public class SharedTransitionNamePanel extends JPanel {
 	private final SharedTransitionsListModel listModel;
 	private JTextField nameField;
 
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel) {
+	private final UndoManager undoManager;
+
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager) {
 		this.rootPane = rootPane;
 		this.listModel = sharedTransitionsListModel;
+		this.undoManager = undoManager;
 		initComponents();		
 	}
 	
@@ -69,13 +74,24 @@ public class SharedTransitionNamePanel extends JPanel {
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else{
+					SharedTransition transition = null;
+					
 					try{
-						listModel.addElement(new SharedTransition(name));
-						exit();
+						transition = new SharedTransition(name);
+					}catch(RequireException e){
+						JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					try{
+						listModel.addElement(transition);
 					}catch(RequireException e){
 						JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
+					
+					undoManager.addNewEdit(new AddSharedTransitionCommand(listModel, transition));
+					exit();
 				}
 			}
 		});

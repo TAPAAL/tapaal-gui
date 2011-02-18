@@ -1,6 +1,7 @@
 package pipe.dataLayer;
 
 import java.awt.Container;
+import java.awt.Graphics;
 
 import javax.swing.BoxLayout;
 
@@ -121,6 +122,11 @@ public class TimedTransitionComponent extends Transition {
 		//updateConnected();
 		
 		repaint();
+	}
+	
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {

@@ -116,7 +116,7 @@ public class TimedArcPetriNet {
 			place.setModel(null);
 	}
 
-	public void remove(TimedTransition transition) {
+	public void remove(TimedTransition transition) { // TODO: These methods must clean up arcs also
 		boolean removed = transitions.remove(transition);
 		if (removed)
 			transition.setModel(null);

@@ -22,7 +22,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
 	private TimedTransitionComponent transition;
-	private boolean attributesVisible;
 	private String name;
 	private DataLayer pnmlData;
 	private DrawingSurfaceImpl view;
@@ -43,8 +42,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		initComponents();
 
 		rootPane.setDefaultButton(okButton);
-
-		attributesVisible = transition.getAttributesVisible();
 	}
 
 	/**
@@ -66,9 +63,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
-		sharedTransitionsComboBox = new JComboBox();
-		sharedTransitionsComboBox.setName("SHARED-DROP-DOWN");
-		nameTextField.setName("NAME-TEXT-FIELD");
+		sharedTransitionsComboBox = new JComboBox(network.sharedTransitions().toArray());
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());

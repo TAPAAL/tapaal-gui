@@ -10,7 +10,7 @@ public class SharedTransition {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	private String name;
 	private List<TimedTransition> transitions;
-	
+
 	public SharedTransition(String name){
 		setName(name);
 		transitions = new ArrayList<TimedTransition>();
@@ -21,7 +21,7 @@ public class SharedTransition {
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
 	}
-	
+
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
 	}
@@ -31,20 +31,33 @@ public class SharedTransition {
 		transitions.add(transition);
 		transition.setName(name);
 	}
-	
+
 	public void unshare(TimedTransition timedTransition) {
 		transitions.remove(timedTransition);
 	}	
 
 	public boolean isEnabled() {
 		if(transitions.size() == 0) return false;
-		
+
 		for(TimedTransition transition : transitions){
 			if(!transition.isEnabledAlone()) return false;
 		}
 		return true;
 	}
+
+	public String name() {
+		return name;
+	}
 	
+	public void delete(){
+		// transition.delete() will call unshare and thus modify the transitions collection
+		// which won't work while we are iterating through it, so we copy it first.
+		ArrayList<TimedTransition> copy = new ArrayList<TimedTransition>(transitions);
+		for(TimedTransition transition : copy){
+			transition.delete();
+		}
+	}
+
 	@Override
 	public String toString() {
 		return name;
@@ -75,8 +88,4 @@ public class SharedTransition {
 		return true;
 	}
 
-	public String name() {
-		return name;
-	}
-	
 }

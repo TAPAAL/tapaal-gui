@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -31,9 +32,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private SharedPlacesListModel sharedPlacesListModel;
 	private SharedTransitionsListModel sharedTransitionsListModel;
 	private JComboBox placesTransitionsComboBox;
+	private UndoManager undoManager;
 
-	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network){
+	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network, UndoManager undoManager){
 		Require.that(network != null, "network cannot be null");
+		Require.that(undoManager != null, "undoManager cannot be null");
+		this.undoManager = undoManager;
 
 		sharedPlacesListModel = new SharedPlacesListModel(network);
 		sharedTransitionsListModel = new SharedTransitionsListModel(network);
@@ -90,22 +94,14 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 	private void showSharedTransitionNameDialog() {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
-
 		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-		// 2 Add editor
-		JPanel panel = isDisplayingTransitions() ? new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel) : new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel);
+		JPanel panel = isDisplayingTransitions() ? new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager) : new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager);
 		contentPane.add(panel);
 
 		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
 		guiDialog.pack();
-
-		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 	}
@@ -131,6 +127,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			network.add(place);
 			fireIntervalAdded(this, network.numberOfSharedPlaces()-1, network.numberOfSharedPlaces());
 		}
+
+		public void removeElement(SharedPlace place) {
+			network.remove(place);
+			fireContentsChanged(this, 0, getSize()+1);
+		}
 	}
 
 	public class SharedTransitionsListModel extends AbstractListModel {
@@ -153,6 +154,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void addElement(SharedTransition transition){
 			network.add(transition);
 			fireIntervalAdded(this, network.numberOfSharedTransitions()-1, network.numberOfSharedTransitions());
+		}
+
+		public void removeElement(SharedTransition transition) {
+			network.remove(transition);
+			fireContentsChanged(this, 0, getSize()+1);
 		}
 	}
 }
