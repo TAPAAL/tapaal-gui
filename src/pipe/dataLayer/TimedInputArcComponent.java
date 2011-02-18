@@ -85,11 +85,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	@Override
 	public TimedInputArcComponent copy() {
-		TimedOutputArcComponent copy = new TimedOutputArcComponent(this);
-		copy.setSource(this.getSource());
-		copy.setTarget(this.getTarget());
-		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.copy(), this.timeInterval);
-		return timedCopy;
+		return new TimedInputArcComponent(new TimedOutputArcComponent(this), this.timeInterval);
 	}
 
 	@Override
@@ -139,11 +135,12 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		updateWeightLabel(true);
 	}
 
-	public TimedInputArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
-		TimedInputArcComponent arc = this.copy();
+	public TimedInputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+		TimedInputArcComponent arc =  new TimedInputArcComponent(this);
+		
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
-		arc.setUnderlyingArc(tapn.getInputArcFromPlaceToTransition(tapn.getPlaceByName(inputArc.source().name()),tapn.getTransitionByName(inputArc.destination().name())));
+		arc.setUnderlyingArc(tapn.getInputArcFromPlaceToTransition(tapn.getPlaceByName(inputArc.source().name()), tapn.getTransitionByName(inputArc.destination().name())));
 		
 		arc.getSource().addConnectFrom(arc);
 		arc.getTarget().addConnectTo(arc);
@@ -152,6 +149,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		arc.addMouseListener(timedArcHandler);
 		arc.addMouseWheelListener(timedArcHandler);
 		arc.addMouseMotionListener(timedArcHandler);
+		
+		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

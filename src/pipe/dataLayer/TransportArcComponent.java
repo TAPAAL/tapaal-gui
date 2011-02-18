@@ -201,7 +201,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 				underlyingTransportArc.interval());
 	}
 	
-	public TransportArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TransportArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TransportArcComponent arc = new TransportArcComponent(this, group, isInPreSet);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
@@ -217,6 +217,8 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		arc.addMouseListener(transportArcHandler);
 		arc.addMouseWheelListener(transportArcHandler);
 		arc.addMouseMotionListener(transportArcHandler);
+		
+		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

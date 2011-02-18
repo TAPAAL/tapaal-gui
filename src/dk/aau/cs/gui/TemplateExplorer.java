@@ -1,7 +1,6 @@
 package dk.aau.cs.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -257,6 +256,7 @@ public class TemplateExplorer extends JPanel {
 		copyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Template template = selectedModel().copy();
+				
 				String name = template.model().getName();
 				if(parent.network().hasTAPNCalled(name)) {
 					int i = 2;
@@ -315,9 +315,9 @@ public class TemplateExplorer extends JPanel {
 	private void showRenameTemplateDialog() {
 		Template template = selectedModel();
 
-		String newName = (String) JOptionPane.showInputDialog(parent
-				.drawingSurface(), "Template name:", "Rename Template",
+		String newName = (String) JOptionPane.showInputDialog(parent.drawingSurface(), "Template name:", "Rename Template",
 				JOptionPane.PLAIN_MESSAGE, null, null, template.model().getName());
+		
 		if (newName == null || template.model().getName().equals(newName))
 			return;
 
@@ -367,10 +367,6 @@ public class TemplateExplorer extends JPanel {
 
 	public Template selectedModel() {
 		return (Template) templateList.getSelectedValue();
-	}
-
-	public void setSelectedGuiModel(DataLayer guiModel) {
-		selectedModel().setGuiModel(guiModel);
 	}
 
 	public void updateTemplateList() {

@@ -127,7 +127,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		g2.setTransform(reset);
 	}
 	
-	public TimedInhibitorArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TimedInhibitorArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedInhibitorArcComponent arc = new TimedInhibitorArcComponent(this);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
@@ -141,6 +141,8 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		arc.addMouseListener(timedArcHandler);
 		arc.addMouseWheelListener(timedArcHandler);
 		arc.addMouseMotionListener(timedArcHandler);
+		
+		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

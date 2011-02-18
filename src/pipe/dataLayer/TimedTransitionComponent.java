@@ -123,7 +123,7 @@ public class TimedTransitionComponent extends Transition {
 		repaint();
 	}
 
-	public TimedTransitionComponent copy(TimedArcPetriNet tapn) {
+	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(positionX, positionY, id, transition.name(), nameOffsetX, nameOffsetY, true, isInfiniteServer(), getAngle(), getPriority());
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 		
@@ -132,13 +132,15 @@ public class TimedTransitionComponent extends Transition {
 		transitionComponent.getNameLabel().addMouseMotionListener(labelHandler);
 		transitionComponent.getNameLabel().addMouseWheelListener(labelHandler);
 		
-		TransitionHandler transitionHandler = new TAPNTransitionHandler((DrawingSurfaceImpl)getParent(), transitionComponent, getGuiModel(), tapn);
+		TransitionHandler transitionHandler = new TAPNTransitionHandler((DrawingSurfaceImpl)getParent(), transitionComponent, guiModel, tapn);
 		transitionComponent.addMouseListener(transitionHandler);
 		transitionComponent.addMouseMotionListener(transitionHandler);
 		transitionComponent.addMouseWheelListener(transitionHandler);
 
 		transitionComponent.addMouseListener(new AnimationHandler());
 	
+		transitionComponent.setGuiModel(guiModel);
+		
 		return transitionComponent;
 	}
 

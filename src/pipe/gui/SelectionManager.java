@@ -61,6 +61,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 
 	public void disableSelection() {
 		if (enabled == true) {
+			this.clearSelection();
 			drawingSurface.remove(this);
 			enabled = false;
 		}

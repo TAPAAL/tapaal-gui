@@ -388,7 +388,7 @@ public class TimedPlaceComponent extends Place {
 		super.setName(nameInput);
 	}
 
-	public TimedPlaceComponent copy(TimedArcPetriNet tapn) {
+	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionX, positionY, id, place.name(), nameOffsetX, nameOffsetY, initialMarking, markingOffsetX, markingOffsetY, capacity);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 		
@@ -397,10 +397,12 @@ public class TimedPlaceComponent extends Place {
 		placeComponent.getNameLabel().addMouseMotionListener(labelHandler);
 		placeComponent.getNameLabel().addMouseWheelListener(labelHandler);
 
-		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent, getGuiModel(), tapn);
+		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent, guiModel, tapn);
 		placeComponent.addMouseListener(placeHandler);
 		placeComponent.addMouseWheelListener(placeHandler);
 		placeComponent.addMouseMotionListener(placeHandler);
+		
+		placeComponent.setGuiModel(guiModel);
 		
 		return placeComponent;
 	}

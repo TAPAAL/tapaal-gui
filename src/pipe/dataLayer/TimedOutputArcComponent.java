@@ -75,7 +75,8 @@ public class TimedOutputArcComponent extends Arc {
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
 		weightLabel = new NameLabel(zoom);
-
+		
+		this.myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
 			this.myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
 		}
@@ -199,15 +200,6 @@ public class TimedOutputArcComponent extends Arc {
 		g2.transform(reset);
 	}
 
-	@Override
-	public TimedOutputArcComponent clone() {
-
-		TimedOutputArcComponent toReturn = (TimedOutputArcComponent) super
-				.clone();
-		return toReturn;
-
-	}
-
 	public dk.aau.cs.model.tapn.TimedOutputArc underlyingArc() {
 		return outputArc;
 	}
@@ -216,7 +208,7 @@ public class TimedOutputArcComponent extends Arc {
 		this.outputArc = outputArc;
 	}
 
-	public TimedOutputArcComponent copy(TimedArcPetriNet tapn, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+	public TimedOutputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
 		TimedOutputArcComponent arc = new TimedOutputArcComponent(this);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
@@ -229,6 +221,8 @@ public class TimedOutputArcComponent extends Arc {
 		arc.addMouseListener(arcHandler);
 		arc.addMouseWheelListener(arcHandler);
 		arc.addMouseMotionListener(arcHandler);
+		
+		arc.setGuiModel(guiModel);
 		
 		return arc;
 	}

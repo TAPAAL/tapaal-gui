@@ -5,13 +5,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Observable;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Annotation;
-
-import pipe.gui.handler.AnimationHandler;
-import pipe.gui.handler.LabelHandler;
-import pipe.gui.handler.TAPNTransitionHandler;
-import pipe.gui.handler.TransitionHandler;
-
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 
@@ -1057,42 +1050,39 @@ public class DataLayer extends Observable implements Cloneable {
 		
 		for(Place p : placesArray) {
 			if(p instanceof TimedPlaceComponent) {
-				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn);
+				TimedPlaceComponent place = ((TimedPlaceComponent)p).copy(tapn, guiModel);
 				oldToNewMapping.put(p, place);
-				place.setGuiModel(guiModel);
 				guiModel.addPetriNetObject(place);
 			}
 		}
 		
 		for(Transition t : transitionsArray) {
 			if(t instanceof TimedTransitionComponent) {
-				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn);
+				TimedTransitionComponent trans = ((TimedTransitionComponent)t).copy(tapn, guiModel);
 				oldToNewMapping.put(t, trans);
-				trans.setGuiModel(guiModel);
 				guiModel.addPetriNetObject(trans);
 			}
 		}
 		
 		for(Arc arc : arcsArray) {
 			if(arc instanceof TransportArcComponent) {
-				TransportArcComponent transArc = ((TransportArcComponent)arc).copy(tapn, oldToNewMapping);
-				transArc.setGuiModel(guiModel);
+				TransportArcComponent transArc = ((TransportArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
 				guiModel.addPetriNetObject(transArc);
 			}
 			else if(arc instanceof TimedInhibitorArcComponent) {
-				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, oldToNewMapping);
-				inhibArc.setGuiModel(guiModel);
+				TimedInhibitorArcComponent inhibArc = ((TimedInhibitorArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);				
 				guiModel.addPetriNetObject(inhibArc);
 			}
 			else if(arc instanceof TimedInputArcComponent) {
-				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, oldToNewMapping);
-				inputArc.setGuiModel(guiModel);
+				TimedInputArcComponent inputArc = ((TimedInputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
 				guiModel.addPetriNetObject(inputArc);
 			}
 			else if(arc instanceof TimedOutputArcComponent) {
-				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, oldToNewMapping);
-				outputArc.setGuiModel(guiModel);
+				TimedOutputArcComponent outputArc = ((TimedOutputArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
 				guiModel.addPetriNetObject(outputArc);
+			}
+			else {
+				throw new RuntimeException("Arc was unknown type");
 			}
 		}
 		

@@ -52,6 +52,7 @@ import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import pipe.gui.Pipe;
 
 /**
  * The petrinet is drawn onto this frame.
@@ -130,6 +131,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 	}
 
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model) {
+		this.selection.disableSelection();
+		
 		nameGenerator.add(model);
 		this.mouseHandler.setModel(guiModel, model);
 		this.undoManager.setModel(guiModel);
@@ -145,7 +148,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			add(pnObject);
 		}
-		this.add(selection);
+		if(CreateGui.getApp().getMode() == Pipe.SELECT)
+			this.selection.enableSelection();
+		
 		
 		repaint();
 	}
