@@ -121,6 +121,7 @@ public class TabComponent extends JPanel {
 
 						CreateGui.removeTab(index);
 						pane.removeTabAt(index);
+						CreateGui.getApp().activateSelectAction();
 					}
 				}
 			});

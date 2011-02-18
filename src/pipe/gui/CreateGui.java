@@ -43,7 +43,7 @@ public class CreateGui {
 		// appGui.createNewTabFromFile(null);
 
 		appGui.setVisible(true);
-		appGui.init();
+		appGui.activateSelectAction();
 		Verifyta.trySetupFromEnvironmentVariable();
 
 		VersionChecker versionChecker = new VersionChecker();

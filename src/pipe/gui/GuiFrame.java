@@ -765,7 +765,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 					// TODO: change this code... it's ugly :)
 					if (appGui.getMode() == Pipe.SELECT) {
-						appGui.init();
+						appGui.activateSelectAction();
 					}
 
 				} else {
@@ -1226,7 +1226,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		redoAction.setEnabled(flag);
 	}
 
-	public void init() {
+	public void activateSelectAction() {
 		// Set selection mode at startup
 		setMode(Pipe.SELECT);
 		selectAction.actionPerformed(null);
