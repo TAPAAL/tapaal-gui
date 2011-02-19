@@ -17,7 +17,12 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
+import dk.aau.cs.gui.undo.UnshareTransitionCommand;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.util.RequireException;
 
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
@@ -68,7 +73,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
 		transitionEditorPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Transition Editor"));
-		
+
 		sharedCheckBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				JCheckBox box = (JCheckBox)arg0.getSource();
@@ -86,7 +91,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);
-				
+
 		nameLabel.setText("Name:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -106,7 +111,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				nameTextFieldFocusLost(evt);
 			}
 		});
-		
+
 		GridBagConstraints gbc = new java.awt.GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -124,7 +129,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		transitionEditorPanel.add(rotationLabel, gridBagConstraints);
 
 		rotationComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] {
-						"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
+				"0\u00B0", "+45\u00B0", "+90\u00B0", "-45\u00B0" }));
 		rotationComboBox.setMaximumSize(new java.awt.Dimension(120, 20));
 		rotationComboBox.setMinimumSize(new java.awt.Dimension(120, 20));
 		rotationComboBox.setPreferredSize(new java.awt.Dimension(120, 20));
@@ -177,7 +182,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		add(buttonPanel, gridBagConstraints);
 
 		nameTextField.setText(transition.getName());
-		sharedCheckBox.setSelected(transition.underlyingTransition().isShared());
+		if(transition.underlyingTransition().isShared()){
+			switchToNameDropDown();
+			sharedCheckBox.setSelected(true);
+			sharedTransitionsComboBox.setSelectedItem(transition.underlyingTransition().sharedTransition());
+		}
 	}// </editor-fold>//GEN-END:initComponents
 
 	protected void switchToNameTextField() {
@@ -230,36 +239,58 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	};
 
 	private void okButtonHandler(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_okButtonHandler
-
+		String newName = nameTextField.getText();
+			
 		view.getUndoManager().newEdit(); // new "transaction""
 
-		String newName = nameTextField.getText();
-		if (!newName.equals(name)) {
-			if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
-				System.err
-						.println("Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
-				JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-								"Error", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			} else if ((pnmlData.getPlaceByName(newName) != null)
-					|| (pnmlData.getTransitionByNameIgnoreGiven(transition,
-							newName) != null)) {
-				System.err
-						.println("Transitions cannot be called the same as an other Place or Transition.");
-				JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"Transitions cannot be called the same as another Place or Transition.",
-								"Error", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			} else {
-				view.getNameGenerator().updateTransitionIndex(transition.underlyingTransition().model(), newName);
-				view.getUndoManager().addEdit(transition.setPNObjectName(newName));
+		if(sharedCheckBox.isSelected()){
+			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
+			view.getUndoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition(), transition));
+			transition.setName(selectedTransition.name());
+			selectedTransition.makeShared(transition.underlyingTransition());
+		}else{
+			if(transition.underlyingTransition().isShared()){
+				view.getUndoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition(), transition));
+				transition.underlyingTransition().unshare();
 			}
+			
+			// TODO: check name is not in use
+			if(transition.underlyingTransition().model().isNameUsed(newName)){
+				view.getUndoManager().undo(); 
+				JOptionPane.showMessageDialog(this,
+						"The specified name is already used by another place or transition.",
+						"Error", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			try{ // set name
+				Command cmd = transition.setPNObjectName(newName);
+				view.getUndoManager().addEdit(cmd);
+			}catch(RequireException e){
+				view.getUndoManager().undo(); 
+				JOptionPane.showMessageDialog(this,
+						"Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+						"Error", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			view.getNameGenerator().updateTransitionIndex(transition.underlyingTransition().model(), newName);
 		}
+//			} else if ((pnmlData.getPlaceByName(newName) != null) || (pnmlData.getTransitionByNameIgnoreGiven(transition, newName) != null)) {
+//				System.err.println("Transitions cannot be called the same as an other Place or Transition.");
+//				JOptionPane.showMessageDialog(
+//						CreateGui.getApp(),
+//						"Transitions cannot be called the same as another Place or Transition.",
+//						"Error", JOptionPane.INFORMATION_MESSAGE);
+//				return;
+//			} else {
+//				view.getNameGenerator().updateTransitionIndex(transition.underlyingTransition().model(), newName);
+//				view.getUndoManager().addEdit(transition.setPNObjectName(newName));
+//			}
+//		}else if(sharedCheckBox.isSelected()){
+//			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
+//			if(sharedT)
+//			selectedTransition.makeShared(transition.underlyingTransition());
+//		}
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {

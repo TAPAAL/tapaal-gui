@@ -72,7 +72,7 @@ public class Transition extends PlaceTransitionObject {
 	/** Place Width */
 	public static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
 
-	private int angle;
+	protected int angle;
 	protected boolean enabled = false;
 	// private boolean enabledBackwards = false;
 	public boolean highlighted = false;
@@ -450,7 +450,7 @@ public class Transition extends PlaceTransitionObject {
 	// delayValid = _delayValid;
 	// }
 
-	private void constructTransition() {
+	protected void constructTransition() {
 		transition = new GeneralPath();
 		transition.append(new Rectangle2D.Double(
 				(componentWidth - TRANSITION_WIDTH) / 2, 0, TRANSITION_WIDTH,

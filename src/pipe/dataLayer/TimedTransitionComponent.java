@@ -1,7 +1,14 @@
 package pipe.dataLayer;
 
+import java.awt.BasicStroke;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
 
@@ -14,12 +21,15 @@ import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class TimedTransitionComponent extends Transition {
+	private static final int DASHED_PADDING = 8;
 	private static final long serialVersionUID = -2280012053262288174L;
 	private dk.aau.cs.model.tapn.TimedTransition transition;
+	private GeneralPath dashedOutline;
 
 	public TimedTransitionComponent(double positionXInput, double positionYInput,
 			dk.aau.cs.model.tapn.TimedTransition transition) {
@@ -127,6 +137,34 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		if(transition.isShared()){
+			Graphics2D graphics = (Graphics2D)g;
+			Stroke oldStroke = graphics.getStroke();
+			
+			BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
+			graphics.setStroke(dashed);
+			
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			graphics.draw(dashedOutline);
+						
+			graphics.setStroke(oldStroke);
+		}
+	}
+	
+	@Override
+	protected void constructTransition() {
+		super.constructTransition();
+		double x = ((componentWidth - TRANSITION_WIDTH - DASHED_PADDING) / 2);
+		double y = -DASHED_PADDING/2;
+		double width = TRANSITION_WIDTH + DASHED_PADDING;
+		double height = TRANSITION_HEIGHT + DASHED_PADDING;
+		dashedOutline = new GeneralPath(new Rectangle2D.Double(x, y, width, height));
+	}
+	
+	@Override
+	public Command rotate(int angleInc) {
+		dashedOutline.transform(AffineTransform.getRotateInstance(Math.toRadians(angleInc), (componentWidth) / 2, (componentHeight)  / 2));
+		return super.rotate(angleInc);
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {

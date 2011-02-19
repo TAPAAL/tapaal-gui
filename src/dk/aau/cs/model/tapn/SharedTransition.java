@@ -28,11 +28,15 @@ public class SharedTransition {
 
 	// TODO: Find a better name for this
 	public void makeShared(TimedTransition transition){
+		Require.that(transition != null, "transition cannot be null");
+		transition.makeShared(this); // this will unshare first if part of another shared transition
 		transitions.add(transition);
 		transition.setName(name);
 	}
 
+	// TODO: this should somehow change timedTransition also, but calling unshare yields infinite loop
 	public void unshare(TimedTransition timedTransition) {
+		Require.that(timedTransition != null, "timedTransition cannot be null");
 		transitions.remove(timedTransition);
 	}	
 

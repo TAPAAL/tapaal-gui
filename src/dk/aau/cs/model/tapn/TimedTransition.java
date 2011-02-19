@@ -29,11 +29,20 @@ public class TimedTransition extends TAPNElement {
 		return sharedTransition != null;
 	}
 	
+	public SharedTransition sharedTransition(){
+		return sharedTransition;
+	}
+	
 	public void makeShared(SharedTransition sharedTransition){
+		unshare();
+		this.sharedTransition = sharedTransition;
+	}
+	
+	public void unshare() {
 		if(isShared()){
 			sharedTransition.unshare(this);
+			sharedTransition = null;
 		}
-		this.sharedTransition = sharedTransition;
 	}
 	
 	public String name() {
@@ -192,6 +201,10 @@ public class TimedTransition extends TAPNElement {
 		return transportArcsGoingThrough;
 	}
 	
+	public TimedTransition copy() {
+		return new TimedTransition(this.name);
+	}
+	
 	@Override
 	public String toString() {
 		if (model() != null)
@@ -215,9 +228,5 @@ public class TimedTransition extends TAPNElement {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
-	}
-
-	public TimedTransition copy() {
-		return new TimedTransition(this.name);
 	}
 }
