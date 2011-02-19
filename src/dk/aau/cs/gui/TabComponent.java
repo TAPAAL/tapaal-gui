@@ -142,10 +142,8 @@ public class TabComponent extends JPanel {
 				g2.setColor(Color.MAGENTA);
 			}
 			int delta = 6;
-			g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight()
-					- delta - 1);
-			g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight()
-					- delta - 1);
+			g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
+			g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
 			g2.dispose();
 		}
 

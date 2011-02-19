@@ -254,18 +254,18 @@ public class UndoManager {
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
 					addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view));
+				}else if(pnObject instanceof TransportArcComponent){
+					TransportArcComponent transportArc = (TransportArcComponent)pnObject;
+					addEdit(new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view));
+				}else if(pnObject instanceof TimedInhibitorArcComponent){
+					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
+					addEdit(new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel, view));
 				}else if(pnObject instanceof TimedInputArcComponent){
 					TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
 					addEdit(new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view));
 				}else if(pnObject instanceof TimedOutputArcComponent){
 					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
 					addEdit(new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel, view));
-				}else if(pnObject instanceof TransportArcComponent){
-					TransportArcComponent transportArc = (TransportArcComponent)pnObject;
-					addEdit(new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view));
-				}else if(pnObject instanceof TimedInhibitorArcComponent){
-					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
-					addEdit(new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view));
 				}else if(pnObject instanceof AnnotationNote){
 					addEdit(new DeletePetriNetObjectEdit(pnObject, view, guiModel));
 				}else{

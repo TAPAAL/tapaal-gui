@@ -399,8 +399,7 @@ public class DataLayer extends Observable implements Cloneable {
 	 * @param arcInput
 	 *            New Arc
 	 */
-	private void addInhibitorArcToInhibitorsMap(
-			TimedInhibitorArcComponent inhibitorArcInput) {
+	private void addInhibitorArcToInhibitorsMap(TimedInhibitorArcComponent inhibitorArcInput) {
 		// now we want to add the inhibitor arc to the list of inhibitor arcs
 		// for
 		// it's source and target
@@ -476,12 +475,12 @@ public class DataLayer extends Observable implements Cloneable {
 	 */
 	public void addPetriNetObject(PetriNetObject pnObject) {
 		if (setPetriNetObjectArrayList(pnObject)) {
-			if (pnObject instanceof TimedOutputArcComponent) {
+			if (pnObject instanceof TimedInhibitorArcComponent) {
+				addArc((TimedInhibitorArcComponent) pnObject);
+			} else if (pnObject instanceof TimedOutputArcComponent) {
 				addArc((TimedOutputArcComponent) pnObject);
 			} else if (pnObject instanceof InhibitorArc) {
 				addArc((InhibitorArc) pnObject);
-			} else if (pnObject instanceof TimedInhibitorArcComponent) {
-				addArc((TimedInhibitorArcComponent) pnObject);
 			} else if (pnObject instanceof Place) {
 				addPlace((Place) pnObject);
 			} else if (pnObject instanceof Transition) {
@@ -567,23 +566,58 @@ public class DataLayer extends Observable implements Cloneable {
 						}
 						tapnInhibitorsMap.remove(pnObject);
 					}
-				} else if (pnObject instanceof TimedOutputArcComponent) {
+				} else if (pnObject instanceof TimedInhibitorArcComponent) {
 
 					// get source and target of the arc
-					PlaceTransitionObject attached = ((Arc) pnObject)
-							.getSource();
+					PlaceTransitionObject attached = ((Arc) pnObject).getSource();
 
 					if (attached != null) {
-						ArrayList<TimedOutputArcComponent> a = arcsMap
-								.get(attached);
+						ArrayList<TimedInhibitorArcComponent> a = tapnInhibitorsMap.get(attached);
 						if (a != null) {
 							a.remove(pnObject);
 						}
 
 						attached.removeFromArc((Arc) pnObject);
 						if (attached instanceof Transition) {
+							((Transition) attached).removeArcCompareObject((Arc) pnObject);
+						}
+						// attached.updateConnected(); //causing null pointer
+						// exceptions (?)
+					}
+
+					attached = ((Arc) pnObject).getTarget();
+
+					if (attached != null) {
+						if (tapnInhibitorsMap.get(attached) != null) { // causing
+																		// null
+																		// pointer
+																		// exceptions
+																		// (!)
+							tapnInhibitorsMap.get(attached).remove(pnObject);
+						}
+
+						attached.removeToArc((Arc) pnObject);
+						if (attached instanceof Transition) {
 							((Transition) attached)
 									.removeArcCompareObject((Arc) pnObject);
+						}
+						// attached.updateConnected(); //causing null pointer
+						// exceptions (?)
+					}
+				} else if (pnObject instanceof TimedOutputArcComponent) {
+
+					// get source and target of the arc
+					PlaceTransitionObject attached = ((Arc) pnObject).getSource();
+
+					if (attached != null) {
+						ArrayList<TimedOutputArcComponent> a = arcsMap.get(attached);
+						if (a != null) {
+							a.remove(pnObject);
+						}
+
+						attached.removeFromArc((Arc) pnObject);
+						if (attached instanceof Transition) {
+							((Transition) attached).removeArcCompareObject((Arc) pnObject);
 							attached.updateConnected();
 						}
 						// attached.updateConnected(); //causing null pointer
@@ -601,8 +635,7 @@ public class DataLayer extends Observable implements Cloneable {
 
 						attached.removeToArc((Arc) pnObject);
 						if (attached instanceof Transition) {
-							((Transition) attached)
-									.removeArcCompareObject((Arc) pnObject);
+							((Transition) attached).removeArcCompareObject((Arc) pnObject);
 							attached.updateConnected();
 						}
 						// attached.updateConnected(); //causing null pointer
@@ -638,47 +671,6 @@ public class DataLayer extends Observable implements Cloneable {
 																	// exceptions
 																	// (!)
 							inhibitorsMap.get(attached).remove(pnObject);
-						}
-
-						attached.removeToArc((Arc) pnObject);
-						if (attached instanceof Transition) {
-							((Transition) attached)
-									.removeArcCompareObject((Arc) pnObject);
-						}
-						// attached.updateConnected(); //causing null pointer
-						// exceptions (?)
-					}
-				} else if (pnObject instanceof TimedInhibitorArcComponent) {
-
-					// get source and target of the arc
-					PlaceTransitionObject attached = ((Arc) pnObject)
-							.getSource();
-
-					if (attached != null) {
-						ArrayList<TimedInhibitorArcComponent> a = tapnInhibitorsMap
-								.get(attached);
-						if (a != null) {
-							a.remove(pnObject);
-						}
-
-						attached.removeFromArc((Arc) pnObject);
-						if (attached instanceof Transition) {
-							((Transition) attached)
-									.removeArcCompareObject((Arc) pnObject);
-						}
-						// attached.updateConnected(); //causing null pointer
-						// exceptions (?)
-					}
-
-					attached = ((Arc) pnObject).getTarget();
-
-					if (attached != null) {
-						if (tapnInhibitorsMap.get(attached) != null) { // causing
-																		// null
-																		// pointer
-																		// exceptions
-																		// (!)
-							tapnInhibitorsMap.get(attached).remove(pnObject);
 						}
 
 						attached.removeToArc((Arc) pnObject);
