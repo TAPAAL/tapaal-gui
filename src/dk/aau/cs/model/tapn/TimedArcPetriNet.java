@@ -7,6 +7,7 @@ import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNet {
 	private String name;
+	private TimedArcPetriNetNetwork parentNetwork;
 
 	private List<TimedPlace> places;
 	private List<TimedTransition> transitions;
@@ -29,6 +30,14 @@ public class TimedArcPetriNet {
 		transportArcs = new ArrayList<TransportArc>();
 
 		setMarking(new TimedMarking());
+	}
+	
+	public void setParentNetwork(TimedArcPetriNetNetwork network){
+		this.parentNetwork = network;
+	}
+	
+	public TimedArcPetriNetNetwork parentNetwork(){
+		return parentNetwork;
 	}
 
 	public void add(TimedPlace place) {
@@ -189,6 +198,8 @@ public class TimedArcPetriNet {
 	}
 
 	public boolean isNameUsed(String name) {
+		if(parentNetwork.isNameUsedForShared(name)) return true;
+		
 		for (TimedPlace place : places){
 			if (place.name().equalsIgnoreCase(name))
 				return true;

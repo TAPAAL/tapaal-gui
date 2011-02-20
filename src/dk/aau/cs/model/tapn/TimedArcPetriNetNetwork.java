@@ -28,6 +28,7 @@ public class TimedArcPetriNetNetwork {
 		Require.that(tapn != null, "tapn must be non-null");
 		Require.that(tapn.marking() != null, "Marking must be non-null");
 
+		tapn.setParentNetwork(this);
 		tapns.add(tapn);
 		currentMarking.addMarking(tapn, tapn.marking());
 	}
@@ -46,7 +47,7 @@ public class TimedArcPetriNetNetwork {
 		sharedPlaces.add(sharedPlace);		
 	}
 
-	private boolean isNameUsed(String name) {
+	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
 			if(transition.name().equalsIgnoreCase(name)) return true;
 		}
@@ -55,14 +56,23 @@ public class TimedArcPetriNetNetwork {
 			if(place.name().equalsIgnoreCase(name)) return true;
 		}
 		
+		return false;
+	}
+	
+	public boolean isNameUsedInTemplates(String name){
 		for(TimedArcPetriNet net : tapns){
 			if(net.isNameUsed(name)) return true;
 		}
 		return false;
 	}
+		
+	private boolean isNameUsed(String name) {
+		return isNameUsedForShared(name) || isNameUsedInTemplates(name);
+	}
 
 	public void remove(TimedArcPetriNet tapn) {
 		if (tapn != null) {
+			tapn.setParentNetwork(null);
 			tapns.remove(tapn);
 			currentMarking.removeMarkingFor(tapn);
 		}

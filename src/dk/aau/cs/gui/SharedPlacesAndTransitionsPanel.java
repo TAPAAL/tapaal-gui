@@ -13,6 +13,8 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
@@ -33,6 +35,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private SharedTransitionsListModel sharedTransitionsListModel;
 	private JComboBox placesTransitionsComboBox;
 	private UndoManager undoManager;
+	private JButton renameButton;
+	private JButton removeButton;
 
 	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network, UndoManager undoManager){
 		Require.that(network != null, "network cannot be null");
@@ -53,6 +57,18 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 	private void initComponents() {
 		list = new JList();
+		list.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				JList source = (JList)e.getSource();
+				if(source.getSelectedIndex() == -1){
+					removeButton.setEnabled(false);
+					renameButton.setEnabled(false);
+				}else{
+					removeButton.setEnabled(true);
+					renameButton.setEnabled(true);
+				}
+			}
+		});
 		JScrollPane scrollPane = new JScrollPane(list);
 
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
@@ -70,8 +86,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		placesTransitionsComboBox.setSelectedIndex(0); // Sets up the proper list model
 
 		JPanel buttonPanel = new JPanel();
-		JButton renameButton = new JButton("Rename");
-		JButton removeButton = new JButton("Remove");
+		renameButton = new JButton("Rename");
+		renameButton.setEnabled(false);
+		removeButton = new JButton("Remove");
+		removeButton.setEnabled(false);
 		JButton addButton = new JButton("Add");
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
