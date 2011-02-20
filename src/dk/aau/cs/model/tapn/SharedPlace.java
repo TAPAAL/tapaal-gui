@@ -7,9 +7,33 @@ import dk.aau.cs.util.Require;
 public class SharedPlace {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	private String name;
+	
+	private TimedArcPetriNetNetwork network;
 
 	public SharedPlace(String name){
 		setName(name);
+	}
+	
+
+	public void delete() {
+		// place.delete() will call unshare and thus modify the place collection
+		// which won't work while we are iterating through it, so we copy it first.
+//		ArrayList<TimedTransition> copy = new ArrayList<TimedTransition>(transitions);
+//		for(TimedTransition transition : copy){
+//			transition.delete();
+//		}
+	}
+
+	public void setNetwork(TimedArcPetriNetNetwork network) {
+		this.network = network;		
+	}
+	
+	public TimedArcPetriNetNetwork network(){
+		return network;
+	}
+	
+	public String name() {
+		return name;
 	}
 
 	public void setName(String newName) {
@@ -50,20 +74,5 @@ public class SharedPlace {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
-	}
-
-	public String name() {
-		return name;
-	}
-
-	public void delete() {
-		// place.delete() will call unshare and thus modify the place collection
-		// which won't work while we are iterating through it, so we copy it first.
-//		ArrayList<TimedTransition> copy = new ArrayList<TimedTransition>(transitions);
-//		for(TimedTransition transition : copy){
-//			transition.delete();
-//		}
-	}
-	
-	
+	}	
 }

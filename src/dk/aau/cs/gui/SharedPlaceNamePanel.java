@@ -15,6 +15,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import pipe.gui.undo.UndoManager;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
@@ -27,13 +28,18 @@ public class SharedPlaceNamePanel extends JPanel {
 	private final JRootPane rootPane;
 	private final SharedPlacesListModel listModel;
 	private JTextField nameField;
-
+	private SharedPlace placeToEdit;
 	private final UndoManager undoManager;
 
 	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager) {
+		this(rootPane, SharedPlacesListModel, undoManager, null);	
+	}
+	
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
 		this.listModel = SharedPlacesListModel;
 		this.undoManager = undoManager;
+		this.placeToEdit = placeToEdit;
 		initComponents();		
 	}
 	
@@ -54,7 +60,8 @@ public class SharedPlaceNamePanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		namePanel.add(label, gbc);
 		
-		nameField = new JTextField();
+		String initialText = placeToEdit == null ? "" : placeToEdit.name();
+		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(100,27));
 		nameField.setPreferredSize(new Dimension(150, 27));
 		gbc = new GridBagConstraints();
@@ -75,24 +82,51 @@ public class SharedPlaceNamePanel extends JPanel {
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else{
-					SharedPlace place = null;
-					try{
-						place = new SharedPlace(name);
-					}catch(RequireException e){
-						JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					boolean success = false;
+					if(placeToEdit == null){
+						success = addNewSharedPlace(name);
+					}else{
+						success = updateExistingPlace(name);
 					}
 					
-					try{
-						listModel.addElement(place);
-					}catch(RequireException e){
-						JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-					undoManager.addNewEdit(new AddSharedPlaceCommand(listModel, place));
-					exit();
+					if(success) exit();
 				}
+			}
+
+			private boolean updateExistingPlace(String name) {
+				throw new RuntimeException("Not implemented");
+//				// TODO: check that name is not used elsewhere
+//				try{
+//					placeToEdit.setName(name);
+//				}catch(RequireException e){
+//					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+//					return false;
+//				}
+//				
+//				listModel.updatedName();
+//				// TODO: add undo edit
+//				// TODO: update affected places' namelabel
+//				return true;
+			}
+
+			private boolean addNewSharedPlace(String name) {
+				SharedPlace place = null;
+				try{
+					place = new SharedPlace(name);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				try{
+					listModel.addElement(place);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				undoManager.addNewEdit(new AddSharedPlaceCommand(listModel, place));
+				return true;
 			}
 		});
 		

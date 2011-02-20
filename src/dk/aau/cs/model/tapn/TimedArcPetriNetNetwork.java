@@ -37,6 +37,7 @@ public class TimedArcPetriNetNetwork {
 		Require.that(sharedTransition != null, "sharedTransition must not be null");
 		Require.that(!isNameUsed(sharedTransition.name()), "There is already a transition or place with that name");
 		
+		sharedTransition.setNetwork(this);
 		sharedTransitions.add(sharedTransition);
 	}
 	
@@ -44,6 +45,7 @@ public class TimedArcPetriNetNetwork {
 		Require.that(sharedPlace != null, "sharedPlace must not be null");
 		Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
 		
+		sharedPlace.setNetwork(this);
 		sharedPlaces.add(sharedPlace);		
 	}
 
@@ -66,7 +68,7 @@ public class TimedArcPetriNetNetwork {
 		return false;
 	}
 		
-	private boolean isNameUsed(String name) {
+	public boolean isNameUsed(String name) {
 		return isNameUsedForShared(name) || isNameUsedInTemplates(name);
 	}
 
@@ -80,6 +82,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public void remove(SharedPlace sharedPlace) {
 		if (sharedPlace != null) {
+			sharedPlace.setNetwork(null);
 			sharedPlaces.remove(sharedPlace);
 			sharedPlace.delete();
 		}
@@ -87,6 +90,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public void remove(SharedTransition sharedTransition) {
 		if (sharedTransition != null) {
+			sharedTransition.setNetwork(null);
 			sharedTransitions.remove(sharedTransition);
 			sharedTransition.delete();
 		}

@@ -11,15 +11,28 @@ public class SharedTransition {
 	private String name;
 	private List<TimedTransition> transitions;
 
+	private TimedArcPetriNetNetwork network;
+	
 	public SharedTransition(String name){
-		setName(name);
 		transitions = new ArrayList<TimedTransition>();
+		setName(name);
+	}
+	
+	public TimedArcPetriNetNetwork network() {
+		return network;
+	}
+	
+	public void setNetwork(TimedArcPetriNetNetwork network){
+		this.network = network;
 	}
 
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
+		for(TimedTransition transition : transitions){
+			transition.setName(newName);
+		}
 	}
 
 	private boolean isValid(String newName) {
@@ -91,5 +104,4 @@ public class SharedTransition {
 			return false;
 		return true;
 	}
-
 }

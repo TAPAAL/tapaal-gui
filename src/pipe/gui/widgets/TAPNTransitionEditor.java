@@ -240,8 +240,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 			
 			try{ // set name
-				Command cmd = transition.setPNObjectName(newName);
-				view.getUndoManager().addEdit(cmd);
+				transition.underlyingTransition().setName(newName);
+//				Command cmd = transition.setPNObjectName(newName);
+//				view.getUndoManager().addEdit(cmd);
 			}catch(RequireException e){
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this,

@@ -79,7 +79,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent copy() {
 		TimedPlaceComponent copy = new TimedPlaceComponent(Zoomer
 				.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(
-				this.getY(), zoom), this.place);
+						this.getY(), zoom), this.place);
 		copy.pnName.setName(this.getName());
 		copy.nameOffsetX = this.nameOffsetX;
 		copy.nameOffsetY = this.nameOffsetY;
@@ -278,28 +278,28 @@ public class TimedPlaceComponent extends Place {
 			if (numberOfTokens <= 12) {
 				ageOfTokensWindow.setLocation(
 						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-								.getLocation().y
-								+ 31 + numberOfTokens);
+						.getLocation().y
+						+ 31 + numberOfTokens);
 			} else if (numberOfTokens > 12 && numberOfTokens < 20) {
 				ageOfTokensWindow.setLocation(
 						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-								.getLocation().y
-								+ 40 + numberOfTokens);
+						.getLocation().y
+						+ 40 + numberOfTokens);
 			} else if (numberOfTokens >= 20 && numberOfTokens <= 35) {
 				ageOfTokensWindow.setLocation(
 						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-								.getLocation().y
-								+ 35 + numberOfTokens);
+						.getLocation().y
+						+ 35 + numberOfTokens);
 			} else if (numberOfTokens > 35 && numberOfTokens < 40) {
 				ageOfTokensWindow.setLocation(
 						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-								.getLocation().y
-								+ 40 + numberOfTokens);
+						.getLocation().y
+						+ 40 + numberOfTokens);
 			} else {
 				ageOfTokensWindow.setLocation(
 						ageOfTokensWindow.getLocation().x, ageOfTokensWindow
-								.getLocation().y
-								+ 20 + numberOfTokens);
+						.getLocation().y
+						+ 20 + numberOfTokens);
 			}
 			ageOfTokensWindow.setVisible(show);
 		}
@@ -334,12 +334,9 @@ public class TimedPlaceComponent extends Place {
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
 			if (attributesVisible == true) {
+				pnName.setName(place.name());
 				if (!(place.invariant().upperBound() instanceof InfBound)) {
-					pnName.setName(place.name());
 					pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
-				}
-				else {
-					pnName.setName(place.name());
 				}
 			}
 		} else {
@@ -378,8 +375,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public int getNumberOfTokens() {
-		return place.numberOfTokens(); // TODO: This may fail if saving while in
-										// animation mode?
+		return place.numberOfTokens(); 
 	}
 
 	@Override
@@ -391,7 +387,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionX, positionY, id, place.name(), nameOffsetX, nameOffsetY, initialMarking, markingOffsetX, markingOffsetY, capacity);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
-		
+
 		LabelHandler labelHandler = new LabelHandler(placeComponent.getNameLabel(), placeComponent);
 		placeComponent.getNameLabel().addMouseListener(labelHandler);
 		placeComponent.getNameLabel().addMouseMotionListener(labelHandler);
@@ -401,9 +397,9 @@ public class TimedPlaceComponent extends Place {
 		placeComponent.addMouseListener(placeHandler);
 		placeComponent.addMouseWheelListener(placeHandler);
 		placeComponent.addMouseMotionListener(placeHandler);
-		
+
 		placeComponent.setGuiModel(guiModel);
-		
+
 		return placeComponent;
 	}
 }

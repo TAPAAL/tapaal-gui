@@ -88,12 +88,25 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		renameButton = new JButton("Rename");
 		renameButton.setEnabled(false);
+		renameButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				if(isDisplayingTransitions()){
+					showSharedTransitionNameDialog((SharedTransition)list.getSelectedValue());
+				}else{
+					showSharedPlaceNameDialog((SharedPlace)list.getSelectedValue());
+				}
+			}		
+		});
 		removeButton = new JButton("Remove");
 		removeButton.setEnabled(false);
 		JButton addButton = new JButton("Add");
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				showSharedTransitionNameDialog();
+				if(isDisplayingTransitions()){
+					showSharedTransitionNameDialog(null);
+				}else{
+					showSharedPlaceNameDialog(null);
+				}
 			}		
 		});
 
@@ -110,12 +123,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		return placesTransitionsComboBox.getSelectedItem().equals(TRANSITIONS);
 	}
 
-	private void showSharedTransitionNameDialog() {
+	private void showSharedTransitionNameDialog(SharedTransition transitionToEdit) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		JPanel panel = isDisplayingTransitions() ? new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager) : new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager);
+		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, transitionToEdit);
 		contentPane.add(panel);
 
 		guiDialog.setResizable(false);
@@ -123,6 +135,21 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 	}
+	
+	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		Container contentPane = guiDialog.getContentPane();
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+		
+		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager, placeToEdit);
+		contentPane.add(panel);
+
+		guiDialog.setResizable(false);
+		guiDialog.pack();
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+	}
+
 
 	public class SharedPlacesListModel extends AbstractListModel {
 		private static final long serialVersionUID = 1L;
@@ -148,7 +175,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 		public void removeElement(SharedPlace place) {
 			network.remove(place);
-			fireContentsChanged(this, 0, getSize()+1);
+			fireContentsChanged(this, 0, getSize());
+		}
+		
+		public void updatedName(){
+			fireContentsChanged(this, 0, getSize());
 		}
 	}
 
@@ -176,7 +207,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 		public void removeElement(SharedTransition transition) {
 			network.remove(transition);
-			fireContentsChanged(this, 0, getSize()+1);
+			fireContentsChanged(this, 0, getSize());
+		}
+
+		public void updatedName() {
+			fireContentsChanged(this, 0, getSize());
 		}
 	}
 }

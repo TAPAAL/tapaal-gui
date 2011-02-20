@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
+import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
 
 public class TimedPlace extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	
 	private String name;
 	private TimeInvariant invariant;
 	private List<TimedOutputArc> preset;
@@ -17,6 +20,8 @@ public class TimedPlace extends TAPNElement {
 
 	private TimedMarking currentMarking;
 
+	private List<TimedPlaceListener> listeners;
+	
 	public TimedPlace(String name) {
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
 	}
@@ -28,8 +33,19 @@ public class TimedPlace extends TAPNElement {
 		postset = new ArrayList<TimedInputArc>();
 		presetTransportArcs = new ArrayList<TransportArc>();
 		postsetTransportArcs = new ArrayList<TransportArc>();
+		listeners = new ArrayList<TimedPlaceListener>();
 	}
 
+	public void addTimedPlaceListener(TimedPlaceListener listener){
+		Require.that(listener != null, "Listener cannot be null");
+		listeners.add(listener);
+	}
+	
+	public void removeTimedPlaceListener(TimedPlaceListener listener){
+		Require.that(listener != null, "Listener cannot be null");
+		listeners.remove(listener);
+	}
+	
 	public void setCurrentMarking(TimedMarking currentMarking) {
 		this.currentMarking = currentMarking;
 	}
@@ -42,8 +58,16 @@ public class TimedPlace extends TAPNElement {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
+		
+		fireNameChanged();
 	}
 	
+	private void fireNameChanged() {
+		for(TimedPlaceListener listener : listeners){
+			listener.nameChanged(new TimedPlaceEvent(this));
+		}
+	}
+
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
 	}

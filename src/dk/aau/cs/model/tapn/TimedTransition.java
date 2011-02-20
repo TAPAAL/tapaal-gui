@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
+import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
@@ -16,15 +18,29 @@ public class TimedTransition extends TAPNElement {
 	private List<TimedInhibitorArc> inhibitorArcs;
 	
 	private SharedTransition sharedTransition;
+	
+	private List<TimedTransitionListener> listeners;
 
 	public TimedTransition(String name) {
-		setName(name);
 		preset = new ArrayList<TimedInputArc>();
 		postset = new ArrayList<TimedOutputArc>();
 		transportArcsGoingThrough = new ArrayList<TransportArc>();
 		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+		listeners = new ArrayList<TimedTransitionListener>();
+
+		setName(name);
 	}
 
+	public void addTimedTransitionListener(TimedTransitionListener listener){
+		Require.that(listener != null, "listener cannot be null");
+		listeners.add(listener);
+	}
+	
+	public void removeListener(TimedTransitionListener listener){
+		Require.that(listener != null, "listener cannot be null");
+		listeners.remove(listener);
+	}
+	
 	public boolean isShared(){
 		return sharedTransition != null;
 	}
@@ -53,6 +69,13 @@ public class TimedTransition extends TAPNElement {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
+		fireNameChanged();
+	}
+	
+	private void fireNameChanged(){
+		for(TimedTransitionListener listener : listeners){
+			listener.nameChanged(new TimedTransitionEvent(this));
+		}
 	}
 	
 	private boolean isValid(String newName) {

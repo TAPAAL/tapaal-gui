@@ -24,6 +24,8 @@ import pipe.gui.widgets.TAPNTransitionEditor;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
+import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 
 public class TimedTransitionComponent extends Transition {
 	private static final int DASHED_PADDING = 8;
@@ -35,6 +37,12 @@ public class TimedTransitionComponent extends Transition {
 			dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
+		transition.addTimedTransitionListener(new TimedTransitionListener() {
+			public void nameChanged(TimedTransitionEvent e) {
+				TimedTransition source = e.source();
+				TimedTransitionComponent.super.setName(source.name());
+			}
+		});
 	}
 
 	public TimedTransitionComponent(double positionXInput,
@@ -45,7 +53,7 @@ public class TimedTransitionComponent extends Transition {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput, timedTransition, infServer,
 				angleInput, priority);
-		transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
+		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
 	}
 
 	@Override

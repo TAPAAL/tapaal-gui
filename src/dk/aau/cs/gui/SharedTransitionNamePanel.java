@@ -26,16 +26,23 @@ public class SharedTransitionNamePanel extends JPanel {
 	private final JRootPane rootPane;
 	private final SharedTransitionsListModel listModel;
 	private JTextField nameField;
+	private SharedTransition transitionToEdit;
 
 	private final UndoManager undoManager;
 
+
 	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager) {
+		this(rootPane, sharedTransitionsListModel, undoManager, null);
+	}
+	
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, SharedTransition transitionToEdit) {
 		this.rootPane = rootPane;
 		this.listModel = sharedTransitionsListModel;
 		this.undoManager = undoManager;
-		initComponents();		
+		this.transitionToEdit = transitionToEdit;
+		initComponents();	
 	}
-	
+
 	public void initComponents(){
 		setLayout(new BorderLayout());
 		
@@ -53,7 +60,8 @@ public class SharedTransitionNamePanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		namePanel.add(label, gbc);
 		
-		nameField = new JTextField();
+		String initialText = transitionToEdit == null ? "" : transitionToEdit.name();
+		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(100,27));
 		nameField.setPreferredSize(new Dimension(150, 27));
 		gbc = new GridBagConstraints();
@@ -70,29 +78,59 @@ public class SharedTransitionNamePanel extends JPanel {
 		okButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				String name = nameField.getText();
+						
 				if(name == null || name.isEmpty()){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}else{
-					SharedTransition transition = null;
-					
-					try{
-						transition = new SharedTransition(name);
-					}catch(RequireException e){
-						JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					boolean success = true;
+					if(transitionToEdit == null){
+						success = addNewSharedTransition(name);
+					}else if(!name.equals(transitionToEdit.name())){
+						success = updateExistingTransition(name);
 					}
 					
-					try{
-						listModel.addElement(transition);
-					}catch(RequireException e){
-						JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-					undoManager.addNewEdit(new AddSharedTransitionCommand(listModel, transition));
-					exit();
+					if(success) exit();
 				}
+			}
+
+			private boolean updateExistingTransition(String name) {
+				if(transitionToEdit.network().isNameUsed(name)) {
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the templates.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				try{
+					transitionToEdit.setName(name);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				listModel.updatedName();
+//				// TODO: add undo edit
+//				// TODO: update affected places' namelabel
+				return true;
+			}
+			private boolean addNewSharedTransition(String name) {
+				SharedTransition transition = null;
+				
+				try{
+					transition = new SharedTransition(name);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				try{
+					listModel.addElement(transition);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				undoManager.addNewEdit(new AddSharedTransitionCommand(listModel, transition));
+				return true;
 			}
 		});
 		
