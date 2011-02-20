@@ -100,7 +100,7 @@ public class TabContent extends JSplitPane {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 3;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.25;
@@ -108,7 +108,7 @@ public class TabContent extends JSplitPane {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 4;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.25;
@@ -116,7 +116,7 @@ public class TabContent extends JSplitPane {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.25;
