@@ -228,13 +228,19 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		if(sharedCheckBox.isSelected()){	
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
 			view.getUndoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition(), transition));
-			selectedTransition.makeShared(transition.underlyingTransition());
+			try{
+				selectedTransition.makeShared(transition.underlyingTransition());
+			}catch(RequireException e){
+				view.getUndoManager().undo();
+				JOptionPane.showMessageDialog(this,"Another transition in the same template is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 		}else{			
-			if(transition.underlyingTransition().model().isNameUsed(newName)){
+			if(transition.underlyingTransition().model().isNameUsed(newName) && !transition.underlyingTransition().name().equals(newName)){
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
 						"The specified name is already used by another place or transition.",
-						"Error", JOptionPane.INFORMATION_MESSAGE);
+						"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
@@ -246,7 +252,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
 						"Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-						"Error", JOptionPane.INFORMATION_MESSAGE);
+						"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			view.getNameGenerator().updateTransitionIndex(transition.underlyingTransition().model(), newName);

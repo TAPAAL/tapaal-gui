@@ -191,7 +191,7 @@ public class TimedArcPetriNet {
 	}
 
 	public boolean isNameUsed(String name) {
-		if(parentNetwork.isNameUsedForShared(name)) return true;
+		if(parentNetwork != null && parentNetwork.isNameUsedForShared(name)) return true;
 		
 		for (TimedPlace place : places){
 			if (place.name().equalsIgnoreCase(name))

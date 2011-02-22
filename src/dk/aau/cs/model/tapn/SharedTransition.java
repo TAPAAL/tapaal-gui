@@ -8,13 +8,13 @@ import dk.aau.cs.util.Require;
 
 public class SharedTransition {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	
 	private String name;
-	private List<TimedTransition> transitions;
+	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
 
 	private TimedArcPetriNetNetwork network;
 	
 	public SharedTransition(String name){
-		transitions = new ArrayList<TimedTransition>();
 		setName(name);
 	}
 	
@@ -45,7 +45,6 @@ public class SharedTransition {
 		Require.that(templateDoesNotContainSharedTransition(transition.model()), "Another transition in the same template is already shared under that name");
 		transition.makeShared(this); // this will unshare first if part of another shared transition
 		transitions.add(transition);
-		transition.setName(name);
 	}
 
 	private boolean templateDoesNotContainSharedTransition(TimedArcPetriNet model) {

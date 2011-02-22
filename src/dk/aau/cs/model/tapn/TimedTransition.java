@@ -16,9 +16,9 @@ public class TimedTransition extends TAPNElement {
 	private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
 	private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
 	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-	
+
 	private SharedTransition sharedTransition;
-	
+
 	private List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
@@ -29,49 +29,54 @@ public class TimedTransition extends TAPNElement {
 		Require.that(listener != null, "listener cannot be null");
 		listeners.add(listener);
 	}
-	
+
 	public void removeListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
 		listeners.remove(listener);
 	}
-	
+
 	public boolean isShared(){
 		return sharedTransition != null;
 	}
-	
+
 	public SharedTransition sharedTransition(){
 		return sharedTransition;
 	}
-	
+
 	public void makeShared(SharedTransition sharedTransition){
-		unshare();
-		this.sharedTransition = sharedTransition;
+		Require.that(sharedTransition != null, "sharedTransition cannot be null");
+
+		if(this.sharedTransition != sharedTransition){
+			unshare();
+			this.sharedTransition = sharedTransition;
+			setName(sharedTransition.name());
+		}
 	}
-	
+
 	public void unshare() {
 		if(isShared()){
 			sharedTransition.unshare(this);
 			sharedTransition = null;
 		}
 	}
-	
+
 	public String name() {
 		return name;
 	}
-	
+
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
 		fireNameChanged();
 	}
-	
+
 	private void fireNameChanged(){
 		for(TimedTransitionListener listener : listeners){
 			listener.nameChanged(new TimedTransitionEvent(this));
 		}
 	}
-	
+
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
 	}
@@ -193,7 +198,7 @@ public class TimedTransition extends TAPNElement {
 
 		return producedTokens;
 	}
-	
+
 	public List<TimedToken> calculateConsumedTokens(TimedMarking timedMarking, FiringMode firingMode) {
 		List<TimedToken> tokensToConsume = new ArrayList<TimedToken>();
 
@@ -213,15 +218,15 @@ public class TimedTransition extends TAPNElement {
 	public Iterable<TimedInputArc> getInputArcs(){
 		return preset;
 	}
-	
+
 	public Iterable<TransportArc> getTransportArcsGoingThrough(){
 		return transportArcsGoingThrough;
 	}
-	
+
 	public TimedTransition copy() {
 		return new TimedTransition(this.name);
 	}
-	
+
 	@Override
 	public String toString() {
 		if (model() != null)
@@ -229,7 +234,7 @@ public class TimedTransition extends TAPNElement {
 		else
 			return name;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

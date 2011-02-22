@@ -836,8 +836,7 @@ public class TimedArcPetriNetFactory {
 					initialMarkingInput, markingOffsetXInput,
 					markingOffsetYInput, capacityInput);
 
-			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(
-					invariant, constants));
+			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 
 			for (int i = 0; i < initialMarkingInput; i++) {
 				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));

@@ -10,7 +10,7 @@ import dk.aau.cs.util.Require;
 
 public class TimedPlace extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
-	
+
 	private String name;
 	private TimeInvariant invariant;
 	private List<TimedOutputArc> preset = new ArrayList<TimedOutputArc>();
@@ -18,11 +18,12 @@ public class TimedPlace extends TAPNElement {
 	private List<TransportArc> presetTransportArcs = new ArrayList<TransportArc>();
 	private List<TransportArc> postsetTransportArcs = new ArrayList<TransportArc>();
 	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-	
+
 	private TimedMarking currentMarking;
+	private SharedPlace sharedPlace;
 
 	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
-	
+
 	public TimedPlace(String name) {
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
 	}
@@ -36,12 +37,33 @@ public class TimedPlace extends TAPNElement {
 		Require.that(listener != null, "Listener cannot be null");
 		listeners.add(listener);
 	}
-	
+
 	public void removeTimedPlaceListener(TimedPlaceListener listener){
 		Require.that(listener != null, "Listener cannot be null");
 		listeners.remove(listener);
 	}
-	
+
+	public void makeShared(SharedPlace sharedPlace) {
+		Require.that(sharedPlace != null, "sharedPlace cannot be null");
+		
+		if(this.sharedPlace != sharedPlace){
+			unshare();
+			this.sharedPlace = sharedPlace;
+			setName(sharedPlace.name());
+		}
+	}	
+
+	public void unshare() {
+		if(isShared()){
+			sharedPlace.unshare(this);
+			sharedPlace = null;
+		}
+	}
+
+	private boolean isShared() {
+		return sharedPlace != null;
+	}
+
 	public void setCurrentMarking(TimedMarking newMarking) {
 		Require.that(newMarking != null, "newMarking cannot be null");
 		this.currentMarking = newMarking;
@@ -55,10 +77,10 @@ public class TimedPlace extends TAPNElement {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
-		
+
 		fireNameChanged();
 	}
-	
+
 	private void fireNameChanged() {
 		for(TimedPlaceListener listener : listeners){
 			listener.nameChanged(new TimedPlaceEvent(this));
@@ -97,12 +119,12 @@ public class TimedPlace extends TAPNElement {
 		Require.that(arc != null, "Cannot add null to postset");
 		postsetTransportArcs.add(arc);
 	}
-	
+
 	public void addInhibitorArc(TimedInhibitorArc arc){
 		Require.that(arc != null, "arc cannot be null");
 		inhibitorArcs.add(arc);
 	}
-	
+
 	public void removeInhibitorArc(TimedInhibitorArc arc){
 		Require.that(arc != null, "arc cannot be null");
 		inhibitorArcs.remove(arc);
@@ -172,12 +194,12 @@ public class TimedPlace extends TAPNElement {
 			currentMarking.removeArbitraryTokenFrom(this);
 		}
 	}
-	
+
 	public TimedPlace copy() {
 		TimedPlace p = new TimedPlace(this.name);
-		
+
 		p.invariant = this.invariant.copy();
-		
+
 		return p;
 	}
 
@@ -185,7 +207,7 @@ public class TimedPlace extends TAPNElement {
 	public String toString() {
 		return name;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -193,7 +215,7 @@ public class TimedPlace extends TAPNElement {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

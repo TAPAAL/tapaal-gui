@@ -9,17 +9,14 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetwork {
-	private List<TimedArcPetriNet> tapns;
-	private List<SharedPlace> sharedPlaces;
-	private List<SharedTransition> sharedTransitions;
+	private List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
+	private List<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
+	private List<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+	
 	private NetworkMarking currentMarking;
-
 	private ConstantStore constants;
 
 	public TimedArcPetriNetNetwork() {
-		tapns = new ArrayList<TimedArcPetriNet>();
-		sharedPlaces = new ArrayList<SharedPlace>();
-		sharedTransitions = new ArrayList<SharedTransition>();
 		currentMarking = new NetworkMarking();
 		constants = new ConstantStore();
 	}

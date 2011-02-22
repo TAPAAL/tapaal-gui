@@ -382,9 +382,7 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 	}
 
 	public void update(boolean displayConstantNames) {
-		updateBounds();
-		updateLabelLocation();
-		updateConnected();
+		updateOnMove();
 	}
 
 	public Point2D.Double getCentre() {

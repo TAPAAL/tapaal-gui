@@ -1,12 +1,16 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Require;
 
 public class SharedPlace {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	
 	private String name;
+	private List<TimedPlace> places = new ArrayList<TimedPlace>();
 	
 	private TimedArcPetriNetNetwork network;
 
@@ -18,10 +22,10 @@ public class SharedPlace {
 	public void delete() {
 		// place.delete() will call unshare and thus modify the place collection
 		// which won't work while we are iterating through it, so we copy it first.
-//		ArrayList<TimedTransition> copy = new ArrayList<TimedTransition>(transitions);
-//		for(TimedTransition transition : copy){
-//			transition.delete();
-//		}
+		ArrayList<TimedPlace> copy = new ArrayList<TimedPlace>(places);
+		for(TimedPlace place : copy){
+			place.delete();
+		}
 	}
 
 	public void setNetwork(TimedArcPetriNetNetwork network) {
@@ -40,11 +44,37 @@ public class SharedPlace {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
+		for(TimedPlace place : places){
+			place.setName(newName);
+		}
 	}
 	
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
 	}
+	
+	// TODO: Find a better name for this
+	public void makeShared(TimedPlace place){
+		Require.that(place != null, "place cannot be null");
+		Require.that(templateDoesNotContainSharedPlace(place.model()), "Another place in the same template is already shared under that name");
+		place.makeShared(this); // this will unshare first if part of another shared transition
+		places.add(place);
+		place.setName(name);
+	}
+
+	private boolean templateDoesNotContainSharedPlace(TimedArcPetriNet model) {
+		for(TimedPlace place : places){
+			if(model.equals(place.model())) return false;
+		}
+		return true;
+	}
+
+	// TODO: this should somehow change timedPlace also, but calling unshare yields infinite loop
+	public void unshare(TimedPlace timedPlace) {
+		Require.that(timedPlace != null, "timedPlace cannot be null");
+		places.remove(timedPlace);
+	}	
+	
 	
 	@Override
 	public String toString() {
