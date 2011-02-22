@@ -42,9 +42,17 @@ public class SharedTransition {
 	// TODO: Find a better name for this
 	public void makeShared(TimedTransition transition){
 		Require.that(transition != null, "transition cannot be null");
+		Require.that(templateDoesNotContainSharedTransition(transition.model()), "Another transition in the same template is already shared under that name");
 		transition.makeShared(this); // this will unshare first if part of another shared transition
 		transitions.add(transition);
 		transition.setName(name);
+	}
+
+	private boolean templateDoesNotContainSharedTransition(TimedArcPetriNet model) {
+		for(TimedTransition transition : transitions){
+			if(model.equals(transition.model())) return false;
+		}
+		return true;
 	}
 
 	// TODO: this should somehow change timedTransition also, but calling unshare yields infinite loop

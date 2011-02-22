@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedTransitionsListModel;
 import dk.aau.cs.gui.undo.AddSharedTransitionCommand;
+import dk.aau.cs.gui.undo.RenameSharedTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.util.RequireException;
 
@@ -100,6 +101,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					return false;
 				}
 				
+				String oldName = transitionToEdit.name();
 				try{
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
@@ -108,8 +110,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				}
 				
 				listModel.updatedName();
-//				// TODO: add undo edit
-//				// TODO: update affected places' namelabel
+				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, oldName, name));
 				return true;
 			}
 			private boolean addNewSharedTransition(String name) {

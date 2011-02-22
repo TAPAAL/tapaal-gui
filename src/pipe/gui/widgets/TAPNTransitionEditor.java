@@ -15,8 +15,8 @@ import javax.swing.event.CaretListener;
 
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.DrawingSurfaceImpl;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
+import dk.aau.cs.gui.undo.RenameTimedTransition;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -228,7 +228,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		if(sharedCheckBox.isSelected()){	
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
 			view.getUndoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition(), transition));
-			transition.setName(selectedTransition.name());
 			selectedTransition.makeShared(transition.underlyingTransition());
 		}else{			
 			if(transition.underlyingTransition().model().isNameUsed(newName)){
@@ -238,11 +237,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 						"Error", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			
+
+			String oldName = transition.underlyingTransition().name();
 			try{ // set name
 				transition.underlyingTransition().setName(newName);
-//				Command cmd = transition.setPNObjectName(newName);
-//				view.getUndoManager().addEdit(cmd);
+				view.getUndoManager().addEdit(new RenameTimedTransition(transition.underlyingTransition(), oldName, newName));
 			}catch(RequireException e){
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
@@ -273,7 +272,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				view.getUndoManager().addEdit(transition.rotate(angle));
 			}
 		}
-		transition.repaint();
 		exit();
 	}
 
