@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -59,16 +62,20 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		list = new JList();
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				JList source = (JList)e.getSource();
-				if(source.getSelectedIndex() == -1){
-					removeButton.setEnabled(false);
-					renameButton.setEnabled(false);
-				}else{
-					removeButton.setEnabled(true);
-					renameButton.setEnabled(true);
+				if(!e.getValueIsAdjusting()){
+					JList source = (JList)e.getSource();
+					if(source.getSelectedIndex() == -1){
+						removeButton.setEnabled(false);
+						renameButton.setEnabled(false);
+					}else{
+						removeButton.setEnabled(true);
+						renameButton.setEnabled(true);
+					}
 				}
 			}
 		});
+		list.addMouseListener(createDoubleClickMouseAdapter());
+		
 		JScrollPane scrollPane = new JScrollPane(list);
 
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
@@ -119,6 +126,23 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		add(buttonPanel, BorderLayout.PAGE_END);
 	}
 
+	private MouseListener createDoubleClickMouseAdapter() {
+		return new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if (!list.isSelectionEmpty()) {
+					if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
+						if(isDisplayingTransitions()){
+							showSharedTransitionNameDialog((SharedTransition)list.getSelectedValue());
+						}else{
+							showSharedPlaceNameDialog((SharedPlace)list.getSelectedValue());
+						}
+					}
+				}
+			}
+		};
+	}
+
 	private boolean isDisplayingTransitions(){
 		return placesTransitionsComboBox.getSelectedItem().equals(TRANSITIONS);
 	}
@@ -135,12 +159,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 	}
-	
+
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-		
+
 		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager, placeToEdit);
 		contentPane.add(panel);
 
@@ -177,7 +201,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			network.remove(place);
 			fireContentsChanged(this, 0, getSize());
 		}
-		
+
 		public void updatedName(){
 			fireContentsChanged(this, 0, getSize());
 		}

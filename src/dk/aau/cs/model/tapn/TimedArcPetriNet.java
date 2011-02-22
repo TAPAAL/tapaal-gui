@@ -9,26 +9,17 @@ public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
 
-	private List<TimedPlace> places;
-	private List<TimedTransition> transitions;
-	private List<TimedInputArc> inputArcs;
-	private List<TimedOutputArc> outputArcs;
-	private List<TimedInhibitorArc> inhibitorArcs;
-	private List<TransportArc> transportArcs;
+	private List<TimedPlace> places = new ArrayList<TimedPlace>();
+	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
+	private List<TimedInputArc> inputArcs = new ArrayList<TimedInputArc>();
+	private List<TimedOutputArc> outputArcs = new ArrayList<TimedOutputArc>();
+	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+	private List<TransportArc> transportArcs = new ArrayList<TransportArc>();
 
 	private TimedMarking currentMarking;
 
 	public TimedArcPetriNet(String name) {
-		Require.that(name != null && !name.isEmpty(), "Error: name cannot be empty or null");
-		
-		this.name = name;
-		places = new ArrayList<TimedPlace>();
-		transitions = new ArrayList<TimedTransition>();
-		inputArcs = new ArrayList<TimedInputArc>();
-		outputArcs = new ArrayList<TimedOutputArc>();
-		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-		transportArcs = new ArrayList<TransportArc>();
-
+		setName(name);
 		setMarking(new TimedMarking());
 	}
 	
@@ -92,6 +83,7 @@ public class TimedArcPetriNet {
 
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
+		arc.source().addInhibitorArc(arc);
 		arc.destination().addInhibitorArc(arc);
 	}
 
@@ -163,6 +155,7 @@ public class TimedArcPetriNet {
 		boolean removed = inhibitorArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
+			arc.source().removeInhibitorArc(arc);
 			arc.destination().removeInhibitorArc(arc);
 		}
 	}
@@ -225,8 +218,8 @@ public class TimedArcPetriNet {
 	}
 
 	public void setName(String newName) {
-		if (name != null && name != "")
-			name = newName;
+		Require.that(newName != null && !newName.isEmpty(), "name cannot be null or empty");
+		name = newName;
 	}
 
 	public TimedPlace getPlaceByName(String placeName) {

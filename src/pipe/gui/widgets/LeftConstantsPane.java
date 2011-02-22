@@ -76,7 +76,6 @@ public class LeftConstantsPane extends JPanel {
 								.getPoint());
 						ListModel dlm = constantsList.getModel();
 						Constant c = (Constant) dlm.getElementAt(index);
-						;
 						constantsList.ensureIndexIsVisible(index);
 
 						showEditConstantDialog(c);

@@ -12,22 +12,16 @@ import dk.aau.cs.util.Require;
 public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	private String name;
-	private List<TimedOutputArc> postset;
-	private List<TimedInputArc> preset;
-	private List<TransportArc> transportArcsGoingThrough;
-	private List<TimedInhibitorArc> inhibitorArcs;
+	private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
+	private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
+	private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
+	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	
 	private SharedTransition sharedTransition;
 	
-	private List<TimedTransitionListener> listeners;
+	private List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
-		preset = new ArrayList<TimedInputArc>();
-		postset = new ArrayList<TimedOutputArc>();
-		transportArcsGoingThrough = new ArrayList<TransportArc>();
-		inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-		listeners = new ArrayList<TimedTransitionListener>();
-
 		setName(name);
 	}
 

@@ -13,14 +13,15 @@ public class TimedPlace extends TAPNElement {
 	
 	private String name;
 	private TimeInvariant invariant;
-	private List<TimedOutputArc> preset;
-	private List<TimedInputArc> postset;
-	private List<TransportArc> presetTransportArcs;
-	private List<TransportArc> postsetTransportArcs;
-
+	private List<TimedOutputArc> preset = new ArrayList<TimedOutputArc>();
+	private List<TimedInputArc> postset = new ArrayList<TimedInputArc>();
+	private List<TransportArc> presetTransportArcs = new ArrayList<TransportArc>();
+	private List<TransportArc> postsetTransportArcs = new ArrayList<TransportArc>();
+	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+	
 	private TimedMarking currentMarking;
 
-	private List<TimedPlaceListener> listeners;
+	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 	
 	public TimedPlace(String name) {
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
@@ -29,11 +30,6 @@ public class TimedPlace extends TAPNElement {
 	public TimedPlace(String name, TimeInvariant invariant) {
 		setName(name);
 		setInvariant(invariant);
-		preset = new ArrayList<TimedOutputArc>();
-		postset = new ArrayList<TimedInputArc>();
-		presetTransportArcs = new ArrayList<TransportArc>();
-		postsetTransportArcs = new ArrayList<TransportArc>();
-		listeners = new ArrayList<TimedPlaceListener>();
 	}
 
 	public void addTimedPlaceListener(TimedPlaceListener listener){
@@ -46,8 +42,9 @@ public class TimedPlace extends TAPNElement {
 		listeners.remove(listener);
 	}
 	
-	public void setCurrentMarking(TimedMarking currentMarking) {
-		this.currentMarking = currentMarking;
+	public void setCurrentMarking(TimedMarking newMarking) {
+		Require.that(newMarking != null, "newMarking cannot be null");
+		this.currentMarking = newMarking;
 	}
 
 	public String name() {
@@ -99,6 +96,16 @@ public class TimedPlace extends TAPNElement {
 	public void addToPostset(TransportArc arc) {
 		Require.that(arc != null, "Cannot add null to postset");
 		postsetTransportArcs.add(arc);
+	}
+	
+	public void addInhibitorArc(TimedInhibitorArc arc){
+		Require.that(arc != null, "arc cannot be null");
+		inhibitorArcs.add(arc);
+	}
+	
+	public void removeInhibitorArc(TimedInhibitorArc arc){
+		Require.that(arc != null, "arc cannot be null");
+		inhibitorArcs.remove(arc);
 	}
 
 	public boolean hasTokenSatisfyingInterval(TimeInterval interval) {

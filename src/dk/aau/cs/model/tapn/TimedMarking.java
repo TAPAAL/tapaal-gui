@@ -58,6 +58,7 @@ public class TimedMarking {
 	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
+		Require.that(delay.compareTo(BigDecimal.ZERO) >= 0, "cannot delay with negative numbers");
 		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			for (TimedToken token : entry.getValue()) {
 				TimeInvariant invariant = token.place().invariant();
@@ -74,6 +75,9 @@ public class TimedMarking {
 	}
 
 	public TimedMarking delay(BigDecimal amount) {
+		Require.that(amount.compareTo(BigDecimal.ZERO) >= 0, "cannot delay with negative numbers");
+		Require.that(isDelayPossible(amount), "The specified delay is not possible due to an invariant.");
+		
 		TimedMarking clone = new TimedMarking();
 		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(placesToTokensMap.size());
 		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
