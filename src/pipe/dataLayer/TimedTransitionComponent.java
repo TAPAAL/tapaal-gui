@@ -76,7 +76,7 @@ public class TimedTransitionComponent extends Transition {
 
 		// 2 Add Place editor
 		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this,
-				CreateGui.getView(), CreateGui.getCurrentTab().network()), this);
+				CreateGui.getView(), transition.model().parentNetwork()), this);
 
 		guiDialog.setResizable(true);
 

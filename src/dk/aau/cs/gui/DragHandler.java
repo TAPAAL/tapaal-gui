@@ -30,8 +30,7 @@ public class DragHandler extends javax.swing.event.MouseInputAdapter {
 		int anchorX = anchorPoint.x;
 		int anchorY = anchorPoint.y;
 
-		Point parentOnScreen = draggableComponent.getParent()
-				.getLocationOnScreen();
+		Point parentOnScreen = draggableComponent.getParent().getLocationOnScreen();
 		Point mouseOnScreen = e.getLocationOnScreen();
 
 		int x = Math.max(0, mouseOnScreen.x - parentOnScreen.x - anchorX);

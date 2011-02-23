@@ -29,8 +29,33 @@ public class ConstantBound implements Bound {
 	}
 
 	public String toString() {
-
 		return constant.name();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((constant == null) ? 0 : constant.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ConstantBound))
+			return false;
+		ConstantBound other = (ConstantBound) obj;
+		if (constant == null) {
+			if (other.constant != null)
+				return false;
+		} else if (!constant.equals(other.constant))
+			return false;
+		return true;
 	}
 
 }

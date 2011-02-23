@@ -239,4 +239,8 @@ public class TimedArcPetriNetNetwork {
 	public Collection<SharedTransition> sharedTransitions() {
 		return sharedTransitions;
 	}
+
+	public Collection<SharedPlace> sharedPlaces() {
+		return sharedPlaces;
+	}
 }

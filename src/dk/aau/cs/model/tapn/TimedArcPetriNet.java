@@ -113,8 +113,10 @@ public class TimedArcPetriNet {
 
 	public void remove(TimedPlace place) {
 		boolean removed = places.remove(place);
-		if (removed)
+		if (removed){
+			currentMarking.removePlaceFromMarking(place);
 			place.setModel(null);
+		}
 	}
 
 	public void remove(TimedTransition transition) { // TODO: These methods must clean up arcs also

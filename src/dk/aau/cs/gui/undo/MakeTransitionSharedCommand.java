@@ -20,14 +20,13 @@ public class MakeTransitionSharedCommand extends Command {
 	@Override
 	public void redo() {
 		sharedTransition.makeShared(timedTransition);
-		transitionComponent.setName(sharedTransition.name());
 		transitionComponent.repaint();
 	}
 
 	@Override
 	public void undo() {
 		timedTransition.unshare();
-		transitionComponent.setName(oldName);
+		timedTransition.setName(oldName);
 		transitionComponent.repaint();
 	}
 

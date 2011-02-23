@@ -30,22 +30,6 @@ public class TimeInvariant {
 		return isUpperIncluded;
 	}
 
-	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(isUpperIncluded ? "<=" : "<");
-		buffer.append(" ");
-		buffer.append(upper);
-		return buffer.toString();
-	};
-
-	public String toString(boolean displayConstantNames) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(isUpperIncluded ? "<=" : "<");
-		buffer.append(" ");
-		buffer.append(displayConstantNames || upper instanceof InfBound ? upper	: upper.value());
-		return buffer.toString();
-	}
 
 	public boolean isSatisfied(BigDecimal age) {
 		if (upper instanceof InfBound)
@@ -93,6 +77,52 @@ public class TimeInvariant {
 	
 	public TimeInvariant copy() {
 		return new TimeInvariant(this.isUpperIncluded, upper.copy());
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(isUpperIncluded ? "<=" : "<");
+		buffer.append(" ");
+		buffer.append(upper);
+		return buffer.toString();
+	};
+	
+	public String toString(boolean displayConstantNames) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(isUpperIncluded ? "<=" : "<");
+		buffer.append(" ");
+		buffer.append(displayConstantNames || upper instanceof InfBound ? upper	: upper.value());
+		return buffer.toString();
+	}
+
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (isUpperIncluded ? 1231 : 1237);
+		result = prime * result + ((upper == null) ? 0 : upper.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TimeInvariant))
+			return false;
+		TimeInvariant other = (TimeInvariant) obj;
+		if (isUpperIncluded != other.isUpperIncluded)
+			return false;
+		if (upper == null) {
+			if (other.upper != null)
+				return false;
+		} else if (!upper.equals(other.upper))
+			return false;
+		return true;
 	}
 
 }

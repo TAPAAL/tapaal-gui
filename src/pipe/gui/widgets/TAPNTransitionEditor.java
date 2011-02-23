@@ -16,7 +16,7 @@ import javax.swing.event.CaretListener;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
-import dk.aau.cs.gui.undo.RenameTimedTransition;
+import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -247,7 +247,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			String oldName = transition.underlyingTransition().name();
 			try{ // set name
 				transition.underlyingTransition().setName(newName);
-				view.getUndoManager().addEdit(new RenameTimedTransition(transition.underlyingTransition(), oldName, newName));
+				view.getUndoManager().addEdit(new RenameTimedTransitionCommand(transition.underlyingTransition(), oldName, newName));
 			}catch(RequireException e){
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this,

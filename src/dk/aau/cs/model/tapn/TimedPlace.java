@@ -60,8 +60,12 @@ public class TimedPlace extends TAPNElement {
 		}
 	}
 
-	private boolean isShared() {
+	public boolean isShared() {
 		return sharedPlace != null;
+	}
+
+	public SharedPlace sharedPlace() {
+		return sharedPlace;
 	}
 
 	public void setCurrentMarking(TimedMarking newMarking) {
@@ -232,4 +236,5 @@ public class TimedPlace extends TAPNElement {
 			return false;
 		return true;
 	}
+
 }

@@ -37,6 +37,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
+import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 
 public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
@@ -48,6 +50,12 @@ public class TimedPlaceComponent extends Place {
 			dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
+		this.place.addTimedPlaceListener(new TimedPlaceListener() {
+			public void nameChanged(TimedPlaceEvent e) {
+				TimedPlace place = e.source();
+				TimedPlaceComponent.super.setName(place.name());				
+			}
+		});
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 	}
@@ -317,8 +325,7 @@ public class TimedPlaceComponent extends Place {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new PlaceEditorPanel(guiDialog.getRootPane(), this,
-				CreateGui.getModel(), CreateGui.getView()));
+		contentPane.add(new PlaceEditorPanel(guiDialog.getRootPane(), this, CreateGui.getView(), place.model().parentNetwork()));
 
 		guiDialog.setResizable(false);
 

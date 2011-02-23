@@ -3,8 +3,10 @@ package dk.aau.cs.model.tapn;
 public interface Bound {
 	int value();
 
-	public Bound copy();
-
+	Bound copy();
+	boolean equals(Object other);
+	int hashCode();
+	
 	public static Bound Infinity = new InfBound();
 
 	public class InfBound implements Bound {

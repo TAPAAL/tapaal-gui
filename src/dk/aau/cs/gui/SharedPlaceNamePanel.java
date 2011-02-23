@@ -15,10 +15,9 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
 import pipe.gui.undo.UndoManager;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
+import dk.aau.cs.gui.undo.RenameSharedPlaceCommand;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.util.RequireException;
 
@@ -94,19 +93,22 @@ public class SharedPlaceNamePanel extends JPanel {
 			}
 
 			private boolean updateExistingPlace(String name) {
-				throw new RuntimeException("Not implemented");
-//				// TODO: check that name is not used elsewhere
-//				try{
-//					placeToEdit.setName(name);
-//				}catch(RequireException e){
-//					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
-//					return false;
-//				}
-//				
-//				listModel.updatedName();
-//				// TODO: add undo edit
-//				// TODO: update affected places' namelabel
-//				return true;
+				if(placeToEdit.network().isNameUsed(name)) {
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the templates.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				String oldName = placeToEdit.name();
+				try{
+					placeToEdit.setName(name);
+				}catch(RequireException e){
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				listModel.updatedName();
+				undoManager.addNewEdit(new RenameSharedPlaceCommand(placeToEdit, oldName, name));
+				return true;
 			}
 
 			private boolean addNewSharedPlace(String name) {

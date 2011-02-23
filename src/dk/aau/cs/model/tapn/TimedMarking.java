@@ -121,4 +121,10 @@ public class TimedMarking {
 		}
 		return size;
 	}
+
+	public void removePlaceFromMarking(TimedPlace place) {
+		if(placesToTokensMap.containsKey(place)){
+			placesToTokensMap.remove(place);
+		}
+	}
 }
