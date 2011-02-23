@@ -28,7 +28,7 @@ import pipe.gui.Zoomer;
  *         functions so that DataLayer objects can be created outside the GUI
  */
 public abstract class PlaceTransitionObject extends PetriNetObject implements
-		Cloneable {
+Cloneable {
 
 	/**
 	 * 
@@ -391,10 +391,10 @@ public abstract class PlaceTransitionObject extends PetriNetObject implements
 	}
 
 	protected void updateLabelLocation() {
-		pnName.setPosition(Grid.getModifiedX((int) (positionX + Zoomer
-				.getZoomedValue(nameOffsetX, zoom))), Grid
-				.getModifiedY((int) (positionY + Zoomer.getZoomedValue(
-						nameOffsetY, zoom))));
+		pnName.setPosition(
+				Grid.getModifiedX((int) (positionX + Zoomer.getZoomedValue(nameOffsetX, zoom))), 
+				Grid.getModifiedY((int) (positionY + Zoomer.getZoomedValue(nameOffsetY, zoom)))
+		);
 	}
 
 	@Override
