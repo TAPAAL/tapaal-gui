@@ -50,6 +50,8 @@ public class TimedPlace extends TAPNElement {
 			unshare();
 			this.sharedPlace = sharedPlace;
 			setName(sharedPlace.name());
+			currentMarking.removePlaceFromMarking(this);
+			fireSharedStateChanged();
 		}
 	}	
 
@@ -57,6 +59,7 @@ public class TimedPlace extends TAPNElement {
 		if(isShared()){
 			sharedPlace.unshare(this);
 			sharedPlace = null;
+			fireSharedStateChanged();
 		}
 	}
 
@@ -81,7 +84,6 @@ public class TimedPlace extends TAPNElement {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
-
 		fireNameChanged();
 	}
 
@@ -90,6 +92,26 @@ public class TimedPlace extends TAPNElement {
 			listener.nameChanged(new TimedPlaceEvent(this));
 		}
 	}
+	
+
+	private void fireSharedStateChanged() {
+		for(TimedPlaceListener listener : listeners){
+			listener.sharedStateChanged(new TimedPlaceEvent(this));
+		}
+	}
+	
+	private void fireInvariantChanged(){
+		for(TimedPlaceListener listener : listeners){
+			listener.invariantChanged(new TimedPlaceEvent(this));
+		}
+	}
+	
+	private void fireMarkingChanged(){
+		for(TimedPlaceListener listener : listeners){
+			listener.markingChanged(new TimedPlaceEvent(this));
+		}
+	}
+	
 
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
@@ -102,6 +124,7 @@ public class TimedPlace extends TAPNElement {
 	public void setInvariant(TimeInvariant invariant) {
 		Require.that(invariant != null, "A timed place must have a non-null invariant");
 		this.invariant = invariant;
+		fireInvariantChanged();
 	}
 
 	public void addToPreset(TimedOutputArc arc) {
@@ -186,16 +209,30 @@ public class TimedPlace extends TAPNElement {
 	}
 
 	public void addToken(TimedToken timedToken) {
+		Require.that(timedToken != null, "timedToken cannot be null");
 		currentMarking.add(timedToken);
+		fireMarkingChanged();
+	}
+	
+	public void addTokens(Iterable<TimedToken> tokens) {
+		Require.that(tokens != null, "tokens cannot be null");
+		
+		for(TimedToken token : tokens){
+			currentMarking.add(token); // avoid firing marking changed on every add
+		}
+		fireMarkingChanged();
 	}
 
 	public void removeToken(TimedToken timedToken) {
+		Require.that(timedToken != null, "timedToken cannot be null");
 		currentMarking.remove(timedToken);
+		fireMarkingChanged();
 	}
 
 	public void removeToken() {
 		if (numberOfTokens() > 0) {
 			currentMarking.removeArbitraryTokenFrom(this);
+			fireMarkingChanged();
 		}
 	}
 
@@ -236,5 +273,4 @@ public class TimedPlace extends TAPNElement {
 			return false;
 		return true;
 	}
-
 }

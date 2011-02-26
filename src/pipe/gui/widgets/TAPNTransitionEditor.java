@@ -219,15 +219,15 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		String newName = nameTextField.getText();
 			
 		view.getUndoManager().newEdit(); // new "transaction""
-
+		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
-			view.getUndoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition(), transition));
+			view.getUndoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
 			transition.underlyingTransition().unshare();
 		}
 		
 		if(sharedCheckBox.isSelected()){	
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
-			view.getUndoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition(), transition));
+			view.getUndoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition()));
 			try{
 				selectedTransition.makeShared(transition.underlyingTransition());
 			}catch(RequireException e){
@@ -236,7 +236,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return;
 			}
 		}else{			
-			if(transition.underlyingTransition().model().isNameUsed(newName) && !transition.underlyingTransition().name().equals(newName)){
+			if(transition.underlyingTransition().model().isNameUsed(newName) && (wasShared || !transition.underlyingTransition().name().equals(newName))){
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
 						"The specified name is already used by another place or transition.",
@@ -255,7 +255,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			view.getNameGenerator().updateTransitionIndex(transition.underlyingTransition().model(), newName);
+			view.getNameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		}
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();

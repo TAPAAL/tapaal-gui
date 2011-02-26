@@ -26,6 +26,12 @@ public class TimedMarking {
 		tokens.add(token);
 	}
 
+	private void add(List<TimedToken> producedTokens) {
+		for (TimedToken token : producedTokens) {
+			add(token);
+		}
+	}
+
 	public void remove(TimedToken token) {
 		if (placesToTokensMap.containsKey(token.place())) {
 			List<TimedToken> tokens = placesToTokensMap.get(token.place());
@@ -33,15 +39,15 @@ public class TimedMarking {
 		}
 	}
 
-	private void add(List<TimedToken> producedTokens) {
-		for (TimedToken token : producedTokens) {
-			add(token);
-		}
-	}
-
 	private void remove(List<TimedToken> tokensToConsume) {
 		for (TimedToken token : tokensToConsume) {
 			remove(token);
+		}
+	}
+
+	public void removePlaceFromMarking(TimedPlace place) {
+		if(placesToTokensMap.containsKey(place)){
+			placesToTokensMap.remove(place);
 		}
 	}
 
@@ -122,9 +128,4 @@ public class TimedMarking {
 		return size;
 	}
 
-	public void removePlaceFromMarking(TimedPlace place) {
-		if(placesToTokensMap.containsKey(place)){
-			placesToTokensMap.remove(place);
-		}
-	}
 }

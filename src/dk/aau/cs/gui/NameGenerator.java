@@ -5,6 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import pipe.dataLayer.Template;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -73,6 +75,14 @@ public class NameGenerator {
 				if(number > nameCounter) nameCounter = number;
 			}
 		}
+		
+		for(SharedTransition t : tapn.parentNetwork().sharedTransitions()) {
+			Matcher m = transitionPattern.matcher(t.name().toLowerCase());
+			if(m.matches()) {
+				int number = Integer.parseInt(m.group(1));
+				if(number > nameCounter) nameCounter = number;
+			}
+		}
 		transitionIDs.put(tapn, ++nameCounter);
 	}
 
@@ -86,6 +96,15 @@ public class NameGenerator {
 				if(number > nameCounter) nameCounter = number;
 			}
 		}
+		
+		for(SharedPlace p : tapn.parentNetwork().sharedPlaces()) {
+			Matcher m = placePattern.matcher(p.name().toLowerCase());
+			if(m.matches()) {
+				int number = Integer.parseInt(m.group(1));
+				if(number > nameCounter) nameCounter = number;
+			}
+		}
+		
 		placeIDs.put(tapn, ++nameCounter);
 	}
 
@@ -98,14 +117,6 @@ public class NameGenerator {
 				tapnId = ++id;
 		}
 	}
-	
-	public void updateTransitionIndex(TimedArcPetriNet model, String newName) {
-		updateMap(model, newName, "^T(\\d+)$", transitionIDs);
-	}
-
-	public void updatePlaceIndex(TimedArcPetriNet model, String newName) {
-		updateMap(model, newName, "^P(\\d+)$", placeIDs);
-	}
 
 	private void updateMap(TimedArcPetriNet model, String newName, String pattern, Hashtable<TimedArcPetriNet, Integer> map) {
 		Pattern compiledPattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
@@ -116,6 +127,17 @@ public class NameGenerator {
 			if(id >= current){
 				map.put(model, ++id);
 			}
+		}
+	}
+
+	public void updateIndices(TimedArcPetriNet model, String newName) {
+		updateMap(model, newName, "^T(\\d+)$", transitionIDs);
+		updateMap(model, newName, "^P(\\d+)$", placeIDs);		
+	}
+
+	public void updateIndicesForAllModels(String name) {
+		for(TimedArcPetriNet net : placeIDs.keySet()){
+			updateIndices(net, name);
 		}
 	}
 }

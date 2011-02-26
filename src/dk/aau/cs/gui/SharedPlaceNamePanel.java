@@ -29,15 +29,17 @@ public class SharedPlaceNamePanel extends JPanel {
 	private JTextField nameField;
 	private SharedPlace placeToEdit;
 	private final UndoManager undoManager;
+	private final NameGenerator nameGenerator;
 
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager) {
-		this(rootPane, SharedPlacesListModel, undoManager, null);	
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager, NameGenerator nameGenerator) {
+		this(rootPane, SharedPlacesListModel, undoManager, nameGenerator, null);	
 	}
 	
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager, SharedPlace placeToEdit) {
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager, NameGenerator nameGenerator, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
 		this.listModel = SharedPlacesListModel;
 		this.undoManager = undoManager;
+		this.nameGenerator = nameGenerator;
 		this.placeToEdit = placeToEdit;
 		initComponents();		
 	}
@@ -88,7 +90,10 @@ public class SharedPlaceNamePanel extends JPanel {
 						success = updateExistingPlace(name);
 					}
 					
-					if(success) exit();
+					if(success){
+						nameGenerator.updateIndicesForAllModels(name);
+						exit();
+					}
 				}
 			}
 

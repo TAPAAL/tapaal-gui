@@ -11,6 +11,7 @@ import dk.aau.cs.util.Require;
 
 public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	
 	private String name;
 	private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
 	private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
@@ -50,6 +51,7 @@ public class TimedTransition extends TAPNElement {
 			unshare();
 			this.sharedTransition = sharedTransition;
 			setName(sharedTransition.name());
+			fireSharedStateChanged();
 		}
 	}
 
@@ -57,6 +59,7 @@ public class TimedTransition extends TAPNElement {
 		if(isShared()){
 			sharedTransition.unshare(this);
 			sharedTransition = null;
+			fireSharedStateChanged();
 		}
 	}
 
@@ -74,6 +77,12 @@ public class TimedTransition extends TAPNElement {
 	private void fireNameChanged(){
 		for(TimedTransitionListener listener : listeners){
 			listener.nameChanged(new TimedTransitionEvent(this));
+		}
+	}
+	
+	private void fireSharedStateChanged() {
+		for(TimedTransitionListener listener : listeners){
+			listener.sharedStateChanged(new TimedTransitionEvent(this));
 		}
 	}
 
@@ -119,10 +128,6 @@ public class TimedTransition extends TAPNElement {
 
 	@Override
 	public void delete() {
-		if(isShared()){
-			sharedTransition.unshare(this);
-			sharedTransition = null; // TODO: check if this is problematic wrt. undo/redo
-		}
 		model().remove(this);
 	}
 

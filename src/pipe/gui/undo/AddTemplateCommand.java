@@ -3,7 +3,6 @@ package pipe.gui.undo;
 import pipe.dataLayer.Template;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class AddTemplateCommand extends Command {
 	private Template template;

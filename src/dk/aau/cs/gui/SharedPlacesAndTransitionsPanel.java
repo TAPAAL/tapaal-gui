@@ -38,13 +38,16 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private SharedTransitionsListModel sharedTransitionsListModel;
 	private JComboBox placesTransitionsComboBox;
 	private UndoManager undoManager;
+	private NameGenerator nameGenerator;
 	private JButton renameButton;
 	private JButton removeButton;
 
-	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network, UndoManager undoManager){
+	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network, UndoManager undoManager, NameGenerator nameGenerator){
 		Require.that(network != null, "network cannot be null");
 		Require.that(undoManager != null, "undoManager cannot be null");
+		Require.that(nameGenerator != null, "nameGenerator cannot be null");
 		this.undoManager = undoManager;
+		this.nameGenerator = nameGenerator;
 
 		sharedPlacesListModel = new SharedPlacesListModel(network);
 		sharedTransitionsListModel = new SharedTransitionsListModel(network);
@@ -151,7 +154,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, transitionToEdit);
+		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, nameGenerator, transitionToEdit);
 		contentPane.add(panel);
 
 		guiDialog.setResizable(false);
@@ -165,7 +168,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager, placeToEdit);
+		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager, nameGenerator, placeToEdit);
 		contentPane.add(panel);
 
 		guiDialog.setResizable(false);

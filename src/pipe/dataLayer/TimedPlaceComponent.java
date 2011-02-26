@@ -9,7 +9,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.Window;
+import java.awt.geom.Ellipse2D;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -44,7 +47,9 @@ public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
 
 	private dk.aau.cs.model.tapn.TimedPlace place;
+	
 	private Window ageOfTokensWindow;
+	private Shape dashedOutline = createDashedOutline();
 
 	public TimedPlaceComponent(double positionXInput, double positionYInput,
 			dk.aau.cs.model.tapn.TimedPlace place) {
@@ -55,6 +60,10 @@ public class TimedPlaceComponent extends Place {
 				TimedPlace place = e.source();
 				TimedPlaceComponent.super.setName(place.name());				
 			}
+
+			public void sharedStateChanged(TimedPlaceEvent e) { repaint(); }
+			public void invariantChanged(TimedPlaceEvent e) { update(true); }
+			public void markingChanged(TimedPlaceEvent e) { repaint(); }
 		});
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
@@ -153,33 +162,19 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g;
-
-		if (hasCapacity()) {
-			g2.setStroke(new BasicStroke(2.0f));
-		} else {
-			g2.setStroke(new BasicStroke(1.0f));
-		}
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-
-		if (selected && !ignoreSelection) {
-			g2.setColor(Pipe.SELECTION_FILL_COLOUR);
-		} else {
-			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
-		}
-		g2.fill(placeEllipse);
-
-		if (selected && !ignoreSelection) {
-			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-		} else {
-			g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-		}
-		g2.draw(placeEllipse);
-
-		g2.setStroke(new BasicStroke(1.0f));
-
 		paintTokens(g);
+		if(place.isShared()){
+			Graphics2D graphics = (Graphics2D)g;
+			Stroke oldStroke = graphics.getStroke();
+			
+			BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
+			graphics.setStroke(dashed);
+			
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			graphics.draw(dashedOutline);
+						
+			graphics.setStroke(oldStroke);
+		}
 	}
 
 	protected void paintTokens(Graphics g) {
@@ -344,6 +339,8 @@ public class TimedPlaceComponent extends Place {
 				pnName.setName(place.name());
 				if (!(place.invariant().upperBound() instanceof InfBound)) {
 					pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+				}else{
+					pnName.setText("");
 				}
 			}
 		} else {
@@ -389,6 +386,10 @@ public class TimedPlaceComponent extends Place {
 	public void setName(String nameInput) {
 		place.setName(nameInput);
 		super.setName(nameInput);
+	}
+	
+	private static Shape createDashedOutline(){
+		return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {

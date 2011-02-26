@@ -28,7 +28,6 @@ import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 
 public class TimedTransitionComponent extends Transition {
-	private static final int DASHED_PADDING = 8;
 	private static final long serialVersionUID = -2280012053262288174L;
 	private dk.aau.cs.model.tapn.TimedTransition transition;
 	private GeneralPath dashedOutline;
@@ -41,6 +40,10 @@ public class TimedTransitionComponent extends Transition {
 			public void nameChanged(TimedTransitionEvent e) {
 				TimedTransition source = e.source();
 				TimedTransitionComponent.super.setName(source.name());
+			}
+
+			public void sharedStateChanged(TimedTransitionEvent e) {
+				repaint();
 			}
 		});
 	}
@@ -162,10 +165,10 @@ public class TimedTransitionComponent extends Transition {
 	@Override
 	protected void constructTransition() {
 		super.constructTransition();
-		double x = ((componentWidth - TRANSITION_WIDTH - DASHED_PADDING) / 2);
-		double y = -DASHED_PADDING/2;
-		double width = TRANSITION_WIDTH + DASHED_PADDING;
-		double height = TRANSITION_HEIGHT + DASHED_PADDING;
+		double x = ((componentWidth - TRANSITION_WIDTH - Pipe.DASHED_PADDING) / 2);
+		double y = -Pipe.DASHED_PADDING/2;
+		double width = TRANSITION_WIDTH + Pipe.DASHED_PADDING;
+		double height = TRANSITION_HEIGHT + Pipe.DASHED_PADDING;
 		dashedOutline = new GeneralPath(new Rectangle2D.Double(x, y, width, height));
 	}
 	

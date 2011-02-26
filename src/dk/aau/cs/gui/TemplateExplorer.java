@@ -152,7 +152,6 @@ public class TemplateExplorer extends JPanel {
 				Template template = ShowNewTemplateDialog();
 				if (template != null) {
 					int index = listModel.size();
-					listModel.addElement(template);
 					undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
 					parent.addTemplate(template);
 					parent.drawingSurface().setModel(template.guiModel(), template.model());

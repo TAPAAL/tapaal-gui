@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -23,6 +24,8 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -129,39 +132,22 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		// 
 		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
 			return;
 		}
 
 		UndoManager undoManager = CreateGui.getView().getUndoManager();
-		if (e.isShiftDown()) {
-			/*
-			 * if ((myObject instanceof TimedPlace)==false){ int oldCapacity =
-			 * ((Place)myObject).getCapacity(); int oldMarking =
-			 * ((Place)myObject).getCurrentMarking();
-			 * 
-			 * int newCapacity = oldCapacity - e.getWheelRotation(); if
-			 * (newCapacity < 0) { newCapacity = 0; }
-			 * 
-			 * undoManager.newEdit(); // new "transaction"" if ((newCapacity >
-			 * 0) && (oldMarking > newCapacity)){ if
-			 * (((Place)myObject).getMarkingParameter() != null) {
-			 * undoManager.addEdit(((Place)myObject).clearMarkingParameter()); }
-			 * undoManager
-			 * .addEdit(((Place)myObject).setCurrentMarking(newCapacity)); }
-			 * undoManager.addEdit(((Place)myObject).setCapacity(newCapacity));
-			 * }
-			 */
-		} else {
-				if (myObject instanceof TimedPlaceComponent) {
-					int clicks = -e.getWheelRotation();
 
-					Command command = new TimedPlaceMarkingEdit(
-							(TimedPlaceComponent) myObject, clicks);
-					command.redo();
-					undoManager.addNewEdit(command);
+		if (myObject instanceof TimedPlaceComponent) {
+			int clicks = -e.getWheelRotation();
+			TimedPlace place = ((TimedPlaceComponent)myObject).underlyingPlace();
+			if(clicks > 0) {
+				place.addToken(new TimedToken(place));
+			}else{
+				place.removeToken();
 			}
+			Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, clicks);
+			undoManager.addNewEdit(command);
 		}
 	}
 

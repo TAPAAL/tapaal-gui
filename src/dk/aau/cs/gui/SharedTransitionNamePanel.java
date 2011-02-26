@@ -30,16 +30,17 @@ public class SharedTransitionNamePanel extends JPanel {
 	private SharedTransition transitionToEdit;
 
 	private final UndoManager undoManager;
+	private final NameGenerator nameGenerator;
 
-
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager) {
-		this(rootPane, sharedTransitionsListModel, undoManager, null);
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator) {
+		this(rootPane, sharedTransitionsListModel, undoManager, nameGenerator, null);
 	}
 	
-	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, SharedTransition transitionToEdit) {
+	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, SharedTransition transitionToEdit) {
 		this.rootPane = rootPane;
 		this.listModel = sharedTransitionsListModel;
 		this.undoManager = undoManager;
+		this.nameGenerator = nameGenerator;
 		this.transitionToEdit = transitionToEdit;
 		initComponents();	
 	}
@@ -91,7 +92,10 @@ public class SharedTransitionNamePanel extends JPanel {
 						success = updateExistingTransition(name);
 					}
 					
-					if(success) exit();
+					if(success){
+						nameGenerator.updateIndicesForAllModels(name);
+						exit();
+					}
 				}
 			}
 

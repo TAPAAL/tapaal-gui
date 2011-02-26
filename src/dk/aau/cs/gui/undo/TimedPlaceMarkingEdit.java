@@ -2,6 +2,7 @@ package dk.aau.cs.gui.undo;
 
 import pipe.dataLayer.TimedPlaceComponent;
 
+// TODO: Fix this to work on the model class instead of the GUI class
 public class TimedPlaceMarkingEdit extends Command {
 	private int numberOfTokens;
 	private final TimedPlaceComponent timedPlaceComponent;

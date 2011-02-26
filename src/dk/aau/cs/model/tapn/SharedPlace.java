@@ -10,14 +10,32 @@ public class SharedPlace {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
+	private TimeInvariant invariant;
 	private List<TimedPlace> places = new ArrayList<TimedPlace>();
 	
 	private TimedArcPetriNetNetwork network;
 
 	public SharedPlace(String name){
-		setName(name);
+		this(name, TimeInvariant.LESS_THAN_INFINITY);
 	}
 	
+	public SharedPlace(String name, TimeInvariant invariant){
+		setName(name);
+		setInvariant(invariant);
+	}
+	
+	public TimeInvariant invariant(){
+		return invariant;
+	}
+	
+	public void setInvariant(TimeInvariant invariant) {
+		Require.that(invariant != null, "invariant must not be null");
+		this.invariant = invariant;
+		for(TimedPlace place : places){
+			place.setInvariant(invariant);
+		}
+	}
+
 
 	public void delete() {
 		// place.delete() will call unshare and thus modify the place collection
@@ -60,6 +78,7 @@ public class SharedPlace {
 		place.makeShared(this); // this will unshare first if part of another shared transition
 		places.add(place);
 		place.setName(name);
+		place.setInvariant(invariant);
 	}
 
 	private boolean templateDoesNotContainSharedPlace(TimedArcPetriNet model) {

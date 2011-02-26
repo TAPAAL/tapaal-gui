@@ -73,6 +73,7 @@ public class Pipe {
 	public static final int DEFAULT_ELEMENT_TYPE = SELECT;
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;
+	public static final int DASHED_PADDING = 8;
 
 	public static final Color ENABLED_TRANSITION_COLOUR = new Color(192, 0, 0);
 	public static final Color ELEMENT_LINE_COLOUR = Color.BLACK;

@@ -31,11 +31,11 @@ import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
-import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
@@ -453,14 +453,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void doOK() {
 		view.getUndoManager().newEdit(); // new "transaction""
 		
+		boolean wasShared = place.underlyingPlace().isShared() && !sharedCheckBox.isSelected();
 		if(place.underlyingPlace().isShared()){
-			view.getUndoManager().addEdit(new UnsharePlaceCommand(place.underlyingPlace().sharedPlace(), place.underlyingPlace(), place));
+			view.getUndoManager().addEdit(new UnsharePlaceCommand(place.underlyingPlace().sharedPlace(), place.underlyingPlace()));
 			place.underlyingPlace().unshare();
 		}
 		
 		if(sharedCheckBox.isSelected()){ // If you make it selected, everything else (marking, invariant) is disregarded
 			SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
-			view.getUndoManager().addEdit(new MakePlaceSharedCommand(selectedPlace, place.underlyingPlace(), place));
+			view.getUndoManager().addEdit(new MakePlaceSharedCommand(selectedPlace, place.underlyingPlace()));
 			try{
 				selectedPlace.makeShared(place.underlyingPlace());
 			}catch(RequireException e){
@@ -471,7 +472,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}else{
 			String newName = nameTextField.getText();
 			String oldName = place.underlyingPlace().name();
-			if(place.underlyingPlace().model().isNameUsed(newName) && !oldName.equals(newName)){
+			if(place.underlyingPlace().model().isNameUsed(newName) && (wasShared || !oldName.equals(newName))){
 				view.getUndoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -491,16 +492,20 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			view.getNameGenerator().updatePlaceIndex(place.underlyingPlace().model(), newName);
+			view.getNameGenerator().updateIndices(place.underlyingPlace().model(), newName);
 		
 			int newMarking = (Integer)markingSpinner.getValue();
 			if(newMarking != place.underlyingPlace().numberOfTokens()){
-				view.getUndoManager().addEdit(new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens()));
+				Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
+				command.redo();
+				view.getUndoManager().addEdit(command);
 			}
 			
 			TimeInvariant newInvariant = constructInvariant();
-			if(!newInvariant.equals(place.underlyingPlace().invariant())){
-				view.getUndoManager().addEdit(new ChangedInvariantCommand(place.underlyingPlace(), place.underlyingPlace().invariant(), newInvariant));
+			TimeInvariant oldInvariant = place.underlyingPlace().invariant();
+			if(!newInvariant.equals(oldInvariant)){
+				view.getUndoManager().addEdit(new ChangedInvariantCommand(place.underlyingPlace(), oldInvariant, newInvariant));
+				place.underlyingPlace().setInvariant(newInvariant);
 			}
 		}
 
