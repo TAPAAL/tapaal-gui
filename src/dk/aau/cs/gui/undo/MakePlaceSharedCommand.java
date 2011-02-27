@@ -31,8 +31,8 @@ public class MakePlaceSharedCommand extends Command {
 	@Override
 	public void undo() {
 		timedPlace.unshare();
-		timedPlace.addTokens(oldTokens);
 		timedPlace.setName(oldName);
 		timedPlace.setInvariant(oldInvariant);
+		timedPlace.addTokens(oldTokens);
 	}
 }
