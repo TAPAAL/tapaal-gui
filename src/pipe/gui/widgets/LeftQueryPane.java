@@ -24,6 +24,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Verifier;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
 public class LeftQueryPane extends JPanel {
@@ -120,8 +121,12 @@ public class LeftQueryPane extends JPanel {
 		verifyButton.setPreferredSize(dimension);
 		verifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
-				Verifier.runUppaalVerification(tabContent.network(), q);
+				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
+				
+				if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+					Verifier.runVerifyTAPNVerification(tabContent.network(), query);
+				else
+					Verifier.runUppaalVerification(tabContent.network(), query);
 			}
 		});
 		gbc = new GridBagConstraints();
