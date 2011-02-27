@@ -172,7 +172,7 @@ public class LeftQueryPane extends JPanel {
 			updateQuery(q, newQuery);
 	}
 
-	private void addQuery(TAPNQuery query) {
+	public void addQuery(TAPNQuery query) {
 		listModel.addElement(query);
 	}
 

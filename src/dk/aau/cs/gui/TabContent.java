@@ -314,7 +314,10 @@ public class TabContent extends JSplitPane {
 
 	public void removeQuery(TAPNQuery queryToRemove) {
 		queries.removeQuery(queryToRemove);
-
+	}
+	
+	public void addQuery(TAPNQuery query){
+		queries.addQuery(query);
 	}
 
 	public void setConstants(Iterable<Constant> constants) {

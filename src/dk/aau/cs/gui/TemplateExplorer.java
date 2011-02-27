@@ -192,7 +192,7 @@ public class TemplateExplorer extends JPanel {
 				}
 				
 				if(queriesToDelete.isEmpty() || choice == JOptionPane.YES_OPTION) {
-					Command command = new RemoveTemplateCommand(TemplateExplorer.this, template, index);
+					Command command = new RemoveTemplateCommand(parent, TemplateExplorer.this, template, index, queriesToDelete);
 					undoManager.addNewEdit(command);
 					command.redo();
 				}
