@@ -50,15 +50,10 @@ public abstract class RunVerificationBase extends
 		TAPNComposer composer = new TAPNComposer();
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 
-		// TODO: Get rid of this step by changing the underlying translations
-		// etc.
-		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
-		dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
-
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
-		VerificationResult<TAPNTrace> result = modelChecker.verify(options, tapn, clonedQuery);
+		VerificationResult<TAPNTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (result.error()) {
 			return new VerificationResult<TapaalTrace>(result.errorMessage());
 		} else {

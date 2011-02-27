@@ -22,7 +22,7 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Verifier;
-import pipe.gui.widgets.QueryDialogue.QueryDialogueOption;
+import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.util.Require;
 
@@ -148,7 +148,7 @@ public class LeftQueryPane extends JPanel {
 		addQueryButton.setPreferredSize(dimension);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialogue.ShowUppaalQueryDialogue(
+				TAPNQuery q = QueryDialog.ShowUppaalQueryDialogue(
 						QueryDialogueOption.Save, null, tabContent.network());
 				if (q != null) {
 					addQuery(q);
@@ -165,7 +165,7 @@ public class LeftQueryPane extends JPanel {
 
 	private void showEditDialog() {
 		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
-		TAPNQuery newQuery = QueryDialogue.ShowUppaalQueryDialogue(
+		TAPNQuery newQuery = QueryDialog.ShowUppaalQueryDialogue(
 				QueryDialogueOption.Save, q, tabContent.network());
 
 		if (newQuery != null)

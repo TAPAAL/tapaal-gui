@@ -1,0 +1,148 @@
+package dk.aau.cs.verification.VerifyTAPN;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.verification.VerifyTAPN.ExportedVerifyTAPNModel;
+
+public class VerifyTAPNExporter {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
+		File modelFile = createTempFile(".xml");
+		File queryFile = createTempFile(".q");
+
+		return export(model, query, modelFile, queryFile);
+	}
+
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile) {
+		if (modelFile == null || queryFile == null)
+			return null;
+
+		try{
+			PrintStream modelStream = new PrintStream(modelFile);
+			
+			outputModel(model, modelStream);
+			modelStream.close();
+			
+			PrintStream queryStream = new PrintStream(queryFile);
+			queryStream.append(query.getProperty().toString());
+			queryStream.close();
+		} catch(FileNotFoundException e) {
+			System.err.append("An error occurred while exporting the model to VerifyTAPN. Verification cancelled.");
+			return null;
+		}
+		
+	
+		return new ExportedVerifyTAPNModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath());
+	}
+	
+	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
+		modelStream.append("<pnml>\n");
+		modelStream.append("<net id=\"" + model.getName() + "\" type=\"P/T net\">\n");
+		
+		for(TimedPlace p : model.places())
+			outputPlace(p, modelStream);
+		
+		for(TimedTransition t : model.transitions())
+			outputTransition(t,modelStream);
+		
+		for(TimedInputArc inputArc : model.inputArcs())
+			outputInputArc(inputArc, modelStream);
+		
+		for(TimedOutputArc outputArc : model.outputArcs())
+			outputOutputArc(outputArc, modelStream);
+		
+		for(TransportArc transArc : model.transportArcs())
+			outputTransportArc(transArc, modelStream);
+		
+		for(TimedInhibitorArc inhibArc : model.inhibitorArcs())
+			outputInhibitorArc(inhibArc, modelStream);
+		
+		modelStream.append("</net>\n");
+		modelStream.append("</pnml>");
+	}
+	
+	private void outputPlace(TimedPlace p, PrintStream modelStream) {
+		modelStream.append("<place ");
+		
+		modelStream.append("id=\"" + p.name() + "\" ");
+		modelStream.append("name=\"" + p.name() + "\" ");
+		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
+		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
+		
+		modelStream.append("/>\n");
+	}
+
+	private void outputTransition(TimedTransition t, PrintStream modelStream) {
+		modelStream.append("<transition ");
+		
+		modelStream.append("id=\"" + t.name() + "\" ");
+		modelStream.append("name=\"" + t.name() + "\"");
+		
+		modelStream.append("/>");
+	}
+
+	private void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
+		modelStream.append("<inputArc ");
+		
+		modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
+		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
+		modelStream.append("target=\"" + inputArc.destination().name() + "\"");
+		
+		modelStream.append("/>\n");
+	}
+
+	private void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
+		modelStream.append("<outputArc ");
+		
+		modelStream.append("inscription=\"1\" " );
+		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
+		modelStream.append("target=\"" + outputArc.destination().name() + "\"");
+		
+		modelStream.append("/>\n");
+	}
+
+	private void outputTransportArc(TransportArc transArc, PrintStream modelStream) {
+		modelStream.append("<transportArc ");
+		
+		modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
+		modelStream.append("source=\"" + transArc.source().name() + "\" ");
+		modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
+		modelStream.append("target=\"" + transArc.destination().name() + "\"");
+		
+		modelStream.append("/>\n");
+	}
+
+	private void outputInhibitorArc(TimedInhibitorArc inhibArc,	PrintStream modelStream) {
+		modelStream.append("<inhibitorArc ");
+		
+		modelStream.append("inscription=\"" + inhibArc.interval().toString(false).replace("<", "&lt;") + "\" ");
+		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
+		modelStream.append("target=\"" + inhibArc.destination().name() + "\"");
+		
+		modelStream.append("/>\n");
+	}
+
+	
+
+	private File createTempFile(String ending) {
+		File file = null;
+		try {
+			file = File.createTempFile("verifyta", ending);
+
+		} catch (IOException e2) {
+			e2.printStackTrace();
+			return null;
+		}
+		return file;
+	}
+}

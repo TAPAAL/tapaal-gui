@@ -67,8 +67,7 @@ public class TimeInterval {
 		buffer.append(isLowerIncluded ? "[" : "(");
 		buffer.append(displayConstantNames ? lower : lower.value());
 		buffer.append(",");
-		buffer.append(displayConstantNames || upper instanceof InfBound ? upper
-				: upper.value());
+		buffer.append(displayConstantNames || upper instanceof InfBound ? upper : upper.value());
 		buffer.append(isUpperIncluded ? "]" : ")");
 		return buffer.toString();
 	}

@@ -29,8 +29,7 @@ public class VerifytaTraceParser {
 					break; // we are done parsing trace, exit outer loop
 
 				if (nextIsState) { // untimed trace
-					SymbolicState state = SymbolicState.parse("State:\n"
-							+ element);
+					SymbolicState state = SymbolicState.parse("State:\n" + element);
 					trace.addState(state);
 					previousState = state;
 					if (previousTransitionFiring != null) {

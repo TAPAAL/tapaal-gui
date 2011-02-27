@@ -1,95 +1,29 @@
 package pipe.gui.widgets;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+import javax.swing.undo.*;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
-import pipe.gui.Verifier;
-import dk.aau.cs.TCTL.StringPosition;
-import dk.aau.cs.TCTL.TCTLAFNode;
-import dk.aau.cs.TCTL.TCTLAGNode;
-import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
-import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
-import dk.aau.cs.TCTL.TCTLAndListNode;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
-import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLNotNode;
-import dk.aau.cs.TCTL.TCTLOrListNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
-import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
-import dk.aau.cs.petrinet.TAPN;
+import pipe.dataLayer.*;
+import pipe.dataLayer.TAPNQuery.*;
+import pipe.gui.*;
+import dk.aau.cs.TCTL.*;
+import dk.aau.cs.TCTL.Parsing.*;
+import dk.aau.cs.TCTL.visitors.*;
+import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.NewModelToOldModelTransformer;
-import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 
-public class QueryDialogue extends JPanel {
+public class QueryDialog extends JPanel {
 
 	private static final long serialVersionUID = 7852107237344005546L;
 
@@ -148,18 +82,18 @@ public class QueryDialogue extends JPanel {
 	private JPanel searchOptionsPanel;
 	private JPanel uppaalOptionsPanel;
 	private ButtonGroup searchRadioButtonGroup;
-	private JRadioButton bFS;
-	private JRadioButton dFS;
-	private JRadioButton rDFS;
-	private JRadioButton closestToTargetFirst;
+	private JRadioButton breadthFirstSearch;
+	private JRadioButton depthFirstSearch;
+	private JRadioButton randomDepthFirstSearch;
+	private JRadioButton closestToTargetFirstSearch;
 
 	// Trace options panel
 	private JPanel traceOptionsPanel;
 
 	private ButtonGroup traceRadioButtonGroup;
-	private JRadioButton none;
-	private JRadioButton some;
-	private JRadioButton fastest;
+	private JRadioButton noTraceRadioButton;
+	private JRadioButton someTraceRadioButton;
+	private JRadioButton fastestTraceRadioButton;
 
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
@@ -181,6 +115,7 @@ public class QueryDialogue extends JPanel {
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 
+	private String name_verifyTAPN = "VerifyTAPN";
 	private String name_ADVNOSYM = "Optimised Standard";
 	private String name_NAIVE = "Standard";
 	private String name_BROADCAST = "Broadcast Reduction";
@@ -189,20 +124,19 @@ public class QueryDialogue extends JPanel {
 
 	private TCTLAbstractProperty newProperty;
 
-	public QueryDialogue(EscapableDialog me, DataLayer datalayer,
+	public QueryDialog(EscapableDialog me, DataLayer datalayer,
 			QueryDialogueOption option, TAPNQuery queryToCreateFrom,
 			TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
 		this.datalayer = datalayer;
-		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder()
-		: queryToCreateFrom.getProperty();
+		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		setLayout(new GridBagLayout());
 
 		init(option, queryToCreateFrom);
 	}
 
-	public void setQueryFieldEditable(boolean isEditable) {
+	private void setQueryFieldEditable(boolean isEditable) {
 		queryField.setEditable(isEditable);
 	}
 
@@ -215,7 +149,7 @@ public class QueryDialogue extends JPanel {
 		int capacity = getCapacity();
 
 		TAPNQuery.TraceOption traceOption = null;
-		String traceOptionString = getTraceOptions();
+		String traceOptionString = getTraceOption();
 
 		if (traceOptionString.toLowerCase().contains("some")) {
 			traceOption = TraceOption.SOME;
@@ -226,7 +160,7 @@ public class QueryDialogue extends JPanel {
 		}
 
 		TAPNQuery.SearchOption searchOption = null;
-		String searchOptionString = getSearchOptions();
+		String searchOptionString = getSearchOption();
 
 		if (searchOptionString.toLowerCase().contains("breadth")) {
 			searchOption = SearchOption.BFS;
@@ -241,7 +175,7 @@ public class QueryDialogue extends JPanel {
 		}
 
 		ReductionOption reductionOptionToSet = null;
-		String reductionOptionString = "" + reductionOption.getSelectedItem();
+		String reductionOptionString = (String)reductionOption.getSelectedItem();
 		boolean symmetry = symmetryReduction.isSelected();
 
 		if (reductionOptionString.equals(name_NAIVE) && !symmetry) {
@@ -261,6 +195,8 @@ public class QueryDialogue extends JPanel {
 			reductionOptionToSet = ReductionOption.DEGREE2BROADCAST;
 		} else if (reductionOptionString.equals(name_BROADCASTDEG2) && symmetry) {
 			reductionOptionToSet = ReductionOption.DEGREE2BROADCASTSYMMETRY;
+		} else if (reductionOptionString.equals(name_verifyTAPN)) {
+			reductionOptionToSet = ReductionOption.VerifyTAPN;
 		}
 
 		return new TAPNQuery(name, capacity, newProperty.copy(), traceOption,
@@ -269,15 +205,14 @@ public class QueryDialogue extends JPanel {
 	}
 
 	private int getCapacity() {
-		return (Integer) ((JSpinner) boundednessCheckPanel.getComponent(1))
-		.getValue();
+		return (Integer) ((JSpinner) boundednessCheckPanel.getComponent(1)).getValue();
 	}
 
 	private String getQueryComment() {
 		return ((JTextField) namePanel.getComponent(1)).getText();
 	}
 
-	private String getTraceOptions() {
+	private String getTraceOption() {
 		String toReturn = null;
 		for (Object radioButton : traceOptionsPanel.getComponents()) {
 			if ((radioButton instanceof JRadioButton)) {
@@ -290,7 +225,7 @@ public class QueryDialogue extends JPanel {
 		return toReturn;
 	}
 
-	private String getSearchOptions() {
+	private String getSearchOption() {
 		String toReturn = null;
 		for (Object radioButton : searchOptionsPanel.getComponents()) {
 			if ((radioButton instanceof JRadioButton)) {
@@ -305,14 +240,37 @@ public class QueryDialogue extends JPanel {
 	}
 
 	private void refreshTraceOptions() {
-		if (symmetryReduction.isSelected()) {
-			some.setEnabled(false);
-			fastest.setEnabled(false);
-			none.setSelected(true);
-		} else {
-			some.setEnabled(true);
-			fastest.setEnabled(true);
+		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
+			someTraceRadioButton.setEnabled(true);
+			fastestTraceRadioButton.setEnabled(false);
+			noTraceRadioButton.setSelected(true);
 		}
+		else if (symmetryReduction.isSelected()) {
+			someTraceRadioButton.setEnabled(false);
+			fastestTraceRadioButton.setEnabled(false);
+			noTraceRadioButton.setSelected(true);
+		} else {
+			someTraceRadioButton.setEnabled(true);
+			fastestTraceRadioButton.setEnabled(true);
+		}
+	}
+	
+	private void refreshSearchOptions() {
+		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
+		{
+			depthFirstSearch.setEnabled(true);
+			breadthFirstSearch.setEnabled(true);
+			breadthFirstSearch.setSelected(true);
+			randomDepthFirstSearch.setEnabled(false);
+			closestToTargetFirstSearch.setEnabled(false);
+		}
+		else {
+			depthFirstSearch.setEnabled(true);
+			breadthFirstSearch.setEnabled(true);
+			randomDepthFirstSearch.setEnabled(true);
+			closestToTargetFirstSearch.setEnabled(true);
+		}
+		
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -338,13 +296,7 @@ public class QueryDialogue extends JPanel {
 	}
 
 	private void enableOnlyLivenessReductionOptions() {
-		String[] options = null;
-
-		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
-		}else{
-			options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
-		}
+		String[] options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
 
 		String reductionOptionString = "" + reductionOption.getSelectedItem();
 		boolean selectedOptionStillAvailable = false;
@@ -367,9 +319,13 @@ public class QueryDialogue extends JPanel {
 		reductionOption.removeAllItems();
 
 		if(!this.datalayer.hasTAPNInhibitorArcs()){
-			String[] options = {name_ADVNOSYM, name_NAIVE, name_BROADCAST, name_BROADCASTDEG2};
+			String[] options = null;
+			if(!datalayer.hasTransportArcs() && !datalayer.hasInvariants()) {
+				options = new String[] { name_verifyTAPN, name_ADVNOSYM, name_NAIVE, name_BROADCAST, name_BROADCASTDEG2};
+			}else {
+				options = new String[] { name_ADVNOSYM, name_NAIVE, name_BROADCAST, name_BROADCASTDEG2};
 
-
+			}
 			for (String s : options) {
 				reductionOption.addItem(s);
 			}
@@ -384,8 +340,7 @@ public class QueryDialogue extends JPanel {
 
 	public static TAPNQuery ShowUppaalQueryDialogue(QueryDialogueOption option,
 			TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -393,7 +348,7 @@ public class QueryDialogue extends JPanel {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add query editor
-		QueryDialogue queryDialogue = new QueryDialogue(guiDialog, CreateGui.getModel(), option, queryToRepresent, tapnNetwork);
+		QueryDialog queryDialogue = new QueryDialog(guiDialog, CreateGui.getModel(), option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -416,8 +371,7 @@ public class QueryDialogue extends JPanel {
 		}
 	}
 
-	private TCTLAbstractStateProperty getCurrentSelectionChild(int number,
-			TCTLAbstractProperty property) {
+	private TCTLAbstractStateProperty getSpecificChildOfProperty(int number, TCTLAbstractProperty property) {
 		StringPosition[] children = property.getChildren();
 		int count = 0;
 		for (int i = 0; i < children.length; i++) {
@@ -484,17 +438,13 @@ public class QueryDialogue extends JPanel {
 
 	private void updateQueryButtonsAccordingToSelection() {
 		if (currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
-			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection
-			.getObject();
+			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) currentSelection.getObject();
 
 			// bit of a hack to prevent posting edits to the undo manager when
-			// we programmatically
-			// change the selection in the atomic proposition comboboxes etc.
-			// because a different
-			// atomic proposition was selected
+			// we programmatically change the selection in the atomic proposition comboboxes etc.
+			// because a different atomic proposition was selected
 			userChangedAtomicPropSelection = false;
-			templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node
-					.getTemplate()));
+			templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
 			placesBox.setSelectedItem(node.getPlace());
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(node.getN());
@@ -510,23 +460,19 @@ public class QueryDialogue extends JPanel {
 		}
 	}
 
-	// Delete current selection
 	private void deleteSelection() {
 		if (currentSelection != null) {
 			TCTLAbstractProperty replacement = null;
 			if (currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				replacement = getCurrentSelectionChild(1, currentSelection
-						.getObject());
+				replacement = getSpecificChildOfProperty(1, currentSelection.getObject());
 			} else if (currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
 				replacement = new TCTLPathPlaceHolder();
 			}
 			if (replacement != null) {
 
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection
-						.getObject(), replacement);
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), replacement);
 
-				newProperty = newProperty.replace(currentSelection.getObject(),
-						replacement);
+				newProperty = newProperty.replace(currentSelection.getObject(),	replacement);
 
 				if (currentSelection.getObject() instanceof TCTLAbstractPathProperty)
 					resetQuantifierSelectionButtons();
@@ -563,8 +509,7 @@ public class QueryDialogue extends JPanel {
 		reductionOption.setSelectedItem(reductionOptionString);
 	}
 	private void setEnabledReductionOptions() {
-		if (getQuantificationSelection().equals("E[]")
-				|| getQuantificationSelection().equals("A<>")) {
+		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			enableOnlyLivenessReductionOptions();
 		} else {
 			enableAllReductionOptions();
@@ -661,18 +606,15 @@ public class QueryDialogue extends JPanel {
 	}
 
 	private void updateQueryOnAtomicPropositionChange() {
-		if (currentSelection != null
-				&& currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
+		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
 			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
 					templateBox.getSelectedItem().toString(),
 					(String) placesBox.getSelectedItem(),
 					(String) relationalOperatorBox.getSelectedItem(),
 					(Integer) placeMarking.getValue());
 			if (!property.equals(currentSelection.getObject())) {
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection
-						.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),
-						property);
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
 			}
@@ -683,8 +625,7 @@ public class QueryDialogue extends JPanel {
 	// Initialization of the dialogue
 	// /////////////////////////////////////////////////////////////////////
 
-	private void init(QueryDialogueOption option,
-			final TAPNQuery queryToCreateFrom) {
+	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
 		initQueryNamePanel(queryToCreateFrom);
 		initBoundednessCheckPanel(queryToCreateFrom);
 		initQueryPanel(queryToCreateFrom);
@@ -954,7 +895,7 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
-				TCTLEGNode property = new TCTLEGNode(getCurrentSelectionChild(
+				TCTLEGNode property = new TCTLEGNode(getSpecificChildOfProperty(
 						1, currentSelection.getObject()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection
 						.getObject(), property);
@@ -969,7 +910,7 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
-				TCTLEFNode property = new TCTLEFNode(getCurrentSelectionChild(
+				TCTLEFNode property = new TCTLEFNode(getSpecificChildOfProperty(
 						1, currentSelection.getObject()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection
 						.getObject(), property);
@@ -984,7 +925,7 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
-				TCTLAGNode property = new TCTLAGNode(getCurrentSelectionChild(
+				TCTLAGNode property = new TCTLAGNode(getSpecificChildOfProperty(
 						1, currentSelection.getObject()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection
 						.getObject(), property);
@@ -999,7 +940,7 @@ public class QueryDialogue extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				setEnabledReductionOptions();
-				TCTLAFNode property = new TCTLAFNode(getCurrentSelectionChild(
+				TCTLAFNode property = new TCTLAFNode(getSpecificChildOfProperty(
 						1, currentSelection.getObject()));
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection
 						.getObject(), property);
@@ -1507,40 +1448,40 @@ public class QueryDialogue extends JPanel {
 		searchOptionsPanel.setBorder(BorderFactory
 				.createTitledBorder("Analysis Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		bFS = new JRadioButton("Breadth First Search");
-		dFS = new JRadioButton("Depth First Search");
-		rDFS = new JRadioButton("Random Depth First Search");
-		closestToTargetFirst = new JRadioButton(
+		breadthFirstSearch = new JRadioButton("Breadth First Search");
+		depthFirstSearch = new JRadioButton("Depth First Search");
+		randomDepthFirstSearch = new JRadioButton("Random Depth First Search");
+		closestToTargetFirstSearch = new JRadioButton(
 		"Search by Closest To Target First");
-		searchRadioButtonGroup.add(bFS);
-		searchRadioButtonGroup.add(dFS);
-		searchRadioButtonGroup.add(rDFS);
-		searchRadioButtonGroup.add(closestToTargetFirst);
+		searchRadioButtonGroup.add(breadthFirstSearch);
+		searchRadioButtonGroup.add(depthFirstSearch);
+		searchRadioButtonGroup.add(randomDepthFirstSearch);
+		searchRadioButtonGroup.add(closestToTargetFirstSearch);
 
 		if (queryToCreateFrom == null) {
-			bFS.setSelected(true);
+			breadthFirstSearch.setSelected(true);
 		} else {
 			if (queryToCreateFrom.getSearchOption() == SearchOption.BFS) {
-				bFS.setSelected(true);
+				breadthFirstSearch.setSelected(true);
 			} else if (queryToCreateFrom.getSearchOption() == SearchOption.DFS) {
-				dFS.setSelected(true);
+				depthFirstSearch.setSelected(true);
 			} else if (queryToCreateFrom.getSearchOption() == SearchOption.RDFS) {
-				rDFS.setSelected(true);
+				randomDepthFirstSearch.setSelected(true);
 			} else if (queryToCreateFrom.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST) {
-				closestToTargetFirst.setSelected(true);
+				closestToTargetFirstSearch.setSelected(true);
 			}
 		}
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridy = 0;
-		searchOptionsPanel.add(bFS, gridBagConstraints);
+		searchOptionsPanel.add(breadthFirstSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
-		searchOptionsPanel.add(dFS, gridBagConstraints);
+		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 2;
-		searchOptionsPanel.add(rDFS, gridBagConstraints);
+		searchOptionsPanel.add(randomDepthFirstSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 3;
-		searchOptionsPanel.add(closestToTargetFirst, gridBagConstraints);
+		searchOptionsPanel.add(closestToTargetFirstSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -1553,37 +1494,37 @@ public class QueryDialogue extends JPanel {
 		traceOptionsPanel.setBorder(BorderFactory
 				.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
-		some = new JRadioButton(
+		someTraceRadioButton = new JRadioButton(
 		"Some encountered trace (only without symmetry reduction)");
-		fastest = new JRadioButton(
+		fastestTraceRadioButton = new JRadioButton(
 		"Fastest trace (only without symmetry reduction)");
-		none = new JRadioButton("No trace");
-		traceRadioButtonGroup.add(some);
-		traceRadioButtonGroup.add(fastest);
-		traceRadioButtonGroup.add(none);
+		noTraceRadioButton = new JRadioButton("No trace");
+		traceRadioButtonGroup.add(someTraceRadioButton);
+		traceRadioButtonGroup.add(fastestTraceRadioButton);
+		traceRadioButtonGroup.add(noTraceRadioButton);
 
 		if (queryToCreateFrom == null) {
-			some.setEnabled(false);
-			fastest.setEnabled(false);
-			none.setSelected(true);
+			someTraceRadioButton.setEnabled(false);
+			fastestTraceRadioButton.setEnabled(false);
+			noTraceRadioButton.setSelected(true);
 		} else {
 			if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
-				some.setSelected(true);
+				someTraceRadioButton.setSelected(true);
 			} else if (queryToCreateFrom.getTraceOption() == TraceOption.FASTEST) {
-				fastest.setSelected(true);
+				fastestTraceRadioButton.setSelected(true);
 			} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE) {
-				none.setSelected(true);
+				noTraceRadioButton.setSelected(true);
 			}
 		}
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridy = 0;
-		traceOptionsPanel.add(some, gridBagConstraints);
+		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
-		traceOptionsPanel.add(fastest, gridBagConstraints);
+		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
 		gridBagConstraints.gridy = 2;
-		traceOptionsPanel.add(none, gridBagConstraints);
+		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -1596,12 +1537,20 @@ public class QueryDialogue extends JPanel {
 
 		// ReductionOptions starts here:
 		reductionOptionsPanel = new JPanel(new FlowLayout());
-		reductionOptionsPanel.setBorder(BorderFactory
-				.createTitledBorder("Reduction Options"));
-		String[] reductionOptions = { name_NAIVE, name_ADVNOSYM,
-				name_BROADCAST, name_BROADCASTDEG2 };
+		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
+		String[] reductionOptions = { name_verifyTAPN, name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2 };
 		reductionOption = new JComboBox(reductionOptions);
-		reductionOption.setSelectedIndex(3);
+		reductionOption.setSelectedIndex(4);
+		
+		reductionOption.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JComboBox source = (JComboBox)e.getSource();
+				String selectedItem = (String)source.getSelectedItem();
+				if(selectedItem != null) {
+					setEnabledOptionsAccordingToCurrentReduction();					
+				}
+			}
+		});
 
 		reductionOptionsPanel.add(new JLabel("  Choose reduction method:"));
 		reductionOptionsPanel.add(reductionOption);
@@ -1662,6 +1611,9 @@ public class QueryDialogue extends JPanel {
 					reduction = name_ADVNOSYM;
 					symmetry = false;
 					// enableTraceOptions();
+				} else if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPN) {
+					reduction = name_verifyTAPN;
+					symmetry = true;
 				}
 			} else {
 				if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
@@ -1681,8 +1633,24 @@ public class QueryDialogue extends JPanel {
 
 	}
 
-	private void initButtonPanel(QueryDialogueOption option,
-			final TAPNQuery queryToCreateFrom) {
+	protected void setEnabledOptionsAccordingToCurrentReduction() {
+		refreshSymmetryReduction();
+		refreshTraceOptions();
+		refreshSearchOptions();
+	}
+
+	private void refreshSymmetryReduction() {
+		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
+			symmetryReduction.setSelected(true);
+			symmetryReduction.setEnabled(false);
+		}
+		else{
+			symmetryReduction.setSelected(symmetryReduction.isSelected());
+			symmetryReduction.setEnabled(true);
+		}
+	}
+
+	private void initButtonPanel(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
 		buttonPanel = new JPanel(new FlowLayout());
 		if (option == QueryDialogueOption.Save) {
 			saveButton = new JButton("Save");
@@ -1702,7 +1670,12 @@ public class QueryDialogue extends JPanel {
 				public void actionPerformed(ActionEvent evt) {
 					querySaved = true;
 					exit();
-					Verifier.runUppaalVerification(tapnNetwork, getQuery());
+					TAPNQuery query = getQuery();
+					
+					if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+						Verifier.runVerifyTAPNVerification(tapnNetwork, query);
+					else
+						Verifier.runUppaalVerification(tapnNetwork, query);
 				}
 			});
 			cancelButton.addActionListener(new ActionListener() {
@@ -1750,7 +1723,7 @@ public class QueryDialogue extends JPanel {
 
 						UppaalExporter exporter = new UppaalExporter();
 						TAPNComposer composer = new TAPNComposer();
-						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialogue.this.tapnNetwork);
+						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
 						// TODO: Get rid of this step by changing the underlying translations
 						// etc.

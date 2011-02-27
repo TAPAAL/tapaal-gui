@@ -9,6 +9,8 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -20,10 +22,15 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 
 public class Verifier {
 	private static Verifyta getVerifyta() {
-		Verifyta verifyta = new Verifyta(new FileFinderImpl(),
-				new MessengerImpl());
+		Verifyta verifyta = new Verifyta(new FileFinderImpl(), new MessengerImpl());
 		verifyta.setup();
 		return verifyta;
+	}
+	
+	private static VerifyTAPN getVerifyTAPN() {
+		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+		verifytapn.setup();
+		return verifytapn;
 	}
 
 	public static void analyzeAndOptimizeKBound(
@@ -31,8 +38,7 @@ public class Verifier {
 		Verifyta verifyta = getVerifyta();
 
 		if (!verifyta.isCorrectVersion()) {
-			System.err
-					.println("Verifyta not found, or you are running an old version of Verifyta.\n"
+			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
 							+ "Update to the latest development version.");
 			return;
 		}
@@ -46,94 +52,39 @@ public class Verifier {
 		Verifyta verifyta = getVerifyta();
 
 		if (!verifyta.isCorrectVersion()) {
-			System.err
-					.println("Verifyta not found, or you are running an old version of Verifyta.\n"
+			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
 							+ "Update to the latest development version.");
 			return;
 		}
-		KBoundAnalyzer analyzer = new KBoundAnalyzer(tapnNetwork, k, verifyta,
-				new MessengerImpl());
+		KBoundAnalyzer analyzer = new KBoundAnalyzer(tapnNetwork, k, verifyta, new MessengerImpl());
 		analyzer.analyze();
 	}
 
-	public static void runUppaalVerification(
-			TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
+	public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
 		runUppaalVerification(timedArcPetriNetNetwork, input, false);
 	}
 
-	private static void runUppaalVerification(
-			TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input,
-			boolean untimedTrace) {
+	private static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input,	boolean untimedTrace) {
 		Verifyta verifyta = getVerifyta();
 		if (!verifyta.isCorrectVersion()) {
-			System.err
-					.println("Verifyta not found, or you are running an old version of Verifyta.\n"
+			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
 							+ "Update to the latest development version.");
 			return;
 		}
 
 		TCTLAbstractProperty inputQuery = input.getProperty();
 
-		VerifytaOptions verifytaOptions = new VerifytaOptions(input
-				.getTraceOption(), input.getSearchOption(), untimedTrace, input
-				.getReductionOption());
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption());
 
 		if (inputQuery == null) {
 			return;
 		}
 
-		// //Handle problems with liveness checking
-		// // Bit of a hack because we know the first node of the query AST is
-		// always the path quantifier,
-		// // i.e. we cant have nested path quantifiers
-		// if (inputQuery instanceof TCTLEGNode || inputQuery instanceof
-		// TCTLAFNode ) {
-		//
-		// //If selected wrong method for checking
-		// if (input.getReductionOption() == ReductionOption.STANDARD ||
-		// input.getReductionOption() == ReductionOption.STANDARDSYMMETRY){
-		// //Error
-		// JOptionPane.showMessageDialog(CreateGui.getApp(),
-		// "Verification of liveness properties (EG,AF) is not possible with the selected reduction option.",
-		// "Verification Error",
-		// JOptionPane.ERROR_MESSAGE);
-		// // XXX - Srba
-		// return;
-		// }
-		//
-		// //Check if degree-2 or give an error
-		// boolean isModelDegree2 = timedArcPetriNetNetwork.isDegree2();
-		// if (!isModelDegree2 && !(input.getReductionOption() ==
-		// ReductionOption.BROADCAST
-		// || input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY
-		// || input.getReductionOption() == ReductionOption.DEGREE2BROADCAST
-		// || input.getReductionOption() ==
-		// ReductionOption.DEGREE2BROADCASTSYMMETRY)){
-		// //Error
-		// JOptionPane.showMessageDialog(CreateGui.getApp(),
-		// "The net cannot be verified for liveness properties (EG,AF) because there is\n"+
-		// "a transition with either more that two input places or more than two output places.\n"+
-		// "You may try to modify the model so that the net does not contain any such transition\n"+
-		// "and then run the verification process again.",
-		// "Liveness Verification Error",
-		// JOptionPane.ERROR_MESSAGE);
-		// return;
-		// }
-		//
-		// }
-		//
-		// TAPN model = convertModelToAAUTAPN(timedArcPetriNetNetwork);
-
 		if (timedArcPetriNetNetwork != null) {
-			RunVerificationBase thread = new RunVerification(verifyta,
-					new MessengerImpl());
-			RunningVerificationDialog dialog = new RunningVerificationDialog(
-					CreateGui.getApp());
+			RunVerificationBase thread = new RunVerification(verifyta, new MessengerImpl());
+			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytaOptions, timedArcPetriNetNetwork,
-					new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), input
-							.getCapacity()
-							+ timedArcPetriNetNetwork.marking().size()));
+			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), input.getCapacity() + timedArcPetriNetNetwork.marking().size()));
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -142,5 +93,33 @@ public class Verifier {
 		}
 
 		return;
+	}
+
+	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
+		VerifyTAPN verifytapn = getVerifyTAPN();
+
+		TCTLAbstractProperty inputQuery = query.getProperty();
+
+		int bound = tapnNetwork.marking().size() + query.getCapacity();
+		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption());
+
+		if (inputQuery == null) {
+			return;
+		}
+
+		if (tapnNetwork != null) {
+			RunVerificationBase thread = new RunVerification(verifytapn, new MessengerImpl());
+			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
+			dialog.setupListeners(thread);
+			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.petrinet.TAPNQuery(query.getProperty(), query.getCapacity() + tapnNetwork.marking().size()));
+			dialog.setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"There was an error converting the model.",
+					"Conversion error", JOptionPane.ERROR_MESSAGE);
+		}
+
+		return;
+		
 	}
 }

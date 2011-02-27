@@ -53,8 +53,7 @@ public class VerifytaTraceInterpreter {
 			List<TransitionFiring> firingSequence = new ArrayList<TransitionFiring>();
 			List<String> firingSequenceNames = new ArrayList<String>();
 
-			while (iterator.hasNext()
-					&& (action = iterator.next()) instanceof TransitionFiring) {
+			while (iterator.hasNext() && (action = iterator.next()) instanceof TransitionFiring) {
 				firingSequence.add((TransitionFiring) action);
 				firingSequenceNames.add(((TransitionFiring) action).channel());
 			}
@@ -137,12 +136,9 @@ public class VerifytaTraceInterpreter {
 			String automata = participant.automata();
 			String sourceLocation = start.sourceState().locationFor(automata);
 
-			if (!namingScheme.isIgnoredAutomata(automata)
-					&& !namingScheme.isIgnoredPlace(sourceLocation)) {
+			if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
 				TAPNPlace place = tapn.getPlaceByName(sourceLocation);
-				BigDecimal clockValue = start.sourceState()
-						.getLocalClockOrVariable(automata,
-								namingScheme().tokenClockName()).lower();
+				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName()).lower();
 				Token token = new Token(place, clockValue);
 				tokens.add(token);
 			}

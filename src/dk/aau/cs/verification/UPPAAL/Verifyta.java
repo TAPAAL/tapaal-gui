@@ -14,10 +14,13 @@ import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.trace.UppaalTrace;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.NewModelToOldModelTransformer;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.VerificationOptions;
@@ -170,8 +173,7 @@ public class Verifyta implements ModelChecker {
 		return false;
 	}
 
-	private String createArgumentString(String modelFile, String queryFile,
-			VerificationOptions options) {
+	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
 		StringBuffer buffer = new StringBuffer(options.toString());
 		buffer.append(" ");
 		buffer.append(modelFile);
@@ -187,20 +189,21 @@ public class Verifyta implements ModelChecker {
 		}
 	}
 
-	public VerificationResult<TAPNTrace> verify(VerificationOptions options,
-			TimedArcPetriNet model, TAPNQuery query) {
+	public VerificationResult<TAPNTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {
+		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
+		dk.aau.cs.petrinet.TimedArcPetriNet transformedModel = transformer.transformModel(model.value1());
+		
 		UppaalExporter exporter = new UppaalExporter();
-		ExportedModel exportedModel = exporter.export(model, query, ((VerifytaOptions) options).getReduction());
+		ExportedModel exportedModel = exporter.export(transformedModel, query, ((VerifytaOptions) options).getReduction());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
 
-		return verify(options, model, exportedModel);
+		return verify(options, transformedModel, exportedModel);
 	}
 
-	private VerificationResult<TAPNTrace> verify(VerificationOptions options,
-			TimedArcPetriNet model, ExportedModel exportedModel) {
+	private VerificationResult<TAPNTrace> verify(VerificationOptions options, dk.aau.cs.petrinet.TimedArcPetriNet model, ExportedModel exportedModel) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 
@@ -248,7 +251,7 @@ public class Verifyta implements ModelChecker {
 	}
 
 	private TAPNTrace parseTrace(String output, VerificationOptions options,
-			TimedArcPetriNet model, ExportedModel exportedModel) {
+			dk.aau.cs.petrinet.TimedArcPetriNet model, ExportedModel exportedModel) {
 		TAPNTrace tapnTrace = null;
 
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
@@ -257,13 +260,11 @@ public class Verifyta implements ModelChecker {
 
 		if (trace == null) {
 			if (((VerifytaOptions) options).trace() != TraceOption.NONE) {
-				messenger
-						.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
+				messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
 			}
 		} else {
 			if (exportedModel.namingScheme() == null) { // TODO: get rid of
-				messenger
-						.displayErrorMessage("Traces are currently not supported on the chosen translation");
+				messenger.displayErrorMessage("Traces are currently not supported on the chosen translation");
 			} else {
 				tapnTrace = interpretTimedTrace(model, exportedModel, trace);
 			}
@@ -271,7 +272,7 @@ public class Verifyta implements ModelChecker {
 		return tapnTrace;
 	}
 
-	private TAPNTrace interpretTimedTrace(TimedArcPetriNet model, ExportedModel exportedModel, UppaalTrace trace) {
+	private TAPNTrace interpretTimedTrace(dk.aau.cs.petrinet.TimedArcPetriNet model, ExportedModel exportedModel, UppaalTrace trace) {
 		VerifytaTraceInterpreter traceIntepreter = new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
 		return traceIntepreter.interpretTrace(trace);
 	}

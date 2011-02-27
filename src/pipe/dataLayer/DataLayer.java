@@ -5,7 +5,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Observable;
 
+import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 
 
@@ -984,6 +986,23 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 		return false;
 	}
+	
+	public boolean hasTransportArcs() {
+		for(Arc arc : arcsArray) {
+			if(arc instanceof TransportArcComponent) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean hasInvariants() {
+		for(Place p : placesArray) {
+			if(!((TimedPlaceComponent)p).underlyingPlace().invariant().equals(TimeInvariant.LESS_THAN_INFINITY))
+				return true;
+		}
+		return false;
+	}
 
 	public NetType netType() {
 		return type;
@@ -1087,4 +1106,6 @@ public class DataLayer extends Observable implements Cloneable {
 		
 		return guiModel;
 	}
+
+	
 }
