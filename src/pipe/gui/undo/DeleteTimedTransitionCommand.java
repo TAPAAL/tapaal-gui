@@ -3,14 +3,17 @@ package pipe.gui.undo;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	private final TimedTransitionComponent transition;
+	private SharedTransition sharedTransition;
 
 	public DeleteTimedTransitionCommand(TimedTransitionComponent transition, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		this.transition = transition;
+		this.sharedTransition = transition.underlyingTransition().sharedTransition();
 	}
 
 	@Override
@@ -22,6 +25,7 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
 		transition.undelete(view);
+		if(sharedTransition != null) sharedTransition.makeShared(transition.underlyingTransition());
 		tapn.add(transition.underlyingTransition());
 		view.repaint();
 	}

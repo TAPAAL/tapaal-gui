@@ -77,8 +77,6 @@ public class SharedPlace {
 		Require.that(templateDoesNotContainSharedPlace(place.model()), "Another place in the same template is already shared under that name");
 		place.makeShared(this); // this will unshare first if part of another shared transition
 		places.add(place);
-		place.setName(name);
-		place.setInvariant(invariant);
 	}
 
 	private boolean templateDoesNotContainSharedPlace(TimedArcPetriNet model) {

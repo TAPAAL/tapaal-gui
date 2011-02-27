@@ -33,7 +33,7 @@ public class TimedArcPetriNet {
 
 	public void add(TimedPlace place) {
 		Require.that(place != null, "Argument must be a non-null place");
-		Require.that(!isNameUsed(place.name()),	"A place or transition with the specified name already exists in the petri net.");
+		Require.that(!isNameUsed(place.name()) || place.isShared(), "A place or transition with the specified name already exists in the petri net.");
 
 		place.setModel(this);
 		places.add(place);
@@ -42,7 +42,7 @@ public class TimedArcPetriNet {
 
 	public void add(TimedTransition transition) {
 		Require.that(transition != null, "Argument must be a non-null transition");
-		Require.that(!isNameUsed(transition.name()), "A place or transition with the specified name already exists in the petri net.");
+		Require.that(!isNameUsed(transition.name()) || transition.isShared(), "A place or transition with the specified name already exists in the petri net.");
 
 		transition.setModel(this);
 		transitions.add(transition);

@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -31,9 +32,13 @@ import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 public class TemplateExplorer extends JPanel {
 	private static final long serialVersionUID = -2334464984237161208L;
@@ -192,7 +197,21 @@ public class TemplateExplorer extends JPanel {
 				}
 				
 				if(queriesToDelete.isEmpty() || choice == JOptionPane.YES_OPTION) {
-					Command command = new RemoveTemplateCommand(parent, TemplateExplorer.this, template, index, queriesToDelete);
+					ArrayList<Tuple<TimedPlace, SharedPlace>> placesToUnshare = new ArrayList<Tuple<TimedPlace,SharedPlace>>();
+					for(TimedPlace place : template.model().places()){
+						if(place.isShared()){
+							placesToUnshare.add(new Tuple<TimedPlace, SharedPlace>(place, place.sharedPlace()));
+						}
+					}
+					
+					ArrayList<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare = new ArrayList<Tuple<TimedTransition,SharedTransition>>();
+					for(TimedTransition transition : template.model().transitions()){
+						if(transition.isShared()){
+							transitionsToUnshare.add(new Tuple<TimedTransition, SharedTransition>(transition, transition.sharedTransition()));
+						}
+					}
+					
+					Command command = new RemoveTemplateCommand(parent, TemplateExplorer.this, template, index, queriesToDelete, placesToUnshare, transitionsToUnshare);
 					undoManager.addNewEdit(command);
 					command.redo();
 				}

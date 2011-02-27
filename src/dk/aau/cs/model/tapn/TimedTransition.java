@@ -128,6 +128,7 @@ public class TimedTransition extends TAPNElement {
 
 	@Override
 	public void delete() {
+		unshare();
 		model().remove(this);
 	}
 
@@ -239,6 +240,15 @@ public class TimedTransition extends TAPNElement {
 		else
 			return name;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((model() == null) ? 0 : model().hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -249,6 +259,11 @@ public class TimedTransition extends TAPNElement {
 		if (!(obj instanceof TimedTransition))
 			return false;
 		TimedTransition other = (TimedTransition) obj;
+		if (model() == null) {
+			if (other.model() != null)
+				return false;
+		} else if (!model().equals(other.model()))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
