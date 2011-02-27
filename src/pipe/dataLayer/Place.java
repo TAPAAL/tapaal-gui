@@ -450,7 +450,6 @@ public class Place extends PlaceTransitionObject {
 	public void update(boolean displayConstantNames) {
 		if (attributesVisible == true) {
 			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
-
 		} else {
 			pnName.setText("");
 		}

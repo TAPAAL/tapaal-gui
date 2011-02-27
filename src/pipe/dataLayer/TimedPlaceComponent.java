@@ -47,7 +47,7 @@ public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
 
 	private dk.aau.cs.model.tapn.TimedPlace place;
-	
+
 	private Window ageOfTokensWindow;
 	private Shape dashedOutline = createDashedOutline();
 
@@ -166,13 +166,13 @@ public class TimedPlaceComponent extends Place {
 		if(place.isShared()){
 			Graphics2D graphics = (Graphics2D)g;
 			Stroke oldStroke = graphics.getStroke();
-			
+
 			BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
 			graphics.setStroke(dashed);
-			
+
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			graphics.draw(dashedOutline);
-						
+
 			graphics.setStroke(oldStroke);
 		}
 	}
@@ -335,13 +335,12 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(place != null) {
-			if (attributesVisible == true) {
-				pnName.setName(place.name());
-				if (!(place.invariant().upperBound() instanceof InfBound)) {
-					pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
-				}else{
-					pnName.setText("");
-				}
+			pnName.setName(place.name());
+
+			if (!(place.invariant().upperBound() instanceof InfBound) && attributesVisible) {
+				pnName.setText("\nInv: " + place.invariant().toString(displayConstantNames));
+			}else{
+				pnName.setText("");
 			}
 		} else {
 			pnName.setName("");
@@ -387,7 +386,7 @@ public class TimedPlaceComponent extends Place {
 		place.setName(nameInput);
 		super.setName(nameInput);
 	}
-	
+
 	private static Shape createDashedOutline(){
 		return new Ellipse2D.Double(-Pipe.DASHED_PADDING/2, -Pipe.DASHED_PADDING/2, DIAMETER + Pipe.DASHED_PADDING, DIAMETER + Pipe.DASHED_PADDING);
 	}
