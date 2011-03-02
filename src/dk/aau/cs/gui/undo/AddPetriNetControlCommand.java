@@ -1,7 +1,7 @@
 package dk.aau.cs.gui.undo;
 
 import dk.aau.cs.gui.DrawingSurface;
-import dk.aau.cs.gui.PetriNetElementControl;
+import dk.aau.cs.gui.components.PetriNetElementControl;
 
 public class AddPetriNetControlCommand extends Command {
 	private PetriNetElementControl control;

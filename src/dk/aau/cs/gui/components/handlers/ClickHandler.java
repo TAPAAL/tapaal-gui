@@ -1,10 +1,12 @@
-package dk.aau.cs.gui;
+package dk.aau.cs.gui.components.handlers;
 
 import java.awt.event.MouseEvent;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
+
+import dk.aau.cs.gui.components.PetriNetElementControl;
 
 public class ClickHandler extends MouseInputAdapter {
 	private PetriNetElementControl control;

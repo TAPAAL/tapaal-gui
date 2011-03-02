@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package dk.aau.cs.gui.components;
 
 import java.awt.Component;
 import java.awt.Font;
@@ -12,6 +12,9 @@ import java.awt.event.MouseWheelListener;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.event.MouseInputAdapter;
+
+import dk.aau.cs.gui.DrawingSurface;
+import dk.aau.cs.gui.components.handlers.DragHandler;
 
 import pipe.gui.Pipe;
 

@@ -1,10 +1,12 @@
-package dk.aau.cs.gui;
+package dk.aau.cs.gui.components;
 
 import java.awt.Graphics;
 import java.awt.Point;
 
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
+
+import dk.aau.cs.gui.DrawingSurface;
 
 import pipe.gui.Pipe;
 

@@ -1,4 +1,4 @@
-package dk.aau.cs.gui;
+package dk.aau.cs.gui.components;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -17,6 +17,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.gui.Pipe;
+import dk.aau.cs.gui.DrawingSurface;
+import dk.aau.cs.gui.components.handlers.ClickHandler;
+import dk.aau.cs.gui.components.handlers.DragHandler;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class TimedPlaceControl extends PetriNetElementControl {
