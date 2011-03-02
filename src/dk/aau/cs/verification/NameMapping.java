@@ -13,15 +13,12 @@ public class NameMapping {
 		originalToMappedNames = new HashMap<Tuple<String, String>, String>();
 	}
 
-	public void addMapping(String templateName, String objectName,
-			String mappedName) {
-		Tuple<String, String> value = new Tuple<String, String>(templateName,
-				objectName);
+	public void addMapping(String templateName, String objectName, String mappedName) {
+		Tuple<String, String> value = new Tuple<String, String>(templateName, objectName);
 		if (mappedNamesToOriginalNames.containsKey(mappedName))
 			throw new RuntimeException(mappedName + " already maps to a value");
 		if (originalToMappedNames.containsKey(value))
-			throw new RuntimeException(templateName + "." + objectName
-					+ " already maps to a value");
+			throw new RuntimeException(templateName + "." + objectName + " already maps to a value");
 
 		mappedNamesToOriginalNames.put(mappedName, value);
 		originalToMappedNames.put(value, mappedName);
@@ -32,7 +29,6 @@ public class NameMapping {
 	}
 
 	public String map(String templateName, String objectName) {
-		return originalToMappedNames.get(new Tuple<String, String>(
-				templateName, objectName));
+		return originalToMappedNames.get(new Tuple<String, String>(templateName, objectName));
 	}
 }

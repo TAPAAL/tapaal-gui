@@ -9,12 +9,11 @@ import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.NewModelToOldModelTransformer;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
@@ -53,7 +52,7 @@ public abstract class RunVerificationBase extends
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
-		VerificationResult<TAPNTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
+		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage());
 		} else {
@@ -64,7 +63,7 @@ public abstract class RunVerificationBase extends
 		}
 	}
 
-	private TAPNNetworkTrace decomposeTrace(TAPNTrace trace, NameMapping mapping) {
+	private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
 		if (trace == null)
 			return null;
 
@@ -94,14 +93,10 @@ public abstract class RunVerificationBase extends
 
 		} else {
 			modelChecker.kill();
-			messenger
-					.displayInfoMessage(
-							"Verification was interupted by the user. No result found!",
-							"Verification Cancelled");
+			messenger.displayInfoMessage("Verification was interupted by the user. No result found!", "Verification Cancelled");
 
 		}
 	}
 
-	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result,
-			long verificationTime);
+	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result,	long verificationTime);
 }

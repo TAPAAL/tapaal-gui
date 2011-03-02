@@ -15,8 +15,8 @@ import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
@@ -189,7 +189,7 @@ public class Verifyta implements ModelChecker {
 		}
 	}
 
-	public VerificationResult<TAPNTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {
 		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
 		dk.aau.cs.petrinet.TimedArcPetriNet transformedModel = transformer.transformModel(model.value1());
 		
@@ -200,10 +200,10 @@ public class Verifyta implements ModelChecker {
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
 
-		return verify(options, transformedModel, exportedModel);
+		return verify(options, model.value1(), exportedModel);
 	}
 
-	private VerificationResult<TAPNTrace> verify(VerificationOptions options, dk.aau.cs.petrinet.TimedArcPetriNet model, ExportedModel exportedModel) {
+	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel) {
 		runner = new ProcessRunner(verifytapath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
 
@@ -216,10 +216,10 @@ public class Verifyta implements ModelChecker {
 			QueryResult queryResult = parseQueryResult(standardOutput);
 
 			if (queryResult == null) {
-				return new VerificationResult<TAPNTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
+				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
-				TAPNTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
-				return new VerificationResult<TAPNTrace>(queryResult, tapnTrace, runner.getRunningTime());
+				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime());
 			}
 		}
 	}
@@ -250,13 +250,11 @@ public class Verifyta implements ModelChecker {
 		return queryResult;
 	}
 
-	private TAPNTrace parseTrace(String output, VerificationOptions options,
-			dk.aau.cs.petrinet.TimedArcPetriNet model, ExportedModel exportedModel) {
-		TAPNTrace tapnTrace = null;
+	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, TimedArcPetriNet model, ExportedModel exportedModel) {
+		TimedArcPetriNetTrace tapnTrace = null;
 
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
-		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(
-				new StringReader(output)));
+		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 
 		if (trace == null) {
 			if (((VerifytaOptions) options).trace() != TraceOption.NONE) {
@@ -272,7 +270,7 @@ public class Verifyta implements ModelChecker {
 		return tapnTrace;
 	}
 
-	private TAPNTrace interpretTimedTrace(dk.aau.cs.petrinet.TimedArcPetriNet model, ExportedModel exportedModel, UppaalTrace trace) {
+	private TimedArcPetriNetTrace interpretTimedTrace(TimedArcPetriNet model, ExportedModel exportedModel, UppaalTrace trace) {
 		VerifytaTraceInterpreter traceIntepreter = new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
 		return traceIntepreter.interpretTrace(trace);
 	}
