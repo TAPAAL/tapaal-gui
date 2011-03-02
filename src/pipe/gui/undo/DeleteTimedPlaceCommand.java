@@ -10,8 +10,7 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	private final TimedPlaceComponent timedPlace;
 	private SharedPlace sharedPlace;
 
-	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlace, TimedArcPetriNet tapn, DataLayer guiModel,
-			DrawingSurfaceImpl view) {
+	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlace, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		this.timedPlace = timedPlace;
 		this.sharedPlace = timedPlace.underlyingPlace().sharedPlace();

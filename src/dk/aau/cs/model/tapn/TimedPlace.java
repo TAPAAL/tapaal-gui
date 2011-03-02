@@ -113,7 +113,6 @@ public class TimedPlace extends TAPNElement {
 		}
 	}
 	
-
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
 	}

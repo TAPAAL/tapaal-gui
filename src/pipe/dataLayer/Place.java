@@ -3,7 +3,6 @@ package pipe.dataLayer;
 import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -184,10 +183,6 @@ public class Place extends PlaceTransitionObject {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 
-		Insets insets = getInsets();
-		int x = insets.left;
-		int y = insets.top;
-
 		if (hasCapacity()) {
 			g2.setStroke(new BasicStroke(2.0f));
 		} else {
@@ -211,46 +206,46 @@ public class Place extends PlaceTransitionObject {
 		g2.draw(placeEllipse);
 
 		g2.setStroke(new BasicStroke(1.0f));
-		int marking = getCurrentMarking();
+//		int marking = getCurrentMarking();
 
-		// structure sees how many markings there are and fills the place in
-		// with
-		// the appropriate number.
-		switch (marking) {
-		case 5:
-			g.drawOval(x + 6, y + 6, tWidth, tHeight);
-			g.fillOval(x + 6, y + 6, tWidth, tHeight);
-			/* falls through */
-		case 4:
-			g.drawOval(x + 18, y + 20, tWidth, tHeight);
-			g.fillOval(x + 18, y + 20, tWidth, tHeight);
-			/* falls through */
-		case 3:
-			g.drawOval(x + 6, y + 20, tWidth, tHeight);
-			g.fillOval(x + 6, y + 20, tWidth, tHeight);
-			/* falls through */
-		case 2:
-			g.drawOval(x + 18, y + 6, tWidth, tHeight);
-			g.fillOval(x + 18, y + 6, tWidth, tHeight);
-			/* falls through */
-		case 1:
-			g.drawOval(x + 12, y + 13, tWidth, tHeight);
-			g.fillOval(x + 12, y + 13, tWidth, tHeight);
-			break;
-		case 0:
-			break;
-		default:
-			if (marking > 999) {
-				g.drawString("#" + String.valueOf(marking), x, y + 20);
-			} else if (marking > 99) {
-				g.drawString("#" + String.valueOf(marking), x, y + 20);
-			} else if (marking > 9) {
-				g.drawString("#" + String.valueOf(marking), x + 2, y + 20);
-			} else {
-				g.drawString("#" + String.valueOf(marking), x + 6, y + 20);
-			}
-			break;
-		}
+//		// structure sees how many markings there are and fills the place in
+//		// with
+//		// the appropriate number.
+//		switch (marking) {
+//		case 5:
+//			g.drawOval(x + 6, y + 6, tWidth, tHeight);
+//			g.fillOval(x + 6, y + 6, tWidth, tHeight);
+//			/* falls through */
+//		case 4:
+//			g.drawOval(x + 18, y + 20, tWidth, tHeight);
+//			g.fillOval(x + 18, y + 20, tWidth, tHeight);
+//			/* falls through */
+//		case 3:
+//			g.drawOval(x + 6, y + 20, tWidth, tHeight);
+//			g.fillOval(x + 6, y + 20, tWidth, tHeight);
+//			/* falls through */
+//		case 2:
+//			g.drawOval(x + 18, y + 6, tWidth, tHeight);
+//			g.fillOval(x + 18, y + 6, tWidth, tHeight);
+//			/* falls through */
+//		case 1:
+//			g.drawOval(x + 12, y + 13, tWidth, tHeight);
+//			g.fillOval(x + 12, y + 13, tWidth, tHeight);
+//			break;
+//		case 0:
+//			break;
+//		default:
+//			if (marking > 999) {
+//				g.drawString("#" + String.valueOf(marking), x, y + 20);
+//			} else if (marking > 99) {
+//				g.drawString("#" + String.valueOf(marking), x, y + 20);
+//			} else if (marking > 9) {
+//				g.drawString("#" + String.valueOf(marking), x + 2, y + 20);
+//			} else {
+//				g.drawString("#" + String.valueOf(marking), x + 6, y + 20);
+//			}
+//			break;
+//		}
 	}
 
 	/**

@@ -30,22 +30,15 @@ import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 public class TimedTransitionComponent extends Transition {
 	private static final long serialVersionUID = -2280012053262288174L;
 	private dk.aau.cs.model.tapn.TimedTransition transition;
+	private dk.aau.cs.model.tapn.event.TimedTransitionListener listener;
 	private GeneralPath dashedOutline;
 
 	public TimedTransitionComponent(double positionXInput, double positionYInput,
 			dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
-		transition.addTimedTransitionListener(new TimedTransitionListener() {
-			public void nameChanged(TimedTransitionEvent e) {
-				TimedTransition source = e.source();
-				TimedTransitionComponent.super.setName(source.name());
-			}
-
-			public void sharedStateChanged(TimedTransitionEvent e) {
-				repaint();
-			}
-		});
+		this.listener = timedTransitionListener();
+		transition.addTimedTransitionListener(listener);
 	}
 
 	public TimedTransitionComponent(double positionXInput,
@@ -56,7 +49,19 @@ public class TimedTransitionComponent extends Transition {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput, timedTransition, infServer,
 				angleInput, priority);
+		this.listener = timedTransitionListener();
 		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
+	}
+	
+	private TimedTransitionListener timedTransitionListener(){
+		return new TimedTransitionListener() {
+			public void nameChanged(TimedTransitionEvent e) {
+				TimedTransition source = e.source();
+				TimedTransitionComponent.super.setName(source.name());
+			}
+
+			public void sharedStateChanged(TimedTransitionEvent e) { repaint(); }
+		};
 	}
 
 	@Override
@@ -114,6 +119,10 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public void setUnderlyingTransition(TimedTransition transition) {
+		if(this.transition != null && listener != null){
+			transition.removeListener(listener);
+		}
+		transition.addTimedTransitionListener(listener);
 		this.transition = transition;
 		this.setName(transition.name());
 		repaint();

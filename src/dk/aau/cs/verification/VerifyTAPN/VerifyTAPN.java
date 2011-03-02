@@ -37,29 +37,24 @@ public class VerifyTAPN implements ModelChecker {
 		this.messenger = messenger;
 	}
 	
-	@Override
 	public String getPath() {
 		return verifytapnpath;
 	}
 
-	@Override
 	public String getVersion() { // atm. any version of VerifyTAPN will do
 		return "";
 	}
 
-	@Override
 	public boolean isCorrectVersion() {// atm. any version of VerifyTAPN will do
 		return true;
 	}
 
-	@Override
 	public void kill() {
 		if (runner != null) {
 			runner.kill();
 		}
 	}
 
-	@Override
 	public boolean setup() {
 		if (isNotSetup()) {
 			messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTAPN_MSG, "Locate VerifyTAPN");
@@ -81,7 +76,6 @@ public class VerifyTAPN implements ModelChecker {
 		return verifytapnpath == null || verifytapnpath.equals("");
 	}
 
-	@Override
 	public VerificationResult<TAPNTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {	
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);

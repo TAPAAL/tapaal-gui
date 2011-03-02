@@ -322,18 +322,16 @@ public class TimedArcPetriNetFactory {
 					positionYInput, idInput, nameInput, nameOffsetXInput,
 					nameOffsetYInput, initialMarkingInput, markingOffsetXInput,
 					markingOffsetYInput, capacityInput);
-
-			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(
-					invariant, constants));
-
-			for (int i = 0; i < initialMarkingInput; i++) {
-				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));
-			}
+			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+			tapn.add(p);
 
 			((TimedPlaceComponent) placeComponent).setUnderlyingPlace(p);
 			guiModel.addPetriNetObject(placeComponent);
 			addListeners(placeComponent);
-			tapn.add(p);
+			
+			for (int i = 0; i < initialMarkingInput; i++) {
+				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));
+			}
 		}
 	}
 
@@ -837,16 +835,15 @@ public class TimedArcPetriNetFactory {
 					markingOffsetYInput, capacityInput);
 
 			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+			tapn.add(p);
+			
+			((TimedPlaceComponent) place).setUnderlyingPlace(p);
+			guiModel.addPetriNetObject(place);
+			addListeners(place);
 
 			for (int i = 0; i < initialMarkingInput; i++) {
 				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));
 			}
-
-			((TimedPlaceComponent) place).setUnderlyingPlace(p);
-			guiModel.addPetriNetObject(place);
-			addListeners(place);
-			tapn.add(p);
-
 		}
 	}
 

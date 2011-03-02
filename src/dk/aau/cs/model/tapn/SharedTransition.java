@@ -111,4 +111,8 @@ public class SharedTransition {
 			return false;
 		return true;
 	}
+
+	public Iterable<TimedTransition> transitions() {
+		return new ArrayList<TimedTransition>(transitions);
+	}
 }

@@ -12,8 +12,11 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
@@ -26,6 +29,7 @@ import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 public class SharedPlacesAndTransitionsPanel extends JPanel {
@@ -109,6 +113,32 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		});
 		removeButton = new JButton("Remove");
 		removeButton.setEnabled(false);
+		removeButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				if(list.getSelectedValue() != null){
+					if(isDisplayingTransitions()){
+						SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
+						
+						JCheckBox checkBox = new JCheckBox("Delete from all templates");
+						JLabel label = new JLabel("<html>The transition is used in one or more templates.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in place.</html>");
+						Object[] params = {label, checkBox};
+						int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
+						if(choice == JOptionPane.OK_OPTION){
+							if(checkBox.isSelected()){
+								System.out.println("delete");
+							}else{
+								for(TimedTransition transition : sharedTransition.transitions()){
+									transition.unshare();
+								}
+							}
+						}
+					}else{
+						
+					}
+				}
+			}		
+		});
+		
 		JButton addButton = new JButton("Add");
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {

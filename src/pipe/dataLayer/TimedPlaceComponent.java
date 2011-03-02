@@ -47,6 +47,7 @@ public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
 
 	private dk.aau.cs.model.tapn.TimedPlace place;
+	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
 
 	private Window ageOfTokensWindow;
 	private Shape dashedOutline = createDashedOutline();
@@ -55,16 +56,9 @@ public class TimedPlaceComponent extends Place {
 			dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
-		this.place.addTimedPlaceListener(new TimedPlaceListener() {
-			public void nameChanged(TimedPlaceEvent e) {
-				TimedPlace place = e.source();
-				TimedPlaceComponent.super.setName(place.name());				
-			}
+		this.listener = timedPlaceListener();		
+		this.place.addTimedPlaceListener(listener);
 
-			public void sharedStateChanged(TimedPlaceEvent e) { repaint(); }
-			public void invariantChanged(TimedPlaceEvent e) { update(true); }
-			public void markingChanged(TimedPlaceEvent e) { repaint(); }
-		});
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 	}
@@ -78,11 +72,23 @@ public class TimedPlaceComponent extends Place {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput, initialMarkingInput,
 				markingOffsetXInput, markingOffsetYInput, capacityInput);
-
+		listener = timedPlaceListener();
 		attributesVisible = true;
 		ageOfTokensWindow = new Window(new Frame());
 	}
 
+	private TimedPlaceListener timedPlaceListener() {
+		return new TimedPlaceListener() {
+			public void nameChanged(TimedPlaceEvent e) {
+				TimedPlace place = e.source();
+				TimedPlaceComponent.super.setName(place.name());				
+			}
+			public void sharedStateChanged(TimedPlaceEvent e) { repaint(); }
+			public void invariantChanged(TimedPlaceEvent e) { update(true); }
+			public void markingChanged(TimedPlaceEvent e) { repaint(); }
+		};
+	}
+	
 	@Override
 	public TimedPlaceComponent clone() {
 		TimedPlaceComponent toReturn = (TimedPlaceComponent) super.clone();
@@ -360,6 +366,10 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public void setUnderlyingPlace(TimedPlace place) {
+		if(this.place != null && listener != null){
+			this.place.removeTimedPlaceListener(listener);
+		}
+		place.addTimedPlaceListener(listener);
 		this.place = place;
 		this.setName(place.name());
 		this.repaint();
