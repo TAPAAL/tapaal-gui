@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class UntimedTrace implements TapaalTrace {
-	private List<TapaalTraceStep> steps = new ArrayList<TapaalTraceStep>();
+public class UntimedTAPNNetworkTrace implements TAPNNetworkTrace {
+	private List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
 
-	public void add(TimedTransitionStep step) {
+	public void add(TAPNNetworkTimedTransitionStep step) {
 		steps.add(step);
 	}
 
-	public Iterator<TapaalTraceStep> iterator() {
+	public Iterator<TAPNNetworkTraceStep> iterator() {
 		return steps.iterator();
 	}
 

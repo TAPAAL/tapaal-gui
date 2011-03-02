@@ -1708,19 +1708,6 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-//						PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
-//
-//						TAPN model = null;
-//						try {
-//							model = transformer.getAAUTAPN(
-//									CreateGui.getModel(), 0);
-//						} catch (Exception ex) {
-//							JOptionPane.showMessageDialog(QueryDialogue.this,
-//									"An error occured during export.", "Error",
-//									JOptionPane.ERROR_MESSAGE);
-//							return;
-//						}
-
 						UppaalExporter exporter = new UppaalExporter();
 						TAPNComposer composer = new TAPNComposer();
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);

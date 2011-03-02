@@ -1,6 +1,6 @@
 package dk.aau.cs.model.tapn.simulation;
 
-public interface TapaalTrace extends Iterable<TapaalTraceStep> {
+public interface TAPNNetworkTrace extends Iterable<TAPNNetworkTraceStep> {
 	boolean isConcreteTrace();
 
 	int length();

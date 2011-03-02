@@ -111,7 +111,7 @@ public class Verifier {
 			RunVerificationBase thread = new RunVerification(verifytapn, new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.petrinet.TAPNQuery(query.getProperty(), query.getCapacity() + tapnNetwork.marking().size()));
+			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.petrinet.TAPNQuery(query.getProperty(), bound));
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),

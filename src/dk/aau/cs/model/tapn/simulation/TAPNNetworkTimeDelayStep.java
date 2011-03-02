@@ -6,11 +6,11 @@ import java.text.DecimalFormat;
 import pipe.gui.Pipe;
 import dk.aau.cs.model.tapn.NetworkMarking;
 
-public class TimeDelayStep implements TapaalTraceStep {
+public class TAPNNetworkTimeDelayStep implements TAPNNetworkTraceStep {
 	private BigDecimal delay;
 	private static final DecimalFormat df = createDecimalFormat();
 
-	public TimeDelayStep(BigDecimal delay) {
+	public TAPNNetworkTimeDelayStep(BigDecimal delay) {
 		this.delay = delay;
 	}
 

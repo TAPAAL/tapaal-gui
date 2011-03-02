@@ -2,7 +2,7 @@ package dk.aau.cs.model.tapn.simulation;
 
 import dk.aau.cs.model.tapn.NetworkMarking;
 
-public interface TapaalTraceStep {
+public interface TAPNNetworkTraceStep {
 	NetworkMarking performStepFrom(NetworkMarking marking); // TODO: We should
 															// introduce an
 															// interface for

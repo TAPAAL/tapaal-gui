@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
-import dk.aau.cs.model.tapn.simulation.TapaalTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -21,7 +21,7 @@ public class RunKBoundOptimization extends RunKBoundAnalysis {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TapaalTrace> result,
+	protected void showResult(VerificationResult<TAPNNetworkTrace> result,
 			long verificationTime) {
 		if (result.getQueryResult().integerResult() == extraTokens + 1) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),

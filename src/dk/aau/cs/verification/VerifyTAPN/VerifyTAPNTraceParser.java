@@ -13,10 +13,10 @@ import dk.aau.cs.model.tapn.TimedMarking;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.simulation.TapaalTrace;
-import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TimedTrace;
-import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 
 
 public class VerifyTAPNTraceParser {
@@ -27,13 +27,13 @@ public class VerifyTAPNTraceParser {
 		this.tapn = tapn;
 	}
 
-	public TapaalTrace parseTrace(BufferedReader reader) {
-		TimedTrace trace = new TimedTrace();
+	public TAPNNetworkTrace parseTrace(BufferedReader reader) {
+		TimedTAPNNetworkTrace trace = new TimedTAPNNetworkTrace();
 		try {
 			String line;
 			TimedMarking previousMarking = null;
 			TimedTransition previousTransition = null;
-			TimedTransitionStep previousTransitionFiring = null;
+			TAPNNetworkTimedTransitionStep previousTransitionFiring = null;
 			while (reader.ready() && (line = reader.readLine()) != null) {
 
 				if (line == null || line.isEmpty())
@@ -43,13 +43,13 @@ public class VerifyTAPNTraceParser {
 					TimedMarking marking = parseMarking(line);
 					if (previousTransitionFiring != null) {
 						List<TimedToken> consumedTokens = findConsumedTokensBetween(previousMarking, marking);
-						trace.add(new TimedTransitionStep(previousTransition, consumedTokens));
+						trace.add(new TAPNNetworkTimedTransitionStep(previousTransition, consumedTokens));
 						previousTransition = null;
 					}
 					previousMarking = marking;
 				} else if(line.contains("Delay")) {
 					BigDecimal delay = parseDelay(line);
-					trace.add(new TimeDelayStep(delay));
+					trace.add(new TAPNNetworkTimeDelayStep(delay));
 				} else if(line.contains("Transition")) {
 					previousTransition = parseTransition(line);
 				}
@@ -102,11 +102,7 @@ public class VerifyTAPNTraceParser {
 	
 	private BigDecimal parseDelay(String delayLine) {
 		String[] split = delayLine.split(" ");
-		Pattern p = Pattern.compile("\\d+(?:\\.\\d+)?");
-		Matcher m = p.matcher(split[1]);
-		m.find();
-		
-		return new BigDecimal(m.group(0));
+		return new BigDecimal(split[1]);
 	}
 	
 	private TimedTransition parseTransition(String transitionLine) {

@@ -9,7 +9,7 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.simulation.TapaalTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.util.Tuple;
@@ -102,15 +102,15 @@ public class VerifyTAPN implements ModelChecker {
 			if (queryResult == null) {
 				return new VerificationResult<TAPNTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
-				TapaalTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
+				TAPNNetworkTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
 				return new VerificationResult<TAPNTrace>(queryResult, null, runner.getRunningTime()); // TODO: return tapnTrace instead of null when done refactoring
 			}
 		}
 	}
 	
-	private TapaalTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel) {
+	private TAPNNetworkTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel) {
 		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
-		TapaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
+		TAPNNetworkTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 		
 		if (trace == null) {
 			if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {

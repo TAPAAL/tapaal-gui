@@ -20,15 +20,15 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
-import dk.aau.cs.model.tapn.simulation.TapaalTrace;
-import dk.aau.cs.model.tapn.simulation.TapaalTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.RequireException;
 
 public class Animator {
-	private ArrayList<TapaalTraceStep> actionHistory;
+	private ArrayList<TAPNNetworkTraceStep> actionHistory;
 	private int currentAction;
 	private ArrayList<NetworkMarking> markings;
 	private int currentMarkingIndex = 0;
@@ -40,7 +40,7 @@ public class Animator {
 	private boolean isDisplayingUntimedTrace = false;
 
 	public Animator() {
-		actionHistory = new ArrayList<TapaalTraceStep>();
+		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
 		currentAction = -1;
 		markings = new ArrayList<NetworkMarking>();
 	}
@@ -53,7 +53,7 @@ public class Animator {
 		return markings.get(currentMarkingIndex);
 	}
 
-	public void SetTrace(TapaalTrace trace) {
+	public void SetTrace(TAPNNetworkTrace trace) {
 		if (trace.isConcreteTrace()) {
 			setTimedTrace(trace);
 		} else {
@@ -66,11 +66,11 @@ public class Animator {
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
 
-	private void setUntimedTrace(TapaalTrace trace) {
+	private void setUntimedTrace(TAPNNetworkTrace trace) {
 		tab.addAbstractAnimationPane();
 		AnimationHistoryComponent untimedAnimationHistory = CreateGui.getAbstractAnimationPane();
 
-		for(TapaalTraceStep step : trace){
+		for(TAPNNetworkTraceStep step : trace){
 			untimedAnimationHistory.addHistoryItem(step.toString());
 		}
 
@@ -89,8 +89,8 @@ public class Animator {
 				"Verification Information", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	private void setTimedTrace(TapaalTrace trace) {
-		for (TapaalTraceStep step : trace) {
+	private void setTimedTrace(TAPNNetworkTrace trace) {
+		for (TAPNNetworkTraceStep step : trace) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 	}
@@ -173,8 +173,8 @@ public class Animator {
 
 	public void stepBack() {
 		if (!actionHistory.isEmpty()){
-			TapaalTraceStep lastStep = actionHistory.get(currentAction);
-			if(isDisplayingUntimedTrace && lastStep instanceof TimedTransitionStep){
+			TAPNNetworkTraceStep lastStep = actionHistory.get(currentAction);
+			if(isDisplayingUntimedTrace && lastStep instanceof TAPNNetworkTimedTransitionStep){
 				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String previousInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex());
 				if(previousInUntimedTrace.equals(lastStep.toString())){
@@ -198,8 +198,8 @@ public class Animator {
 
 	public void stepForward() {
 		if (currentAction < actionHistory.size() - 1) {
-			TapaalTraceStep nextStep = actionHistory.get(currentAction+1);
-			if(isDisplayingUntimedTrace && nextStep instanceof TimedTransitionStep){
+			TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
+			if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
 				AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 				String nextInUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 				if(nextInUntimedTrace.equals(nextStep.toString())){
@@ -262,7 +262,7 @@ public class Animator {
 			}
 		}
 		
-		addMarking(new TimedTransitionStep(transition, null), next);
+		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
 		tab.network().setMarking(currentMarking());
 
 		activeGuiModel().repaintPlaces();
@@ -273,7 +273,7 @@ public class Animator {
 
 	public void letTimePass(BigDecimal delay) {
 		if (currentMarking().isDelayPossible(delay)) {
-			addMarking(new TimeDelayStep(delay), currentMarking().delay(delay));
+			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
 		}
 
@@ -309,7 +309,7 @@ public class Animator {
 		}
 	}
 
-	private void addMarking(TapaalTraceStep action, NetworkMarking marking) {
+	private void addMarking(TAPNNetworkTraceStep action, NetworkMarking marking) {
 		if (currentAction < actionHistory.size() - 1)
 			removeStoredActions(currentAction + 1);
 

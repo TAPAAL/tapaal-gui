@@ -8,7 +8,7 @@ import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.simulation.TapaalTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.petrinet.trace.TAPNTrace;
 import dk.aau.cs.util.Tuple;
@@ -21,7 +21,7 @@ import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
 public abstract class RunVerificationBase extends
-		SwingWorker<VerificationResult<TapaalTrace>, Void> {
+		SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
 	private ModelChecker modelChecker;
 
@@ -46,7 +46,7 @@ public abstract class RunVerificationBase extends
 	}
 
 	@Override
-	protected VerificationResult<TapaalTrace> doInBackground() throws Exception {
+	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		TAPNComposer composer = new TAPNComposer();
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 
@@ -55,16 +55,16 @@ public abstract class RunVerificationBase extends
 
 		VerificationResult<TAPNTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (result.error()) {
-			return new VerificationResult<TapaalTrace>(result.errorMessage());
+			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage());
 		} else {
-			return new VerificationResult<TapaalTrace>(
+			return new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime());
 		}
 	}
 
-	private TapaalTrace decomposeTrace(TAPNTrace trace, NameMapping mapping) {
+	private TAPNNetworkTrace decomposeTrace(TAPNTrace trace, NameMapping mapping) {
 		if (trace == null)
 			return null;
 
@@ -80,7 +80,7 @@ public abstract class RunVerificationBase extends
 	@Override
 	protected void done() {
 		if (!isCancelled()) {
-			VerificationResult<TapaalTrace> result = null;
+			VerificationResult<TAPNNetworkTrace> result = null;
 
 			try {
 				result = get();
@@ -102,6 +102,6 @@ public abstract class RunVerificationBase extends
 		}
 	}
 
-	protected abstract void showResult(VerificationResult<TapaalTrace> result,
+	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result,
 			long verificationTime);
 }
