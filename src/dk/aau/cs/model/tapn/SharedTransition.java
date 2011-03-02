@@ -1,6 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -112,7 +113,7 @@ public class SharedTransition {
 		return true;
 	}
 
-	public Iterable<TimedTransition> transitions() {
+	public Collection<TimedTransition> transitions() {
 		return new ArrayList<TimedTransition>(transitions);
 	}
 }

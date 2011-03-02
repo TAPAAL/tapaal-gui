@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -22,17 +23,32 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import pipe.dataLayer.Template;
+import pipe.dataLayer.TimedPlaceComponent;
+import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.undo.DeleteTimedPlaceCommand;
+import pipe.gui.undo.DeleteTimedTransitionCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
+import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
+import dk.aau.cs.gui.undo.DeleteSharedTransitionCommand;
+import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
+import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
+import dk.aau.cs.gui.undo.UnsharePlaceCommand;
+import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 public class SharedPlacesAndTransitionsPanel extends JPanel {
+	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition may be used in one or more templates.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the templates.</html>";
+	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place may be used in one or more templates.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the templates.</html>";
+
 	private static final long serialVersionUID = 1L;
 	private static final String TRANSITIONS = "Transitions";
 	private static final String PLACES = "Places";
@@ -43,18 +59,20 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private JComboBox placesTransitionsComboBox;
 	private UndoManager undoManager;
 	private NameGenerator nameGenerator;
+	private TabContent tab;
+
 	private JButton renameButton;
 	private JButton removeButton;
 
-	public SharedPlacesAndTransitionsPanel(TimedArcPetriNetNetwork network, UndoManager undoManager, NameGenerator nameGenerator){
-		Require.that(network != null, "network cannot be null");
-		Require.that(undoManager != null, "undoManager cannot be null");
-		Require.that(nameGenerator != null, "nameGenerator cannot be null");
-		this.undoManager = undoManager;
-		this.nameGenerator = nameGenerator;
+	public SharedPlacesAndTransitionsPanel(TabContent tab){
+		Require.that(tab != null, "tab cannot be null");
 
-		sharedPlacesListModel = new SharedPlacesListModel(network);
-		sharedTransitionsListModel = new SharedTransitionsListModel(network);
+		this.undoManager = tab.drawingSurface().getUndoManager();
+		this.nameGenerator = tab.drawingSurface().getNameGenerator();
+		this.tab = tab;
+
+		sharedPlacesListModel = new SharedPlacesListModel(tab.network());
+		sharedTransitionsListModel = new SharedTransitionsListModel(tab.network());
 
 		setLayout(new BorderLayout());
 		initComponents();
@@ -82,7 +100,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			}
 		});
 		list.addMouseListener(createDoubleClickMouseAdapter());
-		
+
 		JScrollPane scrollPane = new JScrollPane(list);
 
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
@@ -116,29 +134,79 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		removeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(list.getSelectedValue() != null){
-					if(isDisplayingTransitions()){
-						SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
-						
-						JCheckBox checkBox = new JCheckBox("Delete from all templates");
-						JLabel label = new JLabel("<html>The transition is used in one or more templates.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in place.</html>");
-						Object[] params = {label, checkBox};
-						int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
-						if(choice == JOptionPane.OK_OPTION){
-							if(checkBox.isSelected()){
-								System.out.println("delete");
-							}else{
-								for(TimedTransition transition : sharedTransition.transitions()){
-									transition.unshare();
-								}
-							}
+					JCheckBox checkBox = new JCheckBox("Delete from all templates");
+
+					JLabel label = new JLabel(isDisplayingTransitions() ? TRANSITION_IS_USED_MESSAGE : PLACE_IS_USED_MESSAGE);
+					Object[] params = {label, checkBox};
+					int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
+					if(choice == JOptionPane.OK_OPTION){
+						boolean deleteFromTemplates = checkBox.isSelected();
+
+						undoManager.newEdit();
+						if(isDisplayingTransitions()){
+							deleteSharedTransition(deleteFromTemplates);
+						}else{
+							deleteSharedPlace(deleteFromTemplates);
 						}
-					}else{
-						
+					}
+				}
+			}
+
+			private void deleteSharedPlace(boolean deleteFromTemplates) {
+				SharedPlace sharedPlace = (SharedPlace)list.getSelectedValue();
+				if(deleteFromTemplates){
+					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
+						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
+						undoManager.addEdit(new DeleteTimedPlaceCommand(place, place.underlyingPlace().model(), template.guiModel(), tab.drawingSurface()));
+						place.delete();
+					}
+					tab.drawingSurface().repaint();
+					sharedPlacesListModel.removeElement(sharedPlace);
+					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
+				}else{
+					Collection<TimedPlace> copy = sharedPlace.places();
+					for(TimedPlace place : copy){
+						place.unshare();
+						undoManager.addEdit(new UnsharePlaceCommand(sharedPlace, place));
+					}
+					sharedPlacesListModel.removeElement(sharedPlace);
+					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
+					for(TimedPlace place : copy){
+						String name = nameGenerator.getNewPlaceName(place.model());
+						// We add this invisible transition renaming to avoid problems with undo
+						undoManager.addEdit(new RenameTimedPlaceCommand(tab, place, name, place.name())); 
+					}
+				}
+			}
+
+			private void deleteSharedTransition(boolean deleteFromTemplates) {
+				SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
+				if(deleteFromTemplates){
+					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
+						TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(sharedTransition.name());
+						undoManager.addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
+						transition.delete();
+					}
+					tab.drawingSurface().repaint();
+					sharedTransitionsListModel.removeElement(sharedTransition);
+					undoManager.addEdit(new DeleteSharedTransitionCommand(sharedTransition, sharedTransitionsListModel));
+				}else{
+					Collection<TimedTransition> copy = sharedTransition.transitions();
+					for(TimedTransition transition : copy){
+						transition.unshare();
+						undoManager.addEdit(new UnshareTransitionCommand(sharedTransition, transition));
+					}
+					sharedTransitionsListModel.removeElement(sharedTransition);
+					undoManager.addEdit(new DeleteSharedTransitionCommand(sharedTransition, sharedTransitionsListModel));
+					for(TimedTransition transition : copy){
+						String name = nameGenerator.getNewTransitionName(transition.model());
+						// We add this invisible transition renaming to avoid problems with undo
+						undoManager.addEdit(new RenameTimedTransitionCommand(transition, name, transition.name())); 
 					}
 				}
 			}		
 		});
-		
+
 		JButton addButton = new JButton("Add");
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {

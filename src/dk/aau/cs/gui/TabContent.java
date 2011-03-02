@@ -88,7 +88,7 @@ public class TabContent extends JSplitPane {
 		constantsPanel = new LeftConstantsPane(enableAddButton, this);
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
 		templateExplorer = new TemplateExplorer(this);
-		SharedPlacesAndTransitionsPanel sharedPTPanel = new SharedPlacesAndTransitionsPanel(tapnNetwork, drawingSurface.getUndoManager(), drawingSurface.getNameGenerator());
+		SharedPlacesAndTransitionsPanel sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
