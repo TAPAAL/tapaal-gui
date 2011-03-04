@@ -303,7 +303,7 @@ public class Transition extends PlaceTransitionObject {
 	 */
 	public boolean isEnabled(boolean animationStatus) {
 		if (animationStatus == true) {
-			if (enabled == true) {
+			if (isEnabled()) {
 				highlighted = true;
 				return true;
 			} else {
