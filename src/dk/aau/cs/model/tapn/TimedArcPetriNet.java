@@ -226,7 +226,7 @@ public class TimedArcPetriNet {
 
 	public TimedPlace getPlaceByName(String placeName) {
 		for (TimedPlace p : places) {
-			if (p.name() == placeName) {
+			if (p.name().equals(placeName)) {
 				return p;
 			}
 		}
@@ -235,7 +235,7 @@ public class TimedArcPetriNet {
 
 	public TimedTransition getTransitionByName(String transitionName) {
 		for (TimedTransition t : transitions) {
-			if (t.name() == transitionName) {
+			if (t.name().equals(transitionName)) {
 				return t;
 			}
 		}
