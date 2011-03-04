@@ -14,10 +14,9 @@ public class AnimationHistoryComponent extends JList {
 	public AnimationHistoryComponent() {
 		super();
 		setModel(new DefaultListModel());
-		getListModel().addElement("Initial Marking");
-		setSelectedIndex(0);
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+		reset();
+		
 		for (MouseListener listener : getMouseListeners()) {
 			removeMouseListener(listener);
 		}
@@ -89,5 +88,7 @@ public class AnimationHistoryComponent extends JList {
 
 	public void reset() {
 		getListModel().clear();
+		getListModel().addElement("Initial Marking");
+		setSelectedIndex(0);
 	}
 }
