@@ -113,13 +113,13 @@ public class TimedArcPetriNetFactory {
 	
 
 	// TODO: the methods for loading nets in the old and the new format 
-	// contains a lot of duplicate code at the moment. The code moreover
+	// contain a lot of duplicate code at the moment. The code moreover
 	// contains remnants of the pipe code which is not that readable and this 
 	// whole class thus needs to be refactored.
 	private Template parseTimedArcPetriNetFromPNML(Node tapnNode) {
 		if (isModelInNewFormat) {
 			try {
-				return createTimedArcPetriNetFromPNML(tapnNode);
+				return parseTimedArcPetriNet(tapnNode);
 			} catch (Exception e) {
 				isModelInNewFormat = false;
 			}
@@ -127,7 +127,7 @@ public class TimedArcPetriNetFactory {
 
 		if (!isModelInNewFormat) {
 			try {
-				return createTimedArcPetriNetFromPNMLOldFormat(tapnNode);
+				return parseTimedArcPetriNetAsOldFormat(tapnNode);
 			} catch (Exception e2) {
 				System.out.println("There was an error parsing the chosen model.");
 				throw new RuntimeException("An error occurred while trying to parse the chosen model.");
@@ -137,8 +137,7 @@ public class TimedArcPetriNetFactory {
 		throw new RuntimeException("An error occurred while trying to parse the chosen model.");
 	}
 
-	private Template createTimedArcPetriNetFromPNML(
-			Node tapnNode) {
+	private Template parseTimedArcPetriNet(Node tapnNode) {
 		initialMarking = new TimedMarking();
 		if (tapnNode instanceof Element) {
 			String name = getTAPNName((Element) tapnNode);
@@ -675,7 +674,7 @@ public class TimedArcPetriNetFactory {
 	// //////////////////////////////////////////////////////////
 	// Legacy support for old format
 	// //////////////////////////////////////////////////////////
-	private Template createTimedArcPetriNetFromPNMLOldFormat(Node tapnNode) {
+	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode) {
 		initialMarking = new TimedMarking();
 		tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		guiModel = new DataLayer();
@@ -699,15 +698,15 @@ public class TimedArcPetriNetFactory {
 		if (node instanceof Element) {
 			element = (Element) node;
 			if ("labels".equals(element.getNodeName())) {
-				createAndAddAnnotationAsOldFormat(element);
+				parseAndAddAnnotationAsOldFormat(element);
 			} else if ("place".equals(element.getNodeName())) {
-				createAndAddPlaceAsOldFormat(element);
+				parseAndAddPlaceAsOldFormat(element);
 			} else if ("transition".equals(element.getNodeName())) {
-				createAndAddTransitionAsOldFormat(element);
+				parseAndAddTransitionAsOldFormat(element);
 			} else if ("arc".equals(element.getNodeName())) {
-				createAndAddArcAsOldFormat(element);
+				parseAndAddArcAsOldFormat(element);
 			} else if ("queries".equals(element.getNodeName())) {
-				TAPNQuery query = createQueryAsOldFormat(element);
+				TAPNQuery query = parseQueryAsOldFormat(element);
 				query.getProperty().accept(
 						new AddTemplateVisitor(templateName), null);
 				if (query != null)
@@ -716,7 +715,7 @@ public class TimedArcPetriNetFactory {
 		}
 	}
 
-	private void createAndAddAnnotationAsOldFormat(Element inputLabelElement) {
+	private void parseAndAddAnnotationAsOldFormat(Element inputLabelElement) {
 		int positionXInput = 0;
 		int positionYInput = 0;
 		int widthInput = 0;
@@ -759,17 +758,17 @@ public class TimedArcPetriNetFactory {
 		addListeners(an);
 	}
 
-	private void createAndAddTransitionAsOldFormat(Element element) {
+	private void parseAndAddTransitionAsOldFormat(Element element) {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
 		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
-		boolean timedTransition = getChildNodesContentOfValueChildNodeAsBoolean(element, "timed");
-		boolean infiniteServer = getChildNodesContentOfValueChildNodeAsBoolean(element, "infiniteServer");
-		int angle = getChildNodesContentOfValueChildNodeAsInt(element,"orientation");
-		int priority = getChildNodesContentOfValueChildNodeAsInt(element,"priority");
+		boolean timedTransition = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "timed");
+		boolean infiniteServer = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(element, "infiniteServer");
+		int angle = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"orientation");
+		int priority = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,"priority");
 
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
@@ -795,17 +794,17 @@ public class TimedArcPetriNetFactory {
 		tapn.add(t);
 	}
 
-	private void createAndAddPlaceAsOldFormat(Element element) {
+	private void parseAndAddPlaceAsOldFormat(Element element) {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
 		String nameInput = getChildNodesContentOfValueChildNodeAsString(element, "name");
 		double nameOffsetXInput = getNameOffsetAttribute(element, "x");
 		double nameOffsetYInput = getNameOffsetAttribute(element, "y");
-		int initialMarkingInput = getChildNodesContentOfValueChildNodeAsInt(element, "initialMarking");
+		int initialMarkingInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element, "initialMarking");
 		double markingOffsetXInput = getMarkingOffsetAttribute(element, "x");
 		double markingOffsetYInput = getMarkingOffsetAttribute(element, "y");
-		int capacityInput = getChildNodesContentOfValueChildNodeAsInt(element,	"capacity");
+		int capacityInput = getContentOfFirstSpecificChildNodesValueChildNodeAsInt(element,	"capacity");
 		String invariant = getChildNodesContentOfValueChildNodeAsString(element, "invariant");
 
 		positionXInput = Grid.getModifiedX(positionXInput);
@@ -847,11 +846,11 @@ public class TimedArcPetriNetFactory {
 		}
 	}
 
-	private void createAndAddArcAsOldFormat(Element inputArcElement) {
+	private void parseAndAddArcAsOldFormat(Element inputArcElement) {
 		String idInput = inputArcElement.getAttribute("id");
 		String sourceInput = inputArcElement.getAttribute("source");
 		String targetInput = inputArcElement.getAttribute("target");
-		boolean taggedArc = getChildNodesContentOfValueChildNodeAsBoolean(inputArcElement, "tagged");
+		boolean taggedArc = getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(inputArcElement, "tagged");
 		String inscriptionTempStorage = getChildNodesContentOfValueChildNodeAsString(inputArcElement, "inscription");
 
 		PlaceTransitionObject sourceIn = guiModel.getPlaceTransitionObject(sourceInput);
@@ -926,7 +925,7 @@ public class TimedArcPetriNetFactory {
 		}
 	}
 
-	private TAPNQuery createQueryAsOldFormat(Element queryElement) {
+	private TAPNQuery parseQueryAsOldFormat(Element queryElement) {
 		String comment = getQueryComment(queryElement);
 		TraceOption traceOption = getQueryTraceOption(queryElement);
 		SearchOption searchOption = getQuerySearchOption(queryElement);
@@ -936,7 +935,7 @@ public class TimedArcPetriNetFactory {
 		int capacity = getQueryCapacityAsOldFormat(queryElement);
 
 		TCTLAbstractProperty query;
-		query = parseQueryAsOldFormat(queryElement);
+		query = parseQueryPropertyAsOldFormat(queryElement);
 
 		if (query != null)
 			return new TAPNQuery(comment, capacity, query, traceOption,
@@ -946,18 +945,16 @@ public class TimedArcPetriNetFactory {
 			return null;
 	}
 
-	private TCTLAbstractProperty parseQueryAsOldFormat(Element queryElement) {
+	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) {
 		TCTLAbstractProperty query = null;
 		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 
-		String queryToParse = getChildNodesContentOfValueChildNodeAsString(
-				queryElement, "query");
+		String queryToParse = getChildNodesContentOfValueChildNodeAsString(queryElement, "query");
 
 		try {
 			query = queryParser.parse(queryToParse);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(
-							CreateGui.getApp(),
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
 							"TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.",
 							"Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 			System.err.println("No query was specified: " + e.getStackTrace());
@@ -966,11 +963,10 @@ public class TimedArcPetriNetFactory {
 	}
 
 	private int getQueryCapacityAsOldFormat(Element queryElement) {
-		return getChildNodesContentOfValueChildNodeAsInt(queryElement, "capacity");
+		return getContentOfFirstSpecificChildNodesValueChildNodeAsInt(queryElement, "capacity");
 	}
 
-	private boolean getChildNodesContentOfValueChildNodeAsBoolean(
-			Element element, String childNodeName) {
+	private boolean getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(Element element, String childNodeName) {
 		Node node = getFirstChildNodeByName(element, childNodeName);
 
 		if (node instanceof Element) {
@@ -1043,7 +1039,7 @@ public class TimedArcPetriNetFactory {
 		return 0.0;
 	}
 
-	private int getChildNodesContentOfValueChildNodeAsInt(Element element, String childNodeName) {
+	private int getContentOfFirstSpecificChildNodesValueChildNodeAsInt(Element element, String childNodeName) {
 		Node node = getFirstChildNodeByName(element, childNodeName);
 
 		if (node instanceof Element) {
