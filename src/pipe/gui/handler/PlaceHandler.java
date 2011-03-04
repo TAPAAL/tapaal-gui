@@ -128,6 +128,9 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			if(clicks > 0) {
 				place.addToken(new TimedToken(place));
 			}else{
+				if(place.numberOfTokens() == 0)
+					return;
+				
 				place.removeToken();
 			}
 			Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, clicks);
