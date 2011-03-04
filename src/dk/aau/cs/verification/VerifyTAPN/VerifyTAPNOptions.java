@@ -5,7 +5,6 @@ import java.util.Map;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
-import pipe.gui.KBoundAnalyzer;
 import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifyTAPNOptions implements VerificationOptions{

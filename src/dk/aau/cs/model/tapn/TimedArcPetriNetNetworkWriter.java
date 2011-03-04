@@ -234,7 +234,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
 		placeElement.setAttribute("markingOffsetX",	(inputPlace.getMarkingOffsetXObject() != null ? String.valueOf(inputPlace.getMarkingOffsetXObject()) : ""));
 		placeElement.setAttribute("markingOffsetY",	(inputPlace.getMarkingOffsetYObject() != null ? String.valueOf(inputPlace.getMarkingOffsetYObject()) : ""));
-		placeElement.setAttribute("capacity", ((Integer) inputPlace.getCapacity() != null ? String.valueOf((Integer) inputPlace.getCapacity()) : ""));
 
 		if (inputPlace instanceof TimedPlaceComponent) {
 			String invariantInput = ((TimedPlaceComponent) inputPlace).getInvariantAsString();

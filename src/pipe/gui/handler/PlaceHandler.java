@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -75,36 +73,26 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2
 					&& CreateGui.getApp().isEditionAllowed()
-					&& (CreateGui.getApp().getMode() == Pipe.PLACE || CreateGui
-							.getApp().getMode() == Pipe.SELECT)) {
+					&& (CreateGui.getApp().getMode() == Pipe.PLACE || CreateGui.getApp().getMode() == Pipe.SELECT)) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {
-				int currentMarking = ((Place) myObject).getCurrentMarking();
 				UndoManager undoManager = CreateGui.getView().getUndoManager();
 
 				switch (CreateGui.getApp().getMode()) {
 				case Pipe.ADDTOKEN:
 					if (myObject instanceof TimedPlaceComponent) {
-						Command command = new TimedPlaceMarkingEdit(
-								(TimedPlaceComponent) myObject, 1);
+						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, 1);
 						command.redo();
 						undoManager.addNewEdit(command);
-					} else {
-						undoManager.addNewEdit(((Place) myObject)
-								.setCurrentMarking(++currentMarking));
 					}
 					break;
 				case Pipe.DELTOKEN:
 					if (myObject instanceof TimedPlaceComponent) {
-						Command command = new TimedPlaceMarkingEdit(
-								(TimedPlaceComponent) myObject, -1);
+						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, -1);
 						command.redo();
 						undoManager.addNewEdit(command);
-					} else if (currentMarking > 0) {
-						undoManager.addNewEdit(((Place) myObject)
-								.setCurrentMarking(--currentMarking));
-					}
+					} 
 
 					break;
 				default:
@@ -115,12 +103,8 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
 				JPopupMenu m = getPopup(e);
 				if (m != null) {
-					int x = Zoomer.getZoomedValue(((Place) myObject)
-							.getNameOffsetXObject().intValue(), myObject
-							.getZoom());
-					int y = Zoomer.getZoomedValue(((Place) myObject)
-							.getNameOffsetYObject().intValue(), myObject
-							.getZoom());
+					int x = Zoomer.getZoomedValue(((Place) myObject).getNameOffsetXObject().intValue(), myObject.getZoom());
+					int y = Zoomer.getZoomedValue(((Place) myObject).getNameOffsetYObject().intValue(), myObject.getZoom());
 					m.show(myObject, x, y);
 				}
 			}

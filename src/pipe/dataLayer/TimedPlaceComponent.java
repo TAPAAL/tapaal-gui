@@ -34,7 +34,6 @@ import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -242,22 +241,6 @@ public class TimedPlaceComponent extends Place {
 
 	public boolean satisfiesInvariant(BigDecimal token) {
 		return place.invariant().isSatisfied(token);
-	}
-
-	// overide, so that we can take care of the age of the tokens
-	@Override
-	public Command setCurrentMarking(int currentMarkingInput) {
-		int oldMarking = place.numberOfTokens();
-
-		int tokensToAdd = currentMarkingInput - oldMarking;
-		if (tokensToAdd >= 0) {
-			addTokens(tokensToAdd);
-		} else {
-			removeTokens(Math.abs(tokensToAdd));
-		}
-
-		repaint();
-		return new TimedPlaceMarkingEdit(this, tokensToAdd);
 	}
 
 	public Command setInvariant(TimeInvariant inv) {
