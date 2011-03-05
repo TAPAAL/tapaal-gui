@@ -2,6 +2,10 @@ package dk.aau.cs.petrinet;
 
 import java.math.BigDecimal;
 
+/**
+ * @Deprecated use dk.aau.cs.model.tapn.TimedToken instead
+ */
+@Deprecated
 public class Token {
 	private TAPNPlace place;
 	private BigDecimal age;

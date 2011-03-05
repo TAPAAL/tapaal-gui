@@ -1,5 +1,6 @@
 package dk.aau.cs.petrinet;
 
+@Deprecated
 public class PrioritizedTAPNTransition extends TAPNTransition {
 	private int priority = 1;
 

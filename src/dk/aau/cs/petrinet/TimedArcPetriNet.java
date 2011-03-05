@@ -2,6 +2,10 @@ package dk.aau.cs.petrinet;
 
 import java.util.List;
 
+/**
+ * @Deprecated use dk.aau.cs.model.tapn.TimedArcPetriNet instead
+ */
+@Deprecated
 public interface TimedArcPetriNet {
 	void addPlace(TAPNPlace place);
 
