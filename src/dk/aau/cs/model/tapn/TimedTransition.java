@@ -135,6 +135,10 @@ public class TimedTransition extends TAPNElement {
 	public int presetSize() {
 		return preset.size() + transportArcsGoingThrough.size();
 	}
+	
+	public int postsetSize() {
+		return postset.size() + transportArcsGoingThrough.size();
+	}
 
 	public boolean isEnabled() {
 		if(isShared()){
@@ -271,4 +275,6 @@ public class TimedTransition extends TAPNElement {
 			return false;
 		return true;
 	}
+
+
 }
