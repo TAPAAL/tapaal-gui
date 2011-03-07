@@ -33,26 +33,27 @@ import pipe.gui.handler.PlaceHandler;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
+import dk.aau.cs.util.Require;
 
 public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
 
-	private dk.aau.cs.model.tapn.TimedPlace place;
+	private dk.aau.cs.model.tapn.TimedPlaceInterface place;
 	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
 
 	private Window ageOfTokensWindow;
 	private Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(double positionXInput, double positionYInput,
-			dk.aau.cs.model.tapn.TimedPlace place) {
+	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlaceInterface place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
 		this.listener = timedPlaceListener();		
@@ -79,10 +80,9 @@ public class TimedPlaceComponent extends Place {
 	private TimedPlaceListener timedPlaceListener() {
 		return new TimedPlaceListener() {
 			public void nameChanged(TimedPlaceEvent e) {
-				TimedPlace place = e.source();
+				TimedPlaceInterface place = e.source();
 				TimedPlaceComponent.super.setName(place.name());				
 			}
-			public void sharedStateChanged(TimedPlaceEvent e) { repaint(); }
 			public void invariantChanged(TimedPlaceEvent e) { update(true); }
 			public void markingChanged(TimedPlaceEvent e) { repaint(); }
 		};
@@ -117,14 +117,15 @@ public class TimedPlaceComponent extends Place {
 
 	@Override
 	public void delete() {
-		if (place != null)
-			place.delete();
-		super.delete();
+		Require.notImplemented();
+//		if (place != null)
+//			place.delete();
+//		super.delete();
 	}
 
 	public String getInvariantAsString() {
 
-		return place.invariant().toString();
+		return getInvariant().toString();
 	}
 
 	public TimeInvariant getInvariant() {
@@ -149,6 +150,7 @@ public class TimedPlaceComponent extends Place {
 		return buffer.toString();
 	}
 
+	// TODO: get rid of
 	public ArrayList<BigDecimal> getTokens() {
 		ArrayList<BigDecimal> tokensToReturn = new ArrayList<BigDecimal>();
 
@@ -239,10 +241,6 @@ public class TimedPlaceComponent extends Place {
 		}
 	}
 
-	public boolean satisfiesInvariant(BigDecimal token) {
-		return place.invariant().isSatisfied(token);
-	}
-
 	public Command setInvariant(TimeInvariant inv) {
 		TimeInvariant old = place.invariant();
 		place.setInvariant(inv);
@@ -300,8 +298,7 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -309,7 +306,7 @@ public class TimedPlaceComponent extends Place {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new PlaceEditorPanel(guiDialog.getRootPane(), this, CreateGui.getView(), place.model().parentNetwork()));
+		contentPane.add(new PlaceEditorPanel(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
 
 		guiDialog.setResizable(false);
 
@@ -344,18 +341,17 @@ public class TimedPlaceComponent extends Place {
 		return getName();
 	}
 
-	public TimedPlace underlyingPlace() {
+	public TimedPlaceInterface underlyingPlace() {
 		return place;
 	}
 
-	public void setUnderlyingPlace(TimedPlace place) {
+	public void setUnderlyingPlace(TimedPlaceInterface place) {
 		if(this.place != null && listener != null){
 			this.place.removeTimedPlaceListener(listener);
 		}
 		place.addTimedPlaceListener(listener);
 		this.place = place;
-		this.setName(place.name());
-		this.repaint();
+		this.update(true);
 	}
 
 	public void addTokens(int numberOfTokensToAdd) {

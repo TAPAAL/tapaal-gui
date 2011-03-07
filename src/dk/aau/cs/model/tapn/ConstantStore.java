@@ -27,7 +27,7 @@ public class ConstantStore {
 		}
 
 		for (TimedArcPetriNet tapn : model.templates()) {
-			for (TimedPlace place : tapn.places()) {
+			for (TimedPlaceInterface place : tapn.places()) {
 				buildConstraints(place);
 			}
 
@@ -46,7 +46,7 @@ public class ConstantStore {
 
 	}
 
-	private void buildConstraints(TimedPlace place) {
+	private void buildConstraints(TimedPlaceInterface place) {
 		TimeInvariant invariant = place.invariant();
 
 		Bound bound = invariant.upperBound();

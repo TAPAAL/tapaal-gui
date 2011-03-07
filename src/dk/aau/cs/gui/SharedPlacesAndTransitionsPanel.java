@@ -154,29 +154,30 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 			private void deleteSharedPlace(boolean deleteFromTemplates) {
 				SharedPlace sharedPlace = (SharedPlace)list.getSelectedValue();
-				if(deleteFromTemplates){
-					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
-						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
-						undoManager.addEdit(new DeleteTimedPlaceCommand(place, place.underlyingPlace().model(), template.guiModel(), tab.drawingSurface()));
-						place.delete();
-					}
-					tab.drawingSurface().repaint();
-					sharedPlacesListModel.removeElement(sharedPlace);
-					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
-				}else{
-					Collection<TimedPlace> copy = sharedPlace.places();
-					for(TimedPlace place : copy){
-						place.unshare();
-						undoManager.addEdit(new UnsharePlaceCommand(sharedPlace, place));
-					}
-					sharedPlacesListModel.removeElement(sharedPlace);
-					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
-					for(TimedPlace place : copy){
-						String name = nameGenerator.getNewPlaceName(place.model());
-						// We add this invisible transition renaming to avoid problems with undo
-						undoManager.addEdit(new RenameTimedPlaceCommand(tab, place, name, place.name())); 
-					}
-				}
+				Require.notImplemented();
+//				if(deleteFromTemplates){
+//					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
+//						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
+//						undoManager.addEdit(new DeleteTimedPlaceCommand(place, place.underlyingPlace().model(), template.guiModel(), tab.drawingSurface()));
+//						place.delete();
+//					}
+//					tab.drawingSurface().repaint();
+//					sharedPlacesListModel.removeElement(sharedPlace);
+//					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
+//				}else{
+//					Collection<TimedPlace> copy = sharedPlace.places();
+//					for(TimedPlace place : copy){
+//						place.unshare();
+//						undoManager.addEdit(new UnsharePlaceCommand(sharedPlace, place));
+//					}
+//					sharedPlacesListModel.removeElement(sharedPlace);
+//					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
+//					for(TimedPlace place : copy){
+//						String name = nameGenerator.getNewPlaceName(place.model());
+//						// We add this invisible transition renaming to avoid problems with undo
+//						undoManager.addEdit(new RenameTimedPlaceCommand(tab, place, name, place.name())); 
+//					}
+//				}
 			}
 
 			private void deleteSharedTransition(boolean deleteFromTemplates) {

@@ -5,4 +5,8 @@ public class Require {
 		if (!condition)
 			throw new RequireException(message);
 	}
+	
+	public static void notImplemented(){
+		throw new RuntimeException("NOT IMPLEMENTED");
+	}
 }

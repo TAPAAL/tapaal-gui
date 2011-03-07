@@ -22,6 +22,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.util.Require;
 
 /**
  * Class to handle undo & redo functionality
@@ -250,7 +251,8 @@ public class UndoManager {
 			if (!pnObject.isDeleted()) {
 				if(pnObject instanceof TimedPlaceComponent){
 					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
-					addEdit(new DeleteTimedPlaceCommand(tp, tp.underlyingPlace().model(), guiModel, view));
+					Require.notImplemented();
+					//addEdit(new DeleteTimedPlaceCommand(tp, tp.underlyingPlace().model(), guiModel, view));
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
 					addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view));

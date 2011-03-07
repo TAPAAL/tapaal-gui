@@ -8,20 +8,20 @@ import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
 
-public class TimedPlace extends TAPNElement {
+public class TimedPlace  implements TimedPlaceInterface {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
 	private String name;
 	private TimeInvariant invariant;
-	private List<TimedOutputArc> preset = new ArrayList<TimedOutputArc>();
-	private List<TimedInputArc> postset = new ArrayList<TimedInputArc>();
-	private List<TransportArc> presetTransportArcs = new ArrayList<TransportArc>();
-	private List<TransportArc> postsetTransportArcs = new ArrayList<TransportArc>();
-	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 
-	private TimedMarking currentMarking;
-	private SharedPlace sharedPlace;
+//	private List<TimedOutputArc> preset = new ArrayList<TimedOutputArc>();
+//	private List<TimedInputArc> postset = new ArrayList<TimedInputArc>();
+//	private List<TransportArc> presetTransportArcs = new ArrayList<TransportArc>();
+//	private List<TransportArc> postsetTransportArcs = new ArrayList<TransportArc>();
+//	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 
+	private TimedArcPetriNet model;
+	private TimedMarkingInterface currentMarking;
 	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 
 	public TimedPlace(String name) {
@@ -31,6 +31,14 @@ public class TimedPlace extends TAPNElement {
 	public TimedPlace(String name, TimeInvariant invariant) {
 		setName(name);
 		setInvariant(invariant);
+	}
+	
+	public TimedArcPetriNet model() {
+		return model;
+	}
+
+	public void setModel(TimedArcPetriNet model) {
+		this.model = model;
 	}
 
 	public void addTimedPlaceListener(TimedPlaceListener listener){
@@ -43,38 +51,14 @@ public class TimedPlace extends TAPNElement {
 		listeners.remove(listener);
 	}
 
-	public void makeShared(SharedPlace sharedPlace) {
-		Require.that(sharedPlace != null, "sharedPlace cannot be null");
-		
-		if(this.sharedPlace != sharedPlace){
-			unshare();
-			this.sharedPlace = sharedPlace;
-			setName(sharedPlace.name());
-			setInvariant(sharedPlace.invariant());
-			currentMarking.removePlaceFromMarking(this);
-			fireSharedStateChanged();
-		}
-	}	
-
-	public void unshare() {
-		if(isShared()){
-			sharedPlace.unshare(this);
-			sharedPlace = null;
-			fireSharedStateChanged();
-		}
-	}
-
 	public boolean isShared() {
-		return sharedPlace != null;
+		return false;
 	}
 
-	public SharedPlace sharedPlace() {
-		return sharedPlace;
-	}
-
-	public void setCurrentMarking(TimedMarking newMarking) {
-		Require.that(newMarking != null, "newMarking cannot be null");
-		this.currentMarking = newMarking;
+	public void setCurrentMarking(TimedMarkingInterface marking) {
+		Require.that(marking != null, "marking cannot be null");
+		this.currentMarking = marking;
+		fireMarkingChanged();
 	}
 
 	public String name() {
@@ -93,14 +77,7 @@ public class TimedPlace extends TAPNElement {
 			listener.nameChanged(new TimedPlaceEvent(this));
 		}
 	}
-	
-
-	private void fireSharedStateChanged() {
-		for(TimedPlaceListener listener : listeners){
-			listener.sharedStateChanged(new TimedPlaceEvent(this));
-		}
-	}
-	
+		
 	private void fireInvariantChanged(){
 		for(TimedPlaceListener listener : listeners){
 			listener.invariantChanged(new TimedPlaceEvent(this));
@@ -127,90 +104,65 @@ public class TimedPlace extends TAPNElement {
 		fireInvariantChanged();
 	}
 
-	public void addToPreset(TimedOutputArc arc) {
-		Require.that(arc != null, "Cannot add null to preset");
-		preset.add(arc);
-	}
-
-	public void addToPreset(TransportArc arc) {
-		Require.that(arc != null, "Cannot add null to preset");
-		presetTransportArcs.add(arc);
-	}
-
-	public void addToPostset(TimedInputArc arc) {
-		Require.that(arc != null, "Cannot add null to postset");
-		postset.add(arc);
-	}
-
-	public void addToPostset(TransportArc arc) {
-		Require.that(arc != null, "Cannot add null to postset");
-		postsetTransportArcs.add(arc);
-	}
-
-	public void addInhibitorArc(TimedInhibitorArc arc){
-		Require.that(arc != null, "arc cannot be null");
-		inhibitorArcs.add(arc);
-	}
-
-	public void removeInhibitorArc(TimedInhibitorArc arc){
-		Require.that(arc != null, "arc cannot be null");
-		inhibitorArcs.remove(arc);
-	}
-
-	public boolean hasTokenSatisfyingInterval(TimeInterval interval) {
-		List<TimedToken> tokens = currentMarking.getTokensFor(this);
-
-		for (TimedToken t : tokens) {
-			if (interval.isIncluded(t.age()))
-				return true;
-		}
-
-		return false;
-	}
-
-	public List<TimedToken> tokensSatisfyingInterval(TimeInterval interval) {
-		List<TimedToken> tokens = currentMarking.getTokensFor(this);
-		ArrayList<TimedToken> toReturn = new ArrayList<TimedToken>();
-		for (TimedToken t : tokens) {
-			if (interval.isIncluded(t.age()))
-				toReturn.add(t);
-		}
-
-		return toReturn;
-	}
+//	public void addToPreset(TimedOutputArc arc) {
+//		Require.that(arc != null, "Cannot add null to preset");
+//		preset.add(arc);
+//	}
+//
+//	public void addToPreset(TransportArc arc) {
+//		Require.that(arc != null, "Cannot add null to preset");
+//		presetTransportArcs.add(arc);
+//	}
+//
+//	public void addToPostset(TimedInputArc arc) {
+//		Require.that(arc != null, "Cannot add null to postset");
+//		postset.add(arc);
+//	}
+//
+//	public void addToPostset(TransportArc arc) {
+//		Require.that(arc != null, "Cannot add null to postset");
+//		postsetTransportArcs.add(arc);
+//	}
+//
+//	public void addInhibitorArc(TimedInhibitorArc arc){
+//		Require.that(arc != null, "arc cannot be null");
+//		inhibitorArcs.add(arc);
+//	}
+//
+//	public void removeInhibitorArc(TimedInhibitorArc arc){
+//		Require.that(arc != null, "arc cannot be null");
+//		inhibitorArcs.remove(arc);
+//	}
 
 	public List<TimedToken> tokens() {
 		return currentMarking.getTokensFor(this);
 	}
 
 	public int numberOfTokens() {
-		return currentMarking.getTokensFor(this).size();
+		return tokens().size();
 	}
 
 
-	public void removeFromPostset(TimedInputArc arc) {
-		postset.remove(arc);
-	}
-
-	public void removeFromPostset(TransportArc arc) {
-		postsetTransportArcs.remove(arc);
-	}
-
-	public void removeFromPreset(TransportArc arc) {
-		presetTransportArcs.remove(arc);
-	}
-
-	public void removeFromPreset(TimedOutputArc arc) {
-		preset.remove(arc);
-	}
-
-	public void delete() {
-		unshare();
-		model().remove(this);
-	}
+//	public void removeFromPostset(TimedInputArc arc) {
+//		postset.remove(arc);
+//	}
+//
+//	public void removeFromPostset(TransportArc arc) {
+//		postsetTransportArcs.remove(arc);
+//	}
+//
+//	public void removeFromPreset(TransportArc arc) {
+//		presetTransportArcs.remove(arc);
+//	}
+//
+//	public void removeFromPreset(TimedOutputArc arc) {
+//		preset.remove(arc);
+//	}
 
 	public void addToken(TimedToken timedToken) {
 		Require.that(timedToken != null, "timedToken cannot be null");
+		Require.that(timedToken.place().equals(this), "token is located in a different place");
+		
 		currentMarking.add(timedToken);
 		fireMarkingChanged();
 	}
@@ -232,7 +184,7 @@ public class TimedPlace extends TAPNElement {
 
 	public void removeToken() {
 		if (numberOfTokens() > 0) {
-			currentMarking.removeArbitraryTokenFrom(this);
+			currentMarking.remove(tokens().get(0));
 			fireMarkingChanged();
 		}
 	}

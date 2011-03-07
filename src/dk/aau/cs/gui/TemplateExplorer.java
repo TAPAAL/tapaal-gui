@@ -36,6 +36,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
@@ -197,23 +198,24 @@ public class TemplateExplorer extends JPanel {
 				}
 				
 				if(queriesToDelete.isEmpty() || choice == JOptionPane.YES_OPTION) {
-					ArrayList<Tuple<TimedPlace, SharedPlace>> placesToUnshare = new ArrayList<Tuple<TimedPlace,SharedPlace>>();
-					for(TimedPlace place : template.model().places()){
-						if(place.isShared()){
-							placesToUnshare.add(new Tuple<TimedPlace, SharedPlace>(place, place.sharedPlace()));
-						}
-					}
-					
-					ArrayList<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare = new ArrayList<Tuple<TimedTransition,SharedTransition>>();
-					for(TimedTransition transition : template.model().transitions()){
-						if(transition.isShared()){
-							transitionsToUnshare.add(new Tuple<TimedTransition, SharedTransition>(transition, transition.sharedTransition()));
-						}
-					}
-					
-					Command command = new RemoveTemplateCommand(parent, TemplateExplorer.this, template, index, queriesToDelete, placesToUnshare, transitionsToUnshare);
-					undoManager.addNewEdit(command);
-					command.redo();
+					Require.notImplemented();
+//					ArrayList<Tuple<TimedPlace, SharedPlace>> placesToUnshare = new ArrayList<Tuple<TimedPlace,SharedPlace>>();
+//					for(TimedPlace place : template.model().places()){
+//						if(place.isShared()){
+//							placesToUnshare.add(new Tuple<TimedPlace, SharedPlace>(place, place.sharedPlace()));
+//						}
+//					}
+//					
+//					ArrayList<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare = new ArrayList<Tuple<TimedTransition,SharedTransition>>();
+//					for(TimedTransition transition : template.model().transitions()){
+//						if(transition.isShared()){
+//							transitionsToUnshare.add(new Tuple<TimedTransition, SharedTransition>(transition, transition.sharedTransition()));
+//						}
+//					}
+//					
+//					Command command = new RemoveTemplateCommand(parent, TemplateExplorer.this, template, index, queriesToDelete, placesToUnshare, transitionsToUnshare);
+//					undoManager.addNewEdit(command);
+//					command.redo();
 				}
 				
 			}
@@ -222,7 +224,7 @@ public class TemplateExplorer extends JPanel {
 				Iterable<TAPNQuery> queries = parent.queries();
 				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
-				for (TimedPlace p : template.model().places()) {
+				for (TimedPlaceInterface p : template.model().places()) {
 					for (TAPNQuery q : queries) {
 						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(template.model().getName(), p.name())) {
 							queriesToDelete.add(q);

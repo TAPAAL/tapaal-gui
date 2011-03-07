@@ -1,14 +1,14 @@
 package dk.aau.cs.gui.undo;
 
 import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 
 public class ChangedInvariantCommand extends Command {
-	private final TimedPlace place;
+	private final TimedPlaceInterface place;
 	private final TimeInvariant oldInvariant;
 	private final TimeInvariant newInvariant;
 
-	public ChangedInvariantCommand(TimedPlace place, TimeInvariant oldInvariant, TimeInvariant newInvariant){
+	public ChangedInvariantCommand(TimedPlaceInterface place, TimeInvariant oldInvariant, TimeInvariant newInvariant){
 		this.place = place;
 		this.oldInvariant = oldInvariant;
 		this.newInvariant = newInvariant;

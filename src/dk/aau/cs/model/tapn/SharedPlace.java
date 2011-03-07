@@ -1,20 +1,23 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
+import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
 
-public class SharedPlace {
+public class SharedPlace implements TimedPlaceInterface{
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
 	private TimeInvariant invariant;
-	private List<TimedPlace> places = new ArrayList<TimedPlace>();
 	
 	private TimedArcPetriNetNetwork network;
+	private TimedMarkingInterface currentMarking;
+	
+	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 
 	public SharedPlace(String name){
 		this(name, TimeInvariant.LESS_THAN_INFINITY);
@@ -25,6 +28,21 @@ public class SharedPlace {
 		setInvariant(invariant);
 	}
 	
+	public String name() {
+		return name;
+	}
+	
+	public void setName(String newName) {
+		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
+		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
+		this.name = newName;
+		fireNameChanged();
+	}
+	
+	private boolean isValid(String newName) {
+		return namePattern.matcher(newName).matches();
+	}
+
 	public TimeInvariant invariant(){
 		return invariant;
 	}
@@ -32,19 +50,7 @@ public class SharedPlace {
 	public void setInvariant(TimeInvariant invariant) {
 		Require.that(invariant != null, "invariant must not be null");
 		this.invariant = invariant;
-		for(TimedPlace place : places){
-			place.setInvariant(invariant);
-		}
-	}
-
-
-	public void delete() {
-		// place.delete() will call unshare and thus modify the place collection
-		// which won't work while we are iterating through it, so we copy it first.
-		ArrayList<TimedPlace> copy = new ArrayList<TimedPlace>(places);
-		for(TimedPlace place : copy){
-			place.delete();
-		}
+		fireInvariantChanged();
 	}
 
 	public void setNetwork(TimedArcPetriNetNetwork network) {
@@ -55,44 +61,85 @@ public class SharedPlace {
 		return network;
 	}
 	
-	public String name() {
-		return name;
+	public void addTimedPlaceListener(TimedPlaceListener listener) {
+		Require.that(listener != null, "Listener cannot be null");
+		listeners.add(listener);
 	}
 
-	public void setName(String newName) {
-		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
-		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
-		this.name = newName;
-		for(TimedPlace place : places){
-			place.setName(newName);
-		}
-	}
-	
-	private boolean isValid(String newName) {
-		return namePattern.matcher(newName).matches();
-	}
-	
-	// TODO: Find a better name for this
-	public void makeShared(TimedPlace place){
-		Require.that(place != null, "place cannot be null");
-		Require.that(templateDoesNotContainSharedPlace(place.model()), "Another place in the same template is already shared under that name");
-		place.makeShared(this); // this will unshare first if part of another shared transition
-		places.add(place);
+	public void removeTimedPlaceListener(TimedPlaceListener listener) {
+		Require.that(listener != null, "Listener cannot be null");
+		listeners.remove(listener);
 	}
 
-	private boolean templateDoesNotContainSharedPlace(TimedArcPetriNet model) {
-		for(TimedPlace place : places){
-			if(model.equals(place.model())) return false;
-		}
+	public TimedPlaceInterface copy() {
+		return this; // TODO: there should only be one of each shared place
+	}
+
+	public boolean isShared() {
 		return true;
 	}
 
-	// TODO: this should somehow change timedPlace also, but calling unshare yields infinite loop
-	public void unshare(TimedPlace timedPlace) {
-		Require.that(timedPlace != null, "timedPlace cannot be null");
-		places.remove(timedPlace);
-	}	
+	public void setCurrentMarking(TimedMarkingInterface marking) {
+		Require.that(marking != null, "marking cannot be null");
+		currentMarking = marking;
+		fireMarkingChanged();
+	}
 	
+	public void addToken(TimedToken timedToken) {
+		Require.that(timedToken != null, "timedToken cannot be null");
+		Require.that(timedToken.place().equals(this), "token is located in a different place");
+		
+		currentMarking.add(timedToken);
+		fireMarkingChanged();
+	}
+	
+	public void addTokens(Iterable<TimedToken> tokens) {
+		Require.that(tokens != null, "tokens cannot be null"); // TODO: maybe check that tokens are in this place?
+		
+		for(TimedToken token : tokens){
+			currentMarking.add(token); // avoid firing marking changed on every add
+		}
+		fireMarkingChanged();
+	}
+
+	public void removeToken(TimedToken timedToken) {
+		Require.that(timedToken != null, "timedToken cannot be null");
+		currentMarking.remove(timedToken);
+		fireMarkingChanged();
+	}
+
+	public void removeToken() {
+		if (numberOfTokens() > 0) {
+			currentMarking.remove(tokens().get(0));
+			fireMarkingChanged();
+		}
+	}
+
+	public List<TimedToken> tokens() {
+		return currentMarking.getTokensFor(this);
+	}	
+
+	public int numberOfTokens() {
+		return tokens().size();
+	}
+	
+	private void fireMarkingChanged() {
+		for(TimedPlaceListener listener : listeners){
+			listener.markingChanged(new TimedPlaceEvent(this));
+		}
+	}
+	
+	private void fireNameChanged() {
+		for(TimedPlaceListener listener : listeners){
+			listener.nameChanged(new TimedPlaceEvent(this));
+		}
+	}
+
+	private void fireInvariantChanged() {
+		for(TimedPlaceListener listener : listeners){
+			listener.invariantChanged(new TimedPlaceEvent(this));
+		}
+	}
 	
 	@Override
 	public String toString() {
@@ -123,8 +170,4 @@ public class SharedPlace {
 			return false;
 		return true;
 	}
-
-	public Collection<TimedPlace> places() {
-		return new ArrayList<TimedPlace>(places);
-	}	
 }

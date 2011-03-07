@@ -1,15 +1,16 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.util.Require;
 
 public class TimedInputArc extends TAPNElement {
-	private TimedPlace source;
+	private TimedPlaceInterface source;
 	private TimeInterval interval;
 	private TimedTransition destination;
 
-	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
+	public TimedInputArc(TimedPlaceInterface source, TimedTransition destination, TimeInterval interval) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		
@@ -18,7 +19,7 @@ public class TimedInputArc extends TAPNElement {
 		setTimeInterval(interval);
 	}
 
-	public TimedPlace source() {
+	public TimedPlaceInterface source() {
 		return source;
 	}
 
@@ -37,7 +38,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public boolean isEnabled() {
-		return source.hasTokenSatisfyingInterval(interval);
+		return getElligibleTokens().size() > 0;
 	}
 
 	public boolean isEnabledBy(TimedToken token) {
@@ -46,7 +47,14 @@ public class TimedInputArc extends TAPNElement {
 	}
 	
 	public List<TimedToken> getElligibleTokens(){
-		return source.tokensSatisfyingInterval(interval);
+		ArrayList<TimedToken> elligbleTokens = new ArrayList<TimedToken>();
+		List<TimedToken> tokens = source.tokens();
+
+		for (TimedToken t : tokens) {
+			if (isEnabledBy(t)) elligbleTokens.add(t);
+		}
+
+		return elligbleTokens;
 	}
 
 	public void delete() {
@@ -55,5 +63,11 @@ public class TimedInputArc extends TAPNElement {
 
 	public TimedInputArc copy(TimedArcPetriNet tapn) {
 		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy());
+	}
+
+	// This method should ONLY be called in relation to sharing/unsharing a place
+	public void setSource(TimedPlaceInterface place) {
+		Require.that(place != null, "place cannot be null");
+		this.source = place;		
 	}
 }

@@ -63,6 +63,7 @@ import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 public class GuiFrame extends JFrame implements ActionListener, Observer {
@@ -1396,47 +1397,47 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
 			Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
 			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-
-			boolean queriesAffected = false;
-			for (PetriNetObject pn : selection) {
-				if (pn instanceof TimedPlaceComponent) {
-					TimedPlaceComponent place = (TimedPlaceComponent)pn;
-					for (TAPNQuery q : queries) {
-						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(place.underlyingPlace().model().getName(),place.underlyingPlace().name())) {
-							queriesAffected = true;
-							queriesToDelete.add(q);
-						}
-					}
-				}
-			}
-			StringBuilder s = new StringBuilder();
-			s.append("The following queries are associated with the currently selected objects:\n\n");
-			for (TAPNQuery q : queriesToDelete) {
-				s.append(q.getName());
-				s.append("\n");
-			}
-			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
-
-			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-					CreateGui.getApp(), s.toString(), "Warning",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-					: JOptionPane.YES_OPTION;
-
-					if (choice == JOptionPane.YES_OPTION) {
-						appView.getUndoManager().newEdit(); // new "transaction""
-
-						if (queriesAffected) {
-							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-							for (TAPNQuery q : queriesToDelete) {
-								currentTab.removeQuery(q);
-							}
-						}
-
-						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-						appView.getSelectionObject().deleteSelection();
-						appView.repaint();
-						CreateGui.getCurrentTab().network().buildConstraints();
-					}
+			Require.notImplemented();
+//			boolean queriesAffected = false;
+//			for (PetriNetObject pn : selection) {
+//				if (pn instanceof TimedPlaceComponent) {
+//					TimedPlaceComponent place = (TimedPlaceComponent)pn;
+//					for (TAPNQuery q : queries) {
+//						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(place.underlyingPlace().model().getName(),place.underlyingPlace().name())) {
+//							queriesAffected = true;
+//							queriesToDelete.add(q);
+//						}
+//					}
+//				}
+//			}
+//			StringBuilder s = new StringBuilder();
+//			s.append("The following queries are associated with the currently selected objects:\n\n");
+//			for (TAPNQuery q : queriesToDelete) {
+//				s.append(q.getName());
+//				s.append("\n");
+//			}
+//			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+//
+//			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+//					CreateGui.getApp(), s.toString(), "Warning",
+//					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+//					: JOptionPane.YES_OPTION;
+//
+//					if (choice == JOptionPane.YES_OPTION) {
+//						appView.getUndoManager().newEdit(); // new "transaction""
+//
+//						if (queriesAffected) {
+//							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+//							for (TAPNQuery q : queriesToDelete) {
+//								currentTab.removeQuery(q);
+//							}
+//						}
+//
+//						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+//						appView.getSelectionObject().deleteSelection();
+//						appView.repaint();
+//						CreateGui.getCurrentTab().network().buildConstraints();
+//					}
 		}
 
 	}

@@ -29,38 +29,38 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
-import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
-import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
 
 public class PlaceEditorPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = -4163767112591119036L;
-	TimedPlaceComponent place;
-	DrawingSurfaceImpl view;
-	JRootPane rootPane;
+	private JRootPane rootPane;
 	
 	private JCheckBox sharedCheckBox;
 	private JComboBox sharedPlacesComboBox;
 
-	private final TimedArcPetriNetNetwork network;
+	private TimedPlaceComponent place;
+	private Context context;
 	
-	public PlaceEditorPanel(JRootPane _rootPane, TimedPlaceComponent _place, DrawingSurfaceImpl _view, TimedArcPetriNetNetwork network) {
-		place = _place;
-		view = _view;
-		rootPane = _rootPane;
-		this.network = network;
+	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
+		this.rootPane = rootPane;
+		this.place = placeComponent;
+		this.context = context;
 		initComponents();
 	}
 
@@ -150,7 +150,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				}
 			}		
 		});
-		sharedCheckBox.setEnabled(network.numberOfSharedPlaces() > 0);
+		sharedCheckBox.setEnabled(context.network().numberOfSharedPlaces() > 0);
 		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
@@ -158,7 +158,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 3);
 		basicPropertiesPanel.add(sharedCheckBox, gridBagConstraints);
 		
-		sharedPlacesComboBox = new JComboBox(network.sharedPlaces().toArray());
+		sharedPlacesComboBox = new JComboBox(context.network().sharedPlaces().toArray());
 		
 		nameLabel = new javax.swing.JLabel();
 		nameLabel.setText("Name:");
@@ -206,7 +206,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		if(place.underlyingPlace().isShared()){
 			switchToNameDropDown();
 			sharedCheckBox.setSelected(true);
-			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace().sharedPlace());
+			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 		}else{
 			switchToNameTextField();
 		}
@@ -284,7 +284,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gbc.gridy = 0;
 		invariantGroup.add(invariantInf, gbc);
 
-		Set<String> constants = CreateGui.getCurrentTab().network().getConstantNames();
+		Set<String> constants = context.network().getConstantNames();
 		invConstantsComboBox = new JComboBox(constants.toArray());
 
 		invConstantsComboBox.setMinimumSize(new Dimension(80, 30));
@@ -451,60 +451,61 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void doOK() {
-		view.getUndoManager().newEdit(); // new "transaction""
+		context.undoManager().newEdit(); // new "transaction""
 		
-		boolean wasShared = place.underlyingPlace().isShared() && !sharedCheckBox.isSelected();
-		if(place.underlyingPlace().isShared()){
-			view.getUndoManager().addEdit(new UnsharePlaceCommand(place.underlyingPlace().sharedPlace(), place.underlyingPlace()));
-			place.underlyingPlace().unshare();
-		}
-		
+//		boolean wasShared = place.underlyingPlace().isShared() && !sharedCheckBox.isSelected();
+//		if(place.underlyingPlace().isShared()){
+//			view.getUndoManager().addEdit(new UnsharePlaceCommand(place.underlyingPlace().sharedPlace(), place.underlyingPlace()));
+//			place.underlyingPlace().unshare();
+//		}
+//		
 		if(sharedCheckBox.isSelected()){ // If you make it selected, everything else (marking, invariant) is disregarded
 			SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
-			view.getUndoManager().addEdit(new MakePlaceSharedCommand(selectedPlace, place.underlyingPlace()));
+			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, (TimedPlace)place.underlyingPlace(), place); // TODO: avoid casting
+			context.undoManager().addEdit(command);
 			try{
-				selectedPlace.makeShared(place.underlyingPlace());
+				command.redo();
 			}catch(RequireException e){
-				view.getUndoManager().undo();
+				context.undoManager().undo();
 				JOptionPane.showMessageDialog(this,"Another place in the same template is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}else{
 			String newName = nameTextField.getText();
 			String oldName = place.underlyingPlace().name();
-			if(place.underlyingPlace().model().isNameUsed(newName) && (wasShared || !oldName.equals(newName))){
-				view.getUndoManager().undo(); 
+			if(context.activeModel().isNameUsed(newName) && !oldName.equals(newName)){
+				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
 			try{ // set name
 				place.underlyingPlace().setName(newName);
-				Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTab().getSelectedComponent()).queries();
-
-				RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(oldName, newName);
-				for (TAPNQuery q : queries) {
-					q.getProperty().accept(renameVisitor, null);
-				}
-				view.getUndoManager().addEdit(new RenameTimedPlaceCommand(view.parent(), place.underlyingPlace(), oldName, newName));
+//				Iterable<TAPNQuery> queries = context.queries();
+//
+//				RenamePlaceTCTLVisitor renameVisitor = new RenamePlaceTCTLVisitor(oldName, newName);
+//				for (TAPNQuery q : queries) {
+//					q.getProperty().accept(renameVisitor, null);
+//				}
+//				context.undoManager().addEdit(new RenameTimedPlaceCommand(context.tabContent(), place.underlyingPlace(), oldName, newName));
 			}catch(RequireException e){
-				view.getUndoManager().undo(); 
+				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			view.getNameGenerator().updateIndices(place.underlyingPlace().model(), newName);
+			context.nameGenerator().updateIndices(context.activeModel(), newName);
 		
 			int newMarking = (Integer)markingSpinner.getValue();
 			if(newMarking != place.underlyingPlace().numberOfTokens()){
 				Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
 				command.redo();
-				view.getUndoManager().addEdit(command);
+				context.undoManager().addEdit(command);
 			}
 			
 			TimeInvariant newInvariant = constructInvariant();
 			TimeInvariant oldInvariant = place.underlyingPlace().invariant();
 			if(!newInvariant.equals(oldInvariant)){
-				view.getUndoManager().addEdit(new ChangedInvariantCommand(place.underlyingPlace(), oldInvariant, newInvariant));
+				context.undoManager().addEdit(new ChangedInvariantCommand(place.underlyingPlace(), oldInvariant, newInvariant));
 				place.underlyingPlace().setInvariant(newInvariant);
 			}
 		}
@@ -514,7 +515,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 		place.repaint();
 
-		CreateGui.getCurrentTab().network().buildConstraints();
+		context.network().buildConstraints();
 		exit();
 	}
 
@@ -529,7 +530,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		}else{
 			boolean nonStrict = "<=".equals(invRelationConstant.getSelectedItem());
-			Constant constant = network.getConstant((String)invConstantsComboBox.getSelectedItem());
+			Constant constant = context.network().getConstant((String)invConstantsComboBox.getSelectedItem());
 			return new TimeInvariant(nonStrict, new ConstantBound(constant));
 		}
 	}

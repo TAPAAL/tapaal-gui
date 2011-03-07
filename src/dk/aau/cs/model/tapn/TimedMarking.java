@@ -10,14 +10,21 @@ import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
 // This class must remain immutable wrt. delays and transition firings!
-public class TimedMarking {
-	private HashMap<TimedPlace, List<TimedToken>> placesToTokensMap;
-
+public class TimedMarking implements TimedMarkingInterface { // TODO: Consider removing the interface here?
+	private HashMap<TimedPlaceInterface, List<TimedToken>> placesToTokensMap;
+	private NetworkMarking parent;
+	
 	public TimedMarking() {
-		placesToTokensMap = new HashMap<TimedPlace, List<TimedToken>>();
+		placesToTokensMap = new HashMap<TimedPlaceInterface, List<TimedToken>>();
+	}
+	
+	public void setNetworkMarking(NetworkMarking marking){
+		this.parent = marking;
 	}
 
 	public void add(TimedToken token) {
+		Require.that(!token.place().isShared(), "this method should only be called for tokens in non-shared places");
+		
 		if (!placesToTokensMap.containsKey(token.place())) {
 			placesToTokensMap.put(token.place(), new ArrayList<TimedToken>());
 		}
@@ -33,6 +40,8 @@ public class TimedMarking {
 	}
 
 	public void remove(TimedToken token) {
+		Require.that(!token.place().isShared(), "this method should only be called for tokens in non-shared places");
+		
 		if (placesToTokensMap.containsKey(token.place())) {
 			List<TimedToken> tokens = placesToTokensMap.get(token.place());
 			tokens.remove(token);
@@ -45,27 +54,33 @@ public class TimedMarking {
 		}
 	}
 
-	public void removePlaceFromMarking(TimedPlace place) {
-		if(placesToTokensMap.containsKey(place)){
-			placesToTokensMap.remove(place);
+	public void removePlaceFromMarking(TimedPlaceInterface place) {
+		if(place.isShared()){
+			parent.removePlaceFromMarking(place);
+		}else{
+			if(placesToTokensMap.containsKey(place)){
+				placesToTokensMap.remove(place);
+			}
 		}
 	}
 
-	public List<TimedToken> getTokensFor(TimedPlace place) {
+	private List<TimedToken> getTokensFor(TimedPlace place) {
 		if (!placesToTokensMap.containsKey(place))
 			return new ArrayList<TimedToken>();
 		return placesToTokensMap.get(place);
 	}
-
-	public void removeArbitraryTokenFrom(TimedPlace timedPlace) {
-		Require.that(placesToTokensMap.get(timedPlace).size() > 0,
-				"No tokens to remove");
-		placesToTokensMap.get(timedPlace).remove(0);
+	
+	public List<TimedToken> getTokensFor(TimedPlaceInterface place){
+		if(place.isShared()){
+			return parent.getTokensFor(place);
+		}else{
+			return getTokensFor((TimedPlace)place);
+		}
 	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
 		Require.that(delay.compareTo(BigDecimal.ZERO) >= 0, "cannot delay with negative numbers");
-		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
+		for (Entry<TimedPlaceInterface, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			for (TimedToken token : entry.getValue()) {
 				TimeInvariant invariant = token.place().invariant();
 				if (!invariant.isSatisfied(token.age().add(delay))) {
@@ -85,8 +100,8 @@ public class TimedMarking {
 		Require.that(isDelayPossible(amount), "The specified delay is not possible due to an invariant.");
 		
 		TimedMarking clone = new TimedMarking();
-		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(placesToTokensMap.size());
-		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
+		HashMap<TimedPlaceInterface, List<TimedToken>> newMap = new HashMap<TimedPlaceInterface, List<TimedToken>>(placesToTokensMap.size());
+		for (Entry<TimedPlaceInterface, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			ArrayList<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
 			for (TimedToken token : entry.getValue()) {
 				newTokens.add(token.delay(amount));
@@ -127,5 +142,4 @@ public class TimedMarking {
 		}
 		return size;
 	}
-
 }

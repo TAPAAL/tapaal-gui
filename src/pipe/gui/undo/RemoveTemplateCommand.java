@@ -10,6 +10,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class RemoveTemplateCommand extends AddTemplateCommand {
@@ -28,6 +29,7 @@ public class RemoveTemplateCommand extends AddTemplateCommand {
 			Collection<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare
 	) {
 		super(templateExplorer, template, listIndex);
+		Require.notImplemented();
 		this.tabContent = tabContent;
 		this.queriesToDelete = queriesToDelete;
 		this.placesToUnshare = placesToUnshare;
@@ -36,17 +38,19 @@ public class RemoveTemplateCommand extends AddTemplateCommand {
 
 	@Override
 	public void redo() {
+		Require.notImplemented();
 		super.undo(); // Just the opposite of adding a template
 		for(TAPNQuery query : queriesToDelete) { tabContent.removeQuery(query);	}
-		for(Tuple<TimedPlace, SharedPlace> tuple : placesToUnshare){ tuple.value1().unshare(); }
-		for(Tuple<TimedTransition, SharedTransition> tuple : transitionsToUnshare){ tuple.value1().unshare(); }
+//		for(Tuple<TimedPlace, SharedPlace> tuple : placesToUnshare){ tuple.value1().unshare(); }
+//		for(Tuple<TimedTransition, SharedTransition> tuple : transitionsToUnshare){ tuple.value1().unshare(); }
 	}
 
 	@Override
 	public void undo() {
+		Require.notImplemented();
 		super.redo(); // Just the opposite of adding a template
 		for(TAPNQuery query : queriesToDelete){ tabContent.addQuery(query); }
-		for(Tuple<TimedPlace, SharedPlace> tuple : placesToUnshare){ tuple.value2().makeShared(tuple.value1()); }
-		for(Tuple<TimedTransition, SharedTransition> tuple : transitionsToUnshare){ tuple.value2().makeShared(tuple.value1()); }
+//		for(Tuple<TimedPlace, SharedPlace> tuple : placesToUnshare){ tuple.value2().makeShared(tuple.value1()); }
+//		for(Tuple<TimedTransition, SharedTransition> tuple : transitionsToUnshare){ tuple.value2().makeShared(tuple.value1()); }
 	}
 }

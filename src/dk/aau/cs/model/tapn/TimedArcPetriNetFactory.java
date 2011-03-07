@@ -396,7 +396,7 @@ public class TimedArcPetriNetFactory {
 		tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
 				sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput, taggedArc);
 
-		TimedPlace place = tapn.getPlaceByName(targetIn.getName());
+		TimedPlaceInterface place = tapn.getPlaceByName(targetIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(sourceIn.getName());
 
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place);
@@ -434,9 +434,9 @@ public class TimedArcPetriNetFactory {
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
 				TransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
-				TimedPlace sourcePlace = tapn.getPlaceByName(sourceIn.getName());
+				TimedPlaceInterface sourcePlace = tapn.getPlaceByName(sourceIn.getName());
 				TimedTransition trans = tapn.getTransitionByName(targetIn.getName());
-				TimedPlace destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
+				TimedPlaceInterface destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
 				TimeInterval interval = TimeInterval.parse(inscriptionSplit[0],	constants);
 
 				assert (sourcePlace != null);
@@ -461,9 +461,9 @@ public class TimedArcPetriNetFactory {
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
 				TransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
-				TimedPlace sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
+				TimedPlaceInterface sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = tapn.getTransitionByName(sourceIn.getName());
-				TimedPlace destPlace = tapn.getPlaceByName(targetIn.getName());
+				TimedPlaceInterface destPlace = tapn.getPlaceByName(targetIn.getName());
 				TimeInterval interval = transportArcsTimeIntervals.get((TransportArcComponent) presetTransportArc);
 
 				assert (sourcePlace != null);
@@ -500,7 +500,7 @@ public class TimedArcPetriNetFactory {
 				taggedArc),
 				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
 
-		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
+		TimedPlaceInterface place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 
@@ -525,7 +525,7 @@ public class TimedArcPetriNetFactory {
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
 					),
 				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
-		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
+		TimedPlaceInterface place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);

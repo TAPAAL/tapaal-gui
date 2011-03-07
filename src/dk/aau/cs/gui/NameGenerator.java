@@ -8,7 +8,7 @@ import pipe.dataLayer.Template;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class NameGenerator {
@@ -89,7 +89,7 @@ public class NameGenerator {
 	private void setupPlaceIDCounter(TimedArcPetriNet tapn) {
 		Pattern placePattern = Pattern.compile("^P(\\d+)$", Pattern.CASE_INSENSITIVE);
 		int nameCounter = -1;
-		for(TimedPlace p : tapn.places()) {
+		for(TimedPlaceInterface p : tapn.places()) {
 			Matcher m = placePattern.matcher(p.name().toLowerCase());
 			if(m.matches()) {
 				int number = Integer.parseInt(m.group(1));

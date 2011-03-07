@@ -11,7 +11,7 @@ import dk.aau.cs.TA.trace.TimeDelayFiringAction;
 import dk.aau.cs.TA.trace.TransitionFiring;
 import dk.aau.cs.TA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
@@ -102,7 +102,7 @@ public class VerifytaTraceInterpreter {
 				String sourceLocation = participant.location();
 
 				if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
-					TimedPlace place = tapn.getPlaceByName(sourceLocation);
+					TimedPlaceInterface place = tapn.getPlaceByName(sourceLocation);
 					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName()).lower();
 					TimedToken token = new TimedToken(place, clockValue);
 					tokens.add(token);
@@ -121,7 +121,7 @@ public class VerifytaTraceInterpreter {
 			String sourceLocation = start.sourceState().locationFor(automata);
 
 			if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
-				TimedPlace place = tapn.getPlaceByName(sourceLocation);
+				TimedPlaceInterface place = tapn.getPlaceByName(sourceLocation);
 				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName()).lower();
 				TimedToken token = new TimedToken(place, clockValue);
 				tokens.add(token);

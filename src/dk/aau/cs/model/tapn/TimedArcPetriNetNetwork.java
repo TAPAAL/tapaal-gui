@@ -23,11 +23,11 @@ public class TimedArcPetriNetNetwork {
 
 	public void add(TimedArcPetriNet tapn) {
 		Require.that(tapn != null, "tapn must be non-null");
-		Require.that(tapn.marking() != null, "Marking must be non-null");
 
 		tapn.setParentNetwork(this);
 		tapns.add(tapn);
-		currentMarking.addMarking(tapn, tapn.marking());
+		currentMarking.addMarking(tapn, new TimedMarking());
+		tapn.setMarking(currentMarking);
 	}
 	
 	public void add(SharedTransition sharedTransition){
@@ -58,7 +58,7 @@ public class TimedArcPetriNetNetwork {
 		return false;
 	}
 	
-	public boolean isNameUsedInTemplates(String name){
+	private boolean isNameUsedInTemplates(String name){
 		for(TimedArcPetriNet net : tapns){
 			if(net.isNameUsed(name)) return true;
 		}
@@ -81,7 +81,6 @@ public class TimedArcPetriNetNetwork {
 		if (sharedPlace != null) {
 			sharedPlace.setNetwork(null);
 			sharedPlaces.remove(sharedPlace);
-			sharedPlace.delete();
 		}
 	}
 	
@@ -112,7 +111,7 @@ public class TimedArcPetriNetNetwork {
 	public void setMarking(NetworkMarking marking) {
 		currentMarking = marking;
 		for (TimedArcPetriNet tapn : tapns) {
-			tapn.setMarking(marking.getMarkingFor(tapn));
+			tapn.setMarking(currentMarking);
 		}
 	}
 
@@ -144,7 +143,7 @@ public class TimedArcPetriNetNetwork {
 
 	public void updateGuardsWithNewConstant(String oldName, Constant newConstant) {
 		for (TimedArcPetriNet tapn : templates()) {
-			for (TimedPlace place : tapn.places()) {
+			for (TimedPlaceInterface place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}
 
@@ -163,13 +162,11 @@ public class TimedArcPetriNetNetwork {
 
 	}
 
-	private void updatePlaceInvariant(String oldName, Constant newConstant,
-			TimedPlace place) {
+	private void updatePlaceInvariant(String oldName, Constant newConstant, TimedPlaceInterface place) {
 		updateBound(oldName, newConstant, place.invariant().upperBound());
 	}
 
-	private void updateTimeInterval(String oldName, Constant newConstant,
-			TimeInterval interval) {
+	private void updateTimeInterval(String oldName, Constant newConstant, TimeInterval interval) {
 		updateBound(oldName, newConstant, interval.lowerBound());
 		updateBound(oldName, newConstant, interval.upperBound());
 	}

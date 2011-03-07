@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedMarking;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 
 
@@ -81,7 +81,7 @@ public class VerifyTAPNTraceParser {
 		ArrayList<TimedToken> consumedTokens = new ArrayList<TimedToken>();
 		
 		boolean tokenFound = false;
-		for(TimedPlace p : tapn.places()) {
+		for(TimedPlaceInterface p : tapn.places()) {
 			for(TimedToken t : previousMarking.getTokensFor(p)) {
 				for(TimedToken t2 : marking.getTokensFor(p)) {
 					if(t.equals(t2)) {

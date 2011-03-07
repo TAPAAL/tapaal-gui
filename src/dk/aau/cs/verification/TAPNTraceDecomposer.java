@@ -3,17 +3,17 @@ package dk.aau.cs.verification;
 import java.util.ArrayList;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.UntimedTAPNNetworkTrace;
 import dk.aau.cs.util.Tuple;
@@ -77,7 +77,7 @@ public class TAPNTraceDecomposer {
 			convertedTokens = new ArrayList<TimedToken>(transitionFiring.consumedTokens().size());
 			for (TimedToken token : transitionFiring.consumedTokens()) {
 				Tuple<String, String> remappedName = mapping.map(token.place().name());
-				TimedPlace place = tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
+				TimedPlaceInterface place = tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
 				convertedTokens.add(new TimedToken(place, token.age()));
 			}
 		}
