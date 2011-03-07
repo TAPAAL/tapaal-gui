@@ -24,7 +24,7 @@ public class NewModelToOldModelTransformer {
 
 	private void CreatePlaces(dk.aau.cs.model.tapn.TimedArcPetriNet model,
 			dk.aau.cs.petrinet.TAPN constructedModel) {
-		for (dk.aau.cs.model.tapn.TimedPlaceInterface place : model.places()) {
+		for (dk.aau.cs.model.tapn.TimedPlace place : model.places()) {
 			dk.aau.cs.petrinet.TAPNPlace tapnPlace = new TAPNPlace(
 					place.name(), ConvertToLegacyGuardString(place.invariant()
 							.toString()), 0);

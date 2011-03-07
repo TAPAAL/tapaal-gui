@@ -1,15 +1,15 @@
 package dk.aau.cs.model.tapn.event;
 
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
+import dk.aau.cs.model.tapn.TimedPlace;
 
 public class TimedPlaceEvent {
-	private TimedPlaceInterface source;
+	private TimedPlace source;
 	
-	public TimedPlaceEvent(TimedPlaceInterface source){
+	public TimedPlaceEvent(TimedPlace source){
 		this.source = source;
 	}
 	
-	public TimedPlaceInterface source(){
+	public TimedPlace source(){
 		return source;
 	}
 }

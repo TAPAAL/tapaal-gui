@@ -26,7 +26,7 @@ public class TimedArcPetriNetNetwork {
 
 		tapn.setParentNetwork(this);
 		tapns.add(tapn);
-		currentMarking.addMarking(tapn, new TimedMarking());
+		currentMarking.addMarking(tapn, new LocalTimedMarking());
 		tapn.setMarking(currentMarking);
 	}
 	
@@ -143,7 +143,7 @@ public class TimedArcPetriNetNetwork {
 
 	public void updateGuardsWithNewConstant(String oldName, Constant newConstant) {
 		for (TimedArcPetriNet tapn : templates()) {
-			for (TimedPlaceInterface place : tapn.places()) {
+			for (TimedPlace place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}
 
@@ -162,7 +162,7 @@ public class TimedArcPetriNetNetwork {
 
 	}
 
-	private void updatePlaceInvariant(String oldName, Constant newConstant, TimedPlaceInterface place) {
+	private void updatePlaceInvariant(String oldName, Constant newConstant, TimedPlace place) {
 		updateBound(oldName, newConstant, place.invariant().upperBound());
 	}
 

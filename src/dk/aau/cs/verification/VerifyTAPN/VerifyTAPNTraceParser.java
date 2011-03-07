@@ -9,8 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedMarking;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
@@ -31,7 +31,7 @@ public class VerifyTAPNTraceParser {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 		try {
 			String line;
-			TimedMarking previousMarking = null;
+			LocalTimedMarking previousMarking = null;
 			TimedTransition previousTransition = null;
 			TAPNNetworkTimedTransitionStep previousTransitionFiring = null;
 			while (reader.ready() && (line = reader.readLine()) != null) {
@@ -40,7 +40,7 @@ public class VerifyTAPNTraceParser {
 					break; // we are done parsing trace, exit outer loop
 
 				if(line.contains("Marking")) {
-					TimedMarking marking = parseMarking(line);
+					LocalTimedMarking marking = parseMarking(line);
 					if (previousTransitionFiring != null) {
 						List<TimedToken> consumedTokens = findConsumedTokensBetween(previousMarking, marking);
 						trace.add(new TimedTransitionStep(previousTransition, consumedTokens));
@@ -61,8 +61,8 @@ public class VerifyTAPNTraceParser {
 		return trace;
 	}
 
-	private TimedMarking parseMarking(String markingString) {
-		TimedMarking marking = new TimedMarking();
+	private LocalTimedMarking parseMarking(String markingString) {
+		LocalTimedMarking marking = new LocalTimedMarking();
 		String[] tokens = markingString.split(" ");
 		Pattern pattern = Pattern.compile("\\((\\w+),(\\d+(?:\\.\\d+)?)\\)");
 		
@@ -77,11 +77,11 @@ public class VerifyTAPNTraceParser {
 		return marking;
 	}
 
-	private List<TimedToken> findConsumedTokensBetween(TimedMarking previousMarking, TimedMarking marking) {
+	private List<TimedToken> findConsumedTokensBetween(LocalTimedMarking previousMarking, LocalTimedMarking marking) {
 		ArrayList<TimedToken> consumedTokens = new ArrayList<TimedToken>();
 		
 		boolean tokenFound = false;
-		for(TimedPlaceInterface p : tapn.places()) {
+		for(TimedPlace p : tapn.places()) {
 			for(TimedToken t : previousMarking.getTokensFor(p)) {
 				for(TimedToken t2 : marking.getTokensFor(p)) {
 					if(t.equals(t2)) {

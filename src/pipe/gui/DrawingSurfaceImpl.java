@@ -553,7 +553,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 
 		private PlaceTransitionObject newTimedPlace(Point p) {
 			p = adjustPoint(p, view.getZoom());
-			dk.aau.cs.model.tapn.TimedPlace tp = new dk.aau.cs.model.tapn.TimedPlace(nameGenerator.getNewPlaceName(model));
+			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
 			pnObject = new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid
 							.getModifiedY(p.y), tp);
 			model.add(tp);

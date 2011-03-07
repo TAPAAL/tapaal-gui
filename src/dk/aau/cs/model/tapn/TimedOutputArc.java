@@ -4,9 +4,9 @@ import dk.aau.cs.util.Require;
 
 public class TimedOutputArc extends TAPNElement {
 	private TimedTransition source;
-	private TimedPlaceInterface destination;
+	private TimedPlace destination;
 
-	public TimedOutputArc(TimedTransition source, TimedPlaceInterface destination) {
+	public TimedOutputArc(TimedTransition source, TimedPlace destination) {
 		Require.that(source != null, "An arc must have a non-null source transition");
 		Require.that(destination != null, "An arc must have a non-null destination place");
 
@@ -18,7 +18,7 @@ public class TimedOutputArc extends TAPNElement {
 		return source;
 	}
 
-	public TimedPlaceInterface destination() {
+	public TimedPlace destination() {
 		return destination;
 	}
 
@@ -31,7 +31,7 @@ public class TimedOutputArc extends TAPNElement {
 		return new TimedOutputArc(tapn.getTransitionByName(source.name()), tapn.getPlaceByName(destination.name()));
 	}
 
-	public void setDestination(TimedPlaceInterface place) {
+	public void setDestination(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
 		this.destination = place;		
 	}

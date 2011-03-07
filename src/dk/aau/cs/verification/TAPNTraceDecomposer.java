@@ -3,7 +3,7 @@ package dk.aau.cs.verification;
 import java.util.ArrayList;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
@@ -77,7 +77,7 @@ public class TAPNTraceDecomposer {
 			convertedTokens = new ArrayList<TimedToken>(transitionFiring.consumedTokens().size());
 			for (TimedToken token : transitionFiring.consumedTokens()) {
 				Tuple<String, String> remappedName = mapping.map(token.place().name());
-				TimedPlaceInterface place = tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
+				TimedPlace place = tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
 				convertedTokens.add(new TimedToken(place, token.age()));
 			}
 		}

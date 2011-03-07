@@ -1136,7 +1136,7 @@ public class QueryDialog extends JPanel {
 				.getSelectedItem();
 				if (!tapn.equals(currentlySelected)) {
 					Vector<String> placeNames = new Vector<String>();
-					for (TimedPlaceInterface place : tapn.places()) {
+					for (TimedPlace place : tapn.places()) {
 						placeNames.add(place.name());
 					}
 					placesBox.setModel(new DefaultComboBoxModel(placeNames));

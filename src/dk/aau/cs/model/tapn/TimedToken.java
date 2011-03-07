@@ -6,19 +6,19 @@ import java.text.DecimalFormat;
 import pipe.gui.Pipe;
 
 public class TimedToken {
-	private TimedPlaceInterface place;
+	private TimedPlace place;
 	private BigDecimal age;
 
-	public TimedToken(TimedPlaceInterface place) {
+	public TimedToken(TimedPlace place) {
 		this(place, BigDecimal.ZERO);
 	}
 
-	public TimedToken(TimedPlaceInterface place, BigDecimal age) {
+	public TimedToken(TimedPlace place, BigDecimal age) {
 		this.place = place;
 		this.age = age;
 	}
 
-	public TimedPlaceInterface place() {
+	public TimedPlace place() {
 		return place;
 	}
 

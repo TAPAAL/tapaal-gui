@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import pipe.gui.Pipe;
-import dk.aau.cs.model.tapn.TimedMarking;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 
 public class TimeDelayStep implements TimedArcPetriNetStep {
 	private BigDecimal delay;
@@ -14,7 +14,7 @@ public class TimeDelayStep implements TimedArcPetriNetStep {
 		this.delay = delay;
 	}
 
-	public TimedMarking performStepFrom(TimedMarking marking) {
+	public LocalTimedMarking performStepFrom(LocalTimedMarking marking) {
 		return marking.delay(delay);
 	}
 	

@@ -20,7 +20,7 @@ import pipe.gui.Pipe;
 import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.components.handlers.ClickHandler;
 import dk.aau.cs.gui.components.handlers.DragHandler;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 
 public class TimedPlaceControl extends PetriNetElementControl {
 	private static final long serialVersionUID = 3512995997457683903L;
@@ -28,14 +28,14 @@ public class TimedPlaceControl extends PetriNetElementControl {
 	private static final float DEFAULT_LINE_THICKNESS = 1.0f;
 	private static final int DRAW_OFFSET = 1;
 
-	private final TimedPlace timedPlace;
+	private final LocalTimedPlace timedPlace;
 	private TextLabel nameLabel;
 	private TextLabel invariantLabel;
 
 	private float lineThickness = DEFAULT_LINE_THICKNESS;
 	private boolean attributesVisible = true;
 
-	public TimedPlaceControl(DrawingSurface parent, TimedPlace timedPlace,
+	public TimedPlaceControl(DrawingSurface parent, LocalTimedPlace timedPlace,
 			Point position) {
 		super(parent, position);
 		this.timedPlace = timedPlace;

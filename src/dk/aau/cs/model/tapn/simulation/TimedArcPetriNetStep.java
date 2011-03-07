@@ -1,7 +1,7 @@
 package dk.aau.cs.model.tapn.simulation;
 
-import dk.aau.cs.model.tapn.TimedMarking;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 
 public interface TimedArcPetriNetStep {
-	TimedMarking performStepFrom(TimedMarking marking);
+	LocalTimedMarking performStepFrom(LocalTimedMarking marking);
 }

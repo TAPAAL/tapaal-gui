@@ -42,7 +42,7 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
@@ -453,15 +453,15 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void doOK() {
 		context.undoManager().newEdit(); // new "transaction""
 		
-//		boolean wasShared = place.underlyingPlace().isShared() && !sharedCheckBox.isSelected();
+		SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
+		boolean wasShared = place.underlyingPlace().isShared() && !sharedCheckBox.isSelected();
 //		if(place.underlyingPlace().isShared()){
 //			view.getUndoManager().addEdit(new UnsharePlaceCommand(place.underlyingPlace().sharedPlace(), place.underlyingPlace()));
 //			place.underlyingPlace().unshare();
 //		}
 //		
 		if(sharedCheckBox.isSelected()){ // If you make it selected, everything else (marking, invariant) is disregarded
-			SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
-			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, (TimedPlace)place.underlyingPlace(), place); // TODO: avoid casting
+			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place); // TODO: avoid casting
 			context.undoManager().addEdit(command);
 			try{
 				command.redo();

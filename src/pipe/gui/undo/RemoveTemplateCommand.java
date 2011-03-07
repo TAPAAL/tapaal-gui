@@ -8,7 +8,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
@@ -16,7 +16,7 @@ import dk.aau.cs.util.Tuple;
 public class RemoveTemplateCommand extends AddTemplateCommand {
 	private final Collection<TAPNQuery> queriesToDelete;
 	private final TabContent tabContent;
-	private final Collection<Tuple<TimedPlace, SharedPlace>> placesToUnshare;
+	private final Collection<Tuple<LocalTimedPlace, SharedPlace>> placesToUnshare;
 	private final Collection<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare;
 
 	public RemoveTemplateCommand(
@@ -25,7 +25,7 @@ public class RemoveTemplateCommand extends AddTemplateCommand {
 			Template template, 
 			int listIndex, 
 			Collection<TAPNQuery> queriesToDelete, 
-			Collection<Tuple<TimedPlace, SharedPlace>> placesToUnshare, 
+			Collection<Tuple<LocalTimedPlace, SharedPlace>> placesToUnshare, 
 			Collection<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare
 	) {
 		super(templateExplorer, template, listIndex);

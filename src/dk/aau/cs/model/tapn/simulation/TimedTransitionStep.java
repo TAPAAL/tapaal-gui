@@ -2,7 +2,7 @@ package dk.aau.cs.model.tapn.simulation;
 
 import java.util.List;
 
-import dk.aau.cs.model.tapn.TimedMarking;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
@@ -17,7 +17,7 @@ public class TimedTransitionStep implements TimedArcPetriNetStep {
 		this.consumedTokens = consumedTokens;
 	}
 
-	public TimedMarking performStepFrom(TimedMarking marking) {
+	public LocalTimedMarking performStepFrom(LocalTimedMarking marking) {
 		return marking.fireTransition(transition, consumedTokens);
 	}
 	

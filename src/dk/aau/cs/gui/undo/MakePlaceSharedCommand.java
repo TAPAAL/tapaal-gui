@@ -9,52 +9,51 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Require;
 
 public class MakePlaceSharedCommand extends Command {
 	private final SharedPlace sharedPlace;
-	private final TimedPlace timedPlace;
+	private final TimedPlace place;
 	private final TimedArcPetriNet tapn;
 	private final TimedPlaceComponent placeComponent;
 	
 	private final List<TimedToken> oldTokens;
 	
-	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace timedPlace, TimedPlaceComponent placeComponent){
+	public MakePlaceSharedCommand(TimedArcPetriNet tapn, SharedPlace sharedPlace, TimedPlace place, TimedPlaceComponent placeComponent){
 		Require.that(tapn != null, "tapn cannot be null");
 		Require.that(sharedPlace != null, "sharedPlace cannot be null");
-		Require.that(timedPlace != null, "timedPlace cannot be null");
+		Require.that(place != null, "timedPlace cannot be null");
 		Require.that(placeComponent != null, "placeComponent cannot be null");
 		
 		this.tapn = tapn;
 		this.sharedPlace = sharedPlace;
-		this.timedPlace = timedPlace;
+		this.place = place;
 		this.placeComponent = placeComponent;
-		this.oldTokens = timedPlace.tokens();
+		this.oldTokens = place.tokens();
 	}
 	
 	@Override
 	public void redo() {
-		updateArcs(timedPlace, sharedPlace);
+		updateArcs(place, sharedPlace);
 		
-		tapn.remove(timedPlace);
+		tapn.remove(place);
 		tapn.add(sharedPlace);
 		placeComponent.setUnderlyingPlace(sharedPlace);
 	}
 
 	@Override
 	public void undo() {
-		updateArcs(sharedPlace, timedPlace);
+		updateArcs(sharedPlace, place);
 		tapn.remove(sharedPlace);
-		tapn.add(timedPlace);
-		timedPlace.addTokens(oldTokens);
-		placeComponent.setUnderlyingPlace(timedPlace);
+		tapn.add(place);
+		place.addTokens(oldTokens);
+		placeComponent.setUnderlyingPlace(place);
 		
 	}
 	
-	private void updateArcs(TimedPlaceInterface toReplace, TimedPlaceInterface replacement) {
+	private void updateArcs(TimedPlace toReplace, TimedPlace replacement) {
 		for(TimedInputArc arc : tapn.inputArcs()){
 			if(arc.source().equals(toReplace)){
 				arc.setSource(replacement);

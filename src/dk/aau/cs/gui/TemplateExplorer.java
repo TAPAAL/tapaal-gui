@@ -35,8 +35,8 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
@@ -224,7 +224,7 @@ public class TemplateExplorer extends JPanel {
 				Iterable<TAPNQuery> queries = parent.queries();
 				HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 
-				for (TimedPlaceInterface p : template.model().places()) {
+				for (TimedPlace p : template.model().places()) {
 					for (TAPNQuery q : queries) {
 						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(template.model().getName(), p.name())) {
 							queriesToDelete.add(q);

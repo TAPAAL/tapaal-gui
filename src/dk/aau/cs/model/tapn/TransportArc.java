@@ -6,13 +6,13 @@ import java.util.List;
 import dk.aau.cs.util.Require;
 
 public class TransportArc extends TAPNElement {
-	private TimedPlaceInterface source;
+	private TimedPlace source;
 	private TimedTransition transition;
-	private TimedPlaceInterface destination;
+	private TimedPlace destination;
 
 	private TimeInterval interval;
 
-	public TransportArc(TimedPlaceInterface source, TimedTransition transition, TimedPlaceInterface destination, TimeInterval interval) {
+	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval) {
 		Require.that(source != null, "The source place cannot be null");
 		Require.that(transition != null, "The associated transition cannot be null");
 		Require.that(destination != null, "The destination place cannot be null");
@@ -23,7 +23,7 @@ public class TransportArc extends TAPNElement {
 		setTimeInterval(interval);
 	}
 
-	public TimedPlaceInterface source() {
+	public TimedPlace source() {
 		return source;
 	}
 
@@ -31,7 +31,7 @@ public class TransportArc extends TAPNElement {
 		return transition;
 	}
 
-	public TimedPlaceInterface destination() {
+	public TimedPlace destination() {
 		return destination;
 	}
 
@@ -79,13 +79,13 @@ public class TransportArc extends TAPNElement {
 	}
 
 	// Should ONLY be called in relation to sharing/unsharing places
-	public void setSource(TimedPlaceInterface place) {
+	public void setSource(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
 		this.source = place;		
 	}
 	
 	// Should ONLY be called in relation to sharing/unsharing places
-	public void setDestination(TimedPlaceInterface place) {
+	public void setDestination(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
 		this.destination = place;		
 	}

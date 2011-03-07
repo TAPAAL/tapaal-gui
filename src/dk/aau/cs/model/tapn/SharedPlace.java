@@ -8,14 +8,14 @@ import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
 
-public class SharedPlace implements TimedPlaceInterface{
+public class SharedPlace implements TimedPlace{
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;
 	private TimeInvariant invariant;
 	
 	private TimedArcPetriNetNetwork network;
-	private TimedMarkingInterface currentMarking;
+	private TimedMarking currentMarking;
 	
 	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 
@@ -71,7 +71,7 @@ public class SharedPlace implements TimedPlaceInterface{
 		listeners.remove(listener);
 	}
 
-	public TimedPlaceInterface copy() {
+	public TimedPlace copy() {
 		return this; // TODO: there should only be one of each shared place
 	}
 
@@ -79,7 +79,7 @@ public class SharedPlace implements TimedPlaceInterface{
 		return true;
 	}
 
-	public void setCurrentMarking(TimedMarkingInterface marking) {
+	public void setCurrentMarking(TimedMarking marking) {
 		Require.that(marking != null, "marking cannot be null");
 		currentMarking = marking;
 		fireMarkingChanged();

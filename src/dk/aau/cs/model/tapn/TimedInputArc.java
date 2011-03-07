@@ -6,11 +6,11 @@ import java.util.List;
 import dk.aau.cs.util.Require;
 
 public class TimedInputArc extends TAPNElement {
-	private TimedPlaceInterface source;
+	private TimedPlace source;
 	private TimeInterval interval;
 	private TimedTransition destination;
 
-	public TimedInputArc(TimedPlaceInterface source, TimedTransition destination, TimeInterval interval) {
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		
@@ -19,7 +19,7 @@ public class TimedInputArc extends TAPNElement {
 		setTimeInterval(interval);
 	}
 
-	public TimedPlaceInterface source() {
+	public TimedPlace source() {
 		return source;
 	}
 
@@ -66,7 +66,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	// This method should ONLY be called in relation to sharing/unsharing a place
-	public void setSource(TimedPlaceInterface place) {
+	public void setSource(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
 		this.source = place;		
 	}

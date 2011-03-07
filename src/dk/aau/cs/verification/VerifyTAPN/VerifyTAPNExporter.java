@@ -9,8 +9,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.petrinet.TAPNQuery;
@@ -50,7 +50,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.getName() + "\" type=\"P/T net\">\n");
 		
-		for(TimedPlaceInterface p : model.places())
+		for(TimedPlace p : model.places())
 			outputPlace(p, modelStream);
 		
 		for(TimedTransition t : model.transitions())
@@ -72,7 +72,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("</pnml>");
 	}
 	
-	private void outputPlace(TimedPlaceInterface p, PrintStream modelStream) {
+	private void outputPlace(TimedPlace p, PrintStream modelStream) {
 		modelStream.append("<place ");
 		
 		modelStream.append("id=\"" + p.name() + "\" ");

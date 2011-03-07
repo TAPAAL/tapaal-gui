@@ -9,14 +9,14 @@ import java.util.Map.Entry;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
-public class NetworkMarking implements TimedMarkingInterface {
-	private HashMap<TimedArcPetriNet, TimedMarking> markings = new HashMap<TimedArcPetriNet, TimedMarking>();
-	private HashMap<TimedPlaceInterface, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlaceInterface, List<TimedToken>>();
+public class NetworkMarking implements TimedMarking {
+	private HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
+	private HashMap<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
 
 	public NetworkMarking() {
 	}
 
-	public void addMarking(TimedArcPetriNet tapn, TimedMarking marking) {
+	public void addMarking(TimedArcPetriNet tapn, LocalTimedMarking marking) {
 		Require.that(tapn != null, "tapn must not be null");
 		Require.that(!markings.containsKey(tapn), "There is already a marking for that tapn");
 
@@ -28,12 +28,12 @@ public class NetworkMarking implements TimedMarkingInterface {
 		Require.that(tapn != null, "tapn must be non-null");
 
 		if (markings.containsKey(tapn)){
-			TimedMarking marking = markings.remove(tapn);
+			LocalTimedMarking marking = markings.remove(tapn);
 			marking.setNetworkMarking(null);
 		}
 	}
 	
-	private TimedMarking getMarkingFor(TimedArcPetriNet tapn) {
+	private LocalTimedMarking getMarkingFor(TimedArcPetriNet tapn) {
 		return markings.get(tapn);
 	}
 
@@ -44,7 +44,7 @@ public class NetworkMarking implements TimedMarkingInterface {
 	private NetworkMarking shallowCopy() {
 		NetworkMarking shallowCopy = new NetworkMarking();
 
-		for (Entry<TimedArcPetriNet, TimedMarking> entry : markings.entrySet()) {
+		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
 			shallowCopy.markings.put(entry.getKey(), entry.getValue());
 		}
 
@@ -52,7 +52,7 @@ public class NetworkMarking implements TimedMarkingInterface {
 	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
-		for (TimedMarking marking : markings.values()) {
+		for (LocalTimedMarking marking : markings.values()) {
 			if (!marking.isDelayPossible(delay))
 				return false;
 		}
@@ -64,8 +64,8 @@ public class NetworkMarking implements TimedMarkingInterface {
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
 
 		NetworkMarking newMarking = new NetworkMarking();
-		HashMap<TimedArcPetriNet, TimedMarking> newMarkings = new HashMap<TimedArcPetriNet, TimedMarking>(markings.size());
-		for (Entry<TimedArcPetriNet, TimedMarking> entry : markings.entrySet()) {
+		HashMap<TimedArcPetriNet, LocalTimedMarking> newMarkings = new HashMap<TimedArcPetriNet, LocalTimedMarking>(markings.size());
+		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
 			newMarkings.put(entry.getKey(), entry.getValue().delay(amount));
 		}
 		newMarking.markings = newMarkings;
@@ -76,7 +76,7 @@ public class NetworkMarking implements TimedMarkingInterface {
 		Require.that(transition != null, "transition cannot be null");
 
 		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
-		TimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
+		LocalTimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
 
 		shallowCopy.removeMarkingFor(transition.model());
 		shallowCopy.addMarking(transition.model(), newMarking);
@@ -89,7 +89,7 @@ public class NetworkMarking implements TimedMarkingInterface {
 		Require.that(tokensToConsume != null, "Must specify a list of tokens");
 
 		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
-		TimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, tokensToConsume);
+		LocalTimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, tokensToConsume);
 
 		shallowCopy.removeMarkingFor(transition.model());
 		shallowCopy.addMarking(transition.model(), newMarking);
@@ -99,7 +99,7 @@ public class NetworkMarking implements TimedMarkingInterface {
 
 	public int size() {
 		int size = 0;
-		for (TimedMarking marking : markings.values()) {
+		for (LocalTimedMarking marking : markings.values()) {
 			size += marking.size();
 		}
 		
@@ -113,7 +113,7 @@ public class NetworkMarking implements TimedMarkingInterface {
 		if(token.place().isShared()){
 			addTokenToSharedPlace(token);
 		}else{
-			getMarkingFor(((TimedPlace)token.place()).model()).add(token); // TODO: ugly cast, but only way to get model?
+			getMarkingFor(((LocalTimedPlace)token.place()).model()).add(token); // TODO: ugly cast, but only way to get model?
 		}
 	}
 
@@ -126,34 +126,34 @@ public class NetworkMarking implements TimedMarkingInterface {
 		sharedPlacesTokens.get(token.place()).add(token);
 	}
 
-	public List<TimedToken> getTokensFor(TimedPlaceInterface place){
+	public List<TimedToken> getTokensFor(TimedPlace place){
 		if(place.isShared()){
 			if(!sharedPlacesTokens.containsKey(place)) return new ArrayList<TimedToken>();
 			return sharedPlacesTokens.get(place);
 		}else{
-			TimedPlace timedPlace = (TimedPlace)place;
+			LocalTimedPlace timedPlace = (LocalTimedPlace)place;
 			return getMarkingFor(timedPlace.model()).getTokensFor(timedPlace);
 		}
 	}
 	
 	public void remove(TimedToken token) {
-		TimedPlaceInterface place = token.place();
+		TimedPlace place = token.place();
 		if(place.isShared()){
 			if(sharedPlacesTokens.containsKey(place)){
 				sharedPlacesTokens.get(place).remove(token);
 			}
 		}else{
-			getMarkingFor(((TimedPlace)place).model()).remove(token); // TODO: this is ugly but only way to obtain the model?
+			getMarkingFor(((LocalTimedPlace)place).model()).remove(token); // TODO: this is ugly but only way to obtain the model?
 		}
 	}
 
-	public void removePlaceFromMarking(TimedPlaceInterface place) {
+	public void removePlaceFromMarking(TimedPlace place) {
 		if(place.isShared()){
 			if(sharedPlacesTokens.containsKey(place)){
 				sharedPlacesTokens.remove(place);
 			}
 		}else{
-			getMarkingFor(((TimedPlace)place).model()).removePlaceFromMarking(place);	
+			getMarkingFor(((LocalTimedPlace)place).model()).removePlaceFromMarking(place);	
 		}
 		
 	}

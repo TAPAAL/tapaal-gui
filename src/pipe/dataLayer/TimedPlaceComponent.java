@@ -37,7 +37,7 @@ import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
@@ -47,13 +47,13 @@ import dk.aau.cs.util.Require;
 public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
 
-	private dk.aau.cs.model.tapn.TimedPlaceInterface place;
+	private dk.aau.cs.model.tapn.TimedPlace place;
 	private dk.aau.cs.model.tapn.event.TimedPlaceListener listener;
 
 	private Window ageOfTokensWindow;
 	private Shape dashedOutline = createDashedOutline();
 
-	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlaceInterface place) {
+	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
 		this.listener = timedPlaceListener();		
@@ -80,7 +80,7 @@ public class TimedPlaceComponent extends Place {
 	private TimedPlaceListener timedPlaceListener() {
 		return new TimedPlaceListener() {
 			public void nameChanged(TimedPlaceEvent e) {
-				TimedPlaceInterface place = e.source();
+				TimedPlace place = e.source();
 				TimedPlaceComponent.super.setName(place.name());				
 			}
 			public void invariantChanged(TimedPlaceEvent e) { update(true); }
@@ -341,11 +341,11 @@ public class TimedPlaceComponent extends Place {
 		return getName();
 	}
 
-	public TimedPlaceInterface underlyingPlace() {
+	public TimedPlace underlyingPlace() {
 		return place;
 	}
 
-	public void setUnderlyingPlace(TimedPlaceInterface place) {
+	public void setUnderlyingPlace(TimedPlace place) {
 		if(this.place != null && listener != null){
 			this.place.removeTimedPlaceListener(listener);
 		}

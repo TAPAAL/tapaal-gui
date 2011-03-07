@@ -22,8 +22,8 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedPlaceInterface;
 import dk.aau.cs.model.tapn.TimedToken;
 
 /**
@@ -125,7 +125,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 		if (myObject instanceof TimedPlaceComponent) {
 			int clicks = -e.getWheelRotation();
-			TimedPlaceInterface place = ((TimedPlaceComponent)myObject).underlyingPlace();
+			TimedPlace place = ((TimedPlaceComponent)myObject).underlyingPlace();
 			if(clicks > 0) {
 				place.addToken(new TimedToken(place));
 			}else{

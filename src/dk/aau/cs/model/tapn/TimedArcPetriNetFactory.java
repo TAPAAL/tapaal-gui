@@ -59,7 +59,7 @@ public class TimedArcPetriNetFactory {
 	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals;
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
-	private TimedMarking initialMarking;
+	private LocalTimedMarking initialMarking;
 	private ArrayList<TAPNQuery> queries;
 	private TreeMap<String, Constant> constants;
 	private DrawingSurfaceImpl drawingSurface;
@@ -69,7 +69,7 @@ public class TimedArcPetriNetFactory {
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
-		initialMarking = new TimedMarking();
+		initialMarking = new LocalTimedMarking();
 		queries = new ArrayList<TAPNQuery>();
 		constants = new TreeMap<String, Constant>();
 		this.drawingSurface = drawingSurfaceImpl;
@@ -138,7 +138,7 @@ public class TimedArcPetriNetFactory {
 	}
 
 	private Template parseTimedArcPetriNet(Node tapnNode) {
-		initialMarking = new TimedMarking();
+		initialMarking = new LocalTimedMarking();
 		if (tapnNode instanceof Element) {
 			String name = getTAPNName((Element) tapnNode);
 			if(isNameAllowed(name))
@@ -321,7 +321,7 @@ public class TimedArcPetriNetFactory {
 					positionYInput, idInput, nameInput, nameOffsetXInput,
 					nameOffsetYInput, initialMarkingInput, markingOffsetXInput,
 					markingOffsetYInput, capacityInput);
-			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
 
 			((TimedPlaceComponent) placeComponent).setUnderlyingPlace(p);
@@ -396,7 +396,7 @@ public class TimedArcPetriNetFactory {
 		tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
 				sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput, taggedArc);
 
-		TimedPlaceInterface place = tapn.getPlaceByName(targetIn.getName());
+		TimedPlace place = tapn.getPlaceByName(targetIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(sourceIn.getName());
 
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place);
@@ -434,9 +434,9 @@ public class TimedArcPetriNetFactory {
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
 				TransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
-				TimedPlaceInterface sourcePlace = tapn.getPlaceByName(sourceIn.getName());
+				TimedPlace sourcePlace = tapn.getPlaceByName(sourceIn.getName());
 				TimedTransition trans = tapn.getTransitionByName(targetIn.getName());
-				TimedPlaceInterface destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
+				TimedPlace destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
 				TimeInterval interval = TimeInterval.parse(inscriptionSplit[0],	constants);
 
 				assert (sourcePlace != null);
@@ -461,9 +461,9 @@ public class TimedArcPetriNetFactory {
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
 				TransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
-				TimedPlaceInterface sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
+				TimedPlace sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = tapn.getTransitionByName(sourceIn.getName());
-				TimedPlaceInterface destPlace = tapn.getPlaceByName(targetIn.getName());
+				TimedPlace destPlace = tapn.getPlaceByName(targetIn.getName());
 				TimeInterval interval = transportArcsTimeIntervals.get((TransportArcComponent) presetTransportArc);
 
 				assert (sourcePlace != null);
@@ -500,7 +500,7 @@ public class TimedArcPetriNetFactory {
 				taggedArc),
 				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
 
-		TimedPlaceInterface place = tapn.getPlaceByName(sourceIn.getName());
+		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 
@@ -525,7 +525,7 @@ public class TimedArcPetriNetFactory {
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
 					),
 				(inscriptionTempStorage != null ? inscriptionTempStorage : ""));
-		TimedPlaceInterface place = tapn.getPlaceByName(sourceIn.getName());
+		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
@@ -675,7 +675,7 @@ public class TimedArcPetriNetFactory {
 	// Legacy support for old format
 	// //////////////////////////////////////////////////////////
 	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode) {
-		initialMarking = new TimedMarking();
+		initialMarking = new LocalTimedMarking();
 		tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
 		guiModel = new DataLayer();
 
@@ -833,7 +833,7 @@ public class TimedArcPetriNetFactory {
 					initialMarkingInput, markingOffsetXInput,
 					markingOffsetYInput, capacityInput);
 
-			TimedPlace p = new TimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
 			
 			((TimedPlaceComponent) place).setUnderlyingPlace(p);
