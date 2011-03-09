@@ -97,7 +97,7 @@ public class TikZExporter {
 			}
 			String arrowType ="";
 			if(arc instanceof TAPNInhibitorArc){
-				arrowType = "-o";
+				arrowType = "inhibArc";
 			}
 			else if(arc instanceof TransportArc){
 				arrowType = "transportArc";
@@ -243,6 +243,7 @@ public class TikZExporter {
 		out.append("\\begin{tikzpicture}[font=\\scriptsize]\n");
 		out.append("\\tikzstyle{arc}=[->,>=stealth,thick]\n");
 		if(!net.netType().equals(NetType.UNTIMED)) out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
+		out.append("\\tikzstyle{inhibArc}=[->,>=o,thick]\n");
 		out.append("\\tikzstyle{every place}=[minimum size=6mm,thick]\n");
 		out.append("\\tikzstyle{every transition} = [fill=black,minimum width=2mm,minimum height=5mm]\n");
 		out.append("\\tikzstyle{every token}=[fill=white,text=black]\n");
