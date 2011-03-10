@@ -22,32 +22,32 @@ public class TimedArcPetriNet {
 		setName(name);
 		setMarking(new LocalTimedMarking());
 	}
-	
+
 	public TimedMarking marking(){
 		return currentMarking;
 	}
-	
+
 	public void setParentNetwork(TimedArcPetriNetNetwork network){
 		this.parentNetwork = network;
 	}
-	
+
 	public TimedArcPetriNetNetwork parentNetwork(){
 		return parentNetwork;
 	}
-	
-//	public void add(TimedPlace place) {
-//		Require.that(place != null, "Argument must be a non-null place");
-//		Require.that(!isNameUsed(place.name()) || place.isShared(), "A place or transition with the specified name already exists in the petri net.");
-//
-//		place.setModel(this);
-//		places.add(place);
-//		place.setCurrentMarking(currentMarking);
-//	}
-	
+
+	//	public void add(TimedPlace place) {
+	//		Require.that(place != null, "Argument must be a non-null place");
+	//		Require.that(!isNameUsed(place.name()) || place.isShared(), "A place or transition with the specified name already exists in the petri net.");
+	//
+	//		place.setModel(this);
+	//		places.add(place);
+	//		place.setCurrentMarking(currentMarking);
+	//	}
+
 	public void add(TimedPlace place) {
 		Require.that(place != null, "Argument must be a non-null place");
-		Require.that(!isNameUsed(place.name()) || place.isShared(), "A place or transition with the specified name already exists in the petri net.");
-		
+		Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name already exists in the petri net.");
+
 		if(!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
 		place.setCurrentMarking(currentMarking);
@@ -84,7 +84,7 @@ public class TimedArcPetriNet {
 		arc.setModel(this);
 		outputArcs.add(arc);
 		arc.source().addToPostset(arc);
-// 		arc.destination().addToPreset(arc);// TODO: TimedPlaceInterface FIXME
+		// 		arc.destination().addToPreset(arc);// TODO: TimedPlaceInterface FIXME
 	}
 
 	public void add(TimedInhibitorArc arc) {
@@ -96,7 +96,7 @@ public class TimedArcPetriNet {
 
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
-	//	arc.source().addInhibitorArc(arc);// TODO: TimedPlaceInterface FIXME
+		//	arc.source().addInhibitorArc(arc);// TODO: TimedPlaceInterface FIXME
 		arc.destination().addInhibitorArc(arc);
 	}
 
@@ -111,9 +111,9 @@ public class TimedArcPetriNet {
 
 		arc.setModel(this);
 		transportArcs.add(arc);
-//		arc.source().addToPostset(arc); // TODO: TimedPlaceInterface FIXME
+		//		arc.source().addToPostset(arc); // TODO: TimedPlaceInterface FIXME
 		arc.transition().addTransportArcGoingThrough(arc);
-//		arc.destination().addToPreset(arc);// TODO: TimedPlaceInterface FIXME
+		//		arc.destination().addToPreset(arc);// TODO: TimedPlaceInterface FIXME
 	}
 
 	public void addToken(TimedToken token) {
@@ -126,9 +126,9 @@ public class TimedArcPetriNet {
 
 	public void remove(TimedPlace place) {
 		boolean removed = places.remove(place);
-		if (removed){
+		if (removed && !place.isShared()){
 			currentMarking.removePlaceFromMarking(place);
-			if(!place.isShared()) ((LocalTimedPlace)place).setModel(null);
+			((LocalTimedPlace)place).setModel(null);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class TimedArcPetriNet {
 		boolean removed = inputArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-		//	arc.source().removeFromPostset(arc);// TODO: TimedPlaceInterface FIXME
+			//	arc.source().removeFromPostset(arc);// TODO: TimedPlaceInterface FIXME
 			arc.destination().removeFromPreset(arc);
 		}
 	}
@@ -151,9 +151,9 @@ public class TimedArcPetriNet {
 		boolean removed = transportArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-//			arc.source().removeFromPostset(arc);// TODO: TimedPlaceInterface FIXME
+			//			arc.source().removeFromPostset(arc);// TODO: TimedPlaceInterface FIXME
 			arc.transition().removeTransportArcGoingThrough(arc);
-//			arc.destination().removeFromPreset(arc);// TODO: TimedPlaceInterface FIXME
+			//			arc.destination().removeFromPreset(arc);// TODO: TimedPlaceInterface FIXME
 		}
 	}
 
@@ -162,7 +162,7 @@ public class TimedArcPetriNet {
 		if (removed) {
 			arc.setModel(null);
 			arc.source().removeFromPostset(arc);
-//			arc.destination().removeFromPreset(arc);// TODO: TimedPlaceInterface FIXME
+			//			arc.destination().removeFromPreset(arc);// TODO: TimedPlaceInterface FIXME
 		}
 	}
 
@@ -170,7 +170,7 @@ public class TimedArcPetriNet {
 		boolean removed = inhibitorArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-//			arc.source().removeInhibitorArc(arc); // TODO: TimedPlaceInterface FIXME
+			//			arc.source().removeInhibitorArc(arc); // TODO: TimedPlaceInterface FIXME
 			arc.destination().removeInhibitorArc(arc);
 		}
 	}
@@ -203,7 +203,7 @@ public class TimedArcPetriNet {
 
 	public boolean isNameUsed(String name) {
 		if(parentNetwork != null && parentNetwork.isNameUsedForShared(name)) return true;
-		
+
 		for (TimedPlace place : places){
 			if (place.name().equalsIgnoreCase(name))
 				return true;
@@ -250,7 +250,7 @@ public class TimedArcPetriNet {
 	public void setMarking(TimedMarking marking) {
 		Require.that(marking != null, "marking must not be null");
 		this.currentMarking = marking;
-		
+
 		for (TimedPlace p : places) {
 			p.setCurrentMarking(marking);
 		}
@@ -279,30 +279,30 @@ public class TimedArcPetriNet {
 	public Iterable<TimedInhibitorArc> inhibitorArcs() {
 		return inhibitorArcs;
 	}
-	
+
 	public TimedArcPetriNet copy() {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(this.name);
-		
+
 		for(TimedPlace p : this.places)
 			tapn.add(p.copy());
-		
+
 		for(TimedTransition t : this.transitions)
 			tapn.add(t.copy());
-		
+
 		for(TimedInputArc inputArc : this.inputArcs)
 			tapn.add(inputArc.copy(tapn));
-		
+
 		for(TimedOutputArc outputArc : this.outputArcs)
 			tapn.add(outputArc.copy(tapn));
-		
+
 		for(TransportArc transArc : this.transportArcs)
 			tapn.add(transArc.copy(tapn));
-		
+
 		for(TimedInhibitorArc inhibArc : this.inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
-		
+
 		tapn.setMarking(this.currentMarking.clone());
-		
+
 		return tapn;
 	}
 
@@ -335,7 +335,7 @@ public class TimedArcPetriNet {
 			if(inhibArc.source().equals(place) && inhibArc.destination().equals(transition))
 				return inhibArc;
 		}
-		
+
 		return null;
 	}
 }

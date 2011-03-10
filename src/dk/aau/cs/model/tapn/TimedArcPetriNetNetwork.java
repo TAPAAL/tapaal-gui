@@ -43,6 +43,7 @@ public class TimedArcPetriNetNetwork {
 		Require.that(!isNameUsed(sharedPlace.name()), "There is already a transition or place with that name");
 		
 		sharedPlace.setNetwork(this);
+		sharedPlace.setCurrentMarking(currentMarking);
 		sharedPlaces.add(sharedPlace);		
 	}
 
