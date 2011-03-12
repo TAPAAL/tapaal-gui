@@ -21,13 +21,13 @@ public class RenameTimedPlaceCommand extends Command {
 	@Override
 	public void redo() {
 		place.setName(newName);
-		updateQueries(newName, oldName);
+		updateQueries(oldName, newName);
 	}
 
 	@Override
 	public void undo() {
 		place.setName(oldName);
-		updateQueries(oldName, newName);
+		updateQueries(newName,oldName);
 	}
 	
 	private void updateQueries(String nameToFind, String nameToInsert){
