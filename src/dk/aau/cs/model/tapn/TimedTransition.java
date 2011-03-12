@@ -224,13 +224,25 @@ public class TimedTransition extends TAPNElement {
 
 		return tokensToConsume;
 	}
-
-	public Iterable<TimedInputArc> getInputArcs(){
-		return preset;
+	
+	public boolean hasInhibitorArcs() {
+		return inhibitorArcs.size() > 0;
 	}
 
-	public Iterable<TransportArc> getTransportArcsGoingThrough(){
+	public List<TimedInputArc> getInputArcs(){
+		return preset;
+	}
+	
+	public List<TimedOutputArc> getOutputArcs() {
+		return postset;
+	}
+
+	public List<TransportArc> getTransportArcsGoingThrough(){
 		return transportArcsGoingThrough;
+	}
+	
+	public int getNumberOfTransportArcsGoingThrough() {
+		return transportArcsGoingThrough.size();
 	}
 
 	public TimedTransition copy() {
@@ -275,6 +287,10 @@ public class TimedTransition extends TAPNElement {
 			return false;
 		return true;
 	}
+
+
+
+	
 
 
 }

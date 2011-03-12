@@ -293,7 +293,6 @@ public class TimedArcPetriNetFactory {
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
 		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
-		int capacityInput = Integer.parseInt(place.getAttribute("capacity"));
 		String invariant = place.getAttribute("invariant");
 
 		positionXInput = Grid.getModifiedX(positionXInput);
@@ -313,14 +312,14 @@ public class TimedArcPetriNetFactory {
 			placeComponent = new Place(positionXInput, positionYInput, idInput,
 					nameInput, nameOffsetXInput, nameOffsetYInput,
 					initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, capacityInput);
+					markingOffsetYInput, 0);
 
 		} else {
 
 			placeComponent = new TimedPlaceComponent(positionXInput,
 					positionYInput, idInput, nameInput, nameOffsetXInput,
 					nameOffsetYInput, initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, capacityInput);
+					markingOffsetYInput, 0);
 			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
 			tapn.add(p);
 
@@ -401,6 +400,11 @@ public class TimedArcPetriNetFactory {
 
 		TimedOutputArc outputArc = new TimedOutputArc(transition, place);
 		((TimedOutputArcComponent) tempArc).setUnderlyingArc(outputArc);
+		
+		if(tapn.hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
+			throw new RuntimeException("Error while loading model:\n - Multiple arcs between a place and a transition is not allowed");
+		}
+		
 		guiModel.addPetriNetObject(tempArc);
 		addListeners(tempArc);
 		tapn.add(outputArc);
@@ -506,6 +510,11 @@ public class TimedArcPetriNetFactory {
 
 		TimedInputArc inputArc = new TimedInputArc(place, transition, interval);
 		((TimedInputArcComponent) tempArc).setUnderlyingArc(inputArc);
+		
+		if(tapn.hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
+			throw new RuntimeException("Error while loading model:\n - Multiple arcs between a place and a transition is not allowed");
+		}
+		
 		guiModel.addPetriNetObject(tempArc);
 		addListeners(tempArc);
 		tapn.add(inputArc);

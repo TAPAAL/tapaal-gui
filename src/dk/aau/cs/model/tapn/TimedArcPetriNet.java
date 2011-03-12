@@ -66,7 +66,7 @@ public class TimedArcPetriNet {
 		Require.that(places.contains(arc.source()),	"The source place must be part of the petri net.");
 		Require.that(transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
 		Require.that(!inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
-		Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
+		//Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
 
 		arc.setModel(this);
 		inputArcs.add(arc);
@@ -79,7 +79,7 @@ public class TimedArcPetriNet {
 		Require.that(places.contains(arc.destination()), "The destination place must be part of the petri net.");
 		Require.that(transitions.contains(arc.source()), "The source transition must be part of the petri net");
 		Require.that(!outputArcs.contains(arc),	"The specified arc is already a part of the petri net.");
-		Require.that(!hasArcFromTransitionToPlace(arc.source(), arc.destination()),	"Cannot have two arcs between the same transition and place");
+		//Require.that(!hasArcFromTransitionToPlace(arc.source(), arc.destination()),	"Cannot have two arcs between the same transition and place");
 
 		arc.setModel(this);
 		outputArcs.add(arc);
@@ -175,7 +175,7 @@ public class TimedArcPetriNet {
 		}
 	}
 
-	private boolean hasArcFromPlaceToTransition(TimedPlace source, TimedTransition destination) {
+	public boolean hasArcFromPlaceToTransition(TimedPlace source, TimedTransition destination) {
 		for (TimedInputArc arc : inputArcs)
 			if (arc.source().equals(source) && arc.destination().equals(destination))
 				return true;
@@ -189,7 +189,7 @@ public class TimedArcPetriNet {
 		return false;
 	}
 
-	private boolean hasArcFromTransitionToPlace(TimedTransition source, TimedPlace destination) {
+	public boolean hasArcFromTransitionToPlace(TimedTransition source, TimedPlace destination) {
 		for (TimedOutputArc arc : outputArcs){
 			if (arc.source().equals(source) && arc.destination().equals(destination))
 				return true;

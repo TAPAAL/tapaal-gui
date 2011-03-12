@@ -25,10 +25,10 @@ import dk.aau.cs.petrinet.TAPNTransportArc;
 import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.translations.ModelTranslator;
-import dk.aau.cs.translations.Pairing;
+import dk.aau.cs.translations.OldPairing;
 import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
-import dk.aau.cs.translations.Pairing.ArcType;
+import dk.aau.cs.translations.OldPairing.ArcType;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class BroadcastTranslation implements
@@ -398,19 +398,19 @@ public class BroadcastTranslation implements
 			if (t.isDegree2() && !t.hasInhibitorArcs()) {
 				createDegree2Structure(ta, t);
 			} else {
-				List<Pairing> pairing = CreatePairing(t);
+				List<OldPairing> pairing = CreatePairing(t);
 				createStructureForPairing(ta, t, pairing);
 			}
 		}
 	}
 
 	private void createDegree2Structure(TimedAutomaton ta, TAPNTransition t) {
-		List<Pairing> pairing = CreatePairing(t);
+		List<OldPairing> pairing = CreatePairing(t);
 
 		if (pairing.size() == 0)
 			return;
 		if (pairing.size() == 1) {
-			Pairing pair = pairing.get(0);
+			OldPairing pair = pairing.get(0);
 
 			Edge e = new Edge(getLocationByName(pair.getInput().getName()),
 					getLocationByName(pair.getOutput().getName()),
@@ -421,7 +421,7 @@ public class BroadcastTranslation implements
 
 			ta.addTransition(e);
 		} else {
-			Pairing pair1 = pairing.get(0);
+			OldPairing pair1 = pairing.get(0);
 
 			Edge e1 = new Edge(getLocationByName(pair1.getInput().getName()),
 					getLocationByName(pair1.getOutput().getName()),
@@ -432,7 +432,7 @@ public class BroadcastTranslation implements
 
 			ta.addTransition(e1);
 
-			Pairing pair2 = pairing.get(1);
+			OldPairing pair2 = pairing.get(1);
 
 			Edge e2 = new Edge(getLocationByName(pair2.getInput().getName()),
 					getLocationByName(pair2.getOutput().getName()),
@@ -460,9 +460,9 @@ public class BroadcastTranslation implements
 	}
 
 	protected void createStructureForPairing(TimedAutomaton ta,
-			TAPNTransition t, List<Pairing> pairing) {
+			TAPNTransition t, List<OldPairing> pairing) {
 		int i = 0;
-		for (Pairing pair : pairing) {
+		for (OldPairing pair : pairing) {
 			String inputPlaceName = pair.getInput().getName();
 			String locationName = String.format(TOKEN_INTERMEDIATE_PLACE,
 					inputPlaceName, t.getName(), i);
@@ -529,8 +529,8 @@ public class BroadcastTranslation implements
 		}
 	}
 
-	private List<Pairing> CreatePairing(TAPNTransition t) {
-		List<Pairing> pairing = new ArrayList<Pairing>();
+	private List<OldPairing> CreatePairing(TAPNTransition t) {
+		List<OldPairing> pairing = new ArrayList<OldPairing>();
 		HashSet<Arc> usedPostSetArcs = new HashSet<Arc>();
 
 		for (Arc inputArc : t.getPreset()) {
@@ -539,7 +539,7 @@ public class BroadcastTranslation implements
 					if (inputArc instanceof TAPNTransportArc
 							&& outputArc instanceof TAPNTransportArc
 							&& inputArc == outputArc) {
-						Pairing p = new Pairing((TAPNArc) inputArc,
+						OldPairing p = new OldPairing((TAPNArc) inputArc,
 								((TAPNArc) inputArc).getGuard(), outputArc,
 								ArcType.TARC);
 						pairing.add(p);
@@ -548,7 +548,7 @@ public class BroadcastTranslation implements
 						break;
 					} else if (!(inputArc instanceof TAPNTransportArc)
 							&& !(outputArc instanceof TAPNTransportArc)) {
-						Pairing p = new Pairing((TAPNArc) inputArc,
+						OldPairing p = new OldPairing((TAPNArc) inputArc,
 								((TAPNArc) inputArc).getGuard(), outputArc,
 								ArcType.NORMAL);
 						pairing.add(p);

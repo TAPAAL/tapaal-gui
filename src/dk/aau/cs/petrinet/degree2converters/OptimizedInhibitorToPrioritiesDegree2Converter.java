@@ -28,8 +28,7 @@ public class OptimizedInhibitorToPrioritiesDegree2Converter extends
 	protected void createOptimizedSimulation(TAPNTransition transition,
 			TimedArcPetriNet degree2Net) throws Exception {
 		addTransition(degree2Net, transition.getName(), LOW);
-		TAPNTransition newTransition = (TAPNTransition) getByName(transition
-				.getName());
+		TAPNTransition newTransition = (TAPNTransition) getByName(transition.getName());
 		newTransition.setFromOriginalNet(true);
 
 		for (Arc arc : transition.getPreset()) {

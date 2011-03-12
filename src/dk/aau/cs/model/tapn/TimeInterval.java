@@ -160,4 +160,19 @@ public class TimeInterval {
 		return new TimeInterval(this);
 	}
 
+	public TimeInterval intersect(TimeInvariant invariant) {
+		if(invariant.equals(TimeInvariant.LESS_THAN_INFINITY))
+			return this.copy();
+	
+		int invariantUpper = invariant.upperBound().value();
+		
+		if (invariantUpper < this.lower.value() || (invariantUpper == this.lower.value() && !isLowerIncluded) || (invariantUpper == this.lower.value() && !invariant.isUpperNonstrict())) {
+			return new TimeInterval(false, new IntBound(0), new IntBound(0), false); // intersection is empty, so return an empty interval
+		} else if (invariantUpper > this.upper.value()) {
+			return this.copy();
+		} else {
+			return new TimeInterval(this.isLowerIncluded, this.lower.copy(), invariant.upperBound().copy(), invariant.isUpperNonstrict());
+		}
+	}
+
 }

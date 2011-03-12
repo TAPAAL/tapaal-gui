@@ -28,10 +28,10 @@ import dk.aau.cs.petrinet.TimedArcPetriNet;
 import dk.aau.cs.petrinet.Token;
 import dk.aau.cs.petrinet.degree2converters.InhibDegree2Converter;
 import dk.aau.cs.translations.ModelTranslator;
-import dk.aau.cs.translations.Pairing;
+import dk.aau.cs.translations.OldPairing;
 import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
-import dk.aau.cs.translations.Pairing.ArcType;
+import dk.aau.cs.translations.OldPairing.ArcType;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
 public class Degree2BroadcastTranslation implements
@@ -279,7 +279,7 @@ public class Degree2BroadcastTranslation implements
 			TimedArcPetriNet originalModel, TimedAutomaton control) {
 		for (TAPNTransition transition : degree2Net.getTransitions()) {
 			if (!transition.isFromOriginalNet()) {
-				Pairing pairing = createPairing(transition, false);
+				OldPairing pairing = createPairing(transition, false);
 
 				if (!pairing.getInput().getName().equals(PLOCK)) {
 					Edge e = new Edge(getLocationByName(pairing.getInput()
@@ -373,7 +373,7 @@ public class Degree2BroadcastTranslation implements
 		for (TAPNTransition transition : degree2Net.getTransitions()) {
 			if (transition.isFromOriginalNet()) {
 				if (transition.getPreset().size() == 1) {
-					Pairing pairing = createPairing(transition, true);
+					OldPairing pairing = createPairing(transition, true);
 					String guard = createTransitionGuardWithLock(pairing
 							.getInputArc(), pairing.getOutput(), pairing
 							.getArcType().equals(ArcType.TARC));
@@ -387,9 +387,9 @@ public class Degree2BroadcastTranslation implements
 					saveGuard(transition.getName(), pairing.getInput()
 							.getName(), guard);
 				} else {
-					List<Pairing> pairing = CreatePairing(transition);
+					List<OldPairing> pairing = CreatePairing(transition);
 
-					Pairing pair1 = pairing.get(0);
+					OldPairing pair1 = pairing.get(0);
 					String guard1 = createTransitionGuardWithLock(pair1
 							.getInputArc(), pair1.getOutput(), pair1
 							.getArcType().equals(ArcType.TARC));
@@ -403,7 +403,7 @@ public class Degree2BroadcastTranslation implements
 					saveGuard(transition.getName(), pair1.getInput().getName(),
 							guard1);
 
-					Pairing pair2 = pairing.get(1);
+					OldPairing pair2 = pairing.get(1);
 					String guard2 = createTransitionGuardWithLock(pair2
 							.getInputArc(), pair2.getOutput(), pair2
 							.getArcType().equals(ArcType.TARC));
@@ -418,7 +418,7 @@ public class Degree2BroadcastTranslation implements
 							guard2);
 				}
 			} else {
-				Pairing pairing = createPairing(transition, true);
+				OldPairing pairing = createPairing(transition, true);
 				String guard = createTransitionGuard(pairing.getInputArc(),
 						pairing.getOutput(), pairing.getArcType().equals(
 								ArcType.TARC));
@@ -460,8 +460,8 @@ public class Degree2BroadcastTranslation implements
 		}
 	}
 
-	private List<Pairing> CreatePairing(TAPNTransition t) {
-		List<Pairing> pairing = new ArrayList<Pairing>();
+	private List<OldPairing> CreatePairing(TAPNTransition t) {
+		List<OldPairing> pairing = new ArrayList<OldPairing>();
 		HashSet<Arc> usedPostSetArcs = new HashSet<Arc>();
 
 		for (Arc inputArc : t.getPreset()) {
@@ -470,7 +470,7 @@ public class Degree2BroadcastTranslation implements
 					if (inputArc instanceof TAPNTransportArc
 							&& outputArc instanceof TAPNTransportArc
 							&& inputArc == outputArc) {
-						Pairing p = new Pairing((TAPNArc) inputArc,
+						OldPairing p = new OldPairing((TAPNArc) inputArc,
 								((TAPNArc) inputArc).getGuard(), outputArc,
 								ArcType.TARC);
 						pairing.add(p);
@@ -479,7 +479,7 @@ public class Degree2BroadcastTranslation implements
 						break;
 					} else if (!(inputArc instanceof TAPNTransportArc)
 							&& !(outputArc instanceof TAPNTransportArc)) {
-						Pairing p = new Pairing((TAPNArc) inputArc,
+						OldPairing p = new OldPairing((TAPNArc) inputArc,
 								((TAPNArc) inputArc).getGuard(), outputArc,
 								ArcType.NORMAL);
 						pairing.add(p);
@@ -494,7 +494,7 @@ public class Degree2BroadcastTranslation implements
 		return pairing;
 	}
 
-	private Pairing createPairing(TAPNTransition transition,
+	private OldPairing createPairing(TAPNTransition transition,
 			boolean isForTokenAutomaton) {
 		Arc source = null;
 		Arc dest = null;
@@ -526,7 +526,7 @@ public class Degree2BroadcastTranslation implements
 		boolean isTransportArc = source instanceof TAPNTransportArc;
 		ArcType type = isTransportArc ? ArcType.TARC : ArcType.NORMAL;
 
-		return new Pairing((TAPNArc) source, ((TAPNArc) source).getGuard(),
+		return new OldPairing((TAPNArc) source, ((TAPNArc) source).getGuard(),
 				dest, type);
 	}
 

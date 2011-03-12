@@ -70,10 +70,6 @@ public class TimeInvariant {
 
 		return new TimeInvariant(operator.equals("<="), bound);
 	}
-
-	public static TimeInvariant parseInvariantWithoutConstant(String invariant) {
-		return TimeInvariant.parse(invariant, new TreeMap<String, Constant>());
-	}
 	
 	public TimeInvariant copy() {
 		return new TimeInvariant(this.isUpperIncluded, upper.copy());

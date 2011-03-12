@@ -232,9 +232,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						createTAPNInhibitorArc.updateWeightLabel(true);
 					} catch (RequireException ex) {
 						cleanupArc(createTAPNInhibitorArc, view);
-						JOptionPane
-								.showMessageDialog(
-										CreateGui.getApp(),
+						JOptionPane.showMessageDialog(CreateGui.getApp(),
 										"There was an error drawing the arc. Possible problems:\n"
 												+ " - There is already an arc between the selected place and transition\n"
 												+ " - You are attempting to draw an arc between a shared transition and a shared place",
@@ -684,20 +682,21 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						// Set underlying TimedInputArc
 						TimedOutputArcComponent outputArc = (TimedOutputArcComponent) timedArcToCreate;
+						
 						try {
+							if(hasArcFromTransitionToPlace(model,((TimedTransitionComponent) outputArc.getSource()), ((TimedPlaceComponent) outputArc.getTarget()))){
+								throw new RequireException("Cannot have two arcs between the same place and transition");
+							}
+							
 							dk.aau.cs.model.tapn.TimedOutputArc timedOutputArc = new TimedOutputArc(
-									((TimedTransitionComponent) outputArc
-											.getSource())
-											.underlyingTransition(),
-									((TimedPlaceComponent) outputArc
-											.getTarget()).underlyingPlace());
+									((TimedTransitionComponent) outputArc.getSource()).underlyingTransition(),
+									((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace());
 							model.add(timedOutputArc);
 							outputArc.setUnderlyingArc(timedOutputArc);
 							outputArc.updateWeightLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(timedArcToCreate, view);
-							JOptionPane
-									.showMessageDialog(
+							JOptionPane.showMessageDialog(
 											CreateGui.getApp(),
 											"There was an error drawing the arc. Possible problems:\n"
 													+ " - There is already an arc between the selected place and transition\n"
@@ -711,8 +710,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// twice
 						contentPane.remove(timedArcToCreate);
 
-						guiModel
-								.addArc((TimedOutputArcComponent) timedArcToCreate);
+						guiModel.addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
 						if (!fastMode) {
 							// we are not in fast mode so we have to set a new
@@ -743,12 +741,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// Set underlying TimedInputArc
 						TimedInputArcComponent timedArc = (TimedInputArcComponent) timedArcToCreate;
 						try {
+							if(hasArcFromPlaceToTransition(model,((TimedPlaceComponent) timedArc.getSource()), ((TimedTransitionComponent) timedArc.getTarget()))){
+								throw new RequireException("Cannot have two arcs between the same place and transition");
+							}
+							
 							dk.aau.cs.model.tapn.TimedInputArc tia = new TimedInputArc(
-									((TimedPlaceComponent) timedArc.getSource())
-											.underlyingPlace(),
-									((TimedTransitionComponent) timedArc
-											.getTarget())
-											.underlyingTransition(),
+									((TimedPlaceComponent) timedArc.getSource()).underlyingPlace(),
+									((TimedTransitionComponent) timedArc.getTarget()).underlyingTransition(),
 									TimeInterval.ZERO_INF);
 							model.add(tia);
 							timedArc.setUnderlyingArc(tia);
@@ -828,6 +827,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		default:
 			break;
 		}
+	}
+
+	private boolean hasArcFromTransitionToPlace(TimedArcPetriNet model, TimedTransitionComponent transition, TimedPlaceComponent place) {
+		return model.hasArcFromTransitionToPlace(transition.underlyingTransition(), place.underlyingPlace());
+	}
+	
+	private boolean hasArcFromPlaceToTransition(TimedArcPetriNet model, TimedPlaceComponent place, TimedTransitionComponent transition) {
+		return model.hasArcFromPlaceToTransition(place.underlyingPlace(), transition.underlyingTransition());
 	}
 
 	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {

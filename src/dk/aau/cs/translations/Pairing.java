@@ -1,47 +1,46 @@
 package dk.aau.cs.translations;
 
-import dk.aau.cs.petrinet.Arc;
-import dk.aau.cs.petrinet.TAPNArc;
-import dk.aau.cs.petrinet.TAPNPlace;
+import java.util.Hashtable;
+import java.util.List;
 
+import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Require;
+
+// This class assumes that the net is conservative and
+// that a place name "_BOTTOM_" exist in the model
 public class Pairing {
-	public enum ArcType {
-		NORMAL, TARC
+	private TimedTransition transition;
+	
+	private Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
+	
+	public Pairing(TimedTransition t) {
+		this.transition = t;
+		generatePairing();
 	}
 
-	private TAPNArc input;
-	private Arc output;
-	private String interval;
-	private ArcType arcType;
+	private void generatePairing() {
+		List<TimedInputArc> inputArcs = transition.getInputArcs();
+		List<TimedOutputArc> outputArcs = transition.getOutputArcs();
+		
+		int presetSize = inputArcs.size();
+		int postsetSize = outputArcs.size();
+		
+		Require.that(presetSize == postsetSize, "The provided model is not conservative");
 
-	public Pairing(TAPNArc input, String interval, Arc output, ArcType arcType) {
-		this.input = input;
-		this.interval = interval;
-		this.output = output;
-		this.arcType = arcType;
+		for(int i = 0; i < presetSize; i++)
+		{			
+			add(inputArcs.get(i), outputArcs.get(i));
+		}
 	}
 
-	public TAPNPlace getInput() {
-		return (TAPNPlace) input.getSource();
+	private void add(TimedInputArc inputArc, TimedOutputArc outputArc) {
+		inputArcToOutputArc.put(inputArc, outputArc);
 	}
-
-	public TAPNPlace getOutput() {
-		return (TAPNPlace) output.getTarget();
+	
+	public TimedOutputArc getOutputArcFor(TimedInputArc inputArc) {
+		Require.that(inputArcToOutputArc.containsKey(inputArc), "The given input arc is not in the preset of the transition");
+		
+		return inputArcToOutputArc.get(inputArc);
 	}
-
-	public ArcType getArcType() {
-		return arcType;
-	}
-
-	public String getInterval() {
-		return interval;
-	}
-
-	public TAPNArc getInputArc() {
-		return input;
-	}
-
-	public Arc getOutputArc() {
-		return output;
-	}
+	
 }
