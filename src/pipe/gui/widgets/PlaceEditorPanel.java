@@ -496,7 +496,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private void setInvariantControlsBasedOn(TimeInvariant invariant) {
 		if(invariant.upperBound() instanceof ConstantBound){
-			Require.notImplemented();
+			constantInvRadioButton.setSelected(true);
+			invRelationConstant.setModel(new DefaultComboBoxModel(invariant.upperBound().value() == 0 ? new String[] { "<=" } : new String[] { "<", "<=" }));
+			invRelationConstant.setSelectedItem(invariant.isUpperNonstrict() ? "<=" : "<");
+			invRelationConstant.setEnabled(true);
+			invConstantsComboBox.setEnabled(true);
+			invConstantsComboBox.setSelectedItem(((ConstantBound)invariant.upperBound()).constant());
 		}else{
 			normalInvRadioButton.setSelected(true);
 			if(invariant.upperBound() instanceof InfBound){

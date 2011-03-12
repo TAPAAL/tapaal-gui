@@ -22,6 +22,11 @@ public class ConstantBound implements Bound {
 		return new ConstantBound(constant.copy());
 	}
 
+
+	public Constant constant() {
+		return constant;
+	}
+	
 	public void setConstant(Constant newConstant) {
 		Require.that(newConstant != null, "Constant cannot be null");
 
@@ -57,5 +62,4 @@ public class ConstantBound implements Bound {
 			return false;
 		return true;
 	}
-
 }
