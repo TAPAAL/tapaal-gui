@@ -317,6 +317,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 			if (getParent() != null) {
 				getParent().remove(weightLabel);
 			}
+			source.removeFromArc(this);
+			target.removeToArc(this);
 			myPath.forceHidePoints();
 			super.delete();
 			deleted = true;

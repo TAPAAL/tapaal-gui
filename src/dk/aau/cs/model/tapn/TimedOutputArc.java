@@ -9,7 +9,7 @@ public class TimedOutputArc extends TAPNElement {
 	public TimedOutputArc(TimedTransition source, TimedPlace destination) {
 		Require.that(source != null, "An arc must have a non-null source transition");
 		Require.that(destination != null, "An arc must have a non-null destination place");
-
+		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
 		this.source = source;
 		this.destination = destination;
 	}

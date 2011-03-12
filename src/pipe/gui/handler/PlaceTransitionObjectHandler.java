@@ -214,14 +214,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 					// XXX -- kyrke hack to precent some race condisions in pipe
 					// gui
-					if ((createTAPNInhibitorArc.getTarget()) == null
-							|| (!(createTAPNInhibitorArc.getTransition() instanceof Transition))) {
-						createTAPNInhibitorArc.delete();
-						createTAPNInhibitorArc.removeKeyListener(keyHandler);
-						keyHandler = null;
-						view.remove(createTAPNInhibitorArc);
-						view.createArc = null;
-						view.repaint();
+					if (createTAPNInhibitorArc.getTarget() == null
+							|| !(createTAPNInhibitorArc.getTransition() instanceof Transition)) {
+						cleanupArc(createTAPNInhibitorArc, view);
 						break;
 					}
 
@@ -236,12 +231,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
 						createTAPNInhibitorArc.updateWeightLabel(true);
 					} catch (RequireException ex) {
-						createTAPNInhibitorArc.delete();
+						cleanupArc(createTAPNInhibitorArc, view);
 						JOptionPane
 								.showMessageDialog(
 										CreateGui.getApp(),
 										"There was an error drawing the arc. Possible problems:\n"
-												+ " - There is already an arc between the selected place and transition",
+												+ " - There is already an arc between the selected place and transition\n"
+												+ " - You are attempting to draw an arc between a shared transition and a shared place",
 										"Error", JOptionPane.ERROR_MESSAGE);
 						break;
 					}
@@ -378,8 +374,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								// System.out.println("DEBUG: arc normal i arc inhibidor!");
 							}
 							createArc.delete();
-							someArc.getTransition().removeArcCompareObject(
-									createArc);
+							someArc.getTransition().removeArcCompareObject(createArc);
 							someArc.getTransition().updateConnected();
 							break;
 						}
@@ -615,15 +610,15 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							((TransportArcComponent) transportArcToCreate)
 									.updateWeightLabel(true);
 						} catch (RequireException ex) {
-
-							transportArcToCreate.delete();
-							view.transportArcPart1.delete();
+							cleanupArc(transportArcToCreate, view);
+							cleanupArc(view.transportArcPart1, view);
 							JOptionPane
 									.showMessageDialog(
 											CreateGui.getApp(),
 											"There was an error drawing the arc. Possible problems:\n"
 													+ " - There is already an arc between the source place and transition\n"
-													+ " - There is already an arc between the transtion and the target place",
+													+ " - There is already an arc between the transtion and the target place\n"
+													+ " - You are attempting to draw an arc between a shared transition and a shared place",
 											"Error", JOptionPane.ERROR_MESSAGE);
 							break;
 						}
@@ -700,12 +695,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							outputArc.setUnderlyingArc(timedOutputArc);
 							outputArc.updateWeightLabel(true);
 						} catch (RequireException ex) {
-							timedArcToCreate.delete();
+							cleanupArc(timedArcToCreate, view);
 							JOptionPane
 									.showMessageDialog(
 											CreateGui.getApp(),
 											"There was an error drawing the arc. Possible problems:\n"
-													+ " - There is already an arc between the selected place and transition",
+													+ " - There is already an arc between the selected place and transition\n"
+													+ " - You are attempting to draw an arc between a shared transition and a shared place",
 											"Error", JOptionPane.ERROR_MESSAGE);
 							break;
 						}
@@ -733,8 +729,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						// XXX -- kyrke hack to precent some race condisions in
 						// pipe gui
-						if ((timedArcToCreate.getTarget()) == null
-								|| (!(timedArcToCreate.getTransition() instanceof Transition))) {
+						if (timedArcToCreate.getTarget() == null
+								|| !(timedArcToCreate.getTransition() instanceof Transition)) {
 							timedArcToCreate.delete();
 							timedArcToCreate.removeKeyListener(keyHandler);
 							keyHandler = null;
@@ -758,12 +754,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							timedArc.setUnderlyingArc(tia);
 							timedArc.updateWeightLabel(true);
 						} catch (RequireException ex) {
-							timedArcToCreate.delete();
+							cleanupArc(timedArcToCreate, view);
 							JOptionPane
 									.showMessageDialog(
 											CreateGui.getApp(),
 											"There was an error drawing the arc. Possible problems:\n"
-													+ " - There is already an arc between the selected place and transition",
+													+ " - There is already an arc between the selected place and transition\n"
+													+ " - You are attempting to draw an arc between a shared transition and a shared place",
 											"Error", JOptionPane.ERROR_MESSAGE);
 							break;
 						}
@@ -831,5 +828,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		default:
 			break;
 		}
+	}
+
+	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
+		arc.delete();
+		arc.removeKeyListener(keyHandler);
+		keyHandler = null;
+		view.remove(arc);
+		view.createArc = null;
+		view.repaint();
 	}
 }
