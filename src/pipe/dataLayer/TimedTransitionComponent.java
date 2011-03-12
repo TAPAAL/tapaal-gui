@@ -21,6 +21,7 @@ import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -83,8 +84,7 @@ public class TimedTransitionComponent extends Transition {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add Place editor
-		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this,
-				CreateGui.getView(), transition.model().parentNetwork()), this);
+		contentPane.add(new TAPNTransitionEditor(guiDialog.getRootPane(), this, new Context(CreateGui.getCurrentTab())));
 
 		guiDialog.setResizable(true);
 

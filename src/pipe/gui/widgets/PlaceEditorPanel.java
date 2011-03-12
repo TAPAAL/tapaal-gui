@@ -41,7 +41,11 @@ import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
@@ -145,7 +149,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
 		if(place.underlyingPlace().isShared()) sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 
-		sharedCheckBox.setEnabled(sharedPlaces.length > 0);
+		sharedCheckBox.setEnabled(sharedPlaces.length > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 
 		nameTextField.setText(place.underlyingPlace().name());
@@ -153,6 +157,27 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		setMarking(place.underlyingPlace().numberOfTokens());
 		setInvariantControlsBasedOn(place.underlyingPlace().invariant());		
+	}
+
+	private boolean hasArcsToSharedTransitions(TimedPlace underlyingPlace) {
+		for(TimedInputArc arc : context.activeModel().inputArcs()){
+			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
+		}
+		
+		for(TimedOutputArc arc : context.activeModel().outputArcs()){
+			if(arc.destination().equals(underlyingPlace) && arc.source().isShared()) return true;
+		}
+		
+		for(TransportArc arc : context.activeModel().transportArcs()){
+			if(arc.source().equals(underlyingPlace) && arc.transition().isShared()) return true;
+			if(arc.destination().equals(underlyingPlace) && arc.transition().isShared()) return true;
+		}
+		
+		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
+			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
+		}
+		
+		return false;
 	}
 
 	private void initBasicPropertiesPanel() {

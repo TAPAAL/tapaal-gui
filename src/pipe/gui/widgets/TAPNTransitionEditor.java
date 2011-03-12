@@ -15,11 +15,18 @@ import javax.swing.event.CaretListener;
 
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
 public class TAPNTransitionEditor extends javax.swing.JPanel {
@@ -27,14 +34,12 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private TimedTransitionComponent transition;
 	private DrawingSurfaceImpl view;
 	private JRootPane rootPane;
-	private final TimedArcPetriNetNetwork network;
+	private Context context;
 
-	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition,
-			DrawingSurfaceImpl _view, TimedArcPetriNetNetwork network) {
+	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
 		rootPane = _rootPane;
 		transition = _transition;
-		view = _view;
-		this.network = network;
+		this.context = context;
 		initComponents();
 
 		rootPane.setDefaultButton(okButton);
@@ -53,7 +58,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
-		sharedTransitionsComboBox = new JComboBox(network.sharedTransitions().toArray());
+		sharedTransitionsComboBox = new JComboBox(context.network().sharedTransitions().toArray());
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(120,27));
 		setLayout(new java.awt.GridBagLayout());
 
@@ -70,7 +75,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				}
 			}		
 		});
-		sharedCheckBox.setEnabled(network.numberOfSharedTransitions() > 0);
+		sharedCheckBox.setEnabled(context.network().numberOfSharedTransitions() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
@@ -164,6 +169,27 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		}else{
 			switchToNameTextField();
 		}
+	}
+	
+	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
+		for(TimedInputArc arc : context.activeModel().inputArcs()){
+			if(arc.destination().equals(underlyingTransition) && arc.source().isShared()) return true;
+		}
+		
+		for(TimedOutputArc arc : context.activeModel().outputArcs()){
+			if(arc.source().equals(underlyingTransition) && arc.destination().isShared()) return true;
+		}
+		
+		for(TransportArc arc : context.activeModel().transportArcs()){
+			if(arc.transition().equals(underlyingTransition) && arc.source().isShared()) return true;
+			if(arc.transition().equals(underlyingTransition) && arc.destination().isShared()) return true;
+		}
+		
+		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
+			if(arc.destination().equals(underlyingTransition) && arc.source().isShared()) return true;
+		}
+		
+		return false;
 	}
 
 	protected void switchToNameTextField() {
