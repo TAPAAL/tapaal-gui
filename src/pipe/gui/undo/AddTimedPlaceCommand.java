@@ -16,6 +16,7 @@ public class AddTimedPlaceCommand extends TAPNElementCommand {
 
 	@Override
 	public void undo() {
+		tapn.remove(timedPlace.underlyingPlace());
 		timedPlace.delete();
 		view.repaint();
 	}
