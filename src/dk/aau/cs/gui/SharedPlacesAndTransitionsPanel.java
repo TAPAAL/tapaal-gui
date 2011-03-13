@@ -8,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -35,8 +34,8 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Pipe;
 import pipe.gui.undo.DeleteTimedInhibitorArcCommand;
 import pipe.gui.undo.DeleteTimedInputArcCommand;
 import pipe.gui.undo.DeleteTimedOutputArcCommand;
@@ -212,22 +211,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					deleteCmd.redo();
 					undoManager.addEdit(deleteCmd);
 					
+					// We introduced temporary name before, to avoid exceptions, so we rename the places to the correct names here
 					for(Entry<LocalTimedPlace, String> entry : createdPlaces.entrySet()){
 						Command renameCmd = new RenameTimedPlaceCommand(tab, entry.getKey(), entry.getValue(), sharedPlace.name());
 						renameCmd.redo();
 						undoManager.addEdit(renameCmd);
 					}
-//					for(TimedPlace place : copy){
-					
-					//					}
-					
-					//					for(TimedPlace place : copy){
-					//						place.unshare();
-					//						undoManager.addEdit(new UnsharePlaceCommand(sharedPlace, place));
-					//					}
-					//					sharedPlacesListModel.removeElement(sharedPlace);
-					//					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
-					
 				}
 			}
 
