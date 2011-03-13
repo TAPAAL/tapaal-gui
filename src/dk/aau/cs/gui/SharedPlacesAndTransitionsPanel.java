@@ -8,6 +8,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -45,11 +48,15 @@ import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
 import dk.aau.cs.gui.undo.DeleteSharedTransitionCommand;
+import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
+import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
@@ -188,18 +195,39 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					sharedPlacesListModel.removeElement(sharedPlace);
 					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
 				}else{
-					//					Collection<TimedPlace> copy = sharedPlace.places();
+					Hashtable<LocalTimedPlace, String> createdPlaces = new Hashtable<LocalTimedPlace, String>();
+					for(Template template : tab.templates()){
+						TimedPlace place = template.model().getPlaceByName(sharedPlace.name());
+						TimedPlaceComponent component = (TimedPlaceComponent) template.guiModel().getPlaceByName(sharedPlace.name());
+						if(place != null){
+							String name = nameGenerator.getNewPlaceName(template.model());
+							LocalTimedPlace localPlace = new LocalTimedPlace(name);
+							createdPlaces.put(localPlace, name);
+							Command cmd = new UnsharePlaceCommand(template.model(), sharedPlace, localPlace, component);
+							cmd.redo();
+							undoManager.addEdit(cmd);
+						}
+					}
+					Command deleteCmd = new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel);
+					deleteCmd.redo();
+					undoManager.addEdit(deleteCmd);
+					
+					for(Entry<LocalTimedPlace, String> entry : createdPlaces.entrySet()){
+						Command renameCmd = new RenameTimedPlaceCommand(tab, entry.getKey(), entry.getValue(), sharedPlace.name());
+						renameCmd.redo();
+						undoManager.addEdit(renameCmd);
+					}
+//					for(TimedPlace place : copy){
+					
+					//					}
+					
 					//					for(TimedPlace place : copy){
 					//						place.unshare();
 					//						undoManager.addEdit(new UnsharePlaceCommand(sharedPlace, place));
 					//					}
 					//					sharedPlacesListModel.removeElement(sharedPlace);
 					//					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
-					//					for(TimedPlace place : copy){
-					//						String name = nameGenerator.getNewPlaceName(place.model());
-					//						// We add this invisible transition renaming to avoid problems with undo
-					//						undoManager.addEdit(new RenameTimedPlaceCommand(tab, place, name, place.name())); 
-					//					}
+					
 				}
 			}
 
