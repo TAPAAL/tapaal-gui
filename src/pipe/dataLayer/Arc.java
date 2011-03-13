@@ -400,6 +400,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 			super.undelete(view);
 			getSource().addConnectFrom(this);
 			getTarget().addConnectTo(this);
+			deleted = false;
 		}
 	}
 
