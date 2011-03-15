@@ -46,6 +46,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
@@ -59,11 +60,11 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 public class GuiFrame extends JFrame implements ActionListener, Observer {
@@ -830,7 +831,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 	public void saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getFile(index);
-				
+
 		if (!forceSaveAs && modelFile != null) { // ordinary save
 			saveNet(index, modelFile);
 		} else { // save as
@@ -846,7 +847,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				saveNet(index, modelFile);
 			}
 		}
-		
+
 		// resize "header" of current tab immediately to fit the length of the
 		// model name
 		appTab.getTabComponentAt(index).doLayout();
@@ -857,14 +858,14 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			TabContent currentTab = CreateGui.getTab(index);
 			NetworkMarking currentMarking = null;
 			if(getGUIMode().equals(GUIMode.animation)){
-				 currentMarking = currentTab.network().marking();
-				 currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
+				currentMarking = currentTab.network().marking();
+				currentTab.network().setMarking(CreateGui.getAnimator().getInitialMarking());
 			}
-			
+
 			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
-				currentTab.templates(), 
-				currentTab.queries(), 
-				currentTab.network().constants()
+					currentTab.templates(), 
+					currentTab.queries(), 
+					currentTab.network().constants()
 			);
 
 			tapnWriter.savePNML(outFile);
@@ -1397,47 +1398,48 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
 			Iterable<TAPNQuery> queries = ((TabContent) appTab.getSelectedComponent()).queries();
 			HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-			Require.notImplemented();
-//			boolean queriesAffected = false;
-//			for (PetriNetObject pn : selection) {
-//				if (pn instanceof TimedPlaceComponent) {
-//					TimedPlaceComponent place = (TimedPlaceComponent)pn;
-//					for (TAPNQuery q : queries) {
-//						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(place.underlyingPlace().model().getName(),place.underlyingPlace().name())) {
-//							queriesAffected = true;
-//							queriesToDelete.add(q);
-//						}
-//					}
-//				}
-//			}
-//			StringBuilder s = new StringBuilder();
-//			s.append("The following queries are associated with the currently selected objects:\n\n");
-//			for (TAPNQuery q : queriesToDelete) {
-//				s.append(q.getName());
-//				s.append("\n");
-//			}
-//			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
-//
-//			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
-//					CreateGui.getApp(), s.toString(), "Warning",
-//					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-//					: JOptionPane.YES_OPTION;
-//
-//					if (choice == JOptionPane.YES_OPTION) {
-//						appView.getUndoManager().newEdit(); // new "transaction""
-//
-//						if (queriesAffected) {
-//							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-//							for (TAPNQuery q : queriesToDelete) {
-//								currentTab.removeQuery(q);
-//							}
-//						}
-//
-//						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-//						appView.getSelectionObject().deleteSelection();
-//						appView.repaint();
-//						CreateGui.getCurrentTab().network().buildConstraints();
-//					}
+
+			boolean queriesAffected = false;
+			for (PetriNetObject pn : selection) {
+				if (pn instanceof TimedPlaceComponent) {
+					TimedPlaceComponent place = (TimedPlaceComponent)pn;
+					if(!place.underlyingPlace().isShared()){
+						for (TAPNQuery q : queries) {
+							if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().getName(),place.underlyingPlace().name())) {
+								queriesAffected = true;
+								queriesToDelete.add(q);
+							}
+						}
+					}
+				}
+			}
+			StringBuilder s = new StringBuilder();
+			s.append("The following queries are associated with the currently selected objects:\n\n");
+			for (TAPNQuery q : queriesToDelete) {
+				s.append(q.getName());
+				s.append("\n");
+			}
+			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
+
+			int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+					CreateGui.getApp(), s.toString(), "Warning",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+					: JOptionPane.YES_OPTION;
+
+			if (choice == JOptionPane.YES_OPTION) {
+				appView.getUndoManager().newEdit(); // new "transaction""
+				if (queriesAffected) {
+					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+					for (TAPNQuery q : queriesToDelete) {
+						currentTab.removeQuery(q);
+					}
+				}
+				
+				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+				appView.getSelectionObject().deleteSelection();
+				appView.repaint();
+				CreateGui.getCurrentTab().network().buildConstraints();
+			}
 		}
 
 	}

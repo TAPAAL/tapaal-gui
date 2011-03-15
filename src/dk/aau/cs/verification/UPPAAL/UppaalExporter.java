@@ -21,20 +21,22 @@ import dk.aau.cs.translations.tapn.StandardNamingScheme;
 import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
 
+// TODO: remove the old model method parameters once all translations have been converted
 public class UppaalExporter {
-	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query,
+	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TimedArcPetriNet model, TAPNQuery query,
 			ReductionOption reduction) {
 		File modelFile = createTempFile(".xml");
 		File queryFile = createTempFile(".q");
 
-		return export(model, query, reduction, modelFile, queryFile);
+		return export(newModel, model, query, reduction, modelFile, queryFile);
 	}
 
-	public ExportedModel export(TimedArcPetriNet model, TAPNQuery query,
+	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TimedArcPetriNet model, TAPNQuery query,
 			ReductionOption reduction, File modelFile, File queryFile) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
+		
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
 		TranslationNamingScheme namingScheme = null;
 		if (reduction == ReductionOption.STANDARDSYMMETRY) {
@@ -74,11 +76,9 @@ public class UppaalExporter {
 					extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
 			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer
-						.transformModel(model);
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(newModel);
 				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer
-						.transformQuery(query);
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
 				uppaalQuery.output(new PrintStream(queryFile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();

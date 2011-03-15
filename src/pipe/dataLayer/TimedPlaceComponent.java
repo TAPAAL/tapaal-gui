@@ -42,7 +42,6 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
-import dk.aau.cs.util.Require;
 
 public class TimedPlaceComponent extends Place {
 	private static final long serialVersionUID = 1L;
@@ -117,10 +116,7 @@ public class TimedPlaceComponent extends Place {
 
 	@Override
 	public void delete() {
-		Require.notImplemented();
-//		if (place != null)
-//			place.delete();
-//		super.delete();
+		super.delete();
 	}
 
 	public String getInvariantAsString() {

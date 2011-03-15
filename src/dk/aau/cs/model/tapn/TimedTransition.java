@@ -244,6 +244,10 @@ public class TimedTransition extends TAPNElement {
 	public int getNumberOfTransportArcsGoingThrough() {
 		return transportArcsGoingThrough.size();
 	}
+	
+	public List<TimedInhibitorArc> getInhibitorArcs() {
+		return inhibitorArcs;
+	}
 
 	public TimedTransition copy() {
 		return new TimedTransition(this.name);
@@ -287,6 +291,8 @@ public class TimedTransition extends TAPNElement {
 			return false;
 		return true;
 	}
+
+
 
 
 

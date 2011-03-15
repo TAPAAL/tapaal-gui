@@ -194,7 +194,7 @@ public class Verifyta implements ModelChecker {
 		dk.aau.cs.petrinet.TimedArcPetriNet transformedModel = transformer.transformModel(model.value1());
 		
 		UppaalExporter exporter = new UppaalExporter();
-		ExportedModel exportedModel = exporter.export(transformedModel, query, ((VerifytaOptions) options).getReduction());
+		ExportedModel exportedModel = exporter.export(model.value1(), transformedModel, query, ((VerifytaOptions) options).getReduction());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

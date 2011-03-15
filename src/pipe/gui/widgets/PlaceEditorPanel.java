@@ -24,10 +24,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
-import dk.aau.cs.TCTL.visitors.RenamePlaceTCTLVisitor;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
@@ -47,7 +45,6 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.Bound.InfBound;
-import dk.aau.cs.util.Require;
 import dk.aau.cs.util.RequireException;
 
 public class PlaceEditorPanel extends javax.swing.JPanel {

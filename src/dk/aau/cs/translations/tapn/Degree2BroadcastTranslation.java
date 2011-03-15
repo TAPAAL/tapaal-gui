@@ -342,12 +342,12 @@ public class Degree2BroadcastTranslation implements
 		createInitialLocationsForTokenAutomata(degree2Net, tokenTA);
 		createEdgesForTokenAutomata(degree2Net, tokenTA);
 		createTestingEdgesForTokenAutomata(originalModel, tokenTA);
-		tokenTA.setDeclarations(createLocalDeclarations(originalModel, token));
+		tokenTA.setDeclarations(createLocalDeclarations());
 
 		return tokenTA;
 	}
 
-	protected String createLocalDeclarations(TimedArcPetriNet model, Token token) {
+	protected String createLocalDeclarations() {
 		return "clock " + CLOCK_NAME + ";";
 	}
 

@@ -229,150 +229,150 @@ public class Export {
 		}
 	}
 
-	public static void exportUppaalXMLFromQuery(DataLayer appModel,	TAPNQuery input, String modelFile, String queryFile) {
-		File xmlfile = null, qfile = null;
-		try {
-			xmlfile = new File(modelFile);
-			qfile = new File(queryFile);
-		} catch (NullPointerException e2) {
-			e2.printStackTrace();
-			return;
-		}
-
-		// Create transformer
-		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
-
-		TAPN model = null;
-		try {
-			model = transformer.getAAUTAPN(appModel, 0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		if (CreateGui.getApp().getComponentCount() == 0) {
-			return;
-		}
-
-		int capacity;
-		capacity = input.getCapacity();
-		String inputQuery = input.getQuery();
-		TraceOption traceOption = input.getTraceOption();
-		SearchOption searchOption = input.getSearchOption();
-		String verifytaOptions = "";
-
-		if (traceOption == TraceOption.SOME) {
-			verifytaOptions = "-t0";
-		} else if (traceOption == TraceOption.FASTEST) {
-			verifytaOptions = "-t2";
-		} else if (traceOption == TraceOption.NONE) {
-			verifytaOptions = "";
-		}
-
-		if (searchOption == SearchOption.BFS) {
-			verifytaOptions += "-o0";
-		} else if (searchOption == SearchOption.DFS) {
-			verifytaOptions += "-o1";
-		} else if (searchOption == SearchOption.RDFS) {
-			verifytaOptions += "-o2";
-		} else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST) {
-			verifytaOptions += "-o6";
-		}
-
-		if (inputQuery == null) {
-			return;
-		}
-
-		// TODO: Refactor so translation to dk.aau.cs.petrinet.TAPNQuery happens
-		// exactly once
-
-		// Select the model based on selected export option.
-		if (input.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
-
-			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
-			try {
-				t.autoTransform(model, new PrintStream(xmlfile), 
-								new PrintStream(qfile), 
-								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-
-		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
-
-			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
-			try {
-				t.autoTransform(model, new PrintStream(xmlfile),
-								new PrintStream(qfile),
-								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
-			Logger.log("Using ADV_NOSYMQ");
-			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
-			try {
-				t.autoTransform(model, new PrintStream(xmlfile),
-								new PrintStream(qfile),
-								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-
-		} else if (input.getReductionOption() == ReductionOption.BROADCAST
-				|| input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY) {
-			BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
-
-			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else if (input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY
-				|| input.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
-			Degree2BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(capacity,
-						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
-			
-			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
-				nta.outputToUPPAALXML(new PrintStream(xmlfile));
-				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
-				query.output(new PrintStream(qfile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-
-			try {
-				model.convertToConservative();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-
-			try {
-				NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
-				model = deg2Converter.transform(model);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-
-			// Create uppaal xml file
-			try {
-				StandardTranslation t2 = new StandardTranslation(model, new PrintStream(xmlfile), capacity);
-				t2.transform();
-				t2.transformQueriesToUppaal(capacity, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), new PrintStream(qfile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	public static void exportUppaalXMLFromQuery(DataLayer appModel,	TAPNQuery input, String modelFile, String queryFile) {
+//		File xmlfile = null, qfile = null;
+//		try {
+//			xmlfile = new File(modelFile);
+//			qfile = new File(queryFile);
+//		} catch (NullPointerException e2) {
+//			e2.printStackTrace();
+//			return;
+//		}
+//
+//		// Create transformer
+//		PipeTapnToAauTapnTransformer transformer = new PipeTapnToAauTapnTransformer();
+//
+//		TAPN model = null;
+//		try {
+//			model = transformer.getAAUTAPN(appModel, 0);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		if (CreateGui.getApp().getComponentCount() == 0) {
+//			return;
+//		}
+//
+//		int capacity;
+//		capacity = input.getCapacity();
+//		String inputQuery = input.getQuery();
+//		TraceOption traceOption = input.getTraceOption();
+//		SearchOption searchOption = input.getSearchOption();
+//		String verifytaOptions = "";
+//
+//		if (traceOption == TraceOption.SOME) {
+//			verifytaOptions = "-t0";
+//		} else if (traceOption == TraceOption.FASTEST) {
+//			verifytaOptions = "-t2";
+//		} else if (traceOption == TraceOption.NONE) {
+//			verifytaOptions = "";
+//		}
+//
+//		if (searchOption == SearchOption.BFS) {
+//			verifytaOptions += "-o0";
+//		} else if (searchOption == SearchOption.DFS) {
+//			verifytaOptions += "-o1";
+//		} else if (searchOption == SearchOption.RDFS) {
+//			verifytaOptions += "-o2";
+//		} else if (searchOption == SearchOption.CLOSE_TO_TARGET_FIRST) {
+//			verifytaOptions += "-o6";
+//		}
+//
+//		if (inputQuery == null) {
+//			return;
+//		}
+//
+//		// TODO: Refactor so translation to dk.aau.cs.petrinet.TAPNQuery happens
+//		// exactly once
+//
+//		// Select the model based on selected export option.
+//		if (input.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
+//
+//			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
+//			try {
+//				t.autoTransform(model, new PrintStream(xmlfile), 
+//								new PrintStream(qfile), 
+//								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
+//
+//			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
+//			try {
+//				t.autoTransform(model, new PrintStream(xmlfile),
+//								new PrintStream(qfile),
+//								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//		} else if (input.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
+//			Logger.log("Using ADV_NOSYMQ");
+//			OptimizedStandardTranslation t = new OptimizedStandardTranslation();
+//			try {
+//				t.autoTransform(model, new PrintStream(xmlfile),
+//								new PrintStream(qfile),
+//								new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), capacity);
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else if (input.getReductionOption() == ReductionOption.BROADCAST
+//				|| input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY) {
+//			BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.BroadcastTranslation(capacity, input.getReductionOption() == ReductionOption.BROADCASTSYMMETRY);
+//
+////			try {
+////				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+////				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+////				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
+////				query.output(new PrintStream(qfile));
+////			} catch (FileNotFoundException e) {
+////				e.printStackTrace();
+////			} catch (Exception e) {
+////				e.printStackTrace();
+////			}
+//		} else if (input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY
+//				|| input.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
+//			Degree2BroadcastTranslation broadcastTransformer = new dk.aau.cs.translations.tapn.Degree2BroadcastTranslation(capacity,
+//						input.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY);
+//			
+//			try {
+//				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(model);
+//				nta.outputToUPPAALXML(new PrintStream(xmlfile));
+//				dk.aau.cs.TA.UPPAALQuery query = broadcastTransformer.transformQuery(new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), capacity + 1 + model.getTokens().size()));
+//				query.output(new PrintStream(qfile));
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		} else {
+//
+//			try {
+//				model.convertToConservative();
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//			}
+//
+//			try {
+//				NaiveDegree2Converter deg2Converter = new NaiveDegree2Converter();
+//				model = deg2Converter.transform(model);
+//			} catch (Exception e1) {
+//				e1.printStackTrace();
+//			}
+//
+//			// Create uppaal xml file
+//			try {
+//				StandardTranslation t2 = new StandardTranslation(model, new PrintStream(xmlfile), capacity);
+//				t2.transform();
+//				t2.transformQueriesToUppaal(capacity, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), 0), new PrintStream(qfile));
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 }

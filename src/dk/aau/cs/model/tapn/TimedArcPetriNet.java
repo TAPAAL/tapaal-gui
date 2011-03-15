@@ -283,8 +283,13 @@ public class TimedArcPetriNet {
 	public TimedArcPetriNet copy() {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(this.name);
 
-		for(TimedPlace p : this.places)
-			tapn.add(p.copy());
+		for(TimedPlace p : this.places) {
+			TimedPlace copy = p.copy();
+			tapn.add(copy);
+			for(TimedToken t : this.currentMarking.getTokensFor(p)) {
+				tapn.addToken(new TimedToken(copy));
+			}
+		}
 
 		for(TimedTransition t : this.transitions)
 			tapn.add(t.copy());
@@ -301,7 +306,7 @@ public class TimedArcPetriNet {
 		for(TimedInhibitorArc inhibArc : this.inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
 
-		tapn.setMarking(this.currentMarking.clone());
+		//tapn.setMarking(this.currentMarking.clone());
 
 		return tapn;
 	}

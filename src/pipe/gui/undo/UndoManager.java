@@ -22,7 +22,6 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import dk.aau.cs.gui.undo.Command;
-import dk.aau.cs.util.Require;
 
 /**
  * Class to handle undo & redo functionality
@@ -249,31 +248,32 @@ public class UndoManager {
 			//		}
 
 			if (!pnObject.isDeleted()) {
+				Command cmd = null;
 				if(pnObject instanceof TimedPlaceComponent){
 					TimedPlaceComponent tp = (TimedPlaceComponent)pnObject;
-					Require.notImplemented();
-					//addEdit(new DeleteTimedPlaceCommand(tp, tp.underlyingPlace().model(), guiModel, view));
+					cmd = new DeleteTimedPlaceCommand(tp, view.getModel(), guiModel, view);
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
-					addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view));
+					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view);
 				}else if(pnObject instanceof TransportArcComponent){
 					TransportArcComponent transportArc = (TransportArcComponent)pnObject;
-					addEdit(new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view));
+					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view);
 				}else if(pnObject instanceof TimedInhibitorArcComponent){
 					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;
-					addEdit(new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel, view));
+					cmd = new DeleteTimedInhibitorArcCommand(tia, tia.underlyingTimedInhibitorArc().model(), guiModel, view);
 				}else if(pnObject instanceof TimedInputArcComponent){
 					TimedInputArcComponent tia = (TimedInputArcComponent)pnObject;
-					addEdit(new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view));
+					cmd = new DeleteTimedInputArcCommand(tia, tia.underlyingTimedInputArc().model(), guiModel, view);
 				}else if(pnObject instanceof TimedOutputArcComponent){
 					TimedOutputArcComponent toa = (TimedOutputArcComponent)pnObject;
-					addEdit(new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel, view));
+					cmd = new DeleteTimedOutputArcCommand(toa, toa.underlyingArc().model(), guiModel, view);
 				}else if(pnObject instanceof AnnotationNote){
-					addEdit(new DeletePetriNetObjectEdit(pnObject, view, guiModel));
+					cmd = new DeletePetriNetObjectEdit(pnObject, view, guiModel);
 				}else{
 					throw new RuntimeException("This should not be possible");
 				}
-				pnObject.delete();
+				cmd.redo();
+				addEdit(cmd);
 			}
 		}
 	}

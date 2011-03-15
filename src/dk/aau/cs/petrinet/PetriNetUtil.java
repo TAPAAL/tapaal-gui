@@ -1,8 +1,10 @@
 package dk.aau.cs.petrinet;
 
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedPlace;
+
 public final class PetriNetUtil {
-	public static final String createGuard(String guard, TAPNPlace target,
-			boolean isTransportArc) {
+	public static final String createGuard(String guard, TAPNPlace target,	boolean isTransportArc) {
 		if (!isTransportArc || target.getInvariant().equals("<inf"))
 			return guard;
 
@@ -16,6 +18,7 @@ public final class PetriNetUtil {
 			invComparison = "<";
 		}
 
+		inv = inv.trim();
 		int invariantBound = Integer.parseInt(inv);
 
 		String firstDelim = guard.substring(0, 1);
@@ -39,5 +42,14 @@ public final class PetriNetUtil {
 				return firstDelim + lower + "," + invariantBound + ")";
 			}
 		}
+	}
+
+	// TODO: fix this so it doesn't use TAPNPlace once translations are fixed.
+	public static String createGuard(String guard, TimedPlace timedPlace,	boolean isTransportArc) {
+		if (!isTransportArc || timedPlace.invariant().equals(TimeInvariant.LESS_THAN_INFINITY))
+			return guard;
+
+		TAPNPlace place = timedPlace == null ? null : new TAPNPlace(timedPlace.name(), timedPlace.invariant().toString(false), timedPlace.numberOfTokens());
+		return createGuard(guard, place, isTransportArc);
 	}
 }

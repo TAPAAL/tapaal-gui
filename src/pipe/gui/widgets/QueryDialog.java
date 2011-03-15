@@ -1723,7 +1723,7 @@ public class QueryDialog extends JPanel {
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
 						
-						exporter.export(tapn, clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
+						exporter.export(transformedModel.value1(), tapn, clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
 					} else {
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"No Uppaal XML file saved.");

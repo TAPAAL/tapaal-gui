@@ -8,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -23,25 +25,37 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import pipe.dataLayer.Arc;
 import pipe.dataLayer.Template;
+import pipe.dataLayer.TimedInhibitorArcComponent;
+import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
+import pipe.gui.undo.DeleteTimedInhibitorArcCommand;
+import pipe.gui.undo.DeleteTimedInputArcCommand;
+import pipe.gui.undo.DeleteTimedOutputArcCommand;
 import pipe.gui.undo.DeleteTimedPlaceCommand;
 import pipe.gui.undo.DeleteTimedTransitionCommand;
+import pipe.gui.undo.DeleteTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
 import dk.aau.cs.gui.undo.DeleteSharedTransitionCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
@@ -154,30 +168,69 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 			private void deleteSharedPlace(boolean deleteFromTemplates) {
 				SharedPlace sharedPlace = (SharedPlace)list.getSelectedValue();
-				Require.notImplemented();
-//				if(deleteFromTemplates){
-//					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
-//						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
-//						undoManager.addEdit(new DeleteTimedPlaceCommand(place, place.underlyingPlace().model(), template.guiModel(), tab.drawingSurface()));
-//						place.delete();
-//					}
-//					tab.drawingSurface().repaint();
-//					sharedPlacesListModel.removeElement(sharedPlace);
-//					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
-//				}else{
-//					Collection<TimedPlace> copy = sharedPlace.places();
-//					for(TimedPlace place : copy){
-//						place.unshare();
-//						undoManager.addEdit(new UnsharePlaceCommand(sharedPlace, place));
-//					}
-//					sharedPlacesListModel.removeElement(sharedPlace);
-//					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
-//					for(TimedPlace place : copy){
-//						String name = nameGenerator.getNewPlaceName(place.model());
-//						// We add this invisible transition renaming to avoid problems with undo
-//						undoManager.addEdit(new RenameTimedPlaceCommand(tab, place, name, place.name())); 
-//					}
-//				}
+
+				if(deleteFromTemplates){
+					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
+						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
+						if(place != null){
+							for(Arc arc : place.getPreset()){
+								Command cmd = createDeleteArcCommand(template, arc, tab.drawingSurface()); 
+								cmd.redo();
+								undoManager.addEdit(cmd);
+							}
+
+							for(Arc arc : place.getPostset()){
+								Command cmd = createDeleteArcCommand(template, arc, tab.drawingSurface());
+								cmd.redo();
+								undoManager.addEdit(cmd);
+							}
+
+							Command cmd = new DeleteTimedPlaceCommand(place, template.model(), template.guiModel(), tab.drawingSurface());
+							cmd.redo();
+							undoManager.addEdit(cmd);
+						}
+					}
+					tab.drawingSurface().repaint();
+					sharedPlacesListModel.removeElement(sharedPlace);
+					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
+				}else{
+					Hashtable<LocalTimedPlace, String> createdPlaces = new Hashtable<LocalTimedPlace, String>();
+					for(Template template : tab.templates()){
+						TimedPlace place = template.model().getPlaceByName(sharedPlace.name());
+						TimedPlaceComponent component = (TimedPlaceComponent) template.guiModel().getPlaceByName(sharedPlace.name());
+						if(place != null){
+							String name = nameGenerator.getNewPlaceName(template.model());
+							LocalTimedPlace localPlace = new LocalTimedPlace(name);
+							createdPlaces.put(localPlace, name);
+							Command cmd = new UnsharePlaceCommand(template.model(), sharedPlace, localPlace, component);
+							cmd.redo();
+							undoManager.addEdit(cmd);
+						}
+					}
+					Command deleteCmd = new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel);
+					deleteCmd.redo();
+					undoManager.addEdit(deleteCmd);
+					
+					// We introduced temporary name before, to avoid exceptions, so we rename the places to the correct names here
+					for(Entry<LocalTimedPlace, String> entry : createdPlaces.entrySet()){
+						Command renameCmd = new RenameTimedPlaceCommand(tab, entry.getKey(), entry.getValue(), sharedPlace.name());
+						renameCmd.redo();
+						undoManager.addEdit(renameCmd);
+					}
+				}
+			}
+
+			private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {
+				if(arc instanceof TimedInhibitorArcComponent){
+					return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+				}else if(arc instanceof TransportArcComponent){
+					TransportArcComponent component = (TransportArcComponent)arc;
+					return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel(), drawingSurface);
+				}else if(arc instanceof TimedInputArcComponent){
+					return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+				}else{
+					return new DeleteTimedOutputArcCommand((TimedOutputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
+				}
 			}
 
 			private void deleteSharedTransition(boolean deleteFromTemplates) {
