@@ -1,8 +1,7 @@
-package dk.aau.cs.model.tapn;
+package dk.aau.cs.io;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -50,6 +49,22 @@ import pipe.gui.handler.TransportArcHandler;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;
+import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
@@ -64,7 +79,7 @@ public class TimedArcPetriNetFactory {
 	private ArrayList<TAPNQuery> queries;
 	private TreeMap<String, Constant> constants;
 	private DrawingSurfaceImpl drawingSurface;
-	private boolean isModelInNewFormat = true;
+	private NameGenerator nameGenerator = new NameGenerator();
 
 	public TimedArcPetriNetFactory(DrawingSurfaceImpl drawingSurfaceImpl) {
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
@@ -76,7 +91,8 @@ public class TimedArcPetriNetFactory {
 		this.drawingSurface = drawingSurfaceImpl;
 	}
 
-	public Iterable<Template> parseTimedArcPetriNetsFromPNML(Document tapnDoc) {
+	public LoadedModel parseTimedArcPetriNetsFromPNML(Document tapnDoc) { 
+		Require.notImplemented();
 		ArrayList<Template> templates = new ArrayList<Template>();
 
 		NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
@@ -88,90 +104,13 @@ public class TimedArcPetriNetFactory {
 			}
 		}
 
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
 		NodeList nets = tapnDoc.getElementsByTagName("net");
-		for (int i = 0; i < nets.getLength(); i++) {
-			templates.add(parseTimedArcPetriNetFromPNML(nets.item(i)));
-		}
-
-		if (isModelInNewFormat) {
-			NodeList queryNodes = tapnDoc.getElementsByTagName("query");
-			for (int i = 0; i < queryNodes.getLength(); i++) {
-				Node q = queryNodes.item(i);
-
-				if (q instanceof Element) {
-					TAPNQuery query = parseTAPNQuery((Element) q);
-
-					if (query != null)
-						queries.add(query);
-				}
-			}
-		}
-		ArrayList<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
-		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
-		return new LoadedModel(templates, sharedPlaces, sharedTransitions, constants.values(), queries).templates();
-	}
-	
-
-	
-
-	// TODO: the methods for loading nets in the old and the new format 
-	// contain a lot of duplicate code at the moment. The code moreover
-	// contains remnants of the pipe code which is not that readable and this 
-	// whole class thus needs to be refactored.
-	private Template parseTimedArcPetriNetFromPNML(Node tapnNode) {
-		if (isModelInNewFormat) {
-			try {
-				return parseTimedArcPetriNet(tapnNode);
-			} catch (Exception e) {
-				isModelInNewFormat = false;
-			}
-		}
-
-		if (!isModelInNewFormat) {
-			try {
-				return parseTimedArcPetriNetAsOldFormat(tapnNode);
-			} catch (Exception e2) {
-				System.out.println("There was an error parsing the chosen model.");
-				throw new RuntimeException("An error occurred while trying to parse the chosen model.");
-			}
-		}
-
-		throw new RuntimeException("An error occurred while trying to parse the chosen model.");
-	}
-
-	private Template parseTimedArcPetriNet(Node tapnNode) {
-		initialMarking = new LocalTimedMarking();
-		if (tapnNode instanceof Element) {
-			String name = getTAPNName((Element) tapnNode);
-			if(isNameAllowed(name))
-				tapn = new TimedArcPetriNet(name);
-			else
-				tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
-		} else {
-			tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
-		}
-		guiModel = new DataLayer();
-
-		Node node = null;
-		NodeList nodeList = null;
-
-		nodeList = tapnNode.getChildNodes();
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			node = nodeList.item(i);
-			parseElement(node);
-		}
-
-		tapn.setMarking(initialMarking);
-
-		return new Template(tapn, guiModel);
-	}
-
-	private boolean isNameAllowed(String name) {
-		Require.that(name != null, "name was null");
+		templates.add(parseTimedArcPetriNetAsOldFormat(nets.item(0), network));
 		
-		return !name.isEmpty() && java.util.regex.Pattern.matches("[a-zA-Z]([_a-zA-Z0-9])*", name);
+		return new LoadedModel(network, templates, queries);
 	}
-
+	
 	public Iterable<TAPNQuery> getQueries() {
 		return queries;
 	}
@@ -180,213 +119,6 @@ public class TimedArcPetriNetFactory {
 		return constants.values();
 	}
 
-	private String getTAPNName(Element tapnNode) {
-		String name = tapnNode.getAttribute("name");
-
-		if (name == null || name.equals(""))
-			name = tapnNode.getAttribute("id");
-
-		return name;
-	}
-
-	private void parseElement(Node node) {
-		Element element;
-		if (node instanceof Element) {
-			element = (Element) node;
-			if ("labels".equals(element.getNodeName())) {
-				parseAndAddAnnotation(element);
-			} else if ("place".equals(element.getNodeName())) {
-				parseAndAddPlace(element);
-			} else if ("transition".equals(element.getNodeName())) {
-				parseAndAddTransition(element);
-			} else if ("arc".equals(element.getNodeName())) {
-				parseAndAddArc(element);
-			}
-		}
-
-	}
-
-	private void parseAndAddAnnotation(Element annotation) {
-		int positionXInput = 0;
-		int positionYInput = 0;
-		int widthInput = 0;
-		int heightInput = 0;
-		boolean borderInput = true;
-
-		String positionXTempStorage = annotation.getAttribute("positionX");
-		String positionYTempStorage = annotation.getAttribute("positionY");
-		String widthTemp = annotation.getAttribute("width");
-		String heightTemp = annotation.getAttribute("height");
-		String borderTemp = annotation.getAttribute("border");
-
-		String text = annotation.getTextContent();
-			
-		if (positionXTempStorage.length() > 0) {
-			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
-		}
-
-		if (positionYTempStorage.length() > 0) {
-			positionYInput = Integer.valueOf(positionYTempStorage).intValue() + 1;
-		}
-
-		if (widthTemp.length() > 0) {
-			widthInput = Integer.valueOf(widthTemp).intValue() + 1;
-		}
-
-		if (heightTemp.length() > 0) {
-			heightInput = Integer.valueOf(heightTemp).intValue() + 1;
-		}
-
-		if (borderTemp.length() > 0) {
-			borderInput = Boolean.valueOf(borderTemp).booleanValue();
-		} else {
-			borderInput = true;
-		}
-		AnnotationNote an = new AnnotationNote(text, positionXInput,
-				positionYInput, widthInput, heightInput, borderInput);
-		guiModel.addPetriNetObject(an);
-		addListeners(an);
-	}
-
-	private void parseAndAddTransition(Element transition) {
-
-		double positionXInput = Double.parseDouble(transition.getAttribute("positionX"));
-		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
-		String idInput = transition.getAttribute("id");
-		String nameInput = transition.getAttribute("name");
-		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
-		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
-		boolean timedTransition = transition.getAttribute("timed").equals("true") ? true : false;
-		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
-		int angle = Integer.parseInt(transition.getAttribute("angle"));
-		int priority = Integer.parseInt(transition.getAttribute("priority"));
-
-		positionXInput = Grid.getModifiedX(positionXInput);
-		positionYInput = Grid.getModifiedY(positionYInput);
-
-		if (idInput.length() == 0 && nameInput.length() > 0) {
-			idInput = nameInput;
-		}
-
-		if (nameInput.length() == 0 && idInput.length() > 0) {
-			nameInput = idInput;
-		}
-
-		TimedTransition t = new TimedTransition(nameInput);
-
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
-				positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput, timedTransition,
-				infiniteServer, angle, priority);
-		transitionComponent.setUnderlyingTransition(t);
-		transitionComponent.setTimed(true);
-		guiModel.addPetriNetObject(transitionComponent);
-		addListeners(transitionComponent);
-		tapn.add(t);
-	}
-
-	private void parseAndAddPlace(Element place) {
-		double positionXInput = Double.parseDouble(place.getAttribute("positionX"));
-		double positionYInput = Double.parseDouble(place.getAttribute("positionY"));
-		String idInput = place.getAttribute("id");
-		String nameInput = place.getAttribute("name");
-		double nameOffsetXInput = Double.parseDouble(place.getAttribute("nameOffsetX"));
-		double nameOffsetYInput = Double.parseDouble(place.getAttribute("nameOffsetY"));
-		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
-		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
-		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
-		String invariant = place.getAttribute("invariant");
-
-		positionXInput = Grid.getModifiedX(positionXInput);
-		positionYInput = Grid.getModifiedY(positionYInput);
-
-		if (idInput.length() == 0 && nameInput.length() > 0) {
-			idInput = nameInput;
-		}
-
-		if (nameInput.length() == 0 && idInput.length() > 0) {
-			nameInput = idInput;
-		}
-
-		Place placeComponent = null;
-
-		if (invariant == null || invariant == "") {
-			placeComponent = new Place(positionXInput, positionYInput, idInput,
-					nameInput, nameOffsetXInput, nameOffsetYInput,
-					initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, 0);
-
-		} else {
-
-			placeComponent = new TimedPlaceComponent(positionXInput,
-					positionYInput, idInput, nameInput, nameOffsetXInput,
-					nameOffsetYInput, initialMarkingInput, markingOffsetXInput,
-					markingOffsetYInput, 0);
-			LocalTimedPlace p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
-			tapn.add(p);
-
-			((TimedPlaceComponent) placeComponent).setUnderlyingPlace(p);
-			guiModel.addPetriNetObject(placeComponent);
-			addListeners(placeComponent);
-			
-			for (int i = 0; i < initialMarkingInput; i++) {
-				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));
-			}
-		}
-	}
-
-	private void parseAndAddArc(Element arc) {
-		String idInput = arc.getAttribute("id");
-		String sourceInput = arc.getAttribute("source");
-		String targetInput = arc.getAttribute("target");
-		boolean taggedArc = arc.getAttribute("tagged").equals("true") ? true : false;
-		String inscriptionTempStorage = arc.getAttribute("inscription");
-		String type = arc.getAttribute("type");
-
-		PlaceTransitionObject sourceIn = guiModel.getPlaceTransitionObject(sourceInput);
-		PlaceTransitionObject targetIn = guiModel.getPlaceTransitionObject(targetInput);
-
-		// add the insets and offset
-		int aStartx = sourceIn.getX() + sourceIn.centreOffsetLeft();
-		int aStarty = sourceIn.getY() + sourceIn.centreOffsetTop();
-
-		int aEndx = targetIn.getX() + targetIn.centreOffsetLeft();
-		int aEndy = targetIn.getY() + targetIn.centreOffsetTop();
-
-		double _startx = aStartx;
-		double _starty = aStarty;
-		double _endx = aEndx;
-		double _endy = aEndy;
-
-		Arc tempArc;
-
-		if (type.equals("tapnInhibitor")) {
-
-			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
-					inscriptionTempStorage, sourceIn, targetIn, _startx,
-					_starty, _endx, _endy);
-
-		} else {
-			if (type.equals("timed")) {
-				tempArc = parseAndAddTimedInputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
-
-			} else if (type.equals("transport")) {
-				tempArc = parseAndAddTransportArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
-
-			} else {
-				tempArc = parseAndAddTimedOutputArc(idInput, taggedArc,
-						inscriptionTempStorage, sourceIn, targetIn, _startx,
-						_starty, _endx, _endy);
-			}
-
-		}
-
-		parseArcPath(arc, tempArc);
-	}
 
 	private Arc parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
@@ -551,69 +283,6 @@ public class TimedArcPetriNetFactory {
 		return tempArc;
 	}
 
-	private void parseArcPath(Element arc, Arc tempArc) {
-		NodeList nodelist = arc.getElementsByTagName("arcpath");
-		if (nodelist.getLength() > 0) {
-			tempArc.getArcPath().purgePathPoints();
-			for (int i = 0; i < nodelist.getLength(); i++) {
-				Node node = nodelist.item(i);
-				if (node instanceof Element) {
-					Element element = (Element) node;
-					if ("arcpath".equals(element.getNodeName())) {
-						String arcTempX = element.getAttribute("xCoord");
-						String arcTempY = element.getAttribute("yCoord");
-
-						// Wierd naming convention in pipe: this represents if
-						// the arc point is a curve point or not
-						String arcTempType = element.getAttribute("arcPointType");
-						float arcPointX = Float.valueOf(arcTempX).floatValue();
-						float arcPointY = Float.valueOf(arcTempY).floatValue();
-						arcPointX += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						arcPointY += Pipe.ARC_CONTROL_POINT_CONSTANT + 1;
-						boolean arcPointType = Boolean.valueOf(arcTempType).booleanValue();
-						tempArc.getArcPath().addPoint(arcPointX, arcPointY,	arcPointType);
-					}
-				}
-			}
-		}
-	}
-
-	private TAPNQuery parseTAPNQuery(Element queryElement) {
-		String comment = getQueryComment(queryElement);
-		TraceOption traceOption = getQueryTraceOption(queryElement);
-		SearchOption searchOption = getQuerySearchOption(queryElement);
-		HashTableSize hashTableSize = getQueryHashTableSize(queryElement);
-		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
-		ReductionOption reductionOption = getQueryReductionOption(queryElement);
-		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
-
-		TCTLAbstractProperty query;
-		query = parseQueryProperty(queryElement.getAttribute("query"));
-
-		if (query != null)
-			return new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, hashTableSize,
-					extrapolationOption);
-		else
-			return null;
-	}
-
-	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
-		TCTLAbstractProperty query = null;
-		TAPAALQueryParser queryParser = new TAPAALQueryParser();
-
-		try {
-			query = queryParser.parse(queryToParse);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(
-							CreateGui.getApp(),
-							"TAPAAL encountered an error trying to parse one of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.",
-							"Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-			System.err.println("No query was specified: " + e.getStackTrace());
-		}
-		return query;
-	}
-
 	private ReductionOption getQueryReductionOption(Element queryElement) {
 		ReductionOption reductionOption;
 		try {
@@ -685,9 +354,8 @@ public class TimedArcPetriNetFactory {
 	// //////////////////////////////////////////////////////////
 	// Legacy support for old format
 	// //////////////////////////////////////////////////////////
-	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode) {
-		initialMarking = new LocalTimedMarking();
-		tapn = new TimedArcPetriNet(drawingSurface.getNameGenerator().getNewTemplateName());
+	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode, TimedArcPetriNetNetwork network) {
+		tapn = new TimedArcPetriNet(nameGenerator .getNewTemplateName());
 		guiModel = new DataLayer();
 
 		Node node = null;
@@ -699,7 +367,7 @@ public class TimedArcPetriNetFactory {
 			parseElementAsOldFormat(node, tapn.getName());
 		}
 
-		tapn.setMarking(initialMarking);
+		tapn.setMarking(network.marking());
 
 		return new Template(tapn, guiModel);
 	}
@@ -838,7 +506,6 @@ public class TimedArcPetriNetFactory {
 					markingOffsetYInput, capacityInput);
 
 		} else {
-
 			place = new TimedPlaceComponent(positionXInput, positionYInput,
 					idInput, nameInput, nameOffsetXInput, nameOffsetYInput,
 					initialMarkingInput, markingOffsetXInput,
@@ -1163,27 +830,5 @@ public class TimedArcPetriNetFactory {
 			}
 			newObject.setGuiModel(guiModel);
 		}
-	}
-
-	public class LoadedModel{
-		private Collection<Template> templates;
-		private Collection<Constant> constants;
-		private Collection<TAPNQuery> queries;
-		private Collection<SharedPlace> sharedPlaces;
-		private Collection<SharedTransition> sharedTransitions;
-		
-		public LoadedModel(Collection<Template> templates, Collection<SharedPlace> sharedPlaces, Collection<SharedTransition> sharedTransitions, Collection<Constant> constants, Collection<TAPNQuery> queries){
-			this.templates = templates;
-			this.sharedPlaces = sharedPlaces;
-			this.sharedTransitions = sharedTransitions;
-			this.constants = constants;
-			this.queries = queries; 
-		}
-		
-		public Iterable<Template> templates(){ return templates; }
-		public Iterable<Constant> constants(){ return constants; }
-		public Iterable<TAPNQuery> queries(){ return queries; }
-		public Iterable<SharedPlace> sharedPlaces(){ return sharedPlaces; }
-		public Iterable<SharedTransition> sharedTransitions(){ return sharedTransitions; }
 	}
 }

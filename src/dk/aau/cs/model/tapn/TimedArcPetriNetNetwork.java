@@ -247,8 +247,8 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public SharedTransition getSharedTransitionByName(String name) {
-		for(SharedTransition transition : sharedTransitions){
-			if(transition.name().equalsIgnoreCase(name)) return transition;
+		for(SharedTransition t : sharedTransitions){
+			if(t.name().equalsIgnoreCase(name)) return t;
 		}
 		return null;
 	}

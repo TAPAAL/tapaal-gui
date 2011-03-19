@@ -60,13 +60,13 @@ import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.io.LoadedModel;
+import dk.aau.cs.io.TapnXmlLoader;
+import dk.aau.cs.io.TimedArcPetriNetFactory;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TapnXmlLoader;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
-import dk.aau.cs.model.tapn.TapnXmlLoader.LoadedModel;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 public class GuiFrame extends JFrame implements ActionListener, Observer {

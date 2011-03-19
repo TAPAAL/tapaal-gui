@@ -1,4 +1,4 @@
-package dk.aau.cs.model.tapn;
+package dk.aau.cs.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +34,10 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements PNMLWriter {

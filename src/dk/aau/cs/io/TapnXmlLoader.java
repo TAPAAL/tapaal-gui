@@ -1,4 +1,4 @@
-package dk.aau.cs.model.tapn;
+package dk.aau.cs.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +56,23 @@ import pipe.gui.handler.TransportArcHandler;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.SharedTransition;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedMarking;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
@@ -797,21 +814,5 @@ public class TapnXmlLoader {
 			}
 			newObject.setGuiModel(template.guiModel());
 		}
-	}
-
-	public class LoadedModel{
-		private Collection<Template> templates;
-		private Collection<TAPNQuery> queries;
-		private TimedArcPetriNetNetwork network; 
-		
-		public LoadedModel(TimedArcPetriNetNetwork network, Collection<Template> templates, Collection<TAPNQuery> queries){
-			this.templates = templates;
-			this.network = network;
-			this.queries = queries; 
-		}
-
-		public Collection<Template> templates(){ return templates; }
-		public Collection<TAPNQuery> queries(){ return queries; }
-		public TimedArcPetriNetNetwork network(){ return network; }
 	}
 }
