@@ -72,8 +72,7 @@ public class UppaalExporter {
 			namingScheme = new OptimizedStandardNamingScheme();
 		} else if (reduction == ReductionOption.BROADCAST
 				|| reduction == ReductionOption.BROADCASTSYMMETRY) {
-			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(
-					extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
+			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
 			try {
 				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(newModel);
@@ -94,11 +93,9 @@ public class UppaalExporter {
 					reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
 			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer
-						.transformModel(model);
+				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(newModel);
 				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer
-						.transformQuery(query);
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
 				uppaalQuery.output(new PrintStream(queryFile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -108,14 +105,12 @@ public class UppaalExporter {
 				return null;
 			}
 		} else if (reduction == ReductionOption.KBOUNDOPTMIZATION) {
-			Degree2BroadcastKBoundOptimizeTranslation transformer = new Degree2BroadcastKBoundOptimizeTranslation(
-					extraTokens);
+			Degree2BroadcastKBoundOptimizeTranslation transformer = new Degree2BroadcastKBoundOptimizeTranslation(extraTokens);
 
 			try {
-				dk.aau.cs.TA.NTA nta = transformer.transformModel(model);
+				dk.aau.cs.TA.NTA nta = transformer.transformModel(newModel);
 				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer
-						.transformQuery(query);
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer.transformQuery(query);
 				uppaalQuery.output(new PrintStream(queryFile));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();

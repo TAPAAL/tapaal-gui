@@ -94,7 +94,7 @@ public class Edge {
 
 	@Override
 	public String toString() {
-		return "Edge from " + source.getID() + " to " + dest.getID()
+		return "Edge from " + source.getName() + " to " + dest.getName()
 				+ ". Guard: " + guard + ", Sync: " + sync + ", Update: "
 				+ update;
 	}

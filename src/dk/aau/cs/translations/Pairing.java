@@ -6,19 +6,18 @@ import java.util.List;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.util.Require;
 
-// This class assumes that the net is conservative and
-// that a place name "_BOTTOM_" exist in the model
+// This class assumes that the transition is conservative
 public class Pairing {
-	private TimedTransition transition;
+	protected TimedTransition transition;
 	
-	private Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
+	protected Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
 	
 	public Pairing(TimedTransition t) {
 		this.transition = t;
 		generatePairing();
 	}
 
-	private void generatePairing() {
+	protected void generatePairing() {
 		List<TimedInputArc> inputArcs = transition.getInputArcs();
 		List<TimedOutputArc> outputArcs = transition.getOutputArcs();
 		
@@ -33,7 +32,7 @@ public class Pairing {
 		}
 	}
 
-	private void add(TimedInputArc inputArc, TimedOutputArc outputArc) {
+	protected void add(TimedInputArc inputArc, TimedOutputArc outputArc) {
 		inputArcToOutputArc.put(inputArc, outputArc);
 	}
 	

@@ -5,6 +5,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 public class TAPNToConservativeTAPNConverter {
@@ -13,8 +14,13 @@ public class TAPNToConservativeTAPNConverter {
 	public TimedArcPetriNet makeConservative(TimedArcPetriNet model) {
 		TimedArcPetriNet conservativeModel = model.copy();
 
-		LocalTimedPlace bottom = new LocalTimedPlace(BOTTOM);
-		conservativeModel.add(bottom);
+		
+		TimedPlace bottom = conservativeModel.getPlaceByName(BOTTOM);
+		if(bottom == null) {
+			bottom = new LocalTimedPlace(BOTTOM);
+			conservativeModel.add(bottom);
+		}
+		
 		
 		for (TimedTransition t : conservativeModel.transitions()) {
 			int difference = t.postsetSize() - t.presetSize();

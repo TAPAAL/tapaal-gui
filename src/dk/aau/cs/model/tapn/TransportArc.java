@@ -91,4 +91,9 @@ public class TransportArc extends TAPNElement {
 		Require.that(place != null, "place cannot be null");
 		this.destination = place;		
 	}
+	
+	@Override
+	public String toString() {
+		return "From " + source.name() + " to " + destination.name() + " through " + transition.name() + " with interval " + interval().toString();
+	}
 }

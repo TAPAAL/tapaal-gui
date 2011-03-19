@@ -10,10 +10,9 @@ import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.*;
 
-public class Degree2BroadcastKBoundOptimizeTranslation extends
-		Degree2BroadcastTranslation {
+public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastTranslation {
 	private final String usedExtraTokens = "usedExtraTokens";
 	private int tokens = 0;
 	private final int SUBTRACT = 0;
@@ -25,7 +24,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends
 
 	@Override
 	public NTA transformModel(TimedArcPetriNet model) throws Exception {
-		tokens = model.getTokens().size();
+		tokens = model.marking().size();
 		NTA nta = super.transformModel(model);
 
 		for (TimedAutomaton ta : nta.getTimedAutomata()) {
@@ -38,11 +37,10 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends
 	}
 
 	private void addKBoundUpdates(TimedAutomaton ta) {
-		Location pcapacity = getLocationByName("P_capacity");
+		Location pcapacity = getLocationByName(P_CAPACITY);
 
 		for (Edge e : ta.getTransitions()) {
-			if (e.getSource() == pcapacity && isNotInitializationEdge(e)
-					&& isNotTestingEdge(e)) {
+			if (e.getSource() == pcapacity && isNotInitializationEdge(e) && isNotTestingEdge(e)) {
 
 				String newUpdate = createUpdate(e.getUpdate(), ADD);
 				e.setUpdate(newUpdate);
@@ -81,8 +79,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends
 	}
 
 	@Override
-	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net,
-			TimedArcPetriNet originalModel) {
+	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net,TimedArcPetriNet originalModel) {
 		StringBuilder builder = new StringBuilder("int[");
 		builder.append(-(tokens + extraTokens));
 		builder.append(",");
@@ -90,8 +87,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends
 		builder.append("] ");
 		builder.append(usedExtraTokens);
 		builder.append(" = 0;\n");
-		builder.append(super
-				.createGlobalDeclarations(degree2Net, originalModel));
+		builder.append(super.createGlobalDeclarations(degree2Net, originalModel));
 		return builder.toString();
 	}
 

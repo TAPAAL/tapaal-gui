@@ -71,4 +71,9 @@ public class TimedInputArc extends TAPNElement {
 		Require.that(place != null, "place cannot be null");
 		this.source = place;		
 	}
+	
+	@Override
+	public String toString() {
+		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString();
+	}
 }
