@@ -96,6 +96,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)
 		));		
 	}
+	
+	public void setNetwork(TimedArcPetriNetNetwork network) {
+		sharedPlacesListModel.setNetwork(network);
+		sharedTransitionsListModel.setNetwork(network);
+	}
 
 	private void initComponents() {
 		list = new JList();
@@ -360,6 +365,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void updatedName(){
 			fireContentsChanged(this, 0, getSize());
 		}
+
+		public void setNetwork(TimedArcPetriNetNetwork network) {
+			Require.that(network != null, "network cannot be null");
+			this.network = network;
+			fireContentsChanged(this, 0, network.numberOfSharedPlaces());
+		}
 	}
 
 	public class SharedTransitionsListModel extends AbstractListModel {
@@ -391,6 +402,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 		public void updatedName() {
 			fireContentsChanged(this, 0, getSize());
+		}
+
+		public void setNetwork(TimedArcPetriNetNetwork network) {
+			Require.that(network != null, "network cannot be null");
+			this.network = network;
+			fireContentsChanged(this, 0, network.numberOfSharedTransitions());
 		}
 	}
 }

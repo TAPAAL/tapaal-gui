@@ -14,17 +14,14 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
 import pipe.dataLayer.TimedTransitionComponent;
-import pipe.gui.DrawingSurfaceImpl;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
@@ -32,7 +29,6 @@ import dk.aau.cs.util.RequireException;
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
 	private TimedTransitionComponent transition;
-	private DrawingSurfaceImpl view;
 	private JRootPane rootPane;
 	private Context context;
 
@@ -244,26 +240,26 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private void okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
 			
-		view.getUndoManager().newEdit(); // new "transaction""
+		context.undoManager().newEdit(); // new "transaction""
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
-			view.getUndoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
+			context.undoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
 			transition.underlyingTransition().unshare();
 		}
 		
 		if(sharedCheckBox.isSelected()){	
 			SharedTransition selectedTransition = (SharedTransition)sharedTransitionsComboBox.getSelectedItem();
-			view.getUndoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition()));
+			context.undoManager().addEdit(new MakeTransitionSharedCommand(selectedTransition, transition.underlyingTransition()));
 			try{
 				selectedTransition.makeShared(transition.underlyingTransition());
 			}catch(RequireException e){
-				view.getUndoManager().undo();
+				context.undoManager().undo();
 				JOptionPane.showMessageDialog(this,"Another transition in the same template is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}else{			
 			if(transition.underlyingTransition().model().isNameUsed(newName) && (wasShared || !transition.underlyingTransition().name().equals(newName))){
-				view.getUndoManager().undo(); 
+				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
 						"The specified name is already used by another place or transition.",
 						"Error", JOptionPane.ERROR_MESSAGE);
@@ -273,15 +269,15 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			String oldName = transition.underlyingTransition().name();
 			try{ // set name
 				transition.underlyingTransition().setName(newName);
-				view.getUndoManager().addEdit(new RenameTimedTransitionCommand(transition.underlyingTransition(), oldName, newName));
+				context.undoManager().addEdit(new RenameTimedTransitionCommand(transition.underlyingTransition(), oldName, newName));
 			}catch(RequireException e){
-				view.getUndoManager().undo(); 
+				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this,
 						"Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			view.getNameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
+			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		}
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();
@@ -301,7 +297,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				break;
 			}
 			if (angle != 0) {
-				view.getUndoManager().addEdit(transition.rotate(angle));
+				context.undoManager().addEdit(transition.rotate(angle));
 			}
 		}
 		exit();

@@ -1,7 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
-import java.util.TreeMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +40,7 @@ public class TimeInvariant {
 	}
 
 	public static TimeInvariant parse(String invariant,
-			TreeMap<String, Constant> constants) {
+			Map<String, Constant> constants) {
 		Pattern pattern = Pattern.compile("^(<|<=)\\s*(\\w+)$");
 		Matcher matcher = pattern.matcher(invariant);
 		matcher.find();

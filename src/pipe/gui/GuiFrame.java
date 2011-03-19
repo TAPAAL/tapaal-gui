@@ -62,9 +62,11 @@ import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TapnXmlLoader;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetFactory;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.TapnXmlLoader.LoadedModel;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 
 public class GuiFrame extends JFrame implements ActionListener, Observer {
@@ -863,6 +865,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			}
 
 			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
+					currentTab.network(),
 					currentTab.templates(), 
 					currentTab.queries(), 
 					currentTab.network().constants()
@@ -945,26 +948,21 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		if (file != null) {
 			try {
-				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-				Document doc = builder.parse(file);
-
+//				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//				Document doc = builder.parse(file);
+				
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(Pipe.CREATING);
 				}
 
-				TimedArcPetriNetFactory factory = new TimedArcPetriNetFactory(currentTab.drawingSurface());
-
-				Iterable<Template> templates = factory.parseTimedArcPetriNetsFromPNML(doc);
-				for (Template t : templates) {
-					currentTab.addTemplate(t);
-				}
-
-				currentTab.setQueries(factory.getQueries());
-				currentTab.setConstants(factory.getConstants());
-				currentTab.network().buildConstraints();
-				currentTab.setupNameGeneratorsFromTemplates(templates);
+				TapnXmlLoader loader = new TapnXmlLoader(currentTab.drawingSurface());
+				LoadedModel loadedModel = loader.load(file);
+								
+				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
+				currentTab.setQueries(loadedModel.queries());
+				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();

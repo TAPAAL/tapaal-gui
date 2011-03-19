@@ -1,7 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
-import java.util.TreeMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,8 +105,7 @@ public class TimeInterval {
 		return isUpperIncluded;
 	}
 
-	public static TimeInterval parse(String interval,
-			TreeMap<String, Constant> constants) {
+	public static TimeInterval parse(String interval, Map<String, Constant> constants) {
 		Pattern pattern = Pattern
 				.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
 		Matcher matcher = pattern.matcher(interval);

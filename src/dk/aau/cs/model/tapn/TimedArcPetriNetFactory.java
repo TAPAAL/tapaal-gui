@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -105,8 +106,9 @@ public class TimedArcPetriNetFactory {
 				}
 			}
 		}
-
-		return templates;
+		ArrayList<SharedPlace> sharedPlaces = new ArrayList<SharedPlace>();
+		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
+		return new LoadedModel(templates, sharedPlaces, sharedTransitions, constants.values(), queries).templates();
 	}
 	
 
@@ -1163,4 +1165,25 @@ public class TimedArcPetriNetFactory {
 		}
 	}
 
+	public class LoadedModel{
+		private Collection<Template> templates;
+		private Collection<Constant> constants;
+		private Collection<TAPNQuery> queries;
+		private Collection<SharedPlace> sharedPlaces;
+		private Collection<SharedTransition> sharedTransitions;
+		
+		public LoadedModel(Collection<Template> templates, Collection<SharedPlace> sharedPlaces, Collection<SharedTransition> sharedTransitions, Collection<Constant> constants, Collection<TAPNQuery> queries){
+			this.templates = templates;
+			this.sharedPlaces = sharedPlaces;
+			this.sharedTransitions = sharedTransitions;
+			this.constants = constants;
+			this.queries = queries; 
+		}
+		
+		public Iterable<Template> templates(){ return templates; }
+		public Iterable<Constant> constants(){ return constants; }
+		public Iterable<TAPNQuery> queries(){ return queries; }
+		public Iterable<SharedPlace> sharedPlaces(){ return sharedPlaces; }
+		public Iterable<SharedTransition> sharedTransitions(){ return sharedTransitions; }
+	}
 }

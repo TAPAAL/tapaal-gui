@@ -1,8 +1,12 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.regex.Pattern;
+
 import dk.aau.cs.util.Require;
 
 public class Constant {
+	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+	
 	private String name;
 	private int value;
 	private int lowerBound;
@@ -26,10 +30,14 @@ public class Constant {
 		this.isUsed = constant.isUsed;
 	}
 
-	public void setName(String name) {
-		Require.that(name != null && !name.isEmpty(),
-				"A constant must have a name");
-		this.name = name;
+	public void setName(String newName) {
+		Require.that(newName != null && !newName.isEmpty(), "A constant must have a name");
+		Require.that(isValid(newName), "name must match regular expression [a-zA-Z_][a-zA-Z0-9_]*");
+		this.name = newName;
+	}
+
+	private boolean isValid(String newName) {
+		return namePattern.matcher(newName).matches();
 	}
 
 	public String name() {

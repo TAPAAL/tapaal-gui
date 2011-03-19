@@ -41,11 +41,14 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	private Iterable<Template> templates;
 	private Iterable<TAPNQuery> queries;
 	private Iterable<Constant> constants;
+	private final TimedArcPetriNetNetwork network;
 
 	public TimedArcPetriNetNetworkWriter(
+			TimedArcPetriNetNetwork network, 
 			Iterable<Template> templates,
 			Iterable<TAPNQuery> queries, 
 			Iterable<Constant> constants) {
+		this.network = network;
 		this.templates = templates;
 		this.queries = queries;
 		this.constants = constants;
@@ -70,6 +73,8 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
 			pnmlRootNode.setAttributeNode(pnmlAttr);
 
+			appendSharedPlaces(document, pnmlRootNode);
+			appendSharedTransitions(document, pnmlRootNode);
 			appendConstants(document, pnmlRootNode);
 			appendTemplates(document, pnmlRootNode);
 			appendQueries(document, pnmlRootNode);
@@ -111,6 +116,24 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		}
 	}
 	
+	private void appendSharedPlaces(Document document, Element root) {
+		for(SharedPlace place : network.sharedPlaces()){
+			Element element = document.createElement("shared-place");
+			element.setAttribute("invariant", place.invariant().toString());
+			element.setAttribute("name", place.name());
+			element.setAttribute("initialMarking", String.valueOf(place.numberOfTokens()));
+			root.appendChild(element);
+		}
+	}
+
+	private void appendSharedTransitions(Document document, Element root) {
+		for(SharedTransition transition : network.sharedTransitions()){
+			Element element = document.createElement("shared-transition");
+			element.setAttribute("name", transition.name());
+			root.appendChild(element);
+		}
+	}
+
 	private void appendConstants(Document document, Element root) {
 		for (Constant constant : constants) {
 			Element elem = createConstantElement(constant, document);
@@ -234,11 +257,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		placeElement.setAttribute("initialMarking", ((Integer) inputPlace.getNumberOfTokens() != null ? String.valueOf((Integer) inputPlace.getNumberOfTokens()) : "0"));
 		placeElement.setAttribute("markingOffsetX",	(inputPlace.getMarkingOffsetXObject() != null ? String.valueOf(inputPlace.getMarkingOffsetXObject()) : ""));
 		placeElement.setAttribute("markingOffsetY",	(inputPlace.getMarkingOffsetYObject() != null ? String.valueOf(inputPlace.getMarkingOffsetYObject()) : ""));
-
-		if (inputPlace instanceof TimedPlaceComponent) {
-			String invariantInput = ((TimedPlaceComponent) inputPlace).getInvariantAsString();
-			placeElement.setAttribute("invariant", invariantInput != null ? invariantInput : "");
-		}
+		placeElement.setAttribute("invariant", inputPlace.underlyingPlace().invariant().toString());
 
 		return placeElement;
 	}

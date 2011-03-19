@@ -16,6 +16,12 @@ public class ConstantStore {
 	public ConstantStore() {
 
 	}
+	
+	public ConstantStore(Iterable<Constant> constants){
+		for(Constant c : constants){
+			this.constants.put(c.name(), c);
+		}			
+	}
 
 	public Collection<Constant> getConstants() {
 		return constants.values();

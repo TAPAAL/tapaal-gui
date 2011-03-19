@@ -17,8 +17,12 @@ public class TimedArcPetriNetNetwork {
 	private ConstantStore constants;
 
 	public TimedArcPetriNetNetwork() {
-		currentMarking = new NetworkMarking();
-		constants = new ConstantStore();
+		this(new ConstantStore());
+	}
+	
+	public TimedArcPetriNetNetwork(ConstantStore constants){
+		this.constants = constants;
+		this.currentMarking = new NetworkMarking();
 	}
 
 	public void add(TimedArcPetriNet tapn) {
@@ -240,5 +244,19 @@ public class TimedArcPetriNetNetwork {
 
 	public Collection<SharedPlace> sharedPlaces() {
 		return sharedPlaces;
+	}
+
+	public SharedTransition getSharedTransitionByName(String name) {
+		for(SharedTransition transition : sharedTransitions){
+			if(transition.name().equalsIgnoreCase(name)) return transition;
+		}
+		return null;
+	}
+
+	public TimedPlace getSharedPlaceByName(String name) {
+		for(SharedPlace place : sharedPlaces){
+			if(place.name().equalsIgnoreCase(name)) return place;
+		}
+		return null;
 	}
 }

@@ -23,7 +23,6 @@ public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, Timed
 	
 	private List<TimedTransition> retainedDegree2Transitions = new ArrayList<TimedTransition>();
 
-	@Override
 	public TimedArcPetriNet transformModel(TimedArcPetriNet model) throws Exception {
 		try{
 			TAPNToConservativeTAPNConverter converter = new TAPNToConservativeTAPNConverter();

@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
@@ -27,6 +28,7 @@ import pipe.gui.widgets.LeftQueryPane;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
@@ -53,15 +55,15 @@ public class TabContent extends JSplitPane {
 
 	private JPanel animatorLeftPane;
 	private JSplitPane animationHistorySplitter;
+	private SharedPlacesAndTransitionsPanel sharedPTPanel;
 
 
-	public TabContent() {
-
-		for (TimedArcPetriNet net : tapnNetwork.templates()) {
+	public TabContent() { 
+		for (TimedArcPetriNet net: tapnNetwork.templates()){
 			guiModels.put(net, new DataLayer());
 		}
 
-		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
+		this.drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -76,9 +78,10 @@ public class TabContent extends JSplitPane {
 		this.setContinuousLayout(true);
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
-		this.setDividerSize(8);
-	}
+		this.setDividerSize(8);	
 
+	}
+	
 	public void createEditorLeftPane() {
 		editorLeftPane = new JPanel(new GridBagLayout());
 		editorLeftPane.setPreferredSize(new Dimension(230, 100)); // height is ignored because the component is stretched
@@ -88,7 +91,7 @@ public class TabContent extends JSplitPane {
 		constantsPanel = new LeftConstantsPane(enableAddButton, this);
 		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
 		templateExplorer = new TemplateExplorer(this);
-		SharedPlacesAndTransitionsPanel sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
+		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -289,6 +292,10 @@ public class TabContent extends JSplitPane {
 		templateExplorer.updateTemplateList();
 	}
 	
+	public void addGuiModel(TimedArcPetriNet net, DataLayer guiModel){
+		guiModels.put(net, guiModel);
+	}
+	
 	public void removeTemplate(Template template) {
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
@@ -327,7 +334,19 @@ public class TabContent extends JSplitPane {
 
 	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
 		drawingSurface.setupNameGeneratorsFromTemplates(templates);
+	}
 
+	public void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
+		Require.that(network != null, "network cannot be null");
+		this.tapnNetwork = network;
+		
+		guiModels.clear();
+		for(Template template : templates){
+			addGuiModel(template.model(), template.guiModel());
+		}
+
+		sharedPTPanel.setNetwork(network);
+		templateExplorer.updateTemplateList();
 	}
 
 	
