@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -26,6 +27,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.Arc;
+import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.dataLayer.TimedInputArcComponent;
@@ -45,6 +47,7 @@ import pipe.gui.undo.DeleteTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
 import dk.aau.cs.gui.undo.DeleteSharedTransitionCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
@@ -173,7 +176,25 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 			private void deleteSharedPlace(boolean deleteFromTemplates) {
 				SharedPlace sharedPlace = (SharedPlace)list.getSelectedValue();
-
+				Collection<TAPNQuery> affectedQueries = findAffectedQueries(sharedPlace);
+				if(affectedQueries.size() > 0){
+					StringBuffer buffer = new StringBuffer("The following queries contains the shared place and will also be deleted:");
+					buffer.append(System.getProperty("line.separator"));
+					buffer.append(System.getProperty("line.separator"));
+					
+					for(TAPNQuery query : affectedQueries){
+						buffer.append(query.getName());
+						buffer.append(System.getProperty("line.separator"));
+					}
+					buffer.append(System.getProperty("line.separator"));
+					buffer.append("Do you want to continue?");
+					int choice = JOptionPane.showConfirmDialog(SharedPlacesAndTransitionsPanel.this, buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					if(choice == JOptionPane.NO_OPTION) return;
+					
+					Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
+					cmd.redo();
+					undoManager.addEdit(cmd);
+				}
 				if(deleteFromTemplates){
 					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
 						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
@@ -223,6 +244,14 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 						undoManager.addEdit(renameCmd);
 					}
 				}
+			}
+
+			private Collection<TAPNQuery> findAffectedQueries(SharedPlace sharedPlace) {
+				ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
+				for(TAPNQuery query : tab.queries()){
+					// TODO: add queries
+				}
+				return queries;
 			}
 
 			private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {

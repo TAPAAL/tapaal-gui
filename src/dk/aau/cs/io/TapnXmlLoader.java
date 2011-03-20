@@ -81,7 +81,7 @@ public class TapnXmlLoader {
 	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
 
-	private DrawingSurfaceImpl drawingSurface; // TODO: delete me
+	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
@@ -191,7 +191,6 @@ public class TapnXmlLoader {
 		for (int i = 0; i < nets.getLength(); i++) {
 			Template template = parseTimedArcPetriNet(nets.item(i), network, constants);
 			templates.add(template);
-			network.add(template.model());
 		}
 		return templates;
 	}
@@ -213,10 +212,9 @@ public class TapnXmlLoader {
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
 		String name = getTAPNName(tapnNode);
 
-
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
-		tapn.setMarking(network.marking());
-
+		network.add(tapn);
+		
 		DataLayer guiModel = new DataLayer();
 		Template template = new Template(tapn, guiModel);
 
@@ -238,9 +236,8 @@ public class TapnXmlLoader {
 			template.guiModel().addPetriNetObject(note);
 			addListeners(note, template);
 		} else if ("place".equals(element.getNodeName())) {
-			TimedPlaceComponent place = parsePlace(element, network, constants);
+			TimedPlaceComponent place = parsePlace(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(place);
-			template.model().add(place.underlyingPlace());
 			addListeners(place, template);
 		} else if ("transition".equals(element.getNodeName())) {
 			TimedTransitionComponent transition = parseTransition(element, network);
@@ -353,7 +350,7 @@ public class TapnXmlLoader {
 		return transitionComponent;
 	}
 
-	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
+	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, Map<String, Constant> constants) {
 		double positionXInput = Double.parseDouble(place.getAttribute("positionX"));
 		double positionYInput = Double.parseDouble(place.getAttribute("positionY"));
 		String idInput = place.getAttribute("id");
@@ -380,8 +377,10 @@ public class TapnXmlLoader {
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
 			p = network.getSharedPlaceByName(nameInput);
+			tapn.add(p);
 		}else{
 			p = new LocalTimedPlace(nameInput, TimeInvariant.parse(invariant, constants));
+			tapn.add(p);
 			for (int i = 0; i < initialMarkingInput; i++) {
 				network.marking().add(new TimedToken(p));
 			}

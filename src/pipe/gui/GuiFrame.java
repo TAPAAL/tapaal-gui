@@ -42,10 +42,6 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -61,8 +57,7 @@ import pipe.gui.widgets.NewTAPNPanel;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
-import dk.aau.cs.io.TapnXmlLoader;
-import dk.aau.cs.io.TimedArcPetriNetFactory;
+import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
@@ -948,16 +943,13 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		if (file != null) {
 			try {
-//				DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-//				Document doc = builder.parse(file);
-				
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
 					CreateGui.getApp().setMode(Pipe.CREATING);
 				}
 
-				TapnXmlLoader loader = new TapnXmlLoader(currentTab.drawingSurface());
+				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
 				LoadedModel loadedModel = loader.load(file);
 								
 				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());

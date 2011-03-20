@@ -1126,18 +1126,18 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(150, 27);
 		placesBox.setMaximumSize(d);
 
-		templateBox = new JComboBox(new DefaultComboBoxModel(tapnNetwork
-				.templates().toArray()));
+		templateBox = new JComboBox(new DefaultComboBoxModel(tapnNetwork.templates().toArray()));
 		templateBox.addActionListener(new ActionListener() {
 			private TimedArcPetriNet currentlySelected = null;
 
 			public void actionPerformed(ActionEvent e) {
-				TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox
-				.getSelectedItem();
+				TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getSelectedItem();
 				if (!tapn.equals(currentlySelected)) {
 					Vector<String> placeNames = new Vector<String>();
 					for (TimedPlace place : tapn.places()) {
-						placeNames.add(place.name());
+						if(!place.isShared()){
+							placeNames.add(place.name());
+						}
 					}
 					placesBox.setModel(new DefaultComboBoxModel(placeNames));
 

@@ -1,16 +1,22 @@
 package dk.aau.cs.io;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import pipe.dataLayer.AnnotationNote;
 import pipe.dataLayer.Arc;
@@ -52,7 +58,6 @@ import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
-import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
@@ -60,6 +65,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedMarking;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -68,31 +74,49 @@ import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
-public class TimedArcPetriNetFactory {
+public class TapnLegacyXmlLoader {
 
 	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs;
 	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs;
 	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals;
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
-	private LocalTimedMarking initialMarking;
 	private ArrayList<TAPNQuery> queries;
 	private TreeMap<String, Constant> constants;
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 
-	public TimedArcPetriNetFactory(DrawingSurfaceImpl drawingSurfaceImpl) {
+	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
-		initialMarking = new LocalTimedMarking();
 		queries = new ArrayList<TAPNQuery>();
 		constants = new TreeMap<String, Constant>();
 		this.drawingSurface = drawingSurfaceImpl;
 	}
+	
+	public LoadedModel load(File file) {
+		Require.that(file != null && file.exists(), "file must be non-null and exist");
 
-	public LoadedModel parseTimedArcPetriNetsFromPNML(Document tapnDoc) { 
-		Require.notImplemented();
+		Document doc = loadDocument(file);
+		if(doc == null) return null;
+		return parse(doc);
+	}
+
+	private Document loadDocument(File file) {
+		try {
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			return builder.parse(file);
+		} catch (ParserConfigurationException e) {
+			return null;
+		} catch (SAXException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	private LoadedModel parse(Document tapnDoc) { 
 		ArrayList<Template> templates = new ArrayList<Template>();
 
 		NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
@@ -110,15 +134,6 @@ public class TimedArcPetriNetFactory {
 		
 		return new LoadedModel(network, templates, queries);
 	}
-	
-	public Iterable<TAPNQuery> getQueries() {
-		return queries;
-	}
-
-	public Iterable<Constant> getConstants() {
-		return constants.values();
-	}
-
 
 	private Arc parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
@@ -356,6 +371,8 @@ public class TimedArcPetriNetFactory {
 	// //////////////////////////////////////////////////////////
 	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode, TimedArcPetriNetNetwork network) {
 		tapn = new TimedArcPetriNet(nameGenerator .getNewTemplateName());
+		network.add(tapn);
+
 		guiModel = new DataLayer();
 
 		Node node = null;
@@ -364,22 +381,20 @@ public class TimedArcPetriNetFactory {
 		nodeList = tapnNode.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			node = nodeList.item(i);
-			parseElementAsOldFormat(node, tapn.getName());
+			parseElementAsOldFormat(node, tapn.getName(), network.marking());
 		}
-
-		tapn.setMarking(network.marking());
 
 		return new Template(tapn, guiModel);
 	}
 
-	private void parseElementAsOldFormat(Node node, String templateName) {
+	private void parseElementAsOldFormat(Node node, String templateName, TimedMarking marking) {
 		Element element;
 		if (node instanceof Element) {
 			element = (Element) node;
 			if ("labels".equals(element.getNodeName())) {
 				parseAndAddAnnotationAsOldFormat(element);
 			} else if ("place".equals(element.getNodeName())) {
-				parseAndAddPlaceAsOldFormat(element);
+				parseAndAddPlaceAsOldFormat(element, marking);
 			} else if ("transition".equals(element.getNodeName())) {
 				parseAndAddTransitionAsOldFormat(element);
 			} else if ("arc".equals(element.getNodeName())) {
@@ -473,7 +488,7 @@ public class TimedArcPetriNetFactory {
 		tapn.add(t);
 	}
 
-	private void parseAndAddPlaceAsOldFormat(Element element) {
+	private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
@@ -519,7 +534,7 @@ public class TimedArcPetriNetFactory {
 			addListeners(place);
 
 			for (int i = 0; i < initialMarkingInput; i++) {
-				initialMarking.add(new TimedToken(p, new BigDecimal(0.0)));
+				marking.add(new TimedToken(p, new BigDecimal(0.0)));
 			}
 		}
 	}
