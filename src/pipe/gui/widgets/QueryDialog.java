@@ -1119,8 +1119,7 @@ public class QueryDialog extends JPanel {
 	private void initPredicationConstructionPanel() {
 		// Predicate specification panel
 		predicatePanel = new JPanel(new GridBagLayout());
-		predicatePanel
-		.setBorder(BorderFactory.createTitledBorder("Predicates"));
+		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
 		placesBox = new JComboBox();
 		Dimension d = new Dimension(150, 27);

@@ -254,7 +254,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				selectedTransition.makeShared(transition.underlyingTransition());
 			}catch(RequireException e){
 				context.undoManager().undo();
-				JOptionPane.showMessageDialog(this,"Another transition in the same template is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this,"Another transition in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}else{			

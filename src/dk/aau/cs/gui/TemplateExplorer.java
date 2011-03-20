@@ -73,7 +73,7 @@ public class TemplateExplorer extends JPanel {
 		initExplorerPanel();
 		initButtonsPanel();
 
-		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Templates"),	BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Components"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 
 		addCreatedComponents(hideButtons);
 	}
@@ -298,21 +298,21 @@ public class TemplateExplorer extends JPanel {
 
 	private Template ShowNewTemplateDialog() {
 		String templateName = (String) JOptionPane.showInputDialog(
-				parent.drawingSurface(), "Template name:", "Rename Template",
+				parent.drawingSurface(), "Component name:", "Rename Component",
 				JOptionPane.PLAIN_MESSAGE, null, null, 
 				parent.drawingSurface().getNameGenerator().getNewTemplateName());
 
 		if (templateName != null) {
 			if(!isNameAllowed(templateName)) {
 				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new template could not be created.",
-						"Error Creating Template",
+						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
+						"Error Creating Component",
 						JOptionPane.ERROR_MESSAGE);
 			}
 			else if (parent.network().hasTAPNCalled(templateName)) {
 				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"A template named \"" + templateName + "\" already exists.\n\nThe new template could not be created.",
-						"Error Creating Template",
+						"A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
+						"Error Creating Component",
 						JOptionPane.ERROR_MESSAGE);
 			}
 			else {
@@ -333,7 +333,7 @@ public class TemplateExplorer extends JPanel {
 	private void showRenameTemplateDialog() {
 		Template template = selectedModel();
 
-		String newName = (String) JOptionPane.showInputDialog(parent.drawingSurface(), "Template name:", "Rename Template",
+		String newName = (String) JOptionPane.showInputDialog(parent.drawingSurface(), "Component name:", "Rename Component",
 				JOptionPane.PLAIN_MESSAGE, null, null, template.model().getName());
 		
 		if (newName == null || template.model().getName().equals(newName))
@@ -342,14 +342,14 @@ public class TemplateExplorer extends JPanel {
 		if (!isNameAllowed(newName))
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
-							"Acceptable names for templates are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*.\n\nThe template could not be renamed.",
-							"Error Renaming Template",
+							"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*.\n\nThe component could not be renamed.",
+							"Error Renaming Component",
 							JOptionPane.ERROR_MESSAGE);
 		
 		else if (parent.network().hasTAPNCalled(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
-							"A template named \"" + newName + "\" already exists. Please try another name.",
+							"A component named \"" + newName + "\" already exists. Please try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
 			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);

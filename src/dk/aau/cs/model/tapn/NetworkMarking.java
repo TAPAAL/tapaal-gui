@@ -47,6 +47,10 @@ public class NetworkMarking implements TimedMarking {
 		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
 			shallowCopy.markings.put(entry.getKey(), entry.getValue());
 		}
+		
+		for(Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()){
+			shallowCopy.sharedPlacesTokens.put(entry.getKey(), entry.getValue());
+		}
 
 		return shallowCopy;
 	}

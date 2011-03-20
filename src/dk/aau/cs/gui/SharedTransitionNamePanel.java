@@ -101,7 +101,7 @@ public class SharedTransitionNamePanel extends JPanel {
 
 			private boolean updateExistingTransition(String name) {
 				if(transitionToEdit.network().isNameUsed(name)) {
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the templates.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				

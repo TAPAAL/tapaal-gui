@@ -99,7 +99,7 @@ public class SharedPlaceNamePanel extends JPanel {
 
 			private boolean updateExistingPlace(String name) {
 				if(placeToEdit.network().isNameUsed(name)) {
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the templates.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				

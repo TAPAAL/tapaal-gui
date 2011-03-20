@@ -63,8 +63,8 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 public class SharedPlacesAndTransitionsPanel extends JPanel {
-	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition may be used in one or more templates.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the templates.</html>";
-	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place may be used in one or more templates.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the templates.</html>";
+	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition may be used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
+	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place may be used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
 
 	private static final long serialVersionUID = 1L;
 	private static final String TRANSITIONS = "Transitions";
@@ -156,7 +156,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		removeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(list.getSelectedValue() != null){
-					JCheckBox checkBox = new JCheckBox("Delete from all templates");
+					JCheckBox checkBox = new JCheckBox("Delete from all components");
 
 					JLabel label = new JLabel(isDisplayingTransitions() ? TRANSITION_IS_USED_MESSAGE : PLACE_IS_USED_MESSAGE);
 					Object[] params = {label, checkBox};
