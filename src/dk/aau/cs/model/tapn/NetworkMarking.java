@@ -56,6 +56,15 @@ public class NetworkMarking implements TimedMarking {
 	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
+		for(List<TimedToken> listOfTokens: sharedPlacesTokens.values()){
+			for(TimedToken token : listOfTokens){
+				TimeInvariant invariant = token.place().invariant();
+				if (!invariant.isSatisfied(token.age().add(delay))) {
+					return false;
+				}
+			}
+		}
+		
 		for (LocalTimedMarking marking : markings.values()) {
 			if (!marking.isDelayPossible(delay))
 				return false;
@@ -68,11 +77,17 @@ public class NetworkMarking implements TimedMarking {
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
 
 		NetworkMarking newMarking = new NetworkMarking();
-		HashMap<TimedArcPetriNet, LocalTimedMarking> newMarkings = new HashMap<TimedArcPetriNet, LocalTimedMarking>(markings.size());
-		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-			newMarkings.put(entry.getKey(), entry.getValue().delay(amount));
+		for(Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()){
+			List<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
+			for(TimedToken token : entry.getValue()){
+				newTokens.add(token.delay(amount));
+			}
+			newMarking.sharedPlacesTokens.put(entry.getKey(), newTokens);
 		}
-		newMarking.markings = newMarkings;
+		
+		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+			newMarking.markings.put(entry.getKey(), entry.getValue().delay(amount));
+		}
 		return newMarking;
 	}
 
