@@ -49,6 +49,7 @@ public class SharedTransition {
 	}
 
 	private boolean templateDoesNotContainSharedTransition(TimedArcPetriNet model) {
+		Require.that(model != null, "model cannot be null");
 		for(TimedTransition transition : transitions){
 			if(model.equals(transition.model())) return false;
 		}

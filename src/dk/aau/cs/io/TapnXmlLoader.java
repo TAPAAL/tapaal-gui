@@ -214,6 +214,7 @@ public class TapnXmlLoader {
 
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 		network.add(tapn);
+		nameGenerator.add(tapn);
 		
 		DataLayer guiModel = new DataLayer();
 		Template template = new Template(tapn, guiModel);
@@ -240,9 +241,8 @@ public class TapnXmlLoader {
 			template.guiModel().addPetriNetObject(place);
 			addListeners(place, template);
 		} else if ("transition".equals(element.getNodeName())) {
-			TimedTransitionComponent transition = parseTransition(element, network);
+			TimedTransitionComponent transition = parseTransition(element, network, template.model());
 			template.guiModel().addPetriNetObject(transition);
-			template.model().add(transition.underlyingTransition());
 			addListeners(transition, template);
 		} else if ("arc".equals(element.getNodeName())) {
 			parseAndAddArc(element, template, constants);
@@ -267,7 +267,7 @@ public class TapnXmlLoader {
 			if(!isNameAllowed(name)){
 				name = nameGenerator.getNewTemplateName();
 			}
-
+			nameGenerator.updateTemplateIndex(name);
 			return name;
 		} else {
 			return nameGenerator.getNewTemplateName();
@@ -315,7 +315,7 @@ public class TapnXmlLoader {
 		return an;
 	}
 
-	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network) {
+	private TimedTransitionComponent parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
 		double positionXInput = Double.parseDouble(transition.getAttribute("positionX"));
 		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
 		String idInput = transition.getAttribute("id");
@@ -340,8 +340,13 @@ public class TapnXmlLoader {
 		
 		TimedTransition t = new TimedTransition(nameInput);
 		if(network.isNameUsedForShared(nameInput)){
+			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
+			tapn.add(t);
 			network.getSharedTransitionByName(nameInput).makeShared(t);
+		}else{
+			tapn.add(t);
 		}
+		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(
 				positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput, true,
@@ -385,7 +390,7 @@ public class TapnXmlLoader {
 				network.marking().add(new TimedToken(p));
 			}
 		}
-
+		nameGenerator.updateIndicesForAllModels(nameInput);
 		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionXInput, positionYInput, idInput, nameInput, nameOffsetXInput, nameOffsetYInput, initialMarkingInput, markingOffsetXInput, markingOffsetYInput, 0);
 		placeComponent.setUnderlyingPlace(p);
 
@@ -527,8 +532,7 @@ public class TapnXmlLoader {
 				assert (trans != null);
 				assert (destPlace != null);
 
-				TransportArc transArc = new TransportArc(sourcePlace, trans,
-						destPlace, interval);
+				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval);
 
 				tempArc.setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);

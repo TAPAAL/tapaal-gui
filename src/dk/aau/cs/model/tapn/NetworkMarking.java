@@ -93,6 +93,9 @@ public class NetworkMarking implements TimedMarking {
 
 	public NetworkMarking fireTransition(TimedTransition transition, FiringMode firingMode) {
 		Require.that(transition != null, "transition cannot be null");
+		Require.that(firingMode != null, "firingMode cannot be null");
+		
+		if(transition.isShared()) return fireSharedTransition(transition.sharedTransition(), firingMode);
 
 		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
 		LocalTimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
@@ -100,6 +103,16 @@ public class NetworkMarking implements TimedMarking {
 		shallowCopy.removeMarkingFor(transition.model());
 		shallowCopy.addMarking(transition.model(), newMarking);
 
+		return shallowCopy;
+	}
+
+	private NetworkMarking fireSharedTransition(SharedTransition sharedTransition, FiringMode firingMode) {
+		// validity of arguments already checked above
+		NetworkMarking shallowCopy = shallowCopy();
+		for(TimedTransition transition : sharedTransition.transitions()){
+			
+		}
+		
 		return shallowCopy;
 	}
 
