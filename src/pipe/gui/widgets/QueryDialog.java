@@ -116,10 +116,10 @@ public class QueryDialog extends JPanel {
 	private UndoableEditSupport undoSupport;
 
 	private String name_verifyTAPN = "VerifyTAPN";
-	private String name_ADVNOSYM = "Optimised Standard";
-	private String name_NAIVE = "Standard";
-	private String name_BROADCAST = "Broadcast Reduction";
-	private String name_BROADCASTDEG2 = "Broadcast Degree 2 Reduction";
+	private String name_ADVNOSYM = "UPPAAL: Optimised Standard Reduction";
+	private String name_NAIVE = "UPPAAL: Standard Reduction";
+	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
+	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
