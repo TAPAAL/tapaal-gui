@@ -110,7 +110,10 @@ public class NetworkMarking implements TimedMarking {
 		// validity of arguments already checked above
 		NetworkMarking shallowCopy = shallowCopy();
 		for(TimedTransition transition : sharedTransition.transitions()){
+			LocalTimedMarking ltm = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
 			
+			shallowCopy.removeMarkingFor(transition.model());
+			shallowCopy.addMarking(transition.model(), ltm);
 		}
 		
 		return shallowCopy;
