@@ -25,6 +25,15 @@ public class TimedToken {
 	public BigDecimal age() {
 		return age;
 	}
+	
+	public TimedToken clone() {
+		return new TimedToken(place, age); // age is immutable so ok to pass it
+											// to constructor
+	}
+
+	public TimedToken delay(BigDecimal delay) {
+		return new TimedToken(place, age.add(delay));
+	}
 
 	@Override
 	public String toString() {
@@ -68,14 +77,5 @@ public class TimedToken {
 		} else if (!place.equals(other.place))
 			return false;
 		return true;
-	}
-
-	public TimedToken clone() {
-		return new TimedToken(place, age); // age is immutable so ok to pass it
-											// to constructor
-	}
-
-	public TimedToken delay(BigDecimal delay) {
-		return new TimedToken(place, age.add(delay));
 	}
 }

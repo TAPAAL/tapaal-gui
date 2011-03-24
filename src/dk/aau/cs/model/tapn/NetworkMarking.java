@@ -41,19 +41,19 @@ public class NetworkMarking implements TimedMarking {
 		return delay(BigDecimal.ZERO);
 	}
 
-	private NetworkMarking shallowCopy() {
-		NetworkMarking shallowCopy = new NetworkMarking();
-
-		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-			shallowCopy.markings.put(entry.getKey(), entry.getValue());
-		}
-		
-		for(Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()){
-			shallowCopy.sharedPlacesTokens.put(entry.getKey(), entry.getValue());
-		}
-
-		return shallowCopy;
-	}
+//	private NetworkMarking shallowCopy() {
+//		NetworkMarking shallowCopy = new NetworkMarking();
+//
+//		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
+//			shallowCopy.markings.put(entry.getKey(), entry.getValue());
+//		}
+//		
+//		for(Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()){
+//			shallowCopy.sharedPlacesTokens.put(entry.getKey(), entry.getValue());
+//		}
+//
+//		return shallowCopy;
+//	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
 		for(List<TimedToken> listOfTokens: sharedPlacesTokens.values()){
@@ -86,7 +86,7 @@ public class NetworkMarking implements TimedMarking {
 		}
 		
 		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-			newMarking.markings.put(entry.getKey(), entry.getValue().delay(amount));
+			newMarking.addMarking(entry.getKey(), entry.getValue().delay(amount));
 		}
 		return newMarking;
 	}
@@ -97,40 +97,75 @@ public class NetworkMarking implements TimedMarking {
 		
 		if(transition.isShared()) return fireSharedTransition(transition.sharedTransition(), firingMode);
 
-		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
-		LocalTimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
+		NetworkMarking clone = clone(); // TODO: try to conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
+		LocalTimedMarking newMarking = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
 
-		shallowCopy.removeMarkingFor(transition.model());
-		shallowCopy.addMarking(transition.model(), newMarking);
-
-		return shallowCopy;
+		clone.removeMarkingFor(transition.model());
+		clone.addMarking(transition.model(), newMarking);
+		
+		return clone;
 	}
 
 	private NetworkMarking fireSharedTransition(SharedTransition sharedTransition, FiringMode firingMode) {
 		// validity of arguments already checked above
-		NetworkMarking shallowCopy = shallowCopy();
+		NetworkMarking clone = clone();
 		for(TimedTransition transition : sharedTransition.transitions()){
-			LocalTimedMarking ltm = getMarkingFor(transition.model()).fireTransition(transition, firingMode);
+			LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
 			
-			shallowCopy.removeMarkingFor(transition.model());
-			shallowCopy.addMarking(transition.model(), ltm);
+			clone.removeMarkingFor(transition.model());
+			clone.addMarking(transition.model(), ltm);
 		}
 		
-		return shallowCopy;
+		return clone;
+	}
+
+	private NetworkMarking fireSharedTransition(SharedTransition sharedTransition, List<TimedToken> tokensToConsume) {
+		HashMap<TimedTransition, List<TimedToken>> tokensPerTransition = distributeTokensToIndividualTransitions(sharedTransition, tokensToConsume);
+		
+		NetworkMarking clone = clone();
+		for(TimedTransition transition : sharedTransition.transitions()){
+			LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, tokensPerTransition.get(transition));
+			
+			clone.removeMarkingFor(transition.model());
+			clone.addMarking(transition.model(), ltm);
+		}
+		
+		return clone;
+	}
+
+	private HashMap<TimedTransition, List<TimedToken>> distributeTokensToIndividualTransitions(SharedTransition sharedTransition, List<TimedToken> tokensToConsume) {
+		HashMap<TimedTransition, List<TimedToken>> distributedTokens = new HashMap<TimedTransition, List<TimedToken>>();
+		
+		for(TimedToken token : tokensToConsume){
+			for(TimedTransition transition : sharedTransition.transitions()){
+				if(!distributedTokens.containsKey(transition)) distributedTokens.put(transition, new ArrayList<TimedToken>());
+				
+				if(transition.model().equals(((LocalTimedPlace)token.place()).model())){
+					distributedTokens.get(transition).add(token);
+					break;
+				}
+			}
+		}
+		
+		return distributedTokens;
 	}
 
 	public NetworkMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume) {
 		Require.that(transition != null, "transition cannot be null");
 		Require.that(tokensToConsume != null, "Must specify a list of tokens");
+		
+		if(transition.isShared()) return fireSharedTransition(transition.sharedTransition(), tokensToConsume);
+		
+		NetworkMarking clone = clone(); // TODO: Try to conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
+										// cannot be done right now because the fireTransition call on local marking needs the reference setup properly to the new network marking
+		LocalTimedMarking newMarking = clone.getMarkingFor(transition.model()).fireTransition(transition, tokensToConsume);
 
-		NetworkMarking shallowCopy = shallowCopy(); // conserve memory by reusing unchanged markings (they are immutable wrt. transition firing and delay)
-		LocalTimedMarking newMarking = getMarkingFor(transition.model()).fireTransition(transition, tokensToConsume);
+		clone.removeMarkingFor(transition.model());
+		clone.addMarking(transition.model(), newMarking);
 
-		shallowCopy.removeMarkingFor(transition.model());
-		shallowCopy.addMarking(transition.model(), newMarking);
-
-		return shallowCopy;
+		return clone;
 	}
+
 
 	public int size() {
 		int size = 0;

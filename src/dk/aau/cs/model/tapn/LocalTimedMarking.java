@@ -13,24 +13,26 @@ import dk.aau.cs.util.Require;
 public class LocalTimedMarking implements TimedMarking { // TODO: Consider removing the interface here?
 	private HashMap<TimedPlace, List<TimedToken>> placesToTokensMap;
 	private NetworkMarking parent;
-	
+
 	public LocalTimedMarking() {
 		placesToTokensMap = new HashMap<TimedPlace, List<TimedToken>>();
 	}
-	
+
 	public void setNetworkMarking(NetworkMarking marking){
 		this.parent = marking;
 	}
 
 	public void add(TimedToken token) {
-		Require.that(!token.place().isShared(), "this method should only be called for tokens in non-shared places");
-		
-		if (!placesToTokensMap.containsKey(token.place())) {
-			placesToTokensMap.put(token.place(), new ArrayList<TimedToken>());
-		}
+		if(token.place().isShared()) {
+			parent.add(token);
+		} else {
+			if (!placesToTokensMap.containsKey(token.place())) {
+				placesToTokensMap.put(token.place(), new ArrayList<TimedToken>());
+			}
 
-		List<TimedToken> tokens = placesToTokensMap.get(token.place());
-		tokens.add(token);
+			List<TimedToken> tokens = placesToTokensMap.get(token.place());
+			tokens.add(token);
+		}
 	}
 
 	private void add(List<TimedToken> producedTokens) {
@@ -40,13 +42,14 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 	}
 
 	public void remove(TimedToken token) {
-		Require.that(!token.place().isShared(), "this method should only be called for tokens in non-shared places");
-		
-		if (placesToTokensMap.containsKey(token.place())) {
+		if(token.place().isShared()) {
+			parent.remove(token);
+		} else if (placesToTokensMap.containsKey(token.place())) {
 			List<TimedToken> tokens = placesToTokensMap.get(token.place());
 			tokens.remove(token);
 		}
 	}
+
 
 	private void remove(List<TimedToken> tokensToConsume) {
 		for (TimedToken token : tokensToConsume) {
@@ -69,7 +72,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 			return new ArrayList<TimedToken>();
 		return placesToTokensMap.get(place);
 	}
-	
+
 	public List<TimedToken> getTokensFor(TimedPlace place){
 		if(place.isShared()){
 			return parent.getTokensFor(place);
@@ -98,28 +101,28 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 	public LocalTimedMarking delay(BigDecimal amount) {
 		Require.that(amount.compareTo(BigDecimal.ZERO) >= 0, "cannot delay with negative numbers");
 		Require.that(isDelayPossible(amount), "The specified delay is not possible due to an invariant.");
-		
+
 		LocalTimedMarking clone = new LocalTimedMarking();
-		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>(placesToTokensMap.size());
 		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			ArrayList<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
 			for (TimedToken token : entry.getValue()) {
 				newTokens.add(token.delay(amount));
 			}
-			newMap.put(entry.getKey(), newTokens);
+			clone.placesToTokensMap.put(entry.getKey(), newTokens);
 		}
-
-		clone.placesToTokensMap = newMap;
+		
+		clone.parent = parent;
 		return clone;
 	}
 
 	public LocalTimedMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume) {
 		Require.that(transition != null, "transition must not be null");
-		Require.that(transition.isEnabledBy(tokensToConsume), "Tokens does not enable transition");
+		Require.that(transition.isEnabledBy(tokensToConsume), "Tokens do not enable transition");
 
 		LocalTimedMarking clone = clone();
 
 		List<TimedToken> producedTokens = transition.calculateProducedTokensFrom(tokensToConsume);
+
 		clone.remove(tokensToConsume);
 		clone.add(producedTokens);
 

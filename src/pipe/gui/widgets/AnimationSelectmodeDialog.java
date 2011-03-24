@@ -35,41 +35,35 @@ public class AnimationSelectmodeDialog extends JPanel {
 	}
 
 	public AnimationSelectmodeDialog(TimedTransition transition) {
-
 		setLayout(new GridBagLayout());
-
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
+		//c.weightx = 0.5;
 		c.gridx = 0;
 		c.gridy = 0;
 
 		this.transition = transition;
 
 		namePanel = new JPanel(new FlowLayout());
-		namePanel.add(new JLabel("Select tokens to Fire in Transition " + transition.name()));
+		namePanel.add(new JLabel("<html>Select tokens to fire transition <b>" + transition.name() + "</b></html>"));
 
 		add(namePanel, c);
 
 		// Start adding the stuff
-		JPanel presetPanelContainer;
-		presetPanelContainer = new JPanel(new FlowLayout());
-
+		JPanel presetPanelContainer = new JPanel(new FlowLayout());
 		c.gridx = 0;
 		c.gridy = 1;
 
 		add(presetPanelContainer, c);
 
-		for (TimedInputArc arc : transition.getInputArcs()) {
-			JPanel tokenPanel = createDropDownForArc(arc.source().name(), arc.getElligibleTokens());
-			presetPanelContainer.add(tokenPanel);
+		if(transition.isShared()){
+			for(TimedTransition trans : transition.sharedTransition().transitions()){
+				createDropDownsForTransition(trans, presetPanelContainer);
+			}
+		}else{
+			createDropDownsForTransition(transition, presetPanelContainer);
 		}
-		
-		for (TransportArc arc : transition.getTransportArcsGoingThrough()) {
-			JPanel tokenPanel = createDropDownForArc(arc.source().name(), arc.getElligibleTokens());
-			presetPanelContainer.add(tokenPanel);
-		}
-
 		c.gridx = 0;
 		c.gridy = 2;
 		// OK
@@ -89,13 +83,25 @@ public class AnimationSelectmodeDialog extends JPanel {
 		add(okButton, c);
 	}
 
+	private void createDropDownsForTransition(TimedTransition transition, JPanel presetPanelContainer) {
+		for (TimedInputArc arc : transition.getInputArcs()) {
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens());
+			presetPanelContainer.add(tokenPanel);
+		}
+		
+		for (TransportArc arc : transition.getTransportArcsGoingThrough()) {
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens());
+			presetPanelContainer.add(tokenPanel);
+		}
+	}
+
 	private JPanel createDropDownForArc(String placeName, List<TimedToken> elligibleTokens) {
 		JPanel presetPanel = new JPanel(new FlowLayout());
 
 		// For each place in the preset create a box for selecting tokens
 
 		presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + placeName));
-		presetPanel.add(new JLabel("Select token from Place " + placeName));
+		presetPanel.add(new JLabel("Select token"));
 		
 		JComboBox selectTokenBox = new JComboBox(elligibleTokens.toArray());
 		selectTokenBox.setSelectedIndex(0);
