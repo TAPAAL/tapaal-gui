@@ -60,7 +60,6 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		this.useSymmetry = useSymmetry;
 	}
 	
-	@Override
 	public NTA transformModel(TimedArcPetriNet model) throws Exception {
 		clearLocationMappings();
 		numberOfInitChannels = 0;
@@ -358,7 +357,6 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		return matcher.find();
 	}
 	
-	@Override
 	public UPPAALQuery transformQuery(TAPNQuery query) throws Exception {
 		OptimizedStandardTranslationQueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
 		return  new StandardUPPAALQuery(visitor.getUppaalQueryFor(query));

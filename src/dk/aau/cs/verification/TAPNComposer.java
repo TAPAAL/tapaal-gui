@@ -40,11 +40,12 @@ public class TAPNComposer {
 		createTransportArcs(model, tapn, mapping);
 		createInhibitorArcs(model, tapn, mapping);
 
-		dumpToConsole(tapn, mapping);
+		//dumpToConsole(tapn, mapping);
 
 		return new Tuple<TimedArcPetriNet, NameMapping>(tapn, mapping);
 	}
 
+	@SuppressWarnings("unused")
 	private void dumpToConsole(TimedArcPetriNet tapn, NameMapping mapping) {
 		System.out.println("Composed Model:");
 		System.out.println("PLACES:");
