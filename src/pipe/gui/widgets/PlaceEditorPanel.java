@@ -212,7 +212,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		nameTextField = new javax.swing.JTextField();
 		sharedPlacesComboBox = new JComboBox();
-
+		sharedPlacesComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				SharedPlace place = (SharedPlace)e.getItem();
+				setMarking(place.numberOfTokens());
+				setInvariantControlsBasedOn(place.invariant());
+			}
+		});
+		
 		markingLabel = new javax.swing.JLabel("Marking:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
