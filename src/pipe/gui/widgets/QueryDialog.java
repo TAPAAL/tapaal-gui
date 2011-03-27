@@ -25,6 +25,8 @@ import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 
 public class QueryDialog extends JPanel {
 
+	private static final String SHARED = "Shared";
+
 	private static final long serialVersionUID = 7852107237344005546L;
 
 	public enum QueryDialogueOption {
@@ -254,7 +256,7 @@ public class QueryDialog extends JPanel {
 			fastestTraceRadioButton.setEnabled(true);
 		}
 	}
-	
+
 	private void refreshSearchOptions() {
 		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
 		{
@@ -270,7 +272,7 @@ public class QueryDialog extends JPanel {
 			randomDepthFirstSearch.setEnabled(true);
 			closestToTargetFirstSearch.setEnabled(true);
 		}
-		
+
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -444,7 +446,10 @@ public class QueryDialog extends JPanel {
 			// we programmatically change the selection in the atomic proposition comboboxes etc.
 			// because a different atomic proposition was selected
 			userChangedAtomicPropSelection = false;
-			templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
+			if(node.getTemplate().equals(""))
+				templateBox.setSelectedItem(SHARED);
+			else
+				templateBox.setSelectedItem(tapnNetwork.getTAPNByName(node.getTemplate()));
 			placesBox.setSelectedItem(node.getPlace());
 			relationalOperatorBox.setSelectedItem(node.getOp());
 			placeMarking.setValue(node.getN());
@@ -733,9 +738,7 @@ public class QueryDialog extends JPanel {
 
 	private void initQueryPanel(final TAPNQuery queryToCreateFrom) {
 		queryPanel = new JPanel(new GridBagLayout());
-		queryPanel
-		.setBorder(BorderFactory
-				.createTitledBorder("Query (click on the part of the query you want to change)"));
+		queryPanel.setBorder(BorderFactory.createTitledBorder("Query (click on the part of the query you want to change)"));
 
 		initQueryField();
 		initQuantificationPanel(queryToCreateFrom);
@@ -771,8 +774,7 @@ public class QueryDialog extends JPanel {
 
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
-		queryScrollPane
-		.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		queryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		Dimension d = new Dimension(750, 56);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
@@ -1125,22 +1127,39 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(150, 27);
 		placesBox.setMaximumSize(d);
 
-		templateBox = new JComboBox(new DefaultComboBoxModel(tapnNetwork.templates().toArray()));
+		Vector<Object> items = new Vector<Object>(tapnNetwork.templates().size()+1);
+		items.addAll(tapnNetwork.templates());
+		if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
+
+		templateBox = new JComboBox(new DefaultComboBoxModel(items));
 		templateBox.addActionListener(new ActionListener() {
-			private TimedArcPetriNet currentlySelected = null;
+			private Object currentlySelected = null;
 
 			public void actionPerformed(ActionEvent e) {
-				TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getSelectedItem();
-				if (!tapn.equals(currentlySelected)) {
-					Vector<String> placeNames = new Vector<String>();
-					for (TimedPlace place : tapn.places()) {
-						if(!place.isShared()){
-							placeNames.add(place.name());
+				if(!templateBox.getSelectedItem().equals(SHARED)){
+					TimedArcPetriNet tapn = (TimedArcPetriNet) templateBox.getSelectedItem();
+					if (!tapn.equals(currentlySelected)) {
+						Vector<String> placeNames = new Vector<String>();
+						for (TimedPlace place : tapn.places()) {
+							if(!place.isShared()){
+								placeNames.add(place.name());
+							}
 						}
+						placesBox.setModel(new DefaultComboBoxModel(placeNames));
+
+						currentlySelected = tapn;
+						setEnablednessOfAddPredicateButton();
+						if (userChangedAtomicPropSelection && placeNames.size() > 0)
+							updateQueryOnAtomicPropositionChange();
+					}
+				}else{
+					Vector<String> placeNames = new Vector<String>();
+					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
+							placeNames.add(place.name());
 					}
 					placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
-					currentlySelected = tapn;
+					currentlySelected = SHARED;
 					setEnablednessOfAddPredicateButton();
 					if (userChangedAtomicPropSelection && placeNames.size() > 0)
 						updateQueryOnAtomicPropositionChange();
@@ -1200,15 +1219,15 @@ public class QueryDialog extends JPanel {
 		addPredicateButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
+				String template = templateBox.getSelectedItem().toString();
+				if(template.equals(SHARED)) template = "";
 				TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-						templateBox.getSelectedItem().toString(),
+						template,
 						(String) placesBox.getSelectedItem(),
 						(String) relationalOperatorBox.getSelectedItem(),
 						(Integer) placeMarking.getValue());
-				UndoableEdit edit = new QueryConstructionEdit(currentSelection
-						.getObject(), property);
-				newProperty = newProperty.replace(currentSelection.getObject(),
-						property);
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), property);
+				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
 			}
@@ -1540,7 +1559,7 @@ public class QueryDialog extends JPanel {
 		String[] reductionOptions = { name_verifyTAPN, name_NAIVE, name_ADVNOSYM, name_BROADCAST, name_BROADCASTDEG2 };
 		reductionOption = new JComboBox(reductionOptions);
 		reductionOption.setSelectedIndex(4);
-		
+
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
@@ -1670,7 +1689,7 @@ public class QueryDialog extends JPanel {
 					querySaved = true;
 					exit();
 					TAPNQuery query = getQuery();
-					
+
 					if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 						Verifier.runVerifyTAPNVerification(tapnNetwork, query);
 					else
@@ -1715,13 +1734,13 @@ public class QueryDialog extends JPanel {
 						// etc.
 						NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
 						dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
-						
+
 						TAPNQuery tapnQuery = getQuery();
 						dk.aau.cs.petrinet.TAPNQuery clonedQuery = new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity() + tapnNetwork.marking().size());
-						
+
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
-						
+
 						exporter.export(transformedModel.value1(), tapn, clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
 					} else {
 						JOptionPane.showMessageDialog(CreateGui.getApp(),

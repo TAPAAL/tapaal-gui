@@ -53,12 +53,15 @@ public abstract class TCTLAbstractProperty {
 
 	public abstract void accept(ITCTLVisitor visitor, Object context);
 
-	public abstract boolean containsAtomicPropWithSpecificPlace(String placeName);
+	
+	public abstract boolean containsAtomicPropWithSpecificPlace(String placeName); // TODO: delete
 	public abstract boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName);
 
 	public abstract boolean containsPlaceHolder();
 
 	// This method assumes that a place holder exists in the current query
 	public abstract TCTLAbstractProperty findFirstPlaceHolder();
+
+	
 
 }

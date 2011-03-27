@@ -46,6 +46,8 @@ import pipe.gui.undo.DeleteTimedTransitionCommand;
 import pipe.gui.undo.DeleteTransportArcCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
+import dk.aau.cs.TCTL.visitors.BooleanResult;
+import dk.aau.cs.TCTL.visitors.ContainsAtomicPropWithSharedPlaceVisitor;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
@@ -188,7 +190,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					}
 					buffer.append(System.getProperty("line.separator"));
 					buffer.append("Do you want to continue?");
-					int choice = JOptionPane.showConfirmDialog(SharedPlacesAndTransitionsPanel.this, buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), buffer.toString(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if(choice == JOptionPane.NO_OPTION) return;
 					
 					Command cmd = new DeleteQueriesCommand(tab, affectedQueries);
@@ -248,8 +250,14 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 			private Collection<TAPNQuery> findAffectedQueries(SharedPlace sharedPlace) {
 				ArrayList<TAPNQuery> queries = new ArrayList<TAPNQuery>();
+				ContainsAtomicPropWithSharedPlaceVisitor visitor = new ContainsAtomicPropWithSharedPlaceVisitor(sharedPlace.name());
+
 				for(TAPNQuery query : tab.queries()){
-					// TODO: add queries
+					BooleanResult result = new BooleanResult();
+					query.getProperty().accept(visitor, result);
+					if(result.result()){
+						queries.add(query);
+					}
 				}
 				return queries;
 			}
