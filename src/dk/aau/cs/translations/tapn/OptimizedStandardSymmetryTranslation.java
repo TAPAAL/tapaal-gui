@@ -65,8 +65,7 @@ public class OptimizedStandardSymmetryTranslation implements UppaalTransformer {
 
 	}
 
-	public void transformToUppaal(TAPN model, PrintStream uppaalXML,
-			int numberOfEkstraTokens) {
+	public void transformToUppaal(TAPN model, PrintStream uppaalXML, int numberOfEkstraTokens) {
 
 		ArrayList<Place> tokens = getTokens(model, numberOfEkstraTokens);
 

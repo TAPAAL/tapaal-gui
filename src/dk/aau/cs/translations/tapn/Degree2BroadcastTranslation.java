@@ -29,7 +29,6 @@ public class Degree2BroadcastTranslation implements
 
 	private static final String DEG2_SUFFIX = "_deg2";
 	private static final String DEG1_SUFFIX = "_single";
-	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	private static final String PLOCK = "P_lock";
 	protected static final String P_CAPACITY = "_BOTTOM_";
 	private static final String TOKEN_TEMPLATE_NAME = "Token";

@@ -6,10 +6,7 @@ import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.tapn.TAPNToConservativeTAPNConverter;
 
 public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, TimedArcPetriNet> {
-	
-	protected static final String T_ZEROTEST_FORMAT = "%1$s_%2$s_zerotest";
-	protected static final String T_CHECK_FORMAT = "%1$s_check";
-	protected static final String P_CHECK_FORMAT = "P_%1$s_check";
+
 	protected static final String T_MAX_FORMAT = "%1$s_%2$d";
 	protected static final String T_I_OUT_FORMAT = "%1$s_%2$d_out";
 	protected static final String T_I_IN_FORMAT = "%1$s_%2$d_in";
@@ -59,7 +56,7 @@ public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, Timed
 		return retainedDegree2Transitions;
 	}
 
-	private void createDegree2TransitionSimulation(TimedTransition t) {
+	protected void createDegree2TransitionSimulation(TimedTransition t) {
 		Pairing p = new Pairing(t);
 		
 		if((isTransitionDegree1(t) || isTransitionDegree2(t)) && !t.hasInhibitorArcs())
@@ -94,7 +91,7 @@ public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, Timed
 		
 	}
 	
-	private void createTransitionSimulation(TimedTransition t, Pairing p) {
+	protected void createTransitionSimulation(TimedTransition t, Pairing p) {
 		createRingStructure(t, p);
 		createArcsFromInputToOutputAccordingToPairing(t,p);
 		createInhibitorArcs(t);

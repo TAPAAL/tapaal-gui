@@ -9,7 +9,7 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 	private static final String CONTROL = "Control";
 	private static final String FINISH = "finish";
 
-	private static final String TOKEN_TEMPLATE_NAME = "P";
+	private static final String TOKEN_TEMPLATE_NAME = "Token";
 
 	@Override
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,

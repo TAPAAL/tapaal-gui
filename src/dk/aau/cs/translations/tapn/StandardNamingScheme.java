@@ -10,14 +10,14 @@ import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.Sequ
 
 public class StandardNamingScheme implements TranslationNamingScheme {
 	private static final int NOT_FOUND = -1;
-	private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_T0$";
+	private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1_in$";
+	private final String DEG1_START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1$";
 	private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
-	private Pattern ignoredPlacePattern = Pattern
-			.compile("^P_lock|P_capacity|\\w+_im\\d+|\\w+_hp_0|\\w+_hp\\d+$");;
+	private Pattern deg1StartPattern = Pattern.compile(DEG1_START_OF_SEQUENCE_PATTERN);
+	private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");;
 	private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
 
-	public TransitionTranslation[] interpretTransitionSequence(
-			List<String> firingSequence) {
+	public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
 		List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
 
 		int startIndex = NOT_FOUND;
@@ -27,25 +27,31 @@ public class StandardNamingScheme implements TranslationNamingScheme {
 			Matcher startMatcher = startPattern.matcher(transitionName);
 
 			boolean isStartTransition = startMatcher.matches();
-
+			
 			if (isStartTransition) {
 				if (startIndex != NOT_FOUND) {
-					transitionTranslations
-							.add(new TransitionTranslation(startIndex, i - 1,
-									originalTransitionName, seqInfo));
+					transitionTranslations.add(new TransitionTranslation(startIndex, i - 1,	originalTransitionName, seqInfo));
 				}
 				startIndex = i;
 				originalTransitionName = startMatcher.group(1);
+			} else {
+				Matcher deg1StartMatcher = deg1StartPattern.matcher(transitionName);
+				isStartTransition = deg1StartMatcher.matches();
+				
+				if(isStartTransition) {
+					if (startIndex != NOT_FOUND) {
+						transitionTranslations.add(new TransitionTranslation(startIndex, i - 1,	originalTransitionName, seqInfo));
+					}
+					startIndex = i;
+					originalTransitionName = deg1StartMatcher.group(1);
+				}
 			}
 		}
 
 		if (startIndex != NOT_FOUND) {
-			transitionTranslations
-					.add(new TransitionTranslation(startIndex, firingSequence
-							.size() - 1, originalTransitionName, seqInfo));
+			transitionTranslations.add(new TransitionTranslation(startIndex, firingSequence.size() - 1, originalTransitionName, seqInfo));
 		}
-		TransitionTranslation[] array = new TransitionTranslation[transitionTranslations
-				.size()];
+		TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
 		transitionTranslations.toArray(array);
 		return array;
 	}

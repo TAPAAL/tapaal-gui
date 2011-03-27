@@ -37,9 +37,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 		} else {
 			append(" || !");
 		}
-		append("(");
-		append(createAtomicPropositionSum(PLOCK));
-		append(" == 1)");
+		append(String.format("(%1$s.%2$s == 1)", LOCK_TEMPLATE, PLOCK));
 	}
 
 	private String createAtomicPropositionSum(String place) {

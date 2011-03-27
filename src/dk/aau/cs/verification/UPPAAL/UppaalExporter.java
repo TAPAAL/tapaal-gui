@@ -18,7 +18,6 @@ import dk.aau.cs.translations.tapn.OptimizedStandardNamingScheme;
 import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardNamingScheme;
-import dk.aau.cs.translations.tapn.StandardSymmetryTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
 
 // TODO: remove the old model method parameters once all translations have been converted
@@ -39,13 +38,25 @@ public class UppaalExporter {
 		
 		int extraTokens = query.getTotalTokens() - model.getNumberOfTokens();
 		TranslationNamingScheme namingScheme = null;
-		if (reduction == ReductionOption.STANDARDSYMMETRY) {
+		if (reduction == ReductionOption.STANDARD || reduction == ReductionOption.STANDARDSYMMETRY) {
 
-			StandardSymmetryTranslation t = new StandardSymmetryTranslation();
+			
+			//StandardSymmetryTranslation t = new StandardSymmetryTranslation();
 			try {
-				t.autoTransform((TAPN) model, new PrintStream(modelFile),
-						new PrintStream(queryFile), query, extraTokens);
+
+				StandardTranslation standardTranslation = new StandardTranslation(extraTokens, reduction == ReductionOption.STANDARDSYMMETRY); 
+				dk.aau.cs.TA.NTA nta = standardTranslation.transformModel(newModel);
+				nta.outputToUPPAALXML(new PrintStream(modelFile));
+				dk.aau.cs.TA.UPPAALQuery uppaalQuery = standardTranslation.transformQuery(query);
+				uppaalQuery.output(new PrintStream(queryFile));
+				
+				namingScheme = new StandardNamingScheme();
+				//t.autoTransform((TAPN) model, new PrintStream(modelFile),
+				//		new PrintStream(queryFile), query, extraTokens);
 			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				return null;
+			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
@@ -137,24 +148,24 @@ public class UppaalExporter {
 			}
 
 			// Create uppaal xml file
-			try {
-				StandardTranslation t2 = new StandardTranslation((TAPN) model,
-						new PrintStream(modelFile), extraTokens);
-				t2.transform();
-				t2.transformQueriesToUppaal(extraTokens, query,
-						new PrintStream(queryFile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+//			try {
+//				
+////				StandardTranslation t2 = new StandardTranslation((TAPN) model,
+////						new PrintStream(modelFile), extraTokens);
+////				t2.transform();
+////				t2.transformQueriesToUppaal(extraTokens, query,
+////						new PrintStream(queryFile));
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//				return null;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				return null;
+//			}
 
 			namingScheme = new StandardNamingScheme();
 		}
-		return new ExportedModel(modelFile.getAbsolutePath(), queryFile
-				.getAbsolutePath(), namingScheme);
+		return new ExportedModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), namingScheme);
 	}
 
 	private File createTempFile(String ending) {
