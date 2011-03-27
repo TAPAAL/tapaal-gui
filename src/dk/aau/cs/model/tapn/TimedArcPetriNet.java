@@ -277,13 +277,20 @@ public class TimedArcPetriNet {
 		for(TimedPlace p : this.places) {
 			TimedPlace copy = p.copy();
 			tapn.add(copy);
-			for(TimedToken t : this.currentMarking.getTokensFor(p)) {
-				tapn.addToken(new TimedToken(copy));
+			if(!p.isShared()){
+				for(int i = 0; i < p.numberOfTokens(); i++) {
+					tapn.addToken(new TimedToken(copy));
+				}
 			}
 		}
 
-		for(TimedTransition t : this.transitions)
-			tapn.add(t.copy());
+		for(TimedTransition t : this.transitions){
+			TimedTransition copy = t.copy();
+			tapn.add(copy);
+			if(t.isShared()){
+				t.sharedTransition().makeShared(copy);
+			}
+		}
 
 		for(TimedInputArc inputArc : this.inputArcs)
 			tapn.add(inputArc.copy(tapn));

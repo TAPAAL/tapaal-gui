@@ -30,7 +30,8 @@ public class TimedArcPetriNetNetwork {
 
 		tapn.setParentNetwork(this);
 		tapns.add(tapn);
-		currentMarking.addMarking(tapn, new LocalTimedMarking());
+		LocalTimedMarking marking = tapn.marking() instanceof LocalTimedMarking ? (LocalTimedMarking)tapn.marking() : new LocalTimedMarking();
+		currentMarking.addMarking(tapn, marking);
 		tapn.setMarking(currentMarking);
 	}
 	
