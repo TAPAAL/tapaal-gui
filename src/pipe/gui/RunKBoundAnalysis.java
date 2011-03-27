@@ -14,12 +14,36 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result,
-			long verificationTime) {
-		JOptionPane.showMessageDialog(CreateGui.getApp(), result
+	protected void showResult(VerificationResult<TAPNNetworkTrace> result, long verificationTime) {
+		if(result != null && !result.error()) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), result
 				.isQuerySatisfied() ? getAnswerNotBoundedString()
 				: getAnswerBoundedString(), "Analysis Result",
 				JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			String extraInformation = "";
+			
+			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
+				
+				extraInformation = "We have detected an error that often arises when UPPAAL is missing a valid Licence File.\n" +
+						"Please open the UPPAAL GUI while connected to the internet, to correct this problem.";
+				
+			}
+			
+			String message = "An error occured during the verification." +
+			System.getProperty("line.separator") + 	
+			System.getProperty("line.separator");
+			
+			if (extraInformation != ""){
+				message += extraInformation +			
+				System.getProperty("line.separator") + 	
+				System.getProperty("line.separator");
+			}
+			
+			message += "UPPAAL output:\n" + result.errorMessage();
+			
+			messenger.displayWrappedErrorMessage(message,"Error during verification");
+		}
 	}
 
 	protected String getAnswerNotBoundedString() {

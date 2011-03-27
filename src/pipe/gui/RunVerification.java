@@ -47,11 +47,11 @@ public class RunVerification extends RunVerificationBase {
 			//link time reference
 			//is the error as this (often) means the possibility for a uppaal licence key error
 			
-			String extraInfomration = "";
+			String extraInformation = "";
 			
-			if (result.errorMessage().contains("relocation")){
+			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
 				
-				extraInfomration = "We have detected an error that often arises when UPPAAL is missing a valid Licence File.\n" +
+				extraInformation = "We have detected an error that often arises when UPPAAL is missing a valid Licence File.\n" +
 						"Please open the UPPAAL GUI while connected to the internet, to correct this problem.";
 				
 			}
@@ -60,8 +60,8 @@ public class RunVerification extends RunVerificationBase {
 			System.getProperty("line.separator") + 	
 			System.getProperty("line.separator");
 			
-			if (extraInfomration != ""){
-				message += extraInfomration +			
+			if (extraInformation != ""){
+				message += extraInformation +			
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");
 			}
