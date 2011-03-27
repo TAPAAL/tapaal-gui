@@ -20,6 +20,7 @@ public class AnimationHistoryComponent extends JList {
 		for (MouseListener listener : getMouseListeners()) {
 			removeMouseListener(listener);
 		}
+		
 		for (MouseMotionListener listener : getMouseMotionListeners()) {
 			removeMouseMotionListener(listener);
 		}
