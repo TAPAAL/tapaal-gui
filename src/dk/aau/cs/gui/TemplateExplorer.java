@@ -196,14 +196,7 @@ public class TemplateExplorer extends JPanel {
 				}
 				
 				if(queriesToDelete.isEmpty() || choice == JOptionPane.YES_OPTION) {
-					
-//					ArrayList<Tuple<TimedPlace, SharedPlace>> placesToUnshare = new ArrayList<Tuple<TimedPlace,SharedPlace>>();
-//					for(TimedPlace place : template.model().places()){
-//						if(place.isShared()){
-//							placesToUnshare.add(new Tuple<TimedPlace, SharedPlace>(place, place.sharedPlace()));
-//						}
-//					}
-//					
+										
 					ArrayList<Tuple<TimedTransition, SharedTransition>> transitionsToUnshare = new ArrayList<Tuple<TimedTransition,SharedTransition>>();
 					for(TimedTransition transition : template.model().transitions()){
 						if(transition.isShared()){
@@ -353,7 +346,7 @@ public class TemplateExplorer extends JPanel {
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
 			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
-			Command command = new RenameTemplateCommand(this, template.model(),	template.model().getName(), newName);
+			Command command = new RenameTemplateCommand(this, parent, template.model(), template.model().getName(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();
 		}
