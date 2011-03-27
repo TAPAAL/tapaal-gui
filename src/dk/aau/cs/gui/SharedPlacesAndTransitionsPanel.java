@@ -362,7 +362,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
-		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, undoManager, nameGenerator, placeToEdit);
+		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, new Context(tab), placeToEdit);
 		contentPane.add(panel);
 
 		guiDialog.setResizable(false);

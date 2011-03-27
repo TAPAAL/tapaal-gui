@@ -16,8 +16,6 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
-import pipe.gui.undo.PetriNetObjectNameEdit;
-import dk.aau.cs.gui.undo.Command;
 
 /**
  * <b>PetriNetObject</b> - Petri-Net Object Class<b> - <i>Abstract</i></b>
@@ -182,11 +180,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		}
 	}
 
-	public Command setPNObjectName(String name) {
-		String oldName = this.getName();
-		this.setName(name);
-		return new PetriNetObjectNameEdit(this, oldName, name);
-	}
 
 	public boolean isDeleted() {
 		return deleted || markedAsDeleted;

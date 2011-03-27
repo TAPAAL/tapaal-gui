@@ -612,8 +612,10 @@ public class QueryDialog extends JPanel {
 
 	private void updateQueryOnAtomicPropositionChange() {
 		if (currentSelection != null && currentSelection.getObject() instanceof TCTLAtomicPropositionNode) {
+			Object item = templateBox.getSelectedItem();
+			String template = item.equals(SHARED) ? "" : item.toString();
 			TCTLAtomicPropositionNode property = new TCTLAtomicPropositionNode(
-					templateBox.getSelectedItem().toString(),
+					template,
 					(String) placesBox.getSelectedItem(),
 					(String) relationalOperatorBox.getSelectedItem(),
 					(Integer) placeMarking.getValue());

@@ -14,7 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import pipe.gui.undo.UndoManager;
+import pipe.dataLayer.TAPNQuery;
+import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
 import dk.aau.cs.gui.undo.AddSharedPlaceCommand;
 import dk.aau.cs.gui.undo.RenameSharedPlaceCommand;
@@ -28,19 +29,17 @@ public class SharedPlaceNamePanel extends JPanel {
 	private final SharedPlacesListModel listModel;
 	private JTextField nameField;
 	private SharedPlace placeToEdit;
-	private final UndoManager undoManager;
-	private final NameGenerator nameGenerator;
+	private final Context context;
 
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager, NameGenerator nameGenerator) {
-		this(rootPane, SharedPlacesListModel, undoManager, nameGenerator, null);	
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context) {
+		this(rootPane, SharedPlacesListModel, context, null);	
 	}
 	
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, UndoManager undoManager, NameGenerator nameGenerator, SharedPlace placeToEdit) {
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
 		this.listModel = SharedPlacesListModel;
-		this.undoManager = undoManager;
-		this.nameGenerator = nameGenerator;
 		this.placeToEdit = placeToEdit;
+		this.context = context;
 		initComponents();		
 	}
 	
@@ -91,7 +90,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					}
 					
 					if(success){
-						nameGenerator.updateIndicesForAllModels(name);
+						context.nameGenerator().updateIndicesForAllModels(name);
 						exit();
 					}
 				}
@@ -111,8 +110,12 @@ public class SharedPlaceNamePanel extends JPanel {
 					return false;
 				}
 				
+				for(TAPNQuery query : context.queries()){
+					query.getProperty().accept(new RenameSharedPlaceVisitor(oldName, name), null);
+				}
+				
 				listModel.updatedName();
-				undoManager.addNewEdit(new RenameSharedPlaceCommand(placeToEdit, oldName, name));
+				context.undoManager().addNewEdit(new RenameSharedPlaceCommand(placeToEdit, listModel, context.tabContent(), oldName, name));
 				return true;
 			}
 
@@ -132,7 +135,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					return false;
 				}
 				
-				undoManager.addNewEdit(new AddSharedPlaceCommand(listModel, place));
+				context.undoManager().addNewEdit(new AddSharedPlaceCommand(listModel, place));
 				return true;
 			}
 		});
