@@ -13,8 +13,6 @@ import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
-import dk.aau.cs.petrinet.PetriNetUtil;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.Pairing;
@@ -22,6 +20,11 @@ import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
+// TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
+// with the only difference being in the global declarations:
+// symmetry: typedef scalar[N] id_t;
+// no symmetry: typedef int[1,N] id_t;
+// See e.g. OptimizedStandardTranslation for how its done
 public class BroadcastTranslation implements
 		ModelTranslator<TimedArcPetriNet, NTA>,
 		QueryTranslator<TAPNQuery, UPPAALQuery> {
@@ -49,7 +52,6 @@ public class BroadcastTranslation implements
 	protected static final String LOCK_BOOL = "lock";
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	//protected Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
 	protected Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
 	protected Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
 	protected Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
@@ -436,7 +438,7 @@ public class BroadcastTranslation implements
 		for(TransportArc transArc : t.getTransportArcsGoingThrough()) {
 			Edge e = new Edge(getLocationByName(transArc.source().name()),
 					getLocationByName(transArc.destination().name()),
-					createTransitionGuardWithLock(transArc, transArc.destination(), true), 
+					createTransitionGuardWithLock(transArc, transArc.destination()), 
 					t.name() + "!",
 					"");
 
@@ -460,7 +462,7 @@ public class BroadcastTranslation implements
 		for(TransportArc transArc : t.getTransportArcsGoingThrough()) {
 			Edge e = new Edge(getLocationByName(transArc.source().name()),
 					getLocationByName(transArc.destination().name()),
-					createTransitionGuardWithLock(transArc, transArc.destination(), true), 
+					createTransitionGuardWithLock(transArc, transArc.destination()), 
 					t.name() + (first ? "?" : "!"),
 					"");
 			
@@ -470,7 +472,7 @@ public class BroadcastTranslation implements
 	}
 
 	private String createTransitionGuardWithLock(TimedInputArc inputArc, TimedOutputArc outputArc, TimedPlace timedPlace, boolean isTransportArc) {
-		String guard = createTransitionGuard(inputArc, outputArc, timedPlace, isTransportArc);
+		String guard = convertGuard(inputArc.interval());
 
 		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";
@@ -481,8 +483,9 @@ public class BroadcastTranslation implements
 		return guard;
 	}
 	
-	private String createTransitionGuardWithLock(TransportArc transArc,	TimedPlace destination, boolean isTransportArc) {
-		String guard = createTransitionGuard(transArc, destination, isTransportArc);
+	private String createTransitionGuardWithLock(TransportArc transArc,	TimedPlace destination) {
+		TimeInterval newInterval = transArc.interval().intersect(destination.invariant()); 
+		String guard = convertGuard(newInterval);
 
 		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";
@@ -511,7 +514,7 @@ public class BroadcastTranslation implements
 			inputArcsToCounters.put(inputArc, counter);
 
 			createTestFireStructure(ta, t, pairing, inputArc.source(), 
-					createTransitionGuard(inputArc, pairing.getOutputArcFor(inputArc), pairing.getOutputArcFor(inputArc).destination(), false), 
+					convertGuard(inputArc.interval()), 
 					pairing.getOutputArcFor(inputArc).destination(), 
 					intermediate, counter);
 
@@ -530,8 +533,9 @@ public class BroadcastTranslation implements
 			String counter = String.format(COUNTER_NAME, i);
 			transportArcsToCounters.put(transArc, counter);
 
+			TimeInterval guard = transArc.interval().intersect(transArc.destination().invariant());
 			createTestFireStructure(ta, t, pairing, transArc.source(), 
-					createTransitionGuard(transArc, transArc.destination(), true), 
+					convertGuard(guard), 
 					transArc.destination(), 
 					intermediate, counter);
 
@@ -569,7 +573,7 @@ public class BroadcastTranslation implements
 
 			Location location = getLocationByName(inputPlace);
 			Edge inhibEdge = new Edge(location, location,
-					createTransitionGuard(inhibArc, null, null, false), 
+					convertGuard(inhibArc.interval()), 
 					String.format(TEST_CHANNEL_NAME, t.name(), "?"),
 					String.format(COUNTER_UPDATE, counter, "++"));
 			ta.addTransition(inhibEdge);
@@ -594,55 +598,35 @@ public class BroadcastTranslation implements
 
 		return locations;
 	}
-
-	protected String createTransitionGuard(TimedInputArc inputArc, TimedOutputArc outputArc, TimedPlace timedPlace, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(inputArc.interval().toString(false), timedPlace,	isTransportArc);
-		return createTransitionGuard(newGuard);
-	}
 	
-	protected String createTransitionGuard(TransportArc transArc, TimedPlace destination, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(transArc.interval().toString(false), destination, isTransportArc);
-		return createTransitionGuard(newGuard);
-	}
-
-	protected String createTransitionGuard(String guard) {
-		if (guard.equals("false"))
-			return guard;
-		if (guard.equals("[0,inf)"))
+	private String convertGuard(TimeInterval interval) {
+		if(interval.equals(TimeInterval.ZERO_INF))
 			return "";
-
-		String[] splitGuard = guard.substring(1, guard.length() - 1).split(",");
-		char firstDelim = guard.charAt(0);
-		char secondDelim = guard.charAt(guard.length() - 1);
-
+		
 		StringBuilder builder = new StringBuilder();
 		builder.append(TOKEN_CLOCK_NAME);
-		builder.append(" ");
-
-		if (firstDelim == '(') {
-			builder.append(">");
-		} else {
-			builder.append(">=");
-		}
-
-		builder.append(splitGuard[0]);
-
-		if (!splitGuard[1].equals("inf")) {
+		if(interval.IsLowerBoundNonStrict())
+			builder.append(" >= ");
+		else
+			builder.append(" > ");
+		
+		builder.append(interval.lowerBound().value());
+		
+		if(!interval.upperBound().equals(Bound.Infinity)) {
 			builder.append(" && ");
 			builder.append(TOKEN_CLOCK_NAME);
-			builder.append(" ");
-
-			if (secondDelim == ')') {
-				builder.append("<");
-			} else {
-				builder.append("<=");
-			}
-			builder.append(splitGuard[1]);
+			
+			if(interval.IsUpperBoundNonStrict())
+				builder.append(" <= ");
+			else
+				builder.append(" < ");
+			
+			builder.append(interval.upperBound().value());
 		}
-
+		
 		return builder.toString();
 	}
-
+	
 	protected String convertInvariant(TimedPlace p) {
 		String inv = "";
 		TimeInvariant invariant = p.invariant();

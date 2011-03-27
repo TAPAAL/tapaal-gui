@@ -1,4 +1,4 @@
-package dk.aau.cs.petrinet;
+package dk.aau.cs.model.tapn;
 
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 

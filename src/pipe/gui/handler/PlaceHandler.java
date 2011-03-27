@@ -22,7 +22,6 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 

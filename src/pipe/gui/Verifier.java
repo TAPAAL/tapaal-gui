@@ -47,8 +47,7 @@ public class Verifier {
 		optimizer.analyze();
 	}
 
-	public static void analyseKBounded(TimedArcPetriNetNetwork tapnNetwork,
-			int k) {
+	public static void analyseKBounded(TimedArcPetriNetNetwork tapnNetwork, int k) {
 		Verifyta verifyta = getVerifyta();
 
 		if (!verifyta.isCorrectVersion()) {
@@ -84,7 +83,7 @@ public class Verifier {
 			RunVerificationBase thread = new RunVerification(verifyta, new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.petrinet.TAPNQuery(input.getProperty(), input.getCapacity() + timedArcPetriNetNetwork.marking().size()));
+			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity() + timedArcPetriNetNetwork.marking().size()));
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -111,7 +110,7 @@ public class Verifier {
 			RunVerificationBase thread = new RunVerification(verifytapn, new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.petrinet.TAPNQuery(query.getProperty(), bound));
+			thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), bound));
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),

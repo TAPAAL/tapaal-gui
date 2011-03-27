@@ -6,11 +6,8 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
-import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class RemoveTemplateCommand extends AddTemplateCommand {

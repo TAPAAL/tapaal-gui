@@ -9,7 +9,6 @@ import dk.aau.cs.TA.NTA;
 import dk.aau.cs.TA.SupQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.model.tapn.*;
 
 public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastTranslation {

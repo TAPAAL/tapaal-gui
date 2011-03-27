@@ -12,6 +12,7 @@ import javax.swing.text.*;
 import javax.swing.undo.*;
 
 import pipe.dataLayer.*;
+import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.*;
 import pipe.gui.*;
 import dk.aau.cs.TCTL.*;
@@ -1732,18 +1733,13 @@ public class QueryDialog extends JPanel {
 						TAPNComposer composer = new TAPNComposer();
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
-						// TODO: Get rid of this step by changing the underlying translations
-						// etc.
-						NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
-						dk.aau.cs.petrinet.TimedArcPetriNet tapn = transformer.transformModel(transformedModel.value1());
-
 						TAPNQuery tapnQuery = getQuery();
-						dk.aau.cs.petrinet.TAPNQuery clonedQuery = new dk.aau.cs.petrinet.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity() + tapnNetwork.marking().size());
-
+						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity() + tapnNetwork.marking().size());
+						
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
-
-						exporter.export(transformedModel.value1(), tapn, clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
+						
+						exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
 					} else {
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
 						"No Uppaal XML file saved.");

@@ -8,10 +8,8 @@ package pipe.gui;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -34,20 +32,7 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.SearchOption;
-import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.FileBrowser;
-import dk.aau.cs.debug.Logger;
-import dk.aau.cs.petrinet.PipeTapnToAauTapnTransformer;
-import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.degree2converters.NaiveDegree2Converter;
-import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.translations.tapn.BroadcastTranslation;
-import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
-import dk.aau.cs.translations.tapn.OptimizedStandardSymmetryTranslation;
-import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
-import dk.aau.cs.translations.tapn.StandardTranslation;
 
 /**
  * Class for exporting things to other formats, as well as printing.

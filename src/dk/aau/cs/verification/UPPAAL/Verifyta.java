@@ -14,13 +14,12 @@ import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TA.trace.UppaalTrace;
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.NewModelToOldModelTransformer;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.VerificationOptions;
@@ -190,11 +189,8 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {
-		NewModelToOldModelTransformer transformer = new NewModelToOldModelTransformer();
-		dk.aau.cs.petrinet.TimedArcPetriNet transformedModel = transformer.transformModel(model.value1());
-		
 		UppaalExporter exporter = new UppaalExporter();
-		ExportedModel exportedModel = exporter.export(model.value1(), transformedModel, query, ((VerifytaOptions) options).getReduction());
+		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");

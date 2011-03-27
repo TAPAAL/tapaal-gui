@@ -7,8 +7,8 @@ import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
@@ -28,8 +28,7 @@ public class KBoundAnalyzer {
 		this.messenger = messenger;
 	}
 
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker,
-			Messenger messenger) {
+	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker, Messenger messenger) {
 		return new RunKBoundAnalysis(modelChecker, messenger);
 	}
 
@@ -38,8 +37,7 @@ public class KBoundAnalyzer {
 		VerifytaOptions options = verificationOptions();
 
 		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker, messenger);
-		RunningVerificationDialog dialog = new RunningVerificationDialog(
-				CreateGui.getApp());
+		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 		dialog.setupListeners(analyzer);
 
 		analyzer.execute(options, tapnNetwork, query);
@@ -47,15 +45,13 @@ public class KBoundAnalyzer {
 	}
 
 	protected VerifytaOptions verificationOptions() {
-		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false,
-				ReductionOption.KBOUNDANALYSIS);
+		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS);
 	}
 
 	protected TAPNQuery getBoundednessQuery(int tokensInModel) {
 		TCTLAbstractProperty property = null;
 
-		property = new TCTLEFNode(new TCTLAtomicPropositionNode("P_capacity",
-				"=", 0));
+		property = new TCTLEFNode(new TCTLAtomicPropositionNode("_BOTTOM_", "=", 0));
 
 		return new TAPNQuery(property, k + 1 + tokensInModel);
 	}

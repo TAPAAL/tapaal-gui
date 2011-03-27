@@ -5,15 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.verification.VerifyTAPN.ExportedVerifyTAPNModel;
 
 public class VerifyTAPNExporter {

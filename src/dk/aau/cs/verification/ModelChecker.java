@@ -1,8 +1,8 @@
 package dk.aau.cs.verification;
 
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.petrinet.TAPNQuery;
 
 import dk.aau.cs.util.Tuple;
 

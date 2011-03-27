@@ -11,7 +11,7 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.model.tapn.TAPNQuery;
 
 public abstract class QueryVisitor implements ITCTLVisitor {
 	protected enum QueryType {

@@ -13,8 +13,6 @@ import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
-import dk.aau.cs.petrinet.PetriNetUtil;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.Degree2Converter;
 import dk.aau.cs.translations.Degree2Pairing;
@@ -23,6 +21,11 @@ import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
+//TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
+//with the only difference being in the global declarations:
+//symmetry: typedef scalar[N] id_t;
+//no symmetry: typedef int[1,N] id_t;
+//See e.g. OptimizedStandardTranslation for how its done
 public class Degree2BroadcastTranslation implements
 		ModelTranslator<TimedArcPetriNet, NTA>,
 		QueryTranslator<TAPNQuery, UPPAALQuery> {
@@ -51,7 +54,7 @@ public class Degree2BroadcastTranslation implements
 	private Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
 	private Hashtable<String, Hashtable<String, String>> arcGuards = new Hashtable<String, Hashtable<String, String>>();
 	
-	private List<TimedTransition> retainedDegree2Transitions;
+	private List<TimedTransition> retainedTransitions;
 	
 	private int numberOfInitChannels = 0;
 	protected int extraTokens = 0;
@@ -78,7 +81,7 @@ public class Degree2BroadcastTranslation implements
 			
 			Degree2Converter converter = new Degree2Converter();
 			degree2Model = converter.transformModel(conservativeModel);
-			retainedDegree2Transitions = converter.getRetainedTransitions();
+			retainedTransitions = converter.getRetainedTransitions();
 		} catch (Exception e) {
 			return null;
 		}
@@ -173,7 +176,7 @@ public class Degree2BroadcastTranslation implements
 					builder.append(t.name() + DEG1_SUFFIX);
 					builder.append(";\n");
 			}
-			else if (retainedDegree2Transitions.contains(t)) {
+			else if (retainedTransitions.contains(t)) {
 				builder.append("chan ");
 				builder.append(t.name() + DEG2_SUFFIX);
 				builder.append(";\n");
@@ -285,7 +288,7 @@ public class Degree2BroadcastTranslation implements
 
 	private void createEdgesForControlAutomaton(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel, TimedAutomaton control) {
 		for (TimedTransition transition : degree2Net.transitions()) {
-			if (!retainedDegree2Transitions.contains(transition)) {
+			if (!retainedTransitions.contains(transition)) {
 				Degree2Pairing pairing = new Degree2Pairing(transition);
 				
 				for(TimedInputArc inputArc : transition.getInputArcs()) {
@@ -373,7 +376,7 @@ public class Degree2BroadcastTranslation implements
 			
 			Degree2Pairing pairing = new Degree2Pairing(transition);
 			
-			if (retainedDegree2Transitions.contains(transition)) {
+			if (retainedTransitions.contains(transition)) {
 					boolean first = true;
 					String suffix = isTransitionDegree1(transition) ? DEG1_SUFFIX : DEG2_SUFFIX;
 					
@@ -407,7 +410,7 @@ public class Degree2BroadcastTranslation implements
 					if(isPartOfLockTemplate(inputArc.source().name()))
 						continue;
 					
-					String guard = createTransitionGuard(inputArc, pairing.getOutputArcFor(inputArc).destination(), false);
+					String guard = convertGuard(inputArc.interval());
 					Edge e = new Edge(getLocationByName(inputArc.source().name()),
 							getLocationByName(pairing.getOutputArcFor(inputArc).destination().name()),
 							guard, transition.name() + "?",
@@ -418,7 +421,8 @@ public class Degree2BroadcastTranslation implements
 				}
 				
 				for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
-					String guard = createTransitionGuardWithLock(transArc, transArc.destination(), true);
+					TimeInterval newGuard = transArc.interval().intersect(transArc.destination().invariant());
+					String guard = convertGuard(newGuard);
 					Edge e = new Edge(getLocationByName(transArc.source().name()),
 							getLocationByName(transArc.destination().name()),
 							guard, transition.name() + "?", "");
@@ -432,8 +436,7 @@ public class Degree2BroadcastTranslation implements
 
 	
 
-	private void saveGuard(String transitionName, String inputPlaceName,
-			String guard) {
+	private void saveGuard(String transitionName, String inputPlaceName, String guard) {
 		String originalTransitionName = getOriginalTransitionName(transitionName);
 		if (originalTransitionName != null && !originalTransitionName.isEmpty()) {
 			if (!arcGuards.containsKey(originalTransitionName)) {
@@ -510,7 +513,7 @@ public class Degree2BroadcastTranslation implements
 					inhibitorArcsToCounters.put(inhibArc, counter);
 
 					Edge e = new Edge(getLocationByName(source),
-							getLocationByName(source), createTransitionGuard(inhibArc, null, false), 
+							getLocationByName(source), convertGuard(inhibArc.interval()), 
 							String.format(TEST_CHANNEL, inhibArc.destination().name(),"?"), 
 							String.format(COUNTER_UPDATE,counter, "=true"));
 					ta.addTransition(e);
@@ -618,18 +621,8 @@ public class Degree2BroadcastTranslation implements
 		return builder.toString();
 	}
 
-	protected String createTransitionGuard(TimedInputArc inputArc, TimedPlace targetPlace, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(inputArc.interval().toString(false), targetPlace, isTransportArc);
-		return createTransitionGuard(newGuard);
-	}
-	
-	protected String createTransitionGuard(TransportArc transArc, TimedPlace targetPlace, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(transArc.interval().toString(false), targetPlace, isTransportArc);
-		return createTransitionGuard(newGuard);
-	}
-
 	protected String createTransitionGuardWithLock(TimedInputArc inputArc, TimedPlace targetPlace, boolean isTransportArc) {
-		String guard = createTransitionGuard(inputArc, targetPlace, isTransportArc);
+		String guard = convertGuard(inputArc.interval());
 
 		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";
@@ -638,10 +631,39 @@ public class Degree2BroadcastTranslation implements
 		}
 
 		return guard;
+	}
+	
+	private String convertGuard(TimeInterval interval) {
+		if(interval.equals(TimeInterval.ZERO_INF))
+			return "";
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append(CLOCK_NAME);
+		if(interval.IsLowerBoundNonStrict())
+			builder.append(" >= ");
+		else
+			builder.append(" > ");
+		
+		builder.append(interval.lowerBound().value());
+		
+		if(!interval.upperBound().equals(Bound.Infinity)) {
+			builder.append(" && ");
+			builder.append(CLOCK_NAME);
+			
+			if(interval.IsUpperBoundNonStrict())
+				builder.append(" <= ");
+			else
+				builder.append(" < ");
+			
+			builder.append(interval.upperBound().value());
+		}
+		
+		return builder.toString();
 	}
 	
 	private String createTransitionGuardWithLock(TransportArc transArc, TimedPlace targetPlace, boolean isTransportArc) {
-		String guard = createTransitionGuard(transArc, targetPlace, isTransportArc);
+		TimeInterval newGuard = transArc.interval().intersect(targetPlace.invariant());
+		String guard = convertGuard(newGuard);
 
 		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";
@@ -650,44 +672,6 @@ public class Degree2BroadcastTranslation implements
 		}
 
 		return guard;
-	}
-
-	protected String createTransitionGuard(String guard) {
-		if (guard.equals("false"))
-			return guard;
-		if (guard.equals("[0,inf)"))
-			return "";
-
-		String[] splitGuard = guard.substring(1, guard.length() - 1).split(",");
-		char firstDelim = guard.charAt(0);
-		char secondDelim = guard.charAt(guard.length() - 1);
-
-		StringBuilder builder = new StringBuilder();
-		builder.append(CLOCK_NAME);
-		builder.append(" ");
-
-		if (firstDelim == '(') {
-			builder.append(">");
-		} else {
-			builder.append(">=");
-		}
-
-		builder.append(splitGuard[0]);
-
-		if (!splitGuard[1].equals("inf")) {
-			builder.append(" && ");
-			builder.append(CLOCK_NAME);
-			builder.append(" ");
-
-			if (secondDelim == ')') {
-				builder.append("<");
-			} else {
-				builder.append("<=");
-			}
-			builder.append(splitGuard[1]);
-		}
-
-		return builder.toString();
 	}
 
 	private String createResetExpressionForNormalArc() {

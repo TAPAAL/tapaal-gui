@@ -1,16 +1,16 @@
 package dk.aau.cs.translations.tapn;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.TA.*;
 import dk.aau.cs.TCTL.visitors.StandardSymmetryTranslationQueryVisitor;
 import dk.aau.cs.TCTL.visitors.StandardTranslationQueryVisitor;
-import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -19,32 +19,18 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.petrinet.Arc;
-import dk.aau.cs.petrinet.Place;
-import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.TAPNArc;
-import dk.aau.cs.petrinet.TAPNPlace;
-import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.TAPNTransition;
-import dk.aau.cs.petrinet.TAPNTransportArc;
-import dk.aau.cs.petrinet.Transition;
-import dk.aau.cs.translations.Degree2Converter;
 import dk.aau.cs.translations.Degree2Pairing;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.NonOptimizingDegree2Converter;
 import dk.aau.cs.translations.QueryTranslator;
+import dk.aau.cs.translations.TranslationNamingScheme;
+import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 
-/*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>, Joakim Byg <jokke@cs.aau.dk>
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
- * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of the TAPAAL nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
- */
+//TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
+//with the only difference being in the global declarations:
+//symmetry: typedef scalar[N] id_t;
+//no symmetry: typedef int[1,N] id_t;
+//See e.g. OptimizedStandardTranslation for how its done
 public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, NTA>, QueryTranslator<TAPNQuery, UPPAALQuery> {
 
 	protected static final String ID_TYPE = "pid_t";
@@ -357,6 +343,72 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, NT
 		} else {
 			StandardTranslationQueryVisitor visitor = new StandardTranslationQueryVisitor(query.getTotalTokens());	
 			return new StandardUPPAALQuery(visitor.getUppaalQueryFor(query));
+		}
+	}
+
+	public TranslationNamingScheme namingScheme() {
+		return new StandardNamingScheme();
+	}
+	
+	protected class StandardNamingScheme implements TranslationNamingScheme {
+		private static final int NOT_FOUND = -1;
+		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1_in$";
+		private final String DEG1_START_OF_SEQUENCE_PATTERN = "^(\\w+?)_1$";
+		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
+		private Pattern deg1StartPattern = Pattern.compile(DEG1_START_OF_SEQUENCE_PATTERN);
+		private Pattern ignoredPlacePattern = Pattern.compile("^P_lock|_BOTTOM_|\\w+_\\d+|\\w+_\\d+_(?:in|out)|P_hp_\\w+_\\d+$");;
+		private final SequenceInfo seqInfo = SequenceInfo.WHOLE;
+
+		public TransitionTranslation[] interpretTransitionSequence(List<String> firingSequence) {
+			List<TransitionTranslation> transitionTranslations = new ArrayList<TransitionTranslation>();
+
+			int startIndex = NOT_FOUND;
+			String originalTransitionName = null;
+			for (int i = 0; i < firingSequence.size(); i++) {
+				String transitionName = firingSequence.get(i);
+				Matcher startMatcher = startPattern.matcher(transitionName);
+
+				boolean isStartTransition = startMatcher.matches();
+				
+				if (isStartTransition) {
+					if (startIndex != NOT_FOUND) {
+						transitionTranslations.add(new TransitionTranslation(startIndex, i - 1,	originalTransitionName, seqInfo));
+					}
+					startIndex = i;
+					originalTransitionName = startMatcher.group(1);
+				} else {
+					Matcher deg1StartMatcher = deg1StartPattern.matcher(transitionName);
+					isStartTransition = deg1StartMatcher.matches();
+					
+					if(isStartTransition) {
+						if (startIndex != NOT_FOUND) {
+							transitionTranslations.add(new TransitionTranslation(startIndex, i - 1,	originalTransitionName, seqInfo));
+						}
+						startIndex = i;
+						originalTransitionName = deg1StartMatcher.group(1);
+					}
+				}
+			}
+
+			if (startIndex != NOT_FOUND) {
+				transitionTranslations.add(new TransitionTranslation(startIndex, firingSequence.size() - 1, originalTransitionName, seqInfo));
+			}
+			TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
+			transitionTranslations.toArray(array);
+			return array;
+		}
+
+		public String tokenClockName() {
+			return "x";
+		}
+
+		public boolean isIgnoredPlace(String location) {
+			Matcher matcher = ignoredPlacePattern.matcher(location);
+			return matcher.matches();
+		}
+
+		public boolean isIgnoredAutomata(String automata) {
+			return false;
 		}
 	}
 }

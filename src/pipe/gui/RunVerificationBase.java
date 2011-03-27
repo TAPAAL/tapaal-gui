@@ -6,11 +6,11 @@ import javax.swing.SwingWorker;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-import dk.aau.cs.petrinet.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;

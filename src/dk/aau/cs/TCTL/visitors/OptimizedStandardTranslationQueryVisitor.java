@@ -10,11 +10,10 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String FINISH = "finish";
 	protected static final String LOCK_BOOL = "lock";
 
-	protected static final String TOKEN_TEMPLATE_NAME = "P";
+	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
-			Object context) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 		append("(sum(i:");
 		append(ID_TYPE);
 		append(")");
