@@ -147,11 +147,11 @@ public class TikZExporter {
 		for (Transition trans : transitions) {
 			String angle = "";
 			if (trans.getAngle() != 0)
-				angle = "rotate=" + String.valueOf(trans.getAngle()) + ",";
+				angle = ",rotate=" + String.valueOf(trans.getAngle());
 
-			out.append("\\node[transition,");
+			out.append("\\node[transition");
 			out.append(angle);
-			out.append("label=above:");
+			out.append(",label=above:");
 			out.append(exportMathName(trans.getName()));
 			out.append("] at (");
 			out.append(trans.getPositionX() * scale);
@@ -160,6 +160,14 @@ public class TikZExporter {
 			out.append(") (");
 			out.append(trans.getId());
 			out.append(") {};\n");
+			
+			if(((TimedTransitionComponent)trans).underlyingTransition().isShared()){
+				out.append("\\node[sharedtransition");
+				out.append(angle);
+				out.append("] at (");
+				out.append(trans.getId());
+				out.append(".center) { };\n");
+			}
 		}
 		return out;
 	}
@@ -167,7 +175,6 @@ public class TikZExporter {
 	private StringBuffer exportPlacesWithTokens(Place[] places) {
 		StringBuffer out = new StringBuffer();
 		for (Place place : places) {
-
 			String invariant = getPlaceInvariantString(place);
 			String tokensInPlace = getTokenListStringFor(place);
 
@@ -183,19 +190,23 @@ public class TikZExporter {
 			out.append(") (");
 			out.append(place.getId());
 			out.append(") {};\n");
+			
+			if(((TimedPlaceComponent)place).underlyingPlace().isShared()){
+				out.append("\\node[sharedplace] at (");
+				out.append(place.getId());
+				out.append(".center) { };\n");
+			}
 		}
 
 		return out;
 	}
 
 	protected String getTokenListStringFor(Place place) {
-		ArrayList<BigDecimal> tokens = ((TimedPlaceComponent) place)
-				.getTokens();
+		ArrayList<BigDecimal> tokens = ((TimedPlaceComponent) place).getTokens();
 		String tokensInPlace = "";
 		if (tokens.size() > 0) {
 			if (tokens.size() == 1 && !net.netType().equals(NetType.UNTIMED)) {
-				tokensInPlace = "structured tokens={"
-						+ tokens.get(0).setScale(1) + "},";
+				tokensInPlace = "structured tokens={" + tokens.get(0).setScale(1) + "},";
 			} else {
 				tokensInPlace = exportMultipleTokens(tokens);
 			}
@@ -204,15 +215,11 @@ public class TikZExporter {
 	}
 
 	protected String getPlaceInvariantString(Place place) {
-		if (net.netType().equals(NetType.UNTIMED))
-			return "";
+		if (net.netType().equals(NetType.UNTIMED)) return "";
 		String invariant = "";
 
-		if (!((TimedPlaceComponent) place).getInvariantAsString().contains(
-				"inf"))
-			invariant = "label=below:inv: "
-					+ replaceWithMathLatex(((TimedPlaceComponent) place)
-							.getInvariantAsString()) + ",";
+		if (!((TimedPlaceComponent) place).getInvariantAsString().contains("inf"))
+			invariant = "label=below:inv: " + replaceWithMathLatex(((TimedPlaceComponent) place).getInvariantAsString()) + ",";
 		return invariant;
 	}
 
@@ -242,16 +249,15 @@ public class TikZExporter {
 		if (!net.netType().equals(NetType.UNTIMED))
 			out.append("\\tikzstyle{transportArc}=[->,>=diamond,thick]\n");
 		out.append("\\tikzstyle{every place}=[minimum size=6mm,thick]\n");
-		out
-				.append("\\tikzstyle{every transition} = [fill=black,minimum width=2mm,minimum height=5mm]\n");
+		out.append("\\tikzstyle{every transition} = [fill=black,minimum width=2mm,minimum height=5mm]\n");
 		out.append("\\tikzstyle{every token}=[fill=white,text=black]\n");
+		out.append("\\tikzstyle{sharedplace}=[place,minimum size=7.5mm,dashed,thin]\n");
+		out.append("\\tikzstyle{sharedtransition}=[transition, fill opacity=0, minimum width=3.5mm, minimum height=6.5mm,dashed]\n");
 		return out;
 	}
 
 	protected String replaceWithMathLatex(String text) {
-		return "$"
-				+ text.replace("inf", "\\infty").replace("<=", "\\leq ")
-						.replace("*", "\\cdot ") + "$";
+		return "$" + text.replace("inf", "\\infty").replace("<=", "\\leq ").replace("*", "\\cdot ") + "$";
 	}
 
 	private String exportMathName(String name) {
