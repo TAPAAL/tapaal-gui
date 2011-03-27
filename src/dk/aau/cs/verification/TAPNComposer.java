@@ -1,5 +1,8 @@
 package dk.aau.cs.verification;
 
+import java.util.HashSet;
+
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -19,34 +22,135 @@ public class TAPNComposer {
 	private int nextPlaceIndex;
 	private int nextTransitionIndex;
 
+	private HashSet<String> processedSharedObjects;
+
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(
 			TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
 		nextTransitionIndex = -1;
+		processedSharedObjects = new HashSet<String>();
 		TimedArcPetriNet tapn = new TimedArcPetriNet("ComposedModel");
 		NameMapping mapping = new NameMapping();
 
-		CreatePlaces(model, tapn, mapping);
-		CreateTransitions(model, tapn, mapping);
-		CreateInputArcs(model, tapn, mapping);
-		CreateOutputArcs(model, tapn, mapping);
-		CreateTransportArcs(model, tapn, mapping);
-		CreateInhibitorArcs(model, tapn, mapping);
+		createSharedPlaces(model, tapn, mapping);
+		createPlaces(model, tapn, mapping);
+		createTransitions(model, tapn, mapping);
+		createInputArcs(model, tapn, mapping);
+		createOutputArcs(model, tapn, mapping);
+		createTransportArcs(model, tapn, mapping);
+		createInhibitorArcs(model, tapn, mapping);
+
+		dumpToConsole(tapn, mapping);
 
 		return new Tuple<TimedArcPetriNet, NameMapping>(tapn, mapping);
 	}
 
-	private void CreatePlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
+	private void dumpToConsole(TimedArcPetriNet tapn, NameMapping mapping) {
+		System.out.println("Composed Model:");
+		System.out.println("PLACES:");
+		for(TimedPlace place : tapn.places()){
+			System.out.print("\t");
+			System.out.print(place.name());
+			System.out.print(", invariant: ");
+			System.out.print(place.invariant().toString());
+			System.out.print(" (Original: ");
+			System.out.print(mapping.map(place.name()));
+			System.out.println(")");
+		}
+
+		System.out.println();
+		System.out.println("TRANSITIONS:");
+		for(TimedTransition transition : tapn.transitions()){
+			System.out.print("\t");
+			System.out.print(transition.name());
+			System.out.print(" (Original: ");
+			System.out.print(mapping.map(transition.name()).toString());
+			System.out.println(")");
+		}
+
+		System.out.println();
+		System.out.println("INPUT ARCS:");
+		for(TimedInputArc arc : tapn.inputArcs()){
+			System.out.print("\tSource: ");
+			System.out.print(arc.source().name());
+			System.out.print(", Target: ");
+			System.out.print(arc.destination().name());
+			System.out.print(", Interval: ");
+			System.out.println(arc.interval().toString());
+		}
+
+		System.out.println();
+		System.out.println("OUTPUT ARCS:");
+		for(TimedOutputArc arc : tapn.outputArcs()){
+			System.out.print("\tSource: ");
+			System.out.print(arc.source().name());
+			System.out.print(", Target: ");
+			System.out.println(arc.destination().name());
+		}
+
+		System.out.println();
+		System.out.println("TRANSPORT ARCS:");
+		for(TransportArc arc : tapn.transportArcs()){
+			System.out.print("\tSource: ");
+			System.out.print(arc.source().name());
+			System.out.print(", Transition: ");
+			System.out.print(arc.transition().name());
+			System.out.print(", Target: ");
+			System.out.print(arc.destination().name());
+			System.out.print(", Interval: ");
+			System.out.println(arc.interval().toString());
+		}
+
+		System.out.println();
+		System.out.println("INHIBITOR ARCS:");
+		for(TimedInhibitorArc arc : tapn.inhibitorArcs()){
+			System.out.print("\tSource: ");
+			System.out.print(arc.source().name());
+			System.out.print(", Target: ");
+			System.out.print(arc.destination().name());
+			System.out.print(", Interval: ");
+			System.out.println(arc.interval().toString());
+		}
+
+		System.out.println();
+		System.out.println("MARKING:");
+		for(TimedPlace place : tapn.places()){
+			for(TimedToken token : place.tokens()){
+				System.out.print(token.toString());
+				System.out.print(", ");
+			}
+		}
+		System.out.println();
+		System.out.println();
+	}
+	
+	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
+		for(SharedPlace place : model.sharedPlaces()){
+			String uniquePlaceName = getUniquePlaceName();
+			
+			LocalTimedPlace constructedPlace = new LocalTimedPlace(uniquePlaceName, place.invariant());
+			constructedModel.add(constructedPlace);
+			mapping.addMappingForShared(place.name(), uniquePlaceName);
+
+			for (TimedToken token : place.tokens()) {
+				constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
+			}
+		}
+	}
+
+	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedPlace timedPlace : tapn.places()) {
-				String uniquePlaceName = getUniquePlaceName();
+				if(!timedPlace.isShared()){
+					String uniquePlaceName = getUniquePlaceName();
 
-				LocalTimedPlace place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
-				constructedModel.add(place);
-				mapping.addMapping(tapn.getName(), timedPlace.name(), uniquePlaceName);
+					LocalTimedPlace place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
+					constructedModel.add(place);
+					mapping.addMapping(tapn.getName(), timedPlace.name(), uniquePlaceName);
 
-				for (TimedToken token : timedPlace.tokens()) {
-					place.addToken(new TimedToken(place, token.age()));
+					for (TimedToken token : timedPlace.tokens()) {
+						place.addToken(new TimedToken(place, token.age()));
+					}
 				}
 			}
 		}
@@ -57,15 +161,21 @@ public class TAPNComposer {
 		return String.format(PLACE_FORMAT, nextPlaceIndex);
 	}
 
-	private void CreateTransitions(TimedArcPetriNetNetwork model,
-			TimedArcPetriNet constructedModel, NameMapping mapping) {
+	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedTransition timedTransition : tapn.transitions()) {
-				String uniqueTransitionName = getUniqueTransitionName();
+				if(!processedSharedObjects.contains(timedTransition.name())){
+					String uniqueTransitionName = getUniqueTransitionName();
 
-				constructedModel.add(new TimedTransition(uniqueTransitionName));
-				mapping.addMapping(tapn.getName(), timedTransition.name(),
-						uniqueTransitionName);
+					constructedModel.add(new TimedTransition(uniqueTransitionName));
+					if(timedTransition.isShared()){
+						String name = timedTransition.sharedTransition().name();
+						processedSharedObjects.add(name);
+						mapping.addMappingForShared(name, uniqueTransitionName);
+					}else{
+						mapping.addMapping(tapn.getName(), timedTransition.name(), uniqueTransitionName);
+					}
+				}
 			}
 		}
 	}
@@ -75,49 +185,63 @@ public class TAPNComposer {
 		return String.format(TRANSITION_FORMAT, nextTransitionIndex);
 	}
 
-	private void CreateInputArcs(TimedArcPetriNetNetwork model,
+	private void createInputArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedInputArc arc : tapn.inputArcs()) {
-				TimedPlace source = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.source().name()));
-				TimedTransition target = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.destination().name()));
+				String template = arc.source().isShared() ? "" : tapn.getName();
+				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
+				
+				template = arc.destination().isShared() ? "" : tapn.getName();
+				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TimedInputArc(source, target, arc.interval()));
 			}
 		}
 	}
 
-	private void CreateOutputArcs(TimedArcPetriNetNetwork model,
+	private void createOutputArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedOutputArc arc : tapn.outputArcs()) {
-				TimedTransition source = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.source().name()));
-				TimedPlace target = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.destination().name()));
+				String template = arc.source().isShared() ? "" : tapn.getName();
+				TimedTransition source = constructedModel.getTransitionByName(mapping.map(template, arc.source().name()));
+
+				template = arc.destination().isShared() ? "" : tapn.getName();
+				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TimedOutputArc(source, target));
 			}
 		}
 	}
 
-	private void CreateTransportArcs(TimedArcPetriNetNetwork model,
+	private void createTransportArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TransportArc arc : tapn.transportArcs()) {
-				TimedPlace source = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.source().name()));
-				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.transition().name()));
-				TimedPlace target = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.destination().name()));
+				String template = arc.source().isShared() ? "" : tapn.getName();
+				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
+				
+				template = arc.transition().isShared() ? "" : tapn.getName();
+				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(template, arc.transition().name()));
+				
+				template = arc.destination().isShared() ? "" : tapn.getName();
+				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TransportArc(source, transition,target, arc.interval()));
 			}
 		}
 	}
 
-	private void CreateInhibitorArcs(TimedArcPetriNetNetwork model,
+	private void createInhibitorArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
-				TimedPlace source = constructedModel.getPlaceByName(mapping.map(tapn.getName(), arc.source().name()));
-				TimedTransition target = constructedModel.getTransitionByName(mapping.map(tapn.getName(), arc.destination().name()));
+				String template = arc.source().isShared() ? "" : tapn.getName();
+				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
+
+				template = arc.destination().isShared() ? "" : tapn.getName();
+				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TimedInhibitorArc(source, target, arc.interval()));
 			}

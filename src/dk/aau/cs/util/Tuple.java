@@ -16,6 +16,11 @@ public class Tuple<T1, T2> {
 	public T2 value2() {
 		return value2;
 	}
+	
+	@Override
+	public String toString() {
+		return value1.toString() + "," + value2.toString();
+	}
 
 	@Override
 	public int hashCode() {

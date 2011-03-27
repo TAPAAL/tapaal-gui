@@ -35,15 +35,6 @@ public class TimedArcPetriNet {
 		return parentNetwork;
 	}
 
-	//	public void add(TimedPlace place) {
-	//		Require.that(place != null, "Argument must be a non-null place");
-	//		Require.that(!isNameUsed(place.name()) || place.isShared(), "A place or transition with the specified name already exists in the petri net.");
-	//
-	//		place.setModel(this);
-	//		places.add(place);
-	//		place.setCurrentMarking(currentMarking);
-	//	}
-
 	public void add(TimedPlace place) {
 		Require.that(place != null, "Argument must be a non-null place");
 		Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name already exists in the petri net.");

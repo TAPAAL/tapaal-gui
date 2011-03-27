@@ -13,6 +13,9 @@ public class NameMapping {
 		originalToMappedNames = new HashMap<Tuple<String, String>, String>();
 	}
 
+	public void addMappingForShared(String objectName, String mappedName){
+		this.addMapping("", objectName, mappedName);
+	}
 	public void addMapping(String templateName, String objectName, String mappedName) {
 		Tuple<String, String> value = new Tuple<String, String>(templateName, objectName);
 		if (mappedNamesToOriginalNames.containsKey(mappedName))
@@ -27,7 +30,7 @@ public class NameMapping {
 	public Tuple<String, String> map(String key) {
 		return mappedNamesToOriginalNames.get(key);
 	}
-
+	
 	public String map(String templateName, String objectName) {
 		return originalToMappedNames.get(new Tuple<String, String>(templateName, objectName));
 	}

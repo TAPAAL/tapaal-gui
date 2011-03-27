@@ -70,7 +70,6 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, NT
 		this.useSymmetry = useSymmetry;
 	}
 	
-	@Override
 	public NTA transformModel(TimedArcPetriNet model) throws Exception {
 		clearLocationMappings();
 		numberOfInitChannels = 0;
@@ -351,7 +350,6 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, NT
 		return matcher.find();
 	}
 	
-	@Override
 	public UPPAALQuery transformQuery(TAPNQuery query) throws Exception {
 		if(useSymmetry) {
 			StandardSymmetryTranslationQueryVisitor visitor = new StandardSymmetryTranslationQueryVisitor();
