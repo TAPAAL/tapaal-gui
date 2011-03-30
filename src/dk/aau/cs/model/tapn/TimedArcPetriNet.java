@@ -57,11 +57,10 @@ public class TimedArcPetriNet {
 		Require.that(places.contains(arc.source()),	"The source place must be part of the petri net.");
 		Require.that(transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
 		Require.that(!inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
-		//Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition");
+		Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition"); // TODO: this was commented out, not sure why
 
 		arc.setModel(this);
 		inputArcs.add(arc);
-		//arc.source().addToPostset(arc);// TODO: TimedPlaceInterface FIXME
 		arc.destination().addToPreset(arc);
 	}
 
@@ -70,12 +69,11 @@ public class TimedArcPetriNet {
 		Require.that(places.contains(arc.destination()), "The destination place must be part of the petri net.");
 		Require.that(transitions.contains(arc.source()), "The source transition must be part of the petri net");
 		Require.that(!outputArcs.contains(arc),	"The specified arc is already a part of the petri net.");
-		//Require.that(!hasArcFromTransitionToPlace(arc.source(), arc.destination()),	"Cannot have two arcs between the same transition and place");
+		Require.that(!hasArcFromTransitionToPlace(arc.source(), arc.destination()),	"Cannot have two arcs between the same transition and place"); // TODO: this was commented out, not sure why
 
 		arc.setModel(this);
 		outputArcs.add(arc);
 		arc.source().addToPostset(arc);
-		// 		arc.destination().addToPreset(arc);// TODO: TimedPlaceInterface FIXME
 	}
 
 	public void add(TimedInhibitorArc arc) {
@@ -87,7 +85,6 @@ public class TimedArcPetriNet {
 
 		arc.setModel(this);
 		inhibitorArcs.add(arc);
-		//	arc.source().addInhibitorArc(arc);// TODO: TimedPlaceInterface FIXME
 		arc.destination().addInhibitorArc(arc);
 	}
 
@@ -102,9 +99,7 @@ public class TimedArcPetriNet {
 
 		arc.setModel(this);
 		transportArcs.add(arc);
-		//		arc.source().addToPostset(arc); // TODO: TimedPlaceInterface FIXME
 		arc.transition().addTransportArcGoingThrough(arc);
-		//		arc.destination().addToPreset(arc);// TODO: TimedPlaceInterface FIXME
 	}
 
 	public void addToken(TimedToken token) {
@@ -133,7 +128,6 @@ public class TimedArcPetriNet {
 		boolean removed = inputArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			//	arc.source().removeFromPostset(arc);// TODO: TimedPlaceInterface FIXME
 			arc.destination().removeFromPreset(arc);
 		}
 	}
@@ -142,9 +136,7 @@ public class TimedArcPetriNet {
 		boolean removed = transportArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			//			arc.source().removeFromPostset(arc);// TODO: TimedPlaceInterface FIXME
 			arc.transition().removeTransportArcGoingThrough(arc);
-			//			arc.destination().removeFromPreset(arc);// TODO: TimedPlaceInterface FIXME
 		}
 	}
 
@@ -153,7 +145,6 @@ public class TimedArcPetriNet {
 		if (removed) {
 			arc.setModel(null);
 			arc.source().removeFromPostset(arc);
-			//			arc.destination().removeFromPreset(arc);// TODO: TimedPlaceInterface FIXME
 		}
 	}
 
@@ -161,7 +152,6 @@ public class TimedArcPetriNet {
 		boolean removed = inhibitorArcs.remove(arc);
 		if (removed) {
 			arc.setModel(null);
-			//			arc.source().removeInhibitorArc(arc); // TODO: TimedPlaceInterface FIXME
 			arc.destination().removeInhibitorArc(arc);
 		}
 	}
@@ -303,8 +293,6 @@ public class TimedArcPetriNet {
 
 		for(TimedInhibitorArc inhibArc : this.inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
-
-		//tapn.setMarking(this.currentMarking.clone());
 
 		return tapn;
 	}

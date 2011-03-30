@@ -24,8 +24,7 @@ public class TAPNComposer {
 
 	private HashSet<String> processedSharedObjects;
 
-	public Tuple<TimedArcPetriNet, NameMapping> transformModel(
-			TimedArcPetriNetNetwork model) {
+	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
 		nextTransitionIndex = -1;
 		processedSharedObjects = new HashSet<String>();

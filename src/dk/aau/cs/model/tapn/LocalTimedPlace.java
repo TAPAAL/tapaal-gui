@@ -14,12 +14,6 @@ public class LocalTimedPlace  implements TimedPlace {
 	private String name;
 	private TimeInvariant invariant;
 
-//	private List<TimedOutputArc> preset = new ArrayList<TimedOutputArc>();
-//	private List<TimedInputArc> postset = new ArrayList<TimedInputArc>();
-//	private List<TransportArc> presetTransportArcs = new ArrayList<TransportArc>();
-//	private List<TransportArc> postsetTransportArcs = new ArrayList<TransportArc>();
-//	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
-
 	private TimedArcPetriNet model;
 	private TimedMarking currentMarking;
 	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
@@ -104,36 +98,6 @@ public class LocalTimedPlace  implements TimedPlace {
 		fireInvariantChanged();
 	}
 
-//	public void addToPreset(TimedOutputArc arc) {
-//		Require.that(arc != null, "Cannot add null to preset");
-//		preset.add(arc);
-//	}
-//
-//	public void addToPreset(TransportArc arc) {
-//		Require.that(arc != null, "Cannot add null to preset");
-//		presetTransportArcs.add(arc);
-//	}
-//
-//	public void addToPostset(TimedInputArc arc) {
-//		Require.that(arc != null, "Cannot add null to postset");
-//		postset.add(arc);
-//	}
-//
-//	public void addToPostset(TransportArc arc) {
-//		Require.that(arc != null, "Cannot add null to postset");
-//		postsetTransportArcs.add(arc);
-//	}
-//
-//	public void addInhibitorArc(TimedInhibitorArc arc){
-//		Require.that(arc != null, "arc cannot be null");
-//		inhibitorArcs.add(arc);
-//	}
-//
-//	public void removeInhibitorArc(TimedInhibitorArc arc){
-//		Require.that(arc != null, "arc cannot be null");
-//		inhibitorArcs.remove(arc);
-//	}
-
 	public List<TimedToken> tokens() {
 		return currentMarking.getTokensFor(this);
 	}
@@ -141,23 +105,6 @@ public class LocalTimedPlace  implements TimedPlace {
 	public int numberOfTokens() {
 		return tokens().size();
 	}
-
-
-//	public void removeFromPostset(TimedInputArc arc) {
-//		postset.remove(arc);
-//	}
-//
-//	public void removeFromPostset(TransportArc arc) {
-//		postsetTransportArcs.remove(arc);
-//	}
-//
-//	public void removeFromPreset(TransportArc arc) {
-//		presetTransportArcs.remove(arc);
-//	}
-//
-//	public void removeFromPreset(TimedOutputArc arc) {
-//		preset.remove(arc);
-//	}
 
 	public void addToken(TimedToken timedToken) {
 		Require.that(timedToken != null, "timedToken cannot be null");

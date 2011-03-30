@@ -280,12 +280,6 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		return Printable.PAGE_EXISTS;
 	}
 
-	/**
-	 * This method is called whenever the frame is moved, resized etc. It
-	 * iterates over the existing petrinet objects and repaints them. TODO:
-	 * write a better description than this since it is now totally not
-	 * happening.
-	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);

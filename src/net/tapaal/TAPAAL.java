@@ -1,7 +1,6 @@
 package net.tapaal;
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -46,7 +45,7 @@ public class TAPAAL {
 		}
 
 		// Open files
-		List<String> files = commandline.getArgList();
+		String[] files = commandline.getArgs();
 		for (String f : files) {
 			File file = new File(f);
 
