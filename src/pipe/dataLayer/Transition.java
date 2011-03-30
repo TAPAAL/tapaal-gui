@@ -18,7 +18,6 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
-import pipe.gui.undo.TransitionServerSemanticEdit;
 import pipe.gui.undo.TransitionTimingEdit;
 import dk.aau.cs.gui.undo.Command;
 
@@ -335,12 +334,6 @@ public class Transition extends PlaceTransitionObject {
 	// public void setHighlighted(boolean status) {
 	// highlighted = status;
 	// }
-
-	public Command setInfiniteServer(boolean status) {
-		infiniteServer = status;
-		repaint();
-		return new TransitionServerSemanticEdit(this);
-	}
 
 	public boolean isInfiniteServer() {
 		return infiniteServer;
