@@ -97,7 +97,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		initComponents();
 
 		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Shared"), 
+				BorderFactory.createTitledBorder("Shared Places and Transitions"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)
 		));		
 	}

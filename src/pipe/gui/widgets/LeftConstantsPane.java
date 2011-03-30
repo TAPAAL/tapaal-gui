@@ -92,7 +92,7 @@ public class LeftConstantsPane extends JPanel {
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
 		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Constants"), 
+				BorderFactory.createTitledBorder("Global Constants"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
 
