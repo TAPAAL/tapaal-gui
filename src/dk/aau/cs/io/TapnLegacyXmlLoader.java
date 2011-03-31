@@ -55,6 +55,7 @@ import pipe.gui.handler.TransportArcHandler;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;
+import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
@@ -73,9 +74,11 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 public class TapnLegacyXmlLoader {
 
+	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs;
 	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs;
 	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals;
@@ -85,6 +88,7 @@ public class TapnLegacyXmlLoader {
 	private TreeMap<String, Constant> constants;
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
+	private boolean firstQueryParsingWarning = true;
 
 	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
@@ -132,7 +136,41 @@ public class TapnLegacyXmlLoader {
 		NodeList nets = tapnDoc.getElementsByTagName("net");
 		templates.add(parseTimedArcPetriNetAsOldFormat(nets.item(0), network));
 		
+		checkThatQueriesUseExistingPlaces(network);
+		
 		return new LoadedModel(network, templates, queries);
+	}
+
+	private void checkThatQueriesUseExistingPlaces(TimedArcPetriNetNetwork network) {
+		ArrayList<TAPNQuery> okQueries = new ArrayList<TAPNQuery>();
+		ArrayList<Tuple<String,String>> templatePlaceNames = getTemplatePlaceNames(network);
+		for(TAPNQuery query : queries) {
+			if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
+				if(firstQueryParsingWarning) {
+					JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+					firstQueryParsingWarning = false;
+				}
+				continue;
+			}
+			
+			okQueries.add(query);
+		}
+		
+		queries = okQueries;
+	}
+
+	private ArrayList<Tuple<String, String>> getTemplatePlaceNames(TimedArcPetriNetNetwork network) {
+		ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
+		for(TimedArcPetriNet tapn : network.templates()) {
+			for(TimedPlace p : tapn.places()) {
+				templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+			}
+		}
+		
+		for(TimedPlace p : network.sharedPlaces()) {
+			templatePlaceNames.add(new Tuple<String, String>("", p.name()));
+		}
+		return templatePlaceNames;
 	}
 
 	private Arc parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
@@ -401,12 +439,22 @@ public class TapnLegacyXmlLoader {
 				parseAndAddArcAsOldFormat(element);
 			} else if ("queries".equals(element.getNodeName())) {
 				TAPNQuery query = parseQueryAsOldFormat(element);
-				query.getProperty().accept(
-						new AddTemplateVisitor(templateName), null);
-				if (query != null)
+				
+				
+				if (query != null) {
+					query.getProperty().accept(new AddTemplateVisitor(templateName), null);
 					queries.add(query);
+				}
 			}
 		}
+	}
+
+	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
+		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
+
+		VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(query.getProperty());
+		
+		return c.getResult();
 	}
 
 	private void parseAndAddAnnotationAsOldFormat(Element inputLabelElement) {
@@ -629,7 +677,7 @@ public class TapnLegacyXmlLoader {
 
 		TCTLAbstractProperty query;
 		query = parseQueryPropertyAsOldFormat(queryElement);
-
+		
 		if (query != null)
 			return new TAPNQuery(comment, capacity, query, traceOption,
 					searchOption, reductionOption, hashTableSize,
@@ -647,9 +695,10 @@ public class TapnLegacyXmlLoader {
 		try {
 			query = queryParser.parse(queryToParse);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-							"TAPAAL encountered an error trying to parse the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.",
-							"Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			if(firstQueryParsingWarning ) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+				firstQueryParsingWarning = false;
+			}
 			System.err.println("No query was specified: " + e.getStackTrace());
 		}
 		return query;
