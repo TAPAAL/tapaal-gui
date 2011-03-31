@@ -329,4 +329,8 @@ public class TimedArcPetriNet {
 
 		return null;
 	}
+
+	public boolean hasInhibitorArcs() {
+		return inhibitorArcs.size() > 0;
+	}
 }

@@ -260,4 +260,12 @@ public class TimedArcPetriNetNetwork {
 		}
 		return null;
 	}
+
+	public boolean hasInhibitorArcs() {
+		for(TimedArcPetriNet tapn : tapns) {
+			if(tapn.hasInhibitorArcs())
+				return true;
+		}
+		return false;
+	}
 }
