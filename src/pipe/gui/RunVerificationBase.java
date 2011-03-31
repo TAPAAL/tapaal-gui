@@ -19,8 +19,7 @@ import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
-public abstract class RunVerificationBase extends
-		SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
+public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
 	private ModelChecker modelChecker;
 
@@ -36,8 +35,7 @@ public abstract class RunVerificationBase extends
 		this.messenger = messenger;
 	}
 
-	public void execute(VerificationOptions options,
-			TimedArcPetriNetNetwork model, TAPNQuery query) {
+	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query) {
 		this.model = model;
 		this.options = options;
 		this.query = query;
@@ -49,7 +47,7 @@ public abstract class RunVerificationBase extends
 		TAPNComposer composer = new TAPNComposer();
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 
-		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getTotalTokens());
+		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);

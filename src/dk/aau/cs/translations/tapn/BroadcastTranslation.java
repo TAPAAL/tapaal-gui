@@ -13,21 +13,32 @@ import dk.aau.cs.TA.StandardUPPAALQuery;
 import dk.aau.cs.TA.TimedAutomaton;
 import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
-import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.Pairing;
-import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
+import dk.aau.cs.util.Tuple;
 
 // TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
 // with the only difference being in the global declarations:
 // symmetry: typedef scalar[N] id_t;
 // no symmetry: typedef int[1,N] id_t;
 // See e.g. OptimizedStandardTranslation for how its done
-public class BroadcastTranslation implements
-		ModelTranslator<TimedArcPetriNet, NTA>,
-		QueryTranslator<TAPNQuery, UPPAALQuery> {
+public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQuery, NTA, UPPAALQuery> {
+//implements ModelTranslator<TimedArcPetriNet, NTA>,
+//		QueryTranslator<TAPNQuery, UPPAALQuery> {
 
 	private int extraTokens;
 	private int largestPresetSize = 0;
@@ -56,12 +67,19 @@ public class BroadcastTranslation implements
 	protected Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
 	protected Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
 
-	public BroadcastTranslation(int extraTokens, boolean useSymmetry) {
-		this.extraTokens = extraTokens;
+	public BroadcastTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;
 	}
+	
+	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		extraTokens = query.getExtraTokens();
+		NTA nta = transformModel(model);
+		UPPAALQuery uppaalQuery = transformQuery(query, model);
+		
+		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
+	}
 
-	public NTA transformModel(TimedArcPetriNet model) throws Exception {
+	private NTA transformModel(TimedArcPetriNet model) throws Exception {
 		clearLocationMappings();
 		clearArcMappings();
 		largestPresetSize = 0;
@@ -389,13 +407,10 @@ public class BroadcastTranslation implements
 	}
 
 	protected void addInitializationStructure(TimedAutomaton ta, TimedArcPetriNet model) {
-		int i = 0;
-
 		for(TimedPlace p : model.places()) {
-			for (TimedToken token : model.marking().getTokensFor(p)) {
+			for (int i = 0; i < p.numberOfTokens(); i++) {
 				Edge initEdge = new Edge(getLocationByName(PCAPACITY), getLocationByName(p.name()), "",	String.format(INITIALIZE_CHANNEL, i, "?"), "");
 				ta.addTransition(initEdge);
-				i++;
 			}
 		}
 	}
@@ -655,8 +670,8 @@ public class BroadcastTranslation implements
 		transportArcsToCounters.clear();	
 	}
 
-	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
-		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry, tapnQuery.getTotalTokens());
+	private UPPAALQuery transformQuery(TAPNQuery tapnQuery, TimedArcPetriNet model) throws Exception {
+		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry, model.marking().size() + tapnQuery.getExtraTokens());
 
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}

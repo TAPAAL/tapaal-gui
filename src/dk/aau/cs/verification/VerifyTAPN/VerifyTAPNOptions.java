@@ -10,13 +10,14 @@ import dk.aau.cs.verification.VerificationOptions;
 public class VerifyTAPNOptions implements VerificationOptions{
 	private TraceOption traceOption;
 	private SearchOption searchOption;
-	private int kBound;
+	private int extraTokens;
+	private int tokensInModel;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
-	public VerifyTAPNOptions(int kBound, TraceOption traceOption, SearchOption search) {
-		this.kBound = kBound;
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search) {
+		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		this.searchOption = search;
 	}
@@ -24,12 +25,16 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public TraceOption trace() {
 		return traceOption;
 	}
+	
+	public void setTokensInModel(int tokens){ // TODO: Get rid of this method when verifytapn refactored
+		this.tokensInModel = tokens;
+	}
 
 	@Override
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 
-		result.append("-k " + kBound + " ");
+		result.append("-k " + extraTokens+tokensInModel + " ");
 		result.append(traceMap.get(traceOption));
 		result.append(searchMap.get(searchOption));
 		

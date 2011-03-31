@@ -1707,7 +1707,7 @@ public class QueryDialog extends JPanel {
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
 						TAPNQuery tapnQuery = getQuery();
-						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity() + tapnNetwork.marking().size());
+						dk.aau.cs.model.tapn.TAPNQuery clonedQuery = new dk.aau.cs.model.tapn.TAPNQuery(tapnQuery.getProperty().copy(), tapnQuery.getCapacity());
 						
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);

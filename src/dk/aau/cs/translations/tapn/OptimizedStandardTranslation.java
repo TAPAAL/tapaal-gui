@@ -21,17 +21,16 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.Degree2Converter;
 import dk.aau.cs.translations.Degree2Pairing;
 import dk.aau.cs.translations.ModelTranslator;
-import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
+import dk.aau.cs.util.Tuple;
 
-public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPetriNet, NTA>, QueryTranslator<TAPNQuery, UPPAALQuery>{
+public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQuery, NTA, UPPAALQuery>{
 
 	protected static final String ID_TYPE = "pid_t";
 	protected static final String ID_TYPE_NAME = "pid";
@@ -55,12 +54,19 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
 	
-	public OptimizedStandardTranslation(int extraTokens, boolean useSymmetry) {
-		this.extraTokens = extraTokens;
+	public OptimizedStandardTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;
 	}
 	
-	public NTA transformModel(TimedArcPetriNet model) throws Exception {
+	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		extraTokens = query.getExtraTokens();
+		NTA nta = transformModel(model);
+		UPPAALQuery uppaalQuery = transformQuery(query);
+		
+		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
+	}
+	
+	private NTA transformModel(TimedArcPetriNet model) throws Exception {
 		clearLocationMappings();
 		numberOfInitChannels = 0;
 		
@@ -189,13 +195,11 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	}
 
 	private void createInitializationTransitionsForTokenAutomata(TimedArcPetriNet degree2Model, TimedAutomaton ta) {
-		int i = 0;
 		for(TimedPlace p : degree2Model.places()) {
-			for (TimedToken token : degree2Model.marking().getTokensFor(p)) {
+			for(int i = 0; i < p.numberOfTokens(); i++) {
 				if (!p.name().equals(PLOCK) && !p.name().equals(PCAPACITY)) {
 					Edge e = new Edge(getLocationByName(PCAPACITY), getLocationByName(p.name()), "", String.format(INITIALIZE_CHANNEL, i, "?"), "");
 					ta.addTransition(e);
-					i++;
 					numberOfInitChannels++;
 				}
 			}
@@ -357,7 +361,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		return matcher.find();
 	}
 	
-	public UPPAALQuery transformQuery(TAPNQuery query) throws Exception {
+	private UPPAALQuery transformQuery(TAPNQuery query) throws Exception {
 		OptimizedStandardTranslationQueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
 		return  new StandardUPPAALQuery(visitor.getUppaalQueryFor(query));
 	}

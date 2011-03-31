@@ -132,10 +132,21 @@ public class TAPNComposer {
 			constructedModel.add(constructedPlace);
 			mapping.addMappingForShared(place.name(), uniquePlaceName);
 
-			for (TimedToken token : place.tokens()) {
-				constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
+			if(isSharedPlaceUsedInTemplates(model, place)){
+				for (TimedToken token : place.tokens()) {
+					constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
+				}
 			}
 		}
+	}
+
+	private boolean isSharedPlaceUsedInTemplates(TimedArcPetriNetNetwork model, SharedPlace place) {
+		for(TimedArcPetriNet tapn : model.templates()){
+			for(TimedPlace timedPlace : tapn.places()){
+				if(timedPlace.equals(place)) return true;
+			}
+		}
+		return false;
 	}
 
 	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {

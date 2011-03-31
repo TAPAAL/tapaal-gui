@@ -83,7 +83,7 @@ public class Verifier {
 			RunVerificationBase thread = new RunVerification(verifyta, new MessengerImpl());
 			RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 			dialog.setupListeners(thread);
-			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity() + timedArcPetriNetNetwork.marking().size()));
+			thread.execute(verifytaOptions, timedArcPetriNetNetwork, new dk.aau.cs.model.tapn.TAPNQuery(input.getProperty(), input.getCapacity()));
 			dialog.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -99,7 +99,7 @@ public class Verifier {
 
 		TCTLAbstractProperty inputQuery = query.getProperty();
 
-		int bound = tapnNetwork.marking().size() + query.getCapacity();
+		int bound = query.getCapacity();
 		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption());
 
 		if (inputQuery == null) {

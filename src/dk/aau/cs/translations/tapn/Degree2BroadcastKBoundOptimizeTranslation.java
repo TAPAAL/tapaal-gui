@@ -17,12 +17,12 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 	private final int SUBTRACT = 0;
 	private final int ADD = 1;
 
-	public Degree2BroadcastKBoundOptimizeTranslation(int extraTokens) {
-		super(extraTokens, true);
+	public Degree2BroadcastKBoundOptimizeTranslation() {
+		super(true);
 	}
 
 	@Override
-	public NTA transformModel(TimedArcPetriNet model) throws Exception {
+	protected NTA transformModel(TimedArcPetriNet model) throws Exception {
 		tokens = model.marking().size();
 		NTA nta = super.transformModel(model);
 
@@ -91,7 +91,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 	}
 
 	@Override
-	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
+	protected UPPAALQuery transformQuery(TAPNQuery tapnQuery, TimedArcPetriNet model) throws Exception {
 		return new SupQuery(usedExtraTokens);
 	}
 

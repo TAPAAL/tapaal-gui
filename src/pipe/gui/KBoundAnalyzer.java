@@ -33,7 +33,7 @@ public class KBoundAnalyzer {
 	}
 
 	public void analyze() {
-		TAPNQuery query = getBoundednessQuery(tapnNetwork.marking().size());
+		TAPNQuery query = getBoundednessQuery();
 		VerifytaOptions options = verificationOptions();
 
 		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker, messenger);
@@ -48,11 +48,11 @@ public class KBoundAnalyzer {
 		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS);
 	}
 
-	protected TAPNQuery getBoundednessQuery(int tokensInModel) {
+	protected TAPNQuery getBoundednessQuery() {
 		TCTLAbstractProperty property = null;
 
 		property = new TCTLEFNode(new TCTLAtomicPropositionNode("_BOTTOM_", "=", 0));
 
-		return new TAPNQuery(property, k + 1 + tokensInModel);
+		return new TAPNQuery(property, k + 1);
 	}
 }

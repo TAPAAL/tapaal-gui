@@ -4,23 +4,23 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 
 public class TAPNQuery {
 	private TCTLAbstractProperty property;
-	private int totalTokens = 0;
+	private int extraTokens = 0;
 
 	public TCTLAbstractProperty getProperty() {
 		return property;
 	}
 
-	public TAPNQuery(TCTLAbstractProperty inputProperty, int totalTokens) {
+	public TAPNQuery(TCTLAbstractProperty inputProperty, int extraTokens) {
 		this.property = inputProperty;
-		this.totalTokens = totalTokens;
+		this.extraTokens = extraTokens;
+	}
+
+	public int getExtraTokens() {
+		return extraTokens;
 	}
 
 	@Override
 	public String toString() {
 		return property.toString();
-	}
-
-	public int getTotalTokens() {
-		return totalTokens;
 	}
 }

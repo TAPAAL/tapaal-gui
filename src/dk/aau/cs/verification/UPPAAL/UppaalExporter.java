@@ -1,18 +1,18 @@
 package dk.aau.cs.verification.UPPAAL;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
 import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.ReductionOption;
-import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastKBoundOptimizeTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
 import dk.aau.cs.translations.tapn.StandardTranslation;
+import dk.aau.cs.util.Tuple;
 
 public class UppaalExporter {
 	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TAPNQuery query, ReductionOption reduction) {
@@ -23,87 +23,36 @@ public class UppaalExporter {
 	}
 
 	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TAPNQuery query, ReductionOption reduction, File modelFile, File queryFile) {
-		if (modelFile == null || queryFile == null)
-			return null;
+		if (modelFile == null || queryFile == null) return null;
 
-		
-		int extraTokens = query.getTotalTokens() - newModel.marking().size();
-		TranslationNamingScheme namingScheme = null;
+		ModelTranslator<dk.aau.cs.model.tapn.TimedArcPetriNet, TAPNQuery, dk.aau.cs.TA.NTA, dk.aau.cs.TA.UPPAALQuery> translator = null;
+			
 		if (reduction == ReductionOption.STANDARD || reduction == ReductionOption.STANDARDSYMMETRY) {
-			StandardTranslation standardTranslation = new StandardTranslation(extraTokens, reduction == ReductionOption.STANDARDSYMMETRY); 
-			namingScheme = standardTranslation.namingScheme();
-			try {
-				dk.aau.cs.TA.NTA nta = standardTranslation.transformModel(newModel);
-				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = standardTranslation.transformQuery(query);
-				uppaalQuery.output(new PrintStream(queryFile));
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			translator = new StandardTranslation(reduction == ReductionOption.STANDARDSYMMETRY); 
 		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARD 
 				|| reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY
 				|| reduction == ReductionOption.KBOUNDANALYSIS) {
-			OptimizedStandardTranslation translater = new OptimizedStandardTranslation(extraTokens, reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS);
-			namingScheme = translater.namingScheme();
-			try { 
-				dk.aau.cs.TA.NTA nta = translater.transformModel(newModel);
-				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = translater.transformQuery(query);
-				uppaalQuery.output(new PrintStream(queryFile));
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			translator = new OptimizedStandardTranslation(reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS);
 		} else if (reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY) {
-			BroadcastTranslation broadcastTransformer = new BroadcastTranslation(extraTokens, reduction == ReductionOption.BROADCASTSYMMETRY);
-			namingScheme = broadcastTransformer.namingScheme();
-			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(newModel);
-				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(queryFile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			translator = new BroadcastTranslation(reduction == ReductionOption.BROADCASTSYMMETRY);
 		} else if (reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST) {
-			Degree2BroadcastTranslation broadcastTransformer = new Degree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
-			namingScheme = broadcastTransformer.namingScheme();
-			try {
-				dk.aau.cs.TA.NTA nta = broadcastTransformer.transformModel(newModel);
-				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = broadcastTransformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(queryFile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			translator = new Degree2BroadcastTranslation(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 		} else if (reduction == ReductionOption.KBOUNDOPTMIZATION) {
-			Degree2BroadcastKBoundOptimizeTranslation transformer = new Degree2BroadcastKBoundOptimizeTranslation(extraTokens);
-
-			try {
-				dk.aau.cs.TA.NTA nta = transformer.transformModel(newModel);
-				nta.outputToUPPAALXML(new PrintStream(modelFile));
-				dk.aau.cs.TA.UPPAALQuery uppaalQuery = transformer.transformQuery(query);
-				uppaalQuery.output(new PrintStream(queryFile));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			translator = new Degree2BroadcastKBoundOptimizeTranslation();
 		} else {
 			throw new RuntimeException("Invalid reduction selected. Please try again");
 		}
-		return new ExportedModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), namingScheme);
+		
+		try { 
+			Tuple<dk.aau.cs.TA.NTA, dk.aau.cs.TA.UPPAALQuery> translatedModel = translator.translate(newModel, query);
+			translatedModel.value1().outputToUPPAALXML(new PrintStream(modelFile));
+			translatedModel.value2().output(new PrintStream(queryFile));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return new ExportedModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), translator.namingScheme());
 	}
 
 	private File createTempFile(String ending) {

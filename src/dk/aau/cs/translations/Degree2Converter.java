@@ -5,7 +5,7 @@ import java.util.List;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.tapn.TAPNToConservativeTAPNConverter;
 
-public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, TimedArcPetriNet> {
+public class Degree2Converter {
 
 	protected static final String T_MAX_FORMAT = "%1$s_%2$d";
 	protected static final String T_I_OUT_FORMAT = "%1$s_%2$d_out";
@@ -34,7 +34,7 @@ public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, Timed
 		for(TimedPlace p : conservativeModel.places()) {
 			TimedPlace copy = p.copy();
 			degree2Model.add(copy);
-			for(TimedToken t : conservativeModel.marking().getTokensFor(p)) {
+			for(int i = 0; i < p.numberOfTokens(); i++) {
 				degree2Model.addToken(new TimedToken(copy));
 			}
 		}
