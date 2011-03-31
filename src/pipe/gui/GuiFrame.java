@@ -826,11 +826,12 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		saveOperation(appTab.getSelectedIndex(), forceSave);
 	}
 
-	public void saveOperation(int index, boolean forceSaveAs) {
+	public boolean saveOperation(int index, boolean forceSaveAs) {
 		File modelFile = CreateGui.getFile(index);
-
+		boolean result = false;
 		if (!forceSaveAs && modelFile != null) { // ordinary save
 			saveNet(index, modelFile);
+			result = true;
 		} else { // save as
 			String path = null;
 			if (modelFile != null) {
@@ -842,12 +843,16 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			if (filename != null) {
 				modelFile = new File(filename);
 				saveNet(index, modelFile);
+				result = true;
+			}else{
+				result = false;
 			}
 		}
 
 		// resize "header" of current tab immediately to fit the length of the
 		// model name
 		appTab.getTabComponentAt(index).doLayout();
+		return result;
 	}
 
 	private void saveNet(int index, File outFile) {
@@ -1006,7 +1011,8 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 					JOptionPane.WARNING_MESSAGE);
 			switch (result) {
 			case JOptionPane.YES_OPTION:
-				saveOperation(index, false);
+				boolean saved = saveOperation(index, false);
+				if(!saved) return false;
 				break;
 			case JOptionPane.CLOSED_OPTION:
 			case JOptionPane.CANCEL_OPTION:
