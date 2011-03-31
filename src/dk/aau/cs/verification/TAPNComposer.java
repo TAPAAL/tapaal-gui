@@ -146,7 +146,7 @@ public class TAPNComposer {
 
 					LocalTimedPlace place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
 					constructedModel.add(place);
-					mapping.addMapping(tapn.getName(), timedPlace.name(), uniquePlaceName);
+					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
 
 					for (TimedToken token : timedPlace.tokens()) {
 						place.addToken(new TimedToken(place, token.age()));
@@ -173,7 +173,7 @@ public class TAPNComposer {
 						processedSharedObjects.add(name);
 						mapping.addMappingForShared(name, uniqueTransitionName);
 					}else{
-						mapping.addMapping(tapn.getName(), timedTransition.name(), uniqueTransitionName);
+						mapping.addMapping(tapn.name(), timedTransition.name(), uniqueTransitionName);
 					}
 				}
 			}
@@ -189,10 +189,10 @@ public class TAPNComposer {
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedInputArc arc : tapn.inputArcs()) {
-				String template = arc.source().isShared() ? "" : tapn.getName();
+				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 				
-				template = arc.destination().isShared() ? "" : tapn.getName();
+				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TimedInputArc(source, target, arc.interval()));
@@ -204,10 +204,10 @@ public class TAPNComposer {
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedOutputArc arc : tapn.outputArcs()) {
-				String template = arc.source().isShared() ? "" : tapn.getName();
+				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedTransition source = constructedModel.getTransitionByName(mapping.map(template, arc.source().name()));
 
-				template = arc.destination().isShared() ? "" : tapn.getName();
+				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TimedOutputArc(source, target));
@@ -219,13 +219,13 @@ public class TAPNComposer {
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TransportArc arc : tapn.transportArcs()) {
-				String template = arc.source().isShared() ? "" : tapn.getName();
+				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 				
-				template = arc.transition().isShared() ? "" : tapn.getName();
+				template = arc.transition().isShared() ? "" : tapn.name();
 				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(template, arc.transition().name()));
 				
-				template = arc.destination().isShared() ? "" : tapn.getName();
+				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TransportArc(source, transition,target, arc.interval()));
@@ -237,10 +237,10 @@ public class TAPNComposer {
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.templates()) {
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
-				String template = arc.source().isShared() ? "" : tapn.getName();
+				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 
-				template = arc.destination().isShared() ? "" : tapn.getName();
+				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TimedInhibitorArc(source, target, arc.interval()));

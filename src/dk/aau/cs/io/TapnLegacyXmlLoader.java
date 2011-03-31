@@ -381,7 +381,7 @@ public class TapnLegacyXmlLoader {
 		nodeList = tapnNode.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			node = nodeList.item(i);
-			parseElementAsOldFormat(node, tapn.getName(), network.marking());
+			parseElementAsOldFormat(node, tapn.name(), network.marking());
 		}
 
 		return new Template(tapn, guiModel);

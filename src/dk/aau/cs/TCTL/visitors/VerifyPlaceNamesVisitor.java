@@ -15,13 +15,14 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.util.Tuple;
 
 public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 
-	private ArrayList<String> placeNames;
+	private ArrayList<Tuple<String, String>> templatePlaceNames;
 
-	public VerifyPlaceNamesVisitor(ArrayList<String> placeNames) {
-		this.placeNames = placeNames;
+	public VerifyPlaceNamesVisitor(ArrayList<Tuple<String, String>> templatePlaceNames) {
+		this.templatePlaceNames = templatePlaceNames;
 	}
 
 	public Context VerifyPlaceNames(TCTLAbstractProperty query) {
@@ -48,11 +49,10 @@ public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 		egNode.getProperty().accept(this, context);
 	}
 
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
-			Object context) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 		Context c = (Context) context;
-		if (!placeNames.contains(atomicPropositionNode.getPlace())) {
-			c.AddIncorrectPlaceName(atomicPropositionNode.getPlace());
+		if (!templatePlaceNames.contains(new Tuple<String,String>(atomicPropositionNode.getTemplate(), atomicPropositionNode.getPlace()))) {
+			c.AddIncorrectPlaceName(atomicPropositionNode.getTemplate() + "." + atomicPropositionNode.getPlace());
 			c.setResult(false);
 		}
 	}

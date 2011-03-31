@@ -11,9 +11,6 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.ExplicitGroup;
-
-import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.*;
 import pipe.gui.*;
@@ -118,8 +115,7 @@ public class QueryDialog extends JPanel {
 
 	// Private Members
 	private StringPosition currentSelection = null;
-
-	private DataLayer datalayer; // TODO: Get rid of
+	
 	private final TimedArcPetriNetNetwork tapnNetwork;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
@@ -135,11 +131,9 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	
 
-	public QueryDialog(EscapableDialog me, DataLayer datalayer,
-			QueryDialogueOption option, TAPNQuery queryToCreateFrom,
-			TimedArcPetriNetNetwork tapnNetwork) {
+	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
+			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
-		this.datalayer = datalayer;
 		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		
@@ -333,49 +327,6 @@ public class QueryDialog extends JPanel {
 		}
 	}
 
-//	private void enableOnlyLivenessReductionOptions() {
-//		String[] options = new String[]{name_BROADCASTDEG2, name_BROADCAST};
-//
-//		String reductionOptionString = "" + reductionOption.getSelectedItem();
-//		boolean selectedOptionStillAvailable = false;
-//
-//		reductionOption.removeAllItems();
-//
-//		for (String s : options) {
-//			reductionOption.addItem(s);
-//			if (s.equals(reductionOptionString)) {
-//				selectedOptionStillAvailable = true;
-//			}
-//		}
-//
-//		if (selectedOptionStillAvailable)
-//			reductionOption.setSelectedItem(reductionOptionString);
-//
-//	}
-//
-//	private void enableAllReductionOptions() {
-//		reductionOption.removeAllItems();
-//
-//		if(!this.datalayer.hasTAPNInhibitorArcs()){
-//			String[] options = null;
-//			if(!datalayer.hasTransportArcs() && !datalayer.hasInvariants()) {
-//				options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
-//			}else {
-//				options = new String[] { name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
-//
-//			}
-//			for (String s : options) {
-//				reductionOption.addItem(s);
-//			}
-//		} else {	
-//			reductionOption.addItem(name_BROADCAST);
-//			reductionOption.addItem(name_BROADCASTDEG2);
-//		}
-//
-//		reductionOption.setSelectedItem("" + name_OPTIMIZEDSTANDARD);
-//
-//	}
-
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
 
@@ -385,7 +336,7 @@ public class QueryDialog extends JPanel {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		// 2 Add query editor
-		QueryDialog queryDialogue = new QueryDialog(guiDialog, CreateGui.getModel(), option, queryToRepresent, tapnNetwork);
+		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -424,8 +375,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	// Update current selection based on position of the caret in the string
-	// representation
-	// used for updating when selecting with the mouse.
+	// representation used for updating when selecting with the mouse.
 	private void updateSelection() {
 		int index = queryField.getCaretPosition();
 		StringPosition position = newProperty.objectAt(index);
@@ -539,13 +489,7 @@ public class QueryDialog extends JPanel {
 			saveUppaalXMLButton.setEnabled(false);
 		}
 	}
-	
-//	private void setEnabledReductionOptions(boolean keepSelection) {
-//		String reductionOptionString = ""+reductionOption.getSelectedItem();
-//		setEnabledReductionOptions();
-//		reductionOption.setSelectedItem(reductionOptionString);
-//	}
-	
+
 	private void setEnabledReductionOptions() {
 		String reductionOptionString = getReductionOption();
 		
@@ -590,7 +534,7 @@ public class QueryDialog extends JPanel {
 
 	}
 
-	private void enablePathButtons() {
+	private void enableOnlyPathButtons() {
 		existsBox.setEnabled(true);
 		existsDiamond.setEnabled(true);
 		forAllBox.setEnabled(true);
@@ -605,7 +549,7 @@ public class QueryDialog extends JPanel {
 		addPredicateButton.setEnabled(false);
 	}
 
-	private void enableStateButtons() {
+	private void enableOnlyStateButtons() {
 		existsBox.setEnabled(false);
 		existsDiamond.setEnabled(false);
 		forAllBox.setEnabled(false);
@@ -1328,10 +1272,8 @@ public class QueryDialog extends JPanel {
 		resetButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				if (queryField.isEditable()) { // in edit mode, this button is
-					// now the parse query button.
-					// User has potentially altered
-					// the query, so try to parse it
+				if (queryField.isEditable()) { // in edit mode, this button is now the parse query button.
+					// User has potentially altered the query, so try to parse it
 					TAPAALQueryParser queryParser = new TAPAALQueryParser();
 					TCTLAbstractProperty newQuery = null;
 
@@ -1351,21 +1293,25 @@ public class QueryDialog extends JPanel {
 
 					if (newQuery != null) // new query parsed successfully
 					{
-						// check correct place names are used in atomic
-						// propositions
-						ArrayList<String> places = new ArrayList<String>();
-						for (int i = 0; i < datalayer.getPlaces().length; i++) {
-							places.add(datalayer.getPlaces()[i].getName());
+						// check correct place names are used in atomic propositions
+						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
+						for(TimedArcPetriNet tapn : tapnNetwork.templates()) {
+							for(TimedPlace p : tapn.places()) {
+								templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+							}
+						}
+						
+						for(TimedPlace p : tapnNetwork.sharedPlaces()) {
+							templatePlaceNames.add(new Tuple<String, String>("", p.name()));
 						}
 
-						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(places);
+						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
 						VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(newQuery);
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();
-							s
-							.append("The following places was used in the query, but are not present in your model:\n\n");
+							s.append("The following places was used in the query, but are not present in your model:\n\n");
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
@@ -1382,8 +1328,7 @@ public class QueryDialog extends JPanel {
 								returnFromManualEdit(null);
 							}
 						} else {
-							UndoableEdit edit = new QueryConstructionEdit(
-									newProperty, newQuery);
+							UndoableEdit edit = new QueryConstructionEdit(newProperty, newQuery);
 							returnFromManualEdit(newQuery);
 							undoSupport.postEdit(edit);
 						}
@@ -1673,9 +1618,9 @@ public class QueryDialog extends JPanel {
 	private void refreshQueryEditingButtons() {
 		if(currentSelection != null) {
 			if(currentSelection.getObject() instanceof TCTLAbstractPathProperty) {
-				enablePathButtons();
+				enableOnlyPathButtons();
 			} else if(currentSelection.getObject() instanceof TCTLAbstractStateProperty) {
-				enableStateButtons();
+				enableOnlyStateButtons();
 			}
 			updateQueryButtonsAccordingToSelection();
 		}

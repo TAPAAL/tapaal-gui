@@ -164,7 +164,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			Element NET = document.createElement("net");
 			root.appendChild(NET);
 			Attr netAttrId = document.createAttribute("id");
-			netAttrId.setValue(tapn.model().getName());
+			netAttrId.setValue(tapn.model().name());
 			NET.setAttributeNode(netAttrId);
 
 			Attr netAttrType = document.createAttribute("type");

@@ -1395,7 +1395,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 					TimedPlaceComponent place = (TimedPlaceComponent)pn;
 					if(!place.underlyingPlace().isShared()){
 						for (TAPNQuery q : queries) {
-							if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().getName(),place.underlyingPlace().name())) {
+							if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
 								queriesAffected = true;
 								queriesToDelete.add(q);
 							}

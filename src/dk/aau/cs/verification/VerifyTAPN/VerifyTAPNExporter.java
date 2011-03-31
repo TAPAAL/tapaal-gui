@@ -47,7 +47,7 @@ public class VerifyTAPNExporter {
 	
 	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
 		modelStream.append("<pnml>\n");
-		modelStream.append("<net id=\"" + model.getName() + "\" type=\"P/T net\">\n");
+		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
 		
 		for(TimedPlace p : model.places())
 			outputPlace(p, modelStream);

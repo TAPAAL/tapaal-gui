@@ -217,7 +217,7 @@ public class TemplateExplorer extends JPanel {
 
 				for (TimedPlace p : template.model().places()) {
 					for (TAPNQuery q : queries) {
-						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(template.model().getName(), p.name())) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(template.model().name(), p.name())) {
 							queriesToDelete.add(q);
 						}
 					}
@@ -268,7 +268,7 @@ public class TemplateExplorer extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				Template template = selectedModel().copy();
 				
-				String name = template.model().getName();
+				String name = template.model().name();
 				if(parent.network().hasTAPNCalled(name)) {
 					int i = 2;
 				
@@ -327,9 +327,9 @@ public class TemplateExplorer extends JPanel {
 		Template template = selectedModel();
 
 		String newName = (String) JOptionPane.showInputDialog(parent.drawingSurface(), "Component name:", "Rename Component",
-				JOptionPane.PLAIN_MESSAGE, null, null, template.model().getName());
+				JOptionPane.PLAIN_MESSAGE, null, null, template.model().name());
 		
-		if (newName == null || template.model().getName().equals(newName))
+		if (newName == null || template.model().name().equals(newName))
 			return;
 
 		if (!isNameAllowed(newName))
@@ -346,7 +346,7 @@ public class TemplateExplorer extends JPanel {
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
 			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
-			Command command = new RenameTemplateCommand(this, parent, template.model(), template.model().getName(), newName);
+			Command command = new RenameTemplateCommand(this, parent, template.model(), template.model().name(), newName);
 			undoManager.addNewEdit(command);
 			command.redo();
 		}

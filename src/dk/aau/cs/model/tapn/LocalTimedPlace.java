@@ -147,7 +147,7 @@ public class LocalTimedPlace  implements TimedPlace {
 	@Override
 	public String toString() {
 		if (model() != null)
-			return model().getName() + "." + name;
+			return model().name() + "." + name;
 		else
 			return name;
 	}

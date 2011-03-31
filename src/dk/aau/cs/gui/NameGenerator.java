@@ -58,7 +58,7 @@ public class NameGenerator {
 		setupPlaceIDCounter(tapn);
 		setupTransitionIDCounter(tapn);
 
-		Matcher m = templatePattern.matcher(tapn.getName());
+		Matcher m = templatePattern.matcher(tapn.name());
 		if(m.matches()) {
 			int number = Integer.parseInt(m.group(1));
 			if(number > tapnId) tapnId = number;

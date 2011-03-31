@@ -105,7 +105,7 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean hasTAPNCalled(String newName) {
 		for (TimedArcPetriNet tapn : tapns)
-			if (tapn.getName().equalsIgnoreCase(newName))
+			if (tapn.name().equalsIgnoreCase(newName))
 				return true;
 		return false;
 	}
@@ -215,7 +215,7 @@ public class TimedArcPetriNetNetwork {
 
 	public TimedArcPetriNet getTAPNByName(String name) {
 		for (TimedArcPetriNet tapn : tapns) {
-			if (tapn.getName().equals(name))
+			if (tapn.name().equals(name))
 				return tapn;
 		}
 		return null;

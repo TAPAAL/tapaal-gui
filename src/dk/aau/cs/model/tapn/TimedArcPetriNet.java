@@ -196,7 +196,7 @@ public class TimedArcPetriNet {
 		return false;
 	}
 
-	public String getName() {
+	public String name() {
 		return name;
 	}
 

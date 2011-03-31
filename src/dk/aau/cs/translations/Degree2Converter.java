@@ -29,7 +29,7 @@ public class Degree2Converter implements ModelTranslator<TimedArcPetriNet, Timed
 			return null;
 		}
 		
-		degree2Model = new TimedArcPetriNet(conservativeModel.getName() + "_degree2");
+		degree2Model = new TimedArcPetriNet(conservativeModel.name() + "_degree2");
 		
 		for(TimedPlace p : conservativeModel.places()) {
 			TimedPlace copy = p.copy();

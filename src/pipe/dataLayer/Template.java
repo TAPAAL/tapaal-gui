@@ -32,7 +32,7 @@ public class Template {
 
 	public Template copy() {
 		TimedArcPetriNet tapn = net.copy();
-		tapn.setName(tapn.getName() + "Copy");
+		tapn.setName(tapn.name() + "Copy");
 		return new Template(tapn, guiModel.copy(tapn));
 	}
 }
