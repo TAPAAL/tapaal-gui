@@ -29,6 +29,8 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 
 public class TAPAALQueryParser implements GPMessageConstants {
 
+	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the query";
+
 	public interface SymbolConstants {
 		final int SYMBOL_EOF = 0; // (EOF)
 		final int SYMBOL_ERROR = 1; // (Error)
@@ -69,24 +71,14 @@ public class TAPAALQueryParser implements GPMessageConstants {
 	};
 
 	public interface RuleConstants {
-		final int RULE_ABSTRACTPROPERTY_EF = 0; // <AbstractProperty> ::= EF
-												// <Expr>
-		final int RULE_ABSTRACTPROPERTY_ELTGT = 1; // <AbstractProperty> ::=
-													// 'E<>' <Expr>
-		final int RULE_ABSTRACTPROPERTY_EG = 2; // <AbstractProperty> ::= EG
-												// <Expr>
-		final int RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET = 3; // <AbstractProperty>
-																// ::= 'E[]'
-																// <Expr>
-		final int RULE_ABSTRACTPROPERTY_AF = 4; // <AbstractProperty> ::= AF
-												// <Expr>
-		final int RULE_ABSTRACTPROPERTY_ALTGT = 5; // <AbstractProperty> ::=
-													// 'A<>' <Expr>
-		final int RULE_ABSTRACTPROPERTY_AG = 6; // <AbstractProperty> ::= AG
-												// <Expr>
-		final int RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET = 7; // <AbstractProperty>
-																// ::= 'A[]'
-																// <Expr>
+		final int RULE_ABSTRACTPROPERTY_EF = 0; // <AbstractProperty> ::= EF <Expr>
+		final int RULE_ABSTRACTPROPERTY_ELTGT = 1; // <AbstractProperty> ::= 'E<>' <Expr>
+		final int RULE_ABSTRACTPROPERTY_EG = 2; // <AbstractProperty> ::= EG <Expr>
+		final int RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET = 3; // <AbstractProperty> ::= 'E[]' <Expr>
+		final int RULE_ABSTRACTPROPERTY_AF = 4; // <AbstractProperty> ::= AF <Expr>
+		final int RULE_ABSTRACTPROPERTY_ALTGT = 5; // <AbstractProperty> ::= 'A<>' <Expr>
+		final int RULE_ABSTRACTPROPERTY_AG = 6; // <AbstractProperty> ::= AG <Expr>
+		final int RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET = 7; // <AbstractProperty> ::= 'A[]' <Expr>
 		final int RULE_EXPR = 8; // <Expr> ::= <Or>
 		final int RULE_OR_OR = 9; // <Or> ::= <Or> or <And>
 		final int RULE_OR_PIPEPIPE = 10; // <Or> ::= <Or> '||' <And>
@@ -96,41 +88,18 @@ public class TAPAALQueryParser implements GPMessageConstants {
 		final int RULE_AND = 14; // <And> ::= <Not>
 		final int RULE_NOT_NOT_LPARAN_RPARAN = 15; // <Not> ::= not '(' <Expr>
 													// ')'
-		final int RULE_NOT_EXCLAM_LPARAN_RPARAN = 16; // <Not> ::= '!' '('
-														// <Expr> ')'
+		final int RULE_NOT_EXCLAM_LPARAN_RPARAN = 16; // <Not> ::= '!' '(' <Expr> ')'
 		final int RULE_NOT = 17; // <Not> ::= <Factor>
 		final int RULE_FACTOR = 18; // <Factor> ::= <AtomicProposition1>
 		final int RULE_FACTOR2 = 19; // <Factor> ::= <AtomicProposition2>
 		final int RULE_FACTOR_LPARAN_RPARAN = 20; // <Factor> ::= '(' <Expr> ')'
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM = 21; // <AtomicProposition1>
-																	// ::=
-																	// Identifier
-																	// '<' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM = 22; // <AtomicProposition1>
-																	// ::=
-																	// Identifier
-																	// '<=' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM = 23; // <AtomicProposition1>
-																	// ::=
-																	// Identifier
-																	// '=' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQEQ_NUM = 24; // <AtomicProposition1>
-																	// ::=
-																	// Identifier
-																	// '==' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GTEQ_NUM = 25; // <AtomicProposition1>
-																	// ::=
-																	// Identifier
-																	// '>=' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GT_NUM = 26; // <AtomicProposition1>
-																	// ::=
-																	// Identifier
-																	// '>' Num
-		final int RULE_ATOMICPROPOSITION2_IDENTIFIER_DOT = 27; // <AtomicProposition2>
-																// ::=
-																// Identifier
-																// '.'
-																// <AtomicProposition1>
+		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM = 21; // <AtomicProposition1> ::= Identifier '<' Num
+		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM = 22; // <AtomicProposition1> ::= Identifier '<=' Num
+		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM = 23; // <AtomicProposition1> ::= Identifier '=' Num
+		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQEQ_NUM = 24; // <AtomicProposition1> ::= Identifier '==' Num
+		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GTEQ_NUM = 25; // <AtomicProposition1> ::= Identifier '>=' Num
+		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GT_NUM = 26; // <AtomicProposition1> ::= Identifier '>' Num
+		final int RULE_ATOMICPROPOSITION2_IDENTIFIER_DOT = 27; // <AtomicProposition2> ::= Identifier '.' <AtomicProposition1>
 	};
 
 	private Stack<TCTLAbstractStateProperty> parseStack;
@@ -215,34 +184,20 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				switch (parser.currentReduction().getParentRule()
 						.getTableIndex()) {
 
-				case RuleConstants.RULE_ABSTRACTPROPERTY_EF: // <AbstractProperty>
-																// ::= EF <Expr>
-				case RuleConstants.RULE_ABSTRACTPROPERTY_ELTGT: // <AbstractProperty>
-																// ::= 'E<>'
-																// <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_EF: // <AbstractProperty> ::= EF <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_ELTGT: // <AbstractProperty> ::= 'E<>' <Expr>
 					root = new TCTLEFNode(parseStack.pop());
 					break;
-				case RuleConstants.RULE_ABSTRACTPROPERTY_EG: // <AbstractProperty>
-																// ::= EG <Expr>
-				case RuleConstants.RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET: // <AbstractProperty>
-																			// ::=
-																			// 'E[]'
-																			// <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_EG: // <AbstractProperty> ::= EG <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET: // <AbstractProperty> ::= 'E[]' <Expr>
 					root = new TCTLEGNode(parseStack.pop());
 					break;
-				case RuleConstants.RULE_ABSTRACTPROPERTY_AF: // <AbstractProperty>
-																// ::= AF <Expr>
-				case RuleConstants.RULE_ABSTRACTPROPERTY_ALTGT: // <AbstractProperty>
-																// ::= 'A<>'
-																// <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_AF: // <AbstractProperty> ::= AF <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_ALTGT: // <AbstractProperty> ::= 'A<>' <Expr>
 					root = new TCTLAFNode(parseStack.pop());
 					break;
-				case RuleConstants.RULE_ABSTRACTPROPERTY_AG: // <AbstractProperty>
-																// ::= AG <Expr>
-				case RuleConstants.RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET: // <AbstractProperty>
-																			// ::=
-																			// 'A[]'
-																			// <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_AG: // <AbstractProperty>::= AG <Expr>
+				case RuleConstants.RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET: // <AbstractProperty> ::= 'A[]' <Expr>
 					root = new TCTLAGNode(parseStack.pop());
 					break;
 
@@ -254,8 +209,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 					if (orProp1 instanceof TCTLOrListNode) {
 						TCTLOrListNode node1 = (TCTLOrListNode) orProp1;
 
-						for (TCTLAbstractStateProperty p : node1
-								.getProperties()) {
+						for (TCTLAbstractStateProperty p : node1.getProperties()) {
 							disjunctions.add(p);
 						}
 					} else {
@@ -265,8 +219,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 					if (orProp2 instanceof TCTLOrListNode) {
 						TCTLOrListNode node2 = (TCTLOrListNode) orProp2;
 
-						for (TCTLAbstractStateProperty p : node2
-								.getProperties()) {
+						for (TCTLAbstractStateProperty p : node2.getProperties()) {
 							disjunctions.add(p);
 						}
 					} else {
@@ -285,8 +238,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 					if (andProp1 instanceof TCTLAndListNode) {
 						TCTLAndListNode node1 = (TCTLAndListNode) andProp1;
 
-						for (TCTLAbstractStateProperty p : node1
-								.getProperties()) {
+						for (TCTLAbstractStateProperty p : node1.getProperties()) {
 							conjunctions.add(p);
 						}
 					} else {
@@ -296,25 +248,18 @@ public class TAPAALQueryParser implements GPMessageConstants {
 					if (andProp2 instanceof TCTLAndListNode) {
 						TCTLAndListNode node2 = (TCTLAndListNode) andProp2;
 
-						for (TCTLAbstractStateProperty p : node2
-								.getProperties()) {
+						for (TCTLAbstractStateProperty p : node2.getProperties()) {
 							conjunctions.add(p);
 						}
 					} else {
 						conjunctions.add(andProp2);
 					}
-					TCTLAndListNode andListNode = new TCTLAndListNode(
-							conjunctions);
+					TCTLAndListNode andListNode = new TCTLAndListNode(conjunctions);
 					parseStack.push(andListNode);
 					break;
 
-				case RuleConstants.RULE_NOT_NOT_LPARAN_RPARAN: // <Not> ::= not
-																// '(' <Expr>
-																// ')'
-				case RuleConstants.RULE_NOT_EXCLAM_LPARAN_RPARAN: // <Not> ::=
-																	// '!' '('
-																	// <Expr>
-																	// ')'
+				case RuleConstants.RULE_NOT_NOT_LPARAN_RPARAN: // <Not> ::= not '(' <Expr> ')'
+				case RuleConstants.RULE_NOT_EXCLAM_LPARAN_RPARAN: // <Not> ::= '!' '(' <Expr> ')'
 					TCTLNotNode notNode = new TCTLNotNode(parseStack.pop());
 					parseStack.push(notNode);
 					break;
@@ -323,62 +268,25 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				case RuleConstants.RULE_OR: // <Or> ::= <And>
 				case RuleConstants.RULE_AND: // <And> ::= <Not>
 				case RuleConstants.RULE_NOT: // <Not> ::= <Factor>
-				case RuleConstants.RULE_FACTOR: // <Factor> ::=
-												// <AtomicProposition>
+				case RuleConstants.RULE_FACTOR: // <Factor> ::= <AtomicProposition>
 				case RuleConstants.RULE_FACTOR2:
-				case RuleConstants.RULE_FACTOR_LPARAN_RPARAN: // <Factor> ::=
-																// '(' <Expr>
-																// ')'
+				case RuleConstants.RULE_FACTOR_LPARAN_RPARAN: // <Factor> ::= '(' <Expr>')'
 					break;
 
-				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM: // <AtomicProposition>
-																				// ::=
-																				// Identifier
-																				// '<'
-																				// Num
-				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM: // <AtomicProposition>
-																				// ::=
-																				// Identifier
-																				// '<='
-																				// Num
-				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM: // <AtomicProposition>
-																				// ::=
-																				// Identifier
-																				// '='
-																				// Num
-				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_EQEQ_NUM: // <AtomicProposition>
-																				// ::=
-																				// Identifier
-																				// '=='
-																				// Num
-				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_GTEQ_NUM: // <AtomicProposition>
-																				// ::=
-																				// Identifier
-																				// '>='
-																				// Num
-				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_GT_NUM: // <AtomicProposition>
-																				// ::=
-																				// Identifier
-																				// '>'
-																				// Num
-					String place = (String) createObjectFromTerminal(parser
-							.currentReduction().getToken(0));
-					String op = (String) createObjectFromTerminal(parser
-							.currentReduction().getToken(1));
-					Integer n = (Integer) createObjectFromTerminal(parser
-							.currentReduction().getToken(2));
-					parseStack
-							.push(new TCTLAtomicPropositionNode(place, op, n));
+				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM: // <AtomicProposition> ::= Identifier '<' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM: // <AtomicProposition> ::= Identifier '<=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM: // <AtomicProposition> ::= Identifier '=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_EQEQ_NUM: // <AtomicProposition> ::= Identifier '==' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_GTEQ_NUM: // <AtomicProposition> ::= Identifier '>=' Num
+				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_GT_NUM: // <AtomicProposition> ::= Identifier '>' Num
+					String place = (String) createObjectFromTerminal(parser.currentReduction().getToken(0));
+					String op = (String) createObjectFromTerminal(parser.currentReduction().getToken(1));
+					Integer n = (Integer) createObjectFromTerminal(parser.currentReduction().getToken(2));
+					parseStack.push(new TCTLAtomicPropositionNode(place, op, n));
 					break;
-				case RuleConstants.RULE_ATOMICPROPOSITION2_IDENTIFIER_DOT: // <AtomicProposition>
-																			// ::=
-																			// Identifier
-																			// '.'
-																			// <AtomicProposition1>
-					TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) parseStack
-							.pop();
-					String template = (String) createObjectFromTerminal(parser
-							.currentReduction().getToken(0));
+				case RuleConstants.RULE_ATOMICPROPOSITION2_IDENTIFIER_DOT: // <AtomicProposition> ::= Identifier '.' <AtomicProposition1>
+					TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) parseStack.pop();
+					String template = (String) createObjectFromTerminal(parser.currentReduction().getToken(0));
 					node.setTemplate(template);
 					parseStack.push(node);
 					break;
@@ -410,9 +318,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				// System.out.println("gpMsgNotLoadedError");
 				// // ************************************** end log
 				done = true;
-				throw new ParseException(
-						"TAPAAL countered an error trying to parse the query",
-						0);
+				throw new ParseException(ERROR_PARSING_QUERY_MESSAGE,0);
 			case gpMsgLexicalError: /* Place code here to handle a illegal or unrecognized token To recover, pop the token from the stack: Parser.PopInputToken */
 			case gpMsgSyntaxError:
 				/*
@@ -425,11 +331,8 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				 */
 				done = true;
 				Token theTok = parser.currentToken();
-				System.out.println("Token not expected: "
-						+ (String) theTok.getData());
-				throw new ParseException(
-						"TAPAAL countered an error trying to parse the query",
-						0);
+				System.out.println("Token not expected: "+ (String) theTok.getData());
+				throw new ParseException(ERROR_PARSING_QUERY_MESSAGE,0);
 
 				// // ************************************** log file
 				// System.out.println("gpMsgSyntaxError");
@@ -459,9 +362,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				// System.out.println("gpMsgInternalError");
 				// // ************************************** end log
 				done = true;
-				throw new ParseException(
-						"TAPAAL countered an error trying to parse the query",
-						0);
+				throw new ParseException(ERROR_PARSING_QUERY_MESSAGE,0);
 
 			}
 		}

@@ -55,6 +55,7 @@ import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
@@ -75,14 +76,17 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 public class TapnXmlLoader {
+	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();;
 	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
 
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
+	private boolean firstQueryParsingWarning = true;
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -118,11 +122,12 @@ public class TapnXmlLoader {
 		parseSharedTransitions(doc, network);
 		
 		Collection<Template> templates = parseTemplates(doc, network, constants);
-		Collection<TAPNQuery> queries = parseQueries(doc);
+		Collection<TAPNQuery> queries = parseQueries(doc, network);
 
 		network.buildConstraints();
 		return new LoadedModel(network, templates, queries);
 	}
+
 
 	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");
@@ -169,20 +174,58 @@ public class TapnXmlLoader {
 		return new SharedTransition(name);
 	}
 
-	private Collection<TAPNQuery> parseQueries(Document doc) {
+	private Collection<TAPNQuery> parseQueries(Document doc, TimedArcPetriNetNetwork network) {
 		Collection<TAPNQuery> queries = new ArrayList<TAPNQuery>();
 		NodeList queryNodes = doc.getElementsByTagName("query");
+		
+		ArrayList<Tuple<String, String>> templatePlaceNames = getPlaceNames(network);
+		boolean queryUsingNonexistentPlaceFound = false;
 		for (int i = 0; i < queryNodes.getLength(); i++) {
 			Node q = queryNodes.item(i);
 
 			if (q instanceof Element) {
 				TAPNQuery query = parseTAPNQuery((Element) q);
+				
+				if (query != null) {
+					if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
+						queryUsingNonexistentPlaceFound = true;
+						continue;
+					}
 
-				if (query != null)
 					queries.add(query);
+				}
 			}
 		}
+		
+		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			firstQueryParsingWarning = false;
+		}
+		
 		return queries;
+	}
+
+	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
+		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
+
+		VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(query.getProperty());
+		
+		return c.getResult();
+		
+	}
+
+	private ArrayList<Tuple<String, String>> getPlaceNames(TimedArcPetriNetNetwork network) {
+		ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
+		for(TimedArcPetriNet tapn : network.templates()) {
+			for(TimedPlace p : tapn.places()) {
+				templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
+			}
+		}
+		
+		for(TimedPlace p : network.sharedPlaces()) {
+			templatePlaceNames.add(new Tuple<String, String>("", p.name()));
+		}
+		return templatePlaceNames;
 	}
 
 	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
@@ -659,10 +702,10 @@ public class TapnXmlLoader {
 		try {
 			query = queryParser.parse(queryToParse);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(
-					CreateGui.getApp(),
-					"TAPAAL encountered an error trying to parse one of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.",
-					"Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+			if(firstQueryParsingWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
+				firstQueryParsingWarning = false;
+			}
 			System.err.println("No query was specified: " + e.getStackTrace());
 		}
 		return query;
