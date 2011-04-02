@@ -106,8 +106,7 @@ public class TimeInterval {
 	}
 
 	public static TimeInterval parse(String interval, Map<String, Constant> constants) {
-		Pattern pattern = Pattern
-				.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
+		Pattern pattern = Pattern.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
 		Matcher matcher = pattern.matcher(interval);
 		matcher.find();
 
@@ -127,13 +126,11 @@ public class TimeInterval {
 			lowerBound = new IntBound(intLower);
 		} catch (NumberFormatException e) {
 			if (constants.containsKey(lowerBoundAsString)) {
-				lowerBound = new ConstantBound(constants
-						.get(lowerBoundAsString));
+				lowerBound = new ConstantBound(constants.get(lowerBoundAsString));
 			} else
-				throw new RuntimeException(
-						"A constant which was not declared was used in an time interval of an arc.");
+				throw new RuntimeException("A constant which was not declared was used in an time interval of an arc.");
 		}
-
+		
 		Bound upperBound = null;
 		if (upperBoundAsString.equals("inf"))
 			upperBound = Bound.Infinity;
@@ -143,8 +140,7 @@ public class TimeInterval {
 				upperBound = new IntBound(intBound);
 			} catch (NumberFormatException e) {
 				if (constants.containsKey(upperBoundAsString)) {
-					upperBound = new ConstantBound(constants
-							.get(upperBoundAsString));
+					upperBound = new ConstantBound(constants.get(upperBoundAsString));
 				} else
 					throw new RuntimeException(
 							"A constant which was not declared was used in an time interval of an arc.");
@@ -172,6 +168,32 @@ public class TimeInterval {
 		} else {
 			return new TimeInterval(this.isLowerIncluded, this.lower.copy(), invariant.upperBound().copy(), invariant.isUpperNonstrict());
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TimeInterval))
+			return false;
+		TimeInterval other = (TimeInterval) obj;
+		if(isLowerIncluded != other.isLowerIncluded)
+			return false;
+		if(lower == null) {
+			if(other.lower != null)
+				return false;
+		} else if(!lower.equals(other.lower))
+			return false;
+		if (isUpperIncluded != other.isUpperIncluded)
+			return false;
+		if (upper == null) {
+			if (other.upper != null)
+				return false;
+		} else if (!upper.equals(other.upper))
+			return false;
+		return true;
 	}
 
 }

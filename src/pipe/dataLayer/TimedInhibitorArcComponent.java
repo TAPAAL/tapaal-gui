@@ -51,12 +51,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	@Override
 	public void updateWeightLabel(boolean displayConstantNames) {
-		if (inhibitorArc != null) {
-			weightLabel.setText(inhibitorArc.interval().toString(
-					displayConstantNames));
-		} else {
-			weightLabel.setText("");
-		}
+		weightLabel.setText("");
 		this.setWeightLabelPosition();
 	}
 
@@ -75,8 +70,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		updateWeightLabel(true);
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc
-				.interval());
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval());
 	}
 
 	@Override

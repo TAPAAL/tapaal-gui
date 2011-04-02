@@ -7,6 +7,11 @@ public class TimedInhibitorArc extends TimedInputArc {
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
 		super(source, destination, interval);
 	}
+	
+	@Override
+	public void setTimeInterval(TimeInterval interval) {
+		super.setTimeInterval(TimeInterval.ZERO_INF);
+	}
 
 	@Override
 	public boolean isEnabled() {

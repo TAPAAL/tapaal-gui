@@ -88,6 +88,7 @@ public class TapnXmlLoader {
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
+	private boolean firstInhibitorIntervalWarning = true;
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -640,6 +641,12 @@ public class TapnXmlLoader {
 		TimedPlace place = template.model().getPlaceByName(sourceIn.getName());
 		TimedTransition transition = template.model().getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
+		
+		if(!interval.equals(TimeInterval.ZERO_INF) && firstInhibitorIntervalWarning) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).", "Unsupported Interval Detected on Inhibitor Arc", JOptionPane.INFORMATION_MESSAGE);
+			firstInhibitorIntervalWarning = false;
+		}
+		
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
 
 		tempArc.setUnderlyingArc(inhibArc);

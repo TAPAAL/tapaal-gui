@@ -90,6 +90,7 @@ public class TapnLegacyXmlLoader {
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
+	private boolean firstInhibitorIntervalWarning = true;
 
 	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
 		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
@@ -329,6 +330,12 @@ public class TapnLegacyXmlLoader {
 		TimedPlace place = tapn.getPlaceByName(sourceIn.getName());
 		TimedTransition transition = tapn.getTransitionByName(targetIn.getName());
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
+		
+		if(!interval.equals(TimeInterval.ZERO_INF) && firstInhibitorIntervalWarning) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).", "Unsupported Interval Detected on Inhibitor Arc", JOptionPane.INFORMATION_MESSAGE);
+			firstInhibitorIntervalWarning = false;
+		}
+		
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
 
 		((TimedInhibitorArcComponent) tempArc).setUnderlyingArc(inhibArc);
