@@ -75,6 +75,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
@@ -92,7 +93,7 @@ public class TapnXmlLoader {
 		this.drawingSurface = drawingSurface;
 	}
 
-	public LoadedModel load(File file) {
+	public LoadedModel load(File file) throws FormatException {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
@@ -113,7 +114,7 @@ public class TapnXmlLoader {
 		}
 	}
 
-	private LoadedModel parse(Document doc) {
+	private LoadedModel parse(Document doc) throws FormatException {
 		Map<String, Constant> constants = parseConstants(doc);
 
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
@@ -228,9 +229,13 @@ public class TapnXmlLoader {
 		return templatePlaceNames;
 	}
 
-	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
+	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
 		Collection<Template> templates = new ArrayList<Template>();
 		NodeList nets = doc.getElementsByTagName("net");
+		
+		if(nets.getLength() <= 0)
+			throw new FormatException("File did not contain any TAPN components.");
+		
 		for (int i = 0; i < nets.getLength(); i++) {
 			Template template = parseTimedArcPetriNet(nets.item(i), network, constants);
 			templates.add(template);
@@ -252,7 +257,7 @@ public class TapnXmlLoader {
 		return constants;
 	}
 
-	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
+	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
 		String name = getTAPNName(tapnNode);
 
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
@@ -274,7 +279,7 @@ public class TapnXmlLoader {
 		return template;
 	}
 
-	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
+	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
 		if ("labels".equals(element.getNodeName())) {
 			AnnotationNote note = parseAnnotation(element);
 			template.guiModel().addPetriNetObject(note);
@@ -420,7 +425,6 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
-		//if(usedNames.contains(nameInput)) throw new RuntimeException("Cannot contain multiple objects with the same name");
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
@@ -440,7 +444,7 @@ public class TapnXmlLoader {
 		return placeComponent;
 	}
 
-	private void parseAndAddArc(Element arc, Template template, Map<String, Constant> constants) {
+	private void parseAndAddArc(Element arc, Template template, Map<String, Constant> constants) throws FormatException {
 		String idInput = arc.getAttribute("id");
 		String sourceInput = arc.getAttribute("source");
 		String targetInput = arc.getAttribute("target");
@@ -491,7 +495,7 @@ public class TapnXmlLoader {
 	private TimedOutputArcComponent parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template) {
+			double _endx, double _endy, Template template) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
 				sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput, taggedArc);
@@ -503,7 +507,7 @@ public class TapnXmlLoader {
 		tempArc.setUnderlyingArc(outputArc);
 
 		if(template.model().hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
-			throw new RuntimeException("Error while loading model:\n - Multiple arcs between a place and a transition is not allowed");
+			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
 		template.guiModel().addPetriNetObject(tempArc);
@@ -597,7 +601,7 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, Map<String, Constant> constants) {
+			double _endx, double _endy, Template template, Map<String, Constant> constants) throws FormatException {
 		Arc tempArc;
 		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
 				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
@@ -612,7 +616,7 @@ public class TapnXmlLoader {
 		((TimedInputArcComponent) tempArc).setUnderlyingArc(inputArc);
 
 		if(template.model().hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
-			throw new RuntimeException("Error while loading model:\n - Multiple arcs between a place and a transition is not allowed");
+			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 
 		template.guiModel().addPetriNetObject(tempArc);

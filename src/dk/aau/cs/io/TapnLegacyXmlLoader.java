@@ -73,6 +73,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
@@ -99,7 +100,7 @@ public class TapnLegacyXmlLoader {
 		this.drawingSurface = drawingSurfaceImpl;
 	}
 	
-	public LoadedModel load(File file) {
+	public LoadedModel load(File file) throws FormatException {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");
 
 		Document doc = loadDocument(file);
@@ -120,7 +121,7 @@ public class TapnLegacyXmlLoader {
 		}
 	}
 
-	private LoadedModel parse(Document tapnDoc) { 
+	private LoadedModel parse(Document tapnDoc) throws FormatException { 
 		ArrayList<Template> templates = new ArrayList<Template>();
 
 		NodeList constantNodes = tapnDoc.getElementsByTagName("constant");
@@ -134,6 +135,10 @@ public class TapnLegacyXmlLoader {
 
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
 		NodeList nets = tapnDoc.getElementsByTagName("net");
+		
+		if(nets.getLength() <= 0)
+			throw new FormatException("File did not contain any TAPN components.");
+		
 		templates.add(parseTimedArcPetriNetAsOldFormat(nets.item(0), network));
 		
 		checkThatQueriesUseExistingPlaces(network);
@@ -176,7 +181,7 @@ public class TapnLegacyXmlLoader {
 	private Arc parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy) {
+			double _endx, double _endy) throws FormatException {
 		
 		Arc tempArc;
 		tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
@@ -189,7 +194,7 @@ public class TapnLegacyXmlLoader {
 		((TimedOutputArcComponent) tempArc).setUnderlyingArc(outputArc);
 		
 		if(tapn.hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
-			throw new RuntimeException("Error while loading model:\n - Multiple arcs between a place and a transition is not allowed");
+			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 		
 		guiModel.addPetriNetObject(tempArc);
@@ -284,7 +289,7 @@ public class TapnLegacyXmlLoader {
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy) {
+			double _endx, double _endy) throws FormatException {
 		Arc tempArc;
 		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
 				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
@@ -299,7 +304,7 @@ public class TapnLegacyXmlLoader {
 		((TimedInputArcComponent) tempArc).setUnderlyingArc(inputArc);
 		
 		if(tapn.hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
-			throw new RuntimeException("Error while loading model:\n - Multiple arcs between a place and a transition is not allowed");
+			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
 		}
 		
 		guiModel.addPetriNetObject(tempArc);
@@ -407,7 +412,7 @@ public class TapnLegacyXmlLoader {
 	// //////////////////////////////////////////////////////////
 	// Legacy support for old format
 	// //////////////////////////////////////////////////////////
-	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode, TimedArcPetriNetNetwork network) {
+	private Template parseTimedArcPetriNetAsOldFormat(Node tapnNode, TimedArcPetriNetNetwork network) throws FormatException {
 		tapn = new TimedArcPetriNet(nameGenerator .getNewTemplateName());
 		network.add(tapn);
 
@@ -425,7 +430,7 @@ public class TapnLegacyXmlLoader {
 		return new Template(tapn, guiModel);
 	}
 
-	private void parseElementAsOldFormat(Node node, String templateName, TimedMarking marking) {
+	private void parseElementAsOldFormat(Node node, String templateName, TimedMarking marking) throws FormatException {
 		Element element;
 		if (node instanceof Element) {
 			element = (Element) node;
@@ -457,7 +462,7 @@ public class TapnLegacyXmlLoader {
 		return c.getResult();
 	}
 
-	private void parseAndAddAnnotationAsOldFormat(Element inputLabelElement) {
+	private void parseAndAddAnnotationAsOldFormat(Element inputLabelElement) throws FormatException {
 		int positionXInput = 0;
 		int positionYInput = 0;
 		int widthInput = 0;
@@ -470,8 +475,7 @@ public class TapnLegacyXmlLoader {
 		String heightTemp = inputLabelElement.getAttribute("height");
 		String borderTemp = inputLabelElement.getAttribute("border");
 
-		String text = getFirstChildNodeByName(inputLabelElement, "text")
-				.getTextContent();
+		String text = getFirstChildNodeByName(inputLabelElement, "text").getTextContent();
 
 		if (positionXTempStorage.length() > 0) {
 			positionXInput = Integer.valueOf(positionXTempStorage).intValue() + 1;
@@ -500,7 +504,7 @@ public class TapnLegacyXmlLoader {
 		addListeners(an);
 	}
 
-	private void parseAndAddTransitionAsOldFormat(Element element) {
+	private void parseAndAddTransitionAsOldFormat(Element element) throws FormatException {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
@@ -536,7 +540,7 @@ public class TapnLegacyXmlLoader {
 		tapn.add(t);
 	}
 
-	private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) {
+	private void parseAndAddPlaceAsOldFormat(Element element, TimedMarking marking) throws FormatException {
 		double positionXInput = getPositionAttribute(element, "x");
 		double positionYInput = getPositionAttribute(element, "y");
 		String idInput = element.getAttribute("id");
@@ -587,7 +591,7 @@ public class TapnLegacyXmlLoader {
 		}
 	}
 
-	private void parseAndAddArcAsOldFormat(Element inputArcElement) {
+	private void parseAndAddArcAsOldFormat(Element inputArcElement) throws FormatException {
 		String idInput = inputArcElement.getAttribute("id");
 		String sourceInput = inputArcElement.getAttribute("source");
 		String targetInput = inputArcElement.getAttribute("target");
@@ -666,7 +670,7 @@ public class TapnLegacyXmlLoader {
 		}
 	}
 
-	private TAPNQuery parseQueryAsOldFormat(Element queryElement) {
+	private TAPNQuery parseQueryAsOldFormat(Element queryElement) throws FormatException {
 		String comment = getQueryComment(queryElement);
 		TraceOption traceOption = getQueryTraceOption(queryElement);
 		SearchOption searchOption = getQuerySearchOption(queryElement);
@@ -686,7 +690,7 @@ public class TapnLegacyXmlLoader {
 			return null;
 	}
 
-	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) {
+	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {
 		TCTLAbstractProperty query = null;
 		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 
@@ -704,11 +708,11 @@ public class TapnLegacyXmlLoader {
 		return query;
 	}
 
-	private int getQueryCapacityAsOldFormat(Element queryElement) {
+	private int getQueryCapacityAsOldFormat(Element queryElement) throws FormatException {
 		return getContentOfFirstSpecificChildNodesValueChildNodeAsInt(queryElement, "capacity");
 	}
 
-	private boolean getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(Element element, String childNodeName) {
+	private boolean getContentOfFirstSpecificChildNodesValueChildNodeAsBoolean(Element element, String childNodeName) throws FormatException {
 		Node node = getFirstChildNodeByName(element, childNodeName);
 
 		if (node instanceof Element) {
@@ -722,15 +726,14 @@ public class TapnLegacyXmlLoader {
 		return false;
 	}
 
-	private double getNameOffsetAttribute(Element element, String coordinateName) {
+	private double getNameOffsetAttribute(Element element, String coordinateName) throws FormatException {
 		Node node = getFirstChildNodeByName(element, "name");
 
 		if (node instanceof Element) {
 			Element e = (Element) node;
 
 			Element graphics = ((Element) getFirstChildNodeByName(e, "graphics"));
-			String offsetCoordinate = ((Element) getFirstChildNodeByName(
-					graphics, "offset")).getAttribute(coordinateName);
+			String offsetCoordinate = ((Element) getFirstChildNodeByName(graphics, "offset")).getAttribute(coordinateName);
 			if (offsetCoordinate.length() > 0) {
 				return Double.valueOf(offsetCoordinate).doubleValue();
 			}
@@ -739,21 +742,20 @@ public class TapnLegacyXmlLoader {
 		return 0.0;
 	}
 
-	private Node getFirstChildNodeByName(Element element, String childNodeName) {
+	private Node getFirstChildNodeByName(Element element, String childNodeName) throws FormatException {
 		Node node = element.getElementsByTagName(childNodeName).item(0);
 
 		if (node == null)
-			throw new RuntimeException("Child node not found");
+			throw new FormatException("TAPAAL could not recognize save format.");
 
 		return node;
 	}
 
-	private String getContentOfValueChildNode(Element element) {
+	private String getContentOfValueChildNode(Element element) throws FormatException {
 		return ((Element) getFirstChildNodeByName(element, "value")).getTextContent();
 	}
 
-	private String getChildNodesContentOfValueChildNodeAsString(
-			Element element, String childNodeName) {
+	private String getChildNodesContentOfValueChildNodeAsString(Element element, String childNodeName) throws FormatException {
 		Node node = getFirstChildNodeByName(element, childNodeName);
 
 		if (node instanceof Element) {
@@ -765,14 +767,13 @@ public class TapnLegacyXmlLoader {
 		return "";
 	}
 
-	private double getPositionAttribute(Element element, String coordinateName) {
+	private double getPositionAttribute(Element element, String coordinateName) throws FormatException {
 		Node node = getFirstChildNodeByName(element, "graphics");
 
 		if (node instanceof Element) {
 			Element e = (Element) node;
 
-			String posCoordinate = ((Element) getFirstChildNodeByName(e,
-					"position")).getAttribute(coordinateName);
+			String posCoordinate = ((Element) getFirstChildNodeByName(e, "position")).getAttribute(coordinateName);
 			if (posCoordinate.length() > 0) {
 				return Double.valueOf(posCoordinate).doubleValue();
 			}
@@ -781,7 +782,7 @@ public class TapnLegacyXmlLoader {
 		return 0.0;
 	}
 
-	private int getContentOfFirstSpecificChildNodesValueChildNodeAsInt(Element element, String childNodeName) {
+	private int getContentOfFirstSpecificChildNodesValueChildNodeAsInt(Element element, String childNodeName) throws FormatException {
 		Node node = getFirstChildNodeByName(element, childNodeName);
 
 		if (node instanceof Element) {
@@ -796,15 +797,14 @@ public class TapnLegacyXmlLoader {
 		return 0;
 	}
 
-	private double getMarkingOffsetAttribute(Element element, String coordinateName) {
+	private double getMarkingOffsetAttribute(Element element, String coordinateName) throws FormatException {
 		Node node = getFirstChildNodeByName(element, "initialMarking");
 
 		if (node instanceof Element) {
 			Element e = (Element) node;
 
 			Element graphics = ((Element) getFirstChildNodeByName(e, "graphics"));
-			String offsetCoordinate = ((Element) getFirstChildNodeByName(
-					graphics, "offset")).getAttribute(coordinateName);
+			String offsetCoordinate = ((Element) getFirstChildNodeByName(graphics, "offset")).getAttribute(coordinateName);
 			if (offsetCoordinate.length() > 0)
 				return Double.parseDouble(offsetCoordinate);
 		}

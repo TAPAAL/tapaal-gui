@@ -969,11 +969,9 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			} catch (Exception e) {
 				undoAddTab(currentlySelected);
 				JOptionPane.showMessageDialog(GuiFrame.this,
-						"Error loading file:\n" + name + "\nGuru meditation:\n"
-						+ e.toString(), "File load error",
+						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(), 
+						"Error loading file: " + name, 
 						JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
-
 				return;
 			}
 		}
