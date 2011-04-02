@@ -79,10 +79,9 @@ public class FileBrowser {
 					f = new File(f.getCanonicalPath() + "." + ext); // force
 																	// extension
 				}
-				 if (!CreateGui.usingGTKFileBrowser() && f.exists() &&
-				 JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() +
-				 "\nDo you want to overwrite this file?") !=
-				 JOptionPane.YES_OPTION) {
+							
+				 if (!CreateGui.usingGTKFileBrowser() && f.exists() &&  
+						 JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?") != JOptionPane.YES_OPTION) {
 				 return null;
 				 }
 				return f.getCanonicalPath();

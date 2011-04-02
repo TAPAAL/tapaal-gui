@@ -57,8 +57,7 @@ public class TimedArcPetriNet {
 		Require.that(places.contains(arc.source()),	"The source place must be part of the petri net.");
 		Require.that(transitions.contains(arc.destination()), "The destination transition must be part of the petri net");
 		Require.that(!inputArcs.contains(arc), "The specified arc is already a part of the petri net.");
-		Require.that(!hasArcFromPlaceToTransition(arc.source(), arc.destination()), "Cannot have two arcs between the same place and transition"); // TODO: this was commented out, not sure why
-
+		
 		arc.setModel(this);
 		inputArcs.add(arc);
 		arc.destination().addToPreset(arc);
@@ -69,8 +68,7 @@ public class TimedArcPetriNet {
 		Require.that(places.contains(arc.destination()), "The destination place must be part of the petri net.");
 		Require.that(transitions.contains(arc.source()), "The source transition must be part of the petri net");
 		Require.that(!outputArcs.contains(arc),	"The specified arc is already a part of the petri net.");
-		Require.that(!hasArcFromTransitionToPlace(arc.source(), arc.destination()),	"Cannot have two arcs between the same transition and place"); // TODO: this was commented out, not sure why
-
+	
 		arc.setModel(this);
 		outputArcs.add(arc);
 		arc.source().addToPostset(arc);
