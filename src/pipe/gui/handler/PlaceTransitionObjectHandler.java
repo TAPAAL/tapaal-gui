@@ -45,6 +45,7 @@ import dk.aau.cs.util.RequireException;
  */
 
 public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
+	private static final String ERROR_MSG_TWO_ARCS = "We do not allow two arcs from a place to a transition or a transition to a place.";
 	private DataLayer guiModel;
 	private TimedArcPetriNet model;
 	ArcKeyboardEventHandler keyHandler = null;
@@ -193,8 +194,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		boolean isNewArc = true; // true if we have to add a new arc to the
 									// Petri Net
 		boolean fastMode = false;
-
-		String error_message_two_arcs = "We do not allow two arcs from a place to a transition or a transition to a place.";
 
 		DrawingSurfaceImpl view = CreateGui.getView();
 		// DataLayer model = CreateGui.getModel();
@@ -459,8 +458,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						PlaceTransitionObject target = transportArcToCreate
 								.getTarget();
 						if (!(target instanceof Transition && target != null)) {
-							System.err
-									.println("Error creating transport arc, invalid target");
+							System.err.println("Error creating transport arc, invalid target");
 							transportArcToCreate.delete();
 							break;
 						}
@@ -474,9 +472,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							Arc someArc = (arcsFrom.next());
 							if (someArc == transportArcToCreate) {
 								break;
-							} else if (someArc.getSource() == transportArcToCreate
-									.getSource()
-									&& someArc.getTarget() == currentObject) {
+							} else if (someArc.getSource() == transportArcToCreate.getSource() && someArc.getTarget() == currentObject) {
 								existsArc = true;
 
 								if (someArc instanceof TimedInhibitorArcComponent) {
@@ -484,12 +480,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									// there is
 									// a TAPNInhibitorArc arc already - This
 									// does not make sense.
-									System.out
-											.println("It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.");
-									JOptionPane
-											.showMessageDialog(
+									cleanupArc(transportArcToCreate, view);
+									System.out.println(ERROR_MSG_TWO_ARCS);
+									JOptionPane.showMessageDialog(
 													CreateGui.getApp(),
-													"It does not make sense to have both a transport arc and an inhibitor arc from a place to a transition.",
+													ERROR_MSG_TWO_ARCS,
 													"Error",
 													JOptionPane.ERROR_MESSAGE);
 
@@ -498,9 +493,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									// there is
 									// a transport arc already - We do not allow
 									// that.
-									System.out.println(error_message_two_arcs);
+									cleanupArc(transportArcToCreate, view);
+									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(CreateGui
-											.getApp(), error_message_two_arcs,
+											.getApp(), ERROR_MSG_TWO_ARCS,
 											"Error", JOptionPane.ERROR_MESSAGE);
 
 								} else if (someArc instanceof TimedOutputArcComponent) {
@@ -508,9 +504,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									// there is
 									// a normal arc already - we increment arc's
 									// weight
-									System.out.println(error_message_two_arcs);
+									cleanupArc(transportArcToCreate, view);
+									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(CreateGui
-											.getApp(), error_message_two_arcs,
+											.getApp(), ERROR_MSG_TWO_ARCS,
 											"Error", JOptionPane.ERROR_MESSAGE);
 
 								} else {
@@ -531,14 +528,12 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								.getPostset()) {
 							if (pt instanceof TransportArcComponent) {
 								if (((TransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
-									groupMaxCounter = ((TransportArcComponent) pt)
-											.getGroupNr();
+									groupMaxCounter = ((TransportArcComponent) pt).getGroupNr();
 								}
 							}
 						}
 
-						((TransportArcComponent) transportArcToCreate)
-								.setGroupNr(groupMaxCounter + 1);
+						((TransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
 
 						currentObject.addConnectTo(transportArcToCreate);
 
@@ -546,14 +541,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// twice
 						contentPane.remove(transportArcToCreate);
 
-						guiModel
-								.addArc((TimedOutputArcComponent) transportArcToCreate);
+						guiModel.addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
-						//undoManager.newEdit();
-
-						// undoManager.addEdit(
-						// new AddPetriNetObjectEdit(transportArcToCreate, view,
-						// model));
 
 						// arc is drawn, remove handler:
 						transportArcToCreate.removeKeyListener(keyHandler);
@@ -563,15 +552,13 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						view.transportArcPart1 = (TransportArcComponent) transportArcToCreate;
 
 						// Create the next arc
-						Arc arc = new TransportArcComponent(currentObject,
-										groupMaxCounter + 1, false);
+						Arc arc = new TransportArcComponent(currentObject, groupMaxCounter + 1, false);
 						createArc(arc, currentObject);
 
 					} else if (transportArcToCreate.getSource() instanceof Transition) {
 						// Step 2
 						if (view.transportArcPart1 == null) {
-							System.err
-									.println("There where a error, cant creat a transport arc without part one");
+							System.err.println("There where a error, cant creat a transport arc without part one");
 							// arc is drawn, remove handler:
 							transportArcToCreate.removeKeyListener(keyHandler);
 							keyHandler = null;
@@ -582,8 +569,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// Check if arc has leagal target
 						if (!(transportArcToCreate.getTarget() instanceof TimedPlaceComponent && transportArcToCreate
 								.getTarget() != null)) {
-							System.err
-									.println("Error creating transport arc, invalid target");
+							System.err.println("Error creating transport arc, invalid target");
 							transportArcToCreate.delete();
 							view.transportArcPart1.delete();
 							break;
@@ -592,26 +578,19 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						dk.aau.cs.model.tapn.TransportArc ta;
 						try {
 							ta = new dk.aau.cs.model.tapn.TransportArc(
-									((TimedPlaceComponent) view.transportArcPart1
-											.getSource()).underlyingPlace(),
-									((TimedTransitionComponent) transportArcToCreate
-											.getSource())
-											.underlyingTransition(),
-									((TimedPlaceComponent) transportArcToCreate
-											.getTarget()).underlyingPlace(),
+									((TimedPlaceComponent) view.transportArcPart1.getSource()).underlyingPlace(),
+									((TimedTransitionComponent) transportArcToCreate.getSource()).underlyingTransition(),
+									((TimedPlaceComponent) transportArcToCreate.getTarget()).underlyingPlace(),
 									TimeInterval.ZERO_INF);
 							model.add(ta);
-							((TransportArcComponent) transportArcToCreate)
-									.setUnderlyingArc(ta);
+							((TransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 							(view.transportArcPart1).setUnderlyingArc(ta);
 							view.transportArcPart1.updateWeightLabel(true);
-							((TransportArcComponent) transportArcToCreate)
-									.updateWeightLabel(true);
+							((TransportArcComponent) transportArcToCreate).updateWeightLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(transportArcToCreate, view);
 							cleanupArc(view.transportArcPart1, view);
-							JOptionPane
-									.showMessageDialog(
+							JOptionPane.showMessageDialog(
 											CreateGui.getApp(),
 											"There was an error drawing the arc. Possible problems:\n"
 													+ " - There is already an arc between the source place and transition\n"
@@ -626,33 +605,28 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// twice
 						contentPane.remove(transportArcToCreate);
 
-						guiModel
-								.addArc((TimedOutputArcComponent) transportArcToCreate);
+						guiModel.addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
 						undoManager.newEdit();
 
-						undoManager.addEdit(new AddTransportArcCommand(
-								(TransportArcComponent) transportArcToCreate,
-								ta, model, guiModel, view));
+						undoManager.addEdit(new AddTransportArcCommand((TransportArcComponent) transportArcToCreate,ta, model, guiModel, view));
 
 						// arc is drawn, remove handler:
 						transportArcToCreate.removeKeyListener(keyHandler);
 						keyHandler = null;
-						/**/
+						
 						if (isNewArc == false) {
 							view.remove(transportArcToCreate);
 						}
-						/* */
+					
 						view.createArc = null;
 
 						((TransportArcComponent) transportArcToCreate)
 								.setGroupNr(view.transportArcPart1.getGroupNr());
 
 						// Ekstra suff
-						view.transportArcPart1
-								.setConnectedTo(((TransportArcComponent) transportArcToCreate));
-						((TransportArcComponent) transportArcToCreate)
-								.setConnectedTo(view.transportArcPart1);
+						view.transportArcPart1.setConnectedTo(((TransportArcComponent) transportArcToCreate));
+						((TransportArcComponent) transportArcToCreate).setConnectedTo(view.transportArcPart1);
 						view.transportArcPart1 = null;
 					}
 
@@ -685,7 +659,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						
 						try {
 							if(hasArcFromTransitionToPlace(model,((TimedTransitionComponent) outputArc.getSource()), ((TimedPlaceComponent) outputArc.getTarget()))){
-								throw new RequireException("Cannot have two arcs between the same place and transition");
+								throw new RequireException(ERROR_MSG_TWO_ARCS);
 							}
 							
 							dk.aau.cs.model.tapn.TimedOutputArc timedOutputArc = new TimedOutputArc(
