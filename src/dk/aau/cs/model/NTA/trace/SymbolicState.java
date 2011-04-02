@@ -1,4 +1,4 @@
-package dk.aau.cs.TA.trace;
+package dk.aau.cs.model.NTA.trace;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

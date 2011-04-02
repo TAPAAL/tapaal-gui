@@ -25,7 +25,7 @@ public class UppaalExporter {
 	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TAPNQuery query, ReductionOption reduction, File modelFile, File queryFile) {
 		if (modelFile == null || queryFile == null) return null;
 
-		ModelTranslator<dk.aau.cs.model.tapn.TimedArcPetriNet, TAPNQuery, dk.aau.cs.TA.NTA, dk.aau.cs.TA.UPPAALQuery> translator = null;
+		ModelTranslator<dk.aau.cs.model.tapn.TimedArcPetriNet, TAPNQuery, dk.aau.cs.model.NTA.NTA, dk.aau.cs.model.NTA.UPPAALQuery> translator = null;
 			
 		if (reduction == ReductionOption.STANDARD || reduction == ReductionOption.STANDARDSYMMETRY) {
 			translator = new StandardTranslation(reduction == ReductionOption.STANDARDSYMMETRY); 
@@ -44,7 +44,7 @@ public class UppaalExporter {
 		}
 		
 		try { 
-			Tuple<dk.aau.cs.TA.NTA, dk.aau.cs.TA.UPPAALQuery> translatedModel = translator.translate(newModel, query);
+			Tuple<dk.aau.cs.model.NTA.NTA, dk.aau.cs.model.NTA.UPPAALQuery> translatedModel = translator.translate(newModel, query);
 			translatedModel.value1().outputToUPPAALXML(new PrintStream(modelFile));
 			translatedModel.value2().output(new PrintStream(queryFile));
 		} catch (Exception e) {

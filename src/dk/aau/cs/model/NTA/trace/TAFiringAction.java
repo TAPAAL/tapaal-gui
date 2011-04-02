@@ -1,9 +1,4 @@
-package dk.aau.cs.TA.trace;
-
-import java.math.BigDecimal;
-import java.math.MathContext;
-
-import pipe.gui.Pipe;
+package dk.aau.cs.model.NTA.trace;
 
 /*  Copyright (c) 2009, Kenneth Yrke Jørgensen <kyrke@cs.aau.dk>
  All rights reserved.
@@ -16,35 +11,6 @@ import pipe.gui.Pipe;
 
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   
  */
-public class TimeDelayFiringAction implements TAFiringAction {
-
-	private SymbolicState state;
-	private BigDecimal timedelay;
-
-	public TimeDelayFiringAction(SymbolicState state, BigDecimal delay) {
-		this.state = state;
-		this.timedelay = delay;
-	}
-
-	public BigDecimal getDelay() {
-		return timedelay;
-	}
-
-	public SymbolicState sourceState() {
-		return state;
-	}
-
-	@Override
-	public String toString() {
-
-		return "Delay: " + timedelay;
-	}
-
-	public static TimeDelayFiringAction parse(SymbolicState previousState,
-			String element) {
-		String delayAsString = element.replace("Delay:", "").trim();
-		double delay = Double.parseDouble(delayAsString);
-		return new TimeDelayFiringAction(previousState, new BigDecimal(delay,
-				new MathContext(Pipe.AGE_DECIMAL_PRECISION)));
-	}
+public interface TAFiringAction {
+	SymbolicState sourceState();
 }

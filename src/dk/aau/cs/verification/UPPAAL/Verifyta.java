@@ -13,7 +13,7 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
-import dk.aau.cs.TA.trace.UppaalTrace;
+import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;

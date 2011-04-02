@@ -3,12 +3,12 @@ package dk.aau.cs.translations.tapn;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.TA.Edge;
-import dk.aau.cs.TA.Location;
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.SupQuery;
-import dk.aau.cs.TA.TimedAutomaton;
-import dk.aau.cs.TA.UPPAALQuery;
+import dk.aau.cs.model.NTA.Edge;
+import dk.aau.cs.model.NTA.Location;
+import dk.aau.cs.model.NTA.NTA;
+import dk.aau.cs.model.NTA.SupQuery;
+import dk.aau.cs.model.NTA.TimedAutomaton;
+import dk.aau.cs.model.NTA.UPPAALQuery;
 import dk.aau.cs.model.tapn.*;
 
 public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastTranslation {

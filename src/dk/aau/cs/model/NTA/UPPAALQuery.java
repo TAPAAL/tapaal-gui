@@ -1,4 +1,4 @@
-package dk.aau.cs.TA;
+package dk.aau.cs.model.NTA;
 
 import java.io.PrintStream;
 

@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dk.aau.cs.TA.trace.Participant;
-import dk.aau.cs.TA.trace.TAFiringAction;
-import dk.aau.cs.TA.trace.TimeDelayFiringAction;
-import dk.aau.cs.TA.trace.TransitionFiring;
-import dk.aau.cs.TA.trace.UppaalTrace;
+import dk.aau.cs.model.NTA.trace.Participant;
+import dk.aau.cs.model.NTA.trace.TAFiringAction;
+import dk.aau.cs.model.NTA.trace.TimeDelayFiringAction;
+import dk.aau.cs.model.NTA.trace.TransitionFiring;
+import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;

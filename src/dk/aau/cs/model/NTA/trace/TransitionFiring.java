@@ -1,4 +1,4 @@
-package dk.aau.cs.TA.trace;
+package dk.aau.cs.model.NTA.trace;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
