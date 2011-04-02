@@ -29,7 +29,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-public class LeftConstantsPane extends JPanel {
+public class ConstantsPane extends JPanel {
 	private static final long serialVersionUID = -7883351020889779067L;
 	private JPanel constantsPanel;
 	private JScrollPane constantsScroller;
@@ -42,7 +42,7 @@ public class LeftConstantsPane extends JPanel {
 
 	private TabContent parent;
 
-	public LeftConstantsPane(boolean enableAddButton, TabContent parent) {
+	public ConstantsPane(boolean enableAddButton, TabContent parent) {
 		this.parent = parent;
 
 		constantsPanel = new JPanel(new BorderLayout());

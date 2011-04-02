@@ -23,8 +23,8 @@ import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
-import pipe.gui.widgets.LeftConstantsPane;
-import pipe.gui.widgets.LeftQueryPane;
+import pipe.gui.widgets.ConstantsPane;
+import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -42,8 +42,8 @@ public class TabContent extends JSplitPane {
 
 	// Normal mode
 	private JPanel editorLeftPane;
-	private LeftQueryPane queries;
-	private LeftConstantsPane constantsPanel;
+	private QueryPane queries;
+	private ConstantsPane constantsPanel;
 	private TemplateExplorer templateExplorer;
 
 	// / Animation
@@ -88,8 +88,8 @@ public class TabContent extends JSplitPane {
 		editorLeftPane.setMinimumSize(new Dimension(210, 100));
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 		
-		constantsPanel = new LeftConstantsPane(enableAddButton, this);
-		queries = new LeftQueryPane(new ArrayList<TAPNQuery>(), this);
+		constantsPanel = new ConstantsPane(enableAddButton, this);
+		queries = new QueryPane(new ArrayList<TAPNQuery>(), this);
 		templateExplorer = new TemplateExplorer(this);
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
 

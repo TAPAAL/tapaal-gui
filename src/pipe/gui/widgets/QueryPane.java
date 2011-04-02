@@ -22,12 +22,15 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.gui.Verifier;
+import pipe.gui.undo.AddQueryCommand;
+import pipe.gui.undo.RemoveQueryCommand;
+import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
-public class LeftQueryPane extends JPanel {
+public class QueryPane extends JPanel {
 	private static final long serialVersionUID = 4062539545170994654L;
 	private JPanel queryCollectionPanel;
 	private JPanel buttonsPanel;
@@ -41,10 +44,11 @@ public class LeftQueryPane extends JPanel {
 
 	private JButton removeQueryButton;
 	private TabContent tabContent;
+	private UndoManager undoManager;
 
-	public LeftQueryPane(ArrayList<TAPNQuery> queriesToSet,
-			TabContent tabContent) {
+	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
 		this.tabContent = tabContent;
+		this.undoManager = tabContent.drawingSurface().getUndoManager();
 		queryCollectionPanel = new JPanel(new BorderLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
@@ -89,10 +93,7 @@ public class LeftQueryPane extends JPanel {
 		this.add(queryCollectionPanel, BorderLayout.CENTER);
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
-		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Queries"), 
-				BorderFactory.createEmptyBorder(3, 3, 3, 3))
-		);
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Queries"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 
 	private void addQueriesComponents() {
@@ -140,6 +141,8 @@ public class LeftQueryPane extends JPanel {
 		removeQueryButton.setPreferredSize(dimension);
 		removeQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
+				undoManager.addNewEdit(new RemoveQueryCommand(query, tabContent));
 				listModel.remove(queryList.getSelectedIndex());
 			}
 		});
@@ -153,9 +156,9 @@ public class LeftQueryPane extends JPanel {
 		addQueryButton.setPreferredSize(dimension);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(
-						QueryDialogueOption.Save, null, tabContent.network());
+				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());
 				if (q != null) {
+					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
 					addQuery(q);
 				}
 			}
