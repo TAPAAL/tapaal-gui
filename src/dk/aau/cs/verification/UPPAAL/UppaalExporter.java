@@ -94,7 +94,7 @@ public class UppaalExporter {
 				return null;
 			}
 
-		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS){
+		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || (reduction == ReductionOption.KBOUNDANALYSIS && !((TAPN)model).hasInhibitorArcs())){
 			OptimizedStandardSymmetryTranslation t = new OptimizedStandardSymmetryTranslation();
 			try {
 				t.autoTransform((TAPN)model, new PrintStream(xmlfile), new PrintStream(qfile), query, extraTokens);
@@ -126,7 +126,7 @@ public class UppaalExporter {
 				e.printStackTrace();
 				return null;
 			}
-		} else if(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST){
+		} else if(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST || (reduction == ReductionOption.KBOUNDANALYSIS && ((TAPN)model).hasInhibitorArcs())){
 			Degree2BroadcastTranslation broadcastTransformer = new Degree2BroadcastTranslation(extraTokens, reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 			namingScheme = broadcastTransformer.namingScheme();
 			try{

@@ -383,6 +383,9 @@ public class TAPN extends PetriNet implements TimedArcPetriNet {
 		
 	}
 
+	public boolean hasInhibitorArcs() {
+		return inhibitorArcs.size() > 0;
+	}
 
 	public List<TAPNInhibitorArc> getInhibitorArcs() {
 		return inhibitorArcs;
