@@ -15,14 +15,14 @@ import dk.aau.cs.translations.tapn.StandardTranslation;
 import dk.aau.cs.util.Tuple;
 
 public class UppaalExporter {
-	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TAPNQuery query, ReductionOption reduction) {
+	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction) {
 		File modelFile = createTempFile(".xml");
 		File queryFile = createTempFile(".q");
 
-		return export(newModel, query, reduction, modelFile, queryFile);
+		return export(model, query, reduction, modelFile, queryFile);
 	}
 
-	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet newModel, TAPNQuery query, ReductionOption reduction, File modelFile, File queryFile) {
+	public ExportedModel export(dk.aau.cs.model.tapn.TimedArcPetriNet model, TAPNQuery query, ReductionOption reduction, File modelFile, File queryFile) {
 		if (modelFile == null || queryFile == null) return null;
 
 		ModelTranslator<dk.aau.cs.model.tapn.TimedArcPetriNet, TAPNQuery, dk.aau.cs.model.NTA.NTA, dk.aau.cs.model.NTA.UPPAALQuery> translator = null;
@@ -31,11 +31,11 @@ public class UppaalExporter {
 			translator = new StandardTranslation(reduction == ReductionOption.STANDARDSYMMETRY); 
 		} else if (reduction == ReductionOption.OPTIMIZEDSTANDARD 
 				|| reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY
-				|| reduction == ReductionOption.KBOUNDANALYSIS) {
+				|| (reduction == ReductionOption.KBOUNDANALYSIS && !model.hasInhibitorArcs())) {
 			translator = new OptimizedStandardTranslation(reduction == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY || reduction == ReductionOption.KBOUNDANALYSIS);
 		} else if (reduction == ReductionOption.BROADCAST || reduction == ReductionOption.BROADCASTSYMMETRY) {
 			translator = new BroadcastTranslation(reduction == ReductionOption.BROADCASTSYMMETRY);
-		} else if (reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST) {
+		} else if (reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY || reduction == ReductionOption.DEGREE2BROADCAST || (reduction == ReductionOption.KBOUNDANALYSIS && model.hasInhibitorArcs())) {
 			translator = new Degree2BroadcastTranslation(reduction == ReductionOption.DEGREE2BROADCASTSYMMETRY);
 		} else if (reduction == ReductionOption.KBOUNDOPTMIZATION) {
 			translator = new Degree2BroadcastKBoundOptimizeTranslation();
@@ -44,7 +44,7 @@ public class UppaalExporter {
 		}
 		
 		try { 
-			Tuple<dk.aau.cs.model.NTA.NTA, dk.aau.cs.model.NTA.UPPAALQuery> translatedModel = translator.translate(newModel, query);
+			Tuple<dk.aau.cs.model.NTA.NTA, dk.aau.cs.model.NTA.UPPAALQuery> translatedModel = translator.translate(model, query);
 			translatedModel.value1().outputToUPPAALXML(new PrintStream(modelFile));
 			translatedModel.value2().output(new PrintStream(queryFile));
 		} catch (Exception e) {
