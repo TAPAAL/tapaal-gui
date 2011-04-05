@@ -54,6 +54,8 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import pipe.gui.widgets.QueryDialog;
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
@@ -449,19 +451,54 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			 aboutItem.setIcon(new ImageIcon(iconURL));
 		 }
 
-		 new JMenu("Experiment");
-
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
 		 menuBar.add(viewMenu);
 		 menuBar.add(drawMenu);
-
 		 menuBar.add(animateMenu);
-
+		 
+		 menuBar.add(buildToolsMenu());
 		 // menuBar.add(experimentMenu);
 		 menuBar.add(helpMenu);
 		 setJMenuBar(menuBar);
 
+	}
+
+	private JMenu buildToolsMenu() {
+		JMenu toolsMenu = new JMenu("Tools");
+		toolsMenu.setMnemonic('t');
+		
+		JMenuItem batchProcessing = new JMenuItem("Batch Processing");
+		batchProcessing.setMnemonic('b');
+		
+		batchProcessing.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				EscapableDialog batchProcessingDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
+
+				Container contentPane = batchProcessingDialog.getContentPane();
+
+				// 1 Set layout
+				contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+
+				// 2 Add query editor
+				BatchProcessingDialog dialog = new BatchProcessingDialog();
+				contentPane.add(dialog);
+
+				batchProcessingDialog.setResizable(false);
+
+				// Make window fit contents' preferred size
+				batchProcessingDialog.pack();
+
+				// Move window to the middle of the screen
+				batchProcessingDialog.setLocationRelativeTo(null);
+				batchProcessingDialog.setVisible(true);
+			}
+		});
+		
+		toolsMenu.add(batchProcessing);
+		return toolsMenu;
 	}
 
 	private void buildToolbar() {
