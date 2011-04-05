@@ -195,12 +195,14 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	}
 
 	private void createInitializationTransitionsForTokenAutomata(TimedArcPetriNet degree2Model, TimedAutomaton ta) {
+		int j = 0;
 		for(TimedPlace p : degree2Model.places()) {
 			for(int i = 0; i < p.numberOfTokens(); i++) {
 				if (!p.name().equals(PLOCK) && !p.name().equals(PCAPACITY)) {
-					Edge e = new Edge(getLocationByName(PCAPACITY), getLocationByName(p.name()), "", String.format(INITIALIZE_CHANNEL, i, "?"), "");
+					Edge e = new Edge(getLocationByName(PCAPACITY), getLocationByName(p.name()), "", String.format(INITIALIZE_CHANNEL, j, "?"), "");
 					ta.addTransition(e);
 					numberOfInitChannels++;
+					j++;
 				}
 			}
 		}

@@ -407,10 +407,12 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 
 	protected void addInitializationStructure(TimedAutomaton ta, TimedArcPetriNet model) {
+		int j = 0;
 		for(TimedPlace p : model.places()) {
 			for (int i = 0; i < p.numberOfTokens(); i++) {
-				Edge initEdge = new Edge(getLocationByName(PCAPACITY), getLocationByName(p.name()), "",	String.format(INITIALIZE_CHANNEL, i, "?"), "");
+				Edge initEdge = new Edge(getLocationByName(PCAPACITY), getLocationByName(p.name()), "",	String.format(INITIALIZE_CHANNEL, j, "?"), "");
 				ta.addTransition(initEdge);
+				j++;
 			}
 		}
 	}

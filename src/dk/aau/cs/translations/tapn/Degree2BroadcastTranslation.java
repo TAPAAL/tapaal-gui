@@ -373,12 +373,14 @@ public class Degree2BroadcastTranslation implements
 	}
 
 	private void createInitializationTransitionsForTokenAutomata(TimedArcPetriNet degree2Net, TimedAutomaton ta) {
+		int j = 0;
 		for(TimedPlace p : degree2Net.places()) {
 			for (int i = 0; i < p.numberOfTokens(); i++) {
 				if (!p.name().equals(PLOCK) && !p.name().equals(P_CAPACITY)) {
-					Edge e = new Edge(getLocationByName(P_CAPACITY), getLocationByName(p.name()), "", String.format(INIT_CHANNEL, i, "?"), "");
+					Edge e = new Edge(getLocationByName(P_CAPACITY), getLocationByName(p.name()), "", String.format(INIT_CHANNEL, j, "?"), "");
 					ta.addTransition(e);
 					numberOfInitChannels++;
+					j++;
 				}
 			}
 		}
