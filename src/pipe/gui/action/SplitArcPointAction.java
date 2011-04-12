@@ -12,28 +12,25 @@ import pipe.gui.CreateGui;
 
 /**
  * @author Nadeem
- *
- * This class is used to split a point on an arc into two to  allow the arc to 
- * be manipulated further.
+ * 
+ *         This class is used to split a point on an arc into two to allow the
+ *         arc to be manipulated further.
  */
-public class SplitArcPointAction 
-        extends javax.swing.AbstractAction {
-   
-   /**
+public class SplitArcPointAction extends javax.swing.AbstractAction {
+
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6080999798954816351L;
-private ArcPathPoint arcPathPoint;
-   
-   
-   public SplitArcPointAction(ArcPathPoint _arcPathPoint) {
-      arcPathPoint = _arcPathPoint;
-   }
-   
-   
-   public void actionPerformed(ActionEvent e) {
-      CreateGui.getView().getUndoManager().addNewEdit(
-               arcPathPoint.splitPoint());
-   }
-   
+	private ArcPathPoint arcPathPoint;
+
+	public SplitArcPointAction(ArcPathPoint _arcPathPoint) {
+		arcPathPoint = _arcPathPoint;
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		CreateGui.getView().getUndoManager().addNewEdit(
+				arcPathPoint.splitPoint());
+	}
+
 }

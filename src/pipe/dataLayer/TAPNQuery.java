@@ -3,13 +3,23 @@ package pipe.dataLayer;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.translations.ReductionOption;
 
-
 public class TAPNQuery {
-	public enum TraceOption {SOME, FASTEST, NONE};
-	public enum SearchOption {BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST};
-	public enum	HashTableSize {MB_4, MB_16, MB_64, MB_256, MB_512};
-	public enum	ExtrapolationOption {AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP};
-	
+	public enum TraceOption {
+		SOME, FASTEST, NONE
+	};
+
+	public enum SearchOption {
+		BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST
+	};
+
+	public enum HashTableSize {
+		MB_4, MB_16, MB_64, MB_256, MB_512
+	};
+
+	public enum ExtrapolationOption {
+		AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP
+	};
+
 	private String name;
 	private int capacity;
 	private TraceOption traceOption;
@@ -17,11 +27,12 @@ public class TAPNQuery {
 	private ReductionOption reductionOption;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
-	
+
 	private TCTLAbstractProperty property = null;
-	
+
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -35,7 +46,8 @@ public class TAPNQuery {
 	}
 
 	/**
-	 * @param capacity the capacity to set
+	 * @param capacity
+	 *            the capacity to set
 	 */
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
@@ -48,7 +60,6 @@ public class TAPNQuery {
 		return capacity;
 	}
 
-	
 	public String getQuery() {
 		return property.toString();
 	}
@@ -61,7 +72,8 @@ public class TAPNQuery {
 	}
 
 	/**
-	 * @param traceOption the traceOption to set
+	 * @param traceOption
+	 *            the traceOption to set
 	 */
 	public void setTraceOption(TraceOption traceOption) {
 		this.traceOption = traceOption;
@@ -75,7 +87,8 @@ public class TAPNQuery {
 	}
 
 	/**
-	 * @param searchOption the searchOption to set
+	 * @param searchOption
+	 *            the searchOption to set
 	 */
 	public void setSearchOption(SearchOption searchOption) {
 		this.searchOption = searchOption;
@@ -89,7 +102,8 @@ public class TAPNQuery {
 	}
 
 	/**
-	 * @param reductionOption the reductionOption to set
+	 * @param reductionOption
+	 *            the reductionOption to set
 	 */
 	public void setReductionOption(ReductionOption reductionOption) {
 		this.reductionOption = reductionOption;
@@ -103,7 +117,8 @@ public class TAPNQuery {
 	}
 
 	/**
-	 * @param hashTableSize the hashTableSize to set
+	 * @param hashTableSize
+	 *            the hashTableSize to set
 	 */
 	public void setHashTableSize(HashTableSize hashTableSize) {
 		this.hashTableSize = hashTableSize;
@@ -117,7 +132,8 @@ public class TAPNQuery {
 	}
 
 	/**
-	 * @param extrapolationOption the extrapolationOption to set
+	 * @param extrapolationOption
+	 *            the extrapolationOption to set
 	 */
 	public void setExtrapolationOption(ExtrapolationOption extrapolationOption) {
 		this.extrapolationOption = extrapolationOption;
@@ -129,10 +145,11 @@ public class TAPNQuery {
 	public ExtrapolationOption getExtrapolationOption() {
 		return extrapolationOption;
 	}
-	
 
-	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property, TraceOption traceOption, SearchOption searchOption, ReductionOption reductionOption, HashTableSize hashTabelSize, ExtrapolationOption extrapolationOption)
-	{
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -142,21 +159,20 @@ public class TAPNQuery {
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
 	}
-	
+
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return getName();
 	}
 
 	public void set(TAPNQuery newQuery) {
 		this.name = newQuery.getName();
-		this.capacity =newQuery.getCapacity();
+		this.capacity = newQuery.getCapacity();
 		this.property = newQuery.getProperty();
 		this.traceOption = newQuery.getTraceOption();
 		this.searchOption = newQuery.getSearchOption();
 		this.reductionOption = newQuery.getReductionOption();
 		this.hashTableSize = newQuery.getHashTableSize();
-		this.extrapolationOption = newQuery.getExtrapolationOption();		
+		this.extrapolationOption = newQuery.getExtrapolationOption();
 	}
 }

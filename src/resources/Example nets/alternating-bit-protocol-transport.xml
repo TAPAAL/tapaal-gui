@@ -1,1248 +1,215 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<pnml>
-<net id="Net-One" type="P/T net">
-<labels x="775" y="62" width="160" height="429" border="true">
-<text>Classical Alternating Bit Protocol with timeouts for resending messages.
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+<constant name="deadline" value="6"/>
+<constant name="delay" value="5"/>
+<net id="TAPN1" type="P/T net">
+<labels border="true" height="570" positionX="776" positionY="63" width="161">Classical Alternating Bit Protocol with timeouts for resending messages.
 
 In this version of the protocol we use transport arcs to track the timestamp of each message from the point it was sent until it returns as an acknowledgement back to the sender.
 
 The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable underapproximation and verifies the correctness of the protocol upto a given number of extra tokens.
 
-Try to experiment with the values of the constants deadline and delay in order to check for what retransmission rates the protocol remains safe.</text>
-</labels>
-<place id="P0">
-<graphics>
-<position x="390.0" y="150.0"/>
-</graphics>
-<name>
-<value>Medium_A</value>
-<graphics>
-<offset x="50.0" y="-5.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P1">
-<graphics>
-<position x="150.0" y="60.0"/>
-</graphics>
-<name>
-<value>Sender_0_A</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>1</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P10">
-<graphics>
-<position x="600.0" y="615.0"/>
-</graphics>
-<name>
-<value>Receiver_1_B</value>
-<graphics>
-<offset x="107.0" y="32.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=2</value>
-</invariant>
-</place>
-<place id="P11">
-<graphics>
-<position x="600.0" y="780.0"/>
-</graphics>
-<name>
-<value>Receiver_0_A</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>1</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P2">
-<graphics>
-<position x="150.0" y="240.0"/>
-</graphics>
-<name>
-<value>Sender_0_B</value>
-<graphics>
-<offset x="-5.0" y="31.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=6</value>
-</invariant>
-</place>
-<place id="P3">
-<graphics>
-<position x="150.0" y="450.0"/>
-</graphics>
-<name>
-<value>Sender_1_A</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P4">
-<graphics>
-<position x="150.0" y="630.0"/>
-</graphics>
-<name>
-<value>Sender_1_B</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=6</value>
-</invariant>
-</place>
-<place id="P5">
-<graphics>
-<position x="390.0" y="360.0"/>
-</graphics>
-<name>
-<value>Medium_B</value>
-<graphics>
-<offset x="44.0" y="0.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P6">
-<graphics>
-<position x="390.0" y="540.0"/>
-</graphics>
-<name>
-<value>Medium_C</value>
-<graphics>
-<offset x="48.0" y="4.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P7">
-<graphics>
-<position x="390.0" y="720.0"/>
-</graphics>
-<name>
-<value>Medium_D</value>
-<graphics>
-<offset x="44.0" y="0.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P8">
-<graphics>
-<position x="600.0" y="240.0"/>
-</graphics>
-<name>
-<value>Receiver_0_B</value>
-<graphics>
-<offset x="110.0" y="33.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=2</value>
-</invariant>
-</place>
-<place id="P9">
-<graphics>
-<position x="600.0" y="450.0"/>
-</graphics>
-<name>
-<value>Receiver_1_A</value>
-<graphics>
-<offset x="110.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<transition id="T0">
-<graphics>
-<position x="150.0" y="360.0"/>
-</graphics>
-<name>
-<value>Ack_rec_0</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>90</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T1">
-<graphics>
-<position x="150.0" y="540.0"/>
-</graphics>
-<name>
-<value>Send_1</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T10">
-<graphics>
-<position x="600.0" y="360.0"/>
-</graphics>
-<name>
-<value>Ack_send_0</value>
-<graphics>
-<offset x="110.0" y="31.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T11">
-<graphics>
-<position x="390.0" y="630.0"/>
-</graphics>
-<name>
-<value>Loss_C</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T12">
-<graphics>
-<position x="390.0" y="780.0"/>
-</graphics>
-<name>
-<value>Loss_D</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T13">
-<graphics>
-<position x="240.0" y="630.0"/>
-</graphics>
-<name>
-<value>ReSend_1</value>
-<graphics>
-<offset x="63.0" y="50.0"/>
-</graphics>
-</name>
-<orientation>
-<value>0</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T16">
-<graphics>
-<position x="510.0" y="615.0"/>
-</graphics>
-<name>
-<value>Receive_old_1</value>
-<graphics>
-<offset x="74.0" y="-4.0"/>
-</graphics>
-</name>
-<orientation>
-<value>0</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T17">
-<graphics>
-<position x="600.0" y="720.0"/>
-</graphics>
-<name>
-<value>Ack_send_1</value>
-<graphics>
-<offset x="108.0" y="33.0"/>
-</graphics>
-</name>
-<orientation>
-<value>90</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T2">
-<graphics>
-<position x="150.0" y="720.0"/>
-</graphics>
-<name>
-<value>Ack_rec_1</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T3">
-<graphics>
-<position x="150.0" y="150.0"/>
-</graphics>
-<name>
-<value>Send_0</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T4">
-<graphics>
-<position x="600.0" y="150.0"/>
-</graphics>
-<name>
-<value>Receive_0</value>
-<graphics>
-<offset x="92.0" y="36.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T5">
-<graphics>
-<position x="240.0" y="240.0"/>
-</graphics>
-<name>
-<value>ReSend_0</value>
-<graphics>
-<offset x="65.0" y="46.0"/>
-</graphics>
-</name>
-<orientation>
-<value>0</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T6">
-<graphics>
-<position x="495.0" y="240.0"/>
-</graphics>
-<name>
-<value>Receive_old_0</value>
-<graphics>
-<offset x="90.0" y="-3.0"/>
-</graphics>
-</name>
-<orientation>
-<value>0</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T7">
-<graphics>
-<position x="390.0" y="240.0"/>
-</graphics>
-<name>
-<value>Loss_A</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T8">
-<graphics>
-<position x="390.0" y="450.0"/>
-</graphics>
-<name>
-<value>Loss_B</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T9">
-<graphics>
-<position x="600.0" y="540.0"/>
-</graphics>
-<name>
-<value>Receive_1</value>
-<graphics>
-<offset x="89.0" y="31.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value/>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<arc id="P0 to T4" source="P0" target="T4">
-<graphics/>
-<inscription>
-<value>[0,1]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="416" y="161" curvePoint="false"/>
-<arcpath id="001" x="597" y="161" curvePoint="false"/>
-<type value="transport"/>
+Try to experiment with the values of the constants deadline and delay in order to check for what retransmission rates the protocol remains safe.</labels>
+<place id="P0" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Medium_A" nameOffsetX="50.0" nameOffsetY="-5.0" positionX="390.0" positionY="150.0"/>
+<place id="P1" initialMarking="1" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Sender_0_A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="60.0"/>
+<place id="P10" initialMarking="0" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="Receiver_1_B" nameOffsetX="107.0" nameOffsetY="32.0" positionX="600.0" positionY="615.0"/>
+<place id="P11" initialMarking="1" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Receiver_0_A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="780.0"/>
+<place id="P2" initialMarking="0" invariant="&lt;= 6" markingOffsetX="0.0" markingOffsetY="0.0" name="Sender_0_B" nameOffsetX="-5.0" nameOffsetY="31.0" positionX="150.0" positionY="240.0"/>
+<place id="P3" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Sender_1_A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="450.0"/>
+<place id="P4" initialMarking="0" invariant="&lt;= 6" markingOffsetX="0.0" markingOffsetY="0.0" name="Sender_1_B" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="630.0"/>
+<place id="P5" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Medium_B" nameOffsetX="44.0" nameOffsetY="0.0" positionX="390.0" positionY="360.0"/>
+<place id="P6" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Medium_C" nameOffsetX="48.0" nameOffsetY="4.0" positionX="390.0" positionY="540.0"/>
+<place id="P7" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Medium_D" nameOffsetX="44.0" nameOffsetY="0.0" positionX="390.0" positionY="720.0"/>
+<place id="P8" initialMarking="0" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="Receiver_0_B" nameOffsetX="110.0" nameOffsetY="33.0" positionX="600.0" positionY="240.0"/>
+<place id="P9" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Receiver_1_A" nameOffsetX="110.0" nameOffsetY="35.0" positionX="600.0" positionY="450.0"/>
+<transition angle="90" id="T0" infiniteServer="false" name="Ack_rec_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="360.0" priority="1" timed="true"/>
+<transition angle="270" id="T1" infiniteServer="false" name="Send_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="540.0" priority="1" timed="true"/>
+<transition angle="270" id="T10" infiniteServer="false" name="Ack_send_0" nameOffsetX="110.0" nameOffsetY="31.0" positionX="600.0" positionY="360.0" priority="1" timed="true"/>
+<transition angle="270" id="T11" infiniteServer="false" name="Loss_C" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="630.0" priority="1" timed="true"/>
+<transition angle="270" id="T12" infiniteServer="false" name="Loss_D" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="780.0" priority="1" timed="true"/>
+<transition angle="0" id="T13" infiniteServer="false" name="ReSend_1" nameOffsetX="63.0" nameOffsetY="50.0" positionX="240.0" positionY="630.0" priority="1" timed="true"/>
+<transition angle="0" id="T16" infiniteServer="false" name="Receive_old_1" nameOffsetX="74.0" nameOffsetY="-4.0" positionX="510.0" positionY="615.0" priority="1" timed="true"/>
+<transition angle="90" id="T17" infiniteServer="false" name="Ack_send_1" nameOffsetX="108.0" nameOffsetY="33.0" positionX="600.0" positionY="720.0" priority="1" timed="true"/>
+<transition angle="270" id="T2" infiniteServer="false" name="Ack_rec_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="720.0" priority="1" timed="true"/>
+<transition angle="270" id="T3" infiniteServer="false" name="Send_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="150.0" priority="1" timed="true"/>
+<transition angle="270" id="T4" infiniteServer="false" name="Receive_0" nameOffsetX="92.0" nameOffsetY="36.0" positionX="600.0" positionY="150.0" priority="1" timed="true"/>
+<transition angle="0" id="T5" infiniteServer="false" name="ReSend_0" nameOffsetX="65.0" nameOffsetY="46.0" positionX="240.0" positionY="240.0" priority="1" timed="true"/>
+<transition angle="0" id="T6" infiniteServer="false" name="Receive_old_0" nameOffsetX="90.0" nameOffsetY="-3.0" positionX="495.0" positionY="240.0" priority="1" timed="true"/>
+<transition angle="270" id="T7" infiniteServer="false" name="Loss_A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="240.0" priority="1" timed="true"/>
+<transition angle="270" id="T8" infiniteServer="false" name="Loss_B" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="450.0" priority="1" timed="true"/>
+<transition angle="270" id="T9" infiniteServer="false" name="Receive_1" nameOffsetX="89.0" nameOffsetY="31.0" positionX="600.0" positionY="540.0" priority="1" timed="true"/>
+<arc id="P0 to T7" inscription="[0,inf)" source="P0" target="T7" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="402" yCoord="176"/>
+<arcpath arcPointType="false" id="1" xCoord="402" yCoord="247"/>
 </arc>
-<arc id="P0 to T6" source="P0" target="T6">
-<graphics/>
-<inscription>
-<value>[0,1]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="413" y="172" curvePoint="false"/>
-<arcpath id="001" x="501" y="252" curvePoint="false"/>
-<type value="transport"/>
+<arc id="P11 to T16" inscription="[0,inf)" source="P11" target="T16" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="604" yCoord="779"/>
+<arcpath arcPointType="false" id="1" xCoord="522" yCoord="642"/>
 </arc>
-<arc id="P0 to T7" source="P0" target="T7">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="402" y="176" curvePoint="false"/>
-<arcpath id="001" x="402" y="247" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P11 to T4" inscription="[0,inf)" source="P11" target="T4" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="626" yCoord="793"/>
+<arcpath arcPointType="false" id="1" xCoord="675" yCoord="800"/>
+<arcpath arcPointType="false" id="2" xCoord="724" yCoord="799"/>
+<arcpath arcPointType="false" id="3" xCoord="724" yCoord="139"/>
+<arcpath arcPointType="false" id="4" xCoord="650" yCoord="138"/>
+<arcpath arcPointType="false" id="5" xCoord="612" yCoord="157"/>
 </arc>
-<arc id="P10 to T17" source="P10" target="T17">
-<graphics/>
-<inscription>
-<value>[1,2]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="611" y="641" curvePoint="false"/>
-<arcpath id="001" x="611" y="726" curvePoint="false"/>
-<type value="transport"/>
+<arc id="P1 to T3" inscription="[0,inf)" source="P1" target="T3" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="162" yCoord="86"/>
+<arcpath arcPointType="false" id="1" xCoord="162" yCoord="157"/>
 </arc>
-<arc id="P11 to T16" source="P11" target="T16">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="604" y="779" curvePoint="false"/>
-<arcpath id="001" x="522" y="642" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P2 to T0" inscription="[0,inf)" source="P2" target="T0" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="161" yCoord="266"/>
+<arcpath arcPointType="false" id="1" xCoord="161" yCoord="366"/>
 </arc>
-<arc id="P11 to T4" source="P11" target="T4">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="626" y="793" curvePoint="false"/>
-<arcpath id="001" x="674" y="799" curvePoint="false"/>
-<arcpath id="002" x="723" y="798" curvePoint="false"/>
-<arcpath id="003" x="723" y="138" curvePoint="false"/>
-<arcpath id="004" x="649" y="137" curvePoint="false"/>
-<arcpath id="005" x="612" y="157" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P2 to T5" inscription="[delay,deadline]" source="P2" target="T5" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="175" yCoord="245"/>
+<arcpath arcPointType="false" id="1" xCoord="214" yCoord="229"/>
+<arcpath arcPointType="false" id="2" xCoord="247" yCoord="247"/>
 </arc>
-<arc id="P1 to T3" source="P1" target="T3">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="162" y="86" curvePoint="false"/>
-<arcpath id="001" x="162" y="157" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P3 to T1" inscription="[0,inf)" source="P3" target="T1" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="162" yCoord="476"/>
+<arcpath arcPointType="false" id="1" xCoord="162" yCoord="547"/>
 </arc>
-<arc id="P2 to T0" source="P2" target="T0">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="161" y="266" curvePoint="false"/>
-<arcpath id="001" x="161" y="366" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P4 to T13" inscription="[delay,deadline]" source="P4" target="T13" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="175" yCoord="635"/>
+<arcpath arcPointType="false" id="1" xCoord="214" yCoord="619"/>
+<arcpath arcPointType="false" id="2" xCoord="247" yCoord="637"/>
 </arc>
-<arc id="P2 to T5" source="P2" target="T5">
-<graphics/>
-<inscription>
-<value>[delay,deadline]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="175" y="245" curvePoint="false"/>
-<arcpath id="001" x="213" y="228" curvePoint="false"/>
-<arcpath id="002" x="247" y="247" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P4 to T2" inscription="[0,inf)" source="P4" target="T2" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="162" yCoord="656"/>
+<arcpath arcPointType="false" id="1" xCoord="162" yCoord="727"/>
 </arc>
-<arc id="P3 to T1" source="P3" target="T1">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="162" y="476" curvePoint="false"/>
-<arcpath id="001" x="162" y="547" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P5 to T0" inscription="[0,3]" source="P5" target="T0" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="387" yCoord="372"/>
+<arcpath arcPointType="false" id="1" xCoord="176" yCoord="372"/>
 </arc>
-<arc id="P4 to T13" source="P4" target="T13">
-<graphics/>
-<inscription>
-<value>[delay,deadline]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="175" y="635" curvePoint="false"/>
-<arcpath id="001" x="213" y="618" curvePoint="false"/>
-<arcpath id="002" x="247" y="637" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P5 to T8" inscription="[0,inf)" source="P5" target="T8" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="402" yCoord="386"/>
+<arcpath arcPointType="false" id="1" xCoord="402" yCoord="457"/>
 </arc>
-<arc id="P4 to T2" source="P4" target="T2">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="162" y="656" curvePoint="false"/>
-<arcpath id="001" x="162" y="727" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P6 to T11" inscription="[0,inf)" source="P6" target="T11" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="402" yCoord="566"/>
+<arcpath arcPointType="false" id="1" xCoord="402" yCoord="637"/>
 </arc>
-<arc id="P5 to T0" source="P5" target="T0">
-<graphics/>
-<inscription>
-<value>[0,3]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="387" y="372" curvePoint="false"/>
-<arcpath id="001" x="176" y="372" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P7 to T12" inscription="[0,inf)" source="P7" target="T12" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="402" yCoord="746"/>
+<arcpath arcPointType="false" id="1" xCoord="402" yCoord="787"/>
 </arc>
-<arc id="P5 to T8" source="P5" target="T8">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="402" y="386" curvePoint="false"/>
-<arcpath id="001" x="402" y="457" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P7 to T2" inscription="[0,3]" source="P7" target="T2" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="387" yCoord="731"/>
+<arcpath arcPointType="false" id="1" xCoord="177" yCoord="731"/>
 </arc>
-<arc id="P6 to T11" source="P6" target="T11">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="402" y="566" curvePoint="false"/>
-<arcpath id="001" x="402" y="637" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P9 to T6" inscription="[0,inf)" source="P9" target="T6" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="604" yCoord="448"/>
+<arcpath arcPointType="false" id="1" xCoord="507" yCoord="267"/>
 </arc>
-<arc id="P6 to T16" source="P6" target="T16">
-<graphics/>
-<inscription>
-<value>[0,1]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="414" y="560" curvePoint="false"/>
-<arcpath id="001" x="516" y="627" curvePoint="false"/>
-<type value="transport"/>
+<arc id="P9 to T9" inscription="[0,inf)" source="P9" target="T9" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="612" yCoord="476"/>
+<arcpath arcPointType="false" id="1" xCoord="612" yCoord="547"/>
 </arc>
-<arc id="P6 to T9" source="P6" target="T9">
-<graphics/>
-<inscription>
-<value>[0,1]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="416" y="551" curvePoint="false"/>
-<arcpath id="001" x="597" y="551" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T0 to P3" inscription="1" source="T0" target="P3" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="161" yCoord="376"/>
+<arcpath arcPointType="false" id="1" xCoord="161" yCoord="447"/>
 </arc>
-<arc id="P7 to T12" source="P7" target="T12">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="402" y="746" curvePoint="false"/>
-<arcpath id="001" x="402" y="787" curvePoint="false"/>
-<type value="timed"/>
+<arc id="P8 to T10" inscription="[1,2]:1" source="P8" target="T10" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="612" yCoord="266"/>
+<arcpath arcPointType="false" id="1" xCoord="612" yCoord="367"/>
 </arc>
-<arc id="P7 to T2" source="P7" target="T2">
-<graphics/>
-<inscription>
-<value>[0,3]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="387" y="731" curvePoint="false"/>
-<arcpath id="001" x="177" y="731" curvePoint="false"/>
-<type value="timed"/>
+<arc id="T10 to P5" inscription="[1,2]:1" source="T10" target="P5" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="597" yCoord="371"/>
+<arcpath arcPointType="false" id="1" xCoord="416" yCoord="371"/>
 </arc>
-<arc id="P8 to T10" source="P8" target="T10">
-<graphics/>
-<inscription>
-<value>[1,2]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="612" y="266" curvePoint="false"/>
-<arcpath id="001" x="612" y="367" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T10 to P9" inscription="1" source="T10" target="P9" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="612" yCoord="377"/>
+<arcpath arcPointType="false" id="1" xCoord="612" yCoord="447"/>
 </arc>
-<arc id="P9 to T6" source="P9" target="T6">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="604" y="448" curvePoint="false"/>
-<arcpath id="001" x="507" y="267" curvePoint="false"/>
-<type value="timed"/>
+<arc id="T13 to P4" inscription="1" source="T13" target="P4" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="246" yCoord="647"/>
+<arcpath arcPointType="false" id="1" xCoord="214" yCoord="694"/>
+<arcpath arcPointType="false" id="2" xCoord="172" yCoord="652"/>
 </arc>
-<arc id="P9 to T9" source="P9" target="T9">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="612" y="476" curvePoint="false"/>
-<arcpath id="001" x="612" y="547" curvePoint="false"/>
-<type value="timed"/>
+<arc id="T13 to P6" inscription="1" source="T13" target="P6" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="256" yCoord="642"/>
+<arcpath arcPointType="false" id="1" xCoord="389" yCoord="559"/>
 </arc>
-<arc id="T0 to P3" source="T0" target="P3">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="161" y="376" curvePoint="false"/>
-<arcpath id="001" x="161" y="447" curvePoint="false"/>
-<type value="normal"/>
+<arc id="P6 to T16" inscription="[0,1]:1" source="P6" target="T16" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="414" yCoord="560"/>
+<arcpath arcPointType="false" id="1" xCoord="516" yCoord="627"/>
 </arc>
-<arc id="T10 to P5" source="T10" target="P5">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="597" y="371" curvePoint="false"/>
-<arcpath id="001" x="416" y="371" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T16 to P10" inscription="[0,1]:1" source="T16" target="P10" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="526" yCoord="627"/>
+<arcpath arcPointType="false" id="1" xCoord="597" yCoord="627"/>
 </arc>
-<arc id="T10 to P9" source="T10" target="P9">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="612" y="377" curvePoint="false"/>
-<arcpath id="001" x="612" y="447" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T17 to P11" inscription="1" source="T17" target="P11" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="611" yCoord="736"/>
+<arcpath arcPointType="false" id="1" xCoord="611" yCoord="777"/>
 </arc>
-<arc id="T13 to P4" source="T13" target="P4">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="246" y="647" curvePoint="false"/>
-<arcpath id="001" x="213" y="693" curvePoint="false"/>
-<arcpath id="002" x="172" y="652" curvePoint="false"/>
-<type value="normal"/>
+<arc id="P10 to T17" inscription="[1,2]:1" source="P10" target="T17" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="611" yCoord="641"/>
+<arcpath arcPointType="false" id="1" xCoord="611" yCoord="726"/>
 </arc>
-<arc id="T13 to P6" source="T13" target="P6">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="256" y="642" curvePoint="false"/>
-<arcpath id="001" x="389" y="559" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T17 to P7" inscription="[1,2]:1" source="T17" target="P7" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="596" yCoord="732"/>
+<arcpath arcPointType="false" id="1" xCoord="417" yCoord="732"/>
 </arc>
-<arc id="T16 to P10" source="T16" target="P10">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="526" y="627" curvePoint="false"/>
-<arcpath id="001" x="597" y="627" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T1 to P4" inscription="1" source="T1" target="P4" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="162" yCoord="557"/>
+<arcpath arcPointType="false" id="1" xCoord="162" yCoord="627"/>
 </arc>
-<arc id="T17 to P11" source="T17" target="P11">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="611" y="736" curvePoint="false"/>
-<arcpath id="001" x="611" y="777" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T1 to P6" inscription="1" source="T1" target="P6" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="177" yCoord="551"/>
+<arcpath arcPointType="false" id="1" xCoord="387" yCoord="551"/>
 </arc>
-<arc id="T17 to P7" source="T17" target="P7">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="596" y="732" curvePoint="false"/>
-<arcpath id="001" x="417" y="732" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T2 to P1" inscription="1" source="T2" target="P1" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="162" yCoord="737"/>
+<arcpath arcPointType="false" id="1" xCoord="138" yCoord="798"/>
+<arcpath arcPointType="false" id="2" xCoord="63" yCoord="798"/>
+<arcpath arcPointType="false" id="3" xCoord="63" yCoord="33"/>
+<arcpath arcPointType="false" id="4" xCoord="168" yCoord="33"/>
+<arcpath arcPointType="false" id="5" xCoord="164" yCoord="57"/>
 </arc>
-<arc id="T1 to P4" source="T1" target="P4">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="162" y="557" curvePoint="false"/>
-<arcpath id="001" x="162" y="627" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T3 to P0" inscription="1" source="T3" target="P0" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="177" yCoord="161"/>
+<arcpath arcPointType="false" id="1" xCoord="387" yCoord="161"/>
 </arc>
-<arc id="T1 to P6" source="T1" target="P6">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="177" y="551" curvePoint="false"/>
-<arcpath id="001" x="387" y="551" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T3 to P2" inscription="1" source="T3" target="P2" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="162" yCoord="167"/>
+<arcpath arcPointType="false" id="1" xCoord="162" yCoord="237"/>
 </arc>
-<arc id="T2 to P1" source="T2" target="P1">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="162" y="737" curvePoint="false"/>
-<arcpath id="001" x="137" y="797" curvePoint="false"/>
-<arcpath id="002" x="62" y="797" curvePoint="false"/>
-<arcpath id="003" x="62" y="32" curvePoint="false"/>
-<arcpath id="004" x="167" y="32" curvePoint="false"/>
-<arcpath id="005" x="163" y="57" curvePoint="false"/>
-<type value="normal"/>
+<arc id="P0 to T4" inscription="[0,1]:1" source="P0" target="T4" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="416" yCoord="161"/>
+<arcpath arcPointType="false" id="1" xCoord="597" yCoord="161"/>
 </arc>
-<arc id="T3 to P0" source="T3" target="P0">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="177" y="161" curvePoint="false"/>
-<arcpath id="001" x="387" y="161" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T4 to P8" inscription="[0,1]:1" source="T4" target="P8" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="612" yCoord="167"/>
+<arcpath arcPointType="false" id="1" xCoord="612" yCoord="237"/>
 </arc>
-<arc id="T3 to P2" source="T3" target="P2">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="162" y="167" curvePoint="false"/>
-<arcpath id="001" x="162" y="237" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T5 to P0" inscription="1" source="T5" target="P0" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="256" yCoord="252"/>
+<arcpath arcPointType="false" id="1" xCoord="389" yCoord="169"/>
 </arc>
-<arc id="T4 to P8" source="T4" target="P8">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="612" y="167" curvePoint="false"/>
-<arcpath id="001" x="612" y="237" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T5 to P2" inscription="1" source="T5" target="P2" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="246" yCoord="257"/>
+<arcpath arcPointType="false" id="1" xCoord="214" yCoord="304"/>
+<arcpath arcPointType="false" id="2" xCoord="172" yCoord="262"/>
 </arc>
-<arc id="T5 to P0" source="T5" target="P0">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="256" y="252" curvePoint="false"/>
-<arcpath id="001" x="389" y="169" curvePoint="false"/>
-<type value="normal"/>
+<arc id="P0 to T6" inscription="[0,1]:1" source="P0" target="T6" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="413" yCoord="172"/>
+<arcpath arcPointType="false" id="1" xCoord="501" yCoord="252"/>
 </arc>
-<arc id="T5 to P2" source="T5" target="P2">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="246" y="257" curvePoint="false"/>
-<arcpath id="001" x="213" y="303" curvePoint="false"/>
-<arcpath id="002" x="172" y="262" curvePoint="false"/>
-<type value="normal"/>
+<arc id="T6 to P8" inscription="[0,1]:1" source="T6" target="P8" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="511" yCoord="252"/>
+<arcpath arcPointType="false" id="1" xCoord="597" yCoord="252"/>
 </arc>
-<arc id="T6 to P8" source="T6" target="P8">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="511" y="252" curvePoint="false"/>
-<arcpath id="001" x="597" y="252" curvePoint="false"/>
-<type value="transport"/>
+<arc id="P6 to T9" inscription="[0,1]:1" source="P6" target="T9" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="416" yCoord="551"/>
+<arcpath arcPointType="false" id="1" xCoord="597" yCoord="551"/>
 </arc>
-<arc id="T9 to P10" source="T9" target="P10">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="612" y="557" curvePoint="false"/>
-<arcpath id="001" x="612" y="612" curvePoint="false"/>
-<type value="transport"/>
+<arc id="T9 to P10" inscription="[0,1]:1" source="T9" target="P10" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="612" yCoord="557"/>
+<arcpath arcPointType="false" id="1" xCoord="612" yCoord="612"/>
 </arc>
-<queries name="Synchronization Violation" traceOption="SOME" searchOption="BFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="OPTIMIZEDSTANDARD">
-<capacity>
-<value>3</value>
-</capacity>
-<query>
-<value>EF ((Sender_0_A=1 and (Receiver_0_B=1 or Receiver_1_A=1)) or (Sender_1_A=1 and (Receiver_0_A=1 or Receiver_1_B=1)))</value>
-</query>
-</queries>
-<constant name="deadline" value="6"/>
-<constant name="delay" value="5"/>
 </net>
+<query capacity="3" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Synchronization Violation" query="EF ((TAPN1.Sender_0_A=1 and (TAPN1.Receiver_0_B=1 or TAPN1.Receiver_1_A=1)) or (TAPN1.Sender_1_A=1 and (TAPN1.Receiver_0_A=1 or TAPN1.Receiver_1_B=1)))" reductionOption="OPTIMIZEDSTANDARD" searchOption="BFS" traceOption="SOME"/>
 </pnml>

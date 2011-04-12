@@ -8,11 +8,12 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 	private static final String PLOCK = "P_lock";
 	private static final String CONTROL = "Control";
 	private static final String FINISH = "finish";
-	
-	private static final String TOKEN_TEMPLATE_NAME = "P";
+
+	private static final String TOKEN_TEMPLATE_NAME = "Token";
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+			Object context) {
 		append("(sum(i:");
 		append(ID_TYPE);
 		append(")");
@@ -27,12 +28,13 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 
 	@Override
 	protected void addEnding(QueryType type) {
-		if(type == QueryType.EF || type == QueryType.AF){
+		if (type == QueryType.EF || type == QueryType.AF) {
 			append(" && ");
-		}else{
+		} else {
 			append(" || !");
 		}
-		append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1)", LOCK_TEMPLATE, PLOCK, CONTROL, FINISH));
+		append(String.format("(%1$s.%2$s == 1 && %3$s.%4$s == 1)",
+				LOCK_TEMPLATE, PLOCK, CONTROL, FINISH));
 	}
 
 }

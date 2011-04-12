@@ -3,9 +3,8 @@ package pipe.gui.widgets;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,25 +12,16 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.TAPNInhibitorArc;
-import pipe.dataLayer.TAPNTransition;
-import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TimedPlace;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArc;
-import pipe.dataLayer.colors.ColoredInputArc;
-import pipe.dataLayer.colors.ColoredTimedPlace;
-import pipe.dataLayer.colors.ColoredToken;
-import pipe.dataLayer.colors.ColoredTransportArc;
-import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 
-public class AnimationSelectmodeDialog extends JPanel{
+public class AnimationSelectmodeDialog extends JPanel {
 
 	private static final long serialVersionUID = 7852107237344005547L;
 
-	TAPNTransition firedtransition = null;
+	TimedTransition transition = null;
 
 	public ArrayList<JComboBox> presetPanels = new ArrayList<JComboBox>();
 
@@ -39,54 +29,44 @@ public class AnimationSelectmodeDialog extends JPanel{
 
 	private JButton okButton;
 	private boolean cancelled = true;
-	
-	public boolean cancelled(){
+
+	public boolean cancelled() {
 		return cancelled;
 	}
-	
-	public AnimationSelectmodeDialog(Transition t){
 
+	public AnimationSelectmodeDialog(TimedTransition transition) {
 		setLayout(new GridBagLayout());
-
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
+		//c.weightx = 0.5;
 		c.gridx = 0;
 		c.gridy = 0;
 
-
-		firedtransition = (TAPNTransition)t; // XXX - unsafe cast (ok by contract)
+		this.transition = transition;
 
 		namePanel = new JPanel(new FlowLayout());
-		namePanel.add(new JLabel("Select tokens to Fire in Transition " + t.getName()));
-
+		namePanel.add(new JLabel("<html>Select tokens to fire transition <b>" + transition.name() + "</b></html>"));
 
 		add(namePanel, c);
 
-
-
-		//Start adding the stuff
-		JPanel presetPanelContainer;
-		presetPanelContainer = new JPanel(new FlowLayout());
-
-
+		// Start adding the stuff
+		JPanel presetPanelContainer = new JPanel(new FlowLayout());
 		c.gridx = 0;
 		c.gridy = 1;
 
 		add(presetPanelContainer, c);
 
-
-		for (Arc a : t.getPreset()){
-			if(!(a instanceof TAPNInhibitorArc)){
-				JPanel presetPanel = createDropDownForArc(a);
-				presetPanelContainer.add(presetPanel);
+		if(transition.isShared()){
+			for(TimedTransition trans : transition.sharedTransition().transitions()){
+				createDropDownsForTransition(trans, presetPanelContainer);
 			}
-
+		}else{
+			createDropDownsForTransition(transition, presetPanelContainer);
 		}
-
 		c.gridx = 0;
 		c.gridy = 2;
-		//OK
+		// OK
 		okButton = new javax.swing.JButton();
 
 		okButton.setText("OK");
@@ -96,95 +76,54 @@ public class AnimationSelectmodeDialog extends JPanel{
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				cancelled = false;
-				exit(); 
+				exit();
 			}
 		});
 
-
-		add(okButton,c);
+		add(okButton, c);
 	}
-	private JPanel createDropDownForArc(Arc a) {
-		JPanel presetPanel;
-		presetPanel = new JPanel(new FlowLayout());
 
-		//For each place in the preset create a box for selecting tokens
-
-		presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + a.getSource().getName()));
-		presetPanel.add(new JLabel("Select token from Place " + a.getSource().getName()));
-
-		if(!CreateGui.getModel().isUsingColors()){
-			ArrayList<String> eligableToken = null;
-
-			DecimalFormat df = new DecimalFormat();
-			df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-			df.setMinimumFractionDigits(1);
-			if (a instanceof TransportArc){
-				eligableToken= new ArrayList<String>();
-				TimedPlace p = (TimedPlace)a.getSource();
-
-				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();					
-
-				TimedPlace targetPlace = (TimedPlace)((TransportArc)a).getConnectedTo().getTarget();
-
-				for (int i=0; i< tokensOfPlace.size(); i++){
-					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i)) && targetPlace.satisfiesInvariant(tokensOfPlace.get(i))) {
-						eligableToken.add(df.format(tokensOfPlace.get(i)));
-					}
-				}	
-
-			}else if (a instanceof TimedArc){
-				eligableToken = new ArrayList<String>();
-				//int indexOfOldestEligebleToken = 0;
-
-				TimedPlace p = (TimedPlace)a.getSource();
-
-				ArrayList<BigDecimal> tokensOfPlace = p.getTokens();						   
-				for (int i=0; i< tokensOfPlace.size(); i++){
-					if ( ((TimedArc)a).satisfiesGuard(tokensOfPlace.get(i))){
-						eligableToken.add(df.format(tokensOfPlace.get(i)));
-					}
-				}						   
-			}
-
-			JComboBox selectTokenBox = new JComboBox(eligableToken.toArray());
-			selectTokenBox.setSelectedIndex(0);
-
-			presetPanel.add(selectTokenBox);
-			presetPanels.add(selectTokenBox);
-		}else{
-			ColoredTimedPlace place = (ColoredTimedPlace)a.getSource();
-			
-			ArrayList<ColoredToken> eligibleTokens = new ArrayList<ColoredToken>();
-			
-			if(a instanceof ColoredTransportArc){
-				ColoredTransportArc cta = (ColoredTransportArc)a;
-				
-				for(ColoredToken token : place.getColoredTokens()){
-					if(cta.satisfiesGuard(token) 
-							&& cta.satisfiesTargetInvariant(token)){
-						eligibleTokens.add(token);
-					}
-				}
-			}else if(a instanceof ColoredInputArc){
-				ColoredInputArc cia = (ColoredInputArc)a;
-				
-				for(ColoredToken token : place.getColoredTokens()){
-					if(cia.satisfiesGuard(token)){
-						eligibleTokens.add(token);
-					}
-				}
-			}
-			
-			JComboBox selectTokenBox = new JComboBox(eligibleTokens.toArray());
-			selectTokenBox.setSelectedIndex(0);
-
-			presetPanel.add(selectTokenBox);
-			presetPanels.add(selectTokenBox);
+	private void createDropDownsForTransition(TimedTransition transition, JPanel presetPanelContainer) {
+		for (TimedInputArc arc : transition.getInputArcs()) {
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens());
+			presetPanelContainer.add(tokenPanel);
 		}
+		
+		for (TransportArc arc : transition.getTransportArcsGoingThrough()) {
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens());
+			presetPanelContainer.add(tokenPanel);
+		}
+	}
+
+	private JPanel createDropDownForArc(String placeName, List<TimedToken> elligibleTokens) {
+		JPanel presetPanel = new JPanel(new FlowLayout());
+
+		// For each place in the preset create a box for selecting tokens
+
+		presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + placeName));
+		presetPanel.add(new JLabel("Select token"));
+		
+		JComboBox selectTokenBox = new JComboBox(elligibleTokens.toArray());
+		selectTokenBox.setSelectedIndex(0);
+
+		presetPanel.add(selectTokenBox);
+		presetPanels.add(selectTokenBox);
 		return presetPanel;
 	}
-	private void exit(){
-		this.getRootPane().getParent().setVisible(false); 
+
+	private void exit() {
+		this.getRootPane().getParent().setVisible(false);
+	}
+
+	public List<TimedToken> getTokens() {
+		if(cancelled) return null;
+		
+		List<TimedToken> tokens = new ArrayList<TimedToken>();
+		for(JComboBox box : presetPanels){
+			tokens.add((TimedToken)box.getSelectedItem());
+		}
+		
+		return tokens;
 	}
 
 }

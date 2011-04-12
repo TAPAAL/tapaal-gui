@@ -6,10 +6,10 @@ package dk.aau.cs.verification;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class BufferDrain extends Thread{
+public class BufferDrain extends Thread {
 
-	BufferedReader drain=null;
-	StringBuffer string=null;
+	BufferedReader drain = null;
+	StringBuffer string = null;
 	boolean running;
 
 	public BufferDrain(BufferedReader drain) {
@@ -24,13 +24,12 @@ public class BufferDrain extends Thread{
 			running = true;
 
 			int c;
-			while (running){
+			while (running) {
 
+				c = drain.read();
 
-				c=drain.read();
-
-				if (c!=-1){
-					string.append((char)c);
+				if (c != -1) {
+					string.append((char) c);
 				} else {
 					running = false;
 				}
@@ -39,13 +38,12 @@ public class BufferDrain extends Thread{
 		} catch (IOException e) {
 
 			e.printStackTrace();
-			running=false;
+			running = false;
 		}
 
-
 	}
-	
-	public String getString(){
+
+	public String getString() {
 		return string.toString();
 	}
 

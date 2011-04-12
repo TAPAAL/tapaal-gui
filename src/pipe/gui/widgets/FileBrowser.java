@@ -6,8 +6,8 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import pipe.gui.CreateGui;
 import pipe.gui.ExtensionFilter;
-
 
 /**
  * @author Maxim
@@ -21,80 +21,75 @@ import pipe.gui.ExtensionFilter;
  * We might want to change this class so the save/load dialog remembers the last folder it was in (like it did
  * when it was static)
  */
-public class FileBrowser 
-         {
-   
-   JFileChooser fc = new JFileChooser();
-   private String ext;
-   
-   
-   public FileBrowser(String filetype, String ext, String path) {
-      super();
-      if (filetype == null) {
-         filetype = "file";
-      }
-      
-      if (path != null) {
-         File f = new File(path);
-         if (f.exists()) {
-            fc.setCurrentDirectory(f);
-         }
-         if (!f.isDirectory()) {
-            fc.setSelectedFile(f);
-         }
-      }
-      
-      this.ext = ext;
-      ExtensionFilter filter = new ExtensionFilter(ext,filetype);
 
-      fc.setFileFilter(filter);
-      
-      //By default hide hidden files
-      fc.setFileHidingEnabled(true);
-   }
-   
-   
-   public FileBrowser(String path) {
-      this("Petri net","xml",path); // default parameters
-   }
-   
-   
-   public FileBrowser() {
-      this(null);
-   }
-   
-   
-   public File openFile() {
-      if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-         try {
-            return fc.getSelectedFile().getCanonicalFile();
-         } catch (IOException e){
-            /* gulp */
-         }
-      }
-      return null;
-   }
-   
-   
-   public String saveFile() {
-      if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-         try {
-            File f = fc.getSelectedFile();
-            if (!f.getName().endsWith("." + ext)) {
-               f = new File(f.getCanonicalPath() + "." + ext); // force extension
-            }
-            if (f.exists() && 
-                    JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + 
-                    "\nDo you want to overwrite this file?") !=
-                    JOptionPane.YES_OPTION) {
-               return null;
-            }
-            return f.getCanonicalPath();
-         } catch (IOException e) {
-            /* gulp */
-         };
-      }
-      return null;
-   }
-   
+public class FileBrowser {
+
+	static JFileChooser fc = new JFileChooser();
+	private String ext;
+
+	public FileBrowser(String filetype, String ext, String path) {
+		super();
+		if (filetype == null) {
+			filetype = "file";
+		}
+
+		if (path != null) {
+			File f = new File(path);
+			if (f.exists()) {
+				fc.setCurrentDirectory(f);
+			}
+			if (!f.isDirectory()) {
+				fc.setSelectedFile(f);
+			}
+		}
+
+		this.ext = ext;
+		ExtensionFilter filter = new ExtensionFilter(ext, filetype);
+
+		fc.setFileFilter(filter);
+
+		// By default hide hidden files
+		fc.setFileHidingEnabled(true);
+	}
+
+	public FileBrowser(String path) {
+		this("Petri net", "xml", path); // default parameters
+	}
+
+	public FileBrowser() {
+		this(null);
+	}
+
+	public File openFile() {
+		if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			try {
+				return fc.getSelectedFile().getCanonicalFile();
+			} catch (IOException e) {
+				/* gulp */
+			}
+		}
+		return null;
+	}
+
+	public String saveFile() {
+		if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+			try {
+				File f = fc.getSelectedFile();
+				if (!f.getName().endsWith("." + ext)) {
+					f = new File(f.getCanonicalPath() + "." + ext); // force
+																	// extension
+				}
+							
+				 if (!CreateGui.usingGTKFileBrowser() && f.exists() &&  
+						 JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?") != JOptionPane.YES_OPTION) {
+				 return null;
+				 }
+				return f.getCanonicalPath();
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while trying to save the file. Please try again", "Error Saving File", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		return null;
+	}
+
 }

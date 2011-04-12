@@ -10,8 +10,7 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedArc;
-import pipe.dataLayer.TransportArc;
+import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.action.SplitArcAction;
 
 public class TransportArcHandler extends TimedArcHandler {
@@ -20,43 +19,40 @@ public class TransportArcHandler extends TimedArcHandler {
 		super(contentpane, obj);
 		enablePopup = true;
 	}
+
 	@Override
 	public JPopupMenu getPopup(MouseEvent e) {
 		int popupIndex = 0;
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TransportArc){
-		//	if ( ! ( ((TimedArc) myObject).getSource() instanceof Transition) ){
-				final TransportArc tarc = (TransportArc)myObject;
+		if (myObject instanceof TransportArcComponent) {
+			// if ( ! ( ((TimedArc) myObject).getSource() instanceof Transition)
+			// ){
+			final TransportArcComponent tarc = (TransportArcComponent) myObject;
 
-				menuItem = new JMenuItem("Properties");      
-				menuItem.addActionListener(new ActionListener(){
-					public void actionPerformed(ActionEvent e) {
-						if(tarc.getSource() instanceof Place){
-							tarc.showTimeIntervalEditor();
-						}else{
-							tarc.getConnectedTo().showTimeIntervalEditor();
-						}
+			menuItem = new JMenuItem("Properties");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (tarc.getSource() instanceof Place) {
+						tarc.showTimeIntervalEditor();
+					} else {
+						tarc.getConnectedTo().showTimeIntervalEditor();
 					}
-				}); 
-				popup.insert(menuItem, popupIndex++);
-			//}
-			//menuItem = new JMenuItem(new EditGroupAction(contentPane, (TransportArc)myObject));
-			//menuItem.setText("Edit Grouping");
-			//popup.insert(menuItem, popupIndex++);
-			
-			menuItem = new JMenuItem(new SplitArcAction((Arc)myObject, e.getPoint()));            
+				}
+			});
+			popup.insert(menuItem, popupIndex++);
+			// }
+			// menuItem = new JMenuItem(new EditGroupAction(contentPane,
+			// (TransportArc)myObject));
+			// menuItem.setText("Edit Grouping");
+			// popup.insert(menuItem, popupIndex++);
+
+			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
+					.getPoint()));
 			menuItem.setText("Insert Point");
 			popup.insert(menuItem, popupIndex++);
 
-			if (((TimedArc)myObject).hasInverse()){
-				menuItem = new JMenuItem(
-						new SplitArcsAction((TimedArc)myObject, false));
-
-				menuItem.setText("Join Arcs (PT / TP)");
-				popup.insert(menuItem, popupIndex++);            
-			}
 			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}
 		return popup;

@@ -7,20 +7,19 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	protected static final String PLOCK = "P_lock";
 	protected static final String TOKEN_TEMPLATE_NAME = "Token";
 
-
 	private boolean useSymmetry;
 	private int totalTokens;
 
-	public BroadcastTranslationQueryVisitor(boolean useSymmetry, int totalTokens)
-	{
+	public BroadcastTranslationQueryVisitor(boolean useSymmetry, int totalTokens) {
 		this.useSymmetry = useSymmetry;
 		this.totalTokens = totalTokens;
 	}
 
 	@Override
-	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
+	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+			Object context) {
 
-		if(useSymmetry){
+		if (useSymmetry) {
 			append("(sum(i:");
 			append(ID_TYPE);
 			append(")");
@@ -31,7 +30,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append(OperatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
-		} else if(totalTokens == 0){
+		} else if (totalTokens == 0) {
 			append("(");
 			append(TOKEN_TEMPLATE_NAME);
 			append(".");
@@ -40,10 +39,10 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append(OperatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
-		}else{
+		} else {
 			append("(");
-			for(int i = 0; i < totalTokens-1; i++){
-				if(i > 0){
+			for (int i = 0; i < totalTokens; i++) {
+				if (i > 0) {
 					append(" + ");
 				}
 
@@ -61,9 +60,9 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 
 	@Override
 	protected void addEnding(QueryType type) {
-		if(type == QueryType.EF || type == QueryType.AF){
+		if (type == QueryType.EF || type == QueryType.AF) {
 			append(" && ");
-		}else{
+		} else {
 			append(" || !");
 		}
 		append("Control.");

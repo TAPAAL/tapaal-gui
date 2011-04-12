@@ -7,38 +7,36 @@ package pipe.gui.undo;
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.ArcPath;
 import pipe.dataLayer.ArcPathPoint;
+import dk.aau.cs.gui.undo.Command;
 
 /**
- *
+ * 
  * @author Pere Bonet
  */
-public class DeleteArcPathPointEdit
-        extends UndoableEdit {
-   
-   ArcPath arcPath;
-   ArcPathPoint point;
-   Integer index;
+public class DeleteArcPathPointEdit extends Command {
 
-   /** Creates a new instance of placeWeightEdit */
-   public DeleteArcPathPointEdit(Arc _arc, ArcPathPoint  _point, Integer _index) {
-      arcPath = _arc.getArcPath();
-      point = _point;
-      index = _index;
-   }
+	ArcPath arcPath;
+	ArcPathPoint point;
+	Integer index;
 
-   
-   /** */
-   @Override
-public void undo() {
-      arcPath.insertPoint(index, point);
-      arcPath.updateArc();      
-   }
+	/** Creates a new instance of placeWeightEdit */
+	public DeleteArcPathPointEdit(Arc _arc, ArcPathPoint _point, Integer _index) {
+		arcPath = _arc.getArcPath();
+		point = _point;
+		index = _index;
+	}
 
-   
-   /** */
-   @Override
-public void redo() {
-      point.delete();
-   }
-   
+	/** */
+	@Override
+	public void undo() {
+		arcPath.insertPoint(index, point);
+		arcPath.updateArc();
+	}
+
+	/** */
+	@Override
+	public void redo() {
+		point.delete();
+	}
+
 }

@@ -11,20 +11,23 @@ import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
-import dk.aau.cs.petrinet.TAPNQuery;
+import dk.aau.cs.model.tapn.TAPNQuery;
 
 public abstract class QueryVisitor implements ITCTLVisitor {
-	protected enum QueryType { EF, EG, AF, AG }
+	protected enum QueryType {
+		EF, EG, AF, AG
+	}
+
 	private StringBuffer uppaalQuery;
 
 	public QueryVisitor() {
 	}
-	
-	protected void append(String string){
+
+	protected void append(String string) {
 		uppaalQuery.append(string);
 	}
-	
-	protected void append(int number){
+
+	protected void append(int number) {
 		uppaalQuery.append(number);
 	}
 
@@ -57,42 +60,41 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		egNode.getProperty().accept(this, context);
 		addEnding(QueryType.EG);
 	}
-	
+
 	public void visit(TCTLAndListNode andListNode, Object context) {
 		uppaalQuery.append("(");
 		boolean firstTime = true;
-		
+
 		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
-			if(!firstTime) {
+			if (!firstTime) {
 				uppaalQuery.append(" && ");
 			}
-			
+
 			p.accept(this, context);
 			firstTime = false;
 		}
-		
+
 		uppaalQuery.append(")");
-		
+
 	}
 
-	
 	public void visit(TCTLOrListNode orListNode, Object context) {
 		uppaalQuery.append("(");
 		boolean firstTime = true;
-		
+
 		for (TCTLAbstractStateProperty p : orListNode.getProperties()) {
-			if(!firstTime) {
+			if (!firstTime) {
 				uppaalQuery.append(" || ");
 			}
-			
+
 			p.accept(this, context);
 			firstTime = false;
 		}
-		
+
 		uppaalQuery.append(")");
-		
+
 	}
-	
+
 	public void visit(TCTLNotNode notNode, Object context) {
 		uppaalQuery.append("!");
 		uppaalQuery.append("(");
@@ -104,16 +106,18 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	}
 
 	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) {
-	
+
 	}
 
 	protected String OperatorConversion(String op) {
-		if(op.equals("="))
+		if (op.equals("="))
 			return "==";
-	
+
 		return op;
 	}
 
-	public abstract void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context);
+	public abstract void visit(TCTLAtomicPropositionNode atomicPropositionNode,
+			Object context);
+
 	protected abstract void addEnding(QueryType queryType);
 }

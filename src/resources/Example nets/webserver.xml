@@ -1,550 +1,96 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<pnml>
-<net id="Net-One" type="P/T net">
-<labels x="536" y="370" width="364" height="272" border="true">
-<text>This example represents a simple webserver which can process only one request at a time.
-
-There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
-
-The user of the tool can now experiments with different values of the periods and deadlines to check whether e.g. five requests can be served without dropping any of them. Note that if the deadline is set e.g. to 4 this query is not satisfiable anymore.</text>
-</labels>
-<place id="P0">
-<graphics>
-<position x="270.0" y="270.0"/>
-</graphics>
-<name>
-<value>Requests</value>
-<graphics>
-<offset x="-17.0" y="8.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=deadline</value>
-</invariant>
-</place>
-<place id="P10">
-<graphics>
-<position x="135.0" y="98.0"/>
-</graphics>
-<name>
-<value>Dropped</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P11">
-<graphics>
-<position x="742.0" y="180.0"/>
-</graphics>
-<name>
-<value>Processing</value>
-<graphics>
-<offset x="127.0" y="17.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=deadline</value>
-</invariant>
-</place>
-<place id="P3">
-<graphics>
-<position x="277.0" y="98.0"/>
-</graphics>
-<name>
-<value>Responses</value>
-<graphics>
-<offset x="-5.0" y="35.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P4">
-<graphics>
-<position x="405.0" y="180.0"/>
-</graphics>
-<name>
-<value>Webserver</value>
-<graphics>
-<offset x="-6.0" y="16.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>1</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<place id="P6">
-<graphics>
-<position x="130.0" y="520.0"/>
-</graphics>
-<name>
-<value>UserA</value>
-<graphics>
-<offset x="37.0" y="40.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>1</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=periodA</value>
-</invariant>
-</place>
-<place id="P7">
-<graphics>
-<position x="385.0" y="517.0"/>
-</graphics>
-<name>
-<value>UserB</value>
-<graphics>
-<offset x="42.0" y="44.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>1</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;=periodB</value>
-</invariant>
-</place>
-<place id="P8">
-<graphics>
-<position x="585.0" y="180.0"/>
-</graphics>
-<name>
-<value>Working</value>
-<graphics>
-<offset x="81.0" y="21.0"/>
-</graphics>
-</name>
-<initialMarking>
-<value>0</value>
-<graphics>
-<offset x="0.0" y="0.0"/>
-</graphics>
-</initialMarking>
-<capacity>
-<value>0</value>
-</capacity>
-<invariant>
-<value>&lt;inf</value>
-</invariant>
-</place>
-<transition id="T0">
-<graphics>
-<position x="495.0" y="270.0"/>
-</graphics>
-<name>
-<value>Process</value>
-<graphics>
-<offset x="36.0" y="44.0"/>
-</graphics>
-</name>
-<orientation>
-<value>0</value>
-</orientation>
-<rate>
-<value>1.0</value>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T2">
-<graphics>
-<position x="495.0" y="105.0"/>
-</graphics>
-<name>
-<value>SendReply</value>
-<graphics>
-<offset x="42.0" y="-9.0"/>
-</graphics>
-</name>
-<orientation>
-<value>0</value>
-</orientation>
-<rate>
-<value>1.0</value>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T3">
-<graphics>
-<position x="135.0" y="390.0"/>
-</graphics>
-<name>
-<value>SendRequestA</value>
-<graphics>
-<offset x="2.0" y="1.0"/>
-</graphics>
-</name>
-<orientation>
-<value>270</value>
-</orientation>
-<rate>
-<value>1.0</value>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T4">
-<graphics>
-<position x="390.0" y="390.0"/>
-</graphics>
-<name>
-<value>SendRequestB</value>
-<graphics>
-<offset x="107.0" y="-2.0"/>
-</graphics>
-</name>
-<orientation>
-<value>90</value>
-</orientation>
-<rate>
-<value>1.0</value>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<transition id="T7">
-<graphics>
-<position x="135.0" y="182.0"/>
-</graphics>
-<name>
-<value>Drop</value>
-<graphics>
-<offset x="-13.0" y="18.0"/>
-</graphics>
-</name>
-<orientation>
-<value>90</value>
-</orientation>
-<rate>
-<value>1.0</value>
-</rate>
-<timed>
-<value>false</value>
-</timed>
-<infiniteServer>
-<value>false</value>
-</infiniteServer>
-<priority>
-<value>1</value>
-</priority>
-</transition>
-<arc id="P0 to T0" source="P0" target="T0">
-<graphics/>
-<inscription>
-<value>[0,deadline):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="296" y="282" curvePoint="false"/>
-<arcpath id="001" x="501" y="287" curvePoint="false"/>
-<type value="transport"/>
-</arc>
-<arc id="P0 to T7" source="P0" target="T7">
-<graphics/>
-<inscription>
-<value>[deadline,deadline]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="269" y="274" curvePoint="false"/>
-<arcpath id="001" x="146" y="198" curvePoint="false"/>
-<type value="timed"/>
-</arc>
-<arc id="P11 to T2" source="P11" target="T2">
-<graphics/>
-<inscription>
-<value>[0,deadline]:1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="742" y="182" curvePoint="false"/>
-<arcpath id="001" x="663" y="113" curvePoint="false"/>
-<arcpath id="002" x="512" y="112" curvePoint="false"/>
-<type value="transport"/>
-</arc>
-<arc id="P4 to T0" source="P4" target="T0">
-<graphics/>
-<inscription>
-<value>[0,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="427" y="202" curvePoint="false"/>
-<arcpath id="001" x="502" y="277" curvePoint="false"/>
-<type value="timed"/>
-</arc>
-<arc id="P6 to T3" source="P6" target="T3">
-<graphics/>
-<inscription>
-<value>[periodA,periodA]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="142" y="517" curvePoint="false"/>
-<arcpath id="001" x="142" y="406" curvePoint="false"/>
-<type value="timed"/>
-</arc>
-<arc id="P7 to T4" source="P7" target="T4">
-<graphics/>
-<inscription>
-<value>[periodB,periodB]</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="396" y="514" curvePoint="false"/>
-<arcpath id="001" x="396" y="406" curvePoint="false"/>
-<type value="timed"/>
-</arc>
-<arc id="P8 to T2" source="P8" target="T2">
-<graphics/>
-<inscription>
-<value>[min,inf)</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="585" y="182" curvePoint="false"/>
-<arcpath id="001" x="511" y="122" curvePoint="false"/>
-<type value="timed"/>
-</arc>
-<arc id="T0 to P11" source="T0" target="P11">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="511" y="287" curvePoint="false"/>
-<arcpath id="001" x="667" y="288" curvePoint="false"/>
-<arcpath id="002" x="743" y="203" curvePoint="false"/>
-<type value="transport"/>
-</arc>
-<arc id="T0 to P8" source="T0" target="P8">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="512" y="277" curvePoint="false"/>
-<arcpath id="001" x="586" y="202" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<arc id="T2 to P3" source="T2" target="P3">
-<graphics/>
-<inscription>
-<value>[0,inf):1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="502" y="112" curvePoint="false"/>
-<arcpath id="001" x="303" y="110" curvePoint="false"/>
-<type value="transport"/>
-</arc>
-<arc id="T2 to P4" source="T2" target="P4">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="501" y="122" curvePoint="false"/>
-<arcpath id="001" x="428" y="182" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<arc id="T3 to P0" source="T3" target="P0">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="147" y="397" curvePoint="false"/>
-<arcpath id="001" x="270" y="291" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<arc id="T3 to P6" source="T3" target="P6">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="152" y="407" curvePoint="false"/>
-<arcpath id="001" x="225" y="465" curvePoint="false"/>
-<arcpath id="002" x="153" y="522" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<arc id="T4 to P0" source="T4" target="P0">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="401" y="396" curvePoint="false"/>
-<arcpath id="001" x="292" y="292" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<arc id="T4 to P7" source="T4" target="P7">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="406" y="407" curvePoint="false"/>
-<arcpath id="001" x="480" y="465" curvePoint="false"/>
-<arcpath id="002" x="408" y="519" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<arc id="T7 to P10" source="T7" target="P10">
-<graphics/>
-<inscription>
-<value>1</value>
-<graphics/>
-</inscription>
-<tagged>
-<value>false</value>
-</tagged>
-<arcpath id="000" x="146" y="188" curvePoint="false"/>
-<arcpath id="001" x="146" y="124" curvePoint="false"/>
-<type value="normal"/>
-</arc>
-<queries name="5 responses, no drops" traceOption="SOME" searchOption="DFS" hashTableSize="MB_16" extrapolationOption="AUTOMATIC" reductionOption="STANDARD">
-<capacity>
-<value>6</value>
-</capacity>
-<query>
-<value>E&lt;&gt;( Responses = 5 &amp;&amp; Dropped = 0 )</value>
-</query>
-</queries>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <constant name="deadline" value="5"/>
 <constant name="min" value="3"/>
 <constant name="periodA" value="7"/>
 <constant name="periodB" value="5"/>
+<net id="TAPN1" type="P/T net">
+<labels border="true" height="273" positionX="537" positionY="371" width="365">This example represents a simple webserver which can process only one request at a time.
+
+There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
+
+The user of the tool can now experiments with different values of the periods and deadlines to check whether e.g. five requests can be served without dropping any of them. Note that if the deadline is set e.g. to 4 this query is not satisfiable anymore.</labels>
+<place id="P0" initialMarking="0" invariant="&lt;= deadline" markingOffsetX="0.0" markingOffsetY="0.0" name="Requests" nameOffsetX="-17.0" nameOffsetY="8.0" positionX="270.0" positionY="270.0"/>
+<place id="P10" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Dropped" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="105.0"/>
+<place id="P11" initialMarking="0" invariant="&lt;= deadline" markingOffsetX="0.0" markingOffsetY="0.0" name="Processing" nameOffsetX="127.0" nameOffsetY="17.0" positionX="735.0" positionY="180.0"/>
+<place id="P3" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Responses" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="270.0" positionY="105.0"/>
+<place id="P4" initialMarking="1" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Webserver" nameOffsetX="-6.0" nameOffsetY="16.0" positionX="405.0" positionY="180.0"/>
+<place id="P6" initialMarking="1" invariant="&lt;= periodA" markingOffsetX="0.0" markingOffsetY="0.0" name="UserA" nameOffsetX="37.0" nameOffsetY="40.0" positionX="135.0" positionY="525.0"/>
+<place id="P7" initialMarking="1" invariant="&lt;= periodB" markingOffsetX="0.0" markingOffsetY="0.0" name="UserB" nameOffsetX="42.0" nameOffsetY="44.0" positionX="390.0" positionY="510.0"/>
+<place id="P8" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Working" nameOffsetX="81.0" nameOffsetY="21.0" positionX="585.0" positionY="180.0"/>
+<transition angle="0" id="T0" infiniteServer="false" name="Process" nameOffsetX="36.0" nameOffsetY="44.0" positionX="495.0" positionY="270.0" priority="1" timed="true"/>
+<transition angle="0" id="T2" infiniteServer="false" name="SendReply" nameOffsetX="42.0" nameOffsetY="-9.0" positionX="495.0" positionY="105.0" priority="1" timed="true"/>
+<transition angle="270" id="T3" infiniteServer="false" name="SendRequestA" nameOffsetX="2.0" nameOffsetY="1.0" positionX="135.0" positionY="390.0" priority="1" timed="true"/>
+<transition angle="90" id="T4" infiniteServer="false" name="SendRequestB" nameOffsetX="107.0" nameOffsetY="-2.0" positionX="390.0" positionY="390.0" priority="1" timed="true"/>
+<transition angle="90" id="T7" infiniteServer="false" name="Drop" nameOffsetX="-13.0" nameOffsetY="18.0" positionX="135.0" positionY="180.0" priority="1" timed="true"/>
+<arc id="P0 to T7" inscription="[deadline,deadline]" source="P0" target="T7" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="269" yCoord="274"/>
+<arcpath arcPointType="false" id="1" xCoord="146" yCoord="196"/>
+</arc>
+<arc id="P4 to T0" inscription="[0,inf)" source="P4" target="T0" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="427" yCoord="202"/>
+<arcpath arcPointType="false" id="1" xCoord="502" yCoord="277"/>
+</arc>
+<arc id="P6 to T3" inscription="[periodA,periodA]" source="P6" target="T3" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="146" yCoord="522"/>
+<arcpath arcPointType="false" id="1" xCoord="142" yCoord="406"/>
+</arc>
+<arc id="P7 to T4" inscription="[periodB,periodB]" source="P7" target="T4" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="401" yCoord="507"/>
+<arcpath arcPointType="false" id="1" xCoord="396" yCoord="406"/>
+</arc>
+<arc id="P8 to T2" inscription="[min,inf)" source="P8" target="T2" type="timed">
+<arcpath arcPointType="false" id="0" xCoord="585" yCoord="182"/>
+<arcpath arcPointType="false" id="1" xCoord="511" yCoord="122"/>
+</arc>
+<arc id="P0 to T0" inscription="[0,deadline):1" source="P0" target="T0" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="296" yCoord="282"/>
+<arcpath arcPointType="false" id="1" xCoord="501" yCoord="287"/>
+</arc>
+<arc id="T0 to P11" inscription="[0,deadline):1" source="T0" target="P11" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="511" yCoord="287"/>
+<arcpath arcPointType="false" id="1" xCoord="668" yCoord="289"/>
+<arcpath arcPointType="false" id="2" xCoord="737" yCoord="203"/>
+</arc>
+<arc id="T0 to P8" inscription="1" source="T0" target="P8" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="512" yCoord="277"/>
+<arcpath arcPointType="false" id="1" xCoord="586" yCoord="202"/>
+</arc>
+<arc id="P11 to T2" inscription="[0,deadline]:1" source="P11" target="T2" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="736" yCoord="181"/>
+<arcpath arcPointType="false" id="1" xCoord="664" yCoord="114"/>
+<arcpath arcPointType="false" id="2" xCoord="512" yCoord="112"/>
+</arc>
+<arc id="T2 to P3" inscription="[0,deadline]:1" source="T2" target="P3" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="502" yCoord="112"/>
+<arcpath arcPointType="false" id="1" xCoord="296" yCoord="116"/>
+</arc>
+<arc id="T2 to P4" inscription="1" source="T2" target="P4" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="501" yCoord="122"/>
+<arcpath arcPointType="false" id="1" xCoord="428" yCoord="182"/>
+</arc>
+<arc id="T3 to P0" inscription="1" source="T3" target="P0" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="147" yCoord="397"/>
+<arcpath arcPointType="false" id="1" xCoord="270" yCoord="291"/>
+</arc>
+<arc id="T3 to P6" inscription="1" source="T3" target="P6" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="152" yCoord="407"/>
+<arcpath arcPointType="false" id="1" xCoord="226" yCoord="466"/>
+<arcpath arcPointType="false" id="2" xCoord="158" yCoord="526"/>
+</arc>
+<arc id="T4 to P0" inscription="1" source="T4" target="P0" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="401" yCoord="396"/>
+<arcpath arcPointType="false" id="1" xCoord="292" yCoord="292"/>
+</arc>
+<arc id="T4 to P7" inscription="1" source="T4" target="P7" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="406" yCoord="407"/>
+<arcpath arcPointType="false" id="1" xCoord="481" yCoord="466"/>
+<arcpath arcPointType="false" id="2" xCoord="414" yCoord="513"/>
+</arc>
+<arc id="T7 to P10" inscription="1" source="T7" target="P10" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="146" yCoord="186"/>
+<arcpath arcPointType="false" id="1" xCoord="146" yCoord="131"/>
+</arc>
 </net>
+<query capacity="6" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="5 responses, no drops" query="EF (TAPN1.Responses=5 and TAPN1.Dropped=0)" reductionOption="STANDARD" searchOption="DFS" traceOption="SOME"/>
 </pnml>

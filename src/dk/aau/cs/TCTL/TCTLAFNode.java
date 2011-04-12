@@ -2,7 +2,6 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-
 public class TCTLAFNode extends TCTLAbstractPathProperty {
 
 	private TCTLAbstractStateProperty property;
@@ -16,14 +15,10 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 		return property;
 	}
 
-
-
 	public TCTLAFNode(TCTLAbstractStateProperty property) {
 		this.property = property;
 		this.property.setParent(this);
 	}
-	
-
 
 	public TCTLAFNode() {
 		this.property = new TCTLStatePlaceHolder();
@@ -41,16 +36,15 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 		start = start + 3;
 		int end = start + property.toString().length();
 		StringPosition position = new StringPosition(start, end, property);
-		
+
 		StringPosition[] children = { position };
 		return children;
 	}
 
-	
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof TCTLAFNode) {
-			TCTLAFNode node = (TCTLAFNode)o;
+		if (o instanceof TCTLAFNode) {
+			TCTLAFNode node = (TCTLAFNode) o;
 			return property.equals(node.getProperty());
 		}
 		return false;
@@ -58,7 +52,8 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 
 	@Override
 	public String toString() {
-		String s = property.isSimpleProperty() ? property.toString() : "(" + property.toString() + ")";
+		String s = property.isSimpleProperty() ? property.toString() : "("
+				+ property.toString() + ")";
 		return "AF " + s;
 	}
 
@@ -68,34 +63,33 @@ public class TCTLAFNode extends TCTLAbstractPathProperty {
 	}
 
 	@Override
-	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
+	public TCTLAbstractPathProperty replace(TCTLAbstractProperty object1,
+			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractPathProperty) {
-			return (TCTLAbstractPathProperty)object2;
+			return (TCTLAbstractPathProperty) object2;
 		} else {
 			property = property.replace(object1, object2);
 			return this;
 		}
 	}
 
-
-
 	@Override
 	public void accept(ITCTLVisitor visitor, Object context) {
 		visitor.visit(this, context);
 	}
-
-
 
 	@Override
 	public boolean containsPlaceHolder() {
 		return property.containsPlaceHolder();
 	}
 
-
-
 	@Override
 	public boolean containsAtomicPropWithSpecificPlace(String placeName) {
-			return property.containsAtomicPropWithSpecificPlace(placeName);
+		return property.containsAtomicPropWithSpecificPlace(placeName);
+	}
+	
+	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {
+		return property.containsAtomicPropositionWithSpecificPlaceInTemplate(templateName, placeName);
 	}
 
 	@Override

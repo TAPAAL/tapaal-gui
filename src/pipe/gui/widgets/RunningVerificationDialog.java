@@ -26,36 +26,36 @@ public class RunningVerificationDialog extends JDialog {
 	public RunningVerificationDialog(JFrame owner) {
 		super(owner, "Verification in progress", true);
 		setLocationRelativeTo(null);
-		setLayout(new GridLayout(2,1));
+		setLayout(new GridLayout(2, 1));
 
 		okButton = new JButton("Interupt Verification");
 
 		Container content = getContentPane();
 		content.add(new Label("Verification is running ...\nPlease wait!"));
-		content.add(okButton);		
+		content.add(okButton);
 
 		pack();
 	}
 
-	public void setupListeners(final SwingWorker<?,?> worker) {
+	public void setupListeners(final SwingWorker<?, ?> worker) {
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				worker.cancel(true);
 			}
 		});
 
-		addWindowListener(new WindowAdapter(){
+		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				worker.cancel(true);
 			}
-		});	
+		});
 
-		worker.addPropertyChangeListener(new PropertyChangeListener(){
+		worker.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
-				if(event.getPropertyName().equals("state")){
-					StateValue stateValue = (StateValue)event.getNewValue();
-					if(stateValue.equals(StateValue.DONE)){
+				if (event.getPropertyName().equals("state")) {
+					StateValue stateValue = (StateValue) event.getNewValue();
+					if (stateValue.equals(StateValue.DONE)) {
 						setVisible(false);
 						dispose();
 					}
