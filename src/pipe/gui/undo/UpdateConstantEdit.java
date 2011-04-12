@@ -1,30 +1,31 @@
 package pipe.gui.undo;
 
-import pipe.dataLayer.Constant;
-import pipe.dataLayer.ConstantStore;
-import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
-public class UpdateConstantEdit extends UndoableEdit {
+public class UpdateConstantEdit extends Command {
 
 	private Constant newConstant;
 	private ConstantStore store;
 	private Constant oldConstant;
-	private DataLayer model;
-	
-	public UpdateConstantEdit(Constant oldConstant, Constant newConstant, 
-			ConstantStore store, DataLayer model){
+	private TimedArcPetriNetNetwork model;
+
+	public UpdateConstantEdit(Constant oldConstant, Constant newConstant,
+			ConstantStore store, TimedArcPetriNetNetwork model) {
 		this.oldConstant = oldConstant;
 		this.newConstant = newConstant;
 		this.store = store;
 		this.model = model;
 	}
-	
+
 	@Override
 	public void redo() {
 		store.remove(oldConstant);
 		store.add(newConstant);
-		model.correctGuards(oldConstant.getName(), newConstant.getName());
+		model.updateGuardsWithNewConstant(oldConstant.name(), newConstant);
 		CreateGui.updateConstantsList();
 	}
 
@@ -32,7 +33,7 @@ public class UpdateConstantEdit extends UndoableEdit {
 	public void undo() {
 		store.remove(newConstant);
 		store.add(oldConstant);
-		model.correctGuards(newConstant.getName(), oldConstant.getName());
+		model.updateGuardsWithNewConstant(newConstant.name(), oldConstant);
 		CreateGui.updateConstantsList();
 
 	}

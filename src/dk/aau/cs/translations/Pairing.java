@@ -1,45 +1,45 @@
 package dk.aau.cs.translations;
 
-import dk.aau.cs.petrinet.Arc;
-import dk.aau.cs.petrinet.TAPNArc;
-import dk.aau.cs.petrinet.TAPNPlace;
+import java.util.Hashtable;
+import java.util.List;
 
+import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.Require;
+
+// This class assumes that the transition is conservative
 public class Pairing {
-	public enum ArcType { NORMAL, TARC }
-
-	private TAPNArc input;
-	private Arc output;
-	private String interval;
-	private ArcType arcType;
+	protected TimedTransition transition;
 	
-	public Pairing(TAPNArc input, String interval, Arc output, ArcType arcType){
-		this.input = input;
-		this.interval = interval;
-		this.output = output;
-		this.arcType = arcType;
+	protected Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
+	
+	public Pairing(TimedTransition t) {
+		this.transition = t;
+		generatePairing();
 	}
 
-	public TAPNPlace getInput() {
-		return (TAPNPlace)input.getSource();
-	}
-	
-	public TAPNPlace getOutput() {
-		return (TAPNPlace)output.getTarget();
-	}
-	
-	public ArcType getArcType(){
-		return arcType;
-	}
-	
-	public String getInterval(){
-		return interval;
-	}
-	
-	public TAPNArc getInputArc(){
-		return input;		
+	protected void generatePairing() {
+		List<TimedInputArc> inputArcs = transition.getInputArcs();
+		List<TimedOutputArc> outputArcs = transition.getOutputArcs();
+		
+		int presetSize = inputArcs.size();
+		int postsetSize = outputArcs.size();
+		
+		Require.that(presetSize == postsetSize, "The provided model is not conservative");
+
+		for(int i = 0; i < presetSize; i++)
+		{			
+			add(inputArcs.get(i), outputArcs.get(i));
+		}
 	}
 
-	public Arc getOutputArc() {
-		return output;
+	protected void add(TimedInputArc inputArc, TimedOutputArc outputArc) {
+		inputArcToOutputArc.put(inputArc, outputArc);
 	}
+	
+	public TimedOutputArc getOutputArcFor(TimedInputArc inputArc) {
+		Require.that(inputArcToOutputArc.containsKey(inputArc), "The given input arc is not in the preset of the transition");
+		
+		return inputArcToOutputArc.get(inputArc);
+	}
+	
 }

@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dk.aau.cs.TA.trace.Participant;
-import dk.aau.cs.TA.trace.TAFiringAction;
-import dk.aau.cs.TA.trace.TimeDelayFiringAction;
-import dk.aau.cs.TA.trace.TransitionFiring;
-import dk.aau.cs.TA.trace.UppaalTrace;
-import dk.aau.cs.petrinet.TAPNPlace;
-import dk.aau.cs.petrinet.TAPNTransition;
-import dk.aau.cs.petrinet.TimedArcPetriNet;
-import dk.aau.cs.petrinet.Token;
-import dk.aau.cs.petrinet.trace.TAPNFiringAction;
-import dk.aau.cs.petrinet.trace.TAPNTrace;
+import dk.aau.cs.model.NTA.trace.Participant;
+import dk.aau.cs.model.NTA.trace.TAFiringAction;
+import dk.aau.cs.model.NTA.trace.TimeDelayFiringAction;
+import dk.aau.cs.model.NTA.trace.TransitionFiring;
+import dk.aau.cs.model.NTA.trace.UppaalTrace;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
@@ -24,95 +25,86 @@ public class VerifytaTraceInterpreter {
 	private final TimedArcPetriNet tapn;
 	private final TranslationNamingScheme namingScheme;
 
-	public VerifytaTraceInterpreter(TimedArcPetriNet tapn, TranslationNamingScheme namingScheme){
-		this.tapn = tapn;
+	public VerifytaTraceInterpreter(TimedArcPetriNet model, TranslationNamingScheme namingScheme) {
+		this.tapn = model;
 		this.namingScheme = namingScheme;
 	}
 
-	protected TimedArcPetriNet tapn(){
+	protected TimedArcPetriNet tapn() {
 		return tapn;
 	}
 
-	protected TranslationNamingScheme namingScheme(){
+	protected TranslationNamingScheme namingScheme() {
 		return namingScheme;
 	}
 
-	public TAPNTrace interpretTrace(UppaalTrace trace){
+	public TimedArcPetriNetTrace interpretTrace(UppaalTrace trace) {
 		return interpretTimedTrace(trace);
 	}
 
-	private TAPNTrace interpretTimedTrace(UppaalTrace trace) {
+	private TimedArcPetriNetTrace interpretTimedTrace(UppaalTrace trace) {
 		boolean isConcreteTrace = trace.isConcreteTrace();
-		TAPNTrace result = new TAPNTrace(isConcreteTrace);
+		TimedArcPetriNetTrace result = new TimedArcPetriNetTrace(isConcreteTrace);
 
 		Iterator<TAFiringAction> iterator = trace.iterator();
 		TAFiringAction action = null;
-		
-		while(iterator.hasNext()){
+
+		while (iterator.hasNext()) {
 			List<TransitionFiring> firingSequence = new ArrayList<TransitionFiring>();
 			List<String> firingSequenceNames = new ArrayList<String>();
 
-			while(iterator.hasNext() && 
-					(action = iterator.next()) instanceof TransitionFiring){
-				firingSequence.add((TransitionFiring)action);
-				firingSequenceNames.add(((TransitionFiring)action).channel());
+			while (iterator.hasNext() && (action = iterator.next()) instanceof TransitionFiring) {
+				firingSequence.add((TransitionFiring) action);
+				firingSequenceNames.add(((TransitionFiring) action).channel());
 			}
 
 			TransitionTranslation[] transitions = namingScheme.interpretTransitionSequence(firingSequenceNames);
 
-			for(TransitionTranslation transitionTranslation : transitions){
-				TAPNFiringAction firingAction = interpretTransitionFiring(firingSequence, transitionTranslation, isConcreteTrace);
-				result.addFiringAction(firingAction);
+			for (TransitionTranslation transitionTranslation : transitions) {
+				TimedTransitionStep transitionStep = interpretTransitionFiring(firingSequence, transitionTranslation, isConcreteTrace);
+				result.add(transitionStep);
 			}
 
-
-			if(action != null && action instanceof TimeDelayFiringAction){
-				BigDecimal delay = ((TimeDelayFiringAction)action).getDelay();
-				TAPNFiringAction delayAction = new dk.aau.cs.petrinet.trace.TimeDelayFiringAction(delay);
-				result.addFiringAction(delayAction);
+			if (action != null && action instanceof TimeDelayFiringAction) {
+				BigDecimal delay = ((TimeDelayFiringAction) action).getDelay();
+				TimeDelayStep delayAction = new TimeDelayStep(delay);
+				result.add(delayAction);
 			}
 		}
 
 		return result;
 	}
 
-	protected TAPNFiringAction interpretTransitionFiring
-	(
-			List<TransitionFiring> firingSequence,
-			TransitionTranslation transitionTranslation,
-			boolean isConcreteTrace
-	) {
-		TAPNTransition transition = tapn.getTransitionsByName(transitionTranslation.originalTransitionName());
-		List<Token> tokens = null;
-		if(isConcreteTrace){
-			if(transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)){
-				tokens = parseConsumedTokens(
-						firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt()+1)
-				);
-			}else if(transitionTranslation.sequenceInfo().equals(SequenceInfo.END)){
+	protected TimedTransitionStep interpretTransitionFiring(List<TransitionFiring> firingSequence,	TransitionTranslation transitionTranslation, boolean isConcreteTrace) {
+		TimedTransition transition = tapn.getTransitionByName(transitionTranslation.originalTransitionName());
+		List<TimedToken> tokens = null;
+		if (isConcreteTrace) {
+			if (transitionTranslation.sequenceInfo().equals(SequenceInfo.WHOLE)) {
+				tokens = parseConsumedTokens(firingSequence.subList(transitionTranslation.startsAt(), transitionTranslation.endsAt() + 1));
+			} else if (transitionTranslation.sequenceInfo().equals(SequenceInfo.END)) {
 				TransitionFiring start = firingSequence.get(transitionTranslation.startsAt());
 				TransitionFiring end = firingSequence.get(transitionTranslation.endsAt());
 				tokens = parseConsumedTokens(start, end);
 			}
 		}
 
-		return new dk.aau.cs.petrinet.trace.TransitionFiringAction(transition, tokens);
+		return new TimedTransitionStep(transition,tokens);
 	}
 
-	private List<Token> parseConsumedTokens(List<TransitionFiring> actions) {
-		ArrayList<Token> tokens = new ArrayList<Token>();
+	private List<TimedToken> parseConsumedTokens(List<TransitionFiring> actions) {
+		ArrayList<TimedToken> tokens = new ArrayList<TimedToken>();
 
-		for(int i = 0; i < actions.size(); i++){
+		for (int i = 0; i < actions.size(); i++) {
 			TransitionFiring action = actions.get(i);
 
-			for(Participant participant : action.participants()){
+			for (Participant participant : action.participants()) {
 				String automata = participant.automata();
 				String sourceLocation = participant.location();
 
-				if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
-					TAPNPlace place = tapn.getPlaceByName(sourceLocation);
+				if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
+					TimedPlace place = tapn.getPlaceByName(sourceLocation);
 					BigDecimal clockValue = participant.clockOrVariableValue(namingScheme().tokenClockName()).lower();
-					Token token = new Token(place, clockValue); 
+					TimedToken token = new TimedToken(place, clockValue);
 					tokens.add(token);
 				}
 			}
@@ -121,17 +113,17 @@ public class VerifytaTraceInterpreter {
 		return tokens;
 	}
 
-	private List<Token> parseConsumedTokens(TransitionFiring start, TransitionFiring end) {
-		ArrayList<Token> tokens = new ArrayList<Token>();
+	private List<TimedToken> parseConsumedTokens(TransitionFiring start, TransitionFiring end) {
+		ArrayList<TimedToken> tokens = new ArrayList<TimedToken>();
 
-		for(Participant participant : end.participants()){
+		for (Participant participant : end.participants()) {
 			String automata = participant.automata();
 			String sourceLocation = start.sourceState().locationFor(automata);
 
-			if(!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)){
-				TAPNPlace place = tapn.getPlaceByName(sourceLocation);
+			if (!namingScheme.isIgnoredAutomata(automata) && !namingScheme.isIgnoredPlace(sourceLocation)) {
+				TimedPlace place = tapn.getPlaceByName(sourceLocation);
 				BigDecimal clockValue = start.sourceState().getLocalClockOrVariable(automata, namingScheme().tokenClockName()).lower();
-				Token token = new Token(place, clockValue); 
+				TimedToken token = new TimedToken(place, clockValue);
 				tokens.add(token);
 			}
 		}

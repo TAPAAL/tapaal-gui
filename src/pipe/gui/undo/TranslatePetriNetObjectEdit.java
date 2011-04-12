@@ -5,47 +5,42 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.PetriNetObject;
-
+import dk.aau.cs.gui.undo.Command;
 
 /**
- *
+ * 
  * @author Pere Bonet
  */
-public class TranslatePetriNetObjectEdit 
-        extends UndoableEdit {
-   
-   PetriNetObject pnObject;
-   Integer transX;
-   Integer transY;
-   
-   
-   /** Creates a new instance of  */
-   public TranslatePetriNetObjectEdit(PetriNetObject _pnObject,
-                                      Integer _transX, Integer _transY) {
-      pnObject = _pnObject;
-      transX = _transX;
-      transY = _transY;
-   }
+public class TranslatePetriNetObjectEdit extends Command {
 
-   
-   /** */
-   @Override
-public void undo() {
-      pnObject.translate(-transX, -transY);
-   }
+	PetriNetObject pnObject;
+	Integer transX;
+	Integer transY;
 
-   
-   /** */
-   @Override
-public void redo() {
-      pnObject.translate(transX, transY);
-   }
+	/** Creates a new instance of */
+	public TranslatePetriNetObjectEdit(PetriNetObject _pnObject,
+			Integer _transX, Integer _transY) {
+		pnObject = _pnObject;
+		transX = _transX;
+		transY = _transY;
+	}
 
-   
-   @Override
-public String toString(){
-      return super.toString()  + " " + pnObject.getName() + 
-              " (" + transX + "," + transY + ")";
-   }
-   
+	/** */
+	@Override
+	public void undo() {
+		pnObject.translate(-transX, -transY);
+	}
+
+	/** */
+	@Override
+	public void redo() {
+		pnObject.translate(transX, transY);
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " " + pnObject.getName() + " (" + transX
+				+ "," + transY + ")";
+	}
+
 }

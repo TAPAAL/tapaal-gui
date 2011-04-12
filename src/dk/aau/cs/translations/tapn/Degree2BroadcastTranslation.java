@@ -1,48 +1,49 @@
 package dk.aau.cs.translations.tapn;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dk.aau.cs.TA.Edge;
-import dk.aau.cs.TA.Location;
-import dk.aau.cs.TA.NTA;
-import dk.aau.cs.TA.StandardUPPAALQuery;
-import dk.aau.cs.TA.TimedAutomaton;
-import dk.aau.cs.TA.UPPAALQuery;
 import dk.aau.cs.TCTL.visitors.BroadcastTranslationQueryVisitor;
-import dk.aau.cs.petrinet.Arc;
-import dk.aau.cs.petrinet.Degree2Converter;
-import dk.aau.cs.petrinet.PetriNetUtil;
-import dk.aau.cs.petrinet.TAPN;
-import dk.aau.cs.petrinet.TAPNArc;
-import dk.aau.cs.petrinet.TAPNInhibitorArc;
-import dk.aau.cs.petrinet.TAPNPlace;
-import dk.aau.cs.petrinet.TAPNQuery;
-import dk.aau.cs.petrinet.TAPNTransition;
-import dk.aau.cs.petrinet.TAPNTransportArc;
-import dk.aau.cs.petrinet.TimedArcPetriNet;
-import dk.aau.cs.petrinet.Token;
-import dk.aau.cs.petrinet.degree2converters.InhibDegree2Converter;
+import dk.aau.cs.model.NTA.Edge;
+import dk.aau.cs.model.NTA.Location;
+import dk.aau.cs.model.NTA.NTA;
+import dk.aau.cs.model.NTA.StandardUPPAALQuery;
+import dk.aau.cs.model.NTA.TimedAutomaton;
+import dk.aau.cs.model.NTA.UPPAALQuery;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.translations.Degree2Converter;
+import dk.aau.cs.translations.Degree2Pairing;
 import dk.aau.cs.translations.ModelTranslator;
-import dk.aau.cs.translations.Pairing;
-import dk.aau.cs.translations.QueryTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
-import dk.aau.cs.translations.Pairing.ArcType;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
+import dk.aau.cs.util.Tuple;
 
+//TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
+//with the only difference being in the global declarations:
+//symmetry: typedef scalar[N] id_t;
+//no symmetry: typedef int[1,N] id_t;
+//See e.g. OptimizedStandardTranslation for how its done
 public class Degree2BroadcastTranslation implements
-ModelTranslator<TimedArcPetriNet, NTA>,
-QueryTranslator<TAPNQuery, UPPAALQuery>{
+		ModelTranslator<TimedArcPetriNet, TAPNQuery, NTA, UPPAALQuery> {
 
 	private static final String DEG2_SUFFIX = "_deg2";
 	private static final String DEG1_SUFFIX = "_single";
-	protected static final String QUERY_PATTERN = "([a-zA-Z][a-zA-Z0-9_]*) (==|<|<=|>=|>) ([0-9])*";
 	private static final String PLOCK = "P_lock";
-	private static final String P_CAPACITY = "P_capacity";
+	protected static final String P_CAPACITY = "_BOTTOM_";
 	private static final String TOKEN_TEMPLATE_NAME = "Token";
 	private static final String CONTROL_TEMPLATE_NAME = "Control";
 	private static final String ID_TYPE = "id_t";
@@ -58,79 +59,102 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	protected static final String LOCK_BOOL = "lock";
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
-	private Hashtable<Arc, String> arcsToCounters = new Hashtable<Arc, String>();
-	private Hashtable<String, Hashtable<String, String>> arcGuards = new Hashtable<String, Hashtable<String,String>>();
+	private Hashtable<TimedInputArc, String> inputArcsToCounters = new Hashtable<TimedInputArc, String>();
+	private Hashtable<TimedInhibitorArc, String> inhibitorArcsToCounters = new Hashtable<TimedInhibitorArc, String>();
+	private Hashtable<TransportArc, String> transportArcsToCounters = new Hashtable<TransportArc, String>();
+	private Hashtable<String, Hashtable<String, String>> arcGuards = new Hashtable<String, Hashtable<String, String>>();
+	
+	private List<TimedTransition> retainedTransitions;
+	
 	private int numberOfInitChannels = 0;
 	protected int extraTokens = 0;
 	private int largestPresetSize = 0;
 	protected boolean useSymmetry;
 
-	public Degree2BroadcastTranslation(int extraTokens, boolean useSymmetry) {
-		this.extraTokens = extraTokens;
+	public Degree2BroadcastTranslation(boolean useSymmetry) {
 		this.useSymmetry = useSymmetry;
 	}
+	
+	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		extraTokens = query.getExtraTokens();
+		NTA nta = transformModel(model);
+		UPPAALQuery uppaalQuery = transformQuery(query, model);
+		
+		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
+	}
 
-	public NTA transformModel(TimedArcPetriNet model) throws Exception {
-		arcsToCounters.clear();
+	protected NTA transformModel(TimedArcPetriNet model) throws Exception {
+		clearArcMappings();
 		arcGuards.clear();
 		clearLocationMappings();
 		numberOfInitChannels = 0;
 		largestPresetSize = 0;
 
-		TimedArcPetriNet degree2Net = getDegree2Converter().transform((TAPN)model);
+		TimedArcPetriNet conservativeModel = null;
+		TimedArcPetriNet degree2Model = null;
+		try {
+			TAPNToConservativeTAPNConverter conservativeConverter = new TAPNToConservativeTAPNConverter();
+			conservativeModel = conservativeConverter.makeConservative(model);
+			
+			Degree2Converter converter = new Degree2Converter();
+			degree2Model = converter.transformModel(conservativeModel);
+			retainedTransitions = converter.getRetainedTransitions();
+		} catch (Exception e) {
+			return null;
+		}
 
 		NTA nta = new NTA();
-		if(useSymmetry || model.getNumberOfTokens()+extraTokens == 0){
-			TimedAutomaton ta = createTokenAutomaton(degree2Net, model, null);
-			createInitializationTransitionsForTokenAutomata(degree2Net, ta);
+		if (useSymmetry || degree2Model.marking().size() + extraTokens == 0) {
+			TimedAutomaton ta = createTokenAutomaton(degree2Model, conservativeModel, null);
+			createInitializationTransitionsForTokenAutomata(degree2Model, ta);
 			ta.setName(TOKEN_TEMPLATE_NAME);
 			ta.setInitLocation(getLocationByName(P_CAPACITY));
-			if(useSymmetry) ta.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
+			if (useSymmetry)
+				ta.setParameters("const " + ID_TYPE + " " + ID_PARAMETER_NAME);
 			nta.addTimedAutomaton(ta);
-		}else{
+		} else {
 			int j = 0;
-			for(Token token : degree2Net.getTokens()){
-				if(!token.place().getName().equals(PLOCK)){
-					clearLocationMappings();
-					arcsToCounters.clear();
-					TimedAutomaton ta = createTokenAutomaton(degree2Net, model, token);
-					ta.setName(TOKEN_TEMPLATE_NAME + j);
-					ta.setInitLocation(getLocationByName(token.place().getName()));
-					nta.addTimedAutomaton(ta);
-					j++;
+			for(TimedPlace p : degree2Model.places()) {
+				for (TimedToken token : degree2Model.marking().getTokensFor(p)) {
+					if (!token.place().name().equals(PLOCK)) {
+						clearLocationMappings();
+						clearArcMappings();
+						TimedAutomaton ta = createTokenAutomaton(degree2Model, conservativeModel, token);
+						ta.setName(TOKEN_TEMPLATE_NAME + j);
+						ta.setInitLocation(getLocationByName(token.place().name()));
+						nta.addTimedAutomaton(ta);
+						j++;
+					}
 				}
 			}
 
-			for(int i = 0; i < extraTokens; i++){
+			TimedPlace bottom = degree2Model.getPlaceByName(P_CAPACITY);
+			for (int i = 0; i < extraTokens; i++) {
 				clearLocationMappings();
-				arcsToCounters.clear();
-				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Net, model, new Token(degree2Net.getPlaceByName(P_CAPACITY)));
+				clearArcMappings();
+				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Model, conservativeModel, new TimedToken(bottom));
 				tokenTemplate.setInitLocation(getLocationByName(P_CAPACITY));
 				nta.addTimedAutomaton(tokenTemplate);
-				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Net.getNumberOfTokens()-1+i));
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Model.marking().size() - 1 + i));
 			}
 		}
 
-		nta.addTimedAutomaton(createControlAutomaton(degree2Net, model));
-		nta.setSystemDeclarations(createSystemDeclaration(degree2Net.getNumberOfTokens()));
-		nta.setGlobalDeclarations(createGlobalDeclarations(degree2Net, model));
+		nta.addTimedAutomaton(createControlAutomaton(degree2Model, conservativeModel));
+		nta.setSystemDeclarations(createSystemDeclaration(degree2Model.marking().size()));
+		nta.setGlobalDeclarations(createGlobalDeclarations(degree2Model, conservativeModel));
 
 		return nta;
 	}
 
-	protected Degree2Converter getDegree2Converter() {
-		return new InhibDegree2Converter();
-	}
-
 	private String createSystemDeclaration(int tokensInModel) {
-		if(useSymmetry  || tokensInModel + extraTokens == 1){
-			return "system " + CONTROL_TEMPLATE_NAME + "," + TOKEN_TEMPLATE_NAME + ";";
-		}else{
+		if (useSymmetry || tokensInModel + extraTokens == 1) {
+			return "system " + CONTROL_TEMPLATE_NAME + ","
+					+ TOKEN_TEMPLATE_NAME + ";";
+		} else {
 			StringBuilder builder = new StringBuilder("system ");
 			builder.append(CONTROL_TEMPLATE_NAME);
 
-			for(int i = 0; i < extraTokens + tokensInModel - 1; i++)
-			{
+			for (int i = 0; i < extraTokens + tokensInModel - 1; i++) {
 				builder.append(", ");
 				builder.append(TOKEN_TEMPLATE_NAME);
 				builder.append(i);
@@ -144,50 +168,54 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel) {
 		StringBuilder builder = new StringBuilder();
 
-		if(useSymmetry){
+		if (useSymmetry) {
 			builder.append("const int N = ");
-			builder.append(degree2Net.getTokens().size() + extraTokens - 1);
+			builder.append(degree2Net.marking().size() + extraTokens - 1);
 			builder.append(";\n");
 			builder.append("typedef ");
 			builder.append("scalar[N] ");
 			builder.append(ID_TYPE);
 			builder.append(";\n");
 
-			for(int i = 0; i < numberOfInitChannels; i++){
+			for (int i = 0; i < numberOfInitChannels; i++) {
 				builder.append("chan ");
-				builder.append(String.format(INIT_CHANNEL, i,""));
+				builder.append(String.format(INIT_CHANNEL, i, ""));
 				builder.append(";\n");
 			}
 		}
 
-
-		for(TAPNTransition t : degree2Net.getTransitions()){
-			if(t.isFromOriginalNet()){
-				if(t.getPreset().size() == 1){
+		for (TimedTransition t : degree2Net.transitions()) {
+			if(t.presetSize() == 0 && !t.hasInhibitorArcs()) {
+				continue;
+			}
+			else if (isTransitionDegree1(t)) {
 					builder.append("broadcast chan ");
-					builder.append(t.getName() + DEG1_SUFFIX);
+					builder.append(t.name() + DEG1_SUFFIX);
 					builder.append(";\n");
-				}else if(t.getPreset().size() == 2){
-					builder.append("chan ");
-					builder.append(t.getName() + DEG2_SUFFIX);
-					builder.append(";\n");
-				}
-			}else{
+			}
+			else if (retainedTransitions.contains(t)) {
 				builder.append("chan ");
-				builder.append(t.getName());
+				builder.append(t.name() + DEG2_SUFFIX);
+				builder.append(";\n");
+			} else {
+				builder.append("chan ");
+				builder.append(t.name());
 				builder.append(";\n");
 			}
 		}
 
-		for(TAPNTransition t : originalModel.getTransitions()){
-			if(!t.isDegree2() || t.hasInhibitorArcs()){
+		for (TimedTransition t : originalModel.transitions()) {
+			if((t.presetSize() == 0 || isTransitionDegree1(t)) && !t.hasInhibitorArcs()) {
+				continue;
+			}
+			else if (!isTransitionDegree2(t) || t.hasInhibitorArcs()) {
 				builder.append("broadcast chan ");
-				builder.append(String.format(TEST_CHANNEL, t.getName(),""));
+				builder.append(String.format(TEST_CHANNEL, t.name(), ""));
 				builder.append(";\n");
 			}
-		}		
+		}
 
-		for(int i = 0; i < largestPresetSize; i++){
+		for (int i = 0; i < largestPresetSize; i++) {
 			builder.append("bool ");
 			builder.append(String.format(COUNTER_NAME, i));
 			builder.append(";\n");
@@ -200,119 +228,114 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	protected String convertInvariant(TAPNPlace place) {
+	private boolean isTransitionDegree1(TimedTransition t) {
+		return t.presetSize() == 1 && t.postsetSize() == 1;
+	}
+	
+	private boolean isTransitionDegree2(TimedTransition t) {
+		return t.presetSize() == 2 && t.postsetSize() == 2;
+	}
+
+	protected String convertInvariant(TimedPlace place) {
 		String inv = "";
-		String invariant = place.getInvariant();
-		if(!invariant.equals("<inf")){
-			inv = CLOCK_NAME + " " + invariant;
+		TimeInvariant invariant = place.invariant();
+		if (!invariant.equals(TimeInvariant.LESS_THAN_INFINITY)) {
+			inv = CLOCK_NAME + " " + invariant.toString(false);
 		}
 
 		return inv;
 	}
 
-	protected Location getLocationByName(String name){
+	protected Location getLocationByName(String name) {
 		return namesToLocations.get(name);
 	}
 
-	protected void addLocationMapping(String name, Location location){
+	protected void addLocationMapping(String name, Location location) {
 		namesToLocations.put(name, location);
 	}
 
-	protected void clearLocationMappings(){
+	protected void clearLocationMappings() {
 		namesToLocations.clear();
 	}
+	
+	private void clearArcMappings() {
+		inputArcsToCounters.clear();
+		inhibitorArcsToCounters.clear();
+		transportArcsToCounters.clear();	
+	}
 
-	private TimedAutomaton createControlAutomaton(TimedArcPetriNet degree2Net,
-			TimedArcPetriNet model) {
+	private TimedAutomaton createControlAutomaton(TimedArcPetriNet degree2Net, TimedArcPetriNet model) {
 		TimedAutomaton control = new TimedAutomaton();
 		createInitialLocationsForControlAutomaton(degree2Net, control);
 		createEdgesForControlAutomaton(degree2Net, model, control);
 		control.setName(CONTROL_TEMPLATE_NAME);
-		if(useSymmetry){
-			Location initial = createInitializationTransitionsForControlAutomaton(degree2Net,control);
+		if (useSymmetry) {
+			Location initial = createInitializationTransitionsForControlAutomaton(degree2Net, control);
 			control.setInitLocation(initial);
-		}else{
+		} else {
 			control.setInitLocation(getLocationByName(PLOCK));
 		}
 
 		return control;
 	}
 
-	private Location createInitializationTransitionsForControlAutomaton(
-			TimedArcPetriNet degree2Net, TimedAutomaton control) {
-		if(degree2Net.getNumberOfTokens() == 1) return getLocationByName(PLOCK);
-			
-		Location first = new Location("","");
+	private Location createInitializationTransitionsForControlAutomaton(TimedArcPetriNet degree2Net, TimedAutomaton control) {
+		if (degree2Net.marking().size() == 1)
+			return getLocationByName(PLOCK);
+
+		Location first = new Location("", "");
 		first.setCommitted(true);
 		control.addLocation(first);
 		Location prev = first;
 
-		for(int i = 0; i < degree2Net.getNumberOfTokens()-2; i++){
-			Location l = new Location("","");
+		for (int i = 0; i < degree2Net.marking().size() - 2; i++) {
+			Location l = new Location("", "");
 			l.setCommitted(true);
 			control.addLocation(l);
 
-			Edge e = new Edge(prev,
-					l,
-					"",
-					String.format(INIT_CHANNEL, i, "!"),
-			"");
+			Edge e = new Edge(prev, l, "", String.format(INIT_CHANNEL, i, "!"),	"");
 			control.addTransition(e);
 			prev = l;
 		}
 
-		Edge e = new Edge(prev,
-				getLocationByName(PLOCK),
-				"",
-				String.format(INIT_CHANNEL, degree2Net.getNumberOfTokens()-2,"!"),
-		"");
+		Edge e = new Edge(prev, getLocationByName(PLOCK), "", String.format(INIT_CHANNEL, degree2Net.marking().size() - 2, "!"), "");
 		control.addTransition(e);
 		return first;
 	}
 
-	private void createEdgesForControlAutomaton(TimedArcPetriNet degree2Net,
-			TimedArcPetriNet originalModel,
-			TimedAutomaton control) {
-		for(TAPNTransition transition : degree2Net.getTransitions()){
-			if(!transition.isFromOriginalNet()){
-				Pairing pairing = createPairing(transition, false);
-
-				if(!pairing.getInput().getName().equals(PLOCK)){
-					Edge e = new Edge(getLocationByName(pairing.getInput().getName()),
-							getLocationByName(pairing.getOutput().getName()),
-							"",
-							transition.getName() + "!",
-					"");
-					control.addTransition(e);
+	private void createEdgesForControlAutomaton(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel, TimedAutomaton control) {
+		for (TimedTransition transition : degree2Net.transitions()) {
+			if (!retainedTransitions.contains(transition)) {
+				Degree2Pairing pairing = new Degree2Pairing(transition);
+				
+				for(TimedInputArc inputArc : transition.getInputArcs()) {
+					if (!inputArc.source().name().equals(PLOCK) && isPartOfLockTemplate(inputArc.source().name())) {
+						Edge e = new Edge(getLocationByName(inputArc.source().name()), 
+								getLocationByName(pairing.getOutputArcFor(inputArc).destination().name()), 
+								"", transition.name() + "!", "");
+						control.addTransition(e);
+					}
 				}
 			}
-		}	
+		}
 
-		for(TAPNTransition transition : originalModel.getTransitions()){
-			if(!transition.isDegree2() || transition.hasInhibitorArcs()){
-				Location ptest = new Location("",createInvariantForControl(transition));
+		for (TimedTransition transition : originalModel.transitions()) {
+			if (!(isTransitionDegree1(transition) || isTransitionDegree2(transition)) || transition.hasInhibitorArcs()) {
+				Location ptest = new Location("", createInvariantForControl(transition));
 				ptest.setCommitted(true);
 				control.addLocation(ptest);
 
-				Edge first = new Edge(getLocationByName(PLOCK),
-						ptest,
-						"",
-						String.format(TEST_CHANNEL, transition.getName(), "!"),
-				"");
+				Edge first = new Edge(getLocationByName(PLOCK), ptest, "", String.format(TEST_CHANNEL, transition.name(), "!"), "");
 				control.addTransition(first);
 
-				if(transition.getPreset().size() != 1){
-					Edge second = new Edge(ptest,
-							getLocationByName(String.format(P_T_IN_FORMAT, transition.getName(), 1)),
-							"",
-							String.format(T_I_IN_FORMAT+"%3$s", transition.getName(), 1, "!"),
+				if (transition.presetSize() != 1) {
+					Edge second = new Edge(ptest, getLocationByName(String.format(P_T_IN_FORMAT, transition.name(), 1)),
+							"", String.format(T_I_IN_FORMAT + "%3$s", transition.name(), 1, "!"),
 							createResetExpressionForControl(transition));
 					control.addTransition(second);
-				}else{
-					Edge second = new Edge(ptest,
-							getLocationByName(PLOCK),
-							"",
-							String.format(T_MAX_FORMAT+"%3$s", transition.getName(), 1, "!"),
+				} else {
+					Edge second = new Edge(ptest, getLocationByName(PLOCK), "",
+							String.format(T_MAX_FORMAT + "%3$s", transition.name(), 1, "!"),
 							createResetExpressionForControl(transition));
 					control.addTransition(second);
 				}
@@ -320,110 +343,122 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		}
 	}
 
-	private void createInitialLocationsForControlAutomaton(
-			TimedArcPetriNet degree2Net, TimedAutomaton ta) {
-		for(TAPNPlace place: degree2Net.getPlaces()){			
-			if(isPartOfLockTemplate(place.getName())){
-				Location l = new Location(place.getName(),"");
+	private void createInitialLocationsForControlAutomaton(TimedArcPetriNet degree2Net, TimedAutomaton ta) {
+		for (TimedPlace place : degree2Net.places()) {
+			if (isPartOfLockTemplate(place.name())) {
+				Location l = new Location(place.name(), "");
 
-				if(!place.getName().equals(PLOCK)){
+				if (!place.name().equals(PLOCK)) {
 					l.setCommitted(true);
 				}
 
 				ta.addLocation(l);
-				addLocationMapping(place.getName(), l);
+				addLocationMapping(place.name(), l);
 			}
 		}
 	}
 
-	private TimedAutomaton createTokenAutomaton(TimedArcPetriNet degree2Net,
-			TimedArcPetriNet originalModel, Token token) throws Exception {
+	private TimedAutomaton createTokenAutomaton(TimedArcPetriNet degree2Net, TimedArcPetriNet originalModel, TimedToken token) throws Exception {
 		TimedAutomaton tokenTA = new TimedAutomaton();
 		createInitialLocationsForTokenAutomata(degree2Net, tokenTA);
 		createEdgesForTokenAutomata(degree2Net, tokenTA);
 		createTestingEdgesForTokenAutomata(originalModel, tokenTA);
-		tokenTA.setDeclarations(createLocalDeclarations(originalModel, token));
+		tokenTA.setDeclarations(createLocalDeclarations());
 
 		return tokenTA;
 	}
 
-	protected String createLocalDeclarations(TimedArcPetriNet model, Token token) {
+	protected String createLocalDeclarations() {
 		return "clock " + CLOCK_NAME + ";";
 	}
 
-	private void createInitializationTransitionsForTokenAutomata(TimedArcPetriNet degree2Net,
-			TimedAutomaton ta) {
-		int i = 0;
-		for(Token token : degree2Net.getTokens()){
-			if(!token.place().getName().equals(PLOCK) && !token.place().getName().equals(P_CAPACITY)){
-				Edge e = new Edge(getLocationByName(P_CAPACITY),
-						getLocationByName(token.place().getName()),
-						"",
-						String.format(INIT_CHANNEL, i, "?"),
-						createUpdateExpressionForTokenInitialization(token));
-				ta.addTransition(e);
-				i++;
-				numberOfInitChannels++;
+	private void createInitializationTransitionsForTokenAutomata(TimedArcPetriNet degree2Net, TimedAutomaton ta) {
+		int j = 0;
+		for(TimedPlace p : degree2Net.places()) {
+			for (int i = 0; i < p.numberOfTokens(); i++) {
+				if (!p.name().equals(PLOCK) && !p.name().equals(P_CAPACITY)) {
+					Edge e = new Edge(getLocationByName(P_CAPACITY), getLocationByName(p.name()), "", String.format(INIT_CHANNEL, j, "?"), "");
+					ta.addTransition(e);
+					numberOfInitChannels++;
+					j++;
+				}
 			}
 		}
 	}
 
 	private void createEdgesForTokenAutomata(TimedArcPetriNet degree2Net, TimedAutomaton token) {
-		for(TAPNTransition transition : degree2Net.getTransitions()){
-			if(transition.isFromOriginalNet()){
-				if(transition.getPreset().size() == 1){
-					Pairing pairing = createPairing(transition, true);
-					String guard = createTransitionGuardWithLock(pairing.getInputArc(), pairing.getOutput(), pairing.getArcType().equals(ArcType.TARC));
-					Edge e = new Edge(getLocationByName(pairing.getInput().getName()),
-							getLocationByName(pairing.getOutput().getName()),
-							guard,
-							transition.getName() + DEG1_SUFFIX + "!",
-							CreateResetExpressionIfNormalArc(pairing.getOutputArc()));
+		for (TimedTransition transition : degree2Net.transitions()) {
+			if(transition.presetSize() == 0 && !transition.hasInhibitorArcs())
+				continue;
+			
+			Degree2Pairing pairing = new Degree2Pairing(transition);
+			
+			if (retainedTransitions.contains(transition)) {
+					boolean first = true;
+					String suffix = isTransitionDegree1(transition) ? DEG1_SUFFIX : DEG2_SUFFIX;
+					
+					for(TimedInputArc inputArc : transition.getInputArcs()) {
+						if(isPartOfLockTemplate(inputArc.source().name()))
+							continue;
+						
+						TimedOutputArc outputArc = pairing.getOutputArcFor(inputArc);
+						String guard = createTransitionGuardWithLock(inputArc, outputArc.destination(), false);
+						Edge e = new Edge(getLocationByName(inputArc.source().name()), 
+								getLocationByName(outputArc.destination().name()), guard, 
+								transition.name() + suffix + (first ? "!" : "?"),
+								createResetExpressionForNormalArc());
+						token.addTransition(e);
+						saveGuard(transition.name(), inputArc.source().name(), guard);
+						first = false;
+					}
+
+					for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+						String guard = createTransitionGuardWithLock(transArc, transArc.destination(), true);
+						Edge e = new Edge(getLocationByName(transArc.source().name()),
+								getLocationByName(transArc.destination().name()),
+								guard, transition.name() + suffix + (first ? "!" : "?"), "");
+						
+						token.addTransition(e);
+						saveGuard(transition.name(), transArc.source().name(), guard);
+						first = false;
+					}
+			} else {
+				for(TimedInputArc inputArc : transition.getInputArcs()) {
+					if(isPartOfLockTemplate(inputArc.source().name()))
+						continue;
+					
+					String guard = convertGuard(inputArc.interval());
+					Edge e = new Edge(getLocationByName(inputArc.source().name()),
+							getLocationByName(pairing.getOutputArcFor(inputArc).destination().name()),
+							guard, transition.name() + "?",
+							createResetExpressionForNormalArc());
 					token.addTransition(e);
-					saveGuard(transition.getName(),pairing.getInput().getName(), guard);
-				}else{
-					List<Pairing> pairing = CreatePairing(transition);
-
-					Pairing pair1 = pairing.get(0);
-					String guard1 = createTransitionGuardWithLock(pair1.getInputArc(), pair1.getOutput(), pair1.getArcType().equals(ArcType.TARC));
-					Edge e1 = new Edge(getLocationByName(pair1.getInput().getName()),
-							getLocationByName(pair1.getOutput().getName()),
-							guard1,
-							transition.getName() + DEG2_SUFFIX + "?",
-							CreateResetExpressionIfNormalArc(pair1.getOutputArc()));
-					token.addTransition(e1);
-					saveGuard(transition.getName(), pair1.getInput().getName(), guard1);
-
-					Pairing pair2 = pairing.get(1);
-					String guard2 = createTransitionGuardWithLock(pair2.getInputArc(), pair2.getOutput(), pair2.getArcType().equals(ArcType.TARC));
-					Edge e2 = new Edge(getLocationByName(pair2.getInput().getName()),
-							getLocationByName(pair2.getOutput().getName()),
-							guard2,
-							transition.getName() + DEG2_SUFFIX + "!",
-							CreateResetExpressionIfNormalArc(pair2.getOutputArc()));
-					token.addTransition(e2);
-					saveGuard(transition.getName(), pair2.getInput().getName(), guard2);
+					saveGuard(transition.name(), inputArc.source().name(), guard);
+				
 				}
-			}else{
-				Pairing pairing = createPairing(transition, true);
-				String guard = createTransitionGuard(pairing.getInputArc(), pairing.getOutput(), pairing.getArcType().equals(ArcType.TARC));
-				Edge e = new Edge(getLocationByName(pairing.getInput().getName()),
-						getLocationByName(pairing.getOutput().getName()),
-						guard,
-						transition.getName() + "?",
-						CreateResetExpressionIfNormalArc(pairing.getOutputArc()));
-				token.addTransition(e);
-				saveGuard(transition.getName(), pairing.getInput().getName(), guard);
+				
+				for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+					TimeInterval newGuard = transArc.interval().intersect(transArc.destination().invariant());
+					String guard = convertGuard(newGuard);
+					Edge e = new Edge(getLocationByName(transArc.source().name()),
+							getLocationByName(transArc.destination().name()),
+							guard, transition.name() + "?", "");
+					
+					token.addTransition(e);
+					saveGuard(transition.name(), transArc.source().name(), guard);
+				}
 			}
-		}		
+		}
 	}
 
-	private void saveGuard(String transitionName, String inputPlaceName,
-			String guard) {
+	
+
+	private void saveGuard(String transitionName, String inputPlaceName, String guard) {
 		String originalTransitionName = getOriginalTransitionName(transitionName);
-		if(originalTransitionName != null && !originalTransitionName.isEmpty()){
-			if(!arcGuards.containsKey(originalTransitionName)){
-				arcGuards.put(originalTransitionName, new Hashtable<String, String>());
+		if (originalTransitionName != null && !originalTransitionName.isEmpty()) {
+			if (!arcGuards.containsKey(originalTransitionName)) {
+				arcGuards.put(originalTransitionName,
+						new Hashtable<String, String>());
 			}
 
 			arcGuards.get(originalTransitionName).put(inputPlaceName, guard);
@@ -434,121 +469,70 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		Pattern pattern = Pattern.compile("^([a-zA-Z_][a-zA-Z0-9_]*)_([0-9]*(?:_in)?)$");
 
 		Matcher matcher = pattern.matcher(name);
-		if(!matcher.find()){
+		if (!matcher.find()) {
 			return null;
-		}else{
+		} else {
 			return matcher.group(1);
 		}
 	}
 
-	private List<Pairing> CreatePairing(TAPNTransition t) {
-		List<Pairing> pairing = new ArrayList<Pairing>();
-		HashSet<Arc> usedPostSetArcs = new HashSet<Arc>();
-
-		for(Arc inputArc : t.getPreset()){
-			for(Arc outputArc : t.getPostset()){
-				if(!usedPostSetArcs.contains(outputArc)){
-					if(inputArc instanceof TAPNTransportArc && outputArc instanceof TAPNTransportArc && inputArc == outputArc){
-						Pairing p = new Pairing((TAPNArc)inputArc,
-								((TAPNArc)inputArc).getGuard(),
-								outputArc,
-								ArcType.TARC);
-						pairing.add(p);
-
-						usedPostSetArcs.add(outputArc);
-						break;
-					}else if(!(inputArc instanceof TAPNTransportArc) && !(outputArc instanceof TAPNTransportArc)){
-						Pairing p = new Pairing((TAPNArc)inputArc,
-								((TAPNArc)inputArc).getGuard(),
-								outputArc,
-								ArcType.NORMAL);
-						pairing.add(p);
-
-						usedPostSetArcs.add(outputArc);
-						break;
-					}
-				}
-			}
-		}
-
-		return pairing;
-	}
-
-	private Pairing createPairing(TAPNTransition transition, boolean isForTokenAutomaton) {
-		Arc source = null;
-		Arc dest = null;
-
-		for(Arc presetArc : transition.getPreset()){
-			if(isForTokenAutomaton && !isPartOfLockTemplate(presetArc.getSource().getName()))
-			{
-				source = presetArc;
-				break;
-			}else if(!isForTokenAutomaton && isPartOfLockTemplate(presetArc.getSource().getName())){
-				source = presetArc;
-				break;
-			}
-		}
-
-		for(Arc postsetArc : transition.getPostset()){
-			if(isForTokenAutomaton && !isPartOfLockTemplate(postsetArc.getTarget().getName()))
-			{
-				dest = postsetArc;
-				break;
-			}else if(!isForTokenAutomaton && isPartOfLockTemplate(postsetArc.getTarget().getName())){
-				dest = postsetArc;
-				break;
-			}
-		}
-
-		boolean isTransportArc = source instanceof TAPNTransportArc;
-		ArcType type = isTransportArc ? ArcType.TARC : ArcType.NORMAL;
-
-		return new Pairing((TAPNArc)source,((TAPNArc)source).getGuard(), dest, type);
-	}
-
 	private void createTestingEdgesForTokenAutomata(TimedArcPetriNet originalModel, TimedAutomaton ta) throws Exception {
 
-		for(TAPNTransition transition : originalModel.getTransitions()){
-			int size = transition.getPreset().size() + transition.getInhibitorArcs().size();
-			if(size > largestPresetSize) largestPresetSize = size;
+		for (TimedTransition transition : originalModel.transitions()) {
+			int size = transition.presetSize() + transition.getInhibitorArcs().size();
+			if (size > largestPresetSize)
+				largestPresetSize = size;
+			
+			if(size == 0)
+				continue;
 
-			if(!transition.isDegree2() || transition.hasInhibitorArcs()){
+			if (!(isTransitionDegree1(transition) || isTransitionDegree2(transition)) || transition.hasInhibitorArcs()) {
 				int i = 0;
-				for(Arc arc : transition.getPreset()){
-					String source = arc.getSource().getName();
+				for (TimedInputArc inputArc : transition.getInputArcs()) {
+					String source = inputArc.source().name();
 					String counter = String.format(COUNTER_NAME, i);
-					arcsToCounters.put(arc, counter);
+					inputArcsToCounters.put(inputArc, counter);
 
-					String guard = arcGuards.get(transition.getName()).get(source);
-					if(guard == null && source.equals(P_CAPACITY)){
+					String guard = arcGuards.get(transition.name()).get(source);
+					if (guard == null && source.equals(P_CAPACITY)) {
 						guard = "";
-					}else if(guard == null){
-						if(arc instanceof TAPNInhibitorArc){
-							guard = createTransitionGuard((TAPNInhibitorArc)arc, null, false);
-						}
+					} else if(guard == null)
 						throw new Exception("guard was not precomputed");
-					}
 
-					//String guard = createGuardForTestingEdge(transition, arc);
 					Edge e = new Edge(getLocationByName(source),
-							getLocationByName(source),
-							guard,
-							String.format(TEST_CHANNEL, transition.getName(), "?"),
+							getLocationByName(source), guard, String.format(TEST_CHANNEL, transition.name(), "?"),
 							String.format(COUNTER_UPDATE, counter, "= true"));
-					ta.addTransition(e);		
+					ta.addTransition(e);
+					i++;
+				}
+				
+				for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+					String source = transArc.source().name();
+					String counter = String.format(COUNTER_NAME, i);
+					transportArcsToCounters.put(transArc, counter);
+
+					String guard = arcGuards.get(transition.name()).get(source);
+					if (guard == null && source.equals(P_CAPACITY)) {
+						guard = "";
+					} else if(guard == null)
+						throw new Exception("guard was not precomputed");
+
+					Edge e = new Edge(getLocationByName(source),
+							getLocationByName(source), guard, String.format(TEST_CHANNEL, transition.name(), "?"),
+							String.format(COUNTER_UPDATE, counter, "= true"));
+					ta.addTransition(e);
 					i++;
 				}
 
-				for(TAPNInhibitorArc arc : transition.getInhibitorArcs()){
-					String source = arc.getSource().getName();
+				for (TimedInhibitorArc inhibArc : transition.getInhibitorArcs()) {
+					String source = inhibArc.source().name();
 					String counter = String.format(COUNTER_NAME, i);
-					arcsToCounters.put(arc, counter);
+					inhibitorArcsToCounters.put(inhibArc, counter);
 
 					Edge e = new Edge(getLocationByName(source),
-							getLocationByName(source),
-							createTransitionGuard(arc, null, false),
-							String.format(TEST_CHANNEL, arc.getTarget().getName(), "?"),
-							String.format(COUNTER_UPDATE, counter, "=true"));
+							getLocationByName(source), convertGuard(inhibArc.interval()), 
+							String.format(TEST_CHANNEL, inhibArc.destination().name(),"?"), 
+							String.format(COUNTER_UPDATE,counter, "=true"));
 					ta.addTransition(e);
 					i++;
 				}
@@ -557,43 +541,54 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 	}
 
 	private void createInitialLocationsForTokenAutomata(TimedArcPetriNet degree2Net, TimedAutomaton ta) {
-		for(TAPNPlace place: degree2Net.getPlaces()){			
-			if(!isPartOfLockTemplate(place.getName())){
-				Location l = new Location(place.getName(), convertInvariant(place));
+		for (TimedPlace place : degree2Net.places()) {
+			if (!isPartOfLockTemplate(place.name())) {
+				Location l = new Location(place.name(), convertInvariant(place));
 				ta.addLocation(l);
-				addLocationMapping(place.getName(), l);
+				addLocationMapping(place.name(), l);
 			}
 		}
 	}
 
-	private String createInvariantForControl(TAPNTransition transition) {
+	private String createInvariantForControl(TimedTransition transition) {
 		return createBooleanExpressionForControl(transition, "==", "==");
 	}
 
-	private String createBooleanExpressionForControl(TAPNTransition transition, String comparison, String inhibComparison)
-	{
+	private String createBooleanExpressionForControl(TimedTransition transition, String comparison, String inhibComparison) {
 		StringBuilder builder = new StringBuilder();
 
 		boolean first = true;
 
-		for(Arc presetArc : transition.getPreset()){
-			if(!first){
+		for (TimedInputArc presetArc : transition.getInputArcs()) {
+			if (!first) {
 				builder.append(" && ");
 			}
 
-			String counter = arcsToCounters.get(presetArc);
+			String counter = inputArcsToCounters.get(presetArc);
+			builder.append(counter);
+			builder.append(comparison);
+			builder.append("true");
+			first = false;
+		}
+		
+		for (TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+			if (!first) {
+				builder.append(" && ");
+			}
+
+			String counter = transportArcsToCounters.get(transArc);
 			builder.append(counter);
 			builder.append(comparison);
 			builder.append("true");
 			first = false;
 		}
 
-		for(TAPNInhibitorArc inhib : transition.getInhibitorArcs()){
-			if(!first){
+		for (TimedInhibitorArc inhib : transition.getInhibitorArcs()) {
+			if (!first) {
 				builder.append(" && ");
 			}
 
-			String counter = arcsToCounters.get(inhib);
+			String counter = inhibitorArcsToCounters.get(inhib);
 			builder.append(counter);
 			builder.append(inhibComparison);
 			builder.append("false");
@@ -602,118 +597,124 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 		return builder.toString();
 	}
 
-	private String createResetExpressionForControl(TAPNTransition transition) {
+	private String createResetExpressionForControl(TimedTransition transition) {
 		StringBuilder builder = new StringBuilder();
 
 		boolean first = true;
 
-		for(Arc presetArc : transition.getPreset()){
-			if(!first){
+		for (TimedInputArc presetArc : transition.getInputArcs()) {
+			if (!first) {
 				builder.append(", ");
 			}
 
-			String counter = arcsToCounters.get(presetArc);
+			String counter = inputArcsToCounters.get(presetArc);
+			builder.append(counter);
+			builder.append(":=false");
+			first = false;
+		}
+		
+		for (TransportArc transArc : transition.getTransportArcsGoingThrough()) {
+			if (!first) {
+				builder.append(", ");
+			}
+
+			String counter = transportArcsToCounters.get(transArc);
 			builder.append(counter);
 			builder.append(":=false");
 			first = false;
 		}
 
-		for(TAPNInhibitorArc inhib : transition.getInhibitorArcs()){
-			if(!first){
+		for (TimedInhibitorArc inhib : transition.getInhibitorArcs()) {
+			if (!first) {
 				builder.append(", ");
 			}
 
-			String counter = arcsToCounters.get(inhib);
+			String counter = inhibitorArcsToCounters.get(inhib);
 			builder.append(counter);
 			builder.append(":=false");
+			first = false;
 		}
 
 		return builder.toString();
 	}
 
-	protected String createTransitionGuard(TAPNArc arc, TAPNPlace target, boolean isTransportArc) {
-		String newGuard = PetriNetUtil.createGuard(arc.getGuard(), target, isTransportArc);
-		return createTransitionGuard(newGuard);
-	}
+	protected String createTransitionGuardWithLock(TimedInputArc inputArc, TimedPlace targetPlace, boolean isTransportArc) {
+		String guard = convertGuard(inputArc.interval());
 
-	protected String createTransitionGuardWithLock(TAPNArc arc, TAPNPlace target, boolean isTransportArc){
-		String guard = createTransitionGuard(arc, target, isTransportArc);
-
-		if(guard == null || guard.isEmpty()){
+		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";
-		}else{
+		} else {
+			guard += " && " + LOCK_BOOL + " == 0";
+		}
+
+		return guard;
+	}
+	
+	private String convertGuard(TimeInterval interval) {
+		if(interval.equals(TimeInterval.ZERO_INF))
+			return "";
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append(CLOCK_NAME);
+		if(interval.IsLowerBoundNonStrict())
+			builder.append(" >= ");
+		else
+			builder.append(" > ");
+		
+		builder.append(interval.lowerBound().value());
+		
+		if(!interval.upperBound().equals(Bound.Infinity)) {
+			builder.append(" && ");
+			builder.append(CLOCK_NAME);
+			
+			if(interval.IsUpperBoundNonStrict())
+				builder.append(" <= ");
+			else
+				builder.append(" < ");
+			
+			builder.append(interval.upperBound().value());
+		}
+		
+		return builder.toString();
+	}
+	
+	private String createTransitionGuardWithLock(TransportArc transArc, TimedPlace targetPlace, boolean isTransportArc) {
+		TimeInterval newGuard = transArc.interval().intersect(targetPlace.invariant());
+		String guard = convertGuard(newGuard);
+
+		if (guard == null || guard.isEmpty()) {
+			guard = LOCK_BOOL + " == 0";
+		} else {
 			guard += " && " + LOCK_BOOL + " == 0";
 		}
 
 		return guard;
 	}
 
-	protected String createTransitionGuard(String guard) {
-		if(guard.equals("false")) return guard;
-		if(guard.equals("[0,inf)")) return "";
-
-		String[] splitGuard = guard.substring(1, guard.length()-1).split(",");
-		char firstDelim = guard.charAt(0);
-		char secondDelim = guard.charAt(guard.length()-1);
-
-		StringBuilder builder = new StringBuilder();
-		builder.append(CLOCK_NAME);
-		builder.append(" ");
-
-		if(firstDelim == '('){
-			builder.append(">");
-		} else {
-			builder.append(">=");
-		}
-
-		builder.append(splitGuard[0]);
-
-		if(!splitGuard[1].equals("inf")){
-			builder.append(" && ");
-			builder.append(CLOCK_NAME);
-			builder.append(" ");
-
-			if(secondDelim == ')'){
-				builder.append("<");
-			}else {
-				builder.append("<=");
-			}
-			builder.append(splitGuard[1]);
-		}
-
-		return builder.toString();
-	}	
-
-	protected String CreateResetExpressionIfNormalArc(Arc arc) {
-		if(!(arc instanceof TAPNTransportArc)){
-			return String.format("%1s := 0", CLOCK_NAME);
-		}else{
-			return "";
-		}
+	private String createResetExpressionForNormalArc() {
+		return String.format("%1s := 0", CLOCK_NAME);
 	}
 
-	private boolean isPartOfLockTemplate(String name){
+	private boolean isPartOfLockTemplate(String name) {
 		Pattern pattern = Pattern.compile("^(P_(?:[a-zA-Z][a-zA-Z0-9_]*)_(?:(?:[0-9]*_(?:in|out)|check))|P_lock|P_deadlock)$");
 
 		Matcher matcher = pattern.matcher(name);
 		return matcher.find();
 	}
 
-	protected String createUpdateExpressionForTokenInitialization(Token token) {
-		return "";
-	}
-
-	public UPPAALQuery transformQuery(TAPNQuery tapnQuery) throws Exception {
-		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry,tapnQuery.getTotalTokens());
+	protected UPPAALQuery transformQuery(TAPNQuery tapnQuery, TimedArcPetriNet model) throws Exception {
+		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(
+				useSymmetry, model.marking().size() + tapnQuery.getExtraTokens());
 
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
 	}
 
-	public TranslationNamingScheme namingScheme(){
+	public TranslationNamingScheme namingScheme() {
 		return new Degree2BroadcastNamingScheme();
 	}
 
-	protected class Degree2BroadcastNamingScheme implements TranslationNamingScheme {
+	protected class Degree2BroadcastNamingScheme implements
+			TranslationNamingScheme {
 		private static final int NOT_FOUND = -1;
 		private final String START_OF_SEQUENCE_PATTERN = "^(\\w+)_(?:test|single|deg2)$";
 		private Pattern startPattern = Pattern.compile(START_OF_SEQUENCE_PATTERN);
@@ -726,24 +727,28 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 
 			int startIndex = NOT_FOUND;
 			String originalTransitionName = null;
-			for(int i = 0; i < firingSequence.size(); i++){
+			for (int i = 0; i < firingSequence.size(); i++) {
 				String transitionName = firingSequence.get(i);
 				Matcher startMatcher = startPattern.matcher(transitionName);
 
 				boolean isStartTransition = startMatcher.matches();
 
-				if(isStartTransition){ 
-					if(startIndex != NOT_FOUND){
-						TransitionTranslation transitionTranslation = createTransitionTranslation(firingSequence.get(startIndex), startIndex, i-1, originalTransitionName);
+				if (isStartTransition) {
+					if (startIndex != NOT_FOUND) {
+						TransitionTranslation transitionTranslation = createTransitionTranslation(
+								firingSequence.get(startIndex), startIndex,
+								i - 1, originalTransitionName);
 						transitionTranslations.add(transitionTranslation);
 					}
-					startIndex = i; 
-					originalTransitionName = startMatcher.group(1); 
-				}			
+					startIndex = i;
+					originalTransitionName = startMatcher.group(1);
+				}
 			}
-			
-			if(startIndex != NOT_FOUND){
-				TransitionTranslation transitionTranslation = createTransitionTranslation(firingSequence.get(startIndex), startIndex, firingSequence.size()-1, originalTransitionName);
+
+			if (startIndex != NOT_FOUND) {
+				TransitionTranslation transitionTranslation = createTransitionTranslation(
+						firingSequence.get(startIndex), startIndex,
+						firingSequence.size() - 1, originalTransitionName);
 				transitionTranslations.add(transitionTranslation);
 			}
 			TransitionTranslation[] array = new TransitionTranslation[transitionTranslations.size()];
@@ -751,8 +756,10 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			return array;
 		}
 
-		private TransitionTranslation createTransitionTranslation(String startTransition, int startIndex, int endIndex, String originalTransitionName) {
-			if(testTransitionPattern.matcher(startTransition).matches()){
+		private TransitionTranslation createTransitionTranslation(
+				String startTransition, int startIndex, int endIndex,
+				String originalTransitionName) {
+			if (testTransitionPattern.matcher(startTransition).matches()) {
 				startIndex += 1; // ignores _test transition
 			}
 			TransitionTranslation transitionTranslation = new TransitionTranslation(startIndex, endIndex, originalTransitionName, seqInfo);
@@ -768,7 +775,7 @@ QueryTranslator<TAPNQuery, UPPAALQuery>{
 			return matcher.matches();
 		}
 
-		public boolean isIgnoredAutomata(String automata){
+		public boolean isIgnoredAutomata(String automata) {
 			return automata.equals(CONTROL_TEMPLATE_NAME);
 		}
 	}

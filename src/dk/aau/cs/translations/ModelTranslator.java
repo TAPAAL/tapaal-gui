@@ -1,5 +1,8 @@
 package dk.aau.cs.translations;
 
-public interface ModelTranslator<TInput, TOutput> {
-	TOutput transformModel(TInput model) throws Exception;
+import dk.aau.cs.util.Tuple;
+
+public interface ModelTranslator<TInputModel, TInputQuery, TOutputModel, TOutputQuery> {
+	Tuple<TOutputModel, TOutputQuery> translate(TInputModel model, TInputQuery query) throws Exception;
+	TranslationNamingScheme namingScheme();
 }
