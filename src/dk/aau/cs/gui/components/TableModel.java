@@ -1,11 +1,13 @@
 package dk.aau.cs.gui.components;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import dk.aau.cs.verification.BatchProcessingVerificationResult;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 public class TableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
@@ -42,10 +44,10 @@ public class TableModel extends AbstractTableModel {
 		BatchProcessingVerificationResult result = results.get(row);
 		
 		switch(col){
-		case 0: return result.modelFileName();
+		case 0: return result.modelFile();
 		case 1: return result.queryName();
 		case 2: return result.isQuerySatisfied() ? "Satisfied" : "Not Satisfied";		
-		case 3: return result.verificationTime() + "s";
+		case 3: return (result.verificationTime() / 1000.0) + " s";
 		//case 4: return result.error();
 		default:
 			return null;

@@ -93,6 +93,8 @@ public class Verifier {
 
 		return;
 	}
+	
+	
 
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
 		VerifyTAPN verifytapn = getVerifyTAPN();

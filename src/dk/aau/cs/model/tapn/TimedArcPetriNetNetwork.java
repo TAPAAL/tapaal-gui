@@ -23,6 +23,7 @@ public class TimedArcPetriNetNetwork {
 	public TimedArcPetriNetNetwork(ConstantStore constants){
 		this.constants = constants;
 		this.currentMarking = new NetworkMarking();
+		buildConstraints();
 	}
 
 	public void add(TimedArcPetriNet tapn) {

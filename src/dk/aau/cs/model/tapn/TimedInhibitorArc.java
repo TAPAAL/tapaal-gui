@@ -5,7 +5,7 @@ import java.util.List;
 
 public class TimedInhibitorArc extends TimedInputArc {
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
-		super(source, destination, interval);
+		super(source, destination, TimeInterval.ZERO_INF);
 	}
 	
 	@Override

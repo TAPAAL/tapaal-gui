@@ -475,7 +475,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				EscapableDialog batchProcessingDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
+				EscapableDialog batchProcessingDialog = new EscapableDialog(CreateGui.getApp(), "Batch Processing", true);
 
 				Container contentPane = batchProcessingDialog.getContentPane();
 
