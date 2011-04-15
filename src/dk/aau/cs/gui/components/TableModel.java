@@ -1,8 +1,6 @@
 package dk.aau.cs.gui.components;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;

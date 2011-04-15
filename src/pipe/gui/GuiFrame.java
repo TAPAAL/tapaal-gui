@@ -54,7 +54,6 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
-import pipe.gui.widgets.QueryDialog;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
@@ -475,25 +474,10 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				EscapableDialog batchProcessingDialog = new EscapableDialog(CreateGui.getApp(), "Batch Processing", true);
-
-				Container contentPane = batchProcessingDialog.getContentPane();
-
-				// 1 Set layout
-				contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-				// 2 Add query editor
-				BatchProcessingDialog dialog = new BatchProcessingDialog();
-				contentPane.add(dialog);
-
-				batchProcessingDialog.setResizable(false);
-
-				// Make window fit contents' preferred size
-				batchProcessingDialog.pack();
-
-				// Move window to the middle of the screen
-				batchProcessingDialog.setLocationRelativeTo(null);
-				batchProcessingDialog.setVisible(true);
+				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
+				dialog.pack();
+				dialog.setLocationRelativeTo(null);
+				dialog.setVisible(true);
 			}
 		});
 		

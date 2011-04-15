@@ -22,7 +22,6 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -35,8 +34,8 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final TableModel tableModel;
 	private List<File> files;
-	private ProcessRunner currentRunner;
 	private boolean isExiting = false;
+	private ModelChecker modelChecker;
 	int fileNumber = 0;
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
 	
@@ -59,7 +58,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected Void doInBackground() throws Exception {
 		for(File file : files){
-			if(exiting()) return null;
+			if(exiting()) {
+				setProgress(100);
+				return null;
+			}
 			
 			fireFileChanged(file.getName());
 			
@@ -91,44 +93,43 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 		fireFileChanged("");
 		fireStatusChanged("done");
+		setProgress(100);
 		return null;
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) {
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
-		
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getCapacity());
 		MapQueryToNewNames(clonedQuery, composedModel.value2());
 		
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN) {
-			VerificationOptions options = new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption());
-			verificationResult = runVerifyTAPNVerification(options, composedModel, clonedQuery);
-		} else { 
-			VerificationOptions options = new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption());
-			verificationResult = runUPPAALVerification(options, composedModel, clonedQuery);
-		}
+		VerificationOptions options = getVerificationOptions(query);
+		modelChecker = getModelChecker(query);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, clonedQuery);
 		return verificationResult;
+	}
+
+	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+			return getVerifyTAPN();
+		else
+			return getVerifyta();
+	}
+
+	private VerificationOptions getVerificationOptions(pipe.dataLayer.TAPNQuery query) {
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption());
+		else
+			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption());
 	}
 	
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
 		RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(mapping);
 		query.getProperty().accept(visitor, null);
 	}
-	
-	private VerificationResult<TimedArcPetriNetTrace> runUPPAALVerification(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> composedModel, TAPNQuery query) {
-		ModelChecker verifyta = getVerifyta();
-		return verifyta.verify(options, composedModel, query);
-	}
 
 	private Verifyta getVerifyta() {
 		Verifyta verifyta = new Verifyta(new FileFinderImpl(), new MessengerImpl());
 		verifyta.setup();
 		return verifyta;
-	}
-
-	private VerificationResult<TimedArcPetriNetTrace> runVerifyTAPNVerification(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> composedModel, TAPNQuery query) {
-		ModelChecker verifyTAPN = getVerifyTAPN();
-		return verifyTAPN.verify(options, composedModel, query);
 	}
 
 	private static VerifyTAPN getVerifyTAPN() {
@@ -162,7 +163,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected void done() {
 		if(isCancelled()){
-			currentRunner.kill();
+			if(modelChecker != null)
+				modelChecker.kill();
 		}
 	}
 	

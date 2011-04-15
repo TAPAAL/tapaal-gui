@@ -2,8 +2,6 @@ package dk.aau.cs.io.batchProcessing;
 
 import java.io.File;
 
-import pipe.gui.DrawingSurfaceImpl;
-
 public class BatchProcessingModelLoader {	
 	public BatchProcessingModelLoader(){ }
 	

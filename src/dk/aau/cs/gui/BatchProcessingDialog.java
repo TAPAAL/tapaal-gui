@@ -1,6 +1,7 @@
 package dk.aau.cs.gui;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,8 +18,8 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -35,7 +36,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
 import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 
-public class BatchProcessingDialog extends JPanel {
+public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;
 
 	private JButton browseFilesButton;
@@ -49,11 +50,21 @@ public class BatchProcessingDialog extends JPanel {
 	private TableModel tableModel;
 	private JProgressBar progressBar;
 	private JButton startButton;
+	private JButton cancelButton;
+	private JPanel filesButtonsPanel;
 	
-	private List<File> files;
+	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
 
-	public BatchProcessingDialog() {	
+	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
+		super(frame, title, modal);
+		
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent we) {
+		    	terminateBatchProcessing();
+				System.out.print("Batch processing terminated");
+		    }
+		});
 
 		initComponents();
 	}
@@ -153,6 +164,7 @@ public class BatchProcessingDialog extends JPanel {
 		monitorPanel.add(progressBar, gbc);
 
 		startButton = new JButton("Start");
+		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -165,6 +177,24 @@ public class BatchProcessingDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,0,0, 10);
 		monitorPanel.add(startButton, gbc);
+		
+		cancelButton = new JButton("Cancel");
+		cancelButton.setEnabled(false);
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				terminateBatchProcessing();
+				fileStatusLabel.setText("");
+				statusLabel.setText("Batch processing cancelled");
+				enableButtons();
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,0,0, 10);
+		monitorPanel.add(cancelButton, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -188,8 +218,10 @@ public class BatchProcessingDialog extends JPanel {
 				}else if(evt.getPropertyName().equals("state")){
 					if((StateValue)evt.getNewValue() == StateValue.DONE){
 						enableButtons();
+						cancelButton.setEnabled(false);
 					}else if((StateValue)evt.getNewValue() == StateValue.STARTED){
 						disableButtons();
+						cancelButton.setEnabled(true);
 					}
 				}
 			}
@@ -218,17 +250,21 @@ public class BatchProcessingDialog extends JPanel {
 				
 		listModel = new DefaultListModel();
 		fileList = new JList(listModel);
-		fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		fileList.setSelectedIndex(0);
+
 		JScrollPane scrollpane = new JScrollPane(fileList);
 		scrollpane.setMinimumSize(new Dimension(175, 200));
 		scrollpane.setPreferredSize(new Dimension(175, 200));
+		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.gridwidth = 2;
 		fileListPanel.add(scrollpane,gbc);
+		
+		filesButtonsPanel = new JPanel(new GridBagLayout());
 		
 		browseFilesButton = new JButton("Select Files...");
 		browseFilesButton.addActionListener(new ActionListener(){
@@ -241,23 +277,33 @@ public class BatchProcessingDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.insets = new Insets(0, 0, 0, 10);
-		fileListPanel.add(browseFilesButton, gbc);
+		filesButtonsPanel.add(browseFilesButton, gbc);
 	
 		clearFilesButton = new JButton("Clear");
+		clearFilesButton.setEnabled(false);
 		clearFilesButton.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearFiles();
+				clearFilesButton.setEnabled(false);
+				startButton.setEnabled(false);
 			}
 		});
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.insets = new Insets(0, 0, 0, 10);
-		fileListPanel.add(clearFilesButton, gbc);
+		filesButtonsPanel.add(clearFilesButton, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTHEAST;
+		fileListPanel.add(filesButtonsPanel,gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -283,6 +329,27 @@ public class BatchProcessingDialog extends JPanel {
 				files.add(file);
 				listModel.addElement(file.getName());
 			}
+			
+			if(listModel.size() > 0) {
+				clearFilesButton.setEnabled(true);
+				startButton.setEnabled(true);
+			}
+			else {
+				clearFilesButton.setEnabled(false);
+				startButton.setEnabled(false);
+			}
+					
+		}
+	}
+	
+	private void terminateBatchProcessing() {
+		if(currentWorker != null && !currentWorker.isDone()){
+			boolean cancelled = false;
+			do{
+				currentWorker.notifyExiting();
+				cancelled = currentWorker.cancel(true);
+			}while(!cancelled);
+			
 		}
 	}
 	
@@ -300,7 +367,10 @@ public class BatchProcessingDialog extends JPanel {
 
 	private void enableButtons() {
 		browseFilesButton.setEnabled(true);
-		clearFilesButton.setEnabled(true);
-		startButton.setEnabled(true);
+		
+		if(listModel.size() > 0) {
+			clearFilesButton.setEnabled(true);
+			startButton.setEnabled(true);
+		}
 	}
 }

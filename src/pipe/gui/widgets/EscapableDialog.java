@@ -45,8 +45,7 @@ public class EscapableDialog extends JDialog {
 				setVisible(false);
 			}
 		};
-		InputMap inputMap = rootPane
-				.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		inputMap.put(stroke, "ESCAPE");
 		rootPane.getActionMap().put("ESCAPE", actionListener);
 		return rootPane;
