@@ -44,8 +44,8 @@ public class TableModel extends AbstractTableModel {
 		switch(col){
 		case 0: return result.modelFile();
 		case 1: return result.queryName();
-		case 2: return result.isQuerySatisfied() ? "Satisfied" : "Not Satisfied";		
-		case 3: return (result.verificationTime() / 1000.0) + " s";
+		case 2: return result.verificationResult();
+		case 3: return (result.verificationTimeInMs() / 1000.0) + " s";
 		//case 4: return result.error();
 		default:
 			return null;

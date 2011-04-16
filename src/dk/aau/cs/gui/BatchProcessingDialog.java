@@ -1,5 +1,6 @@
 package dk.aau.cs.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -7,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -26,8 +29,11 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker.StateValue;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import dk.aau.cs.gui.components.TableModel;
@@ -39,7 +45,7 @@ import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;
 
-	private JButton browseFilesButton;
+	private JButton addFilesButton;
 	private JButton clearFilesButton;
 	
 	private JList fileList;
@@ -56,13 +62,16 @@ public class BatchProcessingDialog extends JDialog {
 	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
 
+	private JButton removeFilesButton;
+
+	private JButton skipFileButton;
+
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent we) {
 		    	terminateBatchProcessing();
-				System.out.print("Batch processing terminated");
 		    }
 		});
 
@@ -153,7 +162,7 @@ public class BatchProcessingDialog extends JDialog {
 		progressBar.setMinimumSize(progressBarDim);
 		progressBar.setPreferredSize(progressBarDim);
 		progressBar.setStringPainted(true);
-		progressBar.setString("0 %"); // TODO: have this display "x / 20 tasks" or similar
+		progressBar.setString("0%");
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -196,6 +205,22 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0,0,0, 10);
 		monitorPanel.add(cancelButton, gbc);
 		
+		skipFileButton = new JButton("Skip");
+		skipFileButton.setEnabled(false);
+		skipFileButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				skipCurrentFile();
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0,0,0, 10);
+		monitorPanel.add(skipFileButton, gbc);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -219,9 +244,11 @@ public class BatchProcessingDialog extends JDialog {
 					if((StateValue)evt.getNewValue() == StateValue.DONE){
 						enableButtons();
 						cancelButton.setEnabled(false);
+						skipFileButton.setEnabled(false);
 					}else if((StateValue)evt.getNewValue() == StateValue.STARTED){
 						disableButtons();
 						cancelButton.setEnabled(true);
+						skipFileButton.setEnabled(true);
 					}
 				}
 			}
@@ -246,12 +273,35 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void initFileListPanel() {
 		JPanel fileListPanel = new JPanel(new GridBagLayout());
-		fileListPanel.setBorder(BorderFactory.createTitledBorder("Files"));
+		fileListPanel.setBorder(BorderFactory.createTitledBorder("Models"));
 				
 		listModel = new DefaultListModel();
 		fileList = new JList(listModel);
 		fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		fileList.setSelectedIndex(0);
+		fileList.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+					removeSelectedFiles();
+				}
+			}
+		});
+		
+		fileList.addListSelectionListener(new ListSelectionListener() {	
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting() == false) {
+					if (fileList.getSelectedIndex() == -1) {
+						removeFilesButton.setEnabled(false);
+					} else {
+						removeFilesButton.setEnabled(true);
+					}
+				}				
+			}
+		});
+		
+		fileList.setCellRenderer(new FileNameCellRenderer());
 
 		JScrollPane scrollpane = new JScrollPane(fileList);
 		scrollpane.setMinimumSize(new Dimension(175, 200));
@@ -260,17 +310,17 @@ public class BatchProcessingDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridwidth = 3;
 		fileListPanel.add(scrollpane,gbc);
 		
 		filesButtonsPanel = new JPanel(new GridBagLayout());
 		
-		browseFilesButton = new JButton("Select Files...");
-		browseFilesButton.addActionListener(new ActionListener(){
+		addFilesButton = new JButton("Add Models");
+		addFilesButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				selectFiles();
+				addFiles();
 			}
 		});
 		
@@ -278,25 +328,40 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(0, 0, 0, 10);
-		filesButtonsPanel.add(browseFilesButton, gbc);
+		gbc.insets = new Insets(0, 0, 0, 5);
+		filesButtonsPanel.add(addFilesButton, gbc);
 	
+		removeFilesButton = new JButton("Remove Models");
+		removeFilesButton.setEnabled(false);
+		removeFilesButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				removeSelectedFiles();		
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 0, 5);
+		filesButtonsPanel.add(removeFilesButton, gbc);
+		
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setEnabled(false);
 		clearFilesButton.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearFiles();
-				clearFilesButton.setEnabled(false);
-				startButton.setEnabled(false);
+				enableButtons();
 			}
 		});
 		
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
+		gbc.gridx = 2;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(0, 0, 0, 10);
+		gbc.anchor = GridBagConstraints.WEST;
 		filesButtonsPanel.add(clearFilesButton, gbc);
+		
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -314,32 +379,35 @@ public class BatchProcessingDialog extends JDialog {
 		add(fileListPanel,gbc);
 	}
 	
-	private void selectFiles() {
+	private void addFiles() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setFileFilter(new FileNameExtensionFilter("TAPAAL models", new String[] { "xml" }));
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("TAPAAL models","xml"));
 		fileChooser.setMultiSelectionEnabled(true);
 		int result = fileChooser.showOpenDialog(BatchProcessingDialog.this);
 		if(result == JFileChooser.APPROVE_OPTION){
 			File[] filesArray = fileChooser.getSelectedFiles();
-			files = new ArrayList<File>(filesArray.length);
-			listModel.clear();
 			for(File file : filesArray) {
-				files.add(file);
-				listModel.addElement(file.getName());
+				if(!files.contains(file)) {
+					files.add(file);
+					listModel.addElement(file);
+				}
 			}
 			
-			if(listModel.size() > 0) {
-				clearFilesButton.setEnabled(true);
-				startButton.setEnabled(true);
-			}
-			else {
-				clearFilesButton.setEnabled(false);
-				startButton.setEnabled(false);
-			}
+			enableButtons();
 					
 		}
+	}
+	
+	private void removeSelectedFiles() {
+		for(Object o : fileList.getSelectedValues()) {
+			File file = (File)o;
+			files.remove(file);
+			listModel.removeElement(file);
+		}
+		
+		enableButtons();
 	}
 	
 	private void terminateBatchProcessing() {
@@ -349,9 +417,16 @@ public class BatchProcessingDialog extends JDialog {
 				currentWorker.notifyExiting();
 				cancelled = currentWorker.cancel(true);
 			}while(!cancelled);
-			
+			System.out.print("Batch processing terminated");
 		}
 	}
+	
+	private void skipCurrentFile() {
+		if(currentWorker != null && !currentWorker.isDone()){
+			currentWorker.notifySkipCurrentVerification();
+		}
+	}
+	
 	
 	private void clearFiles() {
 		files.clear();
@@ -359,18 +434,46 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void disableButtons() {
-		browseFilesButton.setEnabled(false);
+		addFilesButton.setEnabled(false);
 		clearFilesButton.setEnabled(false);
 		startButton.setEnabled(false);
 		
 	}
 
 	private void enableButtons() {
-		browseFilesButton.setEnabled(true);
+		addFilesButton.setEnabled(true);
 		
 		if(listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
+		} else {
+			clearFilesButton.setEnabled(false);
+			startButton.setEnabled(false);
+		}
+	}
+	
+	// Custom cell renderer for the file list to only display the name of the file
+	// instead of the whole path.
+	private class FileNameCellRenderer extends JLabel implements ListCellRenderer {
+		private static final long serialVersionUID = 3071924451912979500L;
+
+		@Override
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			if(value instanceof File)
+				setText(((File)value).getName());
+			else
+				setText(value.toString());
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+			setEnabled(list.isEnabled());
+			setFont(list.getFont());
+			setOpaque(true);
+			return this;
 		}
 	}
 }

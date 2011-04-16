@@ -38,6 +38,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private ModelChecker modelChecker;
 	int fileNumber = 0;
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
+	private boolean skippingCurrentVerification = false;
 	
 
 	public BatchProcessingWorker(List<File> files, TableModel tableModel) {
@@ -54,6 +55,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private synchronized boolean exiting(){
 		return isExiting;
 	}
+	
+	public synchronized void notifySkipCurrentVerification() {
+		skippingCurrentVerification = true;
+		if(modelChecker != null) {
+			modelChecker.kill();
+		}
+	}
+	
 	
 	@Override
 	protected Void doInBackground() throws Exception {
@@ -81,9 +90,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
 					fireStatusChanged("Verifying query " + query.getName() + "...");
 					VerificationResult<TimedArcPetriNetTrace> verificationResult = verify(composedModel, query);
-					if(verificationResult != null && !verificationResult.error()) {
-						BatchProcessingVerificationResult result = new BatchProcessingVerificationResult(file.getName(), query, verificationResult);
-						publish(result);
+					if(verificationResult != null) {
+						if(!verificationResult.error()) {
+							String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
+							publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime());
+						} else if(skippingCurrentVerification) {
+							publishResult(file.getName(), query, "Skipped by user", verificationResult.verificationTime());
+							skippingCurrentVerification = false;
+						} else {
+							publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime());
+						}
 					}
 				}				
 			}
@@ -95,6 +111,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		fireStatusChanged("done");
 		setProgress(100);
 		return null;
+	}
+
+	private void publishResult(String fileName, pipe.dataLayer.TAPNQuery query, String verificationResult, long verificationTime) {
+		BatchProcessingVerificationResult result = new BatchProcessingVerificationResult(fileName, query, verificationResult,verificationTime);
+		publish(result);
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) {
@@ -148,7 +169,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return loader.load(modelFile);
 		}
 		catch(Exception e) {
-			// TODO: warn user that models/queries which cannot be loaded are skipped?
+			publishResult(modelFile.getName(), null, "Error loading model",	0);
 			return null;
 		}
 	}
