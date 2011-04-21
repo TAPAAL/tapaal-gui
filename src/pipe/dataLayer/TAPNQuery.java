@@ -9,7 +9,7 @@ public class TAPNQuery {
 	};
 
 	public enum SearchOption {
-		BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST
+		BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST, BatchProcessingKeepQueryOption
 	};
 
 	public enum HashTableSize {

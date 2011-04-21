@@ -6,12 +6,13 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.gui.components.TableModel;
+import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -20,6 +21,8 @@ import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
@@ -32,8 +35,9 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
-	private final TableModel tableModel;
 	private List<File> files;
+	private final BatchProcessingResultsTableModel tableModel;
+	private BatchProcessingVerificationOptions batchProcessingVerificationOptions;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
 	int fileNumber = 0;
@@ -41,10 +45,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private boolean skippingCurrentVerification = false;
 	
 
-	public BatchProcessingWorker(List<File> files, TableModel tableModel) {
+	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
 		super();
 		this.files = files;
 		this.tableModel = tableModel;
+		this.batchProcessingVerificationOptions = batchProcessingVerificationOptions;
 		
 	}
 
@@ -89,7 +94,18 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
 					fireStatusChanged("Verifying query " + query.getName() + "...");
-					VerificationResult<TimedArcPetriNetTrace> verificationResult = verify(composedModel, query);
+					
+					VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
+					try {
+						verificationResult = verify(composedModel, query);
+					} catch(UnsupportedModelException e) {
+						publishResult(file.getName(), query, "Skipped - model was not supported by reduction", 0);
+						continue;
+					} catch(UnsupportedQueryException e) {
+						publishResult(file.getName(), query, "Skipped - query was not supported by reduction", 0);
+						continue;
+					}
+					
 					if(verificationResult != null) {
 						if(!verificationResult.error()) {
 							String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
@@ -108,7 +124,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			setProgress(progress);
 		}
 		fireFileChanged("");
-		fireStatusChanged("done");
+		fireStatusChanged("Done");
 		setProgress(100);
 		return null;
 	}
@@ -118,12 +134,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		publish(result);
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) {
+	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getCapacity());
 		MapQueryToNewNames(clonedQuery, composedModel.value2());
 		
 		VerificationOptions options = getVerificationOptions(query);
 		modelChecker = getModelChecker(query);
+		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, clonedQuery);
 		return verificationResult;
 	}
@@ -136,10 +153,20 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private VerificationOptions getVerificationOptions(pipe.dataLayer.TAPNQuery query) {
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption());
-		else
-			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption());
+		if(batchProcessingVerificationOptions != null) {
+			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
+			ReductionOption option = batchProcessingVerificationOptions.reductionOption() == ReductionOption.BatchProcessingKeepQueryOption ? query.getReductionOption() : batchProcessingVerificationOptions.reductionOption();
+			
+			if(batchProcessingVerificationOptions.reductionOption() == ReductionOption.VerifyTAPN)
+				return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, search);
+			else
+				return new VerifytaOptions(TraceOption.NONE, search, false, option);
+		} else {
+			if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+				return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption());
+			else
+				return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption());
+		}
 	}
 	
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {

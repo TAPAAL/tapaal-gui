@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.OptimizedStandardTranslationQueryVisitor;
 import dk.aau.cs.model.NTA.Edge;
 import dk.aau.cs.model.NTA.Location;
@@ -29,6 +31,8 @@ import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 
 public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQuery, NTA, UPPAALQuery>{
 
@@ -59,6 +63,12 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	}
 	
 	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		if(!supportsModel(model))
+			throw new UnsupportedModelException("Optimized Standard Translation does not support the given model.");
+		
+		if(!supportsQuery(model, query))
+			throw new UnsupportedQueryException("Optimized Standard Translation does not support the given query.");
+		
 		extraTokens = query.getExtraTokens();
 		NTA nta = transformModel(model);
 		UPPAALQuery uppaalQuery = transformQuery(query);
@@ -422,5 +432,35 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			return false;
 		}
 
+	}
+
+	@Override
+	public boolean supportsModel(TimedArcPetriNet model) {
+		if(model.hasInhibitorArcs())
+			return false;
+		else
+			return true;
+	}
+
+	@Override
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
+		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
+			if(!isModelDegree2(model))
+				return false;
+		}
+		
+		return true;
+	}
+
+	private boolean isModelDegree2(TimedArcPetriNet model) {
+		if(model.hasInhibitorArcs())
+			return false;
+		
+		for(TimedTransition t : model.transitions()) {
+			if(t.presetSize() > 2 || t.postsetSize() > 2)
+				return false;
+		}
+		
+		return true;
 	}
 }

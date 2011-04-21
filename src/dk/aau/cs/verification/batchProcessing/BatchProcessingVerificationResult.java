@@ -24,6 +24,10 @@ public class BatchProcessingVerificationResult {
 		return query != null ? query.getName() : "";
 	}
 	
+	public TAPNQuery query() {
+		return query;
+	}
+	
 	public String verificationResult() {
 		return verificationResult;
 	}

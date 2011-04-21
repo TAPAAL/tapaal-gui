@@ -31,6 +31,8 @@ import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 
 //TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
 //with the only difference being in the global declarations:
@@ -76,6 +78,12 @@ public class Degree2BroadcastTranslation implements
 	}
 	
 	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		if(!supportsModel(model)) // has no effect atm since the translation supports all models
+			throw new UnsupportedModelException("Degree 2 Broadcast Translation does not support the given model.");
+		
+		if(!supportsQuery(model, query)) // has no effect atm since the translation supports all queries
+			throw new UnsupportedQueryException("Degree 2 Broadcast Translation does not support the given query.");
+		
 		extraTokens = query.getExtraTokens();
 		NTA nta = transformModel(model);
 		UPPAALQuery uppaalQuery = transformQuery(query, model);
@@ -778,5 +786,15 @@ public class Degree2BroadcastTranslation implements
 		public boolean isIgnoredAutomata(String automata) {
 			return automata.equals(CONTROL_TEMPLATE_NAME);
 		}
+	}
+
+	@Override
+	public boolean supportsModel(TimedArcPetriNet model) {
+		return true;
+	}
+
+	@Override
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
+		return true;
 	}
 }

@@ -2,17 +2,16 @@ package dk.aau.cs.gui.components;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
 
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
-public class TableModel extends AbstractTableModel {
+public class BatchProcessingResultsTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 	private final String[] HEADINGS = new String[]{ "Model", "Query", "Result", "Verification Time" }; // TODO: add expected result and maybe error columns
 	private List<BatchProcessingVerificationResult> results;
 	
-	public TableModel(){
+	public BatchProcessingResultsTableModel(){
 		results = new ArrayList<BatchProcessingVerificationResult>();
 	}
 	
@@ -43,7 +42,7 @@ public class TableModel extends AbstractTableModel {
 		
 		switch(col){
 		case 0: return result.modelFile();
-		case 1: return result.queryName();
+		case 1: return result.query();
 		case 2: return result.verificationResult();
 		case 3: return (result.verificationTimeInMs() / 1000.0) + " s";
 		//case 4: return result.error();
@@ -57,4 +56,8 @@ public class TableModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 	
+	public Class getColumnClass(int c) {
+        return getValueAt(0, c).getClass();
+    }
+
 }

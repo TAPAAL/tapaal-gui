@@ -30,6 +30,8 @@ import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 
 // TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
 // with the only difference being in the global declarations:
@@ -72,6 +74,12 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 	
 	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		if(!supportsModel(model)) // has no effect atm since broadcast translation supports all models
+			throw new UnsupportedModelException("Broadcast Translation does not support the given model.");
+		
+		if(!supportsQuery(model, query)) // has no effect atm since broadcast translation supports all queries
+			throw new UnsupportedQueryException("Broadcast Translation does not support the given query.");
+		
 		extraTokens = query.getExtraTokens();
 		NTA nta = transformModel(model);
 		UPPAALQuery uppaalQuery = transformQuery(query, model);
@@ -79,7 +87,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
 	}
 
-	private NTA transformModel(TimedArcPetriNet model) throws Exception {
+	private NTA transformModel(TimedArcPetriNet model) {
 		clearLocationMappings();
 		clearArcMappings();
 		largestPresetSize = 0;
@@ -672,7 +680,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		transportArcsToCounters.clear();	
 	}
 
-	private UPPAALQuery transformQuery(TAPNQuery tapnQuery, TimedArcPetriNet model) throws Exception {
+	private UPPAALQuery transformQuery(TAPNQuery tapnQuery, TimedArcPetriNet model) {
 		BroadcastTranslationQueryVisitor visitor = new BroadcastTranslationQueryVisitor(useSymmetry, model.marking().size() + tapnQuery.getExtraTokens());
 
 		return new StandardUPPAALQuery(visitor.getUppaalQueryFor(tapnQuery));
@@ -756,5 +764,15 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		public boolean isIgnoredAutomata(String automata) {
 			return automata.equals(CONTROL_TEMPLATE_NAME);
 		}
+	}
+
+	@Override
+	public boolean supportsModel(TimedArcPetriNet model) {
+		return true;
+	}
+
+	@Override
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
+		return true;
 	}
 }

@@ -20,6 +20,8 @@ import dk.aau.cs.TCTL.visitors.*;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
@@ -28,6 +30,8 @@ public class QueryDialog extends JPanel {
 
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No VerifyTAPN XML file saved.";
+	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
+	private static final String UNSUPPPORTED_QUERY_TEXT = "The chosen query property is not supported by the chosen reduction";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export VerifyTAPN XML";
 	
@@ -1699,7 +1703,22 @@ public class QueryDialog extends JPanel {
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile));
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
+							try {
+								exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
+							} catch(Exception exportException) {
+								StringBuilder s = new StringBuilder();
+								if(exportException instanceof UnsupportedModelException)
+									s.append(UNSUPPORTED_MODEL_TEXT + "\n\n");
+								else if(exportException instanceof UnsupportedQueryException)
+									s.append(UNSUPPPORTED_QUERY_TEXT + "\n\n");
+								
+								if(reduction == ReductionOption.VerifyTAPN)
+									s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
+								else
+									s.append(NO_UPPAAL_XML_FILE_SAVED);
+								
+								JOptionPane.showMessageDialog(CreateGui.getApp(), s.toString());
+							}
 						}
 					} else {
 						JOptionPane.showMessageDialog(CreateGui.getApp(), reduction == ReductionOption.VerifyTAPN ? NO_VERIFYTAPN_XML_FILE_SAVED : NO_UPPAAL_XML_FILE_SAVED);

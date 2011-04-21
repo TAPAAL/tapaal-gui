@@ -8,10 +8,14 @@ import java.io.StringReader;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
@@ -75,7 +79,13 @@ public class VerifyTAPN implements ModelChecker {
 		return verifytapnpath == null || verifytapnpath.equals("");
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {	
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
+		if(!supportsModel(model.value1()))
+			throw new UnsupportedModelException("VerifyTAPN does not support the given model.");
+		
+		if(!supportsQuery(model.value1(), query))
+			throw new UnsupportedQueryException("VerifyTAPN does not support the given query.");
+		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
 
@@ -154,6 +164,18 @@ public class VerifyTAPN implements ModelChecker {
 		VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser();
 		QueryResult queryResult = outputParser.parseOutput(output);
 		return queryResult;
+	}
+	
+	
+	boolean supportsModel(TimedArcPetriNet model) {
+		return true;
+	}
+	
+	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
+		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
+			return false;
+		}
+		return true;
 	}
 
 	
