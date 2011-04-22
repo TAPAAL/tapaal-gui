@@ -1,5 +1,6 @@
 package dk.aau.cs.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -34,11 +35,14 @@ import javax.swing.JTable;
 import javax.swing.JToolTip;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -486,12 +490,11 @@ public class BatchProcessingDialog extends JDialog {
 		JPanel resultTablePanel = new JPanel(new GridBagLayout());
 		resultTablePanel.setBorder(BorderFactory.createTitledBorder("Results"));
 		tableModel = new BatchProcessingResultsTableModel();
-		JTable table = new JTable(tableModel);
-//		{
-//			public javax.swing.JToolTip createToolTip() {
-//				return new MultiLineAutoWrappingToolTip();
-//			};
-//		};
+		JTable table = new JTable(tableModel) {
+			public javax.swing.JToolTip createToolTip() {
+				return new MultiLineAutoWrappingToolTip();
+			};
+		};
 		table.getColumn("Query").setCellRenderer(new QueryCellRenderer(true));
 		JScrollPane scrollPane = new JScrollPane(table);
 		Dimension scrollPaneDims = new Dimension(850,400);
@@ -775,8 +778,8 @@ public class BatchProcessingDialog extends JDialog {
 			setOpaque(true);
 			
 			if(query instanceof TAPNQuery) {
-				TAPNQuery newQuery = (TAPNQuery)query;				
-				setToolTipText(newQuery.getProperty().toString());
+				TAPNQuery newQuery = (TAPNQuery)query;
+				setToolTipText("Query Property:\n\n" + newQuery.getProperty().toString());
 				setText(newQuery.getName());
 			}
 			else {

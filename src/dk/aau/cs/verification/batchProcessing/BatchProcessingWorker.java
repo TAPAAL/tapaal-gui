@@ -93,7 +93,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
-					fireStatusChanged("Verifying query " + query.getName() + "...");
+					fireStatusChanged("Verifying query: " + query.getName() + "...");
 					
 					VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
 					try {
