@@ -84,8 +84,8 @@ public class TabContent extends JSplitPane {
 	
 	public void createEditorLeftPane() {
 		editorLeftPane = new JPanel(new GridBagLayout());
-		editorLeftPane.setPreferredSize(new Dimension(275, 100)); // height is ignored because the component is stretched
-		editorLeftPane.setMinimumSize(new Dimension(275, 100));
+		editorLeftPane.setPreferredSize(new Dimension(300, 100)); // height is ignored because the component is stretched
+		editorLeftPane.setMinimumSize(new Dimension(300, 100));
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 		
 		constantsPanel = new ConstantsPane(enableAddButton, this);
