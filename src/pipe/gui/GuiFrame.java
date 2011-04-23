@@ -474,7 +474,9 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			public void actionPerformed(ActionEvent arg0) {
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
+				dialog.setMinimumSize(dialog.getSize());
 				dialog.setLocationRelativeTo(null);
+				dialog.setResizable(false);
 				dialog.setVisible(true);
 			}
 		});

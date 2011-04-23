@@ -1,6 +1,5 @@
 package dk.aau.cs.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -28,28 +27,26 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JToolTip;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.gui.CreateGui;
+import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
+import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
@@ -97,6 +94,8 @@ public class BatchProcessingDialog extends JDialog {
 	private JPanel reductionOptionsPanel;
 	private JPanel searchOptionsPanel;
 	private JComboBox searchOption;
+
+	private JButton exportButton;
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
 		super(frame, title, modal);
@@ -161,6 +160,8 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridwidth = 3;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
 		gbc.insets = new Insets(0, 0, 10, 0);
 		fileListPanel.add(scrollpane,gbc);
 		
@@ -178,6 +179,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.weightx = 1.0;
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(addFilesButton, gbc);
 	
@@ -289,8 +291,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.NORTHEAST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weighty = 1.0;
+		gbc.weightx = 0;
 		gbc.insets = new Insets(10, 0, 0, 0);
 		add(verificationOptionsPanel, gbc);
 		
@@ -338,7 +342,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.weightx = 0.5;
-		gbc.weighty = 0.5;
+		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(10, 10, 0, 0);
@@ -373,6 +377,7 @@ public class BatchProcessingDialog extends JDialog {
 			options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS, name_ClosestToTarget };
 		}
 		
+		Dimension d = searchOption.getSize();
 		searchOption.removeAllItems();
 		boolean selectedOptionStillAvailable = false;	
 		for (String s : options) {
@@ -381,6 +386,8 @@ public class BatchProcessingDialog extends JDialog {
 				selectedOptionStillAvailable = true;
 			}
 		}
+		searchOption.setMinimumSize(d); // stop dropdown box from automatically resizing when we remove options with "longer" names.
+		searchOption.setPreferredSize(d);
 
 		if (selectedOptionStillAvailable) {
 			searchOption.setSelectedItem(currentSearchOption);
@@ -466,6 +473,7 @@ public class BatchProcessingDialog extends JDialog {
 		String[] options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS, name_ClosestToTarget };
 		searchOption = new JComboBox(options);
 		searchOption.setEnabled(false);
+		searchOption.setMinimumSize(searchOption.getSize());
 	
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -479,7 +487,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weightx = 0.5;
-		gbc.weighty = 0.5;
+		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(10, 10, 0, 0);
@@ -489,22 +497,53 @@ public class BatchProcessingDialog extends JDialog {
 	private void initResultTablePanel() {
 		JPanel resultTablePanel = new JPanel(new GridBagLayout());
 		resultTablePanel.setBorder(BorderFactory.createTitledBorder("Results"));
+		
+		exportButton = new JButton("Export");
+		exportButton.setEnabled(false);
+		exportButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String filename = new FileBrowser("CSV file", "csv", "").saveFile();
+				if (filename != null) {
+					File exportFile = new File(filename);
+					BatchProcessingResultsExporter exporter = new BatchProcessingResultsExporter();
+					try {
+						exporter.exportToCSV(tableModel.getResults(), exportFile);
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while trying to export the results. Please try again", "Error Exporting Results", JOptionPane.ERROR_MESSAGE);
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		resultTablePanel.add(exportButton, gbc);
+		
 		tableModel = new BatchProcessingResultsTableModel();
 		JTable table = new JTable(tableModel) {
+			private static final long serialVersionUID = -146530769055564619L;
+
 			public javax.swing.JToolTip createToolTip() {
 				return new MultiLineAutoWrappingToolTip();
 			};
 		};
 		table.getColumn("Query").setCellRenderer(new QueryCellRenderer(true));
 		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		Dimension scrollPaneDims = new Dimension(850,400);
 		scrollPane.setMinimumSize(scrollPaneDims);
 		scrollPane.setPreferredSize(scrollPaneDims);
 		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
 		resultTablePanel.add(scrollPane,gbc);
 		
@@ -627,8 +666,9 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.SOUTHWEST;
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 0;
 		gbc.insets = new Insets(10, 0, 0, 0);
 		add(monitorPanel,gbc);
 	}
@@ -650,7 +690,7 @@ public class BatchProcessingDialog extends JDialog {
 						cancelButton.setEnabled(false);
 						skipFileButton.setEnabled(false);
 					}else if((StateValue)evt.getNewValue() == StateValue.STARTED){
-						disableButtons();
+						disableButtonsDuringProcessing();
 						cancelButton.setEnabled(true);
 						skipFileButton.setEnabled(true);
 					}
@@ -696,11 +736,14 @@ public class BatchProcessingDialog extends JDialog {
 		listModel.removeAllElements();
 	}
 	
-	private void disableButtons() {
+	private void disableButtonsDuringProcessing() {
 		addFilesButton.setEnabled(false);
 		clearFilesButton.setEnabled(false);
 		startButton.setEnabled(false);
+		exportButton.setEnabled(false);
 		
+		overrideVerificationOptionsCheckbox.setEnabled(false);
+		disableVerificationOptionsButtons();
 	}
 
 	private void enableButtons() {
@@ -713,6 +756,17 @@ public class BatchProcessingDialog extends JDialog {
 			clearFilesButton.setEnabled(false);
 			startButton.setEnabled(false);
 		}
+		
+		if(tableModel.getRowCount() > 0) 
+			exportButton.setEnabled(true);
+		else
+			exportButton.setEnabled(false);
+		
+		overrideVerificationOptionsCheckbox.setEnabled(true);
+		if(overrideVerificationOptionsCheckbox.isSelected())
+			enabledVerificationOptionButtons();
+		else
+			disableVerificationOptionsButtons();
 	}
 	
 	// Custom cell renderer for the file list to only display the name of the file

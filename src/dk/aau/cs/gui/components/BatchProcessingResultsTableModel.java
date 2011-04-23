@@ -60,4 +60,8 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
         return getValueAt(0, c).getClass();
     }
 
+	public Iterable<BatchProcessingVerificationResult> getResults() {
+		return results;
+	}
+
 }
