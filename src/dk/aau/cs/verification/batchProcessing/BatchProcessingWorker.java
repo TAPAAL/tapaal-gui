@@ -10,13 +10,18 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
@@ -32,6 +37,7 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
@@ -78,46 +84,20 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			}
 			
 			fireFileChanged(file.getName());
-			
 			fileNumber++;
 			
-			LoadedBatchProcessingModel model = null;
-			try {
-				model = loadModel(file);
-			} catch(Exception e) {
-				continue;
-			}
+			LoadedBatchProcessingModel model = loadModel(file);
 			
 			if(model != null) {
-				TAPNComposer composer = new TAPNComposer();
-				Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
+				Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
-					fireStatusChanged("Verifying query: " + query.getName() + "...");
+					pipe.dataLayer.TAPNQuery queryToVerify = changeQueryToMatchVerificationOptions(composedModel.value1(), query);
+					VerificationResult<TimedArcPetriNetTrace> verificationResult = processQuery(file, composedModel, queryToVerify);
 					
-					VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
-					try {
-						verificationResult = verify(composedModel, query);
-					} catch(UnsupportedModelException e) {
-						publishResult(file.getName(), query, "Skipped - model was not supported by reduction", 0);
-						continue;
-					} catch(UnsupportedQueryException e) {
-						publishResult(file.getName(), query, "Skipped - query was not supported by reduction", 0);
-						continue;
-					}
-					
-					if(verificationResult != null) {
-						if(!verificationResult.error()) {
-							String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
-							publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime());
-						} else if(skippingCurrentVerification) {
-							publishResult(file.getName(), query, "Skipped by user", verificationResult.verificationTime());
-							skippingCurrentVerification = false;
-						} else {
-							publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime());
-						}
-					}
-				}				
+					if(verificationResult != null)
+						processVerificationResult(file, queryToVerify, verificationResult);
+				}
 			}
 			
 			int progress = 100 * fileNumber / files.size();
@@ -129,20 +109,81 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return null;
 	}
 
+	private pipe.dataLayer.TAPNQuery changeQueryToMatchVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
+		if(batchProcessingVerificationOptions != null) {
+			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
+			ReductionOption option = batchProcessingVerificationOptions.reductionOption() == ReductionOption.BatchProcessingKeepQueryOption ? query.getReductionOption() : batchProcessingVerificationOptions.reductionOption();
+			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
+			
+			return new pipe.dataLayer.TAPNQuery(query.getName(), query.getCapacity(), property, TraceOption.NONE, search, option, query.getHashTableSize(), query.getExtrapolationOption());
+		}
+		
+		return query;
+	}
+
+	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
+		TAPNComposer composer = new TAPNComposer();
+		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
+		return composedModel;
+	}
+
+	private VerificationResult<TimedArcPetriNetTrace> processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
+		fireStatusChanged("Verifying query: " + query.getName() + "...");
+		
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
+		try {
+			verificationResult = verify(composedModel, query);
+		} catch(UnsupportedModelException e) {
+			publishResult(file.getName(), query, "Skipped - model was not supported by reduction", 0);
+			return null;
+		} catch(UnsupportedQueryException e) {
+			publishResult(file.getName(), query, "Skipped - query was not supported by reduction", 0);
+			return null;
+		}
+		return verificationResult;
+	}
+
+	private void processVerificationResult(File file, pipe.dataLayer.TAPNQuery query, VerificationResult<TimedArcPetriNetTrace> verificationResult) {
+		if(!verificationResult.error()) {
+			String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
+			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime());
+		} else if(skippingCurrentVerification) {
+			publishResult(file.getName(), query, "Skipped by user", verificationResult.verificationTime());
+			skippingCurrentVerification = false;
+		} else {
+			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime());
+		}		
+	}
+
 	private void publishResult(String fileName, pipe.dataLayer.TAPNQuery query, String verificationResult, long verificationTime) {
 		BatchProcessingVerificationResult result = new BatchProcessingVerificationResult(fileName, query, verificationResult,verificationTime);
 		publish(result);
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
-		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getCapacity());
-		MapQueryToNewNames(clonedQuery, composedModel.value2());
+		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
+		MapQueryToNewNames(queryToVerify, composedModel.value2());
 		
 		VerificationOptions options = getVerificationOptions(query);
 		modelChecker = getModelChecker(query);
 		
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, clonedQuery);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
 		return verificationResult;
+	}
+
+	private TAPNQuery getTAPNQuery(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
+		if(batchProcessingVerificationOptions != null && batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace)
+			return new TAPNQuery(generateSearchWholeStateSpaceProperty(model), query.getCapacity());
+		else
+			return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
+	}
+
+	private TCTLAbstractProperty generateSearchWholeStateSpaceProperty(TimedArcPetriNet model) throws Exception {
+		TimedPlace p = model.places().iterator().next();
+		if(p == null)
+			throw new Exception("Model contained no places. Should not happen.");
+		
+		return new TCTLAGNode(new TCTLAtomicPropositionNode(p.name(), ">=", 0));
 	}
 
 	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
@@ -187,11 +228,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 	
 	private LoadedBatchProcessingModel loadModel(File modelFile) {
-		
 		fireStatusChanged("Loading model...");
 		
 		BatchProcessingModelLoader loader = new BatchProcessingModelLoader();
-		
 		try {
 			return loader.load(modelFile);
 		}
