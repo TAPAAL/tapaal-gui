@@ -68,7 +68,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_RandomDFS = "Random Depth First Search";
 	private static final String name_ClosestToTarget = "Search by Closest To Target First";
 	private static final String name_KeepQueryOption = "Let Query Decide";
-	private static final String name_SEARCHWHOLESTATESPACE = "Search Whole Statespace";
+	private static final String name_SEARCHWHOLESTATESPACE = "Search Whole State Space";
 
 	private JPanel filesButtonsPanel;
 	private JButton addFilesButton;
