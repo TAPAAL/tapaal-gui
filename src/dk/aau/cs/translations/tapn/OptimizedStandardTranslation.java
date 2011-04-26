@@ -434,7 +434,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 
 	}
 
-	@Override
+	
 	public boolean supportsModel(TimedArcPetriNet model) {
 		if(model.hasInhibitorArcs())
 			return false;
@@ -442,7 +442,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			return true;
 	}
 
-	@Override
+	
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
 		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
 			if(!isModelDegree2(model))

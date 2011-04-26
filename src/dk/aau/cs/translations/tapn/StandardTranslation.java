@@ -431,7 +431,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		}
 	}
 
-	@Override
+
 	public boolean supportsModel(TimedArcPetriNet model) {
 		if(model.hasInhibitorArcs())
 			return false;
@@ -439,7 +439,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 			return true;
 	}
 
-	@Override
+
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
 		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
 			return false;

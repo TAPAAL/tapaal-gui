@@ -766,12 +766,12 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		}
 	}
 
-	@Override
+	
 	public boolean supportsModel(TimedArcPetriNet model) {
 		return true;
 	}
 
-	@Override
+
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
 		return true;
 	}

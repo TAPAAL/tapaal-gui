@@ -143,7 +143,7 @@ public class BatchProcessingDialog extends JDialog {
 		});
 		
 		fileList.addListSelectionListener(new ListSelectionListener() {	
-			@Override
+
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
 					if (fileList.getSelectedIndex() == -1) {
@@ -175,7 +175,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		addFilesButton = new JButton("Add Models");
 		addFilesButton.addActionListener(new ActionListener(){
-			@Override
+			
 			public void actionPerformed(ActionEvent arg0) {
 				addFiles();
 			}
@@ -192,7 +192,7 @@ public class BatchProcessingDialog extends JDialog {
 		removeFilesButton = new JButton("Remove Models");
 		removeFilesButton.setEnabled(false);
 		removeFilesButton.addActionListener(new ActionListener() {
-			@Override
+			
 			public void actionPerformed(ActionEvent arg0) {
 				removeSelectedFiles();		
 			}
@@ -207,7 +207,7 @@ public class BatchProcessingDialog extends JDialog {
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setEnabled(false);
 		clearFilesButton.addActionListener(new ActionListener() {	
-			@Override
+		
 			public void actionPerformed(ActionEvent e) {
 				clearFiles();
 				enableButtons();
@@ -276,7 +276,7 @@ public class BatchProcessingDialog extends JDialog {
 		overrideVerificationOptionsCheckbox = new JCheckBox("Override verification options");
 		overrideVerificationOptionsCheckbox.setSelected(false);
 		overrideVerificationOptionsCheckbox.addActionListener(new ActionListener() {
-			@Override
+		
 			public void actionPerformed(ActionEvent e) {
 				if(overrideVerificationOptionsCheckbox.isSelected())
 					enabledVerificationOptionButtons();
@@ -670,7 +670,7 @@ public class BatchProcessingDialog extends JDialog {
 		startButton = new JButton("Start");
 		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener(){
-			@Override
+		
 			public void actionPerformed(ActionEvent e) {
 				process();
 			}			
@@ -685,7 +685,7 @@ public class BatchProcessingDialog extends JDialog {
 		cancelButton = new JButton("Cancel");
 		cancelButton.setEnabled(false);
 		cancelButton.addActionListener(new ActionListener() {
-			@Override
+		
 			public void actionPerformed(ActionEvent e) {
 				terminateBatchProcessing();
 				fileStatusLabel.setText("");
@@ -703,7 +703,7 @@ public class BatchProcessingDialog extends JDialog {
 		skipFileButton = new JButton("Skip");
 		skipFileButton.setEnabled(false);
 		skipFileButton.addActionListener(new ActionListener() {
-			@Override
+
 			public void actionPerformed(ActionEvent e) {
 				skipCurrentFile();
 			}
@@ -731,7 +731,7 @@ public class BatchProcessingDialog extends JDialog {
 		tableModel.clear();
 		currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
 		currentWorker.addPropertyChangeListener(new PropertyChangeListener(){
-			@Override
+		
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals("progress")) {
 					int progress = (Integer)evt.getNewValue();
@@ -751,12 +751,12 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 		currentWorker.addBatchProcessingListener(new BatchProcessingListener() {
-			@Override
+			
 			public void fireStatusChanged(StatusChangedEvent e) {
 				statusLabel.setText(e.status());		
 			}
 
-			@Override
+	
 			public void fireFileChanged(FileChangedEvent e) {
 				fileStatusLabel.setText(e.fileName());
 			}
@@ -827,7 +827,7 @@ public class BatchProcessingDialog extends JDialog {
 	private class FileNameCellRenderer extends JLabel implements ListCellRenderer {
 		private static final long serialVersionUID = 3071924451912979500L;
 
-		@Override
+		
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			if(value instanceof File)
 				setText(((File)value).getName());

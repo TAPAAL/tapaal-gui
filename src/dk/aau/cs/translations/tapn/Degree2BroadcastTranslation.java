@@ -788,12 +788,12 @@ public class Degree2BroadcastTranslation implements
 		}
 	}
 
-	@Override
+
 	public boolean supportsModel(TimedArcPetriNet model) {
 		return true;
 	}
 
-	@Override
+
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
 		return true;
 	}

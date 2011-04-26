@@ -21,22 +21,22 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		fireTableRowsInserted(lastRow, lastRow);
 	}
 		
-	@Override
+
 	public String getColumnName(int column) {
 		return HEADINGS[column];
 	}
 	
-	@Override
+	
 	public int getColumnCount() {
 		return HEADINGS.length;
 	}
 
-	@Override
+	
 	public int getRowCount() {
 		return results.size();
 	}
 
-	@Override
+
 	public Object getValueAt(int row, int col) {
 		BatchProcessingVerificationResult result = results.get(row);
 		
