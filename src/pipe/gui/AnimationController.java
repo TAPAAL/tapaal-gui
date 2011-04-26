@@ -138,7 +138,7 @@ public class AnimationController extends JPanel {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-			JLabel label = new JLabel("Token selection mode: ");
+			JLabel label = new JLabel("Token selection: ");
 
 			firemode.add(label);
 			firemode.add(firermodebox);
