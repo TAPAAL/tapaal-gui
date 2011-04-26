@@ -152,7 +152,7 @@ public class QueryPane extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(removeQueryButton, gbc);
 
-		addQueryButton = new JButton("New..");
+		addQueryButton = new JButton("New");
 		addQueryButton.setPreferredSize(dimension);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
