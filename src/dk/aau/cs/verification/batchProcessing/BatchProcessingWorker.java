@@ -10,7 +10,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -38,6 +37,7 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
@@ -114,11 +114,20 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
 			ReductionOption option = batchProcessingVerificationOptions.reductionOption() == ReductionOption.BatchProcessingKeepQueryOption ? query.getReductionOption() : batchProcessingVerificationOptions.reductionOption();
 			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
+			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
+			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			
-			return new pipe.dataLayer.TAPNQuery(query.getName(), query.getCapacity(), property, TraceOption.NONE, search, option, query.getHashTableSize(), query.getExtrapolationOption());
+			return new pipe.dataLayer.TAPNQuery(query.getName(), capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
 		}
 		
 		return query;
+	}
+
+	private boolean getSymmetryFromBatchProcessingOptions() {
+		if(batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes)
+			return true;
+		else
+			return false;
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
@@ -164,7 +173,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
 		
-		VerificationOptions options = getVerificationOptions(query);
+		VerificationOptions options = getVerificationOptionsFromQuery(query);
 		modelChecker = getModelChecker(query);
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
@@ -193,21 +202,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return getVerifyta();
 	}
 
-	private VerificationOptions getVerificationOptions(pipe.dataLayer.TAPNQuery query) {
-		if(batchProcessingVerificationOptions != null) {
-			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
-			ReductionOption option = batchProcessingVerificationOptions.reductionOption() == ReductionOption.BatchProcessingKeepQueryOption ? query.getReductionOption() : batchProcessingVerificationOptions.reductionOption();
-			
-			if(batchProcessingVerificationOptions.reductionOption() == ReductionOption.VerifyTAPN)
-				return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, search);
-			else
-				return new VerifytaOptions(TraceOption.NONE, search, false, option);
-		} else {
-			if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-				return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption());
-			else
-				return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption());
-		}
+	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry());
+		else
+			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
 	}
 	
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {

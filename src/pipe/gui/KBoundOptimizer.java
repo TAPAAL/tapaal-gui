@@ -35,6 +35,6 @@ public class KBoundOptimizer extends KBoundAnalyzer {
 	@Override
 	protected VerifytaOptions verificationOptions() {
 		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false,
-				ReductionOption.KBOUNDOPTMIZATION);
+				ReductionOption.KBOUNDOPTMIZATION, true);
 	}
 }

@@ -45,7 +45,7 @@ public class KBoundAnalyzer {
 	}
 
 	protected VerifytaOptions verificationOptions() {
-		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS);
+		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS, true);
 	}
 
 	protected TAPNQuery getBoundednessQuery() {

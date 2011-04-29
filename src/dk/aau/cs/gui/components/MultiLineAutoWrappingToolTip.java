@@ -12,4 +12,5 @@ public class MultiLineAutoWrappingToolTip extends JToolTip {
 	public void updateUI() {
 	    setUI(MultiLineAutoWrappingTooltipUI.createUI(this));
 	}
+	
 }

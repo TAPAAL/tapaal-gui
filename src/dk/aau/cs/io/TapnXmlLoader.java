@@ -694,16 +694,27 @@ public class TapnXmlLoader {
 		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
+		boolean symmetry = getSymmetryReductionOption(queryElement);
 
 		TCTLAbstractProperty query;
 		query = parseQueryProperty(queryElement.getAttribute("query"));
 
 		if (query != null)
 			return new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, hashTableSize,
+					searchOption, reductionOption, symmetry, hashTableSize,
 					extrapolationOption);
 		else
 			return null;
+	}
+
+	private boolean getSymmetryReductionOption(Element queryElement) {
+		boolean symmetry;
+		try {
+			symmetry = queryElement.getAttribute("symmetry").equals("true");
+		} catch(Exception e) {
+			symmetry = true;
+		}
+		return symmetry;	
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {

@@ -50,7 +50,7 @@ import dk.aau.cs.util.Tuple;
 
 public class BatchProcessingLegacyLoader {
 
-//	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
+	private static final String SYMMETRY = "SYMMETRY";
 	private HashMap<Tuple<TimedTransition, Integer>, TimedPlace> presetArcs;
 	private HashMap<Tuple<TimedTransition, Integer>, TimedPlace> postsetArcs;
 	private HashMap<String, String> placeIDToName;
@@ -60,8 +60,6 @@ public class BatchProcessingLegacyLoader {
 	private ArrayList<TAPNQuery> queries;
 	private TreeMap<String, Constant> constants;
 	private NameGenerator nameGenerator = new NameGenerator();
-//	private boolean firstQueryParsingWarning = true;
-//	private boolean firstInhibitorIntervalWarning = true;
 
 	public BatchProcessingLegacyLoader() {
 		presetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
@@ -122,10 +120,6 @@ public class BatchProcessingLegacyLoader {
 		ArrayList<Tuple<String,String>> templatePlaceNames = getTemplatePlaceNames(network);
 		for(TAPNQuery query : queries) {
 			if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
-//				if(firstQueryParsingWarning) {
-//					JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-//					firstQueryParsingWarning = false;
-//				}
 				continue;
 			}
 			
@@ -240,22 +234,27 @@ public class BatchProcessingLegacyLoader {
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
 		
-//		if(!interval.equals(TimeInterval.ZERO_INF) && firstInhibitorIntervalWarning) {
-//			JOptionPane.showMessageDialog(CreateGui.getApp(), "The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).", "Unsupported Interval Detected on Inhibitor Arc", JOptionPane.INFORMATION_MESSAGE);
-//			firstInhibitorIntervalWarning = false;
-//		}
-		
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
 		tapn.add(inhibArc);
 	}
 
 	private ReductionOption getQueryReductionOption(Element queryElement) {
-		ReductionOption reductionOption;
+ReductionOption reductionOption;
+		
+		String reductionString = queryElement.getAttribute("reductionOption");
+		String reductionName = "";
+		if(reductionString.contains(SYMMETRY))
+			reductionName = reductionString.replace(SYMMETRY, "");
+		else {
+			reductionName = reductionString;
+		}
+		
 		try {
-			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
+			reductionOption = ReductionOption.valueOf(reductionName);
 		} catch (Exception e) {
 			reductionOption = ReductionOption.STANDARD;
 		}
+		
 		return reductionOption;
 	}
 
@@ -439,16 +438,26 @@ public class BatchProcessingLegacyLoader {
 		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = getQueryCapacityAsOldFormat(queryElement);
+		boolean symmetry = getSymmetryAsOldFormat(queryElement);
 
 		TCTLAbstractProperty query;
 		query = parseQueryPropertyAsOldFormat(queryElement);
 		
 		if (query != null)
 			return new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, hashTableSize,
+					searchOption, reductionOption, symmetry, hashTableSize,
 					extrapolationOption);
 		else
 			return null;
+	}
+	
+	private boolean getSymmetryAsOldFormat(Element queryElement) {
+		String reductionString = queryElement.getAttribute("reductionOption");
+		
+		if(reductionString.contains(SYMMETRY))
+			return true;
+		else
+			return false;
 	}
 
 	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {
@@ -460,10 +469,6 @@ public class BatchProcessingLegacyLoader {
 		try {
 			query = queryParser.parse(queryToParse);
 		} catch (Exception e) {
-//			if(firstQueryParsingWarning ) {
-//				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-//				firstQueryParsingWarning = false;
-//			}
 			System.err.println("No query was specified: " + e.getStackTrace());
 		}
 		return query;

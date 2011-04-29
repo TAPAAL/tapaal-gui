@@ -31,9 +31,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.ToolTipManager;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
@@ -54,6 +57,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
 import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 
 public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;
@@ -67,8 +71,10 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
 	private static final String name_ClosestToTarget = "Search by Closest To Target First";
-	private static final String name_KeepQueryOption = "Let Query Decide";
+	private static final String name_KeepQueryOption = "As In Query";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search Whole State Space";
+	private static final String name_SYMMETRY = "Yes";
+	private static final String name_NOSYMMETRY = "No";
 
 	private JPanel filesButtonsPanel;
 	private JButton addFilesButton;
@@ -83,25 +89,21 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton startButton;
 	private JButton cancelButton;
 	private JButton skipFileButton;
-	
-	private JCheckBox overrideVerificationOptionsCheckbox;
+
 	private JComboBox reductionOption;
+	private JComboBox searchOption;
+	private JButton exportButton;
+	private JComboBox queryPropertyOption;
+	private JPanel verificationOptionsPanel;
+	private JSpinner numberOfExtraTokensInNet;
+	private JCheckBox keepQueryCapacity;
+	private JComboBox symmetryOption;
 	
 	private BatchProcessingResultsTableModel tableModel;
 	
 	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
 
-	private JCheckBox symmetryReduction;
-	private JPanel reductionOptionsPanel;
-	private JPanel searchOptionsPanel;
-	private JComboBox searchOption;
-
-	private JButton exportButton;
-
-	private JComboBox queryPropertyOption;
-
-	private JPanel queryPropertyOptionsPanel;
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
 		super(frame, title, modal);
@@ -270,33 +272,16 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void initVerificationOptionsPanel() {
-		JPanel verificationOptionsPanel = new JPanel(new GridBagLayout());
+		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
-		
-		overrideVerificationOptionsCheckbox = new JCheckBox("Override verification options");
-		overrideVerificationOptionsCheckbox.setSelected(false);
-		overrideVerificationOptionsCheckbox.addActionListener(new ActionListener() {
-		
-			public void actionPerformed(ActionEvent e) {
-				if(overrideVerificationOptionsCheckbox.isSelected())
-					enabledVerificationOptionButtons();
-				else
-					disableVerificationOptionsButtons();
-			}
-		});
+
+		initQueryPropertyOptionsComponents();
+		initCapacityComponents();
+		initSearchOptionsComponents();
+		initSymmetryOptionsComponents();
+		initReductionOptionsComponents();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 2;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		verificationOptionsPanel.add(overrideVerificationOptionsCheckbox, gbc);
-		
-		initQueryPropertyOptionsPanel(verificationOptionsPanel);
-		initReductionOptionsPanel(verificationOptionsPanel);
-		initSearchOptionsPanel(verificationOptionsPanel);
-		
-		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
@@ -305,43 +290,79 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weightx = 0;
 		gbc.insets = new Insets(10, 0, 0, 0);
 		add(verificationOptionsPanel, gbc);
-		
-		disableVerificationOptionsButtons();
 	}
-	
-	private void initQueryPropertyOptionsPanel(JPanel verificationOptionsPanel) {
-		queryPropertyOptionsPanel = new JPanel(new GridBagLayout());
-		queryPropertyOptionsPanel.setBorder(BorderFactory.createTitledBorder("Choose Query Property"));
-		queryPropertyOptionsPanel.setEnabled(false);
-		
-		String[] options = new String[] { name_KeepQueryOption, name_SEARCHWHOLESTATESPACE };
-		queryPropertyOption = new JComboBox(options);
-		queryPropertyOption.setEnabled(false);
-		
+
+	private void initQueryPropertyOptionsComponents() {
+		JLabel queryLabel = new JLabel("Query:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		queryPropertyOptionsPanel.add(queryPropertyOption);
+		verificationOptionsPanel.add(queryLabel,gbc);
+		
+		String[] options = new String[] { name_KeepQueryOption, name_SEARCHWHOLESTATESPACE };
+		queryPropertyOption = new JComboBox(options);
 		
 		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(queryPropertyOption,gbc);
+	}
+	
+	private void initCapacityComponents() {
+		JLabel capacityLabel = new JLabel("Extra tokens:");
+		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(0, 0, 10, 0);
-		verificationOptionsPanel.add(queryPropertyOptionsPanel, gbc);
+		verificationOptionsPanel.add(capacityLabel, gbc);
+		
+		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(50, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(50, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(50, 30));
+		numberOfExtraTokensInNet.setEnabled(false);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 10);
+		verificationOptionsPanel.add(numberOfExtraTokensInNet, gbc);
+		
+		keepQueryCapacity = new JCheckBox(name_KeepQueryOption);
+		keepQueryCapacity.setSelected(true);
+		keepQueryCapacity.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(keepQueryCapacity.isSelected())
+					numberOfExtraTokensInNet.setEnabled(false);
+				else
+					numberOfExtraTokensInNet.setEnabled(true);
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		verificationOptionsPanel.add(keepQueryCapacity, gbc);
 	}
 
 
-	private void initReductionOptionsPanel(JPanel queryOptionsPanel) {
-		reductionOptionsPanel = new JPanel(new GridBagLayout());
-		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Choose Reduction Method"));
-		reductionOptionsPanel.setEnabled(false);
+	private void initReductionOptionsComponents() {
+		JLabel reductionLabel = new JLabel("Verification Method:");
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 5);
+		verificationOptionsPanel.add(reductionLabel,gbc);
 		
 		String[] options = new String[] { name_KeepQueryOption, name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
 		reductionOption = new JComboBox(options);
-		reductionOption.setEnabled(false);
 		
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -353,50 +374,37 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 	
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.gridwidth = 2;
+		verificationOptionsPanel.add(reductionOption,gbc);
+	}
+	
+	private void initSymmetryOptionsComponents() {
+		JLabel symmetryLabel = new JLabel("Symmetry:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 0;
+		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		reductionOptionsPanel.add(reductionOption,gbc);
+		verificationOptionsPanel.add(symmetryLabel,gbc);
 		
-
-		symmetryReduction = new JCheckBox("Use Symmetry Reduction");
-		symmetryReduction.setEnabled(false);
-		symmetryReduction.setSelected(true);
+		String[] options = new String[] { name_KeepQueryOption, name_SYMMETRY, name_NOSYMMETRY };
+		symmetryOption = new JComboBox(options);
 		
 		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridx = 1;
+		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		reductionOptionsPanel.add(symmetryReduction, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
-		gbc.weightx = 0.5;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(0, 10, 0, 0);
-		queryOptionsPanel.add(reductionOptionsPanel, gbc);
+		verificationOptionsPanel.add(symmetryOption,gbc);
 	}
 	
 	private void setEnabledOptionsAccordingToCurrentReduction() {
-		refreshSymmetryReduction();
 		refreshSearchOptions();
-	}
-	
-	private void refreshSymmetryReduction() {
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
-			symmetryReduction.setSelected(true);
-			symmetryReduction.setEnabled(false);
-		}
-		else{
-			symmetryReduction.setSelected(symmetryReduction.isSelected());
-			symmetryReduction.setEnabled(true);
-		}
 	}
 	
 	private void refreshSearchOptions() {
@@ -435,10 +443,10 @@ public class BatchProcessingDialog extends JDialog {
 			return SearchOption.CLOSE_TO_TARGET_FIRST;
 		else if(((String)searchOption.getSelectedItem()).equals(name_RandomDFS))
 			return SearchOption.RDFS;
-		else if(((String)searchOption.getSelectedItem()).equals(name_KeepQueryOption))
-			return SearchOption.BatchProcessingKeepQueryOption;
-		else
+		else if(((String)searchOption.getSelectedItem()).equals(name_BFS))
 			return SearchOption.BFS;
+		else
+			return SearchOption.BatchProcessingKeepQueryOption;
 	}
 	
 	private String getSearchOptionAsString() {
@@ -447,42 +455,42 @@ public class BatchProcessingDialog extends JDialog {
 
 
 	private void disableVerificationOptionsButtons() {
-		reductionOptionsPanel.setEnabled(false);		
-		for(Component c : reductionOptionsPanel.getComponents())
+		verificationOptionsPanel.setEnabled(false);		
+		for(Component c : verificationOptionsPanel.getComponents())
 			c.setEnabled(false);
-		
-		searchOptionsPanel.setEnabled(false);
-		for(Component c : searchOptionsPanel.getComponents())
-			c.setEnabled(false);
-		
-		queryPropertyOptionsPanel.setEnabled(false);
-		for(Component c : queryPropertyOptionsPanel.getComponents()) {
-			c.setEnabled(false);
-		}
 	}
 
 	private void enabledVerificationOptionButtons() {
-		reductionOptionsPanel.setEnabled(true);
-		for(Component c : reductionOptionsPanel.getComponents())
+		verificationOptionsPanel.setEnabled(false);		
+		for(Component c : verificationOptionsPanel.getComponents())
 			c.setEnabled(true);
 		
-		searchOptionsPanel.setEnabled(true);
-		for(Component c : searchOptionsPanel.getComponents())
-			c.setEnabled(true);
-		
-		queryPropertyOptionsPanel.setEnabled(true);
-		for(Component c : queryPropertyOptionsPanel.getComponents()) {
-			c.setEnabled(true);
-		}
+		if(keepQueryCapacity.isSelected())
+			numberOfExtraTokensInNet.setEnabled(false);
+		else
+			numberOfExtraTokensInNet.setEnabled(true);
 	}
 	
 	private BatchProcessingVerificationOptions getVerificationOptions() {
-		if(overrideVerificationOptionsCheckbox.isSelected()) {
-			return new BatchProcessingVerificationOptions(getQueryPropertyOption(), getSearchOption(), getReductionOption());		
-		}
-		return null;
+		return new BatchProcessingVerificationOptions(getQueryPropertyOption(), keepQueryCapacity.isSelected(), getNumberOfExtraTokens(), getSearchOption(), getSymmetryOption(), getReductionOption());		
 	}
 	
+	
+
+	private int getNumberOfExtraTokens() {
+		return (Integer)numberOfExtraTokensInNet.getValue();
+	}
+
+	private SymmetryOption getSymmetryOption() {
+		String symmetryString = (String)symmetryOption.getSelectedItem();
+		if(symmetryString.equals(name_SYMMETRY))
+			return SymmetryOption.Yes;
+		else if(symmetryString.equals(name_NOSYMMETRY))
+			return SymmetryOption.No;
+		else
+			return SymmetryOption.KeepQueryOption;
+	}
+
 	private QueryPropertyOption getQueryPropertyOption() {
 		String propertyOptionString = (String)queryPropertyOption.getSelectedItem();
 		if(propertyOptionString.equals(name_SEARCHWHOLESTATESPACE))
@@ -494,57 +502,40 @@ public class BatchProcessingDialog extends JDialog {
 
 	private ReductionOption getReductionOption() {
 		String reductionOptionString = (String)reductionOption.getSelectedItem();
-		boolean symmetry = symmetryReduction.isSelected();
 		
-		if (reductionOptionString.equals(name_STANDARD) && !symmetry)
-			return ReductionOption.STANDARD;
-		else if (reductionOptionString.equals(name_STANDARD) && symmetry)
-			return ReductionOption.STANDARDSYMMETRY;
-		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD) && !symmetry)
-			return ReductionOption.OPTIMIZEDSTANDARD;
-		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD) && symmetry)
-			return ReductionOption.OPTIMIZEDSTANDARDSYMMETRY;
-		else if (reductionOptionString.equals(name_BROADCAST) && !symmetry)
-			return ReductionOption.BROADCAST;
-		else if (reductionOptionString.equals(name_BROADCASTDEG2) && !symmetry)
-			return ReductionOption.DEGREE2BROADCAST;
-		else if (reductionOptionString.equals(name_BROADCASTDEG2) && symmetry)
-			return ReductionOption.DEGREE2BROADCASTSYMMETRY;
-		else if (reductionOptionString.equals(name_verifyTAPN))
+		if (reductionOptionString.equals(name_STANDARD)) {
+				return ReductionOption.STANDARD;
+		} else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD)) {
+				return ReductionOption.OPTIMIZEDSTANDARD;
+		} else if (reductionOptionString.equals(name_BROADCAST)) {
+				return ReductionOption.BROADCAST;
+		} else if (reductionOptionString.equals(name_BROADCASTDEG2)) {
+				return ReductionOption.DEGREE2BROADCAST;
+		} else if (reductionOptionString.equals(name_verifyTAPN))
 			return ReductionOption.VerifyTAPN;
-		else if (reductionOptionString.equals(name_KeepQueryOption))
-			return ReductionOption.BatchProcessingKeepQueryOption;
 		else
-			return ReductionOption.BROADCASTSYMMETRY;
+			return ReductionOption.BatchProcessingKeepQueryOption;
 	}
 	
-	private void initSearchOptionsPanel(JPanel queryOptionsPanel) {
-		searchOptionsPanel = new JPanel(new GridBagLayout());
-		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Choose Search Method"));
-		searchOptionsPanel.setEnabled(false);
+	private void initSearchOptionsComponents() {
+		JLabel searchLabel = new JLabel("Search Order:");
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		verificationOptionsPanel.add(searchLabel,gbc);
 		
 		String[] options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS };
 		searchOption = new JComboBox(options);
-		searchOption.setEnabled(false);
 		searchOption.setMinimumSize(searchOption.getSize());
 	
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weightx = 1.0;
-		searchOptionsPanel.add(searchOption,gbc);
-		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.weightx = 0.5;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(10, 10, 0, 0);
-		queryOptionsPanel.add(searchOptionsPanel, gbc);
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.gridwidth = 2;
+		verificationOptionsPanel.add(searchOption,gbc);
 	}
 
 	private void initResultTablePanel() {
@@ -570,9 +561,9 @@ public class BatchProcessingDialog extends JDialog {
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 1;
+		gbc.insets = new Insets(5, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		resultTablePanel.add(exportButton, gbc);
 		
 		tableModel = new BatchProcessingResultsTableModel();
@@ -580,6 +571,8 @@ public class BatchProcessingDialog extends JDialog {
 			private static final long serialVersionUID = -146530769055564619L;
 
 			public javax.swing.JToolTip createToolTip() {
+				ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE); //disable tooltips disappearing
+				ToolTipManager.sharedInstance().setInitialDelay(200);
 				return new MultiLineAutoWrappingToolTip();
 			};
 		};
@@ -594,7 +587,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -795,7 +788,6 @@ public class BatchProcessingDialog extends JDialog {
 		startButton.setEnabled(false);
 		exportButton.setEnabled(false);
 		
-		overrideVerificationOptionsCheckbox.setEnabled(false);
 		disableVerificationOptionsButtons();
 	}
 
@@ -815,11 +807,7 @@ public class BatchProcessingDialog extends JDialog {
 		else
 			exportButton.setEnabled(false);
 		
-		overrideVerificationOptionsCheckbox.setEnabled(true);
-		if(overrideVerificationOptionsCheckbox.isSelected())
-			enabledVerificationOptionButtons();
-		else
-			disableVerificationOptionsButtons();
+		enabledVerificationOptionButtons();
 	}
 	
 	// Custom cell renderer for the file list to only display the name of the file
@@ -879,7 +867,6 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 			
-			
 			setEnabled(table.isEnabled());
 			setFont(table.getFont());
 			setOpaque(true);
@@ -895,55 +882,43 @@ public class BatchProcessingDialog extends JDialog {
 			return this;
 		}
 
-		private String generateTooltipTextFromQuery(TAPNQuery newQuery) {
+		private String generateTooltipTextFromQuery(TAPNQuery query) {
 			StringBuilder s = new StringBuilder();
 			s.append("Extra Tokens: ");
-			s.append(newQuery.getCapacity());
+			s.append(query.getCapacity());
 			s.append("\n\n");
 			
 			s.append("Search Method: \n");
-			if(newQuery.getSearchOption() == SearchOption.DFS)
+			if(query.getSearchOption() == SearchOption.DFS)
 				s.append(name_DFS);
-			else if(newQuery.getSearchOption() == SearchOption.RDFS)
+			else if(query.getSearchOption() == SearchOption.RDFS)
 				s.append(name_RandomDFS);
-			else if(newQuery.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST)
+			else if(query.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST)
 				s.append(name_ClosestToTarget);
 			else
 				s.append(name_BFS);
 			s.append("\n\n");
 			
 			s.append("Reduction: \n");
-			boolean symmetry = false;
-			if (newQuery.getReductionOption() == ReductionOption.STANDARD)
+			if (query.getReductionOption() == ReductionOption.STANDARD)
 				s.append(name_STANDARD);
-			else if (newQuery.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
-				s.append(name_STANDARD);
-				symmetry = true;
-			} else if (newQuery.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD)
+			else if (query.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD)
 				s.append(name_OPTIMIZEDSTANDARD);
-			else if (newQuery.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
-				s.append(name_OPTIMIZEDSTANDARD);
-				symmetry = true;
-			} else if (newQuery.getReductionOption() == ReductionOption.BROADCAST)
+			else if (query.getReductionOption() == ReductionOption.BROADCAST)
 				s.append(name_BROADCAST);
-			else if (newQuery.getReductionOption() == ReductionOption.DEGREE2BROADCAST)
+			else if (query.getReductionOption() == ReductionOption.DEGREE2BROADCAST)
 				s.append(name_BROADCASTDEG2);
-			else if (newQuery.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY) {
-				s.append(name_BROADCASTDEG2);
-				symmetry = true;
-			} else if (newQuery.getReductionOption() == ReductionOption.VerifyTAPN) {
+			else if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
 				s.append(name_verifyTAPN);
-				symmetry = true;
 			} else {
 				s.append(name_BROADCAST);
-				symmetry = true;
 			}
 			
 			s.append("\n\n");
 			s.append("Symmetry: ");
-			s.append(symmetry ? "Yes\n\n" : "No\n\n");
+			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
 			
-			s.append("Query Property:\n" + newQuery.getProperty().toString());
+			s.append("Query Property:\n" + query.getProperty().toString());
 			
 			return s.toString();
 		}

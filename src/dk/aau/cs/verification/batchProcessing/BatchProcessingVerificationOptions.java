@@ -9,15 +9,24 @@ public class BatchProcessingVerificationOptions {
 		KeepQueryOption, SearchWholeStateSpace
 	};
 	
+	public enum SymmetryOption {
+		KeepQueryOption, Yes, No
+	};
+	
 	private ReductionOption reductionOption;
 	private SearchOption searchOption;
-	
 	private QueryPropertyOption queryPropertyOption;
+	private SymmetryOption symmetryOption;
+	private boolean keepQueryCapacity;
+	private int capacity;
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, SearchOption searchOption, ReductionOption reductionOption) {
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption) {
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
 		this.queryPropertyOption = queryPropertyOption;
+		this.symmetryOption = symmetryOption;
+		this.keepQueryCapacity = keepQueryCapacity;
+		this.capacity = capacity;
 	}
 	
 	public ReductionOption reductionOption() {
@@ -30,5 +39,17 @@ public class BatchProcessingVerificationOptions {
 	
 	public QueryPropertyOption queryPropertyOption() {
 		return queryPropertyOption;
+	}
+	
+	public SymmetryOption symmetry() {
+		return symmetryOption;
+	}
+	
+	public boolean KeepCapacityFromQuery() {
+		return keepQueryCapacity;
+	}
+	
+	public int capacity() {
+		return capacity;
 	}
 }

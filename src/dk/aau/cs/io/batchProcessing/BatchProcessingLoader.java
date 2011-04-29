@@ -50,7 +50,6 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class BatchProcessingLoader {
-//	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<Tuple<TimedTransition, Integer>, TimedPlace> presetArcs;
 	private HashMap<Tuple<TimedTransition, Integer>, TimedPlace> postsetArcs;
 	private HashMap<String, String> placeIDToName;
@@ -58,8 +57,6 @@ public class BatchProcessingLoader {
 	private HashMap<Tuple<TimedTransition, Integer>, TimeInterval> transportArcsTimeIntervals;
 
 	private NameGenerator nameGenerator = new NameGenerator();
-//	private boolean firstQueryParsingWarning = true;
-//	private boolean firstInhibitorIntervalWarning = true;
 
 	public BatchProcessingLoader() {
 		presetArcs = new HashMap<Tuple<TimedTransition,Integer>, TimedPlace>();
@@ -156,7 +153,6 @@ public class BatchProcessingLoader {
 		NodeList queryNodes = doc.getElementsByTagName("query");
 		
 		ArrayList<Tuple<String, String>> templatePlaceNames = getPlaceNames(network);
-//		boolean queryUsingNonexistentPlaceFound = false;
 		for (int i = 0; i < queryNodes.getLength(); i++) {
 			Node q = queryNodes.item(i);
 
@@ -165,7 +161,6 @@ public class BatchProcessingLoader {
 				
 				if (query != null) {
 					if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
-//						queryUsingNonexistentPlaceFound = true;
 						continue;
 					}
 
@@ -173,11 +168,6 @@ public class BatchProcessingLoader {
 				}
 			}
 		}
-		
-//		if(queryUsingNonexistentPlaceFound && firstQueryParsingWarning) {
-//			JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-//			firstQueryParsingWarning = false;
-//		}
 		
 		return queries;
 	}
@@ -442,12 +432,6 @@ public class BatchProcessingLoader {
 	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, Map<String, Constant> constants) {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
-		//TimeInterval interval = TimeInterval.parse(inscriptionTempStorage, constants);
-		
-//		if(!interval.equals(TimeInterval.ZERO_INF) && firstInhibitorIntervalWarning) {
-//			JOptionPane.showMessageDialog(CreateGui.getApp(), "The chosen model contained inhibitor arcs with unsupported intervals.\n\nTAPAAL only supports inhibitor arcs with intervals [0,inf).\n\nAny other interval on inhibitor arcs will be replaced with [0,inf).", "Unsupported Interval Detected on Inhibitor Arc", JOptionPane.INFORMATION_MESSAGE);
-//			firstInhibitorIntervalWarning = false;
-//		}
 		
 		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF);
 		tapn.add(inhibArc);
@@ -461,16 +445,27 @@ public class BatchProcessingLoader {
 		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
-
+		boolean symmetry = getSymmetryReductionOption(queryElement);
+		
 		TCTLAbstractProperty query;
 		query = parseQueryProperty(queryElement.getAttribute("query"));
 
 		if (query != null)
 			return new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, hashTableSize,
+					searchOption, reductionOption, symmetry, hashTableSize,
 					extrapolationOption);
 		else
 			return null;
+	}
+	
+	private boolean getSymmetryReductionOption(Element queryElement) {
+		boolean symmetry;
+		try {
+			symmetry = queryElement.getAttribute("symmetry").equals("true");
+		} catch(Exception e) {
+			symmetry = true;
+		}
+		return symmetry;	
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
@@ -480,10 +475,6 @@ public class BatchProcessingLoader {
 		try {
 			query = queryParser.parse(queryToParse);
 		} catch (Exception e) {
-//			if(firstQueryParsingWarning) {
-//				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
-//				firstQueryParsingWarning = false;
-//			}
 			System.err.println("No query was specified: " + e.getStackTrace());
 		}
 		return query;

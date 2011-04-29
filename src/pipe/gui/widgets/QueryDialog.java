@@ -1,28 +1,93 @@
 package pipe.gui.widgets;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
 
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.*;
-import pipe.gui.*;
-import dk.aau.cs.TCTL.*;
-import dk.aau.cs.TCTL.Parsing.*;
-import dk.aau.cs.TCTL.visitors.*;
-import dk.aau.cs.model.tapn.*;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
+import pipe.gui.Verifier;
+import dk.aau.cs.TCTL.StringPosition;
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
-import dk.aau.cs.verification.*;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
@@ -189,10 +254,15 @@ public class QueryDialog extends JPanel {
 		TAPNQuery.SearchOption searchOption = getSearchOption();
 
 		ReductionOption reductionOptionToSet = getReductionOption();
+		boolean symmetry = getSymmetry();
 		
 		return new TAPNQuery(name, capacity, newProperty.copy(), traceOption,
-				searchOption, reductionOptionToSet, /* hashTableSizeToSet */
+				searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */
 				null, /* extrapolationOptionToSet */null);
+	}
+
+	private boolean getSymmetry() {
+		return symmetryReduction.isSelected();
 	}
 
 	private int getCapacity() {
@@ -225,26 +295,17 @@ public class QueryDialog extends JPanel {
 	
 	private ReductionOption getReductionOption() {
 		String reductionOptionString = (String)reductionOption.getSelectedItem();
-		boolean symmetry = symmetryReduction.isSelected();
 		
-		if (reductionOptionString.equals(name_STANDARD) && !symmetry)
+		if (reductionOptionString.equals(name_STANDARD))
 			return ReductionOption.STANDARD;
-		else if (reductionOptionString.equals(name_STANDARD) && symmetry)
-			return ReductionOption.STANDARDSYMMETRY;
-		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD) && !symmetry)
+		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD))
 			return ReductionOption.OPTIMIZEDSTANDARD;
-		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD) && symmetry)
-			return ReductionOption.OPTIMIZEDSTANDARDSYMMETRY;
-		else if (reductionOptionString.equals(name_BROADCAST) && !symmetry)
-			return ReductionOption.BROADCAST;
-		else if (reductionOptionString.equals(name_BROADCASTDEG2) && !symmetry)
+		else if (reductionOptionString.equals(name_BROADCASTDEG2))
 			return ReductionOption.DEGREE2BROADCAST;
-		else if (reductionOptionString.equals(name_BROADCASTDEG2) && symmetry)
-			return ReductionOption.DEGREE2BROADCASTSYMMETRY;
 		else if (reductionOptionString.equals(name_verifyTAPN))
 			return ReductionOption.VerifyTAPN;
 		else
-			return ReductionOption.BROADCASTSYMMETRY;
+			return ReductionOption.BROADCAST;
 	}
 	
 	private String getReductionOptionAsString() {
@@ -674,44 +735,45 @@ public class QueryDialog extends JPanel {
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
-		boolean symmetry = false;
+		boolean symmetry = queryToCreateFrom.useSymmetry();
 
 		if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
 			reduction = name_BROADCAST;
-			symmetry = false;
-		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCASTSYMMETRY) {
-			reduction = name_BROADCAST;
-			symmetry = true;
+//			symmetry = false;
+//		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST ) {
+//			reduction = name_BROADCAST;
+//			symmetry = true;
 		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			reduction = name_BROADCASTDEG2;
-			symmetry = false;
-		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY) {
-			reduction = name_BROADCASTDEG2;
-			symmetry = true;
+//			symmetry = false;
+//		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY) {
+//			reduction = name_BROADCASTDEG2;
+//			symmetry = true;
 		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;
-				symmetry = false;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
-				reduction = name_STANDARD;
-				symmetry = true;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
-				reduction = name_OPTIMIZEDSTANDARD;
-				symmetry = true;
+//				symmetry = false;
+//			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
+//				reduction = name_STANDARD;
+//				symmetry = true;
+//			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
+//				reduction = name_OPTIMIZEDSTANDARD;
+//				symmetry = true;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
 				reduction = name_OPTIMIZEDSTANDARD;
-				symmetry = false;
+//				symmetry = false;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPN) {
 				reduction = name_verifyTAPN;
-				symmetry = true;
+//				symmetry = true;
 			}
 		} else {
-			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
+//			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
+//				reduction = name_OPTIMIZEDSTANDARD;
+////				symmetry = true;
+//			} else 
+			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
 				reduction = name_OPTIMIZEDSTANDARD;
-				symmetry = true;
-			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
-				reduction = name_OPTIMIZEDSTANDARD;
-				symmetry = false;
+//				symmetry = false;
 			}
 		}
 		reductionOption.setSelectedItem(reduction);
@@ -1704,7 +1766,7 @@ public class QueryDialog extends JPanel {
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
-								exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile));
+								exporter.export(transformedModel.value1(), clonedQuery, tapnQuery.getReductionOption(), new File(xmlFile), new File(queryFile), tapnQuery.useSymmetry());
 							} catch(Exception exportException) {
 								StringBuilder s = new StringBuilder();
 								if(exportException instanceof UnsupportedModelException)

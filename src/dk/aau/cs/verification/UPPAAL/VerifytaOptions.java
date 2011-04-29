@@ -13,20 +13,26 @@ public class VerifytaOptions implements VerificationOptions {
 	private SearchOption searchOption;
 	private boolean untimedTrace;
 	private ReductionOption reduction;
+	private boolean symmetry;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifytaOptions(TraceOption trace, SearchOption search,
-			boolean untimedTrace, ReductionOption reduction) {
+			boolean untimedTrace, ReductionOption reduction, boolean symmetry) {
 		this.traceOption = trace;
 		this.searchOption = search;
 		this.untimedTrace = untimedTrace;
 		this.reduction = reduction;
+		this.symmetry = symmetry;
 	}
 
 	public TraceOption trace() {
 		return traceOption;
+	}
+	
+	public boolean symmetry() {
+		return symmetry;
 	}
 
 	@Override

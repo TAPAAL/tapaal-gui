@@ -241,6 +241,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		queryElement.setAttribute("hashTableSize", "" + query.getHashTableSize());
 		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
 		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
+		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
 		
 		return queryElement;
 	}
