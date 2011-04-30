@@ -1552,7 +1552,7 @@ public class QueryDialog extends JPanel {
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new FlowLayout());
-		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
+		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
 
@@ -1566,7 +1566,7 @@ public class QueryDialog extends JPanel {
 			}
 		});
 
-		reductionOptionsPanel.add(new JLabel("  Choose reduction method:"));
+		reductionOptionsPanel.add(new JLabel("  Choose verification method:"));
 		reductionOptionsPanel.add(reductionOption);
 
 		symmetryReduction = new JCheckBox("Use Symmetry Reduction");
