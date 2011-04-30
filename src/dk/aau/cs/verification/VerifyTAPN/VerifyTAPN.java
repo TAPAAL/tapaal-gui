@@ -44,7 +44,14 @@ public class VerifyTAPN implements ModelChecker {
 		return "";
 	}
 
-	public boolean isCorrectVersion() {// atm. any version of VerifyTAPN will do
+	public boolean isCorrectVersion() {
+		if (isNotSetup()) {
+			messenger.displayErrorMessage(
+					"No verifyTAPN specified: The verification is cancelled",
+					"Verification Error");
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -60,7 +67,8 @@ public class VerifyTAPN implements ModelChecker {
 
 			try {
 				File file = fileFinder.ShowFileBrowserDialog("VerifyTAPN", "");
-				verifytapnpath = file.getAbsolutePath();
+				if(file != null)
+					verifytapnpath = file.getAbsolutePath();
 
 			} catch (Exception e) {
 				messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
