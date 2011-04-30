@@ -111,12 +111,14 @@ public class VerifyTAPN implements ModelChecker {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
 				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime()); // TODO: return tapnTrace instead of null when done refactoring
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime()); 
 			}
 		}
 	}
 	
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel) {
+		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+		
 		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 		TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 		

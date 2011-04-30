@@ -34,8 +34,11 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 
-		result.append("-k " + extraTokens+tokensInModel + " ");
+		result.append("-k ");
+		result.append(extraTokens+tokensInModel);
+		result.append(" ");
 		result.append(traceMap.get(traceOption));
+		result.append(" ");
 		result.append(searchMap.get(searchOption));
 		
 		return result.toString();
@@ -43,7 +46,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 
 	public static final Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
-		map.put(TraceOption.SOME, "-t1");
+		map.put(TraceOption.SOME, "-t 1");
 		map.put(TraceOption.NONE, "");
 
 		return map;
