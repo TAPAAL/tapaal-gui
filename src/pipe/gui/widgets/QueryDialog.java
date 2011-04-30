@@ -599,6 +599,8 @@ public class QueryDialog extends JPanel {
 		resetButton.setText("Reset Query");
 		editQueryButton.setText("Edit Query");
 		enableEditingButtons();
+		
+		setEnabledReductionOptions();
 	}
 
 	private void changeToEditMode() {
