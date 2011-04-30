@@ -99,7 +99,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton breadthFirstSearch;
 	private JRadioButton depthFirstSearch;
 	private JRadioButton randomDepthFirstSearch;
-	private JRadioButton closestToTargetFirstSearch;
 
 	// Trace options panel
 	private JPanel traceOptionsPanel;
@@ -211,8 +210,6 @@ public class QueryDialog extends JPanel {
 	private SearchOption getSearchOption() {
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
-		else if(closestToTargetFirstSearch.isSelected())
-			return SearchOption.CLOSE_TO_TARGET_FIRST;
 		else if(randomDepthFirstSearch.isSelected())
 			return SearchOption.RDFS;
 		else
@@ -287,20 +284,16 @@ public class QueryDialog extends JPanel {
 			breadthFirstSearch.setEnabled(true);
 			breadthFirstSearch.setSelected(true);
 			randomDepthFirstSearch.setEnabled(false);
-			closestToTargetFirstSearch.setEnabled(false);
 		}
 		else {
 			depthFirstSearch.setEnabled(true);
 			breadthFirstSearch.setEnabled(true);
 			randomDepthFirstSearch.setEnabled(true);
-			closestToTargetFirstSearch.setEnabled(true);
 		}
 		
 		
 		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
 			depthFirstSearch.setSelected(true);
-		else if(searchOption == SearchOption.CLOSE_TO_TARGET_FIRST && closestToTargetFirstSearch.isEnabled())
-			closestToTargetFirstSearch.setSelected(true);
 		else if(searchOption == SearchOption.RDFS && randomDepthFirstSearch.isEnabled())
 			randomDepthFirstSearch.setSelected(true);
 		else
@@ -733,8 +726,6 @@ public class QueryDialog extends JPanel {
 			depthFirstSearch.setSelected(true);
 		} else if (queryToCreateFrom.getSearchOption() == SearchOption.RDFS) {
 			randomDepthFirstSearch.setSelected(true);
-		} else if (queryToCreateFrom.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST) {
-			closestToTargetFirstSearch.setSelected(true);
 		}
 	}
 
@@ -1484,11 +1475,9 @@ public class QueryDialog extends JPanel {
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
 		randomDepthFirstSearch = new JRadioButton("Random Depth First Search");
-		closestToTargetFirstSearch = new JRadioButton("Search by Closest To Target First");
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
 		searchRadioButtonGroup.add(randomDepthFirstSearch);
-		searchRadioButtonGroup.add(closestToTargetFirstSearch);
 		
 		breadthFirstSearch.setSelected(true);
 
@@ -1500,8 +1489,6 @@ public class QueryDialog extends JPanel {
 		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 2;
 		searchOptionsPanel.add(randomDepthFirstSearch, gridBagConstraints);
-		gridBagConstraints.gridy = 3;
-		searchOptionsPanel.add(closestToTargetFirstSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
 		gridBagConstraints.gridx = 0;
