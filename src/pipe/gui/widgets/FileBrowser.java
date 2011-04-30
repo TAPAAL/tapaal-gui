@@ -24,11 +24,12 @@ import pipe.gui.ExtensionFilter;
 
 public class FileBrowser {
 
-	static JFileChooser fc = new JFileChooser();
+	private JFileChooser fc;
 	private String ext;
 
 	public FileBrowser(String filetype, String ext, String path) {
-		super();
+		fc = new JFileChooser();
+		
 		if (filetype == null) {
 			filetype = "file";
 		}
@@ -47,7 +48,7 @@ public class FileBrowser {
 		ExtensionFilter filter = new ExtensionFilter(ext, filetype);
 
 		fc.setFileFilter(filter);
-
+		fc.setAcceptAllFileFilterUsed(false);
 		// By default hide hidden files
 		fc.setFileHidingEnabled(true);
 	}

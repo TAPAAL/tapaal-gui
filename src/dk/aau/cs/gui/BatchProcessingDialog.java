@@ -71,7 +71,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
 	private static final String name_ClosestToTarget = "Search by Closest To Target First";
-	private static final String name_KeepQueryOption = "As In Query";
+	private static final String name_KeepQueryOption = "Do Not Override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search Whole State Space";
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
@@ -273,7 +273,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void initVerificationOptionsPanel() {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
-		verificationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
+		verificationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Override Verification Options"));
 
 		initQueryPropertyOptionsComponents();
 		initCapacityComponents();
@@ -546,6 +546,10 @@ public class BatchProcessingDialog extends JDialog {
 		exportButton.setEnabled(false);
 		exportButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				exportResults();
+			}
+
+			private void exportResults() {
 				String filename = new FileBrowser("CSV file", "csv", "").saveFile();
 				if (filename != null) {
 					File exportFile = new File(filename);
@@ -877,8 +881,10 @@ public class BatchProcessingDialog extends JDialog {
 				setText(newQuery.getName());
 			}
 			else {
-				setText(query.toString());
+				setToolTipText("");
+				setText("");
 			}
+			
 			return this;
 		}
 
