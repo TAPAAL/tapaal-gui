@@ -866,7 +866,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(
 					currentTab.network(),
-					currentTab.templates(), 
+					currentTab.allTemplates(), 
 					currentTab.queries(), 
 					currentTab.network().constants()
 			);
@@ -911,7 +911,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer());
 		tab.addTemplate(template);
 
-		tab.setActiveTemplate(template);
+		tab.setCurrentTemplate(template);
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();

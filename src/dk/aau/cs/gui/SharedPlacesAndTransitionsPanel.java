@@ -198,7 +198,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					undoManager.addEdit(cmd);
 				}
 				if(deleteFromTemplates){
-					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
+					for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 						TimedPlaceComponent place = (TimedPlaceComponent)template.guiModel().getPlaceByName(sharedPlace.name());
 						if(place != null){
 							for(Arc arc : place.getPreset()){
@@ -223,7 +223,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					undoManager.addEdit(new DeleteSharedPlaceCommand(sharedPlace, sharedPlacesListModel));
 				}else{
 					Hashtable<LocalTimedPlace, String> createdPlaces = new Hashtable<LocalTimedPlace, String>();
-					for(Template template : tab.templates()){
+					for(Template template : tab.allTemplates()){
 						TimedPlace place = template.model().getPlaceByName(sharedPlace.name());
 						TimedPlaceComponent component = (TimedPlaceComponent) template.guiModel().getPlaceByName(sharedPlace.name());
 						if(place != null){
@@ -278,7 +278,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			private void deleteSharedTransition(boolean deleteFromTemplates) {
 				SharedTransition sharedTransition = (SharedTransition)list.getSelectedValue();
 				if(deleteFromTemplates){
-					for(Template template : tab.templates()){ // TODO: Get rid of pipe references somehow
+					for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 						TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(sharedTransition.name());
 						undoManager.addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
 						transition.delete();

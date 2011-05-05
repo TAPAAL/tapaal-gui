@@ -141,7 +141,7 @@ public class TAPNComposer {
 	}
 
 	private boolean isSharedPlaceUsedInTemplates(TimedArcPetriNetNetwork model, SharedPlace place) {
-		for(TimedArcPetriNet tapn : model.templates()){
+		for(TimedArcPetriNet tapn : model.activeTemplates()){
 			for(TimedPlace timedPlace : tapn.places()){
 				if(timedPlace.equals(place)) return true;
 			}
@@ -150,7 +150,7 @@ public class TAPNComposer {
 	}
 
 	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedPlace timedPlace : tapn.places()) {
 				if(!timedPlace.isShared()){
 					String uniquePlaceName = getUniquePlaceName();
@@ -173,7 +173,7 @@ public class TAPNComposer {
 	}
 
 	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedTransition timedTransition : tapn.transitions()) {
 				if(!processedSharedObjects.contains(timedTransition.name())){
 					String uniqueTransitionName = getUniqueTransitionName();
@@ -198,7 +198,7 @@ public class TAPNComposer {
 
 	private void createInputArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedInputArc arc : tapn.inputArcs()) {
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
@@ -213,7 +213,7 @@ public class TAPNComposer {
 
 	private void createOutputArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedOutputArc arc : tapn.outputArcs()) {
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedTransition source = constructedModel.getTransitionByName(mapping.map(template, arc.source().name()));
@@ -228,7 +228,7 @@ public class TAPNComposer {
 
 	private void createTransportArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TransportArc arc : tapn.transportArcs()) {
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
@@ -246,7 +246,7 @@ public class TAPNComposer {
 
 	private void createInhibitorArcs(TimedArcPetriNetNetwork model,
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));

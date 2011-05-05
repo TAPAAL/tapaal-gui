@@ -110,10 +110,12 @@ public class NetworkMarking implements TimedMarking {
 		// validity of arguments already checked above
 		NetworkMarking clone = clone();
 		for(TimedTransition transition : sharedTransition.transitions()){
-			LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
-			
-			clone.removeMarkingFor(transition.model());
-			clone.addMarking(transition.model(), ltm);
+			if(transition.model().isActive()) {
+				LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, firingMode);
+				
+				clone.removeMarkingFor(transition.model());
+				clone.addMarking(transition.model(), ltm);
+			}
 		}
 		
 		return clone;
@@ -124,10 +126,12 @@ public class NetworkMarking implements TimedMarking {
 		
 		NetworkMarking clone = clone();
 		for(TimedTransition transition : sharedTransition.transitions()){
-			LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, tokensPerTransition.get(transition));
-			
-			clone.removeMarkingFor(transition.model());
-			clone.addMarking(transition.model(), ltm);
+			if(transition.model().isActive()) {
+				LocalTimedMarking ltm = clone.getMarkingFor(transition.model()).fireTransition(transition, tokensPerTransition.get(transition));
+				
+				clone.removeMarkingFor(transition.model());
+				clone.addMarking(transition.model(), ltm);
+			}
 		}
 		
 		return clone;
@@ -138,11 +142,13 @@ public class NetworkMarking implements TimedMarking {
 		
 		for(TimedToken token : tokensToConsume){
 			for(TimedTransition transition : sharedTransition.transitions()){
-				if(!distributedTokens.containsKey(transition)) distributedTokens.put(transition, new ArrayList<TimedToken>());
-				
-				if(transition.model().equals(((LocalTimedPlace)token.place()).model())){
-					distributedTokens.get(transition).add(token);
-					break;
+				if(transition.model().isActive()) {
+					if(!distributedTokens.containsKey(transition)) distributedTokens.put(transition, new ArrayList<TimedToken>());
+					
+					if(transition.model().equals(((LocalTimedPlace)token.place()).model())){
+						distributedTokens.get(transition).add(token);
+						break;
+					}
 				}
 			}
 		}

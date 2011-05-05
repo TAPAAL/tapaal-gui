@@ -32,7 +32,7 @@ public class ConstantStore {
 			c.reset();
 		}
 
-		for (TimedArcPetriNet tapn : model.templates()) {
+		for (TimedArcPetriNet tapn : model.allTemplates()) {
 			for (TimedPlace place : tapn.places()) {
 				buildConstraints(place);
 			}

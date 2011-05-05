@@ -1,11 +1,15 @@
 package dk.aau.cs.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Pattern;
@@ -13,10 +17,14 @@ import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -57,6 +65,7 @@ public class TemplateExplorer extends JPanel {
 
 	private TabContent parent;
 	private UndoManager undoManager;
+	private boolean isInAnimationMode;
 
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
@@ -70,6 +79,7 @@ public class TemplateExplorer extends JPanel {
 
 	private void init(boolean hideButtons) {
 		setLayout(new BorderLayout());
+		isInAnimationMode = false;
 		initExplorerPanel();
 		initButtonsPanel();
 
@@ -91,7 +101,7 @@ public class TemplateExplorer extends JPanel {
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new BorderLayout());
 		listModel = new DefaultListModel();
-		for (Template net : parent.templates()) {
+		for (Template net : parent.allTemplates()) {
 			listModel.addElement(net);
 		}
 
@@ -109,34 +119,18 @@ public class TemplateExplorer extends JPanel {
 			}
 
 			public void intervalRemoved(ListDataEvent arg0) {
-				templateList.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0
-						.getIndex0() - 1);
+				templateList.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0() - 1);
 			}
 		});
 
 		templateList = new JList(listModel);
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
-		templateList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
-					if (templateList.getSelectedIndex() == -1) {
-						removeTemplateButton.setEnabled(false);
-						renameButton.setEnabled(false);
-						copyButton.setEnabled(false);
-					} else {
-						if (buttonPanel != null) {
-							if (listModel.size() > 1)
-								removeTemplateButton.setEnabled(true);
-							renameButton.setEnabled(true);
-							copyButton.setEnabled(true);
-						}
-						templateList.ensureIndexIsVisible(e.getFirstIndex());
-						openSelectedTemplate();
-					}
-				}
-			}
-		});
+		templateList.setCellRenderer(new TemplateListCellRenderer(templateList.getCellRenderer()));
+		
+		TemplateListManager manager = new TemplateListManager(templateList);
+		templateList.addListSelectionListener(manager);
+		templateList.addMouseListener(manager);
 
 		scrollpane = new JScrollPane(templateList);
 		templatePanel.add(scrollpane, BorderLayout.CENTER);
@@ -382,8 +376,14 @@ public class TemplateExplorer extends JPanel {
 
 	public void updateTemplateList() {
 		listModel.clear();
-		for (Template net : parent.templates()) {
-			listModel.addElement(net);
+		if(isInAnimationMode) {
+			for (Template net : parent.activeTemplates()) {
+				listModel.addElement(net);
+			}
+		} else {
+			for (Template net : parent.allTemplates()) {
+				listModel.addElement(net);
+			}
 		}
 	}
 
@@ -393,5 +393,107 @@ public class TemplateExplorer extends JPanel {
 
 	public void showButtons() {
 		addCreatedComponents(false);
+	}
+	
+	public void switchToAnimationMode() {
+		hideButtons();
+		isInAnimationMode = true;
+		updateTemplateList();
+	}
+	
+
+	public void switchToEditorMode() {
+		showButtons();
+		isInAnimationMode = false;
+		updateTemplateList();
+	}
+	
+	private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
+		private static final long serialVersionUID = 1257272566670437973L;
+		private JCheckBox activeCheckbox = new JCheckBox();
+		private ListCellRenderer cellRenderer;
+		
+		public TemplateListCellRenderer(ListCellRenderer renderer) {
+			this.cellRenderer = renderer;
+			setLayout(new BorderLayout()); 
+	        setOpaque(false); 
+	        activeCheckbox.setOpaque(false); 
+		}
+		
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			Component renderer = cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			removeAll();
+			if(!isInAnimationMode) { 
+				boolean isActive = ((Template)value).isActive();
+				activeCheckbox.setSelected(isActive);
+				setToolTipText((isActive ? "Uncheck" : "Check") + " to " + (isActive ? "deactive" : "activate") + " template");
+				add(activeCheckbox, BorderLayout.WEST);
+			}
+			add(renderer, BorderLayout.CENTER);
+			return this;
+		}
+		
+		
+	}
+	
+	private class TemplateListManager extends MouseAdapter implements ListSelectionListener, ActionListener {
+		private int checkBoxWidth = new JCheckBox().getPreferredSize().width;
+		private ListSelectionModel selectionModel;
+		private JList list;
+		
+		public TemplateListManager(JList list) {
+			this.list = list;
+			this.selectionModel = list.getSelectionModel();
+			this.list.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
+		}
+		
+		private void toggleSelection(int index) { 
+			if(index<0) 
+				return; 
+			
+			if(!selectionModel.isSelectedIndex(index)) 
+				selectionModel.addSelectionInterval(index, index); 
+			
+			Template item = ((Template)list.getModel().getElementAt(index));
+			item.setActive(!item.isActive());
+			list.repaint();
+		}
+		
+		public void mouseClicked(MouseEvent e) {
+			int index = templateList.locationToIndex(e.getPoint()); 
+			
+			if(index<0) 
+				return; 
+			
+			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) 
+				return; 
+			
+			toggleSelection(index);
+		}
+		
+
+		public void valueChanged(ListSelectionEvent e) {
+			if (e.getValueIsAdjusting() == false) {
+				if (templateList.getSelectedIndex() == -1) {
+					removeTemplateButton.setEnabled(false);
+					renameButton.setEnabled(false);
+					copyButton.setEnabled(false);
+				} else {
+					if (buttonPanel != null) {
+						if (listModel.size() > 1)
+							removeTemplateButton.setEnabled(true);
+						renameButton.setEnabled(true);
+						copyButton.setEnabled(true);
+					}
+					templateList.ensureIndexIsVisible(e.getFirstIndex());
+					openSelectedTemplate();
+				}
+			}
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			toggleSelection(list.getSelectedIndex());
+		}
+		
 	}
 }

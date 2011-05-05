@@ -1143,8 +1143,8 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(150, 27);
 		placesBox.setMaximumSize(d);
 
-		Vector<Object> items = new Vector<Object>(tapnNetwork.templates().size()+1);
-		items.addAll(tapnNetwork.templates());
+		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
+		items.addAll(tapnNetwork.activeTemplates());
 		if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
 
 		templateBox = new JComboBox(new DefaultComboBoxModel(items));
@@ -1350,7 +1350,7 @@ public class QueryDialog extends JPanel {
 					{
 						// check correct place names are used in atomic propositions
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
-						for(TimedArcPetriNet tapn : tapnNetwork.templates()) {
+						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
 							for(TimedPlace p : tapn.places()) {
 								templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
 							}

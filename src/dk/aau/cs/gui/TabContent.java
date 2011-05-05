@@ -59,7 +59,7 @@ public class TabContent extends JSplitPane {
 
 
 	public TabContent() { 
-		for (TimedArcPetriNet net: tapnNetwork.templates()){
+		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
 			guiModels.put(net, new DataLayer());
 		}
 
@@ -164,7 +164,7 @@ public class TabContent extends JSplitPane {
 		animatorLeftPane = new JPanel(new GridBagLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
-		templateExplorer.hideButtons();
+		templateExplorer.switchToAnimationMode();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -195,7 +195,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void switchToEditorComponents() {
-		templateExplorer.showButtons();
+		templateExplorer.switchToEditorMode();
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -278,9 +278,17 @@ public class TabContent extends JSplitPane {
 		return drawingSurface;
 	}
 
-	public Iterable<Template> templates() {
+	public Iterable<Template> allTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
-		for (TimedArcPetriNet net : tapnNetwork.templates()) {
+		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
+			list.add(new Template(net, guiModels.get(net)));
+		}
+		return list;
+	}
+	
+	public Iterable<Template> activeTemplates() {
+		ArrayList<Template> list = new ArrayList<Template>();
+		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
 			list.add(new Template(net, guiModels.get(net)));
 		}
 		return list;
@@ -302,11 +310,11 @@ public class TabContent extends JSplitPane {
 		templateExplorer.updateTemplateList();
 	}
 
-	public Template activeTemplate() {
+	public Template currentTemplate() {
 		return templateExplorer.selectedModel();
 	}
 
-	public void setActiveTemplate(Template template) {
+	public void setCurrentTemplate(Template template) {
 		drawingSurface.setModel(template.guiModel(), template.model());
 	}
 
