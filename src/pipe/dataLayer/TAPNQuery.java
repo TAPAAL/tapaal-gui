@@ -29,6 +29,7 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 
 	private TCTLAbstractProperty property = null;
+	private boolean isActive = true;
 
 	/**
 	 * @param name
@@ -174,5 +175,13 @@ public class TAPNQuery {
 		this.reductionOption = newQuery.getReductionOption();
 		this.hashTableSize = newQuery.getHashTableSize();
 		this.extrapolationOption = newQuery.getExtrapolationOption();
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;	
+	}
+	
+	public boolean isActive() {
+		return isActive;
 	}
 }

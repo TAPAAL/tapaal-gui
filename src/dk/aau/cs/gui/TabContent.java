@@ -129,6 +129,9 @@ public class TabContent extends JSplitPane {
 	public void updateConstantsList() {
 		constantsPanel.showConstants();
 	}
+	public void updateQueryList() {
+		queries.repaint();
+	}
 
 	public DataLayer getModel() {
 		return drawingSurface.getGuiModel();
@@ -292,6 +295,15 @@ public class TabContent extends JSplitPane {
 			list.add(new Template(net, guiModels.get(net)));
 		}
 		return list;
+	}
+	
+	public int numberOfActiveTemplates() {
+		int count = 0;
+		for(TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
+			if(net.isActive())
+				count++;
+		}
+		return count;
 	}
 
 	public void addTemplate(Template template) {

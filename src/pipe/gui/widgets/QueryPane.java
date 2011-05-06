@@ -1,6 +1,7 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,14 +9,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -54,15 +58,16 @@ public class QueryPane extends JPanel {
 		listModel = new DefaultListModel();
 
 		queryList = new JList(listModel);
+		queryList.setCellRenderer(new QueryCellRenderer());
 		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
-					if (queryList.getSelectedIndex() == -1) {
+					TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
+					if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
 						editQueryButton.setEnabled(false);
 						verifyButton.setEnabled(false);
 						removeQueryButton.setEnabled(false);
-
 					} else {
 						editQueryButton.setEnabled(true);
 						verifyButton.setEnabled(true);
@@ -173,11 +178,13 @@ public class QueryPane extends JPanel {
 
 	private void showEditDialog() {
 		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
-		TAPNQuery newQuery = QueryDialog.showQueryDialogue(
-				QueryDialogueOption.Save, q, tabContent.network());
-
-		if (newQuery != null)
-			updateQuery(q, newQuery);
+		if(q.isActive()) {
+			TAPNQuery newQuery = QueryDialog.showQueryDialogue(
+					QueryDialogueOption.Save, q, tabContent.network());
+	
+			if (newQuery != null)
+				updateQuery(q, newQuery);
+		}
 	}
 
 	public void addQuery(TAPNQuery query) {
@@ -210,5 +217,31 @@ public class QueryPane extends JPanel {
 
 	public void removeQuery(TAPNQuery queryToRemove) {
 		listModel.removeElement(queryToRemove);
+	}
+	
+	private class QueryCellRenderer extends JLabel implements ListCellRenderer {
+		private static final long serialVersionUID = 3071924451912979500L;
+
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			if(value instanceof TAPNQuery)
+				setText(((TAPNQuery)value).getName());
+			else
+				setText("");
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+			setEnabled(list.isEnabled() && ((TAPNQuery)value).isActive());
+			if(!isEnabled()) 
+				setToolTipText("This query is disabled because it contains propositions involving places from a deactivated component");
+			else
+				setToolTipText("Double-click or press the edit button to edit this query");
+			setFont(list.getFont());
+			setOpaque(true);
+			return this;
+		}
 	}
 }
