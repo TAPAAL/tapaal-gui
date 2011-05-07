@@ -43,6 +43,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
@@ -580,7 +582,11 @@ public class BatchProcessingDialog extends JDialog {
 				return new MultiLineAutoWrappingToolTip();
 			};
 		};
+		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
+		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(new QueryCellRenderer(true));
+		table.getColumn("Result").setCellRenderer(renderer);
+		table.getColumn("Verification Time").setCellRenderer(renderer);
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -927,6 +933,48 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("Query Property:\n" + query.getProperty().toString());
 			
 			return s.toString();
+		}
+	}
+	
+	private class ResultTableCellRenderer extends JLabel  implements TableCellRenderer {
+		Border unselectedBorder = null;
+	    Border selectedBorder = null;
+	    boolean isBordered = true;
+	
+	    public ResultTableCellRenderer(boolean isBordered) {
+	        this.isBordered = isBordered;
+	    }
+		
+		public Component getTableCellRendererComponent(JTable table,
+				Object value, boolean isSelected, boolean hasFocus, int row,
+				int column) {
+			if (isBordered) {
+				if (isSelected) {
+					setBackground(table.getSelectionBackground());
+					setForeground(table.getSelectionForeground());
+					
+					if (selectedBorder == null) {
+						selectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getSelectionBackground());
+					}
+					setBorder(selectedBorder);
+				} else {
+					setBackground(table.getBackground());
+					setForeground(table.getForeground());
+					
+					if (unselectedBorder == null) {
+						unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getBackground());
+					}
+					setBorder(unselectedBorder);
+				}
+			}
+			
+			setEnabled(table.isEnabled());
+			setFont(table.getFont());
+			setOpaque(true);
+			setText(value.toString());
+			setToolTipText(value.toString());
+			
+			return this;
 		}
 	}
 }

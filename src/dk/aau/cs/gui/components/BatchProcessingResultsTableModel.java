@@ -45,7 +45,6 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		case 1: return result.query();
 		case 2: return result.verificationResult();
 		case 3: return (result.verificationTimeInMs() / 1000.0) + " s";
-		//case 4: return result.error();
 		default:
 			return null;
 		}

@@ -93,10 +93,15 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
 					pipe.dataLayer.TAPNQuery queryToVerify = changeQueryToMatchVerificationOptions(composedModel.value1(), query);
-					VerificationResult<TimedArcPetriNetTrace> verificationResult = processQuery(file, composedModel, queryToVerify);
 					
-					if(verificationResult != null)
-						processVerificationResult(file, queryToVerify, verificationResult);
+					if(query.isActive()) { 
+						VerificationResult<TimedArcPetriNetTrace> verificationResult = processQuery(file, composedModel, queryToVerify);
+						
+						if(verificationResult != null)
+							processVerificationResult(file, queryToVerify, verificationResult);
+					}
+					else
+						publishResult(file.getName(), queryToVerify, "Skipped - Query is disabled because it contains propositions involving places from a deactivated component", 0);
 				}
 			}
 			
