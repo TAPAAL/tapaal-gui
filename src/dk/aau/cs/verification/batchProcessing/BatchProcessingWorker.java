@@ -116,8 +116,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
-			
-			return new pipe.dataLayer.TAPNQuery(query.getName(), capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
+			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
+			return new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
 		}
 		
 		return query;
