@@ -11,8 +11,7 @@ public class VerificationResult<TTrace> {
 	}
 
 
-	public VerificationResult(QueryResult queryResult, TTrace trace,
-			long verificationTime) {
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime) {
 
 		this.queryResult = queryResult;
 		this.trace = trace;

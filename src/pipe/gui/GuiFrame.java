@@ -54,6 +54,7 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
@@ -449,19 +450,39 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			 aboutItem.setIcon(new ImageIcon(iconURL));
 		 }
 
-		 new JMenu("Experiment");
-
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
 		 menuBar.add(viewMenu);
 		 menuBar.add(drawMenu);
-
 		 menuBar.add(animateMenu);
-
+		 
+		 menuBar.add(buildToolsMenu());
 		 // menuBar.add(experimentMenu);
 		 menuBar.add(helpMenu);
 		 setJMenuBar(menuBar);
 
+	}
+
+	private JMenu buildToolsMenu() {
+		JMenu toolsMenu = new JMenu("Tools");
+		toolsMenu.setMnemonic('t');
+		
+		JMenuItem batchProcessing = new JMenuItem("Batch Processing");
+		batchProcessing.setMnemonic('b');
+		
+		batchProcessing.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
+				dialog.pack();
+				dialog.setMinimumSize(dialog.getSize());
+				dialog.setLocationRelativeTo(null);
+				dialog.setResizable(false);
+				dialog.setVisible(true);
+			}
+		});
+		
+		toolsMenu.add(batchProcessing);
+		return toolsMenu;
 	}
 
 	private void buildToolbar() {

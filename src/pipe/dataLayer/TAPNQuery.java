@@ -9,7 +9,7 @@ public class TAPNQuery {
 	};
 
 	public enum SearchOption {
-		BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST
+		BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST, BatchProcessingKeepQueryOption
 	};
 
 	public enum HashTableSize {
@@ -25,6 +25,7 @@ public class TAPNQuery {
 	private TraceOption traceOption;
 	private SearchOption searchOption;
 	private ReductionOption reductionOption;
+	private boolean symmetry;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 
@@ -116,6 +117,10 @@ public class TAPNQuery {
 	public ReductionOption getReductionOption() {
 		return reductionOption;
 	}
+	
+	public boolean useSymmetry() {
+		return symmetry;
+	}
 
 	/**
 	 * @param hashTableSize
@@ -149,7 +154,7 @@ public class TAPNQuery {
 
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
 		this.setName(name);
 		this.setCapacity(capacity);
@@ -157,6 +162,7 @@ public class TAPNQuery {
 		this.setTraceOption(traceOption);
 		this.setSearchOption(searchOption);
 		this.setReductionOption(reductionOption);
+		this.symmetry = symmetry;
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
 	}
@@ -173,6 +179,7 @@ public class TAPNQuery {
 		this.traceOption = newQuery.getTraceOption();
 		this.searchOption = newQuery.getSearchOption();
 		this.reductionOption = newQuery.getReductionOption();
+		this.symmetry = newQuery.useSymmetry();
 		this.hashTableSize = newQuery.getHashTableSize();
 		this.extrapolationOption = newQuery.getExtrapolationOption();
 	}

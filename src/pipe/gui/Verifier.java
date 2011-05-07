@@ -73,7 +73,7 @@ public class Verifier {
 
 		TCTLAbstractProperty inputQuery = input.getProperty();
 
-		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption());
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption(), input.useSymmetry());
 
 		if (inputQuery == null) {
 			return;
@@ -93,6 +93,8 @@ public class Verifier {
 
 		return;
 	}
+	
+	
 
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
 		VerifyTAPN verifytapn = getVerifyTAPN();
@@ -104,7 +106,7 @@ public class Verifier {
 		TCTLAbstractProperty inputQuery = query.getProperty();
 
 		int bound = query.getCapacity();
-		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption());
+		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry());
 
 		if (inputQuery == null) {
 			return;

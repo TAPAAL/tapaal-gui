@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.StandardSymmetryTranslationQueryVisitor;
 import dk.aau.cs.TCTL.visitors.StandardTranslationQueryVisitor;
 import dk.aau.cs.model.NTA.Edge;
@@ -30,6 +32,8 @@ import dk.aau.cs.translations.NonOptimizingDegree2Converter;
 import dk.aau.cs.translations.TranslationNamingScheme;
 import dk.aau.cs.translations.TranslationNamingScheme.TransitionTranslation.SequenceInfo;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 
 //TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
 //with the only difference being in the global declarations:
@@ -61,6 +65,12 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 	}
 	
 	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		if(!supportsModel(model))
+			throw new UnsupportedModelException("Standard Translation does not support the given model.");
+		
+		if(!supportsQuery(model, query))
+			throw new UnsupportedQueryException("Standard Translation does not support the given query.");
+		
 		extraTokens = query.getExtraTokens();
 		NTA nta = transformModel(model);
 		UPPAALQuery uppaalQuery = transformQuery(query, model);
@@ -68,7 +78,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
 	}
 	
-	private NTA transformModel(TimedArcPetriNet model) throws Exception {
+	private NTA transformModel(TimedArcPetriNet model) {
 		clearLocationMappings();
 		numberOfInitChannels = 0;
 		
@@ -267,9 +277,6 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 	
 	private void createEdgesForTokenAutomata(TimedArcPetriNet degree2Model, TimedAutomaton tokenTA) {
 		for(TimedTransition transition : degree2Model.transitions()) {
-			if(transition.hasInhibitorArcs())
-				throw new RuntimeException("Standard translation does not support inhibitor arcs!");
-			
 			if(transition.presetSize() == 0)
 				continue;
 			
@@ -348,7 +355,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		return matcher.find();
 	}
 	
-	private UPPAALQuery transformQuery(TAPNQuery query, TimedArcPetriNet model) throws Exception {
+	private UPPAALQuery transformQuery(TAPNQuery query, TimedArcPetriNet model) {
 		if(useSymmetry) {
 			StandardSymmetryTranslationQueryVisitor visitor = new StandardSymmetryTranslationQueryVisitor();
 			return  new StandardUPPAALQuery(visitor.getUppaalQueryFor(query));
@@ -422,5 +429,21 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 		public boolean isIgnoredAutomata(String automata) {
 			return false;
 		}
+	}
+
+
+	public boolean supportsModel(TimedArcPetriNet model) {
+		if(model.hasInhibitorArcs())
+			return false;
+		else
+			return true;
+	}
+
+
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
+		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
+			return false;
+		else
+			return true;
 	}
 }

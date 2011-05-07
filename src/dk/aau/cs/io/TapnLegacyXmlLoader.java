@@ -79,6 +79,7 @@ import dk.aau.cs.util.Tuple;
 
 public class TapnLegacyXmlLoader {
 
+	private static final String SYMMETRY = "SYMMETRY";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs;
 	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs;
@@ -350,11 +351,21 @@ public class TapnLegacyXmlLoader {
 
 	private ReductionOption getQueryReductionOption(Element queryElement) {
 		ReductionOption reductionOption;
+		
+		String reductionString = queryElement.getAttribute("reductionOption");
+		String reductionName = "";
+		if(reductionString.contains(SYMMETRY))
+			reductionName = reductionString.replace(SYMMETRY, "");
+		else {
+			reductionName = reductionString;
+		}
+		
 		try {
-			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
+			reductionOption = ReductionOption.valueOf(reductionName);
 		} catch (Exception e) {
 			reductionOption = ReductionOption.STANDARD;
 		}
+		
 		return reductionOption;
 	}
 
@@ -685,16 +696,26 @@ public class TapnLegacyXmlLoader {
 		ExtrapolationOption extrapolationOption = getQueryExtrapolationOption(queryElement);
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = getQueryCapacityAsOldFormat(queryElement);
+		boolean symmetry = getSymmetryAsOldFormat(queryElement);
 
 		TCTLAbstractProperty query;
 		query = parseQueryPropertyAsOldFormat(queryElement);
 		
 		if (query != null)
 			return new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, hashTableSize,
+					searchOption, reductionOption, symmetry, hashTableSize,
 					extrapolationOption);
 		else
 			return null;
+	}
+
+	private boolean getSymmetryAsOldFormat(Element queryElement) {
+		String reductionString = queryElement.getAttribute("reductionOption");
+		
+		if(reductionString.contains(SYMMETRY))
+			return true;
+		else
+			return false;
 	}
 
 	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {

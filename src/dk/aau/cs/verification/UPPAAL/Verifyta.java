@@ -190,9 +190,9 @@ public class Verifyta implements ModelChecker {
 		}
 	}
 
-	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) {
+	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
 		UppaalExporter exporter = new UppaalExporter();
-		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction());
+		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction(), ((VerifytaOptions) options).symmetry());
 
 		if (exportedModel == null) {
 			messenger.displayErrorMessage("There was an error exporting the model");
