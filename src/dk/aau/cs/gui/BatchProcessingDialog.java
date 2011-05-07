@@ -43,7 +43,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -584,7 +583,7 @@ public class BatchProcessingDialog extends JDialog {
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
 		table.getColumn("Model").setCellRenderer(renderer);
-		table.getColumn("Query").setCellRenderer(new QueryCellRenderer(true));
+		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -846,17 +845,17 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	// Custom cell renderer for the Query Column of the result table display the property of the query
-	private class QueryCellRenderer extends JLabel  implements TableCellRenderer {
+	private class ResultTableCellRenderer extends JLabel  implements TableCellRenderer {
 		private static final long serialVersionUID = 3054497986242852099L;
 		Border unselectedBorder = null;
 	    Border selectedBorder = null;
 	    boolean isBordered = true;
 	
-	    public QueryCellRenderer(boolean isBordered) {
+	    public ResultTableCellRenderer(boolean isBordered) {
 	        this.isBordered = isBordered;
 	    }
 
-		public Component getTableCellRendererComponent(JTable table, Object query, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			if (isBordered) {
 				if (isSelected) {
 					setBackground(table.getSelectionBackground());
@@ -881,10 +880,15 @@ public class BatchProcessingDialog extends JDialog {
 			setFont(table.getFont());
 			setOpaque(true);
 			
-			if(query instanceof TAPNQuery) {
-				TAPNQuery newQuery = (TAPNQuery)query;
-				setToolTipText(generateTooltipTextFromQuery(newQuery));
-				setText(newQuery.getName());
+			if(value != null) {
+				if(value instanceof TAPNQuery) {
+					TAPNQuery newQuery = (TAPNQuery)value;
+					setToolTipText(generateTooltipTextFromQuery(newQuery));
+					setText(newQuery.getName());
+				} else {
+					setToolTipText(value.toString());
+					setText(value.toString());
+				}
 			}
 			else {
 				setToolTipText("");
@@ -933,48 +937,6 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("Query Property:\n" + query.getProperty().toString());
 			
 			return s.toString();
-		}
-	}
-	
-	private class ResultTableCellRenderer extends JLabel  implements TableCellRenderer {
-		Border unselectedBorder = null;
-	    Border selectedBorder = null;
-	    boolean isBordered = true;
-	
-	    public ResultTableCellRenderer(boolean isBordered) {
-	        this.isBordered = isBordered;
-	    }
-		
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus, int row,
-				int column) {
-			if (isBordered) {
-				if (isSelected) {
-					setBackground(table.getSelectionBackground());
-					setForeground(table.getSelectionForeground());
-					
-					if (selectedBorder == null) {
-						selectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getSelectionBackground());
-					}
-					setBorder(selectedBorder);
-				} else {
-					setBackground(table.getBackground());
-					setForeground(table.getForeground());
-					
-					if (unselectedBorder == null) {
-						unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getBackground());
-					}
-					setBorder(unselectedBorder);
-				}
-			}
-			
-			setEnabled(table.isEnabled());
-			setFont(table.getFont());
-			setOpaque(true);
-			setText(value.toString());
-			setToolTipText(value.toString());
-			
-			return this;
 		}
 	}
 }
