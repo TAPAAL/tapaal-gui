@@ -166,6 +166,10 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			Attr netAttrId = document.createAttribute("id");
 			netAttrId.setValue(tapn.model().name());
 			NET.setAttributeNode(netAttrId);
+			
+			Attr netAttrActive = document.createAttribute("active");
+			netAttrActive.setValue("" + tapn.isActive());
+			NET.setAttributeNode(netAttrActive);
 
 			Attr netAttrType = document.createAttribute("type");
 			switch (guiModel.netType()) {
@@ -242,6 +246,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
 		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
 		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
+		queryElement.setAttribute("active", "" + query.isActive());
 		
 		return queryElement;
 	}

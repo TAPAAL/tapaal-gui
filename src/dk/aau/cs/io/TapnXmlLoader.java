@@ -261,7 +261,10 @@ public class TapnXmlLoader {
 	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
 		String name = getTAPNName(tapnNode);
 
+		boolean active = getActiveStatus(tapnNode);
+		
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
+		tapn.setActive(active);
 		network.add(tapn);
 		nameGenerator.add(tapn);
 		
@@ -278,6 +281,20 @@ public class TapnXmlLoader {
 
 
 		return template;
+	}
+
+	private boolean getActiveStatus(Node tapnNode) {
+		if (tapnNode instanceof Element) {
+			Element element = (Element)tapnNode;
+			String activeString = element.getAttribute("active");
+			
+			if (activeString == null || activeString.equals(""))
+				return true;
+			else
+				return activeString.equals("true");
+		} else {
+			return true;
+		}
 	}
 
 	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
@@ -695,15 +712,17 @@ public class TapnXmlLoader {
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getSymmetryReductionOption(queryElement);
+		boolean active = getActiveStatus(queryElement);
 
 		TCTLAbstractProperty query;
 		query = parseQueryProperty(queryElement.getAttribute("query"));
 
-		if (query != null)
-			return new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, hashTableSize,
-					extrapolationOption);
-		else
+		if (query != null) {
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
+					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption);
+			parsedQuery.setActive(active);
+			return parsedQuery;
+		} else
 			return null;
 	}
 
