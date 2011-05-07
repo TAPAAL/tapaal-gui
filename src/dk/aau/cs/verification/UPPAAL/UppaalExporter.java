@@ -57,6 +57,7 @@ public class UppaalExporter {
 		}
 		
 		return new ExportedModel(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), translator.namingScheme());
+
 	}
 
 	private File createTempFile(String ending) {

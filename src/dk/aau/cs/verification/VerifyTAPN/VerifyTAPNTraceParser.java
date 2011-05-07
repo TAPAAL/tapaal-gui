@@ -5,15 +5,22 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
@@ -29,85 +36,63 @@ public class VerifyTAPNTraceParser {
 
 	public TimedArcPetriNetTrace parseTrace(BufferedReader reader) {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
-		try {
-			String line;
-			LocalTimedMarking previousMarking = null;
-			TimedTransition previousTransition = null;
-			TAPNNetworkTimedTransitionStep previousTransitionFiring = null;
-			while (reader.ready() && (line = reader.readLine()) != null) {
-
-				if (line == null || line.isEmpty())
-					break; // we are done parsing trace, exit outer loop
-
-				if(line.contains("Marking")) {
-					LocalTimedMarking marking = parseMarking(line);
-					if (previousTransitionFiring != null) {
-						List<TimedToken> consumedTokens = findConsumedTokensBetween(previousMarking, marking);
-						trace.add(new TimedTransitionStep(previousTransition, consumedTokens));
-						previousTransition = null;
-					}
-					previousMarking = marking;
-				} else if(line.contains("Delay")) {
-					BigDecimal delay = parseDelay(line);
-					trace.add(new TimeDelayStep(delay));
-				} else if(line.contains("Transition")) {
-					previousTransition = parseTransition(line);
+		
+		Document document = loadDocument(reader);
+		if(document == null) return null;
+		
+		NodeList nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();
+		for(int i = 0; i < nodeList.getLength(); i++){
+			Node node = nodeList.item(i);
+			if(node instanceof Element){
+				Element element = (Element)node;
+				
+				if(element.getTagName().equals("transition")){
+					TimedTransitionStep step = parseTransitionStep(element);
+					trace.add(step);
+				}else if(element.getTagName().equals("delay")){
+					TimeDelayStep step = parseTimeDelay(element);
+					trace.add(step);
 				}
 			}
-		} catch (IOException e) {
-			return null;
 		}
-
+	
 		return trace;
 	}
 
-	private LocalTimedMarking parseMarking(String markingString) {
-		LocalTimedMarking marking = new LocalTimedMarking();
-		String[] tokens = markingString.split(" ");
-		Pattern pattern = Pattern.compile("\\((\\w+),(\\d+(?:\\.\\d+)?)\\)");
+	private TimedTransitionStep parseTransitionStep(Element element) {
+		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
 		
-		for(int i = 1; i < tokens.length; i++) { // tokens[0] contains the string "Marking:"
-			Matcher matcher = pattern.matcher(tokens[i]);
-			matcher.find();
-			String place = matcher.group(1);
-			String age = matcher.group(2);
-			marking.add(new TimedToken(tapn.getPlaceByName(place), new BigDecimal(age)));
-		}
 		
-		return marking;
-	}
+		NodeList tokenNodes = element.getChildNodes();
+		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
+		for(int i = 0; i < tokenNodes.getLength(); i++){
+			Node node = tokenNodes.item(i);
+			if(node instanceof Element){
+				Element tokenElement = (Element)node;
 
-	private List<TimedToken> findConsumedTokensBetween(LocalTimedMarking previousMarking, LocalTimedMarking marking) {
-		ArrayList<TimedToken> consumedTokens = new ArrayList<TimedToken>();
-		
-		boolean tokenFound = false;
-		for(TimedPlace p : tapn.places()) {
-			for(TimedToken t : previousMarking.getTokensFor(p)) {
-				for(TimedToken t2 : marking.getTokensFor(p)) {
-					if(t.equals(t2)) {
-						tokenFound = true;
-						break;
-					}
-				}
-				
-				if(!tokenFound) {
-					consumedTokens.add(t);
-				}
+				TimedPlace place = tapn.getPlaceByName(tokenElement.getAttribute("place"));
+				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
+				consumedTokens.add(new TimedToken(place, age));
 			}
 		}
-		
-		return consumedTokens;
-		
-	}
-	
-	private BigDecimal parseDelay(String delayLine) {
-		String[] split = delayLine.split(" ");
-		return new BigDecimal(split[1]);
-	}
-	
-	private TimedTransition parseTransition(String transitionLine) {
-		String[] split = transitionLine.split(" ");
-		return tapn.getTransitionByName(split[1]); 
+		return new TimedTransitionStep(transition, consumedTokens);
 	}
 
+	private TimeDelayStep parseTimeDelay(Element element) {
+		return new TimeDelayStep(new BigDecimal(element.getTextContent()));
+	}
+
+	private Document loadDocument(BufferedReader reader) {
+		try {
+			reader.readLine(); // first line is "Trace:", so ignore it
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			return builder.parse(new InputSource(reader));
+		} catch (ParserConfigurationException e) {
+			return null;
+		} catch (SAXException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		}
+	}
 }

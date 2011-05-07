@@ -99,6 +99,10 @@ public class Verifier {
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
 		VerifyTAPN verifytapn = getVerifyTAPN();
 
+		if (!verifytapn.isCorrectVersion()) {
+			return;
+		}
+		
 		TCTLAbstractProperty inputQuery = query.getProperty();
 
 		int bound = query.getCapacity();

@@ -8,6 +8,7 @@ import dk.aau.cs.util.Require;
 public class TimedArcPetriNet {
 	private String name;
 	private TimedArcPetriNetNetwork parentNetwork;
+	private boolean isActive;
 
 	private List<TimedPlace> places = new ArrayList<TimedPlace>();
 	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
@@ -21,6 +22,7 @@ public class TimedArcPetriNet {
 	public TimedArcPetriNet(String name) {
 		setName(name);
 		setMarking(new LocalTimedMarking());
+		isActive = true;
 	}
 
 	public TimedMarking marking(){
@@ -330,5 +332,13 @@ public class TimedArcPetriNet {
 
 	public boolean hasInhibitorArcs() {
 		return inhibitorArcs.size() > 0;
+	}
+	
+	public boolean isActive() {
+		return isActive;
+	}
+	
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 }

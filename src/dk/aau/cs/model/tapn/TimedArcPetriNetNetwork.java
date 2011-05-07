@@ -99,8 +99,17 @@ public class TimedArcPetriNetNetwork {
 		}
 	}
 	
+	public List<TimedArcPetriNet> activeTemplates() {
+		List<TimedArcPetriNet> activeTemplates = new ArrayList<TimedArcPetriNet>();
+		for(TimedArcPetriNet t : tapns) {
+			if(t.isActive())
+				activeTemplates.add(t);
+		}
+		
+		return activeTemplates;
+	}
 
-	public List<TimedArcPetriNet> templates() {
+	public List<TimedArcPetriNet> allTemplates() {
 		return tapns;
 	}
 
@@ -149,7 +158,7 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void updateGuardsWithNewConstant(String oldName, Constant newConstant) {
-		for (TimedArcPetriNet tapn : templates()) {
+		for (TimedArcPetriNet tapn : allTemplates()) {
 			for (TimedPlace place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}

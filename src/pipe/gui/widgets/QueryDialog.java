@@ -168,7 +168,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton breadthFirstSearch;
 	private JRadioButton depthFirstSearch;
 	private JRadioButton randomDepthFirstSearch;
-	private JRadioButton closestToTargetFirstSearch;
 
 	// Trace options panel
 	private JPanel traceOptionsPanel;
@@ -285,8 +284,6 @@ public class QueryDialog extends JPanel {
 	private SearchOption getSearchOption() {
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
-		else if(closestToTargetFirstSearch.isSelected())
-			return SearchOption.CLOSE_TO_TARGET_FIRST;
 		else if(randomDepthFirstSearch.isSelected())
 			return SearchOption.RDFS;
 		else
@@ -352,20 +349,16 @@ public class QueryDialog extends JPanel {
 			breadthFirstSearch.setEnabled(true);
 			breadthFirstSearch.setSelected(true);
 			randomDepthFirstSearch.setEnabled(false);
-			closestToTargetFirstSearch.setEnabled(false);
 		}
 		else {
 			depthFirstSearch.setEnabled(true);
 			breadthFirstSearch.setEnabled(true);
 			randomDepthFirstSearch.setEnabled(true);
-			closestToTargetFirstSearch.setEnabled(true);
 		}
 		
 		
 		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
 			depthFirstSearch.setSelected(true);
-		else if(searchOption == SearchOption.CLOSE_TO_TARGET_FIRST && closestToTargetFirstSearch.isEnabled())
-			closestToTargetFirstSearch.setSelected(true);
 		else if(searchOption == SearchOption.RDFS && randomDepthFirstSearch.isEnabled())
 			randomDepthFirstSearch.setSelected(true);
 		else
@@ -664,6 +657,8 @@ public class QueryDialog extends JPanel {
 		resetButton.setText("Reset Query");
 		editQueryButton.setText("Edit Query");
 		enableEditingButtons();
+		
+		setEnabledReductionOptions();
 	}
 
 	private void changeToEditMode() {
@@ -797,8 +792,6 @@ public class QueryDialog extends JPanel {
 			depthFirstSearch.setSelected(true);
 		} else if (queryToCreateFrom.getSearchOption() == SearchOption.RDFS) {
 			randomDepthFirstSearch.setSelected(true);
-		} else if (queryToCreateFrom.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST) {
-			closestToTargetFirstSearch.setSelected(true);
 		}
 	}
 
@@ -1216,8 +1209,8 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(150, 27);
 		placesBox.setMaximumSize(d);
 
-		Vector<Object> items = new Vector<Object>(tapnNetwork.templates().size()+1);
-		items.addAll(tapnNetwork.templates());
+		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
+		items.addAll(tapnNetwork.activeTemplates());
 		if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
 
 		templateBox = new JComboBox(new DefaultComboBoxModel(items));
@@ -1423,7 +1416,7 @@ public class QueryDialog extends JPanel {
 					{
 						// check correct place names are used in atomic propositions
 						ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
-						for(TimedArcPetriNet tapn : tapnNetwork.templates()) {
+						for(TimedArcPetriNet tapn : tapnNetwork.activeTemplates()) {
 							for(TimedPlace p : tapn.places()) {
 								templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
 							}
@@ -1548,11 +1541,9 @@ public class QueryDialog extends JPanel {
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
 		randomDepthFirstSearch = new JRadioButton("Random Depth First Search");
-		closestToTargetFirstSearch = new JRadioButton("Search by Closest To Target First");
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
 		searchRadioButtonGroup.add(randomDepthFirstSearch);
-		searchRadioButtonGroup.add(closestToTargetFirstSearch);
 		
 		breadthFirstSearch.setSelected(true);
 
@@ -1564,8 +1555,6 @@ public class QueryDialog extends JPanel {
 		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 2;
 		searchOptionsPanel.add(randomDepthFirstSearch, gridBagConstraints);
-		gridBagConstraints.gridy = 3;
-		searchOptionsPanel.add(closestToTargetFirstSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
 		gridBagConstraints.gridx = 0;
@@ -1616,7 +1605,7 @@ public class QueryDialog extends JPanel {
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new FlowLayout());
-		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Reduction Options"));
+		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
 
@@ -1630,7 +1619,7 @@ public class QueryDialog extends JPanel {
 			}
 		});
 
-		reductionOptionsPanel.add(new JLabel("  Choose reduction method:"));
+		reductionOptionsPanel.add(new JLabel("  Choose verification method:"));
 		reductionOptionsPanel.add(reductionOption);
 
 		symmetryReduction = new JCheckBox("Use Symmetry Reduction");

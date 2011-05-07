@@ -127,7 +127,7 @@ public class ConstantsPane extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(removeBtn, gbc);
 
-		JButton addConstantButton = new JButton("Add..");
+		JButton addConstantButton = new JButton("Add");
 		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

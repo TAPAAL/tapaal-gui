@@ -48,7 +48,14 @@ public class VerifyTAPN implements ModelChecker {
 		return "";
 	}
 
-	public boolean isCorrectVersion() {// atm. any version of VerifyTAPN will do
+	public boolean isCorrectVersion() {
+		if (isNotSetup()) {
+			messenger.displayErrorMessage(
+					"No verifyTAPN specified: The verification is cancelled",
+					"Verification Error");
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -64,7 +71,8 @@ public class VerifyTAPN implements ModelChecker {
 
 			try {
 				File file = fileFinder.ShowFileBrowserDialog("VerifyTAPN", "");
-				verifytapnpath = file.getAbsolutePath();
+				if(file != null)
+					verifytapnpath = file.getAbsolutePath();
 
 			} catch (Exception e) {
 				messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
@@ -113,12 +121,14 @@ public class VerifyTAPN implements ModelChecker {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
 				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime()); // TODO: return tapnTrace instead of null when done refactoring
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime()); 
 			}
 		}
 	}
 	
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel) {
+		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+		
 		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 		TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
 		

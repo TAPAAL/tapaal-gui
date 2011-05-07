@@ -6,6 +6,7 @@ import dk.aau.cs.util.Require;
 public class Template {
 	private TimedArcPetriNet net;
 	private DataLayer guiModel;
+	
 
 	public Template(TimedArcPetriNet net, DataLayer guiModel) {
 		this.net = net;
@@ -23,6 +24,14 @@ public class Template {
 
 	public TimedArcPetriNet model() {
 		return net;
+	}
+	
+	public boolean isActive() {
+		return net.isActive();
+	}
+	
+	public void setActive(boolean isActive) {
+		net.setActive(isActive);
 	}
 
 	public void setGuiModel(DataLayer guiModel) {

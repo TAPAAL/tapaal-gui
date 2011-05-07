@@ -183,7 +183,7 @@ public class BatchProcessingLoader {
 
 	private ArrayList<Tuple<String, String>> getPlaceNames(TimedArcPetriNetNetwork network) {
 		ArrayList<Tuple<String,String>> templatePlaceNames = new ArrayList<Tuple<String,String>>();
-		for(TimedArcPetriNet tapn : network.templates()) {
+		for(TimedArcPetriNet tapn : network.allTemplates()) {
 			for(TimedPlace p : tapn.places()) {
 				templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
 			}

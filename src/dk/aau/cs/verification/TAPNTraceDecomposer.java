@@ -77,7 +77,7 @@ public class TAPNTraceDecomposer {
 			convertedTokens = new ArrayList<TimedToken>(transitionFiring.consumedTokens().size());
 			for (TimedToken token : transitionFiring.consumedTokens()) {
 				Tuple<String, String> remappedName = mapping.map(token.place().name());
-				TimedPlace place = tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
+				TimedPlace place = (remappedName.value1() == null || remappedName.value1().isEmpty()) ? tapnNetwork.getSharedPlaceByName(remappedName.value2()) : tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
 				convertedTokens.add(new TimedToken(place, token.age()));
 			}
 		}

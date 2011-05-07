@@ -66,7 +66,8 @@ public class SharedTransition {
 		if(transitions.size() == 0) return false;
 
 		for(TimedTransition transition : transitions){
-			if(!transition.isEnabledAlone()) return false;
+			if(transition.model().isActive())
+				if(!transition.isEnabledAlone()) return false;
 		}
 		return true;
 	}

@@ -283,7 +283,7 @@ public class Animator {
 	}
 
 	private DataLayer activeGuiModel() {
-		return tab.activeTemplate().guiModel();
+		return tab.currentTemplate().guiModel();
 	}
 
 	public void resethistory() {
