@@ -130,6 +130,7 @@ public class TabContent extends JSplitPane {
 		constantsPanel.showConstants();
 	}
 	public void updateQueryList() {
+		queries.updateQueryButtons();
 		queries.repaint();
 	}
 

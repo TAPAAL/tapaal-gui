@@ -63,16 +63,7 @@ public class QueryPane extends JPanel {
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
-					TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
-					if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
-						editQueryButton.setEnabled(false);
-						verifyButton.setEnabled(false);
-						removeQueryButton.setEnabled(false);
-					} else {
-						editQueryButton.setEnabled(true);
-						verifyButton.setEnabled(true);
-						removeQueryButton.setEnabled(true);
-					}
+					updateQueryButtons();
 				}
 			}
 		});
@@ -99,6 +90,19 @@ public class QueryPane extends JPanel {
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Queries"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+	}
+	
+	public void updateQueryButtons() {
+		TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
+		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
+			editQueryButton.setEnabled(false);
+			verifyButton.setEnabled(false);
+			removeQueryButton.setEnabled(false);
+		} else {
+			editQueryButton.setEnabled(true);
+			verifyButton.setEnabled(true);
+			removeQueryButton.setEnabled(true);
+		}
 	}
 
 	private void addQueriesComponents() {
