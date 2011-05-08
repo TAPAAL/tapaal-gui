@@ -278,4 +278,10 @@ public class TimedArcPetriNetNetwork {
 		}
 		return false;
 	}
+
+	public void swapTemplates(int currentIndex, int newIndex) {
+		TimedArcPetriNet temp = tapns.get(currentIndex);
+		tapns.set(currentIndex, tapns.get(newIndex));
+		tapns.set(newIndex, temp);
+	}
 }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -48,6 +49,8 @@ public class QueryPane extends JPanel {
 	private JButton removeQueryButton;
 	private TabContent tabContent;
 	private UndoManager undoManager;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
 		this.tabContent = tabContent;
@@ -62,6 +65,7 @@ public class QueryPane extends JPanel {
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
+					queryList.ensureIndexIsVisible(queryList.getSelectedIndex());
 					updateQueryButtons();
 				}
 			}
@@ -102,6 +106,17 @@ public class QueryPane extends JPanel {
 			verifyButton.setEnabled(true);
 			removeQueryButton.setEnabled(true);
 		}
+		int index = queryList.getSelectedIndex();
+		if(index > 0)
+			moveUpButton.setEnabled(true);
+		else
+			moveUpButton.setEnabled(false);
+				
+			
+		if(index < listModel.size()-1)
+			moveDownButton.setEnabled(true);
+		else
+			moveDownButton.setEnabled(false);
 	}
 
 	private void addQueriesComponents() {
@@ -177,6 +192,50 @@ public class QueryPane extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addQueryButton, gbc);
+		
+		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton.setEnabled(false);
+		moveUpButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = queryList.getSelectedIndex();
+				
+				if(index > 0) {
+					swapQueries(index, index-1);
+					queryList.setSelectedIndex(index-1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTHEAST;
+		buttonsPanel.add(moveUpButton,gbc);
+		
+		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton.setEnabled(false);
+		moveDownButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = queryList.getSelectedIndex();
+				
+				if(index < listModel.size()-1) {
+					swapQueries(index, index+1);
+					queryList.setSelectedIndex(index+1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
+		buttonsPanel.add(moveDownButton,gbc);
+	}
+	
+	private void swapQueries(int currentIndex, int newIndex) {
+		TAPNQuery temp = (TAPNQuery)listModel.get(currentIndex);
+		listModel.set(currentIndex, listModel.get(newIndex));
+		listModel.set(newIndex, temp);
 	}
 
 	private void showEditDialog() {

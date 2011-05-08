@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -68,6 +70,9 @@ public class TemplateExplorer extends JPanel {
 	private TabContent parent;
 	private UndoManager undoManager;
 	private boolean isInAnimationMode;
+
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
@@ -142,7 +147,7 @@ public class TemplateExplorer extends JPanel {
 	private void initButtonsPanel() {
 		buttonPanel = new JPanel(new GridBagLayout());
 
-		Dimension dimension = new Dimension(82, 23);
+		Dimension dimension = new Dimension(82, 28);
 		newTemplateButton = new JButton("New");
 		newTemplateButton.setEnabled(true);
 		newTemplateButton.setPreferredSize(dimension);
@@ -283,6 +288,46 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(copyButton, gbc);
+		
+		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton.setEnabled(false);
+		moveUpButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = templateList.getSelectedIndex();
+				
+				if(index > 0) {
+					parent.swapTemplates(index, index-1);
+					updateTemplateList();
+					templateList.setSelectedIndex(index-1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTHEAST;
+		buttonPanel.add(moveUpButton,gbc);
+		
+		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton.setEnabled(false);
+		moveDownButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = templateList.getSelectedIndex();
+				
+				if(index < parent.network().allTemplates().size() - 1) {
+					parent.swapTemplates(index, index+1);
+					updateTemplateList();
+					templateList.setSelectedIndex(index+1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
+		buttonPanel.add(moveDownButton,gbc);
 	}
 
 	private Template ShowNewTemplateDialog() {
@@ -503,18 +548,32 @@ public class TemplateExplorer extends JPanel {
 
 		public void valueChanged(ListSelectionEvent e) {
 			if (e.getValueIsAdjusting() == false) {
-				if (templateList.getSelectedIndex() == -1) {
+				int index = templateList.getSelectedIndex();
+				if (index == -1) {
 					removeTemplateButton.setEnabled(false);
 					renameButton.setEnabled(false);
 					copyButton.setEnabled(false);
+					moveUpButton.setEnabled(false);
+					moveDownButton.setEnabled(false);
 				} else {
 					if (buttonPanel != null) {
 						if (listModel.size() > 1)
 							removeTemplateButton.setEnabled(true);
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
+						
+						if(index > 0)
+							moveUpButton.setEnabled(true);
+						else
+							moveUpButton.setEnabled(false);
+								
+							
+						if(index < parent.network().allTemplates().size() - 1)
+							moveDownButton.setEnabled(true);
+						else
+							moveDownButton.setEnabled(false);
 					}
-					templateList.ensureIndexIsVisible(e.getFirstIndex());
+					templateList.ensureIndexIsVisible(index);
 					openSelectedTemplate();
 				}
 			}
