@@ -69,7 +69,7 @@ public class TimedToken {
 		if (age == null) {
 			if (other.age != null)
 				return false;
-		} else if (!age.equals(other.age))
+		} else if (age.compareTo(other.age) != 0)
 			return false;
 		if (place == null) {
 			if (other.place != null)
