@@ -638,7 +638,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(file,gbc);
 			
-		fileStatusLabel = new JLabel("test");
+		fileStatusLabel = new JLabel("");
 		Dimension fileStatusLabelDim = new Dimension(350, 25);
 		fileStatusLabel.setMinimumSize(fileStatusLabelDim);
 		fileStatusLabel.setPreferredSize(fileStatusLabelDim);
@@ -658,7 +658,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(status,gbc);
 			
-		statusLabel = new JLabel("test");
+		statusLabel = new JLabel("");
 		statusLabel.setMinimumSize(fileStatusLabelDim);
 		statusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
@@ -676,7 +676,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(progress,gbc);
 		
-		progressLabel = new JLabel("test");
+		progressLabel = new JLabel("");
 		Dimension dim = new Dimension(280, 25);
 		progressLabel.setMinimumSize(dim);
 		progressLabel.setPreferredSize(dim);
