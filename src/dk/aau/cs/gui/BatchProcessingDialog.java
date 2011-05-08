@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -29,13 +30,13 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.Border;
@@ -57,6 +58,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
 import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
+import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 
@@ -86,10 +88,13 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private JLabel statusLabel;
 	private JLabel fileStatusLabel;
-	private JProgressBar progressBar;
 	private JButton startButton;
 	private JButton cancelButton;
 	private JButton skipFileButton;
+	private JLabel progressLabel;
+	private JLabel timerLabel;
+	private long startTimeMs = 0;
+	    
 
 	private JComboBox reductionOption;
 	private JComboBox searchOption;
@@ -105,6 +110,14 @@ public class BatchProcessingDialog extends JDialog {
 	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
 
+	private Timer timer = new Timer(1000, new AbstractAction() {
+		private static final long serialVersionUID = 1327695063762640628L;
+		
+		public void actionPerformed(ActionEvent e) {
+	    	timerLabel.setText((System.currentTimeMillis()-startTimeMs)/1000 + " s");
+	    }
+	});
+
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
 		super(frame, title, modal);
@@ -118,7 +131,7 @@ public class BatchProcessingDialog extends JDialog {
 		initComponents();
 	}
 
-
+	
 	private void initComponents() {
 		setLayout(new GridBagLayout());
 		
@@ -625,61 +638,85 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(file,gbc);
 			
-		fileStatusLabel = new JLabel("");
+		fileStatusLabel = new JLabel("test");
+		Dimension fileStatusLabelDim = new Dimension(350, 25);
+		fileStatusLabel.setMinimumSize(fileStatusLabelDim);
+		fileStatusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
+		gbc.gridwidth = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(fileStatusLabel,gbc);
+
 		
 		JLabel status = new JLabel("Status:");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(status,gbc);
 			
-		statusLabel = new JLabel("");
+		statusLabel = new JLabel("test");
+		statusLabel.setMinimumSize(fileStatusLabelDim);
+		statusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
+		gbc.gridwidth = 3;
 		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		monitorPanel.add(statusLabel,gbc);
 		
-		JLabel progressLabel = new JLabel("Progress: ");
+		JLabel progress = new JLabel("Progress: ");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
-		monitorPanel.add(progressLabel,gbc);
+		monitorPanel.add(progress,gbc);
 		
-		progressBar = new JProgressBar();
-		Dimension progressBarDim = new Dimension(400, 25);
-		progressBar.setMinimumSize(progressBarDim);
-		progressBar.setPreferredSize(progressBarDim);
-		progressBar.setStringPainted(true);
-		progressBar.setString("0%");
-		
+		progressLabel = new JLabel("test");
+		Dimension dim = new Dimension(280, 25);
+		progressLabel.setMinimumSize(dim);
+		progressLabel.setPreferredSize(dim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 0, 0);
-		monitorPanel.add(progressBar, gbc);
+		gbc.insets = new Insets(0, 0, 0, 10);
+		monitorPanel.add(progressLabel, gbc);
+		
+		JLabel time = new JLabel("Time: ");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 10, 0, 0);
+		monitorPanel.add(time, gbc);
+		
+		timerLabel = new JLabel("");
+		Dimension timerLabelDim = new Dimension(50,25);
+		timerLabel.setMinimumSize(timerLabelDim);
+		timerLabel.setPreferredSize(timerLabelDim);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 5, 0, 5);
+		monitorPanel.add(timerLabel, gbc);
 
 		startButton = new JButton("Start");
 		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener(){
-		
 			public void actionPerformed(ActionEvent e) {
 				process();
 			}			
 		});
 		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 2;
+		gbc.gridx = 4;
+		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,0,0, 10);
 		monitorPanel.add(startButton, gbc);
@@ -696,7 +733,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
+		gbc.gridx = 4;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,0,0, 10);
@@ -711,7 +748,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		});
 		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
+		gbc.gridx = 4;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -735,24 +772,34 @@ public class BatchProcessingDialog extends JDialog {
 		currentWorker.addPropertyChangeListener(new PropertyChangeListener(){
 		
 			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals("progress")) {
-					int progress = (Integer)evt.getNewValue();
-					progressBar.setValue(progress);
-					progressBar.setString(progress + "%");
-				}else if(evt.getPropertyName().equals("state")){
+				if(evt.getPropertyName().equals("state")){
 					if((StateValue)evt.getNewValue() == StateValue.DONE){
 						enableButtons();
 						cancelButton.setEnabled(false);
 						skipFileButton.setEnabled(false);
+						timer.stop();
+						timerLabel.setText("");
 					}else if((StateValue)evt.getNewValue() == StateValue.STARTED){
 						disableButtonsDuringProcessing();
 						cancelButton.setEnabled(true);
 						skipFileButton.setEnabled(true);
+						timerLabel.setText("");
 					}
 				}
 			}
 		});
 		currentWorker.addBatchProcessingListener(new BatchProcessingListener() {
+			public void fireVerificationTaskStarted() {
+				timer.start();				
+				startTimeMs = System.currentTimeMillis();
+			}
+
+			public void fireVerificationTaskComplete(VerificationTaskCompleteEvent e) {
+				timer.stop();
+				int tasksCompleted = e.verificationTasksCompleted();
+				progressLabel.setText(e.verificationTasksCompleted() + " Verification Task" + (tasksCompleted > 1 ? "s" : "") + " Completed");
+				timerLabel.setText("");
+			}
 			
 			public void fireStatusChanged(StatusChangedEvent e) {
 				statusLabel.setText(e.status());		
@@ -762,6 +809,7 @@ public class BatchProcessingDialog extends JDialog {
 			public void fireFileChanged(FileChangedEvent e) {
 				fileStatusLabel.setText(e.fileName());
 			}
+
 		});
 		
 		currentWorker.execute();

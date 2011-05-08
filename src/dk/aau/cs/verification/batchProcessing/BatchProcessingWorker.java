@@ -46,9 +46,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private BatchProcessingVerificationOptions batchProcessingVerificationOptions;
 	private boolean isExiting = false;
 	private ModelChecker modelChecker;
-	int fileNumber = 0;
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
 	private boolean skippingCurrentVerification = false;
+	private int verificationTasksCompleted;
 	
 
 	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
@@ -79,12 +79,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	protected Void doInBackground() throws Exception {
 		for(File file : files){
 			if(exiting()) {
-				setProgress(100);
 				return null;
 			}
 			
 			fireFileChanged(file.getName());
-			fileNumber++;
 			
 			LoadedBatchProcessingModel model = loadModel(file);
 			
@@ -92,6 +90,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
+					fireVerificationTaskStarted();
+					
 					pipe.dataLayer.TAPNQuery queryToVerify = changeQueryToMatchVerificationOptions(composedModel.value1(), query);
 					
 					if(query.isActive()) { 
@@ -102,15 +102,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					}
 					else
 						publishResult(file.getName(), queryToVerify, "Skipped - Query is disabled because it contains propositions involving places from a deactivated component", 0);
+					
+					fireVerificationTaskComplete();
 				}
 			}
-			
-			int progress = 100 * fileNumber / files.size();
-			setProgress(progress);
 		}
 		fireFileChanged("");
 		fireStatusChanged("Done");
-		setProgress(100);
 		return null;
 	}
 
@@ -148,10 +146,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		try {
 			verificationResult = verify(composedModel, query);
 		} catch(UnsupportedModelException e) {
-			publishResult(file.getName(), query, "Skipped - model was not supported by reduction", 0);
+			publishResult(file.getName(), query, "Skipped - model was not supported by verification method", 0);
 			return null;
 		} catch(UnsupportedQueryException e) {
-			publishResult(file.getName(), query, "Skipped - query was not supported by reduction", 0);
+			publishResult(file.getName(), query, "Skipped - query was not supported by verification method", 0);
 			return null;
 		}
 		return verificationResult;
@@ -277,5 +275,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private void fireFileChanged(String fileName) {
 		for(BatchProcessingListener listener : listeners)
 			listener.fireFileChanged(new FileChangedEvent(fileName));
+	}
+	
+	private void fireVerificationTaskComplete() {
+		verificationTasksCompleted++;
+		for(BatchProcessingListener listener : listeners)
+			listener.fireVerificationTaskComplete(new VerificationTaskCompleteEvent(verificationTasksCompleted));
+	}
+	
+	private void fireVerificationTaskStarted() {
+		for(BatchProcessingListener listener : listeners)
+			listener.fireVerificationTaskStarted();
 	}
 }
