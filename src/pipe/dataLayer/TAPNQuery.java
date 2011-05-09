@@ -28,6 +28,8 @@ public class TAPNQuery {
 	private boolean symmetry;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
+	
+	private boolean discreteInclusion; // Only for VerifyTAPN
 
 	private TCTLAbstractProperty property = null;
 	private boolean isActive = true;
@@ -47,6 +49,14 @@ public class TAPNQuery {
 		return name;
 	}
 
+	public void setDiscreteInclusion(boolean value){
+		this.discreteInclusion = value;
+	}
+	
+	public boolean discreteInclusion(){
+		return discreteInclusion;
+	}
+	
 	/**
 	 * @param capacity
 	 *            the capacity to set
@@ -182,6 +192,7 @@ public class TAPNQuery {
 		this.symmetry = newQuery.useSymmetry();
 		this.hashTableSize = newQuery.getHashTableSize();
 		this.extrapolationOption = newQuery.getExtrapolationOption();
+		this.discreteInclusion = newQuery.discreteInclusion();
 	}
 
 	public void setActive(boolean isActive) {

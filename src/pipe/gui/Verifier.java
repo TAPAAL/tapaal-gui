@@ -106,7 +106,7 @@ public class Verifier {
 		TCTLAbstractProperty inputQuery = query.getProperty();
 
 		int bound = query.getCapacity();
-		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry());
+		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion());
 
 		if (inputQuery == null) {
 			return;

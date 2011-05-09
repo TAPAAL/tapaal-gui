@@ -181,6 +181,7 @@ public class QueryDialog extends JPanel {
 	private JPanel reductionOptionsPanel;
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
+	private JCheckBox discreteInclusion;
 
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
@@ -207,13 +208,11 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
-
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
 		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
-		
 		isNetDegree2 = checkForDegree2();
 		
 		setLayout(new GridBagLayout());
@@ -255,9 +254,11 @@ public class QueryDialog extends JPanel {
 		ReductionOption reductionOptionToSet = getReductionOption();
 		boolean symmetry = getSymmetry();
 		
-		return new TAPNQuery(name, capacity, newProperty.copy(), traceOption,
-				searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */
-				null, /* extrapolationOptionToSet */null);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null);
+		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
+			query.setDiscreteInclusion(discreteInclusion.isSelected());
+		}
+		return query;
 	}
 
 	private boolean getSymmetry() {
@@ -773,6 +774,7 @@ public class QueryDialog extends JPanel {
 		}
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
+		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 	}
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1604,8 +1606,9 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void initReductionOptionsPanel() {
-		reductionOptionsPanel = new JPanel(new FlowLayout());
+		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
+		reductionOptionsPanel.setPreferredSize(new Dimension(730, 80));
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
 
@@ -1619,33 +1622,68 @@ public class QueryDialog extends JPanel {
 			}
 		});
 
-		reductionOptionsPanel.add(new JLabel("  Choose verification method:"));
-		reductionOptionsPanel.add(reductionOption);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(new JLabel("  Choose verification method:"), gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(reductionOption, gbc);
 
 		symmetryReduction = new JCheckBox("Use Symmetry Reduction");
 		symmetryReduction.setSelected(true);
 		symmetryReduction.addItemListener(new ItemListener() {
-
 			public void itemStateChanged(ItemEvent e) {
 				refreshTraceOptions();
 			}
 		});
 
-		reductionOptionsPanel.add(symmetryReduction);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(symmetryReduction, gbc);
 
-		GridBagConstraints gridBagConstraints;
-		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
-		add(reductionOptionsPanel, gridBagConstraints);
+		discreteInclusion = new JCheckBox("Use Discrete Inclusion");
+		discreteInclusion.setVisible(true);
+		discreteInclusion.setToolTipText("<html>This optimization will perform more advanced inclusion check<br/>" +
+										 "in an attempt to reduce the number of explored states.<br/>" +
+										 "<b>Note:</b> This may have an adverse affect on performance on some models!</html>");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);	
+		reductionOptionsPanel.add(discreteInclusion, gbc);
+				
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		add(reductionOptionsPanel, gbc);
 	}
 
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshSymmetryReduction();
+		refreshDiscreteInclusion();
 		refreshTraceOptions();
 		refreshSearchOptions();
 		refreshExportButtonText();
+	}
+
+	private void refreshDiscreteInclusion() {
+		ReductionOption reduction = getReductionOption();
+		if(reduction.equals(ReductionOption.VerifyTAPN)){
+			discreteInclusion.setVisible(true);
+		}else{
+			discreteInclusion.setVisible(false);
+		}
 	}
 
 	private void refreshExportButtonText() {

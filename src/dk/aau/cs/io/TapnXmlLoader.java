@@ -712,6 +712,7 @@ public class TapnXmlLoader {
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getSymmetryReductionOption(queryElement);
+		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 
 		TCTLAbstractProperty query;
@@ -721,6 +722,7 @@ public class TapnXmlLoader {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
 					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption);
 			parsedQuery.setActive(active);
+			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
 		} else
 			return null;
@@ -734,6 +736,16 @@ public class TapnXmlLoader {
 			symmetry = true;
 		}
 		return symmetry;	
+	}
+	
+	private boolean getDiscreteInclusionOption(Element queryElement) {
+		boolean discreteInclusion;
+		try {
+			discreteInclusion = queryElement.getAttribute("discreteInclusion").equals("true");
+		} catch(Exception e) {
+			discreteInclusion = false;
+		}
+		return discreteInclusion;	
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {

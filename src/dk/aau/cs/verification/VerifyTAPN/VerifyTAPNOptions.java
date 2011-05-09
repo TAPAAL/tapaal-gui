@@ -13,15 +13,21 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private int extraTokens;
 	private int tokensInModel;
 	private boolean symmetry;
+	private boolean discreteInclusion;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
+		this(extraTokens, traceOption, search, symmetry, false);
+	}
+	
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		this.searchOption = search;
 		this.symmetry = symmetry;
+		this.discreteInclusion = discreteInclusion;
 	}
 
 	public TraceOption trace() {
@@ -30,6 +36,10 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	
 	public boolean symmetry() {
 		return symmetry;
+	}
+	
+	public boolean discreteInclusion(){
+		return discreteInclusion;
 	}
 	
 	public void setTokensInModel(int tokens){ // TODO: Get rid of this method when verifytapn refactored
@@ -47,7 +57,8 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(" ");
 		result.append(searchMap.get(searchOption));
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
-		
+		result.append(discreteInclusion ? " -f 1" : "");
+		System.out.println(result.toString());
 		return result.toString();
 	}
 
@@ -61,8 +72,8 @@ public class VerifyTAPNOptions implements VerificationOptions{
 
 	private static final Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
-		map.put(SearchOption.BFS, "-o0");
-		map.put(SearchOption.DFS, "-o1");
+		map.put(SearchOption.BFS, "-o 0");
+		map.put(SearchOption.DFS, "-o 1");
 
 		return map;
 	}
