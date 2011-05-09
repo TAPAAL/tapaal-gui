@@ -238,6 +238,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		}
 		catch(Exception e) {
 			publishResult(modelFile.getName(), null, "Error loading model",	0);
+			fireVerificationTaskComplete();
 			return null;
 		}
 	}

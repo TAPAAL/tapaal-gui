@@ -194,8 +194,6 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1 - RATIO;
 		animatorLeftPane.add(animationHistoryScrollPane, gbc);
 		this.setLeftComponent(animatorLeftPane);
-
-		drawingSurface.repaintAll();
 	}
 
 	public void switchToEditorComponents() {

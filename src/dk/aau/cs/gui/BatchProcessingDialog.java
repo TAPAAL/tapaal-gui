@@ -790,12 +790,16 @@ public class BatchProcessingDialog extends JDialog {
 		});
 		currentWorker.addBatchProcessingListener(new BatchProcessingListener() {
 			public void fireVerificationTaskStarted() {
-				timer.start();				
+				if(timer.isRunning())
+					timer.restart();
+				else
+					timer.start();			
 				startTimeMs = System.currentTimeMillis();
 			}
 
 			public void fireVerificationTaskComplete(VerificationTaskCompleteEvent e) {
-				timer.stop();
+				if(timer.isRunning())
+					timer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
 				progressLabel.setText(e.verificationTasksCompleted() + " Verification Task" + (tasksCompleted > 1 ? "s" : "") + " Completed");
 				timerLabel.setText("");

@@ -541,7 +541,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			createTestFireStructure(ta, t, pairing, inputArc.source(), 
 					convertGuard(inputArc.interval()), 
 					pairing.getOutputArcFor(inputArc).destination(), 
-					intermediate, counter);
+					intermediate, counter,false);
 
 			i++;
 		}
@@ -562,7 +562,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			createTestFireStructure(ta, t, pairing, transArc.source(), 
 					convertGuard(guard), 
 					transArc.destination(), 
-					intermediate, counter);
+					intermediate, counter, true);
 
 			i++;
 		}
@@ -570,7 +570,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		createStructureForInhibitorArcs(ta, t, i);
 	}
 
-	private void createTestFireStructure(TimedAutomaton ta, TimedTransition t, Pairing pairing, TimedPlace inputPlace, String testTransitionGuard, TimedPlace OutputPlace,  Location intermediate, String counter) {
+	private void createTestFireStructure(TimedAutomaton ta, TimedTransition t, Pairing pairing, TimedPlace inputPlace, String testTransitionGuard, TimedPlace OutputPlace,  Location intermediate, String counter, boolean isTransportArc) {
 		Edge testEdge = new Edge(getLocationByName(inputPlace.name()),
 				intermediate, testTransitionGuard, 
 				String.format(TEST_CHANNEL_NAME, t.name(), "?"),
@@ -580,7 +580,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		Edge fireEdge = new Edge(intermediate, getLocationByName(OutputPlace.name()),
 				"",
 				String.format(FIRE_CHANNEL_NAME, t.name(), "?"),
-				createResetExpressionForNormalArc());
+				isTransportArc ? "" : createResetExpressionForNormalArc());
 		ta.addTransition(fireEdge);
 
 		String guard = String.format(COUNTER_UPDATE, counter, ">1");
