@@ -82,7 +82,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JPanel filesButtonsPanel;
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
-	private JButton removeFilesButton;
+	private JButton removeFileButton;
 	private JList fileList;
 	private DefaultListModel listModel;
 	
@@ -117,6 +117,16 @@ public class BatchProcessingDialog extends JDialog {
 	    	timerLabel.setText((System.currentTimeMillis()-startTimeMs)/1000 + " s");
 	    }
 	});
+	
+	private Timer timeoutTimer = new Timer(3*(60*1000), new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			timeoutCurrentVerificationTask();
+		}
+	});
+
+	private JCheckBox noTimeoutCheckbox;
+
+	private JSpinner timeoutValue;
 
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
@@ -163,9 +173,9 @@ public class BatchProcessingDialog extends JDialog {
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting() == false) {
 					if (fileList.getSelectedIndex() == -1) {
-						removeFilesButton.setEnabled(false);
+						removeFileButton.setEnabled(false);
 					} else {
-						removeFilesButton.setEnabled(true);
+						removeFileButton.setEnabled(true);
 					}
 				}				
 			}
@@ -205,9 +215,9 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(addFilesButton, gbc);
 	
-		removeFilesButton = new JButton("Remove Models");
-		removeFilesButton.setEnabled(false);
-		removeFilesButton.addActionListener(new ActionListener() {
+		removeFileButton = new JButton("Remove Models");
+		removeFileButton.setEnabled(false);
+		removeFileButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent arg0) {
 				removeSelectedFiles();		
@@ -218,7 +228,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 5);
-		filesButtonsPanel.add(removeFilesButton, gbc);
+		filesButtonsPanel.add(removeFileButton, gbc);
 		
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setEnabled(false);
@@ -294,6 +304,7 @@ public class BatchProcessingDialog extends JDialog {
 		initSearchOptionsComponents();
 		initSymmetryOptionsComponents();
 		initReductionOptionsComponents();
+		initTimeoutComponents();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -363,6 +374,45 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(keepQueryCapacity, gbc);
+	}
+	
+	private void initTimeoutComponents() {
+		JLabel timeoutLabel = new JLabel("Verification Task Timeout (minutes): ");
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		verificationOptionsPanel.add(timeoutLabel, gbc);
+		
+		timeoutValue = new JSpinner(new SpinnerNumberModel(5, 1, Integer.MAX_VALUE, 1));	
+		timeoutValue.setMaximumSize(new Dimension(50, 30));
+		timeoutValue.setMinimumSize(new Dimension(50, 30));
+		timeoutValue.setPreferredSize(new Dimension(50, 30));
+		timeoutValue.setEnabled(false);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 5;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 10);
+		verificationOptionsPanel.add(timeoutValue, gbc);
+		
+		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
+		noTimeoutCheckbox.setSelected(true);
+		noTimeoutCheckbox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(noTimeoutCheckbox.isSelected())
+					timeoutValue.setEnabled(false);
+				else
+					timeoutValue.setEnabled(true);
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 5;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
 	}
 
 
@@ -777,8 +827,9 @@ public class BatchProcessingDialog extends JDialog {
 						enableButtons();
 						cancelButton.setEnabled(false);
 						skipFileButton.setEnabled(false);
-						timer.stop();
 						timerLabel.setText("");
+						timer.stop();
+						timeoutTimer.stop();
 					}else if((StateValue)evt.getNewValue() == StateValue.STARTED){
 						disableButtonsDuringProcessing();
 						cancelButton.setEnabled(true);
@@ -793,13 +844,23 @@ public class BatchProcessingDialog extends JDialog {
 				if(timer.isRunning())
 					timer.restart();
 				else
-					timer.start();			
+					timer.start();
+				
+				if(useTimeout()) {
+					if(timeoutTimer.isRunning())
+						timeoutTimer.restart();
+					else
+						timeoutTimer.start();
+				}
+				
 				startTimeMs = System.currentTimeMillis();
 			}
 
 			public void fireVerificationTaskComplete(VerificationTaskCompleteEvent e) {
 				if(timer.isRunning())
 					timer.stop();
+				if(timeoutTimer.isRunning())
+					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
 				progressLabel.setText(e.verificationTasksCompleted() + " Verification Task" + (tasksCompleted > 1 ? "s" : "") + " Completed");
 				timerLabel.setText("");
@@ -816,7 +877,24 @@ public class BatchProcessingDialog extends JDialog {
 
 		});
 		
+		if(useTimeout())
+			setupTimeoutTimer();
+		
 		currentWorker.execute();
+	}
+
+
+	private void setupTimeoutTimer() {
+		int timeout = (Integer)timeoutValue.getValue();
+		timeout = timeout*(60*1000);
+		timeoutTimer.setInitialDelay(timeout);
+		timeoutTimer.setDelay(timeout);
+		timeoutTimer.setRepeats(false);
+	}
+
+
+	private boolean useTimeout() {
+		return !noTimeoutCheckbox.isSelected();
 	}
 
 
@@ -837,6 +915,12 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 	
+	private void timeoutCurrentVerificationTask() {
+		if(currentWorker != null && !currentWorker.isDone()){
+			currentWorker.notifyTimeoutCurrentVerificationTask();
+		}
+	}
+	
 	
 	private void clearFiles() {
 		files.clear();
@@ -845,6 +929,7 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private void disableButtonsDuringProcessing() {
 		addFilesButton.setEnabled(false);
+		removeFileButton.setEnabled(false);
 		clearFilesButton.setEnabled(false);
 		startButton.setEnabled(false);
 		exportButton.setEnabled(false);

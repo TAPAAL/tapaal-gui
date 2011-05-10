@@ -48,6 +48,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private ModelChecker modelChecker;
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
 	private boolean skippingCurrentVerification = false;
+	private boolean timeoutCurrentVerification = false;
 	private int verificationTasksCompleted;
 	
 
@@ -69,6 +70,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	public synchronized void notifySkipCurrentVerification() {
 		skippingCurrentVerification = true;
+		if(modelChecker != null) {
+			modelChecker.kill();
+		}
+	}
+	
+	public synchronized void notifyTimeoutCurrentVerificationTask() {
+		timeoutCurrentVerification = true;
 		if(modelChecker != null) {
 			modelChecker.kill();
 		}
@@ -162,6 +170,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		} else if(skippingCurrentVerification) {
 			publishResult(file.getName(), query, "Skipped by user", verificationResult.verificationTime());
 			skippingCurrentVerification = false;
+		} else if(timeoutCurrentVerification) {
+			publishResult(file.getName(), query, "Skipped due to timeout", verificationResult.verificationTime());
+			timeoutCurrentVerification = false;
 		} else {
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime());
 		}		
