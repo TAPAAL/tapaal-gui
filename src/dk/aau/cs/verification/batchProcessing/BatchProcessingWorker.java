@@ -102,8 +102,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					
 					pipe.dataLayer.TAPNQuery queryToVerify = changeQueryToMatchVerificationOptions(composedModel.value1(), query);
 					
-					if(query.isActive()) { 
-						VerificationResult<TimedArcPetriNetTrace> verificationResult = processQuery(file, composedModel, queryToVerify);
+					if(queryToVerify.isActive()) { 
+						VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
 						
 						if(verificationResult != null)
 							processVerificationResult(file, queryToVerify, verificationResult);
@@ -128,7 +128,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
-			return new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
+			
+			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
+				changedQuery.setActive(query.isActive());
+			
+			return changedQuery;
+				
 		}
 		
 		return query;
@@ -147,7 +153,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return composedModel;
 	}
 
-	private VerificationResult<TimedArcPetriNetTrace> processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
+	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
 		fireStatusChanged("Verifying query: " + query.getName() + "...");
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;

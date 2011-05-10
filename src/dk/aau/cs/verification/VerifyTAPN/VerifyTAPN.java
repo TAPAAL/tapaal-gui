@@ -9,6 +9,8 @@ import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -101,10 +103,10 @@ public class VerifyTAPN implements ModelChecker {
 			messenger.displayErrorMessage("There was an error exporting the model");
 		}
 
-		return verify(options, model, exportedModel);
+		return verify(options, model, exportedModel, query);
 	}
 	
-	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel) {
+	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 		((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 		runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 		runner.run();
@@ -120,13 +122,13 @@ public class VerifyTAPN implements ModelChecker {
 			if (queryResult == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
-				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel);
+				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult);
 				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime()); 
 			}
 		}
 	}
 	
-	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel) {
+	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 		
 		VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
@@ -134,7 +136,10 @@ public class VerifyTAPN implements ModelChecker {
 		
 		if (trace == null) {
 			if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
-				messenger.displayErrorMessage("VerifyTAPN could not generate the requested trace for the model. Try another trace option.");
+				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()))
+					return null;
+				else
+					messenger.displayErrorMessage("VerifyTAPN could not generate the requested trace for the model. Try another trace option.");
 			}
 		} 
 		return trace;
