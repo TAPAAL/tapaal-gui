@@ -529,10 +529,8 @@ public class BatchProcessingDialog extends JDialog {
 		for(Component c : verificationOptionsPanel.getComponents())
 			c.setEnabled(true);
 		
-		if(keepQueryCapacity.isSelected())
-			numberOfExtraTokensInNet.setEnabled(false);
-		else
-			numberOfExtraTokensInNet.setEnabled(true);
+		numberOfExtraTokensInNet.setEnabled(!keepQueryCapacity.isSelected());
+		timeoutValue.setEnabled(useTimeout());
 	}
 	
 	private BatchProcessingVerificationOptions getVerificationOptions() {
@@ -835,6 +833,7 @@ public class BatchProcessingDialog extends JDialog {
 						cancelButton.setEnabled(true);
 						skipFileButton.setEnabled(true);
 						timerLabel.setText("");
+						progressLabel.setText("0 Verification Tasks Completed");
 					}
 				}
 			}
@@ -933,11 +932,13 @@ public class BatchProcessingDialog extends JDialog {
 		clearFilesButton.setEnabled(false);
 		startButton.setEnabled(false);
 		exportButton.setEnabled(false);
+		fileList.setEnabled(false);
 		
 		disableVerificationOptionsButtons();
 	}
 
 	private void enableButtons() {
+		fileList.setEnabled(true);
 		addFilesButton.setEnabled(true);
 		
 		if(listModel.size() > 0) {
@@ -1071,7 +1072,11 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("Symmetry: ");
 			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
 			
-			s.append("Query Property:\n" + query.getProperty().toString());
+			s.append("Query Property:\n"); 
+			if(query.getProperty().toString().equals("AG P0>=0"))
+				s.append(name_SEARCHWHOLESTATESPACE);
+			else
+				s.append(query.getProperty().toString());
 			
 			return s.toString();
 		}
