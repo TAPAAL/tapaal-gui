@@ -325,16 +325,20 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			return "";
 		
 		StringBuilder builder = new StringBuilder();
-		builder.append(TOKEN_CLOCK_NAME);
-		if(interval.IsLowerBoundNonStrict())
-			builder.append(" >= ");
-		else
-			builder.append(" > ");
+		boolean lowerBoundAdded = false;
+		if(!(interval.lowerBound().value() == 0 && interval.IsLowerBoundNonStrict())) {
+			builder.append(TOKEN_CLOCK_NAME);
+			if(interval.IsLowerBoundNonStrict())
+				builder.append(" >= ");
+			else
+				builder.append(" > ");
 		
-		builder.append(interval.lowerBound().value());
+			builder.append(interval.lowerBound().value());
+			lowerBoundAdded = true;
+		}
 		
 		if(!interval.upperBound().equals(Bound.Infinity)) {
-			builder.append(" && ");
+			if(lowerBoundAdded) builder.append(" && ");
 			builder.append(TOKEN_CLOCK_NAME);
 			
 			if(interval.IsUpperBoundNonStrict())

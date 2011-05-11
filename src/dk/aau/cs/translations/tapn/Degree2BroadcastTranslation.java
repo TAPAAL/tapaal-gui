@@ -663,16 +663,21 @@ public class Degree2BroadcastTranslation implements
 			return "";
 		
 		StringBuilder builder = new StringBuilder();
-		builder.append(CLOCK_NAME);
-		if(interval.IsLowerBoundNonStrict())
-			builder.append(" >= ");
-		else
-			builder.append(" > ");
 		
-		builder.append(interval.lowerBound().value());
+		boolean lowerBoundAdded = false;
+		if(!(interval.lowerBound().value() == 0 && interval.IsLowerBoundNonStrict())) {
+			builder.append(CLOCK_NAME);
+			if(interval.IsLowerBoundNonStrict())
+				builder.append(" >= ");
+			else
+				builder.append(" > ");
+		
+			builder.append(interval.lowerBound().value());
+			lowerBoundAdded = true;
+		}
 		
 		if(!interval.upperBound().equals(Bound.Infinity)) {
-			builder.append(" && ");
+			if(lowerBoundAdded) builder.append(" && ");
 			builder.append(CLOCK_NAME);
 			
 			if(interval.IsUpperBoundNonStrict())
