@@ -98,26 +98,51 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
-					fireVerificationTaskStarted();
 					
 					pipe.dataLayer.TAPNQuery queryToVerify = changeQueryToMatchVerificationOptions(composedModel.value1(), query);
 					
-					if(queryToVerify.isActive()) { 
-						VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
-						
-						if(verificationResult != null)
-							processVerificationResult(file, queryToVerify, verificationResult);
-					}
+					if(queryToVerify.getReductionOption() == ReductionOption.BatchProcessingAllReductions)
+						processQueryForAllReductions(file,composedModel, queryToVerify);
 					else
-						publishResult(file.getName(), queryToVerify, "Skipped - Query is disabled because it contains propositions involving places from a deactivated component", 0);
+						processQuery(file, composedModel, queryToVerify);
 					
-					fireVerificationTaskComplete();
 				}
 			}
 		}
 		fireFileChanged("");
 		fireStatusChanged("Done");
 		return null;
+	}
+
+	private void processQueryForAllReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
+		pipe.dataLayer.TAPNQuery query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.VerifyTAPN, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		processQuery(file, composedModel, query);
+
+		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.STANDARD, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		processQuery(file, composedModel, query);
+		
+		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.OPTIMIZEDSTANDARD, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		processQuery(file, composedModel, query);
+		
+		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.BROADCAST, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		processQuery(file, composedModel, query);
+		
+		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.DEGREE2BROADCAST, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		processQuery(file, composedModel, query);
+		
+	}
+
+	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
+		fireVerificationTaskStarted();
+		if(queryToVerify.isActive()) { 
+			VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
+			
+			if(verificationResult != null)
+				processVerificationResult(file, queryToVerify, verificationResult);
+		}
+		else
+			publishResult(file.getName(), queryToVerify, "Skipped - Query is disabled because it contains propositions involving places from a deactivated component", 0);
+		fireVerificationTaskComplete();
 	}
 
 	private pipe.dataLayer.TAPNQuery changeQueryToMatchVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
@@ -128,13 +153,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
 			
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
 			return changedQuery;
-				
 		}
 		
 		return query;

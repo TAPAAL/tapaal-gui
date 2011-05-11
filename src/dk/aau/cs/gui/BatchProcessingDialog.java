@@ -70,6 +70,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_AllReductions = "All Verification Methods";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -425,7 +426,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 5);
 		verificationOptionsPanel.add(reductionLabel,gbc);
 		
-		String[] options = new String[] { name_KeepQueryOption, name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
+		String[] options = new String[] { name_KeepQueryOption, name_verifyTAPN, name_STANDARD, name_OPTIMIZEDSTANDARD, name_BROADCAST, name_BROADCASTDEG2, name_AllReductions };
 		reductionOption = new JComboBox(options);
 		
 		reductionOption.addActionListener(new ActionListener() {
@@ -565,16 +566,18 @@ public class BatchProcessingDialog extends JDialog {
 	private ReductionOption getReductionOption() {
 		String reductionOptionString = (String)reductionOption.getSelectedItem();
 		
-		if (reductionOptionString.equals(name_STANDARD)) {
+		if (reductionOptionString.equals(name_STANDARD))
 				return ReductionOption.STANDARD;
-		} else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD)) {
+		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD))
 				return ReductionOption.OPTIMIZEDSTANDARD;
-		} else if (reductionOptionString.equals(name_BROADCAST)) {
+		else if (reductionOptionString.equals(name_BROADCAST))
 				return ReductionOption.BROADCAST;
-		} else if (reductionOptionString.equals(name_BROADCASTDEG2)) {
+		else if (reductionOptionString.equals(name_BROADCASTDEG2))
 				return ReductionOption.DEGREE2BROADCAST;
-		} else if (reductionOptionString.equals(name_verifyTAPN))
+		else if (reductionOptionString.equals(name_verifyTAPN))
 			return ReductionOption.VerifyTAPN;
+		else if (reductionOptionString.equals(name_AllReductions))
+			return ReductionOption.BatchProcessingAllReductions;
 		else
 			return ReductionOption.BatchProcessingKeepQueryOption;
 	}

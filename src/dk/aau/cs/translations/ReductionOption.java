@@ -11,5 +11,6 @@ public enum ReductionOption {
 	KBOUNDANALYSIS, 
 	KBOUNDOPTMIZATION, 
 	VerifyTAPN,
-	BatchProcessingKeepQueryOption
+	BatchProcessingKeepQueryOption,
+	BatchProcessingAllReductions
 }

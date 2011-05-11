@@ -76,6 +76,7 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -527,6 +528,7 @@ public class QueryDialog extends JPanel {
 				updateSelection(replacement);
 
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		}
 	}
@@ -687,6 +689,7 @@ public class QueryDialog extends JPanel {
 				updateSelection(property);
 				undoSupport.postEdit(edit);
 			}
+			queryChanged();
 		}
 	}
 
@@ -735,41 +738,19 @@ public class QueryDialog extends JPanel {
 
 		if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
 			reduction = name_BROADCAST;
-//			symmetry = false;
-//		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST ) {
-//			reduction = name_BROADCAST;
-//			symmetry = true;
 		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			reduction = name_BROADCASTDEG2;
-//			symmetry = false;
-//		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCASTSYMMETRY) {
-//			reduction = name_BROADCASTDEG2;
-//			symmetry = true;
 		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;
-//				symmetry = false;
-//			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARDSYMMETRY) {
-//				reduction = name_STANDARD;
-//				symmetry = true;
-//			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
-//				reduction = name_OPTIMIZEDSTANDARD;
-//				symmetry = true;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
 				reduction = name_OPTIMIZEDSTANDARD;
-//				symmetry = false;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPN) {
 				reduction = name_verifyTAPN;
-//				symmetry = true;
 			}
 		} else {
-//			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARDSYMMETRY) {
-//				reduction = name_OPTIMIZEDSTANDARD;
-////				symmetry = true;
-//			} else 
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
 				reduction = name_OPTIMIZEDSTANDARD;
-//				symmetry = false;
 			}
 		}
 		reductionOption.setSelectedItem(reduction);
@@ -987,12 +968,9 @@ public class QueryDialog extends JPanel {
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
 
-		existsDiamond = new JRadioButton(
-		"(EF) There exists some reachable marking that satisifies:");
-		existsBox = new JRadioButton(
-		"(EG) There exists a trace on which every marking satisfies:");
-		forAllDiamond = new JRadioButton(
-		"(AF) On all traces there is eventually a marking that satisfies:");
+		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
+		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
+		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
 		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
 
 		quantificationRadioButtonGroup.add(existsDiamond);
@@ -1032,6 +1010,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		});
 
@@ -1044,6 +1023,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		});
 
@@ -1056,6 +1036,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		});
 
@@ -1068,6 +1049,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		});
 	}
@@ -1144,6 +1126,7 @@ public class QueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				}
+				queryChanged();
 			}
 
 		}
@@ -1188,6 +1171,7 @@ public class QueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				}
+				queryChanged();
 			}
 
 		});
@@ -1199,6 +1183,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		});
 	}
@@ -1312,6 +1297,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
+				queryChanged();
 			}
 		}
 
@@ -1468,6 +1454,7 @@ public class QueryDialog extends JPanel {
 					updateSelection(newProperty);
 					undoSupport.postEdit(edit);
 				}
+				queryChanged();
 			}
 		});
 
@@ -1482,8 +1469,9 @@ public class QueryDialog extends JPanel {
 					undoManager.undo();
 					refreshUndoRedo();
 					updateSelection(original);
+					queryChanged();
+					setEnabledReductionOptions();
 				}
-
 			}
 		});
 
@@ -1497,6 +1485,8 @@ public class QueryDialog extends JPanel {
 					undoManager.redo();
 					refreshUndoRedo();
 					updateSelection(replacement);
+					queryChanged();
+					setEnabledReductionOptions();
 				}
 			}
 		});
@@ -1720,7 +1710,10 @@ public class QueryDialog extends JPanel {
 	}
 	
 	private void queryChanged(){
-		
+		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
+		boolean isUpwardClosed = visitor.isUpwardClosed(newProperty);
+		discreteInclusion.setEnabled(isUpwardClosed);
+		discreteInclusion.setSelected(isUpwardClosed ? discreteInclusion.isSelected() : false);
 	}
 	
 
