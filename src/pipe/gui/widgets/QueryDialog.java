@@ -1719,6 +1719,9 @@ public class QueryDialog extends JPanel {
 		}
 	}
 	
+	private void queryChanged(){
+		
+	}
 	
 
 	private void initButtonPanel(QueryDialogueOption option) {

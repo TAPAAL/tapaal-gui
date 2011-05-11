@@ -58,7 +58,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(searchMap.get(searchOption));
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
 		result.append(discreteInclusion ? " -f 1" : "");
-		System.out.println(result.toString());
 		return result.toString();
 	}
 
