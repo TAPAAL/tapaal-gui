@@ -40,7 +40,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 				System.getProperty("line.separator");
 			}
 			
-			message += "UPPAAL output:\n" + result.errorMessage();
+			message += "Model checker output:\n" + result.errorMessage();
 			
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 		}
