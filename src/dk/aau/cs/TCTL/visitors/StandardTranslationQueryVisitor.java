@@ -1,6 +1,7 @@
 package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 
 public class StandardTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "pid_t";

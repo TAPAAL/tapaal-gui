@@ -15,6 +15,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.TCTL.visitors.SimplifyPropositionsVisitor;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
@@ -152,16 +153,25 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
-			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
+			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space"; 
 			
 			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
+			if(changedQuery.getReductionOption() == ReductionOption.VerifyTAPN && batchProcessingVerificationOptions.discreteInclusion())
+				changedQuery.setDiscreteInclusion(true);
+			
+			simplifyQuery(changedQuery);
 			return changedQuery;
 		}
 		
 		return query;
+	}
+	
+	private void simplifyQuery(pipe.dataLayer.TAPNQuery query) {
+		SimplifyPropositionsVisitor visitor = new SimplifyPropositionsVisitor();
+		visitor.FindAndReplaceTrueAndFalsePropositions(query.getProperty());
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
@@ -187,7 +197,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			publishResult(file.getName(), query, "Skipped - model was not supported by verification method", 0);
 			return null;
 		} catch(UnsupportedQueryException e) {
-			publishResult(file.getName(), query, "Skipped - query was not supported by verification method", 0);
+			if(e.getMessage().toLowerCase().contains("discrete inclusion"))
+				publishResult(file.getName(), query, "Skipped -discrete inclusion is enabled and query is not upward closed", 0);
+			else
+				publishResult(file.getName(), query, "Skipped - query was not supported by verification method", 0);
 			return null;
 		}
 		return verificationResult;
@@ -248,7 +261,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry());
+			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.discreteInclusion());
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
 	}

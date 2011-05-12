@@ -6,8 +6,10 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 
 public class UpwardsClosedVisitor extends VisitorBase {
 	public boolean isUpwardClosed(TCTLAbstractProperty query){
@@ -60,6 +62,20 @@ public class UpwardsClosedVisitor extends VisitorBase {
 			c.result = false;
 		}
 	}
+	
+//	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
+//		Context c = (Context)context;
+//		if(!c.queryType.equals(QueryType.EF))
+//			c.result = false;
+//	}
+//	
+//
+//	public void visit(TCTLTrueNode tctlTrueNode, Object context) {
+//		Context c = (Context)context;
+//		if(!c.queryType.equals(QueryType.AG))
+//			c.result = false;
+//
+//	}
 	
 	private enum QueryType { EF, AG, AF, EG }
 	private class Context

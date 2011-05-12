@@ -7,10 +7,12 @@ import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.verification.NameMapping;
 
 public class RenameAllPlacesVisitor implements ITCTLVisitor {
@@ -41,12 +43,11 @@ public class RenameAllPlacesVisitor implements ITCTLVisitor {
 		notNode.getProperty().accept(this, context);
 	}
 
-	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) {
-	}
-
-	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) {
-	}
-
+	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) { }
+	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) { }
+	public void visit(TCTLTrueNode tctlTrueNode, Object context) { }
+	public void visit(TCTLFalseNode tctlFalseNode, Object context) { }
+	
 	public void visit(TCTLAndListNode andListNode, Object context) {
 		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
 			p.accept(this, context);

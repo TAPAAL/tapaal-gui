@@ -7,10 +7,12 @@ import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 
 public abstract class QueryVisitor implements ITCTLVisitor {
@@ -107,6 +109,14 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 
 	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) {
 
+	}
+	
+	public void visit(TCTLTrueNode tctlTrueNode, Object context) {
+		uppaalQuery.append(tctlTrueNode.toString());		
+	}
+	
+	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
+		uppaalQuery.append(tctlFalseNode.toString());
 	}
 
 	protected String OperatorConversion(String op) {

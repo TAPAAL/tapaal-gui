@@ -6,10 +6,12 @@ import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 
 public interface ITCTLVisitor {
 	void visit(TCTLAFNode afNode, Object context);
@@ -31,4 +33,7 @@ public interface ITCTLVisitor {
 	void visit(TCTLAndListNode andListNode, Object context);
 
 	void visit(TCTLOrListNode orListNode, Object context);
+
+	void visit(TCTLTrueNode tctlTrueNode, Object context);
+	void visit(TCTLFalseNode tctlFalseNode, Object context);
 }

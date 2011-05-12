@@ -29,7 +29,7 @@ public class TAPNQuery {
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	
-	private boolean discreteInclusion; // Only for VerifyTAPN
+	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
 	private TCTLAbstractProperty property = null;
 	private boolean isActive = true;

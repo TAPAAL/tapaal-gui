@@ -12,6 +12,8 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.visitors.SimplifyPropositionsVisitor;
+import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
@@ -93,8 +95,12 @@ public class VerifyTAPN implements ModelChecker {
 		if(!supportsModel(model.value1()))
 			throw new UnsupportedModelException("VerifyTAPN does not support the given model.");
 		
-		if(!supportsQuery(model.value1(), query))
+		if(!supportsQuery(model.value1(), query, options))
 			throw new UnsupportedQueryException("VerifyTAPN does not support the given query.");
+		
+		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
+			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
+			
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
@@ -105,7 +111,7 @@ public class VerifyTAPN implements ModelChecker {
 
 		return verify(options, model, exportedModel, query);
 	}
-	
+
 	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 		((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 		runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
@@ -186,11 +192,17 @@ public class VerifyTAPN implements ModelChecker {
 		return true;
 	}
 	
-	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
+	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
 		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
 			return false;
 		}
+		
 		return true;
+	}
+	
+	private boolean isQueryUpwardClosed(TAPNQuery query) {
+		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
+		return visitor.isUpwardClosed(query.getProperty());
 	}
 
 	

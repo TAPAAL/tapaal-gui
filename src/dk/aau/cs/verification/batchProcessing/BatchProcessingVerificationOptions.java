@@ -19,14 +19,16 @@ public class BatchProcessingVerificationOptions {
 	private SymmetryOption symmetryOption;
 	private boolean keepQueryCapacity;
 	private int capacity;
+	private boolean discreteInclusion = false; // only for VerifyTAPN
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption) {
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion) {
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
 		this.queryPropertyOption = queryPropertyOption;
 		this.symmetryOption = symmetryOption;
 		this.keepQueryCapacity = keepQueryCapacity;
 		this.capacity = capacity;
+		this.discreteInclusion = discreteInclusion;
 	}
 	
 	public ReductionOption reductionOption() {
@@ -35,6 +37,10 @@ public class BatchProcessingVerificationOptions {
 	
 	public SearchOption searchOption() {
 		return searchOption;
+	}
+	
+	public boolean discreteInclusion() {
+		return discreteInclusion;
 	}
 	
 	public QueryPropertyOption queryPropertyOption() {
