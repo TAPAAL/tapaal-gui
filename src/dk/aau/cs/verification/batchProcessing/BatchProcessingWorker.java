@@ -14,6 +14,7 @@ import pipe.gui.MessengerImpl;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.SimplifyPropositionsVisitor;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
@@ -92,15 +93,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			}
 			
 			fireFileChanged(file.getName());
-			
 			LoadedBatchProcessingModel model = loadModel(file);
-			
 			if(model != null) {
 				Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
 					
-					pipe.dataLayer.TAPNQuery queryToVerify = changeQueryToMatchVerificationOptions(composedModel.value1(), query);
+					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
 					
 					if(queryToVerify.getReductionOption() == ReductionOption.BatchProcessingAllReductions)
 						processQueryForAllReductions(file,composedModel, queryToVerify);
@@ -117,6 +116,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private void processQueryForAllReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
 		pipe.dataLayer.TAPNQuery query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.VerifyTAPN, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		processQuery(file, composedModel, query);
+		
+		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.VerifyTAPN, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		query.setDiscreteInclusion(true);
 		processQuery(file, composedModel, query);
 
 		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.STANDARD, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
@@ -146,7 +149,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		fireVerificationTaskComplete();
 	}
 
-	private pipe.dataLayer.TAPNQuery changeQueryToMatchVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
+	private pipe.dataLayer.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
 		if(batchProcessingVerificationOptions != null) {
 			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
 			ReductionOption option = batchProcessingVerificationOptions.reductionOption() == ReductionOption.BatchProcessingKeepQueryOption ? query.getReductionOption() : batchProcessingVerificationOptions.reductionOption();
@@ -238,10 +241,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private TAPNQuery getTAPNQuery(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
-		if(batchProcessingVerificationOptions != null && batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.SearchWholeStateSpace)
-			return new TAPNQuery(generateSearchWholeStateSpaceProperty(model), query.getCapacity());
-		else
-			return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
+		return new TAPNQuery(query.getProperty().copy(), query.getCapacity());
 	}
 
 	private TCTLAbstractProperty generateSearchWholeStateSpaceProperty(TimedArcPetriNet model) throws Exception {
@@ -249,7 +249,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(p == null)
 			throw new Exception("Model contained no places. Should not happen.");
 		
-		return new TCTLAGNode(new TCTLAtomicPropositionNode(p.name(), ">=", 0));
+		return new TCTLAGNode(new TCTLTrueNode());
 	}
 
 	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
