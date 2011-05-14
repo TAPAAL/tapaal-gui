@@ -44,7 +44,6 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.TableCellRenderer;
 
 import pipe.dataLayer.TAPNQuery;
@@ -390,7 +389,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutValue.setMaximumSize(new Dimension(50, 30));
 		timeoutValue.setMinimumSize(new Dimension(50, 30));
 		timeoutValue.setPreferredSize(new Dimension(50, 30));
-		timeoutValue.setEnabled(false);
+		timeoutValue.setEnabled(true);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -400,7 +399,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(timeoutValue, gbc);
 		
 		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
-		noTimeoutCheckbox.setSelected(true);
+		noTimeoutCheckbox.setSelected(false);
 		noTimeoutCheckbox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(noTimeoutCheckbox.isSelected())
@@ -1037,7 +1036,7 @@ public class BatchProcessingDialog extends JDialog {
 			
 			if(value != null) {
 				if(value instanceof TAPNQuery) {
-					TAPNQuery newQuery = (TAPNQuery)value;https://svn01.ist.aau.dk/svn/cs/Fileshares/TAPAAL
+					TAPNQuery newQuery = (TAPNQuery)value;
 
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
