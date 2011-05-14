@@ -108,6 +108,14 @@ public class BatchProcessingDialog extends JDialog {
 	private JSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
 	private JComboBox symmetryOption;
+	private JCheckBox noTimeoutCheckbox;
+	private JSpinner timeoutValue;
+	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			timeoutCurrentVerificationTask();
+		}
+	});
+
 	
 	private BatchProcessingResultsTableModel tableModel;
 	
@@ -121,16 +129,6 @@ public class BatchProcessingDialog extends JDialog {
 	    	timerLabel.setText((System.currentTimeMillis()-startTimeMs)/1000 + " s");
 	    }
 	});
-	
-	private Timer timeoutTimer = new Timer(3*(60*1000), new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			timeoutCurrentVerificationTask();
-		}
-	});
-
-	private JCheckBox noTimeoutCheckbox;
-
-	private JSpinner timeoutValue;
 
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
@@ -381,14 +379,14 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void initTimeoutComponents() {
-		JLabel timeoutLabel = new JLabel("Verification Task Timeout (minutes): ");
+		JLabel timeoutLabel = new JLabel("Verification Task Timeout (Seconds): ");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(timeoutLabel, gbc);
 		
-		timeoutValue = new JSpinner(new SpinnerNumberModel(5, 1, Integer.MAX_VALUE, 1));	
+		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5, Integer.MAX_VALUE, 1));	
 		timeoutValue.setMaximumSize(new Dimension(50, 30));
 		timeoutValue.setMinimumSize(new Dimension(50, 30));
 		timeoutValue.setPreferredSize(new Dimension(50, 30));
@@ -897,7 +895,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void setupTimeoutTimer() {
 		int timeout = (Integer)timeoutValue.getValue();
-		timeout = timeout*(60*1000);
+		timeout = timeout*1000;
 		timeoutTimer.setInitialDelay(timeout);
 		timeoutTimer.setDelay(timeout);
 		timeoutTimer.setRepeats(false);
@@ -1039,7 +1037,8 @@ public class BatchProcessingDialog extends JDialog {
 			
 			if(value != null) {
 				if(value instanceof TAPNQuery) {
-					TAPNQuery newQuery = (TAPNQuery)value;
+					TAPNQuery newQuery = (TAPNQuery)value;https://svn01.ist.aau.dk/svn/cs/Fileshares/TAPAAL
+
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
 				} else {
