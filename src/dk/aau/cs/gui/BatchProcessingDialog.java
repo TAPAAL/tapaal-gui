@@ -1,5 +1,6 @@
 package dk.aau.cs.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -43,6 +44,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.TableCellRenderer;
 
 import pipe.dataLayer.TAPNQuery;
@@ -1014,9 +1016,16 @@ public class BatchProcessingDialog extends JDialog {
 					}
 					setBorder(selectedBorder);
 				} else {
-					setBackground(table.getBackground());
-					setForeground(table.getForeground());
+					boolean isResultColumn = table.getColumnName(column).equals("Result");
+					boolean isQueryColumn = table.getColumnName(column).equals("Query");
+					if((isResultColumn && value.toString().equals("Satisfied")) || (isQueryColumn && value.toString().equals("TRUE")))
+						setBackground(new Color(91, 255, 91)); // light red
+					else if((isResultColumn && value.toString().equals("Not Satisfied")) || (isQueryColumn && value.toString().equals("FALSE")))
+						setBackground(new Color(255, 91, 91)); // light green
+					else
+						setBackground(table.getBackground());
 					
+					setForeground(table.getForeground());
 					if (unselectedBorder == null) {
 						unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getBackground());
 					}
