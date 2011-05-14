@@ -20,6 +20,8 @@
  
 Identifier    = {ID Head}{ID Tail}*
 Num     = {Number}+  
+True   = true | TRUE
+False  = false | FALSE
 
 
 ! ------------------------------------------------- Rules
@@ -35,11 +37,10 @@ Num     = {Number}+
 
 <Not>     ::= 'not' '(' <Expr> ')'  | '!' '(' <Expr> ')' | <Factor>
 
-<Factor>      ::=  <AtomicProposition1> | <AtomicProposition2> | '(' <Expr> ')'
+<Factor>      ::=  True | False | <AtomicProposition1> | <AtomicProposition2>  | '(' <Expr> ')'
 
 <AtomicProposition1>   ::=  Identifier '<' Num | Identifier '<=' Num | Identifier '=' Num | Identifier '==' Num | Identifier '>=' Num | Identifier '>' Num
 <AtomicProposition2>   ::=   Identifier '.' <AtomicProposition1>
-
 
 
 

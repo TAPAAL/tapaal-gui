@@ -32,11 +32,13 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -70,10 +72,12 @@ import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
@@ -208,6 +212,8 @@ public class QueryDialog extends JPanel {
 
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
+	private JButton truePredicateButton;
+	private JButton falsePredicateButton;
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
@@ -597,7 +603,8 @@ public class QueryDialog extends JPanel {
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
-
+		truePredicateButton.setEnabled(false);
+		falsePredicateButton.setEnabled(false);
 	}
 
 	private void enableOnlyPathButtons() {
@@ -613,6 +620,8 @@ public class QueryDialog extends JPanel {
 		relationalOperatorBox.setEnabled(false);
 		placeMarking.setEnabled(false);
 		addPredicateButton.setEnabled(false);
+		truePredicateButton.setEnabled(false);
+		falsePredicateButton.setEnabled(false);
 	}
 
 	private void enableOnlyStateButtons() {
@@ -627,6 +636,8 @@ public class QueryDialog extends JPanel {
 		placesBox.setEnabled(true);
 		relationalOperatorBox.setEnabled(true);
 		placeMarking.setEnabled(true);
+		truePredicateButton.setEnabled(true);
+		falsePredicateButton.setEnabled(true);
 		setEnablednessOfAddPredicateButton();
 
 	}
@@ -1275,13 +1286,35 @@ public class QueryDialog extends JPanel {
 		gbc.gridy = 2;
 		gbc.gridwidth = 3;
 		predicatePanel.add(addPredicateButton, gbc);
-
+		
+		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+		separator.setEnabled(true);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.gridwidth = 3;
+		gbc.insets = new Insets(2, 0, 2, 0);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		predicatePanel.add(separator,gbc);
+		
+		truePredicateButton = new JButton("True");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		predicatePanel.add(truePredicateButton, gbc);
+		
+		falsePredicateButton = new JButton("False");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		predicatePanel.add(falsePredicateButton, gbc);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(predicatePanel, gbc);
-
+		
 		// Action listeners for predicate panel
 		addPredicateButton.addActionListener(new ActionListener() {
 
@@ -1302,6 +1335,28 @@ public class QueryDialog extends JPanel {
 		}
 
 		);
+		
+		truePredicateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TCTLTrueNode trueNode = new TCTLTrueNode();
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), trueNode);
+				newProperty = newProperty.replace(currentSelection.getObject(), trueNode);
+				updateSelection(trueNode);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
+		
+		falsePredicateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TCTLFalseNode falseNode = new TCTLFalseNode();
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), falseNode);
+				newProperty = newProperty.replace(currentSelection.getObject(), falseNode);
+				updateSelection(falseNode);
+				undoSupport.postEdit(edit);
+				queryChanged();
+			}
+		});
 
 		placesBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1395,9 +1450,11 @@ public class QueryDialog extends JPanel {
 								"Error Parsing Query",
 								JOptionPane.YES_NO_OPTION,
 								JOptionPane.ERROR_MESSAGE);
-						if (choice == JOptionPane.NO_OPTION) {
+						if (choice == JOptionPane.NO_OPTION)
 							returnFromManualEdit(null);
-						}
+						else
+							return;
+						
 					}
 
 					if (newQuery != null) // new query parsed successfully

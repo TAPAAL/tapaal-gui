@@ -5,7 +5,7 @@ import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 public class TCTLFalseNode extends TCTLAbstractStateProperty {
 
 	public TCTLAbstractStateProperty copy() {
-		return new TCTLTrueNode();
+		return new TCTLFalseNode();
 	}
 
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {

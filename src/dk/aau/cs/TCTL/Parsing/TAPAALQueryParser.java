@@ -20,8 +20,10 @@ import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 
 /*
  * Licensed Material - Property of Matthew Hawkins (hawkini@4email.net) 
@@ -32,74 +34,77 @@ public class TAPAALQueryParser implements GPMessageConstants {
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the query";
 
 	public interface SymbolConstants {
-		final int SYMBOL_EOF = 0; // (EOF)
-		final int SYMBOL_ERROR = 1; // (Error)
-		final int SYMBOL_WHITESPACE = 2; // (Whitespace)
-		final int SYMBOL_EXCLAM = 3; // '!'
-		final int SYMBOL_AMPAMP = 4; // '&&'
-		final int SYMBOL_LPARAN = 5; // '('
-		final int SYMBOL_RPARAN = 6; // ')'
-		final int SYMBOL_DOT = 7; // '.'
-		final int SYMBOL_PIPEPIPE = 8; // '||'
-		final int SYMBOL_LT = 9; // '<'
-		final int SYMBOL_LTEQ = 10; // '<='
-		final int SYMBOL_EQ = 11; // '='
-		final int SYMBOL_EQEQ = 12; // '=='
-		final int SYMBOL_GT = 13; // '>'
-		final int SYMBOL_GTEQ = 14; // '>='
-		final int SYMBOL_ALBRACKETRBRACKET = 15; // 'A[]'
-		final int SYMBOL_ALTGT = 16; // 'A<>'
-		final int SYMBOL_AF = 17; // AF
-		final int SYMBOL_AG = 18; // AG
-		final int SYMBOL_AND = 19; // and
-		final int SYMBOL_ELBRACKETRBRACKET = 20; // 'E[]'
-		final int SYMBOL_ELTGT = 21; // 'E<>'
-		final int SYMBOL_EF = 22; // EF
-		final int SYMBOL_EG = 23; // EG
-		final int SYMBOL_IDENTIFIER = 24; // Identifier
-		final int SYMBOL_NOT = 25; // not
-		final int SYMBOL_NUM = 26; // Num
-		final int SYMBOL_OR = 27; // or
-		final int SYMBOL_ABSTRACTPROPERTY = 28; // <AbstractProperty>
-		final int SYMBOL_AND2 = 29; // <And>
-		final int SYMBOL_ATOMICPROPOSITION1 = 30; // <AtomicProposition1>
-		final int SYMBOL_ATOMICPROPOSITION2 = 31; // <AtomicProposition2>
-		final int SYMBOL_EXPR = 32; // <Expr>
-		final int SYMBOL_FACTOR = 33; // <Factor>
-		final int SYMBOL_NOT2 = 34; // <Not>
-		final int SYMBOL_OR2 = 35; // <Or>
+		final int SYMBOL_EOF                =  0;  // (EOF)
+	       final int SYMBOL_ERROR              =  1;  // (Error)
+	       final int SYMBOL_WHITESPACE         =  2;  // (Whitespace)
+	       final int SYMBOL_EXCLAM             =  3;  // '!'
+	       final int SYMBOL_AMPAMP             =  4;  // '&&'
+	       final int SYMBOL_LPARAN             =  5;  // '('
+	       final int SYMBOL_RPARAN             =  6;  // ')'
+	       final int SYMBOL_DOT                =  7;  // '.'
+	       final int SYMBOL_PIPEPIPE           =  8;  // '||'
+	       final int SYMBOL_LT                 =  9;  // '<'
+	       final int SYMBOL_LTEQ               = 10;  // '<='
+	       final int SYMBOL_EQ                 = 11;  // '='
+	       final int SYMBOL_EQEQ               = 12;  // '=='
+	       final int SYMBOL_GT                 = 13;  // '>'
+	       final int SYMBOL_GTEQ               = 14;  // '>='
+	       final int SYMBOL_ALBRACKETRBRACKET  = 15;  // 'A[]'
+	       final int SYMBOL_ALTGT              = 16;  // 'A<>'
+	       final int SYMBOL_AF                 = 17;  // AF
+	       final int SYMBOL_AG                 = 18;  // AG
+	       final int SYMBOL_AND                = 19;  // and
+	       final int SYMBOL_ELBRACKETRBRACKET  = 20;  // 'E[]'
+	       final int SYMBOL_ELTGT              = 21;  // 'E<>'
+	       final int SYMBOL_EF                 = 22;  // EF
+	       final int SYMBOL_EG                 = 23;  // EG
+	       final int SYMBOL_FALSE              = 24;  // False
+	       final int SYMBOL_IDENTIFIER         = 25;  // Identifier
+	       final int SYMBOL_NOT                = 26;  // not
+	       final int SYMBOL_NUM                = 27;  // Num
+	       final int SYMBOL_OR                 = 28;  // or
+	       final int SYMBOL_TRUE               = 29;  // True
+	       final int SYMBOL_ABSTRACTPROPERTY   = 30;  // <AbstractProperty>
+	       final int SYMBOL_AND2               = 31;  // <And>
+	       final int SYMBOL_ATOMICPROPOSITION1 = 32;  // <AtomicProposition1>
+	       final int SYMBOL_ATOMICPROPOSITION2 = 33;  // <AtomicProposition2>
+	       final int SYMBOL_EXPR               = 34;  // <Expr>
+	       final int SYMBOL_FACTOR             = 35;  // <Factor>
+	       final int SYMBOL_NOT2               = 36;  // <Not>
+	       final int SYMBOL_OR2                = 37;  // <Or>
 	};
 
 	public interface RuleConstants {
-		final int RULE_ABSTRACTPROPERTY_EF = 0; // <AbstractProperty> ::= EF <Expr>
-		final int RULE_ABSTRACTPROPERTY_ELTGT = 1; // <AbstractProperty> ::= 'E<>' <Expr>
-		final int RULE_ABSTRACTPROPERTY_EG = 2; // <AbstractProperty> ::= EG <Expr>
-		final int RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET = 3; // <AbstractProperty> ::= 'E[]' <Expr>
-		final int RULE_ABSTRACTPROPERTY_AF = 4; // <AbstractProperty> ::= AF <Expr>
-		final int RULE_ABSTRACTPROPERTY_ALTGT = 5; // <AbstractProperty> ::= 'A<>' <Expr>
-		final int RULE_ABSTRACTPROPERTY_AG = 6; // <AbstractProperty> ::= AG <Expr>
-		final int RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET = 7; // <AbstractProperty> ::= 'A[]' <Expr>
-		final int RULE_EXPR = 8; // <Expr> ::= <Or>
-		final int RULE_OR_OR = 9; // <Or> ::= <Or> or <And>
-		final int RULE_OR_PIPEPIPE = 10; // <Or> ::= <Or> '||' <And>
-		final int RULE_OR = 11; // <Or> ::= <And>
-		final int RULE_AND_AND = 12; // <And> ::= <And> and <Not>
-		final int RULE_AND_AMPAMP = 13; // <And> ::= <And> '&&' <Not>
-		final int RULE_AND = 14; // <And> ::= <Not>
-		final int RULE_NOT_NOT_LPARAN_RPARAN = 15; // <Not> ::= not '(' <Expr>
-													// ')'
-		final int RULE_NOT_EXCLAM_LPARAN_RPARAN = 16; // <Not> ::= '!' '(' <Expr> ')'
-		final int RULE_NOT = 17; // <Not> ::= <Factor>
-		final int RULE_FACTOR = 18; // <Factor> ::= <AtomicProposition1>
-		final int RULE_FACTOR2 = 19; // <Factor> ::= <AtomicProposition2>
-		final int RULE_FACTOR_LPARAN_RPARAN = 20; // <Factor> ::= '(' <Expr> ')'
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM = 21; // <AtomicProposition1> ::= Identifier '<' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM = 22; // <AtomicProposition1> ::= Identifier '<=' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM = 23; // <AtomicProposition1> ::= Identifier '=' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQEQ_NUM = 24; // <AtomicProposition1> ::= Identifier '==' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GTEQ_NUM = 25; // <AtomicProposition1> ::= Identifier '>=' Num
-		final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GT_NUM = 26; // <AtomicProposition1> ::= Identifier '>' Num
-		final int RULE_ATOMICPROPOSITION2_IDENTIFIER_DOT = 27; // <AtomicProposition2> ::= Identifier '.' <AtomicProposition1>
+		final int RULE_ABSTRACTPROPERTY_EF                    =  0;  // <AbstractProperty> ::= EF <Expr>
+	       final int RULE_ABSTRACTPROPERTY_ELTGT                 =  1;  // <AbstractProperty> ::= 'E<>' <Expr>
+	       final int RULE_ABSTRACTPROPERTY_EG                    =  2;  // <AbstractProperty> ::= EG <Expr>
+	       final int RULE_ABSTRACTPROPERTY_ELBRACKETRBRACKET     =  3;  // <AbstractProperty> ::= 'E[]' <Expr>
+	       final int RULE_ABSTRACTPROPERTY_AF                    =  4;  // <AbstractProperty> ::= AF <Expr>
+	       final int RULE_ABSTRACTPROPERTY_ALTGT                 =  5;  // <AbstractProperty> ::= 'A<>' <Expr>
+	       final int RULE_ABSTRACTPROPERTY_AG                    =  6;  // <AbstractProperty> ::= AG <Expr>
+	       final int RULE_ABSTRACTPROPERTY_ALBRACKETRBRACKET     =  7;  // <AbstractProperty> ::= 'A[]' <Expr>
+	       final int RULE_EXPR                                   =  8;  // <Expr> ::= <Or>
+	       final int RULE_OR_OR                                  =  9;  // <Or> ::= <Or> or <And>
+	       final int RULE_OR_PIPEPIPE                            = 10;  // <Or> ::= <Or> '||' <And>
+	       final int RULE_OR                                     = 11;  // <Or> ::= <And>
+	       final int RULE_AND_AND                                = 12;  // <And> ::= <And> and <Not>
+	       final int RULE_AND_AMPAMP                             = 13;  // <And> ::= <And> '&&' <Not>
+	       final int RULE_AND                                    = 14;  // <And> ::= <Not>
+	       final int RULE_NOT_NOT_LPARAN_RPARAN                  = 15;  // <Not> ::= not '(' <Expr> ')'
+	       final int RULE_NOT_EXCLAM_LPARAN_RPARAN               = 16;  // <Not> ::= '!' '(' <Expr> ')'
+	       final int RULE_NOT                                    = 17;  // <Not> ::= <Factor>
+	       final int RULE_FACTOR_TRUE                            = 18;  // <Factor> ::= True
+	       final int RULE_FACTOR_FALSE                           = 19;  // <Factor> ::= False
+	       final int RULE_FACTOR                                 = 20;  // <Factor> ::= <AtomicProposition1>
+	       final int RULE_FACTOR2                                = 21;  // <Factor> ::= <AtomicProposition2>
+	       final int RULE_FACTOR_LPARAN_RPARAN                   = 22;  // <Factor> ::= '(' <Expr> ')'
+	       final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM   = 23;  // <AtomicProposition1> ::= Identifier '<' Num
+	       final int RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM = 24;  // <AtomicProposition1> ::= Identifier '<=' Num
+	       final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM   = 25;  // <AtomicProposition1> ::= Identifier '=' Num
+	       final int RULE_ATOMICPROPOSITION1_IDENTIFIER_EQEQ_NUM = 26;  // <AtomicProposition1> ::= Identifier '==' Num
+	       final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GTEQ_NUM = 27;  // <AtomicProposition1> ::= Identifier '>=' Num
+	       final int RULE_ATOMICPROPOSITION1_IDENTIFIER_GT_NUM   = 28;  // <AtomicProposition1> ::= Identifier '>' Num
+	       final int RULE_ATOMICPROPOSITION2_IDENTIFIER_DOT      = 29;  // <AtomicProposition2> ::= Identifier '.' <AtomicProposition1>
 	};
 
 	private Stack<TCTLAbstractStateProperty> parseStack;
@@ -272,7 +277,12 @@ public class TAPAALQueryParser implements GPMessageConstants {
 				case RuleConstants.RULE_FACTOR2:
 				case RuleConstants.RULE_FACTOR_LPARAN_RPARAN: // <Factor> ::= '(' <Expr>')'
 					break;
-
+				case RuleConstants.RULE_FACTOR_TRUE: //<Factor> ::= True
+					parseStack.push(new TCTLTrueNode());
+					break;
+				case RuleConstants.RULE_FACTOR_FALSE: //<Factor> ::= False
+					parseStack.push(new TCTLFalseNode());
+					break;
 				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_LT_NUM: // <AtomicProposition> ::= Identifier '<' Num
 				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_LTEQ_NUM: // <AtomicProposition> ::= Identifier '<=' Num
 				case RuleConstants.RULE_ATOMICPROPOSITION1_IDENTIFIER_EQ_NUM: // <AtomicProposition> ::= Identifier '=' Num
