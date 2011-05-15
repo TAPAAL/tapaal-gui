@@ -268,10 +268,11 @@ public class BatchProcessingDialog extends JDialog {
 	private void addFiles() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.setFileFilter(new FileNameExtensionFilter("TAPAAL models", new String[] { "xml" }));
 		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setFileFilter(new FileNameExtensionFilter("TAPAAL models", new String[] { "xml" }));
+        // JS: swapped the two lines above in order to work for Mac OS X
 		fileChooser.setMultiSelectionEnabled(true);
-		int result = fileChooser.showOpenDialog(BatchProcessingDialog.this);
+	    int result = fileChooser.showOpenDialog(BatchProcessingDialog.this);
 		if(result == JFileChooser.APPROVE_OPTION){
 			File[] filesArray = fileChooser.getSelectedFiles();
 			for(File file : filesArray) {
