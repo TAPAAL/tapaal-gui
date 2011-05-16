@@ -49,6 +49,8 @@ public class FileBrowser {
 
 		fc.setFileFilter(filter);
 		fc.setAcceptAllFileFilterUsed(false);
+		fc.setFileFilter(filter);
+		// JS: copied the line above again in order to fix the mac filter issues
 		// By default hide hidden files
 		fc.setFileHidingEnabled(true);
 	}
