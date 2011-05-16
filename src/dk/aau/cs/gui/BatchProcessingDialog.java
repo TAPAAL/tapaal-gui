@@ -268,11 +268,13 @@ public class BatchProcessingDialog extends JDialog {
 	private void addFiles() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("TAPAAL models", new String[] { "xml" });
+		fileChooser.setFileFilter(filter);
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.setFileFilter(new FileNameExtensionFilter("TAPAAL models", new String[] { "xml" }));
-        // JS: swapped the two lines above in order to work for Mac OS X
+		fileChooser.setFileFilter(filter);
+		// JS: added definition of filter in order to fix mac vs. ubuntu filter issues
 		fileChooser.setMultiSelectionEnabled(true);
-	    int result = fileChooser.showOpenDialog(BatchProcessingDialog.this);
+		int result = fileChooser.showOpenDialog(BatchProcessingDialog.this);
 		if(result == JFileChooser.APPROVE_OPTION){
 			File[] filesArray = fileChooser.getSelectedFiles();
 			for(File file : filesArray) {
@@ -379,7 +381,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void initTimeoutComponents() {
-		JLabel timeoutLabel = new JLabel("Verification Task Timeout (Seconds): ");
+		JLabel timeoutLabel = new JLabel("Verification Task Timeout (seconds): ");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
