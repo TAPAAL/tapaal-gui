@@ -329,6 +329,7 @@ public class TimedPlaceComponent extends Place {
 			pnName.setText("");
 		}
 		pnName.zoomUpdate(zoom);
+		updateOnMoveOrZoom();
 		repaint();
 	}
 

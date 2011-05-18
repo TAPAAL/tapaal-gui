@@ -371,7 +371,7 @@ Cloneable {
 	public void translate(int x, int y) {
 		setPositionX(positionX + x);
 		setPositionY(positionY + y);
-		updateOnMove();
+		updateOnMoveOrZoom();
 	}
 
 	/** Sets the center of the component to position x, y */
@@ -382,7 +382,7 @@ Cloneable {
 	}
 
 	public void update(boolean displayConstantNames) {
-		updateOnMove();
+		updateOnMoveOrZoom();
 	}
 
 	public Point2D.Double getCentre() {
@@ -430,11 +430,11 @@ Cloneable {
 		markedAsDeleted = false;
 		addLabelToContainer();
 		update(true);
-		updateOnMove();
+		updateOnMoveOrZoom();
 	}
 
 	// TODO: Find a better name for this
-	public void updateOnMove() {
+	public void updateOnMoveOrZoom() {
 		updateBounds();
 		updateConnected();
 		updateLabelLocation();
