@@ -564,7 +564,7 @@ public class QueryDialog extends JPanel {
 		
 		String[] options;
 		if(tapnNetwork.hasInhibitorArcs()) {
-			options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, /*name_verifyTAPN*/ };
+			options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_verifyTAPN };
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(isNetDegree2)
 				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD };
