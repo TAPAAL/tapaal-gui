@@ -77,8 +77,8 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
 	private static final String name_ClosestToTarget = "Search by Closest To Target First";
-	private static final String name_KeepQueryOption = "Do Not Override";
-	private static final String name_SEARCHWHOLESTATESPACE = "Search Whole State Space";
+	private static final String name_KeepQueryOption = "Do not override";
+	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
 
@@ -350,9 +350,9 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(capacityLabel, gbc);
 		
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(50, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(50, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(50, 30));
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(70, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(70, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setEnabled(false);
 		
 		gbc = new GridBagConstraints();
@@ -381,7 +381,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void initTimeoutComponents() {
-		JLabel timeoutLabel = new JLabel("Verification Task Timeout (seconds): ");
+		JLabel timeoutLabel = new JLabel("Timeout (in seconds): ");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
@@ -389,9 +389,9 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(timeoutLabel, gbc);
 		
 		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5, Integer.MAX_VALUE, 1));	
-		timeoutValue.setMaximumSize(new Dimension(50, 30));
-		timeoutValue.setMinimumSize(new Dimension(50, 30));
-		timeoutValue.setPreferredSize(new Dimension(50, 30));
+		timeoutValue.setMaximumSize(new Dimension(70, 30));
+		timeoutValue.setMinimumSize(new Dimension(70, 30));
+		timeoutValue.setPreferredSize(new Dimension(70, 30));
 		timeoutValue.setEnabled(true);
 		
 		gbc = new GridBagConstraints();
@@ -421,7 +421,7 @@ public class BatchProcessingDialog extends JDialog {
 
 
 	private void initReductionOptionsComponents() {
-		JLabel reductionLabel = new JLabel("Verification Method:");
+		JLabel reductionLabel = new JLabel("Verification method:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -592,7 +592,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void initSearchOptionsComponents() {
-		JLabel searchLabel = new JLabel("Search Order:");
+		JLabel searchLabel = new JLabel("Search order:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
