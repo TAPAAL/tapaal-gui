@@ -22,6 +22,7 @@ public class ContainsAtomicPropositionsWithDisabledTemplateVisitor extends Visit
 				return;
 		}
 		
-		((BooleanResult)context).setResult(false);
+		if(context instanceof BooleanResult)
+			((BooleanResult)context).setResult(false);
 	}
 }

@@ -202,4 +202,12 @@ public class TAPNQuery {
 	public boolean isActive() {
 		return isActive;
 	}
+
+	public TAPNQuery copy() {
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption);
+		copy.setDiscreteInclusion(discreteInclusion);
+		copy.setActive(isActive);
+		
+		return copy;
+	}
 }

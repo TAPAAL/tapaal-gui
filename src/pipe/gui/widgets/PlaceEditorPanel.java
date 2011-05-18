@@ -536,7 +536,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		SharedPlace selectedPlace = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
 		if(sharedCheckBox.isSelected() && !selectedPlace.equals(underlyingPlace)){
-			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place);
+			Command command = new MakePlaceSharedCommand(context.activeModel(), selectedPlace, place.underlyingPlace(), place, context.tabContent());
 			context.undoManager().addEdit(command);
 			try{
 				command.redo();
@@ -544,7 +544,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				context.undoManager().undo();
 				JOptionPane.showMessageDialog(this,"Another place in the same component is already shared under that name", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
-			}
+			}		
 		}else if(!sharedCheckBox.isSelected()){
 			if(underlyingPlace.isShared()){
 				String uniqueName = context.nameGenerator().getNewPlaceName(context.activeModel());

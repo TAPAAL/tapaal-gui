@@ -12,7 +12,6 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.visitors.SimplifyPropositionsVisitor;
 import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
