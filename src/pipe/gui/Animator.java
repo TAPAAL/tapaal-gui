@@ -10,6 +10,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.Transition;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
@@ -98,7 +99,7 @@ public class Animator {
 	public NetworkMarking getInitialMarking(){
 		return initialMarking;
 	}
-	
+
 	/**
 	 * Highlights enabled transitions
 	 */
@@ -136,13 +137,15 @@ public class Animator {
 	 * unhighlighted
 	 */
 	private void disableTransitions() {
-		Iterator<Transition> transitionIterator = activeGuiModel()
-		.returnTransitions();
-		while (transitionIterator.hasNext()) {
-			Transition tempTransition = transitionIterator.next();
-			tempTransition.setEnabledFalse();
-			activeGuiModel().notifyObservers();
-			tempTransition.repaint();
+		for(Template template : tab.allTemplates())
+		{
+			Iterator<Transition> transitionIterator = template.guiModel().returnTransitions();
+			while (transitionIterator.hasNext()) {
+				Transition tempTransition = transitionIterator.next();
+				tempTransition.setEnabledFalse();
+				activeGuiModel().notifyObservers();
+				tempTransition.repaint();
+			}
 		}
 	}
 
@@ -181,7 +184,7 @@ public class Animator {
 					untimedAnimationHistory.stepBackwards();
 				}
 			}
-			
+
 			tab.network().setMarking(markings.get(currentMarkingIndex - 1));
 
 			activeGuiModel().repaintPlaces();
@@ -206,9 +209,9 @@ public class Animator {
 					untimedAnimationHistory.stepForward();
 				}
 			}
-			
+
 			tab.network().setMarking(markings.get(currentMarkingIndex + 1));
-			
+
 			activeGuiModel().repaintPlaces();
 			unhighlightDisabledTransitions();
 			highlightEnabledTransitions();
@@ -219,7 +222,7 @@ public class Animator {
 		}
 	}
 
-	
+
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
 		NetworkMarking next = null;
@@ -243,7 +246,7 @@ public class Animator {
 			AnimationHistoryComponent untimedAnimationHistory = tab.getUntimedAnimationHistory();
 			if(untimedAnimationHistory.isStepForwardAllowed()){
 				String nextFromUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
-				
+
 				if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name())){
 					untimedAnimationHistory.stepForward();
 				}else{
@@ -261,7 +264,7 @@ public class Animator {
 				}
 			}
 		}
-		
+
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
 		tab.network().setMarking(currentMarking());
 
