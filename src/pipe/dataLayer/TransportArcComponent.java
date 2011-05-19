@@ -83,7 +83,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 					displayConstantNames)
 					+ " : " + getGroup());
 		} else if (!isInPreSet) {
-			weightLabel.setText(String.valueOf(getGroup()));
+			weightLabel.setText(" : " + String.valueOf(getGroup()));
 		} else {
 			weightLabel.setText("");
 		}
