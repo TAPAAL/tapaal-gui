@@ -62,8 +62,13 @@ public class Verifyta implements ModelChecker {
 			try {
 				File file = fileFinder.ShowFileBrowserDialog("Uppaal Verifyta", "");
 				
-				if(file != null)
-					verifytapath = file.getAbsolutePath();
+				if(file != null){
+					if(file.getName().matches("^verifyta(?:\\.exe)?$")){
+						verifytapath = file.getAbsolutePath();
+					}else{
+						messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
+					}
+				}
 
 			} catch (Exception e) {
 				messenger.displayErrorMessage(
