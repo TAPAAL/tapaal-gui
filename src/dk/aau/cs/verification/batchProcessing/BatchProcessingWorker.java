@@ -114,25 +114,31 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private void processQueryForAllReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
-		pipe.dataLayer.TAPNQuery query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.VerifyTAPN, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		pipe.dataLayer.TAPNQuery query = queryToVerify.copy();
+		query.setReductionOption(ReductionOption.VerifyTAPN);
+		query.setDiscreteInclusion(false);
 		processQuery(file, composedModel, query);
 		
-		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.VerifyTAPN, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		query = query.copy();
 		query.setDiscreteInclusion(true);
 		processQuery(file, composedModel, query);
 
-		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.STANDARD, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		query = query.copy();
+		query.setReductionOption(ReductionOption.STANDARD);
+		query.setDiscreteInclusion(false);
 		processQuery(file, composedModel, query);
 		
-		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.OPTIMIZEDSTANDARD, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		query = query.copy();
+		query.setReductionOption(ReductionOption.OPTIMIZEDSTANDARD);
 		processQuery(file, composedModel, query);
 		
-		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.BROADCAST, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		query = query.copy();
+		query.setReductionOption(ReductionOption.BROADCAST);
 		processQuery(file, composedModel, query);
 		
-		query = new pipe.dataLayer.TAPNQuery(queryToVerify.getName(), queryToVerify.getCapacity(), queryToVerify.getProperty(), TraceOption.NONE, queryToVerify.getSearchOption(), ReductionOption.DEGREE2BROADCAST, queryToVerify.useSymmetry(), queryToVerify.getHashTableSize(), queryToVerify.getExtrapolationOption());
+		query = query.copy();
+		query.setReductionOption(ReductionOption.DEGREE2BROADCAST);
 		processQuery(file, composedModel, query);
-		
 	}
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
