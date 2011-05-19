@@ -564,7 +564,7 @@ public class QueryDialog extends JPanel {
 		
 		String[] options;
 		if(tapnNetwork.hasInhibitorArcs()) {
-			options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_verifyTAPN };
+			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2 };
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(isNetDegree2)
 				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD };
@@ -1728,6 +1728,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reduction = getReductionOption();
 		if(reduction.equals(ReductionOption.VerifyTAPN)){
 			discreteInclusion.setVisible(true);
+			queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
 		}else{
 			discreteInclusion.setVisible(false);
 		}

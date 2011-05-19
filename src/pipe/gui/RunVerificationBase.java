@@ -83,10 +83,14 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				result = get();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				showErrorMessage(e.getMessage());
+				return;
 			} catch (ExecutionException e) {
 				e.printStackTrace();
+				showErrorMessage(e.getMessage());
+				return;
 			}
-
+			
 			showResult(result, result.verificationTime());
 
 		} else {
@@ -94,6 +98,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			messenger.displayInfoMessage("Verification was interupted by the user. No result found!", "Verification Cancelled");
 
 		}
+	}
+
+	private void showErrorMessage(String errorMessage) {
+		messenger.displayErrorMessage("An error occured during verification.\n\nReason: " + errorMessage, "Verification Error");
 	}
 
 	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result,	long verificationTime);
