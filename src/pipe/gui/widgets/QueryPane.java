@@ -55,7 +55,7 @@ public class QueryPane extends JPanel {
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
 		this.tabContent = tabContent;
 		this.undoManager = tabContent.drawingSurface().getUndoManager();
-		queryCollectionPanel = new JPanel(new BorderLayout());
+		queryCollectionPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
 
@@ -121,7 +121,54 @@ public class QueryPane extends JPanel {
 
 	private void addQueriesComponents() {
 		queryScroller = new JScrollPane(queryList);
-		queryCollectionPanel.add(queryScroller, BorderLayout.CENTER);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridheight = 2;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		queryCollectionPanel.add(queryScroller, gbc);
+		
+		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton.setEnabled(false);
+		moveUpButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = queryList.getSelectedIndex();
+				
+				if(index > 0) {
+					swapQueries(index, index-1);
+					queryList.setSelectedIndex(index-1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.SOUTH;
+		queryCollectionPanel.add(moveUpButton,gbc);
+		
+		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton.setEnabled(false);
+		moveDownButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = queryList.getSelectedIndex();
+				
+				if(index < listModel.size()-1) {
+					swapQueries(index, index+1);
+					queryList.setSelectedIndex(index+1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTH;
+		queryCollectionPanel.add(moveDownButton,gbc);
 	}
 
 	private void addButtons() {
@@ -192,44 +239,6 @@ public class QueryPane extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addQueryButton, gbc);
-		
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
-		moveUpButton.setEnabled(false);
-		moveUpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = queryList.getSelectedIndex();
-				
-				if(index > 0) {
-					swapQueries(index, index-1);
-					queryList.setSelectedIndex(index-1);
-				}
-			}
-		});
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHEAST;
-		buttonsPanel.add(moveUpButton,gbc);
-		
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
-		moveDownButton.setEnabled(false);
-		moveDownButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = queryList.getSelectedIndex();
-				
-				if(index < listModel.size()-1) {
-					swapQueries(index, index+1);
-					queryList.setSelectedIndex(index+1);
-				}
-			}
-		});
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
-		buttonsPanel.add(moveDownButton,gbc);
 	}
 	
 	private void swapQueries(int currentIndex, int newIndex) {

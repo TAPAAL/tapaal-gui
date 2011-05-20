@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -116,9 +114,9 @@ public class TapnXmlLoader {
 	}
 
 	private LoadedModel parse(Document doc) throws FormatException {
-		Map<String, Constant> constants = parseConstants(doc);
+		ConstantStore constants = new ConstantStore(parseConstants(doc));
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
 
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);
@@ -131,7 +129,7 @@ public class TapnXmlLoader {
 	}
 
 
-	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
+	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");
 
 		for(int i = 0; i < sharedPlaceNodes.getLength(); i++){
@@ -144,7 +142,7 @@ public class TapnXmlLoader {
 		}
 	}
 
-	private SharedPlace parseSharedPlace(Element element, TimedMarking marking, Map<String, Constant> constants) {
+	private SharedPlace parseSharedPlace(Element element, TimedMarking marking, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
@@ -230,7 +228,7 @@ public class TapnXmlLoader {
 		return templatePlaceNames;
 	}
 
-	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
+	private Collection<Template> parseTemplates(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		Collection<Template> templates = new ArrayList<Template>();
 		NodeList nets = doc.getElementsByTagName("net");
 		
@@ -244,21 +242,21 @@ public class TapnXmlLoader {
 		return templates;
 	}
 
-	private Map<String, Constant> parseConstants(Document doc) {
-		TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
+	private List<Constant> parseConstants(Document doc) {
+		List<Constant> constants = new ArrayList<Constant>();
 		NodeList constantNodes = doc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
 			Node c = constantNodes.item(i);
 
 			if (c instanceof Element) {
-				Constant constant = parseAndAddConstant((Element) c);
-				constants.put(constant.name(), constant);
+				Constant constant = parseConstant((Element) c);
+				constants.add(constant);
 			}
 		}
 		return constants;
 	}
 
-	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
+	private Template parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		String name = getTAPNName(tapnNode);
 
 		boolean active = getActiveStatus(tapnNode);
@@ -297,7 +295,7 @@ public class TapnXmlLoader {
 		}
 	}
 
-	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
+	private void parseElement(Element element, Template template, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		if ("labels".equals(element.getNodeName())) {
 			AnnotationNote note = parseAnnotation(element);
 			template.guiModel().addPetriNetObject(note);
@@ -421,7 +419,7 @@ public class TapnXmlLoader {
 		return transitionComponent;
 	}
 
-	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, Map<String, Constant> constants) {
+	private TimedPlaceComponent parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		double positionXInput = Double.parseDouble(place.getAttribute("positionX"));
 		double positionYInput = Double.parseDouble(place.getAttribute("positionY"));
 		String idInput = place.getAttribute("id");
@@ -462,7 +460,7 @@ public class TapnXmlLoader {
 		return placeComponent;
 	}
 
-	private void parseAndAddArc(Element arc, Template template, Map<String, Constant> constants) throws FormatException {
+	private void parseAndAddArc(Element arc, Template template, ConstantStore constants) throws FormatException {
 		String idInput = arc.getAttribute("id");
 		String sourceInput = arc.getAttribute("source");
 		String targetInput = arc.getAttribute("target");
@@ -540,7 +538,7 @@ public class TapnXmlLoader {
 	private TransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, Map<String, Constant> constants) {
+			double _endx, double _endy, Template template, ConstantStore constants) {
 
 		
 		String[] inscriptionSplit = {};
@@ -619,7 +617,7 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, Map<String, Constant> constants) throws FormatException {
+			double _endx, double _endy, Template template, ConstantStore constants) throws FormatException {
 		Arc tempArc;
 		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
 				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
@@ -649,7 +647,7 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInhibitorArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, Map<String, Constant> constants) {
+			double _endx, double _endy, Template template, ConstantStore constants) {
 		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
 				new TimedInputArcComponent(
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
@@ -824,7 +822,7 @@ public class TapnXmlLoader {
 		return comment;
 	}
 
-	private Constant parseAndAddConstant(Element constantElement) {
+	private Constant parseConstant(Element constantElement) {
 		String name = constantElement.getAttribute("name");
 		int value = Integer.parseInt(constantElement.getAttribute("value"));
 

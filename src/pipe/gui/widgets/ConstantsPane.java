@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -41,11 +42,13 @@ public class ConstantsPane extends JPanel {
 	private JButton removeBtn;
 
 	private TabContent parent;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 
-	public ConstantsPane(boolean enableAddButton, TabContent parent) {
-		this.parent = parent;
+	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
+		this.parent = currentTab;
 
-		constantsPanel = new JPanel(new BorderLayout());
+		constantsPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 
 		listModel = new DefaultListModel();
@@ -62,6 +65,18 @@ public class ConstantsPane extends JPanel {
 						removeBtn.setEnabled(true);
 						editBtn.setEnabled(true);
 					}
+					
+					int index = constantsList.getSelectedIndex();
+					if(index > 0)
+						moveUpButton.setEnabled(true);
+					else
+						moveUpButton.setEnabled(false);
+							
+						
+					if(index < parent.network().constants().size() - 1)
+						moveDownButton.setEnabled(true);
+					else
+						moveDownButton.setEnabled(false);
 				}
 			}
 		});
@@ -70,10 +85,8 @@ public class ConstantsPane extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!constantsList.isSelectionEmpty()) {
-					if (arg0.getButton() == MouseEvent.BUTTON1
-							&& arg0.getClickCount() == 2) {
-						int index = constantsList.locationToIndex(arg0
-								.getPoint());
+					if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
+						int index = constantsList.locationToIndex(arg0.getPoint());
 						ListModel dlm = constantsList.getModel();
 						Constant c = (Constant) dlm.getElementAt(index);
 						constantsList.ensureIndexIsVisible(index);
@@ -117,8 +130,7 @@ public class ConstantsPane extends JPanel {
 		removeBtn.setEnabled(false);
 		removeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String constName = ((Constant) constantsList.getSelectedValue())
-						.name();
+				String constName = ((Constant) constantsList.getSelectedValue()).name();
 				removeConstant(constName);
 			}
 		});
@@ -160,7 +172,56 @@ public class ConstantsPane extends JPanel {
 
 	private void addConstantsComponents() {
 		constantsScroller = new JScrollPane(constantsList);
-		constantsPanel.add(constantsScroller, BorderLayout.CENTER);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridheight = 2;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		constantsPanel.add(constantsScroller, gbc);
+		
+		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton.setEnabled(false);
+		moveUpButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = constantsList.getSelectedIndex();
+				
+				if(index > 0) {
+					parent.swapConstants(index, index-1);
+					showConstants();
+					constantsList.setSelectedIndex(index-1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.SOUTH;
+		constantsPanel.add(moveUpButton,gbc);
+		
+		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton.setEnabled(false);
+		moveDownButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = constantsList.getSelectedIndex();
+				
+				if(index < parent.network().constants().size() - 1) {
+					parent.swapConstants(index, index+1);
+					showConstants();
+					constantsList.setSelectedIndex(index+1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTH;
+		constantsPanel.add(moveDownButton,gbc);
 	}
 
 	private void showEditConstantDialog(Constant constant) {

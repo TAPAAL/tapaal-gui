@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,7 +57,7 @@ public class BatchProcessingLegacyLoader {
 	private HashMap<Tuple<TimedTransition, Integer>, TimeInterval> transportArcsTimeIntervals;
 	private TimedArcPetriNet tapn;
 	private ArrayList<TAPNQuery> queries;
-	private TreeMap<String, Constant> constants;
+	private ConstantStore constants;
 	private NameGenerator nameGenerator = new NameGenerator();
 
 	public BatchProcessingLegacyLoader() {
@@ -68,7 +67,7 @@ public class BatchProcessingLegacyLoader {
 		transitionIDToName = new HashMap<String, String>();
 		transportArcsTimeIntervals = new HashMap<Tuple<TimedTransition,Integer>, TimeInterval>();
 		queries = new ArrayList<TAPNQuery>();
-		constants = new TreeMap<String, Constant>();
+		constants = new ConstantStore();
 	}
 	
 	public LoadedBatchProcessingModel load(File file) throws FormatException {
@@ -102,7 +101,7 @@ public class BatchProcessingLegacyLoader {
 			}
 		}
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
 		NodeList nets = tapnDoc.getElementsByTagName("net");
 		
 		if(nets.getLength() <= 0)
@@ -313,7 +312,7 @@ ReductionOption reductionOption;
 		int value = Integer.parseInt(constantElement.getAttribute("value"));
 
 		if (!name.isEmpty() && !name.equals(""))
-			constants.put(name, new Constant(name, value));
+			constants.add(new Constant(name, value));
 	}
 
 	// //////////////////////////////////////////////////////////

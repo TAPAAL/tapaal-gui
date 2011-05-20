@@ -98,14 +98,18 @@ public class TemplateExplorer extends JPanel {
 		this.removeAll();
 		if (!hideButtons) {
 			this.add(templatePanel, BorderLayout.CENTER);
+			moveDownButton.setVisible(true);
+			moveUpButton.setVisible(true);
 			this.add(buttonPanel, BorderLayout.PAGE_END);
 		} else {
 			this.add(templatePanel, BorderLayout.CENTER);
+			moveDownButton.setVisible(false);
+			moveUpButton.setVisible(false);
 		}
 	}
 
 	private void initExplorerPanel() {
-		templatePanel = new JPanel(new BorderLayout());
+		templatePanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
 		for (Template net : parent.allTemplates()) {
 			listModel.addElement(net);
@@ -139,8 +143,56 @@ public class TemplateExplorer extends JPanel {
 		templateList.addMouseListener(manager);
 
 		scrollpane = new JScrollPane(templateList);
-		templatePanel.add(scrollpane, BorderLayout.CENTER);
-
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridheight = 2;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		templatePanel.add(scrollpane, gbc);
+		
+		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton.setEnabled(false);
+		moveUpButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = templateList.getSelectedIndex();
+				
+				if(index > 0) {
+					parent.swapTemplates(index, index-1);
+					updateTemplateList();
+					templateList.setSelectedIndex(index-1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.SOUTH;
+		templatePanel.add(moveUpButton,gbc);
+		
+		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton.setEnabled(false);
+		moveDownButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = templateList.getSelectedIndex();
+				
+				if(index < parent.network().allTemplates().size() - 1) {
+					parent.swapTemplates(index, index+1);
+					updateTemplateList();
+					templateList.setSelectedIndex(index+1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTH;
+		templatePanel.add(moveDownButton,gbc);
 	}
 
 	private void initButtonsPanel() {
@@ -287,46 +339,6 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(copyButton, gbc);
-		
-		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
-		moveUpButton.setEnabled(false);
-		moveUpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = templateList.getSelectedIndex();
-				
-				if(index > 0) {
-					parent.swapTemplates(index, index-1);
-					updateTemplateList();
-					templateList.setSelectedIndex(index-1);
-				}
-			}
-		});
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHEAST;
-		buttonPanel.add(moveUpButton,gbc);
-		
-		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
-		moveDownButton.setEnabled(false);
-		moveDownButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = templateList.getSelectedIndex();
-				
-				if(index < parent.network().allTemplates().size() - 1) {
-					parent.swapTemplates(index, index+1);
-					updateTemplateList();
-					templateList.setSelectedIndex(index+1);
-				}
-			}
-		});
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
-		buttonPanel.add(moveDownButton,gbc);
 	}
 
 	private Template ShowNewTemplateDialog() {

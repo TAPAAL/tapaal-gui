@@ -1,7 +1,8 @@
 package dk.aau.cs.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -15,6 +16,7 @@ import java.util.Map.Entry;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -23,6 +25,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -82,6 +86,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 	private JButton renameButton;
 	private JButton removeButton;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");
@@ -93,7 +99,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		sharedPlacesListModel = new SharedPlacesListModel(tab.network());
 		sharedTransitionsListModel = new SharedTransitionsListModel(tab.network());
 
-		setLayout(new BorderLayout());
+		setLayout(new GridBagLayout());
 		initComponents();
 
 		setBorder(BorderFactory.createCompoundBorder(
@@ -108,6 +114,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void initComponents() {
+		JPanel listPanel = new JPanel(new GridBagLayout());
+		
 		list = new JList();
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
@@ -120,13 +128,93 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 						removeButton.setEnabled(true);
 						renameButton.setEnabled(true);
 					}
+					
+					int index = list.getSelectedIndex();
+					if(index > 0)
+						moveUpButton.setEnabled(true);
+					else
+						moveUpButton.setEnabled(false);
+								
+					if(isDisplayingTransitions()) {
+						if(index < sharedTransitionsListModel.getSize() - 1)
+							moveDownButton.setEnabled(true);
+						else
+							moveDownButton.setEnabled(false);
+					} else {
+						if(index < sharedPlacesListModel.getSize() - 1)
+							moveDownButton.setEnabled(true);
+						else
+							moveDownButton.setEnabled(false);
+					}
 				}
 			}
 		});
 		list.addMouseListener(createDoubleClickMouseAdapter());
-
+		
 		JScrollPane scrollPane = new JScrollPane(list);
-
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridheight = 2;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		listPanel.add(scrollPane, gbc);
+		
+		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
+		moveUpButton.setEnabled(false);
+		moveUpButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = list.getSelectedIndex();
+				
+				if(index > 0) {
+					if(isDisplayingTransitions())
+						sharedTransitionsListModel.swap(index, index-1);
+					else
+						sharedPlacesListModel.swap(index, index-1);
+					list.setSelectedIndex(index-1);
+					list.ensureIndexIsVisible(index-1);
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.SOUTH;
+		listPanel.add(moveUpButton,gbc);
+		
+		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
+		moveDownButton.setEnabled(false);
+		moveDownButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = list.getSelectedIndex();
+				
+				if(isDisplayingTransitions()) {
+					if(index < sharedTransitionsListModel.getSize() - 1) {
+						sharedTransitionsListModel.swap(index, index+1);
+						list.setSelectedIndex(index+1);
+						list.ensureIndexIsVisible(index+1);
+						
+					}
+				} else {
+					if(index < sharedPlacesListModel.getSize() - 1) {
+						sharedPlacesListModel.swap(index, index+1);
+						list.setSelectedIndex(index+1);
+						list.ensureIndexIsVisible(index+1);
+					}
+				}
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.NORTH;
+		listPanel.add(moveDownButton,gbc);
+		
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
 		placesTransitionsComboBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -137,10 +225,35 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				}else if(selectedItem.equals(TRANSITIONS)){
 					list.setModel(sharedTransitionsListModel);
 				}
+				
+				if(list.getModel().getSize() > 0) {
+					list.setSelectedIndex(0);
+					list.ensureIndexIsVisible(0);
+				} else {
+					moveDownButton.setEnabled(false);
+					moveUpButton.setEnabled(false);
+				}
 			}		
 		});
 		placesTransitionsComboBox.setSelectedIndex(0); // Sets up the proper list model
-
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		listPanel.add(placesTransitionsComboBox, gbc);
+		
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		add(listPanel, gbc);
+		
 		JPanel buttonPanel = new JPanel();
 		renameButton = new JButton("Rename");
 		renameButton.setEnabled(false);
@@ -317,10 +430,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		buttonPanel.add(renameButton);
 		buttonPanel.add(removeButton);
 		buttonPanel.add(addButton);
-
-		add(placesTransitionsComboBox, BorderLayout.PAGE_START);
-		add(scrollPane, BorderLayout.CENTER);
-		add(buttonPanel, BorderLayout.PAGE_END);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		add(buttonPanel, gbc);
 	}
 
 	private MouseListener createDoubleClickMouseAdapter() {
@@ -379,6 +495,23 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public SharedPlacesListModel(TimedArcPetriNetNetwork network){
 			Require.that(network != null, "network must not be null");
 			this.network = network;
+			
+			addListDataListener(new ListDataListener() {
+				public void intervalAdded(ListDataEvent arg0) {
+					list.setSelectedIndex(arg0.getIndex0());
+				}
+
+				public void intervalRemoved(ListDataEvent arg0) {
+					list.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0() - 1);
+				}
+
+				public void contentsChanged(ListDataEvent e) {
+				}
+			});
+		}
+
+		public void swap(int currentIndex, int newIndex) {
+			network.swapSharedPlaces(currentIndex, newIndex);
 		}
 
 		public Object getElementAt(int index) {
@@ -417,10 +550,27 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public SharedTransitionsListModel(TimedArcPetriNetNetwork network){
 			Require.that(network != null, "network must not be null");
 			this.network = network;
+			
+			addListDataListener(new ListDataListener() {
+				public void intervalAdded(ListDataEvent arg0) {
+					list.setSelectedIndex(arg0.getIndex0());
+				}
+
+				public void intervalRemoved(ListDataEvent arg0) {
+					list.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0() - 1);
+				}
+
+				public void contentsChanged(ListDataEvent e) {
+				}
+			});
 		}
 
 		public Object getElementAt(int index) {
 			return network.getSharedTransitionByIndex(index);
+		}
+		
+		public void swap(int currentIndex, int newIndex) {
+			network.swapSharedTransitions(currentIndex, newIndex);
 		}
 
 		public int getSize() {

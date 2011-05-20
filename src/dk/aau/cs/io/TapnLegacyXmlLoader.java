@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -87,7 +86,7 @@ public class TapnLegacyXmlLoader {
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
 	private ArrayList<TAPNQuery> queries;
-	private TreeMap<String, Constant> constants;
+	private ConstantStore constants;
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
@@ -98,7 +97,7 @@ public class TapnLegacyXmlLoader {
 		postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
 		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
 		queries = new ArrayList<TAPNQuery>();
-		constants = new TreeMap<String, Constant>();
+		constants = new ConstantStore();
 		this.drawingSurface = drawingSurfaceImpl;
 	}
 	
@@ -135,7 +134,7 @@ public class TapnLegacyXmlLoader {
 			}
 		}
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
 		NodeList nets = tapnDoc.getElementsByTagName("net");
 		
 		if(nets.getLength() <= 0)
@@ -424,7 +423,7 @@ public class TapnLegacyXmlLoader {
 		int value = Integer.parseInt(constantElement.getAttribute("value"));
 
 		if (!name.isEmpty() && !name.equals(""))
-			constants.put(name, new Constant(name, value));
+			constants.add(new Constant(name, value));
 	}
 
 	// //////////////////////////////////////////////////////////

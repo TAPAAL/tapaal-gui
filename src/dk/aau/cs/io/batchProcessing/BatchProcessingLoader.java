@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -88,9 +87,9 @@ public class BatchProcessingLoader {
 	}
 
 	private LoadedBatchProcessingModel parse(Document doc) throws FormatException {
-		Map<String, Constant> constants = parseConstants(doc);
+		ConstantStore constants = new ConstantStore(parseConstants(doc));
 
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(new ConstantStore(constants.values()));
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
 
 		parseSharedPlaces(doc, network, constants);
 		parseSharedTransitions(doc, network);
@@ -103,7 +102,7 @@ public class BatchProcessingLoader {
 	}
 
 
-	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) {
+	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");
 
 		for(int i = 0; i < sharedPlaceNodes.getLength(); i++){
@@ -116,7 +115,7 @@ public class BatchProcessingLoader {
 		}
 	}
 
-	private SharedPlace parseSharedPlace(Element element, TimedMarking marking, Map<String, Constant> constants) {
+	private SharedPlace parseSharedPlace(Element element, TimedMarking marking, ConstantStore constants) {
 		String name = element.getAttribute("name");
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
@@ -195,7 +194,7 @@ public class BatchProcessingLoader {
 		return templatePlaceNames;
 	}
 
-	private void parseTemplates(Document doc, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
+	private void parseTemplates(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		NodeList nets = doc.getElementsByTagName("net");
 		
 		if(nets.getLength() <= 0)
@@ -206,21 +205,21 @@ public class BatchProcessingLoader {
 		}
 	}
 
-	private Map<String, Constant> parseConstants(Document doc) {
-		TreeMap<String, Constant> constants = new TreeMap<String, Constant>();
+	private List<Constant> parseConstants(Document doc) {
+		List<Constant> constants = new ArrayList<Constant>();
 		NodeList constantNodes = doc.getElementsByTagName("constant");
 		for (int i = 0; i < constantNodes.getLength(); i++) {
 			Node c = constantNodes.item(i);
 
 			if (c instanceof Element) {
 				Constant constant = parseAndAddConstant((Element) c);
-				constants.put(constant.name(), constant);
+				constants.add(constant);
 			}
 		}
 		return constants;
 	}
 
-	private void parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
+	private void parseTimedArcPetriNet(Node tapnNode, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		String name = getTAPNName(tapnNode);
 		boolean active = getActiveStatus(tapnNode);
 
@@ -252,7 +251,7 @@ public class BatchProcessingLoader {
 		}
 	}
 
-	private void parseElement(Element element, TimedArcPetriNet tapn, TimedArcPetriNetNetwork network, Map<String, Constant> constants) throws FormatException {
+	private void parseElement(Element element, TimedArcPetriNet tapn, TimedArcPetriNetNetwork network, ConstantStore constants) throws FormatException {
 		if ("place".equals(element.getNodeName())) {
 			parsePlace(element, network, tapn, constants);
 		} else if ("transition".equals(element.getNodeName())) {
@@ -313,7 +312,7 @@ public class BatchProcessingLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 	}
 
-	private void parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, Map<String, Constant> constants) {
+	private void parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		String idInput = place.getAttribute("id");
 		String nameInput = place.getAttribute("name");
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
@@ -344,7 +343,7 @@ public class BatchProcessingLoader {
 		nameGenerator.updateIndicesForAllModels(nameInput);
 	}
 
-	private void parseAndAddArc(Element arc, TimedArcPetriNet tapn, Map<String, Constant> constants) throws FormatException {
+	private void parseAndAddArc(Element arc, TimedArcPetriNet tapn, ConstantStore constants) throws FormatException {
 		String sourceId = arc.getAttribute("source");
 		String targetId = arc.getAttribute("target");
 		String inscription = arc.getAttribute("inscription");
@@ -373,7 +372,7 @@ public class BatchProcessingLoader {
 		tapn.add(outputArc);
 	}
 
-	private void parseAndAddTransportArc(String sourceId, String targetId,	String inscription, TimedArcPetriNet tapn, Map<String, Constant> constants) {
+	private void parseAndAddTransportArc(String sourceId, String targetId,	String inscription, TimedArcPetriNet tapn, ConstantStore constants) {
 		String[] inscriptionSplit = {};
 		if (inscription.contains(":")) {
 			inscriptionSplit = inscription.split(":");
@@ -431,7 +430,7 @@ public class BatchProcessingLoader {
 		}
 	}
 
-	private void parseAndAddTimedInputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, Map<String, Constant> constants) throws FormatException {
+	private void parseAndAddTimedInputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants) throws FormatException {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		TimeInterval interval = TimeInterval.parse(inscription, constants);
@@ -445,7 +444,7 @@ public class BatchProcessingLoader {
 		tapn.add(inputArc);
 	}
 
-	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, Map<String, Constant> constants) {
+	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants) {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		

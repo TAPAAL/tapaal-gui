@@ -1,7 +1,6 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,7 +104,7 @@ public class TimeInterval {
 		return isUpperIncluded;
 	}
 
-	public static TimeInterval parse(String interval, Map<String, Constant> constants) {
+	public static TimeInterval parse(String interval, ConstantStore constants) {
 		Pattern pattern = Pattern.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
 		Matcher matcher = pattern.matcher(interval);
 		matcher.find();
@@ -125,8 +124,8 @@ public class TimeInterval {
 			int intLower = Integer.parseInt(lowerBoundAsString);
 			lowerBound = new IntBound(intLower);
 		} catch (NumberFormatException e) {
-			if (constants.containsKey(lowerBoundAsString)) {
-				lowerBound = new ConstantBound(constants.get(lowerBoundAsString));
+			if (constants.containsConstantByName(lowerBoundAsString)) {
+				lowerBound = new ConstantBound(constants.getConstantByName(lowerBoundAsString));
 			} else
 				throw new RuntimeException("A constant which was not declared was used in an time interval of an arc.");
 		}
@@ -139,8 +138,8 @@ public class TimeInterval {
 				int intBound = Integer.parseInt(upperBoundAsString);
 				upperBound = new IntBound(intBound);
 			} catch (NumberFormatException e) {
-				if (constants.containsKey(upperBoundAsString)) {
-					upperBound = new ConstantBound(constants.get(upperBoundAsString));
+				if (constants.containsConstantByName(upperBoundAsString)) {
+					upperBound = new ConstantBound(constants.getConstantByName(upperBoundAsString));
 				} else
 					throw new RuntimeException(
 							"A constant which was not declared was used in an time interval of an arc.");

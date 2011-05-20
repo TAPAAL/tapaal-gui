@@ -1,7 +1,6 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,8 +38,7 @@ public class TimeInvariant {
 		return isUpperIncluded ? comparison <= 0 : comparison < 0;
 	}
 
-	public static TimeInvariant parse(String invariant,
-			Map<String, Constant> constants) {
+	public static TimeInvariant parse(String invariant, ConstantStore constants) {
 		Pattern pattern = Pattern.compile("^(<|<=)\\s*(\\w+)$");
 		Matcher matcher = pattern.matcher(invariant);
 		matcher.find();
@@ -61,8 +59,8 @@ public class TimeInvariant {
 				int intBound = Integer.parseInt(boundAsString);
 				bound = new IntBound(intBound);
 			} catch (NumberFormatException e) {
-				if (constants.containsKey(boundAsString)) {
-					bound = new ConstantBound(constants.get(boundAsString));
+				if (constants.containsConstantByName(boundAsString)) {
+					bound = new ConstantBound(constants.getConstantByName(boundAsString));
 				} else
 					throw new RuntimeException("A constant which was not declared was used in an invariant.");
 			}

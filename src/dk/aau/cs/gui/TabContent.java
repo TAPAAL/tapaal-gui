@@ -372,5 +372,10 @@ public class TabContent extends JSplitPane {
 		tapnNetwork.swapTemplates(currentIndex, newIndex);
 	}
 
+	public void swapConstants(int currentIndex, int newIndex) {
+		tapnNetwork.swapConstants(currentIndex, newIndex);
+		
+	}
+
 	
 }

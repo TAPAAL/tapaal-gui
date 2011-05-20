@@ -132,7 +132,7 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public boolean isConstantNameUsed(String newName) {
-		return constants.isConstantNameUsed(newName);
+		return constants.containsConstantByName(newName);
 	}
 
 	public void buildConstraints() {
@@ -206,7 +206,7 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public int getConstantValue(String name) {
-		return constants.getConstant(name).value();
+		return constants.getConstantByName(name).value();
 	}
 
 	public int getLargestConstantValue() {
@@ -220,7 +220,7 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public Constant getConstant(String constantName) {
-		return constants.getConstant(constantName);
+		return constants.getConstantByName(constantName);
 	}
 
 	public TimedArcPetriNet getTAPNByName(String name) {
@@ -283,5 +283,21 @@ public class TimedArcPetriNetNetwork {
 		TimedArcPetriNet temp = tapns.get(currentIndex);
 		tapns.set(currentIndex, tapns.get(newIndex));
 		tapns.set(newIndex, temp);
+	}
+
+	public void swapConstants(int currentIndex, int newIndex) {
+		constants.swapConstants(currentIndex, newIndex);
+	}
+
+	public void swapSharedPlaces(int currentIndex, int newIndex) {
+		SharedPlace temp = sharedPlaces.get(currentIndex);
+		sharedPlaces.set(currentIndex, sharedPlaces.get(newIndex));
+		sharedPlaces.set(newIndex, temp);
+	}
+
+	public void swapSharedTransitions(int currentIndex, int newIndex) {
+		SharedTransition temp = sharedTransitions.get(currentIndex);
+		sharedTransitions.set(currentIndex, sharedTransitions.get(newIndex));
+		sharedTransitions.set(newIndex, temp);
 	}
 }
