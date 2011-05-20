@@ -21,7 +21,7 @@ public class RunKBoundOptimization extends RunKBoundAnalysis {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result, long verificationTime) {
+	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
 			if (result.getQueryResult().integerResult() == extraTokens + 1) {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),

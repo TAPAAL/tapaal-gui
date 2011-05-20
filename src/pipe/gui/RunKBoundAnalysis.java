@@ -14,7 +14,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result, long verificationTime) {
+	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), result
 				.isQuerySatisfied() ? getAnswerNotBoundedString()

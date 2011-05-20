@@ -18,12 +18,10 @@ public class RunVerification extends RunVerificationBase {
 	}
 
 	@Override
-	protected void showResult(VerificationResult<TAPNNetworkTrace> result,
-			long verificationTime) {
+	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
-			String satisfaction = result.isQuerySatisfied() ? "satisfied" : "not satisfied";
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
-					String.format("Property is %1$s.\nEstimated verification time: %2$.2fs", satisfaction, verificationTime / 1000.0),
+					result.getSummaryString(),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE);
 
 			if (result.getTrace() != null) {
@@ -72,5 +70,4 @@ public class RunVerification extends RunVerificationBase {
 
 		}
 	}
-
 }

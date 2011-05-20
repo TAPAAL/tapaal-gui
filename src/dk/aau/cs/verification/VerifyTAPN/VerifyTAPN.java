@@ -23,6 +23,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -127,17 +128,23 @@ public class VerifyTAPN implements ModelChecker {
 			String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			QueryResult queryResult = parseQueryResult(standardOutput);
-
-			if (queryResult == null) {
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), queryType(query));
+			if (queryResult.value1() == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
-				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult);
-				return new VerificationResult<TimedArcPetriNetTrace>(queryResult, tapnTrace, runner.getRunningTime()); 
+				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2()); 
 			}
 		}
 	}
 	
+	private QueryType queryType(TAPNQuery query) {
+		if(query.getProperty() instanceof TCTLEFNode) return QueryType.EF;
+		else if(query.getProperty() instanceof TCTLEGNode) return QueryType.EG;
+		else if(query.getProperty() instanceof TCTLAFNode) return QueryType.AF;
+		else return QueryType.AG;
+	}
+
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
 		if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
 		
@@ -185,10 +192,10 @@ public class VerifyTAPN implements ModelChecker {
 		return buffer.toString();
 	}
 	
-	private QueryResult parseQueryResult(String output) {
-		VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser();
-		QueryResult queryResult = outputParser.parseOutput(output);
-		return queryResult;
+	private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, QueryType queryType) {
+		VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, queryType);
+		Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
+		return result;
 	}
 	
 	

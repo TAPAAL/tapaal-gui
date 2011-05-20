@@ -25,7 +25,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	private VerificationOptions options;
 	private TimedArcPetriNetNetwork model;
-	private TAPNQuery query;
+	protected TAPNQuery query;
 
 	protected Messenger messenger;
 
@@ -57,8 +57,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			return new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
-					result.verificationTime());
+					result.verificationTime(),
+					result.stats());
 		}
+	}
+	
+	protected int kBound(){
+		return model.marking().size() + query.getExtraTokens();
 	}
 
 	private TAPNNetworkTrace decomposeTrace(TimedArcPetriNetTrace trace, NameMapping mapping) {
@@ -91,7 +96,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return;
 			}
 			
-			showResult(result, result.verificationTime());
+			showResult(result);
 
 		} else {
 			modelChecker.kill();
@@ -104,5 +109,5 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		messenger.displayErrorMessage("An error occured during verification.\n\nReason: " + errorMessage, "Verification Error");
 	}
 
-	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result,	long verificationTime);
+	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);
 }
