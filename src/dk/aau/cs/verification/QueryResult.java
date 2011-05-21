@@ -40,4 +40,8 @@ public class QueryResult {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	public boolean isConclusive() {
+		return true;
+	}
 }

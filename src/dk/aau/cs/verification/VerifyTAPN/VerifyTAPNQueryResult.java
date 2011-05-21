@@ -16,4 +16,8 @@ public class VerifyTAPNQueryResult extends QueryResult {
 	protected String getExplanationString() {
 		return boundednessAnalysis.toString();
 	}
+	
+	public boolean isConclusive(){
+		return boundednessAnalysis.isConclusive();
+	}
 }

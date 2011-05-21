@@ -6,7 +6,7 @@ public class VerificationResult<TTrace> {
 	private String errorMessage = null;
 	private long verificationTime;
 	private Stats stats;
-
+	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
 	}
