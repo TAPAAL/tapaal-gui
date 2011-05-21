@@ -12,9 +12,9 @@ public class BoundednessAnalysisResult {
 	@Override
 	public String toString() {
 		if(maxUsedTokens <= totalTokens){
-			return "The net is bounded.";
+			return "";
 		}else{
-			return "The net is unbounded.";
+			return String.format("\nOnly markings with at most %1$d tokens were explored.\nTry to increase the number of extra tokens.", totalTokens);
 		}
 	}
 }

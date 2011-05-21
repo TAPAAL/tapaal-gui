@@ -51,7 +51,7 @@ public class VerificationResult<TTrace> {
 		return verificationTime;
 	}
 
-	public Object getSummaryString() {
+	public String getSummaryString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(queryResult.toString());
 		buffer.append(System.getProperty("line.separator"));

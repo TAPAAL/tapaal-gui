@@ -1,4 +1,4 @@
-package dk.aau.cs.verification.VerifyTAPN;
+package dk.aau.cs.verification;
 
 public enum QueryType {
 	EF,

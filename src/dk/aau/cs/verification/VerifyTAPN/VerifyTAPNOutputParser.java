@@ -5,16 +5,17 @@ import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 
 public class VerifyTAPNOutputParser {
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 
-	private static final Pattern discoveredPattern = Pattern.compile("^\\s*discovered markings:\\s*(\\d+)$");
-	private static final Pattern exploredPattern = Pattern.compile("^\\s*explored markings:\\s*(\\d+)$");
-	private static final Pattern storedPattern = Pattern.compile("^\\s*stored markings:\\s*(\\d+)$");
-	private static final Pattern maxUsedTokensPattern = Pattern.compile("^\\s*Max used tokens:\\s*(\\d+)$");
+	private static final Pattern discoveredPattern = Pattern.compile("^\\s*discovered markings:\\s*(\\d+)\\s*$");
+	private static final Pattern exploredPattern = Pattern.compile("^\\s*explored markings:\\s*(\\d+)\\s*$");
+	private static final Pattern storedPattern = Pattern.compile("^\\s*stored markings:\\s*(\\d+)\\s*$");
+	private static final Pattern maxUsedTokensPattern = Pattern.compile("^\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*$");
 	private final int totalTokens;
 	private final QueryType queryType;
 	
@@ -56,7 +57,9 @@ public class VerifyTAPNOutputParser {
 					
 					matcher = maxUsedTokensPattern.matcher(line);
 					if(matcher.find()){
-						maxUsedTokens = Integer.valueOf(matcher.group(1));
+						maxUsedTokens = Integer.valueOf(matcher.group(2));
+						String operator = matcher.group(1) == null ? "" : matcher.group(1);
+						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
 					}
 				}
 			}
@@ -64,6 +67,7 @@ public class VerifyTAPNOutputParser {
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens);
 			return new Tuple<QueryResult, Stats>(new VerifyTAPNQueryResult(result, boundedAnalysis, queryType), new Stats(discovered, explored, stored));
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}

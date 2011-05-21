@@ -23,6 +23,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -128,7 +129,7 @@ public class VerifyTAPN implements ModelChecker {
 			String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), queryType(query));
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.queryType());
 			if (queryResult.value1() == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
 			} else {
@@ -136,13 +137,6 @@ public class VerifyTAPN implements ModelChecker {
 				return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2()); 
 			}
 		}
-	}
-	
-	private QueryType queryType(TAPNQuery query) {
-		if(query.getProperty() instanceof TCTLEFNode) return QueryType.EF;
-		else if(query.getProperty() instanceof TCTLEGNode) return QueryType.EG;
-		else if(query.getProperty() instanceof TCTLAFNode) return QueryType.AF;
-		else return QueryType.AG;
 	}
 
 	private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {

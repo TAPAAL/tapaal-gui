@@ -24,6 +24,7 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
@@ -218,7 +219,7 @@ public class Verifyta implements ModelChecker {
 			String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			QueryResult queryResult = parseQueryResult(standardOutput);
+			QueryResult queryResult = parseQueryResult(standardOutput, query.queryType());
 
 			if (queryResult == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput);
@@ -249,8 +250,8 @@ public class Verifyta implements ModelChecker {
 		return buffer.toString();
 	}
 
-	private QueryResult parseQueryResult(String output) {
-		VerifytaOutputParser outputParser = new VerifytaOutputParser();
+	private QueryResult parseQueryResult(String output, QueryType queryType) {
+		VerifytaOutputParser outputParser = new VerifytaOutputParser(queryType);
 		QueryResult queryResult = outputParser.parseOutput(output);
 		return queryResult;
 	}
