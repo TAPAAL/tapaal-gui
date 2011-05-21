@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -52,6 +54,22 @@ public class ConstantsPane extends JPanel {
 		buttonsPanel = new JPanel(new GridBagLayout());
 
 		listModel = new DefaultListModel();
+		listModel.addListDataListener(new ListDataListener() {
+			public void contentsChanged(ListDataEvent arg0) {
+			}
+
+			public void intervalAdded(ListDataEvent arg0) {
+				constantsList.setSelectedIndex(arg0.getIndex0());
+				constantsList.ensureIndexIsVisible(arg0.getIndex0());
+			}
+
+			public void intervalRemoved(ListDataEvent arg0) {
+				int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+				constantsList.setSelectedIndex(index);
+				constantsList.ensureIndexIsVisible(index);
+			}
+		});
+		
 		constantsList = new JList(listModel);
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {

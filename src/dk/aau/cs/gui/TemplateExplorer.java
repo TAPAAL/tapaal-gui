@@ -126,10 +126,13 @@ public class TemplateExplorer extends JPanel {
 
 			public void intervalAdded(ListDataEvent arg0) {
 				templateList.setSelectedIndex(arg0.getIndex0());
+				templateList.ensureIndexIsVisible(arg0.getIndex0());
 			}
 
 			public void intervalRemoved(ListDataEvent arg0) {
-				templateList.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0() - 1);
+				int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+				templateList.setSelectedIndex(index);
+				templateList.ensureIndexIsVisible(index);
 			}
 		});
 

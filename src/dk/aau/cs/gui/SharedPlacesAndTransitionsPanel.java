@@ -499,10 +499,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			addListDataListener(new ListDataListener() {
 				public void intervalAdded(ListDataEvent arg0) {
 					list.setSelectedIndex(arg0.getIndex0());
+					list.ensureIndexIsVisible(arg0.getIndex0());
 				}
 
 				public void intervalRemoved(ListDataEvent arg0) {
-					list.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0() - 1);
+					int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+					list.setSelectedIndex(index);
+					list.ensureIndexIsVisible(index);
 				}
 
 				public void contentsChanged(ListDataEvent e) {
@@ -554,10 +557,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			addListDataListener(new ListDataListener() {
 				public void intervalAdded(ListDataEvent arg0) {
 					list.setSelectedIndex(arg0.getIndex0());
+					list.ensureIndexIsVisible(arg0.getIndex0());
 				}
 
 				public void intervalRemoved(ListDataEvent arg0) {
-					list.setSelectedIndex(arg0.getIndex0() == 0 ? 0 : arg0.getIndex0() - 1);
+					int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+					list.setSelectedIndex(index);
+					list.ensureIndexIsVisible(index);
 				}
 
 				public void contentsChanged(ListDataEvent e) {

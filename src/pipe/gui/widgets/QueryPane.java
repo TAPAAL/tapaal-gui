@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -58,6 +60,22 @@ public class QueryPane extends JPanel {
 		queryCollectionPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
+		
+		listModel.addListDataListener(new ListDataListener() {
+			public void contentsChanged(ListDataEvent arg0) {
+			}
+
+			public void intervalAdded(ListDataEvent arg0) {
+				queryList.setSelectedIndex(arg0.getIndex0());
+				queryList.ensureIndexIsVisible(arg0.getIndex0());
+			}
+
+			public void intervalRemoved(ListDataEvent arg0) {
+				int index = (arg0.getIndex0() == 0) ? 0 : (arg0.getIndex0() - 1);
+				queryList.setSelectedIndex(index);
+				queryList.ensureIndexIsVisible(index);
+			}
+		});
 
 		queryList = new JList(listModel);
 		queryList.setCellRenderer(new QueryCellRenderer());
