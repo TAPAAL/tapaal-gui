@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
@@ -48,8 +49,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		this.oldName = "";
 
 		// Set up initial values
-		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0,
-				Integer.MAX_VALUE, 1);
+		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		valueSpinner.setModel(spinnerModel);
 		nameTextField.setText(oldName);
 
@@ -167,6 +167,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private void initComponents() {
 
 		nameTextField = new javax.swing.JTextField();
+		Dimension size = new Dimension(275, 25);
+		nameTextField.setPreferredSize(size);
+		nameTextField.setMinimumSize(size);
 		nameLabel = new javax.swing.JLabel();
 		valueLabel = new javax.swing.JLabel();
 		valueSpinner = new javax.swing.JSpinner();
@@ -219,7 +222,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 																						.addComponent(
 																								nameTextField,
 																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								78,
+																								javax.swing.GroupLayout.PREFERRED_SIZE,
 																								javax.swing.GroupLayout.PREFERRED_SIZE))
 																		.addGroup(
 																				layout
