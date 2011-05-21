@@ -6,10 +6,8 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
-import dk.aau.cs.TCTL.TCTLTrueNode;
 
 public class UpwardsClosedVisitor extends VisitorBase {
 	public boolean isUpwardClosed(TCTLAbstractProperty query){
