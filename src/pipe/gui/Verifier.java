@@ -33,31 +33,19 @@ public class Verifier {
 		return verifytapn;
 	}
 
-	public static void analyzeAndOptimizeKBound(
+	public static void analyzeKBound(
 			TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
-		Verifyta verifyta = getVerifyta();
+		VerifyTAPN verifytapn = getVerifyTAPN();
 
-		if (!verifyta.isCorrectVersion()) {
-			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
+		if (!verifytapn.isCorrectVersion()) {
+			System.err.println("Verifytapn not found, or you are running an old version of Verifytapn.\n"
 							+ "Update to the latest development version.");
 			return;
 		}
-		KBoundOptimizer optimizer = new KBoundOptimizer(tapnNetwork, k,
-				verifyta, new MessengerImpl(), tokensControl);
+		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, verifytapn, new MessengerImpl(), tokensControl);
 		optimizer.analyze();
 	}
 
-	public static void analyseKBounded(TimedArcPetriNetNetwork tapnNetwork, int k) {
-		Verifyta verifyta = getVerifyta();
-
-		if (!verifyta.isCorrectVersion()) {
-			System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
-							+ "Update to the latest development version.");
-			return;
-		}
-		KBoundAnalyzer analyzer = new KBoundAnalyzer(tapnNetwork, k, verifyta, new MessengerImpl());
-		analyzer.analyze();
-	}
 
 	public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
 		runUppaalVerification(timedArcPetriNetNetwork, input, false);

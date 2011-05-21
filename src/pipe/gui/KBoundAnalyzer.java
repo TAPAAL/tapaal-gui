@@ -1,17 +1,20 @@
 package pipe.gui;
 
+import javax.swing.JSpinner;
+
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 public class KBoundAnalyzer {
 	protected TimedArcPetriNetNetwork tapnNetwork;
@@ -19,24 +22,22 @@ public class KBoundAnalyzer {
 
 	private ModelChecker modelChecker;
 	private Messenger messenger;
+	private final JSpinner spinner;
 
 	public KBoundAnalyzer(TimedArcPetriNetNetwork tapnNetwork, int k,
-			ModelChecker modelChecker, Messenger messenger) {
+			ModelChecker modelChecker, Messenger messenger, JSpinner tokensControl) {
 		this.k = k;
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
-	}
-
-	protected RunKBoundAnalysis getAnalyzer(ModelChecker modelChecker, Messenger messenger) {
-		return new RunKBoundAnalysis(modelChecker, messenger);
+		this.spinner = tokensControl;
 	}
 
 	public void analyze() {
 		TAPNQuery query = getBoundednessQuery();
-		VerifytaOptions options = verificationOptions();
+		VerifyTAPNOptions options = verificationOptions();
 
-		RunKBoundAnalysis analyzer = getAnalyzer(modelChecker, messenger);
+		RunKBoundAnalysis analyzer = new RunKBoundAnalysis(modelChecker, messenger, spinner);
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 		dialog.setupListeners(analyzer);
 
@@ -44,15 +45,15 @@ public class KBoundAnalyzer {
 		dialog.setVisible(true);
 	}
 
-	protected VerifytaOptions verificationOptions() {
-		return new VerifytaOptions(TraceOption.NONE, SearchOption.BFS, false, ReductionOption.KBOUNDANALYSIS, true);
+	protected VerifyTAPNOptions verificationOptions() {
+		return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true);
 	}
 
 	protected TAPNQuery getBoundednessQuery() {
 		TCTLAbstractProperty property = null;
 
-		property = new TCTLEFNode(new TCTLAtomicPropositionNode("_BOTTOM_", "=", 0));
+		property = new TCTLAGNode(new TCTLTrueNode());
 
-		return new TAPNQuery(property, k + 1);
+		return new TAPNQuery(property, k);
 	}
 }

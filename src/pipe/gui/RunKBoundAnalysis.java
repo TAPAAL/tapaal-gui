@@ -1,45 +1,37 @@
 package pipe.gui;
 
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNQueryResult;
 
 public class RunKBoundAnalysis extends RunVerificationBase {
 
-	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger) {
+	private final JSpinner spinner;
+
+	public RunKBoundAnalysis(ModelChecker modelChecker, Messenger messenger,JSpinner spinner) {
 		super(modelChecker, messenger);
+		this.spinner = spinner;
 	}
 
 	@Override
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), result
-				.isQuerySatisfied() ? getAnswerNotBoundedString()
-				: getAnswerBoundedString(), "Analysis Result",
-				JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			String extraInformation = "";
-			
-			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
-				
-				extraInformation = "We have detected an error that often arises when UPPAAL is missing a valid Licence File.\n" +
-						"Please open the UPPAAL GUI while connected to the internet, to correct this problem.";
-				
+			if (!result.getQueryResult().isConclusive()) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						getAnswerNotBoundedString(), "Analysis Result",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				spinner.setValue(((VerifyTAPNQueryResult)result.getQueryResult()).boundednessAnalysis().usedTokens() - model.marking().size());
 			}
-			
+		} else {						
 			String message = "An error occured during the verification." +
 			System.getProperty("line.separator") + 	
 			System.getProperty("line.separator");
-			
-			if (extraInformation != ""){
-				message += extraInformation +			
-				System.getProperty("line.separator") + 	
-				System.getProperty("line.separator");
-			}
-			
 			message += "Model checker output:\n" + result.errorMessage();
 			
 			messenger.displayWrappedErrorMessage(message,"Error during verification");

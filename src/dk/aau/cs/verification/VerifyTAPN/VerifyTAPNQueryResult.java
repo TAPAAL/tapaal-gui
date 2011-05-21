@@ -20,4 +20,9 @@ public class VerifyTAPNQueryResult extends QueryResult {
 	public boolean isConclusive(){
 		return boundednessAnalysis.isConclusive();
 	}
+
+
+	public BoundednessAnalysisResult boundednessAnalysis() {
+		return boundednessAnalysis;
+	}
 }

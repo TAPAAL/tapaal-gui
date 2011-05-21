@@ -130,7 +130,6 @@ public class QueryDialog extends JPanel {
 	private JPanel boundednessCheckPanel;
 	private JSpinner numberOfExtraTokensInNet;
 	private JButton kbounded;
-	private JButton kboundedOptimize;
 
 	// Query Panel
 	private JPanel queryPanel;
@@ -853,20 +852,11 @@ public class QueryDialog extends JPanel {
 		kbounded = new JButton("Check Boundedness");
 		kbounded.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyseKBounded(tapnNetwork, getCapacity());
+				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
 			}
 
 		});
 		boundednessCheckPanel.add(kbounded);
-
-		kboundedOptimize = new JButton("Optimize Number of Tokens");
-		kboundedOptimize.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeAndOptimizeKBound(tapnNetwork, getCapacity(),
-						numberOfExtraTokensInNet);
-			}
-		});
-		boundednessCheckPanel.add(kboundedOptimize);
 
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();

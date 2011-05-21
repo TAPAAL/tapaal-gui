@@ -21,4 +21,8 @@ public class BoundednessAnalysisResult {
 	public boolean isConclusive() {
 		return maxUsedTokens <= totalTokens;
 	}
+
+	public int usedTokens() {
+		return maxUsedTokens;
+	}
 }
