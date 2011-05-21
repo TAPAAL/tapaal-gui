@@ -11,9 +11,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 public class KBoundAnalyzer {

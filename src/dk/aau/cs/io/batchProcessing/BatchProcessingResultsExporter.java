@@ -23,7 +23,18 @@ public class BatchProcessingResultsExporter {
 	public void exportToCSV(Iterable<BatchProcessingVerificationResult> results, File outputFile) throws Exception {
 		PrintStream writer = new PrintStream(outputFile);
 		
-		writer.println("Model" + DELIMITER + "Query" + DELIMITER + "Result" + DELIMITER + "Verification Time" + DELIMITER + "Query Property" + DELIMITER + "Extra Tokens" + DELIMITER + "Search Order" + DELIMITER + "Symmetry" + DELIMITER + "Verification Method");
+		writer.println("Model" + DELIMITER + 
+				       "Query" + DELIMITER + 
+				       "Result" + DELIMITER + 
+				       "Verification Time" + DELIMITER + 
+				       "Discovered States" + DELIMITER + 
+				       "Explored States" + DELIMITER + 
+				       "Stored States" + DELIMITER + 
+				       "Query Property" + DELIMITER + 
+				       "Extra Tokens" + DELIMITER + 
+				       "Search Order" + DELIMITER + 
+				       "Symmetry" + DELIMITER + 
+				       "Verification Method");
 		
 		for(BatchProcessingVerificationResult result : results) {
 			TAPNQuery query = result.query();
@@ -39,6 +50,12 @@ public class BatchProcessingResultsExporter {
 			s.append(result.verificationResult());
 			s.append(DELIMITER);
 			s.append((result.verificationTimeInMs() / 1000.0) + " s");
+			s.append(DELIMITER);
+			s.append(result.hasStats() ? result.stats().discoveredStates() : "");
+			s.append(DELIMITER);
+			s.append(result.hasStats() ? result.stats().exploredStates() : "");
+			s.append(DELIMITER);
+			s.append(result.hasStats() ? result.stats().storedStates() : "");
 			s.append(DELIMITER);
 			s.append(query != null ? query.getProperty().toString() : "");
 			s.append(DELIMITER);

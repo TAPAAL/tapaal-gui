@@ -12,6 +12,18 @@ public class Stats {
 		this.stored = stored;	
 	}
 	
+	public long exploredStates() {
+		return explored;
+	}
+	
+	public long discoveredStates() {
+		return discovered;
+	}
+	
+	public long storedStates() {
+		return stored;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();

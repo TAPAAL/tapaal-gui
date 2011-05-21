@@ -1,5 +1,7 @@
 package dk.aau.cs.verification.batchProcessing;
 
+import dk.aau.cs.verification.NullStats;
+import dk.aau.cs.verification.Stats;
 import pipe.dataLayer.TAPNQuery;
 
 public class BatchProcessingVerificationResult {
@@ -7,12 +9,14 @@ public class BatchProcessingVerificationResult {
 	private TAPNQuery query;
 	private long verificationTimeInMs;
 	private String verificationResult;
+	private Stats stats;
 	
-	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime) {
+	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, Stats stats) {
 		this.file = file;
 		this.query = query;
 		this.verificationResult = verificationResult;
 		this.verificationTimeInMs = verificationTime;
+		this.stats = stats;
 	}
 	
 	
@@ -34,6 +38,18 @@ public class BatchProcessingVerificationResult {
 	
 	public long verificationTimeInMs() {
 		return verificationTimeInMs;
+	}
+	
+	public Stats stats() {
+		return stats;
+	}
+
+
+	public boolean hasStats() {
+		if(stats instanceof NullStats)
+			return false;
+		else
+			return true;
 	}
 	
 	
