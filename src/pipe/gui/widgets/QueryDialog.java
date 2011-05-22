@@ -17,6 +17,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -163,6 +165,8 @@ public class QueryDialog extends JPanel {
 	private JComboBox placesBox;
 	private JComboBox relationalOperatorBox;
 	private JSpinner placeMarking;
+	private JButton truePredicateButton;
+	private JButton falsePredicateButton;
 
 	// Uppaal options panel (search + trace options)
 	// search options panel
@@ -211,8 +215,6 @@ public class QueryDialog extends JPanel {
 
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
-	private JButton truePredicateButton;
-	private JButton falsePredicateButton;
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
@@ -1215,6 +1217,12 @@ public class QueryDialog extends JPanel {
 								placeNames.add(place.name());
 							}
 						}
+						
+						Collections.sort(placeNames, new Comparator<String>() {
+							public int compare(String o1, String o2) {
+								return o1.compareToIgnoreCase(o2);
+							}
+						});
 						placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
 						currentlySelected = tapn;
@@ -1227,6 +1235,11 @@ public class QueryDialog extends JPanel {
 					for (SharedPlace place : tapnNetwork.sharedPlaces()) {
 							placeNames.add(place.name());
 					}
+					Collections.sort(placeNames, new Comparator<String>() {
+						public int compare(String o1, String o2) {
+							return o1.compareToIgnoreCase(o2);
+						}
+					});
 					placesBox.setModel(new DefaultComboBoxModel(placeNames));
 
 					currentlySelected = SHARED;
