@@ -3,26 +3,20 @@
  */
 package pipe.gui;
 
-import java.awt.Image;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
 
 public class RunVerification extends RunVerificationBase {
-	private static ImageIcon satisfiedIcon = loadIcon("satisfied");
-	private static ImageIcon notSatisfiedIcon = loadIcon("notsatisfied");
-	private static ImageIcon inconclusiveIcon = loadIcon("maybe");
-	
-	public RunVerification(ModelChecker modelChecker, Messenger messenger) {
+	private IconSelector iconSelector;
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
 		super(modelChecker, messenger);
+		this.iconSelector = selector;
 	}
 
 	@Override
@@ -30,7 +24,7 @@ public class RunVerification extends RunVerificationBase {
 		if (result != null && !result.error()) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
 					result.getSummaryString(),
-					"Verification Result", JOptionPane.INFORMATION_MESSAGE, getIcon(result));
+					"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result.getQueryResult()));
 
 			if (result.getTrace() != null) {
 				// DataLayer model = CreateGui.getModel();
@@ -79,18 +73,5 @@ public class RunVerification extends RunVerificationBase {
 		}
 	}
 	
-	private static ImageIcon loadIcon(String name){
-		try {
-			return new ImageIcon(ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png")).getScaledInstance(52, 52, Image.SCALE_SMOOTH));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
-	private <T> ImageIcon getIcon(VerificationResult<T> result){
-		if(result.getQueryResult().isQuerySatisfied() && result.getQueryResult().isConclusive()) return satisfiedIcon;
-		else if(!result.getQueryResult().isQuerySatisfied() && result.getQueryResult().isConclusive()) return notSatisfiedIcon;
-		else return inconclusiveIcon;
-	}
 }

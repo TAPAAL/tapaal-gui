@@ -1,12 +1,15 @@
 package dk.aau.cs.verification;
 
 
+
 public class QueryResult {
 	private boolean satisfied = false;
 	protected QueryType queryType;
+	private BoundednessAnalysisResult boundednessAnalysis;
 
-	public QueryResult(boolean satisfied, QueryType queryType){
+	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, QueryType queryType){
 		this.satisfied = satisfied;
+		this.boundednessAnalysis = boundednessAnalysis;
 		this.queryType = queryType;
 	}
 	
@@ -23,6 +26,9 @@ public class QueryResult {
 		return buffer.toString();
 	}
 	
+	public QueryType queryType(){
+		return queryType;
+	}
 	
 	private boolean shouldAddExplanation() {
 		return (queryType.equals(QueryType.EF) && !isQuerySatisfied()) 
@@ -32,16 +38,10 @@ public class QueryResult {
 	}
 	
 	protected String getExplanationString(){
-		return "\nThe answer is conclusive only if the net is bounded\nfor the given number of extra tokens.";
+		return boundednessAnalysis.toString();
 	}
 
-	// TODO: delete me
-	public int integerResult() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public boolean isConclusive() {
-		return true;
+	public BoundednessAnalysisResult boundednessAnalysis() {
+		return boundednessAnalysis;
 	}
 }

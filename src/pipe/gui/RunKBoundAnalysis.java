@@ -5,9 +5,9 @@ import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNQueryResult;
 
 public class RunKBoundAnalysis extends RunVerificationBase {
 
@@ -21,12 +21,12 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 	@Override
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if(result != null && !result.error()) {
-			if (!result.getQueryResult().isConclusive()) {
+			if (!result.getQueryResult().boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) {
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						getAnswerNotBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				spinner.setValue(((VerifyTAPNQueryResult)result.getQueryResult()).boundednessAnalysis().usedTokens() - model.marking().size());
+				spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - model.marking().size());
 			}
 		} else {						
 			String message = "An error occured during the verification." +

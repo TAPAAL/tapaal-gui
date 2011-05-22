@@ -1,4 +1,4 @@
-package dk.aau.cs.verification.VerifyTAPN;
+package dk.aau.cs.verification;
 
 public class BoundednessAnalysisResult {
 	private int maxUsedTokens;
@@ -11,17 +11,18 @@ public class BoundednessAnalysisResult {
 	
 	@Override
 	public String toString() {
-		if(isConclusive()){
+		if(boundednessResult().equals(Boundedness.Bounded)){
 			return "";
 		}else{
 			return String.format("\nOnly markings with at most %1$d tokens were explored.\nTry to increase the number of extra tokens.", totalTokens);
 		}
 	}
 
-	public boolean isConclusive() {
-		return maxUsedTokens <= totalTokens;
+	public Boundedness boundednessResult(){
+		if(maxUsedTokens <= totalTokens) return Boundedness.Bounded;
+		else return Boundedness.NotBounded;
 	}
-
+	
 	public int usedTokens() {
 		return maxUsedTokens;
 	}

@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.UPPAAL;
 
+import dk.aau.cs.verification.InconclusiveBoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 
@@ -23,9 +24,9 @@ public class VerifytaOutputParser {
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
 				if (line.contains(PROPERTY_IS_SATISFIED_STRING)) {
-					return new QueryResult(true, queryType);
+					return new QueryResult(true, new InconclusiveBoundednessAnalysisResult(), queryType);
 				} else if (line.contains(PROPERTY_IS_NOT_SATISFIED_STRING)) {
-					return new QueryResult(false, queryType);
+					return new QueryResult(false, new InconclusiveBoundednessAnalysisResult(), queryType);
 				}
 			}
 		} catch (Exception e) {
