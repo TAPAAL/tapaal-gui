@@ -23,6 +23,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.Degree2Converter;
@@ -71,7 +72,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		
 		extraTokens = query.getExtraTokens();
 		NTA nta = transformModel(model);
-		UPPAALQuery uppaalQuery = transformQuery(query);
+		UPPAALQuery uppaalQuery = transformQuery(model, query);
 		
 		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
 	}
@@ -89,52 +90,89 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 			return null;
 		}
 		
-		
 		NTA nta = new NTA();
-		TimedAutomaton ta = createTokenAutomaton(degree2Model);
-		createInitializationTransitionsForTokenAutomata(degree2Model, ta);
-		ta.setName(TOKEN_TEMPLATE_NAME);
-		ta.setInitLocation(getLocationByName(PCAPACITY));
-		ta.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
-		nta.addTimedAutomaton(ta);
+		if (useSymmetry || degree2Model.marking().size() + extraTokens == 0) {
+			TimedAutomaton ta = createTokenAutomaton(degree2Model);
+			createInitializationTransitionsForTokenAutomata(degree2Model, ta);
+			ta.setName(TOKEN_TEMPLATE_NAME);
+			ta.setInitLocation(getLocationByName(PCAPACITY));
+			if (useSymmetry)
+				ta.setParameters("const " + ID_TYPE + " " + ID_TYPE_NAME);
+			nta.addTimedAutomaton(ta);
+		} else {
+			int j = 0;
+			for(TimedPlace p : degree2Model.places()) {
+				for (TimedToken token : degree2Model.marking().getTokensFor(p)) {
+					if (!token.place().name().equals(PLOCK)) {
+						clearLocationMappings();
+						TimedAutomaton ta = createTokenAutomaton(degree2Model);
+						ta.setName(TOKEN_TEMPLATE_NAME + j);
+						ta.setInitLocation(getLocationByName(token.place().name()));
+						nta.addTimedAutomaton(ta);
+						j++;
+					}
+				}
+			}
+			
+			for (int i = 0; i < extraTokens; i++) {
+				clearLocationMappings();
+				TimedAutomaton tokenTemplate = createTokenAutomaton(degree2Model);
+				tokenTemplate.setInitLocation(getLocationByName(PCAPACITY));
+				nta.addTimedAutomaton(tokenTemplate);
+				tokenTemplate.setName(TOKEN_TEMPLATE_NAME + String.valueOf(degree2Model.marking().size() - 1 + i));
+			}
+		}
 		
 		TimedAutomaton lockTA = createTokenAutomaton(degree2Model);
 		lockTA.setName(LOCK_TEMPLATE_NAME);
 		lockTA.setInitLocation(getLocationByName(PLOCK));
 		nta.addTimedAutomaton(lockTA);
 		
-		nta.addTimedAutomaton(createInitializationAutomata(degree2Model));
+		if(useSymmetry)
+			nta.addTimedAutomaton(createInitializationAutomata(degree2Model));
 		
 		nta.setSystemDeclarations(createSystemDeclaration(degree2Model.marking().size()));
 		nta.setGlobalDeclarations(createGlobalDeclarations(degree2Model));
 		
 		return nta;
-		
 	}
 
 	private String createSystemDeclaration(int tokensInModel) {
-		return "system " + CONTROL_TEMPLATE_NAME + ", " + LOCK_TEMPLATE_NAME + ", "	+ TOKEN_TEMPLATE_NAME + ";";
+		if (useSymmetry || tokensInModel + extraTokens == 1) {
+			return "system " + CONTROL_TEMPLATE_NAME + ", " + LOCK_TEMPLATE_NAME + ", "	+ TOKEN_TEMPLATE_NAME + ";";
+		} else {
+			StringBuilder builder = new StringBuilder("system ");
+			builder.append(LOCK_TEMPLATE_NAME);
+
+			for (int i = 0; i < extraTokens + tokensInModel - 1; i++) {
+				builder.append(", ");
+				builder.append(TOKEN_TEMPLATE_NAME);
+				builder.append(i);
+			}
+			builder.append(";");
+
+			return builder.toString();
+		}
 	}
 	
 	
 	private String createGlobalDeclarations(TimedArcPetriNet degree2Model) {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append("const int N = ");
-		builder.append(degree2Model.marking().size() + extraTokens - 1);
-		builder.append(";\n");
-		builder.append("typedef ");
-		if(useSymmetry)
-			builder.append("scalar[N] ");
-		else
-			builder.append("int[1,N] ");
-		builder.append(ID_TYPE);
-		builder.append(";\n");
-
-		for (int i = 0; i < numberOfInitChannels; i++) {
-			builder.append("chan ");
-			builder.append(String.format(INITIALIZE_CHANNEL, i, ""));
+		if (useSymmetry) {
+			builder.append("const int N = ");
+			builder.append(degree2Model.marking().size() + extraTokens - 1);
 			builder.append(";\n");
+			builder.append("typedef ");
+			builder.append("scalar[N] ");
+			builder.append(ID_TYPE);
+			builder.append(";\n");
+
+			for (int i = 0; i < numberOfInitChannels; i++) {
+				builder.append("chan ");
+				builder.append(String.format(INITIALIZE_CHANNEL, i, ""));
+				builder.append(";\n");
+			}
 		}
 
 		for (TimedTransition t : degree2Model.transitions()) {
@@ -377,8 +415,8 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 		return matcher.find();
 	}
 	
-	private UPPAALQuery transformQuery(TAPNQuery query) throws Exception {
-		OptimizedStandardTranslationQueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor();
+	private UPPAALQuery transformQuery(TimedArcPetriNet model, TAPNQuery query) throws Exception {
+		OptimizedStandardTranslationQueryVisitor visitor = new OptimizedStandardTranslationQueryVisitor(model.marking().size() + query.getExtraTokens(), useSymmetry);
 		return  new StandardUPPAALQuery(visitor.getUppaalQueryFor(query));
 	}
 
