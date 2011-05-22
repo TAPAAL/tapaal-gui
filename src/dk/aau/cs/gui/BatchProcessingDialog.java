@@ -68,10 +68,16 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private static final String name_verifyTAPN = "VerifyTAPN";
 	private static final String name_verifyTAPNDiscreteInclusion = "VerifyTAPN w. Discrete Inclusion";
-	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_verifyTAPNWithLegend = "A: " + name_verifyTAPN;
+	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: " + name_verifyTAPNDiscreteInclusion;
+	private static final String name_STANDARDWithLegend = "C: " + name_STANDARD;
+	private static final String name_OPTIMIZEDSTANDARDWithLegend = "D: " + name_OPTIMIZEDSTANDARD;
+	private static final String name_BROADCASTWithLegend = "E: " + name_BROADCAST;
+	private static final String name_BROADCASTDEG2WithLegend = "F: " + name_BROADCASTDEG2;
 	private static final String name_AllReductions = "All Verification Methods";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
@@ -429,7 +435,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 5);
 		verificationOptionsPanel.add(reductionLabel,gbc);
 		
-		String[] options = new String[] { name_KeepQueryOption, name_verifyTAPN, name_verifyTAPNDiscreteInclusion, name_STANDARD, name_OPTIMIZEDSTANDARD, name_BROADCAST, name_BROADCASTDEG2, name_AllReductions };
+		String[] options = new String[] { name_KeepQueryOption, name_verifyTAPNWithLegend, name_verifyTAPNDiscreteInclusionWithLegend, name_STANDARDWithLegend, name_OPTIMIZEDSTANDARDWithLegend, name_BROADCASTWithLegend, name_BROADCASTDEG2WithLegend, name_AllReductions };
 		reductionOption = new JComboBox(options);
 		
 		reductionOption.addActionListener(new ActionListener() {
@@ -538,7 +544,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private BatchProcessingVerificationOptions getVerificationOptions() {
-		boolean discreteInclusion = getReductionOptionAsString().equals(name_verifyTAPNDiscreteInclusion) ? true : false;
+		boolean discreteInclusion = getReductionOptionAsString().equals(name_verifyTAPNDiscreteInclusionWithLegend) ? true : false;
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(), keepQueryCapacity.isSelected(), getNumberOfExtraTokens(), getSearchOption(), getSymmetryOption(), getReductionOption(), discreteInclusion);		
 	}
 	
@@ -573,17 +579,17 @@ public class BatchProcessingDialog extends JDialog {
 	private ReductionOption getReductionOption() {
 		String reductionOptionString = (String)reductionOption.getSelectedItem();
 		
-		if (reductionOptionString.equals(name_STANDARD))
+		if (reductionOptionString.equals(name_STANDARDWithLegend))
 				return ReductionOption.STANDARD;
-		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD))
+		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARDWithLegend))
 				return ReductionOption.OPTIMIZEDSTANDARD;
-		else if (reductionOptionString.equals(name_BROADCAST))
+		else if (reductionOptionString.equals(name_BROADCASTWithLegend))
 				return ReductionOption.BROADCAST;
-		else if (reductionOptionString.equals(name_BROADCASTDEG2))
+		else if (reductionOptionString.equals(name_BROADCASTDEG2WithLegend))
 				return ReductionOption.DEGREE2BROADCAST;
-		else if (reductionOptionString.equals(name_verifyTAPN))
+		else if (reductionOptionString.equals(name_verifyTAPNWithLegend))
 			return ReductionOption.VerifyTAPN;
-		else if (reductionOptionString.equals(name_verifyTAPNDiscreteInclusion))
+		else if (reductionOptionString.equals(name_verifyTAPNDiscreteInclusionWithLegend))
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_AllReductions))
 			return ReductionOption.BatchProcessingAllReductions;
@@ -655,6 +661,9 @@ public class BatchProcessingDialog extends JDialog {
 			};
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
+		table.getColumnModel().getColumn(0).setMinWidth(25);
+		table.getColumnModel().getColumn(0).setPreferredWidth(25);
+		table.getColumnModel().getColumn(0).setMaxWidth(50);
 		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
