@@ -57,8 +57,8 @@ public class RunVerification extends RunVerificationBase {
 			
 			if (result != null && (result.errorMessage().contains("relocation") || result.errorMessage().toLowerCase().contains("internet connection is required for activation"))){
 				
-				extraInformation = "We have detected an error that often arises when UPPAAL is missing a valid Licence File.\n" +
-						"Please open the UPPAAL GUI while connected to the internet, to correct this problem.";
+				extraInformation = "We detected an error that often arises when UPPAAL is missing a valid Licence file.\n" +
+						"Open the UPPAAL GUI while connected to the internet to correct this problem.";
 				
 			}
 			
@@ -81,7 +81,7 @@ public class RunVerification extends RunVerificationBase {
 	
 	private static ImageIcon loadIcon(String name){
 		try {
-			return new ImageIcon(ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png")).getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+			return new ImageIcon(ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + name + ".png")).getScaledInstance(52, 52, Image.SCALE_SMOOTH));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

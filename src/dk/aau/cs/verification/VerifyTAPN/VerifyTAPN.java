@@ -56,7 +56,7 @@ public class VerifyTAPN implements ModelChecker {
 	public boolean isCorrectVersion() {
 		if (isNotSetup()) {
 			messenger.displayErrorMessage(
-					"No verifyTAPN specified: The verification is cancelled",
+					"No verifytapn specified: The verification is cancelled",
 					"Verification Error");
 			return false;
 		}
@@ -99,10 +99,10 @@ public class VerifyTAPN implements ModelChecker {
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
 		if(!supportsModel(model.value1()))
-			throw new UnsupportedModelException("VerifyTAPN does not support the given model.");
+			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		
 		if(!supportsQuery(model.value1(), query, options))
-			throw new UnsupportedQueryException("VerifyTAPN does not support the given query.");
+			throw new UnsupportedQueryException("Verifytapn does not support the given query.");
 		
 		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
@@ -150,7 +150,7 @@ public class VerifyTAPN implements ModelChecker {
 				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()))
 					return null;
 				else
-					messenger.displayErrorMessage("VerifyTAPN could not generate the requested trace for the model. Try another trace option.");
+					messenger.displayErrorMessage("Verifytapn cannot generate the requested trace for the model. Try another trace option.");
 			}
 		} 
 		return trace;

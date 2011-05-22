@@ -158,7 +158,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				processVerificationResult(file, queryToVerify, verificationResult);
 		}
 		else
-			publishResult(file.getName(), queryToVerify, "Skipped - Query is disabled because it contains propositions involving places from a deactivated component", 0, new NullStats());
+			publishResult(file.getName(), queryToVerify, "Skipped - query is disabled because it contains propositions involving places from a deactivated component", 0, new NullStats());
 		fireVerificationTaskComplete();
 	}
 
@@ -210,13 +210,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		try {
 			verificationResult = verify(composedModel, query);
 		} catch(UnsupportedModelException e) {
-			publishResult(file.getName(), query, "Skipped - model was not supported by verification method", 0, new NullStats());
+			publishResult(file.getName(), query, "Skipped - model not supported by the verification method", 0, new NullStats());
 			return null;
 		} catch(UnsupportedQueryException e) {
 			if(e.getMessage().toLowerCase().contains("discrete inclusion"))
-				publishResult(file.getName(), query, "Skipped -discrete inclusion is enabled and query is not upward closed", 0, new NullStats());
+				publishResult(file.getName(), query, "Skipped - discrete inclusion is enabled and query is not upward closed", 0, new NullStats());
 			else
-				publishResult(file.getName(), query, "Skipped - query was not supported by verification method", 0, new NullStats());
+				publishResult(file.getName(), query, "Skipped - query not supported by the verification method", 0, new NullStats());
 			return null;
 		}
 		return verificationResult;
@@ -224,10 +224,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private void processVerificationResult(File file, pipe.dataLayer.TAPNQuery query, VerificationResult<TimedArcPetriNetTrace> verificationResult) {
 		if(skippingCurrentVerification) {
-			publishResult(file.getName(), query, "Skipped by user", verificationResult.verificationTime(), new NullStats());
+			publishResult(file.getName(), query, "Skipped - by the user", verificationResult.verificationTime(), new NullStats());
 			skippingCurrentVerification = false;
 		} else if(timeoutCurrentVerification) {
-			publishResult(file.getName(), query, "Skipped due to timeout", verificationResult.verificationTime(), new NullStats());
+			publishResult(file.getName(), query, "Skipped - due to timeout", verificationResult.verificationTime(), new NullStats());
 			timeoutCurrentVerification = false;
 		} else if(!verificationResult.error()) {
 			String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
@@ -260,7 +260,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private TCTLAbstractProperty generateSearchWholeStateSpaceProperty(TimedArcPetriNet model) throws Exception {
 		TimedPlace p = model.places().iterator().next();
 		if(p == null)
-			throw new Exception("Model contained no places. Should not happen.");
+			throw new Exception("Model contains no places. This may not happen.");
 		
 		return new TCTLAGNode(new TCTLTrueNode());
 	}
