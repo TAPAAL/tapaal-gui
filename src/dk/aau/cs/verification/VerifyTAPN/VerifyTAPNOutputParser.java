@@ -13,10 +13,10 @@ public class VerifyTAPNOutputParser {
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 
-	private static final Pattern discoveredPattern = Pattern.compile("^\\s*discovered markings:\\s*(\\d+)\\s*$");
-	private static final Pattern exploredPattern = Pattern.compile("^\\s*explored markings:\\s*(\\d+)\\s*$");
-	private static final Pattern storedPattern = Pattern.compile("^\\s*stored markings:\\s*(\\d+)\\s*$");
-	private static final Pattern maxUsedTokensPattern = Pattern.compile("^\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*$");
+	private static final Pattern discoveredPattern = Pattern.compile("\\s*discovered markings:\\s*(\\d+)\\s*");
+	private static final Pattern exploredPattern = Pattern.compile("\\s*explored markings:\\s*(\\d+)\\s*");
+	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
+	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private final int totalTokens;
 	private final QueryType queryType;
 	
