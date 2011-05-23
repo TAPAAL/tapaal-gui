@@ -671,7 +671,7 @@ public class BatchProcessingDialog extends JDialog {
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		Dimension scrollPaneDims = new Dimension(850,400);
+		Dimension scrollPaneDims = new Dimension(850,450);
 		scrollPane.setMinimumSize(scrollPaneDims);
 		scrollPane.setPreferredSize(scrollPaneDims);
 		
@@ -854,7 +854,7 @@ public class BatchProcessingDialog extends JDialog {
 						cancelButton.setEnabled(true);
 						skipFileButton.setEnabled(true);
 						timerLabel.setText("");
-						progressLabel.setText("0 Verification Tasks Completed");
+						progressLabel.setText("0 verification tasks completed");
 					}
 				}
 			}
@@ -882,7 +882,7 @@ public class BatchProcessingDialog extends JDialog {
 				if(timeoutTimer.isRunning())
 					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
-				progressLabel.setText(e.verificationTasksCompleted() + " Verification Task" + (tasksCompleted > 1 ? "s" : "") + " Completed");
+				progressLabel.setText(e.verificationTasksCompleted() + " verification task" + (tasksCompleted > 1 ? "s" : "") + " completed");
 				timerLabel.setText("");
 			}
 			
