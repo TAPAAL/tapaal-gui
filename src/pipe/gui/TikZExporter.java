@@ -137,7 +137,7 @@ public class TikZExporter {
 			} else {
 				if (arc instanceof TransportArcComponent)
 					arcLabel = "node[midway,auto] {"
-							+ ((TransportArcComponent) arc).getGroupNr() + "}";
+							+ ":" + ((TransportArcComponent) arc).getGroupNr() + "}";
 			}
 		}
 		return arcLabel;
