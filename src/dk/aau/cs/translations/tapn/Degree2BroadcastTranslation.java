@@ -34,11 +34,6 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 
-//TODO: Simplify the code by making it output the same NTA for both symmetry and no symmetry, 
-//with the only difference being in the global declarations:
-//symmetry: typedef scalar[N] id_t;
-//no symmetry: typedef int[1,N] id_t;
-//See e.g. OptimizedStandardTranslation for how its done
 public class Degree2BroadcastTranslation implements
 		ModelTranslator<TimedArcPetriNet, TAPNQuery, NTA, UPPAALQuery> {
 

@@ -4,7 +4,7 @@ public class VerificationResult<TTrace> {
 	private QueryResult queryResult;
 	private TTrace trace;
 	private String errorMessage = null;
-	private long verificationTime;
+	private long verificationTime = 0;
 	private Stats stats;
 	
 	public boolean isQuerySatisfied() {
@@ -22,8 +22,9 @@ public class VerificationResult<TTrace> {
 		this(queryResult, trace, verificationTime, new NullStats());
 	}
 
-	public VerificationResult(String outputMessage) {
+	public VerificationResult(String outputMessage, long verificationTime) {
 		this.errorMessage = outputMessage;
+		this.verificationTime = verificationTime;
 	}
 
 	public QueryResult getQueryResult() {

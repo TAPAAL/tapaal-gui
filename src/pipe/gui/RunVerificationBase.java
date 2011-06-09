@@ -52,7 +52,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (result.error()) {
-			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage());
+			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		} else {
 			return new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
