@@ -502,8 +502,13 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 	
 	private String createTransitionGuardWithLock(TransportArc transArc,	TimedPlace destination) {
-		TimeInterval newInterval = transArc.interval().intersect(destination.invariant()); 
-		String guard = convertGuard(newInterval);
+		String guard = "";
+		try {
+			TimeInterval newInterval = transArc.interval().intersect(destination.invariant());
+			guard = convertGuard(newInterval);
+		} catch(Exception e) {
+			guard = "false";
+		}
 
 		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";

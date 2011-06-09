@@ -687,8 +687,13 @@ public class Degree2BroadcastTranslation implements
 	}
 	
 	private String createTransitionGuardWithLock(TransportArc transArc, TimedPlace targetPlace, boolean isTransportArc) {
-		TimeInterval newGuard = transArc.interval().intersect(targetPlace.invariant());
-		String guard = convertGuard(newGuard);
+		String guard = "";
+		try {
+			TimeInterval newGuard = transArc.interval().intersect(targetPlace.invariant());
+			guard = convertGuard(newGuard);
+		} catch(Exception e) {
+			guard = "false";
+		}
 
 		if (guard == null || guard.isEmpty()) {
 			guard = LOCK_BOOL + " == 0";
