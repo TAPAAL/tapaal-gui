@@ -9,6 +9,7 @@ import javax.swing.JTabbedPane;
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
 public class CreateGui {
 
@@ -45,6 +46,7 @@ public class CreateGui {
 		appGui.setVisible(true);
 		appGui.activateSelectAction();
 		Verifyta.trySetupFromEnvironmentVariable();
+		VerifyTAPN.trySetupFromEnvironmentVariable();
 
 		VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion()) {

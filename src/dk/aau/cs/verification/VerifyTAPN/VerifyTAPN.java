@@ -114,6 +114,15 @@ public class VerifyTAPN implements ModelChecker {
 	private boolean isNotSetup() {
 		return verifytapnpath == null || verifytapnpath.equals("");
 	}
+	
+	public static boolean trySetupFromEnvironmentVariable() {
+		String verifytapn = System.getenv("verifytapn");
+		if (verifytapn != null && !verifytapn.isEmpty()) {
+			verifytapnpath = verifytapn;
+			return true;
+		}
+		return false;
+	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
 		if(!supportsModel(model.value1()))
