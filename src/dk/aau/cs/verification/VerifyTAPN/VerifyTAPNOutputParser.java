@@ -19,9 +19,11 @@ public class VerifyTAPNOutputParser {
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private final int totalTokens;
 	private final QueryType queryType;
+	private final int extraTokens;
 	
-	public VerifyTAPNOutputParser(int totalTokens, QueryType queryType){
+	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, QueryType queryType){
 		this.totalTokens = totalTokens;
+		this.extraTokens = extraTokens;
 		this.queryType = queryType;
 	}
 	
@@ -65,7 +67,7 @@ public class VerifyTAPNOutputParser {
 				}
 			}
 			
-			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens);
+			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
 			return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType), new Stats(discovered, explored, stored));
 		} catch (Exception e) {
 			e.printStackTrace();

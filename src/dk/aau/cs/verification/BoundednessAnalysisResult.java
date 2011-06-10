@@ -3,10 +3,12 @@ package dk.aau.cs.verification;
 public class BoundednessAnalysisResult {
 	private int maxUsedTokens;
 	private int totalTokens;
+	private int extraTokens;
 	
-	public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens){
+	public BoundednessAnalysisResult(int totalTokens, int maxUsedTokens, int extraTokens){
 		this.maxUsedTokens = maxUsedTokens;
 		this.totalTokens = totalTokens;
+		this.extraTokens = extraTokens;
 	}
 	
 	@Override
@@ -14,7 +16,7 @@ public class BoundednessAnalysisResult {
 		if(boundednessResult().equals(Boundedness.Bounded)){
 			return "";
 		}else{
-			return String.format("\nOnly markings with at most %1$d tokens were explored.\nTry to increase the number of extra tokens.", totalTokens);
+			return String.format("\nOnly markings with at most %1$d tokens (%2$d extra tokens) \nwere explored. Try to increase the number of extra tokens.", totalTokens, extraTokens);
 		}
 	}
 

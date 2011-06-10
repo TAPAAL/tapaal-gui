@@ -5,7 +5,7 @@ public class InconclusiveBoundednessAnalysisResult extends
 		BoundednessAnalysisResult {
 
 	public InconclusiveBoundednessAnalysisResult() {
-		super(0,0);
+		super(0,0,0);
 	}
 	
 	@Override

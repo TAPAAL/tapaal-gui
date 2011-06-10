@@ -129,7 +129,7 @@ public class VerifyTAPN implements ModelChecker {
 			String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.queryType());
+			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query.queryType());
 			if (queryResult.value1() == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
@@ -186,8 +186,8 @@ public class VerifyTAPN implements ModelChecker {
 		return buffer.toString();
 	}
 	
-	private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, QueryType queryType) {
-		VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, queryType);
+	private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, QueryType queryType) {
+		VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, queryType);
 		Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
 		return result;
 	}
