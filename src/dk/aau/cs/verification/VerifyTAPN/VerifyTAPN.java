@@ -95,7 +95,7 @@ public class VerifyTAPN implements ModelChecker {
 			try {
 				File file = fileFinder.ShowFileBrowserDialog("VerifyTAPN", "");
 				if(file != null){
-					if(file.getName().matches("^verifytapn(?:\\.exe)?$")){
+					if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
 						verifytapnpath = file.getAbsolutePath();
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
