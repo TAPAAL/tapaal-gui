@@ -167,7 +167,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private void initComponents() {
 
 		nameTextField = new javax.swing.JTextField();
-		Dimension size = new Dimension(275, 25);
+		Dimension size = new Dimension(125, 25);
 		nameTextField.setPreferredSize(size);
 		nameTextField.setMinimumSize(size);
 		nameLabel = new javax.swing.JLabel();
