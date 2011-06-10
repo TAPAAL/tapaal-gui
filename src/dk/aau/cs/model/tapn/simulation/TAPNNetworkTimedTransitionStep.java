@@ -23,6 +23,6 @@ public class TAPNNetworkTimedTransitionStep implements TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return transition.toString();
+		return transition.isShared() ? transition.sharedTransition().name() : transition.toString();
 	}
 }

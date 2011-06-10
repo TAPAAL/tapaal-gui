@@ -70,7 +70,7 @@ public class TAPNTraceDecomposer {
 
 	private TAPNNetworkTraceStep decomposeTransitionFiring(TimedTransitionStep transitionFiring) {
 		Tuple<String, String> originalName = mapping.map(transitionFiring.transition().name());
-		TimedTransition transition = tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
+		TimedTransition transition = (originalName.value1() == null || originalName.value1().isEmpty()) ? tapnNetwork.getSharedTransitionByName(originalName.value2()).transitions().iterator().next() : tapnNetwork.getTAPNByName(originalName.value1()).getTransitionByName(originalName.value2());
 
 		ArrayList<TimedToken> convertedTokens = null;
 		if(trace.isTimedTrace()){
