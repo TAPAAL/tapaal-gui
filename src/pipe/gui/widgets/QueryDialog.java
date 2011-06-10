@@ -564,13 +564,13 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 		
 		String[] options;
-		if(tapnNetwork.hasInhibitorArcs()) {
-			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2 };
-		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(isNetDegree2)
 				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD };
 			else
 				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2 };
+		} else if(tapnNetwork.hasInhibitorArcs()) {
+			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2 };
 		} else {
 			options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
 		}
