@@ -197,6 +197,14 @@ public class Verifyta implements ModelChecker {
 			runner.kill();
 		}
 	}
+	
+	public boolean supportsStats(){
+		return false;
+	}
+	
+	public String getStatsExplanation(){
+		return "";
+	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
 		UppaalExporter exporter = new UppaalExporter();

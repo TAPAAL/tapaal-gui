@@ -21,7 +21,7 @@ import dk.aau.cs.verification.VerificationResult;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
-	private ModelChecker modelChecker;
+	protected ModelChecker modelChecker;
 
 	private VerificationOptions options;
 	protected TimedArcPetriNetNetwork model;

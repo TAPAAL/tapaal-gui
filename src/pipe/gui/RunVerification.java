@@ -3,7 +3,13 @@
  */
 package pipe.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
@@ -23,7 +29,7 @@ public class RunVerification extends RunVerificationBase {
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
-					result.getSummaryString(),
+					createMessagePanel(result.getSummaryString()),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result.getQueryResult()));
 
 			if (result.getTrace() != null) {
@@ -71,6 +77,26 @@ public class RunVerification extends RunVerificationBase {
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
+	}
+
+	private JPanel createMessagePanel(String summaryString) {
+		StringBuffer buffer = new StringBuffer("<html>");
+		buffer.append(summaryString.replace("\n", "<br/>"));
+		buffer.append("</html>");
+		
+		final JPanel panel = new JPanel();
+		panel.add(new JLabel(buffer.toString()));
+		if(this.modelChecker.supportsStats()){
+			JButton infoButton = new JButton("Info");
+			infoButton.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent arg0) {
+					JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+			panel.add(infoButton);
+		}
+		
+		return panel;
 	}
 	
 	
