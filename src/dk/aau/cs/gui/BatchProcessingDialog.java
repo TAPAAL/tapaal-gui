@@ -671,7 +671,7 @@ public class BatchProcessingDialog extends JDialog {
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		Dimension scrollPaneDims = new Dimension(850,350);
+		Dimension scrollPaneDims = new Dimension(850,320);
 		scrollPane.setMinimumSize(scrollPaneDims);
 		scrollPane.setPreferredSize(scrollPaneDims);
 		
