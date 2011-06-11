@@ -79,7 +79,20 @@ public class VerifyTAPN implements ModelChecker {
 			return false;
 		}
 		
+		File file = new File(getPath());
+		if(!file.canExecute()){
+			messenger.displayErrorMessage("The program can not be verified as being verifytapn.\n"
+									+ "The verifytapn path will be reset. Please try again, "
+									+ "to manually set the verifytapn path.", "Verifytapn Error");
+			resetVerifytapn();
+			return false;
+		}
+		
 		return true;
+	}
+
+	private void resetVerifytapn() {
+		verifytapnpath = null;	
 	}
 
 	public void kill() {
