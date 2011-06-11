@@ -3,6 +3,9 @@
  */
 package pipe.gui;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -29,7 +32,7 @@ public class RunVerification extends RunVerificationBase {
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), 
-					createMessagePanel(result.getSummaryString()),
+					createMessagePanel(result),
 					"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result.getQueryResult()));
 
 			if (result.getTrace() != null) {
@@ -79,22 +82,52 @@ public class RunVerification extends RunVerificationBase {
 		}
 	}
 
-	private JPanel createMessagePanel(String summaryString) {
+	private String toHTML(String string){
 		StringBuffer buffer = new StringBuffer("<html>");
-		buffer.append(summaryString.replace("\n", "<br/>"));
+		buffer.append(string.replace(System.getProperty("line.separator"), "<br/>"));
 		buffer.append("</html>");
+		return buffer.toString();
+	}
+	
+	private JPanel createMessagePanel(VerificationResult<TAPNNetworkTrace> result) {
+		final JPanel panel = new JPanel(new GridBagLayout());
 		
-		final JPanel panel = new JPanel();
-		panel.add(new JLabel(buffer.toString()));
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(0,0,15,0);
+		gbc.anchor = GridBagConstraints.WEST;		
+		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
+		
 		if(this.modelChecker.supportsStats()){
-			JButton infoButton = new JButton("Info");
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0,0,15,0);
+			gbc.anchor = GridBagConstraints.WEST;
+			panel.add(new JLabel(toHTML(result.getStatsAsString())), gbc);
+			
+			JButton infoButton = new JButton("Stats Info");
 			infoButton.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent arg0) {
 					JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
-			panel.add(infoButton);
+			gbc = new GridBagConstraints();
+			gbc.gridx = 1;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0,10,15,0);
+			gbc.anchor = GridBagConstraints.EAST;
+			panel.add(infoButton, gbc);
 		}
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
 		
 		return panel;
 	}

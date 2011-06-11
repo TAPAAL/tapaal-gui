@@ -37,8 +37,6 @@ public class Stats {
 		
 		buffer.append("Stored markings: ");
 		buffer.append(stored);
-		buffer.append(System.getProperty("line.separator"));
-		buffer.append(System.getProperty("line.separator"));
 		return buffer.toString();
 	}
 }

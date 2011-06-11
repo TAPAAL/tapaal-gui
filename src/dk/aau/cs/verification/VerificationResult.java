@@ -52,13 +52,15 @@ public class VerificationResult<TTrace> {
 		return verificationTime;
 	}
 
-	public String getSummaryString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(queryResult.toString());
-		buffer.append(System.getProperty("line.separator"));
-		buffer.append(System.getProperty("line.separator"));
-		buffer.append(stats.toString());
-		buffer.append(String.format("Estimated verification time: %1$.2fs", verificationTime() / 1000.0));
-		return buffer.toString();
+	public String getVerificationTimeString() {
+		return String.format("Estimated verification time: %1$.2fs", verificationTime() / 1000.0);
+	}
+	
+	public String getStatsAsString(){
+		return stats.toString();
+	}
+
+	public String getResultString() {
+		return queryResult.toString();
 	}
 }
