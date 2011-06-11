@@ -43,6 +43,8 @@ import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
 
@@ -651,7 +653,7 @@ public class BatchProcessingDialog extends JDialog {
 		resultTablePanel.add(exportButton, gbc);
 		
 		tableModel = new BatchProcessingResultsTableModel();
-		JTable table = new JTable(tableModel) {
+		final JTable table = new JTable(tableModel) {
 			private static final long serialVersionUID = -146530769055564619L;
 
 			public javax.swing.JToolTip createToolTip() {
@@ -668,6 +670,15 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
+		
+		tableModel.addTableModelListener(new TableModelListener() {
+			public void tableChanged(TableModelEvent e) {
+				if(e.getType() == TableModelEvent.INSERT){
+					table.scrollRectToVisible(table.getCellRect(e.getLastRow(), e.getLastRow(), true));
+				}
+			}
+		});
+		
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
