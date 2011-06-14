@@ -16,7 +16,7 @@ public class BoundednessAnalysisResult {
 		if(boundednessResult().equals(Boundedness.Bounded)){
 			return "";
 		}else{
-			return String.format("\nOnly markings with at most %1$d tokens (%2$d extra tokens) \nwere explored. Try to increase the number of extra tokens.", totalTokens, extraTokens);
+			return String.format("\n\nOnly markings with at most %1$d tokens (%2$d extra tokens) \nwere explored. Try to increase the number of extra tokens.", totalTokens, extraTokens);
 		}
 	}
 
