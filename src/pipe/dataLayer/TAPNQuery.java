@@ -1,6 +1,10 @@
 package pipe.dataLayer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 
 public class TAPNQuery {
@@ -28,6 +32,7 @@ public class TAPNQuery {
 	private boolean symmetry;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
+	private List<TimedPlace> inclusionPlaces;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -166,6 +171,13 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, hashTabelSize, extrapolationOption, new ArrayList<TimedPlace>());
+	}
+	
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption, List<TimedPlace> inclusionPlaces) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -175,6 +187,7 @@ public class TAPNQuery {
 		this.symmetry = symmetry;
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
+		this.inclusionPlaces = inclusionPlaces;
 	}
 
 	@Override
@@ -193,6 +206,11 @@ public class TAPNQuery {
 		this.hashTableSize = newQuery.getHashTableSize();
 		this.extrapolationOption = newQuery.getExtrapolationOption();
 		this.discreteInclusion = newQuery.discreteInclusion();
+		this.inclusionPlaces = newQuery.inclusionPlaces();
+	}
+
+	public List<TimedPlace> inclusionPlaces() {
+		return inclusionPlaces;
 	}
 
 	public void setActive(boolean isActive) {

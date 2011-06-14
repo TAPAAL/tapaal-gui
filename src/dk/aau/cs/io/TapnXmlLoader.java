@@ -184,7 +184,7 @@ public class TapnXmlLoader {
 			Node q = queryNodes.item(i);
 
 			if (q instanceof Element) {
-				TAPNQuery query = parseTAPNQuery((Element) q);
+				TAPNQuery query = parseTAPNQuery((Element) q, network);
 				
 				if (query != null) {
 					if(!doesPlacesUsedInQueryExist(query, templatePlaceNames)) {
@@ -701,7 +701,7 @@ public class TapnXmlLoader {
 		}
 	}
 
-	private TAPNQuery parseTAPNQuery(Element queryElement) {
+	private TAPNQuery parseTAPNQuery(Element queryElement, TimedArcPetriNetNetwork network) {
 		String comment = getQueryComment(queryElement);
 		TraceOption traceOption = getQueryTraceOption(queryElement);
 		SearchOption searchOption = getQuerySearchOption(queryElement);
@@ -712,18 +712,50 @@ public class TapnXmlLoader {
 		boolean symmetry = getSymmetryReductionOption(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
+		List<TimedPlace> inclusionPlaces = getInclusionPlaces(queryElement, network);
 
 		TCTLAbstractProperty query;
 		query = parseQueryProperty(queryElement.getAttribute("query"));
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption);
+					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption, inclusionPlaces);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
 		} else
 			return null;
+	}
+
+	private List<TimedPlace> getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
+		List<TimedPlace> places = new ArrayList<TimedPlace>();
+		
+		String inclusionPlaces;
+		try{
+			inclusionPlaces = queryElement.getAttribute("inclusionPlaces");
+		} catch(Exception e) {
+			inclusionPlaces = "*NONE*";
+		}
+		
+		if(inclusionPlaces.isEmpty() || inclusionPlaces.equals("*NONE*")) 
+			return places;
+		
+		String[] placeNames = inclusionPlaces.split(",");
+		
+		for(String name : placeNames) {
+			if(name.contains(".")) {
+				String templateName = name.split("\\.")[0];
+				String placeName = name.split("\\.")[1];
+				
+				TimedPlace p = network.getTAPNByName(templateName).getPlaceByName(placeName);
+				places.add(p);
+			} else { // shared Place
+				TimedPlace p = network.getSharedPlaceByName(name);
+				places.add(p);
+			}
+		}
+		
+		return places;
 	}
 
 	private boolean getSymmetryReductionOption(Element queryElement) {

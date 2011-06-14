@@ -38,6 +38,7 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
@@ -248,8 +249,25 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
 		queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
 		queryElement.setAttribute("active", "" + query.isActive());
+		queryElement.setAttribute("inclusionPlaces", getInclusionPlacesString(query));
 		
 		return queryElement;
+	}
+
+	private String getInclusionPlacesString(TAPNQuery query) {
+		if(!query.discreteInclusion() || query.inclusionPlaces().isEmpty())
+			return "*NONE*";
+		
+		boolean first = true;
+		StringBuilder s = new StringBuilder();
+		for(TimedPlace p : query.inclusionPlaces()) {
+			if(!first) s.append(",");
+			
+			s.append(p.toString());
+			if(first) first = false;
+		}
+		
+		return s.toString();
 	}
 
 	private Element createPlaceElement(TimedPlaceComponent inputPlace, DataLayer guiModel, Document document) {

@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -190,7 +191,8 @@ public class QueryDialog extends JPanel {
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
 	private JCheckBox discreteInclusion;
-
+	private JButton selectInclusionPlacesButton;
+	
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -205,6 +207,7 @@ public class QueryDialog extends JPanel {
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 	private boolean isNetDegree2;
+	private List<TimedPlace> inclusionPlaces;
 
 	private String name_verifyTAPN = "VerifyTAPN";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
@@ -219,6 +222,7 @@ public class QueryDialog extends JPanel {
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
+		this.inclusionPlaces = queryToCreateFrom == null ? new ArrayList<TimedPlace>() : queryToCreateFrom.inclusionPlaces();
 		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		isNetDegree2 = checkForDegree2();
@@ -262,7 +266,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reductionOptionToSet = getReductionOption();
 		boolean symmetry = getSymmetry();
 		
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -398,7 +402,7 @@ public class QueryDialog extends JPanel {
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
-
+		
 		Container contentPane = guiDialog.getContentPane();
 
 		// 1 Set layout
@@ -410,6 +414,8 @@ public class QueryDialog extends JPanel {
 
 		guiDialog.setResizable(false);
 
+		guiDialog.setMinimumSize(new Dimension(885,585));
+		
 		// Make window fit contents' preferred size
 		guiDialog.pack();
 
@@ -769,6 +775,7 @@ public class QueryDialog extends JPanel {
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
+		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
 
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1659,7 +1666,6 @@ public class QueryDialog extends JPanel {
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
-		reductionOptionsPanel.setPreferredSize(new Dimension(730, 80));
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
 
@@ -1706,13 +1712,34 @@ public class QueryDialog extends JPanel {
 		discreteInclusion.setToolTipText("<html>This optimization will perform more advanced inclusion check<br/>" +
 										 "in an attempt to reduce the number of explored states.<br/>" +
 										 "<b>Note:</b> This may have an adverse affect on performance on some models!</html>");
+		discreteInclusion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
+			}
+		});
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);	
 		reductionOptionsPanel.add(discreteInclusion, gbc);
-				
+		
+		selectInclusionPlacesButton = new JButton("Select Inclusion Places");
+		selectInclusionPlacesButton.setEnabled(false);
+		selectInclusionPlacesButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);	
+		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -1732,9 +1759,11 @@ public class QueryDialog extends JPanel {
 		ReductionOption reduction = getReductionOption();
 		if(reduction.equals(ReductionOption.VerifyTAPN)){
 			discreteInclusion.setVisible(true);
+			selectInclusionPlacesButton.setVisible(true);
 			queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
 		}else{
 			discreteInclusion.setVisible(false);
+			selectInclusionPlacesButton.setVisible(false);
 		}
 	}
 
