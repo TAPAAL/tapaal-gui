@@ -806,7 +806,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
 		buffer
 		.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
-		buffer.append("Aalborg University 2009 \n\n");
+		buffer.append("Aalborg University 2009-2011 \n\n");
 		buffer.append("Read more at: www.tapaal.net \n\n");
 
 		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
