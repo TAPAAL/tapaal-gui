@@ -59,6 +59,7 @@ import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
+import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
@@ -127,6 +128,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		try {
 			// Set the Look and Feel native for the system.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
 			// 2010-05-07, Kenneth Yrke Jørgensen:
 			// If the native look and feel is GTK replace the useless open
