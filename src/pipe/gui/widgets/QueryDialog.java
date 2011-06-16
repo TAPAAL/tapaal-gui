@@ -872,7 +872,7 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.add(kbounded);
 		boundednessCheckPanel.add(Box.createHorizontalStrut(400));
 		
-		JButton infoButton = new JButton("Help");	
+		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane.showMessageDialog(QueryDialog.this, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
@@ -901,23 +901,28 @@ public class QueryDialog extends JPanel {
 				buffer.append("<html>");
 				buffer.append("<b>Boundedness</b><br/>");
 				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
-				buffer.append("Because TAPN models can produce additional tokens by firing transitions (e.g. a transition that has a single input place ");
-				buffer.append("and two output places) the verifier may need to use additional tokens compared to those that are currently in the net. By ");
-				buffer.append("specifying some extra number of tokens you can ask TAPAAL to check if your net is k-bounded for this number of tokens (i.e. ");
-				buffer.append("k = number of tokens currently in model + number of additional tokens allowed). Simply put if your model is k-bounded then k ");
-				buffer.append("is an upper bound on the number of tokens that your model can contain in any given marking.");
+				buffer.append("Because TAPAAL models can produce additional tokens by firing transitions (e.g. a transition that has a single input place ");
+				buffer.append("and two output places) you may need to use additional tokens compared to those that are already in the net. By ");
+				buffer.append("specifying an extra number of tokens you can ask TAPAAL to check if your net is bounded for this number of extra tokens (i.e. ");
+				buffer.append("whether there is no reachable marking in the net that would exceed the predefined number of tokens. ");
 				buffer.append("<br/><br/>");
 				buffer.append("<b>Search Strategies</b><br/>");
-				buffer.append("The chosen search strategy determine how the chosen verification method performs the search. The possible search strategies are: ");
+				buffer.append("A search strategy determines how the chosen verification method performs the search. The possible search strategies are: ");
 				buffer.append("<ul>");
-				buffer.append("<li>Heuristic Search<br/>If discrete inclusion is not enabled, this will perform a breadth-first search. If discrete inclusion is enabled, it will attempt to maximize the number of tokens in which the engine checks inclusion as quickly as possible.</li>");
-				buffer.append("<li>Breadth First Search<br/>Explores markings breadth first.</li>");
-				buffer.append("<li>Depth First Search<br/>Explores markings depth first.</li>");
-				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space, i.e. the next marking to explore is selected at random.</li>");
+				buffer.append("<li>Heuristic Search<br/> If discrete inclusion optimization is not enabled, this strategy performs a breadth first search. ");
+				buffer.append("If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places where the engine checks for discrete inclusion.</li>");
+				buffer.append("<li>Breadth First Search<br/>Explores markings in a breadth first manner.</li>");
+				buffer.append("<li>Depth First Search<br/>Explores markings in a depth first manner.</li>");
+				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space.</li>");
 				buffer.append("</ul>");
 				buffer.append("<br/>");
 				buffer.append("<b>Verification Methods</b><br/>");
-				buffer.append("Broadly, TAPAAL supports verification via the included engine VerifyTAPN and via UPPAAL. The different UPPAAL verification methods performs different reductions from TAPN to NTA. Broadcast reductions supports all query types, while standard and optimized standard do not support EG and AF queries in general (only a subset of models).");
+				buffer.append("TAPAAL supports verification via its own included engine VerifyTAPN or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
+				buffer.append("The TAPAAL engine supports also the discrete inclusion optimization that works for EF queries where the propositions state only ");
+				buffer.append("lower bounds on the number of tokens and for AG queries with only the upper bounds constraints. On some models this technique gives a considerable speedup. ");
+				buffer.append("The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. ");
+				buffer.append("The different UPPAAL verification methods perform different reductions to networks of timed automata. The broadcast reductions supports ");
+				buffer.append("all query types, while standard and optimized standard support only EF and AG queries but can be often faster.");
 				buffer.append("<br/>");				
 				buffer.append("</html>");
 				return buffer.toString();
