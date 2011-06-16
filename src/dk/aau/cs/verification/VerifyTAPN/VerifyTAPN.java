@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
@@ -13,8 +15,10 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -146,7 +150,8 @@ public class VerifyTAPN implements ModelChecker {
 		
 		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
-			
+		
+		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
 		VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 		ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
@@ -156,6 +161,20 @@ public class VerifyTAPN implements ModelChecker {
 		}
 
 		return verify(options, model, exportedModel, query);
+	}
+
+	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+		List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
+		for(TimedPlace p : ((VerifyTAPNOptions)options).inclusionPlaces()) {
+			if(p instanceof LocalTimedPlace) {
+				LocalTimedPlace local = (LocalTimedPlace)p;
+				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
+			}
+			else // shared place
+				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
+		}
+		
+		((VerifyTAPNOptions)options).setInclusionPlaces(inclusionPlaces);
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {

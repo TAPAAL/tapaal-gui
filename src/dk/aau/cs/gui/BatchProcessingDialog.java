@@ -7,6 +7,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -55,9 +56,11 @@ import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
 import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
@@ -1063,6 +1066,15 @@ public class BatchProcessingDialog extends JDialog {
 
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
+				} else if(table.getColumnName(column).equals("Verification Time")) {
+					setText(value.toString());
+					Point mousePos = table.getMousePosition();
+					BatchProcessingVerificationResult result = null;
+					if(mousePos != null) {
+						result = ((BatchProcessingResultsTableModel)table.getModel()).getResult(table.rowAtPoint(mousePos));
+					}
+					
+					setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
 				} else {
 					setToolTipText(value.toString());
 					setText(value.toString());
@@ -1074,6 +1086,20 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			
 			return this;
+		}
+
+		private String generateStatsToolTipText(BatchProcessingVerificationResult result) {
+			StringBuilder s = new StringBuilder();
+			s.append("Verification Time: ");
+			s.append((result.verificationTimeInMs() / 1000.0));
+			s.append(" s");
+			if(result.hasStats()) {
+				s.append(System.getProperty("line.separator"));
+				s.append(System.getProperty("line.separator"));
+				s.append(result.stats().toString());
+			}
+			
+			return s.toString();
 		}
 
 		private String generateTooltipTextFromQuery(TAPNQuery query) {
@@ -1107,6 +1133,11 @@ public class BatchProcessingDialog extends JDialog {
 				s.append("\n\n");
 				s.append("Discrete Inclusion: ");
 				s.append(query.discreteInclusion() ? "Yes" : "No");
+				if(query.discreteInclusion()) {
+					s.append("\n\n");
+					s.append("Discrete Inclusion Places:\n");
+					s.append(generateListOfInclusionPlaces(query));
+				}
 			} else {
 				s.append(name_BROADCAST);
 			}
@@ -1121,6 +1152,19 @@ public class BatchProcessingDialog extends JDialog {
 			else
 				s.append(query.getProperty().toString());
 			
+			return s.toString();
+		}
+
+		private Object generateListOfInclusionPlaces(TAPNQuery query) {
+			if(query.inclusionPlaces().isEmpty()) return "*NONE*";
+			StringBuilder s = new StringBuilder();
+			boolean first = true;
+			for(TimedPlace p : query.inclusionPlaces()) {
+				if(!first) s.append(", ");
+				
+				s.append(p.toString());
+				if(first) first = false;
+			}
 			return s.toString();
 		}
 	}

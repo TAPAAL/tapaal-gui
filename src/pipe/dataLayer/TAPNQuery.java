@@ -222,7 +222,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption, inclusionPlaces);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		

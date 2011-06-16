@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 public class BatchProcessingResultsTableModel extends AbstractTableModel {
@@ -82,6 +83,12 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 
 	public Iterable<BatchProcessingVerificationResult> getResults() {
 		return results;
+	}
+	
+	public BatchProcessingVerificationResult getResult(int index) {
+		Require.that(index >= 0 && index < results.size(), "Index out of range");
+		
+		return results.get(index);
 	}
 
 }

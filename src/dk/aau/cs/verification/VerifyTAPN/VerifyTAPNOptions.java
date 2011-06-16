@@ -1,10 +1,14 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifyTAPNOptions implements VerificationOptions{
@@ -14,20 +18,26 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private int tokensInModel;
 	private boolean symmetry;
 	private boolean discreteInclusion;
+	private List<TimedPlace> inclusionPlaces;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
-		this(extraTokens, traceOption, search, symmetry, false);
+		this(extraTokens, traceOption, search, symmetry, false, new ArrayList<TimedPlace>());
 	}
 	
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
+		this(extraTokens,traceOption, search, symmetry, discreteInclusion, new ArrayList<TimedPlace>());
+	}
+	
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, List<TimedPlace> inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		this.searchOption = search;
 		this.symmetry = symmetry;
 		this.discreteInclusion = discreteInclusion;
+		this.inclusionPlaces = inclusionPlaces;
 	}
 
 	public TraceOption trace() {
@@ -60,7 +70,23 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
 		result.append(" ");
 		result.append(discreteInclusion ? " -f 1" : "");
+		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");
 		return result.toString();
+	}
+
+	private String generateDiscretePlacesList() {
+		if(inclusionPlaces.isEmpty()) return "*NONE*";
+		
+		StringBuilder s = new StringBuilder();
+		boolean first = true;
+		for(TimedPlace p : inclusionPlaces) {
+			if(!first) s.append(",");
+			
+			s.append(p.name());
+			if(first) first = false;
+		}
+		
+		return s.toString();
 	}
 
 	public static final Map<TraceOption, String> createTraceOptionsMap() {
@@ -77,5 +103,15 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		map.put(SearchOption.DFS, "-o 1");
 
 		return map;
+	}
+
+	public List<TimedPlace> inclusionPlaces() {
+		return inclusionPlaces;
+	}
+	
+	public void setInclusionPlaces(List<TimedPlace> inclusionPlaces) {
+		Require.that(inclusionPlaces != null, "List of inclusion places cannot be null");
+		
+		this.inclusionPlaces = inclusionPlaces;
 	}
 }

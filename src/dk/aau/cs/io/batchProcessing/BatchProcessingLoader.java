@@ -462,6 +462,7 @@ public class BatchProcessingLoader {
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getSymmetryReductionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
+		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		List<TimedPlace> inclusionPlaces = getInclusionPlaces(queryElement, network);
 		
 		
@@ -472,9 +473,20 @@ public class BatchProcessingLoader {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
 					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption, inclusionPlaces);
 			parsedQuery.setActive(active);
+			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
 		} else
 			return null;
+	}
+	
+	private boolean getDiscreteInclusionOption(Element queryElement) {
+		boolean discreteInclusion;
+		try {
+			discreteInclusion = queryElement.getAttribute("discreteInclusion").equals("true");
+		} catch(Exception e) {
+			discreteInclusion = false;
+		}
+		return discreteInclusion;	
 	}
 	
 	private List<TimedPlace> getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
