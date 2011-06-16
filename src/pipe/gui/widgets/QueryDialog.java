@@ -684,7 +684,7 @@ public class QueryDialog extends JPanel {
 
 	private void changeToEditMode() {
 		setQueryFieldEditable(true);
-		resetButton.setText("Parse Query");
+		resetButton.setText("Parse query");
 		editQueryButton.setText("Cancel");
 		clearSelection();
 		disableAllQueryButtons();
@@ -853,9 +853,9 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(50, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(50, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(50, 30));
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
 		boundednessCheckPanel.add(numberOfExtraTokensInNet);
 
 		// Boundedness button
@@ -1070,8 +1070,8 @@ public class QueryDialog extends JPanel {
 		logicButtonPanel.setBorder(BorderFactory.createTitledBorder("Logic"));
 
 		logicButtonGroup = new ButtonGroup();
-		conjunctionButton = new JButton("And");
-		disjunctionButton = new JButton("Or");
+		conjunctionButton = new JButton("and");
+		disjunctionButton = new JButton("or");
 		negationButton = new JButton("not");
 
 		logicButtonGroup.add(conjunctionButton);
@@ -1257,7 +1257,7 @@ public class QueryDialog extends JPanel {
 				}
 			}
 		});
-		Dimension dim = new Dimension(200, 27);
+		Dimension dim = new Dimension(235, 27);
 		templateBox.setMaximumSize(dim);
 		templateBox.setMinimumSize(dim);
 		templateBox.setPreferredSize(dim);
@@ -1285,14 +1285,14 @@ public class QueryDialog extends JPanel {
 		int min = 0;
 		int step = 1;
 		placeMarking = new JSpinner(new SpinnerNumberModel(currentValue, min,Integer.MAX_VALUE, step));
-		placeMarking.setMaximumSize(new Dimension(50, 30));
-		placeMarking.setMinimumSize(new Dimension(50, 30));
-		placeMarking.setPreferredSize(new Dimension(50, 30));
+		placeMarking.setMaximumSize(new Dimension(60, 30));
+		placeMarking.setMinimumSize(new Dimension(60, 30));
+		placeMarking.setPreferredSize(new Dimension(60, 30));
 
 		gbc.gridx = 2;
 		predicatePanel.add(placeMarking, gbc);
 
-		addPredicateButton = new JButton("Add Predicate to Query");
+		addPredicateButton = new JButton("Add predicate to the query");
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 3;
@@ -1403,11 +1403,11 @@ public class QueryDialog extends JPanel {
 		editingButtonPanel.setBorder(BorderFactory.createTitledBorder("Editing"));
 
 		editingButtonsGroup = new ButtonGroup();
-		deleteButton = new JButton("Delete Selection");
-		resetButton = new JButton("Reset Query");
+		deleteButton = new JButton("Delete selection");
+		resetButton = new JButton("Reset query");
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
-		editQueryButton = new JButton("Edit Query");
+		editQueryButton = new JButton("Edit query");
 
 		editingButtonsGroup.add(deleteButton);
 		editingButtonsGroup.add(resetButton);
