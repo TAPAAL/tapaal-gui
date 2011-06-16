@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -849,7 +851,8 @@ public class QueryDialog extends JPanel {
 	private void initBoundednessCheckPanel() {
 
 		// Number of extra tokens field
-		boundednessCheckPanel = new JPanel(new FlowLayout());
+		boundednessCheckPanel = new JPanel();
+		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
@@ -867,6 +870,61 @@ public class QueryDialog extends JPanel {
 
 		});
 		boundednessCheckPanel.add(kbounded);
+		boundednessCheckPanel.add(Box.createHorizontalStrut(400));
+		
+		JButton infoButton = new JButton("Help");	
+		infoButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(QueryDialog.this, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
+			}
+			
+			private Object getMessageComponent(){
+				JTextPane pane = new JTextPane();
+				pane.setContentType("text/html");
+				pane.setText(getHelpMessage());
+				pane.setEditable(false);
+				pane.setCaretPosition(0);
+				for(MouseListener listener : pane.getMouseListeners()){
+					pane.removeMouseListener(listener);
+				}
+				Dimension dim = new Dimension(500,400);
+				pane.setPreferredSize(dim);  
+				pane.setMargin(new Insets(5,5,5,5));  
+				JScrollPane scrollPane = new JScrollPane(pane);  
+				scrollPane.setPreferredSize(dim);  
+				return scrollPane;  
+			}
+			
+			private String getHelpMessage(){ 
+				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
+				StringBuffer buffer = new StringBuffer();
+				buffer.append("<html>");
+				buffer.append("<b>Boundedness</b><br/>");
+				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
+				buffer.append("Because TAPN models can produce additional tokens by firing transitions (e.g. a transition that has a single input place ");
+				buffer.append("and two output places) the verifier may need to use additional tokens compared to those that are currently in the net. By ");
+				buffer.append("specifying some extra number of tokens you can ask TAPAAL to check if your net is k-bounded for this number of tokens (i.e. ");
+				buffer.append("k = number of tokens currently in model + number of additional tokens allowed). Simply put if your model is k-bounded then k ");
+				buffer.append("is an upper bound on the number of tokens that your model can contain in any given marking.");
+				buffer.append("<br/><br/>");
+				buffer.append("<b>Search Strategies</b><br/>");
+				buffer.append("The chosen search strategy determine how the chosen verification method performs the search. The possible search strategies are: ");
+				buffer.append("<ul>");
+				buffer.append("<li>Heuristic Search<br/>If discrete inclusion is not enabled, this will perform a breadth-first search. If discrete inclusion is enabled, it will attempt to maximize the number of tokens in which the engine checks inclusion as quickly as possible.</li>");
+				buffer.append("<li>Breadth First Search<br/>Explores markings breadth first.</li>");
+				buffer.append("<li>Depth First Search<br/>Explores markings depth first.</li>");
+				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space, i.e. the next marking to explore is selected at random.</li>");
+				buffer.append("</ul>");
+				buffer.append("<br/>");
+				buffer.append("<b>Verification Methods</b><br/>");
+				buffer.append("Broadly, TAPAAL supports verification via the included engine VerifyTAPN and via UPPAAL. The different UPPAAL verification methods performs different reductions from TAPN to NTA. Broadcast reductions supports all query types, while standard and optimized standard do not support EG and AF queries in general (only a subset of models).");
+				buffer.append("<br/>");				
+				buffer.append("</html>");
+				return buffer.toString();
+			}
+		});
+		boundednessCheckPanel.add(infoButton);
+
 
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();
@@ -1600,7 +1658,7 @@ public class QueryDialog extends JPanel {
 		searchRadioButtonGroup = new ButtonGroup();
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
-		randomDepthFirstSearch = new JRadioButton("Random Depth First Search");
+		randomDepthFirstSearch = new JRadioButton("Random Search");
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
 		searchRadioButtonGroup.add(randomDepthFirstSearch);
