@@ -3,6 +3,8 @@ package dk.aau.cs.gui;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
@@ -21,6 +24,8 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistoryComponent;
+import pipe.gui.Animator;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.ConstantsPane;
@@ -153,7 +158,32 @@ public class TabContent extends JSplitPane {
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	private void createAnimationHistory() {
 		animBox = new AnimationHistoryComponent();
-
+		animBox.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(SwingUtilities.isLeftMouseButton(e)){
+					int selected = animBox.getSelectedIndex();
+					int clicked = animBox.locationToIndex(e.getPoint());
+					if(clicked != -1){
+						int steps = clicked - selected;
+						Animator anim = CreateGui.getAnimator();
+						if(steps < 0){
+							for(int i = 0; i < Math.abs(steps); i++){
+								animBox.stepBackwards();
+								anim.stepBack();
+								CreateGui.getAnimationController().setAnimationButtonsEnabled();
+							}
+						}else{
+							for(int i = 0; i < Math.abs(steps); i++){
+								animBox.stepForward();
+								anim.stepForward();
+								CreateGui.getAnimationController().setAnimationButtonsEnabled();
+							}
+						}
+					}
+				}
+			}
+		});
 		animationHistoryScrollPane = new JScrollPane(animBox);
 		animationHistoryScrollPane.setBorder(BorderFactory
 				.createCompoundBorder(BorderFactory
