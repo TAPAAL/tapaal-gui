@@ -3,9 +3,13 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
@@ -74,7 +78,45 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	public String getVersion() { // atm. any version of VerifyTAPN will do
-		return "";
+		String result = null;
+
+		if (!isNotSetup()) {
+			String[] commands;
+			commands = new String[] { verifytapnpath, "-v" };
+
+			InputStream stream = null;
+			try {
+				Process child = Runtime.getRuntime().exec(commands);
+				child.waitFor();
+				stream = child.getInputStream();
+			} catch (IOException e) {
+			} catch (InterruptedException e) {
+			}
+
+			if (stream != null) {
+				result = readVersionNumberFrom(stream);
+			}
+		}
+
+		return result;
+	}
+
+	private String readVersionNumberFrom(InputStream stream) {
+		String result = null;
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+
+		String versioninfo = null;
+		try {
+			versioninfo = bufferedReader.readLine();
+		} catch (IOException e) {
+			result = null;
+		}
+
+		Pattern pattern = Pattern.compile("^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$");
+		Matcher m = pattern.matcher(versioninfo);
+		m.find();
+		result = m.group(1);
+		return result;
 	}
 
 	public boolean isCorrectVersion() {
