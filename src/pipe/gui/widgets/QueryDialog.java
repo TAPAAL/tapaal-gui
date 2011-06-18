@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -207,7 +206,7 @@ public class QueryDialog extends JPanel {
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 	private boolean isNetDegree2;
-	private List<TimedPlace> inclusionPlaces;
+	private InclusionPlaces inclusionPlaces;
 
 	private String name_verifyTAPN = "VerifyTAPN";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
@@ -222,7 +221,7 @@ public class QueryDialog extends JPanel {
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
-		this.inclusionPlaces = queryToCreateFrom == null ? new ArrayList<TimedPlace>() : queryToCreateFrom.inclusionPlaces();
+		this.inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		isNetDegree2 = checkForDegree2();

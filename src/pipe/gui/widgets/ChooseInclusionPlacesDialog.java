@@ -34,6 +34,7 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -47,14 +48,18 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	private DefaultListModel listModel;
 
 	private TimedArcPetriNetNetwork tapnNetwork;
+
+	private JCheckBox userSpecifiedCheckBox;
+	private JCheckBox AllPlacesCheckBox;
+	private JButton clearSelection;
 	
 	
-	public ChooseInclusionPlacesDialog(JRootPane rootPane, TimedArcPetriNetNetwork tapnNetwork, List<TimedPlace> inclusionPlaces) {
+	public ChooseInclusionPlacesDialog(JRootPane rootPane, TimedArcPetriNetNetwork tapnNetwork, InclusionPlaces inclusionPlaces) {
 		this.rootPane = rootPane;
 		this.tapnNetwork = tapnNetwork;
 		initComponents();
 		
-		AddPlacesToListModel(inclusionPlaces);
+		setupFromInput(inclusionPlaces);
 	}
 
 
@@ -75,6 +80,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		placeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		placeList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
 		placeList.setVisibleRowCount(0);
+		placeList.setEnabled(false);
 		
 		JScrollPane scrollpane = new JScrollPane(placeList);
 		scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -94,22 +100,33 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		
-		
-		JButton selectAll = new JButton("Select All");
-		selectAll.addActionListener(new ActionListener() {
+		JPanel checkboxPanel = new JPanel(new BorderLayout());
+		AllPlacesCheckBox = new JCheckBox("Use all places for inclusion checking");
+		AllPlacesCheckBox.setSelected(true);
+		AllPlacesCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				for(int i = 0; i < listModel.size(); i++) {
-					CheckBoxListItem item = (CheckBoxListItem)listModel.getElementAt(i);
-					item.setSelected(true);
-				}
-				placeList.repaint();
+				userSpecifiedCheckBox.setSelected(!AllPlacesCheckBox.isSelected());
+				placeList.setEnabled(userSpecifiedCheckBox.isSelected());
+				clearSelection.setEnabled(userSpecifiedCheckBox.isSelected());
 			}
 		});
 		
+		userSpecifiedCheckBox = new JCheckBox("Manually select places eligible for inclusion checking");
+		userSpecifiedCheckBox.setSelected(false);
+		userSpecifiedCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AllPlacesCheckBox.setSelected(!userSpecifiedCheckBox.isSelected());
+				placeList.setEnabled(userSpecifiedCheckBox.isSelected());
+				clearSelection.setEnabled(userSpecifiedCheckBox.isSelected());
+			}
+		});
 		
-		buttonPanel.add(selectAll);
+		checkboxPanel.add(AllPlacesCheckBox, BorderLayout.NORTH);
+		checkboxPanel.add(userSpecifiedCheckBox, BorderLayout.SOUTH);
+		buttonPanel.add(checkboxPanel);
 		
-		JButton clearSelection = new JButton("Clear");
+		clearSelection = new JButton("Clear Selection");
+		clearSelection.setEnabled(false);
 		clearSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				for(int i = 0; i < listModel.size(); i++) {
@@ -143,21 +160,28 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		rootPane.getParent().setVisible(false);
 	}
 
-	private void AddPlacesToListModel(List<TimedPlace> inclusionPlaces) {
+	private void setupFromInput(InclusionPlaces inclusionPlaces) {
+		List<TimedPlace> incPlaces = inclusionPlaces.inclusionPlaces();
 		for(TimedPlace p : tapnNetwork.sharedPlaces())
-			listModel.addElement(new CheckBoxListItem(p, inclusionPlaces.contains(p)));
+			listModel.addElement(new CheckBoxListItem(p, incPlaces.contains(p)));
 		
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
 			for(TimedPlace place : net.places()) {
 				if(!place.isShared())
-					listModel.addElement(new CheckBoxListItem(place, inclusionPlaces.contains(place)));
+					listModel.addElement(new CheckBoxListItem(place, incPlaces.contains(place)));
 			}
 		}
+	
 		
+		boolean allPlaces = inclusionPlaces.inclusionOption() == InclusionPlacesOption.AllPlaces;
+		AllPlacesCheckBox.setSelected(allPlaces);
+		userSpecifiedCheckBox.setSelected(!allPlaces);
+		placeList.setEnabled(!allPlaces);
+		clearSelection.setEnabled(!allPlaces);
 	}
 
 
-	public static List<TimedPlace> showInclusionPlacesDialog(TimedArcPetriNetNetwork tapnNetwork, List<TimedPlace> inclusionPlaces) {
+	public static InclusionPlaces showInclusionPlacesDialog(TimedArcPetriNetNetwork tapnNetwork, InclusionPlaces inclusionPlaces) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
 
 		Container contentPane = guiDialog.getContentPane();
@@ -185,16 +209,20 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	}
 
 
-	private List<TimedPlace> getInclusionPlaces() {
-		List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
-		
-		for(int i = 0; i < listModel.getSize(); i++) {
-			CheckBoxListItem item = (CheckBoxListItem)listModel.getElementAt(i);
-			if(item.isSelected())
-				inclusionPlaces.add(item.place());
+	private InclusionPlaces getInclusionPlaces() {
+		if(AllPlacesCheckBox.isSelected()) 
+			return new InclusionPlaces();
+		else {
+			List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
+			
+			for(int i = 0; i < listModel.getSize(); i++) {
+				CheckBoxListItem item = (CheckBoxListItem)listModel.getElementAt(i);
+				if(item.isSelected())
+					inclusionPlaces.add(item.place());
+			}
+			
+			return new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces);
 		}
-		
-		return inclusionPlaces;
 	}
 	
 	private class CheckBoxListItem {
@@ -263,7 +291,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		}
 		
 		private void toggleSelection(int index) { 
-			if(index<0) 
+			if(index<0 || !list.isEnabled()) 
 				return; 
 			
 			if(!selectionModel.isSelectedIndex(index)) 

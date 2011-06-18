@@ -9,6 +9,8 @@ import java.util.List;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -164,8 +166,13 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
+		
+		if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 
+			return;
+		
 		List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
-		for(TimedPlace p : ((VerifyTAPNOptions)options).inclusionPlaces()) {
+		for(TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
 			if(p instanceof LocalTimedPlace) {
 				LocalTimedPlace local = (LocalTimedPlace)p;
 				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
@@ -174,7 +181,7 @@ public class VerifyTAPN implements ModelChecker {
 				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
 		}
 		
-		((VerifyTAPNOptions)options).setInclusionPlaces(inclusionPlaces);
+		((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {

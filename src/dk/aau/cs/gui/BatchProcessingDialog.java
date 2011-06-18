@@ -53,6 +53,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
@@ -662,6 +663,7 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumnModel().getColumn(0).setMinWidth(60);
 		table.getColumnModel().getColumn(0).setPreferredWidth(60);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
+		table.getColumn("Method").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
@@ -1059,7 +1061,7 @@ public class BatchProcessingDialog extends JDialog {
 
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
-				} else if(table.getColumnName(column).equals("Verification Time")) {
+				} else if(table.getColumnName(column).equals("Verification Time") || table.getColumnName(column).equals("Method")) {
 					setText(value.toString());
 					Point mousePos = table.getMousePosition();
 					BatchProcessingVerificationResult result = null;
@@ -1067,7 +1069,10 @@ public class BatchProcessingDialog extends JDialog {
 						result = ((BatchProcessingResultsTableModel)table.getModel()).getResult(table.rowAtPoint(mousePos));
 					}
 					
-					setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
+					if(table.getColumnName(column).equals("Verification Time"))
+						setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
+					else 
+						setToolTipText(result != null ? generateReductionString(result.query()) : value.toString());
 				} else {
 					setToolTipText(value.toString());
 					setText(value.toString());
@@ -1112,6 +1117,23 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(name_BFS);
 			s.append("\n\n");
 			
+			s.append(generateReductionString(query));
+			
+			s.append("\n\n");
+			s.append("Symmetry: ");
+			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
+			
+			s.append("Query Property:\n"); 
+			if(query.getProperty().toString().equals("AG P0>=0"))
+				s.append(name_SEARCHWHOLESTATESPACE);
+			else
+				s.append(query.getProperty().toString());
+			
+			return s.toString();
+		}
+
+		private String generateReductionString(TAPNQuery query) {
+			StringBuilder s = new StringBuilder();
 			s.append("Reduction: \n");
 			if (query.getReductionOption() == ReductionOption.STANDARD)
 				s.append(name_STANDARD);
@@ -1135,24 +1157,16 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(name_BROADCAST);
 			}
 			
-			s.append("\n\n");
-			s.append("Symmetry: ");
-			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
-			
-			s.append("Query Property:\n"); 
-			if(query.getProperty().toString().equals("AG P0>=0"))
-				s.append(name_SEARCHWHOLESTATESPACE);
-			else
-				s.append(query.getProperty().toString());
-			
 			return s.toString();
 		}
 
-		private Object generateListOfInclusionPlaces(TAPNQuery query) {
-			if(query.inclusionPlaces().isEmpty()) return "*NONE*";
+		private String generateListOfInclusionPlaces(TAPNQuery query) {
+			if(query.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) return "*ALL*";
+			List<TimedPlace> incPlace = query.inclusionPlaces().inclusionPlaces();
+			if(incPlace.isEmpty()) return "*NONE*";
 			StringBuilder s = new StringBuilder();
 			boolean first = true;
-			for(TimedPlace p : query.inclusionPlaces()) {
+			for(TimedPlace p : incPlace) {
 				if(!first) s.append(", ");
 				
 				s.append(p.toString());
