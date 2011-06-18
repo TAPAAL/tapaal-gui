@@ -140,11 +140,13 @@ public class NetworkMarking implements TimedMarking {
 	private HashMap<TimedTransition, List<TimedToken>> distributeTokensToIndividualTransitions(SharedTransition sharedTransition, List<TimedToken> tokensToConsume) {
 		HashMap<TimedTransition, List<TimedToken>> distributedTokens = new HashMap<TimedTransition, List<TimedToken>>();
 		
+		for(TimedTransition transition : sharedTransition.transitions()){
+			distributedTokens.put(transition, new ArrayList<TimedToken>());
+		}
+		
 		for(TimedToken token : tokensToConsume){
 			for(TimedTransition transition : sharedTransition.transitions()){
 				if(transition.model().isActive()) {
-					if(!distributedTokens.containsKey(transition)) distributedTokens.put(transition, new ArrayList<TimedToken>());
-					
 					if(transition.model().equals(((LocalTimedPlace)token.place()).model())){
 						distributedTokens.get(transition).add(token);
 						break;

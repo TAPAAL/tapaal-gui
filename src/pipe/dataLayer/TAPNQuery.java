@@ -9,7 +9,7 @@ import dk.aau.cs.translations.ReductionOption;
 
 public class TAPNQuery {
 	public enum TraceOption {
-		SOME, FASTEST, NONE
+		SOME, NONE
 	};
 
 	public enum SearchOption {

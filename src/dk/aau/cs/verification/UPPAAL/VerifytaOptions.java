@@ -52,7 +52,6 @@ public class VerifytaOptions implements VerificationOptions {
 	public static final Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
 		map.put(TraceOption.SOME, "-t0");
-		map.put(TraceOption.FASTEST, "-t2");
 		map.put(TraceOption.NONE, "");
 
 		return map;

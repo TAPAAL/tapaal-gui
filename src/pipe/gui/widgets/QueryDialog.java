@@ -110,9 +110,7 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export VerifyTAPN XML";
 	
-	private static final String UPPAAL_FASTEST_TRACE_STRING = "Fastest trace (only without symmetry reduction)";
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some encountered trace (only without symmetry reduction)";
-	private static final String VERIFYTAPN_FASTEST_TRACE_STRING = "Fastest trace";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some encountered trace";
 	private static final String SHARED = "Shared";
 
@@ -187,7 +185,6 @@ public class QueryDialog extends JPanel {
 	private ButtonGroup traceRadioButtonGroup;
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
-	private JRadioButton fastestTraceRadioButton;
 
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
@@ -291,8 +288,6 @@ public class QueryDialog extends JPanel {
 	private TraceOption getTraceOption() {
 		if(someTraceRadioButton.isSelected())
 			return TraceOption.SOME;
-		else if(fastestTraceRadioButton.isSelected())
-			return TraceOption.FASTEST;
 		else
 			return TraceOption.NONE;
 	}
@@ -331,29 +326,21 @@ public class QueryDialog extends JPanel {
 		TraceOption traceOption = getTraceOption();
 		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
 			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
-			fastestTraceRadioButton.setText(VERIFYTAPN_FASTEST_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
 			someTraceRadioButton.setSelected(someTraceRadioButton.isSelected());
-			fastestTraceRadioButton.setEnabled(false);
 			noTraceRadioButton.setSelected(noTraceRadioButton.isSelected());
 		}
 		else if (symmetryReduction.isSelected()) {
 			someTraceRadioButton.setText(UPPAAL_SOME_TRACE_STRING);
-			fastestTraceRadioButton.setText(UPPAAL_FASTEST_TRACE_STRING);
 			someTraceRadioButton.setEnabled(false);
-			fastestTraceRadioButton.setEnabled(false);
 			noTraceRadioButton.setSelected(true);
 		} else {
 			someTraceRadioButton.setText(UPPAAL_SOME_TRACE_STRING);
-			fastestTraceRadioButton.setText(UPPAAL_FASTEST_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
-			fastestTraceRadioButton.setEnabled(true);
 		}
 		
 		if(traceOption == TraceOption.SOME && someTraceRadioButton.isEnabled())
 			someTraceRadioButton.setSelected(true);
-		else if(traceOption == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled())
-			fastestTraceRadioButton.setSelected(true);
 		else
 			noTraceRadioButton.setSelected(true);
 	}
@@ -721,7 +708,7 @@ public class QueryDialog extends JPanel {
 	// /////////////////////////////////////////////////////////////////////
 
 	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
-		setPreferredSize(new Dimension(912, 567));
+		setPreferredSize(new Dimension(912, 527));
 		
 		initQueryNamePanel();
 		initBoundednessCheckPanel();
@@ -787,8 +774,6 @@ public class QueryDialog extends JPanel {
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
 			someTraceRadioButton.setSelected(true);
-		} else if (queryToCreateFrom.getTraceOption() == TraceOption.FASTEST) {
-			fastestTraceRadioButton.setSelected(true);
 		} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE) {
 			noTraceRadioButton.setSelected(true);
 		}
@@ -1665,7 +1650,7 @@ public class QueryDialog extends JPanel {
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
 
-		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Analysis Options"));
+		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy"));
 		searchRadioButtonGroup = new ButtonGroup();
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
@@ -1680,13 +1665,15 @@ public class QueryDialog extends JPanel {
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		searchOptionsPanel.add(heuristicSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
 		searchOptionsPanel.add(breadthFirstSearch, gridBagConstraints);
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
 		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridy = 1;
 		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
@@ -1702,14 +1689,11 @@ public class QueryDialog extends JPanel {
 		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
 		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
-		fastestTraceRadioButton = new JRadioButton(UPPAAL_FASTEST_TRACE_STRING);
 		noTraceRadioButton = new JRadioButton("No trace");
 		traceRadioButtonGroup.add(someTraceRadioButton);
-		traceRadioButtonGroup.add(fastestTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
 
 		someTraceRadioButton.setEnabled(false);
-		fastestTraceRadioButton.setEnabled(false);
 		noTraceRadioButton.setSelected(true);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -1718,10 +1702,6 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
-		gridBagConstraints.gridy = 2;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
