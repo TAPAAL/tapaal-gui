@@ -76,7 +76,7 @@ public class BatchProcessingResultsExporter {
 		
 		if(search == SearchOption.DFS)
 			return name_DFS;
-		else if(search == SearchOption.RDFS)
+		else if(search == SearchOption.RANDOM)
 			return name_RandomDFS;
 		else 
 			return name_BFS;

@@ -101,6 +101,8 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
 		map.put(SearchOption.BFS, "-o 0");
 		map.put(SearchOption.DFS, "-o 1");
+		map.put(SearchOption.RANDOM, "-o 2");
+		map.put(SearchOption.HEURISTIC, "-o 3");
 
 		return map;
 	}

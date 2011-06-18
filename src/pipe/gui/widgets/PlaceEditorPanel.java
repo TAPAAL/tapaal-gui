@@ -230,7 +230,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		markingSpinner = new javax.swing.JSpinner();
 		markingSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-		markingSpinner.setPreferredSize(new Dimension(50,27));
+		markingSpinner.setPreferredSize(new Dimension(75,27));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;

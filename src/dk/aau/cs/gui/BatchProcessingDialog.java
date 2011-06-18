@@ -521,7 +521,7 @@ public class BatchProcessingDialog extends JDialog {
 		else if(((String)searchOption.getSelectedItem()).equals(name_ClosestToTarget))
 			return SearchOption.CLOSE_TO_TARGET_FIRST;
 		else if(((String)searchOption.getSelectedItem()).equals(name_RandomDFS))
-			return SearchOption.RDFS;
+			return SearchOption.RANDOM;
 		else if(((String)searchOption.getSelectedItem()).equals(name_BFS))
 			return SearchOption.BFS;
 		else
@@ -1111,7 +1111,7 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("Search Method: \n");
 			if(query.getSearchOption() == SearchOption.DFS)
 				s.append(name_DFS);
-			else if(query.getSearchOption() == SearchOption.RDFS)
+			else if(query.getSearchOption() == SearchOption.RANDOM)
 				s.append(name_RandomDFS);
 			else if(query.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST)
 				s.append(name_ClosestToTarget);

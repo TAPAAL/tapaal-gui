@@ -178,7 +178,8 @@ public class QueryDialog extends JPanel {
 	private ButtonGroup searchRadioButtonGroup;
 	private JRadioButton breadthFirstSearch;
 	private JRadioButton depthFirstSearch;
-	private JRadioButton randomDepthFirstSearch;
+	private JRadioButton randomSearch;
+	private JRadioButton heuristicSearch;
 
 	// Trace options panel
 	private JPanel traceOptionsPanel;
@@ -299,8 +300,10 @@ public class QueryDialog extends JPanel {
 	private SearchOption getSearchOption() {
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
-		else if(randomDepthFirstSearch.isSelected())
-			return SearchOption.RDFS;
+		else if(randomSearch.isSelected())
+			return SearchOption.RANDOM;
+		else if(heuristicSearch.isSelected())
+			return SearchOption.HEURISTIC;
 		else
 			return SearchOption.BFS;
 	}
@@ -356,28 +359,28 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshSearchOptions() {
-		SearchOption searchOption = getSearchOption();
-		
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
-		{
-			depthFirstSearch.setEnabled(true);
-			breadthFirstSearch.setEnabled(true);
-			breadthFirstSearch.setSelected(true);
-			randomDepthFirstSearch.setEnabled(false);
-		}
-		else {
-			depthFirstSearch.setEnabled(true);
-			breadthFirstSearch.setEnabled(true);
-			randomDepthFirstSearch.setEnabled(true);
-		}
-		
-		
-		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
-			depthFirstSearch.setSelected(true);
-		else if(searchOption == SearchOption.RDFS && randomDepthFirstSearch.isEnabled())
-			randomDepthFirstSearch.setSelected(true);
-		else
-			breadthFirstSearch.setSelected(true);
+//		SearchOption searchOption = getSearchOption();
+//		
+//		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
+//		{
+//			depthFirstSearch.setEnabled(true);
+//			breadthFirstSearch.setEnabled(true);
+//			breadthFirstSearch.setSelected(true);
+//			randomSearch.setEnabled(false);
+//		}
+//		else {
+//			depthFirstSearch.setEnabled(true);
+//			breadthFirstSearch.setEnabled(true);
+//			randomSearch.setEnabled(true);
+//		}
+//		
+//		
+//		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
+//			depthFirstSearch.setSelected(true);
+//		else if(searchOption == SearchOption.RDFS && randomSearch.isEnabled())
+//			randomSearch.setSelected(true);
+//		else
+//			breadthFirstSearch.setSelected(true);
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -718,6 +721,8 @@ public class QueryDialog extends JPanel {
 	// /////////////////////////////////////////////////////////////////////
 
 	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
+		setPreferredSize(new Dimension(912, 567));
+		
 		initQueryNamePanel();
 		initBoundednessCheckPanel();
 		initQueryPanel();
@@ -739,7 +744,6 @@ public class QueryDialog extends JPanel {
 		refreshUndoRedo();
 
 		setEnabledOptionsAccordingToCurrentReduction();
-
 	}
 
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
@@ -795,8 +799,10 @@ public class QueryDialog extends JPanel {
 			breadthFirstSearch.setSelected(true);
 		} else if (queryToCreateFrom.getSearchOption() == SearchOption.DFS) {
 			depthFirstSearch.setSelected(true);
-		} else if (queryToCreateFrom.getSearchOption() == SearchOption.RDFS) {
-			randomDepthFirstSearch.setSelected(true);
+		} else if (queryToCreateFrom.getSearchOption() == SearchOption.RANDOM) {
+			randomSearch.setSelected(true);
+		} else if (queryToCreateFrom.getSearchOption() == SearchOption.HEURISTIC){
+			heuristicSearch.setSelected(true);
 		}
 	}
 
@@ -870,7 +876,7 @@ public class QueryDialog extends JPanel {
 
 		});
 		boundednessCheckPanel.add(kbounded);
-		boundednessCheckPanel.add(Box.createHorizontalStrut(400));
+		boundednessCheckPanel.add(Box.createHorizontalStrut(350));
 		
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.addActionListener(new ActionListener(){
@@ -1663,21 +1669,25 @@ public class QueryDialog extends JPanel {
 		searchRadioButtonGroup = new ButtonGroup();
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
-		randomDepthFirstSearch = new JRadioButton("Random Search");
+		randomSearch = new JRadioButton("Random Search");
+		heuristicSearch = new JRadioButton("Heuristic Search");
+		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
-		searchRadioButtonGroup.add(randomDepthFirstSearch);
+		searchRadioButtonGroup.add(randomSearch);
 		
-		breadthFirstSearch.setSelected(true);
+		heuristicSearch.setSelected(true);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridy = 0;
-		searchOptionsPanel.add(breadthFirstSearch, gridBagConstraints);
+		searchOptionsPanel.add(heuristicSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
-		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
+		searchOptionsPanel.add(breadthFirstSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 2;
-		searchOptionsPanel.add(randomDepthFirstSearch, gridBagConstraints);
+		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
+		gridBagConstraints.gridy = 3;
+		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
 		gridBagConstraints.gridx = 0;
