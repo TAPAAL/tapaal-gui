@@ -54,7 +54,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 		return "The net with the specified extra number of tokens is bounded.\n\n"
 				+ "This means that the analysis will be exact and always give \n"
 				+ "the correct answer.\n\n"
-				+ "The number of extra tokens was automatically lowered to the\n "
+				+ "The number of extra tokens was automatically lowered to the\n"
 				+ "minimum number of tokens needed for an exact analysis.";
 	}
 }

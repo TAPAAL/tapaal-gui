@@ -15,6 +15,6 @@ public class InconclusiveBoundednessAnalysisResult extends
 	
 	@Override
 	public String toString() {
-		return "\n\nThe answer is conclusive only if the net is bounded\nfor the given number of extra tokens. It is \nrecommended that you run a boundedness check \nfrom the query dialog.";
+		return "\n\nThe answer is conclusive only if the net is bounded\nfor the given number of extra tokens. It is \nrecommended to run a boundedness check \navailable in the query dialog.";
 	}
 }
