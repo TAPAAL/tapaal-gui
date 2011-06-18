@@ -707,7 +707,7 @@ public class QueryDialog extends JPanel {
 	// /////////////////////////////////////////////////////////////////////
 
 	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
-		setPreferredSize(new Dimension(912, 527));
+		//setPreferredSize(new Dimension(942, 517));
 		
 		initQueryNamePanel();
 		initBoundednessCheckPanel();
