@@ -86,8 +86,8 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_AllReductions = "All Verification Methods";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
-	private static final String name_RandomDFS = "Random Depth First Search";
-	private static final String name_ClosestToTarget = "Search by Closest To Target First";
+	private static final String name_HEURISTIC = "Heuristic Search";
+	private static final String name_Random = "Random Search";
 	private static final String name_KeepQueryOption = "Do not override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
 	private static final String name_SYMMETRY = "Yes";
@@ -489,14 +489,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void refreshSearchOptions() {
 		String currentSearchOption = getSearchOptionAsString();
 
-		String[] options;
-		if(getReductionOption() == ReductionOption.VerifyTAPN)
-		{
-			options = new String[] { name_KeepQueryOption, name_BFS, name_DFS };
-		}
-		else {
-			options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS, name_ClosestToTarget };
-		}
+		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
 		
 		Dimension d = searchOption.getSize();
 		searchOption.removeAllItems();
@@ -518,10 +511,10 @@ public class BatchProcessingDialog extends JDialog {
 	private SearchOption getSearchOption() {
 		if(((String)searchOption.getSelectedItem()).equals(name_DFS))
 			return SearchOption.DFS;
-		else if(((String)searchOption.getSelectedItem()).equals(name_ClosestToTarget))
-			return SearchOption.CLOSE_TO_TARGET_FIRST;
-		else if(((String)searchOption.getSelectedItem()).equals(name_RandomDFS))
+		else if(((String)searchOption.getSelectedItem()).equals(name_Random))
 			return SearchOption.RANDOM;
+		else if(((String)searchOption.getSelectedItem()).equals(name_HEURISTIC))
+			return SearchOption.HEURISTIC;
 		else if(((String)searchOption.getSelectedItem()).equals(name_BFS))
 			return SearchOption.BFS;
 		else
@@ -610,7 +603,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(searchLabel,gbc);
 		
-		String[] options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS };
+		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
 		searchOption = new JComboBox(options);
 		searchOption.setMinimumSize(searchOption.getSize());
 	
@@ -1112,9 +1105,9 @@ public class BatchProcessingDialog extends JDialog {
 			if(query.getSearchOption() == SearchOption.DFS)
 				s.append(name_DFS);
 			else if(query.getSearchOption() == SearchOption.RANDOM)
-				s.append(name_RandomDFS);
-			else if(query.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST)
-				s.append(name_ClosestToTarget);
+				s.append(name_Random);
+			else if(query.getSearchOption() == SearchOption.HEURISTIC)
+				s.append(name_HEURISTIC);
 			else
 				s.append(name_BFS);
 			s.append("\n\n");
