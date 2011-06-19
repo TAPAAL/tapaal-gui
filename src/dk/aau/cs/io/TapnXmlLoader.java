@@ -739,11 +739,11 @@ public class TapnXmlLoader {
 			inclusionPlaces = "*ALL*";
 		}
 		
+		if(!queryElement.hasAttribute("inclusionPlaces") || inclusionPlaces.equals("*ALL*")) 
+			return new InclusionPlaces();
+		
 		if(inclusionPlaces.isEmpty() || inclusionPlaces.equals("*NONE*")) 
 			return new InclusionPlaces(InclusionPlacesOption.UserSpecified, new ArrayList<TimedPlace>());
-		
-		if(inclusionPlaces.equals("*ALL*")) 
-			return new InclusionPlaces();
 		
 		String[] placeNames = inclusionPlaces.split(",");
 		

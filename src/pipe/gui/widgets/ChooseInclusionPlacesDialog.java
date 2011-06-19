@@ -14,7 +14,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -161,16 +164,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 	}
 
 	private void setupFromInput(InclusionPlaces inclusionPlaces) {
-		List<TimedPlace> incPlaces = inclusionPlaces.inclusionPlaces();
-		for(TimedPlace p : tapnNetwork.sharedPlaces())
-			listModel.addElement(new CheckBoxListItem(p, incPlaces.contains(p)));
-		
-		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			for(TimedPlace place : net.places()) {
-				if(!place.isShared())
-					listModel.addElement(new CheckBoxListItem(place, incPlaces.contains(place)));
-			}
-		}
+		addPlacesToPlaceList(inclusionPlaces);
 	
 		
 		boolean allPlaces = inclusionPlaces.inclusionOption() == InclusionPlacesOption.AllPlaces;
@@ -178,6 +172,35 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		userSpecifiedCheckBox.setSelected(!allPlaces);
 		placeList.setEnabled(!allPlaces);
 		clearSelection.setEnabled(!allPlaces);
+	}
+
+
+	private void addPlacesToPlaceList(InclusionPlaces inclusionPlaces) {
+		List<TimedPlace> incPlaces = inclusionPlaces.inclusionPlaces();
+		boolean allPlaces = inclusionPlaces.inclusionOption() == InclusionPlacesOption.AllPlaces;
+		
+		Vector<TimedPlace> tempPlaces = new Vector<TimedPlace>(tapnNetwork.sharedPlaces());
+		sortPlacesByName(tempPlaces);
+		for(TimedPlace p : tempPlaces)
+			listModel.addElement(new CheckBoxListItem(p, allPlaces || incPlaces.contains(p)));
+		
+		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
+			tempPlaces = new Vector<TimedPlace>(net.places());
+			sortPlacesByName(tempPlaces);
+			for(TimedPlace place : tempPlaces) {
+				if(!place.isShared())
+					listModel.addElement(new CheckBoxListItem(place, allPlaces || incPlaces.contains(place)));
+			}
+		}
+	}
+
+
+	private void sortPlacesByName(Vector<TimedPlace> tempPlaces) {
+		Collections.sort(tempPlaces, new Comparator<TimedPlace>() {
+			public int compare(TimedPlace o1, TimedPlace o2) {
+				return o1.name().compareToIgnoreCase(o2.name());
+			}
+		});
 	}
 
 
@@ -319,5 +342,12 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 			toggleSelection(list.getSelectedIndex());
 		}
 		
+//		private class PlaceNameComparer implements Comparator<TimedPlace> {
+//			public int compare(TimedPlace p1, TimedPlace p2) {
+//				return p1.name().compareTo(p2.name());
+//			}
+//		}
 	}
+	
+	
 }
