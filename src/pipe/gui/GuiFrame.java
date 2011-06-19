@@ -1805,7 +1805,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			this.typeID = typeID;
 		}
 		
-		@Override
+		
 		public void actionPerformed(ActionEvent arg0) {
 			
 			if (this == showComponentsAction){
