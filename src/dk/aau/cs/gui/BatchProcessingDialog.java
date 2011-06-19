@@ -53,6 +53,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.FileBrowser;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
@@ -86,8 +87,8 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_AllReductions = "All Verification Methods";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
-	private static final String name_RandomDFS = "Random Depth First Search";
-	private static final String name_ClosestToTarget = "Search by Closest To Target First";
+	private static final String name_HEURISTIC = "Heuristic Search";
+	private static final String name_Random = "Random Search";
 	private static final String name_KeepQueryOption = "Do not override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
 	private static final String name_SYMMETRY = "Yes";
@@ -489,14 +490,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void refreshSearchOptions() {
 		String currentSearchOption = getSearchOptionAsString();
 
-		String[] options;
-		if(getReductionOption() == ReductionOption.VerifyTAPN)
-		{
-			options = new String[] { name_KeepQueryOption, name_BFS, name_DFS };
-		}
-		else {
-			options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS, name_ClosestToTarget };
-		}
+		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
 		
 		Dimension d = searchOption.getSize();
 		searchOption.removeAllItems();
@@ -518,10 +512,10 @@ public class BatchProcessingDialog extends JDialog {
 	private SearchOption getSearchOption() {
 		if(((String)searchOption.getSelectedItem()).equals(name_DFS))
 			return SearchOption.DFS;
-		else if(((String)searchOption.getSelectedItem()).equals(name_ClosestToTarget))
-			return SearchOption.CLOSE_TO_TARGET_FIRST;
-		else if(((String)searchOption.getSelectedItem()).equals(name_RandomDFS))
-			return SearchOption.RDFS;
+		else if(((String)searchOption.getSelectedItem()).equals(name_Random))
+			return SearchOption.RANDOM;
+		else if(((String)searchOption.getSelectedItem()).equals(name_HEURISTIC))
+			return SearchOption.HEURISTIC;
 		else if(((String)searchOption.getSelectedItem()).equals(name_BFS))
 			return SearchOption.BFS;
 		else
@@ -610,7 +604,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(searchLabel,gbc);
 		
-		String[] options = new String[] { name_KeepQueryOption, name_BFS, name_DFS, name_RandomDFS };
+		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
 		searchOption = new JComboBox(options);
 		searchOption.setMinimumSize(searchOption.getSize());
 	
@@ -669,6 +663,7 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumnModel().getColumn(0).setMinWidth(60);
 		table.getColumnModel().getColumn(0).setPreferredWidth(60);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
+		table.getColumn("Method").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
@@ -1066,7 +1061,7 @@ public class BatchProcessingDialog extends JDialog {
 
 					setToolTipText(generateTooltipTextFromQuery(newQuery));
 					setText(newQuery.getName());
-				} else if(table.getColumnName(column).equals("Verification Time")) {
+				} else if(table.getColumnName(column).equals("Verification Time") || table.getColumnName(column).equals("Method")) {
 					setText(value.toString());
 					Point mousePos = table.getMousePosition();
 					BatchProcessingVerificationResult result = null;
@@ -1074,7 +1069,10 @@ public class BatchProcessingDialog extends JDialog {
 						result = ((BatchProcessingResultsTableModel)table.getModel()).getResult(table.rowAtPoint(mousePos));
 					}
 					
-					setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
+					if(table.getColumnName(column).equals("Verification Time"))
+						setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
+					else 
+						setToolTipText(result != null ? generateReductionString(result.query()) : value.toString());
 				} else {
 					setToolTipText(value.toString());
 					setText(value.toString());
@@ -1111,14 +1109,31 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("Search Method: \n");
 			if(query.getSearchOption() == SearchOption.DFS)
 				s.append(name_DFS);
-			else if(query.getSearchOption() == SearchOption.RDFS)
-				s.append(name_RandomDFS);
-			else if(query.getSearchOption() == SearchOption.CLOSE_TO_TARGET_FIRST)
-				s.append(name_ClosestToTarget);
+			else if(query.getSearchOption() == SearchOption.RANDOM)
+				s.append(name_Random);
+			else if(query.getSearchOption() == SearchOption.HEURISTIC)
+				s.append(name_HEURISTIC);
 			else
 				s.append(name_BFS);
 			s.append("\n\n");
 			
+			s.append(generateReductionString(query));
+			
+			s.append("\n\n");
+			s.append("Symmetry: ");
+			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
+			
+			s.append("Query Property:\n"); 
+			if(query.getProperty().toString().equals("AG P0>=0"))
+				s.append(name_SEARCHWHOLESTATESPACE);
+			else
+				s.append(query.getProperty().toString());
+			
+			return s.toString();
+		}
+
+		private String generateReductionString(TAPNQuery query) {
+			StringBuilder s = new StringBuilder();
 			s.append("Reduction: \n");
 			if (query.getReductionOption() == ReductionOption.STANDARD)
 				s.append(name_STANDARD);
@@ -1142,24 +1157,16 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(name_BROADCAST);
 			}
 			
-			s.append("\n\n");
-			s.append("Symmetry: ");
-			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
-			
-			s.append("Query Property:\n"); 
-			if(query.getProperty().toString().equals("AG P0>=0"))
-				s.append(name_SEARCHWHOLESTATESPACE);
-			else
-				s.append(query.getProperty().toString());
-			
 			return s.toString();
 		}
 
-		private Object generateListOfInclusionPlaces(TAPNQuery query) {
-			if(query.inclusionPlaces().isEmpty()) return "*NONE*";
+		private String generateListOfInclusionPlaces(TAPNQuery query) {
+			if(query.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) return "*ALL*";
+			List<TimedPlace> incPlace = query.inclusionPlaces().inclusionPlaces();
+			if(incPlace.isEmpty()) return "*NONE*";
 			StringBuilder s = new StringBuilder();
 			boolean first = true;
-			for(TimedPlace p : query.inclusionPlaces()) {
+			for(TimedPlace p : incPlace) {
 				if(!first) s.append(", ");
 				
 				s.append(p.toString());

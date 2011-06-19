@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
-<net id="TAPN1" type="P/T net">
-<labels border="true" height="735" positionX="558" positionY="50" width="341">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
+<net active="true" id="IntroExample" type="P/T net">
+<labels border="true" height="632" positionX="560" positionY="52" width="343">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
 
 The circles are called places and rectangles transitions. They are connected either by standard arcs from place to transition or transition to place, or they can be connected by transport arcs (these arcs always come in pairs) like from P1 to T3 and T3 to P6.
 
@@ -81,7 +81,7 @@ One may observe that two extra tokens are needed in the intermediate markings in
 </arc>
 <arc id="T3 to P6" inscription="[4,7]:1" source="T3" target="P6" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="56" yCoord="316"/>
-<arcpath arcPointType="false" id="1" xCoord="58" yCoord="313"/>
+<arcpath arcPointType="false" id="1" xCoord="60" yCoord="315"/>
 <arcpath arcPointType="false" id="2" xCoord="57" yCoord="387"/>
 </arc>
 <arc id="T4 to P7" inscription="1" source="T4" target="P7" type="normal">
@@ -89,5 +89,5 @@ One may observe that two extra tokens are needed in the intermediate markings in
 <arcpath arcPointType="false" id="1" xCoord="222" yCoord="732"/>
 </arc>
 </net>
-<query capacity="2" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Target Reachable" query="EF TAPN1.Target=1" reductionOption="STANDARD" searchOption="BFS" traceOption="FASTEST"/>
+<query active="true" capacity="2" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Target Reachable" query="EF IntroExample.Target=1" reductionOption="VerifyTAPN" searchOption="BFS" symmetry="true" traceOption="SOME"/>
 </pnml>

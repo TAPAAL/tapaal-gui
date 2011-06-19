@@ -21,6 +21,7 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.widgets.InclusionPlaces;
 
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -439,14 +440,24 @@ ReductionOption reductionOption;
 		int capacity = getQueryCapacityAsOldFormat(queryElement);
 		boolean symmetry = getSymmetryAsOldFormat(queryElement);
 
+		// The following attributes were not supported in the old versions of TAPAAL
+		// We just pick the default values.
+		boolean discreteInclusion = false;
+		boolean active = true;
+		InclusionPlaces inclusionPlaces = new InclusionPlaces();
+
 		TCTLAbstractProperty query;
 		query = parseQueryPropertyAsOldFormat(queryElement);
+
 		
-		if (query != null)
-			return new TAPNQuery(comment, capacity, query, traceOption,
+		if (query != null) {
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
 					searchOption, reductionOption, symmetry, hashTableSize,
-					extrapolationOption);
-		else
+					extrapolationOption,inclusionPlaces);
+			parsedQuery.setActive(active);
+			parsedQuery.setDiscreteInclusion(discreteInclusion);
+			return parsedQuery;
+		} else
 			return null;
 	}
 	

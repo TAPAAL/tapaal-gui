@@ -3,12 +3,18 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -72,7 +78,45 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	public String getVersion() { // atm. any version of VerifyTAPN will do
-		return "";
+		String result = null;
+
+		if (!isNotSetup()) {
+			String[] commands;
+			commands = new String[] { verifytapnpath, "-v" };
+
+			InputStream stream = null;
+			try {
+				Process child = Runtime.getRuntime().exec(commands);
+				child.waitFor();
+				stream = child.getInputStream();
+			} catch (IOException e) {
+			} catch (InterruptedException e) {
+			}
+
+			if (stream != null) {
+				result = readVersionNumberFrom(stream);
+			}
+		}
+
+		return result;
+	}
+
+	private String readVersionNumberFrom(InputStream stream) {
+		String result = null;
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+
+		String versioninfo = null;
+		try {
+			versioninfo = bufferedReader.readLine();
+		} catch (IOException e) {
+			result = null;
+		}
+
+		Pattern pattern = Pattern.compile("^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$");
+		Matcher m = pattern.matcher(versioninfo);
+		m.find();
+		result = m.group(1);
+		return result;
 	}
 
 	public boolean isCorrectVersion() {
@@ -164,8 +208,13 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private void mapDiscreteInclusionPlacesToNewNames(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model) {
+		VerifyTAPNOptions verificationOptions = (VerifyTAPNOptions)options;
+		
+		if(verificationOptions.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces) 
+			return;
+		
 		List<TimedPlace> inclusionPlaces = new ArrayList<TimedPlace>();
-		for(TimedPlace p : ((VerifyTAPNOptions)options).inclusionPlaces()) {
+		for(TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
 			if(p instanceof LocalTimedPlace) {
 				LocalTimedPlace local = (LocalTimedPlace)p;
 				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
@@ -174,7 +223,7 @@ public class VerifyTAPN implements ModelChecker {
 				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
 		}
 		
-		((VerifyTAPNOptions)options).setInclusionPlaces(inclusionPlaces);
+		((VerifyTAPNOptions)options).setInclusionPlaces(new InclusionPlaces(InclusionPlacesOption.UserSpecified, inclusionPlaces));
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {

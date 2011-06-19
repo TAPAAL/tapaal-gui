@@ -1,19 +1,17 @@
 package pipe.dataLayer;
 
-import java.util.ArrayList;
-import java.util.List;
+import pipe.gui.widgets.InclusionPlaces;
 
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 
 public class TAPNQuery {
 	public enum TraceOption {
-		SOME, FASTEST, NONE
+		SOME, NONE
 	};
 
 	public enum SearchOption {
-		BFS, DFS, RDFS, CLOSE_TO_TARGET_FIRST, BatchProcessingKeepQueryOption
+		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC
 	};
 
 	public enum HashTableSize {
@@ -32,7 +30,7 @@ public class TAPNQuery {
 	private boolean symmetry;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
-	private List<TimedPlace> inclusionPlaces;
+	private InclusionPlaces inclusionPlaces;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -171,13 +169,13 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, hashTabelSize, extrapolationOption, new ArrayList<TimedPlace>());
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, hashTabelSize, extrapolationOption, new InclusionPlaces());
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, List<TimedPlace> inclusionPlaces) {
+			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -209,7 +207,7 @@ public class TAPNQuery {
 		this.inclusionPlaces = newQuery.inclusionPlaces();
 	}
 
-	public List<TimedPlace> inclusionPlaces() {
+	public InclusionPlaces inclusionPlaces() {
 		return inclusionPlaces;
 	}
 

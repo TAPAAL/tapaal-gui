@@ -237,7 +237,7 @@ public class TimedArcPetriNet {
 		}
 	}
 
-	public Iterable<TimedPlace> places() {
+	public List<TimedPlace> places() {
 		return places;
 	}
 

@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -110,9 +109,7 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export VerifyTAPN XML";
 	
-	private static final String UPPAAL_FASTEST_TRACE_STRING = "Fastest trace (only without symmetry reduction)";
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some encountered trace (only without symmetry reduction)";
-	private static final String VERIFYTAPN_FASTEST_TRACE_STRING = "Fastest trace";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some encountered trace";
 	private static final String SHARED = "Shared";
 
@@ -178,7 +175,8 @@ public class QueryDialog extends JPanel {
 	private ButtonGroup searchRadioButtonGroup;
 	private JRadioButton breadthFirstSearch;
 	private JRadioButton depthFirstSearch;
-	private JRadioButton randomDepthFirstSearch;
+	private JRadioButton randomSearch;
+	private JRadioButton heuristicSearch;
 
 	// Trace options panel
 	private JPanel traceOptionsPanel;
@@ -186,7 +184,6 @@ public class QueryDialog extends JPanel {
 	private ButtonGroup traceRadioButtonGroup;
 	private JRadioButton noTraceRadioButton;
 	private JRadioButton someTraceRadioButton;
-	private JRadioButton fastestTraceRadioButton;
 
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
@@ -209,7 +206,7 @@ public class QueryDialog extends JPanel {
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 	private boolean isNetDegree2;
-	private List<TimedPlace> inclusionPlaces;
+	private InclusionPlaces inclusionPlaces;
 
 	private String name_verifyTAPN = "VerifyTAPN";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
@@ -224,7 +221,7 @@ public class QueryDialog extends JPanel {
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
-		this.inclusionPlaces = queryToCreateFrom == null ? new ArrayList<TimedPlace>() : queryToCreateFrom.inclusionPlaces();
+		this.inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		isNetDegree2 = checkForDegree2();
@@ -290,8 +287,6 @@ public class QueryDialog extends JPanel {
 	private TraceOption getTraceOption() {
 		if(someTraceRadioButton.isSelected())
 			return TraceOption.SOME;
-		else if(fastestTraceRadioButton.isSelected())
-			return TraceOption.FASTEST;
 		else
 			return TraceOption.NONE;
 	}
@@ -299,8 +294,10 @@ public class QueryDialog extends JPanel {
 	private SearchOption getSearchOption() {
 		if(depthFirstSearch.isSelected())
 			return SearchOption.DFS;
-		else if(randomDepthFirstSearch.isSelected())
-			return SearchOption.RDFS;
+		else if(randomSearch.isSelected())
+			return SearchOption.RANDOM;
+		else if(heuristicSearch.isSelected())
+			return SearchOption.HEURISTIC;
 		else
 			return SearchOption.BFS;
 	}
@@ -328,56 +325,48 @@ public class QueryDialog extends JPanel {
 		TraceOption traceOption = getTraceOption();
 		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
 			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
-			fastestTraceRadioButton.setText(VERIFYTAPN_FASTEST_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
 			someTraceRadioButton.setSelected(someTraceRadioButton.isSelected());
-			fastestTraceRadioButton.setEnabled(false);
 			noTraceRadioButton.setSelected(noTraceRadioButton.isSelected());
 		}
 		else if (symmetryReduction.isSelected()) {
 			someTraceRadioButton.setText(UPPAAL_SOME_TRACE_STRING);
-			fastestTraceRadioButton.setText(UPPAAL_FASTEST_TRACE_STRING);
 			someTraceRadioButton.setEnabled(false);
-			fastestTraceRadioButton.setEnabled(false);
 			noTraceRadioButton.setSelected(true);
 		} else {
 			someTraceRadioButton.setText(UPPAAL_SOME_TRACE_STRING);
-			fastestTraceRadioButton.setText(UPPAAL_FASTEST_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
-			fastestTraceRadioButton.setEnabled(true);
 		}
 		
 		if(traceOption == TraceOption.SOME && someTraceRadioButton.isEnabled())
 			someTraceRadioButton.setSelected(true);
-		else if(traceOption == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled())
-			fastestTraceRadioButton.setSelected(true);
 		else
 			noTraceRadioButton.setSelected(true);
 	}
 
 	private void refreshSearchOptions() {
-		SearchOption searchOption = getSearchOption();
-		
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
-		{
-			depthFirstSearch.setEnabled(true);
-			breadthFirstSearch.setEnabled(true);
-			breadthFirstSearch.setSelected(true);
-			randomDepthFirstSearch.setEnabled(false);
-		}
-		else {
-			depthFirstSearch.setEnabled(true);
-			breadthFirstSearch.setEnabled(true);
-			randomDepthFirstSearch.setEnabled(true);
-		}
-		
-		
-		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
-			depthFirstSearch.setSelected(true);
-		else if(searchOption == SearchOption.RDFS && randomDepthFirstSearch.isEnabled())
-			randomDepthFirstSearch.setSelected(true);
-		else
-			breadthFirstSearch.setSelected(true);
+//		SearchOption searchOption = getSearchOption();
+//		
+//		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN))
+//		{
+//			depthFirstSearch.setEnabled(true);
+//			breadthFirstSearch.setEnabled(true);
+//			breadthFirstSearch.setSelected(true);
+//			randomSearch.setEnabled(false);
+//		}
+//		else {
+//			depthFirstSearch.setEnabled(true);
+//			breadthFirstSearch.setEnabled(true);
+//			randomSearch.setEnabled(true);
+//		}
+//		
+//		
+//		if(searchOption == SearchOption.DFS && depthFirstSearch.isEnabled())
+//			depthFirstSearch.setSelected(true);
+//		else if(searchOption == SearchOption.RDFS && randomSearch.isEnabled())
+//			randomSearch.setSelected(true);
+//		else
+//			breadthFirstSearch.setSelected(true);
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -718,6 +707,8 @@ public class QueryDialog extends JPanel {
 	// /////////////////////////////////////////////////////////////////////
 
 	private void init(QueryDialogueOption option, final TAPNQuery queryToCreateFrom) {
+		//setPreferredSize(new Dimension(942, 517));
+		
 		initQueryNamePanel();
 		initBoundednessCheckPanel();
 		initQueryPanel();
@@ -739,7 +730,6 @@ public class QueryDialog extends JPanel {
 		refreshUndoRedo();
 
 		setEnabledOptionsAccordingToCurrentReduction();
-
 	}
 
 	private void setupFromQuery(TAPNQuery queryToCreateFrom) {
@@ -783,8 +773,6 @@ public class QueryDialog extends JPanel {
 	private void setupTraceOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.getTraceOption() == TraceOption.SOME) {
 			someTraceRadioButton.setSelected(true);
-		} else if (queryToCreateFrom.getTraceOption() == TraceOption.FASTEST) {
-			fastestTraceRadioButton.setSelected(true);
 		} else if (queryToCreateFrom.getTraceOption() == TraceOption.NONE) {
 			noTraceRadioButton.setSelected(true);
 		}
@@ -795,8 +783,10 @@ public class QueryDialog extends JPanel {
 			breadthFirstSearch.setSelected(true);
 		} else if (queryToCreateFrom.getSearchOption() == SearchOption.DFS) {
 			depthFirstSearch.setSelected(true);
-		} else if (queryToCreateFrom.getSearchOption() == SearchOption.RDFS) {
-			randomDepthFirstSearch.setSelected(true);
+		} else if (queryToCreateFrom.getSearchOption() == SearchOption.RANDOM) {
+			randomSearch.setSelected(true);
+		} else if (queryToCreateFrom.getSearchOption() == SearchOption.HEURISTIC){
+			heuristicSearch.setSelected(true);
 		}
 	}
 
@@ -870,7 +860,7 @@ public class QueryDialog extends JPanel {
 
 		});
 		boundednessCheckPanel.add(kbounded);
-		boundednessCheckPanel.add(Box.createHorizontalStrut(400));
+		boundednessCheckPanel.add(Box.createHorizontalStrut(350));
 		
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.addActionListener(new ActionListener(){
@@ -1659,25 +1649,31 @@ public class QueryDialog extends JPanel {
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
 
-		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Analysis Options"));
+		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy"));
 		searchRadioButtonGroup = new ButtonGroup();
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
-		randomDepthFirstSearch = new JRadioButton("Random Search");
+		randomSearch = new JRadioButton("Random Search");
+		heuristicSearch = new JRadioButton("Heuristic Search");
+		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
-		searchRadioButtonGroup.add(randomDepthFirstSearch);
+		searchRadioButtonGroup.add(randomSearch);
 		
-		breadthFirstSearch.setSelected(true);
+		heuristicSearch.setSelected(true);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		searchOptionsPanel.add(breadthFirstSearch, gridBagConstraints);
+		searchOptionsPanel.add(heuristicSearch, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
+		searchOptionsPanel.add(breadthFirstSearch, gridBagConstraints);
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
 		searchOptionsPanel.add(depthFirstSearch, gridBagConstraints);
-		gridBagConstraints.gridy = 2;
-		searchOptionsPanel.add(randomDepthFirstSearch, gridBagConstraints);
+		gridBagConstraints.gridy = 1;
+		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
 		gridBagConstraints.gridx = 0;
@@ -1692,14 +1688,11 @@ public class QueryDialog extends JPanel {
 		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
 		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
-		fastestTraceRadioButton = new JRadioButton(UPPAAL_FASTEST_TRACE_STRING);
 		noTraceRadioButton = new JRadioButton("No trace");
 		traceRadioButtonGroup.add(someTraceRadioButton);
-		traceRadioButtonGroup.add(fastestTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
 
 		someTraceRadioButton.setEnabled(false);
-		fastestTraceRadioButton.setEnabled(false);
 		noTraceRadioButton.setSelected(true);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -1708,10 +1701,6 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.weightx = 1;
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(fastestTraceRadioButton, gridBagConstraints);
-		gridBagConstraints.gridy = 2;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);

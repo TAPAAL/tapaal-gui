@@ -17,6 +17,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.model.tapn.TimedPlace;
 
 public class DeletePetriNetObjectAction extends AbstractAction {
 
@@ -38,10 +39,8 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		// check if queries need to be removed
-		ArrayList<PetriNetObject> selection = CreateGui.getView()
-				.getSelectionObject().getSelection();
-		Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTab()
-				.getSelectedComponent()).queries();
+		ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
+		Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTab().getSelectedComponent()).queries();
 		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
 		boolean queriesAffected = false;
 
@@ -58,14 +57,12 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 			}
 		}
 		StringBuilder s = new StringBuilder();
-		s
-				.append("The following queries are associated with the currently selected objects:\n\n");
+		s.append("The following queries are associated with the currently selected objects:\n\n");
 		for (TAPNQuery q : queriesToDelete) {
 			s.append(q.getName());
 			s.append("\n");
 		}
-		s
-				.append("\nAre you sure you want to remove the current selection and all associated queries?");
+		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
 		int choice = queriesAffected ? JOptionPane.showConfirmDialog(CreateGui
 				.getApp(), s.toString(), "Warning", JOptionPane.YES_NO_OPTION,
@@ -77,8 +74,7 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 
 			if (CreateGui.getView().getSelectionObject().getSelectionCount() <= 1) {
 				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab()
-							.getSelectedComponent());
+					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
 					for (TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);
 					}
@@ -88,18 +84,25 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 				selected.delete();
 			} else {
 				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab()
-							.getSelectedComponent());
+					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
 					for (TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);
 					}
 				}
-				CreateGui.getView().getUndoManager()
-						.deleteSelection(
-								CreateGui.getView().getSelectionObject()
-										.getSelection());
+				CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());
 				CreateGui.getView().getSelectionObject().deleteSelection();
 			}
+
+			// remove the places from the list of inclusion places
+			for (PetriNetObject p : selection) {
+				if (p instanceof TimedPlaceComponent) {
+					for (TAPNQuery q : queries) {
+						TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
+						q.inclusionPlaces().removePlace(place);
+					}
+				}
+			}
 		}
+		
 	}
 }

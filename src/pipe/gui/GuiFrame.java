@@ -64,7 +64,9 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
 public class GuiFrame extends JFrame implements ActionListener, Observer {
 
@@ -846,7 +848,25 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		} else {
 			verifytaversion = verifyta.getVersion();
 		}
+		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+		String verifytapnPath = verifyTAPN.getPath();
+		String verifytapnversion = "";
 
+		if (verifytapnPath == null || verifytapnPath.isEmpty()) {
+			verifytapnPath = "Not setup";
+			verifytapnversion = "N/A";
+		} else {
+			verifytapnversion = verifyTAPN.getVersion();
+		}
+		
+		buffer.append("VerifyTAPN Information:\n");
+		buffer.append("   Located: ");
+		buffer.append(verifytapnPath);
+		buffer.append("\n");
+		buffer.append("   Version: ");
+		buffer.append(verifytapnversion);
+		buffer.append("\n\n");
+		
 		buffer.append("Verifyta Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytaPath);
@@ -1504,6 +1524,16 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
 					for (TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);
+					}
+				}
+				
+				// remove the places from the list of inclusion places
+				for (PetriNetObject p : selection) {
+					if (p instanceof TimedPlaceComponent) {
+						for (TAPNQuery q : queries) {
+							TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
+							q.inclusionPlaces().removePlace(place);
+						}
 					}
 				}
 				

@@ -108,7 +108,7 @@ public class RunVerification extends RunVerificationBase {
 			gbc.anchor = GridBagConstraints.WEST;
 			panel.add(new JLabel(toHTML(result.getStatsAsString())), gbc);
 			
-			JButton infoButton = new JButton("Stats Info");
+			JButton infoButton = new JButton("Explanation");
 			infoButton.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent arg0) {
 					JOptionPane.showMessageDialog(panel, modelChecker.getStatsExplanation(), "Stats Explanation", JOptionPane.INFORMATION_MESSAGE);

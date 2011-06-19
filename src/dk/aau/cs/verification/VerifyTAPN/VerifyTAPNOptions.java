@@ -1,12 +1,12 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;
@@ -18,20 +18,20 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private int tokensInModel;
 	private boolean symmetry;
 	private boolean discreteInclusion;
-	private List<TimedPlace> inclusionPlaces;
+	private InclusionPlaces inclusionPlaces;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
-		this(extraTokens, traceOption, search, symmetry, false, new ArrayList<TimedPlace>());
+		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
 	}
 	
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
-		this(extraTokens,traceOption, search, symmetry, discreteInclusion, new ArrayList<TimedPlace>());
+		this(extraTokens,traceOption, search, symmetry, discreteInclusion, new InclusionPlaces());
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, List<TimedPlace> inclusionPlaces) {
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		this.searchOption = search;
@@ -75,11 +75,12 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	}
 
 	private String generateDiscretePlacesList() {
-		if(inclusionPlaces.isEmpty()) return "*NONE*";
+		if(inclusionPlaces.inclusionOption() == InclusionPlacesOption.AllPlaces) return "*ALL*";
+		if(inclusionPlaces.inclusionPlaces().isEmpty()) return "*NONE*";
 		
 		StringBuilder s = new StringBuilder();
 		boolean first = true;
-		for(TimedPlace p : inclusionPlaces) {
+		for(TimedPlace p : inclusionPlaces.inclusionPlaces()) {
 			if(!first) s.append(",");
 			
 			s.append(p.name());
@@ -101,16 +102,18 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
 		map.put(SearchOption.BFS, "-o 0");
 		map.put(SearchOption.DFS, "-o 1");
+		map.put(SearchOption.RANDOM, "-o 2");
+		map.put(SearchOption.HEURISTIC, "-o 3");
 
 		return map;
 	}
 
-	public List<TimedPlace> inclusionPlaces() {
+	public InclusionPlaces inclusionPlaces() {
 		return inclusionPlaces;
 	}
 	
-	public void setInclusionPlaces(List<TimedPlace> inclusionPlaces) {
-		Require.that(inclusionPlaces != null, "List of inclusion places cannot be null");
+	public void setInclusionPlaces(InclusionPlaces inclusionPlaces) {
+		Require.that(inclusionPlaces != null, "Inclusion places cannot be null");
 		
 		this.inclusionPlaces = inclusionPlaces;
 	}

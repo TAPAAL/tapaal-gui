@@ -51,6 +51,7 @@ import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
+import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.AddTemplateVisitor;
@@ -696,14 +697,24 @@ public class TapnLegacyXmlLoader {
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = getQueryCapacityAsOldFormat(queryElement);
 		boolean symmetry = getSymmetryAsOldFormat(queryElement);
+		
+		// The following attributes were not supported in the old versions of TAPAAL
+		// We just pick the default values.
+		boolean discreteInclusion = false;
+		boolean active = true;
+		InclusionPlaces inclusionPlaces = new InclusionPlaces();
 
 		TCTLAbstractProperty query;
 		query = parseQueryPropertyAsOldFormat(queryElement);
 		
-		if (query != null)
-			return new TAPNQuery(comment, capacity, query, traceOption,
+		if (query != null) {
+			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
 					searchOption, reductionOption, symmetry, hashTableSize,
-					extrapolationOption);
+					extrapolationOption,inclusionPlaces);
+			parsedQuery.setActive(active);
+			parsedQuery.setDiscreteInclusion(discreteInclusion);
+			return parsedQuery;
+		}
 		else
 			return null;
 	}

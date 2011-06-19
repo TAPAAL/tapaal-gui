@@ -38,6 +38,7 @@ public class VerifyTAPNTraceParser {
 		TimedArcPetriNetTrace trace = new TimedArcPetriNetTrace(true);
 		
 		Document document = loadDocument(reader);
+		
 		if(document == null) return null;
 		
 		NodeList nodeList = document.getElementsByTagName("trace").item(0).getChildNodes();

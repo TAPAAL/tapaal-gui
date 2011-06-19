@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Vector;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -54,7 +57,13 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
-		sharedTransitionsComboBox = new JComboBox(context.network().sharedTransitions().toArray());
+		Vector<SharedTransition> sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
+		Collections.sort(sharedTransitions, new Comparator<SharedTransition>() {
+			public int compare(SharedTransition o1, SharedTransition o2) {
+				return o1.name().compareToIgnoreCase(o2.name());
+			}
+		});
+		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(120,27));
 		setLayout(new java.awt.GridBagLayout());
 

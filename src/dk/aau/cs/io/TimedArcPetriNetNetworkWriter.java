@@ -34,6 +34,7 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -255,12 +256,15 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	}
 
 	private String getInclusionPlacesString(TAPNQuery query) {
-		if(!query.discreteInclusion() || query.inclusionPlaces().isEmpty())
+		if(!query.discreteInclusion() || (query.inclusionPlaces().inclusionOption() == InclusionPlacesOption.UserSpecified && query.inclusionPlaces().inclusionPlaces().isEmpty()))
 			return "*NONE*";
+		
+		if(query.inclusionPlaces().inclusionOption() == InclusionPlacesOption.AllPlaces)
+			return "*ALL*";
 		
 		boolean first = true;
 		StringBuilder s = new StringBuilder();
-		for(TimedPlace p : query.inclusionPlaces()) {
+		for(TimedPlace p : query.inclusionPlaces().inclusionPlaces()) {
 			if(!first) s.append(",");
 			
 			s.append(p.toString());

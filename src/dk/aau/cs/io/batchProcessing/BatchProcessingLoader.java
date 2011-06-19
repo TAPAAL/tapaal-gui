@@ -22,6 +22,8 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -463,7 +465,7 @@ public class BatchProcessingLoader {
 		boolean symmetry = getSymmetryReductionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
-		List<TimedPlace> inclusionPlaces = getInclusionPlaces(queryElement, network);
+		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 		
 		
 		TCTLAbstractProperty query;
@@ -489,18 +491,22 @@ public class BatchProcessingLoader {
 		return discreteInclusion;	
 	}
 	
-	private List<TimedPlace> getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
+	private InclusionPlaces getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
 		List<TimedPlace> places = new ArrayList<TimedPlace>();
 		
 		String inclusionPlaces;
 		try{
 			inclusionPlaces = queryElement.getAttribute("inclusionPlaces");
 		} catch(Exception e) {
-			inclusionPlaces = "*NONE*";
+			inclusionPlaces = "*ALL*";
 		}
+
+		if(!queryElement.hasAttribute("inclusionPlaces") || inclusionPlaces.equals("*ALL*")) 
+			return new InclusionPlaces();
 		
 		if(inclusionPlaces.isEmpty() || inclusionPlaces.equals("*NONE*")) 
-			return places;
+			return new InclusionPlaces(InclusionPlacesOption.UserSpecified, new ArrayList<TimedPlace>());
+		
 		
 		String[] placeNames = inclusionPlaces.split(",");
 		
@@ -517,7 +523,7 @@ public class BatchProcessingLoader {
 			}
 		}
 		
-		return places;
+		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
 	}
 	
 	private boolean getSymmetryReductionOption(Element queryElement) {

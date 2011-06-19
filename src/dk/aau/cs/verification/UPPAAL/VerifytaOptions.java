@@ -52,7 +52,6 @@ public class VerifytaOptions implements VerificationOptions {
 	public static final Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
 		map.put(TraceOption.SOME, "-t0");
-		map.put(TraceOption.FASTEST, "-t2");
 		map.put(TraceOption.NONE, "");
 
 		return map;
@@ -62,8 +61,8 @@ public class VerifytaOptions implements VerificationOptions {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
 		map.put(SearchOption.BFS, "-o0");
 		map.put(SearchOption.DFS, "-o1");
-		map.put(SearchOption.RDFS, "-o2");
-		map.put(SearchOption.CLOSE_TO_TARGET_FIRST, "-o6");
+		map.put(SearchOption.RANDOM, "-o2");
+		map.put(SearchOption.HEURISTIC, "-o0"); // Maybe -o6 for close-to-target search?
 
 		return map;
 	}

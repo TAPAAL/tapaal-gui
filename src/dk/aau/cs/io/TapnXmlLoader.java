@@ -51,6 +51,8 @@ import pipe.gui.handler.TAPNTransitionHandler;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.handler.TransitionHandler;
 import pipe.gui.handler.TransportArcHandler;
+import pipe.gui.widgets.InclusionPlaces;
+import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -712,7 +714,7 @@ public class TapnXmlLoader {
 		boolean symmetry = getSymmetryReductionOption(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
-		List<TimedPlace> inclusionPlaces = getInclusionPlaces(queryElement, network);
+		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
 
 		TCTLAbstractProperty query;
 		query = parseQueryProperty(queryElement.getAttribute("query"));
@@ -727,18 +729,21 @@ public class TapnXmlLoader {
 			return null;
 	}
 
-	private List<TimedPlace> getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
+	private InclusionPlaces getInclusionPlaces(Element queryElement, TimedArcPetriNetNetwork network) {
 		List<TimedPlace> places = new ArrayList<TimedPlace>();
 		
 		String inclusionPlaces;
 		try{
 			inclusionPlaces = queryElement.getAttribute("inclusionPlaces");
 		} catch(Exception e) {
-			inclusionPlaces = "*NONE*";
+			inclusionPlaces = "*ALL*";
 		}
 		
+		if(!queryElement.hasAttribute("inclusionPlaces") || inclusionPlaces.equals("*ALL*")) 
+			return new InclusionPlaces();
+		
 		if(inclusionPlaces.isEmpty() || inclusionPlaces.equals("*NONE*")) 
-			return places;
+			return new InclusionPlaces(InclusionPlacesOption.UserSpecified, new ArrayList<TimedPlace>());
 		
 		String[] placeNames = inclusionPlaces.split(",");
 		
@@ -755,7 +760,7 @@ public class TapnXmlLoader {
 			}
 		}
 		
-		return places;
+		return new InclusionPlaces(InclusionPlacesOption.UserSpecified, places);
 	}
 
 	private boolean getSymmetryReductionOption(Element queryElement) {

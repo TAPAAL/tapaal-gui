@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
-<net id="TAPN1" type="P/T net">
-<labels border="true" height="495" positionX="748" positionY="20" width="132">Classical Alternating Bit Protocol with timeouts for resending messages.
+<net active="true" id="Protocol" type="P/T net">
+<labels border="true" height="496" positionX="749" positionY="21" width="133">Classical Alternating Bit Protocol with timeouts for resending messages.
 
 The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable underapproximation and verifies the correctness of the protocol upto a given number of extra tokens.
 
@@ -55,11 +55,11 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 <arcpath arcPointType="false" id="1" xCoord="496" yCoord="617"/>
 </arc>
 <arc id="P11 to T4" inscription="[0,inf)" source="P11" target="T4" type="timed">
-<arcpath arcPointType="false" id="0" xCoord="627" yCoord="792"/>
-<arcpath arcPointType="false" id="1" xCoord="667" yCoord="792"/>
-<arcpath arcPointType="false" id="2" xCoord="716" yCoord="791"/>
-<arcpath arcPointType="false" id="3" xCoord="716" yCoord="131"/>
-<arcpath arcPointType="false" id="4" xCoord="642" yCoord="130"/>
+<arcpath arcPointType="false" id="0" xCoord="626" yCoord="792"/>
+<arcpath arcPointType="false" id="1" xCoord="668" yCoord="793"/>
+<arcpath arcPointType="false" id="2" xCoord="717" yCoord="792"/>
+<arcpath arcPointType="false" id="3" xCoord="717" yCoord="132"/>
+<arcpath arcPointType="false" id="4" xCoord="643" yCoord="131"/>
 <arcpath arcPointType="false" id="5" xCoord="612" yCoord="157"/>
 </arc>
 <arc id="P1 to T3" inscription="[0,inf)" source="P1" target="T3" type="timed">
@@ -72,7 +72,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="P2 to T5" inscription="[5,6]" source="P2" target="T5" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="174" yCoord="243"/>
-<arcpath arcPointType="false" id="1" xCoord="206" yCoord="221"/>
+<arcpath arcPointType="false" id="1" xCoord="207" yCoord="222"/>
 <arcpath arcPointType="false" id="2" xCoord="247" yCoord="247"/>
 </arc>
 <arc id="P3 to T1" inscription="[0,inf)" source="P3" target="T1" type="timed">
@@ -81,7 +81,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="P4 to T13" inscription="[5,6]" source="P4" target="T13" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="174" yCoord="633"/>
-<arcpath arcPointType="false" id="1" xCoord="206" yCoord="611"/>
+<arcpath arcPointType="false" id="1" xCoord="207" yCoord="612"/>
 <arcpath arcPointType="false" id="2" xCoord="247" yCoord="637"/>
 </arc>
 <arc id="P4 to T2" inscription="[0,inf)" source="P4" target="T2" type="timed">
@@ -142,7 +142,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="T13 to P4" inscription="1" source="T13" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="246" yCoord="647"/>
-<arcpath arcPointType="false" id="1" xCoord="206" yCoord="686"/>
+<arcpath arcPointType="false" id="1" xCoord="207" yCoord="687"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="652"/>
 </arc>
 <arc id="T13 to P6" inscription="1" source="T13" target="P6" type="normal">
@@ -171,10 +171,10 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="T2 to P1" inscription="1" source="T2" target="P1" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="162" yCoord="737"/>
-<arcpath arcPointType="false" id="1" xCoord="131" yCoord="776"/>
-<arcpath arcPointType="false" id="2" xCoord="71" yCoord="776"/>
-<arcpath arcPointType="false" id="3" xCoord="71" yCoord="41"/>
-<arcpath arcPointType="false" id="4" xCoord="146" yCoord="41"/>
+<arcpath arcPointType="false" id="1" xCoord="132" yCoord="777"/>
+<arcpath arcPointType="false" id="2" xCoord="72" yCoord="777"/>
+<arcpath arcPointType="false" id="3" xCoord="72" yCoord="42"/>
+<arcpath arcPointType="false" id="4" xCoord="147" yCoord="42"/>
 <arcpath arcPointType="false" id="5" xCoord="155" yCoord="58"/>
 </arc>
 <arc id="T3 to P0" inscription="1" source="T3" target="P0" type="normal">
@@ -195,7 +195,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="T5 to P2" inscription="1" source="T5" target="P2" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="246" yCoord="257"/>
-<arcpath arcPointType="false" id="1" xCoord="206" yCoord="296"/>
+<arcpath arcPointType="false" id="1" xCoord="207" yCoord="297"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="262"/>
 </arc>
 <arc id="T6 to P8" inscription="1" source="T6" target="P8" type="normal">
@@ -207,5 +207,5 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 <arcpath arcPointType="false" id="1" xCoord="612" yCoord="597"/>
 </arc>
 </net>
-<query capacity="11" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Synchronization Violation" query="EF ((TAPN1.Sender_A=1 and TAPN1.Receiver_B=1) or (TAPN1.Sender_A=1 and TAPN1.Receiver_C=1) or (TAPN1.Sender_C=1 and TAPN1.Receiver_A=1) or (TAPN1.Sender_C=1 and TAPN1.Receiver_D=1))" reductionOption="STANDARDSYMMETRY" searchOption="BFS" traceOption="NONE"/>
+<query active="true" capacity="11" discreteInclusion="true" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*ALL*" name="Synchronization Violation" query="EF ((Protocol.Sender_A&gt;=1 and Protocol.Receiver_B&gt;=1) or (Protocol.Sender_A&gt;=1 and Protocol.Receiver_C&gt;=1) or (Protocol.Sender_C&gt;=1 and Protocol.Receiver_A&gt;=1) or (Protocol.Sender_C&gt;=1 and Protocol.Receiver_D&gt;=1))" reductionOption="VerifyTAPN" searchOption="DFS" symmetry="true" traceOption="NONE"/>
 </pnml>

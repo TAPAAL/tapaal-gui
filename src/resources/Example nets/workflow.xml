@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
-<net id="TAPN1" type="P/T net">
-<labels border="true" height="225" positionX="784" positionY="50" width="268">This is an example of workflow modelling capabilities of TAPAAL.
+<net active="true" id="Workflow" type="P/T net">
+<labels border="true" height="226" positionX="785" positionY="51" width="269">This is an example of workflow modelling capabilities of TAPAAL.
 
 A number of tasks A0 to A7 with dependeces, task duration and a latest  execution deadline are given.
 
@@ -84,12 +84,12 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T1" inscription="[0,15]:1" source="P13" target="T1" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="338" yCoord="342"/>
-<arcpath arcPointType="true" id="1" xCoord="317" yCoord="122"/>
+<arcpath arcPointType="true" id="1" xCoord="318" yCoord="123"/>
 <arcpath arcPointType="true" id="2" xCoord="396" yCoord="32"/>
 </arc>
 <arc id="T1 to P13" inscription="[0,15]:1" source="T1" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="402" yCoord="42"/>
-<arcpath arcPointType="true" id="1" xCoord="332" yCoord="152"/>
+<arcpath arcPointType="true" id="1" xCoord="333" yCoord="153"/>
 <arcpath arcPointType="true" id="2" xCoord="340" yCoord="342"/>
 </arc>
 <arc id="T1 to P3" inscription="1" source="T1" target="P3" type="normal">
@@ -98,14 +98,14 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T2" inscription="[0,9]:1" source="P13" target="T2" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="331" yCoord="346"/>
-<arcpath arcPointType="true" id="1" xCoord="197" yCoord="182"/>
+<arcpath arcPointType="true" id="1" xCoord="198" yCoord="183"/>
 <arcpath arcPointType="true" id="2" xCoord="207" yCoord="42"/>
 </arc>
 <arc id="T2 to P13" inscription="[0,9]:1" source="T2" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="207" yCoord="42"/>
-<arcpath arcPointType="true" id="1" xCoord="257" yCoord="242"/>
-<arcpath arcPointType="true" id="2" xCoord="332" yCoord="332"/>
-<arcpath arcPointType="false" id="3" xCoord="336" yCoord="343"/>
+<arcpath arcPointType="true" id="1" xCoord="258" yCoord="243"/>
+<arcpath arcPointType="true" id="2" xCoord="333" yCoord="333"/>
+<arcpath arcPointType="false" id="3" xCoord="336" yCoord="342"/>
 </arc>
 <arc id="T2 to P2" inscription="1" source="T2" target="P2" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="211" yCoord="27"/>
@@ -117,15 +117,15 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T3" inscription="[0,5]:1" source="P13" target="T3" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="327" yCoord="361"/>
-<arcpath arcPointType="true" id="1" xCoord="152" yCoord="407"/>
-<arcpath arcPointType="true" id="2" xCoord="32" yCoord="362"/>
-<arcpath arcPointType="true" id="3" xCoord="32" yCoord="167"/>
+<arcpath arcPointType="true" id="1" xCoord="153" yCoord="408"/>
+<arcpath arcPointType="true" id="2" xCoord="33" yCoord="363"/>
+<arcpath arcPointType="true" id="3" xCoord="33" yCoord="168"/>
 <arcpath arcPointType="false" id="4" xCoord="72" yCoord="102"/>
 </arc>
 <arc id="T3 to P13" inscription="[0,5]:1" source="T3" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="72" yCoord="102"/>
-<arcpath arcPointType="true" id="1" xCoord="32" yCoord="287"/>
-<arcpath arcPointType="true" id="2" xCoord="107" yCoord="377"/>
+<arcpath arcPointType="true" id="1" xCoord="33" yCoord="288"/>
+<arcpath arcPointType="true" id="2" xCoord="108" yCoord="378"/>
 <arcpath arcPointType="true" id="3" xCoord="327" yCoord="359"/>
 </arc>
 <arc id="T3 to P6" inscription="1" source="T3" target="P6" type="normal">
@@ -138,14 +138,14 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T4" inscription="[0,9]:1" source="P13" target="T4" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="327" yCoord="357"/>
-<arcpath arcPointType="true" id="1" xCoord="107" yCoord="332"/>
-<arcpath arcPointType="true" id="2" xCoord="137" yCoord="182"/>
+<arcpath arcPointType="true" id="1" xCoord="108" yCoord="333"/>
+<arcpath arcPointType="true" id="2" xCoord="138" yCoord="183"/>
 <arcpath arcPointType="false" id="3" xCoord="171" yCoord="137"/>
 </arc>
 <arc id="T4 to P13" inscription="[0,9]:1" source="T4" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="177" yCoord="147"/>
-<arcpath arcPointType="true" id="1" xCoord="122" yCoord="287"/>
-<arcpath arcPointType="true" id="2" xCoord="167" yCoord="347"/>
+<arcpath arcPointType="true" id="1" xCoord="123" yCoord="288"/>
+<arcpath arcPointType="true" id="2" xCoord="168" yCoord="348"/>
 <arcpath arcPointType="true" id="3" xCoord="327" yCoord="356"/>
 </arc>
 <arc id="T4 to P8" inscription="1" source="T4" target="P8" type="normal">
@@ -154,12 +154,12 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T5" inscription="[0,8]:1" source="P13" target="T5" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="327" yCoord="356"/>
-<arcpath arcPointType="true" id="1" xCoord="197" yCoord="332"/>
+<arcpath arcPointType="true" id="1" xCoord="198" yCoord="333"/>
 <arcpath arcPointType="true" id="2" xCoord="177" yCoord="252"/>
 </arc>
 <arc id="T5 to P13" inscription="[0,8]:1" source="T5" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="177" yCoord="252"/>
-<arcpath arcPointType="true" id="1" xCoord="212" yCoord="317"/>
+<arcpath arcPointType="true" id="1" xCoord="213" yCoord="318"/>
 <arcpath arcPointType="true" id="2" xCoord="327" yCoord="353"/>
 </arc>
 <arc id="T5 to P9" inscription="1" source="T5" target="P9" type="normal">
@@ -176,13 +176,13 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T7" inscription="[0,13]:1" source="P13" target="T7" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="349" yCoord="343"/>
-<arcpath arcPointType="true" id="1" xCoord="377" yCoord="272"/>
+<arcpath arcPointType="true" id="1" xCoord="378" yCoord="273"/>
 <arcpath arcPointType="true" id="2" xCoord="372" yCoord="207"/>
 </arc>
 <arc id="T7 to P13" inscription="[0,13]:1" source="T7" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="372" yCoord="207"/>
-<arcpath arcPointType="true" id="1" xCoord="392" yCoord="302"/>
-<arcpath arcPointType="false" id="2" xCoord="352" yCoord="345"/>
+<arcpath arcPointType="true" id="1" xCoord="393" yCoord="303"/>
+<arcpath arcPointType="false" id="2" xCoord="352" yCoord="346"/>
 </arc>
 <arc id="T8 to P12" inscription="1" source="T8" target="P12" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="481" yCoord="192"/>
@@ -190,25 +190,25 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 </arc>
 <arc id="P13 to T8" inscription="[0,18]:1" source="P13" target="T8" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="356" yCoord="353"/>
-<arcpath arcPointType="true" id="1" xCoord="467" yCoord="302"/>
+<arcpath arcPointType="true" id="1" xCoord="468" yCoord="303"/>
 <arcpath arcPointType="true" id="2" xCoord="477" yCoord="207"/>
 </arc>
 <arc id="T8 to P13" inscription="[0,18]:1" source="T8" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="477" yCoord="207"/>
-<arcpath arcPointType="true" id="1" xCoord="512" yCoord="302"/>
+<arcpath arcPointType="true" id="1" xCoord="513" yCoord="303"/>
 <arcpath arcPointType="true" id="2" xCoord="356" yCoord="354"/>
 </arc>
 <arc id="P13 to T9" inscription="[0,25]:1" source="P13" target="T9" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="356" yCoord="357"/>
-<arcpath arcPointType="true" id="1" xCoord="572" yCoord="347"/>
-<arcpath arcPointType="true" id="2" xCoord="662" yCoord="257"/>
+<arcpath arcPointType="true" id="1" xCoord="573" yCoord="348"/>
+<arcpath arcPointType="true" id="2" xCoord="663" yCoord="258"/>
 <arcpath arcPointType="true" id="3" xCoord="642" yCoord="117"/>
 </arc>
 <arc id="T9 to P13" inscription="[0,25]:1" source="T9" target="P13" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="642" yCoord="117"/>
-<arcpath arcPointType="true" id="1" xCoord="692" yCoord="287"/>
-<arcpath arcPointType="true" id="2" xCoord="587" yCoord="377"/>
-<arcpath arcPointType="true" id="3" xCoord="452" yCoord="392"/>
+<arcpath arcPointType="true" id="1" xCoord="693" yCoord="288"/>
+<arcpath arcPointType="true" id="2" xCoord="588" yCoord="378"/>
+<arcpath arcPointType="true" id="3" xCoord="453" yCoord="393"/>
 <arcpath arcPointType="true" id="4" xCoord="355" yCoord="362"/>
 </arc>
 <arc id="T9 to P5" inscription="1" source="T9" target="P5" type="normal">
@@ -216,5 +216,5 @@ By clicking on "Check Boundedness" in the query dialog, one will realise that th
 <arcpath arcPointType="false" id="1" xCoord="672" yCoord="102"/>
 </arc>
 </net>
-<query capacity="2" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Find Fastest Schedule" query="EF TAPN1.Work_Done=1" reductionOption="STANDARD" searchOption="BFS" traceOption="FASTEST"/>
+<query active="true" capacity="2" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Find Schedule" query="EF Workflow.Work_Done=1" reductionOption="VerifyTAPN" searchOption="BFS" symmetry="true" traceOption="SOME"/>
 </pnml>
