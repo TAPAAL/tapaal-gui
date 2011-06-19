@@ -9,7 +9,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -142,11 +145,16 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void setupInitialState() {
-		Object[] sharedPlaces = context.network().sharedPlaces().toArray();
+		Vector<TimedPlace> sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
+		Collections.sort(sharedPlaces, new Comparator<TimedPlace>() {
+			public int compare(TimedPlace o1, TimedPlace o2) {
+				return o1.name().compareToIgnoreCase(o2.name());
+			}
+		});
 		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
 		if(place.underlyingPlace().isShared()) sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 
-		sharedCheckBox.setEnabled(sharedPlaces.length > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));
+		sharedCheckBox.setEnabled(sharedPlaces.size() > 0 && !hasArcsToSharedTransitions(place.underlyingPlace()));
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 
 		nameTextField.setText(place.underlyingPlace().name());
