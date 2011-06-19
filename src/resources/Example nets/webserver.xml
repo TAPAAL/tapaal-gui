@@ -4,8 +4,8 @@
 <constant name="min" value="3"/>
 <constant name="periodA" value="7"/>
 <constant name="periodB" value="5"/>
-<net id="TAPN1" type="P/T net">
-<labels border="true" height="273" positionX="537" positionY="371" width="365">This example represents a simple webserver which can process only one request at a time.
+<net active="true" id="WebServer" type="P/T net">
+<labels border="true" height="274" positionX="538" positionY="372" width="366">This example represents a simple webserver which can process only one request at a time.
 
 There are two users that generate requests with certain periods. Processing a request takes at least 'min' time units. The webserver will drop a request if its deadline is exceeded. If a processing of a request already started, it has to be finished also latest by its deadline. This is guaranteed by the use of transport arcs that preserve the age of the request tokens and the corresponding invariants.
 
@@ -49,7 +49,7 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="T0 to P11" inscription="[0,deadline):1" source="T0" target="P11" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="511" yCoord="287"/>
-<arcpath arcPointType="false" id="1" xCoord="668" yCoord="289"/>
+<arcpath arcPointType="false" id="1" xCoord="669" yCoord="290"/>
 <arcpath arcPointType="false" id="2" xCoord="737" yCoord="203"/>
 </arc>
 <arc id="T0 to P8" inscription="1" source="T0" target="P8" type="normal">
@@ -58,7 +58,7 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="P11 to T2" inscription="[0,deadline]:1" source="P11" target="T2" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="736" yCoord="181"/>
-<arcpath arcPointType="false" id="1" xCoord="664" yCoord="114"/>
+<arcpath arcPointType="false" id="1" xCoord="665" yCoord="115"/>
 <arcpath arcPointType="false" id="2" xCoord="512" yCoord="112"/>
 </arc>
 <arc id="T2 to P3" inscription="[0,deadline]:1" source="T2" target="P3" type="transport">
@@ -75,8 +75,8 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="T3 to P6" inscription="1" source="T3" target="P6" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="152" yCoord="407"/>
-<arcpath arcPointType="false" id="1" xCoord="226" yCoord="466"/>
-<arcpath arcPointType="false" id="2" xCoord="158" yCoord="526"/>
+<arcpath arcPointType="false" id="1" xCoord="227" yCoord="467"/>
+<arcpath arcPointType="false" id="2" xCoord="158" yCoord="527"/>
 </arc>
 <arc id="T4 to P0" inscription="1" source="T4" target="P0" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="401" yCoord="396"/>
@@ -84,7 +84,7 @@ The user of the tool can now experiments with different values of the periods an
 </arc>
 <arc id="T4 to P7" inscription="1" source="T4" target="P7" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="406" yCoord="407"/>
-<arcpath arcPointType="false" id="1" xCoord="481" yCoord="466"/>
+<arcpath arcPointType="false" id="1" xCoord="482" yCoord="467"/>
 <arcpath arcPointType="false" id="2" xCoord="414" yCoord="513"/>
 </arc>
 <arc id="T7 to P10" inscription="1" source="T7" target="P10" type="normal">
@@ -92,5 +92,5 @@ The user of the tool can now experiments with different values of the periods an
 <arcpath arcPointType="false" id="1" xCoord="146" yCoord="131"/>
 </arc>
 </net>
-<query capacity="6" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="5 responses, no drops" query="EF (TAPN1.Responses=5 and TAPN1.Dropped=0)" reductionOption="STANDARD" searchOption="DFS" traceOption="SOME"/>
+<query active="true" capacity="6" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="5 responses, no drops" query="EF (WebServer.Responses=5 and WebServer.Dropped=0)" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="SOME"/>
 </pnml>

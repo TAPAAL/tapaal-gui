@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
-<net id="TAPN1" type="P/T net">
-<labels border="true" height="105" positionX="512" positionY="189" width="179">By firing the transition Transport the produced items are moved to the place Ready. Transport arcs are used for this purpose so that the age of each item is preserved.</labels>
-<labels border="true" height="75" positionX="854" positionY="108" width="164">Consumer is consuming (with certain time restrictions) items that have not yet reached the age of 3.</labels>
-<labels border="true" height="54" positionX="485" positionY="444" width="164">Items that reach the age of 3 have to be Collected into the Garbage place.</labels>
-<labels border="true" height="75" positionX="166" positionY="99" width="179">Producer is producing items with certain time restrictions
+<net active="true" id="ProducerConsumer" type="P/T net">
+<labels border="true" height="106" positionX="513" positionY="190" width="180">By firing the transition Transport the produced items are moved to the place Ready. Transport arcs are used for this purpose so that the age of each item is preserved.</labels>
+<labels border="true" height="76" positionX="855" positionY="109" width="165">Consumer is consuming (with certain time restrictions) items that have not yet reached the age of 3.</labels>
+<labels border="true" height="55" positionX="486" positionY="445" width="165">Items that reach the age of 3 have to be Collected into the Garbage place.</labels>
+<labels border="true" height="76" positionX="167" positionY="100" width="180">Producer is producing items with certain time restrictions
 and these items wait in place In_transit for Transport.</labels>
 <place id="P0" initialMarking="1" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="Ready_to_produce" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="195.0"/>
 <place id="P1" initialMarking="0" invariant="&lt;= 5" markingOffsetX="0.0" markingOffsetY="0.0" name="Recover" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="435.0"/>
@@ -76,6 +76,6 @@ and these items wait in place In_transit for Transport.</labels>
 <arcpath arcPointType="false" id="1" xCoord="702" yCoord="552"/>
 </arc>
 </net>
-<query capacity="5" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Avoid Garbage" query="EG TAPN1.Garbage=0" reductionOption="OPTIMIZEDSTANDARD" searchOption="BFS" traceOption="FASTEST"/>
-<query capacity="5" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Three in Garbage" query="EF TAPN1.Garbage=3" reductionOption="STANDARD" searchOption="BFS" traceOption="FASTEST"/>
+<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Three in Garbage" query="EF ProducerConsumer.Garbage=3" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="SOME"/>
+<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Avoid Garbage" query="EG ProducerConsumer.Garbage=0" reductionOption="OPTIMIZEDSTANDARD" searchOption="BFS" symmetry="false" traceOption="SOME"/>
 </pnml>

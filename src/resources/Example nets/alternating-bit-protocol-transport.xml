@@ -2,8 +2,8 @@
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <constant name="deadline" value="6"/>
 <constant name="delay" value="5"/>
-<net id="TAPN1" type="P/T net">
-<labels border="true" height="570" positionX="776" positionY="63" width="161">Classical Alternating Bit Protocol with timeouts for resending messages.
+<net active="true" id="Protocol" type="P/T net">
+<labels border="true" height="571" positionX="777" positionY="64" width="162">Classical Alternating Bit Protocol with timeouts for resending messages.
 
 In this version of the protocol we use transport arcs to track the timestamp of each message from the point it was sent until it returns as an acknowledgement back to the sender.
 
@@ -47,11 +47,11 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="522" yCoord="642"/>
 </arc>
 <arc id="P11 to T4" inscription="[0,inf)" source="P11" target="T4" type="timed">
-<arcpath arcPointType="false" id="0" xCoord="626" yCoord="793"/>
-<arcpath arcPointType="false" id="1" xCoord="675" yCoord="800"/>
-<arcpath arcPointType="false" id="2" xCoord="724" yCoord="799"/>
-<arcpath arcPointType="false" id="3" xCoord="724" yCoord="139"/>
-<arcpath arcPointType="false" id="4" xCoord="650" yCoord="138"/>
+<arcpath arcPointType="false" id="0" xCoord="626" yCoord="794"/>
+<arcpath arcPointType="false" id="1" xCoord="676" yCoord="801"/>
+<arcpath arcPointType="false" id="2" xCoord="725" yCoord="800"/>
+<arcpath arcPointType="false" id="3" xCoord="725" yCoord="140"/>
+<arcpath arcPointType="false" id="4" xCoord="651" yCoord="139"/>
 <arcpath arcPointType="false" id="5" xCoord="612" yCoord="157"/>
 </arc>
 <arc id="P1 to T3" inscription="[0,inf)" source="P1" target="T3" type="timed">
@@ -63,8 +63,8 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="161" yCoord="366"/>
 </arc>
 <arc id="P2 to T5" inscription="[delay,deadline]" source="P2" target="T5" type="timed">
-<arcpath arcPointType="false" id="0" xCoord="175" yCoord="245"/>
-<arcpath arcPointType="false" id="1" xCoord="214" yCoord="229"/>
+<arcpath arcPointType="false" id="0" xCoord="175" yCoord="246"/>
+<arcpath arcPointType="false" id="1" xCoord="215" yCoord="230"/>
 <arcpath arcPointType="false" id="2" xCoord="247" yCoord="247"/>
 </arc>
 <arc id="P3 to T1" inscription="[0,inf)" source="P3" target="T1" type="timed">
@@ -72,8 +72,8 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="162" yCoord="547"/>
 </arc>
 <arc id="P4 to T13" inscription="[delay,deadline]" source="P4" target="T13" type="timed">
-<arcpath arcPointType="false" id="0" xCoord="175" yCoord="635"/>
-<arcpath arcPointType="false" id="1" xCoord="214" yCoord="619"/>
+<arcpath arcPointType="false" id="0" xCoord="175" yCoord="636"/>
+<arcpath arcPointType="false" id="1" xCoord="215" yCoord="620"/>
 <arcpath arcPointType="false" id="2" xCoord="247" yCoord="637"/>
 </arc>
 <arc id="P4 to T2" inscription="[0,inf)" source="P4" target="T2" type="timed">
@@ -126,7 +126,7 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="T13 to P4" inscription="1" source="T13" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="246" yCoord="647"/>
-<arcpath arcPointType="false" id="1" xCoord="214" yCoord="694"/>
+<arcpath arcPointType="false" id="1" xCoord="215" yCoord="695"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="652"/>
 </arc>
 <arc id="T13 to P6" inscription="1" source="T13" target="P6" type="normal">
@@ -163,10 +163,10 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="T2 to P1" inscription="1" source="T2" target="P1" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="162" yCoord="737"/>
-<arcpath arcPointType="false" id="1" xCoord="138" yCoord="798"/>
-<arcpath arcPointType="false" id="2" xCoord="63" yCoord="798"/>
-<arcpath arcPointType="false" id="3" xCoord="63" yCoord="33"/>
-<arcpath arcPointType="false" id="4" xCoord="168" yCoord="33"/>
+<arcpath arcPointType="false" id="1" xCoord="139" yCoord="799"/>
+<arcpath arcPointType="false" id="2" xCoord="64" yCoord="799"/>
+<arcpath arcPointType="false" id="3" xCoord="64" yCoord="34"/>
+<arcpath arcPointType="false" id="4" xCoord="169" yCoord="34"/>
 <arcpath arcPointType="false" id="5" xCoord="164" yCoord="57"/>
 </arc>
 <arc id="T3 to P0" inscription="1" source="T3" target="P0" type="normal">
@@ -191,7 +191,7 @@ Try to experiment with the values of the constants deadline and delay in order t
 </arc>
 <arc id="T5 to P2" inscription="1" source="T5" target="P2" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="246" yCoord="257"/>
-<arcpath arcPointType="false" id="1" xCoord="214" yCoord="304"/>
+<arcpath arcPointType="false" id="1" xCoord="215" yCoord="305"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="262"/>
 </arc>
 <arc id="P0 to T6" inscription="[0,1]:1" source="P0" target="T6" type="transport">
@@ -211,5 +211,5 @@ Try to experiment with the values of the constants deadline and delay in order t
 <arcpath arcPointType="false" id="1" xCoord="612" yCoord="612"/>
 </arc>
 </net>
-<query capacity="3" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" name="Synchronization Violation" query="EF ((TAPN1.Sender_0_A=1 and (TAPN1.Receiver_0_B=1 or TAPN1.Receiver_1_A=1)) or (TAPN1.Sender_1_A=1 and (TAPN1.Receiver_0_A=1 or TAPN1.Receiver_1_B=1)))" reductionOption="OPTIMIZEDSTANDARD" searchOption="BFS" traceOption="SOME"/>
+<query active="true" capacity="7" discreteInclusion="true" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*ALL*" name="Synchronization Violation" query="EF ((Protocol.Sender_0_A&gt;=1 and (Protocol.Receiver_0_B&gt;=1 or Protocol.Receiver_1_A&gt;=1)) or (Protocol.Sender_1_A&gt;=1 and (Protocol.Receiver_0_A&gt;=1 or Protocol.Receiver_1_B&gt;=1)))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="NONE"/>
 </pnml>
