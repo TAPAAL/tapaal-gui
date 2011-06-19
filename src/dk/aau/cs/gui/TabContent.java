@@ -46,10 +46,10 @@ public class TabContent extends JSplitPane {
 	private File appFile;
 
 	// Normal mode
-	private JPanel editorLeftPane;
-	private QueryPane queries;
-	private ConstantsPane constantsPanel;
-	private TemplateExplorer templateExplorer;
+	JPanel editorLeftPane;
+	QueryPane queries;
+	ConstantsPane constantsPanel;
+	TemplateExplorer templateExplorer;
 
 	// / Animation
 	private AnimationHistoryComponent animBox;
@@ -405,6 +405,17 @@ public class TabContent extends JSplitPane {
 	public void swapConstants(int currentIndex, int newIndex) {
 		tapnNetwork.swapConstants(currentIndex, newIndex);
 		
+	}
+	
+	public void showComponents(boolean enable){
+		templateExplorer.setVisible(enable);
+		sharedPTPanel.setVisible(enable);
+	}
+	public void showQueries(boolean enable){
+		queries.setVisible(enable);
+	}
+	public void showConstantsPanel(boolean enable){
+		constantsPanel.setVisible(enable);
 	}
 
 	

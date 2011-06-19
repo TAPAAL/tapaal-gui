@@ -88,7 +88,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
 	exportPSAction, exportToTikZAction;
-
+	
 	private VerificationAction runUppaalVerification;
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction,
@@ -99,6 +99,8 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	
 	/* CB Joakim Byg - tries both */
 	private TypeAction timedArcAction;
 
@@ -116,6 +118,11 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		draw, animation, noNet
 	}
 
+	private boolean showComponents = true;
+	private boolean showConstants = true;
+	private boolean showQueries = true;
+
+	
 	private GUIMode guiMode = GUIMode.noNet;
 	private JMenu exportMenu, zoomMenu;
 
@@ -411,6 +418,15 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				 "Change the grid size", "G"));
 		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", Pipe.DRAG,
 				 "Drag the drawing", "D", true));
+		 
+		 
+		 viewMenu.addSeparator();
+		 addMenuItem(viewMenu, showComponentsAction = new ViewAction("Show Components", 
+				 453243, "Show/Hide componens", "", true));
+		 addMenuItem(viewMenu, showQueriesAction = new ViewAction("Show Queries", 
+				 453244, "Show/Hide componens", "", true));
+		 addMenuItem(viewMenu, showConstantsAction = new ViewAction("Show Constants", 
+				 453245, "Show/Hide componens", "", true));
 
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
@@ -680,6 +696,9 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			deleteAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
+			
+			showConstantsAction.setEnabled(false);
+			showQueriesAction.setEnabled(false);
 
 			// Only enable this if it is not an untimed net.
 			if (CreateGui.getModel().netType() != NetType.UNTIMED) {
@@ -751,6 +770,10 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		toggleGrid.setEnabled(enable);
 		dragAction.setEnabled(enable);
+		
+		showComponentsAction.setEnabled(enable);
+		showConstantsAction.setEnabled(enable);
+		showQueriesAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -799,6 +822,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		});
 		appGui = CreateGui.getApp();
 		appView = CreateGui.getView();
+		
 	}
 
 	// Less sucky yet far, far simpler to code About dialogue
@@ -845,6 +869,30 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		}
 	}
 
+	public void showQueries(boolean enable){
+		showQueries = enable;
+		CreateGui.getCurrentTab().showQueries(enable);
+	}
+	public void toggleQueries(){
+		showQueries(!showQueries);
+	}
+
+	public void showConstants(boolean enable){
+		showConstants = enable;
+		CreateGui.getCurrentTab().showConstantsPanel(enable);
+	}
+	public void toggleConstants(){
+		showConstants(!showConstants);
+	}
+	
+	public void showComponents(boolean enable){
+		showComponents = enable;
+		CreateGui.getCurrentTab().showComponents(enable);
+	}
+	public void toggleComponents(){
+		showComponents(!showComponents);
+	}
+	
 	public void saveOperation(boolean forceSave){
 		saveOperation(appTab.getSelectedIndex(), forceSave);
 	}
@@ -1122,6 +1170,10 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				CreateGui.getAnimator().restoreModel();
 
 			CreateGui.switchToEditorComponents();
+			showComponents(showComponents);
+			showQueries(showQueries);
+			showConstants(showConstants);
+			
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
 			break;
@@ -1129,6 +1181,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
 			tab.switchToAnimationComponents();
+			showComponents(showComponents);
 
 			startAction.setSelected(true);
 			tab.drawingSurface().changeAnimationMode(true);
@@ -1709,6 +1762,31 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			}
 		}
 
+	}
+	
+	class ViewAction extends GuiAction {
+
+		private static final long serialVersionUID = -5145846750992454638L;
+		private int typeID;
+
+		ViewAction(String name, int typeID, String tooltip, String keystroke,
+				boolean toggleable) {
+			super(name, tooltip, keystroke, toggleable);
+			this.typeID = typeID;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			if (this == showComponentsAction){
+				toggleComponents();
+			} else if (this == showQueriesAction){
+				toggleQueries();
+			} else if (this == showConstantsAction){
+				toggleConstants();
+			}
+		}
+		
 	}
 
 	class FileAction extends GuiAction {
