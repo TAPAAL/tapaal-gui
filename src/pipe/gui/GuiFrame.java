@@ -64,6 +64,7 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
@@ -1470,6 +1471,16 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
 					for (TAPNQuery q : queriesToDelete) {
 						currentTab.removeQuery(q);
+					}
+				}
+				
+				// remove the places from the list of inclusion places
+				for (PetriNetObject p : selection) {
+					if (p instanceof TimedPlaceComponent) {
+						for (TAPNQuery q : queries) {
+							TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
+							q.inclusionPlaces().removePlace(place);
+						}
 					}
 				}
 				

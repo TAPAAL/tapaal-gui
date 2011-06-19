@@ -2,7 +2,6 @@ package pipe.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class InclusionPlaces {
@@ -26,5 +25,9 @@ public class InclusionPlaces {
 	
 	public InclusionPlacesOption inclusionOption() {
 		return inclusionOption;
+	}
+
+	public void removePlace(TimedPlace place) {
+		inclusionPlaces.remove(place);
 	}
 }
