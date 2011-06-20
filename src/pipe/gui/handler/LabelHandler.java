@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.NameLabel;
 import pipe.dataLayer.PlaceTransitionObject;
+import pipe.gui.CreateGui;
 
 public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 		java.awt.event.MouseWheelListener {
@@ -38,7 +39,7 @@ public class LabelHandler extends javax.swing.event.MouseInputAdapter implements
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// 
-		if (!SwingUtilities.isLeftMouseButton(e)) {
+		if (!SwingUtilities.isLeftMouseButton(e) || CreateGui.getView().isInAnimationMode()) {
 			return;
 		}
 

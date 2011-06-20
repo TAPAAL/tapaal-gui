@@ -160,7 +160,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 			this.selection.enableSelection();
 		
 		
-		repaint();
+		repaintAll();
 	}
 
 	public void addNewPetriNetObject(PetriNetObject newObject) {
