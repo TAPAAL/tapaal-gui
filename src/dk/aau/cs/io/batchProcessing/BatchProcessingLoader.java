@@ -553,7 +553,7 @@ public class BatchProcessingLoader {
 		try {
 			reductionOption = ReductionOption.valueOf(queryElement.getAttribute("reductionOption"));
 		} catch (Exception e) {
-			reductionOption = ReductionOption.STANDARD;
+			reductionOption = ReductionOption.VerifyTAPN;
 		}
 		return reductionOption;
 	}

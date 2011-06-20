@@ -492,6 +492,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				checkForSave();
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
 				dialog.setMinimumSize(dialog.getSize());
@@ -1093,6 +1094,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	}
 
 	public boolean checkForSave(int index) {
+		if(index < 0) return false;
 		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"Current file has changed. Save current file?",
