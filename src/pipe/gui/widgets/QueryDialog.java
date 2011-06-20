@@ -907,7 +907,7 @@ public class QueryDialog extends JPanel {
 				buffer.append("</ul>");
 				buffer.append("<br/>");
 				buffer.append("<b>Verification Methods</b><br/>");
-				buffer.append("TAPAAL supports verification via its own included engine VerifyTAPN or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
+				buffer.append("TAPAAL supports verification via its own included engine verifytapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
 				buffer.append("The TAPAAL engine supports also the discrete inclusion optimization that works for EF queries where the propositions state only ");
 				buffer.append("lower bounds on the number of tokens and for AG queries with only the upper bounds constraints. On some models this technique gives a considerable speedup. ");
 				buffer.append("The user selected set of places that are considered for the discrete inclusion can further finetune the performance of the engine. Try to include places where you expect to see many tokens during the execution. ");

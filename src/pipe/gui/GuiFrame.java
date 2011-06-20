@@ -1097,7 +1097,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		if(index < 0) return false;
 		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
-					"Current file has changed. Save current file?",
+					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
 					JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
