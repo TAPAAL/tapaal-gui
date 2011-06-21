@@ -72,8 +72,8 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions
 public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;
 	
-	private static final String name_verifyTAPN = "VerifyTAPN";
-	private static final String name_verifyTAPNDiscreteInclusion = "VerifyTAPN w. Discrete Inclusion";
+	private static final String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
+	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Engine w. Discrete Inclusion";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";

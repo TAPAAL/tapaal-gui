@@ -10,7 +10,7 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 public class BatchProcessingResultsExporter {
-	private static final String name_verifyTAPN = "VerifyTAPN";
+	private static final String name_verifyTAPN = "TAPAAL Engine";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";

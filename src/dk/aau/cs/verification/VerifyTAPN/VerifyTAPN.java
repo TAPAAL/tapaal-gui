@@ -151,10 +151,10 @@ public class VerifyTAPN implements ModelChecker {
 
 	public boolean setup() {
 		if (isNotSetup()) {
-			messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTAPN_MSG, "Locate VerifyTAPN");
+			messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTAPN_MSG, "Locate verifytapn");
 
 			try {
-				File file = fileFinder.ShowFileBrowserDialog("VerifyTAPN", "");
+				File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "");
 				if(file != null){
 					if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
 						verifytapnpath = file.getAbsolutePath();

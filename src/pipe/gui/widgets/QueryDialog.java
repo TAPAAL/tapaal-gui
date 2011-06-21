@@ -103,11 +103,11 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 public class QueryDialog extends JPanel {
 
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
-	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No VerifyTAPN XML file saved.";
+	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
 	private static final String UNSUPPPORTED_QUERY_TEXT = "The chosen query property is not supported by the chosen reduction";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
-	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export VerifyTAPN XML";
+	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export verifytapn XML";
 	
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some encountered trace (only without symmetry reduction)";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some encountered trace";
@@ -208,7 +208,7 @@ public class QueryDialog extends JPanel {
 	private boolean isNetDegree2;
 	private InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "VerifyTAPN";
+	private String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -1902,7 +1902,7 @@ public class QueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN ? "VerifyTAPN XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");

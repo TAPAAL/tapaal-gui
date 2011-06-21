@@ -40,7 +40,7 @@ public class Verifier {
 		VerifyTAPN verifytapn = getVerifyTAPN();
 
 		if (!verifytapn.isCorrectVersion()) {
-			System.err.println("Verifytapn not found, or you are running an old version of Verifytapn.\n"
+			System.err.println("Verifytapn not found, or you are running an old version of verifytapn.\n"
 							+ "Update to the latest development version.");
 			return;
 		}

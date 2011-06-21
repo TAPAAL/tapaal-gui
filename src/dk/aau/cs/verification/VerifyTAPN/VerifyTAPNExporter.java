@@ -37,7 +37,7 @@ public class VerifyTAPNExporter {
 			queryStream.append(query.getProperty().toString());
 			queryStream.close();
 		} catch(FileNotFoundException e) {
-			System.err.append("An error occurred while exporting the model to VerifyTAPN. Verification cancelled.");
+			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
 		}
 		

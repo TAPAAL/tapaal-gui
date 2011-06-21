@@ -872,7 +872,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
 		
-		buffer.append("VerifyTAPN Information:\n");
+		buffer.append("Verifytapn Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytapnPath);
 		buffer.append("\n");
