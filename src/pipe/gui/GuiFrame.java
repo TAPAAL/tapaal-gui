@@ -26,6 +26,7 @@ import java.util.Observer;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -423,11 +424,11 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		 
 		 
 		 viewMenu.addSeparator();
-		 addMenuItem(viewMenu, showComponentsAction = new ViewAction("Show Components", 
+		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
 				 453243, "Show/Hide componens", "", true));
-		 addMenuItem(viewMenu, showQueriesAction = new ViewAction("Show Queries", 
+		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
 				 453244, "Show/Hide componens", "", true));
-		 addMenuItem(viewMenu, showConstantsAction = new ViewAction("Show Constants", 
+		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
 				 453245, "Show/Hide componens", "", true));
 
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -634,8 +635,19 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 	private JMenuItem addMenuItem(JMenu menu, Action action) {
 		JMenuItem item = menu.add(action);
-		KeyStroke keystroke = (KeyStroke) action
-		.getValue(Action.ACCELERATOR_KEY);
+		KeyStroke keystroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
+
+		if (keystroke != null) {
+			item.setAccelerator(keystroke);
+		}
+		return item;
+	}
+	
+	private JMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
+		JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(action);
+		checkBoxItem.setSelected(true);
+		JMenuItem item = menu.add(checkBoxItem);
+		KeyStroke keystroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
 
 		if (keystroke != null) {
 			item.setAccelerator(keystroke);
