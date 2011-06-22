@@ -844,12 +844,16 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	public void actionPerformed(ActionEvent e) {
 		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
 		buffer.append("\n\n");
+		buffer.append("Credits\n\n");
+		buffer.append("TAPAAL GUI and Translations:\n");
 		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
-		buffer
-		.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba \n");
-		buffer.append("Aalborg University 2009-2011 \n\n");
-		buffer.append("Read more at: www.tapaal.net \n\n");
-
+		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba\n");
+		buffer.append("Aalborg University 2009-2011\n\n");
+		buffer.append("TAPAAL Engine:\n");
+		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
+		buffer.append("Aalborg University 2011\n\n");
+		buffer.append("License information and more at: www.tapaal.net\n\n");
+		
 		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
 
 		String verifytaPath = verifyta.getPath();
@@ -872,7 +876,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
 		
-		buffer.append("Verifytapn Information:\n");
+		buffer.append("TAPAAL Engine (verifytapn) Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytapnPath);
 		buffer.append("\n");
@@ -880,7 +884,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		buffer.append(verifytapnversion);
 		buffer.append("\n\n");
 		
-		buffer.append("Verifyta Information:\n");
+		buffer.append("UPPAAL Engine (verifyta) Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytaPath);
 		buffer.append("\n");
