@@ -5,7 +5,7 @@ import java.awt.Color;
 public class Pipe {
    
    public static final String TOOL = "TAPAAL";
-   public static final String VERSION = "DEV"; 
+   public static final String VERSION = "2.0.0"; 
    
    public static String getProgramName(){
 	   return "" + Pipe.TOOL + " " + Pipe.VERSION;
