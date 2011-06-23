@@ -42,33 +42,31 @@ public class VersionChecker {
 	}
 
 	private boolean compareVersions() {
-		String delimiter = "\\.";
-		String[] currentVersionNumbers = Pipe.VERSION.split(delimiter);
-		String[] newestVersionNumbers = newestVersion.split(delimiter);
-
-		int currentLength = currentVersionNumbers.length;
-		int newestLength = newestVersionNumbers.length;
-
-		int length = currentLength > newestLength ? currentLength
-				: newestLength;
-
-		for (int i = 0; i < length; i++) {
-			int current = i >= currentLength ? 0 : Integer
-					.parseInt(currentVersionNumbers[i]);
-			int newest = 0;
-			try { // in case a version like a.0.3 is given, we catch this and
-					// return false
-				newest = i >= newestLength ? 0 : Integer
-						.parseInt(newestVersionNumbers[i]);
-			} catch (NumberFormatException e) {
-				return false;
-			}
-
-			if (newest > current)
-				return true;
+		int[] currentVersionNumbers = null;
+		int[] newestVersionNumbers = null;
+		try{
+			currentVersionNumbers = getVersionNumbers(Pipe.VERSION);
+			newestVersionNumbers = getVersionNumbers(newestVersion);
+		}catch(Exception e){
+			return false;
 		}
-
+		if(currentVersionNumbers.length != 3 || newestVersionNumbers.length != 3) return false;
+		
+		if(newestVersionNumbers[0] > currentVersionNumbers[0]){
+			return true;
+		}else if(newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] > currentVersionNumbers[1]){
+			return true;
+		}else if(newestVersionNumbers[0] == currentVersionNumbers[0] && newestVersionNumbers[1] == currentVersionNumbers[1] && newestVersionNumbers[2] > currentVersionNumbers[2]){
+			return true;
+		}
+		
 		return false;
+	}
+
+	private int[] getVersionNumbers(String version) {
+		String delimiter = "\\.";
+		String[] split = version.split(delimiter);
+		return new int[]{ Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2])};
 	}
 
 	private void getNewestVersion() {
