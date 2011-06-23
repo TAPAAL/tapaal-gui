@@ -17,7 +17,6 @@ SOURCE_DIR  := src
 OUTPUT_DIR  := classes
 
 
-
 PROJECTNAME := TAPAAL
 
 JAVA_HOME := /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
@@ -53,28 +52,9 @@ $(all_javas):
 	$(FIND) $(SOURCE_DIR) -name '*.java' > $@
 	sed -ie 's#\.java#\.class#' $@
 
-#all: $(all_javas)
-#	for arg in `cat $<`; do make $${arg}; done
 
 buildsrc: clean
 	tar czf tapaal_version.orig.tar.gz Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar gtkjfilechooser.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/  xslt/ RunGui.java
-
-install: $(compile)
-	mkdir -p $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/classes/* $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/Images $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/Example\ nets $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/Docs $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/expressions $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/jama $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/java_cup $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/schema $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/xslt $(DESTDIR)/usr/lib/tapaal/
-	cp -r $(CURDIR)/jpowergraph $(DESTDIR)/usr/lib/tapaal/
-	cp $(CURDIR)/jpowergraph-0.2-common.jar $(DESTDIR)/usr/lib/tapaal/ 
-	cp $(CURDIR)/jpowergraph-0.2-swing.jar $(DESTDIR)/usr/lib/tapaal/ 
-	cp $(CURDIR)/gtkjfilechooser.jar $(DESTDIR)/usr/lib/tapaal/ 
-	cp $(CURDIR)/run-unix $(DESTDIR)/usr/bin/tapaal
 
 .PHONY : clean
 clean:
