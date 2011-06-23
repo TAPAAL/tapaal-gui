@@ -13,6 +13,7 @@ public class ResourceManager {
 	private static ImageIcon notSatisfiedIcon = loadIcon("notsatisfied.png");
 	private static ImageIcon inconclusiveIcon = loadIcon("maybe1.png");
 	private static ImageIcon infoIcon = loadIcon("info.png");
+	private static ImageIcon appIcon = loadIcon("tapaal-2.0.png");
 	
 	private static ImageIcon loadIcon(String name) {
 		try {
@@ -39,5 +40,9 @@ public class ResourceManager {
 	
 	public static ImageIcon infoIcon(){
 		return infoIcon;
+	}
+	
+	public static ImageIcon appIcon(){
+		return appIcon;
 	}
 }

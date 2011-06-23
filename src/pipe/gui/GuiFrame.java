@@ -896,7 +896,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		buffer.append("http://pipe2.sourceforge.net/");
 
 		JOptionPane.showMessageDialog(this, buffer.toString(), "About TAPAAL",
-				JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
 
 	// HAK Method called by netModel object when it changes
