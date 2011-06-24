@@ -384,11 +384,11 @@ public class TimedPlaceComponent extends Place {
 		LabelHandler labelHandler = new LabelHandler(placeComponent.getNameLabel(), placeComponent);
 		placeComponent.getNameLabel().addMouseListener(labelHandler);
 		placeComponent.getNameLabel().addMouseMotionListener(labelHandler);
-		placeComponent.getNameLabel().addMouseWheelListener(labelHandler);
+		//placeComponent.getNameLabel().addMouseWheelListener(labelHandler);
 
 		PlaceHandler placeHandler = new PlaceHandler((DrawingSurfaceImpl)getParent(), placeComponent, guiModel, tapn);
 		placeComponent.addMouseListener(placeHandler);
-		placeComponent.addMouseWheelListener(placeHandler);
+		//placeComponent.addMouseWheelListener(placeHandler);
 		placeComponent.addMouseMotionListener(placeHandler);
 
 		placeComponent.setGuiModel(guiModel);

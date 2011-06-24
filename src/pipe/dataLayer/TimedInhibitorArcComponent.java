@@ -133,7 +133,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		
 		TimedArcHandler timedArcHandler = new TimedArcHandler((DrawingSurfaceImpl)getParent(), arc);
 		arc.addMouseListener(timedArcHandler);
-		arc.addMouseWheelListener(timedArcHandler);
+	//	arc.addMouseWheelListener(timedArcHandler);
 		arc.addMouseMotionListener(timedArcHandler);
 		
 		arc.setGuiModel(guiModel);

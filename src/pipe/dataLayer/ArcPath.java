@@ -613,9 +613,9 @@ public class ArcPath implements Shape, Cloneable {
 					pathPoint.addMouseMotionListener(pointHandler);
 				}
 
-				if (pathPoint.getMouseWheelListeners().length == 0) {
-					pathPoint.addMouseWheelListener(pointHandler);
-				}
+//				if (pathPoint.getMouseWheelListeners().length == 0) {
+//					pathPoint.addMouseWheelListener(pointHandler);
+//				}
 				pathPoint.updatePointLocation();
 			}
 		}
@@ -650,9 +650,9 @@ public class ArcPath implements Shape, Cloneable {
 					pathPoint.addMouseMotionListener(pointHandler);
 				}
 
-				if (pathPoint.getMouseWheelListeners().length == 0) {
-					pathPoint.addMouseWheelListener(pointHandler);
-				}
+//				if (pathPoint.getMouseWheelListeners().length == 0) {
+//					pathPoint.addMouseWheelListener(pointHandler);
+//				}
 				pathPoint.updatePointLocation();
 			}
 		}

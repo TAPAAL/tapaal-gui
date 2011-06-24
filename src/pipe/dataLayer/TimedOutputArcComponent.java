@@ -219,7 +219,7 @@ public class TimedOutputArcComponent extends Arc {
 		
 		ArcHandler arcHandler = new ArcHandler((DrawingSurfaceImpl)getParent(), arc);
 		arc.addMouseListener(arcHandler);
-		arc.addMouseWheelListener(arcHandler);
+		//arc.addMouseWheelListener(arcHandler);
 		arc.addMouseMotionListener(arcHandler);
 		
 		arc.setGuiModel(guiModel);

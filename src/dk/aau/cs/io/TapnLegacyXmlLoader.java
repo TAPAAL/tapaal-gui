@@ -860,22 +860,22 @@ public class TapnLegacyXmlLoader {
 						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
 						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
 						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+						//((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject, guiModel, tapn);
 						newObject.addMouseListener(placeHandler);
-						newObject.addMouseWheelListener(placeHandler);
+						//newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 					} else {
 
 						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
 						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
 						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+						//((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 						PlaceHandler placeHandler = new PlaceHandler(drawingSurface, (Place) newObject);
 						newObject.addMouseListener(placeHandler);
-						newObject.addMouseWheelListener(placeHandler);
+						//newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 
 					}
@@ -890,11 +890,11 @@ public class TapnLegacyXmlLoader {
 					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(), (Transition) newObject);
 					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
 					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+					//((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 					newObject.addMouseListener(transitionHandler);
 					newObject.addMouseMotionListener(transitionHandler);
-					newObject.addMouseWheelListener(transitionHandler);
+					//newObject.addMouseWheelListener(transitionHandler);
 
 					newObject.addMouseListener(new AnimationHandler());
 
@@ -904,19 +904,19 @@ public class TapnLegacyXmlLoader {
 						if (newObject instanceof TransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
-							newObject.addMouseWheelListener(transportArcHandler);
+							//newObject.addMouseWheelListener(transportArcHandler);
 							newObject.addMouseMotionListener(transportArcHandler);
 						} else {
 							TimedArcHandler timedArcHandler = new TimedArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(timedArcHandler);
-							newObject.addMouseWheelListener(timedArcHandler);
+							//newObject.addMouseWheelListener(timedArcHandler);
 							newObject.addMouseMotionListener(timedArcHandler);
 						}
 					} else {
 						/* EOC */
 						ArcHandler arcHandler = new ArcHandler(drawingSurface,(Arc) newObject);
 						newObject.addMouseListener(arcHandler);
-						newObject.addMouseWheelListener(arcHandler);
+						//newObject.addMouseWheelListener(arcHandler);
 						newObject.addMouseMotionListener(arcHandler);
 					}
 				} else if (newObject instanceof AnnotationNote) {
