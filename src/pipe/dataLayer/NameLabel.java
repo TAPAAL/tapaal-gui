@@ -2,6 +2,7 @@ package pipe.dataLayer;
 
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
 
 import pipe.gui.Pipe;
@@ -50,8 +51,11 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 		setCursor(new java.awt.Cursor(java.awt.Cursor.CROSSHAIR_CURSOR));
 		setEditable(false);
 		setFocusable(false);
-		setOpaque(false);
+		setOpaque(false); // added by OP
+		setBorder(BorderFactory.createEmptyBorder());
 		setBackground(Pipe.BACKGROUND_COLOR);
+
+		//setBackground(Pipe.BACKGROUND_COLOR);
 	}
 
 	public void setPosition(int x, int y) {
