@@ -71,7 +71,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
-public class GuiFrame extends JFrame implements ActionListener, Observer {
+public class GuiFrame extends JFrame implements Observer {
 
 	private static final long serialVersionUID = 7509589834941127217L;
 	// for zoom combobox and dropdown
@@ -105,6 +105,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	private HelpAction showAboutAction;
 	
 	/* CB Joakim Byg - tries both */
 	private TypeAction timedArcAction;
@@ -482,18 +483,26 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		 randomAnimateAction = new AnimateAction("Simulate", Pipe.ANIMATE,
 				 "Randomly fire a number of transitions", "typed 7", true);
 
+		 
+		 /* The help part */
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
+		 
+		 addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
+				 453246, "Show the About Menu", "_", true));
+		 
+		 
+		 
 
-		 JMenuItem aboutItem = helpMenu.add("About");
-		 aboutItem.addActionListener(this); // Help - About is implemented
+		 /*JMenuItem aboutItem = helpMenu.add("About");
+		 aboutItem.addActionListener(this); // Help - About is implemented*/
 		 // differently
 
-		 URL iconURL = Thread.currentThread().getContextClassLoader()
+		 /*URL iconURL = Thread.currentThread().getContextClassLoader()
 		 .getResource(CreateGui.imgPath + "About.png");
 		 if (iconURL != null) {
 			 aboutItem.setIcon(new ImageIcon(iconURL));
-		 }
+		 }*/
 
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
@@ -864,64 +873,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		
 	}
 
-	// Less sucky yet far, far simpler to code About dialogue
-	public void actionPerformed(ActionEvent e) {
-		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
-		buffer.append("\n\n");
-		buffer.append("Credits\n\n");
-		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
-		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba\n");
-		buffer.append("Aalborg University 2009-2011\n\n");
-		buffer.append("TAPAAL Engine:\n");
-		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011\n\n");
-		buffer.append("License information and more at: www.tapaal.net\n\n");
-		
-		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
 
-		String verifytaPath = verifyta.getPath();
-		String verifytaversion = "";
-
-		if (verifytaPath == null || verifytaPath.isEmpty()) {
-			verifytaPath = "Not setup";
-			verifytaversion = "N/A";
-		} else {
-			verifytaversion = verifyta.getVersion();
-		}
-		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
-		String verifytapnPath = verifyTAPN.getPath();
-		String verifytapnversion = "";
-
-		if (verifytapnPath == null || verifytapnPath.isEmpty()) {
-			verifytapnPath = "Not setup";
-			verifytapnversion = "N/A";
-		} else {
-			verifytapnversion = verifyTAPN.getVersion();
-		}
-		
-		buffer.append("TAPAAL Engine (verifytapn) Information:\n");
-		buffer.append("   Located: ");
-		buffer.append(verifytapnPath);
-		buffer.append("\n");
-		buffer.append("   Version: ");
-		buffer.append(verifytapnversion);
-		buffer.append("\n\n");
-		
-		buffer.append("UPPAAL Engine (verifyta) Information:\n");
-		buffer.append("   Located: ");
-		buffer.append(verifytaPath);
-		buffer.append("\n");
-		buffer.append("   Version: ");
-		buffer.append(verifytaversion);
-
-		buffer.append("  \n\n");
-		buffer.append("Based on PIPE2:\n");
-		buffer.append("http://pipe2.sourceforge.net/");
-
-		JOptionPane.showMessageDialog(this, buffer.toString(), "About TAPAAL",
-				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
-	}
 
 	// HAK Method called by netModel object when it changes
 	public void update(Observable o, Object obj) {
@@ -1858,6 +1810,85 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 				toggleConstants();
 			}
 		}
+		
+	}
+	public void showAbout() {
+		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
+		buffer.append("\n\n");
+		buffer.append("Credits\n\n");
+		buffer.append("TAPAAL GUI and Translations:\n");
+		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
+		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba\n");
+		buffer.append("Aalborg University 2009-2011\n\n");
+		buffer.append("TAPAAL Engine:\n");
+		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
+		buffer.append("Aalborg University 2011\n\n");
+		buffer.append("License information and more at: www.tapaal.net\n\n");
+		
+		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
+
+		String verifytaPath = verifyta.getPath();
+		String verifytaversion = "";
+
+		if (verifytaPath == null || verifytaPath.isEmpty()) {
+			verifytaPath = "Not setup";
+			verifytaversion = "N/A";
+		} else {
+			verifytaversion = verifyta.getVersion();
+		}
+		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+		String verifytapnPath = verifyTAPN.getPath();
+		String verifytapnversion = "";
+
+		if (verifytapnPath == null || verifytapnPath.isEmpty()) {
+			verifytapnPath = "Not setup";
+			verifytapnversion = "N/A";
+		} else {
+			verifytapnversion = verifyTAPN.getVersion();
+		}
+		
+		buffer.append("TAPAAL Engine (verifytapn) Information:\n");
+		buffer.append("   Located: ");
+		buffer.append(verifytapnPath);
+		buffer.append("\n");
+		buffer.append("   Version: ");
+		buffer.append(verifytapnversion);
+		buffer.append("\n\n");
+		
+		buffer.append("UPPAAL Engine (verifyta) Information:\n");
+		buffer.append("   Located: ");
+		buffer.append(verifytaPath);
+		buffer.append("\n");
+		buffer.append("   Version: ");
+		buffer.append(verifytaversion);
+
+		buffer.append("  \n\n");
+		buffer.append("Based on PIPE2:\n");
+		buffer.append("http://pipe2.sourceforge.net/");
+
+		JOptionPane.showMessageDialog(null, buffer.toString(), "About TAPAAL",
+				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
+	}
+	class HelpAction extends GuiAction {
+
+		private static final long serialVersionUID = -5145846750992454639L;
+		private int typeID;
+
+		HelpAction(String name, int typeID, String tooltip, String keystroke,
+				boolean toggleable) {
+			super(name, tooltip, keystroke, toggleable);
+			this.typeID = typeID;
+		}
+		
+		
+		// Less sucky yet far, far simpler to code About dialogue
+		public void actionPerformed(ActionEvent e) {
+			if (this == showAboutAction){
+				showAbout();
+			}
+		}
+		
+		
 		
 	}
 
