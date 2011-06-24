@@ -10,4 +10,4 @@ if [ -z $verifyta ]; then
 	fi 
 fi
 
-( cd `dirname "$0"`; cd lib; java -Dcom.apple.macos.useScreenMenuBar=true -cp .:* TAPAAL )
+( cd `dirname "$0"`; cd lib; java -Xdock:name=TAPAAL -Dcom.apple.mrj.application.growbox.intrudes=false -Dcom.apple.macos.smallTabs=true -Dcom.apple.mrj.application.apple.menu.about.name=TAPAAL -Dcom.apple.macos.useScreenMenuBar=true -cp .:* TAPAAL )

@@ -135,6 +135,11 @@ public class GuiFrame extends JFrame implements Observer {
 	private GUIMode guiMode = GUIMode.noNet;
 	private JMenu exportMenu, zoomMenu;
 
+	
+	public boolean isMac(){
+		return System.getProperty("mrj.version") != null;
+	}
+	
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
 		// name
@@ -167,6 +172,22 @@ public class GuiFrame extends JFrame implements Observer {
 
 		} catch (Exception exc) {
 			System.err.println("Error loading L&F: " + exc);
+		}
+		
+		/* Do magic mac stuff */ 
+		if (isMac()) { // Check if its a MAC / OS X system 
+			try {
+				Class macHandler = getClass().getClassLoader().loadClass("pipe.gui.handler.SpecialMacHandler");
+				
+				macHandler.newInstance();
+				
+			} catch (ClassNotFoundException e) {
+				Logger.log("Error Loading MAC specific settings");
+			} catch (InstantiationException e) {
+				Logger.log("Error Loading MAC specific settings");
+			} catch (IllegalAccessException e) {
+				Logger.log("Error Loading MAC specific settings");
+			}
 		}
 
 		this.setIconImage(new ImageIcon(Thread.currentThread()
@@ -1952,6 +1973,14 @@ public class GuiFrame extends JFrame implements Observer {
 		
 	}
 
+	
+	public void exit(){
+		if (checkForSaveAll()) {
+			dispose();
+			System.exit(0);
+		}
+	}
+	
 	class FileAction extends GuiAction {
 
 		/**
@@ -1981,9 +2010,8 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 			} else if (this == createAction) {
 				showNewPNDialog();
-			} else if ((this == exitAction) && checkForSaveAll()) {
-				dispose();
-				System.exit(0);
+			} else if ((this == exitAction)) {
+				exit();
 			} else if ((this == closeAction) && (appTab.getTabCount() > 0)
 					&& checkForSave()) {
 				// Set GUI mode to noNet
