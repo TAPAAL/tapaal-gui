@@ -13,8 +13,10 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +59,7 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
@@ -105,7 +108,7 @@ public class GuiFrame extends JFrame implements Observer {
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
-	private HelpAction showAboutAction;
+	private HelpAction showAboutAction, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	/* CB Joakim Byg - tries both */
 	private TypeAction timedArcAction;
@@ -488,8 +491,20 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
 		 
+		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
+				 454256, "See the TAPAAL FAQ", "_"));
+		 
+		 helpMenu.addSeparator();
+		 
+		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
+				 453256, "Ask a question about TAPAAL", "_"));
+		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
+				 453254, "Report a Bug in TAPAAL", "_"));
+		 
+		 helpMenu.addSeparator();
+		 
 		 addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
-				 453246, "Show the About Menu", "_", true));
+				 453246, "Show the About Menu", "_"));
 		 
 		 
 		 
@@ -1869,14 +1884,63 @@ public class GuiFrame extends JFrame implements Observer {
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About TAPAAL",
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
+	
+	
+	public void openBrowser(URI url){
+		//open the default bowser on this page
+		
+		try {
+			java.awt.Desktop.getDesktop().browse(url);
+		} catch (IOException e) {
+			Logger.log("Can't open browser");
+			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
+					"Please open the url in your browser by entering " + url.toString(), 
+					"Error opening browser", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+	}
+	
+	public void showAskQuestion() {
+		try {
+			URI url = new URI("https://answers.launchpad.net/tapaal/+addquestion");
+			openBrowser(url);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			Logger.log("Error convering to URL");
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void showReportBug() {
+		try {
+			URI url = new URI("https://bugs.launchpad.net/tapaal/+filebug");
+			openBrowser(url);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			Logger.log("Error convering to URL");
+			e.printStackTrace();
+		}
+	}
+	
+	public void showFAQ() {
+		try {
+			URI url = new URI("https://answers.launchpad.net/tapaal/+faqs");
+			openBrowser(url);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			Logger.log("Error convering to URL");
+			e.printStackTrace();
+		}
+	}
+	
 	class HelpAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454639L;
 		private int typeID;
-
-		HelpAction(String name, int typeID, String tooltip, String keystroke,
-				boolean toggleable) {
-			super(name, tooltip, keystroke, toggleable);
+		
+		HelpAction(String name, int typeID, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke, false);
 			this.typeID = typeID;
 		}
 		
@@ -1885,6 +1949,12 @@ public class GuiFrame extends JFrame implements Observer {
 		public void actionPerformed(ActionEvent e) {
 			if (this == showAboutAction){
 				showAbout();
+			} else if (this == showAskQuestionAction){ 
+				showAskQuestion();
+			} else if (this == showReportBugAction){
+				showReportBug();
+			} else if (this == showFAQAction){
+				showFAQ();
 			}
 		}
 		
