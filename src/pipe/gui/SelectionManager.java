@@ -41,7 +41,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	public SelectionManager(DrawingSurfaceImpl _view) {
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		addMouseWheelListener(this);
+		//addMouseWheelListener(this);
 		this.drawingSurface = _view;
 	}
 

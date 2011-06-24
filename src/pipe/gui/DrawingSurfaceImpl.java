@@ -115,7 +115,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		mouseHandler = new MouseHandler(this, dataLayer);
 		addMouseListener(mouseHandler);
 		addMouseMotionListener(mouseHandler);
-		addMouseWheelListener(mouseHandler);
+		//addMouseWheelListener(mouseHandler);
 
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
