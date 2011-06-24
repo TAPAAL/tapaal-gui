@@ -196,25 +196,15 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	
 	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
-		try {
-		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		if(UIManager.getLookAndFeel().getName().equals("Windows")){
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 		        if ("Nimbus".equals(info.getName())) {
 		            UIManager.setLookAndFeel(info.getClassName());
 		            break;
 		        }
 		    }
-		    return;
-		} catch (UnsupportedLookAndFeelException e) {
-
-		} catch (ClassNotFoundException e) {
-		    // handle exception
-		} catch (InstantiationException e) {
-		    // handle exception
-		} catch (IllegalAccessException e) {
-		    // handle exception
 		}
-		
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	}
 
 	/**
