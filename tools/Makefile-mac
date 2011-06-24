@@ -23,7 +23,7 @@ JAVA_HOME := /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
 JAVA_LIB  := $(JAVA_HOME)/lib
 
 
-DEPEND := libs/jpowergraph-0.2-common.jar:libs/jpowergraph-0.2-swing.jar:libs/gtkjfilechooser.jar:libs/gtkjfilechooser.jar:libs/GOLDEngine.jar:libs/commons-cli-1.2.jar
+DEPEND := libs/jpowergraph-0.2-common.jar:libs/jpowergraph-0.2-swing.jar:libs/gtkjfilechooser.jar:libs/gtkjfilechooser.jar:libs/GOLDEngine.jar:libs/commons-cli-1.2.jar:libs/AppleJavaExtensions.jar:
 
 
 JFLAGS      := -sourcepath $(SOURCE_DIR) \
