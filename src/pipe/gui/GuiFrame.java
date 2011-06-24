@@ -41,6 +41,8 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -137,7 +139,7 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 		setTitle(null);
 		try {
 			// Set the Look and Feel native for the system.
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
 			// 2010-05-07, Kenneth Yrke Jørgensen:
@@ -190,6 +192,28 @@ public class GuiFrame extends JFrame implements ActionListener, Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
+	}
+	
+	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
+		try {
+		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+		        if ("Nimbus".equals(info.getName())) {
+		            UIManager.setLookAndFeel(info.getClassName());
+		            break;
+		        }
+		    }
+		    return;
+		} catch (UnsupportedLookAndFeelException e) {
+
+		} catch (ClassNotFoundException e) {
+		    // handle exception
+		} catch (InstantiationException e) {
+		    // handle exception
+		} catch (IllegalAccessException e) {
+		    // handle exception
+		}
+		
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	}
 
 	/**
