@@ -968,7 +968,7 @@ public class QueryDialog extends JPanel {
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
 		queryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		Dimension d = new Dimension(750, 56);
+		Dimension d = new Dimension(750, 80);
 		queryScrollPane.setPreferredSize(d);
 		queryScrollPane.setMinimumSize(d);
 
@@ -1718,6 +1718,8 @@ public class QueryDialog extends JPanel {
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
+		Dimension d = new Dimension(798, 100);
+		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
 
