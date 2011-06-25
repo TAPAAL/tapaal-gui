@@ -291,4 +291,8 @@ public class Verifyta implements ModelChecker {
 		VerifytaTraceInterpreter traceIntepreter = new VerifytaTraceInterpreter(model, exportedModel.namingScheme());
 		return traceIntepreter.interpretTrace(trace);
 	}
+
+	public static void reset() {
+		verifytapath = "";
+	}
 }

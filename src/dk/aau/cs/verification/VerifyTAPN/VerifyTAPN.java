@@ -318,5 +318,9 @@ public class VerifyTAPN implements ModelChecker {
 		return visitor.isUpwardClosed(query.getProperty());
 	}
 
+	public static void reset() {
+		verifytapnpath = "";
+	}
+
 	
 }
