@@ -565,23 +565,24 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.add(batchProcessing);
 		toolsMenu.addSeparator();
 
-		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location");
-		resetVerifyta.addActionListener(new ActionListener(){
-			@Override public void actionPerformed(ActionEvent e) { 
-				Verifyta.reset(); 
-				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifyta has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		toolsMenu.add(resetVerifyta);
-		
-		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location");
+
+		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL Engine)");
 		resetVerifytapn.addActionListener(new ActionListener(){
-			@Override public void actionPerformed(ActionEvent e) { 
+			public void actionPerformed(ActionEvent e) { 
 				VerifyTAPN.reset(); 
 				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifytapn has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		toolsMenu.add(resetVerifytapn);
+		
+		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL Engine)");
+		resetVerifyta.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) { 
+				Verifyta.reset(); 
+				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifyta has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		toolsMenu.add(resetVerifyta);
 		return toolsMenu;
 	}
 
