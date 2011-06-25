@@ -190,9 +190,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		}
 
-		this.setIconImage(new ImageIcon(Thread.currentThread()
-				.getContextClassLoader().getResource(
-						CreateGui.imgPath + "icon.png")).getImage());
+		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
 
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setSize(screenSize.width * 80 / 100, screenSize.height * 80 / 100);
