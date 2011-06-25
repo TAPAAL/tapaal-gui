@@ -1718,7 +1718,7 @@ public class QueryDialog extends JPanel {
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
-		Dimension d = new Dimension(798, 100);
+		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
