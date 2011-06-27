@@ -415,7 +415,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 Pipe.TAPNARC, "Add an arc", "R", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "",
+				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "T",
 				 true));
 		 /* EOC */
 
