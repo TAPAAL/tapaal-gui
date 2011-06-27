@@ -56,6 +56,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.action.GuiAction;
+import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
@@ -175,7 +176,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		
 		/* Do magic mac stuff */ 
-		if (isMac()) { // Check if its a MAC / OS X system 
+		/*if (isMac()) { // Check if its a MAC / OS X system 
 			try {
 				Class macHandler = getClass().getClassLoader().loadClass("pipe.gui.handler.SpecialMacHandler");
 				
@@ -188,6 +189,9 @@ public class GuiFrame extends JFrame implements Observer {
 			} catch (IllegalAccessException e) {
 				Logger.log("Error Loading MAC specific settings");
 			}
+		}*/
+		if (isMac()){ 
+			SpecialMacHandler macHandler = new SpecialMacHandler(); // Load the special mac handler
 		}
 
 		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
