@@ -73,7 +73,7 @@ clean:
 	@find . -name '*.class' | xargs -L 1 rm -f
 	@rm -f tapaal_version.orig.tar.gz
 	@rm -rf '${OUTPUT_DIR}'
-	@rm -rf '${RELEASEDIR}'
+	@rm -rf '$(RELEASE_DIR)'
 
 
 release: clean 
