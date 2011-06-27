@@ -24,6 +24,7 @@ import dk.aau.cs.debug.Logger;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
  * See http://developer.apple.com/library/mac/documentation/Java/Reference/JavaSE6_AppleExtensionsRef/api/com/apple/eawt/package-summary.html
@@ -41,7 +42,7 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 	   
 	    try {
 	    	Image appImage;
-			appImage = ImageIO.read(new URL(CreateGui.imgPath + "icon.png"));
+			appImage = ImageIO.read(this.getClass().getResource(CreateGui.imgPath + "icon.png"));
 			app.setDockIconImage(appImage);
 		} catch (MalformedURLException e) {
 			Logger.log("Error loading Image");
