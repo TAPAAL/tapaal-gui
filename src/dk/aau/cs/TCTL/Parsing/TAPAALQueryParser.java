@@ -5,8 +5,11 @@ import goldengine.java.GPMessageConstants;
 import goldengine.java.ParserException;
 import goldengine.java.Token;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -126,16 +129,11 @@ public class TAPAALQueryParser implements GPMessageConstants {
 	public TCTLAbstractProperty parse(String query) throws ParseException {
 
 		//Line below is to convert to windows format parths
-		File compiledGrammarFile = new File(Thread.currentThread().getContextClassLoader().getResource("resources/TCTLParser/TAPAALQuery.cgt").getFile());
-		String textToParse = query, compiledGrammar = compiledGrammarFile.getAbsolutePath();
+		//BufferedReader compiledGrammarFile = 
+		InputStream compiledGrammar = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/TCTLParser/TAPAALQuery.cgt");
+		String textToParse = query;
 		Logger.log("Using gramma file:" + compiledGrammar);
 		
-		try {
-			compiledGrammar = URLDecoder.decode(compiledGrammar, "utf-8");
-		} catch (UnsupportedEncodingException e1) {
-			Logger.log("Error converting the URL format");
-		}
-
 		GOLDParser parser = new GOLDParser();
 
 		parseStack = new Stack<TCTLAbstractStateProperty>();
