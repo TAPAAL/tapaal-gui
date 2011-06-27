@@ -24,7 +24,6 @@ import dk.aau.cs.debug.Logger;
 
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
  * See http://developer.apple.com/library/mac/documentation/Java/Reference/JavaSE6_AppleExtensionsRef/api/com/apple/eawt/package-summary.html
