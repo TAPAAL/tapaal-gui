@@ -13,9 +13,11 @@
 #
 
 # Location of trees.
-SOURCE_DIR  := src 
+SOURCE_DIR  := src
+RESOURCE_DIR := $(SOURCE_DIR)/resources
 OUTPUT_DIR  := classes
 
+RELEASE_DIR := release
 
 PROJECTNAME := TAPAAL
 
@@ -30,7 +32,8 @@ endif
 
 JAVA_LIB  := $(JAVA_HOME)/lib
 
-DEPEND := libs/\*
+DEPEND_DIR := libs
+DEPEND := $(DEPEND_DIR)/\*
 
 JFLAGS      := -sourcepath $(SOURCE_DIR) \
 		-cp $(DEPEND)
@@ -48,7 +51,9 @@ all_javas := /tmp/tmp
 JAVA        := $(JAVA_HOME)/bin/java
 JAVAC       := $(JAVA_HOME)/bin/javac
 
-default: TAPAAL.class
+MAINCLASS := TAPAAL
+default: ${MAINCLASS}.class
+
 
 %.class : $(SOURCE_DIR)/%.java
 	$(JAVAC) $(JFLAGS) $(SOURCE_DIR)/$*.java
@@ -67,11 +72,20 @@ clean:
 	@rm -f ${all_javas}
 	@find . -name '*.class' | xargs -L 1 rm -f
 	@rm -f tapaal_version.orig.tar.gz
-	@rm -rf ${OUTPUT_DIR}
+	@rm -rf '${OUTPUT_DIR}'
+	@rm -rf '${RELEASEDIR}'
+
 
 release: clean 
 	@mkdir $(OUTPUT_DIR)
-	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ src/TAPAAL.java
+	@mkdir $(RELEASE_DIR)
+	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ '$(SOURCE_DIR)/$(MAINCLASS).java'
+	cp -R $(OUTPUT_DIR)/* '$(RELEASE_DIR)'
+	cp -R '$(RESOURCE_DIR)' '$(RELEASE_DIR)'
+	cp -R $(DEPEND_DIR)/* '$(RELEASE_DIR)'
+
+
+
 
 
 #Remove BYTE ORDER MARK
