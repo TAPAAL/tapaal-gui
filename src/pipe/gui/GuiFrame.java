@@ -463,15 +463,15 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", Pipe.DRAG,
 				 "Drag the drawing", "D", true));
 		 
-		 
 		 viewMenu.addSeparator();
-		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
+		 
+		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
 				 453243, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
-				 453244, "Show/Hide componens", "", true));
 		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
 				 453245, "Show/Hide componens", "", true));
-
+		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
+				 453244, "Show/Hide componens", "", true));
+		 
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
