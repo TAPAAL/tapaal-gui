@@ -42,7 +42,8 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 	   
 	    try {
 	    	Image appImage;
-			appImage = ImageIO.read(this.getClass().getResource(CreateGui.imgPath + "icon.png"));
+			appImage = ImageIO.read(Thread.currentThread().getContextClassLoader().getResource(
+					CreateGui.imgPath + "icon.png"));
 			app.setDockIconImage(appImage);
 		} catch (MalformedURLException e) {
 			Logger.log("Error loading Image");
