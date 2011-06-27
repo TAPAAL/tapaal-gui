@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -308,7 +309,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 			File[] nets = examplesDir.listFiles();
 */
-
 			String[] nets = null;
 			
 			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
@@ -352,41 +352,43 @@ public class GuiFrame extends JFrame implements Observer {
 		    }
 
 
-/*
-			Arrays.sort(nets, new Comparator<File>() {
-				public int compare(File one, File two) {
 
-					int toReturn = ((File) one).getName().compareTo(
-							((File) two).getName());
+			Arrays.sort(nets, new Comparator<String>() {
+				public int compare(String one, String two) {
+
+					int toReturn = ((String) one).compareTo(
+							((String) two));
 					// Special hack to get intro-example first
-					if (one.getName().equals("intro-example.xml")) {
+					if (one.equals("intro-example.xml")) {
 						toReturn = -1;
 					}
-					if (two.getName().equals("intro-example.xml")) {
+					if (two.equals("intro-example.xml")) {
 						toReturn = 1;
 					}
 					return toReturn;
 				}
-			});*/
+			});
 
 			// Oliver Haggarty - fixed code here so that if folder contains non
 			// .xml file the Example x counter is not incremented when that file
 			// is ignored
-		/*	if (nets.length > 0) {
+			if (nets.length > 0) {
 				JMenu exampleMenu = new JMenu("Example nets");
 				exampleMenu.setIcon(new ImageIcon(Thread.currentThread()
 						.getContextClassLoader().getResource(
 								CreateGui.imgPath + "Example.png")));
 				int k = 0;
 				for (int i = 0; i < nets.length; i++) {
-					if (nets[i].getName().toLowerCase().endsWith(".xml")) {
-						addMenuItem(exampleMenu, new ExampleFileAction(nets[i],
-								(k < 10) ? "ctrl " + (k++) : null));
+					if (nets[i].toLowerCase().endsWith(".xml")) {
+						//addMenuItem(exampleMenu, new ExampleFileAction(nets[i], (k < 10) ? "ctrl " + (k++) : null));
+						InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + nets[i]);
+						ExampleFileAction tmp = new ExampleFileAction(file, nets[i].replace(".xml", ""), (k < 10) ? "ctrl " + (k++) : null);
+						addMenuItem(exampleMenu, tmp);
 					}
 				}
 				fileMenu.add(exampleMenu);
 				fileMenu.addSeparator();
-			}*/
+			}
 		} catch (Exception e) {
 			System.err.println("Error getting example files:" + e);
 			e.printStackTrace();
@@ -1087,6 +1089,70 @@ public class GuiFrame extends JFrame implements Observer {
 		selectAction.actionPerformed(null);
 	}
 
+	
+	/**
+	 * Creates a new tab with the selected file, or a new file if filename==null
+	 * 
+	 * @param filename
+	 *            Filename of net to load, or <b>null</b> to create a new, empty
+	 *            tab
+	 */
+	public void createNewTabFromFile(InputStream file, String namePrefix) {
+		int freeSpace = CreateGui.getFreeSpace();
+		String name = "";
+
+		setObjects(freeSpace);
+		int currentlySelected = appTab.getSelectedIndex();
+
+		if (namePrefix == null || namePrefix == "") {
+			name = "New " + namePrefix +  " " + (newNameCounter++) + ".xml";
+		} else {
+			name = "New Petri net " + (newNameCounter++) + ".xml";
+		}
+
+		TabContent tab = CreateGui.getTab(freeSpace);
+		appTab.addTab(name, null, tab, null);
+		appTab.setTabComponentAt(freeSpace, new TabComponent(appTab));
+		appTab.setSelectedIndex(freeSpace);
+
+		if (file != null) {
+			try {
+				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
+				if (CreateGui.getApp() != null) {
+					// Notifies used to indicate new instances.
+					CreateGui.getApp().setMode(Pipe.CREATING);
+				}
+
+				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
+				LoadedModel loadedModel = loader.load(file);
+								
+				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
+				currentTab.setQueries(loadedModel.queries());
+				currentTab.setConstants(loadedModel.network().constants());
+				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
+
+				if (CreateGui.getApp() != null) {
+					CreateGui.getApp().restoreMode();
+				}
+
+				CreateGui.setFile(null, freeSpace);
+			} catch (Exception e) {
+				undoAddTab(currentlySelected);
+				JOptionPane.showMessageDialog(GuiFrame.this,
+						"TAPAAL encountered an error while loading the file: " + name + "\n\nPossible explanations:\n  - " + e.toString(), 
+						"Error loading file: " + name, 
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+
+		appView.setNetChanged(false); // Status is unchanged
+		appView.updatePreferredSize();
+		setTitle(name);// Change the program caption
+		appTab.setTitleAt(freeSpace, name);
+		selectAction.actionPerformed(null);
+	}
+	
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * 
@@ -1533,19 +1599,21 @@ public class GuiFrame extends JFrame implements Observer {
 		 * 
 		 */
 		private static final long serialVersionUID = -5983638671592349736L;
-		private File filename;
+		private InputStream filename;
+		private String name;
 
-		ExampleFileAction(File file, String keyStroke) {
-			super(file.getName().replace(".xml", ""), "Open example file \""
-					+ file.getName().replace(".xml", "") + "\"", keyStroke);
+		ExampleFileAction(InputStream file, String name, String keyStroke) {
+			super(name.replace(".xml", ""), "Open example file \""
+					+ name.replace(".xml", "") + "\"", keyStroke);
 			filename = file;// .getAbsolutePath();
 			putValue(SMALL_ICON, new ImageIcon(Thread.currentThread()
 					.getContextClassLoader().getResource(
 							CreateGui.imgPath + "Net.png")));
+			this.name = name;
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			createNewTabFromFile(filename);
+			createNewTabFromFile(filename, name);
 		}
 
 	}

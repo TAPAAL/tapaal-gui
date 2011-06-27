@@ -2,6 +2,7 @@ package dk.aau.cs.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,6 +103,14 @@ public class TapnLegacyXmlLoader {
 		this.drawingSurface = drawingSurfaceImpl;
 	}
 	
+	public LoadedModel load(InputStream file) throws FormatException {
+		Require.that(file != null, "file must be non-null and exist");
+
+		Document doc = loadDocument(file);
+		if(doc == null) return null;
+		return parse(doc);
+	}
+	
 	public LoadedModel load(File file) throws FormatException {
 		Require.that(file != null && file.exists(), "file must be non-null and exist");
 
@@ -110,6 +119,19 @@ public class TapnLegacyXmlLoader {
 		return parse(doc);
 	}
 
+	private Document loadDocument(InputStream file) {
+		try {
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			return builder.parse(file);
+		} catch (ParserConfigurationException e) {
+			return null;
+		} catch (SAXException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	
 	private Document loadDocument(File file) {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
