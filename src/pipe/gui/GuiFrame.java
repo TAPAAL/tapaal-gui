@@ -280,35 +280,15 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Example files menu
 		try {
-/*
-			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
-			getResource("resources/Example nets/");
 
-			File examplesDir = new File(examplesDirURL.toURI());
-			*/
 			/**
-			 * The next block fixes a problem that surfaced on Mac OSX with PIPE
-			 * 2.4. In that environment (and not in Windows) any blanks in the
-			 * project name in Eclipse are property converted to '%20' but the
-			 * blank in "Example nets" is not. The following code will do
-			 * nothing on a Windows machine or if the logic on OSX changess. I
-			 * also added a stack trace so if the problem occurs for another
-			 * environment (perhaps multiple blanks need to be manually changed)
-			 * it can be easily fixed. DP
+			 * The next block loads the example nets as InputStream from the resources 
+			 * Notice the check for if we are inside a jar file, as files inside a jar cant
+			 * be listed in the normal way.
+			 * 
+			 *  @author Kenneth Yrke Joergensen <kenneth@yrke.dk>, 2011-06-27
 			 */
-			// examplesDir = new File(new URI(examplesDirURL.toString()));
-/*			String dirURLString = examplesDirURL.toString();
-			int index = dirURLString.indexOf(" ");
-			if (index > 0) {
-				StringBuffer sb = new StringBuffer(dirURLString);
-				sb.replace(index, index + 1, "%20");
-				dirURLString = sb.toString();
-			}
 
-			examplesDir = new File(new URI(dirURLString));
-
-			File[] nets = examplesDir.listFiles();
-*/
 			String[] nets = null;
 			
 			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
@@ -347,12 +327,6 @@ public class GuiFrame extends JFrame implements Observer {
 		        nets = result.toArray(new String[result.size()]);
 		      } 
 		        
-		    for (String s : nets){
-		    	System.out.println(s);
-		    }
-
-
-
 			Arrays.sort(nets, new Comparator<String>() {
 				public int compare(String one, String two) {
 
@@ -390,7 +364,7 @@ public class GuiFrame extends JFrame implements Observer {
 				fileMenu.addSeparator();
 			}
 		} catch (Exception e) {
-			System.err.println("Error getting example files:" + e);
+			Logger.log("Error getting example files:" + e);
 			e.printStackTrace();
 		}
 		addMenuItem(fileMenu, exitAction = new FileAction("Exit",
