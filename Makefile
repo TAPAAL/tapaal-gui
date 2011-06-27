@@ -17,11 +17,11 @@ SOURCE_DIR  := src
 RESOURCE_DIR := $(SOURCE_DIR)/resources
 OUTPUT_DIR  := classes
 
-RELEASE_DIR := release
+RELEASE_DIR := release-version
 
 PROJECTNAME := TAPAAL
 
-JAR_FILE := tapaal.jar
+JAR_FILE := tapaal-version.jar
 
 #Set location of java home
 ifeq (exists, $(shell [ -d /usr/lib/jvm/default-java ]  && echo exists ))
