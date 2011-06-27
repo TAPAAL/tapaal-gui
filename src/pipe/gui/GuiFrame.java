@@ -175,21 +175,6 @@ public class GuiFrame extends JFrame implements Observer {
 			System.err.println("Error loading L&F: " + exc);
 		}
 		
-		/* Do magic mac stuff */ 
-		/*if (isMac()) { // Check if its a MAC / OS X system 
-			try {
-				Class macHandler = getClass().getClassLoader().loadClass("pipe.gui.handler.SpecialMacHandler");
-				
-				macHandler.newInstance();
-				
-			} catch (ClassNotFoundException e) {
-				Logger.log("Error Loading MAC specific settings");
-			} catch (InstantiationException e) {
-				Logger.log("Error Loading MAC specific settings");
-			} catch (IllegalAccessException e) {
-				Logger.log("Error Loading MAC specific settings");
-			}
-		}*/
 		if (isMac()){ 
 			SpecialMacHandler macHandler = new SpecialMacHandler(); // Load the special mac handler
 		}
