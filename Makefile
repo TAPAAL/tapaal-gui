@@ -21,6 +21,8 @@ RELEASE_DIR := release
 
 PROJECTNAME := TAPAAL
 
+JAR_FILE := tapaal.jar
+
 #Set location of java home
 ifeq (exists, $(shell [ -d /usr/lib/jvm/default-java ]  && echo exists ))
 	JAVA_HOME := /usr/lib/jvm/default-java
@@ -50,6 +52,7 @@ all_javas := /tmp/tmp
 
 JAVA        := $(JAVA_HOME)/bin/java
 JAVAC       := $(JAVA_HOME)/bin/javac
+JAR       := $(JAVA_HOME)/bin/jar
 
 MAINCLASS := TAPAAL
 default: ${MAINCLASS}.class
@@ -74,6 +77,7 @@ clean:
 	@rm -f tapaal_version.orig.tar.gz
 	@rm -rf '${OUTPUT_DIR}'
 	@rm -rf '$(RELEASE_DIR)'
+	@rm -rf '$(JAR_FILE)'
 
 
 release: clean 
@@ -84,9 +88,8 @@ release: clean
 	cp -R '$(RESOURCE_DIR)' '$(RELEASE_DIR)'
 	cp -R $(DEPEND_DIR)/* '$(RELEASE_DIR)'
 
-
-
-
+jar: release 
+	$(JAR) -cfe $(JAR_FILE) TAPAAL -C $(RELEASE_DIR) . 
 
 #Remove BYTE ORDER MARK
 removeBOM:  
