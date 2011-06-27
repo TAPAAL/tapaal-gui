@@ -94,3 +94,11 @@ jar: release
 #Remove BYTE ORDER MARK
 removeBOM:  
 	sed -i '1 s/^\xef\xbb\xbf//' $*.java
+
+TOOLS_DIR := tools
+
+install: release
+	mkdir -p $(DESTDIR)/usr/lib/tapaal/
+	cp -R $(CURDIR)/$(RELEASE_DIR)/* $(DESTDIR)/usr/lib/tapaal/
+	cp -R $(CURDIR)/$(TOOLS_DIR)/run-unix $(DESTDIR)/usr/bin/tapaal
+
