@@ -18,12 +18,17 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -274,14 +279,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Example files menu
 		try {
-
+/*
 			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
 			getResource("resources/Example nets/");
 
-			
-
-
 			File examplesDir = new File(examplesDirURL.toURI());
+			*/
 			/**
 			 * The next block fixes a problem that surfaced on Mac OSX with PIPE
 			 * 2.4. In that environment (and not in Windows) any blanks in the
@@ -293,7 +296,7 @@ public class GuiFrame extends JFrame implements Observer {
 			 * it can be easily fixed. DP
 			 */
 			// examplesDir = new File(new URI(examplesDirURL.toString()));
-			String dirURLString = examplesDirURL.toString();
+/*			String dirURLString = examplesDirURL.toString();
 			int index = dirURLString.indexOf(" ");
 			if (index > 0) {
 				StringBuffer sb = new StringBuffer(dirURLString);
@@ -304,7 +307,52 @@ public class GuiFrame extends JFrame implements Observer {
 			examplesDir = new File(new URI(dirURLString));
 
 			File[] nets = examplesDir.listFiles();
+*/
 
+			String[] nets = null;
+			
+			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
+		      if (dirURL != null && dirURL.getProtocol().equals("file")) {
+		        /* A file path: easy enough */
+		        nets = new File(dirURL.toURI()).list();
+		      } 
+
+		      if (dirURL == null) {
+		        /* 
+		         * In case of a jar file, we can't actually find a directory.
+		         * Have to assume the same jar as clazz.
+		         */
+		        String me = this.getName().replace(".", "/")+".class";
+		        dirURL = Thread.currentThread().getContextClassLoader().getResource(me);
+		      }
+		      
+		      if (dirURL.getProtocol().equals("jar")) {
+		        /* A JAR path */
+		        String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+		        JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+		        Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+		        Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
+		        while(entries.hasMoreElements()) {
+		          String name = entries.nextElement().getName();
+		          if (name.startsWith("resources/Example nets/")) { //filter according to the path
+		            String entry = name.substring("resources/Example nets/".length());
+		            int checkSubdir = entry.indexOf("/");
+		            if (checkSubdir >= 0) {
+		              // if it is a subdirectory, we just return the directory name
+		              entry = entry.substring(0, checkSubdir);
+		            }
+		            result.add(entry);
+		          }
+		        }
+		        nets = result.toArray(new String[result.size()]);
+		      } 
+		        
+		    for (String s : nets){
+		    	System.out.println(s);
+		    }
+
+
+/*
 			Arrays.sort(nets, new Comparator<File>() {
 				public int compare(File one, File two) {
 
@@ -319,12 +367,12 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 					return toReturn;
 				}
-			});
+			});*/
 
 			// Oliver Haggarty - fixed code here so that if folder contains non
 			// .xml file the Example x counter is not incremented when that file
 			// is ignored
-			if (nets.length > 0) {
+		/*	if (nets.length > 0) {
 				JMenu exampleMenu = new JMenu("Example nets");
 				exampleMenu.setIcon(new ImageIcon(Thread.currentThread()
 						.getContextClassLoader().getResource(
@@ -338,7 +386,7 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 				fileMenu.add(exampleMenu);
 				fileMenu.addSeparator();
-			}
+			}*/
 		} catch (Exception e) {
 			System.err.println("Error getting example files:" + e);
 			e.printStackTrace();
