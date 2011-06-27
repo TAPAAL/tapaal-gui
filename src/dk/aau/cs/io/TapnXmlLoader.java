@@ -794,7 +794,7 @@ public class TapnXmlLoader {
 				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);
 				firstQueryParsingWarning = false;
 			}
-			System.err.println("No query was specified: " + e.getStackTrace());
+			System.err.println("No query was specified: " + e.getStackTrace().toString());
 		}
 		return query;
 	}
