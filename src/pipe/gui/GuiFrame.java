@@ -276,8 +276,9 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 
 			URL examplesDirURL = Thread.currentThread().getContextClassLoader().
-			getResource("resources/Example nets" + System.getProperty("file.separator"));
+			getResource("resources/Example nets/");
 
+			
 
 
 			File examplesDir = new File(examplesDirURL.toURI());
