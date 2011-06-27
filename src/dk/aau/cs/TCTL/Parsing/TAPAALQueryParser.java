@@ -128,6 +128,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 		//Line below is to convert to windows format parths
 		File compiledGrammarFile = new File(Thread.currentThread().getContextClassLoader().getResource("resources/TCTLParser/TAPAALQuery.cgt").getFile());
 		String textToParse = query, compiledGrammar = compiledGrammarFile.getAbsolutePath();
+		Logger.log("Using gramma file:" + compiledGrammar);
 		
 		try {
 			compiledGrammar = URLDecoder.decode(compiledGrammar, "utf-8");
