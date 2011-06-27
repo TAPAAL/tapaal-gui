@@ -55,6 +55,14 @@ public class CreateGui {
 			message.append(Pipe.VERSION);
 			message.append("\nNew version: ");
 			message.append(versionChecker.getNewVersionNumber());
+			String changelog = versionChecker.getChangelog();
+			if (changelog != ""){
+				message.append("\n");
+				message.append("\n");
+				message.append("Changelog:");
+				message.append("\n");
+				message.append(changelog);
+			}
 
 			JOptionPane.showMessageDialog(appGui, message.toString(),
 					"New version available!", JOptionPane.INFORMATION_MESSAGE);

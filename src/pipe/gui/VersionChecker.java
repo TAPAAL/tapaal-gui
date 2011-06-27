@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.verification.BufferDrain;
 
 public class VersionChecker {
 	private final static String versionURL = "http://www.tapaal.net/fileadmin/version.txt";
@@ -80,6 +81,23 @@ public class VersionChecker {
 					.getInputStream()));
 
 			newestVersion = in.readLine();
+			
+			// Read the changelog part
+			
+			//Skip first line
+			
+			in.readLine();
+			
+			StringBuffer sb = new StringBuffer();
+			String s;
+			
+		    while ((s = in.readLine()) != null) {
+		      sb.append(s + '\n');
+		    }
+		    
+		    changelog = sb.toString();
+		    changelog = changelog.replace("Changelog:\n", "");
+
 			in.close();
 		} catch (Exception e) {
 			Logger.log("Could not check for new version.");
@@ -88,6 +106,10 @@ public class VersionChecker {
 
 	public String getNewVersionNumber() {
 		return newestVersion;
+	}
+	String changelog = "";
+	public String getChangelog(){
+		return changelog;
 	}
 
 }
