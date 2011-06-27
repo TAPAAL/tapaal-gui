@@ -8,6 +8,8 @@ import goldengine.java.Token;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -24,6 +26,7 @@ import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.debug.Logger;
 
 /*
  * Licensed Material - Property of Matthew Hawkins (hawkini@4email.net) 
@@ -125,6 +128,12 @@ public class TAPAALQueryParser implements GPMessageConstants {
 		//Line below is to convert to windows format parths
 		File compiledGrammarFile = new File(Thread.currentThread().getContextClassLoader().getResource("resources/TCTLParser/TAPAALQuery.cgt").getFile());
 		String textToParse = query, compiledGrammar = compiledGrammarFile.getAbsolutePath();
+		
+		try {
+			compiledGrammar = URLDecoder.decode(compiledGrammar, "utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			Logger.log("Error converting the URL format");
+		}
 		System.out.println(compiledGrammar);
 
 		GOLDParser parser = new GOLDParser();
