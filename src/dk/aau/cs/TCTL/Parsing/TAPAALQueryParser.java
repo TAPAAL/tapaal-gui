@@ -134,7 +134,6 @@ public class TAPAALQueryParser implements GPMessageConstants {
 		} catch (UnsupportedEncodingException e1) {
 			Logger.log("Error converting the URL format");
 		}
-		System.out.println(compiledGrammar);
 
 		GOLDParser parser = new GOLDParser();
 
