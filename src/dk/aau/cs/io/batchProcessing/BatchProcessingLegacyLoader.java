@@ -479,7 +479,7 @@ ReductionOption reductionOption;
 		try {
 			query = queryParser.parse(queryToParse);
 		} catch (Exception e) {
-			System.err.println("No query was specified: " + e.getStackTrace());
+			System.err.println("No query was specified: " + e.getStackTrace().toString());
 		}
 		return query;
 	}
