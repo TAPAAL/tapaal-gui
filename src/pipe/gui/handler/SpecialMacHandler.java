@@ -1,11 +1,24 @@
 package pipe.gui.handler;
 
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
+
+import dk.aau.cs.debug.Logger;
 
 
 
@@ -25,6 +38,16 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 		Application app = Application.getApplication();
 		app.setAboutHandler(this);
 	    app.setQuitHandler(this);
+	   
+	    try {
+	    	Image appImage;
+			appImage = ImageIO.read(new URL(CreateGui.imgPath + "icon.png"));
+			app.setDockIconImage(appImage);
+		} catch (MalformedURLException e) {
+			Logger.log("Error loading Image");
+		} catch (IOException e) {
+			Logger.log("Error loading Image");
+		}
 	    
 	    //Set specific settings
         System.setProperty("apple.laf.useScreenMenuBar", "true");

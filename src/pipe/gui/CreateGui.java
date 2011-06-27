@@ -23,7 +23,7 @@ public class CreateGui {
 	public static String imgPath, userPath; // useful for stuff
 
 	public static void init() {
-		imgPath = "resources/Images" + System.getProperty("file.separator");
+		imgPath = "resources/Images/";
 
 		// make the initial dir for browsing be My Documents (win), ~ (*nix),
 		// etc
