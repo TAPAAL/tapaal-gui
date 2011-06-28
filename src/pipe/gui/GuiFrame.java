@@ -96,18 +96,15 @@ public class GuiFrame extends JFrame implements Observer {
 	private StatusBar statusBar;
 	private JMenuBar menuBar;
 	private JToolBar drawingToolBar;
-	// private Map actions = new HashMap();
 	private JComboBox zoomComboBox;
 
-	// XXX kyrke testing
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
 	exportPSAction, exportToTikZAction;
 	
 	private VerificationAction runUppaalVerification;
 
-	private EditAction /* copyAction, cutAction, pasteAction, */undoAction,
-	redoAction;
+	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
@@ -117,12 +114,10 @@ public class GuiFrame extends JFrame implements Observer {
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
 	private HelpAction showAboutAction, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
-	/* CB Joakim Byg - tries both */
 	private TypeAction timedArcAction;
-
 	private TypeAction transportArcAction;
 
-	/* EOC */
+
 	private AnimateAction startAction, stepforwardAction, stepbackwardAction,
 	randomAction, randomAnimateAction, timeAction;
 
@@ -149,8 +144,8 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
-		// name
-		// to be appended to basic window title
+		// name to be appended to basic window title
+		
 		frameTitle = title;
 		setTitle(null);
 		try {
@@ -225,9 +220,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	/**
-	 * This method does build the menus.
-	 * 
-	 * @author unknown
+	 * This method does build the menus
 	 * 
 	 * @author Dave Patterson - fixed problem on OSX due to invalid character in
 	 *         URI caused by unescaped blank. The code changes one blank
@@ -235,6 +228,9 @@ public class GuiFrame extends JFrame implements Observer {
 	 *         works safely in both OSX and Windows. I also added a
 	 *         printStackTrace if there is an exception caught in the setup for
 	 *         the "Example nets" folder.
+	 * @author Kenneth Yrke Joergensen <kenneth@yrke.dk>, 2011-06-28
+	 * 	       Code cleanup, removed unused parts, Refactored help menu, Fixed 
+	 *         loading of Example Nets to work if we create a Jar. 
 	 **/
 	private void buildMenus() {
 		menuBar = new JMenuBar();
@@ -249,10 +245,7 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(fileMenu, closeAction = new FileAction("Close",
 				"Close the current tab", "ctrl W"));
 		fileMenu.addSeparator();
-		/*
-		 * addMenuItem(fileMenu, importAction = new FileAction("Import",
-		 * "Import from Timenet",""));
-		 */
+
 		addMenuItem(fileMenu, saveAction = new FileAction("Save", "Save",
 		"ctrl S"));
 		addMenuItem(fileMenu, saveAsAction = new FileAction("Save as",
@@ -370,6 +363,7 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(fileMenu, exitAction = new FileAction("Exit",
 				"Close the program", "ctrl Q"));
 
+		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
 		addMenuItem(editMenu, undoAction = new EditAction("Undo",
@@ -377,12 +371,8 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(editMenu, redoAction = new EditAction("Redo",
 				"Redo (Ctrl-Y)", "ctrl Y"));
 		editMenu.addSeparator();
-		/*
-		 * addMenuItem(editMenu, cutAction = new EditAction("Cut",
-		 * "Cut (Ctrl-X)","ctrl X")); addMenuItem(editMenu, copyAction = new
-		 * EditAction("Copy", "Copy (Ctrl-C)","ctrl C")); addMenuItem(editMenu,
-		 * pasteAction = new EditAction("Paste", "Paste (Ctrl-V)","ctrl V"));
-		 */addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
+
+		 addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
 				 "Delete selection", "DELETE"));
 
 		 // Bind delete to backspace also
@@ -390,68 +380,41 @@ public class GuiFrame extends JFrame implements Observer {
 				 KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
 		 editMenu.getActionMap().put("Delete", deleteAction);
 
+		 /* Draw menu */
 		 JMenu drawMenu = new JMenu("Draw");
 		 drawMenu.setMnemonic('D');
 		 addMenuItem(drawMenu, selectAction = new TypeAction("Select",
 				 Pipe.SELECT, "Select components", "S", true));
 		 drawMenu.addSeparator();
 
-		 // kyrke inserted timed place
 		 addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
-				 Pipe.TAPNPLACE, "Add a place", "L", true));
-		 // jokke removed normal places
-		 // addMenuItem(drawMenu, placeAction =
-		 // new TypeAction("Place", Pipe.PLACE, "Add a place","P",true));
+				 Pipe.TAPNPLACE, "Add a place", "P", true));
 
 		 addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-				 Pipe.TAPNTRANS, "Add a transition", "I", true));
+				 Pipe.TAPNTRANS, "Add a transition", "T", true));
 
-		 /*
-		  * addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-		  * Pipe.IMMTRANS, "Add an immediate transition","I",true));
-		  */
-		 /*
-		  * CB Joakim Byg - Not part of the model addMenuItem(drawMenu,
-		  * timedtransAction = new TypeAction("Timed transition",
-		  * Pipe.TIMEDTRANS, "Add a timed transition","T",true)); EOC
-		  */
-		 /*
-		  * CB Jiri Srba - Not part of the model addMenuItem(drawMenu, arcAction
-		  * = new TypeAction("Arc", Pipe.ARC, "Add an arc","A",true));" + EOC
-		  */
-
-		 /* CB Joakim Byg - Adding timed arcs */
 		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
-				 Pipe.TAPNARC, "Add an arc", "R", true));
+				 Pipe.TAPNARC, "Add an arc", "A", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "T",
+				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "R",
 				 true));
-		 /* EOC */
 
 		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
-				 Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc", "H", true));
+				 Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc", "I", true));
 
 		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
 				 Pipe.ANNOTATION, "Add an annotation", "N", true));
+		 
 		 drawMenu.addSeparator();
+		 
 		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
 				 Pipe.ADDTOKEN, "Add a token", "ADD", true));
 		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
 				 "Delete token", Pipe.DELTOKEN, "Delete a token", "SUBTRACT",
 				 true));
 
-		 /* drawMenu.addSeparator(); */
-		 /*
-		  * addMenuItem(drawMenu, rateAction = new TypeAction("Rate Parameter",
-		  * Pipe.RATE, "Rate Parameter", "R",true));
-		  */
-		 /*
-		  * addMenuItem(drawMenu, markingAction = new
-		  * TypeAction("Marking Parameter", Pipe.MARKING, "Marking Parameter",
-		  * "M",true));
-		  */
-
+		 /* ViewMenu */
 		 JMenu viewMenu = new JMenu("View");
 		 viewMenu.setMnemonic('V');
 
@@ -482,11 +445,12 @@ public class GuiFrame extends JFrame implements Observer {
 		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
 				 453244, "Show/Hide componens", "", true));
 		 
+		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
 				 "Simulation mode", Pipe.START, "Toggle Simulation Mode",
-				 "Ctrl A", true));
+				 "M", true));
 		 animateMenu.addSeparator();
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
 				 Pipe.STEPBACKWARD, "Step backward a firing", "typed 4"));
@@ -528,29 +492,15 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
 				 453246, "Show the About Menu", "_"));
-		 
-		 
-		 
-
-		 /*JMenuItem aboutItem = helpMenu.add("About");
-		 aboutItem.addActionListener(this); // Help - About is implemented*/
-		 // differently
-
-		 /*URL iconURL = Thread.currentThread().getContextClassLoader()
-		 .getResource(CreateGui.imgPath + "About.png");
-		 if (iconURL != null) {
-			 aboutItem.setIcon(new ImageIcon(iconURL));
-		 }*/
 
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
 		 menuBar.add(viewMenu);
 		 menuBar.add(drawMenu);
 		 menuBar.add(animateMenu);
-		 
 		 menuBar.add(buildToolsMenu());
-		 // menuBar.add(experimentMenu);
 		 menuBar.add(helpMenu);
+		 
 		 setJMenuBar(menuBar);
 
 	}
@@ -662,8 +612,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Tokens
 		drawingToolBar.addSeparator();
-		drawingToolBar.add(tokenAction);
-		drawingToolBar.add(deleteTokenAction);
+		drawingToolBar.add(new ToggleButton(tokenAction));
+		drawingToolBar.add(new ToggleButton(deleteTokenAction));
 
 		// Create panel to put toolbars in
 		JPanel toolBarPanel = new JPanel();
@@ -674,8 +624,7 @@ public class GuiFrame extends JFrame implements Observer {
 		toolBarPanel.add(drawingToolBar);
 
 		// Create a toolBarPaneltmp usign broderlayout and a spacer to get
-		// toolbar to fill
-		// the screen
+		// toolbar to fill the screen
 		JPanel toolBarPaneltmp = new JPanel();
 		toolBarPaneltmp.setLayout(new BorderLayout());
 		toolBarPaneltmp.add(toolBarPanel, BorderLayout.WEST);
@@ -1684,26 +1633,14 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			// if (!isSelected()){
+			
 			this.setSelected(true);
 
 			// deselect other actions
-			/*
-			 * if (this != placeAction) { placeAction.setSelected(false); }
-			 */
 			if (this != transAction) {
 				transAction.setSelected(false);
 			}
-			/*
-			 * CB - Joakim Byg - Is not instansiated, since it is not needed in
-			 * the model if (this != timedtransAction) {
-			 * timedtransAction.setSelected(false); } EOC
-			 */
-			/*
-			 * CB - Jiri Srba - Not part of the model if (this != arcAction) {
-			 * arcAction.setSelected(false); } EOC
-			 */
-			/* CB - Joakim Byg - adding timed arcs */
+
 			if (this != timedArcAction) {
 				timedArcAction.setSelected(false);
 			}
@@ -1746,28 +1683,18 @@ public class GuiFrame extends JFrame implements Observer {
 			statusBar.changeText(typeID);
 
 			if ((typeID != Pipe.ARC) && (appView.createArc != null)) {
+
 				appView.createArc.delete();
 				appView.createArc = null;
 				appView.repaint();
-				// Also handel trasport arcs (if any)
 
+				// Also handel trasport arcs (if any)
 				if (appView.transportArcPart1 != null) {
 					appView.transportArcPart1.delete();
 					appView.transportArcPart1 = null;
 					appView.repaint();
 				}
 			}
-
-			// XXX - kyrke - Dont think this code will ever be runned, as the
-			// above code vill handel it
-			/* CB Joakim Byg - adding timed arc */
-			if ((typeID != Pipe.TAPNARC) && (appView.createArc != null)) {
-				appView.createArc.delete();
-				appView.createArc = null;
-				appView.repaint();
-
-			}
-			/* EOC */
 
 			if (typeID == Pipe.SELECT) {
 				// disable drawing to eliminate possiblity of connecting arc to
