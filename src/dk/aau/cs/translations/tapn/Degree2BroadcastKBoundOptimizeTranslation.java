@@ -9,7 +9,8 @@ import dk.aau.cs.model.NTA.NTA;
 import dk.aau.cs.model.NTA.SupQuery;
 import dk.aau.cs.model.NTA.TimedAutomaton;
 import dk.aau.cs.model.NTA.UPPAALQuery;
-import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastTranslation {
 	private final String usedExtraTokens = "usedExtraTokens";

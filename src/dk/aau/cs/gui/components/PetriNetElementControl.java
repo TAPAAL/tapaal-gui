@@ -6,9 +6,8 @@ import java.awt.Point;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
-import dk.aau.cs.gui.DrawingSurface;
-
 import pipe.gui.Pipe;
+import dk.aau.cs.gui.DrawingSurface;
 
 public abstract class PetriNetElementControl extends JComponent {
 	private static final long serialVersionUID = -3429746860537818157L;

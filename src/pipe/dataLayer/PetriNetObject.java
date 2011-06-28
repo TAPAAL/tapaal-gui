@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelListener;
 import java.util.EventListener;
 
 import javax.swing.JComponent;

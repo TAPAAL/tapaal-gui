@@ -13,10 +13,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.event.MouseInputAdapter;
 
+import pipe.gui.Pipe;
 import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.components.handlers.DragHandler;
-
-import pipe.gui.Pipe;
 
 public class TextLabel extends JLabel {
 	private static final long serialVersionUID = 2836463890383282585L;

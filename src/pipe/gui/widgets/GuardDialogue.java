@@ -30,10 +30,10 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.Bound.InfBound;
 
 public class GuardDialogue extends JPanel /*
  * implements ActionListener,

@@ -38,9 +38,9 @@ import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
-import javax.swing.SwingWorker.StateValue;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -61,13 +61,13 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingWorker;
 import dk.aau.cs.verification.batchProcessing.FileChangedEvent;
 import dk.aau.cs.verification.batchProcessing.StatusChangedEvent;
 import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 
 public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;

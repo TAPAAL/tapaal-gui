@@ -36,6 +36,7 @@ import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.IntBound;
@@ -47,7 +48,6 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.RequireException;
 
 public class PlaceEditorPanel extends javax.swing.JPanel {

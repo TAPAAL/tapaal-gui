@@ -35,11 +35,11 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
-import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 

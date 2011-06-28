@@ -1,29 +1,22 @@
 package pipe.gui.handler;
 
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
+
 import com.apple.eawt.AboutHandler;
+import com.apple.eawt.AppEvent.AboutEvent;
+import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
 
 import dk.aau.cs.debug.Logger;
-
-
-
-import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 
 /**
  * See http://developer.apple.com/library/mac/documentation/Java/Reference/JavaSE6_AppleExtensionsRef/api/com/apple/eawt/package-summary.html

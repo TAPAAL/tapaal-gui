@@ -3,6 +3,7 @@ package dk.aau.cs.gui.components;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;

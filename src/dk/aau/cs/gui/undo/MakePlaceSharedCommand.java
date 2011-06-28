@@ -2,6 +2,7 @@ package dk.aau.cs.gui.undo;
 
 import java.util.Hashtable;
 import java.util.List;
+
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;

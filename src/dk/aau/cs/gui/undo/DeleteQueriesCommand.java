@@ -3,7 +3,6 @@ package dk.aau.cs.gui.undo;
 import java.util.Collection;
 
 import pipe.dataLayer.TAPNQuery;
-
 import dk.aau.cs.gui.TabContent;
 
 public class DeleteQueriesCommand extends Command {
