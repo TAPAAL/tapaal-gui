@@ -3,7 +3,9 @@ package dk.aau.cs.translations;
 import java.util.Hashtable;
 import java.util.List;
 
-import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 // This class assumes that the transition is conservative

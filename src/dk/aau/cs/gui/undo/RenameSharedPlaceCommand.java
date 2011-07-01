@@ -2,8 +2,8 @@ package dk.aau.cs.gui.undo;
 
 import pipe.dataLayer.TAPNQuery;
 import dk.aau.cs.TCTL.visitors.RenameSharedPlaceVisitor;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.SharedPlacesAndTransitionsPanel.SharedPlacesListModel;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.SharedPlace;
 
 public class RenameSharedPlaceCommand extends Command {

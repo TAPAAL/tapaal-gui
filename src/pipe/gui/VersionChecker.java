@@ -7,7 +7,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import dk.aau.cs.debug.Logger;
-import dk.aau.cs.verification.BufferDrain;
 
 public class VersionChecker {
 	private final static String versionURL = "http://www.tapaal.net/fileadmin/version.txt";

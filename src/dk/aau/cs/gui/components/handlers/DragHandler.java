@@ -5,9 +5,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 
-import dk.aau.cs.gui.DrawingSurface;
-
 import pipe.gui.Grid;
+import dk.aau.cs.gui.DrawingSurface;
 
 public class DragHandler extends javax.swing.event.MouseInputAdapter {
 	private Point anchorPoint;

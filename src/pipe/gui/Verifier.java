@@ -11,8 +11,8 @@ import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification

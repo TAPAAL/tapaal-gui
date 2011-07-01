@@ -1,7 +1,6 @@
 package pipe.dataLayer;
 
 import pipe.gui.widgets.InclusionPlaces;
-
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.translations.ReductionOption;
 

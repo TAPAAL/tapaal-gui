@@ -52,7 +52,6 @@ import dk.aau.cs.gui.DrawingSurface;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import pipe.gui.Pipe;
 
 /**
  * The petrinet is drawn onto this frame.

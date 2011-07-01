@@ -8,12 +8,11 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.ArcHandler;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
  * <b>Arc</b> - Petri-Net Normal Arc Class

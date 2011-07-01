@@ -112,7 +112,7 @@ public class GuiFrame extends JFrame implements Observer {
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
-	private HelpAction showAboutAction, showAskQuestionAction, showReportBugAction, showFAQAction;
+	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
@@ -478,11 +478,13 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu helpMenu = new JMenu("Help");
 		 helpMenu.setMnemonic('H');
 		 
-		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
-				 454256, "See the TAPAAL FAQ", "_"));
+		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
+				 453257, "Visit the TAPAAK homepage", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
+		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
+				 454256, "See the TAPAAL FAQ", "_"));
 		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
 				 453256, "Ask a question about TAPAAL", "_"));
 		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
@@ -1970,6 +1972,17 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 	
+	public void showHomepage() {
+		try {
+			URI url = new URI("http://www.tapaal.net");
+			openBrowser(url);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			Logger.log("Error convering to URL");
+			e.printStackTrace();
+		}
+	}
+	
 	class HelpAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454639L;
@@ -1991,6 +2004,8 @@ public class GuiFrame extends JFrame implements Observer {
 				showReportBug();
 			} else if (this == showFAQAction){
 				showFAQ();
+			} else if (this == showHomepage){
+				showHomepage();
 			}
 		}
 		

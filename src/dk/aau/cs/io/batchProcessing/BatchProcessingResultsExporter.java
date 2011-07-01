@@ -5,7 +5,6 @@ import java.io.PrintStream;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
-
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 

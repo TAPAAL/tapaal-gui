@@ -3,7 +3,6 @@ package dk.aau.cs.verification;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
-
 import dk.aau.cs.util.Tuple;
 
 // TODO: MJ -- This interface is getting somewhat bloated -- Try to fix it

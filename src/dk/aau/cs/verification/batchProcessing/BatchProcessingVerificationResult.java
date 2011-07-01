@@ -1,8 +1,8 @@
 package dk.aau.cs.verification.batchProcessing;
 
+import pipe.dataLayer.TAPNQuery;
 import dk.aau.cs.verification.NullStats;
 import dk.aau.cs.verification.Stats;
-import pipe.dataLayer.TAPNQuery;
 
 public class BatchProcessingVerificationResult {
 	private String file;
