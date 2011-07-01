@@ -1,0 +1,13 @@
+TAPAAL 2.0.0 is licensed under three licenses.
+
+1. The GUI interface is licensed under Open Source License 3.0
+
+2. The translations part and TAPN libraries and net.tapaal parts are   
+   licensed under the Simplified BSD License. 
+   
+Source files can be downloaded from http://code.launchpad.com/tapaal
+
+3.The verification engine verifytapn is licensed under GLP v2 license:
+  http://www.gnu.org/licenses/gpl-2.0.txt
+  Source files can be downloaded from http://code.launchpad.com/verifytapn
+
