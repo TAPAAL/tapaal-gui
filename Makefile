@@ -54,12 +54,12 @@ JAVA        := $(JAVA_HOME)/bin/java
 JAVAC       := $(JAVA_HOME)/bin/javac
 JAR       := $(JAVA_HOME)/bin/jar
 
-MAINCLASS := TAPAAL
+MAINCLASS := $(SOURCE_DIR)/TAPAAL
 default: ${MAINCLASS}.class
 
 
-%.class : $(SOURCE_DIR)/%.java
-	$(JAVAC) $(JFLAGS) $(SOURCE_DIR)/$*.java
+%.class : %.java
+	$(JAVAC) $(JFLAGS) $*.java
 
 
 $(all_javas):
