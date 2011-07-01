@@ -54,7 +54,7 @@ JAVA        := $(JAVA_HOME)/bin/java
 JAVAC       := $(JAVA_HOME)/bin/javac
 JAR       := $(JAVA_HOME)/bin/jar
 
-MAINCLASS := $(SOURCE_DIR)/TAPAAL
+	MAINCLASS := $(SOURCE_DIR)/TAPAAL
 default: ${MAINCLASS}.class
 
 
@@ -65,10 +65,6 @@ default: ${MAINCLASS}.class
 $(all_javas):
 	$(FIND) $(SOURCE_DIR) -name '*.java' > $@
 	sed -ie 's#\.java#\.class#' $@
-
-
-buildsrc: clean
-	tar czf tapaal_version.orig.tar.gz Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar gtkjfilechooser.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/  xslt/ RunGui.java
 
 .PHONY : clean
 clean:
