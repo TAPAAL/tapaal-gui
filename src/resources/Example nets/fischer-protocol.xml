@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="Protocol" type="P/T net">
-<labels border="true" height="376" positionX="31" positionY="504" width="119">There are four places A, B, C, and CS 
+<labels border="true" height="377" positionX="32" positionY="505" width="120">There are four places A, B, C, and CS 
 and their dual places A_, B_, C_, and CS_
 There is always at most one token in
 either of the dual places representing
@@ -13,7 +13,7 @@ in place A represents the total number
 of processes.
 </labels>
 <place id="P0" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="A_" nameOffsetX="-5.0" nameOffsetY="33.0" positionX="150.0" positionY="120.0"/>
-<place id="P1" initialMarking="30" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="270.0" positionY="120.0"/>
+<place id="P1" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="270.0" positionY="120.0"/>
 <place id="P2" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="B" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="540.0" positionY="120.0"/>
 <place id="P3" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="B_" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="810.0" positionY="120.0"/>
 <place id="P4" initialMarking="1" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="udf" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="270.0"/>
@@ -36,10 +36,11 @@ of processes.
 <transition angle="0" id="T7" infiniteServer="false" name="Exit1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="420.0" priority="50" timed="true"/>
 <transition angle="0" id="T8" infiniteServer="false" name="Enter" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="570.0" priority="50" timed="true"/>
 <transition angle="0" id="T9" infiniteServer="false" name="Choose2A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="660.0" positionY="90.0" priority="50" timed="true"/>
+<transition angle="0" id="GenerateProcesses" infiniteServer="false" name="GenerateProcesses" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="0.0" priority="1" timed="false"/>
 <arc id="P0 to T9" inscription="[0,inf)" source="P0" target="T9" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="171" yCoord="120"/>
-<arcpath arcPointType="false" id="1" xCoord="217" yCoord="67"/>
-<arcpath arcPointType="false" id="2" xCoord="667" yCoord="67"/>
+<arcpath arcPointType="false" id="1" xCoord="218" yCoord="68"/>
+<arcpath arcPointType="false" id="2" xCoord="668" yCoord="68"/>
 <arcpath arcPointType="false" id="3" xCoord="672" yCoord="87"/>
 </arc>
 <arc id="P1 to T0" inscription="[0,inf)" source="P1" target="T0" type="timed">
@@ -72,9 +73,9 @@ of processes.
 </arc>
 <arc id="P3 to T12" inscription="[0,inf)" source="P3" target="T12" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="836" yCoord="131"/>
-<arcpath arcPointType="false" id="1" xCoord="967" yCoord="127"/>
-<arcpath arcPointType="false" id="2" xCoord="967" yCoord="757"/>
-<arcpath arcPointType="false" id="3" xCoord="427" yCoord="757"/>
+<arcpath arcPointType="false" id="1" xCoord="968" yCoord="128"/>
+<arcpath arcPointType="false" id="2" xCoord="968" yCoord="758"/>
+<arcpath arcPointType="false" id="3" xCoord="428" yCoord="758"/>
 <arcpath arcPointType="false" id="4" xCoord="402" yCoord="687"/>
 </arc>
 <arc id="P3 to T4" inscription="[0,2]" source="P3" target="T4" type="timed">
@@ -83,12 +84,12 @@ of processes.
 </arc>
 <arc id="P4 to T0" inscription="[0,inf)" source="P4" target="T0" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="394" yCoord="268"/>
-<arcpath arcPointType="false" id="1" xCoord="367" yCoord="217"/>
+<arcpath arcPointType="false" id="1" xCoord="368" yCoord="218"/>
 <arcpath arcPointType="false" id="2" xCoord="402" yCoord="147"/>
 </arc>
 <arc id="P4 to T15" inscription="[0,inf)" source="P4" target="T15" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="416" yCoord="285"/>
-<arcpath arcPointType="false" id="1" xCoord="860" yCoord="401"/>
+<arcpath arcPointType="false" id="1" xCoord="861" yCoord="402"/>
 <arcpath arcPointType="false" id="2" xCoord="1041" yCoord="377"/>
 </arc>
 <arc id="P4 to T16" inscription="[0,inf)" source="P4" target="T16" type="timed">
@@ -97,7 +98,7 @@ of processes.
 </arc>
 <arc id="P4 to T2" inscription="[0,inf)" source="P4" target="T2" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="416" yCoord="286"/>
-<arcpath arcPointType="false" id="1" xCoord="487" yCoord="307"/>
+<arcpath arcPointType="false" id="1" xCoord="488" yCoord="308"/>
 <arcpath arcPointType="false" id="2" xCoord="552" yCoord="417"/>
 </arc>
 <arc id="P4 to T5" inscription="[0,inf)" source="P4" target="T5" type="timed">
@@ -106,7 +107,7 @@ of processes.
 </arc>
 <arc id="P5 to T16" inscription="[0,inf)" source="P5" target="T16" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="149" yCoord="423"/>
-<arcpath arcPointType="false" id="1" xCoord="77" yCoord="377"/>
+<arcpath arcPointType="false" id="1" xCoord="78" yCoord="378"/>
 <arcpath arcPointType="false" id="2" xCoord="42" yCoord="282"/>
 </arc>
 <arc id="P6 to T12" inscription="[0,inf)" source="P6" target="T12" type="timed">
@@ -139,18 +140,18 @@ of processes.
 </arc>
 <arc id="P8 to T13" inscription="[0,inf)" source="P8" target="T13" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="821" yCoord="596"/>
-<arcpath arcPointType="false" id="1" xCoord="817" yCoord="727"/>
-<arcpath arcPointType="false" id="2" xCoord="487" yCoord="727"/>
+<arcpath arcPointType="false" id="1" xCoord="818" yCoord="728"/>
+<arcpath arcPointType="false" id="2" xCoord="488" yCoord="728"/>
 <arcpath arcPointType="false" id="3" xCoord="462" yCoord="687"/>
 </arc>
 <arc id="P8 to T15" inscription="[0,inf)" source="P8" target="T15" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="836" yCoord="578"/>
-<arcpath arcPointType="false" id="1" xCoord="1037" yCoord="527"/>
+<arcpath arcPointType="false" id="1" xCoord="1038" yCoord="528"/>
 <arcpath arcPointType="false" id="2" xCoord="1047" yCoord="387"/>
 </arc>
 <arc id="P8 to T3" inscription="[0,inf)" source="P8" target="T3" type="timed">
-<arcpath arcPointType="false" id="0" xCoord="827" yCoord="568"/>
-<arcpath arcPointType="false" id="1" xCoord="922" yCoord="352"/>
+<arcpath arcPointType="false" id="0" xCoord="828" yCoord="568"/>
+<arcpath arcPointType="false" id="1" xCoord="923" yCoord="353"/>
 <arcpath arcPointType="false" id="2" xCoord="676" yCoord="312"/>
 </arc>
 <arc id="P8 to T8" inscription="(2,inf)" source="P8" target="T8" type="timed">
@@ -163,12 +164,12 @@ of processes.
 </arc>
 <arc id="T0 to P4" inscription="1" source="T0" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="406" yCoord="137"/>
-<arcpath arcPointType="false" id="1" xCoord="457" yCoord="217"/>
+<arcpath arcPointType="false" id="1" xCoord="458" yCoord="218"/>
 <arcpath arcPointType="false" id="2" xCoord="411" yCoord="270"/>
 </arc>
 <arc id="T10 to P2" inscription="1" source="T10" target="P2" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="672" yCoord="177"/>
-<arcpath arcPointType="false" id="1" xCoord="667" yCoord="157"/>
+<arcpath arcPointType="false" id="1" xCoord="668" yCoord="158"/>
 <arcpath arcPointType="false" id="2" xCoord="566" yCoord="135"/>
 </arc>
 <arc id="T10 to P8" inscription="1" source="T10" target="P8" type="normal">
@@ -177,9 +178,9 @@ of processes.
 </arc>
 <arc id="T11 to P6" inscription="1" source="T11" target="P6" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="672" yCoord="447"/>
-<arcpath arcPointType="false" id="1" xCoord="667" yCoord="547"/>
-<arcpath arcPointType="false" id="2" xCoord="307" yCoord="547"/>
-<arcpath arcPointType="false" id="3" xCoord="290" yCoord="569"/>
+<arcpath arcPointType="false" id="1" xCoord="668" yCoord="548"/>
+<arcpath arcPointType="false" id="2" xCoord="308" yCoord="548"/>
+<arcpath arcPointType="false" id="3" xCoord="291" yCoord="570"/>
 </arc>
 <arc id="T11 to P8" inscription="1" source="T11" target="P8" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="676" yCoord="432"/>
@@ -191,13 +192,13 @@ of processes.
 </arc>
 <arc id="T12 to P2" inscription="1" source="T12" target="P2" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="396" yCoord="677"/>
-<arcpath arcPointType="false" id="1" xCoord="172" yCoord="622"/>
-<arcpath arcPointType="false" id="2" xCoord="97" yCoord="247"/>
+<arcpath arcPointType="false" id="1" xCoord="173" yCoord="623"/>
+<arcpath arcPointType="false" id="2" xCoord="98" yCoord="248"/>
 <arcpath arcPointType="false" id="3" xCoord="537" yCoord="135"/>
 </arc>
 <arc id="T12 to P4" inscription="1" source="T12" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="402" yCoord="657"/>
-<arcpath arcPointType="false" id="1" xCoord="487" yCoord="487"/>
+<arcpath arcPointType="false" id="1" xCoord="488" yCoord="488"/>
 <arcpath arcPointType="false" id="2" xCoord="407" yCoord="295"/>
 </arc>
 <arc id="T13 to P1" inscription="1" source="T13" target="P1" type="normal">
@@ -206,12 +207,12 @@ of processes.
 </arc>
 <arc id="T13 to P4" inscription="1" source="T13" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="462" yCoord="657"/>
-<arcpath arcPointType="false" id="1" xCoord="517" yCoord="487"/>
+<arcpath arcPointType="false" id="1" xCoord="518" yCoord="488"/>
 <arcpath arcPointType="false" id="2" xCoord="409" yCoord="295"/>
 </arc>
 <arc id="T13 to P5" inscription="1" source="T13" target="P5" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="456" yCoord="677"/>
-<arcpath arcPointType="false" id="1" xCoord="202" yCoord="592"/>
+<arcpath arcPointType="false" id="1" xCoord="203" yCoord="593"/>
 <arcpath arcPointType="false" id="2" xCoord="165" yCoord="446"/>
 </arc>
 <arc id="T14 to P1" inscription="1" source="T14" target="P1" type="normal">
@@ -220,7 +221,7 @@ of processes.
 </arc>
 <arc id="T14 to P4" inscription="1" source="T14" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="522" yCoord="657"/>
-<arcpath arcPointType="false" id="1" xCoord="547" yCoord="487"/>
+<arcpath arcPointType="false" id="1" xCoord="548" yCoord="488"/>
 <arcpath arcPointType="false" id="2" xCoord="410" yCoord="294"/>
 </arc>
 <arc id="T14 to P6" inscription="1" source="T14" target="P6" type="normal">
@@ -229,20 +230,20 @@ of processes.
 </arc>
 <arc id="T15 to P3" inscription="1" source="T15" target="P3" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="1047" yCoord="357"/>
-<arcpath arcPointType="false" id="1" xCoord="1051" yCoord="61"/>
-<arcpath arcPointType="false" id="2" xCoord="826" yCoord="76"/>
+<arcpath arcPointType="false" id="1" xCoord="1052" yCoord="62"/>
+<arcpath arcPointType="false" id="2" xCoord="827" yCoord="77"/>
 <arcpath arcPointType="false" id="3" xCoord="823" yCoord="117"/>
 </arc>
 <arc id="T15 to P4" inscription="1" source="T15" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="1042" yCoord="367"/>
-<arcpath arcPointType="false" id="1" xCoord="902" yCoord="302"/>
+<arcpath arcPointType="false" id="1" xCoord="903" yCoord="303"/>
 <arcpath arcPointType="false" id="2" xCoord="416" yCoord="282"/>
 </arc>
 <arc id="T16 to P2" inscription="1" source="T16" target="P2" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="42" yCoord="252"/>
-<arcpath arcPointType="false" id="1" xCoord="77" yCoord="62"/>
-<arcpath arcPointType="false" id="2" xCoord="572" yCoord="32"/>
-<arcpath arcPointType="false" id="3" xCoord="554" yCoord="117"/>
+<arcpath arcPointType="false" id="1" xCoord="78" yCoord="63"/>
+<arcpath arcPointType="false" id="2" xCoord="573" yCoord="33"/>
+<arcpath arcPointType="false" id="3" xCoord="555" yCoord="117"/>
 </arc>
 <arc id="T16 to P4" inscription="1" source="T16" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="47" yCoord="262"/>
@@ -254,7 +255,7 @@ of processes.
 </arc>
 <arc id="T3 to P5" inscription="1" source="T3" target="P5" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="666" yCoord="317"/>
-<arcpath arcPointType="false" id="1" xCoord="217" yCoord="367"/>
+<arcpath arcPointType="false" id="1" xCoord="218" yCoord="368"/>
 <arcpath arcPointType="false" id="2" xCoord="171" yCoord="420"/>
 </arc>
 <arc id="T3 to P8" inscription="1" source="T3" target="P8" type="normal">
@@ -271,8 +272,8 @@ of processes.
 </arc>
 <arc id="T5 to P4" inscription="1" source="T5" target="P4" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="282" yCoord="417"/>
-<arcpath arcPointType="false" id="1" xCoord="337" yCoord="277"/>
-<arcpath arcPointType="false" id="2" xCoord="387" yCoord="280"/>
+<arcpath arcPointType="false" id="1" xCoord="338" yCoord="278"/>
+<arcpath arcPointType="false" id="2" xCoord="387" yCoord="281"/>
 </arc>
 <arc id="T7 to P1" inscription="1" source="T7" target="P1" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="402" yCoord="417"/>
@@ -288,13 +289,19 @@ of processes.
 </arc>
 <arc id="T9 to P1" inscription="1" source="T9" target="P1" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="667" yCoord="97"/>
-<arcpath arcPointType="false" id="1" xCoord="307" yCoord="97"/>
-<arcpath arcPointType="false" id="2" xCoord="290" yCoord="119"/>
+<arcpath arcPointType="false" id="1" xCoord="308" yCoord="98"/>
+<arcpath arcPointType="false" id="2" xCoord="291" yCoord="120"/>
 </arc>
 <arc id="T9 to P8" inscription="1" source="T9" target="P8" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="672" yCoord="117"/>
 <arcpath arcPointType="false" id="1" xCoord="817" yCoord="567"/>
 </arc>
+<arc id="GenerateProcesses to P1" inscription="1" source="GenerateProcesses" target="P1" type="normal">
+<arcpath arcPointType="false" id="0" xCoord="222" yCoord="27"/>
+<arcpath arcPointType="false" id="1" xCoord="274" yCoord="118"/>
+</arc>
 </net>
-<query active="true" capacity="0" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Mutual Exclusion Violation" query="EF (Protocol.CS&gt;=2 or Protocol.CS_&gt;=2 or (Protocol.CS&gt;=1 and Protocol.CS_&gt;=1))" reductionOption="VerifyTAPN" searchOption="BFS" symmetry="true" traceOption="NONE"/>
+<query active="true" capacity="20" discreteInclusion="true" extrapolationOption="null" hashTableSize="null" inclusionPlaces="Protocol.A,Protocol.A_,Protocol.B_,Protocol.C_,Protocol.CS,Protocol.CS_,Protocol.udf" name="Mutual Exclusion 20 Processes" query="AG (Protocol.CS&lt;=1 and Protocol.CS_&lt;=1 and (Protocol.CS&lt;=0 or Protocol.CS_&lt;=0))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="NONE"/>
+<query active="true" capacity="30" discreteInclusion="true" extrapolationOption="null" hashTableSize="null" inclusionPlaces="Protocol.A,Protocol.A_,Protocol.B_,Protocol.C_,Protocol.CS,Protocol.CS_,Protocol.udf" name="Mutual Exclusion 30 Processes" query="AG (Protocol.CS&lt;=1 and Protocol.CS_&lt;=1 and (Protocol.CS&lt;=0 or Protocol.CS_&lt;=0))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="NONE"/>
+<query active="true" capacity="40" discreteInclusion="true" extrapolationOption="null" hashTableSize="null" inclusionPlaces="Protocol.A,Protocol.A_,Protocol.B_,Protocol.C_,Protocol.CS,Protocol.CS_,Protocol.udf" name="Mutual Exclusion 40 Processes" query="AG (Protocol.CS&lt;=1 and Protocol.CS_&lt;=1 and (Protocol.CS&lt;=0 or Protocol.CS_&lt;=0))" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="NONE"/>
 </pnml>

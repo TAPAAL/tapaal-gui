@@ -1,0 +1,28 @@
+#!/bin/sh
+
+##Overwrite verifyta path:
+#verifyta=/path/to/verifyta
+
+
+if [ -z "$verifyta" ]; then
+        #Search path for verifyta
+	if [ -e /Applications/verifyta ]; then
+	        export verifyta=/Applications/verifyta
+	fi 
+fi
+
+if [ -f $HOME/.bash_profile ]; then
+  . $HOME/.bash_profile
+fi
+
+if [ -f $HOME/.profile ]; then
+  . $HOME/.profile
+fi
+
+if [ -z "$verifyta" ]; then
+        #Search path for verifyta
+        export verifyta=`which verifyta`
+fi
+
+
+( cd `dirname "$0"`; export verifytapn=$PWD/lib/verifytapn64; cd lib; java -cp .:* TAPAAL)

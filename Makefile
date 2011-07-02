@@ -54,21 +54,17 @@ JAVA        := $(JAVA_HOME)/bin/java
 JAVAC       := $(JAVA_HOME)/bin/javac
 JAR       := $(JAVA_HOME)/bin/jar
 
-MAINCLASS := TAPAAL
+	MAINCLASS := $(SOURCE_DIR)/TAPAAL
 default: ${MAINCLASS}.class
 
 
-%.class : $(SOURCE_DIR)/%.java
-	$(JAVAC) $(JFLAGS) $(SOURCE_DIR)/$*.java
+%.class : %.java
+	$(JAVAC) $(JFLAGS) $*.java
 
 
 $(all_javas):
 	$(FIND) $(SOURCE_DIR) -name '*.java' > $@
 	sed -ie 's#\.java#\.class#' $@
-
-
-buildsrc: clean
-	tar czf tapaal_version.orig.tar.gz Makefile pipe/ jpowergraph-0.2-common.jar jpowergraph-0.2-swing.jar gtkjfilechooser.jar schema/ jpowergraph/ java_cup/ jama/ Images/ expressions/  Example\ nets/ Docs/ dk/ cfg/ run-unix/  xslt/ RunGui.java
 
 .PHONY : clean
 clean:
@@ -83,7 +79,7 @@ clean:
 release: clean 
 	@mkdir $(OUTPUT_DIR)
 	@mkdir $(RELEASE_DIR)
-	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ '$(SOURCE_DIR)/$(MAINCLASS).java'
+	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ '$(MAINCLASS).java'
 	cp -R $(OUTPUT_DIR)/* '$(RELEASE_DIR)'
 	cp -R '$(RESOURCE_DIR)' '$(RELEASE_DIR)'
 	cp -R $(DEPEND_DIR)/* '$(RELEASE_DIR)'
