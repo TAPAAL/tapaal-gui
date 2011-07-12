@@ -158,6 +158,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		sharedCheckBox.setSelected(place.underlyingPlace().isShared());
 
 		nameTextField.setText(place.underlyingPlace().name());
+		nameTextField.selectAll();
 		attributesCheckBox.setSelected(place.getAttributesVisible());
 
 		setMarking(place.underlyingPlace().numberOfTokens());
