@@ -233,4 +233,12 @@ public class ConstantStore {
 		constants.set(currentIndex, constants.get(newIndex));
 		constants.set(newIndex, temp);
 	}
+
+	public Constant getConstantByIndex(int index) {
+		return constants.get(index);
+	}
+
+	public int getIndexOf(Constant constant) {
+		return constants.indexOf(constant);
+	}
 }

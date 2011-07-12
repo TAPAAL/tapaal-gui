@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -28,6 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -39,7 +39,7 @@ public class ConstantsPane extends JPanel {
 	private JPanel buttonsPanel;
 
 	private JList constantsList;
-	private DefaultListModel listModel;
+	private ConstantsListModel listModel;
 	private JButton editBtn;
 	private JButton removeBtn;
 
@@ -53,7 +53,7 @@ public class ConstantsPane extends JPanel {
 		constantsPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 
-		listModel = new DefaultListModel();
+		listModel = new ConstantsListModel(parent.network());
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
 			}
@@ -127,7 +127,7 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
 
-		showConstants();
+		//showConstants();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
@@ -175,18 +175,10 @@ public class ConstantsPane extends JPanel {
 		if (model == null)
 			return;
 
-		listModel.removeAllElements();
-		addConstantsToPanel(model);
-		constantsList.validate();
+		listModel.updateAll();
 
 	}
 
-	private void addConstantsToPanel(TimedArcPetriNetNetwork model) {
-		for (Constant constant : model.constants()) {
-			listModel.addElement(constant);
-		}
-
-	}
 
 	private void addConstantsComponents() {
 		constantsScroller = new JScrollPane(constantsList);
@@ -268,7 +260,7 @@ public class ConstantsPane extends JPanel {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 
-		showConstants();
+		//showConstants();
 	}
 
 	protected void removeConstant(String name) {
@@ -282,7 +274,11 @@ public class ConstantsPane extends JPanel {
 		} else
 			parent.drawingSurface().getUndoManager().addNewEdit(edit);
 
-		showConstants();
+		//showConstants();
+	}
+
+	public void setNetwork(TimedArcPetriNetNetwork tapnNetwork) {
+		listModel.setNetwork(tapnNetwork);
 	}
 
 }

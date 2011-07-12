@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
+import dk.aau.cs.model.tapn.event.ConstantEvent;
+import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNetNetwork {
@@ -15,7 +18,9 @@ public class TimedArcPetriNetNetwork {
 	
 	private NetworkMarking currentMarking;
 	private ConstantStore constants;
-
+	
+	private List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
+	
 	public TimedArcPetriNetNetwork() {
 		this(new ConstantStore());
 	}
@@ -24,6 +29,14 @@ public class TimedArcPetriNetNetwork {
 		this.constants = constants;
 		this.currentMarking = new NetworkMarking();
 		buildConstraints();
+	}
+	
+	public void addConstantsListener(ConstantsListener listener){
+		constantsListeners.add(listener);
+	}
+	
+	public void removeConstantsListener(ConstantsListener listener){
+		constantsListeners.remove(listener);
 	}
 
 	public void add(TimedArcPetriNet tapn) {
@@ -139,19 +152,41 @@ public class TimedArcPetriNetNetwork {
 		constants.buildConstraints(this);
 	}
 
+	// TODO: Command is a GUI concern. This should not know anything about it
 	public Command addConstant(String name, int val) {
-		return constants.addConstant(name, val);
+		Command cmd = constants.addConstant(name, val); 
+		Constant constant = constants.getConstantByName(name);
+		fireConstantAdded(constant);
+		return cmd;
 	}
 
+	private void fireConstantAdded(Constant constant) {
+		for(ConstantsListener listener : constantsListeners){
+			listener.ConstantAdded(new ConstantEvent(constant, constants.getIndexOf(constant)));
+		}
+	}
+
+
 	public Command removeConstant(String name) {
-		return constants.removeConstant(name);
+		Constant constant = constants.getConstantByName(name);
+		int index = constants.getIndexOf(constant);
+		Command cmd = constants.removeConstant(name);
+		for(ConstantsListener listener : constantsListeners){
+			listener.ConstantRemoved(new ConstantEvent(constant, index));
+		}
+		return cmd;
 	}
 
 	public Command updateConstant(String oldName, Constant constant) {
+		Constant old = constants.getConstantByName(oldName);
+		int index = constants.getIndexOf(old);
 		Command edit = constants.updateConstant(oldName, constant, this);
 
 		if (edit != null) {
 			updateGuardsWithNewConstant(oldName, constant);
+			for(ConstantsListener listener : constantsListeners){
+				listener.ConstantChanged(new ConstantChangedEvent(old, constant, index));
+			}
 		}
 
 		return edit;
@@ -216,11 +251,16 @@ public class TimedArcPetriNetNetwork {
 	public void setConstants(Iterable<Constant> constants) {
 		for (Constant c : constants) {
 			this.constants.add(c);
+			fireConstantAdded(c);			
 		}
 	}
 
 	public Constant getConstant(String constantName) {
 		return constants.getConstantByName(constantName);
+	}
+	
+	public Constant getConstant(int index){
+		return constants.getConstantByIndex(index);
 	}
 
 	public TimedArcPetriNet getTAPNByName(String name) {

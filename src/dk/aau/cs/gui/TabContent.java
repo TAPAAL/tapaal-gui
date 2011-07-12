@@ -132,7 +132,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void updateConstantsList() {
-		constantsPanel.showConstants();
+		//constantsPanel.showConstants();
 	}
 	public void updateQueryList() {
 		queries.updateQueryButtons();
@@ -378,7 +378,7 @@ public class TabContent extends JSplitPane {
 
 	public void setConstants(Iterable<Constant> constants) {
 		tapnNetwork.setConstants(constants);
-		constantsPanel.showConstants();
+		//constantsPanel.showConstants();
 	}
 
 	public void setupNameGeneratorsFromTemplates(Iterable<Template> templates) {
@@ -396,6 +396,7 @@ public class TabContent extends JSplitPane {
 
 		sharedPTPanel.setNetwork(network);
 		templateExplorer.updateTemplateList();
+		constantsPanel.setNetwork(tapnNetwork);
 	}
 
 	public void swapTemplates(int currentIndex, int newIndex) {
