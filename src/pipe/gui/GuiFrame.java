@@ -348,8 +348,8 @@ public class GuiFrame extends JFrame implements Observer {
 				for (int i = 0; i < nets.length; i++) {
 					if (nets[i].toLowerCase().endsWith(".xml")) {
 						//addMenuItem(exampleMenu, new ExampleFileAction(nets[i], (k < 10) ? "ctrl " + (k++) : null));
-						InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + nets[i]);
-						ExampleFileAction tmp = new ExampleFileAction(file, nets[i].replace(".xml", ""), (k < 10) ? "ctrl " + (k++) : null);
+						
+						ExampleFileAction tmp = new ExampleFileAction(nets[i], nets[i].replace(".xml", ""), (k < 10) ? "ctrl " + (k++) : null);
 						addMenuItem(exampleMenu, tmp);
 					}
 				}
@@ -1029,10 +1029,11 @@ public class GuiFrame extends JFrame implements Observer {
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
+		
 		if (namePrefix == null || namePrefix == "") {
-			name = "New " + namePrefix +  " " + (newNameCounter++) + ".xml";
-		} else {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
+		} else {
+			name = namePrefix + ".xml";
 		}
 
 		TabContent tab = CreateGui.getTab(freeSpace);
@@ -1524,13 +1525,13 @@ public class GuiFrame extends JFrame implements Observer {
 		 * 
 		 */
 		private static final long serialVersionUID = -5983638671592349736L;
-		private InputStream filename;
+		private String filename;
 		private String name;
 
-		ExampleFileAction(InputStream file, String name, String keyStroke) {
+		ExampleFileAction(String file, String name, String keyStroke) {
 			super(name.replace(".xml", ""), "Open example file \""
 					+ name.replace(".xml", "") + "\"", keyStroke);
-			filename = file;// .getAbsolutePath();
+			this.filename = file;
 			putValue(SMALL_ICON, new ImageIcon(Thread.currentThread()
 					.getContextClassLoader().getResource(
 							CreateGui.imgPath + "Net.png")));
@@ -1538,7 +1539,8 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			createNewTabFromFile(filename, name);
+			InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/Example nets/" + filename);
+			createNewTabFromFile(file, name);
 		}
 
 	}
