@@ -5,9 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
+import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.NumberFormatter;
 
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
@@ -51,6 +56,12 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		// Set up initial values
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		valueSpinner.setModel(spinnerModel);
+		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner, "##"));
+		
+		// Disable nonnumeric keys in value spinner
+		JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
 		nameTextField.setText(oldName);
 
 		// wire up buttons
