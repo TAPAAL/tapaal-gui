@@ -16,17 +16,14 @@ public class ConstantsListModel extends AbstractListModel {
 
 	public ConstantsListModel(TimedArcPetriNetNetwork network){
 		listener = new ConstantsListener() {
-			@Override
 			public void ConstantRemoved(ConstantEvent e) {
 				fireIntervalRemoved(this, e.index(), e.index());
 			}
 			
-			@Override
 			public void ConstantChanged(ConstantChangedEvent e) {
 				fireContentsChanged(this, e.index(), e.index());
 			}
 			
-			@Override
 			public void ConstantAdded(ConstantEvent e) {
 				fireIntervalAdded(this, e.index(), e.index());
 			}
