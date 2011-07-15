@@ -42,12 +42,10 @@ public class ConstantsListModel extends AbstractListModel {
 		fireContentsChanged(this,0, Integer.MAX_VALUE);
 	}
 	
-	@Override
 	public Object getElementAt(int index) {
 		return network.getConstant(index);
 	}
 
-	@Override
 	public int getSize() {
 		return network.constants().size();
 	}
