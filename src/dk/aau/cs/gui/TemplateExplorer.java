@@ -36,6 +36,7 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.Zoomer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
@@ -213,7 +214,7 @@ public class TemplateExplorer extends JPanel {
 					int index = listModel.size();
 					undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
 					parent.addTemplate(template);
-					parent.drawingSurface().setModel(template.guiModel(), template.model());
+					parent.drawingSurface().setModel(template.guiModel(), template.model(), template.zoomer());
 				}
 			}
 		});
@@ -411,7 +412,7 @@ public class TemplateExplorer extends JPanel {
 	public Template createNewTemplate(String name) {
 		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 
-		return new Template(tapn, new DataLayer());
+		return new Template(tapn, new DataLayer(), new Zoomer());
 	}
 
 	public void removeTemplate(int index, Template template) {
@@ -427,7 +428,7 @@ public class TemplateExplorer extends JPanel {
 	public void openSelectedTemplate() {
 		Template tapn = selectedModel();
 		if (tapn != null) {
-			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model());
+			parent.drawingSurface().setModel(tapn.guiModel(), tapn.model(), tapn.zoomer());
 		}
 	}
 

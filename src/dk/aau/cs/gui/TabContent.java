@@ -27,6 +27,7 @@ import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
@@ -41,6 +42,7 @@ public class TabContent extends JSplitPane {
 
 	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
 	private JScrollPane drawingSurfaceScroller;
 	private DrawingSurfaceImpl drawingSurface;
 	private File appFile;
@@ -66,6 +68,7 @@ public class TabContent extends JSplitPane {
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
 			guiModels.put(net, new DataLayer());
+			zoomLevels.put(net, new Zoomer());
 		}
 
 		this.drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
@@ -313,7 +316,7 @@ public class TabContent extends JSplitPane {
 	public Iterable<Template> allTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
-			list.add(new Template(net, guiModels.get(net)));
+			list.add(new Template(net, guiModels.get(net), zoomLevels.get(net)));
 		}
 		return list;
 	}
@@ -321,7 +324,7 @@ public class TabContent extends JSplitPane {
 	public Iterable<Template> activeTemplates() {
 		ArrayList<Template> list = new ArrayList<Template>();
 		for (TimedArcPetriNet net : tapnNetwork.activeTemplates()) {
-			list.add(new Template(net, guiModels.get(net)));
+			list.add(new Template(net, guiModels.get(net), zoomLevels.get(net)));
 		}
 		return list;
 	}
@@ -338,6 +341,7 @@ public class TabContent extends JSplitPane {
 	public void addTemplate(Template template) {
 		tapnNetwork.add(template.model());
 		guiModels.put(template.model(), template.guiModel());
+		zoomLevels.put(template.model(), template.zoomer());
 		templateExplorer.updateTemplateList();
 	}
 	
@@ -348,6 +352,7 @@ public class TabContent extends JSplitPane {
 	public void removeTemplate(Template template) {
 		tapnNetwork.remove(template.model());
 		guiModels.remove(template.model());
+		zoomLevels.remove(template.model());
 		templateExplorer.updateTemplateList();
 	}
 
@@ -356,7 +361,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void setCurrentTemplate(Template template) {
-		drawingSurface.setModel(template.guiModel(), template.model());
+		drawingSurface.setModel(template.guiModel(), template.model(), template.zoomer());
 	}
 
 	public Iterable<TAPNQuery> queries() {
@@ -392,6 +397,7 @@ public class TabContent extends JSplitPane {
 		guiModels.clear();
 		for(Template template : templates){
 			addGuiModel(template.model(), template.guiModel());
+			zoomLevels.put(template.model(), template.zoomer());
 		}
 
 		sharedPTPanel.setNetwork(network);

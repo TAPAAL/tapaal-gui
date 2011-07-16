@@ -1,16 +1,18 @@
 package pipe.dataLayer;
 
+import pipe.gui.Zoomer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 
 public class Template {
 	private TimedArcPetriNet net;
 	private DataLayer guiModel;
+	private Zoomer zoomer;
 	
-
-	public Template(TimedArcPetriNet net, DataLayer guiModel) {
+	public Template(TimedArcPetriNet net, DataLayer guiModel, Zoomer zoomer) {
 		this.net = net;
 		this.guiModel = guiModel;
+		this.zoomer = zoomer;
 	}
 
 	@Override
@@ -42,6 +44,10 @@ public class Template {
 	public Template copy() {
 		TimedArcPetriNet tapn = net.copy();
 		tapn.setName(tapn.name() + "Copy");
-		return new Template(tapn, guiModel.copy(tapn));
+		return new Template(tapn, guiModel.copy(tapn), new Zoomer(zoomer.getPercent()));
+	}
+
+	public Zoomer zoomer() {
+		return zoomer;
 	}
 }

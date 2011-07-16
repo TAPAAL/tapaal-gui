@@ -10,8 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import pipe.gui.CreateGui;

@@ -108,7 +108,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		setAutoscrolls(true);
 		setBackground(Pipe.ELEMENT_FILL_COLOUR);
 
-		zoomControl = new Zoomer(100, app);
+		zoomControl = new Zoomer(100);
 
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		mouseHandler = new MouseHandler(this, dataLayer);
@@ -136,7 +136,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		return model;
 	}
 
-	public void setModel(DataLayer guiModel, TimedArcPetriNet model) {
+	public void setModel(DataLayer guiModel, TimedArcPetriNet model, Zoomer zoomer) {
 		this.selection.disableSelection();
 		
 		nameGenerator.add(model);
@@ -144,6 +144,8 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		this.undoManager.setModel(guiModel);
 		this.guiModel = guiModel;
 		this.model = model;
+		this.zoomControl = zoomer;
+		CreateGui.getApp().updateZoomCombo();
 
 		if (animationmode) {
 			CreateGui.getAnimator().highlightEnabledTransitions();
@@ -154,10 +156,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			add(pnObject);
 		}
-		
+				
 		if(CreateGui.getApp().getMode() == Pipe.SELECT)
 			this.selection.enableSelection();
-		
 		
 		repaintAll();
 	}

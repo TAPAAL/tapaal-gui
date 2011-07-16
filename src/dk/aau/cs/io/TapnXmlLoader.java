@@ -44,6 +44,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomable;
+import pipe.gui.Zoomer;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -293,7 +294,7 @@ public class TapnXmlLoader {
 		nameGenerator.add(tapn);
 		
 		DataLayer guiModel = new DataLayer();
-		Template template = new Template(tapn, guiModel);
+		Template template = new Template(tapn, guiModel, new Zoomer());
 
 		NodeList nodeList = tapnNode.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {

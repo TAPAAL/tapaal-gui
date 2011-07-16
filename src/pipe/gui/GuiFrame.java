@@ -177,7 +177,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		
 		if (isMac()){ 
-			SpecialMacHandler macHandler = new SpecialMacHandler(); // Load the special mac handler
+			new SpecialMacHandler();
 		}
 
 		this.setIconImage(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(CreateGui.imgPath + "icon.png")).getImage());
@@ -1001,7 +1001,7 @@ public class GuiFrame extends JFrame implements Observer {
 		appTab.setSelectedIndex(freeSpace);
 
 		String templateName = tab.drawingSurface().getNameGenerator().getNewTemplateName();
-		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer());
+		Template template = new Template(new TimedArcPetriNet(templateName), new DataLayer(), new Zoomer());
 		tab.addTemplate(template);
 
 		tab.setCurrentTemplate(template);
@@ -1846,12 +1846,9 @@ public class GuiFrame extends JFrame implements Observer {
 	class ViewAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454638L;
-		private int typeID;
-
 		ViewAction(String name, int typeID, String tooltip, String keystroke,
 				boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
-			this.typeID = typeID;
 		}
 		
 		
@@ -1988,11 +1985,8 @@ public class GuiFrame extends JFrame implements Observer {
 	class HelpAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454639L;
-		private int typeID;
-		
 		HelpAction(String name, int typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke, false);
-			this.typeID = typeID;
 		}
 		
 		

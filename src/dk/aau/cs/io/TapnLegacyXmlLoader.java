@@ -43,6 +43,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomable;
+import pipe.gui.Zoomer;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -467,7 +468,7 @@ public class TapnLegacyXmlLoader {
 			parseElementAsOldFormat(node, tapn.name(), network.marking());
 		}
 
-		return new Template(tapn, guiModel);
+		return new Template(tapn, guiModel, new Zoomer());
 	}
 
 	private void parseElementAsOldFormat(Node node, String templateName, TimedMarking marking) throws FormatException {
