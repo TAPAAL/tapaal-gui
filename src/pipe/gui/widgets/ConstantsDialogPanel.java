@@ -54,11 +54,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		// Set up initial values
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		valueSpinner.setModel(spinnerModel);
-		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner, "##"));
-		
-		// Disable nonnumeric keys in value spinner
-		JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
-		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+		setupValueEditor();
 
 		nameTextField.setText(oldName);
 
@@ -79,6 +75,14 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		rootPane.setDefaultButton(okButton);
 	}
 
+	private void setupValueEditor() {
+		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner));
+		
+		// Disable nonnumeric keys in value spinner
+		JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
+		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+	}
+
 	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model,
 			Constant constant) {
 		this(pane, model);
@@ -88,6 +92,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(constant
 				.value(), constant.lowerBound(), constant.upperBound(), 1);
 		valueSpinner.setModel(spinnerModel);
+		setupValueEditor();
 		nameTextField.setText(oldName);
 	}
 
