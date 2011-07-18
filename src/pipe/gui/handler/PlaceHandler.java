@@ -23,6 +23,8 @@ import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 
 /**
  * Class used to implement methods corresponding to mouse events on places.
@@ -115,26 +117,26 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-//		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
-//			return;
-//		}
-//
-//		UndoManager undoManager = CreateGui.getView().getUndoManager();
-//
-//		if (myObject instanceof TimedPlaceComponent) {
-//			int clicks = -e.getWheelRotation();
-//			TimedPlace place = ((TimedPlaceComponent)myObject).underlyingPlace();
-//			if(clicks > 0) {
-//				place.addToken(new TimedToken(place));
-//			}else{
-//				if(place.numberOfTokens() == 0)
-//					return;
-//				
-//				place.removeToken();
-//			}
-//			Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, clicks);
-//			undoManager.addNewEdit(command);
-//		}
+		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
+			return;
+		}
+
+		UndoManager undoManager = CreateGui.getView().getUndoManager();
+
+		if (myObject instanceof TimedPlaceComponent) {
+			int clicks = -e.getWheelRotation();
+			TimedPlace place = ((TimedPlaceComponent)myObject).underlyingPlace();
+			if(clicks > 0) {
+				place.addToken(new TimedToken(place));
+			}else{
+				if(place.numberOfTokens() == 0)
+					return;
+				
+				place.removeToken();
+			}
+			Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, clicks);
+			undoManager.addNewEdit(command);
+		}
 	}
 
 	@Override

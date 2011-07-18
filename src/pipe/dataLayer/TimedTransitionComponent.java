@@ -191,12 +191,12 @@ public class TimedTransitionComponent extends Transition {
 		LabelHandler labelHandler = new LabelHandler(transitionComponent.getNameLabel(), transitionComponent);
 		transitionComponent.getNameLabel().addMouseListener(labelHandler);
 		transitionComponent.getNameLabel().addMouseMotionListener(labelHandler);
-		//transitionComponent.getNameLabel().addMouseWheelListener(labelHandler);
+		transitionComponent.getNameLabel().addMouseWheelListener(labelHandler);
 		
 		TransitionHandler transitionHandler = new TAPNTransitionHandler((DrawingSurfaceImpl)getParent(), transitionComponent, guiModel, tapn);
 		transitionComponent.addMouseListener(transitionHandler);
 		transitionComponent.addMouseMotionListener(transitionHandler);
-		//transitionComponent.addMouseWheelListener(transitionHandler);
+		transitionComponent.addMouseWheelListener(transitionHandler);
 
 		transitionComponent.addMouseListener(new AnimationHandler());
 	

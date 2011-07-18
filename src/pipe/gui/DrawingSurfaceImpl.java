@@ -173,11 +173,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 						LabelHandler labelHandler = new LabelHandler(((Place) newObject).getNameLabel(), (Place) newObject);
 						((Place) newObject).getNameLabel().addMouseListener(labelHandler);
 						((Place) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-						//((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+						((Place) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 						PlaceHandler placeHandler = new PlaceHandler(this,(Place) newObject, this.guiModel, this.model);
 						newObject.addMouseListener(placeHandler);
-						//newObject.addMouseWheelListener(placeHandler);
+						newObject.addMouseWheelListener(placeHandler);
 						newObject.addMouseMotionListener(placeHandler);
 						add(newObject);
 
@@ -206,11 +206,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 					LabelHandler labelHandler = new LabelHandler(((Transition) newObject).getNameLabel(),(Transition) newObject);
 					((Transition) newObject).getNameLabel().addMouseListener(labelHandler);
 					((Transition) newObject).getNameLabel().addMouseMotionListener(labelHandler);
-					//((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
+					((Transition) newObject).getNameLabel().addMouseWheelListener(labelHandler);
 
 					newObject.addMouseListener(transitionHandler);
 					newObject.addMouseMotionListener(transitionHandler);
-					//newObject.addMouseWheelListener(transitionHandler);
+					newObject.addMouseWheelListener(transitionHandler);
 
 					newObject.addMouseListener(animationHandler);
 
