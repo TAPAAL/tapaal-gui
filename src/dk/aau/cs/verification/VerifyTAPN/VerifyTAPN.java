@@ -217,7 +217,9 @@ public class VerifyTAPN implements ModelChecker {
 		for(TimedPlace p : verificationOptions.inclusionPlaces().inclusionPlaces()) {
 			if(p instanceof LocalTimedPlace) {
 				LocalTimedPlace local = (LocalTimedPlace)p;
-				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
+				if(local.model().isActive()){
+					inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map(local.model().name(), local.name())));
+				}
 			}
 			else // shared place
 				inclusionPlaces.add(model.value1().getPlaceByName(model.value2().map("", p.name())));
