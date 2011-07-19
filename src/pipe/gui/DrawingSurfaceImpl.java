@@ -18,6 +18,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JLayeredPane;
+import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -57,7 +58,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
  * The petrinet is drawn onto this frame.
  */
 public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
-		Printable, DrawingSurface {
+Printable, DrawingSurface {
 	private static final long serialVersionUID = 4434596266503933386L;
 
 	private boolean netChanged = false;
@@ -66,7 +67,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 
 	public Arc createArc; // no longer static
 	public TransportArcComponent transportArcPart1; // used when creating
-													// transport arcs
+	// transport arcs
 
 	public PlaceTransitionObject createPTO;
 
@@ -96,9 +97,9 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 	private TimedArcPetriNet model;
 	private MouseHandler mouseHandler;
 	private NameGenerator nameGenerator = new NameGenerator();
-	
+
 	private TabContent tabContent;
-	
+
 	public DrawingSurfaceImpl(DataLayer dataLayer, TabContent parent) {
 		this.tabContent = parent;
 		guiModel = dataLayer;
@@ -119,11 +120,11 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		selection = new SelectionManager(this);
 		undoManager = new UndoManager(this, guiModel, app);
 	}
-	
+
 	public TabContent parent(){
 		return tabContent;
 	}
-	
+
 	public NameGenerator getNameGenerator() {
 		return nameGenerator;
 	}
@@ -138,7 +139,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 
 	public void setModel(DataLayer guiModel, TimedArcPetriNet model, Zoomer zoomer) {
 		this.selection.disableSelection();
-		
+
 		nameGenerator.add(model);
 		this.mouseHandler.setModel(guiModel, model);
 		this.undoManager.setModel(guiModel);
@@ -153,13 +154,16 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		}
 
 		this.removeAll();
+		setPreferredSize(new Dimension(0,0));
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
 			add(pnObject);
 		}
-				
+
 		if(CreateGui.getApp().getMode() == Pipe.SELECT)
 			this.selection.enableSelection();
-		
+
+		Component component = getParent().getParent();
+		JScrollPane pane = (JScrollPane)component;
 		repaintAll();
 	}
 
@@ -368,6 +372,37 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 		super.add(pnObject);
 		pnObject.addedToGui();
 		petriNetObjects.add(pnObject);
+
+		calculateNewBoundsForScrollPane(pnObject.getBounds());
+		if(pnObject.getNameLabel() != null){
+			calculateNewBoundsForScrollPane(pnObject.getNameLabel().getBounds());
+		}
+	}
+
+	public void calculateNewBoundsForScrollPane(Rectangle rect) {
+		boolean changed = false;
+		Dimension current = getPreferredSize();
+		
+		int this_width = (rect.x + rect.width + 2);
+		int this_height = (rect.y + rect.height+ 2);
+		
+		if (this_width > current.width) {
+			current.width = this_width; changed=true;
+		}
+		if (this_height > current.height) {
+			current.height = this_height; changed=true;
+		}
+
+		if (changed) {
+			//Update client's preferred size because
+			//the area taken up by the graphics has
+			// changed
+			setPreferredSize(current);
+
+			//Let the scroll pane know to update itself
+			//and its scrollbars.
+			revalidate();
+		}
 	}
 
 	@Override
@@ -549,7 +584,7 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 			p = adjustPoint(p, view.getZoom());
 			dk.aau.cs.model.tapn.LocalTimedPlace tp = new dk.aau.cs.model.tapn.LocalTimedPlace(nameGenerator.getNewPlaceName(model));
 			pnObject = new TimedPlaceComponent(Grid.getModifiedX(p.x), Grid
-							.getModifiedY(p.y), tp);
+					.getModifiedY(p.y), tp);
 			model.add(tp);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
@@ -655,132 +690,132 @@ public class DrawingSurfaceImpl extends JLayeredPane implements Observer,
 					guiModel.addPetriNetObject(pnObject);
 					view.addNewPetriNetObject(pnObject);
 					getUndoManager()
-							.addNewEdit(
-									new AddPetriNetObjectEdit(pnObject, view,
-											guiModel));
+					.addNewEdit(
+							new AddPetriNetObjectEdit(pnObject, view,
+									guiModel));
 					((AnnotationNote) pnObject).enableEditMode();
 					break;
-				// case Pipe.FAST_PLACE:
-				// if (e.isMetaDown() || metaDown) { // provisional
-				// if (createArc != null) {
-				// addPoint(createArc, e);
-				// }
-				// } else {
-				// if (createArc == null) {
-				// break;
-				// }
-				// // user has not clicked on an old PetriNetObject, so
-				// // a new PNO must be created
-				// view.newPNO = true;
-				//
-				// createPTO = newPlace(e.getPoint());
-				// getUndoManager().addNewEdit(
-				// new AddPetriNetObjectEdit(createPTO, view, guiModel));
-				// pnObject.getMouseListeners()[0].mouseReleased(e);
-				// if (e.isControlDown()){
-				// // keep "fast mode"
-				// app.setMode(Pipe.FAST_TRANSITION);
-				// pnObject.getMouseListeners()[0].mousePressed(e);
-				// } else {
-				// //exit "fast mode"
-				// app.resetMode();
-				// }
-				// }
-				// break;
-				//
-				// case Pipe.FAST_TRANSITION:
-				// if (e.isMetaDown() || metaDown) { // provisional
-				// if (createArc != null) {
-				// addPoint(createArc, e);
-				// }
-				// } else {
-				// if ( createArc == null) {
-				// break;
-				// }
-				// // user has not clicked on an old PetriNetObject, so
-				// // a new PNO must be created
-				// view.newPNO = true;
-				//
-				// createPTO = newTransition(e.getPoint(), e.isAltDown());
-				// getUndoManager().addNewEdit(
-				// new AddPetriNetObjectEdit(createPTO, view, guiModel));
-				// pnObject.getMouseListeners()[0].mouseReleased(e);
-				// if (e.isControlDown()){
-				// // keep "fast mode"
-				// app.setMode(Pipe.FAST_PLACE);
-				// pnObject.getMouseListeners()[0].mousePressed(e);
-				// } else {
-				// // exit "fast mode"
-				// app.resetMode();
-				// }
-				// }
-				// break;
-				//
-				// case Pipe.FAST_TAPNPLACE:
-				//
-				// //kyrke working
-				// if (e.isMetaDown() || metaDown) { // provisional
-				// if (createArc != null) {
-				// addPoint(createArc, e);
-				// }
-				// } else {
-				// if (createArc == null) {
-				// break;
-				// }
-				// // user has not clicked on an old PetriNetObject, so
-				// // a new PNO must be created
-				// view.newPNO = true;
-				//
-				// createPTO = newTimedPlace(e.getPoint());
-				// getUndoManager().addNewEdit(
-				// new AddTimedPlaceCommand((TimedPlaceComponent)createPTO,
-				// model, guiModel, view));
-				// pnObject.getMouseListeners()[0].mouseReleased(e);
-				// if (e.isControlDown()){
-				//
-				// // keep "fast mode"
-				// app.setMode(Pipe.FAST_TAPNTRANSITION);
-				// pnObject.getMouseListeners()[0].mousePressed(e);
-				// } else {
-				// //exit "fast mode"
-				// app.resetMode();
-				// }
-				// }
-				// break;
-				//
-				// case Pipe.FAST_TAPNTRANSITION:
-				// //kyrke working
-				//
-				// if (e.isMetaDown() || metaDown) { // provisional
-				// if (createArc != null) {
-				// addPoint(createArc, e);
-				// }
-				// } else {
-				// if ( createArc == null) {
-				// break;
-				// }
-				// // user has not clicked on an old PetriNetObject, so
-				// // a new PNO must be created
-				// view.newPNO = true;
-				//
-				// createPTO = newTAPNTransition(e.getPoint(), e.isAltDown());
-				// getUndoManager().addNewEdit(
-				// new
-				// AddTimedTransitionCommand((TimedTransitionComponent)createPTO,
-				// model, guiModel, view));
-				// pnObject.getMouseListeners()[0].mouseReleased(e);
-				// if (e.isControlDown()){
-				// // keep "fast mode"
-				//
-				// app.setMode(Pipe.FAST_TAPNPLACE);
-				// pnObject.getMouseListeners()[0].mousePressed(e);
-				// pnObject.getMouseListeners()[0].mousePressed(e);
-				// } else {
-				// // exit "fast mode"
-				// app.resetMode();
-				// }
-				// }
-				// break;
+					// case Pipe.FAST_PLACE:
+					// if (e.isMetaDown() || metaDown) { // provisional
+					// if (createArc != null) {
+					// addPoint(createArc, e);
+					// }
+					// } else {
+					// if (createArc == null) {
+					// break;
+					// }
+					// // user has not clicked on an old PetriNetObject, so
+					// // a new PNO must be created
+					// view.newPNO = true;
+					//
+					// createPTO = newPlace(e.getPoint());
+					// getUndoManager().addNewEdit(
+					// new AddPetriNetObjectEdit(createPTO, view, guiModel));
+					// pnObject.getMouseListeners()[0].mouseReleased(e);
+					// if (e.isControlDown()){
+					// // keep "fast mode"
+					// app.setMode(Pipe.FAST_TRANSITION);
+					// pnObject.getMouseListeners()[0].mousePressed(e);
+					// } else {
+					// //exit "fast mode"
+					// app.resetMode();
+					// }
+					// }
+					// break;
+					//
+					// case Pipe.FAST_TRANSITION:
+					// if (e.isMetaDown() || metaDown) { // provisional
+					// if (createArc != null) {
+					// addPoint(createArc, e);
+					// }
+					// } else {
+					// if ( createArc == null) {
+					// break;
+					// }
+					// // user has not clicked on an old PetriNetObject, so
+					// // a new PNO must be created
+					// view.newPNO = true;
+					//
+					// createPTO = newTransition(e.getPoint(), e.isAltDown());
+					// getUndoManager().addNewEdit(
+					// new AddPetriNetObjectEdit(createPTO, view, guiModel));
+					// pnObject.getMouseListeners()[0].mouseReleased(e);
+					// if (e.isControlDown()){
+					// // keep "fast mode"
+					// app.setMode(Pipe.FAST_PLACE);
+					// pnObject.getMouseListeners()[0].mousePressed(e);
+					// } else {
+					// // exit "fast mode"
+					// app.resetMode();
+					// }
+					// }
+					// break;
+					//
+					// case Pipe.FAST_TAPNPLACE:
+					//
+					// //kyrke working
+					// if (e.isMetaDown() || metaDown) { // provisional
+					// if (createArc != null) {
+					// addPoint(createArc, e);
+					// }
+					// } else {
+					// if (createArc == null) {
+					// break;
+					// }
+					// // user has not clicked on an old PetriNetObject, so
+					// // a new PNO must be created
+					// view.newPNO = true;
+					//
+					// createPTO = newTimedPlace(e.getPoint());
+					// getUndoManager().addNewEdit(
+					// new AddTimedPlaceCommand((TimedPlaceComponent)createPTO,
+					// model, guiModel, view));
+					// pnObject.getMouseListeners()[0].mouseReleased(e);
+					// if (e.isControlDown()){
+					//
+					// // keep "fast mode"
+					// app.setMode(Pipe.FAST_TAPNTRANSITION);
+					// pnObject.getMouseListeners()[0].mousePressed(e);
+					// } else {
+					// //exit "fast mode"
+					// app.resetMode();
+					// }
+					// }
+					// break;
+					//
+					// case Pipe.FAST_TAPNTRANSITION:
+					// //kyrke working
+					//
+					// if (e.isMetaDown() || metaDown) { // provisional
+					// if (createArc != null) {
+					// addPoint(createArc, e);
+					// }
+					// } else {
+					// if ( createArc == null) {
+					// break;
+					// }
+					// // user has not clicked on an old PetriNetObject, so
+					// // a new PNO must be created
+					// view.newPNO = true;
+					//
+					// createPTO = newTAPNTransition(e.getPoint(), e.isAltDown());
+					// getUndoManager().addNewEdit(
+					// new
+					// AddTimedTransitionCommand((TimedTransitionComponent)createPTO,
+					// model, guiModel, view));
+					// pnObject.getMouseListeners()[0].mouseReleased(e);
+					// if (e.isControlDown()){
+					// // keep "fast mode"
+					//
+					// app.setMode(Pipe.FAST_TAPNPLACE);
+					// pnObject.getMouseListeners()[0].mousePressed(e);
+					// pnObject.getMouseListeners()[0].mousePressed(e);
+					// } else {
+					// // exit "fast mode"
+					// app.resetMode();
+					// }
+					// }
+					// break;
 				case Pipe.TRANSPORTARC:
 					if (createArc != null) {
 						addPoint(createArc, e);
