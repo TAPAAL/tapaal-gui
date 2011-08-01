@@ -26,7 +26,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 						getAnswerNotBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);
 			} else {
-				spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - model.marking().size());
+				spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						getAnswerBoundedString(), "Analysis Result",
 						JOptionPane.INFORMATION_MESSAGE);

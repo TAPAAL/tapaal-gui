@@ -34,4 +34,13 @@ public class BoundednessAnalysisResult {
 	public int usedTokens() {
 		return maxUsedTokens;
 	}
+	
+	public int totalTokens(){
+		return totalTokens;
+	}
+	
+	public int tokensInNet(){
+		return totalTokens - extraTokens;
+	}
+	
 }
