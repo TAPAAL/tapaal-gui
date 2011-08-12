@@ -1486,6 +1486,7 @@ public class GuiFrame extends JFrame implements Observer {
 				break;
 
 			case Pipe.TIMEPASS:
+				animBox.clearStepsForward();
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
