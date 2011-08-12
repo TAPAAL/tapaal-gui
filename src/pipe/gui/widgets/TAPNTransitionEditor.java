@@ -50,7 +50,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		transitionEditorPanel = new javax.swing.JPanel();
 		nameLabel = new javax.swing.JLabel();
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(120,27));
+		nameTextField.setPreferredSize(new Dimension(200,27));
 		rotationLabel = new javax.swing.JLabel();
 		rotationComboBox = new javax.swing.JComboBox();
 		buttonPanel = new javax.swing.JPanel();
@@ -82,8 +82,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		});
 		sharedCheckBox.setEnabled(context.network().numberOfSharedTransitions() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(sharedCheckBox, gridBagConstraints);

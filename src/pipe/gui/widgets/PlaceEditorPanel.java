@@ -221,6 +221,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField = new javax.swing.JTextField();
+		nameTextField.setPreferredSize(new Dimension(200,27));
 		
 		sharedPlacesComboBox = new JComboBox();
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
