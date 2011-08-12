@@ -459,7 +459,7 @@ public class GuiFrame extends JFrame implements Observer {
 						 Pipe.STEPFORWARD, "Step forward a firing", "typed 6"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay 1",
-				 Pipe.TIMEPASS, "Let time pass 1 unit", "_"));
+				 Pipe.TIMEPASS, "Let time pass 1 time unit", "typed 1"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -1487,6 +1487,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			case Pipe.TIMEPASS:
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
 			case Pipe.STEPFORWARD:
