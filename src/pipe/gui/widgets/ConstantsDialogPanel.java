@@ -34,6 +34,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = 6734583459331431789L;
 	private JRootPane rootPane;
 	private TimedArcPetriNetNetwork model;
+	private int lowerBound;
+	private int upperBound;
 
 	private String oldName;
 
@@ -88,9 +90,11 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		this(pane, model);
 
 		this.oldName = constant.name();
+		this.lowerBound = constant.lowerBound();
+		this.upperBound = constant.upperBound();
 
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(constant
-				.value(), constant.lowerBound(), constant.upperBound(), 1);
+				.value(), 0, constant.upperBound(), 1);
 		valueSpinner.setModel(spinnerModel);
 		setupValueEditor();
 		nameTextField.setText(oldName);
@@ -130,6 +134,22 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					nameTextField.setText(oldName);
 					return;
 				}
+				
+				//Kyrke - This is messy, but a quck fix for bug #815487			
+				//Check that the value is within the allowed bounds
+				if (!( this.lowerBound <= val && val <= this.upperBound )){
+					
+					JOptionPane.showMessageDialog(
+							CreateGui.getApp(),
+							"The specified value is invalid for the current net.\n"
+									+ "Updating the constant to the specified value invalidates the guard\n"
+									+ "on one or more arcs.",
+							"Constant value invalid for current net",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+					
+				}
+				
 				Command edit = model.updateConstant(oldName, new Constant(
 						newName, val));
 				if (edit == null) {
@@ -147,6 +167,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							.addNewEdit(edit);
 					CreateGui.getCurrentTab().drawingSurface().repaintAll();
 				}
+				
+				
+				
 			} else {
 				Command edit = model.addConstant(newName, val);
 				if (edit == null) {
