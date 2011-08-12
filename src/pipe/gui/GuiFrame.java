@@ -1483,6 +1483,7 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
+				CreateGui.appGui.repaint();
 				break;
 
 			case Pipe.TIMEPASS:
