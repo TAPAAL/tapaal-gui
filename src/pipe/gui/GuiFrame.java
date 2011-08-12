@@ -3,6 +3,7 @@ package pipe.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -1483,6 +1484,16 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
+				
+				// XXX
+				// This is a fix for bug #812694 where on mac some menues are gray after
+				// changing from simulation mode, when displaying a trace. Showing and 
+				// hiding a menu seems to fix this problem 
+				Dialog a = new Dialog(CreateGui.appGui);
+				a.setVisible(true);
+				a.setVisible(false);
+				a.dispose();
+				
 				break;
 
 			case Pipe.TIMEPASS:
