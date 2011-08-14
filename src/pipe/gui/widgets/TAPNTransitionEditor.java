@@ -64,7 +64,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 		});
 		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
-		sharedTransitionsComboBox.setPreferredSize(new Dimension(120,27));
+		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
