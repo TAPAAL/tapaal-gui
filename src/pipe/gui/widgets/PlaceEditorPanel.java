@@ -224,6 +224,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		nameTextField.setPreferredSize(new Dimension(200,27));
 		
 		sharedPlacesComboBox = new JComboBox();
+		sharedPlacesComboBox.setPreferredSize(new Dimension(200,27));
 		
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
