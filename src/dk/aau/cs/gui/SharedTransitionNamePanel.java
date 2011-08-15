@@ -130,7 +130,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				try{
 					listModel.addElement(transition);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A Transition or place already exists with the specified name.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
