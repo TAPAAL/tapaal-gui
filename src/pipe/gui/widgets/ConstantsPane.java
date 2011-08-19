@@ -27,10 +27,10 @@ import javax.swing.event.ListSelectionListener;
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.ConstantsListModel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.gui.components.ConstantsListModel;
 
 public class ConstantsPane extends JPanel {
 	private static final long serialVersionUID = -7883351020889779067L;
