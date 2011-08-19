@@ -1161,13 +1161,16 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public boolean checkForSave(int index) {
+		
 		if(index < 0) return false;
+				
 		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
 					JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
+
 			switch (result) {
 			case JOptionPane.YES_OPTION:
 				boolean saved = saveOperation(index, false);
@@ -1176,6 +1179,8 @@ public class GuiFrame extends JFrame implements Observer {
 			case JOptionPane.CLOSED_OPTION:
 			case JOptionPane.CANCEL_OPTION:
 				return false;
+			case JOptionPane.NO_OPTION:
+				return true;
 			}
 		}
 		return true;
