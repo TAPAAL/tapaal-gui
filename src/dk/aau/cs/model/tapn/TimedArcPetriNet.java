@@ -241,7 +241,7 @@ public class TimedArcPetriNet {
 		return places;
 	}
 
-	public Iterable<TimedTransition> transitions() {
+	public List<TimedTransition> transitions() {
 		return transitions;
 	}
 

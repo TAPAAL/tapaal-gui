@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
@@ -58,6 +59,19 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
 		Vector<SharedTransition> sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
+		ArrayList<SharedTransition> usedTransitions = new ArrayList<SharedTransition>();
+		
+		for (TimedTransition tt : context.activeModel().transitions()){
+			if(tt.isShared()){
+				usedTransitions.add(tt.sharedTransition());
+			}
+		}
+		
+		sharedTransitions.removeAll(usedTransitions);
+		if (transition.underlyingTransition().isShared()){
+			sharedTransitions.add(transition.underlyingTransition().sharedTransition());
+		}
+		
 		Collections.sort(sharedTransitions, new Comparator<SharedTransition>() {
 			public int compare(SharedTransition o1, SharedTransition o2) {
 				return o1.name().compareToIgnoreCase(o2.name());
@@ -80,7 +94,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				}
 			}		
 		});
-		sharedCheckBox.setEnabled(context.network().numberOfSharedTransitions() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
+		sharedCheckBox.setEnabled(sharedTransitions.size() > 0 && !hasArcsToSharedPlaces(transition.underlyingTransition()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
