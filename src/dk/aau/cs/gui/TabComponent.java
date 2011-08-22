@@ -119,8 +119,10 @@ public class TabComponent extends JPanel {
 					if(pane.getTabCount() > 0 && CreateGui.getApp().checkForSave(index)){
 						if(pane.getTabCount() == 1) CreateGui.getApp().setGUIMode(GUIMode.noNet);
 
-						CreateGui.removeTab(index);
+						//Close the gui part first, else we get an error bug #826578
 						pane.removeTabAt(index);
+						CreateGui.removeTab(index);
+						
 						CreateGui.getApp().activateSelectAction();
 					}
 				}

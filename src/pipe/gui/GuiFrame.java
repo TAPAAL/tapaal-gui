@@ -843,10 +843,6 @@ public class GuiFrame extends JFrame implements Observer {
 		appView = CreateGui.getDrawingSurface(index);
 	}
 
-	private void setObjectsNull(int index) {
-		CreateGui.removeTab(index);
-	}
-
 	// set tabbed pane properties and add change listener that updates tab with
 	// linked model and view
 	public void setTab() {
@@ -1179,8 +1175,6 @@ public class GuiFrame extends JFrame implements Observer {
 			case JOptionPane.CLOSED_OPTION:
 			case JOptionPane.CANCEL_OPTION:
 				return false;
-			case JOptionPane.NO_OPTION:
-				return true;
 			}
 		}
 		return true;
@@ -2071,8 +2065,10 @@ public class GuiFrame extends JFrame implements Observer {
 				// Set GUI mode to noNet
 				setGUIMode(GUIMode.noNet);
 
-				setObjectsNull(appTab.getSelectedIndex());
-				appTab.remove(appTab.getSelectedIndex());
+				int index = appTab.getSelectedIndex();
+				appTab.remove(index);
+				CreateGui.removeTab(index);
+				
 
 				// Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
