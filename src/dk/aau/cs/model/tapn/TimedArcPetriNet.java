@@ -186,12 +186,14 @@ public class TimedArcPetriNet {
 		if(parentNetwork != null && parentNetwork.isNameUsedForShared(name)) return true;
 
 		for (TimedPlace place : places){
-			if (place.name().equalsIgnoreCase(name))
+			if (place.name().equalsIgnoreCase(name)){
 				return true;
+			}
 		}
 		for (TimedTransition transition : transitions){
-			if (transition.name().equalsIgnoreCase(name))
+			if (transition.name().equalsIgnoreCase(name)){
 				return true;
+			}
 		}
 		return false;
 	}
