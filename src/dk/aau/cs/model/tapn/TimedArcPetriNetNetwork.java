@@ -68,11 +68,15 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
-			if(transition.name().equalsIgnoreCase(name)) return true;
+			if(transition.name().equalsIgnoreCase(name)) {
+				return true;
+			}
 		}
 		
 		for(SharedPlace place : sharedPlaces){
-			if(place.name().equalsIgnoreCase(name)) return true;
+			if(place.name().equalsIgnoreCase(name)) {
+				return true;
+			}
 		}
 		
 		return false;

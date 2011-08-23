@@ -580,7 +580,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 			String newName = nameTextField.getText();
 			String oldName = place.underlyingPlace().name();
-			if(context.activeModel().isNameUsed(newName) && !oldName.equals(newName)){
+			if(context.activeModel().isNameUsed(newName) && !oldName.equalsIgnoreCase(newName)){
 				context.undoManager().undo(); 
 				JOptionPane.showMessageDialog(this, "The specified name is already used by another place or transition.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
