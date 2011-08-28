@@ -55,6 +55,8 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 	}
 
 	private String getVerificationAcrynom(BatchProcessingVerificationResult result) {
+		if(result.query() == null) return "";
+		
 		ReductionOption reduction = result.query().getReductionOption();
 		if(reduction == ReductionOption.VerifyTAPN) {
 			if(!result.query().discreteInclusion())

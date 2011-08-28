@@ -71,7 +71,7 @@ import dk.aau.cs.verification.batchProcessing.VerificationTaskCompleteEvent;
 
 public class BatchProcessingDialog extends JDialog {
 	private static final long serialVersionUID = -5682084589335908227L;
-	
+
 	private static final String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
 	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Engine w. Discrete Inclusion";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
@@ -100,7 +100,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton removeFileButton;
 	private JList fileList;
 	private DefaultListModel listModel;
-	
+
 	private JLabel statusLabel;
 	private JLabel fileStatusLabel;
 	private JButton startButton;
@@ -109,7 +109,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JLabel progressLabel;
 	private JLabel timerLabel;
 	private long startTimeMs = 0;
-	    
+
 
 	private JComboBox reductionOption;
 	private JComboBox searchOption;
@@ -127,37 +127,37 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	});
 
-	
+
 	private BatchProcessingResultsTableModel tableModel;
-	
+
 	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
 
 	private Timer timer = new Timer(1000, new AbstractAction() {
 		private static final long serialVersionUID = 1327695063762640628L;
-		
+
 		public void actionPerformed(ActionEvent e) {
-	    	timerLabel.setText((System.currentTimeMillis()-startTimeMs)/1000 + " s");
-	    }
+			timerLabel.setText((System.currentTimeMillis()-startTimeMs)/1000 + " s");
+		}
 	});
 
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {	
 		super(frame, title, modal);
-		
+
 		addWindowListener(new WindowAdapter() {
-		    public void windowClosing(WindowEvent we) {
-		    	terminateBatchProcessing();
-		    }
+			public void windowClosing(WindowEvent we) {
+				terminateBatchProcessing();
+			}
 		});
 
 		initComponents();
 	}
 
-	
+
 	private void initComponents() {
 		setLayout(new GridBagLayout());
-		
+
 		initFileListPanel();
 		initVerificationOptionsPanel();
 		initMonitorPanel();
@@ -167,7 +167,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void initFileListPanel() {
 		JPanel fileListPanel = new JPanel(new GridBagLayout());
 		fileListPanel.setBorder(BorderFactory.createTitledBorder("Models"));
-				
+
 		listModel = new DefaultListModel();
 		fileList = new JList(listModel);
 		fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -180,7 +180,7 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 		});
-		
+
 		fileList.addListSelectionListener(new ListSelectionListener() {	
 
 			public void valueChanged(ListSelectionEvent e) {
@@ -193,13 +193,13 @@ public class BatchProcessingDialog extends JDialog {
 				}				
 			}
 		});
-		
+
 		fileList.setCellRenderer(new FileNameCellRenderer());
 
 		JScrollPane scrollpane = new JScrollPane(fileList);
 		scrollpane.setMinimumSize(new Dimension(175, 225));
 		scrollpane.setPreferredSize(new Dimension(175, 225));
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -209,17 +209,17 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weighty = 1.0;
 		gbc.insets = new Insets(0, 0, 10, 0);
 		fileListPanel.add(scrollpane,gbc);
-		
+
 		filesButtonsPanel = new JPanel(new GridBagLayout());
-		
+
 		addFilesButton = new JButton("Add Models");
 		addFilesButton.addActionListener(new ActionListener(){
-			
+
 			public void actionPerformed(ActionEvent arg0) {
 				addFiles();
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx = 0;
@@ -227,11 +227,11 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weightx = 1.0;
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(addFilesButton, gbc);
-	
+
 		removeFileButton = new JButton("Remove Models");
 		removeFileButton.setEnabled(false);
 		removeFileButton.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent arg0) {
 				removeSelectedFiles();		
 			}
@@ -242,31 +242,31 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(removeFileButton, gbc);
-		
+
 		clearFilesButton = new JButton("Clear");
 		clearFilesButton.setEnabled(false);
 		clearFilesButton.addActionListener(new ActionListener() {	
-		
+
 			public void actionPerformed(ActionEvent e) {
 				clearFiles();
 				enableButtons();
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		filesButtonsPanel.add(clearFilesButton, gbc);
-		
-		
+
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		fileListPanel.add(filesButtonsPanel,gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -276,7 +276,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(10, 0, 0, 10);
 		add(fileListPanel,gbc);
 	}
-	
+
 	private void addFiles() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -295,19 +295,19 @@ public class BatchProcessingDialog extends JDialog {
 					listModel.addElement(file);
 				}
 			}
-			
+
 			enableButtons();
-					
+
 		}
 	}
-	
+
 	private void removeSelectedFiles() {
 		for(Object o : fileList.getSelectedValues()) {
 			File file = (File)o;
 			files.remove(file);
 			listModel.removeElement(file);
 		}
-		
+
 		enableButtons();
 	}
 
@@ -321,7 +321,7 @@ public class BatchProcessingDialog extends JDialog {
 		initSymmetryOptionsComponents();
 		initReductionOptionsComponents();
 		initTimeoutComponents();
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -340,10 +340,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(queryLabel,gbc);
-		
+
 		String[] options = new String[] { name_KeepQueryOption, name_SEARCHWHOLESTATESPACE };
 		queryPropertyOption = new JComboBox(options);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -352,7 +352,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(queryPropertyOption,gbc);
 	}
-	
+
 	private void initCapacityComponents() {
 		JLabel capacityLabel = new JLabel("Extra tokens:");
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -360,20 +360,20 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(capacityLabel, gbc);
-		
+
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setEnabled(false);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(numberOfExtraTokensInNet, gbc);
-		
+
 		keepQueryCapacity = new JCheckBox(name_KeepQueryOption);
 		keepQueryCapacity.setSelected(true);
 		keepQueryCapacity.addActionListener(new ActionListener() {
@@ -384,14 +384,14 @@ public class BatchProcessingDialog extends JDialog {
 					numberOfExtraTokensInNet.setEnabled(true);
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(keepQueryCapacity, gbc);
 	}
-	
+
 	private void initTimeoutComponents() {
 		JLabel timeoutLabel = new JLabel("Timeout (in seconds): ");
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -399,20 +399,20 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(timeoutLabel, gbc);
-		
+
 		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5, Integer.MAX_VALUE, 1));	
 		timeoutValue.setMaximumSize(new Dimension(70, 30));
 		timeoutValue.setMinimumSize(new Dimension(70, 30));
 		timeoutValue.setPreferredSize(new Dimension(70, 30));
 		timeoutValue.setEnabled(true);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
-		
+
 		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
 		noTimeoutCheckbox.setSelected(false);
 		noTimeoutCheckbox.addActionListener(new ActionListener() {
@@ -423,7 +423,7 @@ public class BatchProcessingDialog extends JDialog {
 					timeoutValue.setEnabled(true);
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 5;
@@ -440,10 +440,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 0, 5, 5);
 		verificationOptionsPanel.add(reductionLabel,gbc);
-		
+
 		String[] options = new String[] { name_KeepQueryOption, name_verifyTAPNWithLegend, name_verifyTAPNDiscreteInclusionWithLegend, name_STANDARDWithLegend, name_OPTIMIZEDSTANDARDWithLegend, name_BROADCASTWithLegend, name_BROADCASTDEG2WithLegend, name_AllReductions };
 		reductionOption = new JComboBox(options);
-		
+
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
@@ -453,7 +453,7 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 		});
-	
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 4;
@@ -462,7 +462,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(reductionOption,gbc);
 	}
-	
+
 	private void initSymmetryOptionsComponents() {
 		JLabel symmetryLabel = new JLabel("Symmetry:");
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -470,10 +470,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(symmetryLabel,gbc);
-		
+
 		String[] options = new String[] { name_KeepQueryOption, name_SYMMETRY, name_NOSYMMETRY };
 		symmetryOption = new JComboBox(options);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 3;
@@ -482,16 +482,16 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(symmetryOption,gbc);
 	}
-	
+
 	private void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshSearchOptions();
 	}
-	
+
 	private void refreshSearchOptions() {
 		String currentSearchOption = getSearchOptionAsString();
 
 		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
-		
+
 		Dimension d = searchOption.getSize();
 		searchOption.removeAllItems();
 		boolean selectedOptionStillAvailable = false;	
@@ -508,7 +508,7 @@ public class BatchProcessingDialog extends JDialog {
 			searchOption.setSelectedItem(currentSearchOption);
 		}
 	}
-	
+
 	private SearchOption getSearchOption() {
 		if(((String)searchOption.getSelectedItem()).equals(name_DFS))
 			return SearchOption.DFS;
@@ -521,7 +521,7 @@ public class BatchProcessingDialog extends JDialog {
 		else
 			return SearchOption.BatchProcessingKeepQueryOption;
 	}
-	
+
 	private String getSearchOptionAsString() {
 		return (String)searchOption.getSelectedItem();
 	}
@@ -537,17 +537,17 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.setEnabled(false);		
 		for(Component c : verificationOptionsPanel.getComponents())
 			c.setEnabled(true);
-		
-		numberOfExtraTokensInNet.setEnabled(!keepQueryCapacity.isSelected());
-		timeoutValue.setEnabled(useTimeout());
+
+				numberOfExtraTokensInNet.setEnabled(!keepQueryCapacity.isSelected());
+				timeoutValue.setEnabled(useTimeout());
 	}
-	
+
 	private BatchProcessingVerificationOptions getVerificationOptions() {
 		boolean discreteInclusion = getReductionOptionAsString().equals(name_verifyTAPNDiscreteInclusionWithLegend) ? true : false;
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(), keepQueryCapacity.isSelected(), getNumberOfExtraTokens(), getSearchOption(), getSymmetryOption(), getReductionOption(), discreteInclusion);		
 	}
-	
-	
+
+
 
 	private int getNumberOfExtraTokens() {
 		return (Integer)numberOfExtraTokensInNet.getValue();
@@ -574,18 +574,18 @@ public class BatchProcessingDialog extends JDialog {
 	private String getReductionOptionAsString() {
 		return (String)reductionOption.getSelectedItem();
 	}
-	
+
 	private ReductionOption getReductionOption() {
 		String reductionOptionString = (String)reductionOption.getSelectedItem();
-		
+
 		if (reductionOptionString.equals(name_STANDARDWithLegend))
-				return ReductionOption.STANDARD;
+			return ReductionOption.STANDARD;
 		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARDWithLegend))
-				return ReductionOption.OPTIMIZEDSTANDARD;
+			return ReductionOption.OPTIMIZEDSTANDARD;
 		else if (reductionOptionString.equals(name_BROADCASTWithLegend))
-				return ReductionOption.BROADCAST;
+			return ReductionOption.BROADCAST;
 		else if (reductionOptionString.equals(name_BROADCASTDEG2WithLegend))
-				return ReductionOption.DEGREE2BROADCAST;
+			return ReductionOption.DEGREE2BROADCAST;
 		else if (reductionOptionString.equals(name_verifyTAPNWithLegend))
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_verifyTAPNDiscreteInclusionWithLegend))
@@ -595,7 +595,7 @@ public class BatchProcessingDialog extends JDialog {
 		else
 			return ReductionOption.BatchProcessingKeepQueryOption;
 	}
-	
+
 	private void initSearchOptionsComponents() {
 		JLabel searchLabel = new JLabel("Search order:");
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -603,11 +603,11 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		verificationOptionsPanel.add(searchLabel,gbc);
-		
+
 		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC, name_BFS, name_DFS, name_Random };
 		searchOption = new JComboBox(options);
 		searchOption.setMinimumSize(searchOption.getSize());
-	
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
@@ -620,7 +620,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void initResultTablePanel() {
 		JPanel resultTablePanel = new JPanel(new GridBagLayout());
 		resultTablePanel.setBorder(BorderFactory.createTitledBorder("Results"));
-		
+
 		exportButton = new JButton("Export");
 		exportButton.setEnabled(false);
 		exportButton.addActionListener(new ActionListener() {
@@ -648,7 +648,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(5, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		resultTablePanel.add(exportButton, gbc);
-		
+
 		tableModel = new BatchProcessingResultsTableModel();
 		final JTable table = new JTable(tableModel) {
 			private static final long serialVersionUID = -146530769055564619L;
@@ -668,7 +668,7 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
-		
+
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
 				if(e.getType() == TableModelEvent.INSERT){
@@ -676,14 +676,14 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 		});
-		
+
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		Dimension scrollPaneDims = new Dimension(850,320);
 		scrollPane.setMinimumSize(scrollPaneDims);
 		scrollPane.setPreferredSize(scrollPaneDims);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
@@ -692,7 +692,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
 		resultTablePanel.add(scrollPane,gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -708,14 +708,14 @@ public class BatchProcessingDialog extends JDialog {
 	private void initMonitorPanel() {
 		JPanel monitorPanel = new JPanel(new GridBagLayout());
 		monitorPanel.setBorder(BorderFactory.createTitledBorder("Monitor"));
-	
+
 		JLabel file = new JLabel("File:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(file,gbc);
-			
+
 		fileStatusLabel = new JLabel("");
 		Dimension fileStatusLabelDim = new Dimension(350, 25);
 		fileStatusLabel.setMinimumSize(fileStatusLabelDim);
@@ -728,14 +728,14 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(fileStatusLabel,gbc);
 
-		
+
 		JLabel status = new JLabel("Status:");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(status,gbc);
-			
+
 		statusLabel = new JLabel("");
 		statusLabel.setMinimumSize(fileStatusLabelDim);
 		statusLabel.setPreferredSize(fileStatusLabelDim);
@@ -746,14 +746,14 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		monitorPanel.add(statusLabel,gbc);
-		
+
 		JLabel progress = new JLabel("Progress: ");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(progress,gbc);
-		
+
 		progressLabel = new JLabel("");
 		Dimension dim = new Dimension(280, 25);
 		progressLabel.setMinimumSize(dim);
@@ -765,7 +765,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 10);
 		monitorPanel.add(progressLabel, gbc);
-		
+
 		JLabel time = new JLabel("Time: ");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -773,7 +773,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(0, 10, 0, 0);
 		monitorPanel.add(time, gbc);
-		
+
 		timerLabel = new JLabel("");
 		Dimension timerLabelDim = new Dimension(50,25);
 		timerLabel.setMinimumSize(timerLabelDim);
@@ -798,11 +798,11 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,0,0, 10);
 		monitorPanel.add(startButton, gbc);
-		
+
 		cancelButton = new JButton("Cancel");
 		cancelButton.setEnabled(false);
 		cancelButton.addActionListener(new ActionListener() {
-		
+
 			public void actionPerformed(ActionEvent e) {
 				terminateBatchProcessing();
 				fileStatusLabel.setText("");
@@ -816,7 +816,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,0,0, 10);
 		monitorPanel.add(cancelButton, gbc);
-		
+
 		skipFileButton = new JButton("Skip");
 		skipFileButton.setEnabled(false);
 		skipFileButton.addActionListener(new ActionListener() {
@@ -832,7 +832,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(0,0,0, 10);
 		monitorPanel.add(skipFileButton, gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -848,7 +848,7 @@ public class BatchProcessingDialog extends JDialog {
 		tableModel.clear();
 		currentWorker = new BatchProcessingWorker(files, tableModel, getVerificationOptions());
 		currentWorker.addPropertyChangeListener(new PropertyChangeListener(){
-		
+
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(evt.getPropertyName().equals("state")){
 					if((StateValue)evt.getNewValue() == StateValue.DONE){
@@ -874,14 +874,14 @@ public class BatchProcessingDialog extends JDialog {
 					timer.restart();
 				else
 					timer.start();
-				
+
 				if(useTimeout()) {
 					if(timeoutTimer.isRunning())
 						timeoutTimer.restart();
 					else
 						timeoutTimer.start();
 				}
-				
+
 				startTimeMs = System.currentTimeMillis();
 			}
 
@@ -894,21 +894,21 @@ public class BatchProcessingDialog extends JDialog {
 				progressLabel.setText(e.verificationTasksCompleted() + " verification task" + (tasksCompleted > 1 ? "s" : "") + " completed");
 				timerLabel.setText("");
 			}
-			
+
 			public void fireStatusChanged(StatusChangedEvent e) {
 				statusLabel.setText(e.status());		
 			}
 
-	
+
 			public void fireFileChanged(FileChangedEvent e) {
 				fileStatusLabel.setText(e.fileName());
 			}
 
 		});
-		
+
 		if(useTimeout())
 			setupTimeoutTimer();
-		
+
 		currentWorker.execute();
 	}
 
@@ -937,25 +937,25 @@ public class BatchProcessingDialog extends JDialog {
 			System.out.print("Batch processing terminated");
 		}
 	}
-	
+
 	private void skipCurrentFile() {
 		if(currentWorker != null && !currentWorker.isDone()){
 			currentWorker.notifySkipCurrentVerification();
 		}
 	}
-	
+
 	private void timeoutCurrentVerificationTask() {
 		if(currentWorker != null && !currentWorker.isDone()){
 			currentWorker.notifyTimeoutCurrentVerificationTask();
 		}
 	}
-	
-	
+
+
 	private void clearFiles() {
 		files.clear();
 		listModel.removeAllElements();
 	}
-	
+
 	private void disableButtonsDuringProcessing() {
 		addFilesButton.setEnabled(false);
 		removeFileButton.setEnabled(false);
@@ -963,14 +963,14 @@ public class BatchProcessingDialog extends JDialog {
 		startButton.setEnabled(false);
 		exportButton.setEnabled(false);
 		fileList.setEnabled(false);
-		
+
 		disableVerificationOptionsButtons();
 	}
 
 	private void enableButtons() {
 		fileList.setEnabled(true);
 		addFilesButton.setEnabled(true);
-		
+
 		if(listModel.size() > 0) {
 			clearFilesButton.setEnabled(true);
 			startButton.setEnabled(true);
@@ -978,21 +978,21 @@ public class BatchProcessingDialog extends JDialog {
 			clearFilesButton.setEnabled(false);
 			startButton.setEnabled(false);
 		}
-		
+
 		if(tableModel.getRowCount() > 0) 
 			exportButton.setEnabled(true);
 		else
 			exportButton.setEnabled(false);
-		
+
 		enabledVerificationOptionButtons();
 	}
-	
+
 	// Custom cell renderer for the file list to only display the name of the file
 	// instead of the whole path.
 	private class FileNameCellRenderer extends JLabel implements ListCellRenderer {
 		private static final long serialVersionUID = 3071924451912979500L;
 
-		
+
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			if(value instanceof File)
 				setText(((File)value).getName());
@@ -1011,24 +1011,24 @@ public class BatchProcessingDialog extends JDialog {
 			return this;
 		}
 	}
-	
+
 	// Custom cell renderer for the Query Column of the result table display the property of the query
 	private class ResultTableCellRenderer extends JLabel  implements TableCellRenderer {
 		private static final long serialVersionUID = 3054497986242852099L;
 		Border unselectedBorder = null;
-	    Border selectedBorder = null;
-	    boolean isBordered = true;
-	
-	    public ResultTableCellRenderer(boolean isBordered) {
-	        this.isBordered = isBordered;
-	    }
+		Border selectedBorder = null;
+		boolean isBordered = true;
+
+		public ResultTableCellRenderer(boolean isBordered) {
+			this.isBordered = isBordered;
+		}
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			if (isBordered) {
 				if (isSelected) {
 					setBackground(table.getSelectionBackground());
 					setForeground(table.getSelectionForeground());
-					
+
 					if (selectedBorder == null) {
 						selectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getSelectionBackground());
 					}
@@ -1036,13 +1036,16 @@ public class BatchProcessingDialog extends JDialog {
 				} else {
 					boolean isResultColumn = table.getColumnName(column).equals("Result");
 					boolean isQueryColumn = table.getColumnName(column).equals("Query");
-					if((isResultColumn && value.toString().equals("Satisfied")) || (isQueryColumn && value.toString().equals("TRUE")))
-						setBackground(new Color(91, 255, 91)); // light red
-					else if((isResultColumn && value.toString().equals("Not Satisfied")) || (isQueryColumn && value.toString().equals("FALSE")))
-						setBackground(new Color(255, 91, 91)); // light green
-					else
+					if(value != null){
+						if((isResultColumn && value.toString().equals("Satisfied")) || (isQueryColumn && value.toString().equals("TRUE")))
+							setBackground(new Color(91, 255, 91)); // light red
+						else if((isResultColumn && value.toString().equals("Not Satisfied")) || (isQueryColumn && value.toString().equals("FALSE")))
+							setBackground(new Color(255, 91, 91)); // light green
+						else
+							setBackground(table.getBackground());
+					}else{
 						setBackground(table.getBackground());
-					
+					}
 					setForeground(table.getForeground());
 					if (unselectedBorder == null) {
 						unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5, table.getBackground());
@@ -1050,11 +1053,11 @@ public class BatchProcessingDialog extends JDialog {
 					setBorder(unselectedBorder);
 				}
 			}
-			
+
 			setEnabled(table.isEnabled());
 			setFont(table.getFont());
 			setOpaque(true);
-			
+
 			if(value != null) {
 				if(value instanceof TAPNQuery) {
 					TAPNQuery newQuery = (TAPNQuery)value;
@@ -1068,7 +1071,7 @@ public class BatchProcessingDialog extends JDialog {
 					if(mousePos != null) {
 						result = ((BatchProcessingResultsTableModel)table.getModel()).getResult(table.rowAtPoint(mousePos));
 					}
-					
+
 					if(table.getColumnName(column).equals("Verification Time"))
 						setToolTipText(result != null ? generateStatsToolTipText(result) : value.toString());
 					else 
@@ -1082,7 +1085,7 @@ public class BatchProcessingDialog extends JDialog {
 				setToolTipText("");
 				setText("");
 			}
-			
+
 			return this;
 		}
 
@@ -1096,7 +1099,7 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(System.getProperty("line.separator"));
 				s.append(result.stats().toString());
 			}
-			
+
 			return s.toString();
 		}
 
@@ -1105,7 +1108,7 @@ public class BatchProcessingDialog extends JDialog {
 			s.append("Extra Tokens: ");
 			s.append(query.getCapacity());
 			s.append("\n\n");
-			
+
 			s.append("Search Method: \n");
 			if(query.getSearchOption() == SearchOption.DFS)
 				s.append(name_DFS);
@@ -1116,47 +1119,48 @@ public class BatchProcessingDialog extends JDialog {
 			else
 				s.append(name_BFS);
 			s.append("\n\n");
-			
+
 			s.append(generateReductionString(query));
-			
+
 			s.append("\n\n");
 			s.append("Symmetry: ");
 			s.append(query.useSymmetry() ? "Yes\n\n" : "No\n\n");
-			
+
 			s.append("Query Property:\n"); 
 			if(query.getProperty().toString().equals("AG P0>=0"))
 				s.append(name_SEARCHWHOLESTATESPACE);
 			else
 				s.append(query.getProperty().toString());
-			
+
 			return s.toString();
 		}
 
 		private String generateReductionString(TAPNQuery query) {
 			StringBuilder s = new StringBuilder();
-			s.append("Reduction: \n");
-			if (query.getReductionOption() == ReductionOption.STANDARD)
-				s.append(name_STANDARD);
-			else if (query.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD)
-				s.append(name_OPTIMIZEDSTANDARD);
-			else if (query.getReductionOption() == ReductionOption.BROADCAST)
-				s.append(name_BROADCAST);
-			else if (query.getReductionOption() == ReductionOption.DEGREE2BROADCAST)
-				s.append(name_BROADCASTDEG2);
-			else if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
-				s.append(name_verifyTAPN);
-				s.append("\n\n");
-				s.append("Discrete Inclusion: ");
-				s.append(query.discreteInclusion() ? "Yes" : "No");
-				if(query.discreteInclusion()) {
+			if(query != null){
+				s.append("Reduction: \n");
+				if (query.getReductionOption() == ReductionOption.STANDARD)
+					s.append(name_STANDARD);
+				else if (query.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD)
+					s.append(name_OPTIMIZEDSTANDARD);
+				else if (query.getReductionOption() == ReductionOption.BROADCAST)
+					s.append(name_BROADCAST);
+				else if (query.getReductionOption() == ReductionOption.DEGREE2BROADCAST)
+					s.append(name_BROADCASTDEG2);
+				else if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
+					s.append(name_verifyTAPN);
 					s.append("\n\n");
-					s.append("Discrete Inclusion Places:\n");
-					s.append(generateListOfInclusionPlaces(query));
+					s.append("Discrete Inclusion: ");
+					s.append(query.discreteInclusion() ? "Yes" : "No");
+					if(query.discreteInclusion()) {
+						s.append("\n\n");
+						s.append("Discrete Inclusion Places:\n");
+						s.append(generateListOfInclusionPlaces(query));
+					}
+				} else {
+					s.append(name_BROADCAST);
 				}
-			} else {
-				s.append(name_BROADCAST);
 			}
-			
 			return s.toString();
 		}
 
@@ -1168,7 +1172,7 @@ public class BatchProcessingDialog extends JDialog {
 			boolean first = true;
 			for(TimedPlace p : incPlace) {
 				if(!first) s.append(", ");
-				
+
 				s.append(p.toString());
 				if(first) first = false;
 			}
