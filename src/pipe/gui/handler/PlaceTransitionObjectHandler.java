@@ -138,7 +138,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		boolean isNewArc = true; // true if we have to add a new arc to the Petri Net
 		boolean fastMode = false;
 
 		DrawingSurfaceImpl view = CreateGui.getView();
@@ -205,11 +204,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					// arc is drawn, remove handler:
 					createTAPNInhibitorArc.removeKeyListener(keyHandler);
 					keyHandler = null;
-					/**/
-					if (isNewArc == false) {
-						view.remove(createTAPNInhibitorArc);
-					}
-					/* */
+					
 					view.createArc = null;
 				}
 			}
@@ -387,10 +382,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						// arc is drawn, remove handler:
 						transportArcToCreate.removeKeyListener(keyHandler);
 						keyHandler = null;
-						
-						if (isNewArc == false) {
-							view.remove(arc2);
-						}
 					
 						view.createArc = null;
 
@@ -522,11 +513,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					// arc is drawn, remove handler:
 					timedArcToCreate.removeKeyListener(keyHandler);
 					keyHandler = null;
-					/**/
-					if (isNewArc == false) {
-						view.remove(timedArcToCreate);
-					}
-					/* */
+					
 					view.createArc = null;
 				}
 			}
