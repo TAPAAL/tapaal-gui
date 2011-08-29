@@ -38,6 +38,8 @@ import dk.aau.cs.util.RequireException;
  *         creation of an arc by left-clicking
  * @author Matthew Worthington - modified the handler which was causing the null
  *         pointer exceptions and incorrect petri nets xml representation.
+ * @author Kenneth Yrke Joergensen - cleanup removed unused stuff, and refactored 
+ * 	       bad design.
  */
 
 public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
