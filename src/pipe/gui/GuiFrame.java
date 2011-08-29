@@ -483,7 +483,7 @@ public class GuiFrame extends JFrame implements Observer {
 		 helpMenu.setMnemonic('H');
 		 
 		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
-				 453257, "Visit the TAPAAK homepage", "_"));
+				 453257, "Visit the TAPAAL homepage", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
