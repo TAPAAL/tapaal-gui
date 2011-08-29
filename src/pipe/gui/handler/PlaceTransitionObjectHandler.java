@@ -335,6 +335,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		case Pipe.ARC:
 			Arc createArc = view.createArc;
 			if (createArc != null) {
+		
 				if (currentObject != createArc.getSource()) {
 					createArc.setSelectable(true);
 					Iterator<Arc> arcsFrom = createArc.getSource()
@@ -648,6 +649,18 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					view.createArc = null;
 
 					timedArcToCreate.setSelectable(true);
+					
+					//XXX, kyrke hack to prevent a race condition in pipe gui
+					if (timedArcToCreate.getTarget() == null
+							|| !(timedArcToCreate.getTransition() instanceof Transition)) {
+						timedArcToCreate.delete();
+						timedArcToCreate.removeKeyListener(keyHandler);
+						keyHandler = null;
+						view.remove(timedArcToCreate);
+						view.createArc = null;
+						view.repaint();
+						break;
+					}
 
 					// We create NormalArcs when source of arc is Transition(
 					// since there are no intervals on output arcs.) ...except
@@ -698,19 +711,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						// else source is a place (not transition)
 					} else {
-
-						// XXX -- kyrke hack to precent some race condisions in
-						// pipe gui
-						if (timedArcToCreate.getTarget() == null
-								|| !(timedArcToCreate.getTransition() instanceof Transition)) {
-							timedArcToCreate.delete();
-							timedArcToCreate.removeKeyListener(keyHandler);
-							keyHandler = null;
-							view.remove(timedArcToCreate);
-							view.createArc = null;
-							view.repaint();
-							break;
-						}
 
 						// Set underlying TimedInputArc
 						TimedInputArcComponent timedArc = (TimedInputArcComponent) timedArcToCreate;
