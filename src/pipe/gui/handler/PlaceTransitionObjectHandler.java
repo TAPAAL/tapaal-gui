@@ -93,19 +93,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		case Pipe.FAST_TAPNPLACE:
 		case Pipe.FAST_TAPNTRANSITION:
 		case Pipe.TAPNARC:
-			// DEBUG KYRKE
-
-			// Detect qucik draw mode
-			if (e.isControlDown()) {
-				// user is holding Ctrl key; switch to fast mode
-				if (this.myObject instanceof Place) {
-					CreateGui.getApp().setFastMode(Pipe.FAST_TAPNTRANSITION);
-				} else if (this.myObject instanceof Transition) {
-
-					CreateGui.getApp().setFastMode(Pipe.FAST_TAPNPLACE);
-				}
-			}
-
 			if (CreateGui.getView().createArc == null) {
 
 				if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET) {
@@ -128,44 +115,12 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			break;
 
-		case Pipe.ARC:
-			if (e.isControlDown()) {
-				// user is holding Ctrl key; switch to fast mode
-				if (this.myObject instanceof Place) {
-					CreateGui.getApp().setFastMode(Pipe.FAST_TRANSITION);
-				} else if (this.myObject instanceof Transition) {
-					CreateGui.getApp().setFastMode(Pipe.FAST_PLACE);
-				}
-			}
 		case Pipe.TAPNINHIBITOR_ARC:
-		case Pipe.INHIBARC:
-		case Pipe.FAST_PLACE:
-		case Pipe.FAST_TRANSITION:
 			if (CreateGui.getView().createArc == null) {
-				if (CreateGui.getApp().getMode() == Pipe.INHIBARC) {
 					if (currentObject instanceof Place) {
-						createArc(new InhibitorArc(currentObject),
-								currentObject);
-					}
-				} else if (CreateGui.getApp().getMode() == Pipe.TAPNINHIBITOR_ARC) {
-					if (currentObject instanceof Place) {
-
 						Arc arc = new TimedInhibitorArcComponent(currentObject);
-
 						createArc(arc, currentObject);
 					}
-				}
-				// else if (CreateGui.getApp().getMode() == Pipe.TAPNARC){
-				// // XXX - kyrke - create only a TimedArc if source is not at
-				// TimedPlace
-				// NormalArc tmparc = new NormalArc(currentObject);
-				//
-				// if (tmparc.getSource() instanceof TimedPlace){
-				// createArc(new TimedArc(tmparc), currentObject);
-				// }else {
-				// createArc(tmparc, currentObject);
-				// }
-				// }
 			}
 			break;
 		case Pipe.TRANSPORTARC:
@@ -265,176 +220,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 			}
 			break;
-		case Pipe.INHIBARC:
-			InhibitorArc createInhibitorArc = (InhibitorArc) view.createArc;
-			if (createInhibitorArc != null) {
-				if (!currentObject.getClass().equals(
-						createInhibitorArc.getSource().getClass())) {
-
-					Iterator<Arc> arcsFrom = createInhibitorArc.getSource()
-							.getConnectFromIterator();
-					// search for pre-existent arcs from createInhibitorArc's
-					// source to createInhibitorArc's target
-					while (arcsFrom.hasNext()) {
-						Arc someArc = (arcsFrom.next());
-						if (someArc == createInhibitorArc) {
-							break;
-						} else if (someArc.getTarget() == currentObject
-								&& someArc.getSource() == createInhibitorArc
-										.getSource()) {
-							isNewArc = false;
-							if (someArc instanceof TimedOutputArcComponent) {
-								// user has drawn an inhibitor arc where there
-								// is
-								// a normal arc already - nothing to do
-							} else if (someArc instanceof InhibitorArc) {
-								// user has drawn an inhibitor arc where there
-								// is
-								// an inhibitor arc already - we increment arc's
-								// weight
-								int weight = someArc.getWeight();
-								undoManager.addNewEdit(someArc
-										.setWeight(++weight));
-							} else {
-								// This is not supposed to happen
-							}
-							createInhibitorArc.delete();
-							someArc.getTransition().removeArcCompareObject(
-									createInhibitorArc);
-							someArc.getTransition().updateConnected();
-							break;
-						}
-					}
-
-					if (isNewArc == true) {
-						createInhibitorArc.setSelectable(true);
-						createInhibitorArc.setTarget(currentObject);
-						currentObject.addConnectTo(createInhibitorArc);
-						// Evil hack to prevent the arc being added to GuiView
-						// twice
-						contentPane.remove(createInhibitorArc);
-						guiModel.addArc(createInhibitorArc);
-						view.addNewPetriNetObject(createInhibitorArc);
-						undoManager.addNewEdit(new AddPetriNetObjectEdit(
-								createInhibitorArc, view, guiModel));
-					}
-
-					// arc is drawn, remove handler:
-					createInhibitorArc.removeKeyListener(keyHandler);
-					keyHandler = null;
-					view.createArc = null;
-				}
-			}
-			break;
-
-		case Pipe.FAST_TRANSITION:
-		case Pipe.FAST_PLACE:
-			fastMode = true;
-		case Pipe.ARC:
-			Arc createArc = view.createArc;
-			if (createArc != null) {
-		
-				if (currentObject != createArc.getSource()) {
-					createArc.setSelectable(true);
-					Iterator<Arc> arcsFrom = createArc.getSource()
-							.getConnectFromIterator();
-					// search for pre-existent arcs from createArc's source to
-					// createArc's target
-					while (arcsFrom.hasNext()) {
-						Arc someArc = (arcsFrom.next());
-						if (someArc == createArc) {
-							break;
-						} else if (someArc.getSource() == createArc.getSource()
-								&& someArc.getTarget() == currentObject) {
-							isNewArc = false;
-
-							if (someArc instanceof TimedOutputArcComponent) {
-								// user has drawn a normal arc where there is
-								// a normal arc already - we increment arc's
-								// weight
-
-								if (!(Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET)) {
-									int weight = someArc.getWeight();
-									undoManager.addNewEdit(someArc
-											.setWeight(++weight));
-								} else {
-									// System.out.println("We dont allow more than one arc from place to transition or transition to place");
-									// JOptionPane.showMessageDialog(CreateGui.getApp(),
-									// "We dont allow more than one arc from place to transition or transition to place!",
-									// "Error",
-									// JOptionPane.ERROR_MESSAGE);
-								}
-							} else {
-								// user has drawn a normal arc where there is
-								// an inhibitor arc already - nothing to do
-								// System.out.println("DEBUG: arc normal i arc inhibidor!");
-							}
-							createArc.delete();
-							someArc.getTransition().removeArcCompareObject(createArc);
-							someArc.getTransition().updateConnected();
-							break;
-						}
-					}
-
-					if (isNewArc == true) {
-						currentObject.addConnectTo(createArc);
-
-						// Evil hack to prevent the arc being added to GuiView
-						// twice
-						contentPane.remove(createArc);
-
-						guiModel.addArc((TimedOutputArcComponent) createArc);
-						view.addNewPetriNetObject(createArc);
-						if (!fastMode) {
-							// we are not in fast mode so we have to set a new
-							// edit
-							// in undoManager for adding the new arc
-							undoManager.newEdit(); // new "transaction""
-						}
-						undoManager.addEdit(new AddPetriNetObjectEdit(
-								createArc, view, guiModel));
-					}
-
-					// arc is drawn, remove handler:
-					createArc.removeKeyListener(keyHandler);
-					keyHandler = null;
-					/**/
-					if (isNewArc == false) {
-						view.remove(createArc);
-					}
-					/* */
-					view.createArc = null;
-				}
-			}
-
-			if (app.getMode() == Pipe.FAST_PLACE
-					|| app.getMode() == Pipe.FAST_TRANSITION) {
-				if (view.newPNO == true) {
-					// a new PNO has been created
-					view.newPNO = false;
-
-					if (currentObject instanceof Transition) {
-						app.setMode(Pipe.FAST_PLACE);
-					} else if (currentObject instanceof Place) {
-						app.setMode(Pipe.FAST_TRANSITION);
-					}
-				} else {
-					if (view.createArc == null) {
-						// user has clicked on an existent PNO
-						app.resetMode();
-					} else {
-						if (currentObject instanceof Transition) {
-							app.setMode(Pipe.FAST_PLACE);
-						} else if (currentObject instanceof Place) {
-							app.setMode(Pipe.FAST_TRANSITION);
-						}
-					}
-				}
-			}
-			break;
-		/* CB Joakim Byg - handle timed arc in the same way as normal arc */
-		// Lets also handle Transport arcs
-
 		case Pipe.TRANSPORTARC:
 
 			Arc transportArcToCreate = view.createArc;
@@ -634,8 +419,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			}
 
 			break;
-		case Pipe.FAST_TAPNPLACE:
-		case Pipe.FAST_TAPNTRANSITION:
 		case Pipe.TAPNARC:
 
 			Arc timedArcToCreate = view.createArc;
@@ -790,7 +573,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 			}
 			break;
-		/* EOC */
 		default:
 			break;
 		}
