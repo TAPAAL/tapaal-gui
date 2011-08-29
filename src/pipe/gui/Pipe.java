@@ -20,50 +20,24 @@ public class Pipe {
 	// String DEFAULT_FILENAME = "PetriNet.xml";
 
 	// PetriNet Object Type Definitions
-	public static final int ANIMATE = 98;
-	public static final int RANDOM = 99;
-	public static final int START = 100;
-	public static final int FIRE = 101;
-	public static final int STEPFORWARD = 102;
-	public static final int STEPBACKWARD = 103;
-	public static final int STOP = 104;
+	
 
-	public static final int PLACE = 105;
 
-	public static final int IMMTRANS = 106;
-	public static final int TIMEDTRANS = 114;
-	public static final int ADDTOKEN = 107;
-	public static final int DELTOKEN = 108;
-	public static final int ANNOTATION = 109;
-	public static final int SELECT = 110;
-	public static final int DELETE = 111;
-	public static final int ARC = 112;
-	public static final int GRID = 113;
-	public static final int INHIBARC = 116;
+	
+	public static enum elementType {
+		PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC, 
+		//TAPN Elements
+		TAPNPLACE, TAPNTRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
+		//Others (might refactore)
+		ADDTOKEN, DELTOKEN, SELECT, DELETE, DRAW, GRID, DRAG, CREATING,
+		//Fast modes
+		FAST_TRANSITION, FAST_PLACE, 
+		//Others (refactore?)
+		STOP, STEPBACKWARD, STEPFORWARD, FIRE, START, RANDOM, ANIMATE, TIMEPASS
+		
+	}
 
-	// Values for Timed-Arc Petri Nets
-	public static final int TAPNPLACE = 700;
-	public static final int TAPNTRANS = 701;
-
-	public static final int TAPNARC = 702;
-	public static final int TRANSPORTARC = 703;
-
-	public static final int FAST_TAPNPLACE = 705;
-	public static final int FAST_TAPNTRANSITION = 706;
-	public static final int TAPNINHIBITOR_ARC = 707;
-
-	// Other
-	public static final int DRAW = 115;
-
-	public static final int DRAG = 120;
-
-	public static final int FAST_PLACE = 150;
-	public static final int FAST_TRANSITION = 151;
-
-	// Special: Parsing in a PNML file - creating components
-	public static final int CREATING = 200;
-
-	public static final int DEFAULT_ELEMENT_TYPE = SELECT;
+	public static final elementType DEFAULT_ELEMENT_TYPE = elementType.SELECT;
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;
 	public static final int DASHED_PADDING = 8;

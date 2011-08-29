@@ -93,7 +93,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
 		if (CreateGui.getView().createArc == null) {
 			switch (CreateGui.getApp().getMode()) {
-			case Pipe.TAPNARC:{
+			case TAPNARC:{
 
 				if (currentObject instanceof TimedPlaceComponent) {
 					Arc arc = new TimedInputArcComponent(currentObject);
@@ -104,7 +104,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 				break;
 			}
-			case Pipe.TAPNINHIBITOR_ARC:{
+			case TAPNINHIBITOR_ARC:{
 
 				if (currentObject instanceof Place) {
 					Arc arc = new TimedInhibitorArcComponent(currentObject);
@@ -113,7 +113,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				break;
 			}
-			case Pipe.TRANSPORTARC:{
+			case TRANSPORTARC:{
 				boolean isInPreSet = false;
 				if (currentObject instanceof Place) {
 					isInPreSet = true;
@@ -154,7 +154,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 		
 		switch (app.getMode()) {
-		case Pipe.TAPNINHIBITOR_ARC:
+		case TAPNINHIBITOR_ARC:
 			TimedInhibitorArcComponent createTAPNInhibitorArc = (TimedInhibitorArcComponent) view.createArc;
 				if (currentObject != createTAPNInhibitorArc.getSource()) {
 
@@ -201,7 +201,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				}
 
 			break;
-		case Pipe.TRANSPORTARC:
+		case TRANSPORTARC:
 
 			Arc transportArcToCreate = view.createArc;
 
@@ -381,7 +381,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 
 			break;
-		case Pipe.TAPNARC:
+		case TAPNARC:
 
 			Arc timedArcToCreate = view.createArc;
 

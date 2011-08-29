@@ -21,6 +21,7 @@ import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
+import pipe.gui.Pipe.elementType;
 import dk.aau.cs.gui.undo.Command;
 
 /**
@@ -212,8 +213,8 @@ public class UndoManager {
 	}
 
 	private void checkMode() {
-		if ((app.getMode() == Pipe.FAST_PLACE)
-				|| (app.getMode() == Pipe.FAST_TRANSITION)) {
+		if ((app.getMode() == Pipe.elementType.FAST_PLACE)
+				|| (app.getMode() == Pipe.elementType.FAST_TRANSITION)) {
 			app.resetMode();
 		}
 	}

@@ -8,6 +8,7 @@ import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
+import pipe.gui.Pipe.elementType;
 
 /**
  * @authors Michael Camacho and Tom Barnwell
@@ -42,8 +43,8 @@ public class ArcKeyboardEventHandler extends KeyAdapter {
 			aView.createArc = null;
 			arcBeingDrawn.delete();
 
-			if ((CreateGui.getApp().getMode() == Pipe.FAST_PLACE)
-					|| (CreateGui.getApp().getMode() == Pipe.FAST_TRANSITION)) {
+			if ((CreateGui.getApp().getMode() == elementType.FAST_PLACE)
+					|| (CreateGui.getApp().getMode() == elementType.FAST_TRANSITION)) {
 				CreateGui.getApp().resetMode();
 			}
 			aView.repaint();

@@ -95,7 +95,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		switch (CreateGui.getApp().getMode()) {
-		case Pipe.SELECT:
+		case SELECT:
 			if (!isDragging) {
 				break;
 			}

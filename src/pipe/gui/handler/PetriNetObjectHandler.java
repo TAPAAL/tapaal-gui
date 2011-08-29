@@ -14,6 +14,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
+import pipe.gui.Pipe.elementType;
 import pipe.gui.action.DeletePetriNetObjectAction;
 
 /**
@@ -80,7 +81,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == Pipe.SELECT) {
+		if (CreateGui.getApp().getMode() == elementType.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
 					((DrawingSurfaceImpl) contentPane).getSelectionObject()
@@ -110,7 +111,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == Pipe.SELECT) {
+		if (CreateGui.getApp().getMode() == elementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
 				CreateGui.getView().getUndoManager().translateSelection(
@@ -143,7 +144,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == Pipe.SELECT) {
+		if (CreateGui.getApp().getMode() == elementType.SELECT) {
 			if (myObject.isDraggable()) {
 				if (!isDragging) {
 					isDragging = true;
