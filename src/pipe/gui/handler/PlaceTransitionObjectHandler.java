@@ -138,7 +138,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		boolean fastMode = false;
 
 		DrawingSurfaceImpl view = CreateGui.getView();
 		UndoManager undoManager = view.getUndoManager();
@@ -162,8 +161,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		case Pipe.TAPNINHIBITOR_ARC:
 			TimedInhibitorArcComponent createTAPNInhibitorArc = (TimedInhibitorArcComponent) view.createArc;
 			if (createTAPNInhibitorArc != null) {
-				if (!currentObject.getClass().equals(
-						createTAPNInhibitorArc.getSource().getClass())) {	
+				if (currentObject != createTAPNInhibitorArc.getSource()) {
 
 					try {
 						dk.aau.cs.model.tapn.TimedInhibitorArc tia = new TimedInhibitorArc(
@@ -401,18 +399,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 			if (timedArcToCreate != null) {
 				if (currentObject != timedArcToCreate.getSource()) {
-					// Remove the reference to createArc to avoid racecondision
-					// with gui
 					view.createArc = null;
 
 					timedArcToCreate.setSelectable(true);
-					
-					//XXX, kyrke hack to prevent a race condition in pipe gui
-					if (timedArcToCreate.getTarget() == null
-							|| !(timedArcToCreate.getTransition() instanceof Transition)) {
-						cleanupArc(timedArcToCreate, view);
-						break;
-					}
 
 					// We create NormalArcs when source of arc is Transition(
 					// since there are no intervals on output arcs.) ...except
@@ -451,12 +440,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						guiModel.addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
-						if (!fastMode) {
-							// we are not in fast mode so we have to set a new
-							// edit
-							// in undoManager for adding the new arc
-							undoManager.newEdit(); // new "transaction""
-						}
+						
+						undoManager.newEdit(); // new "transaction""
+						
 						undoManager.addEdit(new AddTimedOutputArcCommand(
 								(TimedOutputArcComponent) timedArcToCreate,
 								model, guiModel, view));
@@ -499,12 +485,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						guiModel
 								.addArc((TimedOutputArcComponent) timedArcToCreate);
 						view.addNewPetriNetObject(timedArcToCreate);
-						if (!fastMode) {
-							// we are not in fast mode so we have to set a new
-							// edit
-							// in undoManager for adding the new arc
-							undoManager.newEdit(); // new "transaction""
-						}
+
+						undoManager.newEdit(); // new "transaction""
+
 						undoManager.addEdit(new AddTimedInputArcCommand(
 								(TimedInputArcComponent) timedArcToCreate,
 								model, guiModel, view));
