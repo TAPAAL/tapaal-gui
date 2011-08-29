@@ -191,12 +191,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		boolean isNewArc = true; // true if we have to add a new arc to the
-									// Petri Net
+		boolean isNewArc = true; // true if we have to add a new arc to the Petri Net
 		boolean fastMode = false;
 
 		DrawingSurfaceImpl view = CreateGui.getView();
-		// DataLayer model = CreateGui.getModel();
 		UndoManager undoManager = view.getUndoManager();
 		GuiFrame app = CreateGui.getApp();
 
@@ -653,12 +651,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					//XXX, kyrke hack to prevent a race condition in pipe gui
 					if (timedArcToCreate.getTarget() == null
 							|| !(timedArcToCreate.getTransition() instanceof Transition)) {
-						timedArcToCreate.delete();
-						timedArcToCreate.removeKeyListener(keyHandler);
-						keyHandler = null;
-						view.remove(timedArcToCreate);
-						view.createArc = null;
-						view.repaint();
+						cleanupArc(timedArcToCreate, view);
 						break;
 					}
 
