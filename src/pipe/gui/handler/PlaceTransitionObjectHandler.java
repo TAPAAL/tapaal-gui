@@ -75,6 +75,12 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		newArc.requestFocusInWindow();
 		newArc.setSelectable(false);
 	}
+	// Call this function to cleanup temporary key handlers for an new arc object
+	private void freeArc(Arc newArc){
+		newArc.removeKeyListener(keyHandler);
+		keyHandler = null;
+		CreateGui.getView().createArc = null;
+	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -185,10 +191,9 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							createTAPNInhibitorArc, model, guiModel, view));
 
 					// arc is drawn, remove handler:
-					createTAPNInhibitorArc.removeKeyListener(keyHandler);
-					keyHandler = null;
+					freeArc(createTAPNInhibitorArc);
 					
-					view.createArc = null;
+					
 				}
 			}
 			break;
@@ -297,10 +302,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						guiModel.addArc((TimedOutputArcComponent) transportArcToCreate);
 						view.addNewPetriNetObject(transportArcToCreate);
 
-						// arc is drawn, remove handler:
-						transportArcToCreate.removeKeyListener(keyHandler);
-						keyHandler = null;
-						view.createArc = null;
+						// arc is drawn, remove handlers:
+						freeArc(transportArcToCreate);
 						
 						// Create the next arc
 						TransportArcComponent arc2 = new TransportArcComponent(currentObject, groupMaxCounter + 1, false);
@@ -362,11 +365,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 										guiModel, 
 										view));
 
-						// arc is drawn, remove handler:
-						transportArcToCreate.removeKeyListener(keyHandler);
-						keyHandler = null;
-					
-						view.createArc = null;
+						// arc is drawn, remove handlers:
+						freeArc(transportArcToCreate);
 
 						arc2.setGroupNr(arc1.getGroupNr());
 
@@ -479,10 +479,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 					}
 					// arc is drawn, remove handler:
-					timedArcToCreate.removeKeyListener(keyHandler);
-					keyHandler = null;
-					
-					view.createArc = null;
+					// arc is drawn, remove handlers:
+					freeArc(timedArcToCreate);
 				}
 			}
 			break;
@@ -501,10 +499,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 	private void cleanupArc(Arc arc, DrawingSurfaceImpl view) {
 		arc.delete();
-		arc.removeKeyListener(keyHandler);
-		keyHandler = null;
+		// arc is drawn, remove handlers:
+		freeArc(arc);
+		
 		view.remove(arc);
-		view.createArc = null;
 		view.repaint();
 	}
 }
