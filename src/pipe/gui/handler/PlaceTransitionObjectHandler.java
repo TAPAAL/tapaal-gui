@@ -517,33 +517,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					view.createArc = null;
 				}
 			}
-
-			if (app.getMode() == Pipe.FAST_TAPNPLACE
-					|| app.getMode() == Pipe.FAST_TAPNTRANSITION) {
-
-				if (view.newPNO == true) {
-
-					// a new PNO has been created
-					view.newPNO = false;
-
-					if (currentObject instanceof Transition) {
-						app.setMode(Pipe.FAST_TAPNPLACE);
-					} else if (currentObject instanceof Place) {
-						app.setMode(Pipe.FAST_TAPNTRANSITION);
-					}
-				} else {
-					if (view.createArc == null) {
-						// user has clicked on an existent PNO
-						app.resetMode();
-					} else {
-						if (currentObject instanceof Transition) {
-							app.setMode(Pipe.FAST_TAPNPLACE);
-						} else if (currentObject instanceof Place) {
-							app.setMode(Pipe.FAST_TAPNTRANSITION);
-						}
-					}
-				}
-			}
 			break;
 		default:
 			break;
