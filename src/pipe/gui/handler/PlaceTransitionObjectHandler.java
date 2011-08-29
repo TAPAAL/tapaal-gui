@@ -29,7 +29,6 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
-import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
 /**
@@ -84,55 +83,39 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		}
 
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
-		
-		switch (CreateGui.getApp().getMode()) {
+		if (CreateGui.getView().createArc == null) {
+			switch (CreateGui.getApp().getMode()) {
+			case Pipe.TAPNARC:{
 
-		case Pipe.FAST_TAPNPLACE:
-		case Pipe.FAST_TAPNTRANSITION:
-		case Pipe.TAPNARC:
-			if (CreateGui.getView().createArc == null) {
-
-				if (Pipe.drawingmode == Pipe.drawmodes.TIMEDARCPETRINET) {
-					// We only create a TAPNArc if source is not at TimedPlace
-					// NormalArc tmparc = new NormalArc(currentObject);
-
-					if (currentObject instanceof TimedPlaceComponent) {
-						Arc arc = new TimedInputArcComponent(currentObject);
-						createArc(arc, currentObject);
-					} else {
-						Arc arc = new TimedOutputArcComponent(currentObject);
-						createArc(arc, currentObject);
-					}
+				if (currentObject instanceof TimedPlaceComponent) {
+					Arc arc = new TimedInputArcComponent(currentObject);
+					createArc(arc, currentObject);
 				} else {
-					// XXX - Dont know why this has to be here, but i kind of
-					// works now?? -- kyrke
-
+					Arc arc = new TimedOutputArcComponent(currentObject);
+					createArc(arc, currentObject);
 				}
+				break;
 			}
+			case Pipe.TAPNINHIBITOR_ARC:{
 
-			break;
+				if (currentObject instanceof Place) {
+					Arc arc = new TimedInhibitorArcComponent(currentObject);
+					createArc(arc, currentObject);
+				}
 
-		case Pipe.TAPNINHIBITOR_ARC:
-			if (CreateGui.getView().createArc == null) {
-					if (currentObject instanceof Place) {
-						Arc arc = new TimedInhibitorArcComponent(currentObject);
-						createArc(arc, currentObject);
-					}
+				break;
 			}
-			break;
-		case Pipe.TRANSPORTARC:
-			if (CreateGui.getView().createArc == null) {
+			case Pipe.TRANSPORTARC:{
 				boolean isInPreSet = false;
 				if (currentObject instanceof Place) {
 					isInPreSet = true;
 					Arc arc = new TransportArcComponent(currentObject, 1,
-									isInPreSet);
+							isInPreSet);
 					createArc(arc, currentObject);
 				}
+				break;
 			}
-			break;
-		default:
-			break;
+			}
 		}
 	}
 

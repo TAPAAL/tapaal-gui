@@ -11,13 +11,6 @@ public class Pipe {
 	   return "" + Pipe.TOOL + " " + Pipe.VERSION;
    }
    
-	public enum drawmodes {
-		PETRINET, TIMEDPETRINET, TIMEDARCPETRINET
-	}
-
-	// For TAPAAL we hardcode the drawingmode
-	public static drawmodes drawingmode = Pipe.drawmodes.TIMEDARCPETRINET;
-
 	// Filesystem Definitions
 	public static final String PROPERTY_FILE_EXTENSION = ".properties";
 	public static final String PROPERTY_FILE_DESC = "PIPE Properties file";
