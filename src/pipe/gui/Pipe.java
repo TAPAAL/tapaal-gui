@@ -101,8 +101,6 @@ public class Pipe {
 	public static final int MAX_NODES = 20000; // it was 10000 previously
 	// TODO: find a better value for MAX_NODES
 
-	public static final int TIMEPASS = 700;
-
 	public static final int verifytaMinRev = 4543;// 4409;
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
