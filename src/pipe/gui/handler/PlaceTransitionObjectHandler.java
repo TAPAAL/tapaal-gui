@@ -137,6 +137,11 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		super.mouseReleased(e);
 
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
+		
+		if (view.createArc == null){
+			//If we have no arc, we have nothing to do
+			return;
+		}
 
 		//Check if the mouse was moved since key down event, and we are looking at the target
 		//Break the drawing if this is the case
@@ -151,7 +156,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 		switch (app.getMode()) {
 		case Pipe.TAPNINHIBITOR_ARC:
 			TimedInhibitorArcComponent createTAPNInhibitorArc = (TimedInhibitorArcComponent) view.createArc;
-			if (createTAPNInhibitorArc != null) {
 				if (currentObject != createTAPNInhibitorArc.getSource()) {
 
 					try {
@@ -195,12 +199,12 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					
 					
 				}
-			}
+
 			break;
 		case Pipe.TRANSPORTARC:
 
 			Arc transportArcToCreate = view.createArc;
-			if (transportArcToCreate != null) {
+
 				if (currentObject != transportArcToCreate.getSource()) {
 
 					transportArcToCreate.setSelectable(true);
@@ -375,22 +379,18 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 				}
 
-			}
 
 			break;
 		case Pipe.TAPNARC:
 
 			Arc timedArcToCreate = view.createArc;
 
-			if (timedArcToCreate != null) {
 				if (currentObject != timedArcToCreate.getSource()) {
 					view.createArc = null;
 
 					timedArcToCreate.setSelectable(true);
 
-					// We create NormalArcs when source of arc is Transition(
-					// since there are no intervals on output arcs.) ...except
-					// if the arc is a TransportArc
+					// Are we creating an Input or Output arc_
 					if (!(timedArcToCreate instanceof TimedInputArcComponent)) {
 
 						// Set underlying TimedInputArc
@@ -482,9 +482,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					// arc is drawn, remove handlers:
 					freeArc(timedArcToCreate);
 				}
-			}
-			break;
-		default:
 			break;
 		}
 	}
