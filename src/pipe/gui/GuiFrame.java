@@ -385,27 +385,27 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu drawMenu = new JMenu("Draw");
 		 drawMenu.setMnemonic('D');
 		 addMenuItem(drawMenu, selectAction = new TypeAction("Select",
-				 Pipe.SELECT, "Select components", "S", true));
+				 Pipe.SELECT, "Select components (S)", "S", true));
 		 drawMenu.addSeparator();
 
 		 addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
-				 Pipe.TAPNPLACE, "Add a place", "P", true));
+				 Pipe.TAPNPLACE, "Add a place (P)", "P", true));
 
 		 addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-				 Pipe.TAPNTRANS, "Add a transition", "T", true));
+				 Pipe.TAPNTRANS, "Add a transition (T)", "T", true));
 
 		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
-				 Pipe.TAPNARC, "Add an arc", "A", true));
+				 Pipe.TAPNARC, "Add an arc (A)", "A", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "R",
+				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc (R)", "R",
 				 true));
 
 		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
-				 Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc", "I", true));
+				 Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
 		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
-				 Pipe.ANNOTATION, "Add an annotation", "N", true));
+				 Pipe.ANNOTATION, "Add an annotation (N)", "N", true));
 		 
 		 drawMenu.addSeparator();
 		 
@@ -450,7 +450,7 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
-				 "Simulation mode", Pipe.START, "Toggle Simulation Mode",
+				 "Simulation mode", Pipe.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 animateMenu.addSeparator();
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
