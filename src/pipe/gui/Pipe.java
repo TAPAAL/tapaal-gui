@@ -16,14 +16,8 @@ public class Pipe {
 	public static final String PROPERTY_FILE_DESC = "PIPE Properties file";
 	public static final String CLASS_FILE_EXTENSION = ".class";
 	public static final String CLASS_FILE_DESC = "Java Class File";
-	// File DEFAULT_DIRECTORY = new File("Petri-Nets");
-	// String DEFAULT_FILENAME = "PetriNet.xml";
 
-	// PetriNet Object Type Definitions
-	
-
-
-	
+	//Enum for all actions and types of elements
 	public static enum elementType {
 		PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC, 
 		//TAPN Elements
@@ -98,14 +92,10 @@ public class Pipe {
 	public static Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
 	public static Color ANIMATION_BACKGROUND_COLOR = new Color(246, 250, 255);
 
-	public static final int MAX_NODES = 20000; // it was 10000 previously
-	// TODO: find a better value for MAX_NODES
+	public static final int MAX_NODES = 20000;
 
 	public static final int verifytaMinRev = 4543;// 4409;
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
-
-	// public static final int NUMBER_OF_BUTTONS =
-	// MouseInfo.getNumberOfButtons();
 
 }
