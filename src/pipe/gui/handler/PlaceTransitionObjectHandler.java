@@ -3,12 +3,9 @@ package pipe.gui.handler;
 import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
-
 import javax.swing.JOptionPane;
-
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.Place;
 import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TimedInhibitorArcComponent;
@@ -22,7 +19,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
-import pipe.gui.undo.AddPetriNetObjectEdit;
 import pipe.gui.undo.AddTimedInhibitorArcCommand;
 import pipe.gui.undo.AddTimedInputArcCommand;
 import pipe.gui.undo.AddTimedOutputArcCommand;
@@ -33,6 +29,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.RequireException;
 
 /**
@@ -131,12 +128,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 					Arc arc = new TransportArcComponent(currentObject, 1,
 									isInPreSet);
 					createArc(arc, currentObject);
-				} else {
-					// Do nothing this is not supported
 				}
-
-			} else {
-				// XXX Do stuff - perhaps
 			}
 			break;
 		default:
@@ -157,20 +149,22 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 		PlaceTransitionObject currentObject = (PlaceTransitionObject) myObject;
 
+		//Check if the mouse was moved since key down event, and we are looking at the target
+		//Break the drawing if this is the case
+		Arc createArc = view.createArc; 
+		if (createArc != null && currentObject != createArc.getSource()){
+		if (createArc.getTarget() == null) {
+			cleanupArc(createArc, view);
+			return;
+		}
+		}
+		
 		switch (app.getMode()) {
 		case Pipe.TAPNINHIBITOR_ARC:
 			TimedInhibitorArcComponent createTAPNInhibitorArc = (TimedInhibitorArcComponent) view.createArc;
 			if (createTAPNInhibitorArc != null) {
 				if (!currentObject.getClass().equals(
-						createTAPNInhibitorArc.getSource().getClass())) {
-
-					// XXX -- kyrke hack to precent some race condisions in pipe
-					// gui
-					if (createTAPNInhibitorArc.getTarget() == null
-							|| !(createTAPNInhibitorArc.getTransition() instanceof Transition)) {
-						cleanupArc(createTAPNInhibitorArc, view);
-						break;
-					}
+						createTAPNInhibitorArc.getSource().getClass())) {	
 
 					try {
 						dk.aau.cs.model.tapn.TimedInhibitorArc tia = new TimedInhibitorArc(
@@ -225,9 +219,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 			Arc transportArcToCreate = view.createArc;
 			if (transportArcToCreate != null) {
 				if (currentObject != transportArcToCreate.getSource()) {
-					// Remove the reference to createArc to avoid racecondision
-					// with gui
-					view.createArc = null;
 
 					transportArcToCreate.setSelectable(true);
 
@@ -332,48 +323,40 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						transportArcToCreate.removeKeyListener(keyHandler);
 						keyHandler = null;
 						view.createArc = null;
-
-						view.transportArcPart1 = (TransportArcComponent) transportArcToCreate;
-
+						
 						// Create the next arc
-						Arc arc = new TransportArcComponent(currentObject, groupMaxCounter + 1, false);
-						createArc(arc, currentObject);
+						TransportArcComponent arc2 = new TransportArcComponent(currentObject, groupMaxCounter + 1, false);
+						
+						//Update the partners for the arcs
+						TransportArcComponent arc1 = ((TransportArcComponent) transportArcToCreate);
+						
+						arc2.setConnectedTo(arc1);
+						arc1.setConnectedTo(arc2);
+										
+						//Draw part 2 of the transport arc
+						createArc(arc2, currentObject);
+						
 
 					} else if (transportArcToCreate.getSource() instanceof Transition) {
-						// Step 2
-						if (view.transportArcPart1 == null) {
-							System.err.println("There where a error, cant creat a transport arc without part one");
-							// arc is drawn, remove handler:
-							transportArcToCreate.removeKeyListener(keyHandler);
-							keyHandler = null;
-							view.createArc = null;
-							break;
-						}
-
-						// Check if arc has leagal target
-						if (!(transportArcToCreate.getTarget() instanceof TimedPlaceComponent && transportArcToCreate
-								.getTarget() != null)) {
-							System.err.println("Error creating transport arc, invalid target");
-							transportArcToCreate.delete();
-							view.transportArcPart1.delete();
-							break;
-						}
-
+						
+						TransportArcComponent arc2 = (TransportArcComponent) transportArcToCreate;
+						TransportArcComponent arc1 = arc2.getConnectedTo();
+						
 						dk.aau.cs.model.tapn.TransportArc ta;
 						try {
 							ta = new dk.aau.cs.model.tapn.TransportArc(
-									((TimedPlaceComponent) view.transportArcPart1.getSource()).underlyingPlace(),
-									((TimedTransitionComponent) transportArcToCreate.getSource()).underlyingTransition(),
-									((TimedPlaceComponent) transportArcToCreate.getTarget()).underlyingPlace(),
+									((TimedPlaceComponent) arc1.getSource()).underlyingPlace(),
+									((TimedTransitionComponent) arc2.getSource()).underlyingTransition(),
+									((TimedPlaceComponent) arc2.getTarget()).underlyingPlace(),
 									TimeInterval.ZERO_INF);
 							model.add(ta);
 							((TransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
-							(view.transportArcPart1).setUnderlyingArc(ta);
-							view.transportArcPart1.updateWeightLabel(true);
+							arc1.setUnderlyingArc(ta);
+							arc1.updateWeightLabel(true);
 							((TransportArcComponent) transportArcToCreate).updateWeightLabel(true);
 						} catch (RequireException ex) {
-							cleanupArc(transportArcToCreate, view);
-							cleanupArc(view.transportArcPart1, view);
+							cleanupArc(arc1, view);
+							cleanupArc(arc2, view);
 							JOptionPane.showMessageDialog(
 											CreateGui.getApp(),
 											"There was an error drawing the arc. Possible problems:\n"
@@ -383,35 +366,37 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 											"Error", JOptionPane.ERROR_MESSAGE);
 							break;
 						}
-						currentObject.addConnectTo(transportArcToCreate);
 
 						// Evil hack to prevent the arc being added to GuiView
 						// twice
-						contentPane.remove(transportArcToCreate);
+						contentPane.remove(arc2);
 
-						guiModel.addArc((TimedOutputArcComponent) transportArcToCreate);
-						view.addNewPetriNetObject(transportArcToCreate);
+						guiModel.addArc(arc2);
+						view.addNewPetriNetObject(arc2);
+						
 						undoManager.newEdit();
 
-						undoManager.addEdit(new AddTransportArcCommand((TransportArcComponent) transportArcToCreate,ta, model, guiModel, view));
+						undoManager.addEdit(
+								new AddTransportArcCommand(
+										arc2,
+										(dk.aau.cs.model.tapn.TransportArc) (arc2.underlyingTransportArc()), 
+										model, 
+										guiModel, 
+										view));
 
 						// arc is drawn, remove handler:
 						transportArcToCreate.removeKeyListener(keyHandler);
 						keyHandler = null;
 						
 						if (isNewArc == false) {
-							view.remove(transportArcToCreate);
+							view.remove(arc2);
 						}
 					
 						view.createArc = null;
 
-						((TransportArcComponent) transportArcToCreate)
-								.setGroupNr(view.transportArcPart1.getGroupNr());
+						arc2.setGroupNr(arc1.getGroupNr());
 
-						// Ekstra suff
-						view.transportArcPart1.setConnectedTo(((TransportArcComponent) transportArcToCreate));
-						((TransportArcComponent) transportArcToCreate).setConnectedTo(view.transportArcPart1);
-						view.transportArcPart1 = null;
+						
 					}
 
 				}

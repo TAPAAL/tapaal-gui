@@ -1704,12 +1704,6 @@ public class GuiFrame extends JFrame implements Observer {
 				appView.createArc = null;
 				appView.repaint();
 
-				// Also handel trasport arcs (if any)
-				if (appView.transportArcPart1 != null) {
-					appView.transportArcPart1.delete();
-					appView.transportArcPart1 = null;
-					appView.repaint();
-				}
 			}
 
 			if (typeID == Pipe.SELECT) {

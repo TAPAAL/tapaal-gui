@@ -42,13 +42,6 @@ public class ArcKeyboardEventHandler extends KeyAdapter {
 			aView.createArc = null;
 			arcBeingDrawn.delete();
 
-			if (arcBeingDrawn instanceof TransportArcComponent) {
-				if (aView.transportArcPart1 != null) {
-					aView.transportArcPart1.delete();
-					aView.transportArcPart1 = null;
-				}
-			}
-
 			if ((CreateGui.getApp().getMode() == Pipe.FAST_PLACE)
 					|| (CreateGui.getApp().getMode() == Pipe.FAST_TRANSITION)) {
 				CreateGui.getApp().resetMode();

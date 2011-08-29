@@ -66,9 +66,6 @@ Printable, DrawingSurface {
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
-	public TransportArcComponent transportArcPart1; // used when creating
-	// transport arcs
-
 	public PlaceTransitionObject createPTO;
 
 	private AnimationHandler animationHandler = new AnimationHandler();

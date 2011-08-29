@@ -108,8 +108,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 
 		super.delete();
 
-		// xxx - hack to awoid delete loop
-
+		//Avoid delete loop (but we need to save connected to for undo redo)
 		TransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a != null && a.connectedTo != null) {
@@ -123,6 +122,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	public void undelete(DrawingSurfaceImpl view) {
 		super.undelete(view);
 
+		//Avoid loop
 		TransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a.connectedTo != null) {
