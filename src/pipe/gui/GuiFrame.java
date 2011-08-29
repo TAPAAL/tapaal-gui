@@ -1930,7 +1930,7 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("Based on PIPE2:\n");
 		buffer.append("http://pipe2.sourceforge.net/");
 
-		JOptionPane.showMessageDialog(null, buffer.toString(), "About TAPAAL",
+		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.TOOLNAME,
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
 	
