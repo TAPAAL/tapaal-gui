@@ -461,7 +461,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void showSharedTransitionNameDialog(SharedTransition transitionToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Transition", true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, nameGenerator, transitionToEdit);
@@ -474,7 +474,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Place", true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 

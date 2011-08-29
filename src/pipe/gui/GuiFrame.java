@@ -55,6 +55,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.tapaal.TAPAAL;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
@@ -1869,7 +1871,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 	}
 	public void showAbout() {
-		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
+		StringBuffer buffer = new StringBuffer("About " + TAPAAL.TOOLNAME);
 		buffer.append("\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
@@ -2168,7 +2170,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showNewPNDialog() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+				"Create new Petri Net", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

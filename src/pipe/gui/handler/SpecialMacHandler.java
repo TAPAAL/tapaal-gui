@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 
 import javax.imageio.ImageIO;
 
+import net.tapaal.TAPAAL;
+
 import pipe.gui.CreateGui;
 import pipe.gui.Pipe;
 
@@ -45,7 +47,7 @@ public class SpecialMacHandler implements AboutHandler, QuitHandler  /*, OpenFil
 	    
 	    //Set specific settings
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", Pipe.TOOL);
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", TAPAAL.TOOLNAME);
 
         // Use native file chooser
         System.setProperty("apple.awt.fileDialogForDirectories", "true");

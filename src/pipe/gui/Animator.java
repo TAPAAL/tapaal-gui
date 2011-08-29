@@ -346,7 +346,7 @@ public class Animator {
 	}
 
 	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Select tokens to fire", true);
 
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));

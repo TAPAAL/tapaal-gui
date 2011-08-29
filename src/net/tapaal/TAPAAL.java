@@ -9,15 +9,25 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import pipe.gui.CreateGui;
+import pipe.gui.Pipe;
 import dk.aau.cs.debug.Logger;
 
 public class TAPAAL {
-
+	
 	/**
 	 * Main class for lunching TAPAAL
 	 * 
 	 * @author Kenneth Yrke Joergensen (kenneth@yrke.dk)
 	 */
+	
+	public static final String TOOLNAME = "TAPAAL";
+	public static final String VERSION = "DEV"; 
+
+	public static String getProgramName(){
+		return "" + TAPAAL.TOOLNAME + " " + TAPAAL.VERSION;
+	}
+
+	
 	public static void main(String[] args) {
 		// Create a CommandLineParser using Posix Style
 		CommandLineParser parser = new PosixParser();

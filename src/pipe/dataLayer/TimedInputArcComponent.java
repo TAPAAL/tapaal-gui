@@ -99,7 +99,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	public void showTimeIntervalEditor() {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Timed Arc", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
