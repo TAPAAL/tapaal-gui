@@ -13,7 +13,7 @@ import pipe.dataLayer.Arc;
 import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -56,7 +56,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 			/* CB Joakim Byg - timed arcs should not be handled here */
 		} else if (myObject instanceof TimedOutputArcComponent
 				&& !(myObject instanceof TimedInputArcComponent)
-				&& !(myObject instanceof TransportArcComponent)) {
+				&& !(myObject instanceof TimedTransportArcComponent)) {
 			/* EOC */
 			
 			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e

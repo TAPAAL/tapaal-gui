@@ -1533,9 +1533,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	class ExampleFileAction extends GuiAction {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -5983638671592349736L;
 		private String filename;
 		private String name;
@@ -1559,9 +1556,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	class DeleteAction extends GuiAction {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -8592450390507637174L;
 
 		DeleteAction(String name, String tooltip, String keystroke) {
@@ -1660,7 +1654,7 @@ public class GuiFrame extends JFrame implements Observer {
 			if (this != timedArcAction) {
 				timedArcAction.setSelected(false);
 			}
-			/* EOC */
+			
 			if (this != timedPlaceAction) {
 				timedPlaceAction.setSelected(false);
 			}
@@ -2047,8 +2041,6 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.userPath = filePath.getParent();
 					createNewTabFromFile(filePath);
 
-					// TODO make update leftPane work better
-					// CreateGui.updateLeftPanel();
 				}
 			} else if (this == createAction) {
 				showNewPNDialog();
@@ -2063,7 +2055,6 @@ public class GuiFrame extends JFrame implements Observer {
 				appTab.remove(index);
 				CreateGui.removeTab(index);
 				
-
 				// Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);

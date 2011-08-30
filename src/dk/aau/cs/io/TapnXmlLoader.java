@@ -38,7 +38,7 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -84,9 +84,9 @@ import dk.aau.cs.util.Tuple;
 
 public class TapnXmlLoader {
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
-	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();;
-	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
-	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();;
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
@@ -562,7 +562,7 @@ public class TapnXmlLoader {
 		return tempArc;
 	}
 
-	private TransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
+	private TimedTransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
 			double _endx, double _endy, Template template, ConstantStore constants) {
@@ -576,7 +576,7 @@ public class TapnXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		TransportArcComponent tempArc = new TransportArcComponent(new TimedInputArcComponent(
+		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(
 				new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
 				inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
@@ -585,7 +585,7 @@ public class TapnXmlLoader {
 
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(sourceIn.getName());
 				TimedTransition trans = template.model().getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -607,16 +607,16 @@ public class TapnXmlLoader {
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	(TransportArcComponent) tempArc);
-				transportArcsTimeIntervals.put((TransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
+				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
+				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
-				TimeInterval interval = transportArcsTimeIntervals.get((TransportArcComponent) presetTransportArc);
+				TimeInterval interval = transportArcsTimeIntervals.get((TimedTransportArcComponent) presetTransportArc);
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -633,9 +633,9 @@ public class TapnXmlLoader {
 				template.model().add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
-				transportArcsTimeIntervals.remove((TransportArcComponent) presetTransportArc);
+				transportArcsTimeIntervals.remove((TimedTransportArcComponent) presetTransportArc);
 			} else {
-				postsetArcs.put((TimedTransitionComponent) sourceIn, (TransportArcComponent) tempArc);
+				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
 			}
 		}
 		return tempArc;
@@ -943,7 +943,7 @@ public class TapnXmlLoader {
 				} else if (newObject instanceof Arc) {
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TransportArcComponent) {
+						if (newObject instanceof TimedTransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
 							//newObject.addMouseWheelListener(transportArcHandler);

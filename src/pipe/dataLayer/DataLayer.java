@@ -177,8 +177,8 @@ public class DataLayer extends Observable implements Cloneable {
 			}
 
 			// Transportarc fix boddy
-			if (arcInput instanceof TransportArcComponent) {
-				TransportArcComponent tmp = (TransportArcComponent) arcInput;
+			if (arcInput instanceof TimedTransportArcComponent) {
+				TimedTransportArcComponent tmp = (TimedTransportArcComponent) arcInput;
 				PlaceTransitionObject first = tmp.getSource();
 
 				if (tmp.getConnectedTo() == null) {
@@ -186,14 +186,14 @@ public class DataLayer extends Observable implements Cloneable {
 
 						for (Object o : tmp.getTarget().getPostset()) {
 
-							if (o instanceof TransportArcComponent) {
-								if (tmp.getGroupNr() == ((TransportArcComponent) o)
+							if (o instanceof TimedTransportArcComponent) {
+								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o)
 										.getGroupNr()) {
 									// Found partner
 
 									tmp
-											.setConnectedTo(((TransportArcComponent) o));
-									((TransportArcComponent) o)
+											.setConnectedTo(((TimedTransportArcComponent) o));
+									((TimedTransportArcComponent) o)
 											.setConnectedTo(tmp);
 
 									break;
@@ -204,18 +204,18 @@ public class DataLayer extends Observable implements Cloneable {
 
 					} else {
 						// First is TimedTransition
-						tmp = (TransportArcComponent) arcInput;
+						tmp = (TimedTransportArcComponent) arcInput;
 
 						for (Object o : tmp.getSource().getPreset()) {
 
-							if (o instanceof TransportArcComponent) {
-								if (tmp.getGroupNr() == ((TransportArcComponent) o)
+							if (o instanceof TimedTransportArcComponent) {
+								if (tmp.getGroupNr() == ((TimedTransportArcComponent) o)
 										.getGroupNr()) {
 									// Found partner
 
 									tmp
-											.setConnectedTo(((TransportArcComponent) o));
-									((TransportArcComponent) o)
+											.setConnectedTo(((TimedTransportArcComponent) o));
+									((TimedTransportArcComponent) o)
 											.setConnectedTo(tmp);
 
 									break;
@@ -239,7 +239,7 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 	}
 
-	public void addTransportArc(TransportArcComponent transportArc) {
+	public void addTransportArc(TimedTransportArcComponent transportArc) {
 		arcsArray.add(transportArc);
 		addArcToArcsMap(transportArc);
 		setChanged();
@@ -988,7 +988,7 @@ public class DataLayer extends Observable implements Cloneable {
 	
 	public boolean hasTransportArcs() {
 		for(Arc arc : arcsArray) {
-			if(arc instanceof TransportArcComponent) {
+			if(arc instanceof TimedTransportArcComponent) {
 				return true;
 			}
 		}
@@ -1075,8 +1075,8 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 		
 		for(Arc arc : arcsArray) {
-			if(arc instanceof TransportArcComponent) {
-				TransportArcComponent transArc = ((TransportArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
+			if(arc instanceof TimedTransportArcComponent) {
+				TimedTransportArcComponent transArc = ((TimedTransportArcComponent)arc).copy(tapn, guiModel, oldToNewMapping);
 				guiModel.addPetriNetObject(transArc);
 			}
 			else if(arc instanceof TimedInhibitorArcComponent) {

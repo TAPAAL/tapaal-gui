@@ -17,7 +17,7 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
@@ -256,8 +256,8 @@ public class UndoManager {
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
 					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view);
-				}else if(pnObject instanceof TransportArcComponent){
-					TransportArcComponent transportArc = (TransportArcComponent)pnObject;
+				}else if(pnObject instanceof TimedTransportArcComponent){
+					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
 					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view);
 				}else if(pnObject instanceof TimedInhibitorArcComponent){
 					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;

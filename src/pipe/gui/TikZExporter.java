@@ -16,7 +16,7 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 
 public class TikZExporter {
 
@@ -95,7 +95,7 @@ public class TikZExporter {
 			String arrowType = "";
 			if (arc instanceof TimedInhibitorArcComponent) {
 				arrowType = "inhibArc";
-			} else if (arc instanceof TransportArcComponent) {
+			} else if (arc instanceof TimedTransportArcComponent) {
 				arrowType = "transportArc";
 			} else if (arc instanceof TimedInputArcComponent) {
 				arrowType = "arc";
@@ -129,15 +129,15 @@ public class TikZExporter {
 				arcLabel += replaceWithMathLatex(((TimedInputArcComponent) arc)
 						.getGuardAsString());
 
-				if (arc instanceof TransportArcComponent)
+				if (arc instanceof TimedTransportArcComponent)
 					arcLabel += ":"
-							+ ((TransportArcComponent) arc).getGroupNr();
+							+ ((TimedTransportArcComponent) arc).getGroupNr();
 
 				arcLabel += "}";
 			} else {
-				if (arc instanceof TransportArcComponent)
+				if (arc instanceof TimedTransportArcComponent)
 					arcLabel = "node[midway,auto] {"
-							+ ":" + ((TransportArcComponent) arc).getGroupNr() + "}";
+							+ ":" + ((TimedTransportArcComponent) arc).getGroupNr() + "}";
 			}
 		}
 		return arcLabel;

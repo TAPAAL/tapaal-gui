@@ -14,7 +14,7 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
@@ -117,7 +117,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 				boolean isInPreSet = false;
 				if (currentObject instanceof Place) {
 					isInPreSet = true;
-					Arc arc = new TransportArcComponent(currentObject, 1,
+					Arc arc = new TimedTransportArcComponent(currentObject, 1,
 							isInPreSet);
 					createArc(arc, currentObject);
 				}
@@ -250,7 +250,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 													"Error",
 													JOptionPane.ERROR_MESSAGE);
 
-								} else if (someArc instanceof TransportArcComponent) {
+								} else if (someArc instanceof TimedTransportArcComponent) {
 									// user has drawn a transport arc where
 									// there is
 									// a transport arc already - We do not allow
@@ -288,14 +288,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						for (Object pt : transportArcToCreate.getTarget()
 								.getPostset()) {
-							if (pt instanceof TransportArcComponent) {
-								if (((TransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
-									groupMaxCounter = ((TransportArcComponent) pt).getGroupNr();
+							if (pt instanceof TimedTransportArcComponent) {
+								if (((TimedTransportArcComponent) pt).getGroupNr() > groupMaxCounter) {
+									groupMaxCounter = ((TimedTransportArcComponent) pt).getGroupNr();
 								}
 							}
 						}
 
-						((TransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
+						((TimedTransportArcComponent) transportArcToCreate).setGroupNr(groupMaxCounter + 1);
 
 						currentObject.addConnectTo(transportArcToCreate);
 
@@ -310,10 +310,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						freeArc(transportArcToCreate);
 						
 						// Create the next arc
-						TransportArcComponent arc2 = new TransportArcComponent(currentObject, groupMaxCounter + 1, false);
+						TimedTransportArcComponent arc2 = new TimedTransportArcComponent(currentObject, groupMaxCounter + 1, false);
 						
 						//Update the partners for the arcs
-						TransportArcComponent arc1 = ((TransportArcComponent) transportArcToCreate);
+						TimedTransportArcComponent arc1 = ((TimedTransportArcComponent) transportArcToCreate);
 						
 						arc2.setConnectedTo(arc1);
 						arc1.setConnectedTo(arc2);
@@ -324,8 +324,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 					} else if (transportArcToCreate.getSource() instanceof Transition) {
 						
-						TransportArcComponent arc2 = (TransportArcComponent) transportArcToCreate;
-						TransportArcComponent arc1 = arc2.getConnectedTo();
+						TimedTransportArcComponent arc2 = (TimedTransportArcComponent) transportArcToCreate;
+						TimedTransportArcComponent arc1 = arc2.getConnectedTo();
 						
 						dk.aau.cs.model.tapn.TransportArc ta;
 						try {
@@ -335,10 +335,10 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									((TimedPlaceComponent) arc2.getTarget()).underlyingPlace(),
 									TimeInterval.ZERO_INF);
 							model.add(ta);
-							((TransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
+							((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 							arc1.setUnderlyingArc(ta);
 							arc1.updateWeightLabel(true);
-							((TransportArcComponent) transportArcToCreate).updateWeightLabel(true);
+							((TimedTransportArcComponent) transportArcToCreate).updateWeightLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(arc1, view);
 							cleanupArc(arc2, view);

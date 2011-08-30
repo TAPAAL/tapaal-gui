@@ -10,7 +10,7 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.action.SplitArcAction;
 
 public class TransportArcHandler extends TimedArcHandler {
@@ -26,10 +26,10 @@ public class TransportArcHandler extends TimedArcHandler {
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TransportArcComponent) {
+		if (myObject instanceof TimedTransportArcComponent) {
 			// if ( ! ( ((TimedArc) myObject).getSource() instanceof Transition)
 			// ){
-			final TransportArcComponent tarc = (TransportArcComponent) myObject;
+			final TimedTransportArcComponent tarc = (TimedTransportArcComponent) myObject;
 
 			menuItem = new JMenuItem("Properties");
 			menuItem.addActionListener(new ActionListener() {
