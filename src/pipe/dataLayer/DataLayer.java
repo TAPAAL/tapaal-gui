@@ -21,9 +21,6 @@ public class DataLayer extends Observable implements Cloneable {
 	/** ArrayList containing all the Arc objects in the Petri-Net */
 	private ArrayList<Arc> arcsArray = null;
 
-	/** ArrayList containing all the Arc objects in the Petri-Net */
-	private ArrayList<InhibitorArc> inhibitorsArray = null;
-
 	/**
 	 * ArrayList for net-level label objects (as opposed to element-level
 	 * labels).
@@ -51,7 +48,6 @@ public class DataLayer extends Observable implements Cloneable {
 	 * Hashtable which maps PlaceTransitionObjects to their list of connected
 	 * arcs
 	 */
-	private Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>> inhibitorsMap = null;
 	private Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>> tapnInhibitorsMap = null;
 
 	private NetType type = NetType.TAPN;
@@ -71,13 +67,12 @@ public class DataLayer extends Observable implements Cloneable {
 		placesArray = new ArrayList<Place>();
 		transitionsArray = new ArrayList<Transition>();
 		arcsArray = new ArrayList<Arc>();
-		inhibitorsArray = new ArrayList<InhibitorArc>();
+
 		// tapnInhibitorsArray = new ArrayList();
 		labelsArray = new ArrayList<AnnotationNote>();
 
 		// may as well do the hashtable here as well
 		arcsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedOutputArcComponent>>();
-		inhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<InhibitorArc>>();
 		tapnInhibitorsMap = new Hashtable<PlaceTransitionObject, ArrayList<TimedInhibitorArcComponent>>();
 	}
 
@@ -295,61 +290,6 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 	}
 
-	/**
-	 * Add inhibitorArcInput to back of the InhibitorArc ArrayList All observers
-	 * are notified of this change (Model-View Architecture)
-	 * 
-	 * @param arcInput
-	 *            Arc Object to add
-	 */
-	public void addArc(InhibitorArc inhibitorArcInput) {
-		boolean unique = true;
-
-		if (inhibitorArcInput != null) {
-			if (inhibitorArcInput.getId() != null
-					&& inhibitorArcInput.getId().length() > 0) {
-				for (int i = 0; i < inhibitorsArray.size(); i++) {
-					if (inhibitorArcInput.getId().equals(
-							((Arc) inhibitorsArray.get(i)).getId())) {
-						unique = false;
-					}
-				}
-			} else {
-				String id = null;
-				if (inhibitorsArray != null && inhibitorsArray.size() > 0) {
-					int no = inhibitorsArray.size();
-					do {
-						for (int i = 0; i < inhibitorsArray.size(); i++) {
-							id = "I" + no;
-							if (inhibitorsArray.get(i) != null) {
-								if (id.equals(((Arc) inhibitorsArray.get(i))
-										.getId())) {
-									unique = false;
-									no++;
-								} else {
-									unique = true;
-								}
-							}
-						}
-					} while (!unique);
-				} else {
-					id = "I0";
-				}
-				if (id != null) {
-					inhibitorArcInput.setId(id);
-				} else {
-					inhibitorArcInput.setId("error");
-				}
-			}
-			inhibitorsArray.add(inhibitorArcInput);
-			addInhibitorArcToInhibitorsMap(inhibitorArcInput);
-
-			setChanged();
-
-			// notifyObservers(arcInput.getBounds());
-			notifyObservers(inhibitorArcInput);
-		}
-	}
 
 	/**
 	 * Update the arcsMap hashtable to reflect the new arc
@@ -430,41 +370,6 @@ public class DataLayer extends Observable implements Cloneable {
 		// System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
 	}
 
-	/**
-	 * Update the inhibitorsMap hashtable to reflect the new inhibitor arc
-	 * 
-	 * @param arcInput
-	 *            New Arc
-	 */
-	private void addInhibitorArcToInhibitorsMap(InhibitorArc inhibitorArcInput) {
-		// now we want to add the inhibitor arc to the list of inhibitor arcs
-		// for
-		// it's source and target
-		PlaceTransitionObject source = inhibitorArcInput.getSource();
-		PlaceTransitionObject target = inhibitorArcInput.getTarget();
-		ArrayList<InhibitorArc> newList = null;
-
-		if (source != null) {
-			if (inhibitorsMap.get(source) != null) {
-				inhibitorsMap.get(source).add(inhibitorArcInput);
-			} else {
-				newList = new ArrayList<InhibitorArc>();
-				newList.add(inhibitorArcInput);
-				inhibitorsMap.put(source, newList);
-			}
-		}
-
-		if (target != null) {
-			if (inhibitorsMap.get(target) != null) {
-				inhibitorsMap.get(target).add(inhibitorArcInput);
-			} else {
-				newList = new ArrayList<InhibitorArc>();
-				newList.add(inhibitorArcInput);
-				inhibitorsMap.put(target, newList);
-			}
-		}
-		// System.out.println("inhibitorsMap size: " + inhibitorsMap.size());
-	}
 
 	/**
 	 * Add any PetriNetObject - the object will be added to the appropriate
@@ -480,8 +385,6 @@ public class DataLayer extends Observable implements Cloneable {
 				addArc((TimedInhibitorArcComponent) pnObject);
 			} else if (pnObject instanceof TimedOutputArcComponent) {
 				addArc((TimedOutputArcComponent) pnObject);
-			} else if (pnObject instanceof InhibitorArc) {
-				addArc((InhibitorArc) pnObject);
 			} else if (pnObject instanceof Place) {
 				addPlace((Place) pnObject);
 			} else if (pnObject instanceof Transition) {
@@ -539,20 +442,6 @@ public class DataLayer extends Observable implements Cloneable {
 						arcsMap.remove(pnObject);
 					}
 
-					if (inhibitorsMap.get(pnObject) != null) {
-
-						// get the list of attached arcs for the object we are
-						// removing
-						attachedArcs = inhibitorsMap.get(pnObject);
-
-						// iterate over all the attached arcs, removing them all
-						// Pere: in inverse order!
-						// for (int i=0; i < attachedArcs.size(); i++){
-						for (int i = attachedArcs.size() - 1; i >= 0; i--) {
-							((Arc) attachedArcs.get(i)).delete();
-						}
-						inhibitorsMap.remove(pnObject);
-					}
 					if (tapnInhibitorsMap.get(pnObject) != null) {
 
 						// get the list of attached arcs for the object we are
@@ -642,47 +531,7 @@ public class DataLayer extends Observable implements Cloneable {
 						// attached.updateConnected(); //causing null pointer
 						// exceptions (?)
 					}
-				} else if (pnObject instanceof InhibitorArc) {
-
-					// get source and target of the arc
-					PlaceTransitionObject attached = ((Arc) pnObject)
-							.getSource();
-
-					if (attached != null) {
-						ArrayList<InhibitorArc> a = inhibitorsMap.get(attached);
-						if (a != null) {
-							a.remove(pnObject);
-						}
-
-						attached.removeFromArc((Arc) pnObject);
-						if (attached instanceof Transition) {
-							((Transition) attached)
-									.removeArcCompareObject((Arc) pnObject);
-						}
-						// attached.updateConnected(); //causing null pointer
-						// exceptions (?)
-					}
-
-					attached = ((Arc) pnObject).getTarget();
-
-					if (attached != null) {
-						if (inhibitorsMap.get(attached) != null) { // causing
-																	// null
-																	// pointer
-																	// exceptions
-																	// (!)
-							inhibitorsMap.get(attached).remove(pnObject);
-						}
-
-						attached.removeToArc((Arc) pnObject);
-						if (attached instanceof Transition) {
-							((Transition) attached)
-									.removeArcCompareObject((Arc) pnObject);
-						}
-						// attached.updateConnected(); //causing null pointer
-						// exceptions (?)
-					}
-				}
+				} 
 
 				if (didSomething) {
 					setChanged();
@@ -730,9 +579,6 @@ public class DataLayer extends Observable implements Cloneable {
 			return true;
 		} else if (pnObject instanceof TimedOutputArcComponent) {
 			changeArrayList = arcsArray;
-			return true;
-		} else if (pnObject instanceof InhibitorArc) {
-			changeArrayList = inhibitorsArray;
 			return true;
 		} else if (pnObject instanceof AnnotationNote) {
 			changeArrayList = labelsArray;
@@ -813,19 +659,7 @@ public class DataLayer extends Observable implements Cloneable {
 		return returnArray;
 	}
 
-	/**
-	 * Get an List of all the InhibitorArc objects in the Petri-Net
-	 * 
-	 * @return An List of all the InhibitorArc objects
-	 */
-	public InhibitorArc[] getInhibitors() {
-		InhibitorArc[] returnArray = new InhibitorArc[inhibitorsArray.size()];
 
-		for (int i = 0; i < inhibitorsArray.size(); i++) {
-			returnArray[i] = inhibitorsArray.get(i);
-		}
-		return returnArray;
-	}
 
 	/**
 	 * Return the Transition called transitionName from the Petri-Net
@@ -1043,11 +877,6 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 
 		for (Arc arc : arcsArray) {
-			arc.updateWeightLabel(displayConstantNames);
-			arc.repaint();
-		}
-
-		for (InhibitorArc arc : inhibitorsArray) {
 			arc.updateWeightLabel(displayConstantNames);
 			arc.repaint();
 		}
