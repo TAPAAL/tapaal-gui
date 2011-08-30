@@ -594,7 +594,7 @@ Printable, DrawingSurface {
 
 			pnObject = new Transition(Grid.getModifiedX(p.x), Grid
 					.getModifiedY(p.y));
-			((Transition) pnObject).setTimed(timed);
+			
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
@@ -607,7 +607,7 @@ Printable, DrawingSurface {
 
 			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y), transition);
-			((Transition) pnObject).setTimed(timed);
+			
 			model.add(transition);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);

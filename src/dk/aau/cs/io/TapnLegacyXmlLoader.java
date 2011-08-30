@@ -575,7 +575,6 @@ public class TapnLegacyXmlLoader {
 				nameOffsetXInput, nameOffsetYInput, timedTransition,
 				infiniteServer, angle, priority);
 		transition.setUnderlyingTransition(t);
-		transition.setTimed(true);
 		guiModel.addPetriNetObject(transition);
 		addListeners(transition);
 		tapn.add(t);

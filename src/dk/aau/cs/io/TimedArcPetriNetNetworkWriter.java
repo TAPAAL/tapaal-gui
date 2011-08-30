@@ -326,7 +326,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
 		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
-		transitionElement.setAttribute("timed", String.valueOf(inputTransition.isTimed()));
 		transitionElement.setAttribute("infiniteServer", String.valueOf(inputTransition.isInfiniteServer()));
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", String.valueOf(inputTransition.getPriority()));

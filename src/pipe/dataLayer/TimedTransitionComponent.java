@@ -48,7 +48,7 @@ public class TimedTransitionComponent extends Transition {
 			boolean timedTransition, boolean infServer, int angleInput,
 			int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput, timedTransition, infServer,
+				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
 		this.listener = timedTransitionListener();
 		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);

@@ -42,20 +42,16 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 			return;
 		}
 
-		if (e.isShiftDown()) {
-			CreateGui.getView().getUndoManager().addNewEdit(
-					((Transition) myObject).setTimed(!((Transition) myObject)
-							.isTimed()));
+
+		int rotation = 0;
+		if (e.getWheelRotation() < 0) {
+			rotation = -e.getWheelRotation() * 135;
 		} else {
-			int rotation = 0;
-			if (e.getWheelRotation() < 0) {
-				rotation = -e.getWheelRotation() * 135;
-			} else {
-				rotation = e.getWheelRotation() * 45;
-			}
-			CreateGui.getView().getUndoManager().addNewEdit(
-					((Transition) myObject).rotate(rotation));
+			rotation = e.getWheelRotation() * 45;
 		}
+		CreateGui.getView().getUndoManager().addNewEdit(
+				((Transition) myObject).rotate(rotation));
+
 	}
 
 	/**
