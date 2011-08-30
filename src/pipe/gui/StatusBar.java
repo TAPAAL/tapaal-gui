@@ -89,31 +89,31 @@ public class StatusBar extends JPanel {
 		case INHIBARC:
 			changeText(textforInhibArc);
 			break;
-/*
-		case Pipe.ADDTOKEN:
+
+		case ADDTOKEN:
 			changeText(textforAddtoken);
 			break;
 
-		case Pipe.DELTOKEN:
+		case DELTOKEN:
 			changeText(textforDeltoken);
 			break;
 
-		case Pipe.SELECT:
+		case SELECT:
 			changeText(textforMove);
 			break;
 
-		case Pipe.DRAW:
+		case DRAW:
 			changeText(textforDrawing);
 			break;
-*/
+
 		case ANNOTATION:
 			changeText(textforAnnotation);
 			break;
-/*
-		case Pipe.DRAG:
+
+		case DRAG:
 			changeText(textforDrag);
 			break;
-*/
+
 		default:
 			changeText("To-do (textfor" + type);
 			break;
