@@ -433,9 +433,7 @@ public class DataLayer extends Observable implements Cloneable {
 							} catch (IndexOutOfBoundsException e) {
 								// XXX - this is a hack
 								// This is OK, it just means that the transport
-								// arc
-								// already has been removed
-
+								// arc already has been removed
 							}
 
 						}
