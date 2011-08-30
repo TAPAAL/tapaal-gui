@@ -1,6 +1,3 @@
-/*
- * Created on 10-Feb-2004
- */
 package pipe.gui;
 
 import java.awt.Color;
@@ -94,15 +91,6 @@ public class Grid {
 			return (int) y;
 		}
 		return (int) (Math.round(y / gridSpacing) * gridSpacing);
-	}
-
-	// method never used?
-	public static float getGridSpacing() {
-		if (enabled) {
-			return gridSpacing;
-		} else {
-			return 1; // Pretend we're using a pixel-fine grid
-		}
 	}
 
 }

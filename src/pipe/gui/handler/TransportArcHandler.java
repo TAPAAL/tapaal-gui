@@ -27,8 +27,6 @@ public class TransportArcHandler extends TimedArcHandler {
 		JPopupMenu popup = super.getPopup(e);
 
 		if (myObject instanceof TimedTransportArcComponent) {
-			// if ( ! ( ((TimedArc) myObject).getSource() instanceof Transition)
-			// ){
 			final TimedTransportArcComponent tarc = (TimedTransportArcComponent) myObject;
 
 			menuItem = new JMenuItem("Properties");
@@ -42,11 +40,6 @@ public class TransportArcHandler extends TimedArcHandler {
 				}
 			});
 			popup.insert(menuItem, popupIndex++);
-			// }
-			// menuItem = new JMenuItem(new EditGroupAction(contentPane,
-			// (TransportArc)myObject));
-			// menuItem.setText("Edit Grouping");
-			// popup.insert(menuItem, popupIndex++);
 
 			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
 					.getPoint()));
