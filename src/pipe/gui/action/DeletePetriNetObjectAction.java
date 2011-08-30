@@ -21,9 +21,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 
 public class DeletePetriNetObjectAction extends AbstractAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5945117611937154440L;
 	private PetriNetObject selected;
 
@@ -31,12 +28,6 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 		selected = component;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		// check if queries need to be removed
 		ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
