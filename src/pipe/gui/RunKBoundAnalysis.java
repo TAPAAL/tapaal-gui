@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import dk.aau.cs.Messenger;
+import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
@@ -29,7 +30,7 @@ public class RunKBoundAnalysis extends RunVerificationBase {
 				spinner.setValue(result.getQueryResult().boundednessAnalysis().usedTokens() - result.getQueryResult().boundednessAnalysis().tokensInNet());
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
 						getAnswerBoundedString(), "Analysis Result",
-						JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.INFORMATION_MESSAGE, ResourceManager.satisfiedIcon());
 			}
 		} else {						
 			String message = "An error occured during the verification." +
