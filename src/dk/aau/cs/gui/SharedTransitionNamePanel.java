@@ -100,12 +100,15 @@ public class SharedTransitionNamePanel extends JPanel {
 			}
 
 			private boolean updateExistingTransition(String name) {
-				if(transitionToEdit.network().isNameUsed(name)) {
+				
+				String oldName = transitionToEdit.name();
+				
+				if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
-				String oldName = transitionToEdit.name();
+				
 				try{
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
@@ -114,7 +117,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				}
 				
 				listModel.updatedName();
-				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, oldName, name));
+				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, oldName, name, listModel));
 				return true;
 			}
 			private boolean addNewSharedTransition(String name) {
