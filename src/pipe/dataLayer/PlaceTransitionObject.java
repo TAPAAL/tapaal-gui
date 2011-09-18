@@ -187,26 +187,13 @@ Cloneable {
 	}
 
 	/**
-	 * Set id
-	 * 
-	 * @param idInput
-	 *            String value for Place id;
-	 */
-	@Override
-	public void setId(String idInput) {
-		id = idInput;
-		setName(id);
-		// System.out.println("setting id to: " + idInput);
-	}
-
-	/**
 	 * Get id
 	 * 
 	 * @return String value for Place id;
 	 */
 	@Override
 	public String getId() {
-		return (id != null) ? id : pnName.getName();
+		return getName();
 	}
 
 	/**
@@ -216,7 +203,7 @@ Cloneable {
 	 */
 	@Override
 	public String getName() {
-		return (pnName != null) ? pnName.getName() : id;
+		return (pnName != null) ? pnName.getName() : "";
 	}
 
 	public double getNameOffsetX() {

@@ -28,6 +28,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.io.IdResolver;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -57,6 +58,8 @@ public class BatchProcessingLoader {
 	private HashMap<String, String> transitionIDToName;
 	private HashMap<Tuple<TimedTransition, Integer>, TimeInterval> transportArcsTimeIntervals;
 
+	private IdResolver idResolver = new IdResolver();
+	
 	private NameGenerator nameGenerator = new NameGenerator();
 
 	public BatchProcessingLoader() {
@@ -291,7 +294,9 @@ public class BatchProcessingLoader {
 	private void parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
-	
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
 		}
@@ -317,6 +322,9 @@ public class BatchProcessingLoader {
 	private void parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		String idInput = place.getAttribute("id");
 		String nameInput = place.getAttribute("name");
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
 
@@ -346,8 +354,8 @@ public class BatchProcessingLoader {
 	}
 
 	private void parseAndAddArc(Element arc, TimedArcPetriNet tapn, ConstantStore constants) throws FormatException {
-		String sourceId = arc.getAttribute("source");
-		String targetId = arc.getAttribute("target");
+		String sourceId = idResolver.get(tapn.name(), arc.getAttribute("source"));
+		String targetId = idResolver.get(tapn.name(), arc.getAttribute("target"));
 		String inscription = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
 

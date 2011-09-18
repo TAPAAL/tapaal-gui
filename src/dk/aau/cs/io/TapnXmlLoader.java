@@ -92,6 +92,7 @@ public class TapnXmlLoader {
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
+	private IdResolver idResolver = new IdResolver();
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -141,6 +142,8 @@ public class TapnXmlLoader {
 	}
 
 	private LoadedModel parse(Document doc) throws FormatException {
+		idResolver.clear();
+		
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
 
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
@@ -411,6 +414,9 @@ public class TapnXmlLoader {
 		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
 		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
@@ -458,6 +464,8 @@ public class TapnXmlLoader {
 		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
 		String invariant = place.getAttribute("invariant");
 
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
 
@@ -494,7 +502,10 @@ public class TapnXmlLoader {
 		boolean taggedArc = arc.getAttribute("tagged").equals("true") ? true : false;
 		String inscriptionTempStorage = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
-
+		
+		sourceInput = idResolver.get(template.model().name(), sourceInput);
+		targetInput = idResolver.get(template.model().name(), targetInput);
+		
 		PlaceTransitionObject sourceIn = template.guiModel().getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = template.guiModel().getPlaceTransitionObject(targetInput);
 
