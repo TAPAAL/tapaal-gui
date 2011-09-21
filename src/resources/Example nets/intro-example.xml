@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="IntroExample" type="P/T net">
-<labels border="true" height="632" positionX="560" positionY="52" width="343">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
+<labels border="true" height="633" positionX="561" positionY="53" width="344">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
 
 The circles are called places and rectangles transitions. They are connected either by standard arcs from place to transition or transition to place, or they can be connected by transport arcs (these arcs always come in pairs) like from P1 to T3 and T3 to P6.
 
@@ -18,20 +18,20 @@ In our example we might want to know if it is possible by doing some time delays
 The query "Target Reachable" in the upper right corner expressis this property. It moreover asks for fastest such trace. By clicking on "Verify" the verification will begin and ouput the trace allowing us to place a token into the place Targe. By clicking on the symbols &gt; and &lt; one can move back and force in the trace and investigate the intermediate markings.
 
 One may observe that two extra tokens are needed in the intermediate markings in order to reach the place Target. Indeed, this number of extra tokens is specified in the Query dialog and by clicking on "Check Boundedness", one can verify that 2 extra tokens are really enough for an exact analysis.</labels>
-<place id="P0" initialMarking="1" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Start" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="30.0"/>
+<place id="Start" initialMarking="1" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Start" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="30.0"/>
 <place id="P1" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="P1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="45.0" positionY="195.0"/>
 <place id="P2" initialMarking="0" invariant="&lt;= 5" markingOffsetX="0.0" markingOffsetY="0.0" name="P2" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="360.0" positionY="195.0"/>
 <place id="P3" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="P3" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="225.0" positionY="390.0"/>
 <place id="P4" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="P4" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="495.0" positionY="390.0"/>
 <place id="P5" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="P5" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="360.0" positionY="570.0"/>
 <place id="P6" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="P6" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="45.0" positionY="390.0"/>
-<place id="P7" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Target" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="735.0"/>
+<place id="Target" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Target" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="735.0"/>
 <transition angle="180" id="T0" infiniteServer="false" name="T0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="135.0" positionY="120.0" priority="1" timed="true"/>
 <transition angle="90" id="T1" infiniteServer="false" name="T1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="360.0" positionY="300.0" priority="1" timed="true"/>
 <transition angle="90" id="T2" infiniteServer="false" name="T2" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="360.0" positionY="480.0" priority="1" timed="true"/>
 <transition angle="90" id="T3" infiniteServer="false" name="T3" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="45.0" positionY="300.0" priority="1" timed="true"/>
 <transition angle="0" id="T4" infiniteServer="false" name="T4" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="210.0" positionY="630.0" priority="1" timed="true"/>
-<arc id="P0 to T0" inscription="[2,4]" source="P0" target="T0" type="timed">
+<arc id="Start to T0" inscription="[2,4]" source="Start" target="T0" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="146" yCoord="56"/>
 <arcpath arcPointType="false" id="1" xCoord="146" yCoord="116"/>
 </arc>
@@ -81,10 +81,10 @@ One may observe that two extra tokens are needed in the intermediate markings in
 </arc>
 <arc id="T3 to P6" inscription="[4,7]:1" source="T3" target="P6" type="transport">
 <arcpath arcPointType="false" id="0" xCoord="56" yCoord="316"/>
-<arcpath arcPointType="false" id="1" xCoord="60" yCoord="315"/>
+<arcpath arcPointType="false" id="1" xCoord="61" yCoord="316"/>
 <arcpath arcPointType="false" id="2" xCoord="57" yCoord="387"/>
 </arc>
-<arc id="T4 to P7" inscription="1" source="T4" target="P7" type="normal">
+<arc id="T4 to Target" inscription="1" source="T4" target="Target" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="222" yCoord="657"/>
 <arcpath arcPointType="false" id="1" xCoord="222" yCoord="732"/>
 </arc>
