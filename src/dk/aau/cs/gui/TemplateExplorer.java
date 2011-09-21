@@ -491,8 +491,11 @@ public class TemplateExplorer extends JPanel {
 			if(!isInAnimationMode) { 
 				boolean isActive = ((Template)value).isActive();
 				activeCheckbox.setSelected(isActive);
-				setToolTipText(isActive ? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
+				setToolTipText((isActive)? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
 				add(activeCheckbox, BorderLayout.WEST);
+			} else {
+				
+				setToolTipText(null);
 			}
 			add(renderer, BorderLayout.CENTER);
 			return this;
@@ -598,7 +601,9 @@ public class TemplateExplorer extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			toggleSelection(list.getSelectedIndex());
+			if (!isInAnimationMode){
+				toggleSelection(list.getSelectedIndex());
+			}
 		}
 		
 	}

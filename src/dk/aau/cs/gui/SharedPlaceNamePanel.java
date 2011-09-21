@@ -31,13 +31,13 @@ public class SharedPlaceNamePanel extends JPanel {
 	private SharedPlace placeToEdit;
 	private final Context context;
 
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context) {
-		this(rootPane, SharedPlacesListModel, context, null);	
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context) {
+		this(rootPane, sharedPlacesListModel, context, null);	
 	}
 	
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context, SharedPlace placeToEdit) {
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
-		this.listModel = SharedPlacesListModel;
+		this.listModel = sharedPlacesListModel;
 		this.placeToEdit = placeToEdit;
 		this.context = context;
 		initComponents();		
@@ -86,23 +86,30 @@ public class SharedPlaceNamePanel extends JPanel {
 					if(placeToEdit == null){
 						success = addNewSharedPlace(name);
 					}else{
-						success = updateExistingPlace(name);
+						if (!name.equals(placeToEdit.name())){ //Name is different
+							success = updateExistingPlace(name);
+						}else {
+							success = true;
+						}
 					}
-					
+
 					if(success){
 						context.nameGenerator().updateIndicesForAllModels(name);
 						exit();
 					}
+
 				}
 			}
 
 			private boolean updateExistingPlace(String name) {
-				if(placeToEdit.network().isNameUsed(name)) {
+				String oldName = placeToEdit.name();
+				
+				if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
-				String oldName = placeToEdit.name();
+				
 				try{
 					placeToEdit.setName(name);
 				}catch(RequireException e){
