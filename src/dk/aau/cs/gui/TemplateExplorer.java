@@ -558,7 +558,10 @@ public class TemplateExplorer extends JPanel {
 			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) 
 				return; 
 			
-			toggleSelection(index);
+			if (!isInAnimationMode){
+				toggleSelection(index);
+			}
+			
 		}
 
 		public void valueChanged(ListSelectionEvent e) {
