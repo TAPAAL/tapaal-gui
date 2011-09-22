@@ -11,21 +11,14 @@ import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
 
 /**
- * <b>NameLabel</b> - This class is for the labels of PN Objects
+ * This class is for the labels of PN Objects
  * 
- * @see </p>
- *      <p>
- *      <a href="uml\NameLabel.png">NameLabel UML</a>
- *      </p>
  * @version 1.0
  * @author Camilla Clifford
  */
 public class NameLabel extends JTextArea implements Cloneable, Translatable,
 		Zoomable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5167510420195429773L;
 	private int positionX;
 	private int positionY;
@@ -51,7 +44,7 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 		setCursor(new java.awt.Cursor(java.awt.Cursor.CROSSHAIR_CURSOR));
 		setEditable(false);
 		setFocusable(false);
-		setOpaque(false); // added by OP
+		setOpaque(false);
 		setBorder(BorderFactory.createEmptyBorder());
 		setBackground(Pipe.BACKGROUND_COLOR);
 
