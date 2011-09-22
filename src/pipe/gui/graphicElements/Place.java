@@ -19,28 +19,29 @@ public class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
 	public final static String type = "Place";
-	/** Initial Marking */
+	
+	// Initial Marking
 	protected Integer initialMarking = 0;
 
-	/** Current Marking */
+	// Current Marking
 	protected Integer currentMarking = 0;
 
-	/** Initial Marking X-axis Offset */
+	// Initial Marking X-axis Offset 
 	protected Double markingOffsetX = 0d;
 
-	/** Initial Marking Y-axis Offset */
+	// Initial Marking Y-axis Offset 
 	protected Double markingOffsetY = 0d;
 
-	/** Value of the capacity restriction; 0 means no capacity restriction */
+	// Value of the capacity restriction; 0 means no capacity restriction 
 	protected Integer capacity = 0;
 
 	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
-	/** Token Width and Height */
+	// Token Width and Height
 	public static int tWidth = 4;
 	public static int tHeight = 4;
 
-	/** Ellipse2D.Double place */
+	// Ellipse2D.Double place
 	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
