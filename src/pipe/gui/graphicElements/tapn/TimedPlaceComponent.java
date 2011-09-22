@@ -108,8 +108,6 @@ public class TimedPlaceComponent extends Place {
 		copy.nameOffsetY = this.nameOffsetY;
 		copy.capacity = this.capacity;
 		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
 		copy.markingOffsetX = this.markingOffsetX;
 		copy.markingOffsetY = this.markingOffsetY;
 		copy.setOriginal(this);
@@ -380,7 +378,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionX, positionY, id, place.name(), nameOffsetX, nameOffsetY, initialMarking, markingOffsetX, markingOffsetY, capacity);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionX, positionY, id, place.name(), nameOffsetX, nameOffsetY, 0, markingOffsetX, markingOffsetY, capacity);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		LabelHandler labelHandler = new LabelHandler(placeComponent.getNameLabel(), placeComponent);

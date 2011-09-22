@@ -18,13 +18,6 @@ import pipe.gui.Zoomer;
 public class Place extends PlaceTransitionObject {
 
 	private static final long serialVersionUID = -5155964364065651381L;
-	public final static String type = "Place";
-	
-	// Initial Marking
-	protected Integer initialMarking = 0;
-
-	// Current Marking
-	protected Integer currentMarking = 0;
 
 	// Initial Marking X-axis Offset 
 	protected Double markingOffsetX = 0d;
@@ -51,8 +44,6 @@ public class Place extends PlaceTransitionObject {
 			double markingOffsetYInput, int capacityInput) {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput);
-		initialMarking = new Integer(initialMarkingInput);
-		currentMarking = new Integer(initialMarkingInput);
 		markingOffsetX = new Double(markingOffsetXInput);
 		markingOffsetY = new Double(markingOffsetYInput);
 		componentWidth = DIAMETER;
@@ -79,8 +70,6 @@ public class Place extends PlaceTransitionObject {
 		copy.nameOffsetY = this.nameOffsetY;
 		copy.capacity = this.capacity;
 		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
 		copy.markingOffsetX = this.markingOffsetX;
 		copy.markingOffsetY = this.markingOffsetY;
 		copy.update(true);
@@ -94,8 +83,6 @@ public class Place extends PlaceTransitionObject {
 		copy.nameOffsetY = this.nameOffsetY;
 		copy.capacity = this.capacity;
 		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
 		copy.markingOffsetX = this.markingOffsetX;
 		copy.markingOffsetY = this.markingOffsetY;
 		copy.setOriginal(this);
@@ -126,25 +113,6 @@ public class Place extends PlaceTransitionObject {
 		g2.draw(placeEllipse);
 
 		g2.setStroke(new BasicStroke(1.0f));
-	}
-
-	/**
-	 * Set initial marking
-	 * 
-	 * @param initialMarkingInput
-	 *            Integer value for initial marking
-	 */
-	public void setInitialMarking(int initialMarkingInput) {
-		initialMarking = initialMarkingInput;
-	}
-
-	/**
-	 * Get current marking
-	 * 
-	 * @return Integer value for current marking
-	 */
-	public int getCurrentMarking() {
-		return ((currentMarking == null) ? 0 : currentMarking.intValue());
 	}
 
 	/**
@@ -259,8 +227,6 @@ public class Place extends PlaceTransitionObject {
 
 		Place toReturn = (Place) super.clone();
 
-		toReturn.initialMarking = this.initialMarking;
-		toReturn.currentMarking = this.currentMarking;
 		toReturn.markingOffsetX = this.markingOffsetX;
 		toReturn.markingOffsetY = this.markingOffsetY;
 		toReturn.componentWidth = componentWidth;
