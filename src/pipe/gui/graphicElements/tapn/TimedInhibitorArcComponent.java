@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
@@ -7,6 +7,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;

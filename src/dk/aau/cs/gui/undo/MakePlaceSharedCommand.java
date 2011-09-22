@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
 import dk.aau.cs.gui.TabContent;

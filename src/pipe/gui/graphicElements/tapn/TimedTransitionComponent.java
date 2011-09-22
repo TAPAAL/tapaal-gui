@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
 import java.awt.Container;
@@ -12,6 +12,8 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
 
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;

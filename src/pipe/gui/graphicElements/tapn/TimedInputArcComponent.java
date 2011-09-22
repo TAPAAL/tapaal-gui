@@ -1,10 +1,13 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.Container;
 import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
+import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;

@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.dataLayer.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;

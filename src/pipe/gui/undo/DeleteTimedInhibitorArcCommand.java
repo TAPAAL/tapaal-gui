@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedInhibitorArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class DeleteTimedInhibitorArcCommand extends TAPNElementCommand {

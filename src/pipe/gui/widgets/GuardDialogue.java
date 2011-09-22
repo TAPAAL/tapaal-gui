@@ -26,8 +26,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.TimedInputArcComponent;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;

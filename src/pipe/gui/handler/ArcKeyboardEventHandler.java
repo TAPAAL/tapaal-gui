@@ -4,11 +4,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Pipe.elementType;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 /**
  * @authors Michael Camacho and Tom Barnwell

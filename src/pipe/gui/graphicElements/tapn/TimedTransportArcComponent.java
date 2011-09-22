@@ -1,10 +1,12 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;

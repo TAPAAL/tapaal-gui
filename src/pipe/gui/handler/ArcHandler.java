@@ -10,15 +10,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.action.EditWeightAction;
 import pipe.gui.action.SplitArcAction;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on arcs.

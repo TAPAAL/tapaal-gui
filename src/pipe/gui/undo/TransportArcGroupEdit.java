@@ -1,6 +1,6 @@
 package pipe.gui.undo;
 
-import pipe.dataLayer.TimedTransportArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
 
 public class TransportArcGroupEdit extends Command {

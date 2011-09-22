@@ -14,8 +14,8 @@ import javax.swing.JOptionPane;
 
 import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.TimedPlace;
 

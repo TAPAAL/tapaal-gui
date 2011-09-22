@@ -1,6 +1,6 @@
 package dk.aau.cs.gui.undo;
 
-import pipe.dataLayer.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 
 // TODO: Fix this to work on the model class instead of the GUI class
 public class TimedPlaceMarkingEdit extends Command {
