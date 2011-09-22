@@ -146,17 +146,6 @@ public class TimedPlaceComponent extends Place {
 		return buffer.toString();
 	}
 
-	// TODO: get rid of
-	public ArrayList<BigDecimal> getTokens() {
-		ArrayList<BigDecimal> tokensToReturn = new ArrayList<BigDecimal>();
-
-		for (TimedToken t : place.tokens()) {
-			tokensToReturn.add(t.age());
-		}
-
-		return tokensToReturn;
-	}
-
 	public boolean isAgeOfTokensShown() {
 		return ageOfTokensWindow.isVisible();
 	}

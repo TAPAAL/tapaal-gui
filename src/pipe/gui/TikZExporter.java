@@ -3,8 +3,9 @@ package pipe.gui;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.List;
+
+import dk.aau.cs.model.tapn.TimedToken;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -203,11 +204,13 @@ public class TikZExporter {
 	}
 
 	protected String getTokenListStringFor(Place place) {
-		ArrayList<BigDecimal> tokens = ((TimedPlaceComponent) place).getTokens();
+		
+		List<TimedToken> tokens = ((TimedPlaceComponent) place).underlyingPlace().tokens();
+		
 		String tokensInPlace = "";
 		if (tokens.size() > 0) {
 			if (tokens.size() == 1 && !net.netType().equals(NetType.UNTIMED)) {
-				tokensInPlace = "structured tokens={" + tokens.get(0).setScale(1) + "},";
+				tokensInPlace = "structured tokens={" + tokens.get(0).age().setScale(1) + "},";
 			} else {
 				tokensInPlace = exportMultipleTokens(tokens);
 			}
@@ -224,7 +227,7 @@ public class TikZExporter {
 		return invariant;
 	}
 
-	private String exportMultipleTokens(ArrayList<BigDecimal> tokens) {
+	private String exportMultipleTokens(List<TimedToken> tokens) {
 		StringBuffer out = new StringBuffer();
 
 		out.append("structured tokens={\\#");
@@ -233,10 +236,10 @@ public class TikZExporter {
 		if (!net.netType().equals(NetType.UNTIMED)) {
 			out.append("pin=above:{\\{");
 			for (int i = 0; i < tokens.size() - 1; i++) {
-				out.append(tokens.get(i).setScale(1));
+				out.append(tokens.get(i).age().setScale(1));
 				out.append(",");
 			}
-			out.append(tokens.get(tokens.size() - 1).setScale(1));
+			out.append(tokens.get(tokens.size() - 1).age().setScale(1));
 			out.append("\\}},");
 		}
 		return out.toString();
