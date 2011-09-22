@@ -28,7 +28,7 @@ public class RunningVerificationDialog extends JDialog {
 		setLocationRelativeTo(null);
 		setLayout(new GridLayout(2, 1));
 
-		okButton = new JButton("Interupt Verification");
+		okButton = new JButton("Interrupt Verification");
 
 		Container content = getContentPane();
 		content.add(new Label("Verification is running... Please wait!"));

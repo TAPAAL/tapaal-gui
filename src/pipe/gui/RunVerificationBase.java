@@ -100,7 +100,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		} else {
 			modelChecker.kill();
-			messenger.displayInfoMessage("Verification was interupted by the user. No result found!", "Verification Cancelled");
+			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");
 
 		}
 	}
