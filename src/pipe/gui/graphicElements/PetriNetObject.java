@@ -30,7 +30,7 @@ import pipe.gui.Zoomable;
  * @author James D Bloom
  */
 public abstract class PetriNetObject extends JComponent implements Zoomable,
-		CopyPasteable, Cloneable, Translatable {
+		Cloneable, Translatable {
 
 	/**
 	 * 

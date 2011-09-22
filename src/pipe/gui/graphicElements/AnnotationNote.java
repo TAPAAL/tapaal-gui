@@ -1,7 +1,3 @@
-/*
- * Created on 04-Mar-2004
- * Author is Michael Camacho
- */
 package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
@@ -17,20 +13,15 @@ import java.awt.geom.AffineTransform;
 import javax.swing.JDialog;
 
 import pipe.gui.CreateGui;
-import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.undo.AnnotationTextEdit;
 import pipe.gui.widgets.AnnotationPanel;
 import pipe.gui.widgets.EscapableDialog;
 
 public class AnnotationNote extends Note {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3503959956765396720L;
 
 	private boolean fillNote = true;
@@ -161,23 +152,6 @@ public class AnnotationNote extends Note {
 		}
 	}
 
-	public AnnotationNote paste(double x, double y, boolean toAnotherView) {
-		return new AnnotationNote(this.note.getText(), Grid.getModifiedX(x
-				+ this.getX()), Grid.getModifiedY(y + this.getY()), this.note
-				.getWidth(), this.note.getHeight(), this.isShowingBorder());
-	}
-
-	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(this.note.getText(), Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom),	this.note.getWidth(), this.note.getHeight(), this.isShowingBorder());
-		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
-		annotation.addMouseListener(noteHandler);
-		annotation.addMouseMotionListener(noteHandler);
-		annotation.getNote().addMouseListener(noteHandler);
-		annotation.getNote().addMouseMotionListener(noteHandler);
-		
-		return annotation;
-	}
-
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -268,9 +242,6 @@ public class AnnotationNote extends Note {
 
 	public class ResizePoint extends javax.swing.JComponent {
 
-		/**
-	 * 
-	 */
 		private static final long serialVersionUID = -1615544376708838434L;
 		private int SIZE = 3;
 		private static final int TOP = 1;
@@ -335,7 +306,7 @@ public class AnnotationNote extends Note {
 			}
 		}
 
-		// change ResizePoint's size a little bit acording to the zoom percent
+		// Change ResizePoint's size a little bit acording to the zoom percent
 		private void setZoom(int percent) {
 			if (zoom >= 220) {
 				SIZE = 5;
