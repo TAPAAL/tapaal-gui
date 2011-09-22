@@ -84,8 +84,14 @@ public class TimedPlaceComponent extends Place {
 				TimedPlace place = e.source();
 				TimedPlaceComponent.super.setName(place.name());				
 			}
-			public void invariantChanged(TimedPlaceEvent e) { update(true); }
-			public void markingChanged(TimedPlaceEvent e) { repaint(); }
+			
+			public void invariantChanged(TimedPlaceEvent e) { 
+				update(true); 
+			}
+			
+			public void markingChanged(TimedPlaceEvent e) { 
+				repaint();
+			}
 		};
 	}
 	
@@ -120,7 +126,6 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public String getInvariantAsString() {
-
 		return getInvariant().toString();
 	}
 
@@ -150,7 +155,6 @@ public class TimedPlaceComponent extends Place {
 		return ageOfTokensWindow.isVisible();
 	}
 
-	// overide method
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -184,8 +188,7 @@ public class TimedPlaceComponent extends Place {
 		int marking = place.numberOfTokens();
 
 		// structure sees how many markings there are and fills the place in
-		// with
-		// the appropriate number.
+		// with the appropriate number.
 		switch (marking) {
 		case 2:
 			if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
@@ -236,8 +239,11 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public void showAgeOfTokens(boolean show) {
-		if (ageOfTokensWindow != null)
+		
+		if (ageOfTokensWindow != null){
 			ageOfTokensWindow.dispose();
+		}
+		
 		// Build interface
 		if (show) {
 			ageOfTokensWindow = new Window(new Frame());
