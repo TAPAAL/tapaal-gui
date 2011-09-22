@@ -13,30 +13,10 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
 /**
- * <b>Place</b> - Petri-Net Place Class
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom
- * 
- * @author Edwin Chung corresponding states of matrixes has been set to change
- *         when markings are altered. Users will be prompted to save their work
- *         when the markings of places are altered. (6th Feb 2007)
- * 
- * @author Edwin Chung 16 Mar 2007: modified the constructor and several other
- *         functions so that DataLayer objects can be created outside the GUI
+  * Class for drawing a Place
  */
 public class Place extends PlaceTransitionObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5155964364065651381L;
 	public final static String type = "Place";
 	/** Initial Marking */
