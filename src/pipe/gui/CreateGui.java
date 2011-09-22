@@ -8,7 +8,7 @@ import javax.swing.JTabbedPane;
 
 import net.tapaal.TAPAAL;
 
-import pipe.gui.graphicElements.DataLayer;
+import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;

@@ -57,13 +57,13 @@ import javax.swing.event.ChangeListener;
 
 import net.tapaal.TAPAAL;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.action.GuiAction;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;

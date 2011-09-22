@@ -6,11 +6,11 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.Transition;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;

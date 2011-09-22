@@ -10,6 +10,7 @@ import java.util.EventListener;
 
 import javax.swing.JComponent;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.CopyPasteable;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;

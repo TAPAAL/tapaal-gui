@@ -23,12 +23,12 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.Transition;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.Note;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;

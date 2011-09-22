@@ -1,12 +1,15 @@
-package pipe.gui.graphicElements;
+package pipe.dataLayer;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Observable;
 
-import pipe.dataLayer.NetType;
-import pipe.dataLayer.Transition;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;

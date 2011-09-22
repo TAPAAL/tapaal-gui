@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
@@ -17,7 +18,6 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.action.ShowHideInfoAction;
-import pipe.gui.graphicElements.DataLayer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**

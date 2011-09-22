@@ -7,10 +7,10 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;

@@ -6,6 +6,7 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
@@ -13,7 +14,6 @@ import pipe.gui.Pipe.elementType;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPathPoint;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;

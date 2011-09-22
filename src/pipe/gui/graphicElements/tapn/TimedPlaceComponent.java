@@ -24,11 +24,11 @@ import java.util.Locale;
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.PlaceHandler;

@@ -5,11 +5,11 @@ import java.util.Hashtable;
 
 import javax.swing.BoxLayout;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;

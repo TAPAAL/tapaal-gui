@@ -9,9 +9,9 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.Transition;
-import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
