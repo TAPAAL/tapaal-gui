@@ -78,7 +78,7 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
-		weightLabel = new NameLabel(zoom);
+		label = new NameLabel(zoom);
 		
 		this.myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
@@ -89,8 +89,6 @@ public class TimedOutputArcComponent extends Arc {
 		this.id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
-		this.setWeight(arc.getWeight());
-		this.inView = arc.inView;
 	}
 
 	public TimedOutputArcComponent paste(double despX, double despY,
@@ -125,7 +123,7 @@ public class TimedOutputArcComponent extends Arc {
 
 		TimedOutputArcComponent copy = new TimedOutputArcComponent(0, 0, // startPoint
 				0, 0, // endPoint
-				source, target, this.getWeight(), source.getId() + " to "
+				source, target, 1, source.getId() + " to "
 						+ target.getId(), false);
 
 		copy.myPath.delete();
@@ -139,8 +137,6 @@ public class TimedOutputArcComponent extends Arc {
 		source.addConnectFrom(copy);
 		target.addConnectTo(copy);
 
-		copy.inView = this.inView;
-
 		return copy;
 	}
 
@@ -148,9 +144,9 @@ public class TimedOutputArcComponent extends Arc {
 		return new TimedOutputArcComponent(this);
 	}
 
-	public void updateWeightLabel(boolean displayConstantNames) {
-		weightLabel.setText("");
-		setWeightLabelPosition();
+	public void updateLabel(boolean displayConstantNames) {
+		label.setText("");
+		setLabelPosition();
 	}
 
 	@Override

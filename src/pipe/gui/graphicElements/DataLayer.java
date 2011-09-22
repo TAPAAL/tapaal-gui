@@ -884,7 +884,7 @@ public class DataLayer extends Observable implements Cloneable {
 		}
 
 		for (Arc arc : arcsArray) {
-			arc.updateWeightLabel(displayConstantNames);
+			arc.updateLabel(displayConstantNames);
 			arc.repaint();
 		}
 

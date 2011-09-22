@@ -167,7 +167,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								TimeInterval.ZERO_INF);
 						model.add(tia);
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
-						createTAPNInhibitorArc.updateWeightLabel(true);
+						createTAPNInhibitorArc.updateLabel(true);
 					} catch (RequireException ex) {
 						cleanupArc(createTAPNInhibitorArc, view);
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -337,8 +337,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							model.add(ta);
 							((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 							arc1.setUnderlyingArc(ta);
-							arc1.updateWeightLabel(true);
-							((TimedTransportArcComponent) transportArcToCreate).updateWeightLabel(true);
+							arc1.updateLabel(true);
+							((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(arc1, view);
 							cleanupArc(arc2, view);
@@ -406,7 +406,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace());
 							model.add(timedOutputArc);
 							outputArc.setUnderlyingArc(timedOutputArc);
-							outputArc.updateWeightLabel(true);
+							outputArc.updateLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(timedArcToCreate, view);
 							JOptionPane.showMessageDialog(
@@ -448,7 +448,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									TimeInterval.ZERO_INF);
 							model.add(tia);
 							timedArc.setUnderlyingArc(tia);
-							timedArc.updateWeightLabel(true);
+							timedArc.updateLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(timedArcToCreate, view);
 							JOptionPane

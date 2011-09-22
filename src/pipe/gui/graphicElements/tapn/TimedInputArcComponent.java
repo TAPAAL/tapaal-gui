@@ -33,7 +33,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	private void init() {
 		timeInterval = "[0,inf)";
-		updateWeightLabel(true);
+		updateLabel(true);
 	}
 
 	public TimedInputArcComponent(TimedOutputArcComponent arc) {
@@ -44,7 +44,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	public TimedInputArcComponent(TimedOutputArcComponent arc, String guard) {
 		super(arc);
 		timeInterval = guard;
-		updateWeightLabel(true);
+		updateLabel(true);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		inputArc.setTimeInterval(guard);
 
 		// hacks - I use the weight to display the TimeInterval
-		updateWeightLabel(true);
+		updateLabel(true);
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval, inputArc.interval());
@@ -76,14 +76,14 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	// hacks - I use the weight to display the TimeInterval
 	@Override
-	public void updateWeightLabel(boolean showConstantNames) {
+	public void updateLabel(boolean showConstantNames) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if (inputArc == null)
-				weightLabel.setText("");
+				label.setText("");
 			else
-				weightLabel.setText(inputArc.interval().toString(showConstantNames));
+				label.setText(inputArc.interval().toString(showConstantNames));
 
-			this.setWeightLabelPosition();
+			this.setLabelPosition();
 		}
 	}
 
@@ -124,9 +124,9 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	@Override
-	public void setWeightLabelPosition() {
-		weightLabel.setPosition((int) (myPath.midPoint.x)
-				+ weightLabel.getWidth() / 2 - 4, (int) (myPath.midPoint.y)
+	public void setLabelPosition() {
+		label.setPosition((int) (myPath.midPoint.x)
+				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y)
 				- ((zoom / 55) * (zoom / 55)));
 	}
 
@@ -136,7 +136,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	public void setUnderlyingArc(dk.aau.cs.model.tapn.TimedInputArc ia) {
 		this.inputArc = ia;
-		updateWeightLabel(true);
+		updateLabel(true);
 	}
 
 	public TimedInputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {

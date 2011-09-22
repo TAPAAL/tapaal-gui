@@ -350,7 +350,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 			} else {
 				arcElement.setAttribute("type", "normal");
-				arcElement.setAttribute("inscription", Integer.toString((inputArc != null ? inputArc.getWeight() : 1)));
+				arcElement.setAttribute("inscription", "");
 			}
 		} 
 		return arcElement;
