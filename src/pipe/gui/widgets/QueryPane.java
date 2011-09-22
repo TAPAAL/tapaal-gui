@@ -333,4 +333,9 @@ public class QueryPane extends JPanel {
 			return this;
 		}
 	}
+
+	public void selectFirst() {
+		queryList.setSelectedIndex(0);
+		
+	}
 }

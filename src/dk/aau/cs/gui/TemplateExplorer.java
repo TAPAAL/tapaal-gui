@@ -448,6 +448,10 @@ public class TemplateExplorer extends JPanel {
 			}
 		}
 	}
+	
+	public void selectFirst() {
+			templateList.setSelectedIndex(0);
+	}
 
 	public void hideButtons() {
 		addCreatedComponents(true);

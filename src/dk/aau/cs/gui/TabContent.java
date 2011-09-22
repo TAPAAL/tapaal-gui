@@ -40,12 +40,12 @@ public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
 	private static final double RATIO = 0.2;
 
-	private TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
-	private HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
-	private HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
-	private JScrollPane drawingSurfaceScroller;
-	private DrawingSurfaceImpl drawingSurface;
-	private File appFile;
+	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
+	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+	protected HashMap<TimedArcPetriNet, Zoomer> zoomLevels = new HashMap<TimedArcPetriNet, Zoomer>();
+	protected JScrollPane drawingSurfaceScroller;
+	protected DrawingSurfaceImpl drawingSurface;
+	protected File appFile;
 
 	// Normal mode
 	JPanel editorLeftPane;
@@ -54,15 +54,15 @@ public class TabContent extends JSplitPane {
 	TemplateExplorer templateExplorer;
 
 	// / Animation
-	private AnimationHistoryComponent animBox;
-	private AnimationController animControlerBox;
-	private JScrollPane animationHistoryScrollPane;
-	private JScrollPane animationControllerScrollPane;
-	private AnimationHistoryComponent abstractAnimationPane = null;
+	protected AnimationHistoryComponent animBox;
+	protected AnimationController animControlerBox;
+	protected JScrollPane animationHistoryScrollPane;
+	protected JScrollPane animationControllerScrollPane;
+	protected AnimationHistoryComponent abstractAnimationPane = null;
 
-	private JPanel animatorLeftPane;
-	private JSplitPane animationHistorySplitter;
-	private SharedPlacesAndTransitionsPanel sharedPTPanel;
+	protected JPanel animatorLeftPane;
+	protected JSplitPane animationHistorySplitter;
+	protected SharedPlacesAndTransitionsPanel sharedPTPanel;
 
 
 	public TabContent() { 
@@ -402,6 +402,7 @@ public class TabContent extends JSplitPane {
 
 		sharedPTPanel.setNetwork(network);
 		templateExplorer.updateTemplateList();
+		
 		constantsPanel.setNetwork(tapnNetwork);
 	}
 
@@ -423,6 +424,13 @@ public class TabContent extends JSplitPane {
 	}
 	public void showConstantsPanel(boolean enable){
 		constantsPanel.setVisible(enable);
+	}
+	
+	public void selectFirstElements(){
+		templateExplorer.selectFirst();
+		queries.selectFirst();
+		constantsPanel.selectFirst();
+		
 	}
 
 	

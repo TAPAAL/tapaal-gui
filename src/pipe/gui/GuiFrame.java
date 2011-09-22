@@ -1054,6 +1054,8 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
+				currentTab.selectFirstElements();
+				
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1117,6 +1119,8 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
+				currentTab.selectFirstElements();
+				
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1137,6 +1141,8 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
+		
+		
 	}
 
 	private void undoAddTab(int currentlySelected) {
