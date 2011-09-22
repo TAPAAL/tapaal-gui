@@ -23,9 +23,6 @@ import dk.aau.cs.gui.undo.Command;
 
 public class ArcPathPoint extends PetriNetObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7584441718171173604L;
 	public static final boolean STRAIGHT = false;
 	public static final boolean CURVED = true;
@@ -74,7 +71,6 @@ public class ArcPathPoint extends PetriNetObject {
 		return point;
 	}
 
-	//
 	public void setPointLocation(float x, float y) {
 		double realX = Zoomer.getUnzoomedValue(x, zoom);
 		double realY = Zoomer.getUnzoomedValue(y, zoom);
@@ -195,8 +191,7 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void delete() {// Won't delete if only two points left. General
-							// delete.
+	public void delete() {// Won't delete if only two points left. General delete.
 		if (isDeleteable()) {
 			if (getArcPath().getArc().isSelected()) {
 				return;
@@ -285,8 +280,7 @@ public class ArcPathPoint extends PetriNetObject {
 
 	public void zoomUpdate(int zoom) {
 		this.zoom = zoom;
-		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed
-		// out
+		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed out
 		if (zoom > 213) {
 			SIZE = 5;
 		} else if (zoom > 126) {

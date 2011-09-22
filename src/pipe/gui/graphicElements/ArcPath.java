@@ -1,6 +1,3 @@
-/**
- * Created on 12-Feb-2004
- */
 package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
@@ -41,10 +38,7 @@ public class ArcPath implements Shape, Cloneable {
 	protected ArcPathPoint currentPoint;
 	private boolean pointLock = false;
 	private static Stroke proximityStroke = new BasicStroke(
-			Pipe.ARC_PATH_PROXIMITY_WIDTH/*
-										 * , BasicStroke.CAP_BUTT,
-										 * BasicStroke.JOIN_MITER
-										 */);
+			Pipe.ARC_PATH_PROXIMITY_WIDTH);
 	private static Stroke stroke = new BasicStroke(
 			Pipe.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
