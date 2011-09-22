@@ -11,28 +11,12 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
 /**
- * <b>PlaceTransitionObject</b> - Petri-Net PLace or Transition SuperClass<b> -
- * <i>Abstract</i></b>
+ * Petri-Net Place or Transition SuperClass
  * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom
- * 
- * @author Edwin Chung 16 Mar 2007: modified the constructor and several other
- *         functions so that DataLayer objects can be created outside the GUI
  */
 public abstract class PlaceTransitionObject extends PetriNetObject implements
 Cloneable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6629006415467929184L;
 	/** X-axis Position on screen */
 	protected double positionX;
@@ -196,7 +180,6 @@ Cloneable {
 	public void setId(String idInput) {
 		id = idInput;
 		setName(id);
-		// System.out.println("setting id to: " + idInput);
 	}
 
 	/**
@@ -321,32 +304,20 @@ Cloneable {
 
 	/** Adds outwards arc to place/transition */
 	public void addConnectTo(Arc newArc) {
-		// System.out.println("DEBUG: added arc (to)!:" + newArc + " de " +
-		// this);
 		connectTo.add(newArc);
 	}
 
 	/** Adds inwards arc to place/transition */
 	public void addConnectFrom(Arc newArc) {
-		// System.out.println("DEBUG: added arc (from)!:" + newArc + " de " +
-		// this);
 		connectFrom.add(newArc);
 	}
 
 	public void removeFromArc(Arc oldArc) {
-		if (connectFrom.remove(oldArc)) {
-			// System.out.println("DEBUG: removeFromArc_ok");
-		} else {
-			// System.out.println("DEBUG: removeFromArc_ko");
-		}
+		connectFrom.remove(oldArc);
 	}
 
 	public void removeToArc(Arc oldArc) {
-		if (connectTo.remove(oldArc)) {
-			// System.out.println("DEBUG: removeToArc_ok");
-		} else {
-			// System.out.println("DEBUG: removeToArc_ko");
-		}
+		connectTo.remove(oldArc);
 	}
 
 	/** Updates location of any attached arcs */
