@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.dataLayer.Note;
+import pipe.gui.graphicElements.Note;
 
 public class EditNoteAction extends AbstractAction {
 

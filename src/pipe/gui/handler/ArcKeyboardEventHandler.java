@@ -3,11 +3,11 @@ package pipe.gui.handler;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import pipe.dataLayer.Arc;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Pipe.elementType;
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 /**

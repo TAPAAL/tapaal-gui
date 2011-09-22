@@ -1,7 +1,7 @@
 /*
  * Note.java
  */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Component;
 import java.awt.Dimension;

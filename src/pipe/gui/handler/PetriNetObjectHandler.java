@@ -9,13 +9,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.PetriNetObject;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.action.DeletePetriNetObjectAction;
+import pipe.gui.graphicElements.PetriNetObject;
 
 /**
  * Class used to implement methods corresponding to mouse events on all

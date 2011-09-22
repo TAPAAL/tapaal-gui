@@ -8,8 +8,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.dataLayer.AnnotationNote;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.AnnotationNote;
 
 public class EditAnnotationBorderAction extends AbstractAction {
 

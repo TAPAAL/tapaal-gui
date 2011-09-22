@@ -10,15 +10,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.Place;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.action.ShowHideInfoAction;
+import pipe.gui.graphicElements.DataLayer;
+import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;

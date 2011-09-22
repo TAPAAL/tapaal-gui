@@ -12,10 +12,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.AnnotationNote;
 import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
 import pipe.gui.action.EditNoteAction;
+import pipe.gui.graphicElements.AnnotationNote;
 
 public class AnnotationNoteHandler extends NoteHandler {
 

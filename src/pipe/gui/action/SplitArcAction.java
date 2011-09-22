@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 
-import pipe.dataLayer.Arc;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.Arc;
 
 /**
  * This class is used to split an arc in two at the point the user clicks the

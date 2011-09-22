@@ -7,8 +7,8 @@ package pipe.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import pipe.dataLayer.ArcPathPoint;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.ArcPathPoint;
 
 public class ToggleArcPointAction extends javax.swing.AbstractAction {
 

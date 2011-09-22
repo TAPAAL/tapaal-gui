@@ -12,11 +12,11 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.TAPNTransitionHandler;

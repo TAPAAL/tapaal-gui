@@ -6,8 +6,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import pipe.dataLayer.Arc;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.Arc;
 
 /**
  * This class allows the user to change the weight on an arc.

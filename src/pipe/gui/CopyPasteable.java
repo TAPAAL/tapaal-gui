@@ -1,6 +1,6 @@
 package pipe.gui;
 
-import pipe.dataLayer.PetriNetObject;
+import pipe.gui.graphicElements.PetriNetObject;
 
 /**
  * This is the interface that a component must implement so that it can be

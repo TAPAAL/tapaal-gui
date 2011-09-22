@@ -32,11 +32,11 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;

@@ -12,10 +12,10 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.ArcPathPoint;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcPointAction;
 import pipe.gui.action.ToggleArcPointAction;
+import pipe.gui.graphicElements.ArcPathPoint;
 
 public class ArcPathPointHandler extends PetriNetObjectHandler {
 

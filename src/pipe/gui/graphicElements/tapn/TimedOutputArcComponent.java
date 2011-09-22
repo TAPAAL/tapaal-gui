@@ -8,14 +8,14 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPath;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.NameLabel;
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPath;
+import pipe.gui.graphicElements.DataLayer;
+import pipe.gui.graphicElements.NameLabel;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.ArcHandler;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 

@@ -1,7 +1,7 @@
 /**
  * Created on 12-Feb-2004
  */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Rectangle;
@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.swing.JLayeredPane;
 
+import pipe.dataLayer.Transition;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;

@@ -4,7 +4,7 @@
 
 package pipe.gui.undo;
 
-import pipe.dataLayer.Arc;
+import pipe.gui.graphicElements.Arc;
 import dk.aau.cs.gui.undo.Command;
 
 /**

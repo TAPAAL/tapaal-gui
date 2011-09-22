@@ -18,7 +18,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
@@ -28,6 +27,7 @@ import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.DataLayer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;

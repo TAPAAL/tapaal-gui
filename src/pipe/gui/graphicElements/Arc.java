@@ -1,10 +1,11 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
 import javax.swing.JLayeredPane;
 
+import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;

@@ -9,10 +9,10 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
+import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;

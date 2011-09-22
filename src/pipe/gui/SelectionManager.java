@@ -13,10 +13,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPath;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.PlaceTransitionObject;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPath;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 
 /**
  * @author Peter Kyme, Michael Camacho Class to handle selection rectangle

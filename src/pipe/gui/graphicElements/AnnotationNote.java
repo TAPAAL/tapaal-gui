@@ -2,7 +2,7 @@
  * Created on 04-Mar-2004
  * Author is Michael Camacho
  */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Dimension;

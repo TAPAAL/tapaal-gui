@@ -1,6 +1,7 @@
 package pipe.dataLayer;
 
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.DataLayer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.util.Require;
 

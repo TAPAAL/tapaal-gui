@@ -57,14 +57,14 @@ import javax.swing.event.ChangeListener;
 
 import net.tapaal.TAPAAL;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
-import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.graphicElements.DataLayer;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.EscapableDialog;
@@ -1505,7 +1505,7 @@ public class GuiFrame extends JFrame implements Observer {
 				animBox.stepForward();
 				CreateGui.getAnimator().stepForward();
 				// update mouseOverView
-				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces()) {
+				for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
 					if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
 						((TimedPlaceComponent) p).showAgeOfTokens(true);
 					}
@@ -1517,7 +1517,7 @@ public class GuiFrame extends JFrame implements Observer {
 				animBox.stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				// update mouseOverView
-				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces()) {
+				for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
 					if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
 						((TimedPlaceComponent) p).showAgeOfTokens(true);
 					}

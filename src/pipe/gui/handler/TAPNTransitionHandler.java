@@ -6,10 +6,10 @@ import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.DataLayer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class TAPNTransitionHandler extends TransitionHandler {

@@ -2,7 +2,7 @@ package pipe.gui.action;
 
 import java.awt.event.ActionEvent;
 
-import pipe.dataLayer.PlaceTransitionObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 
 
 public class ShowHideInfoAction extends javax.swing.AbstractAction {

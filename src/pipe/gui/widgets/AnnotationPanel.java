@@ -5,7 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JSplitPane;
 
-import pipe.dataLayer.AnnotationNote;
+import pipe.gui.graphicElements.AnnotationNote;
 
 /*
  * ParameterPanel.java

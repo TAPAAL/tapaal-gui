@@ -30,8 +30,8 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
+import pipe.gui.graphicElements.DataLayer;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.widgets.FileBrowser;
 
 /**
