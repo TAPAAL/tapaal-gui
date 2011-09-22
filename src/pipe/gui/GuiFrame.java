@@ -410,9 +410,9 @@ public class GuiFrame extends JFrame implements Observer {
 		 drawMenu.addSeparator();
 		 
 		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
-				 Pipe.ADDTOKEN, "Add a token", "ADD", true));
+				 Pipe.ADDTOKEN, "Add a token", "typed +", true));
 		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
-				 "Delete token", Pipe.DELTOKEN, "Delete a token", "SUBTRACT",
+				 "Delete token", Pipe.DELTOKEN, "Delete a token", "typed -",
 				 true));
 
 		 /* ViewMenu */
