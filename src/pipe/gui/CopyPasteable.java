@@ -15,7 +15,7 @@ public interface CopyPasteable {
 	 * 
 	 * @return a copy of the PetriNetObject
 	 */
-	public PetriNetObject copy();
+	PetriNetObject copy();
 
 	/**
 	 * paste()
@@ -26,7 +26,7 @@ public interface CopyPasteable {
 	 * @return a copy of the saved PetriNetObject that can be added to a GuiView
 	 *         instance
 	 */
-	public PetriNetObject paste(double despX, double despY,
+	PetriNetObject paste(double despX, double despY,
 			boolean toAnotherView);
 
 	/**
@@ -34,6 +34,6 @@ public interface CopyPasteable {
 	 * 
 	 * @return true if this object can be copied and pasted
 	 */
-	public boolean isCopyPasteable();
+	boolean isCopyPasteable();
 
 }

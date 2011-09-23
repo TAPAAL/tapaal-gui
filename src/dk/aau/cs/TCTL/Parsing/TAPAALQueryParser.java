@@ -36,26 +36,26 @@ public class TAPAALQueryParser implements GPMessageConstants {
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL countered an error trying to parse the query";
 
 	public interface SymbolConstants {
-		final int SYMBOL_EOF                =  0;  // (EOF)
-	       final int SYMBOL_ERROR              =  1;  // (Error)
-	       final int SYMBOL_WHITESPACE         =  2;  // (Whitespace)
-	       final int SYMBOL_EXCLAM             =  3;  // '!'
-	       final int SYMBOL_AMPAMP             =  4;  // '&&'
-	       final int SYMBOL_LPARAN             =  5;  // '('
-	       final int SYMBOL_RPARAN             =  6;  // ')'
-	       final int SYMBOL_DOT                =  7;  // '.'
-	       final int SYMBOL_PIPEPIPE           =  8;  // '||'
-	       final int SYMBOL_LT                 =  9;  // '<'
-	       final int SYMBOL_LTEQ               = 10;  // '<='
-	       final int SYMBOL_EQ                 = 11;  // '='
-	       final int SYMBOL_EQEQ               = 12;  // '=='
-	       final int SYMBOL_GT                 = 13;  // '>'
-	       final int SYMBOL_GTEQ               = 14;  // '>='
-	       final int SYMBOL_ALBRACKETRBRACKET  = 15;  // 'A[]'
-	       final int SYMBOL_ALTGT              = 16;  // 'A<>'
-	       final int SYMBOL_AF                 = 17;  // AF
-	       final int SYMBOL_AG                 = 18;  // AG
-	       final int SYMBOL_AND                = 19;  // and
+		int SYMBOL_EOF                =  0;  // (EOF)
+	       int SYMBOL_ERROR              =  1;  // (Error)
+	       int SYMBOL_WHITESPACE         =  2;  // (Whitespace)
+	       int SYMBOL_EXCLAM             =  3;  // '!'
+	       int SYMBOL_AMPAMP             =  4;  // '&&'
+	       int SYMBOL_LPARAN             =  5;  // '('
+	       int SYMBOL_RPARAN             =  6;  // ')'
+	       int SYMBOL_DOT                =  7;  // '.'
+	       int SYMBOL_PIPEPIPE           =  8;  // '||'
+	       int SYMBOL_LT                 =  9;  // '<'
+	       int SYMBOL_LTEQ               = 10;  // '<='
+	       int SYMBOL_EQ                 = 11;  // '='
+	       int SYMBOL_EQEQ               = 12;  // '=='
+	       int SYMBOL_GT                 = 13;  // '>'
+	       int SYMBOL_GTEQ               = 14;  // '>='
+	       int SYMBOL_ALBRACKETRBRACKET  = 15;  // 'A[]'
+	       int SYMBOL_ALTGT              = 16;  // 'A<>'
+	       int SYMBOL_AF                 = 17;  // AF
+	       int SYMBOL_AG                 = 18;  // AG
+	       int SYMBOL_AND                = 19;  // and
 	       final int SYMBOL_ELBRACKETRBRACKET  = 20;  // 'E[]'
 	       final int SYMBOL_ELTGT              = 21;  // 'E<>'
 	       final int SYMBOL_EF                 = 22;  // EF
