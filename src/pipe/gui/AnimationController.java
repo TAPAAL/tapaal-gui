@@ -243,7 +243,7 @@ public class AnimationController extends JPanel {
 			// BigDecimal timeDelayToSet = new
 			// BigDecimal(TimeDelayField.getText(), new
 			// MathContext(Pipe.AGE_PRECISION));
-			if (timeDelayToSet.compareTo(new BigDecimal(0l)) <= 0) {
+			if (timeDelayToSet.compareTo(new BigDecimal(0L)) <= 0) {
 				// Nothing to do, illegal value
 				System.err.println("Illegal value");
 			} else {
