@@ -245,9 +245,8 @@ Printable, DrawingSurface {
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 
-				if (newObject instanceof Zoomable) {
-					newObject.zoomUpdate(getZoom());
-				}
+				newObject.zoomUpdate(getZoom());
+				
 			}
 			newObject.setGuiModel(guiModel);
 		}

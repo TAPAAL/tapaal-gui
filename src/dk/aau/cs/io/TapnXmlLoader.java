@@ -968,9 +968,9 @@ public class TapnXmlLoader {
 					((Note) newObject).getNote().addMouseListener(noteHandler);
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
-				if (newObject instanceof Zoomable) {
-					newObject.zoomUpdate(drawingSurface.getZoom());
-				}
+				
+				newObject.zoomUpdate(drawingSurface.getZoom());
+				
 			}
 			newObject.setGuiModel(template.guiModel());
 		}
