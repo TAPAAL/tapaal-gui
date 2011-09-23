@@ -1030,7 +1030,7 @@ public class GuiFrame extends JFrame implements Observer {
 		int currentlySelected = appTab.getSelectedIndex();
 
 		
-		if (namePrefix == null || namePrefix == "") {
+		if (namePrefix == null || namePrefix.equals("")) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
 		} else {
 			name = namePrefix + ".xml";
@@ -2137,7 +2137,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName() == "selected") {
+			if (evt.getPropertyName().equals("selected")) {
 				Boolean b = (Boolean) evt.getNewValue();
 				if (b != null) {
 					setSelected(b.booleanValue());

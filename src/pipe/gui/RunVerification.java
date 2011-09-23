@@ -69,7 +69,7 @@ public class RunVerification extends RunVerificationBase {
 			System.getProperty("line.separator") + 	
 			System.getProperty("line.separator");
 			
-			if (extraInformation != ""){
+			if (!extraInformation.equals("")){
 				message += extraInformation +			
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");

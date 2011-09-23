@@ -122,7 +122,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		} else {
 			int val = (Integer) valueSpinner.getValue();
 
-			if (oldName != "") {
+			if (!oldName.equals("")) {
 				if (!oldName.equals(newName)
 						&& model.isConstantNameUsed(newName)) {
 					JOptionPane

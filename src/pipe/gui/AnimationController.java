@@ -64,7 +64,7 @@ public class AnimationController extends JPanel {
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName() == "selected") {
+			if (evt.getPropertyName().equals("selected")) {
 				Boolean b = (Boolean) evt.getNewValue();
 				if (b != null) {
 					setSelected(b.booleanValue());

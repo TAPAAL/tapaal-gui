@@ -606,7 +606,7 @@ public class TapnLegacyXmlLoader {
 
 		Place place = null;
 
-		if (invariant == null || invariant == "") {
+		if (invariant == null || invariant.equals("")) {
 			place = new Place(positionXInput, positionYInput, idInput,
 					nameInput, nameOffsetXInput, nameOffsetYInput,
 					initialMarkingInput, markingOffsetXInput,

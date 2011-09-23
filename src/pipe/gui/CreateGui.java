@@ -58,7 +58,7 @@ public class CreateGui {
 			message.append("\nNew version: ");
 			message.append(versionChecker.getNewVersionNumber());
 			String changelog = versionChecker.getChangelog();
-			if (changelog != ""){
+			if (!changelog.equals("")){
 				message.append('\n');
 				message.append('\n');
 				message.append("Changelog:");

@@ -129,8 +129,8 @@ public class GuardDialogue extends JPanel /*
 				if (rightInterval instanceof InfBound
 						|| leftInterval.value() <= rightInterval.value()) {
 					return new dk.aau.cs.model.tapn.TimeInterval(
-							(leftDelim == "[" ? true : false), leftInterval,
-							rightInterval, (rightDelim == "]" ? true : false));
+							(leftDelim.equals("[") ? true : false), leftInterval,
+							rightInterval, (rightDelim.equals("]") ? true : false));
 				} else {
 					return oldGuard;
 				}

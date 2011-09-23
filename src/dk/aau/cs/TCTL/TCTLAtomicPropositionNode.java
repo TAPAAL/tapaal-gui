@@ -65,8 +65,8 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) o;
 			// TODO: Not sure if this is intentional but this is reference
 			// equals and not equality
-			return this.template == node.template
-					&& this.place == node.getPlace() && this.op == node.getOp()
+			return this.template.equals(node.template)
+					&& this.place.equals(node.getPlace()) && this.op.equals(node.getOp())
 					&& this.n == node.getN();
 		}
 		return false;
