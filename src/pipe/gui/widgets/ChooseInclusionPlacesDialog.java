@@ -36,7 +36,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;

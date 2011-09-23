@@ -10,7 +10,6 @@ import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
-import pipe.gui.Pipe;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;

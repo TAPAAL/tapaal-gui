@@ -160,9 +160,7 @@ Printable, DrawingSurface {
 		if(CreateGui.getApp().getMode() == elementType.SELECT)
 			this.selection.enableSelection();
 
-		Component component = getParent().getParent();
-		JScrollPane pane = (JScrollPane)component;
-		repaintAll();
+
 	}
 
 	public void addNewPetriNetObject(PetriNetObject newObject) {

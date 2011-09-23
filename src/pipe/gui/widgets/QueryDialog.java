@@ -64,7 +64,6 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import pipe.gui.Verifier;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;

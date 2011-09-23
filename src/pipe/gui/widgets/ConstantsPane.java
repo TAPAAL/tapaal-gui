@@ -25,7 +25,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;

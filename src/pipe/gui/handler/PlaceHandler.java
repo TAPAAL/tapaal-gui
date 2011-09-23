@@ -14,7 +14,6 @@ import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.action.ShowHideInfoAction;
