@@ -186,7 +186,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	private void simplifyQuery(pipe.dataLayer.TAPNQuery query) {
 		SimplifyPropositionsVisitor visitor = new SimplifyPropositionsVisitor();
-		visitor.FindAndReplaceTrueAndFalsePropositions(query.getProperty());
+		visitor.findAndReplaceTrueAndFalsePropositions(query.getProperty());
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
@@ -309,7 +309,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected void process(List<BatchProcessingVerificationResult> chunks) {
 		for(BatchProcessingVerificationResult result : chunks){
-			tableModel.AddResult(result);
+			tableModel.addResult(result);
 		}
 	}
 	

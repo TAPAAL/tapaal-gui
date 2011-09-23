@@ -1536,7 +1536,7 @@ public class QueryDialog extends JPanel {
 
 						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
-						VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(newQuery);
+						VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(newQuery);
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();

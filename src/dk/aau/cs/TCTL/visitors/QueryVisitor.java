@@ -119,7 +119,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		uppaalQuery.append(tctlFalseNode.toString());
 	}
 
-	protected String OperatorConversion(String op) {
+	protected String operatorConversion(String op) {
 		if (op.equals("="))
 			return "==";
 

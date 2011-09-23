@@ -31,13 +31,13 @@ public class SharedPlaceNamePanel extends JPanel {
 	private SharedPlace placeToEdit;
 	private final Context context;
 
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context) {
-		this(rootPane, SharedPlacesListModel, context, null);	
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context) {
+		this(rootPane, sharedPlacesListModel, context, null);	
 	}
 	
-	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context, SharedPlace placeToEdit) {
+	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
-		listModel = SharedPlacesListModel;
+		listModel = sharedPlacesListModel;
 		this.placeToEdit = placeToEdit;
 		this.context = context;
 		initComponents();		

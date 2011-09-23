@@ -41,7 +41,7 @@ public class SymbolicState {
 		return automataLocations.get(automata);
 	}
 
-	public boolean IsConcreteState() {
+	public boolean isConcreteState() {
 		for (ValueRange range : globalClocksAndVariables.values()) {
 			if (!range.hasExactValue())
 				return false;

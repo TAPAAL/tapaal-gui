@@ -24,7 +24,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 
 		append("(");
 		append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));
-		append(OperatorConversion(atomicPropositionNode.getOp()));
+		append(operatorConversion(atomicPropositionNode.getOp()));
 		append(" ");
 		append(atomicPropositionNode.getN());
 		append(")");

@@ -166,7 +166,7 @@ public class TimedArcPetriNetNetwork {
 
 	private void fireConstantAdded(Constant constant) {
 		for(ConstantsListener listener : constantsListeners){
-			listener.ConstantAdded(new ConstantEvent(constant, constants.getIndexOf(constant)));
+			listener.constantAdded(new ConstantEvent(constant, constants.getIndexOf(constant)));
 		}
 	}
 
@@ -176,7 +176,7 @@ public class TimedArcPetriNetNetwork {
 		int index = constants.getIndexOf(constant);
 		Command cmd = constants.removeConstant(name);
 		for(ConstantsListener listener : constantsListeners){
-			listener.ConstantRemoved(new ConstantEvent(constant, index));
+			listener.constantRemoved(new ConstantEvent(constant, index));
 		}
 		return cmd;
 	}
@@ -189,7 +189,7 @@ public class TimedArcPetriNetNetwork {
 		if (edit != null) {
 			updateGuardsWithNewConstant(oldName, constant);
 			for(ConstantsListener listener : constantsListeners){
-				listener.ConstantChanged(new ConstantChangedEvent(old, constant, index));
+				listener.constantChanged(new ConstantChangedEvent(old, constant, index));
 			}
 		}
 
