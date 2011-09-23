@@ -534,8 +534,8 @@ public class Transition extends PlaceTransitionObject {
 
 	class ArcAngleCompare implements Comparable<ArcAngleCompare> {
 
-		private final static boolean SOURCE = false;
-		private final static boolean TARGET = true;
+		private static final boolean SOURCE = false;
+		private static final boolean TARGET = true;
 		private Arc arc;
 		private Transition transition;
 		private double angle;
