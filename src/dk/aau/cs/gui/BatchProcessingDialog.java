@@ -184,7 +184,7 @@ public class BatchProcessingDialog extends JDialog {
 		fileList.addListSelectionListener(new ListSelectionListener() {	
 
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
+				if (!(e.getValueIsAdjusting())) {
 					if (fileList.getSelectedIndex() == -1) {
 						removeFileButton.setEnabled(false);
 					} else {

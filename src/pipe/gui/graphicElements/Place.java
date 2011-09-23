@@ -212,7 +212,7 @@ public class Place extends PlaceTransitionObject {
 
 	@Override
 	public void update(boolean displayConstantNames) {
-		if (attributesVisible == true) {
+		if (attributesVisible) {
 			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
 		} else {
 			pnName.setText("");

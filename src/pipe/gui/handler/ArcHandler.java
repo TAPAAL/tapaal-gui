@@ -55,7 +55,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		super.mousePressed(e);
-		if (CreateGui.getApp().isEditionAllowed() == false) {
+		if (!(CreateGui.getApp().isEditionAllowed())) {
 			return;
 		}
 		if (e.getClickCount() == 2) {
@@ -98,7 +98,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (CreateGui.getApp().isEditionAllowed() == false) {
+		if (!(CreateGui.getApp().isEditionAllowed())) {
 			return;
 		}
 

@@ -58,7 +58,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		popup.insert(menuItem, index++);
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Place) myObject));
-		if (((Place) myObject).getAttributesVisible() == true) {
+		if (((Place) myObject).getAttributesVisible()) {
 			menuItem.setText("Hide Attributes");
 		} else {
 			menuItem.setText("Show Attributes");
@@ -117,7 +117,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
+		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown()) {
 			return;
 		}
 

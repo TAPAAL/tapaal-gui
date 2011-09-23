@@ -244,7 +244,7 @@ public class Transition extends PlaceTransitionObject {
 	 * @return True if enabled
 	 */
 	public boolean isEnabled(boolean animationStatus) {
-		if (animationStatus == true) {
+		if (animationStatus) {
 			if (isEnabled()) {
 				highlighted = true;
 				return true;

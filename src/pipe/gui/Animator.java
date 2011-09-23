@@ -109,7 +109,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) == true) {
+			if (tempTransition.isEnabled(true)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -125,7 +125,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) == false) {
+			if (!(tempTransition.isEnabled(true))) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}

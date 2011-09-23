@@ -562,7 +562,7 @@ public class TemplateExplorer extends JPanel {
 		}
 
 		public void valueChanged(ListSelectionEvent e) {
-			if (e.getValueIsAdjusting() == false) {
+			if (!(e.getValueIsAdjusting())) {
 				int index = templateList.getSelectedIndex();
 				if (index == -1) {
 					removeTemplateButton.setEnabled(false);

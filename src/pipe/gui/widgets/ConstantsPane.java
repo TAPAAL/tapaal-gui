@@ -73,7 +73,7 @@ public class ConstantsPane extends JPanel {
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
+				if (!(e.getValueIsAdjusting())) {
 					if (constantsList.getSelectedIndex() == -1) {
 						editBtn.setEnabled(false);
 						removeBtn.setEnabled(false);

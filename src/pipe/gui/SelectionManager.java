@@ -46,13 +46,13 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void updateBounds() {
-		if (enabled == true) {
+		if (enabled) {
 			setBounds(0, 0, drawingSurface.getWidth(), drawingSurface.getHeight());
 		}
 	}
 
 	public void enableSelection() {
-		if (enabled == false) {
+		if (!(enabled)) {
 			drawingSurface.add(this);
 			enabled = true;
 			updateBounds();
@@ -60,7 +60,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void disableSelection() {
-		if (enabled == true) {
+		if (enabled) {
 			this.clearSelection();
 			drawingSurface.remove(this);
 			enabled = false;
@@ -199,7 +199,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
 	public void mouseReleased(MouseEvent e) {
-		if (isSelecting == true) {
+		if (isSelecting) {
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
 			isSelecting = false;

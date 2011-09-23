@@ -82,7 +82,7 @@ public class QueryPane extends JPanel {
 		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
+				if (!(e.getValueIsAdjusting())) {
 					queryList.ensureIndexIsVisible(queryList.getSelectedIndex());
 					updateQueryButtons();
 				}

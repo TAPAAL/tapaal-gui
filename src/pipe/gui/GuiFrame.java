@@ -1193,7 +1193,7 @@ public class GuiFrame extends JFrame implements Observer {
 		// Loop through all tabs and check if they have been saved
 		for (int counter = 0; counter < appTab.getTabCount(); counter++) {
 			appTab.setSelectedIndex(counter);
-			if (checkForSave() == false) {
+			if (!(checkForSave())) {
 				return false;
 			}
 		}
@@ -1202,7 +1202,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setRandomAnimationMode(boolean on) {
 
-		if (on == false) {
+		if (!(on)) {
 			stepforwardAction.setEnabled(CreateGui.getAnimationHistory().isStepForwardAllowed());
 			stepbackwardAction.setEnabled(CreateGui.getAnimationHistory().isStepBackAllowed());
 
@@ -1788,7 +1788,7 @@ public class GuiFrame extends JFrame implements Observer {
 						return;
 					}
 				}
-				if (doZoom == true) {
+				if (doZoom) {
 					updateZoomCombo();
 					appView.zoomTo(new java.awt.Point((int) midpointX,
 							(int) midpointY));

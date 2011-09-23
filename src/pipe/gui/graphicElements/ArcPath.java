@@ -184,10 +184,10 @@ public class ArcPath implements Shape, Cloneable {
 			int curveEndIndex = 0;
 			myCurrentPoint = pathPoints.get(c);
 
-			if (myCurrentPoint.getPointType() == true) {
+			if (myCurrentPoint.getPointType()) {
 				curveStartIndex = c - 1;
 
-				for (; c <= endIndex && myCurrentPoint.getPointType() == true; c++) {
+				for (; c <= endIndex && myCurrentPoint.getPointType(); c++) {
 					myCurrentPoint = pathPoints.get(c);
 					curveEndIndex = c;
 				}
@@ -239,7 +239,7 @@ public class ArcPath implements Shape, Cloneable {
 			myPreviousPoint = pathPoints.get(c - 1);
 			myCurrentPoint = pathPoints.get(c);
 
-			if (myCurrentPoint.getPointType() == false) {
+			if (!(myCurrentPoint.getPointType())) {
 				myCurrentPoint.setControl1(getControlPoint(myPreviousPoint
 						.getPoint(), myCurrentPoint.getPoint(), myPreviousPoint
 						.getPoint(), myCurrentPoint.getPoint()));
@@ -247,7 +247,7 @@ public class ArcPath implements Shape, Cloneable {
 						.getPoint(), myPreviousPoint.getPoint(), myCurrentPoint
 						.getPoint(), myPreviousPoint.getPoint()));
 			} else {
-				if (c > 1 && myPreviousPoint.getPointType() == false) {
+				if (c > 1 && !(myPreviousPoint.getPointType())) {
 					myPreviousButOnePoint = pathPoints.get(c - 2);
 					myCurrentPoint.setControl1(getControlPoint(
 							myPreviousButOnePoint.getPoint(), myPreviousPoint
@@ -256,7 +256,7 @@ public class ArcPath implements Shape, Cloneable {
 				}
 				if (c < getEndIndex()) {
 					myNextPoint = pathPoints.get(c + 1);
-					if (myNextPoint.getPointType() == false) {
+					if (!(myNextPoint.getPointType())) {
 						myCurrentPoint.setControl2(getControlPoint(myNextPoint
 								.getPoint(), myCurrentPoint.getPoint(),
 								myCurrentPoint.getPoint(), myPreviousPoint
@@ -275,7 +275,7 @@ public class ArcPath implements Shape, Cloneable {
 		if (!(getEndIndex() > 0)) {
 			return;
 		} else if (source != null && source instanceof Transition
-				&& (pathPoints.get(1)).getPointType() == true) {
+				&& (pathPoints.get(1)).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(1);
 			ArcPathPoint myLastPoint = pathPoints.get(0);
 			float distance = (float) getMod(myPoint.getPoint(), myLastPoint
@@ -291,7 +291,7 @@ public class ArcPath implements Shape, Cloneable {
 			myPoint.setControl2(getControlPoint(myPoint.getPoint(), myPoint
 					.getControl1(), myPoint.getPoint(), myPoint.getControl1()));
 		} else if (target != null && source instanceof Place
-				&& (pathPoints.get(getEndIndex())).getPointType() == true) {
+				&& (pathPoints.get(getEndIndex())).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(getEndIndex());
 			ArcPathPoint myLastPoint = pathPoints.get(getEndIndex() - 1);
 			float distance = (float) getMod(myPoint.getPoint(), myLastPoint
