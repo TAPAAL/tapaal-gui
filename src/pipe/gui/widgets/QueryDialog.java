@@ -1,6 +1,8 @@
 package pipe.gui.widgets;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -23,7 +25,6 @@ import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -805,6 +806,10 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void initQueryNamePanel() {
+		
+		JPanel splitter = new JPanel(new BorderLayout());
+		
+		
 		namePanel = new JPanel(new FlowLayout());
 		namePanel.add(new JLabel("Query name: "));
 		
@@ -829,38 +834,7 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
-
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(0,10,0,10);
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		add(namePanel, gridBagConstraints);
-	}
-
-	private void initBoundednessCheckPanel() {
-
-		// Number of extra tokens field
-		boundednessCheckPanel = new JPanel();
-		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
-		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
-
-		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
-		boundednessCheckPanel.add(numberOfExtraTokensInNet);
-
-		// Boundedness button
-		kbounded = new JButton("Check Boundedness");
-		kbounded.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
-			}
-
-		});
-		boundednessCheckPanel.add(kbounded);
-		boundednessCheckPanel.add(Box.createHorizontalStrut(350));
+		
 		
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.addActionListener(new ActionListener(){
@@ -918,9 +892,45 @@ public class QueryDialog extends JPanel {
 				return buffer.toString();
 			}
 		});
-		boundednessCheckPanel.add(infoButton);
+		JPanel helpPanel = new JPanel(new FlowLayout());
+		helpPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		helpPanel.add(infoButton);
+		
+		splitter.add(namePanel, BorderLayout.LINE_START);
+		splitter.add(helpPanel, BorderLayout.LINE_END);
 
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.insets = new Insets(0,10,0,10);
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		add(splitter, gridBagConstraints);
+	}
 
+	private void initBoundednessCheckPanel() {
+
+		// Number of extra tokens field
+		boundednessCheckPanel = new JPanel();
+		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
+		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
+
+		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
+		boundednessCheckPanel.add(numberOfExtraTokensInNet);
+
+		// Boundedness button
+		kbounded = new JButton("Check Boundedness");
+		kbounded.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
+			}
+
+		});
+		boundednessCheckPanel.add(kbounded);
+		
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
