@@ -43,7 +43,7 @@ public class DataLayer extends Observable implements Cloneable {
 	 * An ArrayList used to point to either the Arc, Place or Transition
 	 * ArrayLists when these ArrayLists are being update
 	 */
-	private ArrayList changeArrayList = null;
+	private ArrayList<? extends PetriNetObject> changeArrayList = null;
 
 	/** Used to determine whether the matrixes have been modified */
 	static boolean initialMarkingVectorChanged = true;
@@ -403,12 +403,7 @@ public class DataLayer extends Observable implements Cloneable {
 				addTransition((Transition) pnObject);
 			} else if (pnObject instanceof AnnotationNote) {
 				addAnnotation((AnnotationNote)pnObject);				
-			} else { // arrows, other labels.
-				changeArrayList.add(pnObject);
-				setChanged();
-
-				notifyObservers(pnObject);
-			}
+			} 
 		}
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;

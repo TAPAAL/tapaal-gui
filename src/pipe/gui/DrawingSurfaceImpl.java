@@ -18,7 +18,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JLayeredPane;
-import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
