@@ -241,7 +241,6 @@ public class ArcPathPoint extends PetriNetObject {
 
 	@Override
 	public void addedToGui() {
-		;
 	}
 
 	void hidePoint() {
@@ -269,7 +268,6 @@ public class ArcPathPoint extends PetriNetObject {
 
 	@Override
 	public void undelete(DrawingSurfaceImpl view) {
-		;
 	}
 
 	@Override

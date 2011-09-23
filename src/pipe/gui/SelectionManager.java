@@ -242,15 +242,12 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		;// Not needed
 	}
 
 	public void mouseEntered(MouseEvent e) {
-		; // Not needed
 	}
 
 	public void mouseExited(MouseEvent e) {
-		; // Not needed
 	}
 
 	/*
@@ -260,7 +257,6 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
 	public void mouseMoved(MouseEvent e) {
-		; // Not needed
 	}
 
 	public int getSelectionCount() {

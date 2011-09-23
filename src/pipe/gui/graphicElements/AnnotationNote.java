@@ -57,7 +57,6 @@ public class AnnotationNote extends Note {
 		dragPoints[3] = new ResizePoint(this, ResizePoint.RIGHT);
 		dragPoints[4] = new ResizePoint(this, ResizePoint.BOTTOM
 				| ResizePoint.RIGHT);
-		;
 		dragPoints[5] = new ResizePoint(this, ResizePoint.BOTTOM);
 		dragPoints[6] = new ResizePoint(this, ResizePoint.BOTTOM
 				| ResizePoint.LEFT);
