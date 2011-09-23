@@ -15,7 +15,7 @@ import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -74,7 +74,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2
 					&& CreateGui.getApp().isEditionAllowed()
-					&& (CreateGui.getApp().getMode() == elementType.PLACE || CreateGui.getApp().getMode() == elementType.SELECT)) {
+					&& (CreateGui.getApp().getMode() == ElementType.PLACE || CreateGui.getApp().getMode() == ElementType.SELECT)) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {

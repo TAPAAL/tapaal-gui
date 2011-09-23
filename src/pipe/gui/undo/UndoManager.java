@@ -212,8 +212,8 @@ public class UndoManager {
 	}
 
 	private void checkMode() {
-		if ((app.getMode() == Pipe.elementType.FAST_PLACE)
-				|| (app.getMode() == Pipe.elementType.FAST_TRANSITION)) {
+		if ((app.getMode() == Pipe.ElementType.FAST_PLACE)
+				|| (app.getMode() == Pipe.ElementType.FAST_TRANSITION)) {
 			app.resetMode();
 		}
 	}

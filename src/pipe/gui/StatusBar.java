@@ -58,7 +58,7 @@ public class StatusBar extends JPanel {
 		label.setText(newText);
 	}
 
-	public void changeText(Pipe.elementType type) {
+	public void changeText(Pipe.ElementType type) {
 		switch (type) {
 		case PLACE:
 			changeText(textforPlace);

@@ -62,7 +62,7 @@ import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
@@ -94,7 +94,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private String frameTitle; // Frame title
 	private GuiFrame appGui;
 	private DrawingSurfaceImpl appView;
-	private Pipe.elementType mode, prev_mode, old_mode; // *** mode WAS STATIC ***
+	private Pipe.ElementType mode, prev_mode, old_mode; // *** mode WAS STATIC ***
 	private int newNameCounter = 1;
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
@@ -387,34 +387,34 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu drawMenu = new JMenu("Draw");
 		 drawMenu.setMnemonic('D');
 		 addMenuItem(drawMenu, selectAction = new TypeAction("Select",
-				 elementType.SELECT, "Select components (S)", "S", true));
+				 ElementType.SELECT, "Select components (S)", "S", true));
 		 drawMenu.addSeparator();
 
 		 addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
-				 elementType.TAPNPLACE, "Add a place (P)", "P", true));
+				 ElementType.TAPNPLACE, "Add a place (P)", "P", true));
 
 		 addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-				 elementType.TAPNTRANS, "Add a transition (T)", "T", true));
+				 ElementType.TAPNTRANS, "Add a transition (T)", "T", true));
 
 		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
-				 elementType.TAPNARC, "Add an arc (A)", "A", true));
+				 ElementType.TAPNARC, "Add an arc (A)", "A", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", elementType.TRANSPORTARC, "Add a transport arc (R)", "R",
+				 "Transport Arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
 				 true));
 
 		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
-				 elementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
+				 ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
 		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
-				 elementType.ANNOTATION, "Add an annotation (N)", "N", true));
+				 ElementType.ANNOTATION, "Add an annotation (N)", "N", true));
 		 
 		 drawMenu.addSeparator();
 		 
 		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
-				 elementType.ADDTOKEN, "Add a token", "ADD", true));
+				 ElementType.ADDTOKEN, "Add a token", "ADD", true));
 		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
-				 "Delete token", elementType.DELTOKEN, "Delete a token", "SUBTRACT",
+				 "Delete token", ElementType.DELTOKEN, "Delete a token", "SUBTRACT",
 				 true));
 
 		 /* ViewMenu */
@@ -436,7 +436,7 @@ public class GuiFrame extends JFrame implements Observer {
 		 viewMenu.addSeparator();
 		 addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				 "Change the grid size", "G"));
-		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", elementType.DRAG,
+		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", ElementType.DRAG,
 				 "Drag the drawing", "D", true));
 		 
 		 viewMenu.addSeparator();
@@ -452,17 +452,17 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
-				 "Simulation mode", elementType.START, "Toggle simulation mode (M)",
+				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 animateMenu.addSeparator();
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
-				 elementType.STEPBACKWARD, "Step backward a firing", "typed 4"));
+				 ElementType.STEPBACKWARD, "Step backward a firing", "typed 4"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Forward",
-						 elementType.STEPFORWARD, "Step forward a firing", "typed 6"));
+						 ElementType.STEPFORWARD, "Step forward a firing", "typed 6"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay 1",
-				 elementType.TIMEPASS, "Let time pass 1 time unit", "typed 1"));
+				 ElementType.TIMEPASS, "Let time pass 1 time unit", "typed 1"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -471,9 +471,9 @@ public class GuiFrame extends JFrame implements Observer {
 		  * AnimateAction("Simulate", Pipe.ANIMATE,
 		  * "Randomly fire a number of transitions", "typed 7",true));
 		  */
-		 randomAction = new AnimateAction("Random", elementType.RANDOM,
+		 randomAction = new AnimateAction("Random", ElementType.RANDOM,
 				 "Randomly fire a transition", "typed 5");
-		 randomAnimateAction = new AnimateAction("Simulate", elementType.ANIMATE,
+		 randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
 				 "Randomly fire a number of transitions", "typed 7", true);
 
 		 
@@ -865,7 +865,7 @@ public class GuiFrame extends JFrame implements Observer {
 					setGUIMode(GUIMode.draw);
 
 					// TODO: change this code... it's ugly :)
-					if (appGui.getMode() == elementType.SELECT) {
+					if (appGui.getMode() == ElementType.SELECT) {
 						appGui.activateSelectAction();
 					}
 
@@ -885,7 +885,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	// HAK Method called by netModel object when it changes
 	public void update(Observable o, Object obj) {
-		if ((mode != elementType.CREATING) && (!appView.isInAnimationMode())) {
+		if ((mode != ElementType.CREATING) && (!appView.isInAnimationMode())) {
 			appView.setNetChanged(true);
 		}
 	}
@@ -1045,7 +1045,7 @@ public class GuiFrame extends JFrame implements Observer {
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(elementType.CREATING);
+					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
 				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
@@ -1108,7 +1108,7 @@ public class GuiFrame extends JFrame implements Observer {
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(elementType.CREATING);
+					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
 				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
@@ -1305,12 +1305,12 @@ public class GuiFrame extends JFrame implements Observer {
 		setMode(old_mode);
 	}
 
-	public void setFastMode(Pipe.elementType _mode) {
+	public void setFastMode(Pipe.ElementType _mode) {
 		old_mode = mode;
 		setMode(_mode);
 	}
 
-	public void setMode(Pipe.elementType _mode) {
+	public void setMode(Pipe.ElementType _mode) {
 		// Don't bother unless new mode is different.
 		if (mode != _mode) {
 			prev_mode = mode;
@@ -1318,7 +1318,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 
-	public Pipe.elementType getMode() {
+	public Pipe.ElementType getMode() {
 		return mode;
 	}
 
@@ -1328,40 +1328,40 @@ public class GuiFrame extends JFrame implements Observer {
 		mode = prev_mode;
 
 		if (placeAction != null) {
-			placeAction.setSelected(mode == elementType.PLACE);
+			placeAction.setSelected(mode == ElementType.PLACE);
 		}
 		if (transAction != null) {
-			transAction.setSelected(mode == elementType.IMMTRANS);
+			transAction.setSelected(mode == ElementType.IMMTRANS);
 		}
 
 		if (timedtransAction != null) {
-			timedtransAction.setSelected(mode == elementType.TIMEDTRANS);
+			timedtransAction.setSelected(mode == ElementType.TIMEDTRANS);
 		}
 
 		if (arcAction != null) {
-			arcAction.setSelected(mode == elementType.ARC);
+			arcAction.setSelected(mode == ElementType.ARC);
 		}
 
 		if (timedArcAction != null)
-			timedArcAction.setSelected(mode == elementType.TAPNARC);
+			timedArcAction.setSelected(mode == ElementType.TAPNARC);
 
 		if (transportArcAction != null)
-			transportArcAction.setSelected(mode == elementType.TRANSPORTARC);
+			transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
 
 		if (timedPlaceAction != null)
-			timedPlaceAction.setSelected(mode == elementType.TAPNPLACE);
+			timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
 
 		if (tokenAction != null)
-			tokenAction.setSelected(mode == elementType.ADDTOKEN);
+			tokenAction.setSelected(mode == ElementType.ADDTOKEN);
 
 		if (deleteTokenAction != null)
-			deleteTokenAction.setSelected(mode == elementType.DELTOKEN);
+			deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
 
 		if (selectAction != null)
-			selectAction.setSelected(mode == elementType.SELECT);
+			selectAction.setSelected(mode == ElementType.SELECT);
 
 		if (annotationAction != null)
-			annotationAction.setSelected(mode == elementType.ANNOTATION);
+			annotationAction.setSelected(mode == ElementType.ANNOTATION);
 
 	}
 
@@ -1389,7 +1389,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void activateSelectAction() {
 		// Set selection mode at startup
-		setMode(elementType.SELECT);
+		setMode(ElementType.SELECT);
 		selectAction.actionPerformed(null);
 	}
 
@@ -1432,21 +1432,21 @@ public class GuiFrame extends JFrame implements Observer {
 		 * 
 		 */
 		private static final long serialVersionUID = 8582324286370859664L;
-		private elementType typeID;
+		private ElementType typeID;
 		private AnimationHistoryComponent animBox;
 
-		AnimateAction(String name, elementType typeID, String tooltip, String keystroke) {
+		AnimateAction(String name, ElementType typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 			this.typeID = typeID;
 		}
 
-		AnimateAction(String name, elementType typeID, String tooltip,
+		AnimateAction(String name, ElementType typeID, String tooltip,
 				String keystroke, boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 			this.typeID = typeID;
 		}
 
-		public AnimateAction(String name, elementType typeID, String tooltip,
+		public AnimateAction(String name, ElementType typeID, String tooltip,
 				KeyStroke keyStroke) {
 			super(name, tooltip, keyStroke);
 			this.typeID = typeID;
@@ -1628,14 +1628,14 @@ public class GuiFrame extends JFrame implements Observer {
 		 * 
 		 */
 		private static final long serialVersionUID = 1333311291148756241L;
-		private Pipe.elementType typeID;
+		private Pipe.ElementType typeID;
 
-		TypeAction(String name, Pipe.elementType typeID, String tooltip, String keystroke) {
+		TypeAction(String name, Pipe.ElementType typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 			this.typeID = typeID;
 		}
 
-		TypeAction(String name, Pipe.elementType typeID, String tooltip, String keystroke,
+		TypeAction(String name, Pipe.ElementType typeID, String tooltip, String keystroke,
 				boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 			this.typeID = typeID;
@@ -1691,7 +1691,7 @@ public class GuiFrame extends JFrame implements Observer {
 			setMode(typeID);
 			statusBar.changeText(typeID);
 
-			if ((typeID != elementType.ARC) && (appView.createArc != null)) {
+			if ((typeID != ElementType.ARC) && (appView.createArc != null)) {
 
 				appView.createArc.delete();
 				appView.createArc = null;
@@ -1699,13 +1699,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 			}
 
-			if (typeID == elementType.SELECT) {
+			if (typeID == ElementType.SELECT) {
 				// disable drawing to eliminate possiblity of connecting arc to
 				// old coord of moved component
 				statusBar.changeText(typeID);
 				appView.getSelectionObject().enableSelection();
 				appView.setCursorType("arrow");
-			} else if (typeID == elementType.DRAG) {
+			} else if (typeID == ElementType.DRAG) {
 				appView.setCursorType("move");
 			} else {
 				appView.setCursorType("crosshair");

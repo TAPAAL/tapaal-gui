@@ -26,7 +26,7 @@ import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
@@ -87,12 +87,12 @@ public class AnimationController extends JPanel {
 			randomAction, randomAnimateAction, timeAction;
 
 	public AnimationController() {
-		startAction = new AnimateAction("Simulation mode", elementType.START,
+		startAction = new AnimateAction("Simulation mode", ElementType.START,
 				"Toggle simulation mode", "Ctrl A", true);
 
-		stepbackwardAction = new AnimateAction("Back", elementType.STEPBACKWARD,
+		stepbackwardAction = new AnimateAction("Back", ElementType.STEPBACKWARD,
 				"Step backward a firing", "typed 4");
-		stepforwardAction = new AnimateAction("Forward", elementType.STEPFORWARD,
+		stepforwardAction = new AnimateAction("Forward", ElementType.STEPFORWARD,
 				"Step forward a firing", "typed 6");
 
 		stepbackwardAction.setEnabled(false);
@@ -101,9 +101,9 @@ public class AnimationController extends JPanel {
 		// timeAction = new AnimateAction("Time", Pipe.TIMEPASS,
 		// "Let Time pass", "_");
 
-		randomAction = new AnimateAction("Random", elementType.RANDOM,
+		randomAction = new AnimateAction("Random", ElementType.RANDOM,
 				"Randomly fire a transition", "typed 5");
-		randomAnimateAction = new AnimateAction("Simulate", elementType.ANIMATE,
+		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
 				"Randomly fire a number of transitions", "typed 7", true);
 
 		setLayout(new GridBagLayout());
@@ -265,21 +265,21 @@ public class AnimationController extends JPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = -4066032248332540289L;
-		private elementType typeID;
+		private ElementType typeID;
 		private AnimationHistoryComponent animBox;
 
-		AnimateAction(String name, elementType typeID, String tooltip, String keystroke) {
+		AnimateAction(String name, ElementType typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 			this.typeID = typeID;
 		}
 
-		AnimateAction(String name, elementType typeID, String tooltip,
+		AnimateAction(String name, ElementType typeID, String tooltip,
 				String keystroke, boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 			this.typeID = typeID;
 		}
 
-		public AnimateAction(String name, elementType typeID, String tooltip,
+		public AnimateAction(String name, ElementType typeID, String tooltip,
 				KeyStroke keyStroke) {
 			super(name, tooltip, keyStroke);
 			this.typeID = typeID;

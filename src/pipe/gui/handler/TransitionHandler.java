@@ -15,7 +15,7 @@ import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -87,9 +87,9 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2
-						&& (CreateGui.getApp().getMode() == elementType.TIMEDTRANS
-								|| CreateGui.getApp().getMode() == elementType.IMMTRANS || CreateGui
-								.getApp().getMode() == elementType.SELECT)) {
+						&& (CreateGui.getApp().getMode() == ElementType.TIMEDTRANS
+								|| CreateGui.getApp().getMode() == ElementType.IMMTRANS || CreateGui
+								.getApp().getMode() == ElementType.SELECT)) {
 					((Transition) myObject).showEditor();
 				}
 			}
