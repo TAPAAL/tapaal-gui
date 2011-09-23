@@ -711,7 +711,7 @@ public class QueryDialog extends JPanel {
 		//setPreferredSize(new Dimension(942, 517));
 		
 		initQueryNamePanel();
-		initBoundednessCheckPanel();
+		
 		initQueryPanel();
 		initUppaalOptionsPanel();
 		initReductionOptionsPanel();
@@ -909,11 +909,12 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void initBoundednessCheckPanel() {
-
+		
 		// Number of extra tokens field
 		boundednessCheckPanel = new JPanel();
+		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Tokens Options"));
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
-		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
+		boundednessCheckPanel.add(new JLabel("Extra tokens: "));
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
@@ -933,11 +934,12 @@ public class QueryDialog extends JPanel {
 		
 		GridBagConstraints gridBagConstraints;
 		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.insets = new Insets(0,10,0,10);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		add(boundednessCheckPanel, gridBagConstraints);
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
 
 	private void initQueryPanel() {
@@ -1646,6 +1648,7 @@ public class QueryDialog extends JPanel {
 
 		initSearchOptionsPanel();
 		initTraceOptionsPanel();
+		initBoundednessCheckPanel();
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -1686,7 +1689,7 @@ public class QueryDialog extends JPanel {
 		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
