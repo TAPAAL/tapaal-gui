@@ -71,7 +71,7 @@ public class TabContent extends JSplitPane {
 			zoomLevels.put(net, new Zoomer());
 		}
 
-		this.drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
+		drawingSurface = new DrawingSurfaceImpl(new DataLayer(), this);
 		drawingSurfaceScroller = new JScrollPane(drawingSurface);
 		// make it less bad on XP
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -392,7 +392,7 @@ public class TabContent extends JSplitPane {
 
 	public void setNetwork(TimedArcPetriNetNetwork network, Collection<Template> templates) {
 		Require.that(network != null, "network cannot be null");
-		this.tapnNetwork = network;
+		tapnNetwork = network;
 		
 		guiModels.clear();
 		for(Template template : templates){

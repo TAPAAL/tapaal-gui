@@ -40,7 +40,7 @@ public class TimedTransitionComponent extends Transition {
 			dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
-		this.listener = timedTransitionListener();
+		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 	}
 
@@ -52,7 +52,7 @@ public class TimedTransitionComponent extends Transition {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
-		this.listener = timedTransitionListener();
+		listener = timedTransitionListener();
 		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
 	}
 	

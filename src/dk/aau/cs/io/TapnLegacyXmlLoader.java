@@ -100,7 +100,7 @@ public class TapnLegacyXmlLoader {
 		transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 		queries = new ArrayList<TAPNQuery>();
 		constants = new ConstantStore();
-		this.drawingSurface = drawingSurfaceImpl;
+		drawingSurface = drawingSurfaceImpl;
 	}
 	
 	public LoadedModel load(InputStream file) throws FormatException {

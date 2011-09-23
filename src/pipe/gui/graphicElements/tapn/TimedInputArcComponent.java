@@ -88,7 +88,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 
 	@Override
 	public TimedInputArcComponent copy() {
-		return new TimedInputArcComponent(new TimedOutputArcComponent(this), this.timeInterval);
+		return new TimedInputArcComponent(new TimedOutputArcComponent(this), timeInterval);
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		TimedOutputArcComponent copy = new TimedOutputArcComponent(this);
 		copy.setSource(this.getSource());
 		copy.setTarget(this.getTarget());
-		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), this.timeInterval);
+		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), timeInterval);
 		return timedCopy;
 	}
 
@@ -134,7 +134,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	public void setUnderlyingArc(dk.aau.cs.model.tapn.TimedInputArc ia) {
-		this.inputArc = ia;
+		inputArc = ia;
 		updateLabel(true);
 	}
 

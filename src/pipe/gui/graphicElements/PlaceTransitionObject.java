@@ -216,7 +216,7 @@ Cloneable {
 	 * @return Double value for X-axis offset of ...
 	 */
 	public Double getNameOffsetXObject() {
-		return this.nameOffsetX;
+		return nameOffsetX;
 	}
 
 	/**
@@ -225,7 +225,7 @@ Cloneable {
 	 * @return Double value for Y-axis offset of ...
 	 */
 	public Double getNameOffsetYObject() {
-		return this.nameOffsetY;
+		return nameOffsetY;
 	}
 
 	/**
@@ -501,8 +501,8 @@ Cloneable {
 		PlaceTransitionObject toReturn = (PlaceTransitionObject) super.clone();
 		toReturn.pnName = (NameLabel) pnName.clone();
 
-		toReturn.connectFrom = this.connectFrom;
-		toReturn.connectTo = this.connectTo;
+		toReturn.connectFrom = connectFrom;
+		toReturn.connectTo = connectTo;
 
 		return toReturn;
 	}

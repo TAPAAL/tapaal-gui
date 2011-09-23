@@ -16,10 +16,10 @@ public class Context { // TODO: consider having only currentTab as a field and h
 	
 	public Context(TabContent tab) {
 		Require.that(tab != null, "tab cannot be null");
-		this.currentTab = tab;
-		this.network = tab.network();
-		this.selectedTemplate = tab.currentTemplate();
-		this.undoManager = tab.drawingSurface().getUndoManager();
+		currentTab = tab;
+		network = tab.network();
+		selectedTemplate = tab.currentTemplate();
+		undoManager = tab.drawingSurface().getUndoManager();
 	}
 	
 	public TimedArcPetriNetNetwork network(){

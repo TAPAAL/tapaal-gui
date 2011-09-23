@@ -62,7 +62,7 @@ public class TCTLNotNode extends TCTLAbstractStateProperty {
 			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
-			obj2.setParent(this.parent);
+			obj2.setParent(parent);
 			return obj2;
 		} else {
 			property = property.replace(object1, object2);

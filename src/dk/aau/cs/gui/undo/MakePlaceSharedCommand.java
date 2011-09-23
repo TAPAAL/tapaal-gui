@@ -39,9 +39,9 @@ public class MakePlaceSharedCommand extends Command {
 		this.sharedPlace = sharedPlace;
 		this.place = place;
 		this.placeComponent = placeComponent;
-		this.oldTokens = place.tokens();
+		oldTokens = place.tokens();
 		this.currentTab = currentTab;
-		this.newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
+		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
 	
 	@Override

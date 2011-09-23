@@ -152,17 +152,17 @@ public class Transition extends PlaceTransitionObject {
 		Transition copy = new Transition(Grid.getModifiedX(x + this.getX()
 				+ Pipe.PLACE_TRANSITION_HEIGHT / 2), Grid.getModifiedY(y
 				+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(this.pnName.getName() + "(" + this.getCopyNumber()
+		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()
 				+ ")");
 
 		this.newCopy(copy);
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
 
-		copy.angle = this.angle;
+		copy.angle = angle;
 
-		copy.attributesVisible = this.attributesVisible;
-		copy.priority = this.priority;
+		copy.attributesVisible = attributesVisible;
+		copy.priority = priority;
 		copy.transition.transform(AffineTransform.getRotateInstance(Math
 				.toRadians(copy.angle), Transition.TRANSITION_HEIGHT / 2,
 				Transition.TRANSITION_HEIGHT / 2));
@@ -173,11 +173,11 @@ public class Transition extends PlaceTransitionObject {
 		Transition copy = new Transition(Zoomer.getUnzoomedValue(this.getX(),
 				zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
 		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.angle = this.angle;
-		copy.attributesVisible = this.attributesVisible;
-		copy.priority = this.priority;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.angle = angle;
+		copy.attributesVisible = attributesVisible;
+		copy.priority = priority;
 		copy.setOriginal(this);
 		return copy;
 	}

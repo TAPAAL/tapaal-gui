@@ -43,7 +43,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	public void setUnderlyingArc(TransportArc arc) {
-		this.underlyingTransportArc = arc; // must explicitly set underlying arc
+		underlyingTransportArc = arc; // must explicitly set underlying arc
 											// on connected to
 		updateLabel(true);
 	}

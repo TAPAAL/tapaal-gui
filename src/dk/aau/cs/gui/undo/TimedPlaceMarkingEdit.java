@@ -8,7 +8,7 @@ public class TimedPlaceMarkingEdit extends Command {
 	private final TimedPlaceComponent timedPlaceComponent;
 
 	public TimedPlaceMarkingEdit(TimedPlaceComponent tpc, int numberOfTokens) {
-		this.timedPlaceComponent = tpc;
+		timedPlaceComponent = tpc;
 		this.numberOfTokens = numberOfTokens;
 	}
 

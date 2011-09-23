@@ -70,7 +70,7 @@ public class TimeInvariant {
 	}
 	
 	public TimeInvariant copy() {
-		return new TimeInvariant(this.isUpperIncluded, upper.copy());
+		return new TimeInvariant(isUpperIncluded, upper.copy());
 	}
 
 	@Override

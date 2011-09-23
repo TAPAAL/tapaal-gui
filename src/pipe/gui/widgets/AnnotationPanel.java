@@ -108,12 +108,12 @@ public class AnnotationPanel extends javax.swing.JPanel {
 
 			@Override
 			public int getMinimumDividerLocation() {
-				return this.lastDividerLocation;
+				return lastDividerLocation;
 			}
 
 			@Override
 			public int getMaximumDividerLocation() {
-				return this.lastDividerLocation;
+				return lastDividerLocation;
 			}
 		};
 		split.setResizeWeight(1.0);

@@ -20,8 +20,8 @@ public class VerifytaOptions implements VerificationOptions {
 
 	public VerifytaOptions(TraceOption trace, SearchOption search,
 			boolean untimedTrace, ReductionOption reduction, boolean symmetry) {
-		this.traceOption = trace;
-		this.searchOption = search;
+		traceOption = trace;
+		searchOption = search;
 		this.untimedTrace = untimedTrace;
 		this.reduction = reduction;
 		this.symmetry = symmetry;

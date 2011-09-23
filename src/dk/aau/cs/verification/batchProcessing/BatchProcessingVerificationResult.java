@@ -15,7 +15,7 @@ public class BatchProcessingVerificationResult {
 		this.file = file;
 		this.query = query;
 		this.verificationResult = verificationResult;
-		this.verificationTimeInMs = verificationTime;
+		verificationTimeInMs = verificationTime;
 		this.stats = stats;
 	}
 	

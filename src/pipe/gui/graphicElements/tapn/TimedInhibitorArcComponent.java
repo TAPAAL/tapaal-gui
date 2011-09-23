@@ -36,7 +36,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	public void setUnderlyingArc(TimedInhibitorArc arc) {
-		this.inhibitorArc = arc;
+		inhibitorArc = arc;
 		updateLabel(true);
 	}
 

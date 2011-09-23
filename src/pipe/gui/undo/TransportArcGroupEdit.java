@@ -10,7 +10,7 @@ public class TransportArcGroupEdit extends Command {
 
 	public TransportArcGroupEdit(TimedTransportArcComponent arc, int oldGroup,
 			int newGroup) {
-		this.myArc = arc;
+		myArc = arc;
 		this.oldGroup = oldGroup;
 		this.newGroup = newGroup;
 	}

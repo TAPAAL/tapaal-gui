@@ -37,7 +37,7 @@ public class SharedPlaceNamePanel extends JPanel {
 	
 	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel SharedPlacesListModel, Context context, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
-		this.listModel = SharedPlacesListModel;
+		listModel = SharedPlacesListModel;
 		this.placeToEdit = placeToEdit;
 		this.context = context;
 		initComponents();		

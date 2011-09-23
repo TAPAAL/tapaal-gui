@@ -11,7 +11,7 @@ public class TCTLFalseNode extends TCTLAbstractStateProperty {
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
-			obj2.setParent(this.parent);
+			obj2.setParent(parent);
 			return obj2;
 		} else {
 			return this;

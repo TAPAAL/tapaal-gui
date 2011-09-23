@@ -23,7 +23,7 @@ public class TimeDelayFiringAction implements TAFiringAction {
 
 	public TimeDelayFiringAction(SymbolicState state, BigDecimal delay) {
 		this.state = state;
-		this.timedelay = delay;
+		timedelay = delay;
 	}
 
 	public BigDecimal getDelay() {

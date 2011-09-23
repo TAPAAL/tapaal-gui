@@ -24,7 +24,7 @@ public class TransitionFiring implements TAFiringAction {
 
 	public TransitionFiring(SymbolicState state, String channel,
 			Participant... participants) {
-		this.previousState = state;
+		previousState = state;
 		this.channel = channel;
 		this.participants = participants;
 	}

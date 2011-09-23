@@ -42,7 +42,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		//addMouseWheelListener(this);
-		this.drawingSurface = _view;
+		drawingSurface = _view;
 	}
 
 	public void updateBounds() {

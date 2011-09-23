@@ -30,7 +30,7 @@ public class TimedArcPetriNet {
 	}
 
 	public void setParentNetwork(TimedArcPetriNetNetwork network){
-		this.parentNetwork = network;
+		parentNetwork = network;
 	}
 
 	public TimedArcPetriNetNetwork parentNetwork(){
@@ -232,7 +232,7 @@ public class TimedArcPetriNet {
 
 	public void setMarking(TimedMarking marking) {
 		Require.that(marking != null, "marking must not be null");
-		this.currentMarking = marking;
+		currentMarking = marking;
 
 		for (TimedPlace p : places) {
 			p.setCurrentMarking(marking);
@@ -264,9 +264,9 @@ public class TimedArcPetriNet {
 	}
 
 	public TimedArcPetriNet copy() {
-		TimedArcPetriNet tapn = new TimedArcPetriNet(this.name);
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 
-		for(TimedPlace p : this.places) {
+		for(TimedPlace p : places) {
 			TimedPlace copy = p.copy();
 			tapn.add(copy);
 			if(!p.isShared()){
@@ -276,7 +276,7 @@ public class TimedArcPetriNet {
 			}
 		}
 
-		for(TimedTransition t : this.transitions){
+		for(TimedTransition t : transitions){
 			TimedTransition copy = t.copy();
 			tapn.add(copy);
 			if(t.isShared()){
@@ -284,16 +284,16 @@ public class TimedArcPetriNet {
 			}
 		}
 
-		for(TimedInputArc inputArc : this.inputArcs)
+		for(TimedInputArc inputArc : inputArcs)
 			tapn.add(inputArc.copy(tapn));
 
-		for(TimedOutputArc outputArc : this.outputArcs)
+		for(TimedOutputArc outputArc : outputArcs)
 			tapn.add(outputArc.copy(tapn));
 
-		for(TransportArc transArc : this.transportArcs)
+		for(TransportArc transArc : transportArcs)
 			tapn.add(transArc.copy(tapn));
 
-		for(TimedInhibitorArc inhibArc : this.inhibitorArcs)
+		for(TimedInhibitorArc inhibArc : inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
 
 		return tapn;

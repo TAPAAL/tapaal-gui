@@ -15,8 +15,8 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		this.timedPlaceComponent = timedPlaceComponent;
-		this.numberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
-		this.timedPlace = timedPlaceComponent.underlyingPlace();
+		numberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
+		timedPlace = timedPlaceComponent.underlyingPlace();
 	}
 
 	@Override

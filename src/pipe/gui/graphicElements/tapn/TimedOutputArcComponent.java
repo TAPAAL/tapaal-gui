@@ -80,13 +80,13 @@ public class TimedOutputArcComponent extends Arc {
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
 		label = new NameLabel(zoom);
 		
-		this.myPath = new ArcPath(this);
+		myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
-			this.myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
+			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
 		}
-		this.myPath.createPath();
+		myPath.createPath();
 		this.updateBounds();
-		this.id = arc.id;
+		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
 	}
@@ -127,9 +127,9 @@ public class TimedOutputArcComponent extends Arc {
 						+ target.getId(), false);
 
 		copy.myPath.delete();
-		for (int i = 0; i <= this.myPath.getEndIndex(); i++) {
-			copy.myPath.addPoint(this.myPath.getPoint(i).getX() + despX,
-					this.myPath.getPoint(i).getY() + despY, this.myPath
+		for (int i = 0; i <= myPath.getEndIndex(); i++) {
+			copy.myPath.addPoint(myPath.getPoint(i).getX() + despX,
+					myPath.getPoint(i).getY() + despY, myPath
 							.getPointType(i));
 			copy.myPath.selectPoint(i);
 		}

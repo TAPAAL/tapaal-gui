@@ -13,7 +13,7 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	public DeleteTimedTransitionCommand(TimedTransitionComponent transition, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		this.transition = transition;
-		this.sharedTransition = transition.underlyingTransition().sharedTransition();
+		sharedTransition = transition.underlyingTransition().sharedTransition();
 	}
 
 	@Override

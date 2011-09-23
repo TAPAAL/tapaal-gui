@@ -271,7 +271,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		
 		public CheckBoxListItem(TimedPlace place, boolean selected) {
 			this.place = place;
-			this.isSelected = selected;
+			isSelected = selected;
 		}
 		
 		public TimedPlace place() {
@@ -300,7 +300,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		
 		
 		public InclusionPlacesCellRenderer(ListCellRenderer renderer) {
-			this.cellRenderer = renderer;
+			cellRenderer = renderer;
 			setLayout(new BorderLayout()); 
 	        setOpaque(false); 
 	        activeCheckbox.setOpaque(false);
@@ -326,7 +326,7 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		
 		public InclusionPlacesListManager(JList list) {
 			this.list = list;
-			this.selectionModel = list.getSelectionModel();
+			selectionModel = list.getSelectionModel();
 			this.list.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
 		}
 		

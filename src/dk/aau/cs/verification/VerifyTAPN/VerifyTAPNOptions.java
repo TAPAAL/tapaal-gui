@@ -34,7 +34,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
-		this.searchOption = search;
+		searchOption = search;
 		this.symmetry = symmetry;
 		this.discreteInclusion = discreteInclusion;
 		this.inclusionPlaces = inclusionPlaces;
@@ -53,7 +53,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	}
 	
 	public void setTokensInModel(int tokens){ // TODO: Get rid of this method when verifytapn refactored
-		this.tokensInModel = tokens;
+		tokensInModel = tokens;
 	}
 
 	@Override

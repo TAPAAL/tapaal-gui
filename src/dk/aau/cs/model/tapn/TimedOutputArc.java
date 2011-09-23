@@ -33,7 +33,7 @@ public class TimedOutputArc extends TAPNElement {
 
 	public void setDestination(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
-		this.destination = place;		
+		destination = place;		
 	}
 	
 	@Override

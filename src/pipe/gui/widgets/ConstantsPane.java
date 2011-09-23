@@ -47,7 +47,7 @@ public class ConstantsPane extends JPanel {
 	private JButton moveDownButton;
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
-		this.parent = currentTab;
+		parent = currentTab;
 
 		constantsPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());

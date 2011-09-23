@@ -479,7 +479,7 @@ public class TemplateExplorer extends JPanel {
 		
 		
 		public TemplateListCellRenderer(ListCellRenderer renderer) {
-			this.cellRenderer = renderer;
+			cellRenderer = renderer;
 			setLayout(new BorderLayout()); 
 	        setOpaque(false); 
 	        activeCheckbox.setOpaque(false);
@@ -508,7 +508,7 @@ public class TemplateExplorer extends JPanel {
 		
 		public TemplateListManager(JList list) {
 			this.list = list;
-			this.selectionModel = list.getSelectionModel();
+			selectionModel = list.getSelectionModel();
 			this.list.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
 		}
 		

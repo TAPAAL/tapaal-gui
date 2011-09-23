@@ -103,8 +103,8 @@ public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 		}
 
 		public Context() {
-			this.result = true;
-			this.incorrectPlaceNames = new HashSet<String>();
+			result = true;
+			incorrectPlaceNames = new HashSet<String>();
 		}
 	}
 

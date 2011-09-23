@@ -10,7 +10,7 @@ public class RenameSharedTransitionCommand extends Command {
 	public RenameSharedTransitionCommand(SharedTransition transition, String oldName, String name) {
 		this.transition = transition;
 		this.oldName = oldName;
-		this.newName = name;
+		newName = name;
 	}
 
 	@Override

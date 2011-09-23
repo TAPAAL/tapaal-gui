@@ -18,7 +18,7 @@ public class SymbolicState {
 			HashMap<String, String> locations,
 			HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables,
 			HashMap<String, ValueRange> globalClocksAndVariables) {
-		this.automataLocations = locations;
+		automataLocations = locations;
 		this.localClocksAndVariables = localClocksAndVariables;
 		this.globalClocksAndVariables = globalClocksAndVariables;
 	}

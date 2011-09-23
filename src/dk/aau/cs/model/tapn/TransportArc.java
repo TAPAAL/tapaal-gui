@@ -83,13 +83,13 @@ public class TransportArc extends TAPNElement {
 	// Should ONLY be called in relation to sharing/unsharing places
 	public void setSource(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
-		this.source = place;		
+		source = place;		
 	}
 	
 	// Should ONLY be called in relation to sharing/unsharing places
 	public void setDestination(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
-		this.destination = place;		
+		destination = place;		
 	}
 	
 	@Override

@@ -51,7 +51,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		rootPane = pane;
 		this.model = model;
 
-		this.oldName = "";
+		oldName = "";
 
 		// Set up initial values
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
@@ -89,9 +89,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			Constant constant) {
 		this(pane, model);
 
-		this.oldName = constant.name();
-		this.lowerBound = constant.lowerBound();
-		this.upperBound = constant.upperBound();
+		oldName = constant.name();
+		lowerBound = constant.lowerBound();
+		upperBound = constant.upperBound();
 
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(constant
 				.value(), 0, constant.upperBound(), 1);
@@ -137,7 +137,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				
 				//Kyrke - This is messy, but a quck fix for bug #815487			
 				//Check that the value is within the allowed bounds
-				if (!( this.lowerBound <= val && val <= this.upperBound )){
+				if (!( lowerBound <= val && val <= upperBound )){
 					
 					JOptionPane.showMessageDialog(
 							CreateGui.getApp(),

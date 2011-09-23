@@ -64,14 +64,14 @@ public class Place extends PlaceTransitionObject {
 		this.incrementCopyNumber();
 		Place copy = new Place(Grid.getModifiedX(x + this.getX()+ Pipe.PLACE_TRANSITION_HEIGHT / 2), 
 				Grid.getModifiedY(y	+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(this.pnName.getName() + "(" + this.getCopyNumber()	+ ")");
+		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()	+ ")");
 		this.newCopy(copy);
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.capacity = capacity;
+		copy.attributesVisible = attributesVisible;
+		copy.markingOffsetX = markingOffsetX;
+		copy.markingOffsetY = markingOffsetY;
 		copy.update(true);
 		return copy;
 	}
@@ -79,12 +79,12 @@ public class Place extends PlaceTransitionObject {
 	public Place copy() {
 		Place copy = new Place(Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
 		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.capacity = capacity;
+		copy.attributesVisible = attributesVisible;
+		copy.markingOffsetX = markingOffsetX;
+		copy.markingOffsetY = markingOffsetY;
 		copy.setOriginal(this);
 		return copy;
 	}
@@ -227,8 +227,8 @@ public class Place extends PlaceTransitionObject {
 
 		Place toReturn = (Place) super.clone();
 
-		toReturn.markingOffsetX = this.markingOffsetX;
-		toReturn.markingOffsetY = this.markingOffsetY;
+		toReturn.markingOffsetX = markingOffsetX;
+		toReturn.markingOffsetY = markingOffsetY;
 		toReturn.componentWidth = componentWidth;
 		toReturn.componentHeight = componentHeight;
 		toReturn.setCentre((int) positionX, (int) positionY);

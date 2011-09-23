@@ -34,7 +34,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	}
 
 	public String getUppaalQueryFor(TAPNQuery tapnQuery) {
-		this.uppaalQuery = new StringBuffer();
+		uppaalQuery = new StringBuffer();
 		tapnQuery.getProperty().accept(this, null);
 		return uppaalQuery.toString();
 	}

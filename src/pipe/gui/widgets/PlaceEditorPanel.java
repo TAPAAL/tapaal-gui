@@ -62,7 +62,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
-		this.place = placeComponent;
+		place = placeComponent;
 		this.context = context;
 		initComponents();
 	}

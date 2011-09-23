@@ -8,7 +8,7 @@ public class BooleanResult {
 	}
 	
 	public BooleanResult(boolean initialValue){
-		this.result = initialValue;
+		result = initialValue;
 	}
 
 	public boolean result(){

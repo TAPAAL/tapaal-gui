@@ -56,7 +56,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
-		this.listener = timedPlaceListener();		
+		listener = timedPlaceListener();		
 		this.place.addTimedPlaceListener(listener);
 
 		attributesVisible = true;
@@ -107,14 +107,14 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent copy() {
 		TimedPlaceComponent copy = new TimedPlaceComponent(Zoomer
 				.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(
-						this.getY(), zoom), this.place);
+						this.getY(), zoom), place);
 		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.capacity = capacity;
+		copy.attributesVisible = attributesVisible;
+		copy.markingOffsetX = markingOffsetX;
+		copy.markingOffsetY = markingOffsetY;
 		copy.setOriginal(this);
 		return copy;
 	}

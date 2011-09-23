@@ -38,7 +38,7 @@ public class SharedTransitionNamePanel extends JPanel {
 	
 	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator, SharedTransition transitionToEdit) {
 		this.rootPane = rootPane;
-		this.listModel = sharedTransitionsListModel;
+		listModel = sharedTransitionsListModel;
 		this.undoManager = undoManager;
 		this.nameGenerator = nameGenerator;
 		this.transitionToEdit = transitionToEdit;

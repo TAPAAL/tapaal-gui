@@ -21,8 +21,8 @@ public class TCTLEFNode extends TCTLAbstractPathProperty {
 	}
 
 	public TCTLEFNode() {
-		this.property = new TCTLStatePlaceHolder();
-		this.property.setParent(this);
+		property = new TCTLStatePlaceHolder();
+		property.setParent(this);
 	}
 
 	@Override

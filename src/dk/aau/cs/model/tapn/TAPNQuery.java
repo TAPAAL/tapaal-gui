@@ -15,7 +15,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery(TCTLAbstractProperty inputProperty, int extraTokens) {
-		this.property = inputProperty;
+		property = inputProperty;
 		this.extraTokens = extraTokens;
 	}
 

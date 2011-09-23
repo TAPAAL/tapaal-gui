@@ -31,10 +31,10 @@ public class TimeInterval {
 	public TimeInterval(TimeInterval interval) {
 		Require.that(interval != null, "Interval cannot be null");
 
-		this.isLowerIncluded = interval.isLowerIncluded;
-		this.isUpperIncluded = interval.isUpperIncluded;
-		this.lower = interval.lower.copy();
-		this.upper = interval.upper.copy();
+		isLowerIncluded = interval.isLowerIncluded;
+		isUpperIncluded = interval.isUpperIncluded;
+		lower = interval.lower.copy();
+		upper = interval.upper.copy();
 	}
 
 	private boolean isValidInterval() {
@@ -160,12 +160,12 @@ public class TimeInterval {
 	
 		int invariantUpper = invariant.upperBound().value();
 		
-		if (invariantUpper < this.lower.value() || (invariantUpper == this.lower.value() && !isLowerIncluded) || (invariantUpper == this.lower.value() && !invariant.isUpperNonstrict())) {
+		if (invariantUpper < lower.value() || (invariantUpper == lower.value() && !isLowerIncluded) || (invariantUpper == lower.value() && !invariant.isUpperNonstrict())) {
 			return new TimeInterval(false, new IntBound(0), new IntBound(0), false); // intersection is empty, so return an empty interval
-		} else if (invariantUpper > this.upper.value()) {
+		} else if (invariantUpper > upper.value()) {
 			return this.copy();
 		} else {
-			return new TimeInterval(this.isLowerIncluded, this.lower.copy(), invariant.upperBound().copy(), invariant.isUpperNonstrict());
+			return new TimeInterval(isLowerIncluded, lower.copy(), invariant.upperBound().copy(), invariant.isUpperNonstrict());
 		}
 	}
 	
