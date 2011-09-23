@@ -92,9 +92,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 								.getApp().getMode() == elementType.SELECT)) {
 					((Transition) myObject).showEditor();
 				}
-			} else {
-				// do nothing except the things that one do in the simulator
-				// (handled somewhere else)
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
@@ -117,9 +114,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mousePressed(MouseEvent e) {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
-		} else {
-			// do nothing except the things that one do in the simulator
-			// (handled somewhere else).
 		}
 	}
 }

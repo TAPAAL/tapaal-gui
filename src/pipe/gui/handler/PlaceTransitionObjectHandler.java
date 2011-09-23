@@ -265,8 +265,6 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 											.getApp(), ERROR_MSG_TWO_ARCS,
 											"Error", JOptionPane.ERROR_MESSAGE);
 
-								} else {
-									// This should not happen - since all types of arcs are listed above.
 								}
 								break;
 							}

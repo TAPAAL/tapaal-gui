@@ -168,9 +168,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	public void mousePressed(MouseEvent e) {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
-		} else {
-			// do nothing except the things that one do in the simulator
-			// (handled somewhere else).
 		}
 
 	}

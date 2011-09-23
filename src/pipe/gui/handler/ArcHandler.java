@@ -101,42 +101,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 		if (!(CreateGui.getApp().isEditionAllowed())) {
 			return;
 		}
-
-		Arc arc = ((Arc) myObject);
-		if (arc instanceof TimedOutputArcComponent) {
-
-			// if (e.isControlDown()) {
-			// if (arc.getWeight() == 1) {
-			// if (((NormalArc)arc).hasInvisibleInverse()) {
-			// if (arc.getSource() instanceof Place){
-			// if (e.isShiftDown()) {
-			// arc = ((NormalArc)arc).getInverse();
-			// }
-			// } else {
-			// if (!e.isShiftDown()) {
-			// arc = ((NormalArc)arc).getInverse();
-			// }
-			// }
-			// }
-			// CreateGui.getView().getUndoManager().addNewEdit(
-			// ((NormalArc)arc).setTagged(!((NormalArc)arc).isTagged()));
-			// }
-			// return;
-			// }
-			/*
-			 * if (((NormalArc)arc).hasInvisibleInverse()) { if (arc.getSource()
-			 * instanceof Place){ if (e.isShiftDown()) { arc =
-			 * ((NormalArc)arc).getInverse(); } } else { if (!e.isShiftDown()) {
-			 * arc = ((NormalArc)arc).getInverse(); } } }
-			 */
-		}
-		/*
-		 * int oldWeight = arc.getWeight(); int newWeight = oldWeight -
-		 * e.getWheelRotation(); if (newWeight < 1) { newWeight = 1; } if
-		 * (newWeight != oldWeight) {
-		 * CreateGui.getView().getUndoManager().addNewEdit(
-		 * arc.setWeight(newWeight)); arc.repaint(); }
-		 */
+		
 	}
 
 }

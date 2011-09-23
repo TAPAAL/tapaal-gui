@@ -289,8 +289,6 @@ public class Transition extends PlaceTransitionObject {
 	 */
 	@Override
 	public void setEnabled(boolean status) {
-		if (enabled && !status) {
-		}
 		enabled = status;
 	}
 
