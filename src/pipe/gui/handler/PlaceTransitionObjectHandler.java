@@ -228,8 +228,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						Iterator<Arc> arcsFrom = transportArcToCreate
 								.getSource().getConnectFromIterator();
-						// search for pre-existent arcs from
-						// transportArcToCreate's source to
+						// search for pre-existent arcs from transportArcToCreate's source to
 						// transportArcToCreate's target
 						while (arcsFrom.hasNext()) {
 							Arc someArc = (arcsFrom.next());
@@ -239,10 +238,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								existsArc = true;
 
 								if (someArc instanceof TimedInhibitorArcComponent) {
-									// user has drawn a transport arc where
-									// there is
-									// a TAPNInhibitorArc arc already - This
-									// does not make sense.
+									// user has drawn a transport arc where there is
+									// a TAPNInhibitorArc arc already - This does not make sense.
 									cleanupArc(transportArcToCreate, view);
 									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(
@@ -252,10 +249,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 													JOptionPane.ERROR_MESSAGE);
 
 								} else if (someArc instanceof TimedTransportArcComponent) {
-									// user has drawn a transport arc where
-									// there is
-									// a transport arc already - We do not allow
-									// that.
+									// user has drawn a transport arc where there is
+									// a transport arc already - We do not allow that.
 									cleanupArc(transportArcToCreate, view);
 									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(CreateGui
@@ -263,10 +258,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 											"Error", JOptionPane.ERROR_MESSAGE);
 
 								} else if (someArc instanceof TimedOutputArcComponent) {
-									// user has drawn a transport arc where
-									// there is
-									// a normal arc already - we increment arc's
-									// weight
+									// user has drawn a transport arc where there is
+									// a normal arc already - We do not allow that.
 									cleanupArc(transportArcToCreate, view);
 									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(CreateGui
@@ -274,8 +267,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 											"Error", JOptionPane.ERROR_MESSAGE);
 
 								} else {
-									// This should not happen - since all types
-									// of arcs are listed above.
+									// This should not happen - since all types of arcs are listed above.
 								}
 								break;
 							}
