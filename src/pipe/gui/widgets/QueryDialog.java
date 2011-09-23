@@ -1712,12 +1712,13 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
+		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
+		
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
-
+		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
+		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 1;
