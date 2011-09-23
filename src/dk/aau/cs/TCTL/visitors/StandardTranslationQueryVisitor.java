@@ -49,7 +49,7 @@ public class StandardTranslationQueryVisitor extends QueryVisitor {
 				sum.append(" + ");
 			}
 		}
-		sum.append(")");
+		sum.append(')');
 		return sum.toString();
 	}
 }

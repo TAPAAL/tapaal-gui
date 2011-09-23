@@ -265,7 +265,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		boolean first = true;
 		StringBuilder s = new StringBuilder();
 		for(TimedPlace p : query.inclusionPlaces().inclusionPlaces()) {
-			if(!first) s.append(",");
+			if(!first) s.append(',');
 			
 			s.append(p.toString());
 			if(first) first = false;

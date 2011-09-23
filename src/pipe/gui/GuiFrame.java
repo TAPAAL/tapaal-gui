@@ -1586,7 +1586,7 @@ public class GuiFrame extends JFrame implements Observer {
 			s.append("The following queries are associated with the currently selected objects:\n\n");
 			for (TAPNQuery q : queriesToDelete) {
 				s.append(q.getName());
-				s.append("\n");
+				s.append('\n');
 			}
 			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
@@ -1902,7 +1902,7 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("TAPAAL Engine (verifytapn) Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytapnPath);
-		buffer.append("\n");
+		buffer.append('\n');
 		buffer.append("   Version: ");
 		buffer.append(verifytapnversion);
 		buffer.append("\n\n");
@@ -1910,7 +1910,7 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("UPPAAL Engine (verifyta) Information:\n");
 		buffer.append("   Located: ");
 		buffer.append(verifytaPath);
-		buffer.append("\n");
+		buffer.append('\n');
 		buffer.append("   Version: ");
 		buffer.append(verifytaversion);
 

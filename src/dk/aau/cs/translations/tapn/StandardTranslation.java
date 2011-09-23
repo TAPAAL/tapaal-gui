@@ -147,7 +147,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 				builder.append(TOKEN_TEMPLATE_NAME);
 				builder.append(i);
 			}
-			builder.append(";");
+			builder.append(';');
 
 			return builder.toString();
 		}

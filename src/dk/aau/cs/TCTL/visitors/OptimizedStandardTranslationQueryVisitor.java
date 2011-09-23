@@ -64,7 +64,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 				sum.append(" + ");
 			}
 		}
-		sum.append(")");
+		sum.append(')');
 		return sum.toString();
 	}
 }

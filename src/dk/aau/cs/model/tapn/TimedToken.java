@@ -44,7 +44,7 @@ public class TimedToken {
 		buffer.append(place.toString());
 		buffer.append(", ");
 		buffer.append(df.format(age));
-		buffer.append(")");
+		buffer.append(')');
 		return buffer.toString();
 	}
 

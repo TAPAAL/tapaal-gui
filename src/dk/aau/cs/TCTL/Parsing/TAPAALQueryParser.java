@@ -146,7 +146,7 @@ public class TAPAALQueryParser implements GPMessageConstants {
 			temp.deleteOnExit();
 			PrintStream out = new PrintStream(temp);
 			out.append(textToParse);
-			out.append("\n");
+			out.append('\n');
 			out.close();
 
 			// open temp file

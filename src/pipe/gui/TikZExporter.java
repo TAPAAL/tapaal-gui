@@ -157,7 +157,7 @@ public class TikZExporter {
 			out.append(exportMathName(trans.getName()));
 			out.append("] at (");
 			out.append(trans.getPositionX() * scale);
-			out.append(",");
+			out.append(',');
 			out.append(trans.getPositionY() * scale * (-1));
 			out.append(") (");
 			out.append(trans.getId());
@@ -182,12 +182,12 @@ public class TikZExporter {
 
 			out.append("\\node[place,label=above:");
 			out.append(exportMathName(place.getName()));
-			out.append(",");
+			out.append(',');
 			out.append(invariant);
 			out.append(tokensInPlace);
 			out.append("] at (");
 			out.append(place.getPositionX() * scale);
-			out.append(",");
+			out.append(',');
 			out.append(place.getPositionY() * scale * (-1));
 			out.append(") (");
 			out.append(place.getId());
@@ -237,7 +237,7 @@ public class TikZExporter {
 			out.append("pin=above:{\\{");
 			for (int i = 0; i < tokens.size() - 1; i++) {
 				out.append(tokens.get(i).age().setScale(1));
-				out.append(",");
+				out.append(',');
 			}
 			out.append(tokens.get(tokens.size() - 1).age().setScale(1));
 			out.append("\\}},");
@@ -286,9 +286,9 @@ public class TikZExporter {
 			out.append(last);
 
 		for (int i = 0; i < subscripts; i++) {
-			out.append("}");
+			out.append('}');
 		}
-		out.append("$");
+		out.append('$');
 		return out.toString();
 	}
 

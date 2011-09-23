@@ -82,7 +82,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net,TimedArcPetriNet originalModel) {
 		StringBuilder builder = new StringBuilder("int[");
 		builder.append(-(tokens + extraTokens));
-		builder.append(",");
+		builder.append(',');
 		builder.append(tokens + extraTokens);
 		builder.append("] ");
 		builder.append(usedExtraTokens);

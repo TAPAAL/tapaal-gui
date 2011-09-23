@@ -1544,7 +1544,7 @@ public class QueryDialog extends JPanel {
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
-								s.append("\n");
+								s.append('\n');
 							}
 
 							s.append("\nThe specified query has not been saved. Do you want to edit it again?");

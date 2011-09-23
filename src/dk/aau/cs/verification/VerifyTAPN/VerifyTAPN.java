@@ -268,9 +268,9 @@ public class VerifyTAPN implements ModelChecker {
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
 		StringBuffer buffer = new StringBuffer(options.toString());
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(modelFile);
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(queryFile);
 
 		return buffer.toString();

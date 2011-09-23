@@ -154,7 +154,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 				builder.append(TOKEN_TEMPLATE_NAME);
 				builder.append(i);
 			}
-			builder.append(";");
+			builder.append(';');
 
 			return builder.toString();
 		}
@@ -185,7 +185,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			} else if (isTransitionDegree1(t) && !t.hasInhibitorArcs()) {
 				builder.append("broadcast chan ");
 				builder.append(t.name());
-				builder.append(";");
+				builder.append(';');
 			} else if (isTransitionDegree2(t) && !t.hasInhibitorArcs()) {
 				builder.append("chan ");
 				builder.append(t.name());
@@ -193,7 +193,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			} else {
 				builder.append("broadcast chan ");
 				builder.append(String.format(TEST_CHANNEL_NAME, t.name(), ""));
-				builder.append(",");
+				builder.append(',');
 				builder.append(String.format(FIRE_CHANNEL_NAME, t.name(), ""));
 				builder.append(";\n");
 			}
@@ -364,7 +364,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			String counter = inhibitorArcsToCounters.get(inhib);
 			builder.append(counter);
 			builder.append(inhibComparison);
-			builder.append("0");
+			builder.append('0');
 		}
 
 		return builder.toString();

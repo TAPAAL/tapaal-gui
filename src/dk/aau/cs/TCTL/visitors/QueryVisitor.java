@@ -64,7 +64,7 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	}
 
 	public void visit(TCTLAndListNode andListNode, Object context) {
-		uppaalQuery.append("(");
+		uppaalQuery.append('(');
 		boolean firstTime = true;
 
 		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
@@ -76,12 +76,12 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 			firstTime = false;
 		}
 
-		uppaalQuery.append(")");
+		uppaalQuery.append(')');
 
 	}
 
 	public void visit(TCTLOrListNode orListNode, Object context) {
-		uppaalQuery.append("(");
+		uppaalQuery.append('(');
 		boolean firstTime = true;
 
 		for (TCTLAbstractStateProperty p : orListNode.getProperties()) {
@@ -93,15 +93,15 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 			firstTime = false;
 		}
 
-		uppaalQuery.append(")");
+		uppaalQuery.append(')');
 
 	}
 
 	public void visit(TCTLNotNode notNode, Object context) {
-		uppaalQuery.append("!");
-		uppaalQuery.append("(");
+		uppaalQuery.append('!');
+		uppaalQuery.append('(');
 		notNode.getProperty().accept(this, context);
-		uppaalQuery.append(")");
+		uppaalQuery.append(')');
 	}
 
 	public void visit(TCTLStatePlaceHolder statePlaceHolderNode, Object context) {

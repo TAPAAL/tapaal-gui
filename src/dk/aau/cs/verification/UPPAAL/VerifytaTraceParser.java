@@ -20,7 +20,7 @@ public class VerifytaTraceParser {
 				StringBuffer buffer = new StringBuffer();
 				while ((line = reader.readLine()) != null && !line.isEmpty()) {
 					buffer.append(line);
-					buffer.append("\n");
+					buffer.append('\n');
 				}
 
 				String element = buffer.toString();

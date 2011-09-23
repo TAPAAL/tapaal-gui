@@ -55,7 +55,7 @@ public class TimeInterval {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isLowerIncluded ? "[" : "(");
 		buffer.append(lower);
-		buffer.append(",");
+		buffer.append(',');
 		buffer.append(upper);
 		buffer.append(isUpperIncluded ? "]" : ")");
 		return buffer.toString();
@@ -65,7 +65,7 @@ public class TimeInterval {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isLowerIncluded ? "[" : "(");
 		buffer.append(displayConstantNames ? lower : lower.value());
-		buffer.append(",");
+		buffer.append(',');
 		buffer.append(displayConstantNames || upper instanceof InfBound ? upper : upper.value());
 		buffer.append(isUpperIncluded ? "]" : ")");
 		return buffer.toString();

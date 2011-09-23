@@ -145,7 +145,7 @@ public class TimedPlaceComponent extends Place {
 			buffer.append(df.format(token.age()));
 			first = false;
 		}
-		buffer.append("}");
+		buffer.append('}');
 
 		return buffer.toString();
 	}

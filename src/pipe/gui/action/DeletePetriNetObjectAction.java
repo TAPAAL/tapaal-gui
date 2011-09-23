@@ -51,7 +51,7 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 		s.append("The following queries are associated with the currently selected objects:\n\n");
 		for (TAPNQuery q : queriesToDelete) {
 			s.append(q.getName());
-			s.append("\n");
+			s.append('\n');
 		}
 		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
