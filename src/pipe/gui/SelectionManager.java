@@ -33,8 +33,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 	private Point startPoint;
 	private Rectangle selectionRectangle = new Rectangle(-1, -1);
 	private boolean isSelecting;
-	private static final Color selectionColor = new Color(000, 000, 255, 030);
-	private static final Color selectionColorOutline = new Color(000, 000, 100);
+	private static final Color selectionColor = new Color(0, 0, 255, 30);
+	private static final Color selectionColorOutline = new Color(0, 0, 100);
 	private DrawingSurfaceImpl drawingSurface;
 	private boolean enabled = true;
 
