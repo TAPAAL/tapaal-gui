@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -914,14 +915,16 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel = new JPanel();
 		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Tokens Options"));
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
-		boundednessCheckPanel.add(new JLabel("Extra tokens: "));
+		boundednessCheckPanel.add(new JLabel("Extra tokens:  "));
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
 		boundednessCheckPanel.add(numberOfExtraTokensInNet);
 
+		boundednessCheckPanel.add(new JLabel("  "));
+		
 		// Boundedness button
 		kbounded = new JButton("Check Boundedness");
 		kbounded.addActionListener(new ActionListener() {
@@ -938,7 +941,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
 
@@ -1654,7 +1657,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
 		gridBagConstraints.insets = new Insets(5,10,5,10);
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		//gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		add(uppaalOptionsPanel, gridBagConstraints);
 
 	}
@@ -1691,7 +1694,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
 
 	}
@@ -1724,7 +1727,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
