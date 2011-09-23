@@ -356,7 +356,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						undoManager.addEdit(
 								new AddTransportArcCommand(
 										arc2,
-										(dk.aau.cs.model.tapn.TransportArc) (arc2.underlyingTransportArc()), 
+										arc2.underlyingTransportArc(), 
 										model, 
 										guiModel, 
 										view));

@@ -606,8 +606,8 @@ public class TapnXmlLoader {
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
-				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
+				presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
+				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
@@ -615,7 +615,7 @@ public class TapnXmlLoader {
 				TimedPlace sourcePlace = template.model().getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
-				TimeInterval interval = transportArcsTimeIntervals.get((TimedTransportArcComponent) presetTransportArc);
+				TimeInterval interval = transportArcsTimeIntervals.get(presetTransportArc);
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -632,9 +632,9 @@ public class TapnXmlLoader {
 				template.model().add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
-				transportArcsTimeIntervals.remove((TimedTransportArcComponent) presetTransportArc);
+				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
-				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
+				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);
 			}
 		}
 		return tempArc;

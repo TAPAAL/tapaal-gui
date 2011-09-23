@@ -327,8 +327,7 @@ public class GuiFrame extends JFrame implements Observer {
 			Arrays.sort(nets, new Comparator<String>() {
 				public int compare(String one, String two) {
 
-					int toReturn = ((String) one).compareTo(
-							((String) two));
+					int toReturn = one.compareTo(two);
 					// Special hack to get intro-example first
 					if (one.equals("intro-example.xml")) {
 						toReturn = -1;

@@ -284,7 +284,7 @@ public class TapnLegacyXmlLoader {
 				TimedPlace sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = tapn.getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(targetIn.getName());
-				TimeInterval interval = transportArcsTimeIntervals.get((TimedTransportArcComponent) presetTransportArc);
+				TimeInterval interval = transportArcsTimeIntervals.get(presetTransportArc);
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -302,7 +302,7 @@ public class TapnLegacyXmlLoader {
 				tapn.add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
-				transportArcsTimeIntervals.remove((TimedTransportArcComponent) presetTransportArc);
+				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
 				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
 			}
