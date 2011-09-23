@@ -85,7 +85,7 @@ public class Export {
 		// /* The Swing way
 		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
 		DocFlavor flavour = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
-		PrintService printService[] = PrintServiceLookup.lookupPrintServices(
+		PrintService[] printService = PrintServiceLookup.lookupPrintServices(
 				flavour, pras);
 
 		if (printService.length == 0) {

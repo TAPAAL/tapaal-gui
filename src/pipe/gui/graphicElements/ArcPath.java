@@ -194,8 +194,8 @@ public class ArcPath implements Shape, Cloneable {
 				/* calculate a cubic for each section of the curve */
 				int lengthOfCurve = curveEndIndex - curveStartIndex;
 				int k1;
-				int x[] = new int[lengthOfCurve + 2];
-				int y[] = new int[lengthOfCurve + 2];
+				int[] x = new int[lengthOfCurve + 2];
+				int[] y = new int[lengthOfCurve + 2];
 				X = new Cubic[lengthOfCurve + 2];
 				Y = new Cubic[lengthOfCurve + 2];
 

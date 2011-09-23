@@ -260,7 +260,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public int getSelectionCount() {
-		Component netObj[] = drawingSurface.getComponents();
+		Component[] netObj = drawingSurface.getComponents();
 		int selectionCount = 0;
 		// Get all the objects in the current window
 		for (int i = 0; i < netObj.length; i++) {
