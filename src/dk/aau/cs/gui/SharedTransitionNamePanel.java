@@ -62,7 +62,7 @@ public class SharedTransitionNamePanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		namePanel.add(label, gbc);
 		
-		String initialText = transitionToEdit == null ? "" : transitionToEdit.name();
+		String initialText = (transitionToEdit == null) ? "" : transitionToEdit.name();
 		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(100,27));
 		nameField.setPreferredSize(new Dimension(150, 27));

@@ -86,7 +86,7 @@ public class TimeInvariant {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isUpperIncluded ? "<=" : "<");
 		buffer.append(' ');
-		buffer.append(displayConstantNames || upper instanceof InfBound ? upper	: upper.value());
+		buffer.append((displayConstantNames || upper instanceof InfBound) ? upper	: upper.value());
 		return buffer.toString();
 	}
 

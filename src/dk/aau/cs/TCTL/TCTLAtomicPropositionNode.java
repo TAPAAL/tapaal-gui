@@ -87,7 +87,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	@Override
 	public String toString() {
 		String value = place + "" + op + "" + n;
-		return template == null || template.isEmpty() ? value : template + "."
+		return (template == null || template.isEmpty()) ? value : template + "."
 				+ value;
 	}
 

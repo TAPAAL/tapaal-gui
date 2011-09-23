@@ -61,7 +61,7 @@ public class MultiLineAutoWrappingTooltipUI extends BasicToolTipUI {
 			
 			int width = 400;
 			Dimension dim = textArea.getPreferredSize();
-			dim.width = originalDim.width > width ? width : originalDim.width+10;
+			dim.width = (originalDim.width > width) ? width : originalDim.width+10;
 			dim.height++;
 			textArea.setSize(dim);
 			

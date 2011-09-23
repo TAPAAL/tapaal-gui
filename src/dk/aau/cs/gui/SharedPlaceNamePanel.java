@@ -60,7 +60,7 @@ public class SharedPlaceNamePanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		namePanel.add(label, gbc);
 		
-		String initialText = placeToEdit == null ? "" : placeToEdit.name();
+		String initialText = (placeToEdit == null) ? "" : placeToEdit.name();
 		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(100,27));
 		nameField.setPreferredSize(new Dimension(150, 27));
