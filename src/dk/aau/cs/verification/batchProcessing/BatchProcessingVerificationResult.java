@@ -46,10 +46,7 @@ public class BatchProcessingVerificationResult {
 
 
 	public boolean hasStats() {
-		if(stats instanceof NullStats)
-			return false;
-		else
-			return true;
+		return !(stats instanceof NullStats);
 	}
 	
 	

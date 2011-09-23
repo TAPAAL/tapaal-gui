@@ -190,10 +190,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
-		if(batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes)
-			return true;
-		else
-			return false;
+		return batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes;
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {

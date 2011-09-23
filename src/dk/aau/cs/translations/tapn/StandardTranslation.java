@@ -433,17 +433,11 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 
 
 	public boolean supportsModel(TimedArcPetriNet model) {
-		if(model.hasInhibitorArcs())
-			return false;
-		else
-			return true;
+		return !(model.hasInhibitorArcs());
 	}
 
 
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query) {
-		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
-			return false;
-		else
-			return true;
+		return !(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode);
 	}
 }

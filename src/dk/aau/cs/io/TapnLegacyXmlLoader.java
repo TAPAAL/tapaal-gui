@@ -744,10 +744,7 @@ public class TapnLegacyXmlLoader {
 	private boolean getSymmetryAsOldFormat(Element queryElement) {
 		String reductionString = queryElement.getAttribute("reductionOption");
 		
-		if(reductionString.contains(SYMMETRY))
-			return true;
-		else
-			return false;
+		return reductionString.contains(SYMMETRY);
 	}
 
 	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {
