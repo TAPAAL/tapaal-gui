@@ -166,10 +166,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		this.connectedTo = connectedTo;
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-	}
 
 	public void setGroup(int group) {
 		this.group = group;

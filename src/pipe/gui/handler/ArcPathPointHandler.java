@@ -75,10 +75,6 @@ public class ArcPathPointHandler extends PetriNetObjectHandler {
 		}
 	}
 
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		super.mouseDragged(e);
-	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {

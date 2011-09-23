@@ -119,10 +119,6 @@ public class TimedPlaceComponent extends Place {
 		return copy;
 	}
 
-	@Override
-	public void delete() {
-		super.delete();
-	}
 
 	public String getInvariantAsString() {
 		return getInvariant().toString();
