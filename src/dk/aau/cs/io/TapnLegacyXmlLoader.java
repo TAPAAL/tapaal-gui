@@ -30,7 +30,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;

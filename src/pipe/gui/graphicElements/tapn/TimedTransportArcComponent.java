@@ -1,7 +1,6 @@
 package pipe.gui.graphicElements.tapn;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
