@@ -110,8 +110,8 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export verifytapn XML";
 	
-	private static final String UPPAAL_SOME_TRACE_STRING = "Some encountered trace (only without symmetry reduction)";
-	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some encountered trace";
+	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace (only without symmetry reduction)";
+	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace";
 	private static final String SHARED = "Shared";
 
 	private static final long serialVersionUID = 7852107237344005546L;
