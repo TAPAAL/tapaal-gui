@@ -393,12 +393,11 @@ public class Transition extends PlaceTransitionObject {
 
 		arcIterator = left.iterator();
 		double inc = TRANSITION_HEIGHT / (left.size() + 1);
-		double current = TRANSITION_HEIGHT / 2 - inc;
+		double current = TRANSITION_HEIGHT / 2d - inc;
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
 			transform.transform(new Point2D.Double(-0.5 * TRANSITION_WIDTH,
-					current + 1), transformed); // +1 due to rounding making it
-												// off by 1
+					current + 1), transformed); // +1 due to rounding making it off by 1
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
