@@ -53,7 +53,6 @@ public class TimedTransitionComponent extends Transition {
 				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
 		listener = timedTransitionListener();
-		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
 	}
 	
 	private TimedTransitionListener timedTransitionListener(){
@@ -97,19 +96,6 @@ public class TimedTransitionComponent extends Transition {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 	}
-
-//	@Override
-//	public boolean isEnabled(boolean animationStatus) {
-//		if (animationStatus) {
-//			if (isEnabled()) {
-//				highlighted = true;
-//				return true;
-//			} else {
-//				highlighted = false;
-//			}
-//		}
-//		return false;
-//	}
 
 	@Override
 	public boolean isEnabled() {
