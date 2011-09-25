@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
@@ -17,8 +17,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.graphicElements.Arc;
-import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.undo.TransitionRotationEdit;
 import dk.aau.cs.gui.undo.Command;
 

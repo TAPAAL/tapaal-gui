@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.swing.JLayeredPane;
 
-import pipe.dataLayer.Transition;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;

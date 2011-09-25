@@ -24,7 +24,6 @@ import javax.swing.event.MouseInputAdapter;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.Transition;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
@@ -32,6 +31,7 @@ import pipe.gui.graphicElements.Note;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
