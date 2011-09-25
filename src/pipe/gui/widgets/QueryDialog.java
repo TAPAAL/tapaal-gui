@@ -913,9 +913,9 @@ public class QueryDialog extends JPanel {
 		
 		// Number of extra tokens field
 		boundednessCheckPanel = new JPanel();
-		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Tokens Options"));
+		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Boundedness Options"));
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
-		boundednessCheckPanel.add(new JLabel("Extra tokens:  "));
+		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
@@ -1665,7 +1665,7 @@ public class QueryDialog extends JPanel {
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
 
-		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy"));
+		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
 		breadthFirstSearch = new JRadioButton("Breadth First Search");
 		depthFirstSearch = new JRadioButton("Depth First Search");
