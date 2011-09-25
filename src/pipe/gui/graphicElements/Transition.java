@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
@@ -45,30 +44,8 @@ public class Transition extends PlaceTransitionObject {
 
 	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
 
-	public Transition(Transition t) {
-
-		this(t.positionX, t.positionY, t.id, t.getName(), t.nameOffsetX,
-				t.nameOffsetY, false, t.angle, 0);
-
-	}
-
 	/**
 	 * Create Petri-Net Transition object
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 * @param idInput
-	 *            Transition id
-	 * @param nameInput
-	 *            Name
-	 * @param nameOffsetXInput
-	 *            Name X-axis Position
-	 * @param nameOffsetYInput
-	 *            Name Y-axis Position
-	 * @param infServer
-	 *            TODO
 	 */
 	public Transition(double positionXInput, double positionYInput,
 			String idInput, String nameInput, double nameOffsetXInput,
@@ -83,7 +60,6 @@ public class Transition extends PlaceTransitionObject {
 		setCentre((int) positionX, (int) positionY);
 		rotate(angleInput);
 		updateBounds();
-		// this.updateEndPoints();
 	}
 
 	/**
@@ -102,39 +78,6 @@ public class Transition extends PlaceTransitionObject {
 		setCentre((int) positionX, (int) positionY);
 		updateBounds();
 		this.updateEndPoints();
-	}
-
-	public Transition paste(double x, double y, boolean fromAnotherView) {
-		this.incrementCopyNumber();
-		Transition copy = new Transition(Grid.getModifiedX(x + this.getX()
-				+ Pipe.PLACE_TRANSITION_HEIGHT / 2), Grid.getModifiedY(y
-				+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()
-				+ ")");
-
-		this.newCopy(copy);
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-
-		copy.angle = angle;
-
-		copy.attributesVisible = attributesVisible;
-		copy.transition.transform(AffineTransform.getRotateInstance(Math
-				.toRadians(copy.angle), Transition.TRANSITION_HEIGHT / 2,
-				Transition.TRANSITION_HEIGHT / 2));
-		return copy;
-	}
-
-	public Transition copy() {
-		Transition copy = new Transition(Zoomer.getUnzoomedValue(this.getX(),
-				zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
-		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = nameOffsetX;
-		copy.nameOffsetY = nameOffsetY;
-		copy.angle = angle;
-		copy.attributesVisible = attributesVisible;
-		copy.setOriginal(this);
-		return copy;
 	}
 
 	@Override
@@ -230,15 +173,6 @@ public class Transition extends PlaceTransitionObject {
 		enabled = status;
 	}
 
-	/**
-	 * Sets whether Transition is enabled
-	 * 
-	 * @return enabled if True
-	 */
-	// public void setEnabledBackwards(boolean status){
-	// enabledBackwards = status;
-	// }
-
 	/* Called at the end of animation to reset Transitions to false */
 	public void setEnabledFalse() {
 		enabled = false;
@@ -300,12 +234,6 @@ public class Transition extends PlaceTransitionObject {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * pipe.dataLayer.PlaceTransitionObject#updateEndPoint(pipe.dataLayer.Arc)
-	 */
 	@Override
 	public void updateEndPoint(Arc arc) {
 		boolean match = false;
