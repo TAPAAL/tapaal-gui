@@ -21,73 +21,34 @@ import pipe.gui.undo.TransitionRotationEdit;
 import dk.aau.cs.gui.undo.Command;
 
 /**
- * <b>Transition</b> - Petri-Net Transition Class
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom *
- * @author Dave Patterson Add fields and methods to handle delay time for
- *         exponentially distributed timed transitions.
- * 
- *         Note: The exponential distribution is based on a single parameter,
- *         which can either be specified as a delay or a rate. The two values
- *         are inverses of each other, so no matter how the parameter is
- *         specified, the code after the constructor is the same. When a timed
- *         transition is found to be enabled, a projected delay is calculated
- *         based on its exponential distribution. As long as the transition does
- *         not get disabled before it can be fired, that delay governs the
- *         timing of the transition's firing. If other timed transitions are
- *         fired, the delay before they fire (that is, the progress of the
- *         virtual clock) is decremented from this transition's delay time to
- *         simulate the progress of time in the virtual space. Thus, at any
- *         time, the next timed transition to fire is the one with the lowest
- *         delay remaining. If a timed transition gets an expected delay and
- *         then later becomes disabled, its delay is no longer valid. When it
- *         next becomes enabled, it will get a new expected delay (an offset
- *         from the current virtual time). This explaination was included to
- *         clarify any confusion about fields and methods with "delay" in their
- *         names. They have nothing to do with whether the parameter of the
- *         exponential distribution is specified as a rate, or an expected
- *         delay. to the
+ * Petri-Net Transition Class for Drawing Transitions
  */
 public class Transition extends PlaceTransitionObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 942116302162925121L;
-	/** Transition is of Rectangle2D.Double */
+	
+	//Transition is of Rectangle2D.Double
 	private GeneralPath transition;
 	private Shape proximityTransition;
-	/** Place Width */
+
+	// Transition Size
 	public static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
-	/** Place Width */
 	public static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
-
+	
 	protected int angle;
+	
+	// Animation Suff
 	protected boolean enabled = false;
-	// private boolean enabledBackwards = false;
 	public boolean highlighted = false;
-
-	private boolean infiniteServer = false;
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
 	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
 
-	/** The transition priority */
-	private Integer priority = 1;
-
 	public Transition(Transition t) {
 
 		this(t.positionX, t.positionY, t.id, t.getName(), t.nameOffsetX,
-				t.nameOffsetY, t.infiniteServer, t.angle, t.priority);
+				t.nameOffsetY, false, t.angle, 0);
 
 	}
 
@@ -117,14 +78,12 @@ public class Transition extends PlaceTransitionObject {
 				nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; // sets width
 		componentHeight = TRANSITION_HEIGHT;// sets height
-		infiniteServer = infServer;
 		constructTransition();
 		angle = 0;
 		setCentre((int) positionX, (int) positionY);
 		rotate(angleInput);
 		updateBounds();
 		// this.updateEndPoints();
-		this.priority = priority;
 	}
 
 	/**
@@ -160,7 +119,6 @@ public class Transition extends PlaceTransitionObject {
 		copy.angle = angle;
 
 		copy.attributesVisible = attributesVisible;
-		copy.priority = priority;
 		copy.transition.transform(AffineTransform.getRotateInstance(Math
 				.toRadians(copy.angle), Transition.TRANSITION_HEIGHT / 2,
 				Transition.TRANSITION_HEIGHT / 2));
@@ -175,7 +133,6 @@ public class Transition extends PlaceTransitionObject {
 		copy.nameOffsetY = nameOffsetY;
 		copy.angle = angle;
 		copy.attributesVisible = attributesVisible;
-		copy.priority = priority;
 		copy.setOriginal(this);
 		return copy;
 	}
@@ -254,15 +211,6 @@ public class Transition extends PlaceTransitionObject {
 	}
 
 	/**
-	 * Determines whether Transition is enabled backwards
-	 * 
-	 * @return True if enabled
-	 */
-	// public boolean isEnabledBackwards(){
-	// return enabledBackwards;
-	// }
-
-	/**
 	 * Determines whether Transition is enabled
 	 * 
 	 * @return True if enabled
@@ -270,14 +218,6 @@ public class Transition extends PlaceTransitionObject {
 	@Override
 	public boolean isEnabled() {
 		return enabled;
-	}
-
-	// public void setHighlighted(boolean status) {
-	// highlighted = status;
-	// }
-
-	public boolean isInfiniteServer() {
-		return infiniteServer;
 	}
 
 	/**
@@ -307,10 +247,6 @@ public class Transition extends PlaceTransitionObject {
 
 	public int getAngle() {
 		return angle;
-	}
-
-	public int getPriority() {
-		return priority;
 	}
 
 	protected void constructTransition() {
@@ -565,8 +501,7 @@ public class Transition extends PlaceTransitionObject {
 			}
 
 			// This makes sure the angle overlap lies at the intersection
-			// between
-			// edges of a transition
+			// between edges of a transition
 			// Yes it is a nasty hack (a.k.a. ingeneous solution). But it works!
 			if (angle < (Math.toRadians(30 + transition.getAngle()))) {
 				angle += (2 * Math.PI);
@@ -592,18 +527,13 @@ public class Transition extends PlaceTransitionObject {
 
 		 toReturn.positionX = positionX;
 
-
 		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
 		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-		 toReturn.infiniteServer = infiniteServer;
 		 toReturn.constructTransition();
 		 toReturn.angle = 0;
 		 toReturn.setCentre((int)positionX, (int)positionY);
 		 toReturn.rotate(getAngle());
 		 toReturn.updateBounds();
-
-		 //this.updateEndPoints();
-		 toReturn.priority = priority;
 
 		 return toReturn;
 
