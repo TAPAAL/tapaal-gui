@@ -183,5 +183,5 @@ If the FinalNode can be reached within the given limit, the simulation shows one
 <arcpath arcPointType="false" id="1" xCoord="591" yCoord="255"/>
 </arc>
 </net>
-<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Distance to FinalNode less then MaxDistance" query="EF InputGraph.FinalNode&gt;=1" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="SOME"/>
+<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Distance to FinalNode less than MaxDistance" query="EF InputGraph.FinalNode&gt;=1" reductionOption="VerifyTAPN" searchOption="HEURISTIC" symmetry="true" traceOption="SOME"/>
 </pnml>
