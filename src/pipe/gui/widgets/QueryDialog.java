@@ -109,10 +109,10 @@ public class QueryDialog extends JPanel {
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
 	private static final String UNSUPPPORTED_QUERY_TEXT = "The chosen query property is not supported by the chosen reduction";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
-	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export verifytapn XML";
+	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	
-	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace (only without symmetry reduction)";
-	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace";
+	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
+	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SHARED = "Shared";
 
 	private static final long serialVersionUID = 7852107237344005546L;
@@ -721,7 +721,7 @@ public class QueryDialog extends JPanel {
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
 
-		rootPane.setDefaultButton(saveButton);
+		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
 
@@ -1667,10 +1667,10 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		breadthFirstSearch = new JRadioButton("Breadth First Search");
-		depthFirstSearch = new JRadioButton("Depth First Search");
-		randomSearch = new JRadioButton("Random Search");
-		heuristicSearch = new JRadioButton("Heuristic Search");
+		breadthFirstSearch = new JRadioButton("Breadth First Search    ");
+		depthFirstSearch = new JRadioButton("Depth First Search    ");
+		randomSearch = new JRadioButton("Random Search    ");
+		heuristicSearch = new JRadioButton("Heuristic Search    ");
 		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
@@ -1887,6 +1887,7 @@ public class QueryDialog extends JPanel {
 			cancelButton = new JButton("Cancel");
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 
+			
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					// TODO make save
@@ -1990,13 +1991,20 @@ public class QueryDialog extends JPanel {
 			});
 		}
 		if (option == QueryDialogueOption.Save) {
+			buttonPanel.add(saveUppaalXMLButton);
+			
+			Dimension minSize = new Dimension(400, 5);
+			Dimension prefSize = new Dimension(400, 5);
+			Dimension maxSize = new Dimension(Short.MAX_VALUE, 400);
+			buttonPanel.add(new Box.Filler(minSize, prefSize, maxSize));
+
+						
 			buttonPanel.add(cancelButton);
 
 			buttonPanel.add(saveButton);
 
 			buttonPanel.add(saveAndVerifyButton);
 
-			buttonPanel.add(saveUppaalXMLButton);
 		} else {
 			buttonPanel.add(cancelButton);
 
