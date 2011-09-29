@@ -418,6 +418,7 @@ public class TemplateExplorer extends JPanel {
 	public void removeTemplate(int index, Template template) {
 		listModel.remove(index);
 		parent.removeTemplate(template);
+		templateList.setSelectedIndex(index);
 	}
 
 	public void addTemplate(int index, Template template) {
