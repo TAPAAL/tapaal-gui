@@ -1272,8 +1272,9 @@ public class QueryDialog extends JPanel {
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
 		placesBox = new JComboBox();
-		Dimension d = new Dimension(150, 27);
+		Dimension d = new Dimension(125, 27);
 		placesBox.setMaximumSize(d);
+		placesBox.setPreferredSize(d);
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
