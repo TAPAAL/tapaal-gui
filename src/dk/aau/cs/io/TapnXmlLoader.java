@@ -83,6 +83,7 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class TapnXmlLoader {
+	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();;
 	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
@@ -92,6 +93,7 @@ public class TapnXmlLoader {
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
+	private boolean firstPlaceRenameWarning = true;
 	private IdResolver idResolver = new IdResolver();
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
@@ -177,6 +179,14 @@ public class TapnXmlLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
+		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+			name = "_" + name;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
+		}
+		
 		SharedPlace place = new SharedPlace(name, invariant);
 		place.setCurrentMarking(marking);
 		for(int j = 0; j < numberOfTokens; j++){
@@ -463,8 +473,6 @@ public class TapnXmlLoader {
 		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
 		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
 		String invariant = place.getAttribute("invariant");
-
-		idResolver.add(tapn.name(), idInput, nameInput);
 		
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
@@ -476,6 +484,16 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
+		}
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){

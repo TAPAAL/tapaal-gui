@@ -125,6 +125,10 @@ public class BatchProcessingLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
+		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+			name = "_" + name;
+		}
+		
 		SharedPlace place = new SharedPlace(name, invariant);
 		place.setCurrentMarking(marking);
 		for(int j = 0; j < numberOfTokens; j++){
@@ -323,7 +327,6 @@ public class BatchProcessingLoader {
 		String idInput = place.getAttribute("id");
 		String nameInput = place.getAttribute("name");
 		
-		idResolver.add(tapn.name(), idInput, nameInput);
 		
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
@@ -335,6 +338,12 @@ public class BatchProcessingLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
+		}
+
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
