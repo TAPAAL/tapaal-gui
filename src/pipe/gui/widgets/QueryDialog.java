@@ -210,7 +210,7 @@ public class QueryDialog extends JPanel {
 	private boolean isNetDegree2;
 	private InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
+	private String name_verifyTAPN = "TAPAAL Engine (verifytapn) - Recommended";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -881,7 +881,7 @@ public class QueryDialog extends JPanel {
 				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space.</li>");
 				buffer.append("</ul>");
 				buffer.append("<br/>");
-				buffer.append("<b>Verification Methods</b><br/>");
+				buffer.append("<b>Verification Optionss</b><br/>");
 				buffer.append("TAPAAL supports verification via its own included engine verifytapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
 				buffer.append("The TAPAAL engine supports also the discrete inclusion optimization that works for EF queries where the propositions state only ");
 				buffer.append("lower bounds on the number of tokens and for AG queries with only the upper bounds constraints. On some models this technique gives a considerable speedup. ");
@@ -1735,7 +1735,7 @@ public class QueryDialog extends JPanel {
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
-		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
+		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox();
@@ -1756,7 +1756,7 @@ public class QueryDialog extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(new JLabel("  Choose verification method:"), gbc);
+		reductionOptionsPanel.add(new JLabel("  Verification method:"), gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
