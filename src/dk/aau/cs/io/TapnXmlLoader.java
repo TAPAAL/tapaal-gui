@@ -806,9 +806,16 @@ public class TapnXmlLoader {
 				String templateName = name.split("\\.")[0];
 				String placeName = name.split("\\.")[1];
 				
+				// "true" and "false" are reserved keywords and places using these names are renamed to "_true" and "_false" respectively
+				if(placeName.equalsIgnoreCase("false") || placeName.equalsIgnoreCase("true"))
+					placeName = "_" + placeName;
+				
 				TimedPlace p = network.getTAPNByName(templateName).getPlaceByName(placeName);
 				places.add(p);
 			} else { // shared Place
+				if(name.equalsIgnoreCase("false") || name.equalsIgnoreCase("true"))
+					name = "_" + name;
+				
 				TimedPlace p = network.getSharedPlaceByName(name);
 				places.add(p);
 			}
