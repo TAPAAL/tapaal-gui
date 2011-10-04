@@ -56,14 +56,14 @@ public class SharedPlaceNamePanel extends JPanel {
 	private JPanel createNamePanel() {
 		JPanel namePanel = new JPanel(new GridBagLayout());
 		
-		JLabel label = new JLabel("Please enter a name:");
+		JLabel label = new JLabel("Enter a shared place name:");
 		GridBagConstraints gbc = new GridBagConstraints();
 		namePanel.add(label, gbc);
 		
 		String initialText = placeToEdit == null ? "" : placeToEdit.name();
 		nameField = new JTextField(initialText);
-		nameField.setMinimumSize(new Dimension(100,27));
-		nameField.setPreferredSize(new Dimension(150, 27));
+		nameField.setMinimumSize(new Dimension(150,27));
+		nameField.setPreferredSize(new Dimension(200, 27));
 		gbc = new GridBagConstraints();
 		gbc.gridy = 1;
 		namePanel.add(nameField, gbc);
@@ -74,6 +74,10 @@ public class SharedPlaceNamePanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		
 		JButton okButton = new JButton("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+
 		rootPane.setDefaultButton(okButton);
 		okButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -148,14 +152,18 @@ public class SharedPlaceNamePanel extends JPanel {
 		});
 		
 		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
 			}
 		});
 		
-		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
+		buttonPanel.add(okButton);
 		
 		return buttonPanel;
 	}

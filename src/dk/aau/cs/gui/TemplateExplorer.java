@@ -398,7 +398,7 @@ public class TemplateExplorer extends JPanel {
 		else if (parent.network().hasTAPNCalled(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
-							"A component named \"" + newName + "\" already exists. Please try another name.",
+							"A component named \"" + newName + "\" already exists. Try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
 			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
