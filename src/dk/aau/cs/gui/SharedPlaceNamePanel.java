@@ -113,7 +113,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				try{
 					placeToEdit.setName(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid. \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
@@ -131,7 +131,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				try{
 					place = new SharedPlace(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid. \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
