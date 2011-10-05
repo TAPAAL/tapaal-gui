@@ -480,16 +480,16 @@ public class GuiFrame extends JFrame implements Observer {
 		 helpMenu.setMnemonic('H');
 		 
 		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
-				 453257, "Visit the TAPAAK homepage", "_"));
+				 453257, "Visit TAPAAL homepage", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
-				 454256, "See the TAPAAL FAQ", "_"));
+				 454256, "See TAPAAL frequently asked questions", "_"));
 		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
 				 453256, "Ask a question about TAPAAL", "_"));
 		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
-				 453254, "Report a Bug in TAPAAL", "_"));
+				 453254, "Report a bug in TAPAAL", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
