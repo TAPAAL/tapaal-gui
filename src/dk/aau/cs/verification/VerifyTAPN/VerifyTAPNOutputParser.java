@@ -33,15 +33,17 @@ public class VerifyTAPNOutputParser {
 		int stored = 0;
 		boolean result = false;
 		int maxUsedTokens = 0;
-		
+		boolean foundResult = false;
 		String[] lines = output.split(System.getProperty("line.separator"));
 		try {
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
 				if (line.contains(Query_IS_SATISFIED_STRING)) {
 					result = true;
+					foundResult = true;
 				} else if (line.contains(Query_IS_NOT_SATISFIED_STRING)) {
 					result = false;
+					foundResult = true;
 				} else {
 					Matcher matcher = discoveredPattern.matcher(line);
 					if(matcher.find()){
@@ -66,6 +68,8 @@ public class VerifyTAPNOutputParser {
 					}
 				}
 			}
+			
+			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
 			return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType), new Stats(discovered, explored, stored));

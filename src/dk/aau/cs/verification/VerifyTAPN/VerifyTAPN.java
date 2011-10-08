@@ -240,7 +240,7 @@ public class VerifyTAPN implements ModelChecker {
 			String standardOutput = readOutput(runner.standardOutput());
 
 			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query.queryType());
-			if (queryResult.value1() == null) {
+			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
 				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());

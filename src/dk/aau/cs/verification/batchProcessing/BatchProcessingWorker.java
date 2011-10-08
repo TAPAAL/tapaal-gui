@@ -10,6 +10,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
@@ -197,7 +198,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
+		TAPNComposer composer = new TAPNComposer(new Messenger(){
+			@Override public void displayInfoMessage(String message) { }
+			@Override public void displayInfoMessage(String message, String title) {}
+			@Override public void displayErrorMessage(String message) {}
+			@Override public void displayErrorMessage(String message, String title) {}
+			@Override public void displayWrappedErrorMessage(String message, String title) {}
+			
+		});
 		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 		return composedModel;
 	}
