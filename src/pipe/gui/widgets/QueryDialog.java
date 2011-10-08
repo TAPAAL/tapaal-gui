@@ -66,6 +66,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Verifier;
 import dk.aau.cs.TCTL.StringPosition;
@@ -237,7 +238,7 @@ public class QueryDialog extends JPanel {
 		if(tapnNetwork.hasInhibitorArcs())
 			return false;
 		
-		TAPNComposer composer = new TAPNComposer();
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(tapnNetwork);
 		
 		for(TimedTransition t : composedModel.value1().transitions()) {
@@ -1938,7 +1939,7 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						TAPNComposer composer = new TAPNComposer();
+						TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
 						TAPNQuery tapnQuery = getQuery();

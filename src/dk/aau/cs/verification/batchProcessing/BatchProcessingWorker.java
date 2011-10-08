@@ -197,7 +197,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		TAPNComposer composer = new TAPNComposer();
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 		return composedModel;
 	}
