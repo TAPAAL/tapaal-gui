@@ -203,8 +203,8 @@ public class TAPNComposer {
 						}
 					}else{
 						if(!hasShownMessage){
-							messenger.displayInfoMessage("There are orphan transitions (no incoming or outgoing arcs) in your model."
-									+ System.getProperty("line.separator") + "For technical reasons, these are removed from the model before verification.");
+							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model."
+									+ System.getProperty("line.separator") + "They will be removed before the verification.");
 							hasShownMessage = true;
 						}
 					}
