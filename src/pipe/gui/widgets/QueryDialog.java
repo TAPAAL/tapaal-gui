@@ -927,7 +927,7 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.add(new JLabel("  "));
 		
 		// Boundedness button
-		kbounded = new JButton("Check Boundedness");
+		kbounded = new JButton("Check boundedness");
 		kbounded.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
@@ -1765,7 +1765,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 
-		symmetryReduction = new JCheckBox("Use Symmetry Reduction");
+		symmetryReduction = new JCheckBox("Use symmetry reduction");
 		symmetryReduction.setSelected(true);
 		symmetryReduction.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -1780,7 +1780,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(symmetryReduction, gbc);
 
-		discreteInclusion = new JCheckBox("Use Discrete Inclusion");
+		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
 		discreteInclusion.setToolTipText("<html>This optimization will perform more advanced inclusion check<br/>" +
 										 "in an attempt to reduce the number of explored states.<br/>" +

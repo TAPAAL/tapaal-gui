@@ -41,7 +41,7 @@ import dk.aau.cs.verification.VerificationResult;
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
 		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
-		+ "normally located in tapaal/verifytapn.";
+		+ "normally located in the directory lib.";
 	
 	private static String verifytapnpath = "";
 	

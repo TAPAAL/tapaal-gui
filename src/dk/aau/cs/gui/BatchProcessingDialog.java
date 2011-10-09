@@ -652,7 +652,7 @@ public class BatchProcessingDialog extends JDialog {
 		JPanel resultTablePanel = new JPanel(new GridBagLayout());
 		resultTablePanel.setBorder(BorderFactory.createTitledBorder("Results"));
 
-		exportButton = new JButton("Export");
+		exportButton = new JButton("Export as spreadsheet");
 		exportButton.setEnabled(false);
 		exportButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

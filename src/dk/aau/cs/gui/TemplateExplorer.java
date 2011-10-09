@@ -477,8 +477,8 @@ public class TemplateExplorer extends JPanel {
 	
 	private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
 		private static final long serialVersionUID = 1257272566670437973L;
-		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive component";
-		private static final String CHECK_TO_ACTIVATE = "Check to Active component";
+		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
+		private static final String CHECK_TO_ACTIVATE = "Check to active the component";
 		private JCheckBox activeCheckbox = new JCheckBox();
 		private ListCellRenderer cellRenderer;
 		
