@@ -826,6 +826,10 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(timerLabel, gbc);
 
 		startButton = new JButton("Start");
+		startButton.setMaximumSize(new java.awt.Dimension(85, 25));
+		startButton.setMinimumSize(new java.awt.Dimension(85, 25));
+		startButton.setPreferredSize(new java.awt.Dimension(85, 25));
+
 		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -840,6 +844,10 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(startButton, gbc);
 
 		cancelButton = new JButton("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(85, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(85, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(85, 25));
+		
 		cancelButton.setEnabled(false);
 		cancelButton.addActionListener(new ActionListener() {
 
@@ -858,6 +866,10 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(cancelButton, gbc);
 
 		skipFileButton = new JButton("Skip");
+		skipFileButton.setMaximumSize(new java.awt.Dimension(85, 25));
+		skipFileButton.setMinimumSize(new java.awt.Dimension(85, 25));
+		skipFileButton.setPreferredSize(new java.awt.Dimension(85, 25));
+		
 		skipFileButton.setEnabled(false);
 		skipFileButton.addActionListener(new ActionListener() {
 
