@@ -1269,7 +1269,9 @@ public class GuiFrame extends JFrame implements Observer {
 			showConstants(showConstants);
 			
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-
+			
+			activateSelectAction();
+			selectAction.setSelected(true);
 			break;
 		case animation:
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
@@ -1287,7 +1289,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			setEditionAllowed(false);
 			statusBar.changeText(statusBar.textforAnimation);
-
+			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			break;
@@ -1498,7 +1500,9 @@ public class GuiFrame extends JFrame implements Observer {
 				a.setVisible(true);
 				a.setVisible(false);
 				a.dispose();
-				
+				if(getGUIMode().equals(GUIMode.draw)){
+					activateSelectAction();
+				}
 				break;
 
 			case Pipe.TIMEPASS:

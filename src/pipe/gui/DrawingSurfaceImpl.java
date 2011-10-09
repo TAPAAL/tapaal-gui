@@ -333,6 +333,11 @@ Printable, DrawingSurface {
 
 	public void changeAnimationMode(boolean status) {
 		animationmode = status;
+		if(status){
+			selection.disableSelection();
+		}else{
+			selection.enableSelection();
+		}
 	}
 
 	public void setCursorType(String type) {
@@ -854,7 +859,7 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
 
 		@Override
