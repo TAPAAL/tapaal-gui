@@ -36,6 +36,7 @@ import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
 import pipe.dataLayer.TransportArcComponent;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -622,6 +623,8 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if(app.getGUIMode().equals(GUIMode.animation)) return;
+			
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
