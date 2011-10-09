@@ -1669,10 +1669,10 @@ public class QueryDialog extends JPanel {
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		breadthFirstSearch = new JRadioButton("Breadth First Search    ");
-		depthFirstSearch = new JRadioButton("Depth First Search    ");
-		randomSearch = new JRadioButton("Random Search    ");
-		heuristicSearch = new JRadioButton("Heuristic Search    ");
+		breadthFirstSearch = new JRadioButton("Breadth first search    ");
+		depthFirstSearch = new JRadioButton("Depth first search    ");
+		randomSearch = new JRadioButton("Random search    ");
+		heuristicSearch = new JRadioButton("Heuristic search    ");
 		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);

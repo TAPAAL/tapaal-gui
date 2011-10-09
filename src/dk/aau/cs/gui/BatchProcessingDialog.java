@@ -89,11 +89,11 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_BROADCAST;
 	private static final String name_BROADCASTDEG2WithLegend = "F: "
 			+ name_BROADCASTDEG2;
-	private static final String name_AllReductions = "All Verification Methods";
-	private static final String name_BFS = "Breadth First Search";
-	private static final String name_DFS = "Depth First Search";
-	private static final String name_HEURISTIC = "Heuristic Search";
-	private static final String name_Random = "Random Search";
+	private static final String name_AllReductions = "All verification methods";
+	private static final String name_BFS = "Breadth first search";
+	private static final String name_DFS = "Depth first search";
+	private static final String name_HEURISTIC = "Heuristic search";
+	private static final String name_Random = "Random search";
 	private static final String name_KeepQueryOption = "Do not override";
 	private static final String name_SEARCHWHOLESTATESPACE = "Search whole state space";
 	private static final String name_SYMMETRY = "Yes";
