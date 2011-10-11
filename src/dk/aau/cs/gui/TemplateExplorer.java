@@ -118,7 +118,7 @@ public class TemplateExplorer extends JPanel {
 
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if (listModel.size() == 1) {
+				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1) {
 					removeTemplateButton.setEnabled(false);
 				} else {
 					removeTemplateButton.setEnabled(true);
@@ -534,6 +534,12 @@ public class TemplateExplorer extends JPanel {
 				item.setActive(true);
 				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
 			}
+			
+			if (CreateGui.getCurrentTab().numberOfActiveTemplates() == 0) {
+				removeTemplateButton.setEnabled(false);
+			} else {
+				removeTemplateButton.setEnabled(true);
+			}
 			 
 			toggleAffectedQueries();
 			list.repaint();
@@ -583,8 +589,15 @@ public class TemplateExplorer extends JPanel {
 					moveDownButton.setEnabled(false);
 				} else {
 					if (buttonPanel != null) {
-						if (listModel.size() > 1)
+						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1){
 							removeTemplateButton.setEnabled(true);
+						}else{
+							if (selectedModel().isActive()){
+								removeTemplateButton.setEnabled(false);
+							} else {
+								removeTemplateButton.setEnabled(true);
+							}
+						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
 						

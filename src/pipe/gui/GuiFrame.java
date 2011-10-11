@@ -1472,15 +1472,24 @@ public class GuiFrame extends JFrame implements Observer {
 			switch (typeID) {
 			case Pipe.START:
 				try {
-					setAnimationMode(!appView.isInAnimationMode());
+					
 					if (!appView.isInAnimationMode()) {
-						restoreMode();
-						PetriNetObject.ignoreSelection(false);
+						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+							restoreMode();
+							PetriNetObject.ignoreSelection(false);
+							setAnimationMode(!appView.isInAnimationMode());
+						} else {
+							JOptionPane.showMessageDialog(GuiFrame.this, 
+									"You need at least one active template to enter simulation mode",
+									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+						}
 					} else {
+
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(true);
-						// Do we keep the selection??
 						appView.getSelectionObject().clearSelection();
+						setAnimationMode(!appView.isInAnimationMode());
+
 					}
 				} catch (Exception e) {
 					System.err.println(e);
