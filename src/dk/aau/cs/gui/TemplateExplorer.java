@@ -535,10 +535,14 @@ public class TemplateExplorer extends JPanel {
 				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
 			}
 			
-			if (CreateGui.getCurrentTab().numberOfActiveTemplates() == 0) {
-				removeTemplateButton.setEnabled(false);
-			} else {
+			if (!selectedModel().isActive()){
 				removeTemplateButton.setEnabled(true);
+			}else {
+				if (CreateGui.getCurrentTab().numberOfActiveTemplates() <= 1) {
+					removeTemplateButton.setEnabled(false);
+				} else {
+					removeTemplateButton.setEnabled(true);
+				}
 			}
 			 
 			toggleAffectedQueries();
