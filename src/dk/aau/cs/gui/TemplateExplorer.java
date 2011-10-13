@@ -40,6 +40,7 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
+import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
@@ -527,18 +528,27 @@ public class TemplateExplorer extends JPanel {
 		private void toggleSelection(int index) { 
 			if(index<0) 
 				return; 
-			
-			if(!selectionModel.isSelectedIndex(index)) 
-				selectionModel.addSelectionInterval(index, index); 
-			
+
 			Template item = ((Template)list.getModel().getElementAt(index));
-			item.setActive(!item.isActive());
-			
-			if(parent.numberOfActiveTemplates() == 0) { 
-				item.setActive(true);
-				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
+
+
+			if(!selectionModel.isSelectedIndex(index)) {
+				selectionModel.addSelectionInterval(index, index);
 			}
-			
+
+			boolean newValue =!item.isActive();
+			item.setActive(newValue);
+
+			if(parent.numberOfActiveTemplates() == 0) {
+				//We got an error, about the change
+				item.setActive(!newValue);
+				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				//The change was ok, record it to undo/redo history
+				undoManager.addNewEdit(new ToggleTemplateActivationCommand(parent.templateExplorer, item, newValue));
+			}
+
+
 			if (!selectedModel().isActive()){
 				removeTemplateButton.setEnabled(true);
 			}else {
