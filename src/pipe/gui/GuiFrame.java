@@ -1512,6 +1512,9 @@ public class GuiFrame extends JFrame implements Observer {
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
 				}
+				
+				CreateGui.getCurrentTab().selectFirstElements();
+				
 				break;
 
 			case Pipe.TIMEPASS:
