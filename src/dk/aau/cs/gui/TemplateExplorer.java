@@ -334,7 +334,11 @@ public class TemplateExplorer extends JPanel {
 					template.model().setName(name + i);
 				}
 				
+				int index = listModel.size();
+				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+				
 				parent.addTemplate(template);
+				
 			}
 		});
 
@@ -416,7 +420,7 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public void removeTemplate(int index, Template template) {
-		listModel.remove(index);
+		listModel.removeElement(template);
 		parent.removeTemplate(template);
 		templateList.setSelectedIndex(index);
 	}
