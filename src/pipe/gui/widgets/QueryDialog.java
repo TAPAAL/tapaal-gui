@@ -865,14 +865,14 @@ public class QueryDialog extends JPanel {
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 				StringBuffer buffer = new StringBuffer();
 				buffer.append("<html>");
-				buffer.append("<b>Boundedness</b><br/>");
+				buffer.append("<b>Boundedness Options</b><br/>");
 				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
 				buffer.append("Because TAPAAL models can produce additional tokens by firing transitions (e.g. a transition that has a single input place ");
 				buffer.append("and two output places) you may need to use additional tokens compared to those that are already in the net. By ");
 				buffer.append("specifying an extra number of tokens you can ask TAPAAL to check if your net is bounded for this number of extra tokens (i.e. ");
 				buffer.append("whether there is no reachable marking in the net that would exceed the predefined number of tokens. ");
 				buffer.append("<br/><br/>");
-				buffer.append("<b>Search Strategies</b><br/>");
+				buffer.append("<b>Search Strategy Options</b><br/>");
 				buffer.append("A search strategy determines how the chosen verification method performs the search. The possible search strategies are: ");
 				buffer.append("<ul>");
 				buffer.append("<li>Heuristic Search<br/> If discrete inclusion optimization is not enabled, this strategy performs a breadth first search. ");
@@ -882,7 +882,7 @@ public class QueryDialog extends JPanel {
 				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space.</li>");
 				buffer.append("</ul>");
 				buffer.append("<br/>");
-				buffer.append("<b>Verification Optionss</b><br/>");
+				buffer.append("<b>Verification Options</b><br/>");
 				buffer.append("TAPAAL supports verification via its own included engine verifytapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
 				buffer.append("The TAPAAL engine supports also the discrete inclusion optimization that works for EF queries where the propositions state only ");
 				buffer.append("lower bounds on the number of tokens and for AG queries with only the upper bounds constraints. On some models this technique gives a considerable speedup. ");
