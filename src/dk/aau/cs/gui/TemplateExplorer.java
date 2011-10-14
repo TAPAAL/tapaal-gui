@@ -40,6 +40,7 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
+import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
@@ -118,7 +119,7 @@ public class TemplateExplorer extends JPanel {
 
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
-				if (listModel.size() == 1) {
+				if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1) {
 					removeTemplateButton.setEnabled(false);
 				} else {
 					removeTemplateButton.setEnabled(true);
@@ -334,7 +335,11 @@ public class TemplateExplorer extends JPanel {
 					template.model().setName(name + i);
 				}
 				
+				int index = listModel.size();
+				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+				
 				parent.addTemplate(template);
+				
 			}
 		});
 
@@ -398,7 +403,7 @@ public class TemplateExplorer extends JPanel {
 		else if (parent.network().hasTAPNCalled(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
-							"A component named \"" + newName + "\" already exists. Please try another name.",
+							"A component named \"" + newName + "\" already exists. Try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
 		} else {
 			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
@@ -416,8 +421,9 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public void removeTemplate(int index, Template template) {
-		listModel.remove(index);
+		listModel.removeElement(template);
 		parent.removeTemplate(template);
+		templateList.setSelectedIndex(index);
 	}
 
 	public void addTemplate(int index, Template template) {
@@ -448,6 +454,10 @@ public class TemplateExplorer extends JPanel {
 			}
 		}
 	}
+	
+	public void selectFirst() {
+			templateList.setSelectedIndex(0);
+	}
 
 	public void hideButtons() {
 		addCreatedComponents(true);
@@ -472,8 +482,8 @@ public class TemplateExplorer extends JPanel {
 	
 	private class TemplateListCellRenderer extends JPanel implements ListCellRenderer {
 		private static final long serialVersionUID = 1257272566670437973L;
-		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive component";
-		private static final String CHECK_TO_ACTIVATE = "Check to Active component";
+		private static final String UNCHECK_TO_DEACTIVATE = "Uncheck to deactive the component";
+		private static final String CHECK_TO_ACTIVATE = "Check to active the component";
 		private JCheckBox activeCheckbox = new JCheckBox();
 		private ListCellRenderer cellRenderer;
 		
@@ -491,8 +501,11 @@ public class TemplateExplorer extends JPanel {
 			if(!isInAnimationMode) { 
 				boolean isActive = ((Template)value).isActive();
 				activeCheckbox.setSelected(isActive);
-				setToolTipText(isActive ? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
+				setToolTipText((isActive)? UNCHECK_TO_DEACTIVATE : CHECK_TO_ACTIVATE);
 				add(activeCheckbox, BorderLayout.WEST);
+			} else {
+				
+				setToolTipText(null);
 			}
 			add(renderer, BorderLayout.CENTER);
 			return this;
@@ -515,16 +528,35 @@ public class TemplateExplorer extends JPanel {
 		private void toggleSelection(int index) { 
 			if(index<0) 
 				return; 
-			
-			if(!selectionModel.isSelectedIndex(index)) 
-				selectionModel.addSelectionInterval(index, index); 
-			
+
 			Template item = ((Template)list.getModel().getElementAt(index));
-			item.setActive(!item.isActive());
-			
-			if(parent.numberOfActiveTemplates() == 0) { 
-				item.setActive(true);
+
+
+			if(!selectionModel.isSelectedIndex(index)) {
+				selectionModel.addSelectionInterval(index, index);
+			}
+
+			boolean newValue =!item.isActive();
+			item.setActive(newValue);
+
+			if(parent.numberOfActiveTemplates() == 0) {
+				//We got an error, about the change
+				item.setActive(!newValue);
 				JOptionPane.showMessageDialog(parent, "At least one component must be active.", "Cannot Deactive All Components", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				//The change was ok, record it to undo/redo history
+				undoManager.addNewEdit(new ToggleTemplateActivationCommand(parent.templateExplorer, item, newValue));
+			}
+
+
+			if (!selectedModel().isActive()){
+				removeTemplateButton.setEnabled(true);
+			}else {
+				if (CreateGui.getCurrentTab().numberOfActiveTemplates() <= 1) {
+					removeTemplateButton.setEnabled(false);
+				} else {
+					removeTemplateButton.setEnabled(true);
+				}
 			}
 			 
 			toggleAffectedQueries();
@@ -558,7 +590,10 @@ public class TemplateExplorer extends JPanel {
 			if(e.getX()>templateList.getCellBounds(index, index).x+checkBoxWidth) 
 				return; 
 			
-			toggleSelection(index);
+			if (!isInAnimationMode){
+				toggleSelection(index);
+			}
+			
 		}
 
 		public void valueChanged(ListSelectionEvent e) {
@@ -572,8 +607,15 @@ public class TemplateExplorer extends JPanel {
 					moveDownButton.setEnabled(false);
 				} else {
 					if (buttonPanel != null) {
-						if (listModel.size() > 1)
+						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 1){
 							removeTemplateButton.setEnabled(true);
+						}else{
+							if (selectedModel().isActive()){
+								removeTemplateButton.setEnabled(false);
+							} else {
+								removeTemplateButton.setEnabled(true);
+							}
+						}
 						renameButton.setEnabled(true);
 						copyButton.setEnabled(true);
 						
@@ -595,7 +637,9 @@ public class TemplateExplorer extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			toggleSelection(list.getSelectedIndex());
+			if (!isInAnimationMode){
+				toggleSelection(list.getSelectedIndex());
+			}
 		}
 		
 	}

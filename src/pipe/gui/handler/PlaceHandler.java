@@ -115,31 +115,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		 * middelclick draw a arrow }
 		 */
 	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
-			return;
-		}
-
-		UndoManager undoManager = CreateGui.getView().getUndoManager();
-
-		if (myObject instanceof TimedPlaceComponent) {
-			int clicks = -e.getWheelRotation();
-			TimedPlace place = ((TimedPlaceComponent)myObject).underlyingPlace();
-			if(clicks > 0) {
-				place.addToken(new TimedToken(place));
-			}else{
-				if(place.numberOfTokens() == 0)
-					return;
-				
-				place.removeToken();
-			}
-			Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, clicks);
-			undoManager.addNewEdit(command);
-		}
-	}
-
+	
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {

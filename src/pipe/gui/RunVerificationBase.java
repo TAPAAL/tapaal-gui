@@ -44,7 +44,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-		TAPNComposer composer = new TAPNComposer();
+		TAPNComposer composer = new TAPNComposer(messenger);
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
@@ -100,7 +100,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		} else {
 			modelChecker.kill();
-			messenger.displayInfoMessage("Verification was interupted by the user. No result found!", "Verification Cancelled");
+			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");
 
 		}
 	}

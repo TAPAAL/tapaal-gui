@@ -157,30 +157,18 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	public void setWeightLabelPosition() {
-		weightLabel.setPosition((int) (myPath.midPoint.x)
-				+ weightLabel.getWidth() / 2 - 4, (int) (myPath.midPoint.y));
-	}
-
-	/**
-	 * Get id
-	 * 
-	 * @return String value for Arc id;
-	 */
-	@Override
-	public String getId() {
-		if (id != null) {
-			return id;
-		} else {
-			if (source != null && target != null) {
-				return source.getId() + " to " + target.getId();
-			}
-		}
-		return "";
+		weightLabel.setPosition(
+				(int) (myPath.midPoint.x) + weightLabel.getWidth() / 2 - 4,
+				(int) (myPath.midPoint.y));
 	}
 
 	@Override
 	public String getName() {
-		return getId();
+		if (source != null && target != null) {
+			return source.getId() + " to " + target.getId();
+		} else {
+			return "";
+		}
 	}
 
 	/**
@@ -317,8 +305,10 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 			if (getParent() != null) {
 				getParent().remove(weightLabel);
 			}
-			if(source != null) source.removeFromArc(this);
-			if(target != null) target.removeToArc(this);
+			if (source != null)
+				source.removeFromArc(this);
+			if (target != null)
+				target.removeToArc(this);
 			myPath.forceHidePoints();
 			super.delete();
 			deleted = true;

@@ -49,12 +49,12 @@ public class EditWeightAction extends AbstractAction {
 			}
 		} catch (NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(contentPane,
-					"Please enter a positive integer greater than 0.",
+					"Enter a positive integer greater than 0.",
 					"Invalid entry", JOptionPane.ERROR_MESSAGE);
 		} catch (Exception exc) {
 			exc.printStackTrace();
 			JOptionPane.showMessageDialog(contentPane,
-					"Please enter a positive integer greater than 0.",
+					"Enter a positive integer greater than 0.",
 					"Invalid entry", JOptionPane.ERROR_MESSAGE);
 		}
 	}

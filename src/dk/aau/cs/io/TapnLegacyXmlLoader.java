@@ -80,7 +80,7 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class TapnLegacyXmlLoader {
-
+	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
 	private static final String SYMMETRY = "SYMMETRY";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs;
@@ -94,6 +94,7 @@ public class TapnLegacyXmlLoader {
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
+	private boolean firstPlaceRenameWarning = true;
 
 	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
 		presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
@@ -602,6 +603,14 @@ public class TapnLegacyXmlLoader {
 
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
+		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
 		}
 
 		Place place = null;

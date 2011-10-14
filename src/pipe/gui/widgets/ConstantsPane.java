@@ -281,4 +281,9 @@ public class ConstantsPane extends JPanel {
 		listModel.setNetwork(tapnNetwork);
 	}
 
+	public void selectFirst() {
+		constantsList.setSelectedIndex(0);
+		
+	}
+
 }

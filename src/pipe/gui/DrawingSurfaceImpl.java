@@ -34,8 +34,9 @@ import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
 import pipe.dataLayer.TimedTransportArcComponent;
+import pipe.dataLayer.Transition;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe.elementType;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
@@ -330,6 +331,11 @@ Printable, DrawingSurface {
 
 	public void changeAnimationMode(boolean status) {
 		animationmode = status;
+		if(status){
+			selection.disableSelection();
+		}else{
+			selection.enableSelection();
+		}
 	}
 
 	public void setCursorType(String type) {
@@ -620,6 +626,8 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if(app.getGUIMode().equals(GUIMode.animation)) return;
+			
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
@@ -726,7 +734,7 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
 
 		@Override

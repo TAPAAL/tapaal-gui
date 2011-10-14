@@ -13,6 +13,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.AnnotationNote;
+import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
 import pipe.gui.action.EditNoteAction;
@@ -62,6 +64,8 @@ public class AnnotationNoteHandler extends NoteHandler {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		
 		if ((e.getComponent() == myObject || !e.getComponent().isEnabled())
 				&& (SwingUtilities.isLeftMouseButton(e))) {
 			if (e.getClickCount() == 2) {

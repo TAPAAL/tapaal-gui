@@ -83,6 +83,7 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class TapnXmlLoader {
+	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();;
 	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
@@ -92,6 +93,8 @@ public class TapnXmlLoader {
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
+	private boolean firstPlaceRenameWarning = true;
+	private IdResolver idResolver = new IdResolver();
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -141,6 +144,8 @@ public class TapnXmlLoader {
 	}
 
 	private LoadedModel parse(Document doc) throws FormatException {
+		idResolver.clear();
+		
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
 
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
@@ -174,6 +179,14 @@ public class TapnXmlLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
+		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+			name = "_" + name;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
+		}
+		
 		SharedPlace place = new SharedPlace(name, invariant);
 		place.setCurrentMarking(marking);
 		for(int j = 0; j < numberOfTokens; j++){
@@ -411,6 +424,9 @@ public class TapnXmlLoader {
 		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
 		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
@@ -457,7 +473,7 @@ public class TapnXmlLoader {
 		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
 		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
 		String invariant = place.getAttribute("invariant");
-
+		
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
 
@@ -468,6 +484,16 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
+		}
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
@@ -494,7 +520,10 @@ public class TapnXmlLoader {
 		boolean taggedArc = arc.getAttribute("tagged").equals("true") ? true : false;
 		String inscriptionTempStorage = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
-
+		
+		sourceInput = idResolver.get(template.model().name(), sourceInput);
+		targetInput = idResolver.get(template.model().name(), targetInput);
+		
 		PlaceTransitionObject sourceIn = template.guiModel().getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = template.guiModel().getPlaceTransitionObject(targetInput);
 
@@ -777,9 +806,16 @@ public class TapnXmlLoader {
 				String templateName = name.split("\\.")[0];
 				String placeName = name.split("\\.")[1];
 				
+				// "true" and "false" are reserved keywords and places using these names are renamed to "_true" and "_false" respectively
+				if(placeName.equalsIgnoreCase("false") || placeName.equalsIgnoreCase("true"))
+					placeName = "_" + placeName;
+				
 				TimedPlace p = network.getTAPNByName(templateName).getPlaceByName(placeName);
 				places.add(p);
 			} else { // shared Place
+				if(name.equalsIgnoreCase("false") || name.equalsIgnoreCase("true"))
+					name = "_" + name;
+				
 				TimedPlace p = network.getSharedPlaceByName(name);
 				places.add(p);
 			}

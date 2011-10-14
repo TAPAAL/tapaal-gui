@@ -41,9 +41,9 @@ public class NewTAPNPanel extends JPanel {
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
 
 		JButton okButton = new JButton("OK");
-		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -52,7 +52,7 @@ public class NewTAPNPanel extends JPanel {
 		});
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
+		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.insets = new Insets(3, 3, 3, 3);
 		buttonPanel.add(okButton, gbc);
@@ -60,9 +60,9 @@ public class NewTAPNPanel extends JPanel {
 		rootPane.setDefaultButton(okButton);
 
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setMaximumSize(new java.awt.Dimension(75, 25));
-		cancelButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		cancelButton.setPreferredSize(new java.awt.Dimension(75, 25));
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
@@ -70,7 +70,7 @@ public class NewTAPNPanel extends JPanel {
 		});
 
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
+		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.insets = new Insets(3, 3, 3, 3);
 		buttonPanel.add(cancelButton, gbc);
