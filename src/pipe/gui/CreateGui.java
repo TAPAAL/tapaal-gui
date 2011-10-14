@@ -45,8 +45,8 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 		appGui.activateSelectAction();
-		Verifyta.trySetupFromEnvironmentVariable();
-		VerifyTAPN.trySetupFromEnvironmentVariable();
+		Verifyta.trySetup();
+		VerifyTAPN.trySetup();
 
 		VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion()) {

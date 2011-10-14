@@ -173,7 +173,7 @@ public class Verifyta implements ModelChecker {
 		return result;
 	}
 
-	public static boolean trySetupFromEnvironmentVariable() {
+	public static boolean trySetup() {
 		String verifyta = System.getenv("verifyta");
 		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
