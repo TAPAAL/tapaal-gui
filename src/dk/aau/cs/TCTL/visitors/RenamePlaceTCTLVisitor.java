@@ -20,8 +20,8 @@ public class RenamePlaceTCTLVisitor implements ITCTLVisitor {
 	private String newPlaceName;
 
 	public RenamePlaceTCTLVisitor(String oldName, String newName) {
-		this.oldPlaceName = oldName;
-		this.newPlaceName = newName;
+		oldPlaceName = oldName;
+		newPlaceName = newName;
 	}
 
 	public void visit(TCTLAFNode afNode, Object context) {

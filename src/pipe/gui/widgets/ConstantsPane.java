@@ -25,7 +25,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
@@ -48,7 +47,7 @@ public class ConstantsPane extends JPanel {
 	private JButton moveDownButton;
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
-		this.parent = currentTab;
+		parent = currentTab;
 
 		constantsPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
@@ -74,7 +73,7 @@ public class ConstantsPane extends JPanel {
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
+				if (!(e.getValueIsAdjusting())) {
 					if (constantsList.getSelectedIndex() == -1) {
 						editBtn.setEnabled(false);
 						removeBtn.setEnabled(false);

@@ -27,7 +27,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append("(i).");
 			append(atomicPropositionNode.getPlace());
 			append(") ");
-			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(operatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
 		} else if (totalTokens == 0) {
@@ -36,7 +36,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 			append(".");
 			append(atomicPropositionNode.getPlace());
 			append(") ");
-			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(operatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
 		} else {
@@ -52,7 +52,7 @@ public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 				append(atomicPropositionNode.getPlace());
 			}
 			append(") ");
-			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(operatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
 		}

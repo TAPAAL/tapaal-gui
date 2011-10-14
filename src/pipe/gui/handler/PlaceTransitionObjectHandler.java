@@ -4,21 +4,21 @@ import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
-import pipe.dataLayer.Arc;
+
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
-import pipe.gui.Pipe;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.undo.AddTimedInhibitorArcCommand;
 import pipe.gui.undo.AddTimedInputArcCommand;
 import pipe.gui.undo.AddTimedOutputArcCommand;
@@ -167,7 +167,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								TimeInterval.ZERO_INF);
 						model.add(tia);
 						createTAPNInhibitorArc.setUnderlyingArc(tia);
-						createTAPNInhibitorArc.updateWeightLabel(true);
+						createTAPNInhibitorArc.updateLabel(true);
 					} catch (RequireException ex) {
 						cleanupArc(createTAPNInhibitorArc, view);
 						JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -227,8 +227,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 
 						Iterator<Arc> arcsFrom = transportArcToCreate
 								.getSource().getConnectFromIterator();
-						// search for pre-existent arcs from
-						// transportArcToCreate's source to
+						// search for pre-existent arcs from transportArcToCreate's source to
 						// transportArcToCreate's target
 						while (arcsFrom.hasNext()) {
 							Arc someArc = (arcsFrom.next());
@@ -238,10 +237,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 								existsArc = true;
 
 								if (someArc instanceof TimedInhibitorArcComponent) {
-									// user has drawn a transport arc where
-									// there is
-									// a TAPNInhibitorArc arc already - This
-									// does not make sense.
+									// user has drawn a transport arc where there is
+									// a TAPNInhibitorArc arc already - This does not make sense.
 									cleanupArc(transportArcToCreate, view);
 									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(
@@ -251,10 +248,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 													JOptionPane.ERROR_MESSAGE);
 
 								} else if (someArc instanceof TimedTransportArcComponent) {
-									// user has drawn a transport arc where
-									// there is
-									// a transport arc already - We do not allow
-									// that.
+									// user has drawn a transport arc where there is
+									// a transport arc already - We do not allow that.
 									cleanupArc(transportArcToCreate, view);
 									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(CreateGui
@@ -262,19 +257,14 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 											"Error", JOptionPane.ERROR_MESSAGE);
 
 								} else if (someArc instanceof TimedOutputArcComponent) {
-									// user has drawn a transport arc where
-									// there is
-									// a normal arc already - we increment arc's
-									// weight
+									// user has drawn a transport arc where there is
+									// a normal arc already - We do not allow that.
 									cleanupArc(transportArcToCreate, view);
 									System.out.println(ERROR_MSG_TWO_ARCS);
 									JOptionPane.showMessageDialog(CreateGui
 											.getApp(), ERROR_MSG_TWO_ARCS,
 											"Error", JOptionPane.ERROR_MESSAGE);
 
-								} else {
-									// This should not happen - since all types
-									// of arcs are listed above.
 								}
 								break;
 							}
@@ -337,8 +327,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 							model.add(ta);
 							((TimedTransportArcComponent) transportArcToCreate).setUnderlyingArc(ta);
 							arc1.setUnderlyingArc(ta);
-							arc1.updateWeightLabel(true);
-							((TimedTransportArcComponent) transportArcToCreate).updateWeightLabel(true);
+							arc1.updateLabel(true);
+							((TimedTransportArcComponent) transportArcToCreate).updateLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(arc1, view);
 							cleanupArc(arc2, view);
@@ -364,7 +354,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						undoManager.addEdit(
 								new AddTransportArcCommand(
 										arc2,
-										(dk.aau.cs.model.tapn.TransportArc) (arc2.underlyingTransportArc()), 
+										arc2.underlyingTransportArc(), 
 										model, 
 										guiModel, 
 										view));
@@ -406,7 +396,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									((TimedPlaceComponent) outputArc.getTarget()).underlyingPlace());
 							model.add(timedOutputArc);
 							outputArc.setUnderlyingArc(timedOutputArc);
-							outputArc.updateWeightLabel(true);
+							outputArc.updateLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(timedArcToCreate, view);
 							JOptionPane.showMessageDialog(
@@ -448,7 +438,7 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 									TimeInterval.ZERO_INF);
 							model.add(tia);
 							timedArc.setUnderlyingArc(tia);
-							timedArc.updateWeightLabel(true);
+							timedArc.updateLabel(true);
 						} catch (RequireException ex) {
 							cleanupArc(timedArcToCreate, view);
 							JOptionPane

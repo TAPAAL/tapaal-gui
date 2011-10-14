@@ -30,18 +30,17 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.undo.DeleteTimedInhibitorArcCommand;
 import pipe.gui.undo.DeleteTimedInputArcCommand;
 import pipe.gui.undo.DeleteTimedOutputArcCommand;
@@ -92,8 +91,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");
 
-		this.undoManager = tab.drawingSurface().getUndoManager();
-		this.nameGenerator = tab.drawingSurface().getNameGenerator();
+		undoManager = tab.drawingSurface().getUndoManager();
+		nameGenerator = tab.drawingSurface().getNameGenerator();
 		this.tab = tab;
 
 		sharedPlacesListModel = new SharedPlacesListModel(tab.network());

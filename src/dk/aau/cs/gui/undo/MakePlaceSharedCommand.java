@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.MakePlaceSharedVisitor;
 import dk.aau.cs.gui.TabContent;
@@ -39,9 +39,9 @@ public class MakePlaceSharedCommand extends Command {
 		this.sharedPlace = sharedPlace;
 		this.place = place;
 		this.placeComponent = placeComponent;
-		this.oldTokens = place.tokens();
+		oldTokens = place.tokens();
 		this.currentTab = currentTab;
-		this.newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
+		newQueryToOldQueryMapping = new Hashtable<TAPNQuery, TAPNQuery>();
 	}
 	
 	@Override

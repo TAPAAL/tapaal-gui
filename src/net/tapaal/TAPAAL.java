@@ -9,7 +9,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
 import dk.aau.cs.debug.Logger;
 
 public class TAPAAL {

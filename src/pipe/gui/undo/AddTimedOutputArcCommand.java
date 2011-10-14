@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class AddTimedOutputArcCommand extends TAPNElementCommand {

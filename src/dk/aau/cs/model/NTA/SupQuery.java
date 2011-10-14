@@ -27,11 +27,11 @@ public class SupQuery implements UPPAALQuery {
 		boolean first = true;
 		for (String elem : elements) {
 			if (!first) {
-				file.append(",");
+				file.append(',');
 			}
 			file.append(elem);
 		}
-		file.append("\n");
+		file.append('\n');
 	}
 
 }

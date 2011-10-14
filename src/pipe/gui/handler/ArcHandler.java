@@ -9,16 +9,14 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
-import pipe.gui.Pipe;
-import pipe.gui.action.EditWeightAction;
 import pipe.gui.action.SplitArcAction;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 /**
  * Class used to implement methods corresponding to mouse events on arcs.
@@ -57,7 +55,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		super.mousePressed(e);
-		if (CreateGui.getApp().isEditionAllowed() == false) {
+		if (!(CreateGui.getApp().isEditionAllowed())) {
 			return;
 		}
 		if (e.getClickCount() == 2) {
@@ -100,45 +98,10 @@ public class ArcHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (CreateGui.getApp().isEditionAllowed() == false) {
+		if (!(CreateGui.getApp().isEditionAllowed())) {
 			return;
 		}
-
-		Arc arc = ((Arc) myObject);
-		if (arc instanceof TimedOutputArcComponent) {
-
-			// if (e.isControlDown()) {
-			// if (arc.getWeight() == 1) {
-			// if (((NormalArc)arc).hasInvisibleInverse()) {
-			// if (arc.getSource() instanceof Place){
-			// if (e.isShiftDown()) {
-			// arc = ((NormalArc)arc).getInverse();
-			// }
-			// } else {
-			// if (!e.isShiftDown()) {
-			// arc = ((NormalArc)arc).getInverse();
-			// }
-			// }
-			// }
-			// CreateGui.getView().getUndoManager().addNewEdit(
-			// ((NormalArc)arc).setTagged(!((NormalArc)arc).isTagged()));
-			// }
-			// return;
-			// }
-			/*
-			 * if (((NormalArc)arc).hasInvisibleInverse()) { if (arc.getSource()
-			 * instanceof Place){ if (e.isShiftDown()) { arc =
-			 * ((NormalArc)arc).getInverse(); } } else { if (!e.isShiftDown()) {
-			 * arc = ((NormalArc)arc).getInverse(); } } }
-			 */
-		}
-		/*
-		 * int oldWeight = arc.getWeight(); int newWeight = oldWeight -
-		 * e.getWheelRotation(); if (newWeight < 1) { newWeight = 1; } if
-		 * (newWeight != oldWeight) {
-		 * CreateGui.getView().getUndoManager().addNewEdit(
-		 * arc.setWeight(newWeight)); arc.repaint(); }
-		 */
+		
 	}
 
 }

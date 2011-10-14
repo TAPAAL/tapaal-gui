@@ -6,22 +6,21 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPathPoint;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
 
 /**
@@ -213,8 +212,8 @@ public class UndoManager {
 	}
 
 	private void checkMode() {
-		if ((app.getMode() == Pipe.elementType.FAST_PLACE)
-				|| (app.getMode() == Pipe.elementType.FAST_TRANSITION)) {
+		if ((app.getMode() == Pipe.ElementType.FAST_PLACE)
+				|| (app.getMode() == Pipe.ElementType.FAST_TRANSITION)) {
 			app.resetMode();
 		}
 	}

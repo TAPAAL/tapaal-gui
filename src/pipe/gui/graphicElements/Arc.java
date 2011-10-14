@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -9,82 +9,37 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddArcPathPointEdit;
-import pipe.gui.undo.ArcWeightEdit;
 import dk.aau.cs.gui.undo.Command;
 
 /**
- * <b>Arc</b> - Petri-Net Arc Class
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom
- * 
- * @author Pere Bonet modifed the delete method so that the weight label of an
- *         arc is deleted when the associated arc is deleted
- * 
- * @author Edwin Chung 16 Mar 2007: modified the constructor and several other
- *         functions so that DataLayer objects can be created outside the GUI
- * 
- * @author Nick Dingle 18 Oct 2007: added the ability for an arc to be "tagged"
- *         (permit the passage of tagged tokens).
+   Implementation of Element for drawing an arc
  */
 public abstract class Arc extends PetriNetObject implements Cloneable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6527845538091358791L;
-	// public final static String TYPE = "arc";
-	/** Current Marking */
-	protected int weight = 1;
-	protected NameLabel weightLabel;
+
+	protected NameLabel label;
 
 	private static Point2D.Double point;
 
-	/** references to the objects this arc connects */
+	/** References to the objects this arc connects */
 	private PlaceTransitionObject source = null;
 	private PlaceTransitionObject target = null;
-	// private boolean deleted = false; // Used for cleanup purposes
 
 	protected ArcPath myPath = new ArcPath(this);
 
-	// true if arc is not hidden when a bidirectional arc is used
-	protected boolean inView = true;
-
-	// bounds of arc need to be grown in order to avoid clipping problems
+	// Bounds of arc need to be grown in order to avoid clipping problems
 	protected int zoomGrow = 10;
 
 	/**
 	 * Create Petri-Net Arc object
 	 * 
-	 * @param startPositionXInput
-	 *            Start X-axis Position
-	 * @param startPositionYInput
-	 *            Start Y-axis Position
-	 * @param endPositionXInput
-	 *            End X-axis Position
-	 * @param endPositionYInput
-	 *            End Y-axis Position
-	 * @param sourceInput
-	 *            Arc source
-	 * @param targetInput
-	 *            Arc target
-	 * @param idInput
-	 *            Arc id
-	 * @param inputTagged
-	 *            TODO
 	 */
 	public Arc(double startPositionXInput, double startPositionYInput,
 			double endPositionXInput, double endPositionYInput,
 			PlaceTransitionObject sourceInput,
 			PlaceTransitionObject targetInput, int weightInput, String idInput) {
-		weightLabel = new NameLabel(zoom);
+		label = new NameLabel(zoom);
 		myPath.addPoint((float) startPositionXInput,
 				(float) startPositionYInput, ArcPathPoint.STRAIGHT);
 		myPath.addPoint((float) endPositionXInput, (float) endPositionYInput,
@@ -94,14 +49,13 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
-		setWeight(weightInput);
 	}
 
 	/**
 	 * Create Petri-Net Arc object
 	 */
 	public Arc(PlaceTransitionObject newSource) {
-		weightLabel = new NameLabel(zoom);
+		label = new NameLabel(zoom);
 		source = newSource;
 		myPath.addPoint();
 		myPath.addPoint();
@@ -130,45 +84,33 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	 */
 	public void setTarget(PlaceTransitionObject targetInput) {
 		target = targetInput;
-		// if (CreateGui.getApp() != null) {
-		// updateArcPosition();
-		// }
+	}
+
+	public void setLabelPosition() {
+		label.setPosition((int) (myPath.midPoint.x)
+				+ label.getWidth() / 2 - 4, (int) (myPath.midPoint.y));
 	}
 
 	/**
-	 * Set weight
+	 * Get id
 	 * 
-	 * @param weightInput
-	 *            String value for Arc weight;
+	 * @return String value for Arc id;
 	 */
-	public Command setWeight(int weightInput) {
-		int oldWeight = weight;
-
-		weight = weightInput;
-		if (weight == 1) {
-			weightLabel.setText("");
+	@Override
+	public String getId() {
+		if (id != null) {
+			return id;
 		} else {
-			weightLabel.setText(Integer.toString(weight));
+			if (source != null && target != null) {
+				return source.getId() + " to " + target.getId();
+			}
 		}
-		weightLabel.updateSize();
-		setWeightLabelPosition();
-		repaint();
-		return new ArcWeightEdit(this, oldWeight, weight);
-	}
-
-	public void setWeightLabelPosition() {
-		weightLabel.setPosition(
-				(int) (myPath.midPoint.x) + weightLabel.getWidth() / 2 - 4,
-				(int) (myPath.midPoint.y));
+		return "";
 	}
 
 	@Override
 	public String getName() {
-		if (source != null && target != null) {
-			return source.getId() + " to " + target.getId();
-		} else {
-			return "";
-		}
+		return getId();
 	}
 
 	/**
@@ -208,15 +150,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	}
 
 	/**
-	 * Get weight
-	 * 
-	 * @return Integer value for Arc weight;
-	 */
-	public int getWeight() {
-		return weight;
-	}
-
-	/**
 	 * Updates the start position of the arc, resets the arrowhead and updates
 	 * the bounds
 	 */
@@ -250,8 +183,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		repaint();
 	}
 
-	public void updateWeightLabel(boolean displayConstantNames) {
-
+	public void updateLabel(boolean displayConstantNames) {
+		//No label to update for this type
 	}
 
 	/** Updates the bounding box of the arc component based on the arcs bounds */
@@ -294,8 +227,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 			myPath.addPointsToGui((JLayeredPane) getParent());
 		}
 		updateArcPosition();
-		if (getParent() != null && weightLabel.getParent() == null) {
-			getParent().add(weightLabel);
+		if (getParent() != null && label.getParent() == null) {
+			getParent().add(label);
 		}
 	}
 
@@ -303,12 +236,10 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void delete() {
 		if (!deleted) {
 			if (getParent() != null) {
-				getParent().remove(weightLabel);
+				getParent().remove(label);
 			}
-			if (source != null)
-				source.removeFromArc(this);
-			if (target != null)
-				target.removeToArc(this);
+			if(source != null) source.removeFromArc(this);
+			if(target != null) target.removeToArc(this);
 			myPath.forceHidePoints();
 			super.delete();
 			deleted = true;
@@ -324,14 +255,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		return new AddArcPathPointEdit(this, newPoint);
 	}
 
-	/*
-	 * CB Joakim Byg - probably not needed public abstract String getType(); EOC
-	 */
-
-	public boolean inView() {
-		return inView;
-	}
-
 	public Transition getTransition() {
 		if (getTarget() instanceof Transition) {
 			return (Transition) getTarget();
@@ -342,7 +265,7 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 
 	public void removeFromView() {
 		if (getParent() != null) {
-			getParent().remove(weightLabel);
+			getParent().remove(label);
 		}
 		myPath.forceHidePoints();
 		removeFromContainer();
@@ -376,8 +299,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 	public void zoomUpdate(int percent) {
 		zoom = percent;
 		this.updateArcPosition();
-		weightLabel.zoomUpdate(percent);
-		weightLabel.updateSize();
+		label.zoomUpdate(percent);
+		label.updateSize();
 	}
 
 	public void setZoom(int percent) {

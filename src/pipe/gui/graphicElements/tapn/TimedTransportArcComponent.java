@@ -1,11 +1,12 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.Hashtable;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.TransportArcGroupEdit;
@@ -28,7 +29,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setHead();
 		setGroup(groupNr);
 		// hack to reprint the label of the arc
-		updateWeightLabel(true);
+		updateLabel(true);
 	}
 
 	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group,
@@ -38,13 +39,13 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setHead();
 		this.setGroup(group);
 		// hack to reprint the label of the arc
-		updateWeightLabel(true);
+		updateLabel(true);
 	}
 
 	public void setUnderlyingArc(TransportArc arc) {
-		this.underlyingTransportArc = arc; // must explicitly set underlying arc
+		underlyingTransportArc = arc; // must explicitly set underlying arc
 											// on connected to
-		updateWeightLabel(true);
+		updateLabel(true);
 	}
 
 	public TransportArc underlyingTransportArc() {
@@ -66,7 +67,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		setGroup(groupNr);
 
 		// hacks - I use the weight to display the TimeInterval
-		updateWeightLabel(true);
+		updateLabel(true);
 		repaint();
 
 		return new TransportArcGroupEdit(this, oldGroup, this.getGroup());
@@ -77,17 +78,17 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public void updateWeightLabel(boolean displayConstantNames) {
+	public void updateLabel(boolean displayConstantNames) {
 		if (isInPreSet && underlyingTransportArc != null) {
-			weightLabel.setText(underlyingTransportArc.interval().toString(
+			label.setText(underlyingTransportArc.interval().toString(
 					displayConstantNames)
 					+ " : " + getGroup());
 		} else if (!isInPreSet) {
-			weightLabel.setText(" : " + String.valueOf(getGroup()));
+			label.setText(" : " + String.valueOf(getGroup()));
 		} else {
-			weightLabel.setText("");
+			label.setText("");
 		}
-		this.setWeightLabelPosition();
+		this.setLabelPosition();
 	}
 
 	@Override
@@ -164,10 +165,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		this.connectedTo = connectedTo;
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-	}
 
 	public void setGroup(int group) {
 		this.group = group;
@@ -194,7 +191,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		underlyingTransportArc.setTimeInterval(guard);
 
 		// hacks - I use the weight to display the TimeInterval
-		updateWeightLabel(true);
+		updateLabel(true);
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval,

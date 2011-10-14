@@ -16,28 +16,25 @@ import java.awt.print.PrinterException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
 import javax.swing.JLayeredPane;
-import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
-
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Note;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TimedTransportArcComponent;
-import pipe.dataLayer.Transition;
 import pipe.gui.GuiFrame.GUIMode;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Note;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -158,12 +155,10 @@ Printable, DrawingSurface {
 			add(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == elementType.SELECT)
+		if(CreateGui.getApp().getMode() == ElementType.SELECT)
 			this.selection.enableSelection();
 
-		Component component = getParent().getParent();
-		JScrollPane pane = (JScrollPane)component;
-		repaintAll();
+
 	}
 
 	public void addNewPetriNetObject(PetriNetObject newObject) {
@@ -249,9 +244,8 @@ Printable, DrawingSurface {
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 
-				if (newObject instanceof Zoomable) {
-					newObject.zoomUpdate(getZoom());
-				}
+				newObject.zoomUpdate(getZoom());
+				
 			}
 			newObject.setGuiModel(guiModel);
 		}
@@ -261,7 +255,7 @@ Printable, DrawingSurface {
 
 	public void update(Observable o, Object diffObj) {
 		if ((diffObj instanceof PetriNetObject) && (diffObj != null)) {
-			if (CreateGui.appGui.getMode() == elementType.CREATING) {
+			if (CreateGui.appGui.getMode() == ElementType.CREATING) {
 
 				addNewPetriNetObject((PetriNetObject) diffObj);
 			}
@@ -631,14 +625,14 @@ Printable, DrawingSurface {
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				Pipe.elementType mode = app.getMode();
+				Pipe.ElementType mode = app.getMode();
 				switch (mode) {
 				case PLACE:
 					PlaceTransitionObject pto = newPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(elementType.FAST_TRANSITION);
+						app.setFastMode(ElementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -650,19 +644,19 @@ Printable, DrawingSurface {
 									(TimedPlaceComponent) pto2, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						app.setFastMode(elementType.FAST_TRANSITION);
+						app.setFastMode(ElementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
 				case IMMTRANS:
 				case TIMEDTRANS:
-					boolean timed = (mode == elementType.TIMEDTRANS ? true : false);
+					boolean timed = (mode == ElementType.TIMEDTRANS ? true : false);
 					pto = newTransition(e.getPoint(), timed);
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(elementType.FAST_PLACE);
+						app.setFastMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
@@ -673,7 +667,7 @@ Printable, DrawingSurface {
 									(TimedTransitionComponent) pto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						app.setFastMode(elementType.FAST_PLACE);
+						app.setFastMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;

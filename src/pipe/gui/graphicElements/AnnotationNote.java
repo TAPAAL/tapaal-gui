@@ -1,8 +1,4 @@
-/*
- * Created on 04-Mar-2004
- * Author is Michael Camacho
- */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Dimension;
@@ -29,9 +25,6 @@ import pipe.gui.widgets.EscapableDialog;
 
 public class AnnotationNote extends Note {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3503959956765396720L;
 
 	private boolean fillNote = true;
@@ -65,7 +58,6 @@ public class AnnotationNote extends Note {
 		dragPoints[3] = new ResizePoint(this, ResizePoint.RIGHT);
 		dragPoints[4] = new ResizePoint(this, ResizePoint.BOTTOM
 				| ResizePoint.RIGHT);
-		;
 		dragPoints[5] = new ResizePoint(this, ResizePoint.BOTTOM);
 		dragPoints[6] = new ResizePoint(this, ResizePoint.BOTTOM
 				| ResizePoint.LEFT);
@@ -160,23 +152,6 @@ public class AnnotationNote extends Note {
 					new AnnotationTextEdit(this, oldText, newText));
 			updateBounds();
 		}
-	}
-
-	public AnnotationNote paste(double x, double y, boolean toAnotherView) {
-		return new AnnotationNote(this.note.getText(), Grid.getModifiedX(x
-				+ this.getX()), Grid.getModifiedY(y + this.getY()), this.note
-				.getWidth(), this.note.getHeight(), this.isShowingBorder());
-	}
-
-	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(this.note.getText(), Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom),	this.note.getWidth(), this.note.getHeight(), this.isShowingBorder());
-		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
-		annotation.addMouseListener(noteHandler);
-		annotation.addMouseMotionListener(noteHandler);
-		annotation.getNote().addMouseListener(noteHandler);
-		annotation.getNote().addMouseMotionListener(noteHandler);
-		
-		return annotation;
 	}
 
 	@Override
@@ -274,9 +249,6 @@ public class AnnotationNote extends Note {
 
 	public class ResizePoint extends javax.swing.JComponent {
 
-		/**
-	 * 
-	 */
 		private static final long serialVersionUID = -1615544376708838434L;
 		private int SIZE = 3;
 		private static final int TOP = 1;
@@ -341,7 +313,7 @@ public class AnnotationNote extends Note {
 			}
 		}
 
-		// change ResizePoint's size a little bit acording to the zoom percent
+		// Change ResizePoint's size a little bit acording to the zoom percent
 		private void setZoom(int percent) {
 			if (zoom >= 220) {
 				SIZE = 5;
@@ -351,6 +323,17 @@ public class AnnotationNote extends Note {
 				SIZE = 3;
 			}
 		}
+	}
+	
+	public AnnotationNote copy() {
+		AnnotationNote annotation = new AnnotationNote(note.getText(), Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom),	note.getWidth(), note.getHeight(), this.isShowingBorder());
+		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
+		annotation.addMouseListener(noteHandler);
+		annotation.addMouseMotionListener(noteHandler);
+		annotation.getNote().addMouseListener(noteHandler);
+		annotation.getNote().addMouseMotionListener(noteHandler);
+		
+		return annotation;
 	}
 
 }

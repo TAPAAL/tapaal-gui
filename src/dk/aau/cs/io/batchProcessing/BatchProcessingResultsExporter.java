@@ -44,7 +44,7 @@ public class BatchProcessingResultsExporter {
 			
 			s.append(result.modelFile());
 			s.append(DELIMITER);
-			s.append(query != null ? query.getName() : "");
+			s.append((query != null) ? query.getName() : "");
 			s.append(DELIMITER);
 			s.append(result.verificationResult());
 			s.append(DELIMITER);
@@ -56,15 +56,15 @@ public class BatchProcessingResultsExporter {
 			s.append(DELIMITER);
 			s.append(result.hasStats() ? result.stats().storedStates() : "");
 			s.append(DELIMITER);
-			s.append(query != null ? query.getProperty().toString() : "");
+			s.append((query != null) ? query.getProperty().toString() : "");
 			s.append(DELIMITER);
-			s.append(query != null ? query.getCapacity() : "");
+			s.append((query != null) ? query.getCapacity() : "");
 			s.append(DELIMITER);
-			s.append(query != null ? getSearchOrder(query) : "");
+			s.append((query != null) ? getSearchOrder(query) : "");
 			s.append(DELIMITER);
-			s.append(query != null ? (query.useSymmetry() ? "Yes" : "No") : "");
+			s.append((query != null) ? (query.useSymmetry() ? "Yes" : "No") : "");
 			s.append(DELIMITER);
-			s.append(query != null ? getVerificationMethod(query) : "");
+			s.append((query != null) ? getVerificationMethod(query) : "");
 			
 			writer.println(s.toString());
 		}

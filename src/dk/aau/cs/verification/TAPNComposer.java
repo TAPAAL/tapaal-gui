@@ -58,23 +58,23 @@ public class TAPNComposer {
 		System.out.println("Composed Model:");
 		System.out.println("PLACES:");
 		for(TimedPlace place : tapn.places()){
-			System.out.print("\t");
+			System.out.print('\t');
 			System.out.print(place.name());
 			System.out.print(", invariant: ");
 			System.out.print(place.invariant().toString());
 			System.out.print(" (Original: ");
 			System.out.print(mapping.map(place.name()));
-			System.out.println(")");
+			System.out.println(')');
 		}
 
 		System.out.println();
 		System.out.println("TRANSITIONS:");
 		for(TimedTransition transition : tapn.transitions()){
-			System.out.print("\t");
+			System.out.print('\t');
 			System.out.print(transition.name());
 			System.out.print(" (Original: ");
 			System.out.print(mapping.map(transition.name()).toString());
-			System.out.println(")");
+			System.out.println(')');
 		}
 
 		System.out.println();

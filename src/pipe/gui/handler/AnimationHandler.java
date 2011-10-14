@@ -4,9 +4,9 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.model.tapn.TimedTransition;
 
 /**

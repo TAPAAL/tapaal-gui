@@ -3,12 +3,10 @@ package pipe.gui.handler;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
+import pipe.gui.graphicElements.Arc;
 
 /**
  * @authors Michael Camacho and Tom Barnwell
@@ -43,8 +41,8 @@ public class ArcKeyboardEventHandler extends KeyAdapter {
 			aView.createArc = null;
 			arcBeingDrawn.delete();
 
-			if ((CreateGui.getApp().getMode() == elementType.FAST_PLACE)
-					|| (CreateGui.getApp().getMode() == elementType.FAST_TRANSITION)) {
+			if ((CreateGui.getApp().getMode() == ElementType.FAST_PLACE)
+					|| (CreateGui.getApp().getMode() == ElementType.FAST_TRANSITION)) {
 				CreateGui.getApp().resetMode();
 			}
 			aView.repaint();

@@ -1,7 +1,7 @@
 /*
  * Note.java
  */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,9 +26,6 @@ import dk.aau.cs.gui.undo.Command;
  */
 public abstract class Note extends PetriNetObject implements Translatable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8965208519103066242L;
 	protected JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;

@@ -19,32 +19,31 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Note;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Note;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -248,7 +247,7 @@ public class TapnXmlLoader {
 	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
 		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
-		VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(query.getProperty());
+		VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(query.getProperty());
 		
 		return c.getResult();
 		
@@ -636,8 +635,8 @@ public class TapnXmlLoader {
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
-				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
+				presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
+				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
@@ -645,7 +644,7 @@ public class TapnXmlLoader {
 				TimedPlace sourcePlace = template.model().getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
-				TimeInterval interval = transportArcsTimeIntervals.get((TimedTransportArcComponent) presetTransportArc);
+				TimeInterval interval = transportArcsTimeIntervals.get(presetTransportArc);
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -662,9 +661,9 @@ public class TapnXmlLoader {
 				template.model().add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
-				transportArcsTimeIntervals.remove((TimedTransportArcComponent) presetTransportArc);
+				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
-				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
+				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);
 			}
 		}
 		return tempArc;
@@ -1004,9 +1003,9 @@ public class TapnXmlLoader {
 					((Note) newObject).getNote().addMouseListener(noteHandler);
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
-				if (newObject instanceof Zoomable) {
-					newObject.zoomUpdate(drawingSurface.getZoom());
-				}
+				
+				newObject.zoomUpdate(drawingSurface.getZoom());
+				
 			}
 			newObject.setGuiModel(template.guiModel());
 		}

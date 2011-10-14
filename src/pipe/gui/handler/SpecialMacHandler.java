@@ -9,8 +9,6 @@ import javax.imageio.ImageIO;
 import net.tapaal.TAPAAL;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Pipe;
-
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.QuitEvent;

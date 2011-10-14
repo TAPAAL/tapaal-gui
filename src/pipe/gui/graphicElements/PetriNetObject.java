@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -10,44 +10,30 @@ import java.util.EventListener;
 
 import javax.swing.JComponent;
 
-import pipe.gui.CopyPasteable;
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Translatable;
 import pipe.gui.Zoomable;
 
 /**
- * <b>PetriNetObject</b> - Petri-Net Object Class<b> - <i>Abstract</i></b>
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom
+ * Petri-Net Object Class 
+ * Implements things in common between all types of objects
  */
 public abstract class PetriNetObject extends JComponent implements Zoomable,
-		CopyPasteable, Cloneable, Translatable {
+		Cloneable, Translatable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2693171860021066729L;
 
-	protected final static int COMPONENT_DRAW_OFFSET = 5;
+	protected static final int COMPONENT_DRAW_OFFSET = 5;
 
-	/** Id */
 	protected String id = null;
 
-	/** Name Label for displaying name */
+	/* Name Label for displaying name */
 	protected NameLabel pnName;
 	protected Color objectColour = Pipe.ELEMENT_LINE_COLOUR;
 	protected Color selectionBorderColour = Pipe.SELECTION_LINE_COLOUR;
-	protected boolean selected = false; // True if part of the current
-										// selection.
+	protected boolean selected = false; // True if part of the current selection.
 	protected boolean selectable = true; // True if object can be selected.
 	protected boolean draggable = true; // True if object can be dragged.
 	protected boolean copyPasteable = true; // True if object can be cloned.
@@ -61,9 +47,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	protected int zoom = 100;
 	private DataLayer guiModel;
 
-	/**
-	 * Create PetriNetObject
-	 */
 	public PetriNetObject() {
 	}
 
@@ -75,12 +58,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		return guiModel;
 	}
 
-	/**
-	 * Set id
-	 * 
-	 * @param idInput
-	 *            String value for id;
-	 */
 	public void setId(String idInput) {
 		id = idInput;
 		setName(idInput);
@@ -200,10 +177,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 		super.paintComponent(g);
 	}
 
-	public boolean isCopyPasteable() {
-		return copyPasteable;
-	}
-
 	public abstract int getLayerOffset();
 
 	public int getZoom() {
@@ -227,12 +200,6 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 			for (int i = 0; i < mouseListeners.length; i++) {
 				pnObjectCopy.removeMouseMotionListener((MouseMotionListener) mouseListeners[i]);
 			}
-
-//			mouseListeners = pnObjectCopy.getListeners(MouseWheelListener.class);
-//
-//			for (int i = 0; i < mouseListeners.length; i++) {
-//				pnObjectCopy.removeMouseWheelListener((MouseWheelListener) mouseListeners[i]);
-//			}
 
 			return pnObjectCopy;
 		} catch (CloneNotSupportedException e) {

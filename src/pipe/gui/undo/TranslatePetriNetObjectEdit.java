@@ -4,7 +4,7 @@
 
 package pipe.gui.undo;
 
-import pipe.dataLayer.PetriNetObject;
+import pipe.gui.graphicElements.PetriNetObject;
 import dk.aau.cs.gui.undo.Command;
 
 /**

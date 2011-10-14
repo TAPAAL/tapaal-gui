@@ -10,6 +10,6 @@ package pipe.gui;
  */
 public interface Zoomable {
 
-	public void zoomUpdate(int zoom);
+	void zoomUpdate(int zoom);
 
 }

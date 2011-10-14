@@ -187,14 +187,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	private void simplifyQuery(pipe.dataLayer.TAPNQuery query) {
 		SimplifyPropositionsVisitor visitor = new SimplifyPropositionsVisitor();
-		visitor.FindAndReplaceTrueAndFalsePropositions(query.getProperty());
+		visitor.findAndReplaceTrueAndFalsePropositions(query.getProperty());
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
-		if(batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes)
-			return true;
-		else
-			return false;
+		return batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes;
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
@@ -320,7 +317,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected void process(List<BatchProcessingVerificationResult> chunks) {
 		for(BatchProcessingVerificationResult result : chunks){
-			tableModel.AddResult(result);
+			tableModel.addResult(result);
 		}
 	}
 	

@@ -25,7 +25,7 @@ public class RunVerification extends RunVerificationBase {
 	private IconSelector iconSelector;
 	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
 		super(modelChecker, messenger);
-		this.iconSelector = selector;
+		iconSelector = selector;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class RunVerification extends RunVerificationBase {
 			System.getProperty("line.separator") + 	
 			System.getProperty("line.separator");
 			
-			if (extraInformation != ""){
+			if (!extraInformation.equals("")){
 				message += extraInformation +			
 				System.getProperty("line.separator") + 	
 				System.getProperty("line.separator");
@@ -100,7 +100,7 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
 		
-		if(this.modelChecker.supportsStats()){
+		if(modelChecker.supportsStats()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;

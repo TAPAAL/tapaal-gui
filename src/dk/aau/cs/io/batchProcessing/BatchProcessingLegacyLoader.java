@@ -359,7 +359,7 @@ ReductionOption reductionOption;
 	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
 		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
-		VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(query.getProperty());
+		VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(query.getProperty());
 		
 		return c.getResult();
 	}
@@ -469,10 +469,7 @@ ReductionOption reductionOption;
 	private boolean getSymmetryAsOldFormat(Element queryElement) {
 		String reductionString = queryElement.getAttribute("reductionOption");
 		
-		if(reductionString.contains(SYMMETRY))
-			return true;
-		else
-			return false;
+		return reductionString.contains(SYMMETRY);
 	}
 
 	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {

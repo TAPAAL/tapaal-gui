@@ -7,9 +7,9 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.Transition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class TAPNTransitionHandler extends TransitionHandler {
@@ -28,26 +28,18 @@ public class TAPNTransitionHandler extends TransitionHandler {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
+		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown()) {
 			return;
 		}
 
-		if (e.isShiftDown()) {
-			/*
-			 * CreateGui.getView().getUndoManager().addNewEdit(
-			 * ((Transition)myObject).setTimed(
-			 * !((Transition)myObject).isTimed()));
-			 */
+		int rotation = 0;
+		if (e.getWheelRotation() < 0) {
+			rotation = -e.getWheelRotation() * 135;
 		} else {
-			int rotation = 0;
-			if (e.getWheelRotation() < 0) {
-				rotation = -e.getWheelRotation() * 135;
-			} else {
-				rotation = e.getWheelRotation() * 45;
-			}
-			CreateGui.getView().getUndoManager().addNewEdit(
-					((Transition) myObject).rotate(rotation));
+			rotation = e.getWheelRotation() * 45;
 		}
+		CreateGui.getView().getUndoManager().addNewEdit(
+				((Transition) myObject).rotate(rotation));
 	}
 
 	/**

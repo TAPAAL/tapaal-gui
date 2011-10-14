@@ -1,6 +1,6 @@
 package pipe.gui.undo;
 
-import pipe.dataLayer.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 

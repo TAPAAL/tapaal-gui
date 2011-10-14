@@ -28,7 +28,7 @@ public class KBoundAnalyzer {
 		this.tapnNetwork = tapnNetwork;
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
-		this.spinner = tokensControl;
+		spinner = tokensControl;
 	}
 
 	public void analyze() {

@@ -3,7 +3,7 @@ package pipe.gui.handler;
 import java.awt.Container;
 import java.awt.event.MouseEvent;
 
-import pipe.dataLayer.Note;
+import pipe.gui.graphicElements.Note;
 
 public class NoteHandler extends PetriNetObjectHandler {
 

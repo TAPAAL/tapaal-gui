@@ -29,7 +29,7 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 	}
 
 	public TCTLOrListNode(TCTLOrListNode orListNode) {
-		this.properties = new ArrayList<TCTLAbstractStateProperty>();
+		properties = new ArrayList<TCTLAbstractStateProperty>();
 
 		for (TCTLAbstractStateProperty p : orListNode.properties) {
 			addDisjunct(p.copy());
@@ -38,20 +38,20 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 
 	public TCTLOrListNode(TCTLAbstractStateProperty property1,
 			TCTLAbstractStateProperty property2) {
-		this.properties = new ArrayList<TCTLAbstractStateProperty>();
+		properties = new ArrayList<TCTLAbstractStateProperty>();
 
 		addDisjunct(property1);
 		addDisjunct(property2);
 	}
 
 	public TCTLOrListNode() {
-		this.properties = new ArrayList<TCTLAbstractStateProperty>();
+		properties = new ArrayList<TCTLAbstractStateProperty>();
 		TCTLStatePlaceHolder ph = new TCTLStatePlaceHolder();
 		ph.setParent(this);
-		this.properties.add(ph);
+		properties.add(ph);
 		ph = new TCTLStatePlaceHolder();
 		ph.setParent(this);
-		this.properties.add(ph);
+		properties.add(ph);
 	}
 
 	public void addDisjunct(TCTLAbstractStateProperty disjunct) {
@@ -146,7 +146,7 @@ public class TCTLOrListNode extends TCTLAbstractStateProperty {
 			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
-			obj2.setParent(this.parent);
+			obj2.setParent(parent);
 			return obj2;
 		} else {
 			for (int i = 0; i < properties.size(); i++) {

@@ -31,7 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.widgets.FileBrowser;
 
 /**
@@ -85,7 +85,7 @@ public class Export {
 		// /* The Swing way
 		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
 		DocFlavor flavour = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
-		PrintService printService[] = PrintServiceLookup.lookupPrintServices(
+		PrintService[] printService = PrintServiceLookup.lookupPrintServices(
 				flavour, pras);
 
 		if (printService.length == 0) {

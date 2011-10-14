@@ -12,14 +12,13 @@ import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
@@ -59,7 +58,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		popup.insert(menuItem, index++);
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Place) myObject));
-		if (((Place) myObject).getAttributesVisible() == true) {
+		if (((Place) myObject).getAttributesVisible()) {
 			menuItem.setText("Hide Attributes");
 		} else {
 			menuItem.setText("Show Attributes");
@@ -75,7 +74,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2
 					&& CreateGui.getApp().isEditionAllowed()
-					&& (CreateGui.getApp().getMode() == elementType.PLACE || CreateGui.getApp().getMode() == elementType.SELECT)) {
+					&& (CreateGui.getApp().getMode() == ElementType.PLACE || CreateGui.getApp().getMode() == ElementType.SELECT)) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {
@@ -115,7 +114,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		 * middelclick draw a arrow }
 		 */
 	}
-	
+
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
@@ -145,9 +144,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	public void mousePressed(MouseEvent e) {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
-		} else {
-			// do nothing except the things that one do in the simulator
-			// (handled somewhere else).
 		}
 
 	}

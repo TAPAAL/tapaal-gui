@@ -17,7 +17,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
 
-import pipe.dataLayer.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;

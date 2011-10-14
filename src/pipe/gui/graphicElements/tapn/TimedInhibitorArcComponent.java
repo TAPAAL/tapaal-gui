@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
@@ -7,9 +7,11 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
@@ -34,8 +36,8 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	public void setUnderlyingArc(TimedInhibitorArc arc) {
-		this.inhibitorArc = arc;
-		updateWeightLabel(true);
+		inhibitorArc = arc;
+		updateLabel(true);
 	}
 
 	public TimedInhibitorArc underlyingTimedInhibitorArc() {
@@ -50,9 +52,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public void updateWeightLabel(boolean displayConstantNames) {
-		weightLabel.setText("");
-		this.setWeightLabelPosition();
+	public void updateLabel(boolean displayConstantNames) {
+		label.setText("");
+		this.setLabelPosition();
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		inhibitorArc.setTimeInterval(guard);
 
 		// hacks - I use the weight to display the TimeInterval
-		updateWeightLabel(true);
+		updateLabel(true);
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval());

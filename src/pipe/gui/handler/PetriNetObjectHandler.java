@@ -9,13 +9,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.PetriNetObject;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.GuiFrame.GUIMode;
+
 import pipe.gui.action.DeletePetriNetObjectAction;
+import pipe.gui.graphicElements.PetriNetObject;
 
 /**
  * Class used to implement methods corresponding to mouse events on all
@@ -82,7 +83,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == elementType.SELECT) {
+		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
 					((DrawingSurfaceImpl) contentPane).getSelectionObject()
@@ -112,7 +113,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == elementType.SELECT) {
+		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
 				CreateGui.getView().getUndoManager().translateSelection(
@@ -145,7 +146,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == elementType.SELECT) {
+		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (myObject.isDraggable()) {
 				if (!isDragging) {
 					isDragging = true;

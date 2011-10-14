@@ -26,7 +26,7 @@ public class VerifytaTraceInterpreter {
 	private final TranslationNamingScheme namingScheme;
 
 	public VerifytaTraceInterpreter(TimedArcPetriNet model, TranslationNamingScheme namingScheme) {
-		this.tapn = model;
+		tapn = model;
 		this.namingScheme = namingScheme;
 	}
 

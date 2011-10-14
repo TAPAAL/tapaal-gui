@@ -25,9 +25,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.TimedInputArcComponent;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -129,8 +129,8 @@ public class GuardDialogue extends JPanel /*
 				if (rightInterval instanceof InfBound
 						|| leftInterval.value() <= rightInterval.value()) {
 					return new dk.aau.cs.model.tapn.TimeInterval(
-							(leftDelim == "[" ? true : false), leftInterval,
-							rightInterval, (rightDelim == "]" ? true : false));
+							(leftDelim.equals("[") ? true : false), leftInterval,
+							rightInterval, (rightDelim.equals("]") ? true : false));
 				} else {
 					return oldGuard;
 				}

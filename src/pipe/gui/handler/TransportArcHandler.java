@@ -8,12 +8,12 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TransportArcHandler extends TimedArcHandler {
 

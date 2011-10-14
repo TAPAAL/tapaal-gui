@@ -70,14 +70,14 @@ public class TimeInvariant {
 	}
 	
 	public TimeInvariant copy() {
-		return new TimeInvariant(this.isUpperIncluded, upper.copy());
+		return new TimeInvariant(isUpperIncluded, upper.copy());
 	}
 
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isUpperIncluded ? "<=" : "<");
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(upper);
 		return buffer.toString();
 	};
@@ -85,8 +85,8 @@ public class TimeInvariant {
 	public String toString(boolean displayConstantNames) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(isUpperIncluded ? "<=" : "<");
-		buffer.append(" ");
-		buffer.append(displayConstantNames || upper instanceof InfBound ? upper	: upper.value());
+		buffer.append(' ');
+		buffer.append((displayConstantNames || upper instanceof InfBound) ? upper	: upper.value());
 		return buffer.toString();
 	}
 

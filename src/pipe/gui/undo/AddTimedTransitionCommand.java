@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedTransitionComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class AddTimedTransitionCommand extends TAPNElementCommand {

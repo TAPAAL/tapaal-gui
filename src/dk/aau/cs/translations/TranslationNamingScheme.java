@@ -12,7 +12,7 @@ public interface TranslationNamingScheme {
 
 	boolean isIgnoredAutomata(String automata);
 
-	public class TransitionTranslation {
+	class TransitionTranslation {
 		private int startsAt;
 		private String originalTransitionName;
 		private int endsAt;

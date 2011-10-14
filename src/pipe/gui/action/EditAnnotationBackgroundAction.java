@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.dataLayer.AnnotationNote;
+import pipe.gui.graphicElements.AnnotationNote;
 
 /**
  * Action to toggle the background of a note between white and transparent

@@ -27,8 +27,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
@@ -62,7 +62,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
-		this.place = placeComponent;
+		place = placeComponent;
 		this.context = context;
 		initComponents();
 	}

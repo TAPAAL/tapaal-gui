@@ -65,9 +65,9 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 			TCTLAtomicPropositionNode node = (TCTLAtomicPropositionNode) o;
 			// TODO: Not sure if this is intentional but this is reference
 			// equals and not equality
-			return this.template == node.template
-					&& this.place == node.getPlace() && this.op == node.getOp()
-					&& this.n == node.getN();
+			return template.equals(node.template)
+					&& place.equals(node.getPlace()) && op.equals(node.getOp())
+					&& n == node.getN();
 		}
 		return false;
 	}
@@ -77,7 +77,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 			TCTLAbstractProperty object2) {
 		if (this == object1 && object2 instanceof TCTLAbstractStateProperty) {
 			TCTLAbstractStateProperty obj2 = (TCTLAbstractStateProperty) object2;
-			obj2.setParent(this.parent);
+			obj2.setParent(parent);
 			return obj2;
 		} else {
 			return this;
@@ -87,7 +87,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	@Override
 	public String toString() {
 		String value = place + "" + op + "" + n;
-		return template == null || template.isEmpty() ? value : template + "."
+		return (template == null || template.isEmpty()) ? value : template + "."
 				+ value;
 	}
 
@@ -113,7 +113,7 @@ public class TCTLAtomicPropositionNode extends TCTLAbstractStateProperty {
 	}
 
 	public void setTemplate(String string) {
-		this.template = string;
+		template = string;
 	}
 	
 	public boolean containsAtomicPropositionWithSpecificPlaceInTemplate(String templateName, String placeName) {

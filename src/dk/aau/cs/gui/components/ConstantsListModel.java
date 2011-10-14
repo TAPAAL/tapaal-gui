@@ -16,15 +16,15 @@ public class ConstantsListModel extends AbstractListModel {
 
 	public ConstantsListModel(TimedArcPetriNetNetwork network){
 		listener = new ConstantsListener() {
-			public void ConstantRemoved(ConstantEvent e) {
+			public void constantRemoved(ConstantEvent e) {
 				fireIntervalRemoved(this, e.index(), e.index());
 			}
 			
-			public void ConstantChanged(ConstantChangedEvent e) {
+			public void constantChanged(ConstantChangedEvent e) {
 				fireContentsChanged(this, e.index(), e.index());
 			}
 			
-			public void ConstantAdded(ConstantEvent e) {
+			public void constantAdded(ConstantEvent e) {
 				fireIntervalAdded(this, e.index(), e.index());
 			}
 		};
@@ -34,11 +34,11 @@ public class ConstantsListModel extends AbstractListModel {
 	// TODO: Due to stupid programming, we have to allow it to be set later
 	//       since the Network is sometimes set after the TabContent is created.
 	public void setNetwork(TimedArcPetriNetNetwork newNetwork){
-		if(this.network != null){
-			this.network.removeConstantsListener(listener);
+		if(network != null){
+			network.removeConstantsListener(listener);
 		}
-		this.network = newNetwork;
-		this.network.addConstantsListener(listener);	
+		network = newNetwork;
+		network.addConstantsListener(listener);	
 		fireContentsChanged(this,0, Integer.MAX_VALUE);
 	}
 	

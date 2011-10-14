@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
@@ -13,54 +13,28 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 
 /**
- * <b>Place</b> - Petri-Net Place Class
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom
- * 
- * @author Edwin Chung corresponding states of matrixes has been set to change
- *         when markings are altered. Users will be prompted to save their work
- *         when the markings of places are altered. (6th Feb 2007)
- * 
- * @author Edwin Chung 16 Mar 2007: modified the constructor and several other
- *         functions so that DataLayer objects can be created outside the GUI
+  * Class for drawing a Place
  */
 public class Place extends PlaceTransitionObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5155964364065651381L;
-	public final static String type = "Place";
-	/** Initial Marking */
-	protected Integer initialMarking = 0;
 
-	/** Current Marking */
-	protected Integer currentMarking = 0;
-
-	/** Initial Marking X-axis Offset */
+	// Initial Marking X-axis Offset 
 	protected Double markingOffsetX = 0d;
 
-	/** Initial Marking Y-axis Offset */
+	// Initial Marking Y-axis Offset 
 	protected Double markingOffsetY = 0d;
 
-	/** Value of the capacity restriction; 0 means no capacity restriction */
+	// Value of the capacity restriction; 0 means no capacity restriction 
 	protected Integer capacity = 0;
 
 	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
-	/** Token Width and Height */
+	// Token Width and Height
 	public static int tWidth = 4;
 	public static int tHeight = 4;
 
-	/** Ellipse2D.Double place */
+	// Ellipse2D.Double place
 	protected static Ellipse2D.Double placeEllipse = new Ellipse2D.Double(0, 0,	DIAMETER, DIAMETER);
 	protected static Shape proximityPlace = (new BasicStroke(Pipe.PLACE_TRANSITION_PROXIMITY_RADIUS)).createStrokedShape(placeEllipse);
 
@@ -70,8 +44,6 @@ public class Place extends PlaceTransitionObject {
 			double markingOffsetYInput, int capacityInput) {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput);
-		initialMarking = new Integer(initialMarkingInput);
-		currentMarking = new Integer(initialMarkingInput);
 		markingOffsetX = new Double(markingOffsetXInput);
 		markingOffsetY = new Double(markingOffsetYInput);
 		componentWidth = DIAMETER;
@@ -92,16 +64,14 @@ public class Place extends PlaceTransitionObject {
 		this.incrementCopyNumber();
 		Place copy = new Place(Grid.getModifiedX(x + this.getX()+ Pipe.PLACE_TRANSITION_HEIGHT / 2), 
 				Grid.getModifiedY(y	+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(this.pnName.getName() + "(" + this.getCopyNumber()	+ ")");
+		copy.pnName.setName(pnName.getName() + "(" + this.getCopyNumber()	+ ")");
 		this.newCopy(copy);
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.capacity = capacity;
+		copy.attributesVisible = attributesVisible;
+		copy.markingOffsetX = markingOffsetX;
+		copy.markingOffsetY = markingOffsetY;
 		copy.update(true);
 		return copy;
 	}
@@ -109,14 +79,12 @@ public class Place extends PlaceTransitionObject {
 	public Place copy() {
 		Place copy = new Place(Zoomer.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
 		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.capacity = capacity;
+		copy.attributesVisible = attributesVisible;
+		copy.markingOffsetX = markingOffsetX;
+		copy.markingOffsetY = markingOffsetY;
 		copy.setOriginal(this);
 		return copy;
 	}
@@ -145,25 +113,6 @@ public class Place extends PlaceTransitionObject {
 		g2.draw(placeEllipse);
 
 		g2.setStroke(new BasicStroke(1.0f));
-	}
-
-	/**
-	 * Set initial marking
-	 * 
-	 * @param initialMarkingInput
-	 *            Integer value for initial marking
-	 */
-	public void setInitialMarking(int initialMarkingInput) {
-		initialMarking = initialMarkingInput;
-	}
-
-	/**
-	 * Get current marking
-	 * 
-	 * @return Integer value for current marking
-	 */
-	public int getCurrentMarking() {
-		return ((currentMarking == null) ? 0 : currentMarking.intValue());
 	}
 
 	/**
@@ -263,7 +212,7 @@ public class Place extends PlaceTransitionObject {
 
 	@Override
 	public void update(boolean displayConstantNames) {
-		if (attributesVisible == true) {
+		if (attributesVisible) {
 			pnName.setText("\nk=" + (capacity > 0 ? capacity : "\u221E"));
 		} else {
 			pnName.setText("");
@@ -278,10 +227,8 @@ public class Place extends PlaceTransitionObject {
 
 		Place toReturn = (Place) super.clone();
 
-		toReturn.initialMarking = this.initialMarking;
-		toReturn.currentMarking = this.currentMarking;
-		toReturn.markingOffsetX = this.markingOffsetX;
-		toReturn.markingOffsetY = this.markingOffsetY;
+		toReturn.markingOffsetX = markingOffsetX;
+		toReturn.markingOffsetY = markingOffsetY;
 		toReturn.componentWidth = componentWidth;
 		toReturn.componentHeight = componentHeight;
 		toReturn.setCentre((int) positionX, (int) positionY);

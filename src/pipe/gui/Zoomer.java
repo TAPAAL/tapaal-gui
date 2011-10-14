@@ -61,7 +61,7 @@ public class Zoomer {
 	}
 
 	public static double getZoomedValue(double x, int zoom) {
-		return (x * zoom * 0.01);
+		return x * zoom * 0.01;
 	}
 
 	public static AffineTransform getTransform(int zoom) {
@@ -77,7 +77,7 @@ public class Zoomer {
 	}
 
 	public static double getUnzoomedValue(double x, int zoom) {
-		return (x / (zoom * 0.01));
+		return x / (zoom * 0.01);
 	}
 
 }

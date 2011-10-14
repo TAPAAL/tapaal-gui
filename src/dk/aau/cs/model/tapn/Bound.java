@@ -7,9 +7,9 @@ public interface Bound {
 	boolean equals(Object other);
 	int hashCode();
 	
-	public static Bound Infinity = new InfBound();
+	Bound Infinity = new InfBound();
 
-	public class InfBound implements Bound {
+	class InfBound implements Bound {
 		public int value() {
 			return -1;
 		}

@@ -30,7 +30,7 @@ public class ConstantBound implements Bound {
 	public void setConstant(Constant newConstant) {
 		Require.that(newConstant != null, "Constant cannot be null");
 
-		this.constant = newConstant;
+		constant = newConstant;
 	}
 
 	public String toString() {

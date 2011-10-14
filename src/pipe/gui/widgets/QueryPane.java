@@ -56,7 +56,7 @@ public class QueryPane extends JPanel {
 
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
 		this.tabContent = tabContent;
-		this.undoManager = tabContent.drawingSurface().getUndoManager();
+		undoManager = tabContent.drawingSurface().getUndoManager();
 		queryCollectionPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
@@ -82,7 +82,7 @@ public class QueryPane extends JPanel {
 		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		queryList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting() == false) {
+				if (!(e.getValueIsAdjusting())) {
 					queryList.ensureIndexIsVisible(queryList.getSelectedIndex());
 					updateQueryButtons();
 				}

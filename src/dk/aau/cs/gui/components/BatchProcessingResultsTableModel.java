@@ -18,7 +18,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		results = new ArrayList<BatchProcessingVerificationResult>();
 	}
 	
-	public void AddResult(BatchProcessingVerificationResult result){
+	public void addResult(BatchProcessingVerificationResult result){
 		int lastRow = results.size();
 		results.add(result);
 		fireTableRowsInserted(lastRow, lastRow);

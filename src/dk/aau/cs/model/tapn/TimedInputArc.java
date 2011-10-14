@@ -69,7 +69,7 @@ public class TimedInputArc extends TAPNElement {
 	// This method should ONLY be called in relation to sharing/unsharing a place
 	public void setSource(TimedPlace place) {
 		Require.that(place != null, "place cannot be null");
-		this.source = place;		
+		source = place;		
 	}
 	
 	@Override

@@ -18,7 +18,7 @@ public class SymbolicState {
 			HashMap<String, String> locations,
 			HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables,
 			HashMap<String, ValueRange> globalClocksAndVariables) {
-		this.automataLocations = locations;
+		automataLocations = locations;
 		this.localClocksAndVariables = localClocksAndVariables;
 		this.globalClocksAndVariables = globalClocksAndVariables;
 	}
@@ -41,7 +41,7 @@ public class SymbolicState {
 		return automataLocations.get(automata);
 	}
 
-	public boolean IsConcreteState() {
+	public boolean isConcreteState() {
 		for (ValueRange range : globalClocksAndVariables.values()) {
 			if (!range.hasExactValue())
 				return false;

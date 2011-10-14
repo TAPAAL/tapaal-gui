@@ -15,7 +15,7 @@ public class Pairing {
 	protected Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
 	
 	public Pairing(TimedTransition t) {
-		this.transition = t;
+		transition = t;
 		generatePairing();
 	}
 

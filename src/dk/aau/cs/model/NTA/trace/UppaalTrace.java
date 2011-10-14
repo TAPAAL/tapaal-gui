@@ -52,13 +52,13 @@ public class UppaalTrace implements Iterable<TAFiringAction> {
 		return length() == 0 && numberOfStates() == 0;
 	}
 
-	public List<SymbolicState> States() {
+	public List<SymbolicState> getStates() {
 		return states;
 	}
 
 	public boolean isConcreteTrace() {
 		for (SymbolicState state : states) {
-			if (!state.IsConcreteState()) {
+			if (!state.isConcreteState()) {
 				return false;
 			}
 		}

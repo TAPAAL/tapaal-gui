@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
@@ -8,9 +8,14 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPath;
+import pipe.gui.graphicElements.NameLabel;
+import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.ArcHandler;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -73,19 +78,17 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
-		weightLabel = new NameLabel(zoom);
+		label = new NameLabel(zoom);
 		
-		this.myPath = new ArcPath(this);
+		myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
-			this.myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
+			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
 		}
-		this.myPath.createPath();
+		myPath.createPath();
 		this.updateBounds();
-		this.id = arc.id;
+		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
-		this.setWeight(arc.getWeight());
-		this.inView = arc.inView;
 	}
 
 	public TimedOutputArcComponent paste(double despX, double despY,
@@ -120,21 +123,19 @@ public class TimedOutputArcComponent extends Arc {
 
 		TimedOutputArcComponent copy = new TimedOutputArcComponent(0, 0, // startPoint
 				0, 0, // endPoint
-				source, target, this.getWeight(), source.getId() + " to "
+				source, target, 1, source.getId() + " to "
 						+ target.getId(), false);
 
 		copy.myPath.delete();
-		for (int i = 0; i <= this.myPath.getEndIndex(); i++) {
-			copy.myPath.addPoint(this.myPath.getPoint(i).getX() + despX,
-					this.myPath.getPoint(i).getY() + despY, this.myPath
+		for (int i = 0; i <= myPath.getEndIndex(); i++) {
+			copy.myPath.addPoint(myPath.getPoint(i).getX() + despX,
+					myPath.getPoint(i).getY() + despY, myPath
 							.getPointType(i));
 			copy.myPath.selectPoint(i);
 		}
 
 		source.addConnectFrom(copy);
 		target.addConnectTo(copy);
-
-		copy.inView = this.inView;
 
 		return copy;
 	}
@@ -143,9 +144,9 @@ public class TimedOutputArcComponent extends Arc {
 		return new TimedOutputArcComponent(this);
 	}
 
-	public void updateWeightLabel(boolean displayConstantNames) {
-		weightLabel.setText("");
-		setWeightLabelPosition();
+	public void updateLabel(boolean displayConstantNames) {
+		label.setText("");
+		setLabelPosition();
 	}
 
 	@Override

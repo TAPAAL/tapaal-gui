@@ -19,7 +19,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 	}
 
 	public void setNetworkMarking(NetworkMarking marking){
-		this.parent = marking;
+		parent = marking;
 	}
 
 	public void add(TimedToken token) {

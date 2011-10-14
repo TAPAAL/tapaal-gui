@@ -11,13 +11,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Transition;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
-import pipe.gui.Pipe.elementType;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
+import pipe.gui.graphicElements.Transition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
@@ -38,7 +37,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
+		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown()) {
 			return;
 		}
 
@@ -72,7 +71,7 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		popup.insert(menuItem, index++);
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Transition) myObject));
-		if (((Transition) myObject).getAttributesVisible() == true) {
+		if (((Transition) myObject).getAttributesVisible()) {
 			menuItem.setText("Hide Attributes");
 		} else {
 			menuItem.setText("Show Attributes");
@@ -88,14 +87,11 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2
-						&& (CreateGui.getApp().getMode() == elementType.TIMEDTRANS
-								|| CreateGui.getApp().getMode() == elementType.IMMTRANS || CreateGui
-								.getApp().getMode() == elementType.SELECT)) {
+						&& (CreateGui.getApp().getMode() == ElementType.TIMEDTRANS
+								|| CreateGui.getApp().getMode() == ElementType.IMMTRANS || CreateGui
+								.getApp().getMode() == ElementType.SELECT)) {
 					((Transition) myObject).showEditor();
 				}
-			} else {
-				// do nothing except the things that one do in the simulator
-				// (handled somewhere else)
 			}
 		} else if (SwingUtilities.isRightMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
@@ -118,9 +114,6 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mousePressed(MouseEvent e) {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
-		} else {
-			// do nothing except the things that one do in the simulator
-			// (handled somewhere else).
 		}
 	}
 }

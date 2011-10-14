@@ -4,9 +4,9 @@
 
 package pipe.gui.undo;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPath;
-import pipe.dataLayer.ArcPathPoint;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPath;
+import pipe.gui.graphicElements.ArcPathPoint;
 import dk.aau.cs.gui.undo.Command;
 
 /**

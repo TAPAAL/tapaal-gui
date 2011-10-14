@@ -51,7 +51,7 @@ public class LocalTimedPlace  implements TimedPlace {
 
 	public void setCurrentMarking(TimedMarking marking) {
 		Require.that(marking != null, "marking cannot be null");
-		this.currentMarking = marking;
+		currentMarking = marking;
 		fireMarkingChanged();
 	}
 
@@ -137,9 +137,9 @@ public class LocalTimedPlace  implements TimedPlace {
 	}
 
 	public LocalTimedPlace copy() {
-		LocalTimedPlace p = new LocalTimedPlace(this.name);
+		LocalTimedPlace p = new LocalTimedPlace(name);
 
-		p.invariant = this.invariant.copy();
+		p.invariant = invariant.copy();
 
 		return p;
 	}

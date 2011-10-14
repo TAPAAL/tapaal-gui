@@ -86,7 +86,7 @@ public class TimedPlaceControl extends PetriNetElementControl {
 
 	public void setAttributesVisible(boolean value) {
 		if (value != attributesVisible) {
-			this.attributesVisible = value;
+			attributesVisible = value;
 			if (value) {
 				addChildControls();
 			} else {

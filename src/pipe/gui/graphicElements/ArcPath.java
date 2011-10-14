@@ -1,7 +1,4 @@
-/**
- * Created on 12-Feb-2004
- */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Rectangle;
@@ -40,10 +37,7 @@ public class ArcPath implements Shape, Cloneable {
 	protected ArcPathPoint currentPoint;
 	private boolean pointLock = false;
 	private static Stroke proximityStroke = new BasicStroke(
-			Pipe.ARC_PATH_PROXIMITY_WIDTH/*
-										 * , BasicStroke.CAP_BUTT,
-										 * BasicStroke.JOIN_MITER
-										 */);
+			Pipe.ARC_PATH_PROXIMITY_WIDTH);
 	private static Stroke stroke = new BasicStroke(
 			Pipe.ARC_PATH_SELECTION_WIDTH);
 	private Shape shape, proximityShape;
@@ -133,7 +127,7 @@ public class ArcPath implements Shape, Cloneable {
 		}
 
 		shape = stroke.createStrokedShape(this);
-		getArc().setWeightLabelPosition();
+		getArc().setLabelPosition();
 		proximityShape = proximityStroke.createStrokedShape(this);
 	}
 
@@ -189,18 +183,18 @@ public class ArcPath implements Shape, Cloneable {
 			int curveEndIndex = 0;
 			myCurrentPoint = pathPoints.get(c);
 
-			if (myCurrentPoint.getPointType() == true) {
+			if (myCurrentPoint.getPointType()) {
 				curveStartIndex = c - 1;
 
-				for (; c <= endIndex && myCurrentPoint.getPointType() == true; c++) {
+				for (; c <= endIndex && myCurrentPoint.getPointType(); c++) {
 					myCurrentPoint = pathPoints.get(c);
 					curveEndIndex = c;
 				}
 				/* calculate a cubic for each section of the curve */
 				int lengthOfCurve = curveEndIndex - curveStartIndex;
 				int k1;
-				int x[] = new int[lengthOfCurve + 2];
-				int y[] = new int[lengthOfCurve + 2];
+				int[] x = new int[lengthOfCurve + 2];
+				int[] y = new int[lengthOfCurve + 2];
 				X = new Cubic[lengthOfCurve + 2];
 				Y = new Cubic[lengthOfCurve + 2];
 
@@ -244,7 +238,7 @@ public class ArcPath implements Shape, Cloneable {
 			myPreviousPoint = pathPoints.get(c - 1);
 			myCurrentPoint = pathPoints.get(c);
 
-			if (myCurrentPoint.getPointType() == false) {
+			if (!(myCurrentPoint.getPointType())) {
 				myCurrentPoint.setControl1(getControlPoint(myPreviousPoint
 						.getPoint(), myCurrentPoint.getPoint(), myPreviousPoint
 						.getPoint(), myCurrentPoint.getPoint()));
@@ -252,7 +246,7 @@ public class ArcPath implements Shape, Cloneable {
 						.getPoint(), myPreviousPoint.getPoint(), myCurrentPoint
 						.getPoint(), myPreviousPoint.getPoint()));
 			} else {
-				if (c > 1 && myPreviousPoint.getPointType() == false) {
+				if (c > 1 && !(myPreviousPoint.getPointType())) {
 					myPreviousButOnePoint = pathPoints.get(c - 2);
 					myCurrentPoint.setControl1(getControlPoint(
 							myPreviousButOnePoint.getPoint(), myPreviousPoint
@@ -261,7 +255,7 @@ public class ArcPath implements Shape, Cloneable {
 				}
 				if (c < getEndIndex()) {
 					myNextPoint = pathPoints.get(c + 1);
-					if (myNextPoint.getPointType() == false) {
+					if (!(myNextPoint.getPointType())) {
 						myCurrentPoint.setControl2(getControlPoint(myNextPoint
 								.getPoint(), myCurrentPoint.getPoint(),
 								myCurrentPoint.getPoint(), myPreviousPoint
@@ -280,7 +274,7 @@ public class ArcPath implements Shape, Cloneable {
 		if (!(getEndIndex() > 0)) {
 			return;
 		} else if (source != null && source instanceof Transition
-				&& (pathPoints.get(1)).getPointType() == true) {
+				&& (pathPoints.get(1)).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(1);
 			ArcPathPoint myLastPoint = pathPoints.get(0);
 			float distance = (float) getMod(myPoint.getPoint(), myLastPoint
@@ -296,7 +290,7 @@ public class ArcPath implements Shape, Cloneable {
 			myPoint.setControl2(getControlPoint(myPoint.getPoint(), myPoint
 					.getControl1(), myPoint.getPoint(), myPoint.getControl1()));
 		} else if (target != null && source instanceof Place
-				&& (pathPoints.get(getEndIndex())).getPointType() == true) {
+				&& (pathPoints.get(getEndIndex())).getPointType()) {
 			ArcPathPoint myPoint = pathPoints.get(getEndIndex());
 			ArcPathPoint myLastPoint = pathPoints.get(getEndIndex() - 1);
 			float distance = (float) getMod(myPoint.getPoint(), myLastPoint

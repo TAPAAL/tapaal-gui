@@ -11,7 +11,7 @@ public class Pipe {
 	public static final String CLASS_FILE_DESC = "Java Class File";
 
 	//Enum for all actions and types of elements
-	public static enum elementType {
+	public static enum ElementType {
 		PLACE, IMMTRANS, TIMEDTRANS, ANNOTATION, ARC, INHIBARC, 
 		//TAPN Elements
 		TAPNPLACE, TAPNTRANS, TAPNARC, TRANSPORTARC, TAPNINHIBITOR_ARC,
@@ -24,7 +24,7 @@ public class Pipe {
 		
 	}
 
-	public static final elementType DEFAULT_ELEMENT_TYPE = elementType.SELECT;
+	public static final ElementType DEFAULT_ELEMENT_TYPE = ElementType.SELECT;
 
 	public static final int PLACE_TRANSITION_HEIGHT = 30;
 	public static final int DASHED_PADDING = 8;

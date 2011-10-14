@@ -287,7 +287,7 @@ public class TemplateExplorer extends JPanel {
 				s.append("The following queries are associated with the currently selected objects:\n\n");
 				for (TAPNQuery q : queriesToDelete) {
 					s.append(q.getName());
-					s.append("\n");
+					s.append('\n');
 				}
 				s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 				return s;
@@ -489,7 +489,7 @@ public class TemplateExplorer extends JPanel {
 		
 		
 		public TemplateListCellRenderer(ListCellRenderer renderer) {
-			this.cellRenderer = renderer;
+			cellRenderer = renderer;
 			setLayout(new BorderLayout()); 
 	        setOpaque(false); 
 	        activeCheckbox.setOpaque(false);
@@ -521,7 +521,7 @@ public class TemplateExplorer extends JPanel {
 		
 		public TemplateListManager(JList list) {
 			this.list = list;
-			this.selectionModel = list.getSelectionModel();
+			selectionModel = list.getSelectionModel();
 			this.list.registerKeyboardAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_FOCUSED);
 		}
 		
@@ -597,7 +597,7 @@ public class TemplateExplorer extends JPanel {
 		}
 
 		public void valueChanged(ListSelectionEvent e) {
-			if (e.getValueIsAdjusting() == false) {
+			if (!(e.getValueIsAdjusting())) {
 				int index = templateList.getSelectedIndex();
 				if (index == -1) {
 					removeTemplateButton.setEnabled(false);

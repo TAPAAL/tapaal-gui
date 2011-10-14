@@ -7,17 +7,15 @@ package pipe.gui.handler;
 
 import java.awt.Container;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.AnnotationNote;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.action.EditAnnotationBackgroundAction;
 import pipe.gui.action.EditAnnotationBorderAction;
 import pipe.gui.action.EditNoteAction;
+import pipe.gui.graphicElements.AnnotationNote;
 
 public class AnnotationNoteHandler extends NoteHandler {
 

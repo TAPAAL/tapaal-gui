@@ -67,7 +67,6 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
 import pipe.gui.MessengerImpl;
-import pipe.gui.Pipe;
 import pipe.gui.Verifier;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
@@ -224,8 +223,8 @@ public class QueryDialog extends JPanel {
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
-		this.inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
-		this.newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
+		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
+		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		isNetDegree2 = checkForDegree2();
 		
@@ -1554,7 +1553,7 @@ public class QueryDialog extends JPanel {
 
 						VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
-						VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(newQuery);
+						VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(newQuery);
 
 						if (!c.getResult()) {
 							StringBuilder s = new StringBuilder();
@@ -1562,7 +1561,7 @@ public class QueryDialog extends JPanel {
 
 							for (String placeName : c.getIncorrectPlaceNames()) {
 								s.append(placeName);
-								s.append("\n");
+								s.append('\n');
 							}
 
 							s.append("\nThe specified query has not been saved. Do you want to edit it again?");

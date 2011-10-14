@@ -37,7 +37,7 @@ public class SharedPlaceNamePanel extends JPanel {
 	
 	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context, SharedPlace placeToEdit) {
 		this.rootPane = rootPane;
-		this.listModel = sharedPlacesListModel;
+		listModel = sharedPlacesListModel;
 		this.placeToEdit = placeToEdit;
 		this.context = context;
 		initComponents();		
@@ -60,7 +60,7 @@ public class SharedPlaceNamePanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		namePanel.add(label, gbc);
 		
-		String initialText = placeToEdit == null ? "" : placeToEdit.name();
+		String initialText = (placeToEdit == null) ? "" : placeToEdit.name();
 		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(150,27));
 		nameField.setPreferredSize(new Dimension(200, 27));
