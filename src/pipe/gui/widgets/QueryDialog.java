@@ -395,7 +395,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	Pipe.getProgramName(), true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 		
 		Container contentPane = guiDialog.getContentPane();
 

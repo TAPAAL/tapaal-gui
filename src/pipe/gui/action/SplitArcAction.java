@@ -1,6 +1,3 @@
-/*
- * SplitArcAction.java
- */
 package pipe.gui.action;
 
 import java.awt.Point;
@@ -18,9 +15,6 @@ import pipe.gui.CreateGui;
  */
 public class SplitArcAction extends javax.swing.AbstractAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6841076240159898489L;
 	private Arc selected;
 	Point2D.Float mouseposition;

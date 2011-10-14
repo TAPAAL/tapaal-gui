@@ -58,59 +58,59 @@ public class StatusBar extends JPanel {
 		label.setText(newText);
 	}
 
-	public void changeText(int type) {
+	public void changeText(Pipe.elementType type) {
 		switch (type) {
-		case Pipe.PLACE:
+		case PLACE:
 			changeText(textforPlace);
 			break;
-		case Pipe.TAPNPLACE:
+		case TAPNPLACE:
 			changeText(textforTAPNPlace);
 			break;
-		case Pipe.IMMTRANS:
+		case IMMTRANS:
 			changeText(textforTrans);
 			break;
 
-		case Pipe.TIMEDTRANS:
+		case TIMEDTRANS:
 			changeText(textforTimedTrans);
 			break;
-		case Pipe.TAPNTRANS:
+		case TAPNTRANS:
 			changeText(textforTrans);
 			break;
-		case Pipe.ARC:
+		case ARC:
 			changeText(textforArc);
 			break;
-		case Pipe.TAPNARC:
+		case TAPNARC:
 			changeText(textforArc);
 			break;
-		case Pipe.TRANSPORTARC:
+		case TRANSPORTARC:
 			changeText(textforTransportArc);
 			break;
-		case Pipe.TAPNINHIBITOR_ARC:
-		case Pipe.INHIBARC:
+		case TAPNINHIBITOR_ARC:
+		case INHIBARC:
 			changeText(textforInhibArc);
 			break;
 
-		case Pipe.ADDTOKEN:
+		case ADDTOKEN:
 			changeText(textforAddtoken);
 			break;
 
-		case Pipe.DELTOKEN:
+		case DELTOKEN:
 			changeText(textforDeltoken);
 			break;
 
-		case Pipe.SELECT:
+		case SELECT:
 			changeText(textforMove);
 			break;
 
-		case Pipe.DRAW:
+		case DRAW:
 			changeText(textforDrawing);
 			break;
 
-		case Pipe.ANNOTATION:
+		case ANNOTATION:
 			changeText(textforAnnotation);
 			break;
 
-		case Pipe.DRAG:
+		case DRAG:
 			changeText(textforDrag);
 			break;
 

@@ -138,7 +138,7 @@ public class AnnotationNote extends Note {
 		JDialog.setDefaultLookAndFeelDecorated(true);
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+				"Edit Annotation", true);
 
 		guiDialog.add(new AnnotationPanel(this));
 		guiDialog.setMinimumSize(new Dimension(300, 200));

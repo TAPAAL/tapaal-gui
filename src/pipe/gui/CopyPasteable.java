@@ -1,7 +1,3 @@
-/*
- * Translatable.java
- */
-
 package pipe.gui;
 
 import pipe.dataLayer.PetriNetObject;

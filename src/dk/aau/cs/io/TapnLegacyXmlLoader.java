@@ -37,7 +37,7 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -83,9 +83,9 @@ public class TapnLegacyXmlLoader {
 	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
 	private static final String SYMMETRY = "SYMMETRY";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
-	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs;
-	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs;
-	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals;
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs;
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs;
+	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals;
 	private TimedArcPetriNet tapn;
 	private DataLayer guiModel;
 	private ArrayList<TAPNQuery> queries;
@@ -97,9 +97,9 @@ public class TapnLegacyXmlLoader {
 	private boolean firstPlaceRenameWarning = true;
 
 	public TapnLegacyXmlLoader(DrawingSurfaceImpl drawingSurfaceImpl) {
-		presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
-		postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
-		transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
+		presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+		postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+		transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 		queries = new ArrayList<TAPNQuery>();
 		constants = new ConstantStore();
 		this.drawingSurface = drawingSurfaceImpl;
@@ -246,7 +246,7 @@ public class TapnLegacyXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		tempArc = new TransportArcComponent(new TimedInputArcComponent(
+		tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
 						inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
@@ -255,7 +255,7 @@ public class TapnLegacyXmlLoader {
 
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
 				TimedPlace sourcePlace = tapn.getPlaceByName(sourceIn.getName());
 				TimedTransition trans = tapn.getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -267,7 +267,7 @@ public class TapnLegacyXmlLoader {
 
 				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval);
 
-				((TransportArcComponent) tempArc).setUnderlyingArc(transArc);
+				((TimedTransportArcComponent) tempArc).setUnderlyingArc(transArc);
 				postsetTransportArc.setUnderlyingArc(transArc);
 				guiModel.addPetriNetObject(tempArc);
 				addListeners(tempArc);
@@ -277,16 +277,16 @@ public class TapnLegacyXmlLoader {
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	(TransportArcComponent) tempArc);
-				transportArcsTimeIntervals.put((TransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
+				presetArcs.put((TimedTransitionComponent) targetIn,	(TimedTransportArcComponent) tempArc);
+				transportArcsTimeIntervals.put((TimedTransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
 				TimedPlace sourcePlace = tapn.getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = tapn.getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = tapn.getPlaceByName(targetIn.getName());
-				TimeInterval interval = transportArcsTimeIntervals.get((TransportArcComponent) presetTransportArc);
+				TimeInterval interval = transportArcsTimeIntervals.get((TimedTransportArcComponent) presetTransportArc);
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -295,7 +295,7 @@ public class TapnLegacyXmlLoader {
 				TransportArc transArc = new TransportArc(sourcePlace, trans,
 						destPlace, interval);
 
-				((TransportArcComponent) tempArc).setUnderlyingArc(transArc);
+				((TimedTransportArcComponent) tempArc).setUnderlyingArc(transArc);
 				presetTransportArc.setUnderlyingArc(transArc);
 				guiModel.addPetriNetObject(presetTransportArc);
 				addListeners(presetTransportArc);
@@ -304,9 +304,9 @@ public class TapnLegacyXmlLoader {
 				tapn.add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
-				transportArcsTimeIntervals.remove((TransportArcComponent) presetTransportArc);
+				transportArcsTimeIntervals.remove((TimedTransportArcComponent) presetTransportArc);
 			} else {
-				postsetArcs.put((TimedTransitionComponent) sourceIn, (TransportArcComponent) tempArc);
+				postsetArcs.put((TimedTransitionComponent) sourceIn, (TimedTransportArcComponent) tempArc);
 			}
 		}
 		return tempArc;
@@ -576,7 +576,6 @@ public class TapnLegacyXmlLoader {
 				nameOffsetXInput, nameOffsetYInput, timedTransition,
 				infiniteServer, angle, priority);
 		transition.setUnderlyingTransition(t);
-		transition.setTimed(true);
 		guiModel.addPetriNetObject(transition);
 		addListeners(transition);
 		tapn.add(t);
@@ -934,7 +933,7 @@ public class TapnLegacyXmlLoader {
 				} else if (newObject instanceof Arc) {
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TransportArcComponent) {
+						if (newObject instanceof TimedTransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
 							//newObject.addMouseWheelListener(transportArcHandler);

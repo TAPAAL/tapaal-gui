@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
+import net.tapaal.TAPAAL;
+
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
@@ -29,7 +31,7 @@ public class CreateGui {
 		// etc
 		userPath = null;
 
-		appGui = new GuiFrame(Pipe.TOOL + " " + Pipe.VERSION);
+		appGui = new GuiFrame(TAPAAL.getProgramName());
 
 		Grid.enableGrid();
 
@@ -52,7 +54,7 @@ public class CreateGui {
 		if (versionChecker.checkForNewVersion()) {
 			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
-			message.append(Pipe.VERSION);
+			message.append(TAPAAL.VERSION);
 			message.append("\nNew version: ");
 			message.append(versionChecker.getNewVersionNumber());
 			String changelog = versionChecker.getChangelog();

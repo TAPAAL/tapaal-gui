@@ -33,7 +33,7 @@ import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
@@ -326,7 +326,6 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
 		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
-		transitionElement.setAttribute("timed", String.valueOf(inputTransition.isTimed()));
 		transitionElement.setAttribute("infiniteServer", String.valueOf(inputTransition.isInfiniteServer()));
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", String.valueOf(inputTransition.getPriority()));
@@ -358,7 +357,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	}
 
 	private String getInputArcTypeAsString(TimedInputArcComponent inputArc) {
-		if (inputArc instanceof TransportArcComponent) {
+		if (inputArc instanceof TimedTransportArcComponent) {
 			return "transport";
 		} else if (inputArc instanceof TimedInhibitorArcComponent) {
 			return "tapnInhibitor";
@@ -368,8 +367,8 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	}
 
 	private String getGuardAsString(TimedInputArcComponent inputArc) {
-		if(inputArc instanceof TransportArcComponent)
-			return inputArc.getGuardAsString() + ":" + ((TransportArcComponent) inputArc).getGroupNr();
+		if(inputArc instanceof TimedTransportArcComponent)
+			return inputArc.getGuardAsString() + ":" + ((TimedTransportArcComponent) inputArc).getGroupNr();
 		else {
 			return inputArc.getGuardAsString();
 		}

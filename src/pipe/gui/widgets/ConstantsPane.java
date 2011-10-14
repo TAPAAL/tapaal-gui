@@ -236,7 +236,7 @@ public class ConstantsPane extends JPanel {
 
 	private void showEditConstantDialog(Constant constant) {
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.TOOL + " " + Pipe.VERSION, true);
+				"Edit Constant", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

@@ -18,7 +18,6 @@ import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
-import pipe.gui.undo.TransitionTimingEdit;
 import dk.aau.cs.gui.undo.Command;
 
 /**
@@ -78,14 +77,6 @@ public class Transition extends PlaceTransitionObject {
 
 	private boolean infiniteServer = false;
 
-	/**
-	 * The delay before this transition fires.
-	 */
-	// private double delay;
-
-	/** Is this a timed transition or not? */
-	private boolean timed = false;
-
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
 	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
@@ -96,7 +87,7 @@ public class Transition extends PlaceTransitionObject {
 	public Transition(Transition t) {
 
 		this(t.positionX, t.positionY, t.id, t.getName(), t.nameOffsetX,
-				t.nameOffsetY, t.timed, t.infiniteServer, t.angle, t.priority);
+				t.nameOffsetY, t.infiniteServer, t.angle, t.priority);
 
 	}
 
@@ -120,13 +111,12 @@ public class Transition extends PlaceTransitionObject {
 	 */
 	public Transition(double positionXInput, double positionYInput,
 			String idInput, String nameInput, double nameOffsetXInput,
-			double nameOffsetYInput, boolean timedTransition,
+			double nameOffsetYInput,
 			boolean infServer, int angleInput, int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; // sets width
 		componentHeight = TRANSITION_HEIGHT;// sets height
-		timed = timedTransition;
 		infiniteServer = infServer;
 		constructTransition();
 		angle = 0;
@@ -136,18 +126,6 @@ public class Transition extends PlaceTransitionObject {
 		// this.updateEndPoints();
 		this.priority = priority;
 	}
-
-	// public Transition(String idInput,
-	// String nameInput){
-	//
-	// this(0.0, 0.0, idInput,
-	// nameInput,
-	// 0.0, 0.0,
-	// false,
-	// false,
-	// 0,
-	// 0);
-	// }
 
 	/**
 	 * Create Petri-Net Transition object
@@ -179,7 +157,6 @@ public class Transition extends PlaceTransitionObject {
 		copy.nameOffsetX = this.nameOffsetX;
 		copy.nameOffsetY = this.nameOffsetY;
 
-		copy.timed = this.timed;
 		copy.angle = this.angle;
 
 		copy.attributesVisible = this.attributesVisible;
@@ -196,7 +173,6 @@ public class Transition extends PlaceTransitionObject {
 		copy.pnName.setName(this.getName());
 		copy.nameOffsetX = this.nameOffsetX;
 		copy.nameOffsetY = this.nameOffsetY;
-		copy.timed = this.timed;
 		copy.angle = this.angle;
 		copy.attributesVisible = this.attributesVisible;
 		copy.priority = this.priority;
@@ -218,27 +194,6 @@ public class Transition extends PlaceTransitionObject {
 			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
 		}
 
-		// if (timed) {
-		// if (infiniteServer) {
-		// for (int i=2; i>=1; i--) {
-		// g2.translate(2*i,-2*i);
-		// g2.fill(transition);
-		// Paint pen = g2.getPaint();
-		// if (highlighted) {
-		// g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		// } else if (selected && !ignoreSelection){
-		// g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-		// } else {
-		// g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-		// }
-		// g2.draw(transition);
-		// g2.setPaint(pen);
-		// g2.translate(-2*i,2*i);
-		// }
-		// }
-		// g2.fill(transition);
-		// }
-
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
 		} else if (selected && !ignoreSelection) {
@@ -249,21 +204,7 @@ public class Transition extends PlaceTransitionObject {
 
 		g2.draw(transition);
 		g2.fill(transition);
-		// if (!timed) {
-		// if (infiniteServer) {
-		// for (int i=2; i>=1; i--) {
-		// g2.translate(2*i,-2*i);
-		// Paint pen = g2.getPaint();
-		// g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
-		// g2.fill(transition);
-		// g2.setPaint(pen);
-		// g2.draw(transition);
-		// g2.translate(-2*i,2*i);
-		// }
-		// }
-		// g2.draw(transition);
-
-		// }
+		
 	}
 
 	/**
@@ -373,75 +314,6 @@ public class Transition extends PlaceTransitionObject {
 	public int getPriority() {
 		return priority;
 	}
-
-	/** Set the timed transition attribute (for GSPNs) */
-	public Command setTimed(boolean change) {
-		timed = change;
-		pnName.setText(getText());
-		repaint();
-		return new TransitionTimingEdit(this);
-	}
-
-	/** Get the timed transition attribute (for GSPNs) */
-	public boolean isTimed() {
-		return timed;
-	}
-
-	/**
-	 * This is a setter for the delay for this transition.
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @param _delay
-	 *            the time until this transition will fire
-	 */
-	// public void setDelay( double _delay ) {
-	// delay = _delay;
-	// delayValid = true;
-	// }
-
-	/**
-	 * This is a getter for the delay for this transition.
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @return a double with the amount of delay
-	 * 
-	 */
-	// public double getDelay() {
-	// return delay;
-	// }
-
-	/**
-	 * This method is a getter for the boolean indicating if the delay is valid
-	 * or not.
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @return the delayValid a boolean that is true if the delay is valid, and
-	 *         false otherwise
-	 */
-	// public boolean isDelayValid() {
-	// return delayValid;
-	// }
-
-	/**
-	 * This method is used to set a flag to indicate that the delay is valid or
-	 * invalid. (Mainly it is used to invalidate the delay.)
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @param _delayValid
-	 *            a boolean that is true if the delay is valid, false otherwise
-	 * 
-	 */
-	// public void setDelayValid ( boolean _delayValid ) {
-	// delayValid = _delayValid;
-	// }
 
 	protected void constructTransition() {
 		transition = new GeneralPath();
@@ -715,32 +587,30 @@ public class Transition extends PlaceTransitionObject {
 
 	}
 
-	// @Override
-	// public Transition clone() {
-	// Transition toReturn=null;
-	// toReturn = (Transition)super.clone();
-	//
-	// toReturn.positionX = positionX;
-	//
-	//
-	// toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
-	// toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-	// toReturn.timed = timed;
-	// toReturn.infiniteServer = infiniteServer;
-	// toReturn.constructTransition();
-	// toReturn.angle = 0;
-	// toReturn.setCentre((int)positionX, (int)positionY);
-	// toReturn.rotate(getAngle());
-	// toReturn.updateBounds();
-	//
-	//
-	// //this.updateEndPoints();
-	// toReturn.priority = priority;
-	//
-	// return toReturn;
-	//
-	//
-	//
-	// }
+	 @Override
+	 public Transition clone() {
+		 Transition toReturn=null;
+		 toReturn = (Transition)super.clone();
+
+		 toReturn.positionX = positionX;
+
+
+		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
+		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
+		 toReturn.infiniteServer = infiniteServer;
+		 toReturn.constructTransition();
+		 toReturn.angle = 0;
+		 toReturn.setCentre((int)positionX, (int)positionY);
+		 toReturn.rotate(getAngle());
+		 toReturn.updateBounds();
+
+		 //this.updateEndPoints();
+		 toReturn.priority = priority;
+
+		 return toReturn;
+
+
+
+	 }
 
 }

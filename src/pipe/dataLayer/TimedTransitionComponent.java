@@ -48,7 +48,7 @@ public class TimedTransitionComponent extends Transition {
 			boolean timedTransition, boolean infServer, int angleInput,
 			int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput, timedTransition, infServer,
+				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
 		this.listener = timedTransitionListener();
 		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
@@ -76,7 +76,7 @@ public class TimedTransitionComponent extends Transition {
 	public void showEditor() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+				"Edit Transition", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

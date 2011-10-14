@@ -10,7 +10,9 @@ import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
 import pipe.dataLayer.Place;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedInputArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
+import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
 
 public class TransportArcHandler extends TimedArcHandler {
@@ -26,27 +28,20 @@ public class TransportArcHandler extends TimedArcHandler {
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof TransportArcComponent) {
-			// if ( ! ( ((TimedArc) myObject).getSource() instanceof Transition)
-			// ){
-			final TransportArcComponent tarc = (TransportArcComponent) myObject;
+		if (myObject instanceof TimedTransportArcComponent) {
+			final TimedTransportArcComponent tarc = (TimedTransportArcComponent) myObject;
 
-			menuItem = new JMenuItem("Properties");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (tarc.getSource() instanceof Place) {
+			// Only show properties if its the first arc
+			if (tarc.getSource() instanceof Place) {
+				menuItem = new JMenuItem("Properties");
+				menuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
 						tarc.showTimeIntervalEditor();
-					} else {
-						tarc.getConnectedTo().showTimeIntervalEditor();
 					}
-				}
-			});
-			popup.insert(menuItem, popupIndex++);
-			// }
-			// menuItem = new JMenuItem(new EditGroupAction(contentPane,
-			// (TransportArc)myObject));
-			// menuItem.setText("Edit Grouping");
-			// popup.insert(menuItem, popupIndex++);
+				});
+				popup.insert(menuItem, popupIndex++);
+			}
+			
 
 			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
 					.getPoint()));
@@ -56,5 +51,20 @@ public class TransportArcHandler extends TimedArcHandler {
 			popup.insert(new JPopupMenu.Separator(), popupIndex);
 		}
 		return popup;
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (CreateGui.getApp().isEditionAllowed()) {
+			Arc arc = (Arc) myObject;
+			if (e.getClickCount() == 2) {
+				if (((TimedInputArcComponent)myObject).getSource() instanceof Place) {
+					((TimedInputArcComponent) myObject).showTimeIntervalEditor();
+				}else {
+					arc.getSource().select();
+					arc.getTarget().select();
+					justSelected = true;
+				}
+			}
+			}
 	}
 }

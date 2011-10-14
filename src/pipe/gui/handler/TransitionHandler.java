@@ -16,6 +16,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.Pipe.elementType;
 import pipe.gui.action.ShowHideInfoAction;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
@@ -41,20 +42,16 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 			return;
 		}
 
-		if (e.isShiftDown()) {
-			CreateGui.getView().getUndoManager().addNewEdit(
-					((Transition) myObject).setTimed(!((Transition) myObject)
-							.isTimed()));
+
+		int rotation = 0;
+		if (e.getWheelRotation() < 0) {
+			rotation = -e.getWheelRotation() * 135;
 		} else {
-			int rotation = 0;
-			if (e.getWheelRotation() < 0) {
-				rotation = -e.getWheelRotation() * 135;
-			} else {
-				rotation = e.getWheelRotation() * 45;
-			}
-			CreateGui.getView().getUndoManager().addNewEdit(
-					((Transition) myObject).rotate(rotation));
+			rotation = e.getWheelRotation() * 45;
 		}
+		CreateGui.getView().getUndoManager().addNewEdit(
+				((Transition) myObject).rotate(rotation));
+
 	}
 
 	/**
@@ -91,9 +88,9 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (CreateGui.getApp().isEditionAllowed()) {
 				if (e.getClickCount() == 2
-						&& (CreateGui.getApp().getMode() == Pipe.TIMEDTRANS
-								|| CreateGui.getApp().getMode() == Pipe.IMMTRANS || CreateGui
-								.getApp().getMode() == Pipe.SELECT)) {
+						&& (CreateGui.getApp().getMode() == elementType.TIMEDTRANS
+								|| CreateGui.getApp().getMode() == elementType.IMMTRANS || CreateGui
+								.getApp().getMode() == elementType.SELECT)) {
 					((Transition) myObject).showEditor();
 				}
 			} else {

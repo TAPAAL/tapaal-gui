@@ -14,14 +14,14 @@ import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
 
-public class TransportArcComponent extends TimedInputArcComponent {
+public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 3728885532894319528L;
 	private int group;
 	private boolean isInPreSet;
-	private TransportArcComponent connectedTo = null;
+	private TimedTransportArcComponent connectedTo = null;
 	private TransportArc underlyingTransportArc;
 
-	public TransportArcComponent(PlaceTransitionObject newSource, int groupNr,
+	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr,
 			boolean isInPreSet) {
 		super(new TimedOutputArcComponent(newSource));
 		this.isInPreSet = isInPreSet;
@@ -31,7 +31,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		updateWeightLabel(true);
 	}
 
-	public TransportArcComponent(TimedInputArcComponent timedArc, int group,
+	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group,
 			boolean isInPreSet) {
 		super(timedArc, "");
 		this.isInPreSet = isInPreSet;
@@ -91,7 +91,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public TransportArcComponent copy() {
+	public TimedTransportArcComponent copy() {
 
 		return null;
 	}
@@ -108,9 +108,8 @@ public class TransportArcComponent extends TimedInputArcComponent {
 
 		super.delete();
 
-		// xxx - hack to awoid delete loop
-
-		TransportArcComponent a = connectedTo;
+		//Avoid delete loop (but we need to save connected to for undo redo)
+		TimedTransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a != null && a.connectedTo != null) {
 			a.delete();
@@ -123,7 +122,8 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	public void undelete(DrawingSurfaceImpl view) {
 		super.undelete(view);
 
-		TransportArcComponent a = connectedTo;
+		//Avoid loop
+		TimedTransportArcComponent a = connectedTo;
 		connectedTo = null;
 		if (a.connectedTo != null) {
 			a.undelete(view);
@@ -133,7 +133,7 @@ public class TransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public TransportArcComponent paste(double despX, double despY,
+	public TimedTransportArcComponent paste(double despX, double despY,
 			boolean toAnotherView) {
 
 		return null;
@@ -156,11 +156,11 @@ public class TransportArcComponent extends TimedInputArcComponent {
 		return isInPreSet;
 	}
 
-	public TransportArcComponent getConnectedTo() {
+	public TimedTransportArcComponent getConnectedTo() {
 		return connectedTo;
 	}
 
-	public void setConnectedTo(TransportArcComponent connectedTo) {
+	public void setConnectedTo(TimedTransportArcComponent connectedTo) {
 		this.connectedTo = connectedTo;
 	}
 
@@ -201,8 +201,8 @@ public class TransportArcComponent extends TimedInputArcComponent {
 				underlyingTransportArc.interval());
 	}
 	
-	public TransportArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
-		TransportArcComponent arc = new TransportArcComponent(this, group, isInPreSet);
+	public TimedTransportArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
+		TimedTransportArcComponent arc = new TimedTransportArcComponent(this, group, isInPreSet);
 		arc.setSource(oldToNewMapping.get(this.getSource()));
 		arc.setTarget(oldToNewMapping.get(this.getTarget()));
 		

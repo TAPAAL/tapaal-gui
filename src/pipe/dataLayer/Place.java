@@ -53,16 +53,11 @@ public class Place extends PlaceTransitionObject {
 
 	/** Value of the capacity restriction; 0 means no capacity restriction */
 	protected Integer capacity = 0;
-	/*
-	 * private boolean strongCapacity = false;
-	 */
 
 	public static final int DIAMETER = Pipe.PLACE_TRANSITION_HEIGHT;
 
-	/** Token Width */
+	/** Token Width and Height */
 	public static int tWidth = 4;
-
-	/** Token Height */
 	public static int tHeight = 4;
 
 	/** Ellipse2D.Double place */
@@ -159,7 +154,7 @@ public class Place extends PlaceTransitionObject {
 	 *            Integer value for initial marking
 	 */
 	public void setInitialMarking(int initialMarkingInput) {
-		initialMarking = new Integer(initialMarkingInput);
+		initialMarking = initialMarkingInput;
 	}
 
 	/**
@@ -228,8 +223,7 @@ public class Place extends PlaceTransitionObject {
 	public void updateEndPoint(Arc arc) {
 		if (arc.getSource() == this) {
 			// Make it calculate the angle from the centre of the place rather
-			// than
-			// the current start point
+			// than the current start point
 			arc.setSourceLocation(positionX + (getDiameter() * 0.5), positionY
 					+ (getDiameter() * 0.5));
 			double angle = arc.getArcPath().getStartAngle();

@@ -55,7 +55,6 @@ public class NameLabel extends JTextArea implements Cloneable, Translatable,
 		setBorder(BorderFactory.createEmptyBorder());
 		setBackground(Pipe.BACKGROUND_COLOR);
 
-		//setBackground(Pipe.BACKGROUND_COLOR);
 	}
 
 	public void setPosition(int x, int y) {

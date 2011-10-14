@@ -26,6 +26,7 @@ import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
+import pipe.gui.Pipe.elementType;
 import pipe.gui.action.GuiAction;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
@@ -86,12 +87,12 @@ public class AnimationController extends JPanel {
 			randomAction, randomAnimateAction, timeAction;
 
 	public AnimationController() {
-		startAction = new AnimateAction("Simulation mode", Pipe.START,
+		startAction = new AnimateAction("Simulation mode", elementType.START,
 				"Toggle simulation mode", "Ctrl A", true);
 
-		stepbackwardAction = new AnimateAction("Back", Pipe.STEPBACKWARD,
+		stepbackwardAction = new AnimateAction("Back", elementType.STEPBACKWARD,
 				"Step backward a firing", "typed 4");
-		stepforwardAction = new AnimateAction("Forward", Pipe.STEPFORWARD,
+		stepforwardAction = new AnimateAction("Forward", elementType.STEPFORWARD,
 				"Step forward a firing", "typed 6");
 
 		stepbackwardAction.setEnabled(false);
@@ -100,9 +101,9 @@ public class AnimationController extends JPanel {
 		// timeAction = new AnimateAction("Time", Pipe.TIMEPASS,
 		// "Let Time pass", "_");
 
-		randomAction = new AnimateAction("Random", Pipe.RANDOM,
+		randomAction = new AnimateAction("Random", elementType.RANDOM,
 				"Randomly fire a transition", "typed 5");
-		randomAnimateAction = new AnimateAction("Simulate", Pipe.ANIMATE,
+		randomAnimateAction = new AnimateAction("Simulate", elementType.ANIMATE,
 				"Randomly fire a number of transitions", "typed 7", true);
 
 		setLayout(new GridBagLayout());
@@ -264,21 +265,21 @@ public class AnimationController extends JPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = -4066032248332540289L;
-		private int typeID;
+		private elementType typeID;
 		private AnimationHistoryComponent animBox;
 
-		AnimateAction(String name, int typeID, String tooltip, String keystroke) {
+		AnimateAction(String name, elementType typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 			this.typeID = typeID;
 		}
 
-		AnimateAction(String name, int typeID, String tooltip,
+		AnimateAction(String name, elementType typeID, String tooltip,
 				String keystroke, boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 			this.typeID = typeID;
 		}
 
-		public AnimateAction(String name, int typeID, String tooltip,
+		public AnimateAction(String name, elementType typeID, String tooltip,
 				KeyStroke keyStroke) {
 			super(name, tooltip, keyStroke);
 			this.typeID = typeID;
@@ -289,7 +290,7 @@ public class AnimationController extends JPanel {
 			animBox = CreateGui.getAnimationHistory();
 
 			switch (typeID) {
-			case Pipe.TIMEPASS:
+			case TIMEPASS:
 				animBox.clearStepsForward();
 				CreateGui.getAnimator().letTimePass(
 						new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
@@ -305,13 +306,13 @@ public class AnimationController extends JPanel {
 			// setAnimationButtonsEnabled();
 			// break;
 
-			case Pipe.STEPFORWARD:
+			case STEPFORWARD:
 				animBox.stepForward();
 				CreateGui.getAnimator().stepForward();
 				setAnimationButtonsEnabled();
 				break;
 
-			case Pipe.STEPBACKWARD:
+			case STEPBACKWARD:
 				animBox.stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				setAnimationButtonsEnabled();

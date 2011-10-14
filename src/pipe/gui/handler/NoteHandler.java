@@ -1,8 +1,3 @@
-/*
- * Created on 
- * Author is 
- *
- */
 package pipe.gui.handler;
 
 import java.awt.Container;

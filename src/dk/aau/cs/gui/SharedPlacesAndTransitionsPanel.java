@@ -38,7 +38,7 @@ import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
@@ -378,8 +378,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			private Command createDeleteArcCommand(Template template, Arc arc, DrawingSurfaceImpl drawingSurface) {
 				if(arc instanceof TimedInhibitorArcComponent){
 					return new DeleteTimedInhibitorArcCommand((TimedInhibitorArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
-				}else if(arc instanceof TransportArcComponent){
-					TransportArcComponent component = (TransportArcComponent)arc;
+				}else if(arc instanceof TimedTransportArcComponent){
+					TimedTransportArcComponent component = (TimedTransportArcComponent)arc;
 					return new DeleteTransportArcCommand(component, component.underlyingTransportArc(), template.model(), template.guiModel(), drawingSurface);
 				}else if(arc instanceof TimedInputArcComponent){
 					return new DeleteTimedInputArcCommand((TimedInputArcComponent)arc, template.model(), template.guiModel(), drawingSurface);
@@ -461,7 +461,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void showSharedTransitionNameDialog(SharedTransition transitionToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Transition", true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, nameGenerator, transitionToEdit);
@@ -474,7 +474,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.TOOL + " " + Pipe.VERSION, true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Place", true);
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 

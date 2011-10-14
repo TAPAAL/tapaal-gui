@@ -10,10 +10,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import pipe.dataLayer.Arc;
-import pipe.dataLayer.InhibitorArc;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -41,23 +40,9 @@ public class ArcHandler extends PetriNetObjectHandler {
 		JMenuItem menuItem;
 		JPopupMenu popup = super.getPopup(e);
 
-		if (myObject instanceof InhibitorArc) {
-			menuItem = new JMenuItem(new EditWeightAction(contentPane,
-					(Arc) myObject));
-			menuItem.setText("Edit Weight");
-			popup.insert(menuItem, popupIndex++);
-
-			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
-					.getPoint()));
-			menuItem.setText("Split Arc Segment");
-			popup.insert(menuItem, popupIndex++);
-
-			popup.insert(new JPopupMenu.Separator(), popupIndex++);
-			/* CB Joakim Byg - timed arcs should not be handled here */
-		} else if (myObject instanceof TimedOutputArcComponent
+		if (myObject instanceof TimedOutputArcComponent
 				&& !(myObject instanceof TimedInputArcComponent)
-				&& !(myObject instanceof TransportArcComponent)) {
-			/* EOC */
+				&& !(myObject instanceof TimedTransportArcComponent)) {
 			
 			menuItem = new JMenuItem(new SplitArcAction((Arc) myObject, e
 					.getPoint()));
@@ -95,7 +80,7 @@ public class ArcHandler extends PetriNetObjectHandler {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		switch (CreateGui.getApp().getMode()) {
-		case Pipe.SELECT:
+		case SELECT:
 			if (!isDragging) {
 				break;
 			}

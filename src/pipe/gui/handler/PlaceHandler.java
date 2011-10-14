@@ -18,6 +18,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.Pipe.elementType;
 import pipe.gui.action.ShowHideInfoAction;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
@@ -74,21 +75,21 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2
 					&& CreateGui.getApp().isEditionAllowed()
-					&& (CreateGui.getApp().getMode() == Pipe.PLACE || CreateGui.getApp().getMode() == Pipe.SELECT)) {
+					&& (CreateGui.getApp().getMode() == elementType.PLACE || CreateGui.getApp().getMode() == elementType.SELECT)) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {
 				UndoManager undoManager = CreateGui.getView().getUndoManager();
 
 				switch (CreateGui.getApp().getMode()) {
-				case Pipe.ADDTOKEN:
+				case ADDTOKEN:
 					if (myObject instanceof TimedPlaceComponent) {
 						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, 1);
 						command.redo();
 						undoManager.addNewEdit(command);
 					}
 					break;
-				case Pipe.DELTOKEN:
+				case DELTOKEN:
 					if (myObject instanceof TimedPlaceComponent) {
 						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, -1);
 						command.redo();

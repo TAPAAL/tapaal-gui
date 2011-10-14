@@ -34,9 +34,10 @@ import pipe.dataLayer.Template;
 import pipe.dataLayer.TimedInputArcComponent;
 import pipe.dataLayer.TimedPlaceComponent;
 import pipe.dataLayer.TimedTransitionComponent;
+import pipe.dataLayer.TimedTransportArcComponent;
 import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.Pipe.elementType;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -67,9 +68,6 @@ Printable, DrawingSurface {
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
-	public TransportArcComponent transportArcPart1; // used when creating
-	// transport arcs
-
 	public PlaceTransitionObject createPTO;
 
 	private AnimationHandler animationHandler = new AnimationHandler();
@@ -160,7 +158,7 @@ Printable, DrawingSurface {
 			add(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == Pipe.SELECT)
+		if(CreateGui.getApp().getMode() == elementType.SELECT)
 			this.selection.enableSelection();
 
 		Component component = getParent().getParent();
@@ -224,7 +222,7 @@ Printable, DrawingSurface {
 					add(newObject);
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TransportArcComponent) {
+						if (newObject instanceof TimedTransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
 							//newObject.addMouseWheelListener(transportArcHandler);
@@ -263,7 +261,7 @@ Printable, DrawingSurface {
 
 	public void update(Observable o, Object diffObj) {
 		if ((diffObj instanceof PetriNetObject) && (diffObj != null)) {
-			if (CreateGui.appGui.getMode() == Pipe.CREATING) {
+			if (CreateGui.appGui.getMode() == elementType.CREATING) {
 
 				addNewPetriNetObject((PetriNetObject) diffObj);
 			}
@@ -602,7 +600,7 @@ Printable, DrawingSurface {
 
 			pnObject = new Transition(Grid.getModifiedX(p.x), Grid
 					.getModifiedY(p.y));
-			((Transition) pnObject).setTimed(timed);
+			
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
@@ -615,7 +613,7 @@ Printable, DrawingSurface {
 
 			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y), transition);
-			((Transition) pnObject).setTimed(timed);
+			
 			model.add(transition);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
@@ -633,65 +631,63 @@ Printable, DrawingSurface {
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				int mode = app.getMode();
+				Pipe.elementType mode = app.getMode();
 				switch (mode) {
-				case Pipe.PLACE:
+				case PLACE:
 					PlaceTransitionObject pto = newPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_TRANSITION);
+						app.setFastMode(elementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case Pipe.TAPNPLACE:
+				case TAPNPLACE:
 					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedPlaceCommand(
 									(TimedPlaceComponent) pto2, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_TRANSITION);
+						app.setFastMode(elementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case Pipe.IMMTRANS:
-				case Pipe.TIMEDTRANS:
-					boolean timed = (mode == Pipe.TIMEDTRANS ? true : false);
+				case IMMTRANS:
+				case TIMEDTRANS:
+					boolean timed = (mode == elementType.TIMEDTRANS ? true : false);
 					pto = newTransition(e.getPoint(), timed);
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_PLACE);
+						app.setFastMode(elementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
-				case Pipe.TAPNTRANS:
+				case TAPNTRANS:
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedTransitionCommand(
 									(TimedTransitionComponent) pto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_PLACE);
+						app.setFastMode(elementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case Pipe.ARC:
-					/* CB Joakim Byg - handle TimedArc */
-				case Pipe.TAPNARC:
-					/* EOC */
-				case Pipe.INHIBARC:
+				case ARC:
+				case TAPNARC:
+				case INHIBARC:
 					// Add point to arc in creation
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
 					break;
 
-				case Pipe.ANNOTATION:
+				case ANNOTATION:
 					p = adjustPoint(e.getPoint(), view.getZoom());
 
 					pnObject = new AnnotationNote(p.x, p.y);
@@ -703,139 +699,18 @@ Printable, DrawingSurface {
 									guiModel));
 					((AnnotationNote) pnObject).enableEditMode();
 					break;
-					// case Pipe.FAST_PLACE:
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if (createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newPlace(e.getPoint());
-					// getUndoManager().addNewEdit(
-					// new AddPetriNetObjectEdit(createPTO, view, guiModel));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					// // keep "fast mode"
-					// app.setMode(Pipe.FAST_TRANSITION);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// //exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-					//
-					// case Pipe.FAST_TRANSITION:
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if ( createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newTransition(e.getPoint(), e.isAltDown());
-					// getUndoManager().addNewEdit(
-					// new AddPetriNetObjectEdit(createPTO, view, guiModel));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					// // keep "fast mode"
-					// app.setMode(Pipe.FAST_PLACE);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// // exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-					//
-					// case Pipe.FAST_TAPNPLACE:
-					//
-					// //kyrke working
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if (createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newTimedPlace(e.getPoint());
-					// getUndoManager().addNewEdit(
-					// new AddTimedPlaceCommand((TimedPlaceComponent)createPTO,
-					// model, guiModel, view));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					//
-					// // keep "fast mode"
-					// app.setMode(Pipe.FAST_TAPNTRANSITION);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// //exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-					//
-					// case Pipe.FAST_TAPNTRANSITION:
-					// //kyrke working
-					//
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if ( createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newTAPNTransition(e.getPoint(), e.isAltDown());
-					// getUndoManager().addNewEdit(
-					// new
-					// AddTimedTransitionCommand((TimedTransitionComponent)createPTO,
-					// model, guiModel, view));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					// // keep "fast mode"
-					//
-					// app.setMode(Pipe.FAST_TAPNPLACE);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// // exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-				case Pipe.TRANSPORTARC:
+				case TRANSPORTARC:
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
 					break;
-				case Pipe.TAPNINHIBITOR_ARC:
+				case TAPNINHIBITOR_ARC:
 					// Add point to arc in creation
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
 					break;
-				case Pipe.DRAG:
+				case DRAG:
 					dragStart = new Point(start);
 					break;
 
