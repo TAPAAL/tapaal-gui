@@ -60,6 +60,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 	public void setId(String idInput) {
 		id = idInput;
+		setName(idInput);
 	}
 
 	/**
@@ -68,7 +69,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	 * @return String value for id;
 	 */
 	public String getId() {
-		return id;
+		return getName();
 	}
 
 	/**

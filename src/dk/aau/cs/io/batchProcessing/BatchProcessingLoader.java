@@ -28,6 +28,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
+import dk.aau.cs.io.IdResolver;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -57,6 +58,8 @@ public class BatchProcessingLoader {
 	private HashMap<String, String> transitionIDToName;
 	private HashMap<Tuple<TimedTransition, Integer>, TimeInterval> transportArcsTimeIntervals;
 
+	private IdResolver idResolver = new IdResolver();
+	
 	private NameGenerator nameGenerator = new NameGenerator();
 
 	public BatchProcessingLoader() {
@@ -122,6 +125,10 @@ public class BatchProcessingLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
+		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+			name = "_" + name;
+		}
+		
 		SharedPlace place = new SharedPlace(name, invariant);
 		place.setCurrentMarking(marking);
 		for(int j = 0; j < numberOfTokens; j++){
@@ -291,7 +298,9 @@ public class BatchProcessingLoader {
 	private void parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
-	
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		if (idInput.length() == 0 && nameInput.length() > 0) {
 			idInput = nameInput;
 		}
@@ -317,6 +326,8 @@ public class BatchProcessingLoader {
 	private void parsePlace(Element place, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn, ConstantStore constants) {
 		String idInput = place.getAttribute("id");
 		String nameInput = place.getAttribute("name");
+		
+		
 		int initialMarkingInput = Integer.parseInt(place.getAttribute("initialMarking"));
 		String invariant = place.getAttribute("invariant");
 
@@ -327,6 +338,12 @@ public class BatchProcessingLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
+		}
+
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
@@ -346,8 +363,8 @@ public class BatchProcessingLoader {
 	}
 
 	private void parseAndAddArc(Element arc, TimedArcPetriNet tapn, ConstantStore constants) throws FormatException {
-		String sourceId = arc.getAttribute("source");
-		String targetId = arc.getAttribute("target");
+		String sourceId = idResolver.get(tapn.name(), arc.getAttribute("source"));
+		String targetId = idResolver.get(tapn.name(), arc.getAttribute("target"));
 		String inscription = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
 
@@ -515,9 +532,17 @@ public class BatchProcessingLoader {
 				String templateName = name.split("\\.")[0];
 				String placeName = name.split("\\.")[1];
 				
+				// "true" and "false" are reserved keywords and places using these names are renamed to "_true" and "_false" respectively
+				if(placeName.equalsIgnoreCase("false") || placeName.equalsIgnoreCase("true"))
+					placeName = "_" + placeName;
+				
 				TimedPlace p = network.getTAPNByName(templateName).getPlaceByName(placeName);
 				places.add(p);
 			} else { // shared Place
+				
+				if(name.equalsIgnoreCase("false") || name.equalsIgnoreCase("true"))
+					name = "_" + name;
+				
 				TimedPlace p = network.getSharedPlaceByName(name);
 				places.add(p);
 			}

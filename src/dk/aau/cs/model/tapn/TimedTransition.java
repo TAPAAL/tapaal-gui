@@ -292,6 +292,14 @@ public class TimedTransition extends TAPNElement {
 		return true;
 	}
 
+	public boolean isOrphan() {
+		if(isShared()){
+			return sharedTransition.isOrphan();
+		}else{
+			return presetSize() == 0 && postsetSize() == 0;
+		}
+	}
+
 
 
 

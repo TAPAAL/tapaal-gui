@@ -129,7 +129,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							.showMessageDialog(
 									CreateGui.getApp(),
 									"There is already another constant with the same name.\n\n"
-											+ "Please choose a different name for the constant.",
+											+ "Choose a different name for the constant.",
 									"Error", JOptionPane.INFORMATION_MESSAGE);
 					nameTextField.setText(oldName);
 					return;
@@ -204,14 +204,21 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private void initComponents() {
 
 		nameTextField = new javax.swing.JTextField();
-		Dimension size = new Dimension(125, 25);
+		Dimension size = new Dimension(150, 25);
 		nameTextField.setPreferredSize(size);
 		nameTextField.setMinimumSize(size);
 		nameLabel = new javax.swing.JLabel();
 		valueLabel = new javax.swing.JLabel();
 		valueSpinner = new javax.swing.JSpinner();
 		okButton = new javax.swing.JButton();
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+
 		cancelButton = new javax.swing.JButton();
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 
 		nameLabel.setText("Name:");
 
@@ -239,11 +246,11 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 																layout
 																		.createSequentialGroup()
 																		.addComponent(
-																				okButton)
+																				cancelButton)
 																		.addPreferredGap(
 																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																		.addComponent(
-																				cancelButton))
+																				okButton))
 														.addGroup(
 																layout
 																		.createParallelGroup(

@@ -15,6 +15,7 @@ import javax.swing.JDialog;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.handler.AnnotationNoteHandler;
@@ -217,6 +218,7 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
 			myPoint.myNote.setDraggable(false);
 			myPoint.isPressed = true;
 			myPoint.repaint();
@@ -225,6 +227,8 @@ public class AnnotationNote extends Note {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+
 			myPoint.drag(Grid.getModifiedX(e.getX() - start.x), Grid
 					.getModifiedY(e.getY() - start.y));
 			myPoint.myNote.updateBounds();
@@ -232,7 +236,9 @@ public class AnnotationNote extends Note {
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {
+		public void mouseReleased(MouseEvent e) {			
+			if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+
 			myPoint.myNote.setDraggable(true);
 			myPoint.isPressed = false;
 			myPoint.myNote.updateBounds();

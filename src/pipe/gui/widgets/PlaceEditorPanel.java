@@ -592,7 +592,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				renameCommand.redo();
 			}catch(RequireException e){
 				context.undoManager().undo(); 
-				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Acceptable names for transitions are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			context.nameGenerator().updateIndices(context.activeModel(), newName);

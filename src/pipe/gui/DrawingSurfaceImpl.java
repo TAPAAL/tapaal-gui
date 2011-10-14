@@ -16,14 +16,13 @@ import java.awt.print.PrinterException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
 import javax.swing.JLayeredPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.graphicElements.AnnotationNote;
 import pipe.gui.graphicElements.Arc;
@@ -326,6 +325,11 @@ Printable, DrawingSurface {
 
 	public void changeAnimationMode(boolean status) {
 		animationmode = status;
+		if(status){
+			selection.disableSelection();
+		}else{
+			selection.enableSelection();
+		}
 	}
 
 	public void setCursorType(String type) {
@@ -616,6 +620,8 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if(app.getGUIMode().equals(GUIMode.animation)) return;
+			
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
@@ -722,7 +728,7 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
 
 		@Override

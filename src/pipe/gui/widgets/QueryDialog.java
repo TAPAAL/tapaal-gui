@@ -1,6 +1,8 @@
 package pipe.gui.widgets;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -64,6 +66,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
@@ -106,10 +109,10 @@ public class QueryDialog extends JPanel {
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
 	private static final String UNSUPPPORTED_QUERY_TEXT = "The chosen query property is not supported by the chosen reduction";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
-	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export verifytapn XML";
+	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	
-	private static final String UPPAAL_SOME_TRACE_STRING = "Some encountered trace (only without symmetry reduction)";
-	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some encountered trace";
+	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
+	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SHARED = "Shared";
 
 	private static final long serialVersionUID = 7852107237344005546L;
@@ -207,7 +210,7 @@ public class QueryDialog extends JPanel {
 	private boolean isNetDegree2;
 	private InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
+	private String name_verifyTAPN = "TAPAAL Engine (verifytapn) - Recommended";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -234,7 +237,7 @@ public class QueryDialog extends JPanel {
 		if(tapnNetwork.hasInhibitorArcs())
 			return false;
 		
-		TAPNComposer composer = new TAPNComposer();
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(tapnNetwork);
 		
 		for(TimedTransition t : composedModel.value1().transitions()) {
@@ -709,7 +712,7 @@ public class QueryDialog extends JPanel {
 		//setPreferredSize(new Dimension(942, 517));
 		
 		initQueryNamePanel();
-		initBoundednessCheckPanel();
+		
 		initQueryPanel();
 		initUppaalOptionsPanel();
 		initReductionOptionsPanel();
@@ -718,7 +721,7 @@ public class QueryDialog extends JPanel {
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
 
-		rootPane.setDefaultButton(saveButton);
+		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
 
@@ -804,6 +807,10 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void initQueryNamePanel() {
+		
+		JPanel splitter = new JPanel(new BorderLayout());
+		
+		
 		namePanel = new JPanel(new FlowLayout());
 		namePanel.add(new JLabel("Query name: "));
 		
@@ -828,38 +835,7 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
-
-		GridBagConstraints gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(0,10,0,10);
-		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		add(namePanel, gridBagConstraints);
-	}
-
-	private void initBoundednessCheckPanel() {
-
-		// Number of extra tokens field
-		boundednessCheckPanel = new JPanel();
-		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
-		boundednessCheckPanel.add(new JLabel("Extra number of tokens: "));
-
-		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
-		numberOfExtraTokensInNet.setMaximumSize(new Dimension(65, 30));
-		numberOfExtraTokensInNet.setMinimumSize(new Dimension(65, 30));
-		numberOfExtraTokensInNet.setPreferredSize(new Dimension(65, 30));
-		boundednessCheckPanel.add(numberOfExtraTokensInNet);
-
-		// Boundedness button
-		kbounded = new JButton("Check Boundedness");
-		kbounded.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
-			}
-
-		});
-		boundednessCheckPanel.add(kbounded);
-		boundednessCheckPanel.add(Box.createHorizontalStrut(350));
+		
 		
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.addActionListener(new ActionListener(){
@@ -888,14 +864,14 @@ public class QueryDialog extends JPanel {
 				// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 				StringBuffer buffer = new StringBuffer();
 				buffer.append("<html>");
-				buffer.append("<b>Boundedness</b><br/>");
+				buffer.append("<b>Boundedness Options</b><br/>");
 				buffer.append("The query dialog allows you to specify the extra number of tokens that TAPAAL is allowed to use during the verification. ");
 				buffer.append("Because TAPAAL models can produce additional tokens by firing transitions (e.g. a transition that has a single input place ");
 				buffer.append("and two output places) you may need to use additional tokens compared to those that are already in the net. By ");
 				buffer.append("specifying an extra number of tokens you can ask TAPAAL to check if your net is bounded for this number of extra tokens (i.e. ");
 				buffer.append("whether there is no reachable marking in the net that would exceed the predefined number of tokens. ");
 				buffer.append("<br/><br/>");
-				buffer.append("<b>Search Strategies</b><br/>");
+				buffer.append("<b>Search Strategy Options</b><br/>");
 				buffer.append("A search strategy determines how the chosen verification method performs the search. The possible search strategies are: ");
 				buffer.append("<ul>");
 				buffer.append("<li>Heuristic Search<br/> If discrete inclusion optimization is not enabled, this strategy performs a breadth first search. ");
@@ -905,7 +881,7 @@ public class QueryDialog extends JPanel {
 				buffer.append("<li>Random Search<br/>Performs a random exploration of the state space.</li>");
 				buffer.append("</ul>");
 				buffer.append("<br/>");
-				buffer.append("<b>Verification Methods</b><br/>");
+				buffer.append("<b>Verification Options</b><br/>");
 				buffer.append("TAPAAL supports verification via its own included engine verifytapn or via a translation to networks of timed automata and then using the tool UPPAAL (requires a separate installation).");
 				buffer.append("The TAPAAL engine supports also the discrete inclusion optimization that works for EF queries where the propositions state only ");
 				buffer.append("lower bounds on the number of tokens and for AG queries with only the upper bounds constraints. On some models this technique gives a considerable speedup. ");
@@ -917,16 +893,56 @@ public class QueryDialog extends JPanel {
 				return buffer.toString();
 			}
 		});
-		boundednessCheckPanel.add(infoButton);
+		JPanel helpPanel = new JPanel(new FlowLayout());
+		helpPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		helpPanel.add(infoButton);
+		
+		splitter.add(namePanel, BorderLayout.LINE_START);
+		splitter.add(helpPanel, BorderLayout.LINE_END);
 
-
-		GridBagConstraints gridBagConstraints;
-		gridBagConstraints = new GridBagConstraints();
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 0;
 		gridBagConstraints.insets = new Insets(0,10,0,10);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		add(boundednessCheckPanel, gridBagConstraints);
+		add(splitter, gridBagConstraints);
+	}
+
+	private void initBoundednessCheckPanel() {
+		
+		// Number of extra tokens field
+		boundednessCheckPanel = new JPanel();
+		boundednessCheckPanel.setBorder(BorderFactory.createTitledBorder("Boundedness Options"));
+		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
+		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
+
+		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
+		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
+		boundednessCheckPanel.add(numberOfExtraTokensInNet);
+
+		boundednessCheckPanel.add(new JLabel("  "));
+		
+		// Boundedness button
+		kbounded = new JButton("Check boundedness");
+		kbounded.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
+			}
+
+		});
+		boundednessCheckPanel.add(kbounded);
+		
+		GridBagConstraints gridBagConstraints;
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
 
 	private void initQueryPanel() {
@@ -1256,8 +1272,9 @@ public class QueryDialog extends JPanel {
 		predicatePanel.setBorder(BorderFactory.createTitledBorder("Predicates"));
 
 		placesBox = new JComboBox();
-		Dimension d = new Dimension(150, 27);
+		Dimension d = new Dimension(125, 27);
 		placesBox.setMaximumSize(d);
+		placesBox.setPreferredSize(d);
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
@@ -1635,12 +1652,13 @@ public class QueryDialog extends JPanel {
 
 		initSearchOptionsPanel();
 		initTraceOptionsPanel();
+		initBoundednessCheckPanel();
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
 		gridBagConstraints.insets = new Insets(5,10,5,10);
-		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		//gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		add(uppaalOptionsPanel, gridBagConstraints);
 
 	}
@@ -1648,12 +1666,12 @@ public class QueryDialog extends JPanel {
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
 
-		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy"));
+		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
-		breadthFirstSearch = new JRadioButton("Breadth First Search");
-		depthFirstSearch = new JRadioButton("Depth First Search");
-		randomSearch = new JRadioButton("Random Search");
-		heuristicSearch = new JRadioButton("Heuristic Search");
+		breadthFirstSearch = new JRadioButton("Breadth first search    ");
+		depthFirstSearch = new JRadioButton("Depth first search    ");
+		randomSearch = new JRadioButton("Random search    ");
+		heuristicSearch = new JRadioButton("Heuristic search    ");
 		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
@@ -1675,9 +1693,9 @@ public class QueryDialog extends JPanel {
 		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
 
 	}
@@ -1698,25 +1716,26 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
+		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
+		
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		traceOptionsPanel.add(noTraceRadioButton, gridBagConstraints);
-
+		traceOptionsPanel.add(someTraceRadioButton, gridBagConstraints);
+		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
-		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
-		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Method"));
+		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox();
@@ -1737,7 +1756,7 @@ public class QueryDialog extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(new JLabel("  Choose verification method:"), gbc);
+		reductionOptionsPanel.add(new JLabel("  Verification method:"), gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -1745,7 +1764,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(reductionOption, gbc);
 
-		symmetryReduction = new JCheckBox("Use Symmetry Reduction");
+		symmetryReduction = new JCheckBox("Use symmetry reduction");
 		symmetryReduction.setSelected(true);
 		symmetryReduction.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -1760,7 +1779,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(symmetryReduction, gbc);
 
-		discreteInclusion = new JCheckBox("Use Discrete Inclusion");
+		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
 		discreteInclusion.setToolTipText("<html>This optimization will perform more advanced inclusion check<br/>" +
 										 "in an attempt to reduce the number of explored states.<br/>" +
@@ -1869,6 +1888,7 @@ public class QueryDialog extends JPanel {
 			cancelButton = new JButton("Cancel");
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 
+			
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					// TODO make save
@@ -1918,7 +1938,7 @@ public class QueryDialog extends JPanel {
 					}
 
 					if (xmlFile != null && queryFile != null) {
-						TAPNComposer composer = new TAPNComposer();
+						TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
 						TAPNQuery tapnQuery = getQuery();
@@ -1972,13 +1992,20 @@ public class QueryDialog extends JPanel {
 			});
 		}
 		if (option == QueryDialogueOption.Save) {
+			buttonPanel.add(saveUppaalXMLButton);
+			
+			Dimension minSize = new Dimension(400, 5);
+			Dimension prefSize = new Dimension(400, 5);
+			Dimension maxSize = new Dimension(Short.MAX_VALUE, 400);
+			buttonPanel.add(new Box.Filler(minSize, prefSize, maxSize));
+
+						
 			buttonPanel.add(cancelButton);
 
 			buttonPanel.add(saveButton);
 
 			buttonPanel.add(saveAndVerifyButton);
 
-			buttonPanel.add(saveUppaalXMLButton);
 		} else {
 			buttonPanel.add(cancelButton);
 

@@ -13,10 +13,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.gui.graphicElements.Arc;
 import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.PlaceTransitionObject;
+
 
 /**
  * @author Peter Kyme, Michael Camacho Class to handle selection rectangle
@@ -177,7 +179,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * 
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent e) {	
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
 			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
@@ -217,6 +219,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * )
 	 */
 	public void mouseDragged(MouseEvent e) {
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		
 		if (isSelecting) {
 			selectionRectangle.setSize((int) Math.abs(e.getX()
 					- startPoint.getX()), (int) Math.abs(e.getY()

@@ -189,7 +189,7 @@ Cloneable {
 	 */
 	@Override
 	public String getId() {
-		return (id != null) ? id : pnName.getName();
+		return getName();
 	}
 
 	/**
@@ -199,7 +199,7 @@ Cloneable {
 	 */
 	@Override
 	public String getName() {
-		return (pnName != null) ? pnName.getName() : id;
+		return (pnName != null) ? pnName.getName() : "";
 	}
 
 	public double getNameOffsetX() {

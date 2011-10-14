@@ -4,8 +4,6 @@ import java.awt.Color;
 
 public class Pipe {
    
- 
-   
 	// Filesystem Definitions
 	public static final String PROPERTY_FILE_EXTENSION = ".properties";
 	public static final String PROPERTY_FILE_DESC = "PIPE Properties file";

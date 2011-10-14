@@ -118,4 +118,11 @@ public class SharedTransition {
 	public Collection<TimedTransition> transitions() {
 		return new ArrayList<TimedTransition>(transitions);
 	}
+
+	public boolean isOrphan() {
+		for(TimedTransition transition : transitions){
+			if(transition.presetSize() > 0 || transition.postsetSize() > 0) return false;
+		}
+		return true;
+	}
 }

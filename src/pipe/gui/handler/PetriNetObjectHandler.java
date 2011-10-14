@@ -13,6 +13,8 @@ import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe.ElementType;
+import pipe.gui.GuiFrame.GUIMode;
+
 import pipe.gui.action.DeletePetriNetObjectAction;
 import pipe.gui.graphicElements.PetriNetObject;
 
@@ -71,7 +73,8 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
 			checkForPopup(e);
 		}
@@ -99,7 +102,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
-
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
 		// Have to check for popup here as well as on pressed for
 		// crossplatform!!
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {

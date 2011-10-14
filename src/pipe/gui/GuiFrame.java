@@ -412,9 +412,10 @@ public class GuiFrame extends JFrame implements Observer {
 		 drawMenu.addSeparator();
 		 
 		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
-				 ElementType.ADDTOKEN, "Add a token", "ADD", true));
+				 ElementType.ADDTOKEN, "Add a token (+)", "typed +", true));
+
 		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
-				 "Delete token", ElementType.DELTOKEN, "Delete a token", "SUBTRACT",
+				 "Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
 				 true));
 
 		 /* ViewMenu */
@@ -487,11 +488,11 @@ public class GuiFrame extends JFrame implements Observer {
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
-				 454256, "See the TAPAAL FAQ", "_"));
+				 454256, "See TAPAAL frequently asked questions", "_"));
 		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
 				 453256, "Ask a question about TAPAAL", "_"));
 		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
-				 453254, "Report a Bug in TAPAAL", "_"));
+				 453254, "Report a bug in TAPAAL", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
@@ -1056,6 +1057,8 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
+				currentTab.selectFirstElements();
+				
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1119,6 +1122,8 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
+				currentTab.selectFirstElements();
+				
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1139,6 +1144,8 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
+		
+		
 	}
 
 	private void undoAddTab(int currentlySelected) {
@@ -1265,14 +1272,16 @@ public class GuiFrame extends JFrame implements Observer {
 			showConstants(showConstants);
 			
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-
+			
+			activateSelectAction();
+			selectAction.setSelected(true);
 			break;
 		case animation:
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
 			tab.switchToAnimationComponents();
 			showComponents(showComponents);
-
+			
 			startAction.setSelected(true);
 			tab.drawingSurface().changeAnimationMode(true);
 			tab.drawingSurface().repaintAll();
@@ -1283,7 +1292,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			setEditionAllowed(false);
 			statusBar.changeText(statusBar.textforAnimation);
-
+			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			break;
@@ -1463,15 +1472,24 @@ public class GuiFrame extends JFrame implements Observer {
 			switch (typeID) {
 			case START:
 				try {
-					setAnimationMode(!appView.isInAnimationMode());
+					
 					if (!appView.isInAnimationMode()) {
-						restoreMode();
-						PetriNetObject.ignoreSelection(false);
+						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+							restoreMode();
+							PetriNetObject.ignoreSelection(true);
+							setAnimationMode(!appView.isInAnimationMode());
+						} else {
+							JOptionPane.showMessageDialog(GuiFrame.this, 
+									"You need at least one active template to enter simulation mode",
+									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+						}
 					} else {
+
 						setMode(typeID);
-						PetriNetObject.ignoreSelection(true);
-						// Do we keep the selection??
+						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
+						setAnimationMode(!appView.isInAnimationMode());
+
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -1491,6 +1509,11 @@ public class GuiFrame extends JFrame implements Observer {
 				a.setVisible(true);
 				a.setVisible(false);
 				a.dispose();
+				if(getGUIMode().equals(GUIMode.draw)){
+					activateSelectAction();
+				}
+				
+				CreateGui.getCurrentTab().selectFirstElements();
 				
 				break;
 
