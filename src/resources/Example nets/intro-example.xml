@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="IntroExample" type="P/T net">
-<labels border="true" height="633" positionX="561" positionY="53" width="344">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
+<labels border="true" height="634" positionX="562" positionY="54" width="345">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
 
 The circles are called places and rectangles transitions. They are connected either by standard arcs from place to transition or transition to place, or they can be connected by transport arcs (these arcs always come in pairs) like from P1 to T3 and T3 to P6.
 
@@ -75,18 +75,17 @@ One may observe that two extra tokens are needed in the intermediate markings in
 <arcpath arcPointType="false" id="0" xCoord="371" yCoord="496"/>
 <arcpath arcPointType="false" id="1" xCoord="371" yCoord="567"/>
 </arc>
-<arc id="P1 to T3" inscription="[4,7]:1" source="P1" target="T3" type="transport">
-<arcpath arcPointType="false" id="0" xCoord="56" yCoord="221"/>
-<arcpath arcPointType="false" id="1" xCoord="56" yCoord="306"/>
-</arc>
-<arc id="T3 to P6" inscription="[4,7]:1" source="T3" target="P6" type="transport">
-<arcpath arcPointType="false" id="0" xCoord="56" yCoord="316"/>
-<arcpath arcPointType="false" id="1" xCoord="61" yCoord="316"/>
-<arcpath arcPointType="false" id="2" xCoord="57" yCoord="387"/>
-</arc>
 <arc id="T4 to Target" inscription="1" source="T4" target="Target" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="222" yCoord="657"/>
 <arcpath arcPointType="false" id="1" xCoord="222" yCoord="732"/>
+</arc>
+<arc id="T3 to P6" inscription="[4,7]:1" source="T3" target="P6" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="56" yCoord="316"/>
+<arcpath arcPointType="false" id="1" xCoord="56" yCoord="387"/>
+</arc>
+<arc id="P1 to T3" inscription="[4,7]:1" source="P1" target="T3" type="transport">
+<arcpath arcPointType="false" id="0" xCoord="56" yCoord="221"/>
+<arcpath arcPointType="false" id="1" xCoord="56" yCoord="306"/>
 </arc>
 </net>
 <query active="true" capacity="2" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Target Reachable" query="EF IntroExample.Target=1" reductionOption="VerifyTAPN" searchOption="BFS" symmetry="true" traceOption="SOME"/>
