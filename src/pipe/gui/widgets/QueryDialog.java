@@ -220,6 +220,38 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
+	//Strings for tool tips
+	//Tool tips for quantification panel
+	private static final String TOOL_TIP_EXISTS_DIAMOND = "Query if a certain marking in the net is reachable.";
+	private static final String TOOL_TIP_EXISTS_BOX = "Query if a trace exists in which all markings satisfies some property (This is only available using certain verification engines).";
+	private static final String TOOL_TIP_FORALL_DIAMOND = "Query if there exists a marking in all possible traces which satisfies some property (This is only available using certain verification engines).";
+	private static final String TOOL_TIP_FORALL_BOX = "Query if every reachable marking in the net satifies some property.";
+	
+	//Tool tips for logic panel
+	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently marked part of the query to a conjunction";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently marked part of the query to a disjunction";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently marked part of the query";
+	
+	//Tool tips for query panel
+	private static final String TOOL_TIP_PLACESBOX = "Choose the place considered in this part of the query.";
+	private static final String TOOL_TIP_TEMPLATEBOX = "Choose the component considered in this part of the query.";
+	private static final String TOOL_TIP_RELATIONALOPERATORBOX = "Choose the operator on which to test in this part of the query.";
+	private static final String TOOL_TIP_PLACEMARKING = "Choose the number of tokens which should be tested on.";
+	private static final String TOOL_TIP_ADDPREDICATEBUTTON = "Add the predicate specified above as the currently marked part of the query.";
+	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add true as the currently marked part of the query.";
+	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add false as the currently marked part of the query.";
+	
+	//Tool tips for editing panel
+	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query";
+	private static final String TOOL_TIP_RESETBUTTON = "Completely reset the query";
+	private static final String TOOL_TIP_UNDOBUTTON = "Undo the last action";
+	private static final String TOOL_TIP_REDOBUTTON = "Redo the last action undone";
+	private static final String TOOL_TIP_EDITQUERYBUTTON = "Edit the query manually";
+	
+	//Tool tips for boundedness check panel
+	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "The number of extra tokens allowed in the net";
+	private static final String TOOL_TIP_KBOUNDED = "Check wether the net is bounded according to the number of extra tokens";
+	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
@@ -908,7 +940,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
 	}
-
+	
 	private void initBoundednessCheckPanel() {
 		
 		// Number of extra tokens field
@@ -921,12 +953,14 @@ public class QueryDialog extends JPanel {
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
 		boundednessCheckPanel.add(numberOfExtraTokensInNet);
 
 		boundednessCheckPanel.add(new JLabel("  "));
 		
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
+		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
 		kbounded.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
@@ -1051,6 +1085,12 @@ public class QueryDialog extends JPanel {
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
 		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
 		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
+		
+		//Add tool tips 
+		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
+		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
+		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
+		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
 
 		quantificationRadioButtonGroup.add(existsDiamond);
 		quantificationRadioButtonGroup.add(existsBox);
@@ -1141,6 +1181,11 @@ public class QueryDialog extends JPanel {
 		conjunctionButton = new JButton("and");
 		disjunctionButton = new JButton("or");
 		negationButton = new JButton("not");
+		
+		//Add tool tips
+		conjunctionButton.setToolTipText(TOOL_TIP_CONJUNCTIONBUTTON);
+		disjunctionButton.setToolTipText(TOOL_TIP_DISJUNCTIONBUTTON);
+		negationButton.setToolTipText(TOOL_TIP_NEGATIONBUTTON);
 
 		logicButtonGroup.add(conjunctionButton);
 		logicButtonGroup.add(disjunctionButton);
@@ -1275,6 +1320,7 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(125, 27);
 		placesBox.setMaximumSize(d);
 		placesBox.setPreferredSize(d);
+		
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
@@ -1357,10 +1403,10 @@ public class QueryDialog extends JPanel {
 		placeMarking.setMaximumSize(new Dimension(60, 30));
 		placeMarking.setMinimumSize(new Dimension(60, 30));
 		placeMarking.setPreferredSize(new Dimension(60, 30));
-
+		
 		gbc.gridx = 2;
 		predicatePanel.add(placeMarking, gbc);
-
+		
 		addPredicateButton = new JButton("Add predicate to the query");
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -1394,6 +1440,15 @@ public class QueryDialog extends JPanel {
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(predicatePanel, gbc);
+		
+		//Add tool tips for predicate panel
+		placesBox.setToolTipText(TOOL_TIP_PLACESBOX);
+		templateBox.setToolTipText(TOOL_TIP_TEMPLATEBOX);
+		relationalOperatorBox.setToolTipText(TOOL_TIP_RELATIONALOPERATORBOX);
+		placeMarking.setToolTipText(TOOL_TIP_PLACEMARKING);
+		addPredicateButton.setToolTipText(TOOL_TIP_ADDPREDICATEBUTTON);
+		truePredicateButton.setToolTipText(TOOL_TIP_TRUEPREDICATEBUTTON);
+		falsePredicateButton.setToolTipText(TOOL_TIP_FALSEPREDICATEBUTTON);
 		
 		// Action listeners for predicate panel
 		addPredicateButton.addActionListener(new ActionListener() {
@@ -1477,6 +1532,13 @@ public class QueryDialog extends JPanel {
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
 		editQueryButton = new JButton("Edit query");
+		
+		//Add tool tips
+		deleteButton.setToolTipText(TOOL_TIP_DELETEBUTTON);
+		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
+		undoButton.setToolTipText(TOOL_TIP_UNDOBUTTON);
+		redoButton.setToolTipText(TOOL_TIP_REDOBUTTON);
+		editQueryButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);
 
 		editingButtonsGroup.add(deleteButton);
 		editingButtonsGroup.add(resetButton);
