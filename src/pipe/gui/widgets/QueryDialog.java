@@ -220,6 +220,8 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
+	
+	//TODO
 	//Strings for tool tips
 	//Tool tips for quantification panel
 	private static final String TOOL_TIP_EXISTS_DIAMOND = "Query if a certain marking in the net is reachable.";
@@ -251,6 +253,10 @@ public class QueryDialog extends JPanel {
 	//Tool tips for boundedness check panel
 	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "The number of extra tokens allowed in the net";
 	private static final String TOOL_TIP_KBOUNDED = "Check wether the net is bounded according to the number of extra tokens";
+	
+	//Tool tips for trace options panel
+	private final static String TOOL_TIP_SOME_TRACE = "Show trace after verification has compleated.";
+	private final static String TOOL_TIP_NO_TRACE = "Do not show trace after verification has compleated.";
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
@@ -1761,13 +1767,15 @@ public class QueryDialog extends JPanel {
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
 
 	}
-
+	
 	private void initTraceOptionsPanel() {
 		traceOptionsPanel = new JPanel(new GridBagLayout());
 		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
 		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
 		noTraceRadioButton = new JRadioButton("No trace");
+		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
+		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
 		traceRadioButtonGroup.add(someTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
 
