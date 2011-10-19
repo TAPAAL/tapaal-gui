@@ -258,6 +258,13 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SOME_TRACE = "Show trace after verification has compleated.";
 	private final static String TOOL_TIP_NO_TRACE = "Do not show trace after verification has compleated.";
 	
+	//Tool tips for buttom panel
+	private final static String TOOL_TIP_SAVE_BUTTON = "Save the specifyed query";
+	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the specifyed query";
+	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog";
+	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export the xml needed for the UPPAAL engine";
+	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export the xml needed for the TAPAAL engine";
+	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
@@ -1913,6 +1920,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reduction = getReductionOption();
 		
 		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 	}
 
 	private void refreshQueryEditingButtons() {
@@ -1949,7 +1957,6 @@ public class QueryDialog extends JPanel {
 		discreteInclusion.setSelected(isUpwardClosed ? discreteInclusion.isSelected() : false);
 	}
 	
-
 	private void initButtonPanel(QueryDialogueOption option) {
 		buttonPanel = new JPanel(new FlowLayout());
 		if (option == QueryDialogueOption.Save) {
@@ -1957,7 +1964,12 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
-
+			
+			//Add tool tips
+			saveButton.setToolTipText(TOOL_TIP_SAVE_BUTTON);
+			saveAndVerifyButton.setToolTipText(TOOL_TIP_SAVE_AND_VERIFY_BUTTON);
+			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
+			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
