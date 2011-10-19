@@ -220,9 +220,15 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
-	
-	//TODO
 	//Strings for tool tips
+	//Tool tips for top panel
+	private static final String TOOL_TIP_QUERYNAME = "Enter the name of the query.";
+	private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different options";
+	
+	//Tool tip for query field
+	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on the part of the query to edit<br />" +
+			"(to edit manually press the \"Edit Query\" button</html>";
+	
 	//Tool tips for quantification panel
 	private static final String TOOL_TIP_EXISTS_DIAMOND = "Query if a certain marking in the net is reachable.";
 	private static final String TOOL_TIP_EXISTS_BOX = "Query if a trace exists in which all markings satisfies some property (This is only available using certain verification engines).";
@@ -249,10 +255,28 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_UNDOBUTTON = "Undo the last action";
 	private static final String TOOL_TIP_REDOBUTTON = "Redo the last action undone";
 	private static final String TOOL_TIP_EDITQUERYBUTTON = "Edit the query manually";
+	private final static String TOOL_TIP_PARSE_QUERY = "Parse the manully written query, and exit to manual edit";
+	private final static String TOOL_TIP_CANCEL_QUERY = "Cancel the manully written query, and exit to manual edit";
 	
 	//Tool tips for boundedness check panel
 	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "The number of extra tokens allowed in the net";
 	private static final String TOOL_TIP_KBOUNDED = "Check wether the net is bounded according to the number of extra tokens";
+	
+	//Tool tips for reduction options panel
+	//TODO Add better tool tips for symmetry reduction and select inclusion places
+	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose which reduction engine to use";
+	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "See help for explanation of symmetry reduction";
+	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform more advanced inclusion check<br/>" +
+			 "in an attempt to reduce the number of explored states.<br/>" +
+			 "<b>Note:</b> This may have an adverse affect on performance on some models!</html>"; 
+	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "See help for explanation of selecting inclusion places";
+	
+	//Tool tips for search options panel
+	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>If discrete inclusion optimization is not enabled, this strategy performs a breadth first search.<br />" +
+			"If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places<br />where the engine checks for discrete inclusion.</html>";
+	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
+	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
+	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
 	
 	//Tool tips for trace options panel
 	private final static String TOOL_TIP_SOME_TRACE = "Show trace after verification has compleated.";
@@ -295,6 +319,7 @@ public class QueryDialog extends JPanel {
 
 	private void setQueryFieldEditable(boolean isEditable) {
 		queryField.setEditable(isEditable);
+		queryField.setToolTipText(isEditable ? null : TOOL_TIP_QUERY_FIELD);
 	}
 
 	public TAPNQuery getQuery() {
@@ -715,6 +740,9 @@ public class QueryDialog extends JPanel {
 		updateSelection(newProperty);
 		resetButton.setText("Reset Query");
 		editQueryButton.setText("Edit Query");
+		
+		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
+		editQueryButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);
 		enableEditingButtons();
 		
 		setEnabledReductionOptions();
@@ -724,6 +752,8 @@ public class QueryDialog extends JPanel {
 		setQueryFieldEditable(true);
 		resetButton.setText("Parse query");
 		editQueryButton.setText("Cancel");
+		resetButton.setToolTipText(TOOL_TIP_PARSE_QUERY);
+		editQueryButton.setToolTipText(TOOL_TIP_CANCEL_QUERY);
 		clearSelection();
 		disableAllQueryButtons();
 		disableEditingButtons();
@@ -850,7 +880,7 @@ public class QueryDialog extends JPanel {
 			forAllBox.setSelected(true);
 		}
 	}
-
+	
 	private void initQueryNamePanel() {
 		
 		JPanel splitter = new JPanel(new BorderLayout());
@@ -860,7 +890,8 @@ public class QueryDialog extends JPanel {
 		namePanel.add(new JLabel("Query name: "));
 		
 		queryName = new JTextField("Query Comment/Name Here", 25);
-
+		queryName.setToolTipText(TOOL_TIP_QUERYNAME);
+		
 		namePanel.add(queryName);
 
 		queryName.getDocument().addDocumentListener(new DocumentListener() {
@@ -883,6 +914,7 @@ public class QueryDialog extends JPanel {
 		
 		
 		JButton infoButton = new JButton("Help on the query options");	
+		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
 		infoButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane.showMessageDialog(QueryDialog.this, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
@@ -1026,6 +1058,7 @@ public class QueryDialog extends JPanel {
 		queryField.setBackground(Color.white);
 		queryField.setText(newProperty.toString());
 		queryField.setEditable(false);
+		queryField.setToolTipText(TOOL_TIP_QUERY_FIELD); 
 
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
@@ -1702,7 +1735,7 @@ public class QueryDialog extends JPanel {
 				}
 			}
 		});
-
+		
 		editQueryButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -1747,6 +1780,12 @@ public class QueryDialog extends JPanel {
 		depthFirstSearch = new JRadioButton("Depth first search    ");
 		randomSearch = new JRadioButton("Random search    ");
 		heuristicSearch = new JRadioButton("Heuristic search    ");
+		
+		breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
+		depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);
+		randomSearch.setToolTipText(TOOL_TIP_RANDOM_SEARCH);
+		heuristicSearch.setToolTipText(TOOL_TIP_HEURISTIC_SEARCH);
+		
 		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
@@ -1817,7 +1856,8 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
-
+		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
+		
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
@@ -1843,6 +1883,7 @@ public class QueryDialog extends JPanel {
 
 		symmetryReduction = new JCheckBox("Use symmetry reduction");
 		symmetryReduction.setSelected(true);
+		symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
 		symmetryReduction.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				refreshTraceOptions();
@@ -1858,9 +1899,7 @@ public class QueryDialog extends JPanel {
 
 		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
-		discreteInclusion.setToolTipText("<html>This optimization will perform more advanced inclusion check<br/>" +
-										 "in an attempt to reduce the number of explored states.<br/>" +
-										 "<b>Note:</b> This may have an adverse affect on performance on some models!</html>");
+		discreteInclusion.setToolTipText(TOOL_TIP_DISCRETE_INCLUSION);
 		discreteInclusion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
@@ -1876,6 +1915,7 @@ public class QueryDialog extends JPanel {
 		
 		selectInclusionPlacesButton = new JButton("Select Inclusion Places");
 		selectInclusionPlacesButton.setEnabled(false);
+		selectInclusionPlacesButton.setToolTipText(TOOL_TIP_SELECT_INCLUSION_PLACES);
 		selectInclusionPlacesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
