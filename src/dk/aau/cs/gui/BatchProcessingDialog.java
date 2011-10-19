@@ -99,6 +99,10 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
 
+	//Tool tip strings
+	private final static String TOOL_TIP_QUERY_PROPERTY_OPTION = "Choose wether to override the query";
+	private final static String TOOL_TIP_NUMBER_OF_EXTRA_TOKENS = "Override the number of extra tokens in the net";
+	
 	private static String lastPath = null;
 
 	private JPanel filesButtonsPanel;
@@ -120,6 +124,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JComboBox reductionOption;
 	private JComboBox searchOption;
 	private JButton exportButton;
+	private JButton closeButton;
 	private JComboBox queryPropertyOption;
 	private JPanel verificationOptionsPanel;
 	private JSpinner numberOfExtraTokensInNet;
@@ -323,7 +328,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		enableButtons();
 	}
-
+	
 	private void initVerificationOptionsPanel() {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory
@@ -358,7 +363,8 @@ public class BatchProcessingDialog extends JDialog {
 		String[] options = new String[] { name_KeepQueryOption,
 				name_SEARCHWHOLESTATESPACE };
 		queryPropertyOption = new JComboBox(options);
-
+		queryPropertyOption.setToolTipText(TOOL_TIP_QUERY_PROPERTY_OPTION);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -382,6 +388,7 @@ public class BatchProcessingDialog extends JDialog {
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setEnabled(false);
+		numberOfExtraTokensInNet.setToolTipText(TOOL_TIP_NUMBER_OF_EXTRA_TOKENS);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -389,7 +396,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(numberOfExtraTokensInNet, gbc);
-
+	
 		keepQueryCapacity = new JCheckBox(name_KeepQueryOption);
 		keepQueryCapacity.setSelected(true);
 		keepQueryCapacity.addActionListener(new ActionListener() {
@@ -647,6 +654,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(searchOption, gbc);
 	}
+	
+	private void exit() {
+		rootPane.getParent().setVisible(false);
+	}
 
 	private void initResultTablePanel() {
 		JPanel resultTablePanel = new JPanel(new GridBagLayout());
@@ -685,6 +696,21 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(5, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		resultTablePanel.add(exportButton, gbc);
+		
+		closeButton = new JButton("Close");
+		closeButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exit();
+				
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
+		resultTablePanel.add(closeButton, gbc);
 
 		tableModel = new BatchProcessingResultsTableModel();
 		final JTable table = new JTable(tableModel) {
@@ -698,8 +724,8 @@ public class BatchProcessingDialog extends JDialog {
 			};
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
-		table.getColumnModel().getColumn(0).setMinWidth(60);
-		table.getColumnModel().getColumn(0).setPreferredWidth(60);
+		table.getColumnModel().getColumn(0).setMinWidth(70);
+		table.getColumnModel().getColumn(0).setPreferredWidth(70);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
 		table.getColumn("Method").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
@@ -729,6 +755,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.gridwidth = 2;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
