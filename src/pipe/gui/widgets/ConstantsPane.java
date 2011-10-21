@@ -156,7 +156,7 @@ public class ConstantsPane extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(removeBtn, gbc);
 
-		JButton addConstantButton = new JButton("Add");
+		JButton addConstantButton = new JButton("New");
 		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -233,7 +233,7 @@ public class ConstantsPane extends JPanel {
 		constantsPanel.add(moveDownButton,gbc);
 	}
 
-	private void showEditConstantDialog(Constant constant) {
+	private void showEditConstantDialog(Constant constant) {		
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
 				"Edit Constant", true);
 

@@ -52,6 +52,51 @@ public class SharedPlaceNamePanel extends JPanel {
 		add(namePanel, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.PAGE_END);
 	}
+	
+	public boolean updateExistingPlace(String name) {
+		String oldName = placeToEdit.name();
+		
+		if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
+			JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		
+		try{
+			placeToEdit.setName(name);
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid. \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		for(TAPNQuery query : context.queries()){
+			query.getProperty().accept(new RenameSharedPlaceVisitor(oldName, name), null);
+		}
+		
+		listModel.updatedName();
+		context.undoManager().addNewEdit(new RenameSharedPlaceCommand(placeToEdit, listModel, context.tabContent(), oldName, name));
+		return true;
+	}
+	
+	public boolean addNewSharedPlace(String name) {
+		SharedPlace place = null;
+		try{
+			place = new SharedPlace(name);
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid. \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		try{
+			listModel.addElement(place);
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		context.undoManager().addNewEdit(new AddSharedPlaceCommand(listModel, place));
+		return true;
+	}
 
 	private JPanel createNamePanel() {
 		JPanel namePanel = new JPanel(new GridBagLayout());
@@ -105,7 +150,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				}
 			}
 
-			private boolean updateExistingPlace(String name) {
+			public boolean updateExistingPlace(String name) {
 				String oldName = placeToEdit.name();
 				
 				if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
@@ -130,7 +175,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				return true;
 			}
 
-			private boolean addNewSharedPlace(String name) {
+			public boolean addNewSharedPlace(String name) {
 				SharedPlace place = null;
 				try{
 					place = new SharedPlace(name);
