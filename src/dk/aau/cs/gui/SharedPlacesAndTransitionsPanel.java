@@ -477,9 +477,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
 		//Get string from inputDialog
 		String sharedPlaceName = (String) JOptionPane.showInputDialog(
-				tab.drawingSurface(), "Enter a shared place name:", "Edit Shared Place",
+//				tab.drawingSurface(), "Enter a shared place name:", "Edit Shared Place",
+				null, "Enter a shared place name:", "Edit Shared Place",
 				JOptionPane.PLAIN_MESSAGE, null, null, 
-				tab.drawingSurface().getNameGenerator().getNewTemplateName()
+				""
 				);		
 		//Do logic depending on the returned inputstring.
 		//The class SharedPlaceNamePanel encapsulates the logic of updating and creating a place. 

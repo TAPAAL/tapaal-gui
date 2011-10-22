@@ -5,10 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.NumberFormatter;
 
@@ -36,13 +40,23 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private TimedArcPetriNetNetwork model;
 	private int lowerBound;
 	private int upperBound;
-
+	
+	JPanel nameTextFieldPane;
+	JTextField nameTextField;
+	Dimension size;
+	JLabel nameLabel;  
+	JPanel valueSpinnerPane;
+	JLabel valueLabel; 	
+	JSpinner valueSpinner;
+	JPanel container;
+	
 	private String oldName;
 
 	/** Creates new form LeftConstantsPane */
 
 	public ConstantsDialogPanel() {
 		initComponents();
+		
 	}
 
 	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) {
@@ -60,21 +74,21 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 		nameTextField.setText(oldName);
 
-		// wire up buttons
-		okButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				onOK();
-			}
-		});
-
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exit();
-			}
-		});
-
-		rootPane.setDefaultButton(okButton);
+//		// wire up buttons
+//		okButton.addActionListener(new ActionListener() {
+//
+//			public void actionPerformed(ActionEvent e) {
+//				onOK();
+//			}
+//		});
+//
+//		cancelButton.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				exit();
+//			}
+//		});
+//
+//		rootPane.setDefaultButton(okButton);
 	}
 
 	private void setupValueEditor() {
@@ -83,6 +97,10 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		// Disable nonnumeric keys in value spinner
 		JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
 		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+		
+		//txt.setMaximumSize(new Dimension(60,25));//why does none of these 3 work??
+		//valueSpinner.getEditor().setSize(new Dimension(60,25));
+		//valueSpinner.getEditor().setMaximumSize(new Dimension(60,25));
 	}
 
 	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model,
@@ -99,99 +117,191 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		setupValueEditor();
 		nameTextField.setText(oldName);
 	}
-
-	public void onOK() {
-		String newName = nameTextField.getText();
-
-		if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
-
-			System.err
-					.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
-			JOptionPane
-					.showMessageDialog(
-							CreateGui.getApp(),
-							"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-							"Error", JOptionPane.INFORMATION_MESSAGE);
+	
+	public void showDialog() {
+		Integer constantWasConfirmed = new Integer(2); //cancel = 2, ok = 0, close window = -1		
+		constantWasConfirmed = JOptionPane.showConfirmDialog(
+				null, container, "Edit Constant",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		
+		if (constantWasConfirmed == 2 )
 			return;
-		}
-
-		if (newName.trim().isEmpty()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"You must specify a name.", "Missing name",
-					JOptionPane.ERROR_MESSAGE);
-		} else {
-			int val = (Integer) valueSpinner.getValue();
-
-			if (!oldName.equals("")) {
-				if (!oldName.equals(newName)
-						&& model.isConstantNameUsed(newName)) {
-					JOptionPane
-							.showMessageDialog(
-									CreateGui.getApp(),
-									"There is already another constant with the same name.\n\n"
-											+ "Choose a different name for the constant.",
-									"Error", JOptionPane.INFORMATION_MESSAGE);
-					nameTextField.setText(oldName);
-					return;
-				}
-				
-				//Kyrke - This is messy, but a quck fix for bug #815487			
-				//Check that the value is within the allowed bounds
-				if (!( lowerBound <= val && val <= upperBound )){
-					
-					JOptionPane.showMessageDialog(
-							CreateGui.getApp(),
-							"The specified value is invalid for the current net.\n"
-									+ "Updating the constant to the specified value invalidates the guard\n"
-									+ "on one or more arcs.",
-							"Constant value invalid for current net",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-					
-				}
-				
-				Command edit = model.updateConstant(oldName, new Constant(
-						newName, val));
-				if (edit == null) {
-					JOptionPane
-							.showMessageDialog(
-									CreateGui.getApp(),
-									"The specified value is invalid for the current net.\n"
-											+ "Updating the constant to the specified value invalidates the guard\n"
-											+ "on one or more arcs.",
-									"Constant value invalid for current net",
-									JOptionPane.ERROR_MESSAGE);
-					return;
-				} else {
-					CreateGui.getCurrentTab().drawingSurface().getUndoManager()
-							.addNewEdit(edit);
-					CreateGui.getCurrentTab().drawingSurface().repaintAll();
-				}
-				
-				
-				
-			} else {
-				Command edit = model.addConstant(newName, val);
-				if (edit == null) {
-					JOptionPane
-							.showMessageDialog(
-									CreateGui.getApp(),
-									"A constant with the specified name already exists.",
-									"Constant exists",
-									JOptionPane.ERROR_MESSAGE);
-				} else
-					CreateGui.getView().getUndoManager().addNewEdit(edit);
+		else if (constantWasConfirmed == -1 )
+			return;
+		else if (constantWasConfirmed == 0)
+		{			
+			String newName = nameTextField.getText();
+			
+			if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
+				System.err
+				.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+				JOptionPane
+				.showMessageDialog(
+						CreateGui.getApp(),
+						"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				return;
 			}
 
-			model.buildConstraints();
+			if (newName.trim().isEmpty()) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						"You must specify a name.", "Missing name",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			} else {
+				int val = (Integer) valueSpinner.getValue();
+
+				if (!oldName.equals("")) {
+					if (!oldName.equals(newName)
+							&& model.isConstantNameUsed(newName)) {
+						JOptionPane
+						.showMessageDialog(
+								CreateGui.getApp(),
+								"There is already another constant with the same name.\n\n"
+								+ "Choose a different name for the constant.",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						//nameTextField.setText(oldName);
+						return;
+					}
+					//Kyrke - This is messy, but a quck fix for bug #815487			
+					//Check that the value is within the allowed bounds
+					if (!( lowerBound <= val && val <= upperBound )){
+						JOptionPane.showMessageDialog(
+								CreateGui.getApp(),
+								"The specified value is invalid for the current net.\n"
+								+ "Updating the constant to the specified value invalidates the guard\n"
+								+ "on one or more arcs.",
+								"Constant value invalid for current net",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					Command edit = model.updateConstant(oldName, new Constant(
+							newName, val));
+					if (edit == null) {
+						JOptionPane
+						.showMessageDialog(
+								CreateGui.getApp(),
+								"The specified value is invalid for the current net.\n"
+								+ "Updating the constant to the specified value invalidates the guard\n"
+								+ "on one or more arcs.",
+								"Constant value invalid for current net",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					} else {
+						CreateGui.getCurrentTab().drawingSurface().getUndoManager()
+						.addNewEdit(edit);
+						CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					}
+				} else {
+					Command edit = model.addConstant(newName, val);
+					if (edit == null) {
+						JOptionPane
+						.showMessageDialog(
+								CreateGui.getApp(),
+								"A constant with the specified name already exists.",
+								"Constant exists",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					} else
+						CreateGui.getView().getUndoManager().addNewEdit(edit);
+				}
+				model.buildConstraints();
+			}
 		}
-
-		exit();
 	}
 
-	public void exit() {
-		rootPane.getParent().setVisible(false);
-	}
+//	public void onOK() {
+//		String newName = nameTextField.getText();
+//
+//		if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
+//
+//			System.err
+//					.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+//			JOptionPane
+//					.showMessageDialog(
+//							CreateGui.getApp(),
+//							"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+//							"Error", JOptionPane.INFORMATION_MESSAGE);
+//			return;
+//		}
+//
+//		if (newName.trim().isEmpty()) {
+//			JOptionPane.showMessageDialog(CreateGui.getApp(),
+//					"You must specify a name.", "Missing name",
+//					JOptionPane.ERROR_MESSAGE);
+//		} else {
+//			int val = (Integer) valueSpinner.getValue();
+//
+//			if (!oldName.equals("")) {
+//				if (!oldName.equals(newName)
+//						&& model.isConstantNameUsed(newName)) {
+//					JOptionPane
+//							.showMessageDialog(
+//									CreateGui.getApp(),
+//									"There is already another constant with the same name.\n\n"
+//											+ "Choose a different name for the constant.",
+//									"Error", JOptionPane.INFORMATION_MESSAGE);
+//					nameTextField.setText(oldName);
+//					return;
+//				}
+//				
+//				//Kyrke - This is messy, but a quck fix for bug #815487			
+//				//Check that the value is within the allowed bounds
+//				if (!( lowerBound <= val && val <= upperBound )){
+//					
+//					JOptionPane.showMessageDialog(
+//							CreateGui.getApp(),
+//							"The specified value is invalid for the current net.\n"
+//									+ "Updating the constant to the specified value invalidates the guard\n"
+//									+ "on one or more arcs.",
+//							"Constant value invalid for current net",
+//							JOptionPane.ERROR_MESSAGE);
+//					return;
+//					
+//				}
+//				
+//				Command edit = model.updateConstant(oldName, new Constant(
+//						newName, val));
+//				if (edit == null) {
+//					JOptionPane
+//							.showMessageDialog(
+//									CreateGui.getApp(),
+//									"The specified value is invalid for the current net.\n"
+//											+ "Updating the constant to the specified value invalidates the guard\n"
+//											+ "on one or more arcs.",
+//									"Constant value invalid for current net",
+//									JOptionPane.ERROR_MESSAGE);
+//					return;
+//				} else {
+//					CreateGui.getCurrentTab().drawingSurface().getUndoManager()
+//							.addNewEdit(edit);
+//					CreateGui.getCurrentTab().drawingSurface().repaintAll();
+//				}
+//				
+//				
+//				
+//			} else {
+//				Command edit = model.addConstant(newName, val);
+//				if (edit == null) {
+//					JOptionPane
+//							.showMessageDialog(
+//									CreateGui.getApp(),
+//									"A constant with the specified name already exists.",
+//									"Constant exists",
+//									JOptionPane.ERROR_MESSAGE);
+//				} else
+//					CreateGui.getView().getUndoManager().addNewEdit(edit);
+//			}
+//
+//			model.buildConstraints();
+//		}
+//
+//		exit();
+//	}
+//
+//	public void exit() {
+//		rootPane.getParent().setVisible(false);
+//	}
 
 	/**
 	 * This method is called from within the constructor to initialize the form.
@@ -202,141 +312,164 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
-
+		nameTextFieldPane = new JPanel();
 		nameTextField = new javax.swing.JTextField();
-		Dimension size = new Dimension(150, 25);
+		size = new Dimension(200, 25);
 		nameTextField.setPreferredSize(size);
 		nameTextField.setMinimumSize(size);
-		nameLabel = new javax.swing.JLabel();
-		valueLabel = new javax.swing.JLabel();
-		valueSpinner = new javax.swing.JSpinner();
-		okButton = new javax.swing.JButton();
-		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
-		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
-		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
-
-		cancelButton = new javax.swing.JButton();
-		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
-		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
-		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
-
+		nameLabel = new JLabel(); 
 		nameLabel.setText("Name:");
-
+		nameTextFieldPane.add(nameLabel);
+		nameTextFieldPane.add(nameTextField);
+		//create value spinner component for choosing value 
+		valueSpinnerPane = new JPanel();
+		valueLabel = new javax.swing.JLabel(); 
 		valueLabel.setText("Value:");
-
-		okButton.setText("OK");
-
-		cancelButton.setText("Cancel");
-
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-		this.setLayout(layout);
-		layout
-				.setHorizontalGroup(layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.LEADING)
-														.addGroup(
-																layout
-																		.createSequentialGroup()
-																		.addComponent(
-																				cancelButton)
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																		.addComponent(
-																				okButton))
-														.addGroup(
-																layout
-																		.createParallelGroup(
-																				javax.swing.GroupLayout.Alignment.LEADING,
-																				false)
-																		.addGroup(
-																				layout
-																						.createSequentialGroup()
-																						.addComponent(
-																								nameLabel)
-																						.addPreferredGap(
-																								javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-																						.addComponent(
-																								nameTextField,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								javax.swing.GroupLayout.PREFERRED_SIZE))
-																		.addGroup(
-																				layout
-																						.createSequentialGroup()
-																						.addComponent(
-																								valueLabel)
-																						.addPreferredGap(
-																								javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-																								javax.swing.GroupLayout.DEFAULT_SIZE,
-																								Short.MAX_VALUE)
-																						.addComponent(
-																								valueSpinner,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								78,
-																								javax.swing.GroupLayout.PREFERRED_SIZE))))
-										.addContainerGap(
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)));
-		layout
-				.setVerticalGroup(layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(nameLabel)
-														.addComponent(
-																nameTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																valueLabel)
-														.addComponent(
-																valueSpinner,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(okButton)
-														.addComponent(
-																cancelButton))
-										.addContainerGap(
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)));
+		valueSpinner = new javax.swing.JSpinner();
+		valueSpinner.setMaximumSize(new Dimension(60,25));
+		valueSpinnerPane.add(valueLabel);
+		valueSpinnerPane.add(valueSpinner);
+		//add components to containing pane
+		container = new JPanel();
+		container.add(nameTextFieldPane);
+		container.add(valueSpinnerPane);
+		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		container.setAlignmentX(LEFT_ALIGNMENT);
+		
+//		nameTextField = new javax.swing.JTextField();
+//		Dimension size = new Dimension(200, 25);
+//		nameTextField.setPreferredSize(size);
+//		nameTextField.setMinimumSize(size);
+//		nameLabel = new javax.swing.JLabel();
+//		valueLabel = new javax.swing.JLabel();
+//		valueSpinner = new javax.swing.JSpinner();
+//		okButton = new javax.swing.JButton();
+//		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+//		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+//		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+//
+//		cancelButton = new javax.swing.JButton();
+//		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+//		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+//		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+//
+//		nameLabel.setText("Name:");
+//
+//		valueLabel.setText("Value:");
+//
+//		okButton.setText("OK");
+//
+//		cancelButton.setText("Cancel");
+//
+//		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+//		this.setLayout(layout);
+//		layout
+//				.setHorizontalGroup(layout
+//						.createParallelGroup(
+//								javax.swing.GroupLayout.Alignment.LEADING)
+//						.addGroup(
+//								layout
+//										.createSequentialGroup()
+//										.addContainerGap()
+//										.addGroup(
+//												layout
+//														.createParallelGroup(
+//																javax.swing.GroupLayout.Alignment.LEADING)
+//														.addGroup(
+//																layout
+//																		.createSequentialGroup()
+//																		.addComponent(
+//																				cancelButton)
+//																		.addPreferredGap(
+//																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//																		.addComponent(
+//																				okButton))
+//														.addGroup(
+//																layout
+//																		.createParallelGroup(
+//																				javax.swing.GroupLayout.Alignment.LEADING,
+//																				false)
+//																		.addGroup(
+//																				layout
+//																						.createSequentialGroup()
+//																						.addComponent(
+//																								nameLabel)
+//																						.addPreferredGap(
+//																								javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+//																						.addComponent(
+//																								nameTextField,
+//																								javax.swing.GroupLayout.PREFERRED_SIZE,
+//																								javax.swing.GroupLayout.PREFERRED_SIZE,
+//																								javax.swing.GroupLayout.PREFERRED_SIZE))
+//																		.addGroup(
+//																				layout
+//																						.createSequentialGroup()
+//																						.addComponent(
+//																								valueLabel)
+//																						.addPreferredGap(
+//																								javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+//																								javax.swing.GroupLayout.DEFAULT_SIZE,
+//																								Short.MAX_VALUE)
+//																						.addComponent(
+//																								valueSpinner,
+//																								javax.swing.GroupLayout.PREFERRED_SIZE,
+//																								78,
+//																								javax.swing.GroupLayout.PREFERRED_SIZE))))
+//										.addContainerGap(
+//												javax.swing.GroupLayout.DEFAULT_SIZE,
+//												Short.MAX_VALUE)));
+//		layout
+//				.setVerticalGroup(layout
+//						.createParallelGroup(
+//								javax.swing.GroupLayout.Alignment.LEADING)
+//						.addGroup(
+//								layout
+//										.createSequentialGroup()
+//										.addContainerGap()
+//										.addGroup(
+//												layout
+//														.createParallelGroup(
+//																javax.swing.GroupLayout.Alignment.BASELINE)
+//														.addComponent(nameLabel)
+//														.addComponent(
+//																nameTextField,
+//																javax.swing.GroupLayout.PREFERRED_SIZE,
+//																javax.swing.GroupLayout.DEFAULT_SIZE,
+//																javax.swing.GroupLayout.PREFERRED_SIZE))
+//										.addPreferredGap(
+//												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//										.addGroup(
+//												layout
+//														.createParallelGroup(
+//																javax.swing.GroupLayout.Alignment.BASELINE)
+//														.addComponent(
+//																valueLabel)
+//														.addComponent(
+//																valueSpinner,
+//																javax.swing.GroupLayout.PREFERRED_SIZE,
+//																javax.swing.GroupLayout.DEFAULT_SIZE,
+//																javax.swing.GroupLayout.PREFERRED_SIZE))
+//										.addPreferredGap(
+//												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+//										.addGroup(
+//												layout
+//														.createParallelGroup(
+//																javax.swing.GroupLayout.Alignment.BASELINE)
+//														.addComponent(okButton)
+//														.addComponent(
+//																cancelButton))
+//										.addContainerGap(
+//												javax.swing.GroupLayout.DEFAULT_SIZE,
+//												Short.MAX_VALUE)));
 	}// </editor-fold>//GEN-END:initComponents
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JButton cancelButton;
-	private javax.swing.JLabel nameLabel;
-	private javax.swing.JTextField nameTextField;
-	private javax.swing.JButton okButton;
-	private javax.swing.JLabel valueLabel;
-	private javax.swing.JSpinner valueSpinner;
+	//private javax.swing.JButton cancelButton;
+	//private javax.swing.JLabel nameLabel;
+	//private javax.swing.JTextField nameTextField;
+	//private javax.swing.JButton okButton;
+	//private javax.swing.JLabel valueLabel;
+	//private javax.swing.JSpinner valueSpinner;
 	// End of variables declaration//GEN-END:variables
 
 }

@@ -1,7 +1,9 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -9,14 +11,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
@@ -233,33 +241,80 @@ public class ConstantsPane extends JPanel {
 		constantsPanel.add(moveDownButton,gbc);
 	}
 
-	private void showEditConstantDialog(Constant constant) {		
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Constant", true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add editor
+	private void showEditConstantDialog(Constant constant) {	
+		ConstantsDialogPanel panel;
 		if (constant != null)
-			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-					parent.network(), constant));
+			panel = new ConstantsDialogPanel(new JRootPane(),
+					parent.network(), constant);
 		else
-			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-					parent.network()));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-
-		//showConstants();
+			panel = new ConstantsDialogPanel(new JRootPane(),
+					parent.network());
+		panel.showDialog();
+		showConstants();
+		
+//		//create text field component for inputting name of constant
+//		JPanel nameTextFieldPane = new JPanel();
+//		//nameTextFieldPane.setAlignmentX(LEFT_ALIGNMENT);
+//		//nameTextFieldPane.setLayout(new BoxLayout(nameTextFieldPane, BoxLayout.X_AXIS));
+//		JTextField nameTextField = new javax.swing.JTextField();
+//		Dimension size = new Dimension(150, 25);
+//		nameTextField.setPreferredSize(size);
+//		nameTextField.setMinimumSize(size);
+//		JLabel nameLabel = new JLabel(); 
+//		nameLabel.setText("Name:");
+//		nameTextFieldPane.add(nameLabel);
+//		nameTextFieldPane.add(nameTextField);
+//		//create value spinner component for choosing value 
+//		JPanel valueSpinnerPane = new JPanel();
+//		//valueSpinnerPane.setLayout(new BoxLayout(valueSpinnerPane, BoxLayout.X_AXIS));
+//		//valueSpinnerPane.setAlignmentX(LEFT_ALIGNMENT);
+//		JLabel valueLabel = new javax.swing.JLabel(); 
+//		valueLabel.setText("Value:");
+//		JSpinner valueSpinner = new javax.swing.JSpinner();
+//		valueSpinner.setMaximumSize(new Dimension(60,25));
+//		valueSpinnerPane.add(valueLabel);
+//		valueSpinnerPane.add(valueSpinner);
+//		//add components to containing pane
+//		JPanel container = new JPanel();
+//		container.add(nameTextFieldPane);
+//		container.add(valueSpinnerPane);
+//		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+//		container.setAlignmentX(LEFT_ALIGNMENT);
+//		//Interger to determine if ok-button was pressed in dialog
+//		Integer constantWasConfirmed = new Integer(0); //cancel = 2, ok = 0
+//		
+//		if (constant == null) {
+//		constantWasConfirmed = JOptionPane.showConfirmDialog(
+//				parent.drawingSurface(), container, "Edit Constant",
+//				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+//		}
+//		System.out.println(constantWasConfirmed.toString());
+		
+//		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
+//				"Edit Constant", true);
+//
+//		Container contentPane = guiDialog.getContentPane();
+//
+//		// 1 Set layout
+//		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+//
+//		// 2 Add editor
+//		if (constant != null)
+//			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
+//					parent.network(), constant));
+//		else
+//			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
+//					parent.network()));
+//
+//		guiDialog.setResizable(false);
+//
+//		// Make window fit contents' preferred size
+//		guiDialog.pack();
+//
+//		// Move window to the middle of the screen
+//		guiDialog.setLocationRelativeTo(null);
+//		guiDialog.setVisible(true);
+//
 	}
 
 	protected void removeConstant(String name) {
