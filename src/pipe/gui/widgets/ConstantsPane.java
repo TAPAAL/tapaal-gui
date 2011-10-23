@@ -53,6 +53,12 @@ public class ConstantsPane extends JPanel {
 	private TabContent parent;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	
+	private static final String toolTipEditConstant = "Edit value of existing constant.";
+	private static final String toolTipRemoveConstant = "Remove existing constant.";
+	private static final String toolTipNewConstant = "Create a new constant.";
+	private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
+	
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
 		parent = currentTab;
@@ -133,13 +139,14 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createTitledBorder("Global Constants"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
-
+		this.setToolTipText(toolTipGlobalConstantsLabel);
 		//showConstants();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
+		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constant c = (Constant) constantsList.getSelectedValue();
@@ -153,6 +160,7 @@ public class ConstantsPane extends JPanel {
 
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
+		removeBtn.setToolTipText(toolTipRemoveConstant);
 		removeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String constName = ((Constant) constantsList.getSelectedValue()).name();
@@ -165,6 +173,7 @@ public class ConstantsPane extends JPanel {
 		buttonsPanel.add(removeBtn, gbc);
 
 		JButton addConstantButton = new JButton("New");
+		addConstantButton.setToolTipText(toolTipNewConstant);
 		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -251,70 +260,6 @@ public class ConstantsPane extends JPanel {
 					parent.network());
 		panel.showDialog();
 		showConstants();
-		
-//		//create text field component for inputting name of constant
-//		JPanel nameTextFieldPane = new JPanel();
-//		//nameTextFieldPane.setAlignmentX(LEFT_ALIGNMENT);
-//		//nameTextFieldPane.setLayout(new BoxLayout(nameTextFieldPane, BoxLayout.X_AXIS));
-//		JTextField nameTextField = new javax.swing.JTextField();
-//		Dimension size = new Dimension(150, 25);
-//		nameTextField.setPreferredSize(size);
-//		nameTextField.setMinimumSize(size);
-//		JLabel nameLabel = new JLabel(); 
-//		nameLabel.setText("Name:");
-//		nameTextFieldPane.add(nameLabel);
-//		nameTextFieldPane.add(nameTextField);
-//		//create value spinner component for choosing value 
-//		JPanel valueSpinnerPane = new JPanel();
-//		//valueSpinnerPane.setLayout(new BoxLayout(valueSpinnerPane, BoxLayout.X_AXIS));
-//		//valueSpinnerPane.setAlignmentX(LEFT_ALIGNMENT);
-//		JLabel valueLabel = new javax.swing.JLabel(); 
-//		valueLabel.setText("Value:");
-//		JSpinner valueSpinner = new javax.swing.JSpinner();
-//		valueSpinner.setMaximumSize(new Dimension(60,25));
-//		valueSpinnerPane.add(valueLabel);
-//		valueSpinnerPane.add(valueSpinner);
-//		//add components to containing pane
-//		JPanel container = new JPanel();
-//		container.add(nameTextFieldPane);
-//		container.add(valueSpinnerPane);
-//		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-//		container.setAlignmentX(LEFT_ALIGNMENT);
-//		//Interger to determine if ok-button was pressed in dialog
-//		Integer constantWasConfirmed = new Integer(0); //cancel = 2, ok = 0
-//		
-//		if (constant == null) {
-//		constantWasConfirmed = JOptionPane.showConfirmDialog(
-//				parent.drawingSurface(), container, "Edit Constant",
-//				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-//		}
-//		System.out.println(constantWasConfirmed.toString());
-		
-//		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-//				"Edit Constant", true);
-//
-//		Container contentPane = guiDialog.getContentPane();
-//
-//		// 1 Set layout
-//		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-//
-//		// 2 Add editor
-//		if (constant != null)
-//			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-//					parent.network(), constant));
-//		else
-//			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-//					parent.network()));
-//
-//		guiDialog.setResizable(false);
-//
-//		// Make window fit contents' preferred size
-//		guiDialog.pack();
-//
-//		// Move window to the middle of the screen
-//		guiDialog.setLocationRelativeTo(null);
-//		guiDialog.setVisible(true);
-//
 	}
 
 	protected void removeConstant(String name) {

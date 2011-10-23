@@ -74,6 +74,13 @@ public class TemplateExplorer extends JPanel {
 
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	
+	private static final String toolTipNewComponent ="Create a new component.";
+	private static final String toolTipRemoveComponent ="Remove existing component.";
+	private static final String toolTipCopyComponent ="Copy existing component.";
+	private static final String toolTipRenameComponent="Rename existing component.";
+    private static final String toolTipComponents ="Here you can manage the different components of the Net. \n\n\r" +
+    		"A Net can be broken up in several components and connected via shared places and transitions.";
 
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
@@ -92,7 +99,7 @@ public class TemplateExplorer extends JPanel {
 		initButtonsPanel();
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Components"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-
+		this.setToolTipText(toolTipComponents);
 		addCreatedComponents(hideButtons);
 	}
 
@@ -207,6 +214,7 @@ public class TemplateExplorer extends JPanel {
 		newTemplateButton = new JButton("New");
 		newTemplateButton.setEnabled(true);
 		newTemplateButton.setPreferredSize(dimension);
+		newTemplateButton.setToolTipText(toolTipNewComponent);
 
 		newTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -229,6 +237,7 @@ public class TemplateExplorer extends JPanel {
 		removeTemplateButton = new JButton("Remove");
 		removeTemplateButton.setEnabled(false);
 		removeTemplateButton.setPreferredSize(dimension);
+		removeTemplateButton.setToolTipText(toolTipRemoveComponent);
 
 		removeTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -303,6 +312,7 @@ public class TemplateExplorer extends JPanel {
 		renameButton = new JButton("Rename");
 		renameButton.setEnabled(false);
 		renameButton.setPreferredSize(dimension);
+		renameButton.setToolTipText(toolTipRenameComponent);
 
 		renameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -320,6 +330,7 @@ public class TemplateExplorer extends JPanel {
 		copyButton = new JButton("Copy");
 		copyButton.setEnabled(false);
 		copyButton.setPreferredSize(dimension);
+		copyButton.setToolTipText(toolTipCopyComponent);
 
 		copyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
