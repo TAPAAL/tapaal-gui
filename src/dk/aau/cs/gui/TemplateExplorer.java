@@ -76,11 +76,11 @@ public class TemplateExplorer extends JPanel {
 	private JButton moveDownButton;
 	
 	private static final String toolTipNewComponent ="Create a new component.";
-	private static final String toolTipRemoveComponent ="Remove existing component.";
-	private static final String toolTipCopyComponent ="Copy existing component.";
-	private static final String toolTipRenameComponent="Rename existing component.";
-    private static final String toolTipComponents ="Here you can manage the different components of the Net. \n\n\r" +
-    		"A Net can be broken up in several components and connected via shared places and transitions.";
+	private static final String toolTipRemoveComponent ="Remove selected component.";
+	private static final String toolTipCopyComponent ="Copy selected component.";
+	private static final String toolTipRenameComponent="Rename selected component.";
+    //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
+    	//	"A Net can be broken up in several components and connected via shared places and transitions.";
 
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
@@ -99,7 +99,7 @@ public class TemplateExplorer extends JPanel {
 		initButtonsPanel();
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Components"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		this.setToolTipText(toolTipComponents);
+		//this.setToolTipText(toolTipComponents);
 		addCreatedComponents(hideButtons);
 	}
 

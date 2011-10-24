@@ -54,10 +54,10 @@ public class ConstantsPane extends JPanel {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	
-	private static final String toolTipEditConstant = "Edit value of existing constant.";
-	private static final String toolTipRemoveConstant = "Remove existing constant.";
+	private static final String toolTipEditConstant = "Edit value of selected constant.";
+	private static final String toolTipRemoveConstant = "Remove selected constant.";
 	private static final String toolTipNewConstant = "Create a new constant.";
-	private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
+	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
 	
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
@@ -139,7 +139,7 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createTitledBorder("Global Constants"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
-		this.setToolTipText(toolTipGlobalConstantsLabel);
+		//this.setToolTipText(toolTipGlobalConstantsLabel);
 		//showConstants();
 	}
 

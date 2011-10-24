@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -14,6 +15,8 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.text.NumberFormatter;
 
 import pipe.gui.CreateGui;
@@ -226,3 +229,4 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		container.setAlignmentX(LEFT_ALIGNMENT);		
 	}
 }
+
