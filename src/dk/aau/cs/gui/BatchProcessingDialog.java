@@ -3,6 +3,7 @@ package dk.aau.cs.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -333,7 +334,8 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory
 				.createTitledBorder("Override Verification Options"));
-
+		
+		//TODO
 		initQueryPropertyOptionsComponents();
 		initCapacityComponents();
 		initSearchOptionsComponents();
@@ -355,9 +357,11 @@ public class BatchProcessingDialog extends JDialog {
 	private void initQueryPropertyOptionsComponents() {
 		JLabel queryLabel = new JLabel("Query:");
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(queryLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption,
@@ -366,9 +370,10 @@ public class BatchProcessingDialog extends JDialog {
 		queryPropertyOption.setToolTipText(TOOL_TIP_QUERY_PROPERTY_OPTION);
 		
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(queryPropertyOption, gbc);
@@ -379,7 +384,8 @@ public class BatchProcessingDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(capacityLabel, gbc);
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0,
@@ -393,7 +399,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(numberOfExtraTokensInNet, gbc);
 	
@@ -411,7 +417,8 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(keepQueryCapacity, gbc);
 	}
 
@@ -420,7 +427,8 @@ public class BatchProcessingDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
 
 		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5,
@@ -433,7 +441,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 5;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
 
@@ -451,7 +459,8 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 5;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
 	}
 
@@ -460,7 +469,7 @@ public class BatchProcessingDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 5);
 		verificationOptionsPanel.add(reductionLabel, gbc);
 
@@ -483,9 +492,10 @@ public class BatchProcessingDialog extends JDialog {
 		});
 
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
 		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(reductionOption, gbc);
@@ -496,7 +506,8 @@ public class BatchProcessingDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(symmetryLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption, name_SYMMETRY,
@@ -504,9 +515,10 @@ public class BatchProcessingDialog extends JDialog {
 		symmetryOption = new JComboBox(options);
 
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
 		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(symmetryOption, gbc);
@@ -638,7 +650,8 @@ public class BatchProcessingDialog extends JDialog {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(searchLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC,
@@ -647,9 +660,10 @@ public class BatchProcessingDialog extends JDialog {
 		searchOption.setMinimumSize(searchOption.getSize());
 
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
 		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(searchOption, gbc);
@@ -694,7 +708,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.insets = new Insets(5, 0, 0, 0);
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
+		gbc.anchor = GridBagConstraints.SOUTHWEST;
 		resultTablePanel.add(exportButton, gbc);
 		
 		closeButton = new JButton("Close");
@@ -709,6 +723,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
+		gbc.insets = new Insets(5, 0, 0, 0);
 		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		resultTablePanel.add(closeButton, gbc);
 
