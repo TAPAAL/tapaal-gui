@@ -496,16 +496,38 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void showSharedTransitionNameDialog(SharedTransition transitionToEdit) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Transition", true);
-		Container contentPane = guiDialog.getContentPane();
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, nameGenerator, transitionToEdit);
-		contentPane.add(panel);
-
-		guiDialog.setResizable(false);
-		guiDialog.pack();
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
+		//Get string from inputDialog
+		String sharedTransitionName = (String) JOptionPane.showInputDialog(
+//				tab.drawingSurface(), "Enter a shared place name:", "Edit Shared Place",
+				null, "Enter a shared transition name:", "Edit Shared Transition",
+				JOptionPane.PLAIN_MESSAGE, null, null, 
+				""
+				);		
+		//Do logic depending on the returned inputstring.
+		//The class SharedPlaceNamePanel encapsulates the logic of updating and creating a place. 
+		//To use it we need a dummy pane. (this is a hack to compensate for the way in which
+		//logic is delegated to the SharedPlaceNamePanel class) 
+		JRootPane dummyPane = new JRootPane();
+		SharedTransitionNamePanel panel = new SharedTransitionNamePanel(dummyPane,sharedTransitionsListModel,undoManager,nameGenerator,transitionToEdit); 
+		if (sharedTransitionName != null) {
+			if(!isNameAllowed(sharedTransitionName)) {
+				JOptionPane.showMessageDialog(tab.drawingSurface(),
+						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
+						"Error Creating Component",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			else {						
+				boolean success = true;
+				if(transitionToEdit == null){
+					success = panel.addNewSharedTransition(sharedTransitionName);
+				}else if(!sharedTransitionName.equals(transitionToEdit.name())){
+					success = panel.updateExistingTransition(sharedTransitionName);
+				}			
+				if(success){
+					nameGenerator.updateIndicesForAllModels(sharedTransitionName);
+				}
+			}
+		}
 	}
 
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {

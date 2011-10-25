@@ -103,47 +103,8 @@ public class SharedTransitionNamePanel extends JPanel {
 				}
 			}
 
-			private boolean updateExistingTransition(String name) {
-				
-				String oldName = transitionToEdit.name();
-				
-				if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				
-				
-				try{
-					transitionToEdit.setName(name);
-				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				
-				listModel.updatedName();
-				undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, oldName, name, listModel));
-				return true;
-			}
-			private boolean addNewSharedTransition(String name) {
-				SharedTransition transition = null;
-				
-				try{
-					transition = new SharedTransition(name);
-				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				
-				try{
-					listModel.addElement(transition);
-				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				
-				undoManager.addNewEdit(new AddSharedTransitionCommand(listModel, transition));
-				return true;
-			}
+			
+			
 		});
 		
 		JButton cancelButton = new JButton("Cancel");
@@ -165,6 +126,49 @@ public class SharedTransitionNamePanel extends JPanel {
 
 	private void exit() {
 		rootPane.getParent().setVisible(false);
+	}
+	
+	public boolean addNewSharedTransition(String name) {
+		SharedTransition transition = null;
+		
+		try{
+			transition = new SharedTransition(name);
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		try{
+			listModel.addElement(transition);
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		undoManager.addNewEdit(new AddSharedTransitionCommand(listModel, transition));
+		return true;
+	}
+	
+	public boolean updateExistingTransition(String name) {
+		
+		String oldName = transitionToEdit.name();
+		
+		if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
+			JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		
+		try{
+			transitionToEdit.setName(name);
+		}catch(RequireException e){
+			JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		listModel.updatedName();
+		undoManager.addNewEdit(new RenameSharedTransitionCommand(transitionToEdit, oldName, name, listModel));
+		return true;
 	}
 
 }

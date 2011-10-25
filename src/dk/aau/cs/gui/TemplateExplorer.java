@@ -364,7 +364,7 @@ public class TemplateExplorer extends JPanel {
 	private Template ShowNewTemplateDialog() {
 		String templateName = (String) JOptionPane.showInputDialog(
 //				parent.drawingSurface(), "Component name:", "Rename Component",
-				null, "Component name:", "Rename Component",
+				null, "Component name:", "Enter name of Component",
 				JOptionPane.PLAIN_MESSAGE, null, null, 
 				parent.drawingSurface().getNameGenerator().getNewTemplateName());
 
