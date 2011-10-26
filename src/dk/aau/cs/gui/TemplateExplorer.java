@@ -229,8 +229,8 @@ public class TemplateExplorer extends JPanel {
 		});
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
+		gbc.gridx = 1;
+		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(newTemplateButton, gbc);
 
@@ -304,8 +304,8 @@ public class TemplateExplorer extends JPanel {
 		});
 
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(removeTemplateButton, gbc);
 
@@ -322,8 +322,8 @@ public class TemplateExplorer extends JPanel {
 		});
 
 		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridx = 1;
+		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(renameButton, gbc);
 
@@ -355,8 +355,8 @@ public class TemplateExplorer extends JPanel {
 		});
 
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(copyButton, gbc);
 	}

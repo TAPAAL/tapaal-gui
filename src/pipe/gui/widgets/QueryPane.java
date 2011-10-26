@@ -207,7 +207,7 @@ public class QueryPane extends JPanel {
 			}
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
+		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(editQueryButton, gbc);
@@ -227,7 +227,7 @@ public class QueryPane extends JPanel {
 			}
 		});
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
+		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(verifyButton, gbc);

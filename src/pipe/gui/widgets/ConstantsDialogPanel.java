@@ -1,6 +1,9 @@
 package pipe.gui.widgets;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
@@ -73,21 +76,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		// Set up initial values
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		valueSpinner.setModel(spinnerModel);
-		setupValueEditor();
-
 		nameTextField.setText(oldName);
-	}
-
-	private void setupValueEditor() {
-		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner));
-		
-		// Disable nonnumeric keys in value spinner
-		JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
-		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
-		
-		//txt.setMaximumSize(new Dimension(60,25));//why does none of these 3 work??
-		//valueSpinner.getEditor().setSize(new Dimension(60,25));
-		//valueSpinner.getEditor().setMaximumSize(new Dimension(60,25));
 	}
 
 	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model,
@@ -101,7 +90,6 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(constant
 				.value(), 0, constant.upperBound(), 1);
 		valueSpinner.setModel(spinnerModel);
-		setupValueEditor();
 		nameTextField.setText(oldName);
 	}
 	
@@ -147,7 +135,6 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 								"There is already another constant with the same name.\n\n"
 								+ "Choose a different name for the constant.",
 								"Error", JOptionPane.ERROR_MESSAGE);
-						//nameTextField.setText(oldName);
 						return;
 					}
 					//Kyrke - This is messy, but a quck fix for bug #815487			
@@ -204,29 +191,49 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 	
 	private void initComponents() {
-		nameTextFieldPane = new JPanel();
-		nameTextField = new javax.swing.JTextField();
-		size = new Dimension(200, 25);
-		nameTextField.setPreferredSize(size);
-		nameTextField.setMinimumSize(size);
-		nameLabel = new JLabel(); 
-		nameLabel.setText("Name:");
-		nameTextFieldPane.add(nameLabel);
-		nameTextFieldPane.add(nameTextField);
-		//create value spinner component for choosing value 
-		valueSpinnerPane = new JPanel();
-		valueLabel = new javax.swing.JLabel(); 
-		valueLabel.setText("Value:");
-		valueSpinner = new javax.swing.JSpinner();
-		valueSpinner.setMaximumSize(new Dimension(60,25));
-		valueSpinnerPane.add(valueLabel);
-		valueSpinnerPane.add(valueSpinner);
-		//add components to containing pane
 		container = new JPanel();
-		container.add(nameTextFieldPane);
-		container.add(valueSpinnerPane);
-		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-		container.setAlignmentX(LEFT_ALIGNMENT);		
+		container.setLayout(new GridBagLayout());
+		size = new Dimension(250, 25);
+		
+		nameTextField = new javax.swing.JTextField();		
+		nameTextField.setPreferredSize(size);
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		container.add(nameTextField,gbc);
+		
+		nameLabel = new JLabel(); 
+		nameLabel.setText("Name: ");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		container.add(nameLabel,gbc);
+
+		valueLabel = new javax.swing.JLabel(); 
+		valueLabel.setText("Value: ");
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(2, 0, 2, 0);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		container.add(valueLabel,gbc);
+		
+		valueSpinner = new javax.swing.JSpinner();
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(2, 0, 2, 0);
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		container.add(valueSpinner,gbc);
 	}
 }
 
