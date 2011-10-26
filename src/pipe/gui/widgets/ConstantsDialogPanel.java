@@ -197,6 +197,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		
 		nameTextField = new javax.swing.JTextField();		
 		nameTextField.setPreferredSize(size);
+		nameTextField.addAncestorListener(new RequestFocusListener());
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
