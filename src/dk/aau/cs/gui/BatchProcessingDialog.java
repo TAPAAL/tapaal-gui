@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.monitor.Monitor;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -35,20 +36,25 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
+
+import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -105,7 +111,13 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_NUMBER_OF_EXTRA_TOKENS = "Override the number of extra tokens in the net";
 	
 	private static String lastPath = null;
-
+	
+	//TODO
+	private JSplitPane splitpane;
+	private JPanel topPanel;
+	private JPanel bottomPanel;
+	private JPanel monitorPanel;
+	
 	private JPanel filesButtonsPanel;
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
@@ -155,7 +167,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
-
+		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
 				terminateBatchProcessing();
@@ -166,12 +178,25 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void initComponents() {
-		setLayout(new GridBagLayout());
-
+		setLayout(new FlowLayout());
+		
+		topPanel = new JPanel(new GridBagLayout());
+		bottomPanel = new JPanel(new GridBagLayout());
+		
+		
+		//TODO
 		initFileListPanel();
 		initVerificationOptionsPanel();
 		initMonitorPanel();
 		initResultTablePanel();
+		
+		topPanel.setMinimumSize(new Dimension(0, 355));
+		
+		splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);		
+		splitpane.setResizeWeight(0);
+		splitpane.setDividerSize(10);
+		splitpane.setContinuousLayout(true);
+		setContentPane(splitpane);
 	}
 
 	private void initFileListPanel() {
@@ -275,15 +300,17 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		fileListPanel.add(filesButtonsPanel, gbc);
-
+		
+		//TODO
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		gbc.gridheight = 2;
-		gbc.insets = new Insets(10, 0, 0, 10);
-		add(fileListPanel, gbc);
+		gbc.insets = new Insets(10, 5, 0, 5);
+		topPanel.add(fileListPanel, gbc);
 	}
 
 	private void addFiles() {
@@ -342,16 +369,16 @@ public class BatchProcessingDialog extends JDialog {
 		initSymmetryOptionsComponents();
 		initReductionOptionsComponents();
 		initTimeoutComponents();
-
+		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 1.0;
+		gbc.weighty = 0;
 		gbc.weightx = 0;
-		gbc.insets = new Insets(10, 0, 0, 0);
-		add(verificationOptionsPanel, gbc);
+		gbc.insets = new Insets(10, 0, 0, 5);
+		topPanel.add(verificationOptionsPanel, gbc);
 	}
 
 	private void initQueryPropertyOptionsComponents() {
@@ -470,7 +497,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 5);
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(reductionLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption,
@@ -762,10 +789,12 @@ public class BatchProcessingDialog extends JDialog {
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		Dimension scrollPaneDims = new Dimension(850, 250);
-		scrollPane.setMinimumSize(scrollPaneDims);
-		scrollPane.setPreferredSize(scrollPaneDims);
-
+		Dimension scrollPanePrefDims = new Dimension(850, 250);
+		//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the window
+		Dimension scrollPaneMinDims = new Dimension(850, 250-150);
+		scrollPane.setMinimumSize(scrollPaneMinDims);
+		scrollPane.setPreferredSize(scrollPanePrefDims);
+		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
@@ -780,16 +809,16 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.gridwidth = 4;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.insets = new Insets(10, 5, 5, 5);
-		add(resultTablePanel, gbc);
+		gbc.gridy = 0;
+		gbc.gridwidth = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.insets = new Insets(0, 5, 5, 5);
+		bottomPanel.add(resultTablePanel, gbc);
 	}
 
 	private void initMonitorPanel() {
-		JPanel monitorPanel = new JPanel(new GridBagLayout());
+		monitorPanel = new JPanel(new GridBagLayout());
 		monitorPanel.setBorder(BorderFactory.createTitledBorder("Monitor"));
 
 		JLabel file = new JLabel("File:");
@@ -927,14 +956,16 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 0, 10);
 		monitorPanel.add(skipFileButton, gbc);
 
+		//TODO
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		//gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 0;
-		gbc.insets = new Insets(10, 0, 0, 0);
-		add(monitorPanel, gbc);
+		gbc.weighty = 1;
+		gbc.insets = new Insets(10, 0, 0, 5);
+		topPanel.add(monitorPanel, gbc);
 	}
 
 	private void process() {
