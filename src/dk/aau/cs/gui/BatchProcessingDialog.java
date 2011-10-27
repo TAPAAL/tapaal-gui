@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.monitor.Monitor;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -41,7 +40,6 @@ import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SpringLayout;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
@@ -53,8 +51,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
-
-import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -112,7 +108,6 @@ public class BatchProcessingDialog extends JDialog {
 	
 	private static String lastPath = null;
 	
-	//TODO
 	private JSplitPane splitpane;
 	private JPanel topPanel;
 	private JPanel bottomPanel;
@@ -183,14 +178,10 @@ public class BatchProcessingDialog extends JDialog {
 		topPanel = new JPanel(new GridBagLayout());
 		bottomPanel = new JPanel(new GridBagLayout());
 		
-		
-		//TODO
 		initFileListPanel();
 		initVerificationOptionsPanel();
 		initMonitorPanel();
 		initResultTablePanel();
-		
-		topPanel.setMinimumSize(new Dimension(0, 355));
 		
 		splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);		
 		splitpane.setResizeWeight(0);
@@ -301,7 +292,6 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		fileListPanel.add(filesButtonsPanel, gbc);
 		
-		//TODO
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -362,7 +352,6 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.setBorder(BorderFactory
 				.createTitledBorder("Override Verification Options"));
 		
-		//TODO
 		initQueryPropertyOptionsComponents();
 		initCapacityComponents();
 		initSearchOptionsComponents();
@@ -684,7 +673,6 @@ public class BatchProcessingDialog extends JDialog {
 		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC,
 				name_BFS, name_DFS, name_Random };
 		searchOption = new JComboBox(options);
-		searchOption.setMinimumSize(searchOption.getSize());
 
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -956,12 +944,10 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 0, 10);
 		monitorPanel.add(skipFileButton, gbc);
 
-		//TODO
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		//gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 0;
 		gbc.weighty = 1;
 		gbc.insets = new Insets(10, 0, 0, 5);
