@@ -9,11 +9,12 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 public class BatchProcessingResultsExporter {
-	private static final String name_verifyTAPN = "TAPAAL Engine";
-	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
-	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
-	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_verifyTAPN = "A: TAPAAL Engine";
+	private static final String name_verifyTAPN_discreteInclusion = "B: TAPAAL Engine w. Discrete Inclusion";
+	private static final String name_STANDARD = "C: UPPAAL: Standard Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "D: UPPAAL: Optimised Standard Reduction";
+	private static final String name_BROADCAST = "E: UPPAAL: Broadcast Reduction";
+	private static final String name_BROADCASTDEG2 = "F: UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -91,9 +92,12 @@ public class BatchProcessingResultsExporter {
 			return name_OPTIMIZEDSTANDARD;
 		else if(reduction == ReductionOption.DEGREE2BROADCAST)
 			return name_BROADCASTDEG2;
-		else if(reduction == ReductionOption.VerifyTAPN)
-			return name_verifyTAPN;
-		else
+		else if(reduction == ReductionOption.VerifyTAPN){
+			if(query.discreteInclusion()){
+				return name_verifyTAPN_discreteInclusion;
+			}else
+				return name_verifyTAPN;
+		}else
 			return name_BROADCAST;
 	}
 }
