@@ -594,7 +594,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void enabledVerificationOptionButtons() {
-		verificationOptionsPanel.setEnabled(false);
+		verificationOptionsPanel.setEnabled(true);
 		for (Component c : verificationOptionsPanel.getComponents())
 			c.setEnabled(true);
 
@@ -818,12 +818,13 @@ public class BatchProcessingDialog extends JDialog {
 
 		fileStatusLabel = new JLabel("");
 		Dimension fileStatusLabelDim = new Dimension(350, 25);
-		fileStatusLabel.setMinimumSize(fileStatusLabelDim);
-		fileStatusLabel.setPreferredSize(fileStatusLabelDim);
+		//fileStatusLabel.setMinimumSize(fileStatusLabelDim);
+		//fileStatusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.gridwidth = 3;
+		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(fileStatusLabel, gbc);
@@ -836,12 +837,13 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(status, gbc);
 
 		statusLabel = new JLabel("");
-		statusLabel.setMinimumSize(fileStatusLabelDim);
-		statusLabel.setPreferredSize(fileStatusLabelDim);
+		//statusLabel.setMinimumSize(fileStatusLabelDim);
+		//statusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.gridwidth = 3;
+		gbc.weightx = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		monitorPanel.add(statusLabel, gbc);
@@ -855,11 +857,12 @@ public class BatchProcessingDialog extends JDialog {
 
 		progressLabel = new JLabel("");
 		Dimension dim = new Dimension(280, 25);
-		progressLabel.setMinimumSize(dim);
-		progressLabel.setPreferredSize(dim);
+		//progressLabel.setMinimumSize(dim);
+		//progressLabel.setPreferredSize(dim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
+		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 10);
@@ -950,6 +953,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.weightx = 0;
 		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(10, 0, 0, 5);
 		topPanel.add(monitorPanel, gbc);
 	}
