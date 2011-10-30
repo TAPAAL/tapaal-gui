@@ -40,6 +40,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
@@ -103,7 +104,7 @@ import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class QueryDialog extends JPanel {
-
+	
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
 	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
@@ -126,9 +127,11 @@ public class QueryDialog extends JPanel {
 	private boolean querySaved = false;
 
 	private JRootPane rootPane;
+	private static EscapableDialog guiDialog;
 
 	// Query Name Panel;
 	private JPanel namePanel;
+	private JButton advancedButton = new JButton("Advanced view");
 
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
@@ -219,6 +222,8 @@ public class QueryDialog extends JPanel {
 
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
+	
+	private Boolean advancedView = false;
 	
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -464,7 +469,7 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
+		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 		
 		Container contentPane = guiDialog.getContentPane();
 
@@ -477,7 +482,7 @@ public class QueryDialog extends JPanel {
 
 		guiDialog.setResizable(false);
 
-		guiDialog.setMinimumSize(new Dimension(885,585));
+		//guiDialog.setMinimumSize(new Dimension(885,585));
 		
 		// Make window fit contents' preferred size
 		guiDialog.pack();
@@ -911,7 +916,26 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
-		
+		advancedButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(advancedView){
+					advancedView = false;
+					advancedButton.setText("Advanced view");
+					searchOptionsPanel.setVisible(false);
+					reductionOptionsPanel.setVisible(false);
+					guiDialog.pack();
+				} else {
+					advancedView = true;
+					advancedButton.setText("Simple view");
+					searchOptionsPanel.setVisible(true);
+					reductionOptionsPanel.setVisible(true);
+					guiDialog.pack();
+				}
+				
+			}
+		});
 		
 		JButton infoButton = new JButton("Help on the query options");	
 		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
@@ -967,15 +991,16 @@ public class QueryDialog extends JPanel {
 				buffer.append("all query types, while standard and optimized standard support only EF and AG queries but can be often faster.");
 				buffer.append("<br/>");				
 				buffer.append("</html>");
-				return buffer.toString();
+				return buffer.toString(); 
 			}
 		});
-		JPanel helpPanel = new JPanel(new FlowLayout());
-		helpPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		helpPanel.add(infoButton);
+		JPanel topButtonPanel = new JPanel(new FlowLayout());
+		topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		topButtonPanel.add(advancedButton);
+		topButtonPanel.add(infoButton);
 		
 		splitter.add(namePanel, BorderLayout.LINE_START);
-		splitter.add(helpPanel, BorderLayout.LINE_END);
+		splitter.add(topButtonPanel, BorderLayout.LINE_END);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -1019,7 +1044,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
+		gridBagConstraints.weightx = 0;
 		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
@@ -1765,14 +1790,16 @@ public class QueryDialog extends JPanel {
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.insets = new Insets(5,10,5,10);
-		//gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		add(uppaalOptionsPanel, gridBagConstraints);
 
 	}
 
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
+		searchOptionsPanel.setVisible(false);
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
@@ -1851,6 +1878,7 @@ public class QueryDialog extends JPanel {
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
+		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
