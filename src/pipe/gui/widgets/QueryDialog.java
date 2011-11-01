@@ -474,19 +474,20 @@ public class QueryDialog extends JPanel {
 		Container contentPane = guiDialog.getContentPane();
 
 		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+		//contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
 
-		guiDialog.setResizable(false);
+		guiDialog.setResizable(true);
 
 		//guiDialog.setMinimumSize(new Dimension(885,585));
 		
 		// Make window fit contents' preferred size
 		guiDialog.pack();
-
+		
 		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
@@ -1006,7 +1007,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(0,10,0,10);
+		gridBagConstraints.insets = new Insets(5,10,0,10);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
 	}
@@ -1833,10 +1834,11 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridy = 1;
 		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+		gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
 
 	}
@@ -1960,6 +1962,8 @@ public class QueryDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 10, 0, 10);
 		add(reductionOptionsPanel, gbc);
 	}
 
@@ -2026,7 +2030,7 @@ public class QueryDialog extends JPanel {
 	}
 	
 	private void initButtonPanel(QueryDialogueOption option) {
-		buttonPanel = new JPanel(new FlowLayout());
+		buttonPanel = new JPanel(new BorderLayout());
 		if (option == QueryDialogueOption.Save) {
 			saveButton = new JButton("Save");
 			saveAndVerifyButton = new JButton("Save and Verify");
@@ -2141,20 +2145,20 @@ public class QueryDialog extends JPanel {
 				}
 			});
 		}
+
 		if (option == QueryDialogueOption.Save) {
-			buttonPanel.add(saveUppaalXMLButton);
+			JPanel leftButtomPanel = new JPanel(new FlowLayout());
+			JPanel rightButtomPanel = new JPanel(new FlowLayout());
+			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
+
+			rightButtomPanel.add(cancelButton);
+
+			rightButtomPanel.add(saveButton);
+
+			rightButtomPanel.add(saveAndVerifyButton);
 			
-			Dimension minSize = new Dimension(400, 5);
-			Dimension prefSize = new Dimension(400, 5);
-			Dimension maxSize = new Dimension(Short.MAX_VALUE, 400);
-			buttonPanel.add(new Box.Filler(minSize, prefSize, maxSize));
-
-						
-			buttonPanel.add(cancelButton);
-
-			buttonPanel.add(saveButton);
-
-			buttonPanel.add(saveAndVerifyButton);
+			buttonPanel.add(leftButtomPanel, BorderLayout.LINE_START);
+			buttonPanel.add(rightButtomPanel, BorderLayout.LINE_END);
 
 		} else {
 			buttonPanel.add(cancelButton);
@@ -2165,7 +2169,9 @@ public class QueryDialog extends JPanel {
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 5;
-		gridBagConstraints.anchor = GridBagConstraints.CENTER;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.insets = new Insets(0, 10, 5, 10);
 		add(buttonPanel, gridBagConstraints);
 
 	}
