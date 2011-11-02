@@ -481,9 +481,7 @@ public class QueryDialog extends JPanel {
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
 
-		guiDialog.setResizable(true);
-
-		//guiDialog.setMinimumSize(new Dimension(885,585));
+		guiDialog.setResizable(false);
 		
 		// Make window fit contents' preferred size
 		guiDialog.pack();
