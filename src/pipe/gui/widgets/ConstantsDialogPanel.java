@@ -68,6 +68,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	JPanel container;
 	
 	private String oldName;
+	private boolean autoEdited;
 	//private String currentTextValueOfSpinner;
 	//private boolean spinnerTextIsEmptyString;
 
@@ -115,6 +116,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	}
 	
 	public void showDialog() {
+		autoEdited = false;
 		Integer constantWasConfirmed = new Integer(2); //cancel = 2, ok = 0, close window = -1		
 		constantWasConfirmed = JOptionPane.showConfirmDialog(
 				null, container, "Edit Constant",
@@ -147,17 +149,29 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				showDialog();
 				return;				
 			} else {
+				 
 				//check for empty string in value field
 				//if show error message; showDialog(); and return;
-//				if (currentTextValueOfSpinner.isEmpty()){
-//					JOptionPane.showMessageDialog(CreateGui.getApp(),
-//							"You must specify a value.", "Missing value",
-//							JOptionPane.ERROR_MESSAGE);
-//					showDialog();
-//					return;
-//				}
-				int val = (Integer) valueSpinner.getValue();
-
+				if (autoEdited){
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							"You must specify a value.", "Missing value",
+							JOptionPane.ERROR_MESSAGE);
+					showDialog();
+					return;
+				}
+				//System.out.println("test");
+				//System.out.println(valueSpinner.getValue());
+				//if you are not carefull you get a class cast exception. Apparantly the spinner returns type long!
+				//if valuespinner.getvalue is of not of typew int:
+				int val;				
+				if (valueSpinner.getValue() instanceof Long) {
+					val = (int)((Long) valueSpinner.getValue()).longValue();
+				}
+				else {
+					val = (Integer) valueSpinner.getValue();
+				}
+				
+				
 				if (!oldName.equals("")) {
 					if (!oldName.equals(newName)
 							&& model.isConstantNameUsed(newName)) {
@@ -252,68 +266,154 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 //		}
 //    	
 //    }
-//	 private JSpinner makeDigitsOnlySpinnerUsingDocumentFilter() {
-//         JSpinner spinner = new JSpinner(new SpinnerNumberModel());
-//         JSpinner.NumberEditor jsEditor =
-//             (JSpinner.NumberEditor)spinner.getEditor();
-//
-//         JFormattedTextField textField = jsEditor.getTextField();
-//         final DocumentFilter digitOnlyFilter = new DocumentFilter() {
-//             @Override
-//             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-//                 if (stringContainsOnlyDigits(string)) {
-//                     super.insertString(fb, offset, string, attr);
+	 private JSpinner makeDigitsOnlySpinnerUsingDocumentFilter() {
+         //JSpinner spinner = new JSpinner(new SpinnerNumberModel(0,0,Integer.MAX_VALUE,1));
+         //JSpinner spinner = new JSpinner(new SpinnerNumberModel());
+		 JSpinner spinner = new JSpinner();
+		 //spinner.
+         JSpinner.NumberEditor jsEditor =
+             (JSpinner.NumberEditor)spinner.getEditor();
+
+         JFormattedTextField textField = jsEditor.getTextField();
+         final DocumentFilter digitOnlyFilter = new DocumentFilter() {
+             @Override
+             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            	 //this method is only called by programatic editing of the textbox! 
+//                 if (stringIsNumber(fb.getDocument().getText(0, fb.getDocument().getLength()))) {
+                 //    super.insertString(fb, offset, string, attr);
 //                 }
-//                 System.out.println("test");
-//             }
-//
-//             @Override
-//             public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-//                 super.remove(fb, offset, length);
-//                 System.out.println("test");
-//             }
-//
-//             @Override
-//             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-//                 if (stringContainsOnlyDigits(text)) {
-//                     super.replace(fb, offset, length, text, attrs);
-//                 }
-//                 System.out.println("test");
-//             }
-//
-//             private boolean stringContainsOnlyDigits(String text) {
-//                 for (int i = 0; i<text.length(); i++) {
-//                     if (!Character.isDigit(text.charAt(i))) {
-//                         return false;
-//                     }
-//                 }
-//                 return true;
-//             }
-//         };
-//
-//         NumberFormat format = NumberFormat.getIntegerInstance();
-//         // or add the group chars to the filter
-//         format.setGroupingUsed(false);
-//         textField.setFormatterFactory(new DefaultFormatterFactory(
-//                 new InternationalFormatter(format){
-//             /**
-//					 * 
-//					 */
-//					private static final long serialVersionUID = 1L;
-//
-//			@Override
-//             protected DocumentFilter getDocumentFilter() {
-//                 return digitOnlyFilter;
-//             }
-//         }));
-//
-//         return spinner;
-//     }
+//                 System.out.println("inserting..");
+//                 System.out.println("fb: "+fb.getDocument().getText(0, fb.getDocument().getLength()));
+//                 System.out.println("offset: "+offset);
+//                 System.out.println("string: "+string);
+             }
+
+             @Override
+             public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {                 
+            	 System.out.println("fb: "+fb.getDocument().getText(0, fb.getDocument().getLength()));
+            	 //System.out.println(stringIsNumber(fb.getDocument().getText(0, fb.getDocument().getLength())));
+            	 String old = fb.getDocument().getText(0, fb.getDocument().getLength());
+            	 //make new string
+//            	 System.out.println("offset: "+offset);
+//                 System.out.println("string: "+text);
+//                 System.out.println("length: "+length);
+            	 //text.getChars(0, text.length(), old.toCharArray(), offset);
+            	 StringBuffer newString = new StringBuffer(old);
+            	 newString.replace(offset, length+offset, "");
+            	 
+            	 System.out.println("newlycomposed: "+newString);
+            	 if (stringIsNumber(newString.toString())) {
+                	 super.remove(fb, offset, length);
+                 }
+                
+//                 System.out.println("removing..");
+//                 System.out.println("fb: "+fb.getDocument().getText(0, fb.getDocument().getLength()));
+//                 System.out.println("offset: "+offset);
+//                 System.out.println("length: "+length);
+             }
+
+             @Override
+             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            	 System.out.println("fb: "+fb.getDocument().getText(0, fb.getDocument().getLength()));
+            	 //System.out.println(stringIsNumber(fb.getDocument().getText(0, fb.getDocument().getLength())));
+            	 String old = fb.getDocument().getText(0, fb.getDocument().getLength());
+            	 //make new string
+//            	 System.out.println("offset: "+offset);
+//                 System.out.println("string: "+text);
+//                 System.out.println("length: "+length);
+            	 //text.getChars(0, text.length(), old.toCharArray(), offset);
+            	 StringBuffer newString = new StringBuffer(old);
+            	 newString.replace(offset, length+offset, text);
+            	 
+            	 System.out.println("newlycomposed: "+newString);
+            	 if (stringIsNumber(newString.toString())) {                	
+                     super.replace(fb, offset, length, text, attrs);
+                 }
+                     
+                     //System.out.println("replacing..");
+                 //System.out.println("fb: "+fb.getDocument().getText(0, fb.getDocument().getLength()));
+//                 System.out.println("offset: "+offset);
+//                 System.out.println("string: "+text);
+//                 System.out.println("length: "+length);
+             }
+
+             private boolean stringIsNumber(String text) {
+                 //for (int i = 0; i<text.length(); i++) {
+                  //   if (!Character.isDigit(text.charAt(i))) {
+                   //      return false;
+                    // }
+                 //}
+                 if (Pattern.matches("^([1-9]([0-9])*)?|0$",text))
+                	 return true;
+                 return false;
+             }
+         };
+
+         NumberFormat format = NumberFormat.getIntegerInstance();
+         format.setGroupingUsed(false);
+         textField.setFormatterFactory(new DefaultFormatterFactory(
+        		 new InternationalFormatter(format){             
+        			 private static final long serialVersionUID = 1L;
+        			 @Override
+        			 protected DocumentFilter getDocumentFilter() {
+        				 return digitOnlyFilter;
+        			 }
+        		 }));
+         textField.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+//				if (!valueSpinner.isShowing()) {
+				if (!valueSpinner.isDisplayable()) {
+					System.out.println("autoedit..");
+					autoEdited = true;
+				}
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				System.out.println("something was inserted..");
+//				if (!valueSpinner.isShowing()) {
+				if (!valueSpinner.isDisplayable()) {
+					System.out.println("autoedit..");
+					autoEdited = true;
+				}
+//				try {
+//					System.out.println("doc: "+e.getDocument().getText(0, e.getDocument().getLength()));
+//				} catch (BadLocationException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				System.out.println("changhed called");
+			}
+		});
+         spinner.addChangeListener(new javax.swing.event.ChangeListener() {
+        	    public void stateChanged(javax.swing.event.ChangeEvent e) {
+        	    	//if currentvalue is -1, make it 0:
+        	    	if (((JSpinner)e.getSource()).getValue() instanceof Long) {
+        	    		System.out.println("was long");
+        	    		if (((Long)((JSpinner)e.getSource()).getValue()) == -1l) {
+        	    			System.out.println("was minus 1");
+        	    			((JSpinner)e.getSource()).setValue(new Integer(0));
+        	    		}
+        	    			
+        	    	}
+        	    }
+         	});
+         return spinner;
+     }
 	
 	private void initComponents() {
-		valueSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner));
-		((NumberFormatter)(((JSpinner.DefaultEditor)valueSpinner.getEditor()).getTextField().getFormatter())).setAllowsInvalid(false);
+		valueSpinner =  makeDigitsOnlySpinnerUsingDocumentFilter();
+//		valueSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+//		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner));
+//		((NumberFormatter)(((JSpinner.DefaultEditor)valueSpinner.getEditor()).getTextField().getFormatter())).setAllowsInvalid(false);
 		
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
@@ -350,7 +450,6 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		container.add(valueLabel,gbc);
 		
-		//valueSpinner = new javax.swing.JSpinner();
 		gbc = new GridBagConstraints();
 		gbc.insets = new Insets(2, 0, 2, 0);
 		gbc.gridx = 1;
@@ -360,7 +459,6 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		container.add(valueSpinner,gbc);
 		
-//		valueSpinner =  makeDigitsOnlySpinnerUsingDocumentFilter();
 		
 		//((JTextField)((JSpinner.DefaultEditor)valueSpinner.getEditor()).getTextField()).setEditable(false);
 		//action listeners:

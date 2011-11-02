@@ -7,8 +7,6 @@ import javax.swing.event.AncestorListener;
 
 public class RequestFocusListener implements AncestorListener
 {
-	private boolean removeListener;
-
 	public RequestFocusListener()
 	{
 	}
@@ -16,6 +14,9 @@ public class RequestFocusListener implements AncestorListener
 	@Override
 	public void ancestorAdded(final AncestorEvent arg0)
 	{
+		//JComponent component = arg0.getComponent();
+		//component.requestFocusInWindow();
+		
 		 final AncestorListener al= this;   
 		    SwingUtilities.invokeLater(new Runnable(){
 
@@ -27,7 +28,6 @@ public class RequestFocusListener implements AncestorListener
 		        }
 		    });
 	}
-
 
 	@Override
 	public void ancestorMoved(AncestorEvent arg0) {
