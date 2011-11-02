@@ -125,9 +125,9 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
 	
 	//Tool tips for monitor panel
-	private final static String TOOL_TIP_FileLabel = null;
-	private final static String TOOL_TIP_StatusLabel = null;
-	private final static String TOOL_TIP_ProgressLabel = null;
+	private final static String TOOL_TIP_FileLabel = "Currently verified net";
+	private final static String TOOL_TIP_StatusLabel = "Currently verified query";
+	private final static String TOOL_TIP_ProgressLabel = "Progress of the currently running batch";
 	private final static String TOOL_TIP_TimeLabel = null;
 	private final static String TOOL_TIP_StartButton = "Press to start batch processing";
 	private final static String TOOL_TIP_CancelButton = "Press to cancel the whole currently running batch";
@@ -877,7 +877,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(fileStatusLabel, gbc);
 
-		JLabel status = new JLabel("Status:");
+		JLabel status = new JLabel("Query:");
 		status.setToolTipText(TOOL_TIP_StatusLabel);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
