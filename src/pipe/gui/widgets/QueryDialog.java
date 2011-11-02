@@ -131,7 +131,7 @@ public class QueryDialog extends JPanel {
 
 	// Query Name Panel;
 	private JPanel namePanel;
-	private JButton advancedButton = new JButton("Advanced view");
+	private JButton advancedButton;
 
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
@@ -915,8 +915,9 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
+		advancedButton = new JButton("Advanced view");
 		advancedButton.addActionListener(new ActionListener() {
-			
+			//TODO
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(advancedView){
@@ -924,12 +925,15 @@ public class QueryDialog extends JPanel {
 					advancedButton.setText("Advanced view");
 					searchOptionsPanel.setVisible(false);
 					reductionOptionsPanel.setVisible(false);
+					saveUppaalXMLButton.setVisible(false);
+					
 					guiDialog.pack();
 				} else {
 					advancedView = true;
 					advancedButton.setText("Simple view");
 					searchOptionsPanel.setVisible(true);
 					reductionOptionsPanel.setVisible(true);
+					saveUppaalXMLButton.setVisible(true);
 					guiDialog.pack();
 				}
 				
@@ -2034,6 +2038,8 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
+			//Only show in advanced mode
+			saveUppaalXMLButton.setVisible(false);
 			
 			//Add tool tips
 			saveButton.setToolTipText(TOOL_TIP_SAVE_BUTTON);
