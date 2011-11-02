@@ -104,24 +104,24 @@ public class BatchProcessingDialog extends JDialog {
 
 	//Tool tip strings TODO
 	//Tool tips for model panel
-	private final static String TOOL_TIP_AddFilesButton = "Press to add models to process";
-	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked model";
-	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all models from list";
+	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch processing";
+	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked nets";
+	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	
 	//Tool tips for override verification panel
 	private final static String TOOL_TIP_QueryLabel = null;
-	private final static String TOOL_TIP_Query_Property_Option = "Choose whether to override the query";
+	private final static String TOOL_TIP_Query_Property_Option = "Choose to override the queries in the nets";
 	private final static String TOOL_TIP_CapacityLabel = null;
-	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Choose the number of extra tokens in the net";
-	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the net";
+	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Enter the number of extra tokens in the nets";
+	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the nets";
 	private final static String TOOL_TIP_SearchLabel = null;
-	private final static String TOOL_TIP_SearchOption = "Choose whether to override the search option";
+	private final static String TOOL_TIP_SearchOption = "Choose to override the search options in the nets";
 	private final static String TOOL_TIP_SymmetryLabel = null;
-	private final static String TOOL_TIP_SymmetryOption = "Choose whether to override the symmetry option";
+	private final static String TOOL_TIP_SymmetryOption = "Choose to override the symmetry reduction in the nets";
 	private final static String TOOL_TIP_ReductionLabel = null;
-	private final static String TOOL_TIP_ReductionOption = "Choose whether to override the verification method";
+	private final static String TOOL_TIP_ReductionOption = "Choose to override the verification methods in the nets";
 	private final static String TOOL_TIP_TimeoutLabel = null;
-	private final static String TOOL_TIP_TimeoutValue = "Choose the time out value";
+	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
 	
 	//Tool tips for monitor panel
@@ -129,13 +129,13 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_StatusLabel = null;
 	private final static String TOOL_TIP_ProgressLabel = null;
 	private final static String TOOL_TIP_TimeLabel = null;
-	private final static String TOOL_TIP_StartButton = "Press to start processing";
-	private final static String TOOL_TIP_CancelButton = "Press to cancel the current processing";
-	private final static String TOOL_TIP_SkipFileButton = "Press to skip processing of the current file";
+	private final static String TOOL_TIP_StartButton = "Press to start batch processing";
+	private final static String TOOL_TIP_CancelButton = "Press to cancel the whole currently running batch";
+	private final static String TOOL_TIP_SkipFileButton = "Press to skip the currently running verification";
 	
 	//Tool tips for results panel
-	private final static String TOOL_TIP_ExportButton = "Press to export results as a CVS file";
-	private final static String TOOL_TIP_CloseButton = "Press to close dialog";
+	private final static String TOOL_TIP_ExportButton = "Press to export batch results into a CVS file";
+	private final static String TOOL_TIP_CloseButton = "Press to close the dialog";
 	
 	private static String lastPath = null;
 	
@@ -384,7 +384,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void initVerificationOptionsPanel() {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory
-				.createTitledBorder("Override Verification Options"));
+				.createTitledBorder("Override Verification Options for the Batch"));
 		
 		//TODO
 		initQueryPropertyOptionsComponents();
