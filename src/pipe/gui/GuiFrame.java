@@ -118,6 +118,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
+	private JMenuItem statistics;
+	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
 
@@ -529,10 +531,25 @@ public class GuiFrame extends JFrame implements Observer {
 				dialog.setVisible(true);
 			}
 		});
-		
 		toolsMenu.add(batchProcessing);
-		toolsMenu.addSeparator();
+		
+		statistics = new JMenuItem("Net statictics");
+		statistics.setMnemonic('n');
+		
+		//TODO Fix no net
+		statistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(GuiFrame.this, 
+						CreateGui.getDrawingSurface().getModel().getStatistics(), 
+						"Net statistics", 
+						JOptionPane.INFORMATION_MESSAGE
+						);
 
+			}
+		});
+		
+		toolsMenu.add(statistics);
+		toolsMenu.addSeparator();
 
 		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL Engine)");
 		resetVerifytapn.addActionListener(new ActionListener(){
@@ -838,6 +855,9 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Simulator
 		startAction.setEnabled(enable);
+		
+		// Tools
+		statistics.setEnabled(enable);
 
 	}
 

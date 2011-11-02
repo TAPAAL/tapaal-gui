@@ -1,7 +1,18 @@
 package dk.aau.cs.model.tapn;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import pipe.gui.undo.AddArcPathPointEdit;
 
 import dk.aau.cs.util.Require;
 
@@ -342,5 +353,206 @@ public class TimedArcPetriNet {
 	
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+	
+	private List<TimedTransition> orphans;
+	
+	public Object getStatistics(){
+		
+		JPanel result = new JPanel(new GridBagLayout());
+		 
+		
+		JLabel textPlaces = new JLabel("Number of places: ");
+		JLabel numberOfPlaces = new JLabel(Integer.toString(places().size()));
+		JLabel textTransitions = new JLabel("Number of transitions: ");
+		JLabel numberOfTransitions = new JLabel(Integer.toString(transitions().size()));
+		JLabel textInputArcs = new JLabel("Number of input arcs: ");
+		JLabel numberOfInputArcs = new JLabel(Integer.toString(inputArcs.size()));
+		JLabel textOutputArcs = new JLabel("Number of output arcs: ");
+		JLabel numberOfOutputArcs = new JLabel(Integer.toString(outputArcs.size()));
+		JLabel textInhibitorArcs = new JLabel("Number of inhibitor arcs: ");
+		JLabel numberOfInhibitorArcs = new JLabel(Integer.toString(inhibitorArcs.size()));
+		JLabel textTransportArcs = new JLabel("Number of transport arcs: ");
+		JLabel numberOfTransportArcs = new JLabel(Integer.toString(transportArcs.size()));
+		JLabel textTotalNumberOfArcs = new JLabel("Total number of arcs: ");
+		JLabel numberOfTotalNumberOfArcs = new JLabel((inputArcs.size()+outputArcs.size()+inhibitorArcs.size()+transportArcs.size()) + "\n");
+		
+		/*
+		//Orphan transitions
+		JLabel textOrphans = new JLabel("Number of orphan transitions: ");
+		orphans = getOrphanTransitions();
+		JLabel numberOfOrphans = new JLabel(Integer.toString(orphans.size()));
+		
+		JButton removeOrphans = new JButton("Remove orphan transitions");
+		
+		removeOrphans.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for(TimedTransition orphan:orphans){
+					System.out.println("Removeing orphan");
+					remove(orphan);
+				}
+			}
+		});
+		*/
+		
+		int right = 5;
+		int bottom = 3;
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textPlaces, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfPlaces, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textTransitions, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfTransitions, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textInputArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfInputArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textOutputArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfOutputArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textInhibitorArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfInhibitorArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textTransportArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 5;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfTransportArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 6;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textTotalNumberOfArcs, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 6;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfTotalNumberOfArcs, gbc);
+		
+		/*
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(textOrphans, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(numberOfOrphans, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 8;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.gridwidth = 2;
+		gbc.insets = new Insets(0, 0, bottom, right);
+		result.add(removeOrphans, gbc);
+		*/
+		return result;
+		/*
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Number of places: ");
+		sb.append(places().size() + "\n");
+		sb.append("Number of transitions: ");
+		sb.append(transitions().size() + "\n");
+		sb.append("Number of input arcs: ");
+		sb.append(inputArcs.size() + "\n");
+		sb.append("Number of output arcs: ");
+		sb.append(outputArcs.size() + "\n");
+		sb.append("Number of inhibitor arcs: ");
+		sb.append(inhibitorArcs.size() + "\n");
+		sb.append("Number of transport arcs: ");
+		sb.append(transportArcs.size() + "\n");
+		sb.append("Total number of arcs: ");
+		sb.append((inputArcs.size()+outputArcs.size()+inhibitorArcs.size()+transportArcs.size()) + "\n");
+		
+		return sb.toString();
+		*/
+	}
+	
+	public List<TimedTransition> getOrphanTransitions(){
+		List<TimedTransition> orphans = new ArrayList<TimedTransition>();
+		
+		for(TimedTransition transition:transitions){
+			if(transition.isOrphan()){
+				orphans.add(transition);
+			}
+		}
+		
+		return orphans;
 	}
 }
