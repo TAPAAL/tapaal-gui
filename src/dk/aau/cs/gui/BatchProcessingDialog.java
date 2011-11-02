@@ -109,33 +109,33 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all models from list";
 	
 	//Tool tips for override verification panel
-	private final static String TOOL_TIP_QueryLabel = "Tool tip for query label";
-	private final static String TOOL_TIP_Query_Property_Option = "Choose wether to override the query";
-	private final static String TOOL_TIP_CapacityLabel = "Tool tip for capacity label";
-	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Override the number of extra tokens in the net";
-	private final static String TOOL_TIP_KeepQueryCapacity = "Tool tip for keep query capacity";
-	private final static String TOOL_TIP_SearchLabel = "Tool tip for search label";
-	private final static String TOOL_TIP_SearchOption = "Tool tip for search option";
-	private final static String TOOL_TIP_SymmetryLabel = "Tool tip for symmetry label";
-	private final static String TOOL_TIP_SymmetryOption = "Tool tip for symmetry option";
-	private final static String TOOL_TIP_ReductionLabel = "Tool tip for reduciton label";
-	private final static String TOOL_TIP_ReductionOption = "Tool tip for reduciton option";
-	private final static String TOOL_TIP_TimeoutLabel = "Tool tip for time out label";
-	private final static String TOOL_TIP_TimeoutValue = "Tool tip for time out value";
-	private final static String TOOL_TIP_NoTimeoutCheckBox = "Tool tip for no time out check box";
+	private final static String TOOL_TIP_QueryLabel = null;
+	private final static String TOOL_TIP_Query_Property_Option = "Choose whether to override the query";
+	private final static String TOOL_TIP_CapacityLabel = null;
+	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Choose the number of extra tokens in the net";
+	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the net";
+	private final static String TOOL_TIP_SearchLabel = null;
+	private final static String TOOL_TIP_SearchOption = "Choose whether to override the search option";
+	private final static String TOOL_TIP_SymmetryLabel = null;
+	private final static String TOOL_TIP_SymmetryOption = "Choose whether to override the symmetry option";
+	private final static String TOOL_TIP_ReductionLabel = null;
+	private final static String TOOL_TIP_ReductionOption = "Choose whether to override the verification method";
+	private final static String TOOL_TIP_TimeoutLabel = null;
+	private final static String TOOL_TIP_TimeoutValue = "Choose the time out value";
+	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
 	
 	//Tool tips for monitor panel
-	private final static String TOOL_TIP_FileLabel = "Tool tip for file label";
-	private final static String TOOL_TIP_StatusLabel = "Tool tip for status label";
-	private final static String TOOL_TIP_ProgressLabel = "Tool tip for progress label";
-	private final static String TOOL_TIP_TimeLabel = "Tool tip for time label";
-	private final static String TOOL_TIP_StartButton = "Tool tip for start button";
-	private final static String TOOL_TIP_CancelButton = "Tool tip for cancel button";
-	private final static String TOOL_TIP_SkipFileButton = "Tool tip for skip file button";
+	private final static String TOOL_TIP_FileLabel = null;
+	private final static String TOOL_TIP_StatusLabel = null;
+	private final static String TOOL_TIP_ProgressLabel = null;
+	private final static String TOOL_TIP_TimeLabel = null;
+	private final static String TOOL_TIP_StartButton = "Press to start processing";
+	private final static String TOOL_TIP_CancelButton = "Press to cancel the current processing";
+	private final static String TOOL_TIP_SkipFileButton = "Press to skip processing of the current file";
 	
 	//Tool tips for results panel
-	private final static String TOOL_TIP_ExportButton = "Tool tip for export button";
-	private final static String TOOL_TIP_CloseButton = "Tool tip for close button";
+	private final static String TOOL_TIP_ExportButton = "Press to export results as a CVS file";
+	private final static String TOOL_TIP_CloseButton = "Press to close dialog";
 	
 	private static String lastPath = null;
 	
