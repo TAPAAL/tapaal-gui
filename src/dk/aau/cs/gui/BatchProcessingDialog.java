@@ -102,7 +102,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
 
-	//Tool tip strings TODO
+	//Tool tip strings
 	//Tool tips for model panel
 	private final static String TOOL_TIP_AddFilesButton = "Press to add models to process";
 	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked model";
@@ -386,7 +386,6 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.setBorder(BorderFactory
 				.createTitledBorder("Override Verification Options"));
 		
-		//TODO
 		initQueryPropertyOptionsComponents();
 		initSearchOptionsComponents();
 		initSymmetryOptionsComponents();
@@ -868,6 +867,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		fileStatusLabel = new JLabel("");
 		Dimension fileStatusLabelDim = new Dimension(350, 25);
+		fileStatusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -886,6 +886,8 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(status, gbc);
 
 		statusLabel = new JLabel("");
+		Dimension statusLabelDim = new Dimension(340, 25);
+		statusLabel.setPreferredSize(statusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -905,6 +907,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		progressLabel = new JLabel("");
 		Dimension dim = new Dimension(280, 25);
+		progressLabel.setPreferredSize(dim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
@@ -1005,6 +1008,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(10, 0, 0, 5);
+		
 		topPanel.add(monitorPanel, gbc);
 	}
 
