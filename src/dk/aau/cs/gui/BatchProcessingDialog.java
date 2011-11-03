@@ -135,7 +135,7 @@ public class BatchProcessingDialog extends JDialog {
 	
 	//Tool tips for results panel
 	private final static String TOOL_TIP_ExportButton = "Press to export batch results into a CVS file";
-	private final static String TOOL_TIP_CloseButton = "Press to close the dialog";
+	private final static String TOOL_TIP_CloseButton = "Press to close the batch processing dialog";
 	
 	private static String lastPath = null;
 	
