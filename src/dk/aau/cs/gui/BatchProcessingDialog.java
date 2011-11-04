@@ -104,38 +104,38 @@ public class BatchProcessingDialog extends JDialog {
 
 	//Tool tip strings
 	//Tool tips for model panel
-	private final static String TOOL_TIP_AddFilesButton = "Press to add models to process";
-	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked model";
-	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all models from list";
+	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch processing";
+	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked nets";
+	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	
 	//Tool tips for override verification panel
 	private final static String TOOL_TIP_QueryLabel = null;
-	private final static String TOOL_TIP_Query_Property_Option = "Choose whether to override the query";
+	private final static String TOOL_TIP_Query_Property_Option = "Choose to override the queries in the nets";
 	private final static String TOOL_TIP_CapacityLabel = null;
-	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Choose the number of extra tokens in the net";
-	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the net";
+	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Enter the number of extra tokens in the nets";
+	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the nets";
 	private final static String TOOL_TIP_SearchLabel = null;
-	private final static String TOOL_TIP_SearchOption = "Choose whether to override the search option";
+	private final static String TOOL_TIP_SearchOption = "Choose to override the search options in the nets";
 	private final static String TOOL_TIP_SymmetryLabel = null;
-	private final static String TOOL_TIP_SymmetryOption = "Choose whether to override the symmetry option";
+	private final static String TOOL_TIP_SymmetryOption = "Choose to override the symmetry reduction in the nets";
 	private final static String TOOL_TIP_ReductionLabel = null;
-	private final static String TOOL_TIP_ReductionOption = "Choose whether to override the verification method";
+	private final static String TOOL_TIP_ReductionOption = "Choose to override the verification methods in the nets";
 	private final static String TOOL_TIP_TimeoutLabel = null;
-	private final static String TOOL_TIP_TimeoutValue = "Choose the time out value";
+	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
 	
 	//Tool tips for monitor panel
-	private final static String TOOL_TIP_FileLabel = null;
-	private final static String TOOL_TIP_StatusLabel = null;
-	private final static String TOOL_TIP_ProgressLabel = null;
+	private final static String TOOL_TIP_FileLabel = "Currently verified net";
+	private final static String TOOL_TIP_StatusLabel = "Currently verified query";
+	private final static String TOOL_TIP_ProgressLabel = "Progress of the currently running batch";
 	private final static String TOOL_TIP_TimeLabel = null;
-	private final static String TOOL_TIP_StartButton = "Press to start processing";
-	private final static String TOOL_TIP_CancelButton = "Press to cancel the current processing";
-	private final static String TOOL_TIP_SkipFileButton = "Press to skip processing of the current file";
+	private final static String TOOL_TIP_StartButton = "Press to start batch processing";
+	private final static String TOOL_TIP_CancelButton = "Press to cancel the whole currently running batch";
+	private final static String TOOL_TIP_SkipFileButton = "Press to skip the currently running verification";
 	
 	//Tool tips for results panel
-	private final static String TOOL_TIP_ExportButton = "Press to export results as a CVS file";
-	private final static String TOOL_TIP_CloseButton = "Press to close dialog";
+	private final static String TOOL_TIP_ExportButton = "Press to export batch results into a CVS file";
+	private final static String TOOL_TIP_CloseButton = "Press to close the dialog";
 	
 	private static String lastPath = null;
 	
@@ -384,7 +384,7 @@ public class BatchProcessingDialog extends JDialog {
 	private void initVerificationOptionsPanel() {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory
-				.createTitledBorder("Override Verification Options"));
+				.createTitledBorder("Override Verification Options for the Batch"));
 		
 		initQueryPropertyOptionsComponents();
 		initSearchOptionsComponents();
@@ -866,7 +866,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(file, gbc);
 
 		fileStatusLabel = new JLabel("");
-		Dimension fileStatusLabelDim = new Dimension(350, 25);
+		Dimension fileStatusLabelDim = new Dimension(250, 25);
 		fileStatusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -877,7 +877,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(fileStatusLabel, gbc);
 
-		JLabel status = new JLabel("Status:");
+		JLabel status = new JLabel("Query:");
 		status.setToolTipText(TOOL_TIP_StatusLabel);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -886,7 +886,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(status, gbc);
 
 		statusLabel = new JLabel("");
-		Dimension statusLabelDim = new Dimension(340, 25);
+		Dimension statusLabelDim = new Dimension(250, 25);
 		statusLabel.setPreferredSize(statusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -906,7 +906,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(progress, gbc);
 
 		progressLabel = new JLabel("");
-		Dimension dim = new Dimension(280, 25);
+		Dimension dim = new Dimension(210, 25);
 		progressLabel.setPreferredSize(dim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -923,7 +923,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridx = 2;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 10, 0, 0);
+		gbc.insets = new Insets(0, 5, 0, 0);
 		monitorPanel.add(time, gbc);
 
 		timerLabel = new JLabel("");
