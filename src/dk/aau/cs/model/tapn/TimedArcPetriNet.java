@@ -377,150 +377,144 @@ public class TimedArcPetriNet {
 		JLabel textTotalNumberOfArcs = new JLabel("Total number of arcs: ");
 		JLabel numberOfTotalNumberOfArcs = new JLabel((inputArcs.size()+outputArcs.size()+inhibitorArcs.size()+transportArcs.size()) + "\n");
 		
-		/*
+		//Tokens in net
+		JLabel textTokens = new JLabel("Number of tokens: ");
+		JLabel numberOfTokens = new JLabel(Integer.toString(getNumberOfTokensInNet()));
+		
 		//Orphan transitions
 		JLabel textOrphans = new JLabel("Number of orphan transitions: ");
 		orphans = getOrphanTransitions();
 		JLabel numberOfOrphans = new JLabel(Integer.toString(orphans.size()));
 		
-		JButton removeOrphans = new JButton("Remove orphan transitions");
-		
-		removeOrphans.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				for(TimedTransition orphan:orphans){
-					System.out.println("Removeing orphan");
-					remove(orphan);
-				}
-			}
-		});
-		*/
-		
-		int right = 5;
-		int bottom = 3;
+		int rightMargin = 10;
+		int bottomMargin = 3;
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textPlaces, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfPlaces, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textTransitions, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfTransitions, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textInputArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfInputArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textOutputArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfOutputArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textInhibitorArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfInhibitorArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textTransportArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfTransportArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(textTotalNumberOfArcs, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
 		result.add(numberOfTotalNumberOfArcs, gbc);
 		
-		/*
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottom, right);
-		result.add(textOrphans, gbc);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
+		result.add(textTokens, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottom, right);
-		result.add(numberOfOrphans, gbc);
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
+		result.add(numberOfTokens, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 8;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
+		result.add(textOrphans, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 8;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, bottom, right);
-		result.add(removeOrphans, gbc);
-		*/
+		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
+		result.add(numberOfOrphans, gbc);
+
 		return result;
 		/*
 		StringBuilder sb = new StringBuilder();
@@ -554,5 +548,14 @@ public class TimedArcPetriNet {
 		}
 		
 		return orphans;
+	}
+	
+	public int getNumberOfTokensInNet(){
+		int result = 0;
+		for(TimedPlace place : places){
+			result += place.numberOfTokens();
+		}
+		
+		return result;
 	}
 }
