@@ -857,7 +857,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel = new JPanel(new GridBagLayout());
 		monitorPanel.setBorder(BorderFactory.createTitledBorder("Monitor"));
 
-		JLabel file = new JLabel("File:");
+		JLabel file = new JLabel("Net:");
 		file.setToolTipText(TOOL_TIP_FileLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
