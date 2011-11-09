@@ -9,6 +9,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -229,6 +230,8 @@ public class QueryDialog extends JPanel {
 	//Tool tips for top panel
 	private static final String TOOL_TIP_QUERYNAME = "Enter the name of the query.";
 	private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different options";
+	private static final String TOOL_TIP_ADVANCED_VIEW_BUTTON = "Switch to advanced view";
+	private static final String TOOL_TIP_SIMPLE_VIEW_BUTTON = "Switch to simple view";
 	
 	//Tool tip for query field
 	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on the part of the query to edit<br />" +
@@ -472,7 +475,7 @@ public class QueryDialog extends JPanel {
 		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 		
 		Container contentPane = guiDialog.getContentPane();
-
+		
 		// 1 Set layout
 		//contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		contentPane.setLayout(new GridBagLayout());
@@ -916,25 +919,35 @@ public class QueryDialog extends JPanel {
 			}
 		});
 		advancedButton = new JButton("Advanced view");
+		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		advancedButton.addActionListener(new ActionListener() {
-			//TODO
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(advancedView){
+					Point location = guiDialog.getLocation();
 					advancedView = false;
 					advancedButton.setText("Advanced view");
+					advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 					searchOptionsPanel.setVisible(false);
 					reductionOptionsPanel.setVisible(false);
 					saveUppaalXMLButton.setVisible(false);
 					
 					guiDialog.pack();
+					guiDialog.setLocation(location);
+					
+					
 				} else {
+					Point location = guiDialog.getLocation();
 					advancedView = true;
 					advancedButton.setText("Simple view");
+					advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
 					searchOptionsPanel.setVisible(true);
 					reductionOptionsPanel.setVisible(true);
 					saveUppaalXMLButton.setVisible(true);
+					
 					guiDialog.pack();
+					guiDialog.setLocation(location);
 				}
 				
 			}
