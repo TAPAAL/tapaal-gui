@@ -269,7 +269,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		filesButtonsPanel = new JPanel(new GridBagLayout());
 		
-		addFilesButton = new JButton("Add Models");
+		addFilesButton = new JButton("Add models");
 		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
 		addFilesButton.addActionListener(new ActionListener() {
 
@@ -286,7 +286,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(addFilesButton, gbc);
 		
-		removeFileButton = new JButton("Remove Models");
+		removeFileButton = new JButton("Remove models");
 		removeFileButton.setToolTipText(TOOL_TIP_RemoveFilesButton);
 		removeFileButton.setEnabled(false);
 		removeFileButton.addActionListener(new ActionListener() {
