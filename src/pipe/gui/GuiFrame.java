@@ -65,6 +65,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.ShowNilToInfinityIntervals;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.EscapableDialog;
@@ -136,7 +137,6 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showComponents = true;
 	private boolean showConstants = true;
 	private boolean showQueries = true;
-	private boolean showNilToInfinityIntervals = true;
 
 	
 	private GUIMode guiMode = GUIMode.noNet;
@@ -911,14 +911,9 @@ public class GuiFrame extends JFrame implements Observer {
 		showConstants(!showConstants);
 	}
 	
-	public void showNilToInfinityIntervals(boolean enable) {
-		showNilToInfinityIntervals = enable;
-		//do logic that enables/disables the intervals
-		//System.out.println("intervals are now: "+showNilToInfinityIntervals);
-	}
-	
 	public void toggleNilToInfinityIntervals() {
-		showNilToInfinityIntervals(!showNilToInfinityIntervals);
+		ShowNilToInfinityIntervals.toggleShowNilToInfinityIntervals();
+		appView.repaintAll();
 	}
 	
 	public void showComponents(boolean enable){
