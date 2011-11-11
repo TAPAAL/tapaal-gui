@@ -115,7 +115,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showNilToInfinityIntervalsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	private TypeAction timedArcAction;
@@ -136,6 +136,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showComponents = true;
 	private boolean showConstants = true;
 	private boolean showQueries = true;
+	private boolean showNilToInfinityIntervals = true;
 
 	
 	private GUIMode guiMode = GUIMode.noNet;
@@ -448,6 +449,8 @@ public class GuiFrame extends JFrame implements Observer {
 				 453245, "Show/Hide componens", "", true));
 		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
 				 453244, "Show/Hide componens", "", true));
+		 addCheckboxMenuItem(viewMenu, showNilToInfinityIntervalsAction = new ViewAction("Display [0,infinity) - intervals",
+				 453246, "Show/Hide [0,infinity)-intervals","",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -835,6 +838,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
+		showNilToInfinityIntervalsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -905,6 +909,16 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleConstants(){
 		showConstants(!showConstants);
+	}
+	
+	public void showNilToInfinityIntervals(boolean enable) {
+		showNilToInfinityIntervals = enable;
+		//do logic that enables/disables the intervals
+		//System.out.println("intervals are now: "+showNilToInfinityIntervals);
+	}
+	
+	public void toggleNilToInfinityIntervals() {
+		showNilToInfinityIntervals(!showNilToInfinityIntervals);
 	}
 	
 	public void showComponents(boolean enable){
@@ -1882,6 +1896,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleQueries();
 			} else if (this == showConstantsAction){
 				toggleConstants();
+			} else if (this == showNilToInfinityIntervalsAction) {
+				toggleNilToInfinityIntervals();
 			}
 		}
 		
