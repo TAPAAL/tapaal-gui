@@ -65,7 +65,6 @@ import pipe.dataLayer.Template;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
-import pipe.gui.graphicElements.tapn.ShowNilToInfinityIntervals;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
 import pipe.gui.widgets.EscapableDialog;
@@ -116,7 +115,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showNilToInfinityIntervalsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	private TypeAction timedArcAction;
@@ -449,7 +448,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 453245, "Show/Hide global constants", "", true));
 		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
 				 453244, "Show/Hide verification queries", "", true));
-		 addCheckboxMenuItem(viewMenu, showNilToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
 				 453246, "Show/Hide intervals [0,inf) that do not restrict the firing in any way","",true));
 		 
 		 /* Simulator */
@@ -838,7 +837,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
-		showNilToInfinityIntervalsAction.setEnabled(enable);
+		showZeroToInfinityIntervalsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -911,8 +910,8 @@ public class GuiFrame extends JFrame implements Observer {
 		showConstants(!showConstants);
 	}
 	
-	public void toggleNilToInfinityIntervals() {
-		ShowNilToInfinityIntervals.toggleShowNilToInfinityIntervals();
+	public void toggleZeroToInfinityIntervals() {
+		CreateGui.toggleShowZeroToInfinityIntervals();
 		appView.repaintAll();
 	}
 	
@@ -1891,8 +1890,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleQueries();
 			} else if (this == showConstantsAction){
 				toggleConstants();
-			} else if (this == showNilToInfinityIntervalsAction) {
-				toggleNilToInfinityIntervals();
+			} else if (this == showZeroToInfinityIntervalsAction) {
+				toggleZeroToInfinityIntervals();
 			}
 		}
 		

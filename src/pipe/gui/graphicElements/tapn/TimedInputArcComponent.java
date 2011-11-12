@@ -80,7 +80,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 			if (inputArc == null)
 				label.setText("");
 			else {
-				if (!ShowNilToInfinityIntervals.showNilToInfinityIntervals()) {
+				if (!CreateGui.showZeroToInfinityIntervals()) {
 					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
 						label.setText("");
 					}

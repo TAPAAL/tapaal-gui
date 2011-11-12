@@ -21,6 +21,8 @@ public class CreateGui {
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	private static boolean usingGTKFileBrowser = true;
+	
+	private static boolean showZeroToInfinityIntervals = true;
 
 	public static String imgPath, userPath; // useful for stuff
 
@@ -240,5 +242,13 @@ public class CreateGui {
 	
 	public static boolean usingGTKFileBrowser() {
 		return usingGTKFileBrowser;
+	}
+	
+	public static void toggleShowZeroToInfinityIntervals() {
+		showZeroToInfinityIntervals = !showZeroToInfinityIntervals;
+	}
+	
+	public static boolean showZeroToInfinityIntervals() {
+		return showZeroToInfinityIntervals;
 	}
 }
