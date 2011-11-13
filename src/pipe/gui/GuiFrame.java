@@ -443,13 +443,13 @@ public class GuiFrame extends JFrame implements Observer {
 		 viewMenu.addSeparator();
 		 
 		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
-				 453243, "Show/Hide components", "", true));
+				 453243, "Show/hide the list of components.", "", true));
 		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
-				 453245, "Show/Hide global constants", "", true));
+				 453245, "Show/hide global constants.", "", true));
 		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
-				 453244, "Show/Hide verification queries", "", true));
+				 453244, "Show/hide verification queries.", "", true));
 		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				 453246, "Show/Hide intervals [0,inf) that do not restrict the firing in any way","",true));
+				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
