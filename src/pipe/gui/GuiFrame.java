@@ -45,6 +45,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
@@ -537,13 +538,19 @@ public class GuiFrame extends JFrame implements Observer {
 		statistics.setMnemonic('n');
 		
 		//TODO Fix no net
+		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//String[] columnNames = {"", "Shown", "All", "Active"};
+				
+				//JTable table = new JTable(CreateGui.getDrawingSurface().getModel().getStatistics(), columnNames);
+				
 				JOptionPane.showMessageDialog(GuiFrame.this, 
 						CreateGui.getDrawingSurface().getModel().getStatistics(), 
 						"Net statistics", 
 						JOptionPane.INFORMATION_MESSAGE
 						);
+				
 
 			}
 		});
