@@ -108,8 +108,8 @@ public class QueryDialog extends JPanel {
 	
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
-	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
-	private static final String UNSUPPPORTED_QUERY_TEXT = "The chosen query property is not supported by the chosen reduction";
+	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported by the chosen reduction.";
+	private static final String UNSUPPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	
@@ -229,73 +229,71 @@ public class QueryDialog extends JPanel {
 	//Strings for tool tips
 	//Tool tips for top panel
 	private static final String TOOL_TIP_QUERYNAME = "Enter the name of the query.";
-	private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different options";
-	private static final String TOOL_TIP_ADVANCED_VIEW_BUTTON = "Switch to advanced view";
-	private static final String TOOL_TIP_SIMPLE_VIEW_BUTTON = "Switch to simple view";
+	private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different verification options.";
+	private static final String TOOL_TIP_ADVANCED_VIEW_BUTTON = "Switch to the advanced view.";
+	private static final String TOOL_TIP_SIMPLE_VIEW_BUTTON = "Switch to the simple view.";
 	
 	//Tool tip for query field
-	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on the part of the query to edit<br />" +
-			"(to edit manually press the \"Edit Query\" button</html>";
+	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on a part of the query you want to edit.<br />" +
+			"(Queries can be edited also manually by pressing the \"Edit Query\" button.)</html>";
 	
 	//Tool tips for quantification panel
-	private static final String TOOL_TIP_EXISTS_DIAMOND = "Query if a certain marking in the net is reachable.";
-	private static final String TOOL_TIP_EXISTS_BOX = "Query if a trace exists in which all markings satisfies some property (This is only available using certain verification engines).";
-	private static final String TOOL_TIP_FORALL_DIAMOND = "Query if there exists a marking in all possible traces which satisfies some property (This is only available using certain verification engines).";
-	private static final String TOOL_TIP_FORALL_BOX = "Query if every reachable marking in the net satifies some property.";
+	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
+	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Available only for some verification engines.)";
+	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maxiaml trace there is marking that satisfied the given property. (Available only for some verification engines.)";
+
+	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
 	
 	//Tool tips for logic panel
-	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently marked part of the query to a conjunction";
-	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently marked part of the query to a disjunction";
-	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently marked part of the query";
+	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently marked part of the query with a conjunction.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently marked part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently marked part of the query.";
 	
 	//Tool tips for query panel
-	private static final String TOOL_TIP_PLACESBOX = "Choose the place considered in this part of the query.";
-	private static final String TOOL_TIP_TEMPLATEBOX = "Choose the component considered in this part of the query.";
-	private static final String TOOL_TIP_RELATIONALOPERATORBOX = "Choose the operator on which to test in this part of the query.";
-	private static final String TOOL_TIP_PLACEMARKING = "Choose the number of tokens which should be tested on.";
-	private static final String TOOL_TIP_ADDPREDICATEBUTTON = "Add the predicate specified above as the currently marked part of the query.";
-	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add true as the currently marked part of the query.";
-	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add false as the currently marked part of the query.";
+	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
+	private static final String TOOL_TIP_TEMPLATEBOX = "Choose a component considered for this predicate.";
+	private static final String TOOL_TIP_RELATIONALOPERATORBOX = "Choose a relational operator comparing the number of tokens in the chosen place.";
+	private static final String TOOL_TIP_PLACEMARKING = "Choose a number of tokens.";
+	private static final String TOOL_TIP_ADDPREDICATEBUTTON = "Add the predicate specified above to the query.";
+	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add the value true to the query.";
+	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add the value false to the query.";
 	
 	//Tool tips for editing panel
-	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query";
-	private static final String TOOL_TIP_RESETBUTTON = "Completely reset the query";
-	private static final String TOOL_TIP_UNDOBUTTON = "Undo the last action";
-	private static final String TOOL_TIP_REDOBUTTON = "Redo the last action undone";
-	private static final String TOOL_TIP_EDITQUERYBUTTON = "Edit the query manually";
-	private final static String TOOL_TIP_PARSE_QUERY = "Parse the manully written query, and exit to manual edit";
-	private final static String TOOL_TIP_CANCEL_QUERY = "Cancel the manully written query, and exit to manual edit";
+	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query.";
+	private static final String TOOL_TIP_RESETBUTTON = "Completely reset the query.";
+	private static final String TOOL_TIP_UNDOBUTTON = "Undo the last action.";
+	private static final String TOOL_TIP_REDOBUTTON = "Redo the last undone action.";
+	private static final String TOOL_TIP_EDITQUERYBUTTON = "Edit the query manually.";
+	private final static String TOOL_TIP_PARSE_QUERY = "Parse the manually edited query.";
+	private final static String TOOL_TIP_CANCEL_QUERY = "Cancel manual query creating.";
 	
 	//Tool tips for boundedness check panel
-	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "The number of extra tokens allowed in the net";
-	private static final String TOOL_TIP_KBOUNDED = "Check wether the net is bounded according to the number of extra tokens";
+	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "A number of extra tokens allowed in the net.";
+	private static final String TOOL_TIP_KBOUNDED = "Check wheather the net is bounded for the given number of extra tokens.";
 	
 	//Tool tips for reduction options panel
-	//TODO Add better tool tips for symmetry reduction and select inclusion places
-	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose which reduction engine to use";
-	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "See help for explanation of symmetry reduction";
-	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform more advanced inclusion check<br/>" +
-			 "in an attempt to reduce the number of explored states.<br/>" +
-			 "<b>Note:</b> This may have an adverse affect on performance on some models!</html>"; 
-	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "See help for explanation of selecting inclusion places";
+	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose a verification engine.";
+	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "Apply automatic symmetry reduction.";
+	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform a more advanced inclusion check."; 
+	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>If discrete inclusion optimization is not enabled, this strategy performs a breadth first search.<br />" +
-			"If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places<br />where the engine checks for discrete inclusion.</html>";
+			"If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places<br/>where the engine checks for discrete inclusion.</html>";
 	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
 	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
 	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
 	
 	//Tool tips for trace options panel
-	private final static String TOOL_TIP_SOME_TRACE = "Show trace after verification has compleated.";
-	private final static String TOOL_TIP_NO_TRACE = "Do not show trace after verification has compleated.";
+	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable.";
+	private final static String TOOL_TIP_NO_TRACE = "Do not display any trace information.";
 	
 	//Tool tips for buttom panel
-	private final static String TOOL_TIP_SAVE_BUTTON = "Save the specifyed query";
-	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the specifyed query";
-	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog";
-	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export the xml needed for the UPPAAL engine";
-	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export the xml needed for the TAPAAL engine";
+	private final static String TOOL_TIP_SAVE_BUTTON = "Save the query.";
+	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
+	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
+	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
+	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
