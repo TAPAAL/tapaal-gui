@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +40,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -55,6 +57,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.JTableHeader;
 
 import net.tapaal.TAPAAL;
 
@@ -75,6 +78,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.ResourceManager;
@@ -537,21 +541,16 @@ public class GuiFrame extends JFrame implements Observer {
 		statistics = new JMenuItem("Net statictics");
 		statistics.setMnemonic('n');
 		
-		//TODO Fix no net
-		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//String[] columnNames = {"", "Shown", "All", "Active"};
-				
-				//JTable table = new JTable(CreateGui.getDrawingSurface().getModel().getStatistics(), columnNames);
+				String[] columnNames = {"", "Shown component", "Active components", "All components"};
+				StatisticsPanel panel = new StatisticsPanel(CreateGui.getDrawingSurface().getModel().getStatistics(), columnNames);
 				
 				JOptionPane.showMessageDialog(GuiFrame.this, 
-						CreateGui.getDrawingSurface().getModel().getStatistics(), 
+						panel, 
 						"Net statistics", 
 						JOptionPane.INFORMATION_MESSAGE
 						);
-				
-
 			}
 		});
 		

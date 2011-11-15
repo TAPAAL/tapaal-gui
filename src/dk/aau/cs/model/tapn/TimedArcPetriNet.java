@@ -1,19 +1,9 @@
 package dk.aau.cs.model.tapn;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 
 import pipe.gui.undo.AddArcPathPointEdit;
 
@@ -358,420 +348,71 @@ public class TimedArcPetriNet {
 		this.isActive = isActive;
 	}
 	
-	private List<TimedTransition> orphans;
+	private void fillStatistics(Iterable<TimedArcPetriNet> nets, Object[][] array, int columnNumber){
+		int numberOfPlaces = 0;
+		int numberOfTransitions = 0;
+		int numberOfInputArcs = 0;
+		int numberOfOutputArcs = 0;
+		int numberOfInhibitorArcs = 0;
+		int numberOfTransportArcs = 0;
+		int numberOfTotalNumberOfArcs = 0;
+		int numberOfTokens = 0;
+		int numberOfOrphans = 0;
+		int numberOfComponents = 0;
+		
+		for(TimedArcPetriNet t : nets){
+			numberOfPlaces += t.places().size();
+			numberOfTransitions += t.transitions.size();
+			numberOfInputArcs += t.inputArcs.size();
+			numberOfOutputArcs += t.outputArcs.size();
+			numberOfInhibitorArcs += t.inhibitorArcs.size();
+			numberOfTransportArcs += t.transportArcs.size();
+			numberOfTokens += t.getNumberOfTokensInNet();
+			numberOfOrphans += t.getOrphanTransitions().size();
+			numberOfComponents += 1;
+		}
+		
+		numberOfTotalNumberOfArcs = numberOfInputArcs + numberOfOutputArcs + numberOfInhibitorArcs + numberOfTransportArcs;
+		
+		int rowNumber = 0;
+		array[rowNumber++][columnNumber] = numberOfPlaces;
+		array[rowNumber++][columnNumber] = numberOfTransitions;
+		array[rowNumber++][columnNumber] = numberOfInputArcs;
+		array[rowNumber++][columnNumber] = numberOfOutputArcs;
+		array[rowNumber++][columnNumber] = numberOfInhibitorArcs;
+		array[rowNumber++][columnNumber] = numberOfTransportArcs;
+		array[rowNumber++][columnNumber] = numberOfTotalNumberOfArcs;
+		array[rowNumber++][columnNumber] = numberOfTokens;
+		array[rowNumber++][columnNumber] = numberOfOrphans;
+		array[rowNumber++][columnNumber] = numberOfComponents;
+	}
 	
-	public Object getStatistics(){
+	public Object[][] getStatistics(){
 		
 		//Currently shown component
-		JPanel result = new JPanel(new GridBagLayout());
-		 
+		Object[][] result = new Object[12][4];
+		int rowNumber = 0;
+		int columnNumber = 0;
+		result[rowNumber++][columnNumber] = "Number of places: ";
+		result[rowNumber++][columnNumber] = "Number of transitions: ";
+		result[rowNumber++][columnNumber] = "Number of input arcs: ";
+		result[rowNumber++][columnNumber] = "Number of output arcs: ";
+		result[rowNumber++][columnNumber] = "Number of inhibitor arcs: ";
+		result[rowNumber++][columnNumber] = "Number of transport arcs: ";
+		result[rowNumber++][columnNumber] = "Total number of arcs: ";
+		result[rowNumber++][columnNumber] = "Number of tokens: ";
+		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
+		result[rowNumber++][columnNumber] = "Number of components considered: ";
+		result[rowNumber++][columnNumber] = "Number of shared places: ";
+		result[rowNumber++][columnNumber] = "Number of shared transitions: ";
 		
-		JLabel textPlaces = new JLabel("Number of places: ");
-		JLabel numberOfPlaces = new JLabel(Integer.toString(places().size()));
-		JLabel textTransitions = new JLabel("Number of transitions: ");
-		JLabel numberOfTransitions = new JLabel(Integer.toString(transitions().size()));
-		JLabel textInputArcs = new JLabel("Number of input arcs: ");
-		JLabel numberOfInputArcs = new JLabel(Integer.toString(inputArcs.size()));
-		JLabel textOutputArcs = new JLabel("Number of output arcs: ");
-		JLabel numberOfOutputArcs = new JLabel(Integer.toString(outputArcs.size()));
-		JLabel textInhibitorArcs = new JLabel("Number of inhibitor arcs: ");
-		JLabel numberOfInhibitorArcs = new JLabel(Integer.toString(inhibitorArcs.size()));
-		JLabel textTransportArcs = new JLabel("Number of transport arcs: ");
-		JLabel numberOfTransportArcs = new JLabel(Integer.toString(transportArcs.size()));
-		JLabel textTotalNumberOfArcs = new JLabel("Total number of arcs: ");
-		JLabel numberOfTotalNumberOfArcs = new JLabel((inputArcs.size()+outputArcs.size()+inhibitorArcs.size()+transportArcs.size()) + "\n");
-		JLabel textNets = new JLabel("Number of components considered: ");
-		JLabel numberOfNets = new JLabel(Integer.toString(1));
+		fillStatistics(Arrays.asList(new TimedArcPetriNet[] {this}), result, 1);
+		fillStatistics(this.parentNetwork().activeTemplates(), result, 2);
+		fillStatistics(this.parentNetwork().allTemplates(), result, 3);
 		
-		//Tokens in net
-		JLabel textTokens = new JLabel("Number of tokens: ");
-		JLabel numberOfTokens = new JLabel(Integer.toString(getNumberOfTokensInNet()));
-		
-		//Orphan transitions
-		JLabel textOrphans = new JLabel("Number of orphan transitions: ");
-		orphans = getOrphanTransitions();
-		JLabel numberOfOrphans = new JLabel(Integer.toString(orphans.size()));
-		
-		int rightMargin = 10;
-		int bottomMargin = 3;
-		
-		GridBagConstraints gbc = new GridBagConstraints();
-		
-		//Add Labels
-		int currentColumn = 0;
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textPlaces, gbc);
-		
-		/*
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		//gbc.weightx =12;
-		gbc.gridwidth = 4;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-		separator.setPreferredSize(new Dimension(1,5));
-		result.add(separator, gbc);
-		*/
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textTransitions, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textInputArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textOutputArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textInhibitorArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textTransportArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textTotalNumberOfArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textTokens, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textOrphans, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(textNets, gbc);
-		
-		//For the currently viewed net
-		currentColumn = 1;
-		gbc.gridx = currentColumn;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel("In shown component"), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfPlaces, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfTransitions, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfInputArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfOutputArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfInhibitorArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfTransportArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfTotalNumberOfArcs, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfTokens, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfOrphans, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(numberOfNets, gbc);
-		
-		//For all components
-		int numberOfComponents = 0;
-		int numberOfPlacesNet = 0;
-		int numberOfTransitionsNet = 0;
-		int numberOfInputArcsNet = 0;
-		int numberOfOutputArcsNet = 0;
-		int numberOfInhibitorArcsNet = 0;
-		int numberOfTransportArcsNet = 0;
-		int numberOfTokensNet = 0;
-		int numberOfOrphansNet = 0;
-		int numberOfTotalNumberOfArcsNet = 0;
-		
-		
-		for(TimedArcPetriNet t : this.parentNetwork().allTemplates()){
-			numberOfComponents += 1;
-			numberOfPlacesNet += t.places().size();
-			numberOfTransitionsNet += t.transitions.size();
-			numberOfInputArcsNet += t.inputArcs.size();
-			numberOfOutputArcsNet += t.outputArcs.size();
-			numberOfInhibitorArcsNet += t.inhibitorArcs.size();
-			numberOfTransportArcsNet += t.transportArcs.size();
-			numberOfTokensNet += t.getNumberOfTokensInNet();
-			numberOfOrphansNet += t.getOrphanTransitions().size();
-		}
-		
-		numberOfTotalNumberOfArcsNet = numberOfInputArcsNet + numberOfOutputArcsNet + numberOfInhibitorArcsNet + numberOfTransportArcsNet;
-		
-		currentColumn = 2;
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel("In all components"), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfPlacesNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTransitionsNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfInputArcsNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfOutputArcsNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfInhibitorArcsNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTransportArcsNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTotalNumberOfArcsNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTokensNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfOrphansNet)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfComponents)), gbc);
-		
-		//For active components
-		int numberOfActiveComponents = 0;
-		int numberOfPlacesActiveComponents = 0;
-		int numberOfTransitionsActiveComponents = 0;
-		int numberOfInputArcsActiveComponents = 0;
-		int numberOfOutputArcsActiveComponents = 0;
-		int numberOfInhibitorArcsActiveComponents = 0;
-		int numberOfTransportArcsActiveComponents = 0;
-		int numberOfTokensActiveComponents = 0;
-		int numberOfOrphansActiveComponents = 0;
-		int numberOfTotalNumberOfArcsActiveComponents = 0;
-		
-		
-		for(TimedArcPetriNet t : this.parentNetwork().activeTemplates()){
-			numberOfActiveComponents += 1;
-			numberOfPlacesActiveComponents += t.places().size();
-			numberOfTransitionsActiveComponents += t.transitions.size();
-			numberOfInputArcsActiveComponents += t.inputArcs.size();
-			numberOfOutputArcsActiveComponents += t.outputArcs.size();
-			numberOfInhibitorArcsActiveComponents += t.inhibitorArcs.size();
-			numberOfTransportArcsActiveComponents += t.transportArcs.size();
-			numberOfTokensActiveComponents += t.getNumberOfTokensInNet();
-			numberOfOrphansActiveComponents += t.getOrphanTransitions().size();
-		}
-		
-		numberOfTotalNumberOfArcsActiveComponents = numberOfInputArcsActiveComponents + numberOfOutputArcsActiveComponents
-				+ numberOfInhibitorArcsActiveComponents + numberOfTransportArcsActiveComponents;
-		
-		currentColumn = 3;
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel("In all active components"), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfPlacesActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTransitionsActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfInputArcsActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfOutputArcsActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfInhibitorArcsActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTransportArcsActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTotalNumberOfArcsActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfTokensActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfOrphansActiveComponents)), gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = currentColumn;
-		gbc.gridy = GridBagConstraints.RELATIVE;
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 0, bottomMargin, rightMargin);
-		result.add(new JLabel(Integer.toString(numberOfActiveComponents)), gbc);
+		//Add the number of shared places and transitions
+		result[10][3] = this.parentNetwork().numberOfSharedPlaces();
+		result[11][3] = this.parentNetwork().numberOfSharedTransitions();
 		
 		return result;
 	}
