@@ -115,7 +115,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	private TypeAction timedArcAction;
@@ -443,11 +443,13 @@ public class GuiFrame extends JFrame implements Observer {
 		 viewMenu.addSeparator();
 		 
 		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
-				 453243, "Show/Hide componens", "", true));
+				 453243, "Show/hide the list of components.", "", true));
 		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
-				 453245, "Show/Hide componens", "", true));
+				 453245, "Show/hide global constants.", "", true));
 		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
-				 453244, "Show/Hide componens", "", true));
+				 453244, "Show/hide verification queries.", "", true));
+		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -837,6 +839,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
+		showZeroToInfinityIntervalsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -907,6 +910,11 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleConstants(){
 		showConstants(!showConstants);
+	}
+	
+	public void toggleZeroToInfinityIntervals() {
+		CreateGui.toggleShowZeroToInfinityIntervals();
+		appView.repaintAll();
 	}
 	
 	public void showComponents(boolean enable){
@@ -1884,6 +1892,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleQueries();
 			} else if (this == showConstantsAction){
 				toggleConstants();
+			} else if (this == showZeroToInfinityIntervalsAction) {
+				toggleZeroToInfinityIntervals();
 			}
 		}
 		
