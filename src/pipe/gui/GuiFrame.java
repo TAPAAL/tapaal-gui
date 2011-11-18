@@ -543,8 +543,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String[] columnNames = {"", "Shown component", "Active components", "All components"};
-				StatisticsPanel panel = new StatisticsPanel(CreateGui.getDrawingSurface().getModel().getStatistics(), columnNames);
+				StatisticsPanel panel = new StatisticsPanel();
 				
 				JOptionPane.showMessageDialog(GuiFrame.this, 
 						panel, 

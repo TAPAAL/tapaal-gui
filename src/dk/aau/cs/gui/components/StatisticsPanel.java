@@ -1,5 +1,6 @@
 package dk.aau.cs.gui.components;
 
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
@@ -33,11 +35,22 @@ public class StatisticsPanel extends JPanel{
 	private JButton removeOrphans;
 	private JButton checkBoundedness;
 	
-	public StatisticsPanel(Object[][] contents, Object[] headLines) {
-		super(new GridBagLayout());
+	String[] headLines = {"", "Shown component", "Active components", "All components"};
+	
+	private JPanel panel;
+	
+	public StatisticsPanel() {
+		super(new CardLayout());
 		
-		Require.that(contents[0].length == headLines.length, "There should be the same number of headlines and columns");
+		initPanel();
 		
+		this.add(panel);
+	}
+
+	private void initPanel() {
+		Object[][] contents = CreateGui.getDrawingSurface().getModel().getStatistics();
+		
+		panel = new JPanel(new GridBagLayout());
 		addRow(headLines, 0, true);
 		
 		//Add the content - make space for separators
@@ -57,12 +70,11 @@ public class StatisticsPanel extends JPanel{
 			jSep = new JSeparator();
 			jSep.setPreferredSize(new Dimension(1, 3));
 			gbc.gridy = i;
-			this.add(jSep, gbc);
+			panel.add(jSep, gbc);
 		}
 		
 		//Add buttons
 		addButtons(headLines.length, contents.length*2);
-		
 	}
 	
 	private void addRow(Object[] row, int rowNumber, boolean isHeadLine){
@@ -78,10 +90,10 @@ public class StatisticsPanel extends JPanel{
 				if(isHeadLine){
 					JLabel current = new JLabel(row[i].toString());
 					current.setFont(new Font(current.getFont().getName(), Font.BOLD, current.getFont().getSize()));
-					this.add(current, gbc);
+					panel.add(current, gbc);
 				} else {
 					JLabel current = new JLabel(row[i].toString());
-					this.add(current, gbc);
+					panel.add(current, gbc);
 				}
 			}
 		}
@@ -89,6 +101,7 @@ public class StatisticsPanel extends JPanel{
 	
 	private void addButtons(int gridWidth, int gridHeight){
 		removeOrphans = new JButton("Remove orphan transitions");
+		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		removeOrphans.addActionListener(new ActionListener() {
 			
 			@Override
@@ -99,7 +112,7 @@ public class StatisticsPanel extends JPanel{
 				for(Template template : templates){
 					List<TimedTransition> orphans = template.model().getOrphanTransitions();
 					for(TimedTransition trans : orphans){
-						//Shared transistions makes truble
+						//TODO Shared transistions makes truble
 						if(!trans.isShared()){
 							TimedTransitionComponent t = (TimedTransitionComponent)template.guiModel().getTransitionByName(trans.name());
 							undoManager.addEdit(new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
@@ -109,12 +122,21 @@ public class StatisticsPanel extends JPanel{
 				}
 				
 				tab.drawingSurface().repaint();
+				
+				panel = new JPanel();
+				
+				initPanel();
+				
+				StatisticsPanel.this.removeAll();
+				StatisticsPanel.this.add(panel);
+				
+				StatisticsPanel.this.getParent().validate();
 			}
 		});
 		
 		checkBoundedness = new JButton("Check boundedness");
 		
-		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		
 		buttonsPanel.add(removeOrphans);
 		
 		buttonsPanel.add(checkBoundedness);
@@ -125,6 +147,6 @@ public class StatisticsPanel extends JPanel{
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = gridWidth;
-		this.add(buttonsPanel, gbc);
+		panel.add(buttonsPanel, gbc);
 	}
 }
