@@ -1,6 +1,5 @@
 package dk.aau.cs.gui.components;
 
-import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -40,7 +39,7 @@ public class StatisticsPanel extends JPanel{
 	private JPanel panel;
 	
 	public StatisticsPanel() {
-		super(new CardLayout());
+		super();
 		
 		initPanel();
 		
