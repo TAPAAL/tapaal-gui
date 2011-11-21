@@ -97,11 +97,19 @@ public class FileBrowser {
 					f = new File(f.getCanonicalPath() + "." + ext); // force
 																	// extension
 				}
-							
-				 if (!CreateGui.usingGTKFileBrowser() && f.exists() &&  
-						 JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?") != JOptionPane.YES_OPTION) {
-				 return null;
-				 }
+				
+				//The GTKFileBrowser does not check if the file with the extension appended exists
+				if (/*!CreateGui.usingGTKFileBrowser() &&*/ f.exists()) {
+					int overRide = JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?");
+					switch (overRide) {
+						case JOptionPane.NO_OPTION:
+							return saveFile();
+						case JOptionPane.YES_OPTION:
+							break;
+						default:
+							return null;
+					}
+				}
 				String path =  f.getCanonicalPath();
 				lastPath = f.getParent();
 				return path;
