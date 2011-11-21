@@ -3,15 +3,25 @@ package pipe.gui.widgets;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteOrder;
 import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.IIOByteBuffer;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,6 +30,7 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
@@ -58,6 +69,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	private TimedArcPetriNetNetwork model;
 	private int lowerBound;
 	private int upperBound;
+	private int initialValue = 0;
+	private EscapableDialog dialog;
 
 	JPanel nameTextFieldPane;
 	JTextField nameTextField;
@@ -67,151 +80,46 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	JLabel valueLabel; 	
 	JSpinner valueSpinner;
 	JPanel container;
+	JPanel buttonContainer;
+	JButton okButton;
+	JButton cancelButton;
 
 	private String oldName;
 
-	public ConstantsDialogPanel() {
+	public ConstantsDialogPanel() throws IOException {
 		initComponents();		
 	}
 
-	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) {
+	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model) throws IOException {
 		initComponents();
 		rootPane = pane;
 		this.model = model;		
 		oldName = "";
 		nameTextField.setText(oldName);
-		
-		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
-		valueSpinner.setModel(spinnerModel);
-		setupValueEditor();
 	}
 
 	public ConstantsDialogPanel(JRootPane pane, TimedArcPetriNetNetwork model,
-			Constant constant) {
-		this(pane, model);
+			Constant constant) throws IOException {		
+		rootPane = pane;
+		this.model = model;	
+
+		initialValue = constant.value();		
 		initComponents();
-				
+		
 		oldName = constant.name();
 		lowerBound = constant.lowerBound();
 		upperBound = constant.upperBound();		 
 		nameTextField.setText(oldName);
-		
-		SpinnerNumberModel spinnerModel = new SpinnerNumberModel(constant
-				.value(), 0, constant.upperBound(), 1);
-		valueSpinner.setModel(spinnerModel);
-		setupValueEditor();
-	}
-	
-	private void setupValueEditor() {
-		valueSpinner.setEditor(new JSpinner.NumberEditor(valueSpinner));
-		
-		// Disable nonnumeric keys in value spinner
-		JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();
-		((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 	}
 
 	public void showDialog() {
-		Integer constantWasConfirmed = new Integer(2); //cancel = 2, ok = 0, close window = -1		
-		constantWasConfirmed = JOptionPane.showConfirmDialog(
-				null, container, "Edit Constant",
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (constantWasConfirmed == 2 )
-			return;
-		else if (constantWasConfirmed == -1 )
-			return;
-		else if (constantWasConfirmed == 0)
-		{			
-			String newName = nameTextField.getText();
-
-			if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
-				System.err
-				.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
-				JOptionPane
-				.showMessageDialog(
-						CreateGui.getApp(),
-						"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				showDialog();
-				return;
-			}
-
-			if (newName.trim().isEmpty()) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(),
-						"You must specify a name.", "Missing name",
-						JOptionPane.ERROR_MESSAGE);
-				showDialog();
-				return;				
-			} else {				
-				//if you are not carefull you get a class cast exception. Apparantly the spinner returns type long or int,
-				//depending on whether the value is 0 or different from 0.
-//				int val;				
-//				if (valueSpinner.getValue() instanceof Long) {
-//					val = (int)((Long) valueSpinner.getValue()).longValue();
-//				}
-//				else {
-//					val = (Integer) valueSpinner.getValue();
-//				}
-				int val = (Integer) valueSpinner.getValue();
-				if (!oldName.equals("")) {
-					if (!oldName.equals(newName)
-							&& model.isConstantNameUsed(newName)) {
-						JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"There is already another constant with the same name.\n\n"
-								+ "Choose a different name for the constant.",
-								"Error", JOptionPane.ERROR_MESSAGE);
-						showDialog();
-						return;
-					}
-					//Kyrke - This is messy, but a quck fix for bug #815487			
-					//Check that the value is within the allowed bounds
-					if (!( lowerBound <= val && val <= upperBound )){
-						JOptionPane.showMessageDialog(
-								CreateGui.getApp(),
-								"The specified value is invalid for the current net.\n"
-								+ "Updating the constant to the specified value invalidates the guard\n"
-								+ "on one or more arcs.",
-								"Constant value invalid for current net",
-								JOptionPane.ERROR_MESSAGE);
-						showDialog();
-						return;
-					}
-					Command edit = model.updateConstant(oldName, new Constant(
-							newName, val));
-					if (edit == null) {
-						JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"The specified value is invalid for the current net.\n"
-								+ "Updating the constant to the specified value invalidates the guard\n"
-								+ "on one or more arcs.",
-								"Constant value invalid for current net",
-								JOptionPane.ERROR_MESSAGE);
-						showDialog();
-						return;
-					} else {
-						CreateGui.getCurrentTab().drawingSurface().getUndoManager()
-						.addNewEdit(edit);
-						CreateGui.getCurrentTab().drawingSurface().repaintAll();
-					}
-				} else {
-					Command edit = model.addConstant(newName, val);
-					if (edit == null) {
-						JOptionPane
-						.showMessageDialog(
-								CreateGui.getApp(),
-								"A constant with the specified name already exists.",
-								"Constant exists",
-								JOptionPane.ERROR_MESSAGE);
-						showDialog();
-						return;
-					} else
-						CreateGui.getView().getUndoManager().addNewEdit(edit);
-				}
-				model.buildConstraints();
-			}
-		}
+		dialog = new EscapableDialog(CreateGui.getApp(),
+				"Edit Constant", true);
+		dialog.add(container);
+		dialog.setResizable(false);
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
 	}
 
 	private JSpinner makeDigitsOnlySpinnerUsingDocumentFilter(Integer value) {
@@ -231,25 +139,19 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				String old = fb.getDocument().getText(0, fb.getDocument().getLength());
 				StringBuffer newString = new StringBuffer(old);
 				newString.replace(offset, length+offset, "");
-				System.out.println("value before(remove): "+valueSpinner.getValue().toString());
 				if (stringIsNumber(newString.toString())) {
 					super.remove(fb, offset, length);
 				}
-				valueSpinner.updateUI();
-				System.out.println("value after(remove): "+valueSpinner.getValue().toString());
 			}
 
 			@Override
 			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
 				String old = fb.getDocument().getText(0, fb.getDocument().getLength());
 				StringBuffer newString = new StringBuffer(old);
-				newString.replace(offset, length+offset, text);            	 
-				System.out.println("value after(replace): "+valueSpinner.getValue().toString());
+				newString.replace(offset, length+offset, text);            	 			
 				if (stringIsNumber(newString.toString())) {                	
 					super.replace(fb, offset, length, text, attrs);
 				}
-				valueSpinner.updateUI();
-				System.out.println("value after(replace): "+valueSpinner.getValue().toString());
 			}
 
 			private boolean stringIsNumber(String text) {
@@ -283,9 +185,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		return spinner;
 	}
 
-	private void initComponents() {
-		//valueSpinner =  makeDigitsOnlySpinnerUsingDocumentFilter(initialValue);
-		valueSpinner = new JSpinner();
+	private void initComponents() throws IOException {		
+		valueSpinner =  makeDigitsOnlySpinnerUsingDocumentFilter(initialValue);
 		
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
@@ -301,6 +202,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.gridwidth = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(4, 4, 2, 4);
 		container.add(nameTextField,gbc);
 
 		nameLabel = new JLabel(); 
@@ -309,13 +211,14 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
+		gbc.insets = new Insets(4, 4, 2, 4);
 		gbc.anchor = GridBagConstraints.WEST;
 		container.add(nameLabel,gbc);
 
 		valueLabel = new javax.swing.JLabel(); 
 		valueLabel.setText("Value: ");
 		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(2, 0, 2, 0);
+		gbc.insets = new Insets(2, 4, 2, 4);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
@@ -323,13 +226,172 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		container.add(valueLabel,gbc);
 
 		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(2, 0, 2, 0);
+		gbc.insets = new Insets(2, 4, 2, 4);
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		container.add(valueSpinner,gbc);
+				
+		buttonContainer = new JPanel();
+		buttonContainer.setLayout(new GridBagLayout());
+
+		okButton = new JButton();
+		okButton.setText("OK");
+		okButton.setPreferredSize(new Dimension(80,30));
+		Image yesImage = ImageIO.read(new File("src/resources/Images/satisfied.png"));
+		Image resizedImg = yesImage.getScaledInstance(15, 15, 0);
+		Icon okIcon = new ImageIcon(resizedImg);
+		okButton.setIcon(okIcon);
+		gbc = new GridBagConstraints();		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 0, 0, 6);
+		buttonContainer.add(okButton,gbc);
+		
+		cancelButton = new JButton();
+		cancelButton.setText("Cancel");
+		cancelButton.setPreferredSize(new Dimension(80,30));
+		Image cancelImage = ImageIO.read(new File("src/resources/Images/notsatisfied.png"));
+		Image resizedCancelImg = cancelImage.getScaledInstance(15, 15, 0);
+		gbc = new GridBagConstraints();
+		cancelButton.setIcon(new ImageIcon(resizedCancelImg));
+		gbc.insets = new Insets(0, 0, 0, 10);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		buttonContainer.add(cancelButton,gbc);		
+		
+		//add action listeners for buttons
+		okButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				onOK();
+			}
+		});
+		
+		cancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exit();
+			}
+		});
+		
+		//add button container
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(18, 0, 6, 0);
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		container.add(buttonContainer,gbc);
+	}
+	
+	private void exit() {
+		dialog.setVisible(false);
+	}
+
+	private void onOK() {
+		if (((JSpinner.NumberEditor)valueSpinner.getEditor()).getTextField().getText().equals("")){
+			JOptionPane.showMessageDialog(
+					CreateGui.getApp(),
+					"The specified value is invalid for the current net.\n"
+					+ "Updating the constant to the specified value invalidates the guard\n"
+					+ "on one or more arcs.",
+					"Constant value invalid for current net",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		String newName = nameTextField.getText();
+
+		if (!Pattern.matches("[a-zA-Z]([\\_a-zA-Z0-9])*", newName)) {
+			System.err
+			.println("Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z]*");
+			JOptionPane
+			.showMessageDialog(
+					CreateGui.getApp(),
+					"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
+					"Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if (newName.trim().isEmpty()) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"You must specify a name.", "Missing name",
+					JOptionPane.ERROR_MESSAGE);
+			return;				
+		} else {				
+			//if you are not carefull you get a class cast exception. Apparantly the spinner returns type long or int,
+			//depending on whether the value is 0 or different from 0.
+			int val;				
+			if (valueSpinner.getValue() instanceof Long) {
+				val = (int)((Long) valueSpinner.getValue()).longValue();
+			}
+			else {
+				val = (Integer) valueSpinner.getValue();
+			}
+			if (!oldName.equals("")) {
+				if (!oldName.equals(newName)
+						&& model.isConstantNameUsed(newName)) {
+					JOptionPane
+					.showMessageDialog(
+							CreateGui.getApp(),
+							"There is already another constant with the same name.\n\n"
+							+ "Choose a different name for the constant.",
+							"Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				//Kyrke - This is messy, but a quck fix for bug #815487			
+				//Check that the value is within the allowed bounds
+				if (!( lowerBound <= val && val <= upperBound )){
+					JOptionPane.showMessageDialog(
+							CreateGui.getApp(),
+							"The specified value is invalid for the current net.\n"
+							+ "Updating the constant to the specified value invalidates the guard\n"
+							+ "on one or more arcs.",
+							"Constant value invalid for current net",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				Command edit = model.updateConstant(oldName, new Constant(
+						newName, val));
+				if (edit == null) {
+					JOptionPane
+					.showMessageDialog(
+							CreateGui.getApp(),
+							"The specified value is invalid for the current net.\n"
+							+ "Updating the constant to the specified value invalidates the guard\n"
+							+ "on one or more arcs.",
+							"Constant value invalid for current net",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				} else {
+					CreateGui.getCurrentTab().drawingSurface().getUndoManager()
+					.addNewEdit(edit);
+					CreateGui.getCurrentTab().drawingSurface().repaintAll();
+					exit();
+				}
+			} else {
+				Command edit = model.addConstant(newName, val);
+				if (edit == null) {
+					JOptionPane
+					.showMessageDialog(
+							CreateGui.getApp(),
+							"A constant with the specified name already exists.",
+							"Constant exists",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				} else
+					CreateGui.getView().getUndoManager().addNewEdit(edit);
+				exit();
+			}
+			model.buildConstraints();
+		}		
 	}
 }
 
