@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -47,6 +48,7 @@ import javax.swing.text.DocumentFilter.FilterBypass;
 
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
@@ -163,6 +165,13 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 		NumberFormat format = NumberFormat.getIntegerInstance();
 		format.setGroupingUsed(false);
+		textField.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				okButton.requestFocusInWindow();
+				okButton.doClick();			}
+		});
 		textField.setFormatterFactory(new DefaultFormatterFactory(
 				new InternationalFormatter(format){             
 					private static final long serialVersionUID = 1L;
@@ -195,6 +204,14 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		nameTextField = new javax.swing.JTextField();	
 		nameTextField.setPreferredSize(size);
 		nameTextField.addAncestorListener(new RequestFocusListener());
+		nameTextField.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
+			}
+		});
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -240,7 +257,9 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		okButton = new JButton();
 		okButton.setText("OK");
 		okButton.setPreferredSize(new Dimension(80,30));
-		Image yesImage = ImageIO.read(new File("src/resources/Images/satisfied.png"));
+		okButton.setMnemonic(KeyEvent.VK_O);
+		ImageIcon yesImageIcon = ResourceManager.satisfiedIcon();
+		Image yesImage = yesImageIcon.getImage();
 		Image resizedImg = yesImage.getScaledInstance(15, 15, 0);
 		Icon okIcon = new ImageIcon(resizedImg);
 		okButton.setIcon(okIcon);
@@ -256,8 +275,10 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		cancelButton = new JButton();
 		cancelButton.setText("Cancel");
 		cancelButton.setPreferredSize(new Dimension(80,30));
-		Image cancelImage = ImageIO.read(new File("src/resources/Images/notsatisfied.png"));
-		Image resizedCancelImg = cancelImage.getScaledInstance(15, 15, 0);
+		cancelButton.setMnemonic(KeyEvent.VK_C);
+		ImageIcon cancelImage = ResourceManager.notSatisfiedIcon();
+		Image iconImage = cancelImage.getImage();
+		Image resizedCancelImg = iconImage.getScaledInstance(15, 15, 0);
 		gbc = new GridBagConstraints();
 		cancelButton.setIcon(new ImageIcon(resizedCancelImg));
 		gbc.insets = new Insets(0, 0, 0, 10);
@@ -305,6 +326,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					+ "on one or more arcs.",
 					"Constant value invalid for current net",
 					JOptionPane.ERROR_MESSAGE);
+			valueSpinner.requestFocusInWindow();
 			return;
 		}
 		String newName = nameTextField.getText();
@@ -317,6 +339,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					CreateGui.getApp(),
 					"Acceptable names for constants are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*",
 					"Error", JOptionPane.ERROR_MESSAGE);
+			nameTextField.requestFocusInWindow();
 			return;
 		}
 
@@ -324,6 +347,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"You must specify a name.", "Missing name",
 					JOptionPane.ERROR_MESSAGE);
+			nameTextField.requestFocusInWindow();
 			return;				
 		} else {				
 			//if you are not carefull you get a class cast exception. Apparantly the spinner returns type long or int,
@@ -344,6 +368,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							"There is already another constant with the same name.\n\n"
 							+ "Choose a different name for the constant.",
 							"Error", JOptionPane.ERROR_MESSAGE);
+					nameTextField.requestFocusInWindow();
 					return;
 				}
 				//Kyrke - This is messy, but a quck fix for bug #815487			
@@ -356,6 +381,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							+ "on one or more arcs.",
 							"Constant value invalid for current net",
 							JOptionPane.ERROR_MESSAGE);
+					valueSpinner.requestFocusInWindow();
 					return;
 				}
 				Command edit = model.updateConstant(oldName, new Constant(
@@ -369,6 +395,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							+ "on one or more arcs.",
 							"Constant value invalid for current net",
 							JOptionPane.ERROR_MESSAGE);
+					valueSpinner.requestFocusInWindow();
 					return;
 				} else {
 					CreateGui.getCurrentTab().drawingSurface().getUndoManager()
@@ -385,6 +412,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							"A constant with the specified name already exists.",
 							"Constant exists",
 							JOptionPane.ERROR_MESSAGE);
+					nameTextField.requestFocusInWindow();
 					return;
 				} else
 					CreateGui.getView().getUndoManager().addNewEdit(edit);
