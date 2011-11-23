@@ -359,6 +359,11 @@ public class TimedArcPetriNet {
 		int numberOfTokens = 0;
 		int numberOfOrphans = 0;
 		int numberOfComponents = 0;
+		boolean networkUntimed = true; 
+		
+		//For comparing to 
+		TimeInterval infInterval = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+		TimeInterval infIntervalConst = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
 		
 		for(TimedArcPetriNet t : nets){
 			numberOfPlaces += t.places().size();
@@ -370,6 +375,18 @@ public class TimedArcPetriNet {
 			numberOfTokens += t.getNumberOfTokensInNet();
 			numberOfOrphans += t.getOrphanTransitions().size();
 			numberOfComponents += 1;
+			//Test if all inputarcs is untimed
+			for(TimedInputArc in : t.inputArcs()){
+				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+					networkUntimed = false;
+				}
+			}
+			//Test if all tansportarcs is untimed
+			for(TransportArc in : t.transportArcs()){
+				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+					networkUntimed = false;
+				}
+			}
 		}
 		
 		numberOfTotalNumberOfArcs = numberOfInputArcs + numberOfOutputArcs + numberOfInhibitorArcs + numberOfTransportArcs;
@@ -385,12 +402,13 @@ public class TimedArcPetriNet {
 		array[rowNumber++][columnNumber] = numberOfTokens;
 		array[rowNumber++][columnNumber] = numberOfOrphans;
 		array[rowNumber++][columnNumber] = numberOfComponents;
+		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
 	}
 	
 	public Object[][] getStatistics(){
 		
 		//Currently shown component
-		Object[][] result = new Object[12][4];
+		Object[][] result = new Object[13][4];
 		int rowNumber = 0;
 		int columnNumber = 0;
 		result[rowNumber++][columnNumber] = "Number of places: ";
@@ -403,6 +421,7 @@ public class TimedArcPetriNet {
 		result[rowNumber++][columnNumber] = "Number of tokens: ";
 		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
 		result[rowNumber++][columnNumber] = "Number of components considered: ";
+		result[rowNumber++][columnNumber] = "The network is untimed: ";
 		result[rowNumber++][columnNumber] = "Number of shared places: ";
 		result[rowNumber++][columnNumber] = "Number of shared transitions: ";
 		
@@ -411,8 +430,8 @@ public class TimedArcPetriNet {
 		fillStatistics(this.parentNetwork().allTemplates(), result, 3);
 		
 		//Add the number of shared places and transitions
-		result[10][3] = this.parentNetwork().numberOfSharedPlaces();
-		result[11][3] = this.parentNetwork().numberOfSharedTransitions();
+		result[11][3] = this.parentNetwork().numberOfSharedPlaces();
+		result[12][3] = this.parentNetwork().numberOfSharedTransitions();
 		
 		return result;
 	}

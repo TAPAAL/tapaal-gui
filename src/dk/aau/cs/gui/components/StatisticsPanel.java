@@ -32,7 +32,7 @@ public class StatisticsPanel extends JPanel{
 	private final int rightMargin = 10;
 	
 	private JButton removeOrphans;
-	private JButton checkBoundedness;
+    private static final String REMOVE_ORPHANS_TOOL_TIP = "<html>Remove all orphan transitions<br /> (transitions with no arcs attached)<br /> in all components</html>";
 	
 	String[] headLines = {"", "Shown component", "Active components", "All components"};
 	
@@ -100,6 +100,7 @@ public class StatisticsPanel extends JPanel{
 	
 	private void addButtons(int gridWidth, int gridHeight){
 		removeOrphans = new JButton("Remove orphan transitions");
+		removeOrphans.setToolTipText(REMOVE_ORPHANS_TOOL_TIP);
 		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		removeOrphans.addActionListener(new ActionListener() {
 			
@@ -133,12 +134,8 @@ public class StatisticsPanel extends JPanel{
 			}
 		});
 		
-		checkBoundedness = new JButton("Check boundedness");
-		
 		
 		buttonsPanel.add(removeOrphans);
-		
-		buttonsPanel.add(checkBoundedness);
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
