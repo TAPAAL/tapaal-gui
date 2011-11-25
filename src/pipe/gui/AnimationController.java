@@ -172,7 +172,7 @@ public class AnimationController extends JPanel {
 				}
 
 				public void keyReleased(KeyEvent e) {
-
+					CreateGui.getAnimator().reportBlockingPlaces();
 				}
 
 				public void keyTyped(KeyEvent e) {
@@ -190,7 +190,8 @@ public class AnimationController extends JPanel {
 
 			timedelayPanel.add(TimeDelayField);
 			timedelayPanel.add(okButton);
-
+			//CreateGui.getAnimator().reportBlockingPlaces();
+			
 			// c.fill = GridBagConstraints.HORIZONTAL;
 			// c.weightx = 0.5;
 			// c.gridx = 0;
@@ -214,6 +215,10 @@ public class AnimationController extends JPanel {
 			firermodebox.setSelectedItem(currentFiringMode.toString());
 		}
 
+	}
+	
+	public javax.swing.JButton getOkButton(){
+		return okButton;
 	}
 
 	private void addTimeDelayToHistory() {
@@ -257,6 +262,32 @@ public class AnimationController extends JPanel {
 		}
 
 		setAnimationButtonsEnabled();
+	}
+	
+	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
+		// Hack to allow usage of localised numbes
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.applyLocalizedPattern("#.#");
+
+		DecimalFormat parser = new DecimalFormat();
+		parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+
+		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse
+																	// the
+																	// number
+																	// localised
+		// Try parse
+
+		BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
+				new MathContext(Pipe.AGE_PRECISION));
+
+		// BigDecimal timeDelayToSet = new
+		// BigDecimal(TimeDelayField.getText(), new
+		// MathContext(Pipe.AGE_PRECISION));
+		return timeDelayToSet;
 	}
 
 	class AnimateAction extends GuiAction {

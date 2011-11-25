@@ -2,6 +2,7 @@ package pipe.gui;
 
 import java.awt.Container;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,7 @@ import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -192,6 +194,7 @@ public class Animator {
 			highlightEnabledTransitions();
 			currentAction--;
 			currentMarkingIndex--;
+			reportBlockingPlaces();
 		}
 	}
 
@@ -218,6 +221,7 @@ public class Animator {
 			currentAction++;
 			currentMarkingIndex++;
 			activeGuiModel().redrawVisibleTokenLists();
+			reportBlockingPlaces();
 
 		}
 	}
@@ -271,18 +275,55 @@ public class Animator {
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		reportBlockingPlaces();
 
 	}
 
-	public void letTimePass(BigDecimal delay) {
+	public boolean letTimePass(BigDecimal delay) {
+		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
 			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
+			result = true;
 		}
-
+		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		reportBlockingPlaces();
+		return result;
+	}
+	
+	public void reportBlockingPlaces(){
+		
+		try{
+			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
+			if(delay.compareTo(new BigDecimal(0))<=0){
+				CreateGui.getAnimationController().getOkButton().setEnabled(false);
+				CreateGui.getAnimationController().getOkButton().setToolTipText("Can't handle negative numbers");
+			} else {
+				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
+				if(blockingPlaces.size() == 0){
+					CreateGui.getAnimationController().getOkButton().setEnabled(true);
+					CreateGui.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
+				} else {
+					StringBuilder sb = new StringBuilder();
+					sb.append("<html>The invatiants in the following places<br />prohibits a time delay of " + delay + ":<br /><br />");
+					for (TimedPlace t :blockingPlaces){
+						sb.append(t.toString() + "<br />");
+					}
+					//JOptionPane.showMessageDialog(null, sb.toString());
+					sb.append("</html>");
+					CreateGui.getAnimationController().getOkButton().setEnabled(false);
+					CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
+				}
+			}
+		} catch (NumberFormatException e) {
+			// Do nothing, invalud number
+		} catch (ParseException e) {
+			CreateGui.getAnimationController().getOkButton().setEnabled(false);
+			CreateGui.getAnimationController().getOkButton().setToolTipText("Text in field is not a number");
+		}
 	}
 
 	private DataLayer activeGuiModel() {
