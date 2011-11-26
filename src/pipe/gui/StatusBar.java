@@ -27,7 +27,7 @@ public class StatusBar extends JPanel {
 			+ "options [Mouse wheel -> rotate]";
 	public String textforAddtoken = "Add Token Mode: Click on a place to add a token";
 	public String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
-	public String textforAnimation = "Animation Mode: Red transitions are enabled, click a transition to "
+	public String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to "
 			+ "fire it";
 	public String textforArc = "Arc Mode: Right click on an arc to see menu options "
 			+ "";

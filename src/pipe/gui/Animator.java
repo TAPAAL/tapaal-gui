@@ -308,7 +308,7 @@ public class Animator {
 					CreateGui.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
 				} else {
 					StringBuilder sb = new StringBuilder();
-					sb.append("<html>The invatiants in the following places<br />prohibits a time delay of " + delay + ":<br /><br />");
+					sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
 					for (TimedPlace t :blockingPlaces){
 						sb.append(t.toString() + "<br />");
 					}

@@ -1491,7 +1491,7 @@ public class GuiFrame extends JFrame implements Observer {
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
-									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
 
@@ -1504,7 +1504,7 @@ public class GuiFrame extends JFrame implements Observer {
 				} catch (Exception e) {
 					System.err.println(e);
 					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
