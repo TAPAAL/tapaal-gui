@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 
 
 import javax.swing.BorderFactory;
@@ -252,23 +251,13 @@ public class ConstantsPane extends JPanel {
 	}
 
 	private void showEditConstantDialog(Constant constant) {	
-		ConstantsDialogPanel panel = null;
+		ConstantsDialogPanel panel;
 		if (constant != null)
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network(), constant);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			panel = new ConstantsDialogPanel(new JRootPane(),
+					parent.network(), constant);
 		else
-			try {
-				panel = new ConstantsDialogPanel(new JRootPane(),
-						parent.network());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			panel = new ConstantsDialogPanel(new JRootPane(),
+					parent.network());
 		panel.showDialog();
 		showConstants();
 	}
