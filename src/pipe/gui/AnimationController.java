@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
@@ -162,6 +165,21 @@ public class AnimationController extends JPanel {
 					// okButtonHandler(evt);
 					addTimeDelayToHistory();
 				}
+			});
+			
+			//"Hack" to make sure the toolTip for this button is showed as long as possible
+			okButton.addMouseListener(new MouseAdapter() {
+			    final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
+			    final int dismissDelayMinutes = Integer.MAX_VALUE; // 10 minutes
+			    @Override
+			    public void mouseEntered(MouseEvent e) {
+			        ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
+			    }
+			 
+			    @Override
+			    public void mouseExited(MouseEvent e) {
+			        ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
+			    }
 			});
 
 			TimeDelayField.addKeyListener(new KeyListener() {
