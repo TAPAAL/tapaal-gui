@@ -920,7 +920,6 @@ public class QueryDialog extends JPanel {
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		advancedButton.addActionListener(new ActionListener() {
 
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(advancedView){
 					Point location = guiDialog.getLocation();
