@@ -301,12 +301,12 @@ public class Animator {
 			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
 			if(delay.compareTo(new BigDecimal(0))<=0){
 				CreateGui.getAnimationController().getOkButton().setEnabled(false);
-				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for a positive rational number.");
+				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for positive rational numbers");
 			} else {
 				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
 				if(blockingPlaces.size() == 0){
 					CreateGui.getAnimationController().getOkButton().setEnabled(true);
-					CreateGui.getAnimationController().getOkButton().setToolTipText("Press to add the delay.");
+					CreateGui.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
 				} else {
 					StringBuilder sb = new StringBuilder();
 					sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
@@ -323,7 +323,7 @@ public class Animator {
 			// Do nothing, invalud number
 		} catch (ParseException e) {
 			CreateGui.getAnimationController().getOkButton().setEnabled(false);
-			CreateGui.getAnimationController().getOkButton().setToolTipText("Text in the field is not a number.");
+			CreateGui.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
 		}
 	}
 
