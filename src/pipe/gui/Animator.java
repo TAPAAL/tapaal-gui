@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
+import javax.swing.ToolTipManager;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
