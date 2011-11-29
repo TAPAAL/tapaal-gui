@@ -224,7 +224,7 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
-	private Boolean advancedView = false;
+	private static Boolean advancedView = false;
 	
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -306,6 +306,7 @@ public class QueryDialog extends JPanel {
 		setLayout(new GridBagLayout());
 
 		init(option, queryToCreateFrom);
+		toggleAdvancedSimpleView(false);
 	}
 
 	private boolean checkForDegree2() {
@@ -481,7 +482,7 @@ public class QueryDialog extends JPanel {
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
-
+		
 		guiDialog.setResizable(false);
 		
 		// Make window fit contents' preferred size
@@ -921,32 +922,7 @@ public class QueryDialog extends JPanel {
 		advancedButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-				if(advancedView){
-					Point location = guiDialog.getLocation();
-					advancedView = false;
-					advancedButton.setText("Advanced view");
-					advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-					searchOptionsPanel.setVisible(false);
-					reductionOptionsPanel.setVisible(false);
-					saveUppaalXMLButton.setVisible(false);
-					
-					guiDialog.pack();
-					guiDialog.setLocation(location);
-					
-					
-				} else {
-					Point location = guiDialog.getLocation();
-					advancedView = true;
-					advancedButton.setText("Simple view");
-					advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
-					searchOptionsPanel.setVisible(true);
-					reductionOptionsPanel.setVisible(true);
-					saveUppaalXMLButton.setVisible(true);
-					
-					guiDialog.pack();
-					guiDialog.setLocation(location);
-				}
-				
+				toggleAdvancedSimpleView(true);
 			}
 		});
 		
@@ -1022,6 +998,38 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.insets = new Insets(5,10,0,10);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
+	}
+	
+	private void toggleAdvancedSimpleView(boolean changeState){
+		//Make sure that the right properties are set when the pane is initialized
+		if(!changeState){
+			advancedView = !advancedView;
+		}
+		if(advancedView){
+			Point location = guiDialog.getLocation();
+			advancedView = false;
+			advancedButton.setText("Advanced view");
+			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
+			searchOptionsPanel.setVisible(false);
+			reductionOptionsPanel.setVisible(false);
+			saveUppaalXMLButton.setVisible(false);
+			
+			guiDialog.pack();
+			guiDialog.setLocation(location);
+			
+			
+		} else {
+			Point location = guiDialog.getLocation();
+			advancedView = true;
+			advancedButton.setText("Simple view");
+			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
+			searchOptionsPanel.setVisible(true);
+			reductionOptionsPanel.setVisible(true);
+			saveUppaalXMLButton.setVisible(true);
+			
+			guiDialog.pack();
+			guiDialog.setLocation(location);
+		}
 	}
 	
 	private void initBoundednessCheckPanel() {
