@@ -1964,7 +1964,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
-			Logger.log("Can't open browser");
+			Logger.log("Cannot open the browser.");
 			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);
