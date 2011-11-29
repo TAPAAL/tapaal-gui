@@ -2,6 +2,7 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,14 +20,20 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
@@ -59,6 +66,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private TimedPlaceComponent place;
 	private Context context;
+	
+	private Vector<TimedPlace> sharedPlaces;
+	private int numberOfSharedPlaces = 0;
+	private int maxNumberOfPlacesToShowAtOnce = 15;
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
@@ -145,7 +156,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void setupInitialState() {
-		Vector<TimedPlace> sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
+		sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
 		
 		List<TimedPlace> usedPlaces = context.activeModel().places();
 		
@@ -160,6 +171,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		});
 		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
+		numberOfSharedPlaces = sharedPlaces.size();
 		if(place.underlyingPlace().isShared()) {
 			
 			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
@@ -245,6 +257,19 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			}
 		});
 		
+		sharedPlacesComboBox.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+			}
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+			}
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				adjustDimensionsOfPopUpMenu(sharedPlacesComboBox);
+			}
+		});
+		
 		markingLabel = new javax.swing.JLabel("Marking:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -272,6 +297,42 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
+	}
+	
+	private void adjustDimensionsOfPopUpMenu(JComboBox comboBox) {		
+		if (comboBox.getItemCount() == 0) {
+            return;
+        }
+        Object comp = comboBox.getUI().getAccessibleChild(comboBox, 0);
+        if (!(comp instanceof JPopupMenu)) {
+            return;
+        }
+        FontMetrics metrics = comboBox.getFontMetrics(comboBox.getFont()); 
+        int maxWidth=0;
+        for(int i=0;i<comboBox.getItemCount();i++){
+            if(comboBox.getItemAt(i)==null)
+                continue;
+            int currentWidth=metrics.stringWidth(comboBox.getItemAt(i).toString());
+            if(maxWidth<currentWidth)
+                maxWidth=currentWidth;
+        }
+        JPopupMenu popup = (JPopupMenu) comp;
+        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+        Dimension size = scrollPane.getPreferredSize();
+        if (size.width < maxWidth+24) {
+        	size.width = maxWidth+24;
+        }
+        if (numberOfSharedPlaces > 8) {
+        	if (numberOfSharedPlaces > maxNumberOfPlacesToShowAtOnce) {
+        		int heightOfPopUpMenu = (int)(metrics.getHeight()*maxNumberOfPlacesToShowAtOnce*1.6);        	
+        		size.height = heightOfPopUpMenu;
+        	} else {
+        		int heightOfPopUpMenu = (int)(metrics.getHeight()*numberOfSharedPlaces*1.6);
+        		size.height = heightOfPopUpMenu;
+        	}
+        }
+        scrollPane.setPreferredSize(size);
+        scrollPane.setMaximumSize(size);        
 	}
 
 	private void initTimeInvariantPanel() {

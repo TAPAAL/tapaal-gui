@@ -2,6 +2,7 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,9 +14,13 @@ import java.util.Vector;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
@@ -35,6 +40,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private TimedTransitionComponent transition;
 	private JRootPane rootPane;
 	private Context context;
+	
+	private int numberOfSharedTransitions = 0;
+	private int maxNumberOfTransitionsToShowAtOnce = 15;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
 		rootPane = _rootPane;
@@ -77,8 +85,22 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return o1.name().compareToIgnoreCase(o2.name());
 			}
 		});
+		numberOfSharedTransitions = sharedTransitions.size();
 		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
+		sharedTransitionsComboBox.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+			}
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+			}
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				adjustDimensionsOfPopUpMenu(sharedTransitionsComboBox);
+			}
+		});
+		
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
@@ -189,6 +211,43 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			switchToNameTextField();
 		}
 	}
+	
+	private void adjustDimensionsOfPopUpMenu(JComboBox comboBox) {	
+		if (comboBox.getItemCount() == 0) {
+            return;
+        }
+        Object comp = comboBox.getUI().getAccessibleChild(comboBox, 0);
+        if (!(comp instanceof JPopupMenu)) {
+            return;
+        }
+        FontMetrics metrics = comboBox.getFontMetrics(comboBox.getFont()); 
+        int maxWidth=0;
+        for(int i=0;i<comboBox.getItemCount();i++){
+            if(comboBox.getItemAt(i)==null)
+                continue;
+            int currentWidth=metrics.stringWidth(comboBox.getItemAt(i).toString());
+            if(maxWidth<currentWidth)
+                maxWidth=currentWidth;
+        }
+        JPopupMenu popup = (JPopupMenu) comp;
+        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+        Dimension size = scrollPane.getPreferredSize();
+        if (size.width < maxWidth+24) {
+        	size.width = maxWidth+24;
+        }
+        if (numberOfSharedTransitions > 8) {
+        	if (numberOfSharedTransitions > maxNumberOfTransitionsToShowAtOnce) {
+        		int heightOfPopUpMenu = (int)(metrics.getHeight()*maxNumberOfTransitionsToShowAtOnce*1.6);
+        		size.height = heightOfPopUpMenu;
+        	} else {
+        		int heightOfPopUpMenu = (int)(metrics.getHeight()*numberOfSharedTransitions*1.6);
+        		size.height = heightOfPopUpMenu;
+        	}
+        }
+        scrollPane.setPreferredSize(size);
+        scrollPane.setMaximumSize(size);        
+	}
+
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
 		for(TimedInputArc arc : context.activeModel().inputArcs()){
