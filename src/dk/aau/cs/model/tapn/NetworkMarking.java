@@ -71,7 +71,27 @@ public class NetworkMarking implements TimedMarking {
 		}
 		return true;
 	}
+	
+	public List<TimedPlace> getBlockingPlaces(BigDecimal delay){
+		List<TimedPlace> result = new ArrayList<TimedPlace>();
+		for(List<TimedToken> listOfTokens: sharedPlacesTokens.values()){
+			for(TimedToken token : listOfTokens){
+				TimeInvariant invariant = token.place().invariant();
+				if (!invariant.isSatisfied(token.age().add(delay))) {
+					if(!result.contains(token.place())){
+						result.add(token.place());
+					}
+				}
+			}
+		}
+		
+		for (LocalTimedMarking marking : markings.values()) {
+			result.addAll(marking.getBlockingPlaces(delay));
+		}
 
+		return result;
+	}
+	
 	public NetworkMarking delay(BigDecimal amount) {
 		Require.that(amount != null, "Delay must not be null");
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");

@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
@@ -163,6 +166,27 @@ public class AnimationController extends JPanel {
 					addTimeDelayToHistory();
 				}
 			});
+			
+			//"Hack" to make sure the toolTip for this button is showed as long as possible
+			okButton.addMouseListener(new MouseAdapter() {
+			    final int defaultDismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
+			    final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
+			    final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
+			    final int dismissDelayMinutes = Integer.MAX_VALUE;
+			    @Override
+			    public void mouseEntered(MouseEvent e) {
+			        ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
+			        ToolTipManager.sharedInstance().setInitialDelay(0);
+			        ToolTipManager.sharedInstance().setReshowDelay(0);
+			    }
+			    
+			    @Override
+			    public void mouseExited(MouseEvent e) {
+			        ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
+			        ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
+			        ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
+			    }
+			});
 
 			TimeDelayField.addKeyListener(new KeyListener() {
 				public void keyPressed(KeyEvent e) {
@@ -172,7 +196,7 @@ public class AnimationController extends JPanel {
 				}
 
 				public void keyReleased(KeyEvent e) {
-
+					CreateGui.getAnimator().reportBlockingPlaces();
 				}
 
 				public void keyTyped(KeyEvent e) {
@@ -190,7 +214,8 @@ public class AnimationController extends JPanel {
 
 			timedelayPanel.add(TimeDelayField);
 			timedelayPanel.add(okButton);
-
+			//CreateGui.getAnimator().reportBlockingPlaces();
+			
 			// c.fill = GridBagConstraints.HORIZONTAL;
 			// c.weightx = 0.5;
 			// c.gridx = 0;
@@ -214,6 +239,10 @@ public class AnimationController extends JPanel {
 			firermodebox.setSelectedItem(currentFiringMode.toString());
 		}
 
+	}
+	
+	public javax.swing.JButton getOkButton(){
+		return okButton;
 	}
 
 	private void addTimeDelayToHistory() {
@@ -257,6 +286,32 @@ public class AnimationController extends JPanel {
 		}
 
 		setAnimationButtonsEnabled();
+	}
+	
+	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
+		// Hack to allow usage of localised numbes
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		df.applyLocalizedPattern("#.#");
+
+		DecimalFormat parser = new DecimalFormat();
+		parser.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+		parser.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
+
+		Number parseTime = parser.parse(TimeDelayField.getText()); // Parse
+																	// the
+																	// number
+																	// localised
+		// Try parse
+
+		BigDecimal timeDelayToSet = new BigDecimal(parseTime.toString(),
+				new MathContext(Pipe.AGE_PRECISION));
+
+		// BigDecimal timeDelayToSet = new
+		// BigDecimal(TimeDelayField.getText(), new
+		// MathContext(Pipe.AGE_PRECISION));
+		return timeDelayToSet;
 	}
 
 	class AnimateAction extends GuiAction {

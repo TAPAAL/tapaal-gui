@@ -1298,6 +1298,7 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 			setEditionAllowed(false);
@@ -1491,7 +1492,7 @@ public class GuiFrame extends JFrame implements Observer {
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
-									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
 
@@ -1504,7 +1505,7 @@ public class GuiFrame extends JFrame implements Observer {
 				} catch (Exception e) {
 					System.err.println(e);
 					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
@@ -1963,7 +1964,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
-			Logger.log("Can't open browser");
+			Logger.log("Cannot open the browser.");
 			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);
