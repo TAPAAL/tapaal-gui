@@ -349,6 +349,7 @@ public class TimedArcPetriNet {
 	}
 	
 	private void fillStatistics(Iterable<TimedArcPetriNet> nets, Object[][] array, int columnNumber){
+		int numberOfComponents = 0;
 		int numberOfPlaces = 0;
 		int numberOfTransitions = 0;
 		int numberOfInputArcs = 0;
@@ -358,7 +359,6 @@ public class TimedArcPetriNet {
 		int numberOfTotalNumberOfArcs = 0;
 		int numberOfTokens = 0;
 		int numberOfOrphans = 0;
-		int numberOfComponents = 0;
 		boolean networkUntimed = true; 
 		int numberOfUntimedInputArcs = 0;
 		int numberOfUntimedTransportArcs = 0;
@@ -368,6 +368,7 @@ public class TimedArcPetriNet {
 		TimeInterval infIntervalConst = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
 		
 		for(TimedArcPetriNet t : nets){
+			numberOfComponents += 1;
 			numberOfPlaces += t.places().size();
 			numberOfTransitions += t.transitions.size();
 			numberOfInputArcs += t.inputArcs.size();
@@ -376,7 +377,6 @@ public class TimedArcPetriNet {
 			numberOfTransportArcs += t.transportArcs.size();
 			numberOfTokens += t.getNumberOfTokensInNet();
 			numberOfOrphans += t.getOrphanTransitions().size();
-			numberOfComponents += 1;
 			//Test if all inputarcs is untimed and get the number of untimed input arcs
 			for(TimedInputArc in : t.inputArcs()){
 				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
@@ -398,6 +398,7 @@ public class TimedArcPetriNet {
 		numberOfTotalNumberOfArcs = numberOfInputArcs + numberOfOutputArcs + numberOfInhibitorArcs + numberOfTransportArcs;
 		
 		int rowNumber = 0;
+		array[rowNumber++][columnNumber] = numberOfComponents;
 		array[rowNumber++][columnNumber] = numberOfPlaces;
 		array[rowNumber++][columnNumber] = numberOfTransitions;
 		array[rowNumber++][columnNumber] = numberOfInputArcs;
@@ -406,19 +407,20 @@ public class TimedArcPetriNet {
 		array[rowNumber++][columnNumber] = numberOfTransportArcs;
 		array[rowNumber++][columnNumber] = numberOfTotalNumberOfArcs;
 		array[rowNumber++][columnNumber] = numberOfTokens;
-		array[rowNumber++][columnNumber] = numberOfOrphans;
-		array[rowNumber++][columnNumber] = numberOfComponents;
-		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
 		array[rowNumber++][columnNumber] = numberOfUntimedInputArcs;
 		array[rowNumber++][columnNumber] = numberOfUntimedTransportArcs;
+		//Make space for number of shared transitions and places
+		rowNumber += 2;
+		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
+		array[rowNumber++][columnNumber] = numberOfOrphans;
 	}
 	
 	public Object[][] getStatistics(){
 		
-		//Currently shown component
 		Object[][] result = new Object[15][4];
 		int rowNumber = 0;
 		int columnNumber = 0;
+		result[rowNumber++][columnNumber] = "Number of components considered: ";
 		result[rowNumber++][columnNumber] = "Number of places: ";
 		result[rowNumber++][columnNumber] = "Number of transitions: ";
 		result[rowNumber++][columnNumber] = "Number of input arcs: ";
@@ -427,21 +429,20 @@ public class TimedArcPetriNet {
 		result[rowNumber++][columnNumber] = "Number of pairs of transport arcs: ";
 		result[rowNumber++][columnNumber] = "Total number of arcs: ";
 		result[rowNumber++][columnNumber] = "Number of tokens: ";
-		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
-		result[rowNumber++][columnNumber] = "Number of components considered: ";
-		result[rowNumber++][columnNumber] = "The network is untimed: ";
 		result[rowNumber++][columnNumber] = "Number of untimed input arcs: ";
 		result[rowNumber++][columnNumber] = "Number of untimed transport arcs";
 		result[rowNumber++][columnNumber] = "Number of shared places: ";
 		result[rowNumber++][columnNumber] = "Number of shared transitions: ";
+		result[rowNumber++][columnNumber] = "The network is untimed: ";
+		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
 		
 		fillStatistics(Arrays.asList(new TimedArcPetriNet[] {this}), result, 1);
 		fillStatistics(this.parentNetwork().activeTemplates(), result, 2);
 		fillStatistics(this.parentNetwork().allTemplates(), result, 3);
 		
 		//Add the number of shared places and transitions
-		result[13][3] = this.parentNetwork().numberOfSharedPlaces();
-		result[14][3] = this.parentNetwork().numberOfSharedTransitions();
+		result[11][3] = this.parentNetwork().numberOfSharedPlaces();
+		result[12][3] = this.parentNetwork().numberOfSharedTransitions();
 		
 		return result;
 	}

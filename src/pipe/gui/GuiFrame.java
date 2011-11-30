@@ -543,13 +543,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				StatisticsPanel panel = new StatisticsPanel();
-				
-				JOptionPane.showMessageDialog(GuiFrame.this, 
-						panel, 
-						"Net statistics", 
-						JOptionPane.INFORMATION_MESSAGE
-						);
+				StatisticsPanel.showStatisticsPanel();
 			}
 		});
 		
