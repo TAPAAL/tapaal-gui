@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -41,7 +42,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private JRootPane rootPane;
 	private Context context;
 	
-	private int numberOfSharedTransitions = 0;
+	//private int numberOfSharedTransitions = 0;
 	private int maxNumberOfTransitionsToShowAtOnce = 15;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
@@ -85,21 +86,23 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return o1.name().compareToIgnoreCase(o2.name());
 			}
 		});
-		numberOfSharedTransitions = sharedTransitions.size();
-		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
+		//numberOfSharedTransitions = sharedTransitions.size();
+		//sharedTransitionsComboBox = new JComboBox(sharedTransitions);
+		sharedTransitionsComboBox = new NonTruncatingComboBox(maxNumberOfTransitionsToShowAtOnce);
+		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
-		sharedTransitionsComboBox.addPopupMenuListener(new PopupMenuListener() {
-			@Override
-			public void popupMenuCanceled(PopupMenuEvent arg0) {
-			}
-			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-			}
-			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-				adjustDimensionsOfPopUpMenu(sharedTransitionsComboBox);
-			}
-		});
+//		sharedTransitionsComboBox.addPopupMenuListener(new PopupMenuListener() {
+//			@Override
+//			public void popupMenuCanceled(PopupMenuEvent arg0) {
+//			}
+//			@Override
+//			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+//			}
+//			@Override
+//			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+//				adjustDimensionsOfPopUpMenu(sharedTransitionsComboBox);
+//			}
+//		});
 		
 		setLayout(new java.awt.GridBagLayout());
 
@@ -212,41 +215,41 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		}
 	}
 	
-	private void adjustDimensionsOfPopUpMenu(JComboBox comboBox) {	
-		if (comboBox.getItemCount() == 0) {
-            return;
-        }
-        Object comp = comboBox.getUI().getAccessibleChild(comboBox, 0);
-        if (!(comp instanceof JPopupMenu)) {
-            return;
-        }
-        FontMetrics metrics = comboBox.getFontMetrics(comboBox.getFont()); 
-        int maxWidth=0;
-        for(int i=0;i<comboBox.getItemCount();i++){
-            if(comboBox.getItemAt(i)==null)
-                continue;
-            int currentWidth=metrics.stringWidth(comboBox.getItemAt(i).toString());
-            if(maxWidth<currentWidth)
-                maxWidth=currentWidth;
-        }
-        JPopupMenu popup = (JPopupMenu) comp;
-        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
-        Dimension size = scrollPane.getPreferredSize();
-        if (size.width < maxWidth+24) {
-        	size.width = maxWidth+24;
-        }
-        if (numberOfSharedTransitions > 8) {
-        	if (numberOfSharedTransitions > maxNumberOfTransitionsToShowAtOnce) {
-        		int heightOfPopUpMenu = (int)(metrics.getHeight()*maxNumberOfTransitionsToShowAtOnce*1.6);
-        		size.height = heightOfPopUpMenu;
-        	} else {
-        		int heightOfPopUpMenu = (int)(metrics.getHeight()*numberOfSharedTransitions*1.6);
-        		size.height = heightOfPopUpMenu;
-        	}
-        }
-        scrollPane.setPreferredSize(size);
-        scrollPane.setMaximumSize(size);        
-	}
+//	private void adjustDimensionsOfPopUpMenu(JComboBox comboBox) {	
+//		if (comboBox.getItemCount() == 0) {
+//            return;
+//        }
+//        Object comp = comboBox.getUI().getAccessibleChild(comboBox, 0);
+//        if (!(comp instanceof JPopupMenu)) {
+//            return;
+//        }
+//        FontMetrics metrics = comboBox.getFontMetrics(comboBox.getFont()); 
+//        int maxWidth=0;
+//        for(int i=0;i<comboBox.getItemCount();i++){
+//            if(comboBox.getItemAt(i)==null)
+//                continue;
+//            int currentWidth=metrics.stringWidth(comboBox.getItemAt(i).toString());
+//            if(maxWidth<currentWidth)
+//                maxWidth=currentWidth;
+//        }
+//        JPopupMenu popup = (JPopupMenu) comp;
+//        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+//        Dimension size = scrollPane.getPreferredSize();
+//        if (size.width < maxWidth+24) {
+//        	size.width = maxWidth+24;
+//        }
+//        if (numberOfSharedTransitions > 8) {
+//        	if (numberOfSharedTransitions > maxNumberOfTransitionsToShowAtOnce) {
+//        		int heightOfPopUpMenu = (int)(metrics.getHeight()*maxNumberOfTransitionsToShowAtOnce*1.6);
+//        		size.height = heightOfPopUpMenu;
+//        	} else {
+//        		int heightOfPopUpMenu = (int)(metrics.getHeight()*numberOfSharedTransitions*1.6);
+//        		size.height = heightOfPopUpMenu;
+//        	}
+//        }
+//        scrollPane.setPreferredSize(size);
+//        scrollPane.setMaximumSize(size);        
+//	}
 
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
