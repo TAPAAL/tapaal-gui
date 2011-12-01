@@ -7,7 +7,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -139,6 +142,7 @@ public class TemplateExplorer extends JPanel {
 		});
 
 		templateList = new JList(listModel);
+
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
 		templateList.setCellRenderer(new TemplateListCellRenderer(templateList.getCellRenderer()));
@@ -146,6 +150,12 @@ public class TemplateExplorer extends JPanel {
 		TemplateListManager manager = new TemplateListManager(templateList);
 		templateList.addListSelectionListener(manager);
 		templateList.addMouseListener(manager);
+		
+		//Hack to make sure it's no longer possible to search in the list of components
+		//TODO: Find a better method
+		for(KeyListener k :templateList.getKeyListeners()){
+			templateList.removeKeyListener(k);
+		}
 
 		scrollpane = new JScrollPane(templateList);
 		
