@@ -245,6 +245,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		
 		sharedPlacesComboBox = new JComboBox();
 		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
+		sharedPlacesComboBox.setMaximumRowCount(20);
 		
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -320,8 +321,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		invariantGroup.add(invRelationConstant, gbc);
 
-		invariantSpinner.setMaximumSize(new Dimension(100, 30));
-		invariantSpinner.setMinimumSize(new Dimension(230, 30));
+	//	invariantSpinner.setMaximumSize(new Dimension(100, 30));
+	//  invariantSpinner.setMinimumSize(new Dimension(230, 30));
 		invariantSpinner.setPreferredSize(new Dimension(230, 30));
 
 		gbc = new GridBagConstraints();
