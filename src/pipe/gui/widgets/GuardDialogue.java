@@ -8,7 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -82,7 +87,15 @@ public class GuardDialogue extends JPanel /*
 		buttonPanel = new JPanel(new GridBagLayout());
 
 		okButton = new JButton("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		
 		cancelButton = new JButton("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				TimedInputArcComponent arc = (TimedInputArcComponent) objectToBeEdited;
@@ -142,18 +155,20 @@ public class GuardDialogue extends JPanel /*
 			}
 		});
 
+	
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = GridBagConstraints.EAST;
-		buttonPanel.add(okButton, gridBagConstraints);
+		buttonPanel.add(cancelButton, gridBagConstraints);
 
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-		buttonPanel.add(cancelButton, gridBagConstraints);
+		buttonPanel.add(okButton, gridBagConstraints);
 
+		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
@@ -226,7 +241,7 @@ public class GuardDialogue extends JPanel /*
 
 	private void initNonColoredTimeIntervalControls() {
 
-		Dimension intervalBoxDims = new Dimension(90, 25);
+		Dimension intervalBoxDims = new Dimension(190, 25);
 
 		firstIntervalNumber = new JSpinner();
 		firstIntervalNumber.setMaximumSize(intervalBoxDims);
@@ -264,8 +279,12 @@ public class GuardDialogue extends JPanel /*
 
 		Set<String> constants = CreateGui.getCurrentTab().network()
 		.getConstantNames();
+		String[] constantArray = constants.toArray(new String[constants.size()]);
+	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
+		
+		
 		boolean enableConstantsCheckBoxes = !constants.isEmpty();
-		leftUseConstant = new JCheckBox("Use Constant");
+		leftUseConstant = new JCheckBox("Use Constant                    ");
 		leftUseConstant.setEnabled(enableConstantsCheckBoxes);
 		leftUseConstant.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -280,7 +299,9 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 0;
 		guardEditPanel.add(leftUseConstant, gridBagConstraints);
 
-		leftConstantsComboBox = new JComboBox(constants.toArray());
+	
+		leftConstantsComboBox = new JComboBox(constantArray);
+	//	leftConstantsComboBox = new JComboBox(constants.toArray());
 		leftConstantsComboBox.setVisible(false);
 		leftConstantsComboBox.setMaximumSize(intervalBoxDims);
 		leftConstantsComboBox.setMinimumSize(intervalBoxDims);
@@ -299,7 +320,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 1;
 		guardEditPanel.add(leftConstantsComboBox, gridBagConstraints);
 
-		rightUseConstant = new JCheckBox("Use Constant");
+		rightUseConstant = new JCheckBox("Use Constant                    ");
 		rightUseConstant.setEnabled(enableConstantsCheckBoxes);
 		rightUseConstant.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -507,7 +528,16 @@ public class GuardDialogue extends JPanel /*
 				rightConstantsComboBox.removeAllItems();
 				Collection<Constant> constants = CreateGui.getCurrentTab().network()
 				.constants();
-				for (Constant c : constants) {
+				
+				List <Constant> constantList = new ArrayList(constants);
+				Collections.sort(constantList,new Comparator<Constant>() {
+						public int compare(Constant o1, Constant o2) {
+						return o1.name().compareToIgnoreCase(o2.name());
+						}
+				});
+
+				
+				for (Constant c : constantList) {
 					if (c.value() >= value) {
 						rightConstantsComboBox.addItem(c.name());
 					}
