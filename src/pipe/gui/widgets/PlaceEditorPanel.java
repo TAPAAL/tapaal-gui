@@ -286,7 +286,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void initTimeInvariantPanel() {
 		timeInvariantPanel = new JPanel();
 		timeInvariantPanel.setLayout(new java.awt.GridBagLayout());
-		timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Time Invariant"));
+		timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Age Invariant"));
 
 		invariantGroup = new JPanel(new GridBagLayout());
 		invRelationNormal = new JComboBox(new String[] { "<=", "<" });
@@ -364,7 +364,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		
 		invConstantsComboBox = new JComboBox(constantArray);
 	//	invConstantsComboBox = new JComboBox(constants.toArray());
-
+		invConstantsComboBox.setMaximumRowCount(20);
 		invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
 		invConstantsComboBox.setPreferredSize(new Dimension(180, 30));
 		invConstantsComboBox.addItemListener(new ItemListener() {

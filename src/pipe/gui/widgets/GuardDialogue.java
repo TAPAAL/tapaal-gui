@@ -302,6 +302,7 @@ public class GuardDialogue extends JPanel /*
 	
 		leftConstantsComboBox = new JComboBox(constantArray);
 	//	leftConstantsComboBox = new JComboBox(constants.toArray());
+		leftConstantsComboBox.setMaximumRowCount(20);
 		leftConstantsComboBox.setVisible(false);
 		leftConstantsComboBox.setMaximumSize(intervalBoxDims);
 		leftConstantsComboBox.setMinimumSize(intervalBoxDims);
@@ -336,6 +337,7 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
 		rightConstantsComboBox = new JComboBox(constants.toArray());
+		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
 		rightConstantsComboBox.setMaximumSize(intervalBoxDims);
 		rightConstantsComboBox.setMinimumSize(intervalBoxDims);
