@@ -78,6 +78,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 		});
 		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
+		sharedTransitionsComboBox.setMaximumRowCount(20);
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
 		
 		
