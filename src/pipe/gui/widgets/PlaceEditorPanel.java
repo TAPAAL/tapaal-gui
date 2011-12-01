@@ -241,10 +241,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(200,27));
+		nameTextField.setPreferredSize(new Dimension(290,27));
 		
 		sharedPlacesComboBox = new JComboBox();
-		sharedPlacesComboBox.setPreferredSize(new Dimension(200,27));
+		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
 		
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -321,8 +321,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantGroup.add(invRelationConstant, gbc);
 
 		invariantSpinner.setMaximumSize(new Dimension(100, 30));
-		invariantSpinner.setMinimumSize(new Dimension(180, 30));
-		invariantSpinner.setPreferredSize(new Dimension(180, 30));
+		invariantSpinner.setMinimumSize(new Dimension(230, 30));
+		invariantSpinner.setPreferredSize(new Dimension(230, 30));
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -365,8 +365,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invConstantsComboBox = new JComboBox(constantArray);
 	//	invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMaximumRowCount(20);
-		invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
-		invConstantsComboBox.setPreferredSize(new Dimension(180, 30));
+	//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
+		invConstantsComboBox.setPreferredSize(new Dimension(230, 30));
 		invConstantsComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {

@@ -244,8 +244,8 @@ public class GuardDialogue extends JPanel /*
 		Dimension intervalBoxDims = new Dimension(190, 25);
 
 		firstIntervalNumber = new JSpinner();
-		firstIntervalNumber.setMaximumSize(intervalBoxDims);
-		firstIntervalNumber.setMinimumSize(intervalBoxDims);
+	//	firstIntervalNumber.setMaximumSize(intervalBoxDims);
+	//	firstIntervalNumber.setMinimumSize(intervalBoxDims);
 		firstIntervalNumber.setPreferredSize(intervalBoxDims);
 		firstIntervalNumber.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evt) {
@@ -304,8 +304,8 @@ public class GuardDialogue extends JPanel /*
 	//	leftConstantsComboBox = new JComboBox(constants.toArray());
 		leftConstantsComboBox.setMaximumRowCount(20);
 		leftConstantsComboBox.setVisible(false);
-		leftConstantsComboBox.setMaximumSize(intervalBoxDims);
-		leftConstantsComboBox.setMinimumSize(intervalBoxDims);
+	//	leftConstantsComboBox.setMaximumSize(intervalBoxDims);
+	//  leftConstantsComboBox.setMinimumSize(intervalBoxDims);
 		leftConstantsComboBox.setPreferredSize(intervalBoxDims);
 		leftConstantsComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -339,8 +339,8 @@ public class GuardDialogue extends JPanel /*
 		rightConstantsComboBox = new JComboBox(constants.toArray());
 		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
-		rightConstantsComboBox.setMaximumSize(intervalBoxDims);
-		rightConstantsComboBox.setMinimumSize(intervalBoxDims);
+	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
+	//	rightConstantsComboBox.setMinimumSize(intervalBoxDims);
 		rightConstantsComboBox.setPreferredSize(intervalBoxDims);
 		gridBagConstraints = new GridBagConstraints();
 		rightConstantsComboBox.addItemListener(new ItemListener() {

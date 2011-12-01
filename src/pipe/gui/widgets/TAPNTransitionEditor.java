@@ -51,7 +51,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		transitionEditorPanel = new javax.swing.JPanel();
 		nameLabel = new javax.swing.JLabel();
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(200,27));
+		nameTextField.setPreferredSize(new Dimension(290,27));
 		rotationLabel = new javax.swing.JLabel();
 		rotationComboBox = new javax.swing.JComboBox();
 		buttonPanel = new javax.swing.JPanel();
@@ -78,7 +78,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 		});
 		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
-		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
+		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
 		
 		
 		setLayout(new java.awt.GridBagLayout());
