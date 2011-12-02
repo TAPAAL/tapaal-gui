@@ -8,10 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -28,9 +24,8 @@ import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.*;
 
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedTransition;
-import dk.aau.cs.util.Require;
 
 public class StatisticsPanel extends JPanel{
 
@@ -144,15 +139,24 @@ public class StatisticsPanel extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				TabContent tab = CreateGui.getCurrentTab();
 				Iterable<Template> templates = tab.allTemplates();
+				
 				UndoManager undoManager = CreateGui.getDrawingSurface().getUndoManager();
+				boolean first = true;
 				for(Template template : templates){
 					List<TimedTransition> orphans = template.model().getOrphanTransitions();
 					for(TimedTransition trans : orphans){
 						TimedTransitionComponent t = (TimedTransitionComponent)template.guiModel().getTransitionByName(trans.name());
-						undoManager.addEdit(new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
+						Command cmd = new DeleteTimedTransitionCommand(t, t.underlyingTransition().model(), template.guiModel(), tab.drawingSurface());
 						t.delete();
+						if(first){
+							undoManager.addNewEdit(cmd);
+							first = false;
+						} else {
+							undoManager.addEdit(cmd);
+						}
 					}
 				}
+				
 				
 				tab.drawingSurface().repaint();
 				
