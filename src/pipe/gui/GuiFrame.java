@@ -538,7 +538,7 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(batchProcessing);
 		
-		statistics = new JMenuItem("Net statictics");
+		statistics = new JMenuItem("Net statistics");
 		statistics.setMnemonic('n');
 		
 		statistics.addActionListener(new ActionListener() {
