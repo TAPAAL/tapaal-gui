@@ -147,6 +147,7 @@ Printable, DrawingSurface {
 		if (animationmode) {
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			CreateGui.getAnimator().unhighlightDisabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 		}
 
 		this.removeAll();

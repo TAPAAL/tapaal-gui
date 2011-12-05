@@ -79,9 +79,19 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
 			if (inputArc == null)
 				label.setText("");
-			else
-				label.setText(inputArc.interval().toString(showConstantNames));
-
+			else {
+				if (!CreateGui.showZeroToInfinityIntervals()) {
+					if (inputArc.interval().toString(showConstantNames).equals("[0,inf)")){
+						label.setText("");
+					}
+					else {
+						label.setText(inputArc.interval().toString(showConstantNames));
+					}					
+				}
+				else {
+					label.setText(inputArc.interval().toString(showConstantNames));
+				}
+			}
 			this.setLabelPosition();
 		}
 	}

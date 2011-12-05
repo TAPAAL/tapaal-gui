@@ -3,6 +3,7 @@ package dk.aau.cs.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,6 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
@@ -42,6 +44,7 @@ import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -99,8 +102,48 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
 
+	//Tool tip strings
+	//Tool tips for model panel
+	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch processing";
+	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked nets";
+	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
+	
+	//Tool tips for override verification panel
+	private final static String TOOL_TIP_QueryLabel = null;
+	private final static String TOOL_TIP_Query_Property_Option = "Choose to override the queries in the nets";
+	private final static String TOOL_TIP_CapacityLabel = null;
+	private final static String TOOL_TIP_Number_Of_Extra_Tokens = "Enter the number of extra tokens in the nets";
+	private final static String TOOL_TIP_KeepQueryCapacity = "Override the number of extra tokens in the nets";
+	private final static String TOOL_TIP_SearchLabel = null;
+	private final static String TOOL_TIP_SearchOption = "Choose to override the search options in the nets";
+	private final static String TOOL_TIP_SymmetryLabel = null;
+	private final static String TOOL_TIP_SymmetryOption = "Choose to override the symmetry reduction in the nets";
+	private final static String TOOL_TIP_ReductionLabel = null;
+	private final static String TOOL_TIP_ReductionOption = "Choose to override the verification methods in the nets";
+	private final static String TOOL_TIP_TimeoutLabel = null;
+	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
+	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
+	
+	//Tool tips for monitor panel
+	private final static String TOOL_TIP_FileLabel = "Currently verified net";
+	private final static String TOOL_TIP_StatusLabel = "Currently verified query";
+	private final static String TOOL_TIP_ProgressLabel = "Progress of the currently running batch";
+	private final static String TOOL_TIP_TimeLabel = null;
+	private final static String TOOL_TIP_StartButton = "Press to start batch processing";
+	private final static String TOOL_TIP_CancelButton = "Press to cancel the whole currently running batch";
+	private final static String TOOL_TIP_SkipFileButton = "Press to skip the currently running verification";
+	
+	//Tool tips for results panel
+	private final static String TOOL_TIP_ExportButton = "Press to export batch results into a CVS file";
+	private final static String TOOL_TIP_CloseButton = "Press to close the batch processing dialog";
+	
 	private static String lastPath = null;
-
+	
+	private JSplitPane splitpane;
+	private JPanel topPanel;
+	private JPanel bottomPanel;
+	private JPanel monitorPanel;
+	
 	private JPanel filesButtonsPanel;
 	private JButton addFilesButton;
 	private JButton clearFilesButton;
@@ -120,6 +163,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JComboBox reductionOption;
 	private JComboBox searchOption;
 	private JButton exportButton;
+	private JButton closeButton;
 	private JComboBox queryPropertyOption;
 	private JPanel verificationOptionsPanel;
 	private JSpinner numberOfExtraTokensInNet;
@@ -149,7 +193,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	public BatchProcessingDialog(Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
-
+		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
 				terminateBatchProcessing();
@@ -160,12 +204,21 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void initComponents() {
-		setLayout(new GridBagLayout());
-
+		setLayout(new FlowLayout());
+		
+		topPanel = new JPanel(new GridBagLayout());
+		bottomPanel = new JPanel(new GridBagLayout());
+		
 		initFileListPanel();
 		initVerificationOptionsPanel();
 		initMonitorPanel();
 		initResultTablePanel();
+		
+		splitpane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);		
+		splitpane.setResizeWeight(0);
+		splitpane.setDividerSize(10);
+		splitpane.setContinuousLayout(true);
+		setContentPane(splitpane);
 	}
 
 	private void initFileListPanel() {
@@ -215,8 +268,9 @@ public class BatchProcessingDialog extends JDialog {
 		fileListPanel.add(scrollpane, gbc);
 
 		filesButtonsPanel = new JPanel(new GridBagLayout());
-
-		addFilesButton = new JButton("Add Models");
+		
+		addFilesButton = new JButton("Add models");
+		addFilesButton.setToolTipText(TOOL_TIP_AddFilesButton);
 		addFilesButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -231,8 +285,9 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.weightx = 1.0;
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(addFilesButton, gbc);
-
-		removeFileButton = new JButton("Remove Models");
+		
+		removeFileButton = new JButton("Remove models");
+		removeFileButton.setToolTipText(TOOL_TIP_RemoveFilesButton);
 		removeFileButton.setEnabled(false);
 		removeFileButton.addActionListener(new ActionListener() {
 
@@ -246,8 +301,9 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 5);
 		filesButtonsPanel.add(removeFileButton, gbc);
-
+		
 		clearFilesButton = new JButton("Clear");
+		clearFilesButton.setToolTipText(TOOL_TIP_ClearFilesButton);
 		clearFilesButton.setEnabled(false);
 		clearFilesButton.addActionListener(new ActionListener() {
 
@@ -269,15 +325,16 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		fileListPanel.add(filesButtonsPanel, gbc);
-
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		gbc.gridheight = 2;
-		gbc.insets = new Insets(10, 0, 0, 10);
-		add(fileListPanel, gbc);
+		gbc.insets = new Insets(10, 5, 0, 5);
+		topPanel.add(fileListPanel, gbc);
 	}
 
 	private void addFiles() {
@@ -323,46 +380,51 @@ public class BatchProcessingDialog extends JDialog {
 
 		enableButtons();
 	}
-
+	
 	private void initVerificationOptionsPanel() {
 		verificationOptionsPanel = new JPanel(new GridBagLayout());
 		verificationOptionsPanel.setBorder(BorderFactory
-				.createTitledBorder("Override Verification Options"));
-
+				.createTitledBorder("Override Verification Options for the Batch"));
+		
 		initQueryPropertyOptionsComponents();
-		initCapacityComponents();
 		initSearchOptionsComponents();
 		initSymmetryOptionsComponents();
 		initReductionOptionsComponents();
+		initCapacityComponents();
 		initTimeoutComponents();
-
+		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 1.0;
+		gbc.weighty = 0;
 		gbc.weightx = 0;
-		gbc.insets = new Insets(10, 0, 0, 0);
-		add(verificationOptionsPanel, gbc);
+		gbc.insets = new Insets(10, 0, 0, 5);
+		topPanel.add(verificationOptionsPanel, gbc);
 	}
 
 	private void initQueryPropertyOptionsComponents() {
 		JLabel queryLabel = new JLabel("Query:");
+		queryLabel.setToolTipText(TOOL_TIP_QueryLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(queryLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption,
 				name_SEARCHWHOLESTATESPACE };
 		queryPropertyOption = new JComboBox(options);
-
+		queryPropertyOption.setToolTipText(TOOL_TIP_Query_Property_Option);
+		
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(queryPropertyOption, gbc);
@@ -370,10 +432,12 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void initCapacityComponents() {
 		JLabel capacityLabel = new JLabel("Extra tokens:");
+		capacityLabel.setToolTipText(TOOL_TIP_CapacityLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 4;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(capacityLabel, gbc);
 
 		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0,
@@ -382,15 +446,17 @@ public class BatchProcessingDialog extends JDialog {
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setEnabled(false);
+		numberOfExtraTokensInNet.setToolTipText(TOOL_TIP_Number_Of_Extra_Tokens);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(numberOfExtraTokensInNet, gbc);
-
+	
 		keepQueryCapacity = new JCheckBox(name_KeepQueryOption);
+		keepQueryCapacity.setToolTipText(TOOL_TIP_KeepQueryCapacity);
 		keepQueryCapacity.setSelected(true);
 		keepQueryCapacity.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -403,21 +469,25 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 4;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(keepQueryCapacity, gbc);
 	}
-
+	
 	private void initTimeoutComponents() {
 		JLabel timeoutLabel = new JLabel("Timeout (in seconds): ");
+		timeoutLabel.setToolTipText(TOOL_TIP_TimeoutLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 5;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
 
 		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5,
 				Integer.MAX_VALUE, 1));
+		timeoutValue.setToolTipText(TOOL_TIP_TimeoutValue);
 		timeoutValue.setMaximumSize(new Dimension(70, 30));
 		timeoutValue.setMinimumSize(new Dimension(70, 30));
 		timeoutValue.setPreferredSize(new Dimension(70, 30));
@@ -426,11 +496,12 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 5;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
 
 		noTimeoutCheckbox = new JCheckBox("Do not use timeout");
+		noTimeoutCheckbox.setToolTipText(TOOL_TIP_NoTimeoutCheckBox);
 		noTimeoutCheckbox.setSelected(false);
 		noTimeoutCheckbox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -444,17 +515,19 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 5;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
 	}
 
 	private void initReductionOptionsComponents() {
 		JLabel reductionLabel = new JLabel("Verification method:");
+		reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(0, 0, 5, 5);
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(reductionLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption,
@@ -464,6 +537,7 @@ public class BatchProcessingDialog extends JDialog {
 				name_BROADCASTWithLegend, name_BROADCASTDEG2WithLegend,
 				name_AllReductions };
 		reductionOption = new JComboBox(options);
+		reductionOption.setToolTipText(TOOL_TIP_ReductionOption);
 
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -476,9 +550,10 @@ public class BatchProcessingDialog extends JDialog {
 		});
 
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
-		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(reductionOption, gbc);
@@ -486,20 +561,24 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void initSymmetryOptionsComponents() {
 		JLabel symmetryLabel = new JLabel("Symmetry:");
+		symmetryLabel.setToolTipText(TOOL_TIP_SymmetryLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 2;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(symmetryLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption, name_SYMMETRY,
 				name_NOSYMMETRY };
 		symmetryOption = new JComboBox(options);
+		symmetryOption.setToolTipText(TOOL_TIP_SymmetryOption);
 
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
-		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(symmetryOption, gbc);
@@ -559,7 +638,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void enabledVerificationOptionButtons() {
-		verificationOptionsPanel.setEnabled(false);
+		verificationOptionsPanel.setEnabled(true);
 		for (Component c : verificationOptionsPanel.getComponents())
 			c.setEnabled(true);
 
@@ -628,24 +707,31 @@ public class BatchProcessingDialog extends JDialog {
 
 	private void initSearchOptionsComponents() {
 		JLabel searchLabel = new JLabel("Search order:");
+		searchLabel.setToolTipText(TOOL_TIP_SearchLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(searchLabel, gbc);
 
 		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC,
 				name_BFS, name_DFS, name_Random };
 		searchOption = new JComboBox(options);
-		searchOption.setMinimumSize(searchOption.getSize());
+		searchOption.setToolTipText(TOOL_TIP_SearchOption);
 
 		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
-		gbc.gridy = 2;
-		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(searchOption, gbc);
+	}
+	
+	private void exit() {
+		rootPane.getParent().setVisible(false);
 	}
 
 	private void initResultTablePanel() {
@@ -653,6 +739,7 @@ public class BatchProcessingDialog extends JDialog {
 		resultTablePanel.setBorder(BorderFactory.createTitledBorder("Results"));
 
 		exportButton = new JButton("Export as spreadsheet");
+		exportButton.setToolTipText(TOOL_TIP_ExportButton);
 		exportButton.setEnabled(false);
 		exportButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -683,8 +770,23 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.insets = new Insets(5, 0, 0, 0);
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
+		gbc.anchor = GridBagConstraints.SOUTHWEST;
 		resultTablePanel.add(exportButton, gbc);
+		
+		closeButton = new JButton("Close");
+		closeButton.setToolTipText(TOOL_TIP_CloseButton);
+		closeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exit();
+				
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.insets = new Insets(5, 0, 0, 0);
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
+		resultTablePanel.add(closeButton, gbc);
 
 		tableModel = new BatchProcessingResultsTableModel();
 		final JTable table = new JTable(tableModel) {
@@ -698,8 +800,8 @@ public class BatchProcessingDialog extends JDialog {
 			};
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
-		table.getColumnModel().getColumn(0).setMinWidth(60);
-		table.getColumnModel().getColumn(0).setPreferredWidth(60);
+		table.getColumnModel().getColumn(0).setMinWidth(70);
+		table.getColumnModel().getColumn(0).setPreferredWidth(70);
 		table.getColumnModel().getColumn(0).setMaxWidth(85);
 		table.getColumn("Method").setCellRenderer(renderer);
 		table.getColumn("Model").setCellRenderer(renderer);
@@ -721,14 +823,17 @@ public class BatchProcessingDialog extends JDialog {
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		Dimension scrollPaneDims = new Dimension(850, 250);
-		scrollPane.setMinimumSize(scrollPaneDims);
-		scrollPane.setPreferredSize(scrollPaneDims);
-
+		Dimension scrollPanePrefDims = new Dimension(850, 250);
+		//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the window
+		Dimension scrollPaneMinDims = new Dimension(850, 250-150);
+		scrollPane.setMinimumSize(scrollPaneMinDims);
+		scrollPane.setPreferredSize(scrollPanePrefDims);
+		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		gbc.gridwidth = 2;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -738,19 +843,20 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.gridwidth = 4;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.insets = new Insets(10, 5, 5, 5);
-		add(resultTablePanel, gbc);
+		gbc.gridy = 0;
+		gbc.gridwidth = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.insets = new Insets(0, 5, 5, 5);
+		bottomPanel.add(resultTablePanel, gbc);
 	}
-
+	
 	private void initMonitorPanel() {
-		JPanel monitorPanel = new JPanel(new GridBagLayout());
+		monitorPanel = new JPanel(new GridBagLayout());
 		monitorPanel.setBorder(BorderFactory.createTitledBorder("Monitor"));
 
-		JLabel file = new JLabel("File:");
+		JLabel file = new JLabel("Net:");
+		file.setToolTipText(TOOL_TIP_FileLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -758,18 +864,19 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(file, gbc);
 
 		fileStatusLabel = new JLabel("");
-		Dimension fileStatusLabelDim = new Dimension(350, 25);
-		fileStatusLabel.setMinimumSize(fileStatusLabelDim);
+		Dimension fileStatusLabelDim = new Dimension(250, 25);
 		fileStatusLabel.setPreferredSize(fileStatusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.gridwidth = 3;
+		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		monitorPanel.add(fileStatusLabel, gbc);
 
-		JLabel status = new JLabel("Status:");
+		JLabel status = new JLabel("Query:");
+		status.setToolTipText(TOOL_TIP_StatusLabel);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -777,17 +884,19 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(status, gbc);
 
 		statusLabel = new JLabel("");
-		statusLabel.setMinimumSize(fileStatusLabelDim);
-		statusLabel.setPreferredSize(fileStatusLabelDim);
+		Dimension statusLabelDim = new Dimension(250, 25);
+		statusLabel.setPreferredSize(statusLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.gridwidth = 3;
+		gbc.weightx = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		monitorPanel.add(statusLabel, gbc);
 
 		JLabel progress = new JLabel("Progress: ");
+		progress.setToolTipText(TOOL_TIP_ProgressLabel);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -795,23 +904,24 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(progress, gbc);
 
 		progressLabel = new JLabel("");
-		Dimension dim = new Dimension(280, 25);
-		progressLabel.setMinimumSize(dim);
+		Dimension dim = new Dimension(210, 25);
 		progressLabel.setPreferredSize(dim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 2;
+		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 10);
 		monitorPanel.add(progressLabel, gbc);
 
 		JLabel time = new JLabel("Time: ");
+		time.setToolTipText(TOOL_TIP_TimeLabel);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.EAST;
-		gbc.insets = new Insets(0, 10, 0, 0);
+		gbc.insets = new Insets(0, 5, 0, 0);
 		monitorPanel.add(time, gbc);
 
 		timerLabel = new JLabel("");
@@ -826,6 +936,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(timerLabel, gbc);
 
 		startButton = new JButton("Start");
+		startButton.setToolTipText(TOOL_TIP_StartButton);
 		startButton.setMaximumSize(new java.awt.Dimension(85, 25));
 		startButton.setMinimumSize(new java.awt.Dimension(85, 25));
 		startButton.setPreferredSize(new java.awt.Dimension(85, 25));
@@ -844,6 +955,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(startButton, gbc);
 
 		cancelButton = new JButton("Cancel");
+		cancelButton.setToolTipText(TOOL_TIP_CancelButton);
 		cancelButton.setMaximumSize(new java.awt.Dimension(85, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(85, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(85, 25));
@@ -866,6 +978,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(cancelButton, gbc);
 
 		skipFileButton = new JButton("Skip");
+		skipFileButton.setToolTipText(TOOL_TIP_SkipFileButton);
 		skipFileButton.setMaximumSize(new java.awt.Dimension(85, 25));
 		skipFileButton.setMinimumSize(new java.awt.Dimension(85, 25));
 		skipFileButton.setPreferredSize(new java.awt.Dimension(85, 25));
@@ -888,11 +1001,13 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.weightx = 0;
-		gbc.insets = new Insets(10, 0, 0, 0);
-		add(monitorPanel, gbc);
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(10, 0, 0, 5);
+		
+		topPanel.add(monitorPanel, gbc);
 	}
 
 	private void process() {
@@ -1258,3 +1373,5 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 }
+
+

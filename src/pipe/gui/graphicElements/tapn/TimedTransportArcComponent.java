@@ -5,6 +5,7 @@ import java.awt.Polygon;
 import java.util.Hashtable;
 
 import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TransportArcHandler;
@@ -80,14 +81,29 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		if (isInPreSet && underlyingTransportArc != null) {
-			label.setText(underlyingTransportArc.interval().toString(
-					displayConstantNames)
-					+ " : " + getGroup());
+			if (CreateGui.showZeroToInfinityIntervals()){
+				label.setText(underlyingTransportArc.interval().toString(
+						displayConstantNames)
+						+ " : " + getGroup());
+			}
+			else {
+				if (underlyingTransportArc.interval().toString(
+						displayConstantNames).equals("[0,inf)")) {
+					label.setText(" : " + String.valueOf(getGroup()));
+				}
+				else {
+					label.setText(underlyingTransportArc.interval().toString(
+							displayConstantNames)
+							+ " : " + getGroup());
+				}				
+			}
 		} else if (!isInPreSet) {
 			label.setText(" : " + String.valueOf(getGroup()));
 		} else {
 			label.setText("");
 		}
+		
+		
 		this.setLabelPosition();
 	}
 

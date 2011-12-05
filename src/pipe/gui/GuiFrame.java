@@ -120,7 +120,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	private JMenuItem statistics;
@@ -407,10 +407,10 @@ public class GuiFrame extends JFrame implements Observer {
 				 ElementType.TAPNARC, "Add an arc (A)", "A", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
+				 "Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
 				 true));
 
-		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
+		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor arc",
 				 ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
 		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
@@ -449,12 +449,14 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 viewMenu.addSeparator();
 		 
-		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
-				 453243, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
-				 453245, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
-				 453244, "Show/Hide componens", "", true));
+		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
+				 453243, "Show/hide the list of components.", "", true));
+		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
+				 453245, "Show/hide global constants.", "", true));
+		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
+				 453244, "Show/hide verification queries.", "", true));
+		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -522,7 +524,7 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic('t');
 		
-		JMenuItem batchProcessing = new JMenuItem("Batch Processing");
+		JMenuItem batchProcessing = new JMenuItem("Batch processing");
 		batchProcessing.setMnemonic('b');
 		
 		batchProcessing.addActionListener(new ActionListener() {
@@ -530,9 +532,11 @@ public class GuiFrame extends JFrame implements Observer {
 				checkForSave();
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
-				dialog.setMinimumSize(dialog.getSize());
+				dialog.setPreferredSize(dialog.getSize());
+				//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the result panel
+				dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()-150));
 				dialog.setLocationRelativeTo(null);
-				dialog.setResizable(false);
+				dialog.setResizable(true);
 				dialog.setVisible(true);
 			}
 		});
@@ -559,7 +563,7 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(resetVerifytapn);
 		
-		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL Engine)");
+		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL engine)");
 		resetVerifyta.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) { 
 				Verifyta.reset(); 
@@ -851,6 +855,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
+		showZeroToInfinityIntervalsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -924,6 +929,11 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleConstants(){
 		showConstants(!showConstants);
+	}
+	
+	public void toggleZeroToInfinityIntervals() {
+		CreateGui.toggleShowZeroToInfinityIntervals();
+		appView.repaintAll();
 	}
 	
 	public void showComponents(boolean enable){
@@ -1307,6 +1317,7 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 			setEditionAllowed(false);
@@ -1500,7 +1511,7 @@ public class GuiFrame extends JFrame implements Observer {
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
-									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
 
@@ -1513,7 +1524,7 @@ public class GuiFrame extends JFrame implements Observer {
 				} catch (Exception e) {
 					System.err.println(e);
 					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
@@ -1901,6 +1912,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleQueries();
 			} else if (this == showConstantsAction){
 				toggleConstants();
+			} else if (this == showZeroToInfinityIntervalsAction) {
+				toggleZeroToInfinityIntervals();
 			}
 		}
 		
@@ -1910,8 +1923,8 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
-		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\n");
+		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller, Jiri Srba and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2011\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
@@ -1970,7 +1983,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
-			Logger.log("Can't open browser");
+			Logger.log("Cannot open the browser.");
 			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);

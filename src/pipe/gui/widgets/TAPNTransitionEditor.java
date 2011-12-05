@@ -51,7 +51,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		transitionEditorPanel = new javax.swing.JPanel();
 		nameLabel = new javax.swing.JLabel();
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(200,27));
+		nameTextField.setPreferredSize(new Dimension(290,27));
 		rotationLabel = new javax.swing.JLabel();
 		rotationComboBox = new javax.swing.JComboBox();
 		buttonPanel = new javax.swing.JPanel();
@@ -78,7 +78,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 		});
 		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
-		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
+		sharedTransitionsComboBox.setMaximumRowCount(20);
+		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
+		
+		
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
@@ -146,37 +149,45 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		buttonPanel.setLayout(new java.awt.GridBagLayout());
 
 		okButton.setText("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				okButtonHandler(evt);
 			}
 		});
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		buttonPanel.add(okButton, gridBagConstraints);
-
 		cancelButton.setText("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				cancelButtonHandler(evt);
 			}
 		});
+		
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		buttonPanel.add(cancelButton, gridBagConstraints);
+
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		buttonPanel.add(cancelButton, gridBagConstraints);
+		buttonPanel.add(okButton, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 0, 8, 3);
 		add(buttonPanel, gridBagConstraints);
 
