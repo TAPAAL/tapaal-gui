@@ -550,7 +550,7 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.add(statistics);
 		toolsMenu.addSeparator();
 
-		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL Engine)");
+		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL engine)");
 		resetVerifytapn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) { 
 				VerifyTAPN.reset(); 
