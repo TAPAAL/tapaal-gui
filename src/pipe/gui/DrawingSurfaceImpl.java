@@ -153,6 +153,7 @@ Printable, DrawingSurface {
 		this.removeAll();
 		setPreferredSize(new Dimension(0,0));
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
+			pnObject.zoomUpdate(zoomer.getPercent());
 			add(pnObject);
 		}
 
