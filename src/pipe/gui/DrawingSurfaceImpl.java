@@ -83,6 +83,9 @@ Printable, DrawingSurface {
 	// flag used in fast mode to know if a new PetriNetObject has been created
 	public boolean newPNO = false;
 
+	// flag used in paintComponents() to know if a call to zoom() has been done
+	private boolean doSetViewPosition = true;
+
 	// position where the viewport must be set
 	private Point viewPosition = new Point(0, 0);
 
@@ -284,10 +287,12 @@ Printable, DrawingSurface {
 		}
 
 		selection.updateBounds();
-		
-		//Do this, as zoom might have changed it.
-		((JViewport) getParent()).setViewPosition(viewPosition);
-		app.validate();
+
+		if (doSetViewPosition) {
+			((JViewport) getParent()).setViewPosition(viewPosition);
+			app.validate();
+			doSetViewPosition = false;
+		}
 	}
 
 	public void updatePreferredSize() {
