@@ -1,12 +1,10 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,14 +38,12 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
@@ -57,7 +53,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.JTableHeader;
 
 import net.tapaal.TAPAAL;
 
@@ -1448,23 +1443,6 @@ public class GuiFrame extends JFrame implements Observer {
 		return statusBar;
 	}
 
-	private Component c = null; // arreglantzoom
-	private Component p = new BlankLayer(this);
-
-	/* */
-	void hideNet(boolean doHide) {
-		if (doHide) {
-			c = appTab.getComponentAt(appTab.getSelectedIndex());
-			appTab.setComponentAt(appTab.getSelectedIndex(), p);
-		} else {
-			if (c != null) {
-				appTab.setComponentAt(appTab.getSelectedIndex(), c);
-				c = null;
-			}
-		}
-		appTab.repaint();
-	}
-
 	class AnimateAction extends GuiAction {
 
 		/**
@@ -1798,78 +1776,55 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			boolean doZoom = false;
+			// This is set to true if a valid zoom action is performed
+			boolean didZoom = false;
 			try {
 				String actionName = (String) getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
-				TabContent tabContent = (TabContent) appTab
-				.getSelectedComponent();
-				JViewport thisView = tabContent.drawingSurfaceScrollPane()
-				.getViewport();
-				String selection = null, strToTest = null;
+				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
+				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
+				String selectedZoomLevel = null;
+				int newZoomLevel = Pipe.ZOOM_DEFAULT;
 
-				double midpointX = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().x
-						+ (thisView.getWidth() * 0.5), zoomer.getPercent());
-				double midpointY = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().y
-						+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-
+				/*
+				 * Zoom action name overview
+				 * Zoom in: the zoom IN icon in panel has been pressed
+				 * Zoom out: the zoom OUT icon in panel has been pressed
+				 * Zoom: a specific zoom level has been chosen in drop down or in the menu.
+				 */
 				if (actionName.equals("Zoom in")) {
-					doZoom = zoomer.zoomIn();
+					didZoom = zoomer.zoomIn();
 				} else if (actionName.equals("Zoom out")) {
-					doZoom = zoomer.zoomOut();
+					didZoom = zoomer.zoomOut();
 				} else {
 					if (actionName.equals("Zoom")) {
-						selection = (String) zoomComboBox.getSelectedItem();
+						selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
 					}
 					if (e.getSource() instanceof JMenuItem) {
-						selection = ((JMenuItem) e.getSource()).getText();
+						selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
 					}
-					strToTest = validatePercent(selection);
-
-					if (strToTest != null) {
-						// BK: no need to zoom if already at that level
-						if (zoomer.getPercent() == Integer.parseInt(strToTest)) {
-							return;
-						} else {
-							zoomer.setZoom(Integer.parseInt(strToTest));
-							doZoom = true;
-						}
-					} else {
-						return;
-					}
+					
+					//parse selected zoom level, and strip of %.
+					newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%",""));
+					
+					didZoom = zoomer.setZoom(newZoomLevel);
 				}
-				if (doZoom) {
+				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomTo(new java.awt.Point((int) midpointX,
-							(int) midpointY));
+					
+					double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
+										+ (thisView.getWidth() * 0.5), zoomer.getPercent());
+					double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
+										+ (thisView.getHeight() * 0.5), zoomer.getPercent());
+					
+					java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
+					
+					appView.zoomTo(midpoint);
 				}
 			} catch (ClassCastException cce) {
 				// zoom
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-		}
-
-		private String validatePercent(String selection) {
-
-			try {
-				String toTest = selection;
-
-				if (selection.endsWith("%")) {
-					toTest = selection.substring(0, (selection.length()) - 1);
-				}
-
-				if (Integer.parseInt(toTest) < Pipe.ZOOM_MIN
-						|| Integer.parseInt(toTest) > Pipe.ZOOM_MAX) {
-					throw new Exception();
-				} else {
-					return toTest;
-				}
-			} catch (Exception e) {
-				zoomComboBox.setSelectedItem("");
-				return null;
 			}
 		}
 
