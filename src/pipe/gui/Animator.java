@@ -107,6 +107,7 @@ public class Animator {
 	 * Highlights enabled transitions
 	 */
 	public void highlightEnabledTransitions() {
+		updateFireableTransitions();
 		DataLayer current = activeGuiModel();
 
 		Iterator<Transition> transitionIterator = current.returnTransitions();
@@ -133,6 +134,23 @@ public class Animator {
 				tempTransition.repaint();
 			}
 		}
+	}
+	
+	public void updateFireableTransitions(){
+		FireabletransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
+		fireableTrans.startReInit();
+		
+		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+			while (transitionIterator.hasNext()) {
+				Transition tempTransition = transitionIterator.next();
+				if ((tempTransition.isEnabled(true))) {
+					fireableTrans.addTransition(temp, tempTransition);
+				}
+			}
+		}
+		
+		fireableTrans.reInitDone();
 	}
 
 	/**

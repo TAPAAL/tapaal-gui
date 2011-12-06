@@ -196,6 +196,12 @@ public class CreateGui {
 		return tab.getAnimationController();
 
 	}
+	
+	public static FireabletransitionsList getFireabletransitionsList() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getFireabletransitionsList();
+
+	}	
 
 	public static void removeAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));

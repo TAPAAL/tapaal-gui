@@ -27,6 +27,7 @@ import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.FireabletransitionsList;
 import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
@@ -193,10 +194,11 @@ public class TabContent extends JSplitPane {
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
-
+//TODO
 	public void switchToAnimationComponents() {
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
+		if(fireabletransitionsList == null) createFireabletransitionsList();
 		
 		animatorLeftPane = new JPanel(new GridBagLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
@@ -222,6 +224,14 @@ public class TabContent extends JSplitPane {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.2;
+		animatorLeftPane.add(fireabletransitionsList, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1 - RATIO;
@@ -299,6 +309,23 @@ public class TabContent extends JSplitPane {
 
 	public AnimationHistoryComponent getAnimationHistory() {
 		return animBox;
+	}
+	
+	
+	
+	FireabletransitionsList fireabletransitionsList;
+	
+	private void createFireabletransitionsList(){
+		fireabletransitionsList = new FireabletransitionsList();
+		
+		fireabletransitionsList.setBorder(BorderFactory
+		.createCompoundBorder(BorderFactory
+				.createTitledBorder("Fireable transitions"),
+				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+	}
+	
+	public FireabletransitionsList getFireabletransitionsList(){
+		return fireabletransitionsList;
 	}
 
 	public JScrollPane drawingSurfaceScrollPane() {
