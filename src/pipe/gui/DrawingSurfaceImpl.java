@@ -355,17 +355,6 @@ Printable, DrawingSurface {
 		return zoomControl;
 	}
 
-	public void zoom() {
-		Component[] children = getComponents();
-
-		for (int i = 0; i < children.length; i++) {
-			if (children[i] instanceof Zoomable) {
-				((Zoomable) children[i]).zoomUpdate(zoomControl.getPercent());
-			}
-		}
-		doSetViewPosition = true;
-	}
-
 	public void add(PetriNetObject pnObject) {
 		setLayer(pnObject, DEFAULT_LAYER.intValue() + pnObject.getLayerOffset());
 		super.add(pnObject);
@@ -489,26 +478,25 @@ Printable, DrawingSurface {
 		}
 	}
 
+	// This function should always be called after a change in zoom.
 	public void zoomTo(Point point) {
-		// The zoom is not as smooth as it should be. As far I know, this
-		// behavior
-		// is caused when the method setSize() is called in NameLabel's
-		// updateSize()
-		// In order to disguise it, the view is hidden and a white layer is
-		// shown.
-		// I know it's not a smart solution...
-		// I think zoom function should be redone from scratch so that
-		// BlankLayer
-		// class and doSetViewPosition could be removed
 
-		int zoom = zoomControl.getPercent();
+		int zoomPercent = zoomControl.getPercent();
 
-		JViewport viewport = (JViewport) getParent();
+		JViewport viewport = (JViewport) getParent();		
 
-		Zoomer.getUnzoomedValue(viewport.getViewPosition().x
-				+ (viewport.getWidth() * 0.5), zoom);
-		double newZoomedX = Zoomer.getZoomedValue(point.x, zoom);
-		double newZoomedY = Zoomer.getZoomedValue(point.y, zoom);
+		Component[] children = getComponents();
+
+		//Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
+		for (int i = 0; i < children.length; i++) {
+			if (children[i] instanceof Zoomable) {
+				((Zoomable) children[i]).zoomUpdate(zoomControl.getPercent());
+			}
+		}
+		
+		// Calculate new position of the Drawing Surface.
+		double newZoomedX = Zoomer.getZoomedValue(point.x, zoomPercent);
+		double newZoomedY = Zoomer.getZoomedValue(point.y, zoomPercent);
 
 		int newViewX = (int) (newZoomedX - (viewport.getWidth() * 0.5));
 		if (newViewX < 0) {
@@ -520,14 +508,9 @@ Printable, DrawingSurface {
 			newViewY = 0;
 		}
 
-		// if (doSetViewPosition) {
+		
 		viewPosition.setLocation(newViewX, newViewY);
 		viewport.setViewPosition(viewPosition);
-		// }
-
-		zoom();
-
-		app.hideNet(true); // hide current view :-(
 
 		updatePreferredSize();
 	}
