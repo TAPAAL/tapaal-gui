@@ -10,13 +10,11 @@ import javax.swing.JScrollPane;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-public class NonTruncatingComboBox extends JComboBox{
+public class WidthAdjustingComboBox extends JComboBox{
 
 	private static final long serialVersionUID = 1L;
-	private int maxNumberOfPlacesToShowAtOnce;
 
-	public NonTruncatingComboBox(int maxNumberOfPlacesToShowAtOnce) {
-		this.maxNumberOfPlacesToShowAtOnce = maxNumberOfPlacesToShowAtOnce;
+	public WidthAdjustingComboBox(int maxNumberOfPlacesToShowAtOnce) {
 		this.addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuCanceled(PopupMenuEvent arg0) {
@@ -26,12 +24,13 @@ public class NonTruncatingComboBox extends JComboBox{
 			}
 			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-				adjustDimensionsOfPopUpMenu();
+				adjustWidthOfPopUpMenu();
 			}
 		});
+		this.setMaximumRowCount(maxNumberOfPlacesToShowAtOnce);
 	}
 	
-	private void adjustDimensionsOfPopUpMenu() {
+	private void adjustWidthOfPopUpMenu() {
 		if (this.getItemCount() == 0) {
 			return;
 		}
@@ -51,17 +50,8 @@ public class NonTruncatingComboBox extends JComboBox{
 		JPopupMenu popup = (JPopupMenu) comp;
 		JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
 		Dimension size = scrollPane.getPreferredSize();
-		if (size.width < maxWidth+24) {
-			size.width = maxWidth+24;
-		}
-		if (this.getItemCount() > 8) {
-			if (getItemCount() > maxNumberOfPlacesToShowAtOnce) {
-				int heightOfPopUpMenu = (int)(metrics.getHeight()*maxNumberOfPlacesToShowAtOnce*1.6);        	
-				size.height = heightOfPopUpMenu;
-			} else {
-				int heightOfPopUpMenu = (int)(metrics.getHeight()*getItemCount()*1.6);
-				size.height = heightOfPopUpMenu;
-			}
+		if (size.width < maxWidth+34) {
+			size.width = maxWidth+34;
 		}
 		scrollPane.setPreferredSize(size);
 		scrollPane.setMaximumSize(size);        

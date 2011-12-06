@@ -42,8 +42,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private JRootPane rootPane;
 	private Context context;
 	
-	//private int numberOfSharedTransitions = 0;
-	private int maxNumberOfTransitionsToShowAtOnce = 15;
+	private int maxNumberOfTransitionsToShowAtOnce = 20;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
 		rootPane = _rootPane;
@@ -88,7 +87,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		});
 		//numberOfSharedTransitions = sharedTransitions.size();
 		//sharedTransitionsComboBox = new JComboBox(sharedTransitions);
-		sharedTransitionsComboBox = new NonTruncatingComboBox(maxNumberOfTransitionsToShowAtOnce);
+		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
 //		sharedTransitionsComboBox.addPopupMenuListener(new PopupMenuListener() {
