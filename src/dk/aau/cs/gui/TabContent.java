@@ -39,7 +39,9 @@ import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
-	private static final double RATIO = 0.2;
+	private static final double WEIGHT_Y_TEMPEXP = 0.2;
+	private static final double WEIGHT_Y_FIREABLE_TRANS = 0.2;
+	private static final double RATIO = WEIGHT_Y_FIREABLE_TRANS -WEIGHT_Y_TEMPEXP; 
 
 	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -210,7 +212,7 @@ public class TabContent extends JSplitPane {
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = RATIO;
+		gbc.weighty = WEIGHT_Y_TEMPEXP;
 		animatorLeftPane.add(templateExplorer, gbc);
 
 		gbc = new GridBagConstraints();
@@ -218,16 +220,16 @@ public class TabContent extends JSplitPane {
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
-		animatorLeftPane.add(animControlerBox, gbc);
+		gbc.weighty = WEIGHT_Y_FIREABLE_TRANS;
+		animatorLeftPane.add(fireabletransitionsList, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.2;
-		animatorLeftPane.add(fireabletransitionsList, gbc);
+		gbc.weighty = 0.0;
+		animatorLeftPane.add(animControlerBox, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -237,6 +239,7 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1 - RATIO;
 		animatorLeftPane.add(animationHistoryScrollPane, gbc);
 		this.setLeftComponent(animatorLeftPane);
+		
 	}
 
 	public void switchToEditorComponents() {
@@ -295,7 +298,7 @@ public class TabContent extends JSplitPane {
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1 - RATIO;
+		gbc.weighty = 1 - WEIGHT_Y_TEMPEXP;
 		animatorLeftPane.add(animationHistoryScrollPane);
 	}
 
