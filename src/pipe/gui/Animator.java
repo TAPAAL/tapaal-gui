@@ -137,7 +137,7 @@ public class Animator {
 	}
 	
 	public void updateFireableTransitions(){
-		FireabletransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
+		EnabledTransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
 		fireableTrans.startReInit();
 		
 		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){

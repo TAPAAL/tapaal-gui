@@ -27,7 +27,7 @@ import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.FireabletransitionsList;
+import pipe.gui.EnabledTransitionsList;
 import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
@@ -40,8 +40,8 @@ import dk.aau.cs.util.Require;
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
 	private static final double WEIGHT_Y_TEMPEXP = 0.2;
-	private static final double WEIGHT_Y_FIREABLE_TRANS = 0.2;
-	private static final double RATIO = WEIGHT_Y_FIREABLE_TRANS -WEIGHT_Y_TEMPEXP; 
+	private static final double WEIGHT_Y_ENABLED_TRANS = 0.2;
+	private static final double RATIO = WEIGHT_Y_ENABLED_TRANS -WEIGHT_Y_TEMPEXP; 
 
 	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -200,7 +200,7 @@ public class TabContent extends JSplitPane {
 	public void switchToAnimationComponents() {
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
-		if(fireabletransitionsList == null) createFireabletransitionsList();
+		if(enabledTransitionsList == null) createEnabledTransitionsList();
 		
 		animatorLeftPane = new JPanel(new GridBagLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
@@ -220,8 +220,8 @@ public class TabContent extends JSplitPane {
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = WEIGHT_Y_FIREABLE_TRANS;
-		animatorLeftPane.add(fireabletransitionsList, gbc);
+		gbc.weighty = WEIGHT_Y_ENABLED_TRANS;
+		animatorLeftPane.add(enabledTransitionsList, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -316,19 +316,19 @@ public class TabContent extends JSplitPane {
 	
 	
 	
-	FireabletransitionsList fireabletransitionsList;
+	EnabledTransitionsList enabledTransitionsList;
 	
-	private void createFireabletransitionsList(){
-		fireabletransitionsList = new FireabletransitionsList();
+	private void createEnabledTransitionsList(){
+		enabledTransitionsList = new EnabledTransitionsList();
 		
-		fireabletransitionsList.setBorder(BorderFactory
+		enabledTransitionsList.setBorder(BorderFactory
 		.createCompoundBorder(BorderFactory
-				.createTitledBorder("Fireable transitions"),
+				.createTitledBorder("Enabled transitions"),
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 	
-	public FireabletransitionsList getFireabletransitionsList(){
-		return fireabletransitionsList;
+	public EnabledTransitionsList getFireabletransitionsList(){
+		return enabledTransitionsList;
 	}
 
 	public JScrollPane drawingSurfaceScrollPane() {

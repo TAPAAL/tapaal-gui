@@ -197,7 +197,7 @@ public class CreateGui {
 
 	}
 	
-	public static FireabletransitionsList getFireabletransitionsList() {
+	public static EnabledTransitionsList getFireabletransitionsList() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
 		return tab.getFireabletransitionsList();
 
