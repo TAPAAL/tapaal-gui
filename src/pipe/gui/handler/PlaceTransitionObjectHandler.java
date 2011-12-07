@@ -349,6 +349,8 @@ public class PlaceTransitionObjectHandler extends PetriNetObjectHandler {
 						guiModel.addArc(arc2);
 						view.addNewPetriNetObject(arc2);
 						
+						currentObject.addConnectTo(arc2);
+						
 						undoManager.newEdit();
 
 						undoManager.addEdit(

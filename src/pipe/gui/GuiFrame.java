@@ -1,7 +1,6 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -74,6 +73,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.ResourceManager;
@@ -117,6 +117,8 @@ public class GuiFrame extends JFrame implements Observer {
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
+	
+	private JMenuItem statistics;
 	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
@@ -533,10 +535,19 @@ public class GuiFrame extends JFrame implements Observer {
 				dialog.setVisible(true);
 			}
 		});
-		
 		toolsMenu.add(batchProcessing);
+		
+		statistics = new JMenuItem("Net statistics");
+		statistics.setMnemonic('n');
+		
+		statistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				StatisticsPanel.showStatisticsPanel();
+			}
+		});
+		
+		toolsMenu.add(statistics);
 		toolsMenu.addSeparator();
-
 
 		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL engine)");
 		resetVerifytapn.addActionListener(new ActionListener(){
@@ -843,6 +854,9 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Simulator
 		startAction.setEnabled(enable);
+		
+		// Tools
+		statistics.setEnabled(enable);
 
 	}
 
@@ -1298,6 +1312,7 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 			setEditionAllowed(false);
@@ -1428,23 +1443,6 @@ public class GuiFrame extends JFrame implements Observer {
 		return statusBar;
 	}
 
-	private Component c = null; // arreglantzoom
-	private Component p = new BlankLayer(this);
-
-	/* */
-	void hideNet(boolean doHide) {
-		if (doHide) {
-			c = appTab.getComponentAt(appTab.getSelectedIndex());
-			appTab.setComponentAt(appTab.getSelectedIndex(), p);
-		} else {
-			if (c != null) {
-				appTab.setComponentAt(appTab.getSelectedIndex(), c);
-				c = null;
-			}
-		}
-		appTab.repaint();
-	}
-
 	class AnimateAction extends GuiAction {
 
 		/**
@@ -1491,7 +1489,7 @@ public class GuiFrame extends JFrame implements Observer {
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
-									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
 
@@ -1504,7 +1502,7 @@ public class GuiFrame extends JFrame implements Observer {
 				} catch (Exception e) {
 					System.err.println(e);
 					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
@@ -1778,78 +1776,55 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			boolean doZoom = false;
+			// This is set to true if a valid zoom action is performed
+			boolean didZoom = false;
 			try {
 				String actionName = (String) getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
-				TabContent tabContent = (TabContent) appTab
-				.getSelectedComponent();
-				JViewport thisView = tabContent.drawingSurfaceScrollPane()
-				.getViewport();
-				String selection = null, strToTest = null;
+				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
+				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
+				String selectedZoomLevel = null;
+				int newZoomLevel = Pipe.ZOOM_DEFAULT;
 
-				double midpointX = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().x
-						+ (thisView.getWidth() * 0.5), zoomer.getPercent());
-				double midpointY = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().y
-						+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-
+				/*
+				 * Zoom action name overview
+				 * Zoom in: the zoom IN icon in panel has been pressed
+				 * Zoom out: the zoom OUT icon in panel has been pressed
+				 * Zoom: a specific zoom level has been chosen in drop down or in the menu.
+				 */
 				if (actionName.equals("Zoom in")) {
-					doZoom = zoomer.zoomIn();
+					didZoom = zoomer.zoomIn();
 				} else if (actionName.equals("Zoom out")) {
-					doZoom = zoomer.zoomOut();
+					didZoom = zoomer.zoomOut();
 				} else {
 					if (actionName.equals("Zoom")) {
-						selection = (String) zoomComboBox.getSelectedItem();
+						selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
 					}
 					if (e.getSource() instanceof JMenuItem) {
-						selection = ((JMenuItem) e.getSource()).getText();
+						selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
 					}
-					strToTest = validatePercent(selection);
-
-					if (strToTest != null) {
-						// BK: no need to zoom if already at that level
-						if (zoomer.getPercent() == Integer.parseInt(strToTest)) {
-							return;
-						} else {
-							zoomer.setZoom(Integer.parseInt(strToTest));
-							doZoom = true;
-						}
-					} else {
-						return;
-					}
+					
+					//parse selected zoom level, and strip of %.
+					newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%",""));
+					
+					didZoom = zoomer.setZoom(newZoomLevel);
 				}
-				if (doZoom) {
+				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomTo(new java.awt.Point((int) midpointX,
-							(int) midpointY));
+					
+					double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
+										+ (thisView.getWidth() * 0.5), zoomer.getPercent());
+					double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
+										+ (thisView.getHeight() * 0.5), zoomer.getPercent());
+					
+					java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
+					
+					appView.zoomTo(midpoint);
 				}
 			} catch (ClassCastException cce) {
 				// zoom
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-		}
-
-		private String validatePercent(String selection) {
-
-			try {
-				String toTest = selection;
-
-				if (selection.endsWith("%")) {
-					toTest = selection.substring(0, (selection.length()) - 1);
-				}
-
-				if (Integer.parseInt(toTest) < Pipe.ZOOM_MIN
-						|| Integer.parseInt(toTest) > Pipe.ZOOM_MAX) {
-					throw new Exception();
-				} else {
-					return toTest;
-				}
-			} catch (Exception e) {
-				zoomComboBox.setSelectedItem("");
-				return null;
 			}
 		}
 
@@ -1963,7 +1938,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
-			Logger.log("Can't open browser");
+			Logger.log("Cannot open the browser.");
 			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);

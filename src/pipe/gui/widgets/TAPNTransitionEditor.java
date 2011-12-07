@@ -59,7 +59,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		transitionEditorPanel = new javax.swing.JPanel();
 		nameLabel = new javax.swing.JLabel();
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(200,27));
+		nameTextField.setPreferredSize(new Dimension(290,27));
 		rotationLabel = new javax.swing.JLabel();
 		rotationComboBox = new javax.swing.JComboBox();
 		buttonPanel = new javax.swing.JPanel();
@@ -85,24 +85,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return o1.name().compareToIgnoreCase(o2.name());
 			}
 		});
-		//numberOfSharedTransitions = sharedTransitions.size();
-		//sharedTransitionsComboBox = new JComboBox(sharedTransitions);
 		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
-		sharedTransitionsComboBox.setPreferredSize(new Dimension(200,27));
-//		sharedTransitionsComboBox.addPopupMenuListener(new PopupMenuListener() {
-//			@Override
-//			public void popupMenuCanceled(PopupMenuEvent arg0) {
-//			}
-//			@Override
-//			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-//			}
-//			@Override
-//			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-//				adjustDimensionsOfPopUpMenu(sharedTransitionsComboBox);
-//			}
-//		});
-		
+		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
+
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
@@ -170,37 +156,45 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		buttonPanel.setLayout(new java.awt.GridBagLayout());
 
 		okButton.setText("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				okButtonHandler(evt);
 			}
 		});
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		buttonPanel.add(okButton, gridBagConstraints);
-
 		cancelButton.setText("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
 		cancelButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				cancelButtonHandler(evt);
 			}
 		});
+		
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		buttonPanel.add(cancelButton, gridBagConstraints);
+
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
-		buttonPanel.add(cancelButton, gridBagConstraints);
+		buttonPanel.add(okButton, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 0, 8, 3);
 		add(buttonPanel, gridBagConstraints);
 
@@ -212,44 +206,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		}else{
 			switchToNameTextField();
 		}
-	}
-	
-//	private void adjustDimensionsOfPopUpMenu(JComboBox comboBox) {	
-//		if (comboBox.getItemCount() == 0) {
-//            return;
-//        }
-//        Object comp = comboBox.getUI().getAccessibleChild(comboBox, 0);
-//        if (!(comp instanceof JPopupMenu)) {
-//            return;
-//        }
-//        FontMetrics metrics = comboBox.getFontMetrics(comboBox.getFont()); 
-//        int maxWidth=0;
-//        for(int i=0;i<comboBox.getItemCount();i++){
-//            if(comboBox.getItemAt(i)==null)
-//                continue;
-//            int currentWidth=metrics.stringWidth(comboBox.getItemAt(i).toString());
-//            if(maxWidth<currentWidth)
-//                maxWidth=currentWidth;
-//        }
-//        JPopupMenu popup = (JPopupMenu) comp;
-//        JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
-//        Dimension size = scrollPane.getPreferredSize();
-//        if (size.width < maxWidth+24) {
-//        	size.width = maxWidth+24;
-//        }
-//        if (numberOfSharedTransitions > 8) {
-//        	if (numberOfSharedTransitions > maxNumberOfTransitionsToShowAtOnce) {
-//        		int heightOfPopUpMenu = (int)(metrics.getHeight()*maxNumberOfTransitionsToShowAtOnce*1.6);
-//        		size.height = heightOfPopUpMenu;
-//        	} else {
-//        		int heightOfPopUpMenu = (int)(metrics.getHeight()*numberOfSharedTransitions*1.6);
-//        		size.height = heightOfPopUpMenu;
-//        	}
-//        }
-//        scrollPane.setPreferredSize(size);
-//        scrollPane.setMaximumSize(size);        
-//	}
-
+	}	
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
 		for(TimedInputArc arc : context.activeModel().inputArcs()){

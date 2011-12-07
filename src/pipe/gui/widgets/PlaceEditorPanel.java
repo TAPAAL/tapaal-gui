@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -103,7 +104,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	//	gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.insets = new Insets(0, 8, 5, 8);
 		add(buttonPanel, gridBagConstraints);
 	}
@@ -115,6 +116,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		okButton = new javax.swing.JButton();
 		okButton.setText("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -123,28 +127,33 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		});
 		rootPane.setDefaultButton(okButton);
 
+		cancelButton = new javax.swing.JButton();
+		cancelButton.setText("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		cancelButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				exit();
+			}
+		});
+		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-		buttonPanel.add(okButton, gridBagConstraints);
+		buttonPanel.add(cancelButton, gridBagConstraints);
 
-		cancelButton = new javax.swing.JButton();
-		cancelButton.setText("Cancel");
-		cancelButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				exit();
-			}
-		});
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-		buttonPanel.add(cancelButton, gridBagConstraints);
+		buttonPanel.add(okButton, gridBagConstraints);
 
 		setupInitialState();
 		if(place.underlyingPlace().isShared()){
@@ -242,10 +251,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.add(nameLabel, gridBagConstraints);
 
 		nameTextField = new javax.swing.JTextField();
-		nameTextField.setPreferredSize(new Dimension(200,27));
+		nameTextField.setPreferredSize(new Dimension(290,27));
 		
 		sharedPlacesComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		sharedPlacesComboBox.setPreferredSize(new Dimension(200,27));
+
+		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
 		
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -287,7 +297,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void initTimeInvariantPanel() {
 		timeInvariantPanel = new JPanel();
 		timeInvariantPanel.setLayout(new java.awt.GridBagLayout());
-		timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Time Invariant"));
+		timeInvariantPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Age Invariant"));
 
 		invariantGroup = new JPanel(new GridBagLayout());
 		invRelationNormal = new JComboBox(new String[] { "<=", "<" });
@@ -321,9 +331,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		invariantGroup.add(invRelationConstant, gbc);
 
-		invariantSpinner.setMaximumSize(new Dimension(100, 30));
-		invariantSpinner.setMinimumSize(new Dimension(180, 30));
-		invariantSpinner.setPreferredSize(new Dimension(180, 30));
+	//	invariantSpinner.setMaximumSize(new Dimension(100, 30));
+	//  invariantSpinner.setMinimumSize(new Dimension(230, 30));
+		invariantSpinner.setPreferredSize(new Dimension(230, 30));
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -360,10 +370,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantGroup.add(invariantInf, gbc);
 
 		Set<String> constants = context.network().getConstantNames();
-		invConstantsComboBox = new JComboBox(constants.toArray());
-
-		invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
-		invConstantsComboBox.setPreferredSize(new Dimension(180, 30));
+		String[] constantArray = constants.toArray(new String[constants.size()]);
+	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
+		
+		invConstantsComboBox = new JComboBox(constantArray);
+	//	invConstantsComboBox = new JComboBox(constants.toArray());
+		invConstantsComboBox.setMaximumRowCount(20);
+	//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
+		invConstantsComboBox.setPreferredSize(new Dimension(230, 30));
 		invConstantsComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {

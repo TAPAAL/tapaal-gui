@@ -224,7 +224,7 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
-	private Boolean advancedView = false;
+	private static Boolean advancedView = false;
 	
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -306,6 +306,7 @@ public class QueryDialog extends JPanel {
 		setLayout(new GridBagLayout());
 
 		init(option, queryToCreateFrom);
+		toggleAdvancedSimpleView(false);
 	}
 
 	private boolean checkForDegree2() {
@@ -481,7 +482,7 @@ public class QueryDialog extends JPanel {
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
-
+		
 		guiDialog.setResizable(false);
 		
 		// Make window fit contents' preferred size
@@ -609,7 +610,7 @@ public class QueryDialog extends JPanel {
 				updateSelection(replacement);
 
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		}
 	}
@@ -780,7 +781,7 @@ public class QueryDialog extends JPanel {
 				updateSelection(property);
 				undoSupport.postEdit(edit);
 			}
-			queryChanged();
+//			queryChanged();
 		}
 	}
 
@@ -920,34 +921,8 @@ public class QueryDialog extends JPanel {
 		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		advancedButton.addActionListener(new ActionListener() {
 
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(advancedView){
-					Point location = guiDialog.getLocation();
-					advancedView = false;
-					advancedButton.setText("Advanced view");
-					advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-					searchOptionsPanel.setVisible(false);
-					reductionOptionsPanel.setVisible(false);
-					saveUppaalXMLButton.setVisible(false);
-					
-					guiDialog.pack();
-					guiDialog.setLocation(location);
-					
-					
-				} else {
-					Point location = guiDialog.getLocation();
-					advancedView = true;
-					advancedButton.setText("Simple view");
-					advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
-					searchOptionsPanel.setVisible(true);
-					reductionOptionsPanel.setVisible(true);
-					saveUppaalXMLButton.setVisible(true);
-					
-					guiDialog.pack();
-					guiDialog.setLocation(location);
-				}
-				
+				toggleAdvancedSimpleView(true);
 			}
 		});
 		
@@ -1023,6 +998,38 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.insets = new Insets(5,10,0,10);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
+	}
+	
+	private void toggleAdvancedSimpleView(boolean changeState){
+		//Make sure that the right properties are set when the pane is initialized
+		if(!changeState){
+			advancedView = !advancedView;
+		}
+		if(advancedView){
+			Point location = guiDialog.getLocation();
+			advancedView = false;
+			advancedButton.setText("Advanced view");
+			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
+			searchOptionsPanel.setVisible(false);
+			reductionOptionsPanel.setVisible(false);
+			saveUppaalXMLButton.setVisible(false);
+			
+			guiDialog.pack();
+			guiDialog.setLocation(location);
+			
+			
+		} else {
+			Point location = guiDialog.getLocation();
+			advancedView = true;
+			advancedButton.setText("Simple view");
+			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
+			searchOptionsPanel.setVisible(true);
+			reductionOptionsPanel.setVisible(true);
+			saveUppaalXMLButton.setVisible(true);
+			
+			guiDialog.pack();
+			guiDialog.setLocation(location);
+		}
 	}
 	
 	private void initBoundednessCheckPanel() {
@@ -1214,7 +1221,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1227,7 +1234,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1240,7 +1247,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1253,7 +1260,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 	}
@@ -1335,7 +1342,7 @@ public class QueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				}
-				queryChanged();
+//				queryChanged();
 			}
 
 		}
@@ -1380,7 +1387,7 @@ public class QueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				}
-				queryChanged();
+//				queryChanged();
 			}
 
 		});
@@ -1392,7 +1399,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 	}
@@ -1550,7 +1557,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		}
 
@@ -1563,7 +1570,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), trueNode);
 				updateSelection(trueNode);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 		
@@ -1574,7 +1581,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), falseNode);
 				updateSelection(falseNode);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1738,7 +1745,7 @@ public class QueryDialog extends JPanel {
 					updateSelection(newProperty);
 					undoSupport.postEdit(edit);
 				}
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1753,7 +1760,7 @@ public class QueryDialog extends JPanel {
 					undoManager.undo();
 					refreshUndoRedo();
 					updateSelection(original);
-					queryChanged();
+//					queryChanged();
 					setEnabledReductionOptions();
 				}
 			}
@@ -1769,7 +1776,7 @@ public class QueryDialog extends JPanel {
 					undoManager.redo();
 					refreshUndoRedo();
 					updateSelection(replacement);
-					queryChanged();
+//					queryChanged();
 					setEnabledReductionOptions();
 				}
 			}
@@ -1994,7 +2001,7 @@ public class QueryDialog extends JPanel {
 		if(reduction.equals(ReductionOption.VerifyTAPN)){
 			discreteInclusion.setVisible(true);
 			selectInclusionPlacesButton.setVisible(true);
-			queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
+			//queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
 		}else{
 			discreteInclusion.setVisible(false);
 			selectInclusionPlacesButton.setVisible(false);
@@ -2035,12 +2042,12 @@ public class QueryDialog extends JPanel {
 //		}
 	}
 	
-	private void queryChanged(){
-		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
-		boolean isUpwardClosed = visitor.isUpwardClosed(newProperty);
-		discreteInclusion.setEnabled(isUpwardClosed);
-		discreteInclusion.setSelected(isUpwardClosed ? discreteInclusion.isSelected() : false);
-	}
+//	private void queryChanged(){
+//		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
+//		boolean isUpwardClosed = visitor.isUpwardClosed(newProperty);
+//		discreteInclusion.setEnabled(isUpwardClosed);
+//		discreteInclusion.setSelected(isUpwardClosed ? discreteInclusion.isSelected() : false);
+//	}
 	
 	private void initButtonPanel(QueryDialogueOption option) {
 		buttonPanel = new JPanel(new BorderLayout());

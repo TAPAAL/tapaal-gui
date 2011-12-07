@@ -192,8 +192,8 @@ public class VerifyTAPN implements ModelChecker {
 		if(!supportsQuery(model.value1(), query, options))
 			throw new UnsupportedQueryException("Verifytapn does not support the given query.");
 		
-		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
-			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
+//		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
+//			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 		
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		

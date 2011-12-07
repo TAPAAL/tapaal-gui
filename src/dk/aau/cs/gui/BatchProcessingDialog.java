@@ -776,8 +776,6 @@ public class BatchProcessingDialog extends JDialog {
 		closeButton = new JButton("Close");
 		closeButton.setToolTipText(TOOL_TIP_CloseButton);
 		closeButton.addActionListener(new ActionListener() {
-			
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				exit();
 				

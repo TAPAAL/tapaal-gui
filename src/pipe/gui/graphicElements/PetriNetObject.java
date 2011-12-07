@@ -44,7 +44,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 	protected boolean markedAsDeleted = false;
 
 	// Integer value which represents a zoom percentage
-	protected int zoom = 100;
+	protected int zoom = Pipe.ZOOM_DEFAULT;
 	private DataLayer guiModel;
 
 	public PetriNetObject() {
