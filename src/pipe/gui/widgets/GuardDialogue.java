@@ -66,9 +66,11 @@ public class GuardDialogue extends JPanel /*
 	private JComboBox rightDelimiter;
 
 	private JCheckBox leftUseConstant;
-	private JComboBox leftConstantsComboBox;
+	private WidthAdjustingComboBox leftConstantsComboBox;
 	private JCheckBox rightUseConstant;
-	private JComboBox rightConstantsComboBox;
+	private WidthAdjustingComboBox rightConstantsComboBox;
+	
+	private int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public GuardDialogue(JRootPane rootPane, PetriNetObject objectToBeEdited) {
 		myRootPane = rootPane;
@@ -300,7 +302,8 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(leftUseConstant, gridBagConstraints);
 
 	
-		leftConstantsComboBox = new JComboBox(constantArray);
+		leftConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+		leftConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
 	//	leftConstantsComboBox = new JComboBox(constants.toArray());
 		leftConstantsComboBox.setMaximumRowCount(20);
 		leftConstantsComboBox.setVisible(false);
@@ -336,7 +339,8 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.gridy = 0;
 		guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
-		rightConstantsComboBox = new JComboBox(constants.toArray());
+		rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+		rightConstantsComboBox.setModel(new DefaultComboBoxModel(constants.toArray()));
 		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
 	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);

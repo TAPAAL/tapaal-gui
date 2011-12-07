@@ -373,7 +373,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		String[] constantArray = constants.toArray(new String[constants.size()]);
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 		
-		invConstantsComboBox = new JComboBox(constantArray);
+	    invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+	    invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
 	//	invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMaximumRowCount(20);
 	//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
