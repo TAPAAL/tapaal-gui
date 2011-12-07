@@ -166,18 +166,19 @@ public class EnabledTransitionsList extends JPanel{
 
 		@Override
 		public int compareTo(ListItem o) {
-			//if the transitions is from different templates - don't change the order
-			if(this .template != o.template){
-				return 0;
-			}
 
-			if(this.isShared() == false && o.isShared() == false){
-				return compareToString(o);
+			if(this.isShared() == o.isShared()){
+				//if the transitions is from different templates - don't change the order
+				if(this .template != o.template){
+					return 0;
+				} else {
+					return compareToString(o);
+				}
 			} else {
 				if(this.isShared()){
-					return 1;
-				} else {
 					return -1;
+				} else {
+					return 1;
 				}
 			}
 		}
