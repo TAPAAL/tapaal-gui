@@ -115,7 +115,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
 	
 	private TypeAction timedArcAction;
@@ -136,6 +136,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showComponents = true;
 	private boolean showConstants = true;
 	private boolean showQueries = true;
+	private boolean showEnabledTransitions = true;
 
 	
 	private GUIMode guiMode = GUIMode.noNet;
@@ -450,6 +451,8 @@ public class GuiFrame extends JFrame implements Observer {
 				 453244, "Show/hide verification queries.", "", true));
 		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
 				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","",true));
+		 addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction = new ViewAction("Display Enabled transitions",
+				 453247, "Show/hide the list of enabled transitions","E",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -740,6 +743,7 @@ public class GuiFrame extends JFrame implements Observer {
 			stepforwardAction.setEnabled(false);
 
 			deleteAction.setEnabled(true);
+			showEnabledTransitionsAction.setEnabled(false);
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
@@ -840,6 +844,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
+		showEnabledTransitionsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -923,6 +928,14 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleComponents(){
 		showComponents(!showComponents);
+	}
+	
+	public void showEnabledTransitionsList(boolean enable){
+		showEnabledTransitions = enable;
+		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
+	}
+	public void toggleEnabledTransitionsList(){
+		showEnabledTransitionsList(!showEnabledTransitions);
 	}
 	
 	public void saveOperation(boolean forceSave){
@@ -1264,6 +1277,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            change GUI to this mode
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 */
+	//TODO
 	public void setGUIMode(GUIMode mode) {
 		switch (mode) {
 		case draw:
@@ -1895,6 +1909,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleConstants();
 			} else if (this == showZeroToInfinityIntervalsAction) {
 				toggleZeroToInfinityIntervals();
+			} else if (this == showEnabledTransitionsAction) {
+				toggleEnabledTransitionsList();
 			}
 		}
 		

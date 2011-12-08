@@ -455,6 +455,9 @@ public class TabContent extends JSplitPane {
 	public void showConstantsPanel(boolean enable){
 		constantsPanel.setVisible(enable);
 	}
+	public void showEnabledTransitionsList(boolean enable){
+		enabledTransitionsList.setVisible(enable);
+	}
 	
 	public void selectFirstElements(){
 		templateExplorer.selectFirst();

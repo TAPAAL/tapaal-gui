@@ -403,7 +403,7 @@ public class Animator {
 		}
 
 		CreateGui.getAnimationController().updateFiringModeComboBox();
-	}
+	}	
 	
 	private List<TimedToken> getTokensToConsume(TimedTransition transition){
 		//If there are only one token in each place
