@@ -50,8 +50,8 @@ public class WidthAdjustingComboBox extends JComboBox{
 		JPopupMenu popup = (JPopupMenu) comp;
 		JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
 		Dimension size = scrollPane.getPreferredSize();
-		if (size.width < maxWidth+34) {
-			size.width = maxWidth+34;
+		if (size.width < maxWidth+70) {
+			size.width = maxWidth+70;
 		}
 		scrollPane.setPreferredSize(size);
 		scrollPane.setMaximumSize(size);        

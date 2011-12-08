@@ -535,7 +535,10 @@ public class GuardDialogue extends JPanel /*
 				Collection<Constant> constants = CreateGui.getCurrentTab().network()
 				.constants();
 				
-				List <Constant> constantList = new ArrayList(constants);
+				//List <Constant> constantList = new ArrayList(constants);
+				List <Constant> constantList = new ArrayList<Constant>();
+				constantList.addAll(constants);
+				
 				Collections.sort(constantList,new Comparator<Constant>() {
 						public int compare(Constant o1, Constant o2) {
 						return o1.name().compareToIgnoreCase(o2.name());
