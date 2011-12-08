@@ -18,6 +18,7 @@ import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -245,7 +246,6 @@ public class Animator {
 		}
 	}
 
-
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
 		NetworkMarking next = null;
@@ -253,7 +253,7 @@ public class Animator {
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
 			} else {
-				List<TimedToken> tokensToConsume = showSelectSimulatorDialogue(transition);
+				List<TimedToken> tokensToConsume = getTokensToConsume(transition);
 				if(tokensToConsume == null) return; // Cancelled
 				next = currentMarking().fireTransition(transition, tokensToConsume);
 			}
@@ -403,6 +403,29 @@ public class Animator {
 		}
 
 		CreateGui.getAnimationController().updateFiringModeComboBox();
+	}
+	
+	private List<TimedToken> getTokensToConsume(TimedTransition transition){
+		//If there are only one token in each place
+		List<TimedToken> result = new ArrayList<TimedToken>();
+		boolean userShouldChoose = false;
+		for(TimedInputArc in: transition.getInputArcs()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return null;
+			} else if(elligibleTokens.size() == 1){
+				result.add(elligibleTokens.get(0));
+			} else {
+				userShouldChoose = true;
+				break;
+			}
+		}
+		
+		if (userShouldChoose){
+			return showSelectSimulatorDialogue(transition);
+		} else {
+			return result;
+		}
 	}
 
 	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
