@@ -196,10 +196,13 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 
 	private void initComponents() throws IOException {		
 		valueSpinner =  makeDigitsOnlySpinnerUsingDocumentFilter(initialValue);
+		valueSpinner.setPreferredSize(new Dimension(100, 25));
+		valueSpinner.setMaximumSize(new Dimension(100, 25));
+		valueSpinner.setMinimumSize(new Dimension(100, 25));
 		
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
-		size = new Dimension(250, 25);
+		size = new Dimension(330, 25);
 
 		nameTextField = new javax.swing.JTextField();	
 		nameTextField.setPreferredSize(size);
@@ -248,7 +251,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		//gbc.fill = GridBagConstraints.HORIZONTAL;
 		container.add(valueSpinner,gbc);
 				
 		buttonContainer = new JPanel();

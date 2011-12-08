@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -20,10 +21,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
@@ -42,6 +45,8 @@ import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
 import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
+import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
 import dk.aau.cs.gui.undo.Command;
@@ -218,13 +223,7 @@ public class TemplateExplorer extends JPanel {
 
 		newTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Template template = ShowNewTemplateDialog();
-				if (template != null) {
-					int index = listModel.size();
-					undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
-					parent.addTemplate(template);
-					parent.drawingSurface().setModel(template.guiModel(), template.model(), template.zoomer());
-				}
+				ShowNewTemplateDialog();
 			}
 		});
 
@@ -360,48 +359,20 @@ public class TemplateExplorer extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonPanel.add(copyButton, gbc);
 	}
-
-	private Template ShowNewTemplateDialog() {
-		String templateName = (String) JOptionPane.showInputDialog(
-//				parent.drawingSurface(), "Component name:", "Rename Component",
-				null, "Component name:", "Enter name of Component",
-				JOptionPane.PLAIN_MESSAGE, null, null, 
-				parent.drawingSurface().getNameGenerator().getNewTemplateName());
-
-		if (templateName != null) {
-			if(!isNameAllowed(templateName)) {
-				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			else if (parent.network().hasTAPNCalled(templateName)) {
-				JOptionPane.showMessageDialog(parent.drawingSurface(),
-						"A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			else {
-				Template template = createNewTemplate(templateName);
-				return template;
-			}
-		}
-		return null;
-	}
-
-
-	private boolean isNameAllowed(String templateName) {
-		Require.that(templateName != null, "The template name cannot be null");
-		
-		return !templateName.isEmpty() && Pattern.matches("[a-zA-Z]([_a-zA-Z0-9])*", templateName);
-	}
-
-	private void showRenameTemplateDialog() {
-		Template template = selectedModel();
-
-		String newName = (String) JOptionPane.showInputDialog(parent.drawingSurface(), "Component name:", "Rename Component",
-				JOptionPane.PLAIN_MESSAGE, null, null, template.model().name());
-		
+	
+	private EscapableDialog dialog;
+	JPanel container;
+	JTextField nameTextField;
+	Dimension size;
+	JLabel nameLabel;
+	JPanel buttonContainer;
+	JButton okButton;
+	JButton cancelButton;
+	JPanel nameContainer;
+	
+	private void onOKRenameTemplate() {
+		Template template = selectedModel();			
+		String newName = nameTextField.getText().trim();
 		if (newName == null || template.model().name().equals(newName))
 			return;
 
@@ -423,7 +394,261 @@ public class TemplateExplorer extends JPanel {
 			undoManager.addNewEdit(command);
 			command.redo();
 		}
+		exit();
+	}
+	
+	private void onOK() {
+		Template template = null;		
+		String templateName = nameTextField.getText().trim();		
+		if (templateName != null) {
+			if(!isNameAllowed(templateName)) {
+				JOptionPane.showMessageDialog(parent.drawingSurface(),
+						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
+						"Error Creating Component",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			else if (parent.network().hasTAPNCalled(templateName)) {
+				JOptionPane.showMessageDialog(parent.drawingSurface(),
+						"A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
+						"Error Creating Component",
+						JOptionPane.ERROR_MESSAGE);
+			}
+			else {
+				template = createNewTemplate(templateName);
+			}
+		}
+		if (template != null) {
+			int index = listModel.size();
+			undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
+			parent.addTemplate(template);
+			parent.drawingSurface().setModel(template.guiModel(), template.model(), template.zoomer());
+		}
+		exit();
+	}
+	
+	private void exit() {
+		dialog.setVisible(false);
+	}
+	
+	private void initComponentsOfNewTemplateDialog() {
+		container = new JPanel();
+		container.setLayout(new GridBagLayout());
+		nameContainer = new JPanel();
+		nameContainer.setLayout(new GridBagLayout());
+		size = new Dimension(330, 25);
 
+		nameTextField = new javax.swing.JTextField();	
+		nameTextField.setPreferredSize(size);
+		nameTextField.addAncestorListener(new RequestFocusListener());
+		nameTextField.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
+			}
+		});
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		//gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(4, 4, 2, 4);
+		nameContainer.add(nameTextField,gbc);
+		
+		nameLabel = new JLabel(); 
+		nameLabel.setText("Name of component: ");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(4, 4, 2, 4);
+		gbc.anchor = GridBagConstraints.WEST;
+		nameContainer.add(nameLabel,gbc);
+		
+		buttonContainer = new JPanel();
+		buttonContainer.setLayout(new GridBagLayout());
+
+		okButton = new JButton();
+		okButton.setText("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		okButton.setMnemonic(KeyEvent.VK_O);
+		gbc = new GridBagConstraints();		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = java.awt.GridBagConstraints.WEST;
+		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+		buttonContainer.add(okButton,gbc);
+		
+		cancelButton = new JButton();
+		cancelButton.setText("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMnemonic(KeyEvent.VK_C);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.EAST;
+		buttonContainer.add(cancelButton,gbc);		
+		
+		okButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				onOK();
+			}
+		});
+		
+		cancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exit();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 8, 5, 8);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		container.add(buttonContainer,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 8, 5, 8);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		container.add(nameContainer,gbc);
+	}
+
+	private void ShowNewTemplateDialog() {
+		dialog = new EscapableDialog(CreateGui.getApp(),
+				"Enter Component Name", true);
+		initComponentsOfNewTemplateDialog();
+		dialog.add(container);
+		dialog.setResizable(false);
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
+	}
+
+
+	private boolean isNameAllowed(String templateName) {
+		Require.that(templateName != null, "The template name cannot be null");
+		
+		return !templateName.isEmpty() && Pattern.matches("[a-zA-Z]([_a-zA-Z0-9])*", templateName);
+	}
+	
+	private void initComponentsOfRenameTemplateDialog(String oldname) {
+		container = new JPanel();
+		container.setLayout(new GridBagLayout());
+		nameContainer = new JPanel();
+		nameContainer.setLayout(new GridBagLayout());
+		size = new Dimension(330, 25);
+
+		nameTextField = new javax.swing.JTextField();	
+		nameTextField.setPreferredSize(size);
+		nameTextField.setText(oldname);
+		nameTextField.addAncestorListener(new RequestFocusListener());
+		nameTextField.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
+			}
+		});
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		//gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(4, 4, 2, 4);
+		nameContainer.add(nameTextField,gbc);
+		
+		nameLabel = new JLabel(); 
+		nameLabel.setText("Name of component: ");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(4, 4, 2, 4);
+		gbc.anchor = GridBagConstraints.WEST;
+		nameContainer.add(nameLabel,gbc);
+		
+		buttonContainer = new JPanel();
+		buttonContainer.setLayout(new GridBagLayout());
+
+		okButton = new JButton();
+		okButton.setText("OK");
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		okButton.setMnemonic(KeyEvent.VK_O);
+		gbc = new GridBagConstraints();		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = java.awt.GridBagConstraints.WEST;
+		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+		buttonContainer.add(okButton,gbc);
+		
+		cancelButton = new JButton();
+		cancelButton.setText("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMnemonic(KeyEvent.VK_C);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.EAST;
+		buttonContainer.add(cancelButton,gbc);		
+		
+		okButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				onOKRenameTemplate();
+			}
+		});
+		
+		cancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exit();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 8, 5, 8);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		container.add(buttonContainer,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 8, 5, 8);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		container.add(nameContainer,gbc);
+
+	}
+
+	private void showRenameTemplateDialog() {		
+		dialog = new EscapableDialog(CreateGui.getApp(),
+				"Enter Component Name", true);
+		Template template = selectedModel();
+		initComponentsOfRenameTemplateDialog(template.model().name());
+		dialog.add(container);
+		dialog.setResizable(false);
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
 	}
 
 	public Template createNewTemplate(String name) {

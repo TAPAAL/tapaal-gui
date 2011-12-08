@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -25,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -101,7 +99,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		//	"Shared transitions can link different components.";
 	private static final String toolTipRemoveTransition ="Remove selected transition.";
 	private static final String toolTipChangeBetweenPlacesAndTransitions = "Choose between places and transitions.";
-	
+
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");
 
@@ -128,6 +126,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 
 	private void initComponents() {
 		JPanel listPanel = new JPanel(new GridBagLayout());
+		
 		list = new JList();
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
@@ -238,7 +237,6 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					renameButton.setToolTipText(toolTipRenamePlace);
 					addButton.setToolTipText(toolTipNewPlace);
 					removeButton.setToolTipText(toolTipRemovePlace);
-					
 				}else if(selectedItem.equals(TRANSITIONS)){
 					list.setModel(sharedTransitionsListModel);
 					renameButton.setToolTipText(toolTipRenameTransition);
@@ -496,84 +494,32 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	}
 
 	private void showSharedTransitionNameDialog(SharedTransition transitionToEdit) {
-		//Get string from inputDialog
-		String sharedTransitionName = (String) JOptionPane.showInputDialog(
-//				tab.drawingSurface(), "Enter a shared place name:", "Edit Shared Place",
-				null, "Enter a shared transition name:", "Edit Shared Transition",
-				JOptionPane.PLAIN_MESSAGE, null, null, 
-				""
-				);		
-		//Do logic depending on the returned inputstring.
-		//The class SharedPlaceNamePanel encapsulates the logic of updating and creating a place. 
-		//To use it we need a dummy pane. (this is a hack to compensate for the way in which
-		//logic is delegated to the SharedPlaceNamePanel class) 
-		JRootPane dummyPane = new JRootPane();
-		SharedTransitionNamePanel panel = new SharedTransitionNamePanel(dummyPane,sharedTransitionsListModel,undoManager,nameGenerator,transitionToEdit); 
-		if (sharedTransitionName != null) {
-			if(!isNameAllowed(sharedTransitionName)) {
-				JOptionPane.showMessageDialog(tab.drawingSurface(),
-						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			else {						
-				boolean success = true;
-				if(transitionToEdit == null){
-					success = panel.addNewSharedTransition(sharedTransitionName);
-				}else if(!sharedTransitionName.equals(transitionToEdit.name())){
-					success = panel.updateExistingTransition(sharedTransitionName);
-				}			
-				if(success){
-					nameGenerator.updateIndicesForAllModels(sharedTransitionName);
-				}
-			}
-		}
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Transition", true);
+		Container contentPane = guiDialog.getContentPane();
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+		JPanel panel = new SharedTransitionNamePanel(guiDialog.getRootPane(), sharedTransitionsListModel, undoManager, nameGenerator, transitionToEdit);
+		contentPane.add(panel);
+
+		guiDialog.setResizable(false);
+		guiDialog.pack();
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
 	}
 
 	private void showSharedPlaceNameDialog(SharedPlace placeToEdit) {
-		//Get string from inputDialog
-		String sharedPlaceName = (String) JOptionPane.showInputDialog(
-//				tab.drawingSurface(), "Enter a shared place name:", "Edit Shared Place",
-				null, "Enter a shared place name:", "Edit Shared Place",
-				JOptionPane.PLAIN_MESSAGE, null, null, 
-				""
-				);		
-		//Do logic depending on the returned inputstring.
-		//The class SharedPlaceNamePanel encapsulates the logic of updating and creating a place. 
-		//To use it we need a dummy pane. (this is a hack to compensate for the way in which
-		//logic is delegated to the SharedPlaceNamePanel class) 
-		JRootPane dummyPane = new JRootPane();
-		SharedPlaceNamePanel panel = new SharedPlaceNamePanel(dummyPane, sharedPlacesListModel, new Context(tab), placeToEdit);
-		if (sharedPlaceName != null) {
-			if(!isNameAllowed(sharedPlaceName)) {
-				JOptionPane.showMessageDialog(tab.drawingSurface(),
-						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
-						"Error Creating Component",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			else {
-				boolean success = false;
-				if(placeToEdit == null){
-					success = panel.addNewSharedPlace(sharedPlaceName);
-				}else{
-					if (!sharedPlaceName.equals(placeToEdit.name())){ 
-						success = panel.updateExistingPlace(sharedPlaceName);
-					}else {
-						success = true;
-					}
-				}
-				if(success){
-					new Context(tab).nameGenerator().updateIndicesForAllModels(sharedPlaceName);
-				}
-			}
-		}
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Shared Place", true);
+		Container contentPane = guiDialog.getContentPane();
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+
+		JPanel panel = new SharedPlaceNamePanel(guiDialog.getRootPane(), sharedPlacesListModel, new Context(tab), placeToEdit);
+		contentPane.add(panel);
+
+		guiDialog.setResizable(false);
+		guiDialog.pack();
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
 	}
 
-	private boolean isNameAllowed(String templateName) {
-		Require.that(templateName != null, "The template name cannot be null");
-		
-		return !templateName.isEmpty() && Pattern.matches("[a-zA-Z]([_a-zA-Z0-9])*", templateName);
-	}
 
 	public class SharedPlacesListModel extends AbstractListModel {
 		private static final long serialVersionUID = 1L;
