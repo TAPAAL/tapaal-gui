@@ -47,6 +47,7 @@ import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
+import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -141,7 +142,7 @@ public class TemplateExplorer extends JPanel {
 			}
 		});
 
-		templateList = new JList(listModel);
+		templateList = new NonsearchableJList(listModel);
 
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
@@ -151,11 +152,7 @@ public class TemplateExplorer extends JPanel {
 		templateList.addListSelectionListener(manager);
 		templateList.addMouseListener(manager);
 		
-		//Hack to make sure it's no longer possible to search in the list of components
-		//TODO: Find a better method
-		for(KeyListener k :templateList.getKeyListeners()){
-			templateList.removeKeyListener(k);
-		}
+		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
 		

@@ -33,6 +33,7 @@ import pipe.gui.undo.RemoveQueryCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 
@@ -77,7 +78,7 @@ public class QueryPane extends JPanel {
 			}
 		});
 
-		queryList = new JList(listModel);
+		queryList = new NonsearchableJList(listModel);
 		queryList.setCellRenderer(new QueryCellRenderer());
 		queryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		queryList.addListSelectionListener(new ListSelectionListener() {
