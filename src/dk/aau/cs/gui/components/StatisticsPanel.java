@@ -135,7 +135,7 @@ public class StatisticsPanel extends JPanel{
 		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		removeOrphans.addActionListener(new ActionListener() {
 			
-			@Override
+		
 			public void actionPerformed(ActionEvent e) {
 				TabContent tab = CreateGui.getCurrentTab();
 				Iterable<Template> templates = tab.allTemplates();

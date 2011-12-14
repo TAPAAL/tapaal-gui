@@ -94,9 +94,9 @@ public class AnimationController extends JPanel {
 				"Toggle simulation mode", "Ctrl A", true);
 
 		stepbackwardAction = new AnimateAction("Back", ElementType.STEPBACKWARD,
-				"Step backward a firing", "typed 4");
+				"Step backward (4)", "typed 4");
 		stepforwardAction = new AnimateAction("Forward", ElementType.STEPFORWARD,
-				"Step forward a firing", "typed 6");
+				"Step forward (6)", "typed 6");
 
 		stepbackwardAction.setEnabled(false);
 		stepforwardAction.setEnabled(false);
