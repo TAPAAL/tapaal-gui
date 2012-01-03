@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.util.Vector;
@@ -48,12 +49,20 @@ public class WidthAdjustingComboBox extends JComboBox{
 				maxWidth=currentWidth;
 		}
 		JPopupMenu popup = (JPopupMenu) comp;
-		JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
-		Dimension size = scrollPane.getPreferredSize();
-		if (size.width < maxWidth+70) {
-			size.width = maxWidth+70;
-		}
-		scrollPane.setPreferredSize(size);
-		scrollPane.setMaximumSize(size);        
+		//the following is a hack to fix a compatibility issue with the popupmenu class
+		Component[] listOfComponents = popup.getComponents();
+		JScrollPane scrollPane = null;
+		for (Component element : listOfComponents) {
+			if (element instanceof JScrollPane) {
+				scrollPane = (JScrollPane) element;
+				Dimension size = scrollPane.getPreferredSize();
+				if (size.width < maxWidth+70) {
+					size.width = maxWidth+70;
+				}
+				scrollPane.setPreferredSize(size);
+				scrollPane.setMaximumSize(size);
+				break;
+			}
+		}		
 	}
 }
