@@ -250,7 +250,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.EAST;
 		//gbc.fill = GridBagConstraints.HORIZONTAL;
 		container.add(valueSpinner,gbc);
 				
