@@ -223,7 +223,7 @@ public class TemplateExplorer extends JPanel {
 
 		newTemplateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ShowNewTemplateDialog();
+				ShowNewTemplateDialog("");
 			}
 		});
 
@@ -315,7 +315,7 @@ public class TemplateExplorer extends JPanel {
 
 		renameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				showRenameTemplateDialog();
+				showRenameTemplateDialog("");
 				templateList.validate();
 			}
 		});
@@ -370,24 +370,31 @@ public class TemplateExplorer extends JPanel {
 	JButton cancelButton;
 	JPanel nameContainer;
 	
-	private void onOKRenameTemplate() {
+	private void onOKRenameTemplate() {		
 		Template template = selectedModel();			
 		String newName = nameTextField.getText().trim();
-		if (newName == null || template.model().name().equals(newName))
+		if (newName == null || template.model().name().equals(newName)) {
+			exit();
 			return;
-
-		if (!isNameAllowed(newName))
+		}
+		if (!isNameAllowed(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
 							"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*.\n\nThe component could not be renamed.",
 							"Error Renaming Component",
 							JOptionPane.ERROR_MESSAGE);
-		
+			exit();
+			showRenameTemplateDialog(newName);
+			return;
+		}
 		else if (parent.network().hasTAPNCalled(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
 							"A component named \"" + newName + "\" already exists. Try another name.",
 							"Error", JOptionPane.ERROR_MESSAGE);
+			exit();
+			showRenameTemplateDialog(newName);
+			return;
 		} else {
 			parent.drawingSurface().getNameGenerator().updateTemplateIndex(newName);
 			Command command = new RenameTemplateCommand(this, parent, template.model(), template.model().name(), newName);
@@ -406,12 +413,18 @@ public class TemplateExplorer extends JPanel {
 						"Acceptable names for components are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*\n\nThe new component could not be created.",
 						"Error Creating Component",
 						JOptionPane.ERROR_MESSAGE);
+				exit();
+				ShowNewTemplateDialog(templateName);
+				return;
 			}
 			else if (parent.network().hasTAPNCalled(templateName)) {
 				JOptionPane.showMessageDialog(parent.drawingSurface(),
 						"A component named \"" + templateName + "\" already exists.\n\nThe new component could not be created.",
 						"Error Creating Component",
 						JOptionPane.ERROR_MESSAGE);
+				exit();
+				ShowNewTemplateDialog(templateName);
+				return;
 			}
 			else {
 				template = createNewTemplate(templateName);
@@ -430,7 +443,7 @@ public class TemplateExplorer extends JPanel {
 		dialog.setVisible(false);
 	}
 	
-	private void initComponentsOfNewTemplateDialog() {
+	private void initComponentsOfNewTemplateDialog(String nameToShow) {
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
 		nameContainer = new JPanel();
@@ -439,6 +452,7 @@ public class TemplateExplorer extends JPanel {
 
 		nameTextField = new javax.swing.JTextField();	
 		nameTextField.setPreferredSize(size);
+		nameTextField.setText(nameToShow);	
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(new ActionListener() {			
 			@Override
@@ -524,10 +538,10 @@ public class TemplateExplorer extends JPanel {
 		container.add(nameContainer,gbc);
 	}
 
-	private void ShowNewTemplateDialog() {
+	private void ShowNewTemplateDialog(String nameToShow) {
 		dialog = new EscapableDialog(CreateGui.getApp(),
 				"Enter Component Name", true);
-		initComponentsOfNewTemplateDialog();
+		initComponentsOfNewTemplateDialog(nameToShow);
 		dialog.add(container);
 		dialog.setResizable(false);
 		dialog.pack();
@@ -639,11 +653,16 @@ public class TemplateExplorer extends JPanel {
 
 	}
 
-	private void showRenameTemplateDialog() {		
+	private void showRenameTemplateDialog(String nameToShow) {		
 		dialog = new EscapableDialog(CreateGui.getApp(),
 				"Enter Component Name", true);
 		Template template = selectedModel();
-		initComponentsOfRenameTemplateDialog(template.model().name());
+		if (nameToShow.equals("")){
+			initComponentsOfRenameTemplateDialog(template.model().name());
+		}
+		else {
+			initComponentsOfRenameTemplateDialog(nameToShow);
+		}
 		dialog.add(container);
 		dialog.setResizable(false);
 		dialog.pack();
