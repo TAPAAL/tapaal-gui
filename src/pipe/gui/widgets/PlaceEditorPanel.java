@@ -2,6 +2,7 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -20,14 +21,20 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
@@ -56,10 +63,13 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private JRootPane rootPane;
 
 	private JCheckBox sharedCheckBox;
-	private JComboBox sharedPlacesComboBox;
+	private WidthAdjustingComboBox sharedPlacesComboBox;
 
 	private TimedPlaceComponent place;
 	private Context context;
+	
+	private Vector<TimedPlace> sharedPlaces;
+	private int maxNumberOfPlacesToShowAtOnce = 20;
 
 	public PlaceEditorPanel(JRootPane rootPane, TimedPlaceComponent placeComponent, Context context) {
 		this.rootPane = rootPane;
@@ -154,7 +164,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void setupInitialState() {
-		Vector<TimedPlace> sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
+		sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
 		
 		List<TimedPlace> usedPlaces = context.activeModel().places();
 		
@@ -243,9 +253,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		nameTextField = new javax.swing.JTextField();
 		nameTextField.setPreferredSize(new Dimension(290,27));
 		
-		sharedPlacesComboBox = new JComboBox();
+		sharedPlacesComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+
 		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
-		sharedPlacesComboBox.setMaximumRowCount(20);
 		
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -254,7 +264,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				setInvariantControlsBasedOn(place.invariant());
 			}
 		});
-		
+				
 		markingLabel = new javax.swing.JLabel("Marking:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -283,7 +293,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
 	}
-
+	
 	private void initTimeInvariantPanel() {
 		timeInvariantPanel = new JPanel();
 		timeInvariantPanel.setLayout(new java.awt.GridBagLayout());
@@ -363,7 +373,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		String[] constantArray = constants.toArray(new String[constants.size()]);
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 		
-		invConstantsComboBox = new JComboBox(constantArray);
+	    invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+	    invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
 	//	invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMaximumRowCount(20);
 	//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));

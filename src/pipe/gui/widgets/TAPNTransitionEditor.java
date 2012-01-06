@@ -2,6 +2,7 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,12 +11,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
@@ -35,6 +41,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private TimedTransitionComponent transition;
 	private JRootPane rootPane;
 	private Context context;
+	
+	private int maxNumberOfTransitionsToShowAtOnce = 20;
 
 	public TAPNTransitionEditor(JRootPane _rootPane, TimedTransitionComponent _transition, Context context) {
 		rootPane = _rootPane;
@@ -77,11 +85,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				return o1.name().compareToIgnoreCase(o2.name());
 			}
 		});
-		sharedTransitionsComboBox = new JComboBox(sharedTransitions);
-		sharedTransitionsComboBox.setMaximumRowCount(20);
+		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
+		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
-		
-		
+
 		setLayout(new java.awt.GridBagLayout());
 
 		transitionEditorPanel.setLayout(new java.awt.GridBagLayout());
@@ -199,7 +206,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		}else{
 			switchToNameTextField();
 		}
-	}
+	}	
 	
 	private boolean hasArcsToSharedPlaces(TimedTransition underlyingTransition) {
 		for(TimedInputArc arc : context.activeModel().inputArcs()){
