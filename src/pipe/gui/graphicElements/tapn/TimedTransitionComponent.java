@@ -173,7 +173,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(positionX, positionY, id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 		
 		LabelHandler labelHandler = new LabelHandler(transitionComponent.getNameLabel(), transitionComponent);

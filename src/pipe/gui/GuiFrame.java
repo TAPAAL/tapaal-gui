@@ -1,7 +1,6 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -74,6 +73,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.ResourceManager;
@@ -115,8 +115,10 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
+	
+	private JMenuItem statistics;
 	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
@@ -400,10 +402,10 @@ public class GuiFrame extends JFrame implements Observer {
 				 ElementType.TAPNARC, "Add an arc (A)", "A", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
+				 "Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
 				 true));
 
-		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
+		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor arc",
 				 ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
 		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
@@ -442,12 +444,14 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 viewMenu.addSeparator();
 		 
-		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
-				 453243, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
-				 453245, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
-				 453244, "Show/Hide componens", "", true));
+		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
+				 453243, "Show/hide the list of components.", "C", true));
+		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
+				 453245, "Show/hide global constants.", "O", true));
+		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
+				 453244, "Show/hide verification queries.", "Q", true));
+		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","F",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -456,14 +460,14 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 animateMenu.addSeparator();
-		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
-				 ElementType.STEPBACKWARD, "Step backward a firing", "typed 4"));
+		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
+				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
 		 addMenuItem(animateMenu,
-				 stepforwardAction = new AnimateAction("Forward",
-						 ElementType.STEPFORWARD, "Step forward a firing", "typed 6"));
+				 stepforwardAction = new AnimateAction("Step forward",
+						 ElementType.STEPFORWARD, "Step forward", "typed 6"));
 
-		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay 1",
-				 ElementType.TIMEPASS, "Let time pass 1 time unit", "typed 1"));
+		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
+				 ElementType.TIMEPASS, "Let time pass one time unit", "typed 1"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -515,7 +519,7 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic('t');
 		
-		JMenuItem batchProcessing = new JMenuItem("Batch Processing");
+		JMenuItem batchProcessing = new JMenuItem("Batch processing");
 		batchProcessing.setMnemonic('b');
 		
 		batchProcessing.addActionListener(new ActionListener() {
@@ -523,18 +527,29 @@ public class GuiFrame extends JFrame implements Observer {
 				checkForSave();
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
-				dialog.setMinimumSize(dialog.getSize());
+				dialog.setPreferredSize(dialog.getSize());
+				//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the result panel
+				dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()-150));
 				dialog.setLocationRelativeTo(null);
-				dialog.setResizable(false);
+				dialog.setResizable(true);
 				dialog.setVisible(true);
 			}
 		});
-		
 		toolsMenu.add(batchProcessing);
+		
+		statistics = new JMenuItem("Net statistics");
+		statistics.setMnemonic('n');
+		
+		statistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				StatisticsPanel.showStatisticsPanel();
+			}
+		});
+		
+		toolsMenu.add(statistics);
 		toolsMenu.addSeparator();
 
-
-		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL Engine)");
+		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL engine)");
 		resetVerifytapn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) { 
 				VerifyTAPN.reset(); 
@@ -543,7 +558,7 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(resetVerifytapn);
 		
-		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL Engine)");
+		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL engine)");
 		resetVerifyta.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) { 
 				Verifyta.reset(); 
@@ -835,9 +850,13 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
+		showZeroToInfinityIntervalsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
+		
+		// Tools
+		statistics.setEnabled(enable);
 
 	}
 
@@ -905,6 +924,11 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleConstants(){
 		showConstants(!showConstants);
+	}
+	
+	public void toggleZeroToInfinityIntervals() {
+		CreateGui.toggleShowZeroToInfinityIntervals();
+		appView.repaintAll();
 	}
 	
 	public void showComponents(boolean enable){
@@ -1288,6 +1312,7 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 			setEditionAllowed(false);
@@ -1418,23 +1443,6 @@ public class GuiFrame extends JFrame implements Observer {
 		return statusBar;
 	}
 
-	private Component c = null; // arreglantzoom
-	private Component p = new BlankLayer(this);
-
-	/* */
-	void hideNet(boolean doHide) {
-		if (doHide) {
-			c = appTab.getComponentAt(appTab.getSelectedIndex());
-			appTab.setComponentAt(appTab.getSelectedIndex(), p);
-		} else {
-			if (c != null) {
-				appTab.setComponentAt(appTab.getSelectedIndex(), c);
-				c = null;
-			}
-		}
-		appTab.repaint();
-	}
-
 	class AnimateAction extends GuiAction {
 
 		/**
@@ -1481,7 +1489,7 @@ public class GuiFrame extends JFrame implements Observer {
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
-									"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
 
@@ -1494,7 +1502,7 @@ public class GuiFrame extends JFrame implements Observer {
 				} catch (Exception e) {
 					System.err.println(e);
 					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
@@ -1768,78 +1776,55 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			boolean doZoom = false;
+			// This is set to true if a valid zoom action is performed
+			boolean didZoom = false;
 			try {
 				String actionName = (String) getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
-				TabContent tabContent = (TabContent) appTab
-				.getSelectedComponent();
-				JViewport thisView = tabContent.drawingSurfaceScrollPane()
-				.getViewport();
-				String selection = null, strToTest = null;
+				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
+				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
+				String selectedZoomLevel = null;
+				int newZoomLevel = Pipe.ZOOM_DEFAULT;
 
-				double midpointX = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().x
-						+ (thisView.getWidth() * 0.5), zoomer.getPercent());
-				double midpointY = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().y
-						+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-
+				/*
+				 * Zoom action name overview
+				 * Zoom in: the zoom IN icon in panel has been pressed
+				 * Zoom out: the zoom OUT icon in panel has been pressed
+				 * Zoom: a specific zoom level has been chosen in drop down or in the menu.
+				 */
 				if (actionName.equals("Zoom in")) {
-					doZoom = zoomer.zoomIn();
+					didZoom = zoomer.zoomIn();
 				} else if (actionName.equals("Zoom out")) {
-					doZoom = zoomer.zoomOut();
+					didZoom = zoomer.zoomOut();
 				} else {
 					if (actionName.equals("Zoom")) {
-						selection = (String) zoomComboBox.getSelectedItem();
+						selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
 					}
 					if (e.getSource() instanceof JMenuItem) {
-						selection = ((JMenuItem) e.getSource()).getText();
+						selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
 					}
-					strToTest = validatePercent(selection);
-
-					if (strToTest != null) {
-						// BK: no need to zoom if already at that level
-						if (zoomer.getPercent() == Integer.parseInt(strToTest)) {
-							return;
-						} else {
-							zoomer.setZoom(Integer.parseInt(strToTest));
-							doZoom = true;
-						}
-					} else {
-						return;
-					}
+					
+					//parse selected zoom level, and strip of %.
+					newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%",""));
+					
+					didZoom = zoomer.setZoom(newZoomLevel);
 				}
-				if (doZoom) {
+				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomTo(new java.awt.Point((int) midpointX,
-							(int) midpointY));
+					
+					double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
+										+ (thisView.getWidth() * 0.5), zoomer.getPercent());
+					double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
+										+ (thisView.getHeight() * 0.5), zoomer.getPercent());
+					
+					java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
+					
+					appView.zoomTo(midpoint);
 				}
 			} catch (ClassCastException cce) {
 				// zoom
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-		}
-
-		private String validatePercent(String selection) {
-
-			try {
-				String toTest = selection;
-
-				if (selection.endsWith("%")) {
-					toTest = selection.substring(0, (selection.length()) - 1);
-				}
-
-				if (Integer.parseInt(toTest) < Pipe.ZOOM_MIN
-						|| Integer.parseInt(toTest) > Pipe.ZOOM_MAX) {
-					throw new Exception();
-				} else {
-					return toTest;
-				}
-			} catch (Exception e) {
-				zoomComboBox.setSelectedItem("");
-				return null;
 			}
 		}
 
@@ -1882,6 +1867,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleQueries();
 			} else if (this == showConstantsAction){
 				toggleConstants();
+			} else if (this == showZeroToInfinityIntervalsAction) {
+				toggleZeroToInfinityIntervals();
 			}
 		}
 		
@@ -1891,8 +1878,8 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
-		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\n");
+		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller, Jiri Srba and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2011\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
@@ -1951,7 +1938,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
-			Logger.log("Can't open browser");
+			Logger.log("Cannot open the browser.");
 			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);

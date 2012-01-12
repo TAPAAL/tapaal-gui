@@ -111,7 +111,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			}
 		}
 		fireFileChanged("");
-		fireStatusChanged("Done");
+		fireStatusChanged("");
 		return null;
 	}
 
@@ -208,7 +208,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
-		fireStatusChanged("Verifying query: " + query.getName() + "...");
+		fireStatusChanged(query.getName());
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
 		try {

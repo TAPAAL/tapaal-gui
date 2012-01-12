@@ -9,6 +9,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -40,6 +41,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
@@ -103,11 +105,11 @@ import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class QueryDialog extends JPanel {
-
+	
 	private static final String NO_UPPAAL_XML_FILE_SAVED = "No Uppaal XML file saved.";
 	private static final String NO_VERIFYTAPN_XML_FILE_SAVED = "No verifytapn XML file saved.";
-	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported chosen reduction";
-	private static final String UNSUPPPORTED_QUERY_TEXT = "The chosen query property is not supported by the chosen reduction";
+	private static final String UNSUPPORTED_MODEL_TEXT = "The model is not supported by the chosen reduction.";
+	private static final String UNSUPPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	
@@ -126,9 +128,11 @@ public class QueryDialog extends JPanel {
 	private boolean querySaved = false;
 
 	private JRootPane rootPane;
+	private static EscapableDialog guiDialog;
 
 	// Query Name Panel;
 	private JPanel namePanel;
+	private JButton advancedButton;
 
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
@@ -220,6 +224,77 @@ public class QueryDialog extends JPanel {
 	private TCTLAbstractProperty newProperty;
 	private JTextField queryName;
 	
+	private static Boolean advancedView = false;
+	
+	//Strings for tool tips
+	//Tool tips for top panel
+	private static final String TOOL_TIP_QUERYNAME = "Enter the name of the query.";
+	private static final String TOOL_TIP_INFO_BUTTON = "Get help on the different verification options.";
+	private static final String TOOL_TIP_ADVANCED_VIEW_BUTTON = "Switch to the advanced view.";
+	private static final String TOOL_TIP_SIMPLE_VIEW_BUTTON = "Switch to the simple view.";
+	
+	//Tool tip for query field
+	private final static String TOOL_TIP_QUERY_FIELD = "<html>Click on a part of the query you want to edit.<br />" +
+			"(Queries can be edited also manually by pressing the \"Edit Query\" button.)</html>";
+	
+	//Tool tips for quantification panel
+	private static final String TOOL_TIP_EXISTS_DIAMOND = "Check if the given marking is reachable in the net.";
+	private static final String TOOL_TIP_EXISTS_BOX = "Check if there is a trace on which all markings satisfy the given property. (Available only for some verification engines.)";
+	private static final String TOOL_TIP_FORALL_DIAMOND = "Check if on any maxiaml trace there is marking that satisfies the given property. (Available only for some verification engines.)";
+
+	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
+	
+	//Tool tips for logic panel
+	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently marked part of the query with a conjunction.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently marked part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently marked part of the query.";
+	
+	//Tool tips for query panel
+	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
+	private static final String TOOL_TIP_TEMPLATEBOX = "Choose a component considered for this predicate.";
+	private static final String TOOL_TIP_RELATIONALOPERATORBOX = "Choose a relational operator comparing the number of tokens in the chosen place.";
+	private static final String TOOL_TIP_PLACEMARKING = "Choose a number of tokens.";
+	private static final String TOOL_TIP_ADDPREDICATEBUTTON = "Add the predicate specified above to the query.";
+	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add the value true to the query.";
+	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add the value false to the query.";
+	
+	//Tool tips for editing panel
+	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query.";
+	private static final String TOOL_TIP_RESETBUTTON = "Completely reset the query.";
+	private static final String TOOL_TIP_UNDOBUTTON = "Undo the last action.";
+	private static final String TOOL_TIP_REDOBUTTON = "Redo the last undone action.";
+	private static final String TOOL_TIP_EDITQUERYBUTTON = "Edit the query manually.";
+	private final static String TOOL_TIP_PARSE_QUERY = "Parse the manually edited query.";
+	private final static String TOOL_TIP_CANCEL_QUERY = "Cancel manual query creating.";
+	
+	//Tool tips for boundedness check panel
+	private static final String TOOL_TIP_NUMBEROFEXTRATOKENSINNET = "A number of extra tokens allowed in the net.";
+	private static final String TOOL_TIP_KBOUNDED = "Check wheather the net is bounded for the given number of extra tokens.";
+	
+	//Tool tips for reduction options panel
+	private final static String TOOL_TIP_REDUCTION_OPTION = "Choose a verification engine.";
+	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "Apply automatic symmetry reduction.";
+	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform a more advanced inclusion check."; 
+	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
+	
+	//Tool tips for search options panel
+	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
+			"If heuristic search is not applicable, BFS is used instead.<br/>Click the button <em>Help on the query options</em> to get more info.</html>";
+	private final static String TOOL_TIP_BREADTH_FIRST_SEARCH = "Explores markings in a breadth first manner.";
+	private final static String TOOL_TIP_DEPTH_FIRST_SEARCH = "Explores markings in a depth first manner.";
+	private final static String TOOL_TIP_RANDOM_SEARCH = "Performs a random exploration of the state space.";
+	
+	//Tool tips for trace options panel
+	private final static String TOOL_TIP_SOME_TRACE = "Show a concrete trace whenever applicable.";
+	private final static String TOOL_TIP_NO_TRACE = "Do not display any trace information.";
+	
+	//Tool tips for buttom panel
+	private final static String TOOL_TIP_SAVE_BUTTON = "Save the query.";
+	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
+	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
+	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
+	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
+	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
 		this.tapnNetwork = tapnNetwork;
@@ -231,6 +306,7 @@ public class QueryDialog extends JPanel {
 		setLayout(new GridBagLayout());
 
 		init(option, queryToCreateFrom);
+		toggleAdvancedSimpleView(false);
 	}
 
 	private boolean checkForDegree2() {
@@ -250,6 +326,7 @@ public class QueryDialog extends JPanel {
 
 	private void setQueryFieldEditable(boolean isEditable) {
 		queryField.setEditable(isEditable);
+		queryField.setToolTipText(isEditable ? null : TOOL_TIP_QUERY_FIELD);
 	}
 
 	public TAPNQuery getQuery() {
@@ -394,24 +471,23 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
+		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 		
 		Container contentPane = guiDialog.getContentPane();
-
+		
 		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+		//contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
 		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
 		contentPane.add(queryDialogue);
-
+		
 		guiDialog.setResizable(false);
-
-		guiDialog.setMinimumSize(new Dimension(885,585));
 		
 		// Make window fit contents' preferred size
 		guiDialog.pack();
-
+		
 		// Move window to the middle of the screen
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
@@ -534,7 +610,7 @@ public class QueryDialog extends JPanel {
 				updateSelection(replacement);
 
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		}
 	}
@@ -670,6 +746,9 @@ public class QueryDialog extends JPanel {
 		updateSelection(newProperty);
 		resetButton.setText("Reset Query");
 		editQueryButton.setText("Edit Query");
+		
+		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
+		editQueryButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);
 		enableEditingButtons();
 		
 		setEnabledReductionOptions();
@@ -679,6 +758,8 @@ public class QueryDialog extends JPanel {
 		setQueryFieldEditable(true);
 		resetButton.setText("Parse query");
 		editQueryButton.setText("Cancel");
+		resetButton.setToolTipText(TOOL_TIP_PARSE_QUERY);
+		editQueryButton.setToolTipText(TOOL_TIP_CANCEL_QUERY);
 		clearSelection();
 		disableAllQueryButtons();
 		disableEditingButtons();
@@ -700,7 +781,7 @@ public class QueryDialog extends JPanel {
 				updateSelection(property);
 				undoSupport.postEdit(edit);
 			}
-			queryChanged();
+//			queryChanged();
 		}
 	}
 
@@ -805,7 +886,7 @@ public class QueryDialog extends JPanel {
 			forAllBox.setSelected(true);
 		}
 	}
-
+	
 	private void initQueryNamePanel() {
 		
 		JPanel splitter = new JPanel(new BorderLayout());
@@ -815,7 +896,8 @@ public class QueryDialog extends JPanel {
 		namePanel.add(new JLabel("Query name: "));
 		
 		queryName = new JTextField("Query Comment/Name Here", 25);
-
+		queryName.setToolTipText(TOOL_TIP_QUERYNAME);
+		
 		namePanel.add(queryName);
 
 		queryName.getDocument().addDocumentListener(new DocumentListener() {
@@ -835,9 +917,17 @@ public class QueryDialog extends JPanel {
 
 			}
 		});
-		
+		advancedButton = new JButton("Advanced view");
+		advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
+		advancedButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				toggleAdvancedSimpleView(true);
+			}
+		});
 		
 		JButton infoButton = new JButton("Help on the query options");	
+		infoButton.setToolTipText(TOOL_TIP_INFO_BUTTON);
 		infoButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane.showMessageDialog(QueryDialog.this, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
@@ -890,25 +980,58 @@ public class QueryDialog extends JPanel {
 				buffer.append("all query types, while standard and optimized standard support only EF and AG queries but can be often faster.");
 				buffer.append("<br/>");				
 				buffer.append("</html>");
-				return buffer.toString();
+				return buffer.toString(); 
 			}
 		});
-		JPanel helpPanel = new JPanel(new FlowLayout());
-		helpPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		helpPanel.add(infoButton);
+		JPanel topButtonPanel = new JPanel(new FlowLayout());
+		topButtonPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		topButtonPanel.add(advancedButton);
+		topButtonPanel.add(infoButton);
 		
 		splitter.add(namePanel, BorderLayout.LINE_START);
-		splitter.add(helpPanel, BorderLayout.LINE_END);
+		splitter.add(topButtonPanel, BorderLayout.LINE_END);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.insets = new Insets(0,10,0,10);
+		gridBagConstraints.insets = new Insets(5,10,0,10);
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
 	}
-
+	
+	private void toggleAdvancedSimpleView(boolean changeState){
+		//Make sure that the right properties are set when the pane is initialized
+		if(!changeState){
+			advancedView = !advancedView;
+		}
+		if(advancedView){
+			Point location = guiDialog.getLocation();
+			advancedView = false;
+			advancedButton.setText("Advanced view");
+			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
+			searchOptionsPanel.setVisible(false);
+			reductionOptionsPanel.setVisible(false);
+			saveUppaalXMLButton.setVisible(false);
+			
+			guiDialog.pack();
+			guiDialog.setLocation(location);
+			
+			
+		} else {
+			Point location = guiDialog.getLocation();
+			advancedView = true;
+			advancedButton.setText("Simple view");
+			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
+			searchOptionsPanel.setVisible(true);
+			reductionOptionsPanel.setVisible(true);
+			saveUppaalXMLButton.setVisible(true);
+			
+			guiDialog.pack();
+			guiDialog.setLocation(location);
+		}
+	}
+	
 	private void initBoundednessCheckPanel() {
 		
 		// Number of extra tokens field
@@ -921,12 +1044,14 @@ public class QueryDialog extends JPanel {
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
+		numberOfExtraTokensInNet.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
 		boundednessCheckPanel.add(numberOfExtraTokensInNet);
 
 		boundednessCheckPanel.add(new JLabel("  "));
 		
 		// Boundedness button
 		kbounded = new JButton("Check boundedness");
+		kbounded.setToolTipText(TOOL_TIP_KBOUNDED);
 		kbounded.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				Verifier.analyzeKBound(tapnNetwork, getCapacity(), numberOfExtraTokensInNet);
@@ -940,7 +1065,7 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1;
+		gridBagConstraints.weightx = 0;
 		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
 		uppaalOptionsPanel.add(boundednessCheckPanel, gridBagConstraints);
 	}
@@ -979,6 +1104,7 @@ public class QueryDialog extends JPanel {
 		queryField.setBackground(Color.white);
 		queryField.setText(newProperty.toString());
 		queryField.setEditable(false);
+		queryField.setToolTipText(TOOL_TIP_QUERY_FIELD); 
 
 		// Put the text pane in a scroll pane.
 		JScrollPane queryScrollPane = new JScrollPane(queryField);
@@ -1051,6 +1177,12 @@ public class QueryDialog extends JPanel {
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
 		forAllDiamond = new JRadioButton("(AF) On all traces there is eventually a marking that satisfies:");
 		forAllBox = new JRadioButton("(AG) All reachable markings satisfy:");
+		
+		//Add tool tips 
+		existsDiamond.setToolTipText(TOOL_TIP_EXISTS_DIAMOND);
+		existsBox.setToolTipText(TOOL_TIP_EXISTS_BOX);
+		forAllDiamond.setToolTipText(TOOL_TIP_FORALL_DIAMOND);
+		forAllBox.setToolTipText(TOOL_TIP_FORALL_BOX);
 
 		quantificationRadioButtonGroup.add(existsDiamond);
 		quantificationRadioButtonGroup.add(existsBox);
@@ -1089,7 +1221,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1102,7 +1234,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1115,7 +1247,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1128,7 +1260,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(),	property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 	}
@@ -1141,6 +1273,11 @@ public class QueryDialog extends JPanel {
 		conjunctionButton = new JButton("and");
 		disjunctionButton = new JButton("or");
 		negationButton = new JButton("not");
+		
+		//Add tool tips
+		conjunctionButton.setToolTipText(TOOL_TIP_CONJUNCTIONBUTTON);
+		disjunctionButton.setToolTipText(TOOL_TIP_DISJUNCTIONBUTTON);
+		negationButton.setToolTipText(TOOL_TIP_NEGATIONBUTTON);
 
 		logicButtonGroup.add(conjunctionButton);
 		logicButtonGroup.add(disjunctionButton);
@@ -1205,7 +1342,7 @@ public class QueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				}
-				queryChanged();
+//				queryChanged();
 			}
 
 		}
@@ -1250,7 +1387,7 @@ public class QueryDialog extends JPanel {
 						undoSupport.postEdit(edit);
 					}
 				}
-				queryChanged();
+//				queryChanged();
 			}
 
 		});
@@ -1262,7 +1399,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 	}
@@ -1275,6 +1412,7 @@ public class QueryDialog extends JPanel {
 		Dimension d = new Dimension(125, 27);
 		placesBox.setMaximumSize(d);
 		placesBox.setPreferredSize(d);
+		
 
 		Vector<Object> items = new Vector<Object>(tapnNetwork.activeTemplates().size()+1);
 		items.addAll(tapnNetwork.activeTemplates());
@@ -1357,10 +1495,10 @@ public class QueryDialog extends JPanel {
 		placeMarking.setMaximumSize(new Dimension(60, 30));
 		placeMarking.setMinimumSize(new Dimension(60, 30));
 		placeMarking.setPreferredSize(new Dimension(60, 30));
-
+		
 		gbc.gridx = 2;
 		predicatePanel.add(placeMarking, gbc);
-
+		
 		addPredicateButton = new JButton("Add predicate to the query");
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -1395,6 +1533,15 @@ public class QueryDialog extends JPanel {
 		gbc.fill = GridBagConstraints.VERTICAL;
 		queryPanel.add(predicatePanel, gbc);
 		
+		//Add tool tips for predicate panel
+		placesBox.setToolTipText(TOOL_TIP_PLACESBOX);
+		templateBox.setToolTipText(TOOL_TIP_TEMPLATEBOX);
+		relationalOperatorBox.setToolTipText(TOOL_TIP_RELATIONALOPERATORBOX);
+		placeMarking.setToolTipText(TOOL_TIP_PLACEMARKING);
+		addPredicateButton.setToolTipText(TOOL_TIP_ADDPREDICATEBUTTON);
+		truePredicateButton.setToolTipText(TOOL_TIP_TRUEPREDICATEBUTTON);
+		falsePredicateButton.setToolTipText(TOOL_TIP_FALSEPREDICATEBUTTON);
+		
 		// Action listeners for predicate panel
 		addPredicateButton.addActionListener(new ActionListener() {
 
@@ -1410,7 +1557,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), property);
 				updateSelection(property);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		}
 
@@ -1423,7 +1570,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), trueNode);
 				updateSelection(trueNode);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 		
@@ -1434,7 +1581,7 @@ public class QueryDialog extends JPanel {
 				newProperty = newProperty.replace(currentSelection.getObject(), falseNode);
 				updateSelection(falseNode);
 				undoSupport.postEdit(edit);
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1477,6 +1624,13 @@ public class QueryDialog extends JPanel {
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
 		editQueryButton = new JButton("Edit query");
+		
+		//Add tool tips
+		deleteButton.setToolTipText(TOOL_TIP_DELETEBUTTON);
+		resetButton.setToolTipText(TOOL_TIP_RESETBUTTON);
+		undoButton.setToolTipText(TOOL_TIP_UNDOBUTTON);
+		redoButton.setToolTipText(TOOL_TIP_REDOBUTTON);
+		editQueryButton.setToolTipText(TOOL_TIP_EDITQUERYBUTTON);
 
 		editingButtonsGroup.add(deleteButton);
 		editingButtonsGroup.add(resetButton);
@@ -1591,7 +1745,7 @@ public class QueryDialog extends JPanel {
 					updateSelection(newProperty);
 					undoSupport.postEdit(edit);
 				}
-				queryChanged();
+//				queryChanged();
 			}
 		});
 
@@ -1606,7 +1760,7 @@ public class QueryDialog extends JPanel {
 					undoManager.undo();
 					refreshUndoRedo();
 					updateSelection(original);
-					queryChanged();
+//					queryChanged();
 					setEnabledReductionOptions();
 				}
 			}
@@ -1622,12 +1776,12 @@ public class QueryDialog extends JPanel {
 					undoManager.redo();
 					refreshUndoRedo();
 					updateSelection(replacement);
-					queryChanged();
+//					queryChanged();
 					setEnabledReductionOptions();
 				}
 			}
 		});
-
+		
 		editQueryButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
@@ -1657,14 +1811,16 @@ public class QueryDialog extends JPanel {
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.insets = new Insets(5,10,5,10);
-		//gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		add(uppaalOptionsPanel, gridBagConstraints);
 
 	}
 
 	private void initSearchOptionsPanel() {
 		searchOptionsPanel = new JPanel(new GridBagLayout());
+		searchOptionsPanel.setVisible(false);
 
 		searchOptionsPanel.setBorder(BorderFactory.createTitledBorder("Search Strategy Options"));
 		searchRadioButtonGroup = new ButtonGroup();
@@ -1672,6 +1828,12 @@ public class QueryDialog extends JPanel {
 		depthFirstSearch = new JRadioButton("Depth first search    ");
 		randomSearch = new JRadioButton("Random search    ");
 		heuristicSearch = new JRadioButton("Heuristic search    ");
+		
+		breadthFirstSearch.setToolTipText(TOOL_TIP_BREADTH_FIRST_SEARCH);
+		depthFirstSearch.setToolTipText(TOOL_TIP_DEPTH_FIRST_SEARCH);
+		randomSearch.setToolTipText(TOOL_TIP_RANDOM_SEARCH);
+		heuristicSearch.setToolTipText(TOOL_TIP_HEURISTIC_SEARCH);
+		
 		searchRadioButtonGroup.add(heuristicSearch);
 		searchRadioButtonGroup.add(breadthFirstSearch);
 		searchRadioButtonGroup.add(depthFirstSearch);
@@ -1692,20 +1854,23 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.gridy = 1;
 		searchOptionsPanel.add(randomSearch, gridBagConstraints);
 		gridBagConstraints = new GridBagConstraints();
-		gridBagConstraints.anchor = GridBagConstraints.EAST;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+		gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		uppaalOptionsPanel.add(searchOptionsPanel, gridBagConstraints);
 
 	}
-
+	
 	private void initTraceOptionsPanel() {
 		traceOptionsPanel = new JPanel(new GridBagLayout());
 		traceOptionsPanel.setBorder(BorderFactory.createTitledBorder("Trace Options"));
 		traceRadioButtonGroup = new ButtonGroup();
 		someTraceRadioButton = new JRadioButton(UPPAAL_SOME_TRACE_STRING);
 		noTraceRadioButton = new JRadioButton("No trace");
+		someTraceRadioButton.setToolTipText(TOOL_TIP_SOME_TRACE);
+		noTraceRadioButton.setToolTipText(TOOL_TIP_NO_TRACE);
 		traceRadioButtonGroup.add(someTraceRadioButton);
 		traceRadioButtonGroup.add(noTraceRadioButton);
 
@@ -1735,12 +1900,14 @@ public class QueryDialog extends JPanel {
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
+		reductionOptionsPanel.setVisible(false);
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox();
 		setEnabledReductionOptions();
-
+		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
+		
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
@@ -1766,6 +1933,7 @@ public class QueryDialog extends JPanel {
 
 		symmetryReduction = new JCheckBox("Use symmetry reduction");
 		symmetryReduction.setSelected(true);
+		symmetryReduction.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
 		symmetryReduction.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				refreshTraceOptions();
@@ -1781,9 +1949,7 @@ public class QueryDialog extends JPanel {
 
 		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
-		discreteInclusion.setToolTipText("<html>This optimization will perform more advanced inclusion check<br/>" +
-										 "in an attempt to reduce the number of explored states.<br/>" +
-										 "<b>Note:</b> This may have an adverse affect on performance on some models!</html>");
+		discreteInclusion.setToolTipText(TOOL_TIP_DISCRETE_INCLUSION);
 		discreteInclusion.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectInclusionPlacesButton.setEnabled(discreteInclusion.isSelected());
@@ -1799,6 +1965,7 @@ public class QueryDialog extends JPanel {
 		
 		selectInclusionPlacesButton = new JButton("Select Inclusion Places");
 		selectInclusionPlacesButton.setEnabled(false);
+		selectInclusionPlacesButton.setToolTipText(TOOL_TIP_SELECT_INCLUSION_PLACES);
 		selectInclusionPlacesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces);
@@ -1815,6 +1982,8 @@ public class QueryDialog extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 10, 0, 10);
 		add(reductionOptionsPanel, gbc);
 	}
 
@@ -1832,7 +2001,7 @@ public class QueryDialog extends JPanel {
 		if(reduction.equals(ReductionOption.VerifyTAPN)){
 			discreteInclusion.setVisible(true);
 			selectInclusionPlacesButton.setVisible(true);
-			queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
+			//queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
 		}else{
 			discreteInclusion.setVisible(false);
 			selectInclusionPlacesButton.setVisible(false);
@@ -1843,6 +2012,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reduction = getReductionOption();
 		
 		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 	}
 
 	private void refreshQueryEditingButtons() {
@@ -1872,22 +2042,28 @@ public class QueryDialog extends JPanel {
 //		}
 	}
 	
-	private void queryChanged(){
-		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
-		boolean isUpwardClosed = visitor.isUpwardClosed(newProperty);
-		discreteInclusion.setEnabled(isUpwardClosed);
-		discreteInclusion.setSelected(isUpwardClosed ? discreteInclusion.isSelected() : false);
-	}
+//	private void queryChanged(){
+//		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
+//		boolean isUpwardClosed = visitor.isUpwardClosed(newProperty);
+//		discreteInclusion.setEnabled(isUpwardClosed);
+//		discreteInclusion.setSelected(isUpwardClosed ? discreteInclusion.isSelected() : false);
+//	}
 	
-
 	private void initButtonPanel(QueryDialogueOption option) {
-		buttonPanel = new JPanel(new FlowLayout());
+		buttonPanel = new JPanel(new BorderLayout());
 		if (option == QueryDialogueOption.Save) {
 			saveButton = new JButton("Save");
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
-
+			//Only show in advanced mode
+			saveUppaalXMLButton.setVisible(false);
+			
+			//Add tool tips
+			saveButton.setToolTipText(TOOL_TIP_SAVE_BUTTON);
+			saveAndVerifyButton.setToolTipText(TOOL_TIP_SAVE_AND_VERIFY_BUTTON);
+			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
+			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -1991,20 +2167,20 @@ public class QueryDialog extends JPanel {
 				}
 			});
 		}
+
 		if (option == QueryDialogueOption.Save) {
-			buttonPanel.add(saveUppaalXMLButton);
+			JPanel leftButtomPanel = new JPanel(new FlowLayout());
+			JPanel rightButtomPanel = new JPanel(new FlowLayout());
+			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
+
+			rightButtomPanel.add(cancelButton);
+
+			rightButtomPanel.add(saveButton);
+
+			rightButtomPanel.add(saveAndVerifyButton);
 			
-			Dimension minSize = new Dimension(400, 5);
-			Dimension prefSize = new Dimension(400, 5);
-			Dimension maxSize = new Dimension(Short.MAX_VALUE, 400);
-			buttonPanel.add(new Box.Filler(minSize, prefSize, maxSize));
-
-						
-			buttonPanel.add(cancelButton);
-
-			buttonPanel.add(saveButton);
-
-			buttonPanel.add(saveAndVerifyButton);
+			buttonPanel.add(leftButtomPanel, BorderLayout.LINE_START);
+			buttonPanel.add(rightButtomPanel, BorderLayout.LINE_END);
 
 		} else {
 			buttonPanel.add(cancelButton);
@@ -2015,7 +2191,9 @@ public class QueryDialog extends JPanel {
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 5;
-		gridBagConstraints.anchor = GridBagConstraints.CENTER;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.insets = new Insets(0, 10, 5, 10);
 		add(buttonPanel, gridBagConstraints);
 
 	}
