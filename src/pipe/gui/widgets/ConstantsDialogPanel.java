@@ -167,7 +167,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		format.setGroupingUsed(false);
 		textField.addActionListener(new ActionListener() {
 			
-			@Override
+			
 			public void actionPerformed(ActionEvent e) {
 				okButton.requestFocusInWindow();
 				okButton.doClick();			}
@@ -209,7 +209,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(new ActionListener() {
 			
-			@Override
+			
 			public void actionPerformed(ActionEvent e) {
 				okButton.requestFocusInWindow();
 				okButton.doClick();

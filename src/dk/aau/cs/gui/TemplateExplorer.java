@@ -455,7 +455,7 @@ public class TemplateExplorer extends JPanel {
 		nameTextField.setText(nameToShow);	
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(new ActionListener() {			
-			@Override
+			
 			public void actionPerformed(ActionEvent e) {
 				okButton.requestFocusInWindow();
 				okButton.doClick();
@@ -568,7 +568,7 @@ public class TemplateExplorer extends JPanel {
 		nameTextField.setText(oldname);
 		nameTextField.addAncestorListener(new RequestFocusListener());
 		nameTextField.addActionListener(new ActionListener() {			
-			@Override
+			
 			public void actionPerformed(ActionEvent e) {
 				okButton.requestFocusInWindow();
 				okButton.doClick();

@@ -11,7 +11,7 @@ public class RequestFocusListener implements AncestorListener
 	{
 	}
 
-	@Override
+	
 	public void ancestorAdded(final AncestorEvent arg0)
 	{
 		//JComponent component = arg0.getComponent();
@@ -20,7 +20,7 @@ public class RequestFocusListener implements AncestorListener
 		 final AncestorListener al= this;   
 		    SwingUtilities.invokeLater(new Runnable(){
 
-		        @Override
+		       
 		        public void run() {
 		            JComponent component = (JComponent)arg0.getComponent();
 		            component.requestFocusInWindow();
@@ -29,13 +29,12 @@ public class RequestFocusListener implements AncestorListener
 		    });
 	}
 
-	@Override
 	public void ancestorMoved(AncestorEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void ancestorRemoved(AncestorEvent arg0) {
 		// TODO Auto-generated method stub
 		
