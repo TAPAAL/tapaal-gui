@@ -112,10 +112,10 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-//			if (tempTransition.isEnabled(true)) {
-//				current.notifyObservers();
-//				tempTransition.repaint();
-			 if(tempTransition.isBlueTransition(true)){
+			if (tempTransition.isEnabled(true)) {
+				current.notifyObservers();
+				tempTransition.repaint();
+			} else if(tempTransition.isBlueTransition(true)){
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -149,6 +149,7 @@ public class Animator {
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
 				tempTransition.setEnabledFalse();
+				tempTransition.setBlueTransitionFalse();
 				activeGuiModel().notifyObservers();
 				tempTransition.repaint();
 			}

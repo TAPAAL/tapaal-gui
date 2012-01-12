@@ -35,12 +35,16 @@ public class IntervalOperations {
 	
 	
 	public static TimeInterval intersection(TimeInterval i1, TimeInterval i2){
+		if(i1 == null || i2 == null){
+			return null;
+		}
+		
 		TimeInterval upper, lower;
 		
 		upper = min(i1, i2, BoundToCheck.upper);
 		lower = max(i1, i2, BoundToCheck.lower);
 		
-		if(upper.upperBound().value() > lower.lowerBound().value() || upper.upperBound().value() == lower.lowerBound().value() && lower.IsLowerBoundNonStrict() && upper.IsUpperBoundNonStrict()){
+		if(upper.upperBound().value() > lower.lowerBound().value() || upper.upperBound().value() == lower.lowerBound().value() && lower.IsLowerBoundNonStrict() && upper.IsUpperBoundNonStrict() || (upper.upperBound().value() < 0)){
 			return new TimeInterval(lower.IsLowerBoundNonStrict(), lower.lowerBound(), upper.upperBound(), upper.IsUpperBoundNonStrict());
 		} else {
 			return null;

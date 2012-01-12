@@ -178,6 +178,11 @@ public class Transition extends PlaceTransitionObject {
 		return blueTransition;
 	}
 	
+	/* Called at the end of animation to reset Transitions to false */
+	public void setBlueTransitionFalse(){
+		blueTransition = false;
+	}
+	
 	/**
 	 * Sets whether Transition is enabled
 	 * 
