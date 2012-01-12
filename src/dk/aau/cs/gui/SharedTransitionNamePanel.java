@@ -143,7 +143,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				try{
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
@@ -157,7 +157,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				try{
 					transition = new SharedTransition(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
