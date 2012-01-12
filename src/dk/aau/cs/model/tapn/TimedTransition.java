@@ -19,6 +19,7 @@ public class TimedTransition extends TAPNElement {
 	private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
 	private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
 	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
+	private TimeInterval dInterval = null;
 
 	private SharedTransition sharedTransition;
 
@@ -175,6 +176,9 @@ public class TimedTransition extends TAPNElement {
 				}
 			}
 		}
+		
+		//cache result
+		dInterval = result;
 		
 		return result;
 	}
@@ -338,12 +342,11 @@ public class TimedTransition extends TAPNElement {
 			return presetSize() == 0 && postsetSize() == 0;
 		}
 	}
-
-
-
-
-
 	
-
-
+	/*
+	 * Returns the dInterval lastly calculated
+	 */
+	public TimeInterval getdInterval() {
+		return dInterval;
+	}
 }
