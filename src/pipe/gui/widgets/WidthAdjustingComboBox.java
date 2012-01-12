@@ -14,16 +14,13 @@ import javax.swing.event.PopupMenuListener;
 public class WidthAdjustingComboBox extends JComboBox{
 
 	private static final long serialVersionUID = 1L;
-
+	
 	public WidthAdjustingComboBox(int maxNumberOfPlacesToShowAtOnce) {
 		this.addPopupMenuListener(new PopupMenuListener() {
-			@Override
 			public void popupMenuCanceled(PopupMenuEvent arg0) {
 			}
-			@Override
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
 			}
-			@Override
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 				adjustWidthOfPopUpMenu();
 			}
