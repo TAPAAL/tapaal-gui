@@ -83,10 +83,22 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private NameGenerator nameGenerator;
 	private TabContent tab;
 
-	private JButton renameButton;
-	private JButton removeButton;
+	private JButton renameButton = new JButton("Rename");
+	private JButton removeButton  = new JButton("Remove");
+	private JButton addButton = new JButton("New");
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	
+	private static final String toolTipNewPlace = "Create a new place.";
+	private static final String toolTipRemovePlace = "Remove selected place.";
+	private static final String toolTipRenamePlace = "Rename selected place.";
+	//private static final String toolTipSharedPlacesPanel = "Here you can manage the shared places.<html><br/></html>Shared places can link different components.";
+	private static final String toolTipNewTransition = "Create a new transition.";
+	private static final String toolTipRenameTransition = "Rename selected transition.";
+	//private static final String toolTipSharedTransitionsPanel = "Here you can manage the shared transitions.<html><br/></html>" +
+		//	"Shared transitions can link different components.";
+	private static final String toolTipRemoveTransition ="Remove selected transition.";
+	private static final String toolTipChangeBetweenPlacesAndTransitions = "Choose between places and transitions.";
 
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");
@@ -215,14 +227,21 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		listPanel.add(moveDownButton,gbc);
 		
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
+		placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
 		placesTransitionsComboBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
 				String selectedItem = (String)source.getSelectedItem();
 				if(selectedItem.equals(PLACES)){
 					list.setModel(sharedPlacesListModel);
+					renameButton.setToolTipText(toolTipRenamePlace);
+					addButton.setToolTipText(toolTipNewPlace);
+					removeButton.setToolTipText(toolTipRemovePlace);
 				}else if(selectedItem.equals(TRANSITIONS)){
 					list.setModel(sharedTransitionsListModel);
+					renameButton.setToolTipText(toolTipRenameTransition);
+					addButton.setToolTipText(toolTipNewTransition);
+					removeButton.setToolTipText(toolTipRemoveTransition);
 				}
 				
 				if(list.getModel().getSize() > 0) {
@@ -254,8 +273,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		add(listPanel, gbc);
 		
 		JPanel buttonPanel = new JPanel();
-		renameButton = new JButton("Rename");
 		renameButton.setEnabled(false);
+		if (isDisplayingTransitions()){
+			renameButton.setToolTipText(toolTipRenameTransition);
+		}
+		else {
+			renameButton.setToolTipText(toolTipRenamePlace);
+		}
 		renameButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(isDisplayingTransitions()){
@@ -265,8 +289,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				}
 			}		
 		});
-		removeButton = new JButton("Remove");
 		removeButton.setEnabled(false);
+		if (isDisplayingTransitions()){
+			removeButton.setToolTipText(toolTipRemoveTransition);
+		}
+		else {
+			removeButton.setToolTipText(toolTipRemovePlace);
+		}
 		removeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(list.getSelectedValue() != null){
@@ -415,7 +444,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			}		
 		});
 
-		JButton addButton = new JButton("Add");
+		if (isDisplayingTransitions()){
+			addButton.setToolTipText(toolTipNewTransition);
+		}
+		else {
+			addButton.setToolTipText(toolTipNewPlace);
+		}
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(isDisplayingTransitions()){

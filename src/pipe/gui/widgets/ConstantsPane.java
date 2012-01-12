@@ -1,22 +1,31 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
@@ -45,6 +54,12 @@ public class ConstantsPane extends JPanel {
 	private TabContent parent;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	
+	private static final String toolTipEditConstant = "Edit value of selected constant.";
+	private static final String toolTipRemoveConstant = "Remove selected constant.";
+	private static final String toolTipNewConstant = "Create a new constant.";
+	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
+	
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
 		parent = currentTab;
@@ -125,13 +140,14 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createTitledBorder("Global Constants"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
-
+		//this.setToolTipText(toolTipGlobalConstantsLabel);
 		//showConstants();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
+		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constant c = (Constant) constantsList.getSelectedValue();
@@ -145,6 +161,7 @@ public class ConstantsPane extends JPanel {
 
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
+		removeBtn.setToolTipText(toolTipRemoveConstant);
 		removeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String constName = ((Constant) constantsList.getSelectedValue()).name();
@@ -156,7 +173,8 @@ public class ConstantsPane extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(removeBtn, gbc);
 
-		JButton addConstantButton = new JButton("Add");
+		JButton addConstantButton = new JButton("New");
+		addConstantButton.setToolTipText(toolTipNewConstant);
 		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -233,33 +251,26 @@ public class ConstantsPane extends JPanel {
 		constantsPanel.add(moveDownButton,gbc);
 	}
 
-	private void showEditConstantDialog(Constant constant) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Constant", true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add editor
+	private void showEditConstantDialog(Constant constant) {	
+		ConstantsDialogPanel panel = null;
 		if (constant != null)
-			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-					parent.network(), constant));
+			try {
+				panel = new ConstantsDialogPanel(new JRootPane(),
+						parent.network(), constant);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		else
-			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-					parent.network()));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-
-		//showConstants();
+			try {
+				panel = new ConstantsDialogPanel(new JRootPane(),
+						parent.network());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		panel.showDialog();
+		showConstants();
 	}
 
 	protected void removeConstant(String name) {

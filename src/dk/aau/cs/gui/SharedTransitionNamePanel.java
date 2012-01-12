@@ -4,8 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,13 +48,27 @@ public class SharedTransitionNamePanel extends JPanel {
 	}
 
 	public void initComponents(){
-		setLayout(new BorderLayout());
+		setLayout(new GridBagLayout());
 		
 		JPanel namePanel = createNamePanel();
 		JPanel buttonPanel = createButtonPanel();
 		
-		add(namePanel, BorderLayout.CENTER);
-		add(buttonPanel, BorderLayout.PAGE_END);
+		GridBagConstraints gbcNamePanel = new GridBagConstraints();
+		gbcNamePanel.insets = new Insets(4, 4, 2, 4);
+		gbcNamePanel.gridx = 0;
+		gbcNamePanel.gridy = 0;
+		gbcNamePanel.gridwidth = 1;
+		gbcNamePanel.anchor = GridBagConstraints.EAST;			
+		add(namePanel, gbcNamePanel);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 8, 5, 8);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		add(buttonPanel, gbc);
 	}
 
 	private JPanel createNamePanel() {
@@ -60,25 +76,36 @@ public class SharedTransitionNamePanel extends JPanel {
 		
 		JLabel label = new JLabel("Enter a shared transition name:");
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(4, 4, 2, 4);
 		namePanel.add(label, gbc);
 		
 		String initialText = (transitionToEdit == null) ? "" : transitionToEdit.name();
 		nameField = new JTextField(initialText);
-		nameField.setMinimumSize(new Dimension(150,27));
-		nameField.setPreferredSize(new Dimension(200, 27));
+		nameField.setMinimumSize(new Dimension(330, 25));
+		nameField.setPreferredSize(new Dimension(330, 25));
 		gbc = new GridBagConstraints();
 		gbc.gridy = 1;
+		gbc.insets = new Insets(4, 4, 2, 4);
 		namePanel.add(nameField, gbc);
 		return namePanel;
 	}
 
 	private JPanel createButtonPanel() {
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridBagLayout());
 		
 		JButton okButton = new JButton("OK");
 		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		
+		okButton.setMnemonic(KeyEvent.VK_O);
+		GridBagConstraints gbcOk = new GridBagConstraints();		
+		gbcOk.gridx = 1;
+		gbcOk.gridy = 0;
+		gbcOk.anchor = java.awt.GridBagConstraints.WEST;
+		gbcOk.insets = new java.awt.Insets(5, 5, 5, 5);
 
 		rootPane.setDefaultButton(okButton);
 		okButton.addActionListener(new ActionListener(){
@@ -116,7 +143,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				try{
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
@@ -130,7 +157,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				try{
 					transition = new SharedTransition(name);
 				}catch(RequireException e){
-					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 				
@@ -150,6 +177,13 @@ public class SharedTransitionNamePanel extends JPanel {
 		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		
+		cancelButton.setMnemonic(KeyEvent.VK_C);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.EAST;	
 
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -157,8 +191,9 @@ public class SharedTransitionNamePanel extends JPanel {
 			}
 		});
 		
-		buttonPanel.add(cancelButton);
-		buttonPanel.add(okButton);
+		buttonPanel.add(cancelButton,gbc);
+		buttonPanel.add(okButton,gbcOk);
+		
 		
 		return buttonPanel;
 	}

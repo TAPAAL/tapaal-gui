@@ -53,6 +53,12 @@ public class QueryPane extends JPanel {
 	private UndoManager undoManager;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	
+	private static final String toolTipNewQuery = "Create a new query.";
+	private static final String toolTipEditQuery="Edit the selected query.";
+	private static final String toolTipRemoveQuery="Remove the selected query";
+	private static final String toolTipVerifyQuery="Do a verification of the selected query.";
+	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
 		this.tabContent = tabContent;
@@ -109,7 +115,7 @@ public class QueryPane extends JPanel {
 		setLayout(new BorderLayout());
 		this.add(queryCollectionPanel, BorderLayout.CENTER);
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
-
+		//this.setToolTipText(toolTipQueryPane);
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Queries"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 	
@@ -192,6 +198,7 @@ public class QueryPane extends JPanel {
 	private void addButtons() {
 		editQueryButton = new JButton("Edit");
 		editQueryButton.setEnabled(false);
+		editQueryButton.setToolTipText(toolTipEditQuery);
 		Dimension dimension = new Dimension(82, 23);
 		editQueryButton.setPreferredSize(dimension);
 		editQueryButton.addActionListener(new ActionListener() {
@@ -200,13 +207,14 @@ public class QueryPane extends JPanel {
 			}
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
+		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(editQueryButton, gbc);
 
 		verifyButton = new JButton("Verify");
 		verifyButton.setEnabled(false);
+		verifyButton.setToolTipText(toolTipVerifyQuery);
 		verifyButton.setPreferredSize(dimension);
 		verifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -219,13 +227,14 @@ public class QueryPane extends JPanel {
 			}
 		});
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
+		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(verifyButton, gbc);
 
 		removeQueryButton = new JButton("Remove");
 		removeQueryButton.setEnabled(false);
+		removeQueryButton.setToolTipText(toolTipRemoveQuery);
 		removeQueryButton.setPreferredSize(dimension);
 		removeQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -242,6 +251,7 @@ public class QueryPane extends JPanel {
 
 		addQueryButton = new JButton("New");
 		addQueryButton.setPreferredSize(dimension);
+		addQueryButton.setToolTipText(toolTipNewQuery);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());

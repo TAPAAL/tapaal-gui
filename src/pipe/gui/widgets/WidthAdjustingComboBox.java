@@ -17,10 +17,14 @@ public class WidthAdjustingComboBox extends JComboBox{
 	
 	public WidthAdjustingComboBox(int maxNumberOfPlacesToShowAtOnce) {
 		this.addPopupMenuListener(new PopupMenuListener() {
+
 			public void popupMenuCanceled(PopupMenuEvent arg0) {
 			}
+		
+	
 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
 			}
+			
 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 				adjustWidthOfPopUpMenu();
 			}
