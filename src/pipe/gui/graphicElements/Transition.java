@@ -38,6 +38,7 @@ public class Transition extends PlaceTransitionObject {
 	
 	// Animation Suff
 	protected boolean enabled = false;
+	public boolean blueTransition = false;
 	public boolean highlighted = false;
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
@@ -96,6 +97,8 @@ public class Transition extends PlaceTransitionObject {
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
+		} else if (blueTransition) {
+			g2.setPaint(Pipe.BLUE_TRANSITION_COLOR);
 		} else if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -163,6 +166,18 @@ public class Transition extends PlaceTransitionObject {
 		return enabled;
 	}
 
+	public boolean isBlueTransition(boolean animationStatus){
+		if(animationStatus){
+			blueTransition = isBlueTransition();
+			return blueTransition;
+		}
+		return false;
+	}
+	
+	public boolean isBlueTransition(){
+		return blueTransition;
+	}
+	
 	/**
 	 * Sets whether Transition is enabled
 	 * 

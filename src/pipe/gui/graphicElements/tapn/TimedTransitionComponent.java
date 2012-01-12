@@ -101,6 +101,11 @@ public class TimedTransitionComponent extends Transition {
 	public boolean isEnabled() {
 		return transition.isEnabled();
 	}
+	
+	@Override
+	public boolean isBlueTransition() {
+		return transition.isDEnabled();
+	}
 
 	public dk.aau.cs.model.tapn.TimedTransition underlyingTransition() {
 		return transition;

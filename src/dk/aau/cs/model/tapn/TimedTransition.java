@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimedTransition extends TAPNElement {
@@ -139,7 +140,40 @@ public class TimedTransition extends TAPNElement {
 	public int postsetSize() {
 		return postset.size() + transportArcsGoingThrough.size();
 	}
-
+	
+	public boolean isDEnabled(){
+		TimeInterval dInterval = calculateDInterval();
+		
+		if(dInterval != null){
+			return true;
+		}
+		else{
+			return false; 
+		}
+	}
+	
+	public TimeInterval calculateDInterval(){
+		TimeInterval result = TimeInterval.ZERO_INF;
+		
+		for(TimedInputArc arc : this.getInputArcs()){
+			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
+		}
+		
+		for(TransportArc arc : this.getTransportArcsGoingThrough()){
+			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
+		}
+		
+		for(TimedInhibitorArc arc : this.getInhibitorArcs()){
+			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
+		}
+		
+		if(IntervalOperations.isEmpty(result)){
+			return null;
+		} else {
+			return result;
+		}
+	}
+	
 	public boolean isEnabled() {
 		if(isShared()){
 			return sharedTransition.isEnabled();

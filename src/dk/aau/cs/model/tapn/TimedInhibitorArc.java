@@ -8,6 +8,14 @@ public class TimedInhibitorArc extends TimedInputArc {
 		super(source, destination, TimeInterval.ZERO_INF);
 	}
 	
+	public TimeInterval getDEnabledInterval(){
+		if(source().tokens().size() == 0){
+			return new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+		} else {
+			return new TimeInterval(false, new IntBound(0), new IntBound(0), false);
+		}
+	}
+	
 	@Override
 	public void setTimeInterval(TimeInterval interval) {
 		super.setTimeInterval(TimeInterval.ZERO_INF);
