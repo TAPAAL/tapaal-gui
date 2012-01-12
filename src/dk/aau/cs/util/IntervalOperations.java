@@ -8,18 +8,6 @@ public class IntervalOperations {
 		lower, upper
 	}
 	
-	public static boolean isEmpty(TimeInterval i){
-		if(i == null){
-			return true;
-		}
-		
-		if((!i.IsLowerBoundNonStrict() || !i.IsUpperBoundNonStrict()) && i.lowerBound().value() == i.upperBound().value()){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	public static TimeInterval union(TimeInterval i1, TimeInterval i2){
 		if(i1 == null){
 			return i2;

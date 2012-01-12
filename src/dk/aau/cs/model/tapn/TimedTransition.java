@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -167,11 +168,15 @@ public class TimedTransition extends TAPNElement {
 			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
 		}
 		
-		if(IntervalOperations.isEmpty(result)){
-			return null;
-		} else {
-			return result;
+		for(TimedPlace place : model().places()){
+			if(!(place.invariant().upperBound() instanceof InfBound)){
+				for(TimedToken x : place.tokens()){
+					result = IntervalOperations.intersection(result, place.invariant().subtractToken(x.age()));
+				}
+			}
 		}
+		
+		return result;
 	}
 	
 	public boolean isEnabled() {

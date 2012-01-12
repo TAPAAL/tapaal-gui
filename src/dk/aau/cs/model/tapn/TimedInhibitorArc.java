@@ -12,7 +12,7 @@ public class TimedInhibitorArc extends TimedInputArc {
 		if(source().tokens().size() == 0){
 			return new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
 		} else {
-			return new TimeInterval(false, new IntBound(0), new IntBound(0), false);
+			return null;
 		}
 	}
 	

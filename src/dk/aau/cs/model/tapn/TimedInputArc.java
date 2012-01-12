@@ -115,6 +115,8 @@ public class TimedInputArc extends TAPNElement {
 				}
 			}
 			
+			
+			
 			result = IntervalOperations.union(temp, result);
 		}
 		

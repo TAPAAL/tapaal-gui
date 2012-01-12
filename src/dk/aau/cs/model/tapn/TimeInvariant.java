@@ -1,8 +1,11 @@
 package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import pipe.gui.Pipe;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
@@ -71,6 +74,16 @@ public class TimeInvariant {
 	
 	public TimeInvariant copy() {
 		return new TimeInvariant(isUpperIncluded, upper.copy());
+	}
+	
+	public TimeInterval subtractToken(BigDecimal age){
+		if(upperBound().value() < 0){
+			return new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+		} else{
+			BigDecimal upper = new BigDecimal(upperBound().value(), new MathContext(Pipe.AGE_PRECISION));
+			BigDecimal newUpper = upper.subtract(age, new MathContext(Pipe.AGE_PRECISION));
+			return new TimeInterval(true, new IntBound(0), new IntBound(newUpper.intValue()), isUpperNonstrict());
+		}
 	}
 
 	@Override
