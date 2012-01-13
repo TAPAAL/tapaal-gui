@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
@@ -41,9 +42,9 @@ public class TimeInterval {
 		boolean canBoundsBeEqual = isLowerIncluded && isUpperIncluded;
 		boolean upperIsInfinity = upper == Bound.Infinity;
 		boolean equalBounds = !upperIsInfinity
-				&& lower.value() == upper.value();
+				&& IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) == 0;
 		boolean lowerIsNotInfinity = lower != Bound.Infinity;
-		boolean lowerSmallerThanUpper = lower.value() < upper.value();
+		boolean lowerSmallerThanUpper = IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) < 0;;
 
 		return lowerIsNotInfinity
 				&& ((upperIsInfinity && !isUpperIncluded)

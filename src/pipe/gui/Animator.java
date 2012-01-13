@@ -2,6 +2,7 @@ package pipe.gui;
 
 import java.awt.Container;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -29,6 +31,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 
 public class Animator {
@@ -226,6 +229,18 @@ public class Animator {
 			reportBlockingPlaces();
 
 		}
+	}
+	
+	public void dFireTransition(TimedTransition transition){
+		TimeInterval dInterval = transition.getdInterval();
+		
+		if(dInterval.IsLowerBoundNonStrict()){
+			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound());
+		} else {
+			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(new BigDecimal(0.1), new MathContext(Pipe.AGE_PRECISION)));
+		}
+		
+		fireTransition(transition);
 	}
 
 
