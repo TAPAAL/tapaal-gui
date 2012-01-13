@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import pipe.gui.Pipe;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimeInvariant {
@@ -77,12 +78,13 @@ public class TimeInvariant {
 	}
 	
 	public TimeInterval subtractToken(BigDecimal age){
-		if(upperBound().value() < 0){
+		BigDecimal iUp = IntervalOperations.getRatBound(upperBound()).getBound();
+		
+		if(iUp.compareTo(BigDecimal.ZERO) < 0){
 			return new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
 		} else{
-			BigDecimal upper = new BigDecimal(upperBound().value(), new MathContext(Pipe.AGE_PRECISION));
-			BigDecimal newUpper = upper.subtract(age, new MathContext(Pipe.AGE_PRECISION));
-			return new TimeInterval(true, new IntBound(0), new IntBound(newUpper.intValue()), isUpperNonstrict());
+			BigDecimal newUpper = iUp.subtract(age, new MathContext(Pipe.AGE_PRECISION));
+			return new TimeInterval(true, new IntBound(0), new RatBound(newUpper), isUpperNonstrict());
 		}
 	}
 

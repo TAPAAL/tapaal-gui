@@ -84,34 +84,34 @@ public class TimedInputArc extends TAPNElement {
 	
 	public TimeInterval getDEnabledInterval(){
 		TimeInterval result = null;
-		BigDecimal iLow = new BigDecimal(interval.lowerBound().value(), new MathContext(Pipe.AGE_PRECISION));
-		BigDecimal iHeigh = new BigDecimal(interval.upperBound().value(), new MathContext(Pipe.AGE_PRECISION));
+		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();
+		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound();
 		
 		for(TimedToken token : source.tokens()){
 			TimeInterval temp = null;
-			if( token.age().compareTo(iHeigh) <= 0 || interval().upperBound().value() < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
+			if( token.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
 				BigDecimal newLower = iLow.subtract(token.age(), new MathContext(Pipe.AGE_PRECISION));
 				if(newLower.compareTo(BigDecimal.ZERO) < 0){
 					newLower = BigDecimal.ZERO;
 				}
 				
-				if(interval.upperBound().value() >= 0){//not infinite
+				if(iHeigh.compareTo(BigDecimal.ZERO) >= 0){//not infinite
 					BigDecimal newUpper = iHeigh.subtract(token.age(), new MathContext(Pipe.AGE_PRECISION));
 					if(newUpper.compareTo(BigDecimal.ZERO) < 0){
 						newUpper = BigDecimal.ZERO;
 					}
 					
 					if(newUpper.compareTo(BigDecimal.ZERO) == 0 && interval.IsUpperBoundNonStrict()){
-						temp = new TimeInterval(true, new IntBound(newLower.intValue()), new IntBound(newUpper.intValue()), true);
+						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newUpper.compareTo(newLower) == 0 && interval.IsLowerBoundNonStrict() && interval.IsUpperBoundNonStrict()){
-						temp = new TimeInterval(true, new IntBound(newLower.intValue()), new IntBound(newUpper.intValue()), true);
+						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newLower.compareTo(newUpper) < 0){
-						temp = new  TimeInterval(interval.IsLowerBoundNonStrict(), new IntBound(newLower.intValue()), new IntBound(newUpper.intValue()), interval.IsUpperBoundNonStrict());
+						temp = new  TimeInterval(interval.IsLowerBoundNonStrict(), new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
 					} else { //new bounds are wrong
 						temp = null;
 					}
 				} else { //upper bound is inf
-					temp = new TimeInterval(interval.IsLowerBoundNonStrict(), new IntBound(newLower.intValue()), interval.upperBound(), false);
+					temp = new TimeInterval(interval.IsLowerBoundNonStrict(), new RatBound(newLower), interval.upperBound(), false);
 				}
 			}
 			
@@ -120,7 +120,6 @@ public class TimedInputArc extends TAPNElement {
 			result = IntervalOperations.union(temp, result);
 		}
 		
-		//TODO Consider invariants on the source
 		return result;
 	}
 }
