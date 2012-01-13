@@ -80,7 +80,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 	JLabel nameLabel;  
 	JPanel valueSpinnerPane;
 	JLabel valueLabel; 	
-	JSpinner valueSpinner;
+	CustomJSpinner valueSpinner;
 	JPanel container;
 	JPanel buttonContainer;
 	JButton okButton;
@@ -124,92 +124,14 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		dialog.setVisible(true);
 	}
 
-	private JSpinner makeDigitsOnlySpinnerUsingDocumentFilter(Integer value) {
-		JSpinner spinner = new JSpinner();
-		JSpinner.NumberEditor jsEditor =
-			(JSpinner.NumberEditor)spinner.getEditor();
-
-		JFormattedTextField textField = jsEditor.getTextField();
-		final DocumentFilter digitOnlyFilter = new DocumentFilter() {
-			@Override
-			public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-				//this method is only called by programatic editing of the textbox! 
-			}
-
-			@Override
-			public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {                 
-				String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-				StringBuffer newString = new StringBuffer(old);
-				newString.replace(offset, length+offset, "");
-				if (stringIsNumber(newString.toString())) {
-					super.remove(fb, offset, length);
-				}
-			}
-
-			@Override
-			public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-				String old = fb.getDocument().getText(0, fb.getDocument().getLength());
-				StringBuffer newString = new StringBuffer(old);
-				newString.replace(offset, length+offset, text);            	 			
-				if (stringIsNumber(newString.toString())) {                	
-					super.replace(fb, offset, length, text, attrs);
-				}
-			}
-
-			private boolean stringIsNumber(String text) {
-				if (Pattern.matches("^([1-9]([0-9])*)?|0$",text))
-					return true;
-				return false;
-			}
-		};
-
-		NumberFormat format = NumberFormat.getIntegerInstance();
-		format.setGroupingUsed(false);
-		textField.addActionListener(new ActionListener() {
-			
-			
-			public void actionPerformed(ActionEvent e) {
-				okButton.requestFocusInWindow();
-				okButton.doClick();			}
-		});
-		textField.setFormatterFactory(new DefaultFormatterFactory(
-				new InternationalFormatter(format){             
-					private static final long serialVersionUID = 1L;
-					@Override
-					protected DocumentFilter getDocumentFilter() {
-						return digitOnlyFilter;
-					}
-				}));
-		spinner.setValue(value);
-		spinner.addChangeListener(new javax.swing.event.ChangeListener() {
-			public void stateChanged(javax.swing.event.ChangeEvent e) {
-				//if currentvalue is -1, make it 0:
-					if (((JSpinner)e.getSource()).getValue() instanceof Long) {
-						if (((Long)((JSpinner)e.getSource()).getValue()) == -1l) {
-							((JSpinner)e.getSource()).setValue(new Integer(0));
-						}        	    			
-					}
-			}
-		});
-		return spinner;
-	}
-
-	private void initComponents() throws IOException {		
-		valueSpinner =  makeDigitsOnlySpinnerUsingDocumentFilter(initialValue);
-		valueSpinner.setPreferredSize(new Dimension(100, 25));
-		valueSpinner.setMaximumSize(new Dimension(100, 25));
-		valueSpinner.setMinimumSize(new Dimension(100, 25));
-		
+	private void initComponents() throws IOException {						
 		container = new JPanel();
 		container.setLayout(new GridBagLayout());
 		size = new Dimension(330, 25);
-
 		nameTextField = new javax.swing.JTextField();	
 		nameTextField.setPreferredSize(size);
 		nameTextField.addAncestorListener(new RequestFocusListener());
-		nameTextField.addActionListener(new ActionListener() {
-			
-			
+		nameTextField.addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent e) {
 				okButton.requestFocusInWindow();
 				okButton.doClick();
@@ -243,16 +165,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
 		gbc.anchor = GridBagConstraints.WEST;
-		container.add(valueLabel,gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(2, 4, 2, 4);
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.EAST;
-		//gbc.fill = GridBagConstraints.HORIZONTAL;
-		container.add(valueSpinner,gbc);
+		container.add(valueLabel,gbc);		
 				
 		buttonContainer = new JPanel();
 		buttonContainer.setLayout(new GridBagLayout());
@@ -283,9 +196,18 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		buttonContainer.add(cancelButton,gbc);		
 		
+		//initialize valueSpinner		
+		valueSpinner = new CustomJSpinner(initialValue, okButton);
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(2, 4, 2, 4);
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		container.add(valueSpinner,gbc);
+		
 		//add action listeners for buttons
 		okButton.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				onOK();
 			}
@@ -344,15 +266,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 			nameTextField.requestFocusInWindow();
 			return;				
 		} else {				
-			//if you are not carefull you get a class cast exception. Apparantly the spinner returns type long or int,
-			//depending on whether the value is 0 or different from 0.
-			int val;				
-			if (valueSpinner.getValue() instanceof Long) {
-				val = (int)((Long) valueSpinner.getValue()).longValue();
-			}
-			else {
-				val = (Integer) valueSpinner.getValue();
-			}
+			int val = (Integer) valueSpinner.getValue();
 			if (!oldName.equals("")) {
 				if (!oldName.equals(newName)
 						&& model.isConstantNameUsed(newName)) {
