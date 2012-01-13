@@ -273,9 +273,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(markingLabel, gridBagConstraints);
 
-		markingSpinner = new javax.swing.JSpinner();
-		markingSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-		markingSpinner.setPreferredSize(new Dimension(75,27));
+//		markingSpinner = new javax.swing.JSpinner();
+//		markingSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+//		markingSpinner.setPreferredSize(new Dimension(75,27));
+		markingSpinner = new CustomJSpinner(0, okButton);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
@@ -302,7 +303,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantGroup = new JPanel(new GridBagLayout());
 		invRelationNormal = new JComboBox(new String[] { "<=", "<" });
 		invRelationConstant = new JComboBox(new String[] { "<=", "<" });
-		invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+		//invariantSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+		invariantSpinner = new CustomJSpinner(0, okButton);
 		invariantSpinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if(!invariantInf.isSelected()){
@@ -333,7 +335,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	//	invariantSpinner.setMaximumSize(new Dimension(100, 30));
 	//  invariantSpinner.setMinimumSize(new Dimension(230, 30));
-		invariantSpinner.setPreferredSize(new Dimension(230, 30));
+		//invariantSpinner.setPreferredSize(new Dimension(230, 30));
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
