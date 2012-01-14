@@ -17,6 +17,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.multi.MultiSplitPaneUI;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -207,6 +208,28 @@ public class TabContent extends JSplitPane {
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
 		templateExplorer.switchToAnimationMode();
 		
+		JSplitPane top = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
+		
+		JPanel anim = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		anim.add(animControlerBox, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		anim.add(animationHistoryScrollPane, gbc);
+		
+		JSplitPane outer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, top, anim);
+		
+		/*
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -238,8 +261,17 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1 - RATIO;
 		animatorLeftPane.add(animationHistoryScrollPane, gbc);
-		this.setLeftComponent(animatorLeftPane);
 		
+		*/
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		animatorLeftPane.add(outer, gbc);
+		this.setLeftComponent(animatorLeftPane);
 	}
 
 	public void switchToEditorComponents() {
