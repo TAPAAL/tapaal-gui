@@ -237,7 +237,9 @@ public class Animator {
 		if(dInterval.IsLowerBoundNonStrict()){
 			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound());
 		} else {
-			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(new BigDecimal(0.1), new MathContext(Pipe.AGE_PRECISION)));
+			BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
+			
+			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(delayGranularity, new MathContext(Pipe.AGE_PRECISION)));
 		}
 		
 		fireTransition(transition);

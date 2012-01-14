@@ -25,6 +25,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.Animator;
+import pipe.gui.BlueTransitionControl;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
@@ -63,7 +64,8 @@ public class TabContent extends JSplitPane {
 	protected JPanel animatorLeftPane;
 	protected JSplitPane animationHistorySplitter;
 	protected SharedPlacesAndTransitionsPanel sharedPTPanel;
-
+	
+	protected BlueTransitionControl blueTransitionControl;
 
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
@@ -197,6 +199,7 @@ public class TabContent extends JSplitPane {
 	public void switchToAnimationComponents() {
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
+		if(blueTransitionControl == null) createBlueTransitionControl();
 		
 		animatorLeftPane = new JPanel(new GridBagLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
@@ -217,11 +220,19 @@ public class TabContent extends JSplitPane {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.0;
-		animatorLeftPane.add(animControlerBox, gbc);
+		animatorLeftPane.add(blueTransitionControl, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0.0;
+		animatorLeftPane.add(animControlerBox, gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1 - RATIO;
@@ -249,6 +260,10 @@ public class TabContent extends JSplitPane {
 
 	public AnimationController getAnimationController() {
 		return animControlerBox;
+	}
+	
+	public BlueTransitionControl getBlueTransitionControl(){
+		return blueTransitionControl;
 	}
 
 	public void addAbstractAnimationPane() {
@@ -287,6 +302,10 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1 - RATIO;
 		animatorLeftPane.add(animationHistoryScrollPane);
+	}
+	
+	private void createBlueTransitionControl(){
+		blueTransitionControl = new BlueTransitionControl();
 	}
 
 	private void createAnimationController() {
