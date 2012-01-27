@@ -92,20 +92,20 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private JButton moveDownButton;
 	private JButton sortButton;
 	
-	private static final String toolTipNewPlace = "Create a new place.";
-	private static final String toolTipRemovePlace = "Remove selected place.";
-	private static final String toolTipRenamePlace = "Rename selected place.";
+	private static final String toolTipNewPlace = "Create a new place";
+	private static final String toolTipRemovePlace = "Remove the selected place";
+	private static final String toolTipRenamePlace = "Rename the selected place";
 	private static final String toolTipSortComponents = "Sort the shared places";
-	private final static String toolTipMoveUp = "Move the marked instance up";
-	private final static String toolTipMoveDown = "Move the marked instance down";
+	private final static String toolTipMoveUp = "Move the selected item up";
+	private final static String toolTipMoveDown = "Move the selected item down";
 	
 	//private static final String toolTipSharedPlacesPanel = "Here you can manage the shared places.<html><br/></html>Shared places can link different components.";
-	private static final String toolTipNewTransition = "Create a new transition.";
-	private static final String toolTipRenameTransition = "Rename selected transition.";
+	private static final String toolTipNewTransition = "Create a new transition";
+	private static final String toolTipRenameTransition = "Rename the selected transition";
 	//private static final String toolTipSharedTransitionsPanel = "Here you can manage the shared transitions.<html><br/></html>" +
 		//	"Shared transitions can link different components.";
-	private static final String toolTipRemoveTransition ="Remove selected transition.";
-	private static final String toolTipChangeBetweenPlacesAndTransitions = "Choose between places and transitions.";
+	private static final String toolTipRemoveTransition ="Remove the selected transition";
+	private static final String toolTipChangeBetweenPlacesAndTransitions = "Switch between shared places and transitions";
 
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");

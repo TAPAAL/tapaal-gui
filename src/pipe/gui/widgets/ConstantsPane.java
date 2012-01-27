@@ -58,12 +58,12 @@ public class ConstantsPane extends JPanel {
 	private JButton moveDownButton;
 	private JButton sortButton;
 	
-	private static final String toolTipEditConstant = "Edit value of selected constant.";
-	private static final String toolTipRemoveConstant = "Remove selected constant.";
-	private static final String toolTipNewConstant = "Create a new constant.";
-	private static final String toolTipSortConstants = "Sort the constants.";
-	private final static String toolTipMoveUp = "Move the marked constant up";
-	private final static String toolTipMoveDown = "Move the marked constant down";
+	private static final String toolTipEditConstant = "Edit the value of the selected constant";
+	private static final String toolTipRemoveConstant = "Remove the selected constant";
+	private static final String toolTipNewConstant = "Create a new constant";
+	private static final String toolTipSortConstants = "Sort the constants";
+	private final static String toolTipMoveUp = "Move the selected constant up";
+	private final static String toolTipMoveDown = "Move the selected constant down";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
 	
 

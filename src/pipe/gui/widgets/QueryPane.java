@@ -59,13 +59,13 @@ public class QueryPane extends JPanel {
 	private JButton moveDownButton;
 	private JButton sortButton;
 	
-	private static final String toolTipNewQuery = "Create a new query.";
-	private static final String toolTipEditQuery="Edit the selected query.";
+	private static final String toolTipNewQuery = "Create a new query";
+	private static final String toolTipEditQuery="Edit the selected query";
 	private static final String toolTipRemoveQuery="Remove the selected query";
-	private static final String toolTipVerifyQuery="Do a verification of the selected query.";
-	private static final String toolTipSortQueries="Sort the queries.";
-	private final static String toolTipMoveUp = "Move the marked query up";
-	private final static String toolTipMoveDown = "Move the marked query down";
+	private static final String toolTipVerifyQuery="Verify the selected query";
+	private static final String toolTipSortQueries="Sort the queries";
+	private final static String toolTipMoveUp = "Move the selected query up";
+	private final static String toolTipMoveDown = "Move the selected query down";
 	
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 

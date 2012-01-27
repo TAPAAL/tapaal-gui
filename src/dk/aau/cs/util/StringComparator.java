@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  */
 public class StringComparator implements Comparator<Object>{
 	
-	@Override
+
 	public int compare(Object o1, Object o2) {
 		Pattern p = Pattern.compile("\\d\\d*$");
 		String s1 = o1.toString().toLowerCase();
