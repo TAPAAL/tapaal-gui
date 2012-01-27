@@ -17,33 +17,25 @@ public class NonsearchableJList extends JList{
 
 	public NonsearchableJList() {
 		super();
-		for(KeyListener k : getKeyListeners()){
-			if(k.toString().contains("javax.swing.plaf.basic.BasicListUI$Handler") ){
-				removeKeyListener(k);
-			}
-		}
+		removeKeyListener();
 	}
 
 	public NonsearchableJList(ListModel dataModel){
 		super (dataModel);
-		for(KeyListener k : getKeyListeners()){
-			if(k.toString().contains("javax.swing.plaf.basic.BasicListUI$Handler") ){
-				removeKeyListener(k);
-			}
-		}
+		removeKeyListener();
 	}
 
 	public NonsearchableJList(Object[]  listData){
 		super (listData);
-		for(KeyListener k : getKeyListeners()){
-			if(k.toString().contains("javax.swing.plaf.basic.BasicListUI$Handler") ){
-				removeKeyListener(k);
-			}
-		}
+		removeKeyListener();
 	}
 
 	public NonsearchableJList(Vector<?> listData){
 		super (listData);
+		removeKeyListener();
+	}
+	
+	private void removeKeyListener(){
 		for(KeyListener k : getKeyListeners()){
 			if(k.toString().contains("javax.swing.plaf.basic.BasicListUI$Handler") ){
 				removeKeyListener(k);
