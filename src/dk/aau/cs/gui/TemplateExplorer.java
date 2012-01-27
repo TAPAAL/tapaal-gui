@@ -184,6 +184,7 @@ public class TemplateExplorer extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = templateList.getSelectedIndex();
@@ -204,7 +205,7 @@ public class TemplateExplorer extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
-		
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = templateList.getSelectedIndex();

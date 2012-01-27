@@ -96,6 +96,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private static final String toolTipRemovePlace = "Remove selected place.";
 	private static final String toolTipRenamePlace = "Rename selected place.";
 	private static final String toolTipSortComponents = "Sort the shared places";
+	private final static String toolTipMoveUp = "Move the marked instance up";
+	private final static String toolTipMoveDown = "Move the marked instance down";
 	
 	//private static final String toolTipSharedPlacesPanel = "Here you can manage the shared places.<html><br/></html>Shared places can link different components.";
 	private static final String toolTipNewTransition = "Create a new transition.";
@@ -181,6 +183,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = list.getSelectedIndex();
@@ -204,6 +207,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = list.getSelectedIndex();

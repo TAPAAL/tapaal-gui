@@ -64,6 +64,8 @@ public class QueryPane extends JPanel {
 	private static final String toolTipRemoveQuery="Remove the selected query";
 	private static final String toolTipVerifyQuery="Do a verification of the selected query.";
 	private static final String toolTipSortQueries="Sort the queries.";
+	private final static String toolTipMoveUp = "Move the marked query up";
+	private final static String toolTipMoveDown = "Move the marked query down";
 	
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
@@ -165,6 +167,7 @@ public class QueryPane extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
@@ -184,6 +187,7 @@ public class QueryPane extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();

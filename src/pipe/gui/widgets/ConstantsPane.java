@@ -62,6 +62,8 @@ public class ConstantsPane extends JPanel {
 	private static final String toolTipRemoveConstant = "Remove selected constant.";
 	private static final String toolTipNewConstant = "Create a new constant.";
 	private static final String toolTipSortConstants = "Sort the constants.";
+	private final static String toolTipMoveUp = "Move the marked constant up";
+	private final static String toolTipMoveDown = "Move the marked constant down";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
 	
 
@@ -216,6 +218,7 @@ public class ConstantsPane extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = constantsList.getSelectedIndex();
@@ -236,6 +239,7 @@ public class ConstantsPane extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = constantsList.getSelectedIndex();
