@@ -52,7 +52,6 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
-import dk.aau.cs.gui.components.SortableListModel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortTemplatesCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -70,7 +69,7 @@ public class TemplateExplorer extends JPanel {
 	private JPanel templatePanel;
 	private JScrollPane scrollpane;
 	private JList templateList;
-	private SortableListModel listModel;
+	private DefaultListModel listModel;
 
 	// Template button panel items
 	private JPanel buttonPanel;
@@ -92,6 +91,8 @@ public class TemplateExplorer extends JPanel {
 	private static final String toolTipCopyComponent ="Copy selected component.";
 	private static final String toolTipRenameComponent="Rename selected component.";
 	private final static String toolTipSortComponents = "Sort the components";
+	private final static String toolTipMoveUp = "Move the marked component up";
+	private final static String toolTipMoveDown = "Move the marked component down";
     //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
     	//	"A Net can be broken up in several components and connected via shared places and transitions.";
 
@@ -134,7 +135,7 @@ public class TemplateExplorer extends JPanel {
 
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new GridBagLayout());
-		listModel = new SortableListModel();
+		listModel = new DefaultListModel();
 		for (Template net : parent.allTemplates()) {
 			listModel.addElement(net);
 		}
@@ -203,6 +204,7 @@ public class TemplateExplorer extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = templateList.getSelectedIndex();
