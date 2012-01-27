@@ -21,6 +21,12 @@ public class StringComparator implements Comparator<Object>{
 		Pattern p = Pattern.compile("\\d\\d*$");
 		String s1 = o1.toString().toLowerCase();
 		String s2 = o2.toString().toLowerCase();
+		int p1, p2;
+		if((p1 = s1.indexOf("=")) != -1 && (p2 = s2.indexOf("=")) != -1){
+			//The strings is constants
+			s1 = s1.substring(0, p1).trim();
+			s2 = s2.substring(0, p2).trim();
+		}
 		Matcher m1 = p.matcher(s1);
 		Matcher m2 = p.matcher(s2);
 		if(m1.find() && m2.find()){

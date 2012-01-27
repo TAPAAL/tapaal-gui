@@ -34,6 +34,8 @@ import pipe.gui.undo.RemoveQueryCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.SortQueriesCommand;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.StringComparator;
@@ -205,12 +207,9 @@ public class QueryPane extends JPanel {
 		sortButton.setEnabled(true);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[] sortedListModel = listModel.toArray();
-				Arrays.sort(sortedListModel, new StringComparator());
-				listModel.clear();
-				for(Object o : sortedListModel){
-					listModel.addElement(o);
-				}
+				Command c = new SortQueriesCommand(listModel);
+				undoManager.addNewEdit(c);
+				c.redo();
 			}
 		});
 

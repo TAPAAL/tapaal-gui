@@ -57,6 +57,8 @@ import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
 import dk.aau.cs.gui.undo.DeleteSharedTransitionCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
+import dk.aau.cs.gui.undo.SortSharedPlacesCommand;
+import dk.aau.cs.gui.undo.SortSharedTransitionsCommand;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -236,9 +238,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isDisplayingTransitions()){
-					sharedTransitionsListModel.sort();
+					Command c = new SortSharedTransitionsCommand(sharedTransitionsListModel);
+					undoManager.addNewEdit(c);
+					c.redo();
 				} else {
-					sharedPlacesListModel.sort();
+					Command c = new SortSharedPlacesCommand(sharedPlacesListModel);
+					undoManager.addNewEdit(c);
+					c.redo();
 				}
 			}
 		});
@@ -574,8 +580,14 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			network.swapSharedPlaces(currentIndex, newIndex);
 		}
 		
-		public void sort(){
-			network.sortSharedPlaces();
+		public SharedPlace[] sort(){
+			SharedPlace[] oldOrder = network.sortSharedPlaces();
+			fireContentsChanged(this, 0, getSize());
+			return oldOrder;
+		}
+		
+		public void undoSort(SharedPlace[] oldOrder) {
+			network.undoSort(oldOrder);
 			fireContentsChanged(this, 0, getSize());
 		}
 
@@ -606,6 +618,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			this.network = network;
 			fireContentsChanged(this, 0, network.numberOfSharedPlaces());
 		}
+
 	}
 
 	public class SharedTransitionsListModel extends AbstractListModel {
@@ -641,8 +654,14 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			network.swapSharedTransitions(currentIndex, newIndex);
 		}
 		
-		public void sort(){
-			network.sortSharedTransitions();
+		public SharedTransition[] sort(){
+			SharedTransition[] oldOrder = network.sortSharedTransitions();
+			fireContentsChanged(this, 0, getSize());
+			return oldOrder;
+		}
+		
+		public void undoSort(SharedTransition[] oldOrder) {
+			network.undoSort(oldOrder);
 			fireContentsChanged(this, 0, getSize());
 		}
 

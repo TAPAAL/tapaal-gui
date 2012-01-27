@@ -1,4 +1,4 @@
-package pipe.gui.undo;
+package dk.aau.cs.gui.undo;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +9,6 @@ import javax.swing.JList;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
-import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public class SortTemplatesCommand extends Command{

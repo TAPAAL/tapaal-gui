@@ -37,6 +37,7 @@ import pipe.gui.CreateGui;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.SortConstantsCommand;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
@@ -259,8 +260,9 @@ public class ConstantsPane extends JPanel {
 		sortButton.setEnabled(true);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.sortConstants();
-				showConstants();
+				Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
+				CreateGui.getDrawingSurface().getUndoManager().addNewEdit(sortConstantsCommand);
+				sortConstantsCommand.redo();
 			}
 		});
 		

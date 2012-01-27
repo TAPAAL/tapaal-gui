@@ -348,8 +348,12 @@ public class TimedArcPetriNetNetwork {
 		constants.swapConstants(currentIndex, newIndex);
 	}
 	
-	public void sortConstants() {
-		constants.sortConstants();
+	public Constant[] sortConstants() {
+		return constants.sortConstants();
+	}
+	
+	public void undoSort(Constant[] oldOrder) {
+		constants.undoSort(oldOrder);
 	}
 
 	public void swapSharedPlaces(int currentIndex, int newIndex) {
@@ -358,8 +362,17 @@ public class TimedArcPetriNetNetwork {
 		sharedPlaces.set(newIndex, temp);
 	}
 	
-	public void sortSharedPlaces() {
+	public SharedPlace[] sortSharedPlaces() {
+		SharedPlace[] oldOrder = sharedPlaces.toArray(new SharedPlace[0]);
 		Collections.sort(sharedPlaces, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(SharedPlace[] oldOrder) {
+		sharedPlaces.clear();
+		for(SharedPlace p : oldOrder){
+			sharedPlaces.add(p);
+		}
 	}
 
 	public void swapSharedTransitions(int currentIndex, int newIndex) {
@@ -368,7 +381,16 @@ public class TimedArcPetriNetNetwork {
 		sharedTransitions.set(newIndex, temp);
 	}
 	
-	public void sortSharedTransitions() {
+	public SharedTransition[] sortSharedTransitions() {
+		SharedTransition[] oldOrder = sharedTransitions.toArray(new SharedTransition[0]); 
 		Collections.sort(sharedTransitions, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(SharedTransition[] oldOrder) {
+		sharedTransitions.clear();
+		for(SharedTransition p : oldOrder){
+			sharedTransitions.add(p);
+		}
 	}
 }

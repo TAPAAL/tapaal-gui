@@ -236,8 +236,18 @@ public class ConstantStore {
 		constants.set(newIndex, temp);
 	}
 	
-	public void sortConstants() {
+	public Constant[] sortConstants() {
+		Constant[] oldOrder = constants.toArray(new Constant[0]);
 		Collections.sort(constants, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(Constant[] oldOrder) {
+		constants.clear();
+		for(Constant c: oldOrder){
+			constants.add(c);
+		}
+		
 	}
 
 	public Constant getConstantByIndex(int index) {
@@ -247,6 +257,4 @@ public class ConstantStore {
 	public int getIndexOf(Constant constant) {
 		return constants.indexOf(constant);
 	}
-
-	
 }

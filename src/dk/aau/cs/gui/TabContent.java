@@ -35,6 +35,7 @@ import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane {
@@ -424,8 +425,12 @@ public class TabContent extends JSplitPane {
 		
 	}
 	
-	public void sortConstants(){
-		tapnNetwork.sortConstants();
+	public Constant[] sortConstants(){
+		return tapnNetwork.sortConstants();
+	}
+	
+	public void undoSort(Constant[] oldOrder) {
+		tapnNetwork.undoSort(oldOrder);
 	}
 	
 	public void showComponents(boolean enable){
@@ -444,9 +449,5 @@ public class TabContent extends JSplitPane {
 		queries.selectFirst();
 		constantsPanel.selectFirst();
 		
-	}
-
-	
-
-	
+	}	
 }
