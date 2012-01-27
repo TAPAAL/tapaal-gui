@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,7 @@ import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.util.StringComparator;
 
 public class ConstantStore {
 	private List<Constant> constants = new ArrayList<Constant>();
@@ -233,6 +235,10 @@ public class ConstantStore {
 		constants.set(currentIndex, constants.get(newIndex));
 		constants.set(newIndex, temp);
 	}
+	
+	public void sortConstants() {
+		Collections.sort(constants, new StringComparator());
+	}
 
 	public Constant getConstantByIndex(int index) {
 		return constants.get(index);
@@ -241,4 +247,6 @@ public class ConstantStore {
 	public int getIndexOf(Constant constant) {
 		return constants.indexOf(constant);
 	}
+
+	
 }

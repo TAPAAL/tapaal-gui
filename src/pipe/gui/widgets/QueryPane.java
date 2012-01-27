@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -35,6 +36,7 @@ import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.StringComparator;
 
 public class QueryPane extends JPanel {
 	private static final long serialVersionUID = 4062539545170994654L;
@@ -53,11 +55,14 @@ public class QueryPane extends JPanel {
 	private UndoManager undoManager;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
 	
 	private static final String toolTipNewQuery = "Create a new query.";
 	private static final String toolTipEditQuery="Edit the selected query.";
 	private static final String toolTipRemoveQuery="Remove the selected query";
 	private static final String toolTipVerifyQuery="Do a verification of the selected query.";
+	private static final String toolTipSortQueries="Sort the queries.";
+	
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
@@ -149,7 +154,7 @@ public class QueryPane extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -193,6 +198,28 @@ public class QueryPane extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTH;
 		queryCollectionPanel.add(moveDownButton,gbc);
+		
+		//Sort button
+		sortButton = new JButton("S");
+		sortButton.setToolTipText(toolTipSortQueries);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object[] sortedListModel = listModel.toArray();
+				Arrays.sort(sortedListModel, new StringComparator());
+				listModel.clear();
+				for(Object o : sortedListModel){
+					listModel.addElement(o);
+				}
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		queryCollectionPanel.add(sortButton,gbc);
 	}
 
 	private void addButtons() {

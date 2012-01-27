@@ -34,6 +34,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
+import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Constant;
@@ -54,10 +55,12 @@ public class ConstantsPane extends JPanel {
 	private TabContent parent;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
 	
 	private static final String toolTipEditConstant = "Edit value of selected constant.";
 	private static final String toolTipRemoveConstant = "Remove selected constant.";
 	private static final String toolTipNewConstant = "Create a new constant.";
+	private static final String toolTipSortConstants = "Sort the constants.";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
 	
 
@@ -203,7 +206,7 @@ public class ConstantsPane extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -249,6 +252,24 @@ public class ConstantsPane extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTH;
 		constantsPanel.add(moveDownButton,gbc);
+		
+		//Sort button
+		sortButton = new JButton("S");
+		sortButton.setToolTipText(toolTipSortConstants);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				parent.sortConstants();
+				showConstants();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		constantsPanel.add(sortButton,gbc);
 	}
 
 	private void showEditConstantDialog(Constant constant) {	

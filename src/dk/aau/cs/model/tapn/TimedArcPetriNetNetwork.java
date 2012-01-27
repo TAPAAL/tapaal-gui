@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +11,7 @@ import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.StringComparator;
 
 public class TimedArcPetriNetNetwork {
 	private List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -328,9 +330,26 @@ public class TimedArcPetriNetNetwork {
 		tapns.set(currentIndex, tapns.get(newIndex));
 		tapns.set(newIndex, temp);
 	}
+	
+	public TimedArcPetriNet[] sortTemplates() {
+		TimedArcPetriNet[] oldOrder = tapns.toArray(new TimedArcPetriNet[0]);
+		Collections.sort(tapns, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(TimedArcPetriNet[] tapns) {
+		this.tapns.clear();
+		for(TimedArcPetriNet t: tapns){
+			this.tapns.add(t);
+		}
+	}
 
 	public void swapConstants(int currentIndex, int newIndex) {
 		constants.swapConstants(currentIndex, newIndex);
+	}
+	
+	public void sortConstants() {
+		constants.sortConstants();
 	}
 
 	public void swapSharedPlaces(int currentIndex, int newIndex) {
@@ -338,10 +357,18 @@ public class TimedArcPetriNetNetwork {
 		sharedPlaces.set(currentIndex, sharedPlaces.get(newIndex));
 		sharedPlaces.set(newIndex, temp);
 	}
+	
+	public void sortSharedPlaces() {
+		Collections.sort(sharedPlaces, new StringComparator());
+	}
 
 	public void swapSharedTransitions(int currentIndex, int newIndex) {
 		SharedTransition temp = sharedTransitions.get(currentIndex);
 		sharedTransitions.set(currentIndex, sharedTransitions.get(newIndex));
 		sharedTransitions.set(newIndex, temp);
+	}
+	
+	public void sortSharedTransitions() {
+		Collections.sort(sharedTransitions, new StringComparator());
 	}
 }

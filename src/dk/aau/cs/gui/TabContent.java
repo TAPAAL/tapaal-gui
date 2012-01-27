@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -409,10 +410,22 @@ public class TabContent extends JSplitPane {
 	public void swapTemplates(int currentIndex, int newIndex) {
 		tapnNetwork.swapTemplates(currentIndex, newIndex);
 	}
+	
+	public TimedArcPetriNet[] sortTemplates() {
+		return tapnNetwork.sortTemplates();
+	}
+	
+	public void undoSort(TimedArcPetriNet[] l){
+		tapnNetwork.undoSort(l);
+	}
 
 	public void swapConstants(int currentIndex, int newIndex) {
 		tapnNetwork.swapConstants(currentIndex, newIndex);
 		
+	}
+	
+	public void sortConstants(){
+		tapnNetwork.sortConstants();
 	}
 	
 	public void showComponents(boolean enable){
@@ -432,6 +445,8 @@ public class TabContent extends JSplitPane {
 		constantsPanel.selectFirst();
 		
 	}
+
+	
 
 	
 }

@@ -12,6 +12,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -43,18 +46,21 @@ import pipe.gui.Zoomer;
 import pipe.gui.undo.AddTemplateCommand;
 import pipe.gui.undo.RemoveTemplateCommand;
 import pipe.gui.undo.RenameTemplateCommand;
+import pipe.gui.undo.SortTemplatesCommand;
 import pipe.gui.undo.ToggleTemplateActivationCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
+import dk.aau.cs.gui.components.SortableListModel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.util.Tuple;
 
 public class TemplateExplorer extends JPanel {
@@ -64,7 +70,7 @@ public class TemplateExplorer extends JPanel {
 	private JPanel templatePanel;
 	private JScrollPane scrollpane;
 	private JList templateList;
-	private DefaultListModel listModel;
+	private SortableListModel listModel;
 
 	// Template button panel items
 	private JPanel buttonPanel;
@@ -79,11 +85,13 @@ public class TemplateExplorer extends JPanel {
 
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
 	
 	private static final String toolTipNewComponent ="Create a new component.";
 	private static final String toolTipRemoveComponent ="Remove selected component.";
 	private static final String toolTipCopyComponent ="Copy selected component.";
 	private static final String toolTipRenameComponent="Rename selected component.";
+	private final static String toolTipSortComponents = "Sort the components";
     //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
     	//	"A Net can be broken up in several components and connected via shared places and transitions.";
 
@@ -114,17 +122,19 @@ public class TemplateExplorer extends JPanel {
 			this.add(templatePanel, BorderLayout.CENTER);
 			moveDownButton.setVisible(true);
 			moveUpButton.setVisible(true);
+			sortButton.setVisible(true);
 			this.add(buttonPanel, BorderLayout.PAGE_END);
 		} else {
 			this.add(templatePanel, BorderLayout.CENTER);
 			moveDownButton.setVisible(false);
 			moveUpButton.setVisible(false);
+			sortButton.setVisible(false);
 		}
 	}
 
 	private void initExplorerPanel() {
 		templatePanel = new JPanel(new GridBagLayout());
-		listModel = new DefaultListModel();
+		listModel = new SortableListModel();
 		for (Template net : parent.allTemplates()) {
 			listModel.addElement(net);
 		}
@@ -164,7 +174,7 @@ public class TemplateExplorer extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -210,6 +220,25 @@ public class TemplateExplorer extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTH;
 		templatePanel.add(moveDownButton,gbc);
+		
+		//Sort button
+		sortButton = new JButton("S");
+		sortButton.setToolTipText(toolTipSortComponents);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);
+				undoManager.addNewEdit(command);
+				command.redo();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		templatePanel.add(sortButton,gbc);
 	}
 
 	private void initButtonsPanel() {

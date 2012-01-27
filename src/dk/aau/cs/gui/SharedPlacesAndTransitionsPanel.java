@@ -88,10 +88,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private JButton addButton = new JButton("New");
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
 	
 	private static final String toolTipNewPlace = "Create a new place.";
 	private static final String toolTipRemovePlace = "Remove selected place.";
 	private static final String toolTipRenamePlace = "Rename selected place.";
+	private static final String toolTipSortComponents = "Sort the shared places";
+	
 	//private static final String toolTipSharedPlacesPanel = "Here you can manage the shared places.<html><br/></html>Shared places can link different components.";
 	private static final String toolTipNewTransition = "Create a new transition.";
 	private static final String toolTipRenameTransition = "Rename selected transition.";
@@ -167,7 +170,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -225,6 +228,27 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.NORTH;
 		listPanel.add(moveDownButton,gbc);
+		
+		//Sort button
+		sortButton = new JButton("S");
+		sortButton.setToolTipText(toolTipSortComponents);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(isDisplayingTransitions()){
+					sharedTransitionsListModel.sort();
+				} else {
+					sharedPlacesListModel.sort();
+				}
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		listPanel.add(sortButton,gbc);
 		
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
 		placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
@@ -549,6 +573,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void swap(int currentIndex, int newIndex) {
 			network.swapSharedPlaces(currentIndex, newIndex);
 		}
+		
+		public void sort(){
+			network.sortSharedPlaces();
+			fireContentsChanged(this, 0, getSize());
+		}
 
 		public Object getElementAt(int index) {
 			return network.getSharedPlaceByIndex(index);
@@ -610,6 +639,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		public void swap(int currentIndex, int newIndex) {
 			network.swapSharedTransitions(currentIndex, newIndex);
+		}
+		
+		public void sort(){
+			network.sortSharedTransitions();
+			fireContentsChanged(this, 0, getSize());
 		}
 
 		public int getSize() {
