@@ -236,7 +236,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		listPanel.add(moveDownButton,gbc);
 		
 		//Sort button
-		sortButton = new JButton("S");
+		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(true);
 		sortButton.addActionListener(new ActionListener() {

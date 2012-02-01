@@ -225,10 +225,9 @@ public class TemplateExplorer extends JPanel {
 		templatePanel.add(moveDownButton,gbc);
 		
 		//Sort button
-		sortButton = new JButton("S");
+		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortComponents);
 		sortButton.setEnabled(true);
-		sortButton.setMargin(new Insets(1, 2, 1, 2));
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Command command = new SortTemplatesCommand(parent, TemplateExplorer.this, templateList, listModel);

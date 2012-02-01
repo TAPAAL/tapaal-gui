@@ -259,7 +259,7 @@ public class ConstantsPane extends JPanel {
 		constantsPanel.add(moveDownButton,gbc);
 		
 		//Sort button
-		sortButton = new JButton("S");
+		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortConstants);
 		sortButton.setEnabled(true);
 		sortButton.addActionListener(new ActionListener() {
