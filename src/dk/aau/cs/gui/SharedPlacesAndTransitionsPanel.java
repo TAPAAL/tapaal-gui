@@ -95,7 +95,8 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private static final String toolTipNewPlace = "Create a new place";
 	private static final String toolTipRemovePlace = "Remove the selected place";
 	private static final String toolTipRenamePlace = "Rename the selected place";
-	private static final String toolTipSortComponents = "Sort the shared places";
+	private static final String toolTipSortTransitions = "Sort the shared transitions alphabetically";
+	private static final String toolTipSortPlaces = "Sort the shared places alphabetically";
 	private final static String toolTipMoveUp = "Move the selected item up";
 	private final static String toolTipMoveDown = "Move the selected item down";
 	
@@ -237,7 +238,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
-		sortButton.setToolTipText(toolTipSortComponents);
+		sortButton.setToolTipText(toolTipSortPlaces);
 		sortButton.setEnabled(true);
 		sortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -249,6 +250,16 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					Command c = new SortSharedPlacesCommand(sharedPlacesListModel);
 					undoManager.addNewEdit(c);
 					c.redo();
+				}
+			}
+		});
+		sortButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if(isDisplayingTransitions()){
+					sortButton.setToolTipText(toolTipSortTransitions);
+				} else {
+					sortButton.setToolTipText(toolTipSortPlaces);
 				}
 			}
 		});

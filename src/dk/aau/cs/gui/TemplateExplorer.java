@@ -90,7 +90,7 @@ public class TemplateExplorer extends JPanel {
 	private static final String toolTipRemoveComponent ="Remove the selected component";
 	private static final String toolTipCopyComponent ="Copy the selected component";
 	private static final String toolTipRenameComponent="Rename the selected component";
-	private final static String toolTipSortComponents = "Sort the components";
+	private final static String toolTipSortComponents = "Sort the components alphabetically";
 	private final static String toolTipMoveUp = "Move the selected component up";
 	private final static String toolTipMoveDown = "Move the selected component down";
     //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
