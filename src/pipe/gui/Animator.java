@@ -22,6 +22,7 @@ import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
@@ -405,19 +406,56 @@ public class Animator {
 		CreateGui.getAnimationController().updateFiringModeComboBox();
 	}	
 	
+	enum FillListStatus{
+		zero,
+		one,
+		moreThanOne
+	}
+	
+	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
+		for(TimedInputArc in: transition.getInputArcs()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return FillListStatus.zero;
+			} else if(elligibleTokens.size() == 1){
+				listToFill.add(elligibleTokens.get(0));
+			} else {
+				return FillListStatus.moreThanOne;
+			}
+		}
+		for(TransportArc in: transition.getTransportArcsGoingThrough()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return FillListStatus.zero;
+			} else if(elligibleTokens.size() == 1){
+				listToFill.add(elligibleTokens.get(0));
+			} else {
+				return FillListStatus.moreThanOne;
+			}
+		}
+		return FillListStatus.one;
+	}
+	
 	private List<TimedToken> getTokensToConsume(TimedTransition transition){
 		//If there are only one token in each place
 		List<TimedToken> result = new ArrayList<TimedToken>();
 		boolean userShouldChoose = false;
-		for(TimedInputArc in: transition.getInputArcs()){
-			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() == 0){
+		if(transition.isShared()){
+			for(TimedTransition t : transition.sharedTransition().transitions()){
+				FillListStatus status = fillList(t, result);
+				if(status == FillListStatus.zero){
+					return null;
+				} else if(status == FillListStatus.moreThanOne){
+					userShouldChoose = true;
+					break;
+				}
+			}
+		} else {
+			FillListStatus status = fillList(transition, result);
+			if(status == FillListStatus.zero){
 				return null;
-			} else if(elligibleTokens.size() == 1){
-				result.add(elligibleTokens.get(0));
-			} else {
+			} else if(status == FillListStatus.moreThanOne){
 				userShouldChoose = true;
-				break;
 			}
 		}
 		
