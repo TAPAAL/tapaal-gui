@@ -412,6 +412,8 @@ public class Animator {
 		moreThanOne
 	}
 	
+	//Creates a list of tokens if there is only one token in each of the places
+	//Used by getTokensToConsume
 	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
 		for(TimedInputArc in: transition.getInputArcs()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();

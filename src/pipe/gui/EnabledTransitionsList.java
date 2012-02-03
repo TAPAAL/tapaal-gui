@@ -184,6 +184,8 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		private int compareToString(ListItem o){
+			/*
+			 * TODO use the string comparer in the sortAbleTransitions branch!
 			Pattern p = Pattern.compile("\\d*$");
 			String s1 = this.transition.getName().toLowerCase();
 			String s2 = o.transition.getName().toLowerCase();
@@ -202,8 +204,8 @@ public class EnabledTransitionsList extends JPanel{
 						return 0;
 					}
 				}
-			}
-			return s1.compareTo(s2);
+			}*/
+			return this.transition.getName().toLowerCase().compareTo(o.transition.getName().toLowerCase());
 		}
 	}
 }
