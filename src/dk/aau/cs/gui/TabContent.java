@@ -67,7 +67,9 @@ public class TabContent extends JSplitPane {
 	protected JPanel animatorLeftPane;
 	protected JSplitPane animationHistorySplitter;
 	protected SharedPlacesAndTransitionsPanel sharedPTPanel;
-
+	
+	protected JSplitPane outerSplitPane;
+	protected JSplitPane topSplitPane;
 
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
@@ -198,6 +200,7 @@ public class TabContent extends JSplitPane {
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 //TODO
+	
 	public void switchToAnimationComponents() {
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
@@ -208,7 +211,8 @@ public class TabContent extends JSplitPane {
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
 		templateExplorer.switchToAnimationMode();
 		
-		JSplitPane top = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
+		topSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
+		topSplitPane.setResizeWeight(0.5);
 		
 		JPanel anim = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -227,7 +231,17 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		anim.add(animationHistoryScrollPane, gbc);
 		
-		JSplitPane outer = new JSplitPane(JSplitPane.VERTICAL_SPLIT, top, anim);
+		outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, anim);
+		outerSplitPane.setResizeWeight(0.5);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		animatorLeftPane.add(outerSplitPane, gbc);
+		this.setLeftComponent(animatorLeftPane);
 		
 		/*
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -264,14 +278,15 @@ public class TabContent extends JSplitPane {
 		
 		*/
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		animatorLeftPane.add(outer, gbc);
-		this.setLeftComponent(animatorLeftPane);
+		
+	}
+	
+	public JSplitPane getOuterSplitPane(){
+		return outerSplitPane;
+	}
+	
+	public JSplitPane getTopSplitPane(){
+		return topSplitPane;
 	}
 
 	public void switchToEditorComponents() {

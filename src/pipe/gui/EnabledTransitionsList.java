@@ -30,6 +30,7 @@ public class EnabledTransitionsList extends JPanel{
 
 	public EnabledTransitionsList() {
 		super(new BorderLayout());
+		this.setPreferredSize(new Dimension(0, 300));
 		initPanel();
 	}
 	
@@ -37,6 +38,7 @@ public class EnabledTransitionsList extends JPanel{
 	JList transitionsList;
 	JScrollPane scrollPane;
 	JButton fireButton;
+	ListItem lastSelected;
 	
 	public void initPanel(){
 		transitions = new DefaultListModel();
@@ -63,8 +65,6 @@ public class EnabledTransitionsList extends JPanel{
 		this.add(scrollPane, BorderLayout.CENTER);
 		this.add(fireButton, BorderLayout.SOUTH);
 	}
-	
-	ListItem lastSelected;
 	
 	public void startReInit(){
 		lastSelected = (ListItem)transitionsList.getSelectedValue();

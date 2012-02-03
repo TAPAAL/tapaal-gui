@@ -925,6 +925,10 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showComponents(boolean enable){
 		showComponents = enable;
 		CreateGui.getCurrentTab().showComponents(enable);
+		if(CreateGui.getCurrentTab().getTopSplitPane()!=null){
+			CreateGui.getCurrentTab().getTopSplitPane().setDividerLocation(0.5);
+		}
+		
 	}
 	public void toggleComponents(){
 		showComponents(!showComponents);
@@ -933,6 +937,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
 		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
+		CreateGui.getCurrentTab().getTopSplitPane().setDividerLocation(0.5);
 	}
 	public void toggleEnabledTransitionsList(){
 		showEnabledTransitionsList(!showEnabledTransitions);
