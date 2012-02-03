@@ -202,6 +202,7 @@ public class TabContent extends JSplitPane {
 //TODO
 	
 	public void switchToAnimationComponents() {
+		
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
 		if(enabledTransitionsList == null) createEnabledTransitionsList();
@@ -213,6 +214,7 @@ public class TabContent extends JSplitPane {
 		
 		topSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
 		topSplitPane.setResizeWeight(0.5);
+		topSplitPane.setOneTouchExpandable(true);
 		
 		JPanel anim = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -233,6 +235,7 @@ public class TabContent extends JSplitPane {
 		
 		outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, anim);
 		outerSplitPane.setResizeWeight(0.5);
+		outerSplitPane.setOneTouchExpandable(true);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -495,6 +498,10 @@ public class TabContent extends JSplitPane {
 	public void showComponents(boolean enable){
 		templateExplorer.setVisible(enable);
 		sharedPTPanel.setVisible(enable);
+		if(topSplitPane!=null){
+			topSplitPane.setDividerLocation(0.5);
+			updateTopSplitPanel();
+		}
 	}
 	public void showQueries(boolean enable){
 		queries.setVisible(enable);
@@ -504,6 +511,21 @@ public class TabContent extends JSplitPane {
 	}
 	public void showEnabledTransitionsList(boolean enable){
 		enabledTransitionsList.setVisible(enable);
+		topSplitPane.setDividerLocation(0.5);
+		updateTopSplitPanel();
+	}
+	
+	private void updateTopSplitPanel(){
+		if(enabledTransitionsList.isVisible() || templateExplorer.isVisible()){
+			topSplitPane.setVisible(true);
+			if(outerSplitPane.getDividerLocation() == 0){
+				outerSplitPane.setDividerLocation(0.5);
+			}
+		} else {
+			topSplitPane.setVisible(false);
+			outerSplitPane.setDividerLocation(0.0);
+		}
+		
 	}
 	
 	public void selectFirstElements(){
