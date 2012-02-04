@@ -95,7 +95,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				showErrorMessage(e.getMessage());
 				return;
 			}
-			
+			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 			showResult(result);
 
 		} else {
