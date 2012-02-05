@@ -51,6 +51,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
+		if (isCancelled()) {
+			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+		}
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		} else {
@@ -59,7 +62,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime(),
 					result.stats());
-		}
+		}		
 	}
 	
 	protected int kBound(){
