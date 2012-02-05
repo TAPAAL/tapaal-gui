@@ -2170,7 +2170,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showNewPNDialog() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Create new Petri Net", true);
+				"Create a New Petri Net", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
