@@ -36,7 +36,7 @@ public class RunningVerificationDialog extends JDialog {
 	private Timer timer; 
 	
 	public RunningVerificationDialog(JFrame owner) {
-		super(owner, "Verification in progress", true);		
+		super(owner, "Verification in Progress", true);		
 		initComponents();			
 		pack();
 	}
@@ -56,9 +56,9 @@ public class RunningVerificationDialog extends JDialog {
 		
 		okButton = new JButton("Interrupt Verification");
 		headLineLabel = new JLabel();
-		headLineLabel.setText("Verification is running... Please wait!");
+		headLineLabel.setText("Verification is running, please wait ...  ");
 		progressLabel = new JLabel();
-		progressLabel.setText("Time Elapsed: ");
+		progressLabel.setText("Elapsed time: ");
 		timerLabel = new JLabel();
 		timerLabel.setText("0 s");
 		
@@ -92,11 +92,11 @@ public class RunningVerificationDialog extends JDialog {
 		content.add(timerLabel,gbc);
 		
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
+		gbc.gridx = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridy = 2;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.NORTHEAST;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.insets = insets;
 		content.add(okButton,gbc);
 		
