@@ -51,6 +51,7 @@ import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropWithSharedPlaceVisitor;
+import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
@@ -135,7 +136,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private void initComponents() {
 		JPanel listPanel = new JPanel(new GridBagLayout());
 		
-		list = new JList();
+		list = new NonsearchableJList();
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){

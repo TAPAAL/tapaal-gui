@@ -108,6 +108,7 @@ public class NewTAPNPanel extends JPanel {
 							CreateGui.getApp(),
 							"Something went wrong while creating a new model. Please try again.",
 							"Error", JOptionPane.INFORMATION_MESSAGE);
+			e.printStackTrace();
 			return;
 		}
 

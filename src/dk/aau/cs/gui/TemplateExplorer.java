@@ -8,7 +8,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVisitor;
+import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortTemplatesCommand;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -161,7 +165,8 @@ public class TemplateExplorer extends JPanel {
 			}
 		});
 
-		templateList = new JList(listModel);
+		templateList = new NonsearchableJList(listModel);
+
 		templateList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		templateList.setSelectedIndex(0);
 		templateList.setCellRenderer(new TemplateListCellRenderer(templateList.getCellRenderer()));
@@ -169,6 +174,8 @@ public class TemplateExplorer extends JPanel {
 		TemplateListManager manager = new TemplateListManager(templateList);
 		templateList.addListSelectionListener(manager);
 		templateList.addMouseListener(manager);
+		
+		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
 		
