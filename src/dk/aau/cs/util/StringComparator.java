@@ -34,13 +34,7 @@ public class StringComparator implements Comparator<Object>{
 				int i1 = Integer.parseInt(m1.group());
 				int i2 = Integer.parseInt(m2.group());
 				
-				if(i1 > i2){
-					return 1;
-				} else if (i1 < i2){
-					return -1;
-				} else {
-					return 0;
-				}
+				return i1-i2;
 			}
 		}
 		return s1.compareTo(s2);
