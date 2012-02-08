@@ -66,6 +66,7 @@ import pipe.gui.action.GuiAction;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
+import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
@@ -521,6 +522,16 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		JMenuItem batchProcessing = new JMenuItem("Batch processing");
 		batchProcessing.setMnemonic('b');
+		
+		JMenuItem engineSelection = new JMenuItem("Verification engine");
+		engineSelection.setMnemonic('v');
+		
+		engineSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new EngineDialogPanel().showDialog();				
+			}
+		});
+		toolsMenu.add(engineSelection);
 		
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
