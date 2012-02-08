@@ -50,4 +50,15 @@ public class Template {
 	public Zoomer zoomer() {
 		return zoomer;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Template){
+			Template other = (Template)obj;
+			if(this.net.equals(other.net)){
+				return true;
+			}
+		}
+		return false;
+	}
 }

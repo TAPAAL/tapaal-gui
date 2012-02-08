@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -33,9 +34,12 @@ import pipe.gui.undo.RemoveQueryCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.SortQueriesCommand;
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.StringComparator;
 
 public class QueryPane extends JPanel {
 	private static final long serialVersionUID = 4062539545170994654L;
@@ -54,11 +58,16 @@ public class QueryPane extends JPanel {
 	private UndoManager undoManager;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
 	
-	private static final String toolTipNewQuery = "Create a new query.";
-	private static final String toolTipEditQuery="Edit the selected query.";
+	private static final String toolTipNewQuery = "Create a new query";
+	private static final String toolTipEditQuery="Edit the selected query";
 	private static final String toolTipRemoveQuery="Remove the selected query";
-	private static final String toolTipVerifyQuery="Do a verification of the selected query.";
+	private static final String toolTipVerifyQuery="Verify the selected query";
+	private static final String toolTipSortQueries="Sort the queries alphabetically";
+	private final static String toolTipMoveUp = "Move the selected query up";
+	private final static String toolTipMoveDown = "Move the selected query down";
+	
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
@@ -150,7 +159,7 @@ public class QueryPane extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -159,6 +168,7 @@ public class QueryPane extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
@@ -178,6 +188,7 @@ public class QueryPane extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
@@ -194,6 +205,25 @@ public class QueryPane extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTH;
 		queryCollectionPanel.add(moveDownButton,gbc);
+		
+		//Sort button
+		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton.setToolTipText(toolTipSortQueries);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Command c = new SortQueriesCommand(listModel);
+				undoManager.addNewEdit(c);
+				c.redo();
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		queryCollectionPanel.add(sortButton,gbc);
 	}
 
 	private void addButtons() {

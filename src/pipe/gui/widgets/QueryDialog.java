@@ -243,9 +243,9 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
 	
 	//Tool tips for logic panel
-	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently marked part of the query with a conjunction.";
-	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently marked part of the query with a disjunction.";
-	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently marked part of the query.";
+	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
 	
 	//Tool tips for query panel
 	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
