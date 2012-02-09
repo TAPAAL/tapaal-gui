@@ -44,7 +44,7 @@ public class ArcPathPoint extends PetriNetObject {
 
 	private ArcPathPoint() {
 		copyPasteable = false; // we can't copy & paste indivial arc points!
-		zoom = 100;
+		zoom = Pipe.ZOOM_DEFAULT;
 	}
 
 	public ArcPathPoint(ArcPath a) {
@@ -58,6 +58,11 @@ public class ArcPathPoint extends PetriNetObject {
 		myArcPath = a;
 		setPointLocation(x, y);
 		pointType = _pointType;
+	}
+	
+	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a, int zoomLevel) {
+		this(x,y,_pointType,a);
+		zoom = zoomLevel;
 	}
 
 	/**
@@ -74,7 +79,7 @@ public class ArcPathPoint extends PetriNetObject {
 	public void setPointLocation(float x, float y) {
 		double realX = Zoomer.getUnzoomedValue(x, zoom);
 		double realY = Zoomer.getUnzoomedValue(y, zoom);
-		realPoint.setLocation(realX, realY);
+		getRealPoint().setLocation(realX, realY);
 		point.setLocation(x, y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
@@ -286,11 +291,19 @@ public class ArcPathPoint extends PetriNetObject {
 		} else {
 			SIZE = 3;
 		}
-		float x = Zoomer.getZoomedValue(realPoint.x, zoom);
-		float y = Zoomer.getZoomedValue(realPoint.y, zoom);
+		float x = Zoomer.getZoomedValue(getRealPoint().x, zoom);
+		float y = Zoomer.getZoomedValue(getRealPoint().y, zoom);
 		point.setLocation(x, y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
+	}
+
+	public Point2D.Float getRealPoint() {
+		return realPoint;
+	}
+
+	public void setRealPoint(Point2D.Float realPoint) {
+		this.realPoint = realPoint;
 	}
 
 }

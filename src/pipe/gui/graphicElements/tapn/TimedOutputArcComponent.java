@@ -78,17 +78,18 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public TimedOutputArcComponent(TimedOutputArcComponent arc) {
+		zoom = arc.zoom;
 		label = new NameLabel(zoom);
-		
 		myPath = new ArcPath(this);
 		for (int i = 0; i <= arc.myPath.getEndIndex(); i++) {
-			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i));
+			myPath.addPoint(arc.myPath.getPoint(i).getX(), arc.myPath.getPoint(i).getY(), arc.myPath.getPointType(i),zoom);
 		}
 		myPath.createPath();
 		this.updateBounds();
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
+		
 	}
 
 	public TimedOutputArcComponent paste(double despX, double despY,
@@ -209,22 +210,22 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	public TimedOutputArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
-		TimedOutputArcComponent arc = new TimedOutputArcComponent(this);
-		arc.setSource(oldToNewMapping.get(this.getSource()));
-		arc.setTarget(oldToNewMapping.get(this.getTarget()));
-		arc.setUnderlyingArc(tapn.getOutputArcFromTransitionAndPlace(tapn.getTransitionByName(outputArc.source().name()), tapn.getPlaceByName(outputArc.destination().name())));
+		TimedOutputArcComponent newCopyArc = new TimedOutputArcComponent(this);
+		newCopyArc.setSource(oldToNewMapping.get(this.getSource()));
+		newCopyArc.setTarget(oldToNewMapping.get(this.getTarget()));
+		newCopyArc.setUnderlyingArc(tapn.getOutputArcFromTransitionAndPlace(tapn.getTransitionByName(outputArc.source().name()), tapn.getPlaceByName(outputArc.destination().name())));
 		
-		arc.getSource().addConnectFrom(arc);
-		arc.getTarget().addConnectTo(arc);
-		
-		ArcHandler arcHandler = new ArcHandler((DrawingSurfaceImpl)getParent(), arc);
-		arc.addMouseListener(arcHandler);
+		newCopyArc.getSource().addConnectFrom(newCopyArc);
+		newCopyArc.getTarget().addConnectTo(newCopyArc);
+				
+		ArcHandler arcHandler = new ArcHandler((DrawingSurfaceImpl)getParent(), newCopyArc);
+		newCopyArc.addMouseListener(arcHandler);
 		//arc.addMouseWheelListener(arcHandler);
-		arc.addMouseMotionListener(arcHandler);
+		newCopyArc.addMouseMotionListener(arcHandler);
 		
-		arc.setGuiModel(guiModel);
+		newCopyArc.setGuiModel(guiModel);
 		
-		return arc;
+		return newCopyArc;
 	}
 
 }

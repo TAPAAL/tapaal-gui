@@ -326,7 +326,7 @@ public class AnnotationNote extends Note {
 	}
 	
 	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(note.getText(), this.getOriginalX() , this.getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
+		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
 		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
 		annotation.addMouseListener(noteHandler);
 		annotation.addMouseMotionListener(noteHandler);

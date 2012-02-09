@@ -55,6 +55,7 @@ import javax.swing.table.TableCellRenderer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
+import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
@@ -105,7 +106,7 @@ public class BatchProcessingDialog extends JDialog {
 	//Tool tip strings
 	//Tool tips for model panel
 	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch processing";
-	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked nets";
+	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently selected nets";
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	
 	//Tool tips for override verification panel
@@ -166,11 +167,11 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton closeButton;
 	private JComboBox queryPropertyOption;
 	private JPanel verificationOptionsPanel;
-	private JSpinner numberOfExtraTokensInNet;
+	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
 	private JComboBox symmetryOption;
 	private JCheckBox noTimeoutCheckbox;
-	private JSpinner timeoutValue;
+	private CustomJSpinner timeoutValue;
 	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			timeoutCurrentVerificationTask();
@@ -440,8 +441,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(capacityLabel, gbc);
 
-		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0,
-				Integer.MAX_VALUE, 1));
+		numberOfExtraTokensInNet = new CustomJSpinner(3);
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(70, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(70, 30));
@@ -485,8 +485,9 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
 
-		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5,
-				Integer.MAX_VALUE, 1));
+//		timeoutValue = new JSpinner(new SpinnerNumberModel(30, 5,
+//				Integer.MAX_VALUE, 1));
+		timeoutValue = new CustomJSpinner(30, 5,Integer.MAX_VALUE);
 		timeoutValue.setToolTipText(TOOL_TIP_TimeoutValue);
 		timeoutValue.setMaximumSize(new Dimension(70, 30));
 		timeoutValue.setMinimumSize(new Dimension(70, 30));

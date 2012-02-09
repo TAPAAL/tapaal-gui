@@ -118,8 +118,6 @@ public class QueryDialog extends JPanel {
 	private static final String SHARED = "Shared";
 
 	private static final long serialVersionUID = 7852107237344005546L;
-	
-	
 
 	public enum QueryDialogueOption {
 		VerifyNow, Save, Export
@@ -136,7 +134,7 @@ public class QueryDialog extends JPanel {
 
 	// Boundedness check panel
 	private JPanel boundednessCheckPanel;
-	private JSpinner numberOfExtraTokensInNet;
+	private CustomJSpinner numberOfExtraTokensInNet;
 	private JButton kbounded;
 
 	// Query Panel
@@ -170,7 +168,7 @@ public class QueryDialog extends JPanel {
 	private JComboBox templateBox;
 	private JComboBox placesBox;
 	private JComboBox relationalOperatorBox;
-	private JSpinner placeMarking;
+	private CustomJSpinner placeMarking;
 	private JButton truePredicateButton;
 	private JButton falsePredicateButton;
 
@@ -245,9 +243,9 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_FORALL_BOX = "Check if every reachable marking in the net satifies the given property.";
 	
 	//Tool tips for logic panel
-	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently marked part of the query with a conjunction.";
-	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently marked part of the query with a disjunction.";
-	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently marked part of the query.";
+	private static final String TOOL_TIP_CONJUNCTIONBUTTON = "Expand the currently selected part of the query with a conjunction.";
+	private static final String TOOL_TIP_DISJUNCTIONBUTTON = "Expand the currently selected part of the query with a disjunction.";
+	private static final String TOOL_TIP_NEGATIONBUTTON = "Negate the currently selected part of the query.";
 	
 	//Tool tips for query panel
 	private static final String TOOL_TIP_PLACESBOX = "Choose a place for the predicate.";
@@ -1040,7 +1038,7 @@ public class QueryDialog extends JPanel {
 		boundednessCheckPanel.setLayout(new BoxLayout(boundednessCheckPanel, BoxLayout.X_AXIS));
 		boundednessCheckPanel.add(new JLabel(" Number of extra tokens:  "));
 
-		numberOfExtraTokensInNet = new JSpinner(new SpinnerNumberModel(3, 0, Integer.MAX_VALUE, 1));	
+		numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
@@ -1487,11 +1485,8 @@ public class QueryDialog extends JPanel {
 
 		gbc.gridx = 1;
 		predicatePanel.add(relationalOperatorBox, gbc);
-
-		int currentValue = 0;
-		int min = 0;
-		int step = 1;
-		placeMarking = new JSpinner(new SpinnerNumberModel(currentValue, min,Integer.MAX_VALUE, step));
+		
+		placeMarking = new CustomJSpinner(0);
 		placeMarking.setMaximumSize(new Dimension(60, 30));
 		placeMarking.setMinimumSize(new Dimension(60, 30));
 		placeMarking.setPreferredSize(new Dimension(60, 30));
