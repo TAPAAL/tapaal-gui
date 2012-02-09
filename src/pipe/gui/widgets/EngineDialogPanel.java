@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -19,7 +20,7 @@ public class EngineDialogPanel {
 	private String tapaalVersion = "N/A";
 	private String uppaalVersion = "N/A";
 	
-	private Dimension minimumSize = new Dimension(400,500);
+	//private Dimension minimumSize = new Dimension(400,500);
 	
 	public EngineDialogPanel() {
 		initComponents();		
@@ -66,6 +67,30 @@ public class EngineDialogPanel {
 		gbc.gridy = 0;
 		tapaalPanel.add(tapaalInfoPanel,gbc);
 		
+		//add TapaalButtonPanel to  tapaalpanel
+		JButton tapaalSelectButton = new JButton("Select");
+		JButton tapaalResetButton = new JButton("Reset");
+		JPanel tapaalButtonPanel = new JPanel();
+		tapaalButtonPanel.setLayout(new GridBagLayout());
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		//gbc.anchor = GridBagConstraints.WEST;
+		tapaalButtonPanel.add(tapaalSelectButton,gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		//gbc.anchor = GridBagConstraints.EAST;
+		tapaalButtonPanel.add(tapaalResetButton,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		//gbc.fill = GridBagConstraints.HORIZONTAL;
+		//gbc.weightx = 0;
+		tapaalPanel.add(tapaalButtonPanel,gbc);
+		
+		
 		//make uppaal panel
 		JPanel uppaalPanel = new JPanel();
 		uppaalPanel.setBorder(BorderFactory.createTitledBorder("Uppaal engine"));
@@ -101,23 +126,55 @@ public class EngineDialogPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		uppaalPanel.add(uppaalInfoPanel,gbc);
+		uppaalPanel.add(uppaalInfoPanel,gbc);	
 		
-		//add TapaalButtonPanel to  tapaalpanel 
-		
+		//add uppaalButtonPanel to  uppaalPanel
+		JButton uppaalSelectButton = new JButton("Select");
+		JButton uppaalResetButton = new JButton("Reset");
+		JPanel uppaalButtonPanel = new JPanel();
+		uppaalButtonPanel.setLayout(new GridBagLayout());
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		uppaalButtonPanel.add(uppaalSelectButton,gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.EAST;
+		uppaalButtonPanel.add(uppaalResetButton,gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		uppaalPanel.add(uppaalButtonPanel,gbc);
+
 		//add panels to engine panel
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		//gbc.fill = GridBagConstraints.HORIZONTAL;
 		enginePanel.add(tapaalPanel,gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.VERTICAL;
+		//gbc.fill = GridBagConstraints.VERTICAL;
 		enginePanel.add(uppaalPanel,gbc);
 		
+		JPanel closeButtonPanel = new JPanel();
+		closeButtonPanel.setLayout(new GridBagLayout());
+		JButton closeButton = new JButton("Close");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;		
+		closeButtonPanel.add(closeButton,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.EAST;
+		enginePanel.add(closeButtonPanel,gbc);
 		
 	}
 
@@ -126,7 +183,7 @@ public class EngineDialogPanel {
 				"Select verification engines", true);
 		dialog.add(enginePanel);
 		dialog.setResizable(false);
-		dialog.setMinimumSize(minimumSize);
+		//dialog.setMinimumSize(minimumSize);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
