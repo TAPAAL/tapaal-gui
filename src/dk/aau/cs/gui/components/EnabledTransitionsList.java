@@ -1,4 +1,4 @@
-package pipe.gui;
+package dk.aau.cs.gui.components;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,7 +20,10 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import dk.aau.cs.util.StringComparator;
+
 import pipe.dataLayer.Template;
+import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 
@@ -184,28 +187,9 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		private int compareToString(ListItem o){
-			/*
-			 * TODO use the string comparer in the sortAbleTransitions branch!
-			Pattern p = Pattern.compile("\\d*$");
-			String s1 = this.transition.getName().toLowerCase();
-			String s2 = o.transition.getName().toLowerCase();
-			Matcher m1 = p.matcher(s1);
-			Matcher m2 = p.matcher(s2);
-			if(m1.find() && m2.find()){
-				if(s1.substring(0, m1.start()).equals(s2.substring(0, m2.start()))){
-					int i1 = Integer.parseInt(m1.group());
-					int i2 = Integer.parseInt(m2.group());
-					
-					if(i1 > i2){
-						return 1;
-					} else if (i1 < i2){
-						return -1;
-					} else {
-						return 0;
-					}
-				}
-			}*/
-			return this.transition.getName().toLowerCase().compareTo(o.transition.getName().toLowerCase());
+			StringComparator s = new StringComparator();
+			return s.compare(this.transition.getName(), o.transition.getName());
+			
 		}
 	}
 }
