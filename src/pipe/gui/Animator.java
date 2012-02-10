@@ -79,7 +79,7 @@ public class Animator {
 		}
 
 		CreateGui.getAbstractAnimationPane().setSelectedIndex(0);
-		setFiringmode("Manual");
+		setFiringmode("Random");
 
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				"The verification process returned an untimed trace.\n\n"

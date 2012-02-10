@@ -31,6 +31,7 @@ import javax.swing.border.EmptyBorder;
 import pipe.dataLayer.NetType;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
 /**
@@ -115,7 +116,7 @@ public class AnimationController extends JPanel {
 		// Use the default FlowLayout.
 		// Create everything.
 
-		firermodebox = new JComboBox(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox(FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(new java.awt.event.ActionListener() {
