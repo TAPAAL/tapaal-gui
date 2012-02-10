@@ -148,6 +148,10 @@ public class VerifyTAPN implements ModelChecker {
 			runner.kill();
 		}
 	}
+	
+	public void setVerifyTapnPath(String path) {
+		verifytapnpath = path;
+	}
 
 	public boolean setup() {
 		if (isNotSetup()) {

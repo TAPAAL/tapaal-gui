@@ -523,7 +523,7 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenuItem batchProcessing = new JMenuItem("Batch processing");
 		batchProcessing.setMnemonic('b');
 		
-		JMenuItem engineSelection = new JMenuItem("Verification engine");
+		JMenuItem engineSelection = new JMenuItem("Verification engines");
 		engineSelection.setMnemonic('v');
 		
 		engineSelection.addActionListener(new ActionListener() {
@@ -558,25 +558,6 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		
 		toolsMenu.add(statistics);
-		toolsMenu.addSeparator();
-
-		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL engine)");
-		resetVerifytapn.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) { 
-				VerifyTAPN.reset(); 
-				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifytapn has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		toolsMenu.add(resetVerifytapn);
-		
-		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL engine)");
-		resetVerifyta.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) { 
-				Verifyta.reset(); 
-				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifyta has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		toolsMenu.add(resetVerifyta);
 		return toolsMenu;
 	}
 
