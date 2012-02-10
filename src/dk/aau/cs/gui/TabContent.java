@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -18,7 +17,6 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.multi.MultiSplitPaneUI;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -37,14 +35,10 @@ import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
-	private static final double WEIGHT_Y_TEMPEXP = 0.2;
-	private static final double WEIGHT_Y_ENABLED_TRANS = 0.2;
-	private static final double RATIO = WEIGHT_Y_ENABLED_TRANS -WEIGHT_Y_TEMPEXP; 
 
 	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -61,10 +55,11 @@ public class TabContent extends JSplitPane {
 
 	// / Animation
 	protected AnimationHistoryComponent animBox;
-	protected AnimationController animControlerBox;
+	protected AnimationController animControlerBox;	
 	protected JScrollPane animationHistoryScrollPane;
 	protected JScrollPane animationControllerScrollPane;
 	protected AnimationHistoryComponent abstractAnimationPane = null;
+	protected JPanel animationControlsPanel;
 
 	protected JPanel animatorLeftPane;
 	protected JSplitPane animationHistorySplitter;
@@ -201,8 +196,6 @@ public class TabContent extends JSplitPane {
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
-//TODO
-	JPanel animationControlsPanel;
 	
 	public void switchToAnimationComponents() {
 		
@@ -252,43 +245,6 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animatorLeftPane.add(outerSplitPane, gbc);
 		this.setLeftComponent(animatorLeftPane);
-		
-		/*
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = WEIGHT_Y_TEMPEXP;
-		animatorLeftPane.add(templateExplorer, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = WEIGHT_Y_ENABLED_TRANS;
-		animatorLeftPane.add(enabledTransitionsList, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
-		animatorLeftPane.add(animControlerBox, gbc);
-		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 3;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1 - RATIO;
-		animatorLeftPane.add(animationHistoryScrollPane, gbc);
-		
-		*/
-		
-		
 	}
 	
 	public JSplitPane getOuterSplitPane(){
