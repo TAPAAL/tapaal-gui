@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -34,6 +35,7 @@ import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane {
@@ -409,10 +411,26 @@ public class TabContent extends JSplitPane {
 	public void swapTemplates(int currentIndex, int newIndex) {
 		tapnNetwork.swapTemplates(currentIndex, newIndex);
 	}
+	
+	public TimedArcPetriNet[] sortTemplates() {
+		return tapnNetwork.sortTemplates();
+	}
+	
+	public void undoSort(TimedArcPetriNet[] l){
+		tapnNetwork.undoSort(l);
+	}
 
 	public void swapConstants(int currentIndex, int newIndex) {
 		tapnNetwork.swapConstants(currentIndex, newIndex);
 		
+	}
+	
+	public Constant[] sortConstants(){
+		return tapnNetwork.sortConstants();
+	}
+	
+	public void undoSort(Constant[] oldOrder) {
+		tapnNetwork.undoSort(oldOrder);
 	}
 	
 	public void showComponents(boolean enable){
@@ -431,7 +449,5 @@ public class TabContent extends JSplitPane {
 		queries.selectFirst();
 		constantsPanel.selectFirst();
 		
-	}
-
-	
+	}	
 }

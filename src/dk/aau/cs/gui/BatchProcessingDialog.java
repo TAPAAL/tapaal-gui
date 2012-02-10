@@ -106,7 +106,7 @@ public class BatchProcessingDialog extends JDialog {
 	//Tool tip strings
 	//Tool tips for model panel
 	private final static String TOOL_TIP_AddFilesButton = "Press to add nets to batch processing";
-	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently marked nets";
+	private final static String TOOL_TIP_RemoveFilesButton = "Press to remove the currently selected nets";
 	private final static String TOOL_TIP_ClearFilesButton = "Press to remove all nets from list";
 	
 	//Tool tips for override verification panel
