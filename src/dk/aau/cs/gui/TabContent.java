@@ -217,6 +217,8 @@ public class TabContent extends JSplitPane {
 		
 		topSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
 		topSplitPane.setResizeWeight(0.5);
+		topSplitPane.setBorder(null);
+		topSplitPane.setContinuousLayout(true);
 		topSplitPane.setOneTouchExpandable(true);
 		
 		animationControlsPanel = new JPanel(new GridBagLayout());
@@ -238,6 +240,8 @@ public class TabContent extends JSplitPane {
 		
 		outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, animationControlsPanel);
 		outerSplitPane.setResizeWeight(0.5);
+		outerSplitPane.setBorder(null);
+		outerSplitPane.setContinuousLayout(true);
 		outerSplitPane.setOneTouchExpandable(true);
 		
 		gbc = new GridBagConstraints();
