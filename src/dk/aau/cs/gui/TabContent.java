@@ -335,24 +335,26 @@ public class TabContent extends JSplitPane {
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1 - RATIO;
+		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistorySplitter, gbc);
 	}
 
 	public void removeAbstractAnimationPane() {
-		animatorLeftPane.remove(animationHistorySplitter);
+		animationControlsPanel.remove(animationHistorySplitter);
 		abstractAnimationPane = null;
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1 - WEIGHT_Y_TEMPEXP;
-		animatorLeftPane.add(animationHistoryScrollPane);
+		gbc.weighty = 1.0;
+		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		this.repaint();
+		
 	}
 
 	private void createAnimationController() {
