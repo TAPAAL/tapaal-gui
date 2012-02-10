@@ -202,6 +202,7 @@ public class TabContent extends JSplitPane {
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 //TODO
+	JPanel animationControlsPanel;
 	
 	public void switchToAnimationComponents() {
 		
@@ -218,14 +219,14 @@ public class TabContent extends JSplitPane {
 		topSplitPane.setResizeWeight(0.5);
 		topSplitPane.setOneTouchExpandable(true);
 		
-		JPanel anim = new JPanel(new GridBagLayout());
+		animationControlsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.0;
-		anim.add(animControlerBox, gbc);
+		animationControlsPanel.add(animControlerBox, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -233,9 +234,9 @@ public class TabContent extends JSplitPane {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		anim.add(animationHistoryScrollPane, gbc);
+		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 		
-		outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, anim);
+		outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, animationControlsPanel);
 		outerSplitPane.setResizeWeight(0.5);
 		outerSplitPane.setOneTouchExpandable(true);
 		
@@ -317,7 +318,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void addAbstractAnimationPane() {
-		animatorLeftPane.remove(animationHistoryScrollPane);
+		animationControlsPanel.remove(animationHistoryScrollPane);
 		abstractAnimationPane = new AnimationHistoryComponent();
 
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
@@ -338,7 +339,7 @@ public class TabContent extends JSplitPane {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1 - RATIO;
-		animatorLeftPane.add(animationHistorySplitter, gbc);
+		animationControlsPanel.add(animationHistorySplitter, gbc);
 	}
 
 	public void removeAbstractAnimationPane() {
