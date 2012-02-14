@@ -584,7 +584,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void doOK() {
 		int newMarking = (Integer)markingSpinner.getValue();
 		if (newMarking > 9999) {
-			JOptionPane.showMessageDialog(this,"The maximal number of tokens allowed for one place is 9999", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most 9999 tokens in a place", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
