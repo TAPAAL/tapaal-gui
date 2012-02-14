@@ -107,7 +107,7 @@ public class EngineDialogPanel {
 	}
 	
 	private void resetVerifytaEngine() {
-		Verifyta.reset(); Verifyta.trySetupFromEnvironmentVariable();
+		Verifyta.reset(); 
 		uppaalLocationLabel.setText("Located: Not setup");
 		uppaalVersionLabel.setText("Version: N/A");
 	}
