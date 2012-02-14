@@ -110,14 +110,12 @@ public class EngineDialogPanel {
 		Verifyta.reset(); Verifyta.trySetupFromEnvironmentVariable();
 		uppaalLocationLabel.setText("Located: Not setup");
 		uppaalVersionLabel.setText("Version: N/A");
-		fitDialog();
 	}
 	
 	private void resetTapnEngine() {
 		VerifyTAPN.reset();
 		tapaalLocationLabel.setText("Located: Not setup");
 		tapaalVersionLabel.setText("Version: N/A");
-		fitDialog();
 	}
 	
 	private void fitDialog() {

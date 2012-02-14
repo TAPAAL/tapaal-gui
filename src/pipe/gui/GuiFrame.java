@@ -521,18 +521,7 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.setMnemonic('t');
 		
 		JMenuItem batchProcessing = new JMenuItem("Batch processing");
-		batchProcessing.setMnemonic('b');
-		
-		JMenuItem engineSelection = new JMenuItem("Verification engines");
-		engineSelection.setMnemonic('v');
-		
-		engineSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new EngineDialogPanel().showDialog();				
-			}
-		});
-		toolsMenu.add(engineSelection);
-		
+		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				checkForSave();
@@ -549,15 +538,24 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.add(batchProcessing);
 		
 		statistics = new JMenuItem("Net statistics");
-		statistics.setMnemonic('n');
-		
+		statistics.setMnemonic('n');		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				StatisticsPanel.showStatisticsPanel();
 			}
-		});
+		});		
+		toolsMenu.add(statistics);		
 		
-		toolsMenu.add(statistics);
+		toolsMenu.addSeparator();
+		
+		JMenuItem engineSelection = new JMenuItem("Verification engines");
+		engineSelection.setMnemonic('v');		
+		engineSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new EngineDialogPanel().showDialog();				
+			}
+		});
+		toolsMenu.add(engineSelection);
 		return toolsMenu;
 	}
 
@@ -1877,43 +1875,6 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
 		buffer.append("Aalborg University 2011\n\n");
 		buffer.append("License information and more at: www.tapaal.net\n\n");
-		
-		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
-
-		String verifytaPath = verifyta.getPath();
-		String verifytaversion = "";
-
-		if (verifytaPath == null || verifytaPath.isEmpty()) {
-			verifytaPath = "Not setup";
-			verifytaversion = "N/A";
-		} else {
-			verifytaversion = verifyta.getVersion();
-		}
-		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
-		String verifytapnPath = verifyTAPN.getPath();
-		String verifytapnversion = "";
-
-		if (verifytapnPath == null || verifytapnPath.isEmpty()) {
-			verifytapnPath = "Not setup";
-			verifytapnversion = "N/A";
-		} else {
-			verifytapnversion = verifyTAPN.getVersion();
-		}
-		
-		buffer.append("TAPAAL Engine (verifytapn) Information:\n");
-		buffer.append("   Located: ");
-		buffer.append(verifytapnPath);
-		buffer.append('\n');
-		buffer.append("   Version: ");
-		buffer.append(verifytapnversion);
-		buffer.append("\n\n");
-		
-		buffer.append("UPPAAL Engine (verifyta) Information:\n");
-		buffer.append("   Located: ");
-		buffer.append(verifytaPath);
-		buffer.append('\n');
-		buffer.append("   Version: ");
-		buffer.append(verifytaversion);
 
 		buffer.append("  \n\n");
 		buffer.append("Based on PIPE2:\n");
