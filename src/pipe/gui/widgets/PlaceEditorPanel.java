@@ -582,6 +582,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void doOK() {
+		int newMarking = (Integer)markingSpinner.getValue();
+		if (newMarking > 9999) {
+			JOptionPane.showMessageDialog(this,"The maximal number of tokens allowed for one place is 9999", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
 		context.undoManager().newEdit(); // new "transaction""
 
 		TimedPlace underlyingPlace = place.underlyingPlace();
@@ -626,7 +632,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 
 
-		int newMarking = (Integer)markingSpinner.getValue();
+		
 		if(newMarking != place.underlyingPlace().numberOfTokens()){
 			Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
 			command.redo();
