@@ -338,7 +338,7 @@ public class TabContent extends JSplitPane {
 		
 		enabledTransitionsList.setBorder(BorderFactory
 		.createCompoundBorder(BorderFactory
-				.createTitledBorder("Enabled transitions"),
+				.createTitledBorder("Enabled Transitions"),
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 	
