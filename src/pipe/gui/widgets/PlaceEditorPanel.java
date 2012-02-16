@@ -583,8 +583,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private void doOK() {
 		int newMarking = (Integer)markingSpinner.getValue();
-		if (newMarking > MaximalNumberOfTokensAllowed.intValue()) {
-			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+MaximalNumberOfTokensAllowed.toString()+" tokens in a place", "Error", JOptionPane.ERROR_MESSAGE);
+		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
@@ -674,8 +674,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void exit() {
 		rootPane.getParent().setVisible(false);
 	}
-
-	private Integer MaximalNumberOfTokensAllowed = new Integer(9999);
+	
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;
