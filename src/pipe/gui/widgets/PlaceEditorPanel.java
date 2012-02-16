@@ -584,7 +584,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void doOK() {
 		int newMarking = (Integer)markingSpinner.getValue();
 		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
-			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		

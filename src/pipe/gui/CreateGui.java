@@ -26,7 +26,7 @@ public class CreateGui {
 
 	public static String imgPath, userPath; // useful for stuff
 	
-	public static Integer MaximalNumberOfTokensAllowed = new Integer(9999);
+	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
 
 	public static void init() {
 		imgPath = "resources/Images/";
