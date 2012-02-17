@@ -99,8 +99,8 @@ public class EnabledTransitionsList extends JPanel{
 		transitions.removeElement(item);
 	}
 	
-	public static final String FIRE_BUTTON_DEACTIVATED_TOOL_TIP = "No transitions are fireable";
-	public static final String FIRE_BUTTON_ENABLED_TOOL_TIP = "Press to fire selected transition";
+	public static final String FIRE_BUTTON_DEACTIVATED_TOOL_TIP = "No transitions are enabled";
+	public static final String FIRE_BUTTON_ENABLED_TOOL_TIP = "Press to fire the selected transition";
 	
 	public void updateFireButton(){
 		if(transitions.size() == 0){
@@ -161,7 +161,7 @@ public class EnabledTransitionsList extends JPanel{
 			return isShared;
 		}
 
-		@Override
+	
 		public int compareTo(ListItem o) {
 
 			if(this.isShared() == o.isShared()){

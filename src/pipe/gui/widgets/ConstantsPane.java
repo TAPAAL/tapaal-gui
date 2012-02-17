@@ -147,6 +147,7 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createTitledBorder("Global Constants"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
+		this.setToolTipText("Declaration of global constants that can be used in intervals and age invariants");
 		//this.setToolTipText(toolTipGlobalConstantsLabel);
 		//showConstants();
 	}

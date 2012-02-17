@@ -405,6 +405,7 @@ public class Animator {
 		}
 
 		CreateGui.getAnimationController().updateFiringModeComboBox();
+		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
 	
 	enum FillListStatus{

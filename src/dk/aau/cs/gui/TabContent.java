@@ -340,6 +340,7 @@ public class TabContent extends JSplitPane {
 		.createCompoundBorder(BorderFactory
 				.createTitledBorder("Enabled Transitions"),
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		enabledTransitionsList.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
 	}
 	
 	public EnabledTransitionsList getFireabletransitionsList(){
