@@ -198,6 +198,10 @@ public class Verifyta implements ModelChecker {
 		}
 	}
 	
+	public void setVerifytaPath(String path) {
+		verifytapath = path; 
+	}
+	
 	public boolean supportsStats(){
 		return false;
 	}
