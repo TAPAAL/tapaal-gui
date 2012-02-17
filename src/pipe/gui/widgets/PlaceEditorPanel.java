@@ -582,6 +582,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void doOK() {
+		int newMarking = (Integer)markingSpinner.getValue();
+		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
+			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
 		context.undoManager().newEdit(); // new "transaction""
 
 		TimedPlace underlyingPlace = place.underlyingPlace();
@@ -626,7 +632,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 
 
-		int newMarking = (Integer)markingSpinner.getValue();
+		
 		if(newMarking != place.underlyingPlace().numberOfTokens()){
 			Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
 			command.redo();
@@ -668,7 +674,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void exit() {
 		rootPane.getParent().setVisible(false);
 	}
-
+	
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;
