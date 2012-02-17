@@ -7,12 +7,15 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -47,6 +50,8 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -55,11 +60,13 @@ import javax.swing.table.TableCellRenderer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
+import dk.aau.cs.gui.components.handlers.ClickHandler;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -94,6 +101,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCASTDEG2WithLegend = "F: "
 			+ name_BROADCASTDEG2;
 	private static final String name_AllReductions = "All verification methods";
+	private static final String name_UserDefinedReductions = "Choose multiple verification methods";
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
@@ -139,6 +147,8 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_CloseButton = "Press to close the batch processing dialog";
 	
 	private static String lastPath = null;
+	
+	ReductionOptionChooser reductionOptionChooser;
 	
 	private JSplitPane splitpane;
 	private JPanel topPanel;
@@ -520,7 +530,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
 	}
-
+	//TODO
 	private void initReductionOptionsComponents() {
 		JLabel reductionLabel = new JLabel("Verification method:");
 		reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
@@ -536,9 +546,10 @@ public class BatchProcessingDialog extends JDialog {
 				name_verifyTAPNDiscreteInclusionWithLegend,
 				name_STANDARDWithLegend, name_OPTIMIZEDSTANDARDWithLegend,
 				name_BROADCASTWithLegend, name_BROADCASTDEG2WithLegend,
-				name_AllReductions };
+				name_AllReductions, name_UserDefinedReductions };
 		reductionOption = new JComboBox(options);
 		reductionOption.setToolTipText(TOOL_TIP_ReductionOption);
+		reductionOption.setMaximumRowCount(options.length);
 
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -547,7 +558,24 @@ public class BatchProcessingDialog extends JDialog {
 				if (selectedItem != null) {
 					setEnabledOptionsAccordingToCurrentReduction();
 				}
+				
 			}
+		});
+		
+		reductionOption.addPopupMenuListener(new PopupMenuListener() {
+			
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				Object selectedItem = reductionOption.getSelectedItem();
+				
+				if(selectedItem == name_UserDefinedReductions){
+					//reductionOption.hidePopup();
+					showReductionOptionChooser();
+				}
+			}
+			
+			//Not used
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) { }
+			public void popupMenuCanceled(PopupMenuEvent arg0) { }
 		});
 
 		gbc = new GridBagConstraints();
@@ -560,6 +588,15 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(reductionOption, gbc);
 	}
 
+	private void showReductionOptionChooser(){
+		if(reductionOptionChooser == null){
+			reductionOptionChooser = new ReductionOptionChooser(BatchProcessingDialog.this, "Choose the reductions to use", false);
+			reductionOptionChooser.pack();
+		}
+		reductionOptionChooser.setLocationRelativeTo(BatchProcessingDialog.this);
+		reductionOptionChooser.setVisible(true);
+	}
+	
 	private void initSymmetryOptionsComponents() {
 		JLabel symmetryLabel = new JLabel("Symmetry:");
 		symmetryLabel.setToolTipText(TOOL_TIP_SymmetryLabel);
@@ -646,14 +683,20 @@ public class BatchProcessingDialog extends JDialog {
 		numberOfExtraTokensInNet.setEnabled(!keepQueryCapacity.isSelected());
 		timeoutValue.setEnabled(useTimeout());
 	}
-
+	
+	//TODO
 	private BatchProcessingVerificationOptions getVerificationOptions() {
 		boolean discreteInclusion = getReductionOptionAsString().equals(
 				name_verifyTAPNDiscreteInclusionWithLegend) ? true : false;
+		List<ReductionOption> reductionOptions = null;
+		if(getReductionOption() == ReductionOption.BatchProcessingUserDefinedReductions){
+			reductionOptions = reductionOptionChooser.getChoosenOptions();
+			discreteInclusion = reductionOptionChooser.isDiscreteInclusion();
+		}
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(),
 				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
 				getSearchOption(), getSymmetryOption(), getReductionOption(),
-				discreteInclusion);
+				discreteInclusion, reductionOptions);
 	}
 
 	private int getNumberOfExtraTokens() {
@@ -702,6 +745,8 @@ public class BatchProcessingDialog extends JDialog {
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_AllReductions))
 			return ReductionOption.BatchProcessingAllReductions;
+		else if (reductionOptionString.equals(name_UserDefinedReductions))
+			return ReductionOption.BatchProcessingUserDefinedReductions;
 		else
 			return ReductionOption.BatchProcessingKeepQueryOption;
 	}
@@ -1371,6 +1416,88 @@ public class BatchProcessingDialog extends JDialog {
 					first = false;
 			}
 			return s.toString();
+		}
+	}
+	
+	public class ReductionOptionChooser extends JDialog {
+		private static final long serialVersionUID = -249542142635773309L;
+		
+		private JCheckBox verifyTAPN;
+		private JCheckBox verifyTAPNDiscreteInclusion;
+		private JCheckBox STANDARD;
+		private JCheckBox OPTIMIZEDSTANDARD;
+		private JCheckBox BROADCAST;
+		private JCheckBox BROADCASTDEG2;
+		
+		public ReductionOptionChooser(Frame frame, String title, boolean modal) {
+			super(frame, title, modal);
+			
+			initComponents();
+		}
+		public ReductionOptionChooser(JDialog owner, String title, boolean modal) {
+			super(owner, title, modal);
+			
+			initComponents();
+		}
+		
+		
+		private void initComponents(){
+			
+			getContentPane().setLayout(new GridLayout(0, 1));
+			
+			verifyTAPN = new JCheckBox(name_verifyTAPNWithLegend);
+			verifyTAPN.setMnemonic('A');
+			verifyTAPNDiscreteInclusion = new JCheckBox(name_verifyTAPNDiscreteInclusionWithLegend);
+			verifyTAPN.setMnemonic('B');
+			STANDARD = new JCheckBox(name_STANDARDWithLegend);
+			verifyTAPN.setMnemonic('C');
+			OPTIMIZEDSTANDARD = new JCheckBox(name_OPTIMIZEDSTANDARDWithLegend);
+			verifyTAPN.setMnemonic('D');
+			BROADCAST = new JCheckBox(name_BROADCASTWithLegend);
+			verifyTAPN.setMnemonic('E');
+			BROADCASTDEG2 = new JCheckBox(name_BROADCASTDEG2WithLegend);
+			verifyTAPN.setMnemonic('F');
+			
+			getContentPane().add(verifyTAPN);
+			getContentPane().add(verifyTAPNDiscreteInclusion);
+			getContentPane().add(STANDARD);
+			getContentPane().add(OPTIMIZEDSTANDARD);
+			getContentPane().add(BROADCAST);
+			getContentPane().add(BROADCASTDEG2);
+			
+			JButton closeButton = new JButton("Close");
+			closeButton.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					getRootPane().getParent().setVisible(false);
+				}
+			});
+			
+			getContentPane().add(closeButton);
+			
+		}
+		
+		public List<ReductionOption> getChoosenOptions(){
+			ArrayList<ReductionOption> result = new ArrayList<ReductionOption>();
+			if(verifyTAPN.isSelected()){
+				result.add(ReductionOption.VerifyTAPN);
+			}
+			if(STANDARD.isSelected()){
+				result.add(ReductionOption.STANDARD);
+			}
+			if(OPTIMIZEDSTANDARD.isSelected()){
+				result.add(ReductionOption.OPTIMIZEDSTANDARD);
+			}
+			if(BROADCAST.isSelected()){
+				result.add(ReductionOption.BROADCAST);
+			}
+			if(BROADCASTDEG2.isSelected()){
+				result.add(ReductionOption.DEGREE2BROADCAST);
+			}
+			return result;
+		}
+		
+		public boolean isDiscreteInclusion(){
+			return verifyTAPNDiscreteInclusion.isSelected();
 		}
 	}
 }

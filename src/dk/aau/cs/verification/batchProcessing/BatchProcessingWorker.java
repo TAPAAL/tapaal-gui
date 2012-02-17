@@ -102,10 +102,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					
 					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
 					
-					if(queryToVerify.getReductionOption() == ReductionOption.BatchProcessingAllReductions)
+					if(queryToVerify.getReductionOption() == ReductionOption.BatchProcessingAllReductions){
 						processQueryForAllReductions(file,composedModel, queryToVerify);
-					else
+					} else if (queryToVerify.getReductionOption() == ReductionOption.BatchProcessingUserDefinedReductions){
+						processQueryForUserdefinedReductions(file,composedModel, queryToVerify);
+					} else {
 						processQuery(file, composedModel, queryToVerify);
+					}
 					
 				}
 			}
@@ -113,6 +116,24 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		fireFileChanged("");
 		fireStatusChanged("");
 		return null;
+	}
+
+	private void processQueryForUserdefinedReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
+		pipe.dataLayer.TAPNQuery query = queryToVerify;
+		query.setDiscreteInclusion(false);
+		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
+			if(exiting()) return;
+			query = query.copy();
+			query.setReductionOption(r);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.discreteInclusion()){
+			query = query.copy();
+			query.setReductionOption(ReductionOption.VerifyTAPN);
+			query.setDiscreteInclusion(true);
+			processQuery(file, composedModel, query);
+		}
 	}
 
 	private void processQueryForAllReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {

@@ -528,7 +528,7 @@ public class GuiFrame extends JFrame implements Observer {
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
 				dialog.setPreferredSize(dialog.getSize());
-				//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the result panel
+				//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
 				dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()-150));
 				dialog.setLocationRelativeTo(null);
 				dialog.setResizable(true);

@@ -1,7 +1,10 @@
 package dk.aau.cs.verification.batchProcessing;
 
+import java.util.List;
+
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.Require;
 
 public class BatchProcessingVerificationOptions {
 	
@@ -13,6 +16,7 @@ public class BatchProcessingVerificationOptions {
 		KeepQueryOption, Yes, No
 	};
 	
+	private List<ReductionOption> reductionOptions;
 	private ReductionOption reductionOption;
 	private SearchOption searchOption;
 	private QueryPropertyOption queryPropertyOption;
@@ -21,7 +25,20 @@ public class BatchProcessingVerificationOptions {
 	private int capacity;
 	private boolean discreteInclusion = false; // only for VerifyTAPN
 	
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion, List<ReductionOption> reductionOptions) {
+		Require.that(!(reductionOptions == null && reductionOption == ReductionOption.BatchProcessingUserDefinedReductions), "ReductionOption was given as userdefined but a list of reductionoptions was not given");
+		this.searchOption = searchOption;
+		this.reductionOption = reductionOption;
+		this.queryPropertyOption = queryPropertyOption;
+		this.symmetryOption = symmetryOption;
+		this.keepQueryCapacity = keepQueryCapacity;
+		this.capacity = capacity;
+		this.discreteInclusion = discreteInclusion;
+		this.reductionOptions = reductionOptions;
+	}
+	
 	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion) {
+		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption,reductionOption, discreteInclusion, null); 
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
 		this.queryPropertyOption = queryPropertyOption;
@@ -33,6 +50,11 @@ public class BatchProcessingVerificationOptions {
 	
 	public ReductionOption reductionOption() {
 		return reductionOption;
+	}
+	
+	public List<ReductionOption> reductionOptions() {
+		Require.that(reductionOption == ReductionOption.BatchProcessingUserDefinedReductions, "Tried to get the userdefined reductionoptions, but the reductionoption is not userdefined");
+		return reductionOptions;
 	}
 	
 	public SearchOption searchOption() {
