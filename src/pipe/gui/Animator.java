@@ -252,7 +252,7 @@ public class Animator {
 			if(untimedAnimationHistory.isStepForwardAllowed()){
 				String nextFromUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 
-				if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name())){
+				if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name()) || transition.isShared() && nextFromUntimedTrace.equals(transition.name())){
 					untimedAnimationHistory.stepForward();
 				}else{
 					int fireTransition = JOptionPane.showConfirmDialog(CreateGui.getApp(),
