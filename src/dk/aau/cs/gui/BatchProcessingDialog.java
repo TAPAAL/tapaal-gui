@@ -62,10 +62,12 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 import pipe.gui.widgets.CustomJSpinner;
+import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
+import dk.aau.cs.gui.components.ReductionMethodChooser;
 import dk.aau.cs.gui.components.handlers.ClickHandler;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -541,13 +543,13 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(reductionLabel, gbc);
 
-		String[] options = new String[] { name_KeepQueryOption,
+		/*String[] options = new String[] { name_KeepQueryOption,
 				name_verifyTAPNWithLegend,
 				name_verifyTAPNDiscreteInclusionWithLegend,
 				name_STANDARDWithLegend, name_OPTIMIZEDSTANDARDWithLegend,
 				name_BROADCASTWithLegend, name_BROADCASTDEG2WithLegend,
 				name_AllReductions, name_UserDefinedReductions };
-		reductionOption = new JComboBox(options);
+		reductionOption = new ReductionMethodChooser(options);
 		reductionOption.setToolTipText(TOOL_TIP_ReductionOption);
 		reductionOption.setMaximumRowCount(options.length);
 
@@ -561,6 +563,7 @@ public class BatchProcessingDialog extends JDialog {
 				
 			}
 		});
+		
 		
 		reductionOption.addPopupMenuListener(new PopupMenuListener() {
 			
@@ -586,11 +589,22 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(reductionOption, gbc);
+		*/
+		
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.gridwidth = 2;
+		verificationOptionsPanel.add(new ReductionMethodChooser( ), gbc);
 	}
 
 	private void showReductionOptionChooser(){
 		if(reductionOptionChooser == null){
-			reductionOptionChooser = new ReductionOptionChooser(BatchProcessingDialog.this, "Choose the reductions to use", false);
+			//reductionOptionChooser = new ReductionOptionChooser(BatchProcessingDialog.this, "Choose the reductions to use", true);
+			reductionOptionChooser = new ReductionOptionChooser(BatchProcessingDialog.this, "Choose the reductions to use", true);
 			reductionOptionChooser.pack();
 		}
 		reductionOptionChooser.setLocationRelativeTo(BatchProcessingDialog.this);
@@ -1428,12 +1442,14 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox OPTIMIZEDSTANDARD;
 		private JCheckBox BROADCAST;
 		private JCheckBox BROADCASTDEG2;
+		private JButton closeButton;
 		
 		public ReductionOptionChooser(Frame frame, String title, boolean modal) {
 			super(frame, title, modal);
 			
 			initComponents();
 		}
+		
 		public ReductionOptionChooser(JDialog owner, String title, boolean modal) {
 			super(owner, title, modal);
 			
@@ -1441,9 +1457,10 @@ public class BatchProcessingDialog extends JDialog {
 		}
 		
 		
+		
 		private void initComponents(){
 			
-			getContentPane().setLayout(new GridLayout(0, 1));
+			JPanel content = new JPanel(new GridLayout(0, 1));
 			
 			verifyTAPN = new JCheckBox(name_verifyTAPNWithLegend);
 			verifyTAPN.setMnemonic('A');
@@ -1458,21 +1475,23 @@ public class BatchProcessingDialog extends JDialog {
 			BROADCASTDEG2 = new JCheckBox(name_BROADCASTDEG2WithLegend);
 			verifyTAPN.setMnemonic('F');
 			
-			getContentPane().add(verifyTAPN);
-			getContentPane().add(verifyTAPNDiscreteInclusion);
-			getContentPane().add(STANDARD);
-			getContentPane().add(OPTIMIZEDSTANDARD);
-			getContentPane().add(BROADCAST);
-			getContentPane().add(BROADCASTDEG2);
+			content.add(verifyTAPN);
+			content.add(verifyTAPNDiscreteInclusion);
+			content.add(STANDARD);
+			content.add(OPTIMIZEDSTANDARD);
+			content.add(BROADCAST);
+			content.add(BROADCASTDEG2);
 			
-			JButton closeButton = new JButton("Close");
+			closeButton = new JButton("Close");
 			closeButton.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 					getRootPane().getParent().setVisible(false);
 				}
 			});
 			
-			getContentPane().add(closeButton);
+			content.add(closeButton);
+			
+			super.setContentPane(content);
 			
 		}
 		
