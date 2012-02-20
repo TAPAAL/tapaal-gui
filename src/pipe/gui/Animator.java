@@ -17,10 +17,13 @@ import pipe.gui.graphicElements.Transition;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
@@ -107,6 +110,7 @@ public class Animator {
 	 * Highlights enabled transitions
 	 */
 	public void highlightEnabledTransitions() {
+		updateFireableTransitions();
 		DataLayer current = activeGuiModel();
 
 		Iterator<Transition> transitionIterator = current.returnTransitions();
@@ -133,6 +137,23 @@ public class Animator {
 				tempTransition.repaint();
 			}
 		}
+	}
+	
+	public void updateFireableTransitions(){
+		EnabledTransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
+		fireableTrans.startReInit();
+		
+		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+			while (transitionIterator.hasNext()) {
+				Transition tempTransition = transitionIterator.next();
+				if ((tempTransition.isEnabled(true))) {
+					fireableTrans.addTransition(temp, tempTransition);
+				}
+			}
+		}
+		
+		fireableTrans.reInitDone();
 	}
 
 	/**
@@ -227,7 +248,6 @@ public class Animator {
 		}
 	}
 
-
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
 		NetworkMarking next = null;
@@ -235,7 +255,7 @@ public class Animator {
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
 			} else {
-				List<TimedToken> tokensToConsume = showSelectSimulatorDialogue(transition);
+				List<TimedToken> tokensToConsume = getTokensToConsume(transition);
 				if(tokensToConsume == null) return; // Cancelled
 				next = currentMarking().fireTransition(transition, tokensToConsume);
 			}
@@ -385,6 +405,69 @@ public class Animator {
 		}
 
 		CreateGui.getAnimationController().updateFiringModeComboBox();
+		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
+	}	
+	
+	enum FillListStatus{
+		zero,
+		one,
+		moreThanOne
+	}
+	
+	//Creates a list of tokens if there is only one token in each of the places
+	//Used by getTokensToConsume
+	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
+		for(TimedInputArc in: transition.getInputArcs()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return FillListStatus.zero;
+			} else if(elligibleTokens.size() == 1){
+				listToFill.add(elligibleTokens.get(0));
+			} else {
+				return FillListStatus.moreThanOne;
+			}
+		}
+		for(TransportArc in: transition.getTransportArcsGoingThrough()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return FillListStatus.zero;
+			} else if(elligibleTokens.size() == 1){
+				listToFill.add(elligibleTokens.get(0));
+			} else {
+				return FillListStatus.moreThanOne;
+			}
+		}
+		return FillListStatus.one;
+	}
+	
+	private List<TimedToken> getTokensToConsume(TimedTransition transition){
+		//If there are only one token in each place
+		List<TimedToken> result = new ArrayList<TimedToken>();
+		boolean userShouldChoose = false;
+		if(transition.isShared()){
+			for(TimedTransition t : transition.sharedTransition().transitions()){
+				FillListStatus status = fillList(t, result);
+				if(status == FillListStatus.zero){
+					return null;
+				} else if(status == FillListStatus.moreThanOne){
+					userShouldChoose = true;
+					break;
+				}
+			}
+		} else {
+			FillListStatus status = fillList(transition, result);
+			if(status == FillListStatus.zero){
+				return null;
+			} else if(status == FillListStatus.moreThanOne){
+				userShouldChoose = true;
+			}
+		}
+		
+		if (userShouldChoose){
+			return showSelectSimulatorDialogue(transition);
+		} else {
+			return result;
+		}
 	}
 
 	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {

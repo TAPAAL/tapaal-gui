@@ -126,6 +126,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				BorderFactory.createTitledBorder("Shared Places and Transitions"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)
 		));		
+		this.setToolTipText("Shared places and transitions define the interface among the different components");
 	}
 	
 	public void setNetwork(TimedArcPetriNetNetwork network) {

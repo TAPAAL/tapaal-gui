@@ -10,6 +10,7 @@ import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
@@ -198,6 +199,12 @@ public class CreateGui {
 		return tab.getAnimationController();
 
 	}
+	
+	public static EnabledTransitionsList getFireabletransitionsList() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getFireabletransitionsList();
+
+	}	
 
 	public static void removeAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
