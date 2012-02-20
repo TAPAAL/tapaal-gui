@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -27,10 +28,18 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.DocumentFilter.FilterBypass;
+
+import com.sun.xml.internal.txw2.Document;
 
 import pipe.dataLayer.NetType;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.widgets.DecimalOnlyDocumentFilter;
 import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
@@ -230,6 +239,8 @@ public class AnimationController extends JPanel {
 				.createEmptyBorder(3, 3, 3, 3)));
 		this.setPreferredSize(new Dimension(275, 100));
 		this.setMinimumSize(new Dimension(275, 100));
+		
+		initializeDocumentFilterForDelayInput();
 	}
 
 	public void updateFiringModeComboBox() {
@@ -399,6 +410,11 @@ public class AnimationController extends JPanel {
 
 		CreateGui.appGui.setEnabledStepForwardAction(animationHistory.isStepForwardAllowed());
 		CreateGui.appGui.setEnabledStepBackwardAction(animationHistory.isStepBackAllowed());
+	}
+	
+	private void initializeDocumentFilterForDelayInput() {
+		javax.swing.text.Document doc = TimeDelayField.getDocument();
+		((AbstractDocument)doc).setDocumentFilter(new DecimalOnlyDocumentFilter());
 	}
 
 	JTextField TimeDelayField = new JTextField();
