@@ -87,7 +87,7 @@ public class TAPAAL {
 		if (placeOfJarSeperator != -1){
 			// Its a jar file, lets strip the jar ending.
 			str = str.substring(0, placeOfJarSeperator);
-			System.out.println(str);
+			
 			//Remove the name of the jar file
 			str = str.substring(0, str.lastIndexOf("/")); //Keep the last /
 			
@@ -98,12 +98,13 @@ public class TAPAAL {
 		
 		try {
 			
-			// Stip to base dir (exit bin dir)
-			 
-			
+			if (!str.contains("file://")) {
+				str = "file://" + str;
+			}
 			//Some magic to remove file:// and get the right seperators
 			str = (new File(new URL(str).toURI()).getAbsolutePath());
 			
+			// Stip to base dir (exit bin dir)
 			File installdir = new File(str);
 			installdir = installdir.getParentFile();
 			

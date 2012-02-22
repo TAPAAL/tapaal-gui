@@ -174,11 +174,19 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public static boolean trySetup() {
-		String verifyta = System.getenv("verifyta");
+		
+		String verifyta = null;
+		
+		//Get from evn (overwrite other values)
+		verifyta = System.getenv("verifyta");
 		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
 			return true;
 		}
+		
+		//If a value is saved in conf
+		//TODO: kyrke
+		
 		return false;
 	}
 

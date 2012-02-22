@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tapaal.TAPAAL;
+
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.widgets.InclusionPlaces;
@@ -184,11 +186,31 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	public static boolean trySetup() {
-		String verifytapn = System.getenv("verifytapn");
+		
+		String verifytapn = null;
+		
+		//If env is set, it overwrites the value
+		verifytapn = System.getenv("verifytapn");
 		if (verifytapn != null && !verifytapn.isEmpty()) {
 			verifytapnpath = verifytapn;
 			return true;
 		}
+		
+		//If a value is saved in conf
+		//TODO: kyrke
+		
+		//Search the installdir for verifytapn
+		File installdir = TAPAAL.getInstallDir();
+		File verifytapnfile = new File(installdir + "/bin/verifytapn");
+		
+		if (verifytapnfile.exists()){
+			
+			verifytapnpath = verifytapnfile.getAbsolutePath();
+			return true;
+			
+		}
+		
+		
 		
 		return false;
 	}
