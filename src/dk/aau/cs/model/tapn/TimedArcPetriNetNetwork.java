@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +11,7 @@ import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.StringComparator;
 
 public class TimedArcPetriNetNetwork {
 	private List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -27,7 +29,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public TimedArcPetriNetNetwork(ConstantStore constants){
 		this.constants = constants;
-		this.currentMarking = new NetworkMarking();
+		currentMarking = new NetworkMarking();
 		buildConstraints();
 	}
 	
@@ -68,11 +70,15 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean isNameUsedForShared(String name){
 		for(SharedTransition transition : sharedTransitions){
-			if(transition.name().equalsIgnoreCase(name)) return true;
+			if(transition.name().equalsIgnoreCase(name)) {
+				return true;
+			}
 		}
 		
 		for(SharedPlace place : sharedPlaces){
-			if(place.name().equalsIgnoreCase(name)) return true;
+			if(place.name().equalsIgnoreCase(name)) {
+				return true;
+			}
 		}
 		
 		return false;
@@ -162,7 +168,7 @@ public class TimedArcPetriNetNetwork {
 
 	private void fireConstantAdded(Constant constant) {
 		for(ConstantsListener listener : constantsListeners){
-			listener.ConstantAdded(new ConstantEvent(constant, constants.getIndexOf(constant)));
+			listener.constantAdded(new ConstantEvent(constant, constants.getIndexOf(constant)));
 		}
 	}
 
@@ -172,7 +178,7 @@ public class TimedArcPetriNetNetwork {
 		int index = constants.getIndexOf(constant);
 		Command cmd = constants.removeConstant(name);
 		for(ConstantsListener listener : constantsListeners){
-			listener.ConstantRemoved(new ConstantEvent(constant, index));
+			listener.constantRemoved(new ConstantEvent(constant, index));
 		}
 		return cmd;
 	}
@@ -185,7 +191,7 @@ public class TimedArcPetriNetNetwork {
 		if (edit != null) {
 			updateGuardsWithNewConstant(oldName, constant);
 			for(ConstantsListener listener : constantsListeners){
-				listener.ConstantChanged(new ConstantChangedEvent(old, constant, index));
+				listener.constantChanged(new ConstantChangedEvent(old, constant, index));
 			}
 		}
 
@@ -324,9 +330,30 @@ public class TimedArcPetriNetNetwork {
 		tapns.set(currentIndex, tapns.get(newIndex));
 		tapns.set(newIndex, temp);
 	}
+	
+	public TimedArcPetriNet[] sortTemplates() {
+		TimedArcPetriNet[] oldOrder = tapns.toArray(new TimedArcPetriNet[0]);
+		Collections.sort(tapns, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(TimedArcPetriNet[] tapns) {
+		this.tapns.clear();
+		for(TimedArcPetriNet t: tapns){
+			this.tapns.add(t);
+		}
+	}
 
 	public void swapConstants(int currentIndex, int newIndex) {
 		constants.swapConstants(currentIndex, newIndex);
+	}
+	
+	public Constant[] sortConstants() {
+		return constants.sortConstants();
+	}
+	
+	public void undoSort(Constant[] oldOrder) {
+		constants.undoSort(oldOrder);
 	}
 
 	public void swapSharedPlaces(int currentIndex, int newIndex) {
@@ -334,10 +361,36 @@ public class TimedArcPetriNetNetwork {
 		sharedPlaces.set(currentIndex, sharedPlaces.get(newIndex));
 		sharedPlaces.set(newIndex, temp);
 	}
+	
+	public SharedPlace[] sortSharedPlaces() {
+		SharedPlace[] oldOrder = sharedPlaces.toArray(new SharedPlace[0]);
+		Collections.sort(sharedPlaces, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(SharedPlace[] oldOrder) {
+		sharedPlaces.clear();
+		for(SharedPlace p : oldOrder){
+			sharedPlaces.add(p);
+		}
+	}
 
 	public void swapSharedTransitions(int currentIndex, int newIndex) {
 		SharedTransition temp = sharedTransitions.get(currentIndex);
 		sharedTransitions.set(currentIndex, sharedTransitions.get(newIndex));
 		sharedTransitions.set(newIndex, temp);
+	}
+	
+	public SharedTransition[] sortSharedTransitions() {
+		SharedTransition[] oldOrder = sharedTransitions.toArray(new SharedTransition[0]); 
+		Collections.sort(sharedTransitions, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(SharedTransition[] oldOrder) {
+		sharedTransitions.clear();
+		for(SharedTransition p : oldOrder){
+			sharedTransitions.add(p);
+		}
 	}
 }

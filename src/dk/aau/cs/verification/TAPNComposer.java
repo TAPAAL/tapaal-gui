@@ -2,6 +2,7 @@ package dk.aau.cs.verification;
 
 import java.util.HashSet;
 
+import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -19,17 +20,25 @@ public class TAPNComposer {
 	private static final String PLACE_FORMAT = "P%1$d";
 	private static final String TRANSITION_FORMAT = "T%1$d";
 
+	private Messenger messenger;
+	private boolean hasShownMessage = false;
+	
 	private int nextPlaceIndex;
 	private int nextTransitionIndex;
 
 	private HashSet<String> processedSharedObjects;
 
+	public TAPNComposer(Messenger messenger){
+		this.messenger = messenger;
+	}
+	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
 		nextTransitionIndex = -1;
 		processedSharedObjects = new HashSet<String>();
 		TimedArcPetriNet tapn = new TimedArcPetriNet("ComposedModel");
 		NameMapping mapping = new NameMapping();
+		hasShownMessage = false;
 
 		createSharedPlaces(model, tapn, mapping);
 		createPlaces(model, tapn, mapping);
@@ -49,23 +58,23 @@ public class TAPNComposer {
 		System.out.println("Composed Model:");
 		System.out.println("PLACES:");
 		for(TimedPlace place : tapn.places()){
-			System.out.print("\t");
+			System.out.print('\t');
 			System.out.print(place.name());
 			System.out.print(", invariant: ");
 			System.out.print(place.invariant().toString());
 			System.out.print(" (Original: ");
 			System.out.print(mapping.map(place.name()));
-			System.out.println(")");
+			System.out.println(')');
 		}
 
 		System.out.println();
 		System.out.println("TRANSITIONS:");
 		for(TimedTransition transition : tapn.transitions()){
-			System.out.print("\t");
+			System.out.print('\t');
 			System.out.print(transition.name());
 			System.out.print(" (Original: ");
 			System.out.print(mapping.map(transition.name()).toString());
-			System.out.println(")");
+			System.out.println(')');
 		}
 
 		System.out.println();
@@ -176,15 +185,28 @@ public class TAPNComposer {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedTransition timedTransition : tapn.transitions()) {
 				if(!processedSharedObjects.contains(timedTransition.name())){
-					String uniqueTransitionName = getUniqueTransitionName();
-
-					constructedModel.add(new TimedTransition(uniqueTransitionName));
-					if(timedTransition.isShared()){
-						String name = timedTransition.sharedTransition().name();
-						processedSharedObjects.add(name);
-						mapping.addMappingForShared(name, uniqueTransitionName);
+					
+					// CAUTION: This if statement removes orphan transitions.
+					//   This changes answers for e.g. DEADLOCK queries if
+					//   support for such queries are added later.
+					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
+					if(!timedTransition.isOrphan()){
+						String uniqueTransitionName = getUniqueTransitionName();
+	
+						constructedModel.add(new TimedTransition(uniqueTransitionName));
+						if(timedTransition.isShared()){
+							String name = timedTransition.sharedTransition().name();
+							processedSharedObjects.add(name);
+							mapping.addMappingForShared(name, uniqueTransitionName);
+						}else{
+							mapping.addMapping(tapn.name(), timedTransition.name(), uniqueTransitionName);
+						}
 					}else{
-						mapping.addMapping(tapn.name(), timedTransition.name(), uniqueTransitionName);
+						if(!hasShownMessage){
+							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model."
+									+ System.getProperty("line.separator") + "They will be removed before the verification.");
+							hasShownMessage = true;
+						}
 					}
 				}
 			}

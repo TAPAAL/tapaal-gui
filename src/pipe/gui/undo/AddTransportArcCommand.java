@@ -1,16 +1,16 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
 
 public class AddTransportArcCommand extends TAPNElementCommand {
-	private final TransportArcComponent transportArcComponent;
+	private final TimedTransportArcComponent transportArcComponent;
 	private final TransportArc transportArc;
 
-	public AddTransportArcCommand(TransportArcComponent transportArcComponent,
+	public AddTransportArcCommand(TimedTransportArcComponent transportArcComponent,
 			TransportArc transportArc, TimedArcPetriNet tapn,
 			DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);

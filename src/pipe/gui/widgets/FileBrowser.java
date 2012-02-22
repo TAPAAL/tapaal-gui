@@ -23,6 +23,7 @@ import pipe.gui.ExtensionFilter;
  */
 
 public class FileBrowser {
+	private static String lastPath;
 
 	private JFileChooser fc;
 	private String ext;
@@ -33,7 +34,8 @@ public class FileBrowser {
 		if (filetype == null) {
 			filetype = "file";
 		}
-
+		if(path == null) path = lastPath;
+		
 		if (path != null) {
 			File f = new File(path);
 			if (f.exists()) {
@@ -64,9 +66,12 @@ public class FileBrowser {
 	}
 
 	public File openFile() {
+		setupLastPath();
 		if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			try {
-				return fc.getSelectedFile().getCanonicalFile();
+				File file = fc.getSelectedFile().getCanonicalFile();
+				lastPath = file.getParent();
+				return file;
 			} catch (IOException e) {
 				/* gulp */
 			}
@@ -74,7 +79,17 @@ public class FileBrowser {
 		return null;
 	}
 
+	private void setupLastPath() {
+		if(lastPath != null){
+			File path = new File(lastPath);
+			if(path.exists()){
+				fc.setCurrentDirectory(path);
+			}
+		}
+	}
+
 	public String saveFile() {
+		setupLastPath();
 		if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			try {
 				File f = fc.getSelectedFile();
@@ -82,12 +97,22 @@ public class FileBrowser {
 					f = new File(f.getCanonicalPath() + "." + ext); // force
 																	// extension
 				}
-							
-				 if (!CreateGui.usingGTKFileBrowser() && f.exists() &&  
-						 JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?") != JOptionPane.YES_OPTION) {
-				 return null;
-				 }
-				return f.getCanonicalPath();
+				
+				//The GTKFileBrowser does not check if the file with the extension appended exists
+				if (/*!CreateGui.usingGTKFileBrowser() &&*/ f.exists()) {
+					int overRide = JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?");
+					switch (overRide) {
+						case JOptionPane.NO_OPTION:
+							return saveFile();
+						case JOptionPane.YES_OPTION:
+							break;
+						default:
+							return null;
+					}
+				}
+				String path =  f.getCanonicalPath();
+				lastPath = f.getParent();
+				return path;
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while trying to save the file. Please try again", "Error Saving File", JOptionPane.ERROR_MESSAGE);
 			}

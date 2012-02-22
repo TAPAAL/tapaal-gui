@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
@@ -14,140 +14,53 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import pipe.gui.CreateGui;
-import pipe.gui.Grid;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
-import pipe.gui.undo.TransitionTimingEdit;
 import dk.aau.cs.gui.undo.Command;
 
 /**
- * <b>Transition</b> - Petri-Net Transition Class
- * 
- * @see <p>
- *      <a href="..\PNMLSchema\index.html">PNML - Petri-Net XMLSchema
- *      (stNet.xsd)</a>
- * @see </p>
- *      <p>
- *      <a href="..\..\..\UML\dataLayer.html">UML - PNML Package </a>
- *      </p>
- * @version 1.0
- * @author James D Bloom *
- * @author Dave Patterson Add fields and methods to handle delay time for
- *         exponentially distributed timed transitions.
- * 
- *         Note: The exponential distribution is based on a single parameter,
- *         which can either be specified as a delay or a rate. The two values
- *         are inverses of each other, so no matter how the parameter is
- *         specified, the code after the constructor is the same. When a timed
- *         transition is found to be enabled, a projected delay is calculated
- *         based on its exponential distribution. As long as the transition does
- *         not get disabled before it can be fired, that delay governs the
- *         timing of the transition's firing. If other timed transitions are
- *         fired, the delay before they fire (that is, the progress of the
- *         virtual clock) is decremented from this transition's delay time to
- *         simulate the progress of time in the virtual space. Thus, at any
- *         time, the next timed transition to fire is the one with the lowest
- *         delay remaining. If a timed transition gets an expected delay and
- *         then later becomes disabled, its delay is no longer valid. When it
- *         next becomes enabled, it will get a new expected delay (an offset
- *         from the current virtual time). This explaination was included to
- *         clarify any confusion about fields and methods with "delay" in their
- *         names. They have nothing to do with whether the parameter of the
- *         exponential distribution is specified as a rate, or an expected
- *         delay. to the
+ * Petri-Net Transition Class for Drawing Transitions
  */
 public class Transition extends PlaceTransitionObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 942116302162925121L;
-	/** Transition is of Rectangle2D.Double */
+	
+	//Transition is of Rectangle2D.Double
 	private GeneralPath transition;
 	private Shape proximityTransition;
-	/** Place Width */
+
+	// Transition Size
 	public static final int TRANSITION_HEIGHT = Pipe.PLACE_TRANSITION_HEIGHT;
-	/** Place Width */
 	public static final int TRANSITION_WIDTH = TRANSITION_HEIGHT / 3;
-
+	
 	protected int angle;
+	
+	// Animation Suff
 	protected boolean enabled = false;
-	// private boolean enabledBackwards = false;
 	public boolean highlighted = false;
-
-	private boolean infiniteServer = false;
-
-	/**
-	 * The delay before this transition fires.
-	 */
-	// private double delay;
-
-	/** Is this a timed transition or not? */
-	private boolean timed = false;
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
 
 	private ArrayList<ArcAngleCompare> arcAngleList = new ArrayList<ArcAngleCompare>();
 
-	/** The transition priority */
-	private Integer priority = 1;
-
-	public Transition(Transition t) {
-
-		this(t.positionX, t.positionY, t.id, t.getName(), t.nameOffsetX,
-				t.nameOffsetY, t.timed, t.infiniteServer, t.angle, t.priority);
-
-	}
-
 	/**
 	 * Create Petri-Net Transition object
-	 * 
-	 * @param positionXInput
-	 *            X-axis Position
-	 * @param positionYInput
-	 *            Y-axis Position
-	 * @param idInput
-	 *            Transition id
-	 * @param nameInput
-	 *            Name
-	 * @param nameOffsetXInput
-	 *            Name X-axis Position
-	 * @param nameOffsetYInput
-	 *            Name Y-axis Position
-	 * @param infServer
-	 *            TODO
 	 */
 	public Transition(double positionXInput, double positionYInput,
 			String idInput, String nameInput, double nameOffsetXInput,
-			double nameOffsetYInput, boolean timedTransition,
+			double nameOffsetYInput,
 			boolean infServer, int angleInput, int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput,
 				nameOffsetXInput, nameOffsetYInput);
 		componentWidth = TRANSITION_HEIGHT; // sets width
 		componentHeight = TRANSITION_HEIGHT;// sets height
-		timed = timedTransition;
-		infiniteServer = infServer;
 		constructTransition();
 		angle = 0;
 		setCentre((int) positionX, (int) positionY);
 		rotate(angleInput);
 		updateBounds();
-		// this.updateEndPoints();
-		this.priority = priority;
 	}
-
-	// public Transition(String idInput,
-	// String nameInput){
-	//
-	// this(0.0, 0.0, idInput,
-	// nameInput,
-	// 0.0, 0.0,
-	// false,
-	// false,
-	// 0,
-	// 0);
-	// }
 
 	/**
 	 * Create Petri-Net Transition object
@@ -167,43 +80,6 @@ public class Transition extends PlaceTransitionObject {
 		this.updateEndPoints();
 	}
 
-	public Transition paste(double x, double y, boolean fromAnotherView) {
-		this.incrementCopyNumber();
-		Transition copy = new Transition(Grid.getModifiedX(x + this.getX()
-				+ Pipe.PLACE_TRANSITION_HEIGHT / 2), Grid.getModifiedY(y
-				+ this.getY() + Pipe.PLACE_TRANSITION_HEIGHT / 2));
-		copy.pnName.setName(this.pnName.getName() + "(" + this.getCopyNumber()
-				+ ")");
-
-		this.newCopy(copy);
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-
-		copy.timed = this.timed;
-		copy.angle = this.angle;
-
-		copy.attributesVisible = this.attributesVisible;
-		copy.priority = this.priority;
-		copy.transition.transform(AffineTransform.getRotateInstance(Math
-				.toRadians(copy.angle), Transition.TRANSITION_HEIGHT / 2,
-				Transition.TRANSITION_HEIGHT / 2));
-		return copy;
-	}
-
-	public Transition copy() {
-		Transition copy = new Transition(Zoomer.getUnzoomedValue(this.getX(),
-				zoom), Zoomer.getUnzoomedValue(this.getY(), zoom));
-		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.timed = this.timed;
-		copy.angle = this.angle;
-		copy.attributesVisible = this.attributesVisible;
-		copy.priority = this.priority;
-		copy.setOriginal(this);
-		return copy;
-	}
-
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -218,27 +94,6 @@ public class Transition extends PlaceTransitionObject {
 			g2.setColor(Pipe.ELEMENT_FILL_COLOUR);
 		}
 
-		// if (timed) {
-		// if (infiniteServer) {
-		// for (int i=2; i>=1; i--) {
-		// g2.translate(2*i,-2*i);
-		// g2.fill(transition);
-		// Paint pen = g2.getPaint();
-		// if (highlighted) {
-		// g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		// } else if (selected && !ignoreSelection){
-		// g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
-		// } else {
-		// g2.setPaint(Pipe.ELEMENT_LINE_COLOUR);
-		// }
-		// g2.draw(transition);
-		// g2.setPaint(pen);
-		// g2.translate(-2*i,2*i);
-		// }
-		// }
-		// g2.fill(transition);
-		// }
-
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
 		} else if (selected && !ignoreSelection) {
@@ -249,21 +104,7 @@ public class Transition extends PlaceTransitionObject {
 
 		g2.draw(transition);
 		g2.fill(transition);
-		// if (!timed) {
-		// if (infiniteServer) {
-		// for (int i=2; i>=1; i--) {
-		// g2.translate(2*i,-2*i);
-		// Paint pen = g2.getPaint();
-		// g2.setPaint(Pipe.ELEMENT_FILL_COLOUR);
-		// g2.fill(transition);
-		// g2.setPaint(pen);
-		// g2.draw(transition);
-		// g2.translate(-2*i,2*i);
-		// }
-		// }
-		// g2.draw(transition);
-
-		// }
+		
 	}
 
 	/**
@@ -301,7 +142,7 @@ public class Transition extends PlaceTransitionObject {
 	 * @return True if enabled
 	 */
 	public boolean isEnabled(boolean animationStatus) {
-		if (animationStatus == true) {
+		if (animationStatus) {
 			if (isEnabled()) {
 				highlighted = true;
 				return true;
@@ -313,15 +154,6 @@ public class Transition extends PlaceTransitionObject {
 	}
 
 	/**
-	 * Determines whether Transition is enabled backwards
-	 * 
-	 * @return True if enabled
-	 */
-	// public boolean isEnabledBackwards(){
-	// return enabledBackwards;
-	// }
-
-	/**
 	 * Determines whether Transition is enabled
 	 * 
 	 * @return True if enabled
@@ -331,14 +163,6 @@ public class Transition extends PlaceTransitionObject {
 		return enabled;
 	}
 
-	// public void setHighlighted(boolean status) {
-	// highlighted = status;
-	// }
-
-	public boolean isInfiniteServer() {
-		return infiniteServer;
-	}
-
 	/**
 	 * Sets whether Transition is enabled
 	 * 
@@ -346,19 +170,8 @@ public class Transition extends PlaceTransitionObject {
 	 */
 	@Override
 	public void setEnabled(boolean status) {
-		if (enabled && !status) {
-		}
 		enabled = status;
 	}
-
-	/**
-	 * Sets whether Transition is enabled
-	 * 
-	 * @return enabled if True
-	 */
-	// public void setEnabledBackwards(boolean status){
-	// enabledBackwards = status;
-	// }
 
 	/* Called at the end of animation to reset Transitions to false */
 	public void setEnabledFalse() {
@@ -369,79 +182,6 @@ public class Transition extends PlaceTransitionObject {
 	public int getAngle() {
 		return angle;
 	}
-
-	public int getPriority() {
-		return priority;
-	}
-
-	/** Set the timed transition attribute (for GSPNs) */
-	public Command setTimed(boolean change) {
-		timed = change;
-		pnName.setText(getText());
-		repaint();
-		return new TransitionTimingEdit(this);
-	}
-
-	/** Get the timed transition attribute (for GSPNs) */
-	public boolean isTimed() {
-		return timed;
-	}
-
-	/**
-	 * This is a setter for the delay for this transition.
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @param _delay
-	 *            the time until this transition will fire
-	 */
-	// public void setDelay( double _delay ) {
-	// delay = _delay;
-	// delayValid = true;
-	// }
-
-	/**
-	 * This is a getter for the delay for this transition.
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @return a double with the amount of delay
-	 * 
-	 */
-	// public double getDelay() {
-	// return delay;
-	// }
-
-	/**
-	 * This method is a getter for the boolean indicating if the delay is valid
-	 * or not.
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @return the delayValid a boolean that is true if the delay is valid, and
-	 *         false otherwise
-	 */
-	// public boolean isDelayValid() {
-	// return delayValid;
-	// }
-
-	/**
-	 * This method is used to set a flag to indicate that the delay is valid or
-	 * invalid. (Mainly it is used to invalidate the delay.)
-	 * 
-	 * @author Dave Patterson as part of the Exponential Distribution support
-	 *         for timed transitions.
-	 * 
-	 * @param _delayValid
-	 *            a boolean that is true if the delay is valid, false otherwise
-	 * 
-	 */
-	// public void setDelayValid ( boolean _delayValid ) {
-	// delayValid = _delayValid;
-	// }
 
 	protected void constructTransition() {
 		transition = new GeneralPath();
@@ -494,12 +234,6 @@ public class Transition extends PlaceTransitionObject {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * pipe.dataLayer.PlaceTransitionObject#updateEndPoint(pipe.dataLayer.Arc)
-	 */
 	@Override
 	public void updateEndPoint(Arc arc) {
 		boolean match = false;
@@ -507,7 +241,7 @@ public class Transition extends PlaceTransitionObject {
 		Iterator<ArcAngleCompare> arcIterator = arcAngleList.iterator();
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
-			if (thisArc.arc == arc || !arc.inView()) {
+			if (thisArc.arc == arc) {
 				thisArc.calcAngle();
 				match = true;
 				break;
@@ -587,12 +321,11 @@ public class Transition extends PlaceTransitionObject {
 
 		arcIterator = left.iterator();
 		double inc = TRANSITION_HEIGHT / (left.size() + 1);
-		double current = TRANSITION_HEIGHT / 2 - inc;
+		double current = TRANSITION_HEIGHT / 2d - inc;
 		while (arcIterator.hasNext()) {
 			ArcAngleCompare thisArc = arcIterator.next();
 			transform.transform(new Point2D.Double(-0.5 * TRANSITION_WIDTH,
-					current + 1), transformed); // +1 due to rounding making it
-												// off by 1
+					current + 1), transformed); // +1 due to rounding making it off by 1
 			if (thisArc.sourceOrTarget()) {
 				thisArc.arc.setTargetLocation(positionX + centreOffsetLeft()
 						+ transformed.x, positionY + centreOffsetTop()
@@ -662,8 +395,8 @@ public class Transition extends PlaceTransitionObject {
 
 	class ArcAngleCompare implements Comparable<ArcAngleCompare> {
 
-		private final static boolean SOURCE = false;
-		private final static boolean TARGET = true;
+		private static final boolean SOURCE = false;
+		private static final boolean TARGET = true;
 		private Arc arc;
 		private Transition transition;
 		private double angle;
@@ -695,8 +428,7 @@ public class Transition extends PlaceTransitionObject {
 			}
 
 			// This makes sure the angle overlap lies at the intersection
-			// between
-			// edges of a transition
+			// between edges of a transition
 			// Yes it is a nasty hack (a.k.a. ingeneous solution). But it works!
 			if (angle < (Math.toRadians(30 + transition.getAngle()))) {
 				angle += (2 * Math.PI);
@@ -715,32 +447,25 @@ public class Transition extends PlaceTransitionObject {
 
 	}
 
-	// @Override
-	// public Transition clone() {
-	// Transition toReturn=null;
-	// toReturn = (Transition)super.clone();
-	//
-	// toReturn.positionX = positionX;
-	//
-	//
-	// toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
-	// toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
-	// toReturn.timed = timed;
-	// toReturn.infiniteServer = infiniteServer;
-	// toReturn.constructTransition();
-	// toReturn.angle = 0;
-	// toReturn.setCentre((int)positionX, (int)positionY);
-	// toReturn.rotate(getAngle());
-	// toReturn.updateBounds();
-	//
-	//
-	// //this.updateEndPoints();
-	// toReturn.priority = priority;
-	//
-	// return toReturn;
-	//
-	//
-	//
-	// }
+	 @Override
+	 public Transition clone() {
+		 Transition toReturn=null;
+		 toReturn = (Transition)super.clone();
+
+		 toReturn.positionX = positionX;
+
+		 toReturn.componentWidth = TRANSITION_HEIGHT; //sets width
+		 toReturn.componentHeight = TRANSITION_HEIGHT;//sets height
+		 toReturn.constructTransition();
+		 toReturn.angle = 0;
+		 toReturn.setCentre((int)positionX, (int)positionY);
+		 toReturn.rotate(getAngle());
+		 toReturn.updateBounds();
+
+		 return toReturn;
+
+
+
+	 }
 
 }

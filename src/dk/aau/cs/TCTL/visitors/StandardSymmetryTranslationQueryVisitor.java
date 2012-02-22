@@ -21,7 +21,7 @@ public class StandardSymmetryTranslationQueryVisitor extends QueryVisitor {
 		append("(i).");
 		append(atomicPropositionNode.getPlace());
 		append(") ");
-		append(OperatorConversion(atomicPropositionNode.getOp()));
+		append(operatorConversion(atomicPropositionNode.getOp()));
 		append(" ");
 		append(atomicPropositionNode.getN());
 	}

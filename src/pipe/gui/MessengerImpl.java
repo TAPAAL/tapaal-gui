@@ -13,7 +13,7 @@ import dk.aau.cs.Messenger;
 public class MessengerImpl implements Messenger {
 
 	public void displayInfoMessage(String message) {
-		displayInfoMessage(message, Pipe.getProgramName());
+		displayInfoMessage(message, "Message");
 	}
 
 	public void displayInfoMessage(String message, String title) {
@@ -21,7 +21,7 @@ public class MessengerImpl implements Messenger {
 	}
 
 	public void displayErrorMessage(String message) {
-		displayErrorMessage(message, Pipe.getProgramName());
+		displayErrorMessage(message, "Error");
 	}
 
 	public void displayErrorMessage(String message, String title) {

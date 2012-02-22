@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
+import net.tapaal.TAPAAL;
+
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
@@ -19,8 +22,12 @@ public class CreateGui {
 	private static ArrayList<TabContent> tabs = new ArrayList<TabContent>();
 	
 	private static boolean usingGTKFileBrowser = true;
+	
+	private static boolean showZeroToInfinityIntervals = true;
 
 	public static String imgPath, userPath; // useful for stuff
+	
+	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
 
 	public static void init() {
 		imgPath = "resources/Images/";
@@ -29,7 +36,7 @@ public class CreateGui {
 		// etc
 		userPath = null;
 
-		appGui = new GuiFrame(Pipe.TOOL + " " + Pipe.VERSION);
+		appGui = new GuiFrame(TAPAAL.getProgramName());
 
 		Grid.enableGrid();
 
@@ -52,15 +59,15 @@ public class CreateGui {
 		if (versionChecker.checkForNewVersion()) {
 			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
-			message.append(Pipe.VERSION);
+			message.append(TAPAAL.VERSION);
 			message.append("\nNew version: ");
 			message.append(versionChecker.getNewVersionNumber());
 			String changelog = versionChecker.getChangelog();
-			if (changelog != ""){
-				message.append("\n");
-				message.append("\n");
+			if (!changelog.equals("")){
+				message.append('\n');
+				message.append('\n');
 				message.append("Changelog:");
-				message.append("\n");
+				message.append('\n');
 				message.append(changelog);
 			}
 
@@ -192,6 +199,12 @@ public class CreateGui {
 		return tab.getAnimationController();
 
 	}
+	
+	public static EnabledTransitionsList getFireabletransitionsList() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getFireabletransitionsList();
+
+	}	
 
 	public static void removeAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
@@ -238,5 +251,13 @@ public class CreateGui {
 	
 	public static boolean usingGTKFileBrowser() {
 		return usingGTKFileBrowser;
+	}
+	
+	public static void toggleShowZeroToInfinityIntervals() {
+		showZeroToInfinityIntervals = !showZeroToInfinityIntervals;
+	}
+	
+	public static boolean showZeroToInfinityIntervals() {
+		return showZeroToInfinityIntervals;
 	}
 }

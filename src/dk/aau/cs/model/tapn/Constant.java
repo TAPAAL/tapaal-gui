@@ -23,17 +23,17 @@ public class Constant {
 	public Constant(Constant constant) {
 		Require.that(constant != null, "Constant cannot be null");
 
-		this.name = constant.name;
-		this.value = constant.value;
-		this.lowerBound = constant.lowerBound;
-		this.upperBound = constant.upperBound;
-		this.isUsed = constant.isUsed;
+		name = constant.name;
+		value = constant.value;
+		lowerBound = constant.lowerBound;
+		upperBound = constant.upperBound;
+		isUsed = constant.isUsed;
 	}
 
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A constant must have a name");
 		Require.that(isValid(newName), "name must match regular expression [a-zA-Z_][a-zA-Z0-9_]*");
-		this.name = newName;
+		name = newName;
 	}
 
 	private boolean isValid(String newName) {

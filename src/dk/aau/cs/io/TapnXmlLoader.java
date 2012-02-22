@@ -19,32 +19,31 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Note;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
 import pipe.gui.Pipe;
-import pipe.gui.Zoomable;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Note;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -83,15 +82,18 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 
 public class TapnXmlLoader {
+	private static final String PLACENAME_ERROR_MESSAGE = "The keywords \"true\" and \"false\" are reserved and can not be used as place names.\nPlaces with these names will be renamed to \"_true\" and \"_false\" respectively.\n\n Note that any queries using these places may not be parsed correctly.";
 	private static final String ERROR_PARSING_QUERY_MESSAGE = "TAPAAL encountered an error trying to parse one or more of the queries in the model.\n\nThe queries that could not be parsed will not show up in the query list.";
-	private HashMap<TimedTransitionComponent, TransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();;
-	private HashMap<TimedTransitionComponent, TransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TransportArcComponent>();
-	private HashMap<TransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TransportArcComponent, TimeInterval>();
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> presetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();;
+	private HashMap<TimedTransitionComponent, TimedTransportArcComponent> postsetArcs = new HashMap<TimedTransitionComponent, TimedTransportArcComponent>();
+	private HashMap<TimedTransportArcComponent, TimeInterval> transportArcsTimeIntervals = new HashMap<TimedTransportArcComponent, TimeInterval>();
 
 	private DrawingSurfaceImpl drawingSurface;
 	private NameGenerator nameGenerator = new NameGenerator();
 	private boolean firstQueryParsingWarning = true;
 	private boolean firstInhibitorIntervalWarning = true;
+	private boolean firstPlaceRenameWarning = true;
+	private IdResolver idResolver = new IdResolver();
 
 	public TapnXmlLoader(DrawingSurfaceImpl drawingSurface) {
 		this.drawingSurface = drawingSurface;
@@ -141,6 +143,8 @@ public class TapnXmlLoader {
 	}
 
 	private LoadedModel parse(Document doc) throws FormatException {
+		idResolver.clear();
+		
 		ConstantStore constants = new ConstantStore(parseConstants(doc));
 
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(constants);
@@ -174,6 +178,14 @@ public class TapnXmlLoader {
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
+		if(name.toLowerCase().equals("true") || name.toLowerCase().equals("false")) {
+			name = "_" + name;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
+		}
+		
 		SharedPlace place = new SharedPlace(name, invariant);
 		place.setCurrentMarking(marking);
 		for(int j = 0; j < numberOfTokens; j++){
@@ -235,7 +247,7 @@ public class TapnXmlLoader {
 	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
 		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
-		VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(query.getProperty());
+		VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(query.getProperty());
 		
 		return c.getResult();
 		
@@ -411,6 +423,9 @@ public class TapnXmlLoader {
 		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
+		
 		double nameOffsetXInput = Double.parseDouble(transition.getAttribute("nameOffsetX"));
 		double nameOffsetYInput = Double.parseDouble(transition.getAttribute("nameOffsetY"));
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true") ? true : false;
@@ -457,7 +472,7 @@ public class TapnXmlLoader {
 		double markingOffsetXInput = Double.parseDouble(place.getAttribute("markingOffsetX"));
 		double markingOffsetYInput = Double.parseDouble(place.getAttribute("markingOffsetY"));
 		String invariant = place.getAttribute("invariant");
-
+		
 		positionXInput = Grid.getModifiedX(positionXInput);
 		positionYInput = Grid.getModifiedY(positionYInput);
 
@@ -468,6 +483,16 @@ public class TapnXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
+			if(firstPlaceRenameWarning) {
+				JOptionPane.showMessageDialog(CreateGui.getApp(), PLACENAME_ERROR_MESSAGE, "Invalid Place Name", JOptionPane.INFORMATION_MESSAGE);
+				firstPlaceRenameWarning = false;
+			}
+		}
+		
+		idResolver.add(tapn.name(), idInput, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){
@@ -494,7 +519,10 @@ public class TapnXmlLoader {
 		boolean taggedArc = arc.getAttribute("tagged").equals("true") ? true : false;
 		String inscriptionTempStorage = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
-
+		
+		sourceInput = idResolver.get(template.model().name(), sourceInput);
+		targetInput = idResolver.get(template.model().name(), targetInput);
+		
 		PlaceTransitionObject sourceIn = template.guiModel().getPlaceTransitionObject(sourceInput);
 		PlaceTransitionObject targetIn = template.guiModel().getPlaceTransitionObject(targetInput);
 
@@ -562,7 +590,7 @@ public class TapnXmlLoader {
 		return tempArc;
 	}
 
-	private TransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
+	private TimedTransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
 			double _endx, double _endy, Template template, ConstantStore constants) {
@@ -576,7 +604,7 @@ public class TapnXmlLoader {
 		if (sourceIn instanceof Place) {
 			isInPreSet = true;
 		}
-		TransportArcComponent tempArc = new TransportArcComponent(new TimedInputArcComponent(
+		TimedTransportArcComponent tempArc = new TimedTransportArcComponent(new TimedInputArcComponent(
 				new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc),
 				inscriptionSplit[0]), Integer.parseInt(inscriptionSplit[1]), isInPreSet);
 
@@ -585,7 +613,7 @@ public class TapnXmlLoader {
 
 		if (isInPreSet) {
 			if (postsetArcs.containsKey((TimedTransitionComponent) targetIn)) {
-				TransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
+				TimedTransportArcComponent postsetTransportArc = postsetArcs.get((TimedTransitionComponent) targetIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(sourceIn.getName());
 				TimedTransition trans = template.model().getTransitionByName(targetIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(postsetTransportArc.getTarget().getName());
@@ -607,16 +635,16 @@ public class TapnXmlLoader {
 
 				postsetArcs.remove((TimedTransitionComponent) targetIn);
 			} else {
-				presetArcs.put((TimedTransitionComponent) targetIn,	(TransportArcComponent) tempArc);
-				transportArcsTimeIntervals.put((TransportArcComponent) tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
+				presetArcs.put((TimedTransitionComponent) targetIn,	tempArc);
+				transportArcsTimeIntervals.put(tempArc, TimeInterval.parse(inscriptionSplit[0], constants));
 			}
 		} else {
 			if (presetArcs.containsKey((TimedTransitionComponent) sourceIn)) {
-				TransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
+				TimedTransportArcComponent presetTransportArc = presetArcs.get((TimedTransitionComponent) sourceIn);
 				TimedPlace sourcePlace = template.model().getPlaceByName(presetTransportArc.getSource().getName());
 				TimedTransition trans = template.model().getTransitionByName(sourceIn.getName());
 				TimedPlace destPlace = template.model().getPlaceByName(targetIn.getName());
-				TimeInterval interval = transportArcsTimeIntervals.get((TransportArcComponent) presetTransportArc);
+				TimeInterval interval = transportArcsTimeIntervals.get(presetTransportArc);
 
 				assert (sourcePlace != null);
 				assert (trans != null);
@@ -633,9 +661,9 @@ public class TapnXmlLoader {
 				template.model().add(transArc);
 
 				presetArcs.remove((TimedTransitionComponent) sourceIn);
-				transportArcsTimeIntervals.remove((TransportArcComponent) presetTransportArc);
+				transportArcsTimeIntervals.remove(presetTransportArc);
 			} else {
-				postsetArcs.put((TimedTransitionComponent) sourceIn, (TransportArcComponent) tempArc);
+				postsetArcs.put((TimedTransitionComponent) sourceIn, tempArc);
 			}
 		}
 		return tempArc;
@@ -777,9 +805,16 @@ public class TapnXmlLoader {
 				String templateName = name.split("\\.")[0];
 				String placeName = name.split("\\.")[1];
 				
+				// "true" and "false" are reserved keywords and places using these names are renamed to "_true" and "_false" respectively
+				if(placeName.equalsIgnoreCase("false") || placeName.equalsIgnoreCase("true"))
+					placeName = "_" + placeName;
+				
 				TimedPlace p = network.getTAPNByName(templateName).getPlaceByName(placeName);
 				places.add(p);
 			} else { // shared Place
+				if(name.equalsIgnoreCase("false") || name.equalsIgnoreCase("true"))
+					name = "_" + name;
+				
 				TimedPlace p = network.getSharedPlaceByName(name);
 				places.add(p);
 			}
@@ -943,7 +978,7 @@ public class TapnXmlLoader {
 				} else if (newObject instanceof Arc) {
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TransportArcComponent) {
+						if (newObject instanceof TimedTransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(drawingSurface, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
 							//newObject.addMouseWheelListener(transportArcHandler);
@@ -968,9 +1003,9 @@ public class TapnXmlLoader {
 					((Note) newObject).getNote().addMouseListener(noteHandler);
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
-				if (newObject instanceof Zoomable) {
-					newObject.zoomUpdate(drawingSurface.getZoom());
-				}
+				
+				newObject.zoomUpdate(drawingSurface.getZoom());
+				
 			}
 			newObject.setGuiModel(template.guiModel());
 		}

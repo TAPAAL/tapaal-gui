@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.dataLayer.AnnotationNote;
+import pipe.gui.graphicElements.AnnotationNote;
 
 /**
  * Action to toggle the background of a note between white and transparent
@@ -13,9 +13,6 @@ import pipe.dataLayer.AnnotationNote;
  */
 public class EditAnnotationBackgroundAction extends AbstractAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -1933803940576817894L;
 	private AnnotationNote note;
 

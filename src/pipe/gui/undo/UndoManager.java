@@ -6,21 +6,21 @@ package pipe.gui.undo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPathPoint;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.PlaceTransitionObject;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPathPoint;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.gui.undo.Command;
 
 /**
@@ -212,8 +212,8 @@ public class UndoManager {
 	}
 
 	private void checkMode() {
-		if ((app.getMode() == Pipe.FAST_PLACE)
-				|| (app.getMode() == Pipe.FAST_TRANSITION)) {
+		if ((app.getMode() == Pipe.ElementType.FAST_PLACE)
+				|| (app.getMode() == Pipe.ElementType.FAST_TRANSITION)) {
 			app.resetMode();
 		}
 	}
@@ -255,8 +255,8 @@ public class UndoManager {
 				}else if(pnObject instanceof TimedTransitionComponent){
 					TimedTransitionComponent transition = (TimedTransitionComponent)pnObject;
 					cmd = new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), guiModel, view);
-				}else if(pnObject instanceof TransportArcComponent){
-					TransportArcComponent transportArc = (TransportArcComponent)pnObject;
+				}else if(pnObject instanceof TimedTransportArcComponent){
+					TimedTransportArcComponent transportArc = (TimedTransportArcComponent)pnObject;
 					cmd = new DeleteTransportArcCommand(transportArc, transportArc.underlyingTransportArc(), transportArc.underlyingTransportArc().model(), guiModel, view);
 				}else if(pnObject instanceof TimedInhibitorArcComponent){
 					TimedInhibitorArcComponent tia = (TimedInhibitorArcComponent)pnObject;

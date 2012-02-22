@@ -1,7 +1,11 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+
+import pipe.gui.undo.AddArcPathPointEdit;
 
 import dk.aau.cs.util.Require;
 
@@ -30,7 +34,7 @@ public class TimedArcPetriNet {
 	}
 
 	public void setParentNetwork(TimedArcPetriNetNetwork network){
-		this.parentNetwork = network;
+		parentNetwork = network;
 	}
 
 	public TimedArcPetriNetNetwork parentNetwork(){
@@ -186,12 +190,14 @@ public class TimedArcPetriNet {
 		if(parentNetwork != null && parentNetwork.isNameUsedForShared(name)) return true;
 
 		for (TimedPlace place : places){
-			if (place.name().equalsIgnoreCase(name))
+			if (place.name().equalsIgnoreCase(name)){
 				return true;
+			}
 		}
 		for (TimedTransition transition : transitions){
-			if (transition.name().equalsIgnoreCase(name))
+			if (transition.name().equalsIgnoreCase(name)){
 				return true;
+			}
 		}
 		return false;
 	}
@@ -230,7 +236,7 @@ public class TimedArcPetriNet {
 
 	public void setMarking(TimedMarking marking) {
 		Require.that(marking != null, "marking must not be null");
-		this.currentMarking = marking;
+		currentMarking = marking;
 
 		for (TimedPlace p : places) {
 			p.setCurrentMarking(marking);
@@ -241,7 +247,7 @@ public class TimedArcPetriNet {
 		return places;
 	}
 
-	public Iterable<TimedTransition> transitions() {
+	public List<TimedTransition> transitions() {
 		return transitions;
 	}
 
@@ -262,9 +268,9 @@ public class TimedArcPetriNet {
 	}
 
 	public TimedArcPetriNet copy() {
-		TimedArcPetriNet tapn = new TimedArcPetriNet(this.name);
+		TimedArcPetriNet tapn = new TimedArcPetriNet(name);
 
-		for(TimedPlace p : this.places) {
+		for(TimedPlace p : places) {
 			TimedPlace copy = p.copy();
 			tapn.add(copy);
 			if(!p.isShared()){
@@ -274,7 +280,7 @@ public class TimedArcPetriNet {
 			}
 		}
 
-		for(TimedTransition t : this.transitions){
+		for(TimedTransition t : transitions){
 			TimedTransition copy = t.copy();
 			tapn.add(copy);
 			if(t.isShared()){
@@ -282,16 +288,16 @@ public class TimedArcPetriNet {
 			}
 		}
 
-		for(TimedInputArc inputArc : this.inputArcs)
+		for(TimedInputArc inputArc : inputArcs)
 			tapn.add(inputArc.copy(tapn));
 
-		for(TimedOutputArc outputArc : this.outputArcs)
+		for(TimedOutputArc outputArc : outputArcs)
 			tapn.add(outputArc.copy(tapn));
 
-		for(TransportArc transArc : this.transportArcs)
+		for(TransportArc transArc : transportArcs)
 			tapn.add(transArc.copy(tapn));
 
-		for(TimedInhibitorArc inhibArc : this.inhibitorArcs)
+		for(TimedInhibitorArc inhibArc : inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
 
 		return tapn;
@@ -340,5 +346,125 @@ public class TimedArcPetriNet {
 	
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+	
+	private void fillStatistics(Iterable<TimedArcPetriNet> nets, Object[][] array, int columnNumber){
+		int numberOfComponents = 0;
+		int numberOfPlaces = 0;
+		int numberOfTransitions = 0;
+		int numberOfInputArcs = 0;
+		int numberOfOutputArcs = 0;
+		int numberOfInhibitorArcs = 0;
+		int numberOfTransportArcs = 0;
+		int numberOfTotalNumberOfArcs = 0;
+		int numberOfTokens = 0;
+		int numberOfOrphans = 0;
+		boolean networkUntimed = true; 
+		int numberOfUntimedInputArcs = 0;
+		int numberOfUntimedTransportArcs = 0;
+		
+		//For comparing to 
+		TimeInterval infInterval = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+		TimeInterval infIntervalConst = new TimeInterval(true, new IntBound(0), Bound.Infinity, false);
+		
+		for(TimedArcPetriNet t : nets){
+			numberOfComponents += 1;
+			numberOfPlaces += t.places().size();
+			numberOfTransitions += t.transitions.size();
+			numberOfInputArcs += t.inputArcs.size();
+			numberOfOutputArcs += t.outputArcs.size();
+			numberOfInhibitorArcs += t.inhibitorArcs.size();
+			numberOfTransportArcs += t.transportArcs.size();
+			numberOfTokens += t.getNumberOfTokensInNet();
+			numberOfOrphans += t.getOrphanTransitions().size();
+			//Test if all inputarcs is untimed and get the number of untimed input arcs
+			for(TimedInputArc in : t.inputArcs()){
+				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+					networkUntimed = false;
+				} else {
+					numberOfUntimedInputArcs++;
+				}
+			}
+			//Test if all tansportarcs is untimed and get the number of untimed transport arcs
+			for(TransportArc in : t.transportArcs()){
+				if(!((in.interval().lowerBound().value() == 0 && in.interval().IsLowerBoundNonStrict() && in.interval().upperBound().equals(Bound.Infinity)))){
+					networkUntimed = false;
+				} else {
+					numberOfUntimedTransportArcs++;
+				}
+			}
+		}
+		
+		numberOfTotalNumberOfArcs = numberOfInputArcs + numberOfOutputArcs + numberOfInhibitorArcs + numberOfTransportArcs;
+		
+		int rowNumber = 0;
+		array[rowNumber++][columnNumber] = numberOfComponents;
+		array[rowNumber++][columnNumber] = numberOfPlaces;
+		array[rowNumber++][columnNumber] = numberOfTransitions;
+		array[rowNumber++][columnNumber] = numberOfInputArcs;
+		array[rowNumber++][columnNumber] = numberOfOutputArcs;
+		array[rowNumber++][columnNumber] = numberOfInhibitorArcs;
+		array[rowNumber++][columnNumber] = numberOfTransportArcs;
+		array[rowNumber++][columnNumber] = numberOfTotalNumberOfArcs;
+		array[rowNumber++][columnNumber] = numberOfTokens;
+		array[rowNumber++][columnNumber] = numberOfUntimedInputArcs;
+		array[rowNumber++][columnNumber] = numberOfUntimedTransportArcs;
+		//Make space for number of shared transitions and places
+		rowNumber += 2;
+		array[rowNumber++][columnNumber] = networkUntimed ? "yes" : "no";
+		array[rowNumber++][columnNumber] = numberOfOrphans;
+	}
+	
+	public Object[][] getStatistics(){
+		
+		Object[][] result = new Object[15][4];
+		int rowNumber = 0;
+		int columnNumber = 0;
+		result[rowNumber++][columnNumber] = "Number of components considered: ";
+		result[rowNumber++][columnNumber] = "Number of places: ";
+		result[rowNumber++][columnNumber] = "Number of transitions: ";
+		result[rowNumber++][columnNumber] = "Number of input arcs: ";
+		result[rowNumber++][columnNumber] = "Number of output arcs: ";
+		result[rowNumber++][columnNumber] = "Number of inhibitor arcs: ";
+		result[rowNumber++][columnNumber] = "Number of pairs of transport arcs: ";
+		result[rowNumber++][columnNumber] = "Total number of arcs: ";
+		result[rowNumber++][columnNumber] = "Number of tokens: ";
+		result[rowNumber++][columnNumber] = "Number of untimed input arcs: ";
+		result[rowNumber++][columnNumber] = "Number of untimed transport arcs";
+		result[rowNumber++][columnNumber] = "Number of shared places: ";
+		result[rowNumber++][columnNumber] = "Number of shared transitions: ";
+		result[rowNumber++][columnNumber] = "The network is untimed: ";
+		result[rowNumber++][columnNumber] = "Number of orphan transitions: ";
+		
+		fillStatistics(Arrays.asList(new TimedArcPetriNet[] {this}), result, 1);
+		fillStatistics(this.parentNetwork().activeTemplates(), result, 2);
+		fillStatistics(this.parentNetwork().allTemplates(), result, 3);
+		
+		//Add the number of shared places and transitions
+		result[11][3] = this.parentNetwork().numberOfSharedPlaces();
+		result[12][3] = this.parentNetwork().numberOfSharedTransitions();
+		
+		return result;
+	}
+	
+	public List<TimedTransition> getOrphanTransitions(){
+		List<TimedTransition> orphans = new ArrayList<TimedTransition>();
+		
+		for(TimedTransition transition:transitions){
+			if(transition.isOrphan()){
+				orphans.add(transition);
+			}
+		}
+		
+		return orphans;
+	}
+	
+	public int getNumberOfTokensInNet(){
+		int result = 0;
+		for(TimedPlace place : places){
+			result += place.numberOfTokens();
+		}
+		
+		return result;
 	}
 }

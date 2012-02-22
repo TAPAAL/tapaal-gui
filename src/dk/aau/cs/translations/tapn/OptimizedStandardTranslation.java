@@ -149,7 +149,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 				builder.append(TOKEN_TEMPLATE_NAME);
 				builder.append(i);
 			}
-			builder.append(";");
+			builder.append(';');
 
 			return builder.toString();
 		}
@@ -478,10 +478,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 
 	
 	public boolean supportsModel(TimedArcPetriNet model) {
-		if(model.hasInhibitorArcs())
-			return false;
-		else
-			return true;
+		return !(model.hasInhibitorArcs());
 	}
 
 	

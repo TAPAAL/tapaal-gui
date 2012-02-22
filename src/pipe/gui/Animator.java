@@ -2,22 +2,28 @@ package pipe.gui;
 
 import java.awt.Container;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
+import javax.swing.ToolTipManager;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.Transition;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.model.tapn.simulation.OldestFiringMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
@@ -76,7 +82,7 @@ public class Animator {
 		}
 
 		CreateGui.getAbstractAnimationPane().setSelectedIndex(0);
-		setFiringmode("Manual");
+		setFiringmode("Random");
 
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				"The verification process returned an untimed trace.\n\n"
@@ -104,12 +110,13 @@ public class Animator {
 	 * Highlights enabled transitions
 	 */
 	public void highlightEnabledTransitions() {
+		updateFireableTransitions();
 		DataLayer current = activeGuiModel();
 
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) == true) {
+			if (tempTransition.isEnabled(true)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -125,11 +132,28 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) == false) {
+			if (!(tempTransition.isEnabled(true))) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
 		}
+	}
+	
+	public void updateFireableTransitions(){
+		EnabledTransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
+		fireableTrans.startReInit();
+		
+		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+			while (transitionIterator.hasNext()) {
+				Transition tempTransition = transitionIterator.next();
+				if ((tempTransition.isEnabled(true))) {
+					fireableTrans.addTransition(temp, tempTransition);
+				}
+			}
+		}
+		
+		fireableTrans.reInitDone();
 	}
 
 	/**
@@ -192,6 +216,7 @@ public class Animator {
 			highlightEnabledTransitions();
 			currentAction--;
 			currentMarkingIndex--;
+			reportBlockingPlaces();
 		}
 	}
 
@@ -218,10 +243,10 @@ public class Animator {
 			currentAction++;
 			currentMarkingIndex++;
 			activeGuiModel().redrawVisibleTokenLists();
+			reportBlockingPlaces();
 
 		}
 	}
-
 
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
@@ -230,7 +255,7 @@ public class Animator {
 			if (getFiringmode() != null) {
 				next = currentMarking().fireTransition(transition, getFiringmode());
 			} else {
-				List<TimedToken> tokensToConsume = showSelectSimulatorDialogue(transition);
+				List<TimedToken> tokensToConsume = getTokensToConsume(transition);
 				if(tokensToConsume == null) return; // Cancelled
 				next = currentMarking().fireTransition(transition, tokensToConsume);
 			}
@@ -247,7 +272,7 @@ public class Animator {
 			if(untimedAnimationHistory.isStepForwardAllowed()){
 				String nextFromUntimedTrace = untimedAnimationHistory.getElement(untimedAnimationHistory.getSelectedIndex()+1);
 
-				if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name())){
+				if(nextFromUntimedTrace.equals(transition.model().name() + "." + transition.name()) || transition.isShared() && nextFromUntimedTrace.equals(transition.name())){
 					untimedAnimationHistory.stepForward();
 				}else{
 					int fireTransition = JOptionPane.showConfirmDialog(CreateGui.getApp(),
@@ -271,18 +296,55 @@ public class Animator {
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		reportBlockingPlaces();
 
 	}
 
-	public void letTimePass(BigDecimal delay) {
+	public boolean letTimePass(BigDecimal delay) {
+		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
 			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
+			result = true;
 		}
-
+		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		reportBlockingPlaces();
+		return result;
+	}
+	
+	public void reportBlockingPlaces(){
+		
+		try{
+			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
+			if(delay.compareTo(new BigDecimal(0))<=0){
+				CreateGui.getAnimationController().getOkButton().setEnabled(false);
+				CreateGui.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for positive rational numbers");
+			} else {
+				List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
+				if(blockingPlaces.size() == 0){
+					CreateGui.getAnimationController().getOkButton().setEnabled(true);
+					CreateGui.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
+				} else {
+					StringBuilder sb = new StringBuilder();
+					sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
+					for (TimedPlace t :blockingPlaces){
+						sb.append(t.toString() + "<br />");
+					}
+					//JOptionPane.showMessageDialog(null, sb.toString());
+					sb.append("</html>");
+					CreateGui.getAnimationController().getOkButton().setEnabled(false);
+					CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
+				}
+			}
+		} catch (NumberFormatException e) {
+			// Do nothing, invalud number
+		} catch (ParseException e) {
+			CreateGui.getAnimationController().getOkButton().setEnabled(false);
+			CreateGui.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
+		}
 	}
 
 	private DataLayer activeGuiModel() {
@@ -343,10 +405,73 @@ public class Animator {
 		}
 
 		CreateGui.getAnimationController().updateFiringModeComboBox();
+		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
+	}	
+	
+	enum FillListStatus{
+		zero,
+		one,
+		moreThanOne
+	}
+	
+	//Creates a list of tokens if there is only one token in each of the places
+	//Used by getTokensToConsume
+	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
+		for(TimedInputArc in: transition.getInputArcs()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return FillListStatus.zero;
+			} else if(elligibleTokens.size() == 1){
+				listToFill.add(elligibleTokens.get(0));
+			} else {
+				return FillListStatus.moreThanOne;
+			}
+		}
+		for(TransportArc in: transition.getTransportArcsGoingThrough()){
+			List<TimedToken> elligibleTokens = in.getElligibleTokens();
+			if(elligibleTokens.size() == 0){
+				return FillListStatus.zero;
+			} else if(elligibleTokens.size() == 1){
+				listToFill.add(elligibleTokens.get(0));
+			} else {
+				return FillListStatus.moreThanOne;
+			}
+		}
+		return FillListStatus.one;
+	}
+	
+	private List<TimedToken> getTokensToConsume(TimedTransition transition){
+		//If there are only one token in each place
+		List<TimedToken> result = new ArrayList<TimedToken>();
+		boolean userShouldChoose = false;
+		if(transition.isShared()){
+			for(TimedTransition t : transition.sharedTransition().transitions()){
+				FillListStatus status = fillList(t, result);
+				if(status == FillListStatus.zero){
+					return null;
+				} else if(status == FillListStatus.moreThanOne){
+					userShouldChoose = true;
+					break;
+				}
+			}
+		} else {
+			FillListStatus status = fillList(transition, result);
+			if(status == FillListStatus.zero){
+				return null;
+			} else if(status == FillListStatus.moreThanOne){
+				userShouldChoose = true;
+			}
+		}
+		
+		if (userShouldChoose){
+			return showSelectSimulatorDialogue(transition);
+		} else {
+			return result;
+		}
 	}
 
 	public List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Select Tokens", true);
 
 		Container contentPane = guiDialog.getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));

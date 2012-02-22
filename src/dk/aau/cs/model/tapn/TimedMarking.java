@@ -6,24 +6,24 @@ import java.util.List;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
 public interface TimedMarking {
-	public abstract void add(TimedToken token);
-	public abstract void remove(TimedToken token);
+	void add(TimedToken token);
+	void remove(TimedToken token);
 
 //	public abstract void removePlaceFromMarking(TimedPlace place);
 //	public abstract void removePlaceFromMarking(SharedPlace place);
-	public abstract void removePlaceFromMarking(TimedPlace place);
+	void removePlaceFromMarking(TimedPlace place);
 	
-	public abstract List<TimedToken> getTokensFor(TimedPlace place);
+	List<TimedToken> getTokensFor(TimedPlace place);
 //	public abstract List<TimedToken> getTokensFor(TimedPlace place);
 //	public abstract List<TimedToken> getTokensFor(SharedPlace place);
 	
-	public abstract TimedMarking clone();
+	TimedMarking clone();
 
-	public abstract boolean isDelayPossible(BigDecimal delay);
-	public abstract TimedMarking delay(BigDecimal amount);
+	boolean isDelayPossible(BigDecimal delay);
+	TimedMarking delay(BigDecimal amount);
 
-	public abstract TimedMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume);
-	public abstract TimedMarking fireTransition(TimedTransition transition, FiringMode firingMode);
+	TimedMarking fireTransition(TimedTransition transition, List<TimedToken> tokensToConsume);
+	TimedMarking fireTransition(TimedTransition transition, FiringMode firingMode);
 
-	public abstract int size();
+	int size();
 }

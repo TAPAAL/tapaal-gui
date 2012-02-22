@@ -34,7 +34,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
-		this.searchOption = search;
+		searchOption = search;
 		this.symmetry = symmetry;
 		this.discreteInclusion = discreteInclusion;
 		this.inclusionPlaces = inclusionPlaces;
@@ -53,7 +53,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	}
 	
 	public void setTokensInModel(int tokens){ // TODO: Get rid of this method when verifytapn refactored
-		this.tokensInModel = tokens;
+		tokensInModel = tokens;
 	}
 
 	@Override
@@ -62,13 +62,13 @@ public class VerifyTAPNOptions implements VerificationOptions{
 
 		result.append("-k ");
 		result.append(extraTokens+tokensInModel);
-		result.append(" ");
+		result.append(' ');
 		result.append(traceMap.get(traceOption));
-		result.append(" ");
+		result.append(' ');
 		result.append(searchMap.get(searchOption));
-		result.append(" ");
+		result.append(' ');
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
-		result.append(" ");
+		result.append(' ');
 		result.append(discreteInclusion ? " -f 1" : "");
 		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");
 		return result.toString();
@@ -81,7 +81,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		StringBuilder s = new StringBuilder();
 		boolean first = true;
 		for(TimedPlace p : inclusionPlaces.inclusionPlaces()) {
-			if(!first) s.append(",");
+			if(!first) s.append(',');
 			
 			s.append(p.name());
 			if(first) first = false;

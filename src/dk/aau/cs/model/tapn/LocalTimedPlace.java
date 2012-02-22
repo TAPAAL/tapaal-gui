@@ -51,7 +51,7 @@ public class LocalTimedPlace  implements TimedPlace {
 
 	public void setCurrentMarking(TimedMarking marking) {
 		Require.that(marking != null, "marking cannot be null");
-		this.currentMarking = marking;
+		currentMarking = marking;
 		fireMarkingChanged();
 	}
 
@@ -61,7 +61,7 @@ public class LocalTimedPlace  implements TimedPlace {
 
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
-		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
+		Require.that(isValid(newName) && !newName.toLowerCase().equals("true") && !newName.toLowerCase().equals("false"), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
 		this.name = newName;
 		fireNameChanged();
 	}
@@ -137,9 +137,9 @@ public class LocalTimedPlace  implements TimedPlace {
 	}
 
 	public LocalTimedPlace copy() {
-		LocalTimedPlace p = new LocalTimedPlace(this.name);
+		LocalTimedPlace p = new LocalTimedPlace(name);
 
-		p.invariant = this.invariant.copy();
+		p.invariant = invariant.copy();
 
 		return p;
 	}

@@ -29,13 +29,13 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 			append("(i).");
 			append(atomicPropositionNode.getPlace());
 			append(") ");
-			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(operatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
 		} else {
 			append("(");
 			append(createAtomicPropositionSum(atomicPropositionNode.getPlace()));
-			append(OperatorConversion(atomicPropositionNode.getOp()));
+			append(operatorConversion(atomicPropositionNode.getOp()));
 			append(" ");
 			append(atomicPropositionNode.getN());
 			append(")");
@@ -64,7 +64,7 @@ public class OptimizedStandardTranslationQueryVisitor extends QueryVisitor {
 				sum.append(" + ");
 			}
 		}
-		sum.append(")");
+		sum.append(')');
 		return sum.toString();
 	}
 }

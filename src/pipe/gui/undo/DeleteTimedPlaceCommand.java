@@ -1,8 +1,8 @@
 package pipe.gui.undo;
 
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -15,8 +15,8 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	public DeleteTimedPlaceCommand(TimedPlaceComponent timedPlaceComponent, TimedArcPetriNet tapn, DataLayer guiModel, DrawingSurfaceImpl view) {
 		super(tapn, guiModel, view);
 		this.timedPlaceComponent = timedPlaceComponent;
-		this.numberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
-		this.timedPlace = timedPlaceComponent.underlyingPlace();
+		numberOfTokens = timedPlaceComponent.underlyingPlace().numberOfTokens();
+		timedPlace = timedPlaceComponent.underlyingPlace();
 	}
 
 	@Override

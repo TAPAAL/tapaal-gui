@@ -1,8 +1,8 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -54,15 +54,19 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.tapaal.TAPAAL;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
-import pipe.dataLayer.PetriNetObject;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedPlaceComponent;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.handler.SpecialMacHandler;
+import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
@@ -70,6 +74,7 @@ import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.ResourceManager;
@@ -90,7 +95,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private String frameTitle; // Frame title
 	private GuiFrame appGui;
 	private DrawingSurfaceImpl appView;
-	private int mode, prev_mode, old_mode; // *** mode WAS STATIC ***
+	private Pipe.ElementType mode, prev_mode, old_mode; // *** mode WAS STATIC ***
 	private int newNameCounter = 1;
 	private JTabbedPane appTab;
 	private StatusBar statusBar;
@@ -111,8 +116,10 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
+	
+	private JMenuItem statistics;
 	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
@@ -132,6 +139,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showComponents = true;
 	private boolean showConstants = true;
 	private boolean showQueries = true;
+	private boolean showEnabledTransitions = true;
 
 	
 	private GUIMode guiMode = GUIMode.noNet;
@@ -301,7 +309,7 @@ public class GuiFrame extends JFrame implements Observer {
 		      
 		      if (dirURL.getProtocol().equals("jar")) {
 		        /* A JAR path */
-		        String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+		        String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); //strip out only the JAR file
 		        JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
 		        Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
 		        Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
@@ -309,7 +317,7 @@ public class GuiFrame extends JFrame implements Observer {
 		          String name = entries.nextElement().getName();
 		          if (name.startsWith("resources/Example nets/")) { //filter according to the path
 		            String entry = name.substring("resources/Example nets/".length());
-		            int checkSubdir = entry.indexOf("/");
+		            int checkSubdir = entry.indexOf('/');
 		            if (checkSubdir >= 0) {
 		              // if it is a subdirectory, we just return the directory name
 		              entry = entry.substring(0, checkSubdir);
@@ -323,8 +331,7 @@ public class GuiFrame extends JFrame implements Observer {
 			Arrays.sort(nets, new Comparator<String>() {
 				public int compare(String one, String two) {
 
-					int toReturn = ((String) one).compareTo(
-							((String) two));
+					int toReturn = one.compareTo(two);
 					// Special hack to get intro-example first
 					if (one.equals("intro-example.xml")) {
 						toReturn = -1;
@@ -384,34 +391,35 @@ public class GuiFrame extends JFrame implements Observer {
 		 JMenu drawMenu = new JMenu("Draw");
 		 drawMenu.setMnemonic('D');
 		 addMenuItem(drawMenu, selectAction = new TypeAction("Select",
-				 Pipe.SELECT, "Select components", "S", true));
+				 ElementType.SELECT, "Select components (S)", "S", true));
 		 drawMenu.addSeparator();
 
 		 addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
-				 Pipe.TAPNPLACE, "Add a place", "P", true));
+				 ElementType.TAPNPLACE, "Add a place (P)", "P", true));
 
 		 addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-				 Pipe.TAPNTRANS, "Add a transition", "T", true));
+				 ElementType.TAPNTRANS, "Add a transition (T)", "T", true));
 
 		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
-				 Pipe.TAPNARC, "Add an arc", "A", true));
+				 ElementType.TAPNARC, "Add an arc (A)", "A", true));
 
 		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport Arc", Pipe.TRANSPORTARC, "Add a transport arc", "R",
+				 "Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
 				 true));
 
-		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor Arc",
-				 Pipe.TAPNINHIBITOR_ARC, "Add an inhibitor arc", "I", true));
+		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor arc",
+				 ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
 		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
-				 Pipe.ANNOTATION, "Add an annotation", "N", true));
+				 ElementType.ANNOTATION, "Add an annotation (N)", "N", true));
 		 
 		 drawMenu.addSeparator();
 		 
 		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
-				 Pipe.ADDTOKEN, "Add a token", "ADD", true));
+				 ElementType.ADDTOKEN, "Add a token (+)", "typed +", true));
+
 		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
-				 "Delete token", Pipe.DELTOKEN, "Delete a token", "SUBTRACT",
+				 "Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
 				 true));
 
 		 /* ViewMenu */
@@ -433,33 +441,37 @@ public class GuiFrame extends JFrame implements Observer {
 		 viewMenu.addSeparator();
 		 addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				 "Change the grid size", "G"));
-		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", Pipe.DRAG,
+		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", ElementType.DRAG,
 				 "Drag the drawing", "D", true));
 		 
 		 viewMenu.addSeparator();
 		 
-		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display Components", 
-				 453243, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display Constants", 
-				 453245, "Show/Hide componens", "", true));
-		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display Queries", 
-				 453244, "Show/Hide componens", "", true));
+		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
+				 453243, "Show/hide the list of components.", "C", true));
+		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
+				 453245, "Show/hide global constants.", "O", true));
+		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
+				 453244, "Show/hide verification queries.", "Q", true));
+		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","F",true));
+		 addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction = new ViewAction("Display Enabled transitions",
+				 453247, "Show/hide the list of enabled transitions","E",true));
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
-				 "Simulation mode", Pipe.START, "Toggle Simulation Mode",
+				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 animateMenu.addSeparator();
-		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Back",
-				 Pipe.STEPBACKWARD, "Step backward a firing", "typed 4"));
+		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
+				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
 		 addMenuItem(animateMenu,
-				 stepforwardAction = new AnimateAction("Forward",
-						 Pipe.STEPFORWARD, "Step forward a firing", "typed 6"));
+				 stepforwardAction = new AnimateAction("Step forward",
+						 ElementType.STEPFORWARD, "Step forward", "typed 6"));
 
-		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay 1",
-				 Pipe.TIMEPASS, "Let time pass 1 unit", "_"));
+		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
+				 ElementType.TIMEPASS, "Let time pass one time unit", "typed 1"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -468,9 +480,9 @@ public class GuiFrame extends JFrame implements Observer {
 		  * AnimateAction("Simulate", Pipe.ANIMATE,
 		  * "Randomly fire a number of transitions", "typed 7",true));
 		  */
-		 randomAction = new AnimateAction("Random", Pipe.RANDOM,
+		 randomAction = new AnimateAction("Random", ElementType.RANDOM,
 				 "Randomly fire a transition", "typed 5");
-		 randomAnimateAction = new AnimateAction("Simulate", Pipe.ANIMATE,
+		 randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
 				 "Randomly fire a number of transitions", "typed 7", true);
 
 		 
@@ -479,16 +491,16 @@ public class GuiFrame extends JFrame implements Observer {
 		 helpMenu.setMnemonic('H');
 		 
 		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
-				 453257, "Visit the TAPAAK homepage", "_"));
+				 453257, "Visit the TAPAAL homepage", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
-				 454256, "See the TAPAAL FAQ", "_"));
+				 454256, "See TAPAAL frequently asked questions", "_"));
 		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
 				 453256, "Ask a question about TAPAAL", "_"));
 		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
-				 453254, "Report a Bug in TAPAAL", "_"));
+				 453254, "Report a bug in TAPAAL", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
@@ -511,42 +523,42 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic('t');
 		
-		JMenuItem batchProcessing = new JMenuItem("Batch Processing");
-		batchProcessing.setMnemonic('b');
-		
+		JMenuItem batchProcessing = new JMenuItem("Batch processing");
+		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				checkForSave();
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
-				dialog.setMinimumSize(dialog.getSize());
+				dialog.setPreferredSize(dialog.getSize());
+				//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the result panel
+				dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()-150));
 				dialog.setLocationRelativeTo(null);
-				dialog.setResizable(false);
+				dialog.setResizable(true);
 				dialog.setVisible(true);
 			}
 		});
-		
 		toolsMenu.add(batchProcessing);
-		toolsMenu.addSeparator();
-
-
-		JMenuItem resetVerifytapn = new JMenuItem("Reset verifytapn location (TAPAAL Engine)");
-		resetVerifytapn.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) { 
-				VerifyTAPN.reset(); 
-				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifytapn has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		toolsMenu.add(resetVerifytapn);
 		
-		JMenuItem resetVerifyta = new JMenuItem("Reset verifyta location (UPPAAL Engine)");
-		resetVerifyta.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) { 
-				Verifyta.reset(); 
-				JOptionPane.showMessageDialog(GuiFrame.this, "The location of verifyta has been reset.", "Info", JOptionPane.INFORMATION_MESSAGE);
+		statistics = new JMenuItem("Net statistics");
+		statistics.setMnemonic('n');		
+		statistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				StatisticsPanel.showStatisticsPanel();
+			}
+		});		
+		toolsMenu.add(statistics);		
+		
+		toolsMenu.addSeparator();
+		
+		JMenuItem engineSelection = new JMenuItem("Verification engines");
+		engineSelection.setMnemonic('v');		
+		engineSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new EngineDialogPanel().showDialog();				
 			}
 		});
-		toolsMenu.add(resetVerifyta);
+		toolsMenu.add(engineSelection);
 		return toolsMenu;
 	}
 
@@ -732,6 +744,7 @@ public class GuiFrame extends JFrame implements Observer {
 			stepforwardAction.setEnabled(false);
 
 			deleteAction.setEnabled(true);
+			showEnabledTransitionsAction.setEnabled(false);
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
@@ -831,19 +844,20 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
+		showZeroToInfinityIntervalsAction.setEnabled(enable);
+		showEnabledTransitionsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
+		
+		// Tools
+		statistics.setEnabled(enable);
 
 	}
 
 	// set frame objects by array index
 	private void setObjects(int index) {
 		appView = CreateGui.getDrawingSurface(index);
-	}
-
-	private void setObjectsNull(int index) {
-		CreateGui.removeTab(index);
 	}
 
 	// set tabbed pane properties and add change listener that updates tab with
@@ -866,7 +880,7 @@ public class GuiFrame extends JFrame implements Observer {
 					setGUIMode(GUIMode.draw);
 
 					// TODO: change this code... it's ugly :)
-					if (appGui.getMode() == Pipe.SELECT) {
+					if (appGui.getMode() == ElementType.SELECT) {
 						appGui.activateSelectAction();
 					}
 
@@ -886,7 +900,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	// HAK Method called by netModel object when it changes
 	public void update(Observable o, Object obj) {
-		if ((mode != Pipe.CREATING) && (!appView.isInAnimationMode())) {
+		if ((mode != ElementType.CREATING) && (!appView.isInAnimationMode())) {
 			appView.setNetChanged(true);
 		}
 	}
@@ -907,12 +921,25 @@ public class GuiFrame extends JFrame implements Observer {
 		showConstants(!showConstants);
 	}
 	
+	public void toggleZeroToInfinityIntervals() {
+		CreateGui.toggleShowZeroToInfinityIntervals();
+		appView.repaintAll();
+	}
+	
 	public void showComponents(boolean enable){
 		showComponents = enable;
 		CreateGui.getCurrentTab().showComponents(enable);
 	}
 	public void toggleComponents(){
 		showComponents(!showComponents);
+	}
+	
+	public void showEnabledTransitionsList(boolean enable){
+		showEnabledTransitions = enable;
+		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
+	}
+	public void toggleEnabledTransitionsList(){
+		showEnabledTransitionsList(!showEnabledTransitions);
 	}
 	
 	public void saveOperation(boolean forceSave){
@@ -1030,7 +1057,7 @@ public class GuiFrame extends JFrame implements Observer {
 		int currentlySelected = appTab.getSelectedIndex();
 
 		
-		if (namePrefix == null || namePrefix == "") {
+		if (namePrefix == null || namePrefix.equals("")) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
 		} else {
 			name = namePrefix + ".xml";
@@ -1046,7 +1073,7 @@ public class GuiFrame extends JFrame implements Observer {
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(Pipe.CREATING);
+					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
 				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
@@ -1057,6 +1084,8 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
+				currentTab.selectFirstElements();
+				
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1109,7 +1138,7 @@ public class GuiFrame extends JFrame implements Observer {
 				TabContent currentTab = (TabContent) appTab.getSelectedComponent();
 				if (CreateGui.getApp() != null) {
 					// Notifies used to indicate new instances.
-					CreateGui.getApp().setMode(Pipe.CREATING);
+					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
 				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
@@ -1120,6 +1149,8 @@ public class GuiFrame extends JFrame implements Observer {
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
+				currentTab.selectFirstElements();
+				
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1140,6 +1171,8 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
+		
+		
 	}
 
 	private void undoAddTab(int currentlySelected) {
@@ -1160,13 +1193,16 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public boolean checkForSave(int index) {
+		
 		if(index < 0) return false;
+				
 		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
 					"Confirm Save Current File",
 					JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
+
 			switch (result) {
 			case JOptionPane.YES_OPTION:
 				boolean saved = saveOperation(index, false);
@@ -1190,7 +1226,7 @@ public class GuiFrame extends JFrame implements Observer {
 		// Loop through all tabs and check if they have been saved
 		for (int counter = 0; counter < appTab.getTabCount(); counter++) {
 			appTab.setSelectedIndex(counter);
-			if (checkForSave() == false) {
+			if (!(checkForSave())) {
 				return false;
 			}
 		}
@@ -1199,7 +1235,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setRandomAnimationMode(boolean on) {
 
-		if (on == false) {
+		if (!(on)) {
 			stepforwardAction.setEnabled(CreateGui.getAnimationHistory().isStepForwardAllowed());
 			stepbackwardAction.setEnabled(CreateGui.getAnimationHistory().isStepBackAllowed());
 
@@ -1245,6 +1281,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            change GUI to this mode
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 */
+	//TODO
 	public void setGUIMode(GUIMode mode) {
 		switch (mode) {
 		case draw:
@@ -1263,25 +1300,28 @@ public class GuiFrame extends JFrame implements Observer {
 			showConstants(showConstants);
 			
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-
+			
+			activateSelectAction();
+			selectAction.setSelected(true);
 			break;
 		case animation:
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
 			tab.switchToAnimationComponents();
 			showComponents(showComponents);
-
+			
 			startAction.setSelected(true);
 			tab.drawingSurface().changeAnimationMode(true);
 			tab.drawingSurface().repaintAll();
 			CreateGui.getAnimator().reset();
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 			CreateGui.getAnimator().setFiringmode("Random");
 
 			setEditionAllowed(false);
 			statusBar.changeText(statusBar.textforAnimation);
-
+			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
 			break;
@@ -1303,12 +1343,12 @@ public class GuiFrame extends JFrame implements Observer {
 		setMode(old_mode);
 	}
 
-	public void setFastMode(int _mode) {
+	public void setFastMode(Pipe.ElementType _mode) {
 		old_mode = mode;
 		setMode(_mode);
 	}
 
-	public void setMode(int _mode) {
+	public void setMode(Pipe.ElementType _mode) {
 		// Don't bother unless new mode is different.
 		if (mode != _mode) {
 			prev_mode = mode;
@@ -1316,7 +1356,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 
-	public int getMode() {
+	public Pipe.ElementType getMode() {
 		return mode;
 	}
 
@@ -1326,43 +1366,40 @@ public class GuiFrame extends JFrame implements Observer {
 		mode = prev_mode;
 
 		if (placeAction != null) {
-			placeAction.setSelected(mode == Pipe.PLACE);
+			placeAction.setSelected(mode == ElementType.PLACE);
 		}
 		if (transAction != null) {
-			transAction.setSelected(mode == Pipe.IMMTRANS);
+			transAction.setSelected(mode == ElementType.IMMTRANS);
 		}
 
 		if (timedtransAction != null) {
-			timedtransAction.setSelected(mode == Pipe.TIMEDTRANS);
+			timedtransAction.setSelected(mode == ElementType.TIMEDTRANS);
 		}
 
 		if (arcAction != null) {
-			arcAction.setSelected(mode == Pipe.ARC);
+			arcAction.setSelected(mode == ElementType.ARC);
 		}
 
 		if (timedArcAction != null)
-			timedArcAction.setSelected(mode == Pipe.TAPNARC);
+			timedArcAction.setSelected(mode == ElementType.TAPNARC);
 
 		if (transportArcAction != null)
-			transportArcAction.setSelected(mode == Pipe.TRANSPORTARC);
+			transportArcAction.setSelected(mode == ElementType.TRANSPORTARC);
 
 		if (timedPlaceAction != null)
-			timedPlaceAction.setSelected(mode == Pipe.TAPNPLACE);
-
-		// if (inhibarcAction != null)
-		// inhibarcAction.setSelected(mode == Pipe.TAPNINHIBITOR_ARC);
+			timedPlaceAction.setSelected(mode == ElementType.TAPNPLACE);
 
 		if (tokenAction != null)
-			tokenAction.setSelected(mode == Pipe.ADDTOKEN);
+			tokenAction.setSelected(mode == ElementType.ADDTOKEN);
 
 		if (deleteTokenAction != null)
-			deleteTokenAction.setSelected(mode == Pipe.DELTOKEN);
+			deleteTokenAction.setSelected(mode == ElementType.DELTOKEN);
 
 		if (selectAction != null)
-			selectAction.setSelected(mode == Pipe.SELECT);
+			selectAction.setSelected(mode == ElementType.SELECT);
 
 		if (annotationAction != null)
-			annotationAction.setSelected(mode == Pipe.ANNOTATION);
+			annotationAction.setSelected(mode == ElementType.ANNOTATION);
 
 	}
 
@@ -1390,7 +1427,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void activateSelectAction() {
 		// Set selection mode at startup
-		setMode(Pipe.SELECT);
+		setMode(ElementType.SELECT);
 		selectAction.actionPerformed(null);
 	}
 
@@ -1410,44 +1447,27 @@ public class GuiFrame extends JFrame implements Observer {
 		return statusBar;
 	}
 
-	private Component c = null; // arreglantzoom
-	private Component p = new BlankLayer(this);
-
-	/* */
-	void hideNet(boolean doHide) {
-		if (doHide) {
-			c = appTab.getComponentAt(appTab.getSelectedIndex());
-			appTab.setComponentAt(appTab.getSelectedIndex(), p);
-		} else {
-			if (c != null) {
-				appTab.setComponentAt(appTab.getSelectedIndex(), c);
-				c = null;
-			}
-		}
-		appTab.repaint();
-	}
-
 	class AnimateAction extends GuiAction {
 
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 8582324286370859664L;
-		private int typeID;
+		private ElementType typeID;
 		private AnimationHistoryComponent animBox;
 
-		AnimateAction(String name, int typeID, String tooltip, String keystroke) {
+		AnimateAction(String name, ElementType typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 			this.typeID = typeID;
 		}
 
-		AnimateAction(String name, int typeID, String tooltip,
+		AnimateAction(String name, ElementType typeID, String tooltip,
 				String keystroke, boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 			this.typeID = typeID;
 		}
 
-		public AnimateAction(String name, int typeID, String tooltip,
+		public AnimateAction(String name, ElementType typeID, String tooltip,
 				KeyStroke keyStroke) {
 			super(name, tooltip, keyStroke);
 			this.typeID = typeID;
@@ -1462,38 +1482,64 @@ public class GuiFrame extends JFrame implements Observer {
 			animBox = CreateGui.getAnimationHistory();
 
 			switch (typeID) {
-			case Pipe.START:
+			case START:
 				try {
-					setAnimationMode(!appView.isInAnimationMode());
+					
 					if (!appView.isInAnimationMode()) {
-						restoreMode();
-						PetriNetObject.ignoreSelection(false);
+						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+							restoreMode();
+							PetriNetObject.ignoreSelection(true);
+							setAnimationMode(!appView.isInAnimationMode());
+						} else {
+							JOptionPane.showMessageDialog(GuiFrame.this, 
+									"You need at least one active template to enter simulation mode",
+									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
+						}
 					} else {
+
 						setMode(typeID);
-						PetriNetObject.ignoreSelection(true);
-						// Do we keep the selection??
+						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
+						setAnimationMode(!appView.isInAnimationMode());
+
 					}
 				} catch (Exception e) {
 					System.err.println(e);
 					JOptionPane.showMessageDialog(GuiFrame.this, e.toString(),
-							"Animation Mode Error", JOptionPane.ERROR_MESSAGE);
+							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
+				
+				// XXX
+				// This is a fix for bug #812694 where on mac some menues are gray after
+				// changing from simulation mode, when displaying a trace. Showing and 
+				// hiding a menu seems to fix this problem 
+				Dialog a = new Dialog(CreateGui.appGui);
+				a.setVisible(true);
+				a.setVisible(false);
+				a.dispose();
+				if(getGUIMode().equals(GUIMode.draw)){
+					activateSelectAction();
+				}
+				
+				CreateGui.getCurrentTab().selectFirstElements();
+				
 				break;
 
-			case Pipe.TIMEPASS:
+			case TIMEPASS:
+				animBox.clearStepsForward();
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
-			case Pipe.STEPFORWARD:
+			case STEPFORWARD:
 				animBox.stepForward();
 				CreateGui.getAnimator().stepForward();
 				// update mouseOverView
-				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces()) {
+				for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
 					if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
 						((TimedPlaceComponent) p).showAgeOfTokens(true);
 					}
@@ -1501,11 +1547,11 @@ public class GuiFrame extends JFrame implements Observer {
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
-			case Pipe.STEPBACKWARD:
+			case STEPBACKWARD:
 				animBox.stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				// update mouseOverView
-				for (pipe.dataLayer.Place p : CreateGui.getModel().getPlaces()) {
+				for (pipe.gui.graphicElements.Place p : CreateGui.getModel().getPlaces()) {
 					if (((TimedPlaceComponent) p).isAgeOfTokensShown()) {
 						((TimedPlaceComponent) p).showAgeOfTokens(true);
 					}
@@ -1521,9 +1567,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	class ExampleFileAction extends GuiAction {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -5983638671592349736L;
 		private String filename;
 		private String name;
@@ -1547,9 +1590,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	class DeleteAction extends GuiAction {
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -8592450390507637174L;
 
 		DeleteAction(String name, String tooltip, String keystroke) {
@@ -1580,7 +1620,7 @@ public class GuiFrame extends JFrame implements Observer {
 			s.append("The following queries are associated with the currently selected objects:\n\n");
 			for (TAPNQuery q : queriesToDelete) {
 				s.append(q.getName());
-				s.append("\n");
+				s.append('\n');
 			}
 			s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
@@ -1623,14 +1663,14 @@ public class GuiFrame extends JFrame implements Observer {
 		 * 
 		 */
 		private static final long serialVersionUID = 1333311291148756241L;
-		private int typeID;
+		private Pipe.ElementType typeID;
 
-		TypeAction(String name, int typeID, String tooltip, String keystroke) {
+		TypeAction(String name, Pipe.ElementType typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke);
 			this.typeID = typeID;
 		}
 
-		TypeAction(String name, int typeID, String tooltip, String keystroke,
+		TypeAction(String name, Pipe.ElementType typeID, String tooltip, String keystroke,
 				boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 			this.typeID = typeID;
@@ -1648,7 +1688,7 @@ public class GuiFrame extends JFrame implements Observer {
 			if (this != timedArcAction) {
 				timedArcAction.setSelected(false);
 			}
-			/* EOC */
+			
 			if (this != timedPlaceAction) {
 				timedPlaceAction.setSelected(false);
 			}
@@ -1686,27 +1726,21 @@ public class GuiFrame extends JFrame implements Observer {
 			setMode(typeID);
 			statusBar.changeText(typeID);
 
-			if ((typeID != Pipe.ARC) && (appView.createArc != null)) {
+			if ((typeID != ElementType.ARC) && (appView.createArc != null)) {
 
 				appView.createArc.delete();
 				appView.createArc = null;
 				appView.repaint();
 
-				// Also handel trasport arcs (if any)
-				if (appView.transportArcPart1 != null) {
-					appView.transportArcPart1.delete();
-					appView.transportArcPart1 = null;
-					appView.repaint();
-				}
 			}
 
-			if (typeID == Pipe.SELECT) {
+			if (typeID == ElementType.SELECT) {
 				// disable drawing to eliminate possiblity of connecting arc to
 				// old coord of moved component
 				statusBar.changeText(typeID);
 				appView.getSelectionObject().enableSelection();
 				appView.setCursorType("arrow");
-			} else if (typeID == Pipe.DRAG) {
+			} else if (typeID == ElementType.DRAG) {
 				appView.setCursorType("move");
 			} else {
 				appView.setCursorType("crosshair");
@@ -1746,78 +1780,55 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			boolean doZoom = false;
+			// This is set to true if a valid zoom action is performed
+			boolean didZoom = false;
 			try {
 				String actionName = (String) getValue(NAME);
 				Zoomer zoomer = appView.getZoomController();
-				TabContent tabContent = (TabContent) appTab
-				.getSelectedComponent();
-				JViewport thisView = tabContent.drawingSurfaceScrollPane()
-				.getViewport();
-				String selection = null, strToTest = null;
+				TabContent tabContent = (TabContent) appTab.getSelectedComponent();
+				JViewport thisView = tabContent.drawingSurfaceScrollPane().getViewport();
+				String selectedZoomLevel = null;
+				int newZoomLevel = Pipe.ZOOM_DEFAULT;
 
-				double midpointX = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().x
-						+ (thisView.getWidth() * 0.5), zoomer.getPercent());
-				double midpointY = Zoomer.getUnzoomedValue(thisView
-						.getViewPosition().y
-						+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-
+				/*
+				 * Zoom action name overview
+				 * Zoom in: the zoom IN icon in panel has been pressed
+				 * Zoom out: the zoom OUT icon in panel has been pressed
+				 * Zoom: a specific zoom level has been chosen in drop down or in the menu.
+				 */
 				if (actionName.equals("Zoom in")) {
-					doZoom = zoomer.zoomIn();
+					didZoom = zoomer.zoomIn();
 				} else if (actionName.equals("Zoom out")) {
-					doZoom = zoomer.zoomOut();
+					didZoom = zoomer.zoomOut();
 				} else {
 					if (actionName.equals("Zoom")) {
-						selection = (String) zoomComboBox.getSelectedItem();
+						selectedZoomLevel = (String) zoomComboBox.getSelectedItem();
 					}
 					if (e.getSource() instanceof JMenuItem) {
-						selection = ((JMenuItem) e.getSource()).getText();
+						selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
 					}
-					strToTest = validatePercent(selection);
-
-					if (strToTest != null) {
-						// BK: no need to zoom if already at that level
-						if (zoomer.getPercent() == Integer.parseInt(strToTest)) {
-							return;
-						} else {
-							zoomer.setZoom(Integer.parseInt(strToTest));
-							doZoom = true;
-						}
-					} else {
-						return;
-					}
+					
+					//parse selected zoom level, and strip of %.
+					newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%",""));
+					
+					didZoom = zoomer.setZoom(newZoomLevel);
 				}
-				if (doZoom == true) {
+				if (didZoom) {
 					updateZoomCombo();
-					appView.zoomTo(new java.awt.Point((int) midpointX,
-							(int) midpointY));
+					
+					double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
+										+ (thisView.getWidth() * 0.5), zoomer.getPercent());
+					double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
+										+ (thisView.getHeight() * 0.5), zoomer.getPercent());
+					
+					java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
+					
+					appView.zoomTo(midpoint);
 				}
 			} catch (ClassCastException cce) {
 				// zoom
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-		}
-
-		private String validatePercent(String selection) {
-
-			try {
-				String toTest = selection;
-
-				if (selection.endsWith("%")) {
-					toTest = selection.substring(0, (selection.length()) - 1);
-				}
-
-				if (Integer.parseInt(toTest) < Pipe.ZOOM_MIN
-						|| Integer.parseInt(toTest) > Pipe.ZOOM_MAX) {
-					throw new Exception();
-				} else {
-					return toTest;
-				}
-			} catch (Exception e) {
-				zoomComboBox.setSelectedItem("");
-				return null;
 			}
 		}
 
@@ -1860,65 +1871,32 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleQueries();
 			} else if (this == showConstantsAction){
 				toggleConstants();
+			} else if (this == showZeroToInfinityIntervalsAction) {
+				toggleZeroToInfinityIntervals();
+			} else if (this == showEnabledTransitionsAction) {
+				toggleEnabledTransitionsList();
 			}
 		}
 		
 	}
 	public void showAbout() {
-		StringBuffer buffer = new StringBuffer(Pipe.getProgramName());
+		StringBuffer buffer = new StringBuffer("About " + TAPAAL.TOOLNAME);
 		buffer.append("\n\n");
+		buffer.append("TAPAAL is a tool for editing, simulation and verification of timed-arc Petri nets.\n");
+		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
+		buffer.append("License information and more is avaialbe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Joakim Byg, Lasse Jacobsen, Morten Jacobsen \n");
-		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller and Jiri Srba\n");
-		buffer.append("Aalborg University 2009-2011\n\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\n");
+		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller, Jiri Srba and Jakob H. Taankvist\n");
+		buffer.append("Aalborg University 2009-2012\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011\n\n");
-		buffer.append("License information and more at: www.tapaal.net\n\n");
-		
-		Verifyta verifyta = new Verifyta();// TODO: MJ -- fix this
-
-		String verifytaPath = verifyta.getPath();
-		String verifytaversion = "";
-
-		if (verifytaPath == null || verifytaPath.isEmpty()) {
-			verifytaPath = "Not setup";
-			verifytaversion = "N/A";
-		} else {
-			verifytaversion = verifyta.getVersion();
-		}
-		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
-		String verifytapnPath = verifyTAPN.getPath();
-		String verifytapnversion = "";
-
-		if (verifytapnPath == null || verifytapnPath.isEmpty()) {
-			verifytapnPath = "Not setup";
-			verifytapnversion = "N/A";
-		} else {
-			verifytapnversion = verifyTAPN.getVersion();
-		}
-		
-		buffer.append("TAPAAL Engine (verifytapn) Information:\n");
-		buffer.append("   Located: ");
-		buffer.append(verifytapnPath);
+		buffer.append("Aalborg University 2011-2012\n\n");
 		buffer.append("\n");
-		buffer.append("   Version: ");
-		buffer.append(verifytapnversion);
-		buffer.append("\n\n");
 		
-		buffer.append("UPPAAL Engine (verifyta) Information:\n");
-		buffer.append("   Located: ");
-		buffer.append(verifytaPath);
-		buffer.append("\n");
-		buffer.append("   Version: ");
-		buffer.append(verifytaversion);
 
-		buffer.append("  \n\n");
-		buffer.append("Based on PIPE2:\n");
-		buffer.append("http://pipe2.sourceforge.net/");
-
-		JOptionPane.showMessageDialog(null, buffer.toString(), "About TAPAAL",
+		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.TOOLNAME,
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
 	
@@ -1929,7 +1907,7 @@ public class GuiFrame extends JFrame implements Observer {
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
-			Logger.log("Can't open browser");
+			Logger.log("Cannot open the browser.");
 			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);
@@ -2041,8 +2019,6 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.userPath = filePath.getParent();
 					createNewTabFromFile(filePath);
 
-					// TODO make update leftPane work better
-					// CreateGui.updateLeftPanel();
 				}
 			} else if (this == createAction) {
 				showNewPNDialog();
@@ -2053,9 +2029,10 @@ public class GuiFrame extends JFrame implements Observer {
 				// Set GUI mode to noNet
 				setGUIMode(GUIMode.noNet);
 
-				setObjectsNull(appTab.getSelectedIndex());
-				appTab.remove(appTab.getSelectedIndex());
-
+				int index = appTab.getSelectedIndex();
+				appTab.remove(index);
+				CreateGui.removeTab(index);
+				
 				// Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);
@@ -2138,7 +2115,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName() == "selected") {
+			if (evt.getPropertyName().equals("selected")) {
 				Boolean b = (Boolean) evt.getNewValue();
 				if (b != null) {
 					setSelected(b.booleanValue());
@@ -2162,7 +2139,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showNewPNDialog() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+				"Create a New Petri Net", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

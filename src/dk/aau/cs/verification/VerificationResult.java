@@ -23,7 +23,7 @@ public class VerificationResult<TTrace> {
 	}
 
 	public VerificationResult(String outputMessage, long verificationTime) {
-		this.errorMessage = outputMessage;
+		errorMessage = outputMessage;
 		this.verificationTime = verificationTime;
 	}
 

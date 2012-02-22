@@ -19,7 +19,7 @@ public class StandardUPPAALQuery implements UPPAALQuery {
 		file.append(pathQuantifier);
 		file.append(nodeQuantifier);
 		file.append(query);
-		file.append("\n");
+		file.append('\n');
 	}
 
 	public void setPathQuantifier(String pathQuantifier) {

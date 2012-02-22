@@ -19,7 +19,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 	}
 
 	public void setNetworkMarking(NetworkMarking marking){
-		this.parent = marking;
+		parent = marking;
 	}
 
 	public void add(TimedToken token) {
@@ -92,6 +92,25 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 			}
 		}
 		return true;
+	}
+	
+	public List<TimedPlace> getBlockingPlaces(BigDecimal delay){
+		Require.that(delay.compareTo(BigDecimal.ZERO) >= 0, "cannot delay with negative numbers");
+		List<TimedPlace> result = new ArrayList<TimedPlace>();
+		
+		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
+			boolean blocked = false;
+			for (TimedToken token : entry.getValue()) {
+				TimeInvariant invariant = token.place().invariant();
+				if (!invariant.isSatisfied(token.age().add(delay))) {
+					blocked = true;
+				}
+			}
+			if (blocked){
+				result.add(entry.getKey());
+			}
+		}
+		return result;
 	}
 
 	public LocalTimedMarking clone() {

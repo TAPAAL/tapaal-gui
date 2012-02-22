@@ -8,14 +8,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.dataLayer.AnnotationNote;
 import pipe.gui.CreateGui;
+import pipe.gui.graphicElements.AnnotationNote;
 
 public class EditAnnotationBorderAction extends AbstractAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2849415077610764209L;
 	private AnnotationNote selected;
 

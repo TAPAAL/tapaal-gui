@@ -4,7 +4,7 @@
  * @author Edwin Chung 16 Mar 2007: modified the constructor and several other
  * functions so that DataLayer objects can be created outside the GUI
  */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,9 +23,6 @@ import dk.aau.cs.gui.undo.Command;
 
 public class ArcPathPoint extends PetriNetObject {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7584441718171173604L;
 	public static final boolean STRAIGHT = false;
 	public static final boolean CURVED = true;
@@ -47,7 +44,7 @@ public class ArcPathPoint extends PetriNetObject {
 
 	private ArcPathPoint() {
 		copyPasteable = false; // we can't copy & paste indivial arc points!
-		zoom = 100;
+		zoom = Pipe.ZOOM_DEFAULT;
 	}
 
 	public ArcPathPoint(ArcPath a) {
@@ -62,6 +59,11 @@ public class ArcPathPoint extends PetriNetObject {
 		setPointLocation(x, y);
 		pointType = _pointType;
 	}
+	
+	public ArcPathPoint(float x, float y, boolean _pointType, ArcPath a, int zoomLevel) {
+		this(x,y,_pointType,a);
+		zoom = zoomLevel;
+	}
 
 	/**
 	 * @author Nadeem
@@ -74,11 +76,10 @@ public class ArcPathPoint extends PetriNetObject {
 		return point;
 	}
 
-	//
 	public void setPointLocation(float x, float y) {
 		double realX = Zoomer.getUnzoomedValue(x, zoom);
 		double realY = Zoomer.getUnzoomedValue(y, zoom);
-		realPoint.setLocation(realX, realY);
+		getRealPoint().setLocation(realX, realY);
 		point.setLocation(x, y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
@@ -195,8 +196,7 @@ public class ArcPathPoint extends PetriNetObject {
 	}
 
 	@Override
-	public void delete() {// Won't delete if only two points left. General
-							// delete.
+	public void delete() {// Won't delete if only two points left. General delete.
 		if (isDeleteable()) {
 			if (getArcPath().getArc().isSelected()) {
 				return;
@@ -246,7 +246,6 @@ public class ArcPathPoint extends PetriNetObject {
 
 	@Override
 	public void addedToGui() {
-		;
 	}
 
 	void hidePoint() {
@@ -274,7 +273,6 @@ public class ArcPathPoint extends PetriNetObject {
 
 	@Override
 	public void undelete(DrawingSurfaceImpl view) {
-		;
 	}
 
 	@Override
@@ -285,8 +283,7 @@ public class ArcPathPoint extends PetriNetObject {
 
 	public void zoomUpdate(int zoom) {
 		this.zoom = zoom;
-		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed
-		// out
+		// change ArcPathPoint's size a little bit when it's zoomed in or zoomed out
 		if (zoom > 213) {
 			SIZE = 5;
 		} else if (zoom > 126) {
@@ -294,11 +291,19 @@ public class ArcPathPoint extends PetriNetObject {
 		} else {
 			SIZE = 3;
 		}
-		float x = Zoomer.getZoomedValue(realPoint.x, zoom);
-		float y = Zoomer.getZoomedValue(realPoint.y, zoom);
+		float x = Zoomer.getZoomedValue(getRealPoint().x, zoom);
+		float y = Zoomer.getZoomedValue(getRealPoint().y, zoom);
 		point.setLocation(x, y);
 		setBounds((int) x - SIZE, (int) y - SIZE, 2 * SIZE + SIZE_OFFSET, 2
 				* SIZE + SIZE_OFFSET);
+	}
+
+	public Point2D.Float getRealPoint() {
+		return realPoint;
+	}
+
+	public void setRealPoint(Point2D.Float realPoint) {
+		this.realPoint = realPoint;
 	}
 
 }

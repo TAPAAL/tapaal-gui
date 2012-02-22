@@ -17,27 +17,27 @@ public class StatusBar extends JPanel {
 
 	public String textforDrawing = "Drawing Mode: Click on a button to start adding components to the "
 			+ "Editor";
-	public String textforPlace = "Place Mode: Right click on a Place to see menu options "
-			+ "[Mouse wheel -> marking; Shift + Mouse wheel -> capacity]";
-	public String textforTAPNPlace = "Place Mode: Right click on a Place to see menu options "
-			+ "[Mouse wheel -> marking]";
-	public String textforTrans = "Transition Mode: Right click on a Transition to see menu "
+	public String textforPlace = "Place Mode: Right click on a place to see menu options "
+			+ "";
+	public String textforTAPNPlace = "Place Mode: Right click on a place to see menu options "
+			+ "";
+	public String textforTrans = "Transition Mode: Right click on a transition to see menu "
 			+ "options [Mouse wheel -> rotate]";
-	public String textforTimedTrans = "Timed Transition Mode: Right click on a Transition to see menu "
+	public String textforTimedTrans = "Timed Transition Mode: Right click on a transition to see menu "
 			+ "options [Mouse wheel -> rotate]";
-	public String textforAddtoken = "Add Token Mode: Click on a Place to add a Token";
-	public String textforDeltoken = "Delete Token Mode: Click on a Place to delete a Token ";
-	public String textforAnimation = "Animation Mode: Red transitions are enabled, click a transition to "
+	public String textforAddtoken = "Add Token Mode: Click on a place to add a token";
+	public String textforDeltoken = "Delete Token Mode: Click on a place to delete a token ";
+	public String textforAnimation = "Simulation Mode: Red transitions are enabled, click a transition to "
 			+ "fire it";
-	public String textforArc = "Arc Mode: Right-Click on an Arc to see menu options "
-			+ "[Mouse wheel -> rotate]";
-	public String textforTransportArc = "Transport Arc Mode: Right-Click on an Arc to see menu options "
-			+ "[Mouse wheel -> rotate]";
-	public String textforInhibArc = "Inhibitor Mode: Right-Click on an Arc to see menu options "
-			+ "[Mouse wheel -> rotate]";
+	public String textforArc = "Arc Mode: Right click on an arc to see menu options "
+			+ "";
+	public String textforTransportArc = "Transport Arc Mode: Right click on an arc to see menu options "
+			+ "";
+	public String textforInhibArc = "Inhibitor Mode: Right click on an arc to see menu options "
+			+ "";
 	public String textforMove = "Select Mode: Click/drag to select objects; drag to move them";
-	public String textforAnnotation = "Annotation Mode: Right-Click on an Annotation to see menu options; "
-			+ "Double click to edit";
+	public String textforAnnotation = "Annotation Mode: Right click on an annotation to see menu options; "
+			+ "double click to edit";
 
 	public String textforDrag = "Drag Mode";
 
@@ -58,59 +58,59 @@ public class StatusBar extends JPanel {
 		label.setText(newText);
 	}
 
-	public void changeText(int type) {
+	public void changeText(Pipe.ElementType type) {
 		switch (type) {
-		case Pipe.PLACE:
+		case PLACE:
 			changeText(textforPlace);
 			break;
-		case Pipe.TAPNPLACE:
+		case TAPNPLACE:
 			changeText(textforTAPNPlace);
 			break;
-		case Pipe.IMMTRANS:
+		case IMMTRANS:
 			changeText(textforTrans);
 			break;
 
-		case Pipe.TIMEDTRANS:
+		case TIMEDTRANS:
 			changeText(textforTimedTrans);
 			break;
-		case Pipe.TAPNTRANS:
+		case TAPNTRANS:
 			changeText(textforTrans);
 			break;
-		case Pipe.ARC:
+		case ARC:
 			changeText(textforArc);
 			break;
-		case Pipe.TAPNARC:
+		case TAPNARC:
 			changeText(textforArc);
 			break;
-		case Pipe.TRANSPORTARC:
+		case TRANSPORTARC:
 			changeText(textforTransportArc);
 			break;
-		case Pipe.TAPNINHIBITOR_ARC:
-		case Pipe.INHIBARC:
+		case TAPNINHIBITOR_ARC:
+		case INHIBARC:
 			changeText(textforInhibArc);
 			break;
 
-		case Pipe.ADDTOKEN:
+		case ADDTOKEN:
 			changeText(textforAddtoken);
 			break;
 
-		case Pipe.DELTOKEN:
+		case DELTOKEN:
 			changeText(textforDeltoken);
 			break;
 
-		case Pipe.SELECT:
+		case SELECT:
 			changeText(textforMove);
 			break;
 
-		case Pipe.DRAW:
+		case DRAW:
 			changeText(textforDrawing);
 			break;
 
-		case Pipe.ANNOTATION:
+		case ANNOTATION:
 			changeText(textforAnnotation);
 			break;
 
-		case Pipe.DRAG:
+		case DRAG:
 			changeText(textforDrag);
 			break;
 

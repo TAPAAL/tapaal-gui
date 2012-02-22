@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +22,7 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.HashTableSize;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
@@ -357,7 +359,7 @@ ReductionOption reductionOption;
 	private boolean doesPlacesUsedInQueryExist(TAPNQuery query, ArrayList<Tuple<String, String>> templatePlaceNames) {
 		VerifyPlaceNamesVisitor nameChecker = new VerifyPlaceNamesVisitor(templatePlaceNames);
 
-		VerifyPlaceNamesVisitor.Context c = nameChecker.VerifyPlaceNames(query.getProperty());
+		VerifyPlaceNamesVisitor.Context c = nameChecker.verifyPlaceNames(query.getProperty());
 		
 		return c.getResult();
 	}
@@ -391,6 +393,10 @@ ReductionOption reductionOption;
 
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
+		}
+		
+		if(nameInput.toLowerCase().equals("true") || nameInput.toLowerCase().equals("false")) {
+			nameInput = "_" + nameInput;
 		}
 
 		placeIDToName.put(idInput, nameInput);
@@ -463,10 +469,7 @@ ReductionOption reductionOption;
 	private boolean getSymmetryAsOldFormat(Element queryElement) {
 		String reductionString = queryElement.getAttribute("reductionOption");
 		
-		if(reductionString.contains(SYMMETRY))
-			return true;
-		else
-			return false;
+		return reductionString.contains(SYMMETRY);
 	}
 
 	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {

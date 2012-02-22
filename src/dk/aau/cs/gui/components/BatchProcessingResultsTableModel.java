@@ -18,7 +18,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		results = new ArrayList<BatchProcessingVerificationResult>();
 	}
 	
-	public void AddResult(BatchProcessingVerificationResult result){
+	public void addResult(BatchProcessingVerificationResult result){
 		int lastRow = results.size();
 		results.add(result);
 		fireTableRowsInserted(lastRow, lastRow);
@@ -55,6 +55,8 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 	}
 
 	private String getVerificationAcrynom(BatchProcessingVerificationResult result) {
+		if(result.query() == null) return "";
+		
 		ReductionOption reduction = result.query().getReductionOption();
 		if(reduction == ReductionOption.VerifyTAPN) {
 			if(!result.query().discreteInclusion())

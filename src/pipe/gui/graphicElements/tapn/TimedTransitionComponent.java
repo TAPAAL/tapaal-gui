@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
 import java.awt.Container;
@@ -12,9 +12,11 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
+import pipe.gui.graphicElements.Transition;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.TAPNTransitionHandler;
@@ -38,7 +40,7 @@ public class TimedTransitionComponent extends Transition {
 			dk.aau.cs.model.tapn.TimedTransition transition) {
 		super(positionXInput, positionYInput);
 		this.transition = transition;
-		this.listener = timedTransitionListener();
+		listener = timedTransitionListener();
 		transition.addTimedTransitionListener(listener);
 	}
 
@@ -48,10 +50,9 @@ public class TimedTransitionComponent extends Transition {
 			boolean timedTransition, boolean infServer, int angleInput,
 			int priority) {
 		super(positionXInput, positionYInput, idInput, nameInput,
-				nameOffsetXInput, nameOffsetYInput, timedTransition, infServer,
+				nameOffsetXInput, nameOffsetYInput, infServer,
 				angleInput, priority);
-		this.listener = timedTransitionListener();
-		//transition = new dk.aau.cs.model.tapn.TimedTransition(nameInput);
+		listener = timedTransitionListener();
 	}
 	
 	private TimedTransitionListener timedTransitionListener(){
@@ -76,7 +77,7 @@ public class TimedTransitionComponent extends Transition {
 	public void showEditor() {
 		// Build interface
 		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				Pipe.getProgramName(), true);
+				"Edit Transition", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -95,19 +96,6 @@ public class TimedTransitionComponent extends Transition {
 		guiDialog.setLocationRelativeTo(null);
 		guiDialog.setVisible(true);
 	}
-
-//	@Override
-//	public boolean isEnabled(boolean animationStatus) {
-//		if (animationStatus) {
-//			if (isEnabled()) {
-//				highlighted = true;
-//				return true;
-//			} else {
-//				highlighted = false;
-//			}
-//		}
-//		return false;
-//	}
 
 	@Override
 	public boolean isEnabled() {
@@ -185,7 +173,7 @@ public class TimedTransitionComponent extends Transition {
 	}
 
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(positionX, positionY, id, transition.name(), nameOffsetX, nameOffsetY, true, isInfiniteServer(), getAngle(), getPriority());
+		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
 		
 		LabelHandler labelHandler = new LabelHandler(transitionComponent.getNameLabel(), transitionComponent);

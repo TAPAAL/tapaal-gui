@@ -21,8 +21,8 @@ public class TCTLAGNode extends TCTLAbstractPathProperty {
 	}
 
 	public TCTLAGNode() {
-		this.property = new TCTLStatePlaceHolder();
-		this.property.setParent(this);
+		property = new TCTLStatePlaceHolder();
+		property.setParent(this);
 	}
 
 	@Override

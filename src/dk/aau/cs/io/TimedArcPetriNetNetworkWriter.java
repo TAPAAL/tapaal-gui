@@ -20,20 +20,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PNMLWriter;
-import pipe.dataLayer.Place;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedOutputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
@@ -265,7 +265,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		boolean first = true;
 		StringBuilder s = new StringBuilder();
 		for(TimedPlace p : query.inclusionPlaces().inclusionPlaces()) {
-			if(!first) s.append(",");
+			if(!first) s.append(',');
 			
 			s.append(p.toString());
 			if(first) first = false;
@@ -326,10 +326,9 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		transitionElement.setAttribute("nameOffsetY", (inputTransition.getNameOffsetYObject() != null ? String.valueOf(inputTransition.getNameOffsetYObject()) : ""));
 		transitionElement.setAttribute("name", inputTransition.underlyingTransition().name());
 		transitionElement.setAttribute("id", (inputTransition.getId() != null ? inputTransition.getId()	: "error"));
-		transitionElement.setAttribute("timed", String.valueOf(inputTransition.isTimed()));
-		transitionElement.setAttribute("infiniteServer", String.valueOf(inputTransition.isInfiniteServer()));
+		transitionElement.setAttribute("infiniteServer", "false");
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
-		transitionElement.setAttribute("priority", String.valueOf(inputTransition.getPriority()));
+		transitionElement.setAttribute("priority", "0");
 
 		return transitionElement;
 	}
@@ -351,14 +350,14 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
 			} else {
 				arcElement.setAttribute("type", "normal");
-				arcElement.setAttribute("inscription", Integer.toString((inputArc != null ? inputArc.getWeight() : 1)));
+				arcElement.setAttribute("inscription", "1");
 			}
 		} 
 		return arcElement;
 	}
 
 	private String getInputArcTypeAsString(TimedInputArcComponent inputArc) {
-		if (inputArc instanceof TransportArcComponent) {
+		if (inputArc instanceof TimedTransportArcComponent) {
 			return "transport";
 		} else if (inputArc instanceof TimedInhibitorArcComponent) {
 			return "tapnInhibitor";
@@ -368,8 +367,8 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 	}
 
 	private String getGuardAsString(TimedInputArcComponent inputArc) {
-		if(inputArc instanceof TransportArcComponent)
-			return inputArc.getGuardAsString() + ":" + ((TransportArcComponent) inputArc).getGroupNr();
+		if(inputArc instanceof TimedTransportArcComponent)
+			return inputArc.getGuardAsString() + ":" + ((TimedTransportArcComponent) inputArc).getGroupNr();
 		else {
 			return inputArc.getGuardAsString();
 		}

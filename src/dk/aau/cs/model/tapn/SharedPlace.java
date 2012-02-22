@@ -34,8 +34,8 @@ public class SharedPlace implements TimedPlace{
 	
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
-		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
-		this.name = newName;
+		Require.that(isValid(newName) && !newName.toLowerCase().equals("true") && !newName.toLowerCase().equals("false"), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
+		name = newName;
 		fireNameChanged();
 	}
 	

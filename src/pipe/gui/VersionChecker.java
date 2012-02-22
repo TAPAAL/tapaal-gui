@@ -6,10 +6,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import net.tapaal.TAPAAL;
+
 import dk.aau.cs.debug.Logger;
 
 public class VersionChecker {
-	private final static String versionURL = "http://www.tapaal.net/fileadmin/version.txt";
+	private static final String versionURL = "http://www.tapaal.net/fileadmin/version.txt";
 	private static final int timeoutMs = 6000;
 	private URL url;
 	private String newestVersion;
@@ -25,7 +27,7 @@ public class VersionChecker {
 
 	public boolean checkForNewVersion(){
 		//Disable the version check for DEV versions
-		if (!Pipe.VERSION.equalsIgnoreCase("DEV")){
+		if (!TAPAAL.VERSION.equalsIgnoreCase("DEV")){
 			if(url != null){
 
 				getNewestVersion();
@@ -45,7 +47,7 @@ public class VersionChecker {
 		int[] currentVersionNumbers = null;
 		int[] newestVersionNumbers = null;
 		try{
-			currentVersionNumbers = getVersionNumbers(Pipe.VERSION);
+			currentVersionNumbers = getVersionNumbers(TAPAAL.VERSION);
 			newestVersionNumbers = getVersionNumbers(newestVersion);
 		}catch(Exception e){
 			return false;

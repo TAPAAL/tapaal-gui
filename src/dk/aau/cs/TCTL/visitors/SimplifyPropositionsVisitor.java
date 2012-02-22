@@ -12,7 +12,7 @@ public class SimplifyPropositionsVisitor extends VisitorBase {
 	List<TCTLAtomicPropositionNode> truePropositions = new ArrayList<TCTLAtomicPropositionNode>();
 	List<TCTLAtomicPropositionNode> falsePropositions = new ArrayList<TCTLAtomicPropositionNode>();
 	
-	public void FindAndReplaceTrueAndFalsePropositions(TCTLAbstractProperty query) {
+	public void findAndReplaceTrueAndFalsePropositions(TCTLAbstractProperty query) {
 		query.accept(this, null);
 		
 		for(TCTLAtomicPropositionNode node : truePropositions)

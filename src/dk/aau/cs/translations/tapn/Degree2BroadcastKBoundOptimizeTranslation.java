@@ -15,8 +15,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastTranslation {
 	private final String usedExtraTokens = "usedExtraTokens";
 	private int tokens = 0;
-	private final int SUBTRACT = 0;
-	private final int ADD = 1;
+	private final int subtract = 0;
+	private final int add = 1;
 
 	public Degree2BroadcastKBoundOptimizeTranslation() {
 		super(true);
@@ -42,10 +42,10 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 		for (Edge e : ta.getTransitions()) {
 			if (e.getSource() == pcapacity && isNotInitializationEdge(e) && isNotTestingEdge(e)) {
 
-				String newUpdate = createUpdate(e.getUpdate(), ADD);
+				String newUpdate = createUpdate(e.getUpdate(), add);
 				e.setUpdate(newUpdate);
 			} else if (e.getDestination() == pcapacity && isNotTestingEdge(e)) {
-				String newUpdate = createUpdate(e.getUpdate(), SUBTRACT);
+				String newUpdate = createUpdate(e.getUpdate(), subtract);
 				e.setUpdate(newUpdate);
 			}
 		}
@@ -69,7 +69,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 			newUpdate += ",";
 		}
 		newUpdate += usedExtraTokens;
-		if (method == ADD) {
+		if (method == add) {
 			newUpdate += "++";
 		} else {
 			newUpdate += "--";
@@ -82,7 +82,7 @@ public class Degree2BroadcastKBoundOptimizeTranslation extends Degree2BroadcastT
 	protected String createGlobalDeclarations(TimedArcPetriNet degree2Net,TimedArcPetriNet originalModel) {
 		StringBuilder builder = new StringBuilder("int[");
 		builder.append(-(tokens + extraTokens));
-		builder.append(",");
+		builder.append(',');
 		builder.append(tokens + extraTokens);
 		builder.append("] ");
 		builder.append(usedExtraTokens);

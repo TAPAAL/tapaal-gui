@@ -44,7 +44,7 @@ import dk.aau.cs.verification.VerificationResult;
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
 		+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
-		+ "normally located in tapaal/verifytapn.";
+		+ "normally located in the directory lib.";
 	
 	private static String verifytapnpath = "";
 	
@@ -151,6 +151,10 @@ public class VerifyTAPN implements ModelChecker {
 			runner.kill();
 		}
 	}
+	
+	public void setVerifyTapnPath(String path) {
+		verifytapnpath = path;
+	}
 
 	public boolean setup() {
 		if (isNotSetup()) {
@@ -196,8 +200,8 @@ public class VerifyTAPN implements ModelChecker {
 		if(!supportsQuery(model.value1(), query, options))
 			throw new UnsupportedQueryException("Verifytapn does not support the given query.");
 		
-		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
-			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
+//		if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
+//			throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 		
 		if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 		
@@ -244,7 +248,7 @@ public class VerifyTAPN implements ModelChecker {
 			String standardOutput = readOutput(runner.standardOutput());
 
 			Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query.queryType());
-			if (queryResult.value1() == null) {
+			if (queryResult == null || queryResult.value1() == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 			} else {
 				TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
@@ -272,9 +276,9 @@ public class VerifyTAPN implements ModelChecker {
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
 		StringBuffer buffer = new StringBuffer(options.toString());
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(modelFile);
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(queryFile);
 
 		return buffer.toString();

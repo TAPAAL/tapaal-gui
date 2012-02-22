@@ -27,7 +27,7 @@ public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 		this.templatePlaceNames = templatePlaceNames;
 	}
 
-	public Context VerifyPlaceNames(TCTLAbstractProperty query) {
+	public Context verifyPlaceNames(TCTLAbstractProperty query) {
 		Context c = new Context();
 
 		query.accept(this, c);
@@ -54,7 +54,7 @@ public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode, Object context) {
 		Context c = (Context) context;
 		if (!templatePlaceNames.contains(new Tuple<String,String>(atomicPropositionNode.getTemplate(), atomicPropositionNode.getPlace()))) {
-			c.AddIncorrectPlaceName(atomicPropositionNode.getTemplate() + "." + atomicPropositionNode.getPlace());
+			c.addIncorrectPlaceName(atomicPropositionNode.getTemplate() + "." + atomicPropositionNode.getPlace());
 			c.setResult(false);
 		}
 	}
@@ -98,13 +98,13 @@ public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 			return incorrectPlaceNames;
 		}
 
-		public void AddIncorrectPlaceName(String incorrectPlaceName) {
+		public void addIncorrectPlaceName(String incorrectPlaceName) {
 			incorrectPlaceNames.add(incorrectPlaceName);
 		}
 
 		public Context() {
-			this.result = true;
-			this.incorrectPlaceNames = new HashSet<String>();
+			result = true;
+			incorrectPlaceNames = new HashSet<String>();
 		}
 	}
 

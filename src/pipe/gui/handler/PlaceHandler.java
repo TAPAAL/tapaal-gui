@@ -12,13 +12,13 @@ import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.TimedPlaceComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
-import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.ShowHideInfoAction;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.TimedPlaceMarkingEdit;
@@ -58,7 +58,7 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		popup.insert(menuItem, index++);
 
 		menuItem = new JMenuItem(new ShowHideInfoAction((Place) myObject));
-		if (((Place) myObject).getAttributesVisible() == true) {
+		if (((Place) myObject).getAttributesVisible()) {
 			menuItem.setText("Hide Attributes");
 		} else {
 			menuItem.setText("Show Attributes");
@@ -74,21 +74,21 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2
 					&& CreateGui.getApp().isEditionAllowed()
-					&& (CreateGui.getApp().getMode() == Pipe.PLACE || CreateGui.getApp().getMode() == Pipe.SELECT)) {
+					&& (CreateGui.getApp().getMode() == ElementType.PLACE || CreateGui.getApp().getMode() == ElementType.SELECT)) {
 				((TimedPlaceComponent) myObject).showAgeOfTokens(false);
 				((Place) myObject).showEditor();
 			} else {
 				UndoManager undoManager = CreateGui.getView().getUndoManager();
 
 				switch (CreateGui.getApp().getMode()) {
-				case Pipe.ADDTOKEN:
+				case ADDTOKEN:
 					if (myObject instanceof TimedPlaceComponent) {
 						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, 1);
 						command.redo();
 						undoManager.addNewEdit(command);
 					}
 					break;
-				case Pipe.DELTOKEN:
+				case DELTOKEN:
 					if (myObject instanceof TimedPlaceComponent) {
 						Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, -1);
 						command.redo();
@@ -113,30 +113,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		 * else if (SwingUtilities.isMiddleMouseButton(e)){ // TODO -
 		 * middelclick draw a arrow }
 		 */
-	}
-
-	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (CreateGui.getApp().isEditionAllowed() == false || e.isControlDown()) {
-			return;
-		}
-
-		UndoManager undoManager = CreateGui.getView().getUndoManager();
-
-		if (myObject instanceof TimedPlaceComponent) {
-			int clicks = -e.getWheelRotation();
-			TimedPlace place = ((TimedPlaceComponent)myObject).underlyingPlace();
-			if(clicks > 0) {
-				place.addToken(new TimedToken(place));
-			}else{
-				if(place.numberOfTokens() == 0)
-					return;
-				
-				place.removeToken();
-			}
-			Command command = new TimedPlaceMarkingEdit((TimedPlaceComponent) myObject, clicks);
-			undoManager.addNewEdit(command);
-		}
 	}
 
 	@Override
@@ -168,9 +144,6 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 	public void mousePressed(MouseEvent e) {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
-		} else {
-			// do nothing except the things that one do in the simulator
-			// (handled somewhere else).
 		}
 
 	}

@@ -30,7 +30,7 @@ public class SharedTransition {
 	public void setName(String newName) {
 		Require.that(newName != null && !newName.isEmpty(), "A timed transition must have a name");
 		Require.that(isValid(newName), "The specified name must conform to the pattern [a-zA-Z_][a-zA-Z0-9_]*");
-		this.name = newName;
+		name = newName;
 		for(TimedTransition transition : transitions){
 			transition.setName(newName);
 		}
@@ -117,5 +117,12 @@ public class SharedTransition {
 
 	public Collection<TimedTransition> transitions() {
 		return new ArrayList<TimedTransition>(transitions);
+	}
+
+	public boolean isOrphan() {
+		for(TimedTransition transition : transitions){
+			if(transition.presetSize() > 0 || transition.postsetSize() > 0) return false;
+		}
+		return true;
 	}
 }

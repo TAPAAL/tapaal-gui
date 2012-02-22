@@ -5,21 +5,21 @@ import java.util.List;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 
 public interface TimedPlace {
-	public abstract void addTimedPlaceListener(TimedPlaceListener listener);
-	public abstract void removeTimedPlaceListener(TimedPlaceListener listener);
+	void addTimedPlaceListener(TimedPlaceListener listener);
+	void removeTimedPlaceListener(TimedPlaceListener listener);
 
-	public abstract boolean isShared();
+	boolean isShared();
 
-	public abstract String name();
-	public abstract void setName(String newName);
+	String name();
+	void setName(String newName);
 
-	public abstract TimeInvariant invariant();
-	public abstract void setInvariant(TimeInvariant invariant);
+	TimeInvariant invariant();
+	void setInvariant(TimeInvariant invariant);
 
-	public abstract List<TimedToken> tokens();
-	public abstract int numberOfTokens();
+	List<TimedToken> tokens();
+	int numberOfTokens();
 
-	public abstract void setCurrentMarking(TimedMarking marking);
+	void setCurrentMarking(TimedMarking marking);
 	
 	public abstract void addToken(TimedToken timedToken);
 	public abstract void addTokens(Iterable<TimedToken> tokens);

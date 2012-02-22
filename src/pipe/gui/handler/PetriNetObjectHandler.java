@@ -9,12 +9,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import pipe.dataLayer.PetriNetObject;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
-import pipe.gui.Pipe;
+import pipe.gui.Pipe.ElementType;
+import pipe.gui.GuiFrame.GUIMode;
+
 import pipe.gui.action.DeletePetriNetObjectAction;
+import pipe.gui.graphicElements.PetriNetObject;
 
 /**
  * Class used to implement methods corresponding to mouse events on all
@@ -71,7 +73,8 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
 			checkForPopup(e);
 		}
@@ -80,7 +83,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == Pipe.SELECT) {
+		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
 					((DrawingSurfaceImpl) contentPane).getSelectionObject()
@@ -99,7 +102,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
-
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
 		// Have to check for popup here as well as on pressed for
 		// crossplatform!!
 		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
@@ -110,7 +113,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == Pipe.SELECT) {
+		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (isDragging) {
 				isDragging = false;
 				CreateGui.getView().getUndoManager().translateSelection(
@@ -143,7 +146,7 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 			return;
 		}
 
-		if (CreateGui.getApp().getMode() == Pipe.SELECT) {
+		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (myObject.isDraggable()) {
 				if (!isDragging) {
 					isDragging = true;

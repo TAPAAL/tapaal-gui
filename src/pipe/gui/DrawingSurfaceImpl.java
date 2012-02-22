@@ -16,26 +16,25 @@ import java.awt.print.PrinterException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
 import javax.swing.JLayeredPane;
-import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
-
-import pipe.dataLayer.AnnotationNote;
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.DataLayer;
-import pipe.dataLayer.Note;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.Place;
-import pipe.dataLayer.PlaceTransitionObject;
 import pipe.dataLayer.Template;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TimedPlaceComponent;
-import pipe.dataLayer.TimedTransitionComponent;
-import pipe.dataLayer.Transition;
-import pipe.dataLayer.TransportArcComponent;
+import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.Pipe.ElementType;
+import pipe.gui.graphicElements.AnnotationNote;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.Note;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.handler.AnimationHandler;
 import pipe.gui.handler.AnnotationNoteHandler;
 import pipe.gui.handler.ArcHandler;
@@ -66,9 +65,6 @@ Printable, DrawingSurface {
 	private boolean animationmode = false;
 
 	public Arc createArc; // no longer static
-	public TransportArcComponent transportArcPart1; // used when creating
-	// transport arcs
-
 	public PlaceTransitionObject createPTO;
 
 	private AnimationHandler animationHandler = new AnimationHandler();
@@ -151,20 +147,20 @@ Printable, DrawingSurface {
 		if (animationmode) {
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			CreateGui.getAnimator().unhighlightDisabledTransitions();
+			CreateGui.getAnimator().reportBlockingPlaces();
 		}
 
 		this.removeAll();
 		setPreferredSize(new Dimension(0,0));
 		for (PetriNetObject pnObject : guiModel.getPetriNetObjects()) {
+			pnObject.zoomUpdate(zoomer.getPercent());
 			add(pnObject);
 		}
 
-		if(CreateGui.getApp().getMode() == Pipe.SELECT)
+		if(CreateGui.getApp().getMode() == ElementType.SELECT)
 			this.selection.enableSelection();
 
-		Component component = getParent().getParent();
-		JScrollPane pane = (JScrollPane)component;
-		repaintAll();
+
 	}
 
 	public void addNewPetriNetObject(PetriNetObject newObject) {
@@ -223,7 +219,7 @@ Printable, DrawingSurface {
 					add(newObject);
 					/* CB - Joakim Byg add timed arcs */
 					if (newObject instanceof TimedInputArcComponent) {
-						if (newObject instanceof TransportArcComponent) {
+						if (newObject instanceof TimedTransportArcComponent) {
 							TransportArcHandler transportArcHandler = new TransportArcHandler(this, (Arc) newObject);
 							newObject.addMouseListener(transportArcHandler);
 							//newObject.addMouseWheelListener(transportArcHandler);
@@ -250,9 +246,8 @@ Printable, DrawingSurface {
 					((Note) newObject).getNote().addMouseMotionListener(noteHandler);
 				}
 
-				if (newObject instanceof Zoomable) {
-					newObject.zoomUpdate(getZoom());
-				}
+				newObject.zoomUpdate(getZoom());
+				
 			}
 			newObject.setGuiModel(guiModel);
 		}
@@ -262,7 +257,7 @@ Printable, DrawingSurface {
 
 	public void update(Observable o, Object diffObj) {
 		if ((diffObj instanceof PetriNetObject) && (diffObj != null)) {
-			if (CreateGui.appGui.getMode() == Pipe.CREATING) {
+			if (CreateGui.appGui.getMode() == ElementType.CREATING) {
 
 				addNewPetriNetObject((PetriNetObject) diffObj);
 			}
@@ -332,6 +327,11 @@ Printable, DrawingSurface {
 
 	public void changeAnimationMode(boolean status) {
 		animationmode = status;
+		if(status){
+			selection.disableSelection();
+		}else{
+			selection.enableSelection();
+		}
 	}
 
 	public void setCursorType(String type) {
@@ -354,17 +354,6 @@ Printable, DrawingSurface {
 
 	public Zoomer getZoomController() {
 		return zoomControl;
-	}
-
-	public void zoom() {
-		Component[] children = getComponents();
-
-		for (int i = 0; i < children.length; i++) {
-			if (children[i] instanceof Zoomable) {
-				((Zoomable) children[i]).zoomUpdate(zoomControl.getPercent());
-			}
-		}
-		doSetViewPosition = true;
 	}
 
 	public void add(PetriNetObject pnObject) {
@@ -490,26 +479,25 @@ Printable, DrawingSurface {
 		}
 	}
 
+	// This function should always be called after a change in zoom.
 	public void zoomTo(Point point) {
-		// The zoom is not as smooth as it should be. As far I know, this
-		// behavior
-		// is caused when the method setSize() is called in NameLabel's
-		// updateSize()
-		// In order to disguise it, the view is hidden and a white layer is
-		// shown.
-		// I know it's not a smart solution...
-		// I think zoom function should be redone from scratch so that
-		// BlankLayer
-		// class and doSetViewPosition could be removed
 
-		int zoom = zoomControl.getPercent();
+		int zoomPercent = zoomControl.getPercent();
 
-		JViewport viewport = (JViewport) getParent();
+		JViewport viewport = (JViewport) getParent();		
 
-		Zoomer.getUnzoomedValue(viewport.getViewPosition().x
-				+ (viewport.getWidth() * 0.5), zoom);
-		double newZoomedX = Zoomer.getZoomedValue(point.x, zoom);
-		double newZoomedY = Zoomer.getZoomedValue(point.y, zoom);
+		Component[] children = getComponents();
+
+		//Update elements in the view to zoom, i.e resize graphical elements and reposition them, all done in zoomUpdate.
+		for (int i = 0; i < children.length; i++) {
+			if (children[i] instanceof Zoomable) {
+				((Zoomable) children[i]).zoomUpdate(zoomControl.getPercent());
+			}
+		}
+		
+		// Calculate new position of the Drawing Surface.
+		double newZoomedX = Zoomer.getZoomedValue(point.x, zoomPercent);
+		double newZoomedY = Zoomer.getZoomedValue(point.y, zoomPercent);
 
 		int newViewX = (int) (newZoomedX - (viewport.getWidth() * 0.5));
 		if (newViewX < 0) {
@@ -521,14 +509,9 @@ Printable, DrawingSurface {
 			newViewY = 0;
 		}
 
-		// if (doSetViewPosition) {
+		
 		viewPosition.setLocation(newViewX, newViewY);
 		viewport.setViewPosition(viewPosition);
-		// }
-
-		zoom();
-
-		app.hideNet(true); // hide current view :-(
 
 		updatePreferredSize();
 	}
@@ -596,7 +579,7 @@ Printable, DrawingSurface {
 
 			pnObject = new Transition(Grid.getModifiedX(p.x), Grid
 					.getModifiedY(p.y));
-			((Transition) pnObject).setTimed(timed);
+			
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
 			return (PlaceTransitionObject) pnObject;
@@ -609,7 +592,7 @@ Printable, DrawingSurface {
 
 			pnObject = new TimedTransitionComponent(Grid.getModifiedX(p.x),
 					Grid.getModifiedY(p.y), transition);
-			((Transition) pnObject).setTimed(timed);
+			
 			model.add(transition);
 			guiModel.addPetriNetObject(pnObject);
 			view.addNewPetriNetObject(pnObject);
@@ -622,68 +605,68 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+			if(app.getGUIMode().equals(GUIMode.animation)) return;
+			
 			Point start = e.getPoint();
 			Point p;
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				int mode = app.getMode();
+				Pipe.ElementType mode = app.getMode();
 				switch (mode) {
-				case Pipe.PLACE:
+				case PLACE:
 					PlaceTransitionObject pto = newPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_TRANSITION);
+						app.setFastMode(ElementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case Pipe.TAPNPLACE:
+				case TAPNPLACE:
 					PlaceTransitionObject pto2 = newTimedPlace(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedPlaceCommand(
 									(TimedPlaceComponent) pto2, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_TRANSITION);
+						app.setFastMode(ElementType.FAST_TRANSITION);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case Pipe.IMMTRANS:
-				case Pipe.TIMEDTRANS:
-					boolean timed = (mode == Pipe.TIMEDTRANS ? true : false);
+				case IMMTRANS:
+				case TIMEDTRANS:
+					boolean timed = (mode == ElementType.TIMEDTRANS ? true : false);
 					pto = newTransition(e.getPoint(), timed);
 					getUndoManager().addNewEdit(
 							new AddPetriNetObjectEdit(pto, view, guiModel));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_PLACE);
+						app.setFastMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
-				case Pipe.TAPNTRANS:
+				case TAPNTRANS:
 					pto = newTAPNTransition(e.getPoint());
 					getUndoManager().addNewEdit(
 							new AddTimedTransitionCommand(
 									(TimedTransitionComponent) pto, model,
 									guiModel, view));
 					if (e.isControlDown()) {
-						app.setFastMode(Pipe.FAST_PLACE);
+						app.setFastMode(ElementType.FAST_PLACE);
 						pnObject.dispatchEvent(e);
 					}
 					break;
 
-				case Pipe.ARC:
-					/* CB Joakim Byg - handle TimedArc */
-				case Pipe.TAPNARC:
-					/* EOC */
-				case Pipe.INHIBARC:
+				case ARC:
+				case TAPNARC:
+				case INHIBARC:
 					// Add point to arc in creation
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
 					break;
 
-				case Pipe.ANNOTATION:
+				case ANNOTATION:
 					p = adjustPoint(e.getPoint(), view.getZoom());
 
 					pnObject = new AnnotationNote(p.x, p.y);
@@ -695,139 +678,18 @@ Printable, DrawingSurface {
 									guiModel));
 					((AnnotationNote) pnObject).enableEditMode();
 					break;
-					// case Pipe.FAST_PLACE:
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if (createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newPlace(e.getPoint());
-					// getUndoManager().addNewEdit(
-					// new AddPetriNetObjectEdit(createPTO, view, guiModel));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					// // keep "fast mode"
-					// app.setMode(Pipe.FAST_TRANSITION);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// //exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-					//
-					// case Pipe.FAST_TRANSITION:
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if ( createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newTransition(e.getPoint(), e.isAltDown());
-					// getUndoManager().addNewEdit(
-					// new AddPetriNetObjectEdit(createPTO, view, guiModel));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					// // keep "fast mode"
-					// app.setMode(Pipe.FAST_PLACE);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// // exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-					//
-					// case Pipe.FAST_TAPNPLACE:
-					//
-					// //kyrke working
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if (createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newTimedPlace(e.getPoint());
-					// getUndoManager().addNewEdit(
-					// new AddTimedPlaceCommand((TimedPlaceComponent)createPTO,
-					// model, guiModel, view));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					//
-					// // keep "fast mode"
-					// app.setMode(Pipe.FAST_TAPNTRANSITION);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// //exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-					//
-					// case Pipe.FAST_TAPNTRANSITION:
-					// //kyrke working
-					//
-					// if (e.isMetaDown() || metaDown) { // provisional
-					// if (createArc != null) {
-					// addPoint(createArc, e);
-					// }
-					// } else {
-					// if ( createArc == null) {
-					// break;
-					// }
-					// // user has not clicked on an old PetriNetObject, so
-					// // a new PNO must be created
-					// view.newPNO = true;
-					//
-					// createPTO = newTAPNTransition(e.getPoint(), e.isAltDown());
-					// getUndoManager().addNewEdit(
-					// new
-					// AddTimedTransitionCommand((TimedTransitionComponent)createPTO,
-					// model, guiModel, view));
-					// pnObject.getMouseListeners()[0].mouseReleased(e);
-					// if (e.isControlDown()){
-					// // keep "fast mode"
-					//
-					// app.setMode(Pipe.FAST_TAPNPLACE);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// pnObject.getMouseListeners()[0].mousePressed(e);
-					// } else {
-					// // exit "fast mode"
-					// app.resetMode();
-					// }
-					// }
-					// break;
-				case Pipe.TRANSPORTARC:
+				case TRANSPORTARC:
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
 					break;
-				case Pipe.TAPNINHIBITOR_ARC:
+				case TAPNINHIBITOR_ARC:
 					// Add point to arc in creation
 					if (createArc != null) {
 						addPoint(createArc, e);
 					}
 					break;
-				case Pipe.DRAG:
+				case DRAG:
 					dragStart = new Point(start);
 					break;
 
@@ -851,7 +713,7 @@ Printable, DrawingSurface {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		}
 
 		@Override

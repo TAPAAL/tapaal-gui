@@ -1,7 +1,7 @@
 /*
  * Note.java
  */
-package pipe.dataLayer;
+package pipe.gui.graphicElements;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,9 +26,6 @@ import dk.aau.cs.gui.undo.Command;
  */
 public abstract class Note extends PetriNetObject implements Translatable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8965208519103066242L;
 	protected JTextArea note = new JTextArea();
 	protected boolean drawBorder = true;
@@ -102,12 +99,12 @@ public abstract class Note extends PetriNetObject implements Translatable {
 				/ 2, (int) noteRect.getY() + (rectHeight - note.getHeight())
 				/ 2);
 
-		bounds.setBounds(Zoomer.getZoomedValue(originalX, zoom) - 20, Zoomer
-				.getZoomedValue(originalY, zoom) - 20, (int) ((rectWidth
+		bounds.setBounds(Zoomer.getZoomedValue(originalX, zoom), Zoomer
+				.getZoomedValue(originalY, zoom), (int) ((rectWidth
 				+ Pipe.RESERVED_BORDER + Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer
-				.getScaleFactor(zoom)) + 20, (int) ((rectHeight
+				.getScaleFactor(zoom)), (int) ((rectHeight
 				+ Pipe.RESERVED_BORDER + +Pipe.ANNOTATION_SIZE_OFFSET) * Zoomer
-				.getScaleFactor(zoom)) + 20);
+				.getScaleFactor(zoom)));
 		setBounds(bounds);
 	}
 

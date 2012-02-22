@@ -1,4 +1,4 @@
-package pipe.dataLayer;
+package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -17,17 +17,18 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
 
+import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.Place;
 import pipe.gui.handler.LabelHandler;
 import pipe.gui.handler.PlaceHandler;
 import pipe.gui.undo.TimedPlaceInvariantEdit;
@@ -55,7 +56,7 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent(double positionXInput, double positionYInput, dk.aau.cs.model.tapn.TimedPlace place) {
 		super(positionXInput, positionYInput);
 		this.place = place;
-		this.listener = timedPlaceListener();		
+		listener = timedPlaceListener();		
 		this.place.addTimedPlaceListener(listener);
 
 		attributesVisible = true;
@@ -82,8 +83,14 @@ public class TimedPlaceComponent extends Place {
 				TimedPlace place = e.source();
 				TimedPlaceComponent.super.setName(place.name());				
 			}
-			public void invariantChanged(TimedPlaceEvent e) { update(true); }
-			public void markingChanged(TimedPlaceEvent e) { repaint(); }
+			
+			public void invariantChanged(TimedPlaceEvent e) { 
+				update(true); 
+			}
+			
+			public void markingChanged(TimedPlaceEvent e) { 
+				repaint();
+			}
 		};
 	}
 	
@@ -100,27 +107,20 @@ public class TimedPlaceComponent extends Place {
 	public TimedPlaceComponent copy() {
 		TimedPlaceComponent copy = new TimedPlaceComponent(Zoomer
 				.getUnzoomedValue(this.getX(), zoom), Zoomer.getUnzoomedValue(
-						this.getY(), zoom), this.place);
+						this.getY(), zoom), place);
 		copy.pnName.setName(this.getName());
-		copy.nameOffsetX = this.nameOffsetX;
-		copy.nameOffsetY = this.nameOffsetY;
-		copy.capacity = this.capacity;
-		copy.attributesVisible = this.attributesVisible;
-		copy.initialMarking = this.initialMarking;
-		copy.currentMarking = this.currentMarking;
-		copy.markingOffsetX = this.markingOffsetX;
-		copy.markingOffsetY = this.markingOffsetY;
+		copy.nameOffsetX = nameOffsetX;
+		copy.nameOffsetY = nameOffsetY;
+		copy.capacity = capacity;
+		copy.attributesVisible = attributesVisible;
+		copy.markingOffsetX = markingOffsetX;
+		copy.markingOffsetY = markingOffsetY;
 		copy.setOriginal(this);
 		return copy;
 	}
 
-	@Override
-	public void delete() {
-		super.delete();
-	}
 
 	public String getInvariantAsString() {
-
 		return getInvariant().toString();
 	}
 
@@ -141,27 +141,15 @@ public class TimedPlaceComponent extends Place {
 			buffer.append(df.format(token.age()));
 			first = false;
 		}
-		buffer.append("}");
+		buffer.append('}');
 
 		return buffer.toString();
-	}
-
-	// TODO: get rid of
-	public ArrayList<BigDecimal> getTokens() {
-		ArrayList<BigDecimal> tokensToReturn = new ArrayList<BigDecimal>();
-
-		for (TimedToken t : place.tokens()) {
-			tokensToReturn.add(t.age());
-		}
-
-		return tokensToReturn;
 	}
 
 	public boolean isAgeOfTokensShown() {
 		return ageOfTokensWindow.isVisible();
 	}
 
-	// overide method
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -195,8 +183,7 @@ public class TimedPlaceComponent extends Place {
 		int marking = place.numberOfTokens();
 
 		// structure sees how many markings there are and fills the place in
-		// with
-		// the appropriate number.
+		// with the appropriate number.
 		switch (marking) {
 		case 2:
 			if (myTokens.get(1).age().compareTo(BigDecimal.valueOf(9)) > 0) {
@@ -247,8 +234,11 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public void showAgeOfTokens(boolean show) {
-		if (ageOfTokensWindow != null)
+		
+		if (ageOfTokensWindow != null){
 			ageOfTokensWindow.dispose();
+		}
+		
 		// Build interface
 		if (show) {
 			ageOfTokensWindow = new Window(new Frame());
@@ -294,7 +284,7 @@ public class TimedPlaceComponent extends Place {
 	@Override
 	public void showEditor() {
 		// Build interface
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), Pipe.getProgramName(), true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Place", true);
 
 		Container contentPane = guiDialog.getContentPane();
 
@@ -378,7 +368,7 @@ public class TimedPlaceComponent extends Place {
 	}
 
 	public TimedPlaceComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
-		TimedPlaceComponent placeComponent = new TimedPlaceComponent(positionX, positionY, id, place.name(), nameOffsetX, nameOffsetY, initialMarking, markingOffsetX, markingOffsetY, capacity);
+		TimedPlaceComponent placeComponent = new TimedPlaceComponent(getPositionXObject(), getPositionYObject(), id, place.name(), nameOffsetX, nameOffsetY, 0, markingOffsetX, markingOffsetY, capacity);
 		placeComponent.setUnderlyingPlace(tapn.getPlaceByName(place.name()));
 
 		LabelHandler labelHandler = new LabelHandler(placeComponent.getNameLabel(), placeComponent);

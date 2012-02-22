@@ -10,6 +10,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
@@ -110,7 +111,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			}
 		}
 		fireFileChanged("");
-		fireStatusChanged("Done");
+		fireStatusChanged("");
 		return null;
 	}
 
@@ -186,24 +187,28 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	private void simplifyQuery(pipe.dataLayer.TAPNQuery query) {
 		SimplifyPropositionsVisitor visitor = new SimplifyPropositionsVisitor();
-		visitor.FindAndReplaceTrueAndFalsePropositions(query.getProperty());
+		visitor.findAndReplaceTrueAndFalsePropositions(query.getProperty());
 	}
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
-		if(batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes)
-			return true;
-		else
-			return false;
+		return batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes;
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		TAPNComposer composer = new TAPNComposer();
+		TAPNComposer composer = new TAPNComposer(new Messenger(){
+			public void displayInfoMessage(String message) { }
+			public void displayInfoMessage(String message, String title) {}
+			public void displayErrorMessage(String message) {}
+			public void displayErrorMessage(String message, String title) {}
+			public void displayWrappedErrorMessage(String message, String title) {}
+			
+		});
 		Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(model.network());
 		return composedModel;
 	}
 
 	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
-		fireStatusChanged("Verifying query: " + query.getName() + "...");
+		fireStatusChanged(query.getName());
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
 		try {
@@ -312,7 +317,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected void process(List<BatchProcessingVerificationResult> chunks) {
 		for(BatchProcessingVerificationResult result : chunks){
-			tableModel.AddResult(result);
+			tableModel.addResult(result);
 		}
 	}
 	

@@ -52,7 +52,7 @@ public class TAPNQuery {
 	}
 
 	public void setDiscreteInclusion(boolean value){
-		this.discreteInclusion = value;
+		discreteInclusion = value;
 	}
 	
 	public boolean discreteInclusion(){
@@ -193,17 +193,17 @@ public class TAPNQuery {
 	}
 
 	public void set(TAPNQuery newQuery) {
-		this.name = newQuery.getName();
-		this.capacity = newQuery.getCapacity();
-		this.property = newQuery.getProperty();
-		this.traceOption = newQuery.getTraceOption();
-		this.searchOption = newQuery.getSearchOption();
-		this.reductionOption = newQuery.getReductionOption();
-		this.symmetry = newQuery.useSymmetry();
-		this.hashTableSize = newQuery.getHashTableSize();
-		this.extrapolationOption = newQuery.getExtrapolationOption();
-		this.discreteInclusion = newQuery.discreteInclusion();
-		this.inclusionPlaces = newQuery.inclusionPlaces();
+		name = newQuery.getName();
+		capacity = newQuery.getCapacity();
+		property = newQuery.getProperty();
+		traceOption = newQuery.getTraceOption();
+		searchOption = newQuery.getSearchOption();
+		reductionOption = newQuery.getReductionOption();
+		symmetry = newQuery.useSymmetry();
+		hashTableSize = newQuery.getHashTableSize();
+		extrapolationOption = newQuery.getExtrapolationOption();
+		discreteInclusion = newQuery.discreteInclusion();
+		inclusionPlaces = newQuery.inclusionPlaces();
 	}
 
 	public InclusionPlaces inclusionPlaces() {

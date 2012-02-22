@@ -184,9 +184,9 @@ public class Verifyta implements ModelChecker {
 
 	private String createArgumentString(String modelFile, String queryFile, VerificationOptions options) {
 		StringBuffer buffer = new StringBuffer(options.toString());
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(modelFile);
-		buffer.append(" ");
+		buffer.append(' ');
 		buffer.append(queryFile);
 
 		return buffer.toString();
@@ -196,6 +196,10 @@ public class Verifyta implements ModelChecker {
 		if (runner != null) {
 			runner.kill();
 		}
+	}
+	
+	public void setVerifytaPath(String path) {
+		verifytapath = path; 
 	}
 	
 	public boolean supportsStats(){

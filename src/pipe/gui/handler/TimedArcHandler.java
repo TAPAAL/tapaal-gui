@@ -9,13 +9,13 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pipe.dataLayer.Arc;
 import pipe.dataLayer.NetType;
-import pipe.dataLayer.TimedInhibitorArcComponent;
-import pipe.dataLayer.TimedInputArcComponent;
-import pipe.dataLayer.TransportArcComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.action.SplitArcAction;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
+import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 
 public class TimedArcHandler extends ArcHandler {
 
@@ -31,7 +31,7 @@ public class TimedArcHandler extends ArcHandler {
 		JPopupMenu popup = super.getPopup(e);
 
 		if (myObject instanceof TimedInputArcComponent
-				&& !(myObject instanceof TransportArcComponent)) {
+				&& !(myObject instanceof TimedTransportArcComponent)) {
 			if (!CreateGui.getModel().netType().equals(NetType.UNTIMED) && !(myObject instanceof TimedInhibitorArcComponent)) {
 				menuItem = new JMenuItem("Properties");
 				menuItem.addActionListener(new ActionListener() {

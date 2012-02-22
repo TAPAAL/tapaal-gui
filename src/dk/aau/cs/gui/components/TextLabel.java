@@ -74,7 +74,7 @@ public class TextLabel extends JLabel {
 		private Component targetComponent;
 
 		public MouseWheelAndClickPassThroughHandler(Component target) {
-			this.targetComponent = target;
+			targetComponent = target;
 		}
 
 		@Override

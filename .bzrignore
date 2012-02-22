@@ -5,3 +5,7 @@ Thumbs.db
 bin
 .codepro
 .settings
+.BASE
+.OTHER
+.THIS
+.bzr-repo

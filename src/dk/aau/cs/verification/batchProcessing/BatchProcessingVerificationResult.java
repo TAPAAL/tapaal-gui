@@ -15,7 +15,7 @@ public class BatchProcessingVerificationResult {
 		this.file = file;
 		this.query = query;
 		this.verificationResult = verificationResult;
-		this.verificationTimeInMs = verificationTime;
+		verificationTimeInMs = verificationTime;
 		this.stats = stats;
 	}
 	
@@ -46,10 +46,7 @@ public class BatchProcessingVerificationResult {
 
 
 	public boolean hasStats() {
-		if(stats instanceof NullStats)
-			return false;
-		else
-			return true;
+		return !(stats instanceof NullStats);
 	}
 	
 	

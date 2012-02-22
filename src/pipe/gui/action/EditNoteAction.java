@@ -7,13 +7,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.dataLayer.Note;
+import pipe.gui.graphicElements.Note;
 
 public class EditNoteAction extends AbstractAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4438126438814153880L;
 	private Note selected;
 

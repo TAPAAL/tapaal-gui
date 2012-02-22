@@ -13,10 +13,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
-import pipe.dataLayer.Arc;
-import pipe.dataLayer.ArcPath;
-import pipe.dataLayer.PetriNetObject;
-import pipe.dataLayer.PlaceTransitionObject;
+import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.ArcPath;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+
 
 /**
  * @author Peter Kyme, Michael Camacho Class to handle selection rectangle
@@ -33,8 +35,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 	private Point startPoint;
 	private Rectangle selectionRectangle = new Rectangle(-1, -1);
 	private boolean isSelecting;
-	private static final Color selectionColor = new Color(000, 000, 255, 030);
-	private static final Color selectionColorOutline = new Color(000, 000, 100);
+	private static final Color selectionColor = new Color(0, 0, 255, 30);
+	private static final Color selectionColorOutline = new Color(0, 0, 100);
 	private DrawingSurfaceImpl drawingSurface;
 	private boolean enabled = true;
 
@@ -42,17 +44,17 @@ public class SelectionManager extends javax.swing.JComponent implements
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		//addMouseWheelListener(this);
-		this.drawingSurface = _view;
+		drawingSurface = _view;
 	}
 
 	public void updateBounds() {
-		if (enabled == true) {
+		if (enabled) {
 			setBounds(0, 0, drawingSurface.getWidth(), drawingSurface.getHeight());
 		}
 	}
 
 	public void enableSelection() {
-		if (enabled == false) {
+		if (!(enabled)) {
 			drawingSurface.add(this);
 			enabled = true;
 			updateBounds();
@@ -60,7 +62,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void disableSelection() {
-		if (enabled == true) {
+		if (enabled) {
 			this.clearSelection();
 			drawingSurface.remove(this);
 			enabled = false;
@@ -177,7 +179,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * 
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(MouseEvent e) {	
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
 			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
@@ -199,7 +201,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
 	public void mouseReleased(MouseEvent e) {
-		if (isSelecting == true) {
+		if (isSelecting) {
 			// Select anything that intersects with the rectangle.
 			processSelection(e);
 			isSelecting = false;
@@ -217,6 +219,8 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * )
 	 */
 	public void mouseDragged(MouseEvent e) {
+		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
+		
 		if (isSelecting) {
 			selectionRectangle.setSize((int) Math.abs(e.getX()
 					- startPoint.getX()), (int) Math.abs(e.getY()
@@ -242,15 +246,12 @@ public class SelectionManager extends javax.swing.JComponent implements
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		;// Not needed
 	}
 
 	public void mouseEntered(MouseEvent e) {
-		; // Not needed
 	}
 
 	public void mouseExited(MouseEvent e) {
-		; // Not needed
 	}
 
 	/*
@@ -260,11 +261,10 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
 	public void mouseMoved(MouseEvent e) {
-		; // Not needed
 	}
 
 	public int getSelectionCount() {
-		Component netObj[] = drawingSurface.getComponents();
+		Component[] netObj = drawingSurface.getComponents();
 		int selectionCount = 0;
 		// Get all the objects in the current window
 		for (int i = 0; i < netObj.length; i++) {

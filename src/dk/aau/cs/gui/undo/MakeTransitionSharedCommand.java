@@ -11,7 +11,7 @@ public class MakeTransitionSharedCommand extends Command {
 	public MakeTransitionSharedCommand(SharedTransition sharedTransition, TimedTransition timedTransition){
 		this.sharedTransition = sharedTransition;
 		this.timedTransition = timedTransition;
-		this.oldName = timedTransition.name();
+		oldName = timedTransition.name();
 	}
 	
 	@Override
