@@ -84,8 +84,7 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.verification.UPPAAL.Verifyta;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+
 
 public class GuiFrame extends JFrame implements Observer {
 
@@ -112,6 +111,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
+	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
@@ -560,7 +560,25 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic('t');
 		
-		JMenuItem batchProcessing = new JMenuItem("Batch processing");
+		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		
+
+        //statistics = new JMenuItem("Net statistics");	
+		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.","ctrl I"));				
+		netStatisticsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('I', shortcutkey));
+		statistics.setMnemonic('n');		
+		statistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				StatisticsPanel.showStatisticsPanel();
+			}
+		});		
+		toolsMenu.add(statistics);		
+		
+		
+		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
+		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries","ctrl B"));				
+		batchProcessingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('B', shortcutkey));
+		
 		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -577,18 +595,13 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(batchProcessing);
 		
-		statistics = new JMenuItem("Net statistics");
-		statistics.setMnemonic('n');		
-		statistics.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				StatisticsPanel.showStatisticsPanel();
-			}
-		});		
-		toolsMenu.add(statistics);		
 		
 		toolsMenu.addSeparator();
 		
-		JMenuItem engineSelection = new JMenuItem("Verification engines");
+		//JMenuItem engineSelection = new JMenuItem("Verification engines");
+		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines","ctrl E"));				
+		engineSelectionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('E', shortcutkey));
+		
 		engineSelection.setMnemonic('v');		
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1805,6 +1818,24 @@ public class GuiFrame extends JFrame implements Observer {
 			repaint();
 		}
 
+	}
+	
+	class ToolAction extends GuiAction {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8910743226610517225L;
+
+		ToolAction(String name, String tooltip, String keystroke) {
+			super(name, tooltip, keystroke);
+		}
+
+
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 
 	class ZoomAction extends GuiAction {
