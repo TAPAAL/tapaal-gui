@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -246,18 +247,27 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic('F');
 
+		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		
 		addMenuItem(fileMenu, createAction = new FileAction("New",
 				"Create a new Petri net", "ctrl N"));
+		createAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('N', shortcutkey));
+		
 		addMenuItem(fileMenu, openAction = new FileAction("Open", "Open",
 		"ctrl O"));
+		openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('O', shortcutkey));
+		
 		addMenuItem(fileMenu, closeAction = new FileAction("Close",
 				"Close the current tab", "ctrl W"));
+		closeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('W', shortcutkey));
 		fileMenu.addSeparator();
 
 		addMenuItem(fileMenu, saveAction = new FileAction("Save", "Save",
 		"ctrl S"));
+		saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', shortcutkey));
 		addMenuItem(fileMenu, saveAsAction = new FileAction("Save as",
-				"Save as...", "shift ctrl S"));
+				"Save as...", null));
+		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK)));
 
 		// Export menu
 		exportMenu = new JMenu("Export");
@@ -267,16 +277,20 @@ public class GuiFrame extends JFrame implements Observer {
 						CreateGui.imgPath + "Export.png")));
 		addMenuItem(exportMenu, exportPNGAction = new FileAction("PNG",
 				"Export the net to PNG format", "ctrl G"));
+		exportPNGAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('G', shortcutkey));
 		addMenuItem(exportMenu, exportPSAction = new FileAction("PostScript",
 				"Export the net to PostScript format", "ctrl T"));
+		exportPSAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('T', shortcutkey));
 		addMenuItem(exportMenu, exportToTikZAction = new FileAction("TikZ",
 				"Export the net to PNG format", "ctrl L"));
+		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
 
 		fileMenu.add(exportMenu);
 
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
 		"ctrl P"));
+		printAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('P', shortcutkey));
 		fileMenu.addSeparator();
 
 		// Example files menu
@@ -356,7 +370,14 @@ public class GuiFrame extends JFrame implements Observer {
 					if (nets[i].toLowerCase().endsWith(".xml")) {
 						//addMenuItem(exampleMenu, new ExampleFileAction(nets[i], (k < 10) ? "ctrl " + (k++) : null));
 						
-						ExampleFileAction tmp = new ExampleFileAction(nets[i], nets[i].replace(".xml", ""), (k < 10) ? "ctrl " + (k++) : null);
+						ExampleFileAction tmp = new ExampleFileAction(nets[i], nets[i].replace(".xml", ""), null);
+						if (k < 10) {
+						
+							tmp.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke(""+k).getKeyCode(), shortcutkey));
+							
+						}
+						k++;
+						
 						addMenuItem(exampleMenu, tmp);
 					}
 				}
@@ -369,14 +390,17 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		addMenuItem(fileMenu, exitAction = new FileAction("Exit",
 				"Close the program", "ctrl Q"));
+		exitAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Q', shortcutkey));
 
 		/* Edit Menu */
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic('E');
 		addMenuItem(editMenu, undoAction = new EditAction("Undo",
-				"Undo (Ctrl-Z)", "ctrl Z"));
+				"Undo", "ctrl Z"));
+		undoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Z', shortcutkey));
 		addMenuItem(editMenu, redoAction = new EditAction("Redo",
-				"Redo (Ctrl-Y)", "ctrl Y"));
+				"Redo", "ctrl Y"));
+		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
 		editMenu.addSeparator();
 
 		 addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
@@ -434,8 +458,11 @@ public class GuiFrame extends JFrame implements Observer {
 
 		 addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
 				 "Zoom out by 10% ", "ctrl MINUS"));
+		 
+		 zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("MINUS").getKeyCode(), shortcutkey));
 		 addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
 				 "Zoom in by 10% ", "ctrl PLUS"));
+		 zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("PLUS").getKeyCode(), shortcutkey));
 		 viewMenu.add(zoomMenu);
 
 		 viewMenu.addSeparator();
@@ -659,8 +686,10 @@ public class GuiFrame extends JFrame implements Observer {
 	 */
 	private void addZoomMenuItems(JMenu zoomMenu) {
 		for (int i = 0; i <= zoomExamples.length - 1; i++) {
-			JMenuItem newItem = new JMenuItem(new ZoomAction(zoomExamples[i],
-					"Select zoom percentage", i < 10 ? "ctrl shift " + i : ""));
+			ZoomAction a = new ZoomAction(zoomExamples[i], "Select zoom percentage", "");
+			
+			JMenuItem newItem = new JMenuItem(a);
+			
 			zoomMenu.add(newItem);
 		}
 	}
