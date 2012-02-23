@@ -10,12 +10,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -29,6 +28,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -36,22 +36,20 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -60,15 +58,11 @@ import javax.swing.table.TableCellRenderer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
-import pipe.gui.GuiFrame;
 import pipe.gui.widgets.CustomJSpinner;
-import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
-import dk.aau.cs.gui.components.ReductionMethodChooser;
-import dk.aau.cs.gui.components.handlers.ClickHandler;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
@@ -102,8 +96,6 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_BROADCAST;
 	private static final String name_BROADCASTDEG2WithLegend = "F: "
 			+ name_BROADCASTDEG2;
-	private static final String name_AllReductions = "All verification methods";
-	private static final String name_UserDefinedReductions = "Choose multiple verification methods";
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
@@ -173,7 +165,6 @@ public class BatchProcessingDialog extends JDialog {
 	private JLabel timerLabel;
 	private long startTimeMs = 0;
 
-	private JComboBox reductionOption;
 	private JComboBox searchOption;
 	private JButton exportButton;
 	private JButton closeButton;
@@ -542,54 +533,8 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(reductionLabel, gbc);
-
-		/*String[] options = new String[] { name_KeepQueryOption,
-				name_verifyTAPNWithLegend,
-				name_verifyTAPNDiscreteInclusionWithLegend,
-				name_STANDARDWithLegend, name_OPTIMIZEDSTANDARDWithLegend,
-				name_BROADCASTWithLegend, name_BROADCASTDEG2WithLegend,
-				name_AllReductions, name_UserDefinedReductions };
-		reductionOption = new ReductionMethodChooser(options);
-		reductionOption.setToolTipText(TOOL_TIP_ReductionOption);
-		reductionOption.setMaximumRowCount(options.length);
-
-		reductionOption.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox) e.getSource();
-				String selectedItem = (String) source.getSelectedItem();
-				if (selectedItem != null) {
-					setEnabledOptionsAccordingToCurrentReduction();
-				}
-				
-			}
-		});
 		
-		
-		reductionOption.addPopupMenuListener(new PopupMenuListener() {
-			
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-				Object selectedItem = reductionOption.getSelectedItem();
-				
-				if(selectedItem == name_UserDefinedReductions){
-					//reductionOption.hidePopup();
-					showReductionOptionChooser();
-				}
-			}
-			
-			//Not used
-			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) { }
-			public void popupMenuCanceled(PopupMenuEvent arg0) { }
-		});
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(reductionOption, gbc);
-		*/
+		reductionOptionChooser = new ReductionOptionChooser();
 		
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -598,17 +543,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(new ReductionMethodChooser( ), gbc);
-	}
-
-	private void showReductionOptionChooser(){
-		if(reductionOptionChooser == null){
-			//reductionOptionChooser = new ReductionOptionChooser(BatchProcessingDialog.this, "Choose the reductions to use", true);
-			reductionOptionChooser = new ReductionOptionChooser(BatchProcessingDialog.this, "Choose the reductions to use", true);
-			reductionOptionChooser.pack();
-		}
-		reductionOptionChooser.setLocationRelativeTo(BatchProcessingDialog.this);
-		reductionOptionChooser.setVisible(true);
+		verificationOptionsPanel.add(reductionOptionChooser, gbc);
 	}
 	
 	private void initSymmetryOptionsComponents() {
@@ -700,17 +635,12 @@ public class BatchProcessingDialog extends JDialog {
 	
 	//TODO
 	private BatchProcessingVerificationOptions getVerificationOptions() {
-		boolean discreteInclusion = getReductionOptionAsString().equals(
-				name_verifyTAPNDiscreteInclusionWithLegend) ? true : false;
-		List<ReductionOption> reductionOptions = null;
-		if(getReductionOption() == ReductionOption.BatchProcessingUserDefinedReductions){
-			reductionOptions = reductionOptionChooser.getChoosenOptions();
-			discreteInclusion = reductionOptionChooser.isDiscreteInclusion();
-		}
+		ReductionOption reductionOption = reductionOptionChooser.isOverwriten() ? ReductionOption.BatchProcessingUserDefinedReductions : ReductionOption.BatchProcessingKeepQueryOption;
+		
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(),
 				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
-				getSearchOption(), getSymmetryOption(), getReductionOption(),
-				discreteInclusion, reductionOptions);
+				getSearchOption(), getSymmetryOption(), reductionOption,
+				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.getChoosenOptions());
 	}
 
 	private int getNumberOfExtraTokens() {
@@ -734,35 +664,6 @@ public class BatchProcessingDialog extends JDialog {
 			return QueryPropertyOption.SearchWholeStateSpace;
 		else
 			return QueryPropertyOption.KeepQueryOption;
-	}
-
-	private String getReductionOptionAsString() {
-		return (String) reductionOption.getSelectedItem();
-	}
-
-	private ReductionOption getReductionOption() {
-		String reductionOptionString = (String) reductionOption
-				.getSelectedItem();
-
-		if (reductionOptionString.equals(name_STANDARDWithLegend))
-			return ReductionOption.STANDARD;
-		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARDWithLegend))
-			return ReductionOption.OPTIMIZEDSTANDARD;
-		else if (reductionOptionString.equals(name_BROADCASTWithLegend))
-			return ReductionOption.BROADCAST;
-		else if (reductionOptionString.equals(name_BROADCASTDEG2WithLegend))
-			return ReductionOption.DEGREE2BROADCAST;
-		else if (reductionOptionString.equals(name_verifyTAPNWithLegend))
-			return ReductionOption.VerifyTAPN;
-		else if (reductionOptionString
-				.equals(name_verifyTAPNDiscreteInclusionWithLegend))
-			return ReductionOption.VerifyTAPN;
-		else if (reductionOptionString.equals(name_AllReductions))
-			return ReductionOption.BatchProcessingAllReductions;
-		else if (reductionOptionString.equals(name_UserDefinedReductions))
-			return ReductionOption.BatchProcessingUserDefinedReductions;
-		else
-			return ReductionOption.BatchProcessingKeepQueryOption;
 	}
 
 	private void initSearchOptionsComponents() {
@@ -1433,66 +1334,120 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 	
-	public class ReductionOptionChooser extends JDialog {
-		private static final long serialVersionUID = -249542142635773309L;
+	public class ReductionOptionChooser extends JPanel implements ActionListener{
+		private static final long serialVersionUID = 4423387072826316392L;
+		Object[] objects;
+		private JCheckBoxMenuItem dontOverride;
+		private JCheckBoxMenuItem verifyTAPN;
+		private JCheckBoxMenuItem verifyTAPNDiscreteInclusion;
+		private JCheckBoxMenuItem STANDARD;
+		private JCheckBoxMenuItem OPTIMIZEDSTANDARD;
+		private JCheckBoxMenuItem BROADCAST;
+		private JCheckBoxMenuItem BROADCASTDEG2;
 		
-		private JCheckBox verifyTAPN;
-		private JCheckBox verifyTAPNDiscreteInclusion;
-		private JCheckBox STANDARD;
-		private JCheckBox OPTIMIZEDSTANDARD;
-		private JCheckBox BROADCAST;
-		private JCheckBox BROADCASTDEG2;
-		private JButton closeButton;
+		private JPopupMenu menu;
+		private JButton chooseReductionOptions;
+		Window test;
 		
-		public ReductionOptionChooser(Frame frame, String title, boolean modal) {
-			super(frame, title, modal);
+		private static final String STATUS_TEXT_USERDEF = "Userdefined (choose)";
+		private static final String STATUS_TEXT_DONT_OVERRIDE = "Not overridden (choose)";
+		
+		public ReductionOptionChooser() {
+			super(new GridLayout(1, 0));
 			
-			initComponents();
+			createMenu();
+			
+			chooseReductionOptions = new JButton(STATUS_TEXT_DONT_OVERRIDE);
+			chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
+			chooseReductionOptions.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					if(dontOverride.isSelected()){
+						dontOverride.setSelected(false);
+					}
+					menu.show(chooseReductionOptions, 0, chooseReductionOptions.getHeight());
+				}
+			});
+			this.add(chooseReductionOptions);
+
 		}
 		
-		public ReductionOptionChooser(JDialog owner, String title, boolean modal) {
-			super(owner, title, modal);
-			
-			initComponents();
+		private void toggle(){
+			if(dontOverride.isSelected()){
+				chooseReductionOptions.setText(STATUS_TEXT_DONT_OVERRIDE);
+				verifyTAPN.setEnabled(false);
+				verifyTAPNDiscreteInclusion.setEnabled(false);
+				STANDARD.setEnabled(false);
+				OPTIMIZEDSTANDARD.setEnabled(false);
+				BROADCAST.setEnabled(false);
+				BROADCASTDEG2.setEnabled(false);
+			} else {
+				chooseReductionOptions.setText(STATUS_TEXT_USERDEF);
+				verifyTAPN.setEnabled(true);
+				verifyTAPNDiscreteInclusion.setEnabled(true);
+				STANDARD.setEnabled(true);
+				OPTIMIZEDSTANDARD.setEnabled(true);
+				BROADCAST.setEnabled(true);
+				BROADCASTDEG2.setEnabled(true);
+			}
 		}
-		
-		
-		
-		private void initComponents(){
+				
+		private void createMenu(){
+			dontOverride = new JCheckBoxMenuItem("Don't override");
+			dontOverride.setSelected(true);
+			dontOverride.addActionListener(this);
 			
-			JPanel content = new JPanel(new GridLayout(0, 1));
-			
-			verifyTAPN = new JCheckBox(name_verifyTAPNWithLegend);
-			verifyTAPN.setMnemonic('A');
-			verifyTAPNDiscreteInclusion = new JCheckBox(name_verifyTAPNDiscreteInclusionWithLegend);
-			verifyTAPN.setMnemonic('B');
-			STANDARD = new JCheckBox(name_STANDARDWithLegend);
-			verifyTAPN.setMnemonic('C');
-			OPTIMIZEDSTANDARD = new JCheckBox(name_OPTIMIZEDSTANDARDWithLegend);
-			verifyTAPN.setMnemonic('D');
-			BROADCAST = new JCheckBox(name_BROADCASTWithLegend);
-			verifyTAPN.setMnemonic('E');
-			BROADCASTDEG2 = new JCheckBox(name_BROADCASTDEG2WithLegend);
-			verifyTAPN.setMnemonic('F');
-			
-			content.add(verifyTAPN);
-			content.add(verifyTAPNDiscreteInclusion);
-			content.add(STANDARD);
-			content.add(OPTIMIZEDSTANDARD);
-			content.add(BROADCAST);
-			content.add(BROADCASTDEG2);
-			
-			closeButton = new JButton("Close");
-			closeButton.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) {
-					getRootPane().getParent().setVisible(false);
+			dontOverride.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent arg0) {
+					toggle();
 				}
 			});
 			
-			content.add(closeButton);
+			verifyTAPN = new JCheckBoxMenuItem(name_verifyTAPNWithLegend);
+			verifyTAPN.setMnemonic('A');
+			verifyTAPN.setEnabled(false);
+			verifyTAPN.addActionListener(this);
 			
-			super.setContentPane(content);
+			verifyTAPNDiscreteInclusion = new JCheckBoxMenuItem(name_verifyTAPNDiscreteInclusionWithLegend);
+			verifyTAPNDiscreteInclusion.setMnemonic('B');
+			verifyTAPNDiscreteInclusion.setEnabled(false);
+			verifyTAPNDiscreteInclusion.addActionListener(this);
 			
+			STANDARD = new JCheckBoxMenuItem(name_STANDARDWithLegend);
+			STANDARD.setMnemonic('C');
+			STANDARD.setEnabled(false);
+			STANDARD.addActionListener(this);
+			
+			OPTIMIZEDSTANDARD = new JCheckBoxMenuItem(name_OPTIMIZEDSTANDARDWithLegend);
+			OPTIMIZEDSTANDARD.setMnemonic('D');
+			OPTIMIZEDSTANDARD.setEnabled(false);
+			OPTIMIZEDSTANDARD.addActionListener(this);
+			
+			BROADCAST = new JCheckBoxMenuItem(name_BROADCASTWithLegend);
+			BROADCAST.setMnemonic('E');
+			BROADCAST.setEnabled(false);
+			BROADCAST.addActionListener(this);
+			
+			BROADCASTDEG2 = new JCheckBoxMenuItem(name_BROADCASTDEG2WithLegend);
+			BROADCASTDEG2.setMnemonic('F');
+			BROADCASTDEG2.setEnabled(false);
+			BROADCASTDEG2.addActionListener(this);
+			
+			menu = new JPopupMenu();
+			
+			menu.add(dontOverride);
+			menu.add(verifyTAPN);
+			menu.add(verifyTAPNDiscreteInclusion);
+			menu.add(STANDARD);
+			menu.add(OPTIMIZEDSTANDARD);
+			menu.add(BROADCAST);
+			menu.add(BROADCASTDEG2);
+			menu.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			menu.setSelected(OPTIMIZEDSTANDARD);
+
+		}
+		
+		public void actionPerformed(ActionEvent arg0) {
+			menu.setVisible(true);
 		}
 		
 		public List<ReductionOption> getChoosenOptions(){
@@ -1515,8 +1470,19 @@ public class BatchProcessingDialog extends JDialog {
 			return result;
 		}
 		
+		public boolean isOverwriten(){
+			return !dontOverride.isSelected();
+		}
+		
 		public boolean isDiscreteInclusion(){
 			return verifyTAPNDiscreteInclusion.isSelected();
+		}
+		
+		public void setEnabled(boolean enabled) {
+			super.setEnabled(enabled);
+			for(Component c : getComponents()){
+				c.setEnabled(enabled);
+			}
 		}
 	}
 }

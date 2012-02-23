@@ -121,10 +121,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private void processQueryForUserdefinedReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
 		pipe.dataLayer.TAPNQuery query = queryToVerify;
 		query.setDiscreteInclusion(false);
-		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(exiting()) return;
+		if(batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPN)){
 			query = query.copy();
-			query.setReductionOption(r);
+			query.setReductionOption(ReductionOption.VerifyTAPN);
 			processQuery(file, composedModel, query);
 		}
 		
@@ -134,6 +133,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			query.setDiscreteInclusion(true);
 			processQuery(file, composedModel, query);
 		}
+		
+		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
+			if(r == ReductionOption.VerifyTAPN) { continue; }
+			if(exiting()) return;
+			query = query.copy();
+			query.setReductionOption(r);
+			processQuery(file, composedModel, query);
+		}
+		
+		
 	}
 
 	private void processQueryForAllReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
