@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?>
+<installation version="1.0">
+    <info>
+        <appname>TAPAAL</appname>
+        <appversion>2.1.0</appversion>
+        <authors>
+            <author email="tapaal@cs.aau.dk" name="TAPAAL Team"/>
+        </authors>
+        <url>http://www.tapaal.net</url>
+        <uninstaller name="Uninstaller.jar" write="yes"/>
+        <javaversion>1.6</javaversion>
+        <requiresjdk>no</requiresjdk>
+        <writeinstallationinformation>no</writeinstallationinformation>
+        <pack200/>
+	<!--<run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7" />-->
+    </info>
+<!--<natives>-->
+    <native type="izpack" name="ShellLink.dll"/>
+    <native type="izpack" name="ShellLink_x64.dll"/>
+<!--    <native type="izpack" name="WinSetupAPI.dll"/>
+    <native type="izpack" name="WinSetupAPI_x64.dll"/>-->
+<!--</natives>-->
+    <guiprefs height="480" resizable="no" width="640">
+        <modifier key="useFlags" value="yes"/>
+        <modifier key="langDisplayType" value="default"/>
+    </guiprefs>
+    <resources>
+	<res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
+    </resources>
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+    <panels>
+        <panel classname="CheckedHelloPanel"/>
+        <panel classname="TargetPanel"/>
+	<panel classname="ShortcutPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+    <packs>
+        <pack name="TAPAAL Core" preselected="yes" required="yes">
+            <description/>
+            <file override="update"
+                src="release-files/bin" targetdir="$INSTALL_PATH/"/>
+            <file override="update"
+                src="release-files/lib" targetdir="$INSTALL_PATH/"/>
+        </pack>
+    </packs>
+</installation>
