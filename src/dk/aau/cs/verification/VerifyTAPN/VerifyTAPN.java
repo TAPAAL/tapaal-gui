@@ -202,10 +202,10 @@ public class VerifyTAPN implements ModelChecker {
 		//Search the installdir for verifytapn
 		File installdir = TAPAAL.getInstallDir();
 		
-		String[] paths = {"/bin/verifytapn", "/bin/verifytapn64"};
+		String[] paths = {"/bin/verifytapn", "/bin/verifytapn64", "/bin/verifytapn.exe", "/bin/verifytapn64.exe"};
 		for (String s : paths) {
 			File verifytapnfile = new File(installdir + s);
-
+			
 			if (verifytapnfile.exists()){
 
 				verifytapnpath = verifytapnfile.getAbsolutePath();

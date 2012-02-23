@@ -2,6 +2,7 @@ package net.tapaal;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -98,11 +99,32 @@ public class TAPAAL {
 		
 		try {
 			
-			if (!str.contains("file://")) {
+			//Fix as ubuntu (at least) does not set file:// from ClassLoader
+			if (!str.contains("file:/")) {
 				str = "file://" + str;
 			}
+			
+			
 			//Some magic to remove file:// and get the right seperators
-			str = (new File(new URL(str).toURI()).getAbsolutePath());
+			URL url = new URL(str);
+			URI uri = url.toURI();
+			
+			// Workaround for the following bug: 
+		    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5086147
+		    // Remove extra slashes after the scheme part.
+			
+		    if ( uri.getAuthority() != null ){
+		        try {
+		            uri = new URI( uri.toString().replace("file://", "file:////" ) );
+		        } catch ( URISyntaxException e ) {
+		            throw new IllegalArgumentException( "The specified " +
+		                "URI contains an authority, but could not be " +
+		                "normalized.", e );
+		        }
+		    }
+			
+		    File f = new File(uri);
+			str = f.getAbsolutePath();
 			
 			// Stip to base dir (exit bin dir)
 			File installdir = new File(str);
