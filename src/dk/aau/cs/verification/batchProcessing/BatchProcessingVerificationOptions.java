@@ -48,8 +48,8 @@ public class BatchProcessingVerificationOptions {
 		this.discreteInclusion = discreteInclusion;
 	}
 	
-	public ReductionOption reductionOption() {
-		return reductionOption;
+	public boolean isReductionOptionUserdefined(){
+		return reductionOption == ReductionOption.BatchProcessingUserDefinedReductions;
 	}
 	
 	public List<ReductionOption> reductionOptions() {

@@ -523,7 +523,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
 	}
-	//TODO
+
 	private void initReductionOptionsComponents() {
 		JLabel reductionLabel = new JLabel("Verification method:");
 		reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
@@ -571,35 +571,6 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(symmetryOption, gbc);
 	}
 
-	private void setEnabledOptionsAccordingToCurrentReduction() {
-		refreshSearchOptions();
-	}
-
-	private void refreshSearchOptions() {
-		String currentSearchOption = getSearchOptionAsString();
-
-		String[] options = new String[] { name_KeepQueryOption, name_HEURISTIC,
-				name_BFS, name_DFS, name_Random };
-
-		Dimension d = searchOption.getSize();
-		searchOption.removeAllItems();
-		boolean selectedOptionStillAvailable = false;
-		for (String s : options) {
-			searchOption.addItem(s);
-			if (s.equals(currentSearchOption)) {
-				selectedOptionStillAvailable = true;
-			}
-		}
-		searchOption.setMinimumSize(d); // stop dropdown box from automatically
-										// resizing when we remove options with
-										// "longer" names.
-		searchOption.setPreferredSize(d);
-
-		if (selectedOptionStillAvailable) {
-			searchOption.setSelectedItem(currentSearchOption);
-		}
-	}
-
 	private SearchOption getSearchOption() {
 		if (((String) searchOption.getSelectedItem()).equals(name_DFS))
 			return SearchOption.DFS;
@@ -612,10 +583,6 @@ public class BatchProcessingDialog extends JDialog {
 			return SearchOption.BFS;
 		else
 			return SearchOption.BatchProcessingKeepQueryOption;
-	}
-
-	private String getSearchOptionAsString() {
-		return (String) searchOption.getSelectedItem();
 	}
 
 	private void disableVerificationOptionsButtons() {
@@ -633,7 +600,6 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutValue.setEnabled(useTimeout());
 	}
 	
-	//TODO
 	private BatchProcessingVerificationOptions getVerificationOptions() {
 		ReductionOption reductionOption = reductionOptionChooser.isOverwriten() ? ReductionOption.BatchProcessingUserDefinedReductions : ReductionOption.BatchProcessingKeepQueryOption;
 		
