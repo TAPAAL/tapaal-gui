@@ -373,7 +373,7 @@ public class GuiFrame extends JFrame implements Observer {
 						ExampleFileAction tmp = new ExampleFileAction(nets[i], nets[i].replace(".xml", ""), null);
 						if (k < 10) {
 						
-							tmp.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke(""+k).getKeyCode(), shortcutkey));
+							//tmp.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke(""+k).getKeyCode(), shortcutkey));
 							
 						}
 						k++;
@@ -456,13 +456,13 @@ public class GuiFrame extends JFrame implements Observer {
 						 CreateGui.imgPath + "Zoom.png")));
 		 addZoomMenuItems(zoomMenu);
 
-		 addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
-				 "Zoom out by 10% ", "ctrl MINUS"));
-		 
-		 zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("MINUS").getKeyCode(), shortcutkey));
 		 addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
-				 "Zoom in by 10% ", "ctrl PLUS"));
-		 zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("PLUS").getKeyCode(), shortcutkey));
+				 "Zoom in by 10% ", "ctrl J"));
+		 zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("J").getKeyCode(), shortcutkey));
+
+		 addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
+				 "Zoom out by 10% ", "ctrl K"));
+		 zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("K").getKeyCode(), shortcutkey));
 		 viewMenu.add(zoomMenu);
 
 		 viewMenu.addSeparator();
@@ -473,16 +473,26 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 viewMenu.addSeparator();
 		 
-		 		 addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
-				 453243, "Show/hide the list of components.", "C", true));
-		 addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
-				 453245, "Show/hide global constants.", "O", true));
-		 addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
-				 453244, "Show/hide verification queries.", "Q", true));
-		 addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","F",true));
-		 addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction = new ViewAction("Display Enabled transitions",
-				 453247, "Show/hide the list of enabled transitions","E",true));
+		 	addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
+				 453243, "Show/hide the list of components.", "ctrl 1", true));
+                                 showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
+
+		 	addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
+				 453244, "Show/hide verification queries.", "ctrl 2", true));
+				 showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
+
+		 	addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
+				 453245, "Show/hide global constants.", "ctrl 3", true));
+	  	         	 showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
+			
+		 	addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
+				 453247, "Show/hide the list of enabled transitions","ctrl 4",true));
+				 showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
+
+		 	addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true));
+    				 showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
+
 		 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
