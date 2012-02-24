@@ -354,17 +354,19 @@ public class EngineDialogPanel {
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(0,5,2,5);
-		enginePanel.add(closeButtonPanel,gbc);		
+		enginePanel.add(closeButtonPanel,gbc);	
+		
 	}
 	
 	public void showDialog() {
 		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Select verification engines", true);
+				"Selection of Verification Engines", true);
 		dialog.add(enginePanel);
 		dialog.setResizable(false);
 		dialog.setMinimumSize(minimumSize);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
+	
 	}
 }
