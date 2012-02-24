@@ -125,7 +125,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction transportArcAction;
 
 
-	private AnimateAction startAction, stepforwardAction, stepbackwardAction,
+	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
 	randomAction, randomAnimateAction, timeAction;
 
 	public boolean dragging = false;
@@ -1510,9 +1510,10 @@ public class GuiFrame extends JFrame implements Observer {
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
+				
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
-				
+					
 				// XXX
 				// This is a fix for bug #812694 where on mac some menues are gray after
 				// changing from simulation mode, when displaying a trace. Showing and 
@@ -1548,6 +1549,7 @@ public class GuiFrame extends JFrame implements Observer {
 				break;
 
 			case STEPBACKWARD:
+				System.out.println("Back!");
 				animBox.stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				// update mouseOverView
