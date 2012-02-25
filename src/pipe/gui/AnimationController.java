@@ -347,7 +347,6 @@ public class AnimationController extends JPanel {
 
 			switch (typeID) {
 			case TIMEPASS:
-				animBox.clearStepsForward();
 				CreateGui.getAnimator().letTimePass(
 						new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
 
