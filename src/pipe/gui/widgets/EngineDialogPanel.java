@@ -33,6 +33,8 @@ public class EngineDialogPanel {
 	JLabel uppaalLocationLabel = new JLabel("Located: ");
 	JLabel uppaalVersionLabel = new JLabel("Version: ");
 	
+	JButton closeButton;
+	
 	private Dimension minimumSize = new Dimension(320,1);
 	private Insets panelInsets = new Insets(5, 5, 5, 5);
 	private Insets smallPanelInsets = new Insets(0, 5, 0, 5);
@@ -337,7 +339,7 @@ public class EngineDialogPanel {
 		
 		JPanel closeButtonPanel = new JPanel();
 		closeButtonPanel.setLayout(new GridBagLayout());
-		JButton closeButton = new JButton("Close");
+		closeButton = new JButton("Close");
 		closeButton.setMnemonic(KeyEvent.VK_C);
 		closeButton.addAncestorListener(new RequestFocusListener());
 		closeButton.addActionListener(new ActionListener() {
@@ -366,6 +368,7 @@ public class EngineDialogPanel {
 		dialog.setResizable(false);
 		dialog.setMinimumSize(minimumSize);
 		dialog.pack();
+		closeButton.requestFocusInWindow();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 	
