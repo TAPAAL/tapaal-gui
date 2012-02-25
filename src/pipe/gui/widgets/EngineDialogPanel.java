@@ -339,6 +339,7 @@ public class EngineDialogPanel {
 		closeButtonPanel.setLayout(new GridBagLayout());
 		JButton closeButton = new JButton("Close");
 		closeButton.setMnemonic(KeyEvent.VK_C);
+		closeButton.addAncestorListener(new RequestFocusListener());
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
