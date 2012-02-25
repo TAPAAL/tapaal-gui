@@ -21,6 +21,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -59,6 +60,8 @@ public class AnimationController extends JPanel {
 	 */
 	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
+	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated!";
+	private String PRECISION_ERROR_DIALOG_TITLE = "Number will be truncated!"; 
 
 	class ToggleButton extends JToggleButton implements PropertyChangeListener {
 
@@ -301,7 +304,14 @@ public class AnimationController extends JPanel {
 	}
 	
 	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
-		// Hack to allow usage of localised numbes
+		if (Pattern.matches("^(([1-9]([0-9])*)?|0)(\\.([0-9]){6,})?$",  TimeDelayField.getText())) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					PRECISION_ERROR_MESSAGE, PRECISION_ERROR_DIALOG_TITLE,
+					JOptionPane.INFORMATION_MESSAGE);
+			String oldText = TimeDelayField.getText();
+			TimeDelayField.setText(oldText.substring(0,oldText.indexOf('.')+6));
+		}
+		// Hack to allow usage of localised numbes		
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
