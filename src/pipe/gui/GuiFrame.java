@@ -1549,7 +1549,6 @@ public class GuiFrame extends JFrame implements Observer {
 				break;
 
 			case STEPBACKWARD:
-				System.out.println("Back!");
 				animBox.stepBackwards();
 				CreateGui.getAnimator().stepBack();
 				// update mouseOverView
