@@ -60,8 +60,8 @@ public class AnimationController extends JPanel {
 	 */
 	private static final long serialVersionUID = 7037756165634426275L;
 	private javax.swing.JButton okButton;
-	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated!";
-	private String PRECISION_ERROR_DIALOG_TITLE = "Number will be truncated!"; 
+	private String PRECISION_ERROR_MESSAGE = "The precision is limited to 5 decimal places, the number will be truncated.";
+	private String PRECISION_ERROR_DIALOG_TITLE = "Precision of Time Delay Exceeded"; 
 
 	class ToggleButton extends JToggleButton implements PropertyChangeListener {
 
@@ -223,7 +223,7 @@ public class AnimationController extends JPanel {
 			df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 
 			TimeDelayField.setText(df.format(1f));
-			TimeDelayField.setColumns(5);
+			TimeDelayField.setColumns(6);
 
 			timedelayPanel.add(TimeDelayField);
 			timedelayPanel.add(okButton);
@@ -304,12 +304,14 @@ public class AnimationController extends JPanel {
 	}
 	
 	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
-		if (Pattern.matches("^(([1-9]([0-9])*)?|0)(\\.([0-9]){6,})?$",  TimeDelayField.getText())) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					PRECISION_ERROR_MESSAGE, PRECISION_ERROR_DIALOG_TITLE,
-					JOptionPane.INFORMATION_MESSAGE);
-			String oldText = TimeDelayField.getText();
-			TimeDelayField.setText(oldText.substring(0,oldText.indexOf('.')+6));
+		String oldText = TimeDelayField.getText();
+		if (Pattern.matches("^(([1-9]([0-9])*)?|0)(\\.([0-9]){6,})?$",  oldText)) {			
+			if (oldText.indexOf('.') != -1) {
+				TimeDelayField.setText(oldText.substring(0,oldText.indexOf('.')+6));	
+				JOptionPane.showMessageDialog(CreateGui.getApp(),
+						PRECISION_ERROR_MESSAGE, PRECISION_ERROR_DIALOG_TITLE,
+						JOptionPane.INFORMATION_MESSAGE);				
+			}
 		}
 		// Hack to allow usage of localised numbes		
 		DecimalFormat df = new DecimalFormat();
