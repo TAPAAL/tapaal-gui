@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -52,6 +53,24 @@ public class EngineDialogPanel {
 		makeUppaalPanel();
 		makeEnginePanel();
 		setPathsAndVersionNumbers();
+		dialog = new EscapableDialog(CreateGui.getApp(),
+				"Selection of Verification Engines", true);
+		dialog.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (dialog.getFocusOwner() instanceof JButton) {
+				        ((JButton)(dialog.getFocusOwner())).doClick();	
+					}
+			    }
+			}
+		});
 	}	
 	
 	private void selectTapnEngine() {
@@ -361,9 +380,7 @@ public class EngineDialogPanel {
 		
 	}
 	
-	public void showDialog() {
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Selection of Verification Engines", true);
+	public void showDialog() {		
 		dialog.add(enginePanel);
 		dialog.setResizable(false);
 		dialog.setMinimumSize(minimumSize);
