@@ -582,7 +582,7 @@ public class GuiFrame extends JFrame implements Observer {
 		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				checkForSave();
+				checkForSaveAll();
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
 				dialog.setPreferredSize(dialog.getSize());
