@@ -76,7 +76,7 @@ public class ConstantStore {
 
 	public boolean containsConstantByName(String name) {
 		for(Constant c : constants) {
-			if(c.name().equals(name))
+			if(c.name().equalsIgnoreCase(name))
 				return true;
 		}
 		return false;
@@ -84,7 +84,7 @@ public class ConstantStore {
 
 	public Constant getConstantByName(String name) {
 		for(Constant c : constants) {
-			if(c.name().equals(name))
+			if(c.name().equalsIgnoreCase(name))
 				return c;
 		}
 		return null;
