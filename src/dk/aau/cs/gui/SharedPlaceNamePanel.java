@@ -120,6 +120,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				String name = nameField.getText();
 				if(name == null || name.isEmpty()){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return;
 				}else{
 					boolean success = false;
@@ -146,6 +147,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				
 				if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -154,6 +156,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					placeToEdit.setName(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -172,6 +175,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					place = new SharedPlace(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -179,6 +183,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					listModel.addElement(place);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				

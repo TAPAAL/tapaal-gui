@@ -122,6 +122,7 @@ public class SharedTransitionNamePanel extends JPanel {
 						
 				if(name == null || name.isEmpty()){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return;
 				}else{
 					boolean success = true;
@@ -144,6 +145,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				
 				if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -152,6 +154,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -166,6 +169,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					transition = new SharedTransition(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -173,6 +177,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					listModel.addElement(transition);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
