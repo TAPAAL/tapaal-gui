@@ -7,7 +7,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -34,8 +33,6 @@ public class EngineDialogPanel {
 	JLabel uppaalLocationLabel = new JLabel("Located: ");
 	JLabel uppaalVersionLabel = new JLabel("Version: ");
 	
-	JButton closeButton;
-	
 	private Dimension minimumSize = new Dimension(320,1);
 	private Insets panelInsets = new Insets(5, 5, 5, 5);
 	private Insets smallPanelInsets = new Insets(0, 5, 0, 5);
@@ -53,24 +50,6 @@ public class EngineDialogPanel {
 		makeUppaalPanel();
 		makeEnginePanel();
 		setPathsAndVersionNumbers();
-		dialog = new EscapableDialog(CreateGui.getApp(),
-				"Selection of Verification Engines", true);
-		dialog.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if (dialog.getFocusOwner() instanceof JButton) {
-				        ((JButton)(dialog.getFocusOwner())).doClick();	
-					}
-			    }
-			}
-		});
 	}	
 	
 	private void selectTapnEngine() {
@@ -358,7 +337,7 @@ public class EngineDialogPanel {
 		
 		JPanel closeButtonPanel = new JPanel();
 		closeButtonPanel.setLayout(new GridBagLayout());
-		closeButton = new JButton("Close");
+		JButton closeButton = new JButton("Close");
 		closeButton.setMnemonic(KeyEvent.VK_C);
 		closeButton.addAncestorListener(new RequestFocusListener());
 		closeButton.addActionListener(new ActionListener() {
@@ -380,12 +359,13 @@ public class EngineDialogPanel {
 		
 	}
 	
-	public void showDialog() {		
+	public void showDialog() {
+		dialog = new EscapableDialog(CreateGui.getApp(),
+				"Selection of Verification Engines", true);
 		dialog.add(enginePanel);
 		dialog.setResizable(false);
 		dialog.setMinimumSize(minimumSize);
 		dialog.pack();
-		closeButton.requestFocusInWindow();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 	
