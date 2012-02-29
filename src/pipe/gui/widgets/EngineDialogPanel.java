@@ -28,6 +28,8 @@ public class EngineDialogPanel {
 	private JPanel tapaalPanel;
 	private JPanel uppaalPanel;
 	
+	JButton closeButton;
+	
 	JLabel tapaalLocationLabel = new JLabel("Located: ");
 	JLabel tapaalVersionLabel = new JLabel("Version: ");
 	JLabel uppaalLocationLabel = new JLabel("Located: ");
@@ -337,7 +339,7 @@ public class EngineDialogPanel {
 		
 		JPanel closeButtonPanel = new JPanel();
 		closeButtonPanel.setLayout(new GridBagLayout());
-		JButton closeButton = new JButton("Close");
+		closeButton = new JButton("Close");
 		closeButton.setMnemonic(KeyEvent.VK_C);
 		closeButton.addAncestorListener(new RequestFocusListener());
 		closeButton.addActionListener(new ActionListener() {
@@ -363,6 +365,7 @@ public class EngineDialogPanel {
 		dialog = new EscapableDialog(CreateGui.getApp(),
 				"Selection of Verification Engines", true);
 		dialog.add(enginePanel);
+		dialog.getRootPane().setDefaultButton(closeButton);
 		dialog.setResizable(false);
 		dialog.setMinimumSize(minimumSize);
 		dialog.pack();
