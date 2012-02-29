@@ -426,7 +426,7 @@ public class TemplateExplorer extends JPanel {
 			showRenameTemplateDialog(newName);
 			return;
 		}
-		else if (parent.network().hasTAPNCalled(newName)) {
+		else if (parent.network().hasTAPNCalled(newName) && !template.model().name().equalsIgnoreCase(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
 							"A component named \"" + newName + "\" already exists. Try another name.",

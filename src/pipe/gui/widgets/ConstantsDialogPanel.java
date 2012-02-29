@@ -268,7 +268,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 		} else {				
 			int val = (Integer) valueSpinner.getValue();
 			if (!oldName.equals("")) {
-				if (!oldName.equals(newName)
+				if (!oldName.equalsIgnoreCase(newName)
 						&& model.isConstantNameUsed(newName)) {
 					JOptionPane
 					.showMessageDialog(
@@ -313,7 +313,8 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 				}
 			} else {
 				Command edit = model.addConstant(newName, val);
-				if (edit == null) {
+				
+				if (edit==null) {
 					JOptionPane
 					.showMessageDialog(
 							CreateGui.getApp(),
