@@ -21,7 +21,6 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	public void redo() {
 		transition.delete();
 		view.repaint();
-		System.out.println(transition.underlyingTransition().model());
 	}
 
 	@Override
