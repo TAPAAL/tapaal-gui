@@ -313,7 +313,6 @@ public class AnimationController extends JPanel {
 		return timeDelayToSet;
 	}
 
-
 	private void setEnabledStepbackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
 

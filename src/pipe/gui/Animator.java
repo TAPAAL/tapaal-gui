@@ -250,6 +250,9 @@ public class Animator {
 
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
+		
+		CreateGui.getAnimationHistory().clearStepsForward();
+		
 		NetworkMarking next = null;
 		try{
 			if (getFiringmode() != null) {
@@ -301,6 +304,8 @@ public class Animator {
 	}
 
 	public boolean letTimePass(BigDecimal delay) {
+		CreateGui.getAnimationHistory().clearStepsForward();
+		
 		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
 			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));

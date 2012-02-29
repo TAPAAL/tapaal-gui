@@ -32,6 +32,8 @@ public class SharedPlaceNamePanel extends JPanel {
 	private JTextField nameField;
 	private SharedPlace placeToEdit;
 	private final Context context;
+	
+	JButton okButton;
 
 	public SharedPlaceNamePanel(JRootPane rootPane, SharedPlacesListModel sharedPlacesListModel, Context context) {
 		this(rootPane, sharedPlacesListModel, context, null);	
@@ -82,6 +84,12 @@ public class SharedPlaceNamePanel extends JPanel {
 		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(330, 25));
 		nameField.setPreferredSize(new Dimension(330, 25));
+		nameField.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent e) {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
+			}
+		});
 		gbc = new GridBagConstraints();
 		gbc.gridy = 1;
 		gbc.insets = new Insets(4, 4, 2, 4);
@@ -93,7 +101,7 @@ public class SharedPlaceNamePanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
 		
-		JButton okButton = new JButton("OK");
+		okButton = new JButton("OK");
 		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
@@ -106,12 +114,13 @@ public class SharedPlaceNamePanel extends JPanel {
 		gbcOk.insets = new java.awt.Insets(5, 5, 5, 5);
 
 
-		rootPane.setDefaultButton(okButton);
+	//	rootPane.setDefaultButton(okButton);
 		okButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				String name = nameField.getText();
 				if(name == null || name.isEmpty()){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return;
 				}else{
 					boolean success = false;
@@ -138,6 +147,7 @@ public class SharedPlaceNamePanel extends JPanel {
 				
 				if(placeToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -146,6 +156,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					placeToEdit.setName(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -164,6 +175,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					place = new SharedPlace(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]* \n\nNote that \"true\" and \"false\" are reserved keywords.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -171,6 +183,7 @@ public class SharedPlaceNamePanel extends JPanel {
 					listModel.addElement(place);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedPlaceNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				

@@ -2065,12 +2065,16 @@ public class QueryDialog extends JPanel {
 					// TODO make save
 					// save();
 					querySaved = true;
+					// Now if a query is saved, the net is marked as modified
+					CreateGui.getView().setNetChanged(true);
 					exit();
 				}
 			});
 			saveAndVerifyButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					querySaved = true;
+					// Now if a query is saved and verified, the net is marked as modified
+					CreateGui.getView().setNetChanged(true);
 					exit();
 					TAPNQuery query = getQuery();
 

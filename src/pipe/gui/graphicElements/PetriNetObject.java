@@ -25,7 +25,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 	private static final long serialVersionUID = 2693171860021066729L;
 
-	protected static final int COMPONENT_DRAW_OFFSET = 5;
+	protected static final int COMPONENT_DRAW_OFFSET = 100;
 
 	protected String id = null;
 
