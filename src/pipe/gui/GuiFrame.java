@@ -170,9 +170,9 @@ public class GuiFrame extends JFrame implements Observer {
 			if ("GTK look and feel".equals(UIManager.getLookAndFeel().getName())){
 				try {
 					//Load class to see if its there
-					Class.forName("eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-
-					UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
+					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
+					
+					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
 					CreateGui.setUsingGTKFileBrowser(false);
