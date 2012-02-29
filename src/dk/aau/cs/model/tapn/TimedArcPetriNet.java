@@ -124,8 +124,10 @@ public class TimedArcPetriNet {
 
 	public void remove(TimedTransition transition) { // TODO: These methods must clean up arcs also
 		boolean removed = transitions.remove(transition);
-		if (removed)
-			transition.setModel(null);
+		
+		// TODO: Removed to fix bug #891944 
+		//if (removed)
+		//	transition.setModel(null);
 	}
 
 	public void remove(TimedInputArc arc) {
