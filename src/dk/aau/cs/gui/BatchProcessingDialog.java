@@ -2,6 +2,7 @@ package dk.aau.cs.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -37,11 +39,14 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
@@ -59,6 +64,7 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.CustomJSpinner;
+import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
@@ -1300,20 +1306,11 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	}
 	
-	public class ReductionOptionChooser extends JPanel implements ActionListener{
+	public class ReductionOptionChooser extends JPanel{
 		private static final long serialVersionUID = 4423387072826316392L;
-		Object[] objects;
-		private JCheckBoxMenuItem dontOverride;
-		private JCheckBoxMenuItem verifyTAPN;
-		private JCheckBoxMenuItem verifyTAPNDiscreteInclusion;
-		private JCheckBoxMenuItem STANDARD;
-		private JCheckBoxMenuItem OPTIMIZEDSTANDARD;
-		private JCheckBoxMenuItem BROADCAST;
-		private JCheckBoxMenuItem BROADCASTDEG2;
 		
-		private JPopupMenu menu;
 		private JButton chooseReductionOptions;
-		Window test;
+		ReductionOptionDialog reductionOptionDialog;
 		
 		private static final String STATUS_TEXT_USERDEF = "Userdefined (choose)";
 		private static final String STATUS_TEXT_DONT_OVERRIDE = "Not overridden (choose)";
@@ -1321,46 +1318,207 @@ public class BatchProcessingDialog extends JDialog {
 		public ReductionOptionChooser() {
 			super(new GridLayout(1, 0));
 			
-			createMenu();
+			reductionOptionDialog = new ReductionOptionDialog(BatchProcessingDialog.this, "Choose reductions to run", true);
+			reductionOptionDialog.setLocationRelativeTo(BatchProcessingDialog.this);
+			reductionOptionDialog.setResizable(false);
+			reductionOptionDialog.pack();
 			
 			chooseReductionOptions = new JButton(STATUS_TEXT_DONT_OVERRIDE);
 			chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
 			chooseReductionOptions.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					if(dontOverride.isSelected()){
-						dontOverride.setSelected(false);
-					}
-					menu.show(chooseReductionOptions, 0, chooseReductionOptions.getHeight());
+					reductionOptionDialog.setOverride(true);
+					reductionOptionDialog.setVisible(true);
 				}
 			});
 			this.add(chooseReductionOptions);
 
 		}
 		
-		private void toggle(){
-			if(dontOverride.isSelected()){
-				chooseReductionOptions.setText(STATUS_TEXT_DONT_OVERRIDE);
-				verifyTAPN.setEnabled(false);
-				verifyTAPNDiscreteInclusion.setEnabled(false);
-				STANDARD.setEnabled(false);
-				OPTIMIZEDSTANDARD.setEnabled(false);
-				BROADCAST.setEnabled(false);
-				BROADCASTDEG2.setEnabled(false);
-			} else {
-				chooseReductionOptions.setText(STATUS_TEXT_USERDEF);
-				verifyTAPN.setEnabled(true);
-				verifyTAPNDiscreteInclusion.setEnabled(true);
-				STANDARD.setEnabled(true);
-				OPTIMIZEDSTANDARD.setEnabled(true);
-				BROADCAST.setEnabled(true);
-				BROADCASTDEG2.setEnabled(true);
+		public List<ReductionOption> getChoosenOptions(){
+			return reductionOptionDialog.getChoosenOptions();
+		}
+		
+		public boolean isOverwriten(){
+			return reductionOptionDialog.isOverwriten();
+		}
+		
+		public boolean isDiscreteInclusion(){
+			return reductionOptionDialog.isDiscreteInclusion();
+		}
+		
+		public void setEnabled(boolean enabled) {
+			super.setEnabled(enabled);
+			for(Component c : getComponents()){
+				c.setEnabled(enabled);
 			}
 		}
-				
-		private void createMenu(){
-			dontOverride = new JCheckBoxMenuItem("Don't override");
+	}
+	
+	public class ReductionOptionDialog extends EscapableDialog{
+		private static final long serialVersionUID = 5554793741619572092L;
+		private static final String TEXT_DONT_OVERRIDE = "Do not override the reduction method";
+		private static final String TEXT_OVERRIDE = "Override the reduction method";
+		
+		
+		private JRadioButton dontOverride;
+		private JRadioButton override;
+		private JCheckBox verifyTAPN;
+		private JCheckBox verifyTAPNDiscreteInclusion;
+		private JCheckBox STANDARD;
+		private JCheckBox OPTIMIZEDSTANDARD;
+		private JCheckBox BROADCAST;
+		private JCheckBox BROADCASTDEG2;
+		
+		JButton selectAll;
+		JButton deselectAll;
+		
+		private JPanel content;
+		
+		private JPanel leftPanel;
+		private JPanel rightPanel;
+		
+		public ReductionOptionDialog(JDialog dialog, String string, boolean modal) {
+			super(dialog, string, modal);
+			
+			initComponents();
+		}
+		
+		private void initComponents(){
+			content = new JPanel(new GridBagLayout());
+			
+			initLeftPanel();
+			initRightPanel();
+			
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.anchor = GridBagConstraints.NORTHWEST;
+			content.add(leftPanel, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 1;
+			gbc.gridy = 0;
+			gbc.fill = GridBagConstraints.BOTH;
+			gbc.anchor = GridBagConstraints.NORTHWEST;
+			
+			JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+			//sep.setSize(10, sep.getSize().height);
+			content.add(sep, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 2;
+			gbc.gridy = 0;
+			gbc.anchor = GridBagConstraints.NORTHWEST;
+			content.add(rightPanel);
+			
+			content.setBorder(BorderFactory.createTitledBorder("Select the reduction methods to use"));
+			
+			JButton closeButton = new JButton("Close dialog");
+			closeButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					ReductionOptionDialog.this.setVisible(false);
+					
+				}
+			});
+			
+			this.getContentPane().setLayout(new GridBagLayout());
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			this.getContentPane().add(content, gbc);
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.anchor = GridBagConstraints.EAST;
+			this.getContentPane().add(closeButton, gbc);
+			
+		}
+		
+		private void initRightPanel() {
+			rightPanel = new JPanel(new GridBagLayout());
+			
+			verifyTAPN = new JCheckBox(name_verifyTAPNWithLegend);
+			//verifyTAPN.setMnemonic('A');
+			verifyTAPN.setEnabled(false);
+			
+			verifyTAPNDiscreteInclusion = new JCheckBox(name_verifyTAPNDiscreteInclusionWithLegend);
+			//verifyTAPNDiscreteInclusion.setMnemonic('B');
+			verifyTAPNDiscreteInclusion.setEnabled(false);
+			
+			STANDARD = new JCheckBox(name_STANDARDWithLegend);
+			//STANDARD.setMnemonic('C');
+			STANDARD.setEnabled(false);
+			
+			OPTIMIZEDSTANDARD = new JCheckBox(name_OPTIMIZEDSTANDARDWithLegend);
+			//OPTIMIZEDSTANDARD.setMnemonic('D');
+			OPTIMIZEDSTANDARD.setEnabled(false);
+			
+			BROADCAST = new JCheckBox(name_BROADCASTWithLegend);
+			//BROADCAST.setMnemonic('E');
+			BROADCAST.setEnabled(false);
+			
+			BROADCASTDEG2 = new JCheckBox(name_BROADCASTDEG2WithLegend);
+			//BROADCASTDEG2.setMnemonic('F');
+			BROADCASTDEG2.setEnabled(false);
+			
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.insets = new Insets(5, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(verifyTAPN, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(verifyTAPNDiscreteInclusion, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 2;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(STANDARD, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 3;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 4;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(BROADCAST, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 5;
+			gbc.insets = new Insets(0, 5, 5, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(BROADCASTDEG2, gbc);
+
+		}
+
+		private void initLeftPanel() {
+			
+			leftPanel = new JPanel(new GridLayout(0, 1));
+			dontOverride = new JRadioButton(TEXT_DONT_OVERRIDE);
 			dontOverride.setSelected(true);
-			dontOverride.addActionListener(this);
+			
+			override = new JRadioButton(TEXT_OVERRIDE);
+			override.setSelected(false);
+			
+			ButtonGroup group = new ButtonGroup();
+			group.add(dontOverride);
+			group.add(override);
 			
 			dontOverride.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent arg0) {
@@ -1368,52 +1526,57 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			});
 			
-			verifyTAPN = new JCheckBoxMenuItem(name_verifyTAPNWithLegend);
-			verifyTAPN.setMnemonic('A');
-			verifyTAPN.setEnabled(false);
-			verifyTAPN.addActionListener(this);
+			selectAll = new JButton("Select all");
+			selectAll.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					setAll(true);
+				}
+			});
 			
-			verifyTAPNDiscreteInclusion = new JCheckBoxMenuItem(name_verifyTAPNDiscreteInclusionWithLegend);
-			verifyTAPNDiscreteInclusion.setMnemonic('B');
-			verifyTAPNDiscreteInclusion.setEnabled(false);
-			verifyTAPNDiscreteInclusion.addActionListener(this);
+			deselectAll = new JButton("Deselect all");
+			deselectAll.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					setAll(false);
+				}
+			});
 			
-			STANDARD = new JCheckBoxMenuItem(name_STANDARDWithLegend);
-			STANDARD.setMnemonic('C');
-			STANDARD.setEnabled(false);
-			STANDARD.addActionListener(this);
-			
-			OPTIMIZEDSTANDARD = new JCheckBoxMenuItem(name_OPTIMIZEDSTANDARDWithLegend);
-			OPTIMIZEDSTANDARD.setMnemonic('D');
-			OPTIMIZEDSTANDARD.setEnabled(false);
-			OPTIMIZEDSTANDARD.addActionListener(this);
-			
-			BROADCAST = new JCheckBoxMenuItem(name_BROADCASTWithLegend);
-			BROADCAST.setMnemonic('E');
-			BROADCAST.setEnabled(false);
-			BROADCAST.addActionListener(this);
-			
-			BROADCASTDEG2 = new JCheckBoxMenuItem(name_BROADCASTDEG2WithLegend);
-			BROADCASTDEG2.setMnemonic('F');
-			BROADCASTDEG2.setEnabled(false);
-			BROADCASTDEG2.addActionListener(this);
-			
-			menu = new JPopupMenu();
-			
-			menu.add(dontOverride);
-			menu.add(verifyTAPN);
-			menu.add(verifyTAPNDiscreteInclusion);
-			menu.add(STANDARD);
-			menu.add(OPTIMIZEDSTANDARD);
-			menu.add(BROADCAST);
-			menu.add(BROADCASTDEG2);
-			menu.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			menu.setSelected(OPTIMIZEDSTANDARD);
+			leftPanel.add(dontOverride);
+			leftPanel.add(override);
+			leftPanel.add(selectAll);
+			leftPanel.add(deselectAll);
+		}
 
+		private void toggle(){
+			if(dontOverride.isSelected()){
+				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_DONT_OVERRIDE);
+				verifyTAPN.setEnabled(false);
+				verifyTAPNDiscreteInclusion.setEnabled(false);
+				STANDARD.setEnabled(false);
+				OPTIMIZEDSTANDARD.setEnabled(false);
+				BROADCAST.setEnabled(false);
+				BROADCASTDEG2.setEnabled(false);
+				selectAll.setEnabled(false);
+				deselectAll.setEnabled(false);
+			} else {
+				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_USERDEF);
+				verifyTAPN.setEnabled(true);
+				verifyTAPNDiscreteInclusion.setEnabled(true);
+				STANDARD.setEnabled(true);
+				OPTIMIZEDSTANDARD.setEnabled(true);
+				BROADCAST.setEnabled(true);
+				BROADCASTDEG2.setEnabled(true);
+				selectAll.setEnabled(true);
+				deselectAll.setEnabled(true);
+			}
 		}
 		
-		public void actionPerformed(ActionEvent arg0) {
-			menu.setVisible(true);
+		private void setAll(boolean selected){
+			verifyTAPN.setSelected(selected);
+			verifyTAPNDiscreteInclusion.setSelected(selected);
+			STANDARD.setSelected(selected);
+			OPTIMIZEDSTANDARD.setSelected(selected);
+			BROADCAST.setSelected(selected);
+			BROADCASTDEG2.setSelected(selected);
 		}
 		
 		public List<ReductionOption> getChoosenOptions(){
@@ -1444,10 +1607,11 @@ public class BatchProcessingDialog extends JDialog {
 			return verifyTAPNDiscreteInclusion.isSelected();
 		}
 		
-		public void setEnabled(boolean enabled) {
-			super.setEnabled(enabled);
-			for(Component c : getComponents()){
-				c.setEnabled(enabled);
+		public void setOverride(boolean override){
+			if(override){
+				this.override.setSelected(true);
+			} else {
+				this.dontOverride.setSelected(true);
 			}
 		}
 	}
