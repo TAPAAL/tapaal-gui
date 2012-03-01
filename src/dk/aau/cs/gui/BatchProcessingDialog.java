@@ -1412,7 +1412,7 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.anchor = GridBagConstraints.NORTHWEST;
 			content.add(rightPanel);
 			
-			content.setBorder(BorderFactory.createTitledBorder("Select Verification Methods"));
+			content.setBorder(BorderFactory.createTitledBorder("Verification Method"));
 			
 			JButton closeButton = new JButton("Save");
 			rootPane.setDefaultButton(closeButton);
