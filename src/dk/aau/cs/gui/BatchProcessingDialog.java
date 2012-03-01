@@ -1327,7 +1327,7 @@ public class BatchProcessingDialog extends JDialog {
 			chooseReductionOptions.setToolTipText(TOOL_TIP_ReductionOption);
 			chooseReductionOptions.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					reductionOptionDialog.setOverride(true);
+					//reductionOptionDialog.setOverride(true);
 					reductionOptionDialog.setVisible(true);
 				}
 			});
@@ -1541,6 +1541,9 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			});
 			
+			selectAll.setEnabled(false);
+			deselectAll.setEnabled(false);
+			
 			leftPanel.add(dontOverride);
 			leftPanel.add(override);
 			leftPanel.add(selectAll);
@@ -1612,7 +1615,7 @@ public class BatchProcessingDialog extends JDialog {
 			if(override){
 				this.override.setSelected(true);
 			} else {
-				this.dontOverride.setSelected(true);
+				this.dontOverride.setSelected(true);			
 			}
 		}
 	}
