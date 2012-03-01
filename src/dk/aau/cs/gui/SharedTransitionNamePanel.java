@@ -33,6 +33,8 @@ public class SharedTransitionNamePanel extends JPanel {
 
 	private final UndoManager undoManager;
 	private final NameGenerator nameGenerator;
+	
+	JButton okButton;
 
 	public SharedTransitionNamePanel(JRootPane rootPane, SharedTransitionsListModel sharedTransitionsListModel, UndoManager undoManager, NameGenerator nameGenerator) {
 		this(rootPane, sharedTransitionsListModel, undoManager, nameGenerator, null);
@@ -84,6 +86,12 @@ public class SharedTransitionNamePanel extends JPanel {
 		nameField = new JTextField(initialText);
 		nameField.setMinimumSize(new Dimension(330, 25));
 		nameField.setPreferredSize(new Dimension(330, 25));
+		nameField.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent e) {
+				okButton.requestFocusInWindow();
+				okButton.doClick();
+			}
+		});
 		gbc = new GridBagConstraints();
 		gbc.gridy = 1;
 		gbc.insets = new Insets(4, 4, 2, 4);
@@ -95,7 +103,7 @@ public class SharedTransitionNamePanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
 		
-		JButton okButton = new JButton("OK");
+		okButton = new JButton("OK");
 		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
@@ -107,13 +115,14 @@ public class SharedTransitionNamePanel extends JPanel {
 		gbcOk.anchor = java.awt.GridBagConstraints.WEST;
 		gbcOk.insets = new java.awt.Insets(5, 5, 5, 5);
 
-		rootPane.setDefaultButton(okButton);
+	//	rootPane.setDefaultButton(okButton);
 		okButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				String name = nameField.getText();
 						
 				if(name == null || name.isEmpty()){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "You must specify a name.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return;
 				}else{
 					boolean success = true;
@@ -136,6 +145,7 @@ public class SharedTransitionNamePanel extends JPanel {
 				
 				if(transitionToEdit.network().isNameUsed(name) && !oldName.equalsIgnoreCase(name)) {
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is already used by a place or transition in one of the components.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -144,6 +154,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					transitionToEdit.setName(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -158,6 +169,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					transition = new SharedTransition(name);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "The specified name is invalid.\nAcceptable names are defined by the regular expression:\n[a-zA-Z][_a-zA-Z0-9]*", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				
@@ -165,6 +177,7 @@ public class SharedTransitionNamePanel extends JPanel {
 					listModel.addElement(transition);
 				}catch(RequireException e){
 					JOptionPane.showMessageDialog(SharedTransitionNamePanel.this, "A transition or place with the specified name already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+					nameField.requestFocusInWindow();
 					return false;
 				}
 				

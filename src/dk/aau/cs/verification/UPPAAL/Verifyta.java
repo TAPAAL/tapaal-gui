@@ -173,12 +173,20 @@ public class Verifyta implements ModelChecker {
 		return result;
 	}
 
-	public static boolean trySetupFromEnvironmentVariable() {
-		String verifyta = System.getenv("verifyta");
+	public static boolean trySetup() {
+		
+		String verifyta = null;
+		
+		//Get from evn (overwrite other values)
+		verifyta = System.getenv("verifyta");
 		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
 			return true;
 		}
+		
+		//If a value is saved in conf
+		//TODO: kyrke
+		
 		return false;
 	}
 
@@ -196,6 +204,10 @@ public class Verifyta implements ModelChecker {
 		if (runner != null) {
 			runner.kill();
 		}
+	}
+	
+	public void setVerifytaPath(String path) {
+		verifytapath = path; 
 	}
 	
 	public boolean supportsStats(){

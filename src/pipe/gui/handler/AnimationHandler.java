@@ -30,7 +30,6 @@ public class AnimationHandler extends javax.swing.event.MouseInputAdapter {
 			
 			if (SwingUtilities.isLeftMouseButton(e) && transition.isEnabled()) {
 
-				CreateGui.getAnimationHistory().clearStepsForward();
 				CreateGui.getAnimator().fireTransition(transition);
 				CreateGui.getApp().setRandomAnimationMode(false);
 			}

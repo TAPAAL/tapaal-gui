@@ -29,8 +29,10 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 
 import pipe.dataLayer.NetType;
+import pipe.gui.GuiFrame.AnimateAction;
 import pipe.gui.Pipe.ElementType;
 import pipe.gui.action.GuiAction;
+import dk.aau.cs.gui.components.NonsearchableJComboBox;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 
 /**
@@ -90,13 +92,10 @@ public class AnimationController extends JPanel {
 			randomAction, randomAnimateAction, timeAction;
 
 	public AnimationController() {
-		startAction = new AnimateAction("Simulation mode", ElementType.START,
-				"Toggle simulation mode", "Ctrl A", true);
+		startAction = CreateGui.appGui.startAction;
 
-		stepbackwardAction = new AnimateAction("Step backward", ElementType.STEPBACKWARD,
-				"Step backward", "typed 4");
-		stepforwardAction = new AnimateAction("Step forward", ElementType.STEPFORWARD,
-				"Step forward", "typed 6");
+		stepbackwardAction = CreateGui.appGui.stepbackwardAction;
+		stepforwardAction = CreateGui.appGui.stepforwardAction;
 
 		stepbackwardAction.setEnabled(false);
 		stepforwardAction.setEnabled(false);
@@ -104,10 +103,10 @@ public class AnimationController extends JPanel {
 		// timeAction = new AnimateAction("Time", Pipe.TIMEPASS,
 		// "Let Time pass", "_");
 
-		randomAction = new AnimateAction("Random", ElementType.RANDOM,
-				"Randomly fire a transition", "typed 5");
-		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
-				"Randomly fire a number of transitions", "typed 7", true);
+		//randomAction = new AnimateAction("Random", ElementType.RANDOM,
+		//		"Randomly fire a transition", "typed 5");
+		//randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
+		//		"Randomly fire a number of transitions", "typed 7", true);
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -115,7 +114,7 @@ public class AnimationController extends JPanel {
 		// Use the default FlowLayout.
 		// Create everything.
 
-		firermodebox = new JComboBox(FIRINGMODES);
+		firermodebox = new NonsearchableJComboBox(FIRINGMODES);
 		updateFiringModeComboBox();
 
 		firermodebox.addActionListener(new java.awt.event.ActionListener() {
@@ -312,72 +311,6 @@ public class AnimationController extends JPanel {
 		// BigDecimal(TimeDelayField.getText(), new
 		// MathContext(Pipe.AGE_PRECISION));
 		return timeDelayToSet;
-	}
-
-	class AnimateAction extends GuiAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -4066032248332540289L;
-		private ElementType typeID;
-		private AnimationHistoryComponent animBox;
-
-		AnimateAction(String name, ElementType typeID, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
-			this.typeID = typeID;
-		}
-
-		AnimateAction(String name, ElementType typeID, String tooltip,
-				String keystroke, boolean toggleable) {
-			super(name, tooltip, keystroke, toggleable);
-			this.typeID = typeID;
-		}
-
-		public AnimateAction(String name, ElementType typeID, String tooltip,
-				KeyStroke keyStroke) {
-			super(name, tooltip, keyStroke);
-			this.typeID = typeID;
-		}
-
-		public void actionPerformed(ActionEvent ae) {
-
-			animBox = CreateGui.getAnimationHistory();
-
-			switch (typeID) {
-			case TIMEPASS:
-				animBox.clearStepsForward();
-				CreateGui.getAnimator().letTimePass(
-						new BigDecimal(1, new MathContext(Pipe.AGE_PRECISION)));
-
-				setAnimationButtonsEnabled();
-
-				break;
-
-			// case Pipe.RANDOM:
-			// animBox.clearStepsForward();
-			// CreateGui.getAnimator().doRandomFiring();
-			//
-			// setAnimationButtonsEnabled();
-			// break;
-
-			case STEPFORWARD:
-				animBox.stepForward();
-				CreateGui.getAnimator().stepForward();
-				setAnimationButtonsEnabled();
-				break;
-
-			case STEPBACKWARD:
-				animBox.stepBackwards();
-				CreateGui.getAnimator().stepBack();
-				setAnimationButtonsEnabled();
-				break;
-
-			default:
-				break;
-			}
-		}
-
 	}
 
 	private void setEnabledStepbackwardAction(boolean b) {

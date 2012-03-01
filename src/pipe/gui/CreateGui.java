@@ -10,6 +10,7 @@ import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 
@@ -25,6 +26,8 @@ public class CreateGui {
 	private static boolean showZeroToInfinityIntervals = true;
 
 	public static String imgPath, userPath; // useful for stuff
+	
+	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
 
 	public static void init() {
 		imgPath = "resources/Images/";
@@ -49,8 +52,8 @@ public class CreateGui {
 
 		appGui.setVisible(true);
 		appGui.activateSelectAction();
-		Verifyta.trySetupFromEnvironmentVariable();
-		VerifyTAPN.trySetupFromEnvironmentVariable();
+		Verifyta.trySetup();
+		VerifyTAPN.trySetup();
 
 		VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion()) {
@@ -196,6 +199,12 @@ public class CreateGui {
 		return tab.getAnimationController();
 
 	}
+	
+	public static EnabledTransitionsList getFireabletransitionsList() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		return tab.getFireabletransitionsList();
+
+	}	
 
 	public static void removeAbstractAnimationPane() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));

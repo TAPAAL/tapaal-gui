@@ -6,10 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
@@ -148,6 +153,10 @@ public class VerifyTAPN implements ModelChecker {
 			runner.kill();
 		}
 	}
+	
+	public void setVerifyTapnPath(String path) {
+		verifytapnpath = path;
+	}
 
 	public boolean setup() {
 		if (isNotSetup()) {
@@ -176,12 +185,37 @@ public class VerifyTAPN implements ModelChecker {
 		return verifytapnpath == null || verifytapnpath.equals("");
 	}
 	
-	public static boolean trySetupFromEnvironmentVariable() {
-		String verifytapn = System.getenv("verifytapn");
+	public static boolean trySetup() {
+		
+		String verifytapn = null;
+		
+		//If env is set, it overwrites the value
+		verifytapn = System.getenv("verifytapn");
 		if (verifytapn != null && !verifytapn.isEmpty()) {
 			verifytapnpath = verifytapn;
 			return true;
 		}
+		
+		//If a value is saved in conf
+		//TODO: kyrke
+		
+		//Search the installdir for verifytapn
+		File installdir = TAPAAL.getInstallDir();
+		
+		String[] paths = {"/bin/verifytapn", "/bin/verifytapn64", "/bin/verifytapn.exe", "/bin/verifytapn64.exe"};
+		for (String s : paths) {
+			File verifytapnfile = new File(installdir + s);
+			
+			if (verifytapnfile.exists()){
+
+				verifytapnpath = verifytapnfile.getAbsolutePath();
+				return true;
+
+			}
+		}
+		
+		
+		
 		return false;
 	}
 

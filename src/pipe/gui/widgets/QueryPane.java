@@ -127,6 +127,7 @@ public class QueryPane extends JPanel {
 		this.add(buttonsPanel, BorderLayout.PAGE_END);
 		//this.setToolTipText(toolTipQueryPane);
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Queries"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		this.setToolTipText("List of verification queries (double click to edit)");
 	}
 	
 	public void updateQueryButtons() {

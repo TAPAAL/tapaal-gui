@@ -1,8 +1,8 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>lib/tapaal.jar</jar>
-  <outfile>/home/kyrke/windows/tapaal-test.exe</outfile>
+  <jar>../lib/tapaal.jar</jar>
+  <outfile>/home/kyrke/windows/tapaal.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -12,10 +12,10 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon></icon>
+  <icon>/home/kyrke/projects/tapaal/src/tapaal/tools/img/icon.ico</icon>
   <classPath>
     <mainClass>TAPAAL</mainClass>
-    <cp>./lib/*</cp>
+    <cp>../lib/*</cp>
   </classPath>
   <jre>
     <path></path>

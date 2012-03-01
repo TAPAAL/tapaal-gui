@@ -25,7 +25,7 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 	private static final long serialVersionUID = 2693171860021066729L;
 
-	protected static final int COMPONENT_DRAW_OFFSET = 5;
+	protected static final int COMPONENT_DRAW_OFFSET = 100;
 
 	protected String id = null;
 
@@ -138,15 +138,18 @@ public abstract class PetriNetObject extends JComponent implements Zoomable,
 
 	public void delete() {
 		deleted = true;
-		if(guiModel != null) guiModel.removePetriNetObject(this);
+		if(guiModel != null) {
+			guiModel.removePetriNetObject(this);
+		}
 		removeFromContainer();
 		removeAll();
 	}
 
 	public void undelete(DrawingSurfaceImpl view) {
 		guiModel.addPetriNetObject(this);
-		if (view.isCurrentGuiModel(guiModel))
+		if (view.isCurrentGuiModel(guiModel)) {
 			view.add(this);
+		}
 	}
 
 	protected void removeFromContainer() {

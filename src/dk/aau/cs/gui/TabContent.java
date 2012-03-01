@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -32,15 +31,14 @@ import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
+import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.util.Require;
 
 public class TabContent extends JSplitPane {
 	private static final long serialVersionUID = -648006317150905097L;
-	private static final double RATIO = 0.2;
 
 	protected TimedArcPetriNetNetwork tapnNetwork = new TimedArcPetriNetNetwork();
 	protected HashMap<TimedArcPetriNet, DataLayer> guiModels = new HashMap<TimedArcPetriNet, DataLayer>();
@@ -57,15 +55,18 @@ public class TabContent extends JSplitPane {
 
 	// / Animation
 	protected AnimationHistoryComponent animBox;
-	protected AnimationController animControlerBox;
+	protected AnimationController animControlerBox;	
 	protected JScrollPane animationHistoryScrollPane;
 	protected JScrollPane animationControllerScrollPane;
 	protected AnimationHistoryComponent abstractAnimationPane = null;
+	protected JPanel animationControlsPanel;
 
 	protected JPanel animatorLeftPane;
 	protected JSplitPane animationHistorySplitter;
 	protected SharedPlacesAndTransitionsPanel sharedPTPanel;
-
+	
+	protected JSplitPane outerSplitPane;
+	protected JSplitPane topSplitPane;
 
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
@@ -195,40 +196,63 @@ public class TabContent extends JSplitPane {
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
-
+	
 	public void switchToAnimationComponents() {
+		
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
+		if(enabledTransitionsList == null) createEnabledTransitionsList();
 		
 		animatorLeftPane = new JPanel(new GridBagLayout());
 		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
 		templateExplorer.switchToAnimationMode();
 		
+		topSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
+		topSplitPane.setResizeWeight(0.5);
+		topSplitPane.setBorder(null);
+		topSplitPane.setContinuousLayout(true);
+		topSplitPane.setOneTouchExpandable(true);
+		
+		animationControlsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = RATIO;
-		animatorLeftPane.add(templateExplorer, gbc);
-
+		gbc.weighty = 0.0;
+		animationControlsPanel.add(animControlerBox, gbc);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
-		animatorLeftPane.add(animControlerBox, gbc);
+		gbc.weighty = 1.0;
+		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		
+		outerSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, animationControlsPanel);
+		outerSplitPane.setResizeWeight(0.5);
+		outerSplitPane.setBorder(null);
+		outerSplitPane.setContinuousLayout(true);
+		outerSplitPane.setOneTouchExpandable(true);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1 - RATIO;
-		animatorLeftPane.add(animationHistoryScrollPane, gbc);
+		gbc.weighty = 1.0;
+		animatorLeftPane.add(outerSplitPane, gbc);
 		this.setLeftComponent(animatorLeftPane);
+	}
+	
+	public JSplitPane getOuterSplitPane(){
+		return outerSplitPane;
+	}
+	
+	public JSplitPane getTopSplitPane(){
+		return topSplitPane;
 	}
 
 	public void switchToEditorComponents() {
@@ -254,7 +278,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void addAbstractAnimationPane() {
-		animatorLeftPane.remove(animationHistoryScrollPane);
+		animationControlsPanel.remove(animationHistoryScrollPane);
 		abstractAnimationPane = new AnimationHistoryComponent();
 
 		JScrollPane untimedAnimationHistoryScrollPane = new JScrollPane(abstractAnimationPane);
@@ -271,24 +295,26 @@ public class TabContent extends JSplitPane {
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1 - RATIO;
-		animatorLeftPane.add(animationHistorySplitter, gbc);
+		gbc.weighty = 1.0;
+		animationControlsPanel.add(animationHistorySplitter, gbc);
 	}
 
 	public void removeAbstractAnimationPane() {
-		animatorLeftPane.remove(animationHistorySplitter);
+		animationControlsPanel.remove(animationHistorySplitter);
 		abstractAnimationPane = null;
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
-		gbc.weighty = 1 - RATIO;
-		animatorLeftPane.add(animationHistoryScrollPane);
+		gbc.weighty = 1.0;
+		animationControlsPanel.add(animationHistoryScrollPane, gbc);
+		this.repaint();
+		
 	}
 
 	private void createAnimationController() {
@@ -301,6 +327,24 @@ public class TabContent extends JSplitPane {
 
 	public AnimationHistoryComponent getAnimationHistory() {
 		return animBox;
+	}
+	
+	
+	
+	EnabledTransitionsList enabledTransitionsList;
+	
+	private void createEnabledTransitionsList(){
+		enabledTransitionsList = new EnabledTransitionsList();
+		
+		enabledTransitionsList.setBorder(BorderFactory
+		.createCompoundBorder(BorderFactory
+				.createTitledBorder("Enabled Transitions"),
+				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		enabledTransitionsList.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
+	}
+	
+	public EnabledTransitionsList getFireabletransitionsList(){
+		return enabledTransitionsList;
 	}
 
 	public JScrollPane drawingSurfaceScrollPane() {
@@ -436,12 +480,34 @@ public class TabContent extends JSplitPane {
 	public void showComponents(boolean enable){
 		templateExplorer.setVisible(enable);
 		sharedPTPanel.setVisible(enable);
+		if(topSplitPane!=null){
+			topSplitPane.setDividerLocation(0.5);
+			updateTopSplitPanel();
+		}
 	}
 	public void showQueries(boolean enable){
 		queries.setVisible(enable);
 	}
 	public void showConstantsPanel(boolean enable){
 		constantsPanel.setVisible(enable);
+	}
+	public void showEnabledTransitionsList(boolean enable){
+		enabledTransitionsList.setVisible(enable);
+		topSplitPane.setDividerLocation(0.5);
+		updateTopSplitPanel();
+	}
+	
+	private void updateTopSplitPanel(){
+		if(enabledTransitionsList.isVisible() || templateExplorer.isVisible()){
+			topSplitPane.setVisible(true);
+			if(outerSplitPane.getDividerLocation() == 0){
+				outerSplitPane.setDividerLocation(0.5);
+			}
+		} else {
+			topSplitPane.setVisible(false);
+			outerSplitPane.setDividerLocation(0.0);
+		}
+		
 	}
 	
 	public void selectFirstElements(){

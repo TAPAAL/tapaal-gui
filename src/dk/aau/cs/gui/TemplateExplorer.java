@@ -117,7 +117,7 @@ public class TemplateExplorer extends JPanel {
 		initButtonsPanel();
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Components"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		//this.setToolTipText(toolTipComponents);
+	    this.setToolTipText("List of compoments. Click a component to display it.");
 		addCreatedComponents(hideButtons);
 	}
 
@@ -426,7 +426,7 @@ public class TemplateExplorer extends JPanel {
 			showRenameTemplateDialog(newName);
 			return;
 		}
-		else if (parent.network().hasTAPNCalled(newName)) {
+		else if (parent.network().hasTAPNCalled(newName) && !template.model().name().equalsIgnoreCase(newName)) {
 			JOptionPane.showMessageDialog(
 							parent.drawingSurface(),
 							"A component named \"" + newName + "\" already exists. Try another name.",
