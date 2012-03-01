@@ -1312,13 +1312,13 @@ public class BatchProcessingDialog extends JDialog {
 		private JButton chooseReductionOptions;
 		ReductionOptionDialog reductionOptionDialog;
 		
-		private static final String STATUS_TEXT_USERDEF = "Userdefined (choose)";
-		private static final String STATUS_TEXT_DONT_OVERRIDE = "Not overridden (choose)";
+		private static final String STATUS_TEXT_USERDEF = "Overridden";
+		private static final String STATUS_TEXT_DONT_OVERRIDE = "From the query";
 		
 		public ReductionOptionChooser() {
 			super(new GridLayout(1, 0));
 			
-			reductionOptionDialog = new ReductionOptionDialog(BatchProcessingDialog.this, "Choose reductions to run", true);
+			reductionOptionDialog = new ReductionOptionDialog(BatchProcessingDialog.this, "Choose Verification Methods for Batch Processing", true);
 			reductionOptionDialog.setLocationRelativeTo(BatchProcessingDialog.this);
 			reductionOptionDialog.setResizable(false);
 			reductionOptionDialog.pack();
@@ -1357,8 +1357,8 @@ public class BatchProcessingDialog extends JDialog {
 	
 	public class ReductionOptionDialog extends EscapableDialog{
 		private static final long serialVersionUID = 5554793741619572092L;
-		private static final String TEXT_DONT_OVERRIDE = "Do not override the reduction method";
-		private static final String TEXT_OVERRIDE = "Override the reduction method";
+		private static final String TEXT_DONT_OVERRIDE = "Do not override the verification method";
+		private static final String TEXT_OVERRIDE = "Override the verification method";
 		
 		
 		private JRadioButton dontOverride;
@@ -1412,9 +1412,10 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.anchor = GridBagConstraints.NORTHWEST;
 			content.add(rightPanel);
 			
-			content.setBorder(BorderFactory.createTitledBorder("Select the reduction methods to use"));
+			content.setBorder(BorderFactory.createTitledBorder("Select Verification Methods"));
 			
-			JButton closeButton = new JButton("Close dialog");
+			JButton closeButton = new JButton("Save");
+			rootPane.setDefaultButton(closeButton);
 			closeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					ReductionOptionDialog.this.setVisible(false);
@@ -1423,7 +1424,7 @@ public class BatchProcessingDialog extends JDialog {
 			});
 			
 			this.getContentPane().setLayout(new GridBagLayout());
-			
+
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 0;
@@ -1533,7 +1534,7 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			});
 			
-			deselectAll = new JButton("Deselect all");
+			deselectAll = new JButton("Select none");
 			deselectAll.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					setAll(false);
