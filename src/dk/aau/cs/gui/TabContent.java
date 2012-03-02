@@ -110,10 +110,13 @@ public class TabContent extends JSplitPane {
 		
 		editorTop = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, sharedPTPanel);
 		editorTop.setBorder(null);
+		editorTop.setResizeWeight(0.5);
 		editorButtom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queries, constantsPanel);
 		editorButtom.setBorder(null);
+		editorButtom.setResizeWeight(0.5);
 		editorOuter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, editorTop, editorButtom);
 		editorOuter.setBorder(null);
+		editorOuter.setResizeWeight(0.5);
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -495,6 +498,9 @@ public class TabContent extends JSplitPane {
 	public void showComponents(boolean enable){
 		templateExplorer.setVisible(enable);
 		sharedPTPanel.setVisible(enable);
+		editorTop.setVisible(enable);
+		editorTop.setDividerLocation(0.5);
+		editorOuter.setDividerLocation(0.5);
 		if(topSplitPane!=null){
 			topSplitPane.setDividerLocation(0.5);
 			updateTopSplitPanel();
@@ -502,9 +508,21 @@ public class TabContent extends JSplitPane {
 	}
 	public void showQueries(boolean enable){
 		queries.setVisible(enable);
+		editorButtom.setDividerLocation(0.5);
+		
+		if(!constantsPanel.isVisible()){
+			editorButtom.setVisible(enable);
+			editorOuter.setDividerLocation(0.5);
+		}
 	}
 	public void showConstantsPanel(boolean enable){
 		constantsPanel.setVisible(enable);
+		editorButtom.setDividerLocation(0.5);
+		
+		if(!queries.isVisible()){
+			editorButtom.setVisible(enable);
+			editorOuter.setDividerLocation(0.5);
+		}
 	}
 	public void showEnabledTransitionsList(boolean enable){
 		enabledTransitionsList.setVisible(enable);
