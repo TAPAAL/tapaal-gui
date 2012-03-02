@@ -93,6 +93,10 @@ public class TabContent extends JSplitPane {
 
 	}
 	
+	JSplitPane editorTop;
+	JSplitPane editorButtom;
+	JSplitPane editorOuter;
+	
 	public void createEditorLeftPane() {
 		editorLeftPane = new JPanel(new GridBagLayout());
 		editorLeftPane.setPreferredSize(new Dimension(300, 100)); // height is ignored because the component is stretched
@@ -103,7 +107,23 @@ public class TabContent extends JSplitPane {
 		queries = new QueryPane(new ArrayList<TAPNQuery>(), this);
 		templateExplorer = new TemplateExplorer(this);
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
-
+		
+		editorTop = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, sharedPTPanel);
+		editorTop.setBorder(null);
+		editorButtom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queries, constantsPanel);
+		editorButtom.setBorder(null);
+		editorOuter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, editorTop, editorButtom);
+		editorOuter.setBorder(null);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		editorLeftPane.add(editorOuter, gbc);
+		
+		/*
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -135,6 +155,7 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.25;
 		editorLeftPane.add(sharedPTPanel, gbc);
+		*/
 	}
 
 	public void updateConstantsList() {
@@ -257,13 +278,7 @@ public class TabContent extends JSplitPane {
 
 	public void switchToEditorComponents() {
 		templateExplorer.switchToEditorMode();
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0.34;
-		editorLeftPane.add(templateExplorer, gbc);
+		editorTop.setLeftComponent(templateExplorer);
 		this.setLeftComponent(editorLeftPane);
 
 		drawingSurface.repaintAll();
