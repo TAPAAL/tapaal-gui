@@ -66,6 +66,8 @@ Printable, DrawingSurface {
 
 	public Arc createArc; // no longer static
 	public PlaceTransitionObject createPTO;
+	
+	protected static final int DRAWING_SURFACE_GROW = 100;
 
 	private AnimationHandler animationHandler = new AnimationHandler();
 
@@ -307,8 +309,8 @@ Printable, DrawingSurface {
 				continue; // SelectionObject not included
 			}
 			Rectangle r = components[i].getBounds();
-			int x = r.x + r.width + 20;
-			int y = r.y + r.height + 20;
+			int x = r.x + r.width + DRAWING_SURFACE_GROW;
+			int y = r.y + r.height + DRAWING_SURFACE_GROW;
 			if (x > d.width) {
 				d.width = x;
 			}
