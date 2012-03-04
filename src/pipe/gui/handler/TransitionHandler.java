@@ -36,8 +36,8 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown()) {
+		
+		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected())) {
 			return;
 		}
 

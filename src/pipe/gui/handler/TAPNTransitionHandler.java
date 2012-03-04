@@ -28,7 +28,7 @@ public class TAPNTransitionHandler extends TransitionHandler {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown()) {
+		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected())) {
 			return;
 		}
 

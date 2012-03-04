@@ -147,4 +147,19 @@ public class PlaceHandler extends PlaceTransitionObjectHandler {
 		}
 
 	}
+
+	int i = 0;
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		if (!(CreateGui.getApp().isEditionAllowed()) || e.isControlDown() || !(myObject.isSelected()) || !(myObject instanceof TimedPlaceComponent)) {
+			return;
+		}
+
+		if (e.getWheelRotation() < 0) {
+			((TimedPlaceComponent)myObject).addTokens(1);
+		} else {
+			((TimedPlaceComponent)myObject).removeTokens(1);
+		}
+	}
 }
