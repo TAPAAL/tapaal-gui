@@ -1539,10 +1539,17 @@ public class GuiFrame extends JFrame implements Observer {
 					
 					if (!appView.isInAnimationMode()) {
 						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
-							CreateGui.getCurrentTab().rememberSelectedTemplate();							
+							CreateGui.getCurrentTab().rememberSelectedTemplate();
+							if (CreateGui.getCurrentTab().currentTemplate().isActive()){
+								CreateGui.getCurrentTab().setSelectedTemplateWasActive();
+							}
 							restoreMode();
 							PetriNetObject.ignoreSelection(true);
 							setAnimationMode(!appView.isInAnimationMode());
+							if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {								
+								CreateGui.getCurrentTab().restoreSelectedTemplate();
+								CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
+							}
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",

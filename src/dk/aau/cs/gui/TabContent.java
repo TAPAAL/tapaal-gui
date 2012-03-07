@@ -68,7 +68,8 @@ public class TabContent extends JSplitPane {
 	protected JSplitPane outerSplitPane;
 	protected JSplitPane topSplitPane;
 	
-	private Integer selectedTemplate = 0; 
+	private Integer selectedTemplate = 0;
+	private Boolean selectedTemplateWasActive = false;
 
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
@@ -137,6 +138,18 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.25;
 		editorLeftPane.add(sharedPTPanel, gbc);
+	}
+	
+	public Boolean templateWasActiveBeforeSimulationMode() {
+		return selectedTemplateWasActive;
+	}
+	
+	public void resetSelectedTemplateWasActive() {
+		selectedTemplateWasActive = false;
+	}
+	
+	public void setSelectedTemplateWasActive() {
+		selectedTemplateWasActive = true;
 	}
 	
 	public void rememberSelectedTemplate() {
@@ -426,7 +439,6 @@ public class TabContent extends JSplitPane {
 
 	public void setQueries(Iterable<TAPNQuery> queries) {
 		this.queries.setQueries(queries);
-
 	}
 
 	public void removeQuery(TAPNQuery queryToRemove) {
