@@ -67,6 +67,8 @@ public class TabContent extends JSplitPane {
 	
 	protected JSplitPane outerSplitPane;
 	protected JSplitPane topSplitPane;
+	
+	private Integer selectedTemplate = 0; 
 
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
@@ -135,6 +137,14 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 0.25;
 		editorLeftPane.add(sharedPTPanel, gbc);
+	}
+	
+	public void rememberSelectedTemplate() {
+		selectedTemplate = templateExplorer.indexOfSelectedTemplate();
+	}
+	
+	public void restoreSelectedTemplate() {
+		templateExplorer.restoreSelectedTemplate(selectedTemplate);
 	}
 
 	public void updateConstantsList() {

@@ -1539,6 +1539,7 @@ public class GuiFrame extends JFrame implements Observer {
 					
 					if (!appView.isInAnimationMode()) {
 						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+							CreateGui.getCurrentTab().rememberSelectedTemplate();							
 							restoreMode();
 							PetriNetObject.ignoreSelection(true);
 							setAnimationMode(!appView.isInAnimationMode());
@@ -1553,7 +1554,7 @@ public class GuiFrame extends JFrame implements Observer {
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
 						setAnimationMode(!appView.isInAnimationMode());
-
+						CreateGui.getCurrentTab().restoreSelectedTemplate();
 					}
 				} catch (Exception e) {
 					System.err.println(e);
