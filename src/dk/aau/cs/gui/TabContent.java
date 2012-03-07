@@ -140,6 +140,10 @@ public class TabContent extends JSplitPane {
 		editorLeftPane.add(sharedPTPanel, gbc);
 	}
 	
+	public void selectFirstActiveTemplate(){
+		templateExplorer.selectFirst();
+	}
+	
 	public Boolean templateWasActiveBeforeSimulationMode() {
 		return selectedTemplateWasActive;
 	}

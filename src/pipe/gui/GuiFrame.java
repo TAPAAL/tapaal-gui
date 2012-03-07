@@ -1550,6 +1550,9 @@ public class GuiFrame extends JFrame implements Observer {
 								CreateGui.getCurrentTab().restoreSelectedTemplate();
 								CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
 							}
+							else {
+								CreateGui.getCurrentTab().selectFirstActiveTemplate();
+							}
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
