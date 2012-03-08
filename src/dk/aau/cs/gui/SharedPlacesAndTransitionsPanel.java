@@ -298,6 +298,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 					moveDownButton.setEnabled(false);
 					moveUpButton.setEnabled(false);
 				}
+				if (list.getModel().getSize() <= 0){
+					renameButton.setEnabled(false);
+					removeButton.setEnabled(false);
+				}
 			}		
 		});
 		placesTransitionsComboBox.setSelectedIndex(0); // Sets up the proper list model
@@ -703,6 +707,15 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void removeElement(SharedTransition transition) {
 			network.remove(transition);
 			fireContentsChanged(this, 0, getSize());
+			int numElements = list.getModel().getSize();
+			if(numElements <= 1) {
+				moveDownButton.setEnabled(false);
+				moveUpButton.setEnabled(false);
+			}
+			if (numElements <= 0) {
+				removeButton.setEnabled(false);
+				renameButton.setEnabled(false);
+			}
 		}
 
 		public void updatedName() {
