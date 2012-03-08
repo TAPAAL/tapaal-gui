@@ -624,6 +624,15 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void removeElement(SharedPlace place) {
 			network.remove(place);
 			fireContentsChanged(this, 0, getSize());
+			int numElements = list.getModel().getSize();
+			if(numElements <= 1) {
+				moveDownButton.setEnabled(false);
+				moveUpButton.setEnabled(false);
+			}
+			if (numElements <= 0) {
+				removeButton.setEnabled(false);
+				renameButton.setEnabled(false);
+			}
 		}
 
 		public void updatedName(){
