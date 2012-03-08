@@ -109,6 +109,14 @@ public class TemplateExplorer extends JPanel {
 		undoManager = parent.drawingSurface().getUndoManager();
 		init(hideButtons);
 	}
+	
+	public Integer indexOfSelectedTemplate() {
+		return new Integer(templateList.getSelectedIndex());
+	}
+	
+	public void restoreSelectedTemplate(Integer value) {
+		templateList.setSelectedIndex(value);
+	}
 
 	private void init(boolean hideButtons) {
 		setLayout(new BorderLayout());

@@ -1539,9 +1539,20 @@ public class GuiFrame extends JFrame implements Observer {
 					
 					if (!appView.isInAnimationMode()) {
 						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+							CreateGui.getCurrentTab().rememberSelectedTemplate();
+							if (CreateGui.getCurrentTab().currentTemplate().isActive()){
+								CreateGui.getCurrentTab().setSelectedTemplateWasActive();
+							}
 							restoreMode();
 							PetriNetObject.ignoreSelection(true);
 							setAnimationMode(!appView.isInAnimationMode());
+							if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {								
+								CreateGui.getCurrentTab().restoreSelectedTemplate();
+								CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
+							}
+							else {
+								CreateGui.getCurrentTab().selectFirstActiveTemplate();
+							}
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
@@ -1553,7 +1564,7 @@ public class GuiFrame extends JFrame implements Observer {
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
 						setAnimationMode(!appView.isInAnimationMode());
-
+						CreateGui.getCurrentTab().restoreSelectedTemplate();
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -1576,9 +1587,7 @@ public class GuiFrame extends JFrame implements Observer {
 				a.dispose();
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
-				}
-				
-				CreateGui.getCurrentTab().selectFirstElements();
+				}				
 				
 				break;
 
