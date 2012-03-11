@@ -118,12 +118,15 @@ public class TabContent extends JSplitPane {
 		editorTopSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, sharedPTPanel);
 		editorTopSplitPane.setBorder(null);
 		editorTopSplitPane.setResizeWeight(0.5);
+		editorTopSplitPane.setContinuousLayout(true);
 		editorButtomSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queries, constantsPanel);
 		editorButtomSplitPane.setBorder(null);
 		editorButtomSplitPane.setResizeWeight(0.5);
+		editorButtomSplitPane.setContinuousLayout(true);
 		editorOuterSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, editorTopSplitPane, editorButtomSplitPane);
 		editorOuterSplitPane.setBorder(null);
 		editorOuterSplitPane.setResizeWeight(0.5);
+		editorOuterSplitPane.setContinuousLayout(true);
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -195,6 +198,8 @@ public class TabContent extends JSplitPane {
 	}
 	
 	public void switchToAnimationComponents() {
+		
+		saveSplitPaneDividerlocationsEditor();
 		
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
@@ -275,9 +280,11 @@ public class TabContent extends JSplitPane {
 		}
 	}
 	
-	private void setSplitPaneDividerLocationEditor(){
+	public void setSplitPaneDividerLocationEditor(){
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				int test = editorOuterSplitPane.getHeight();
+				int test2 = editorOuterSplitPane.getDividerLocation();
 				editorOuterSplitPane.setDividerLocation(dividerlocationEditorOuterSplitPane);
 				editorTopSplitPane.setDividerLocation(dividerlocationEditorTopSplitPane);
 				editorButtomSplitPane.setDividerLocation(dividerlocationEditorButtomSplitPane);
