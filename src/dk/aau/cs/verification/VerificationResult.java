@@ -61,6 +61,11 @@ public class VerificationResult<TTrace> {
 	}
 
 	public String getResultString() {
+		if (queryResult.isDiscreteIncludion() && !queryResult.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded) &&
+				((!queryResult.isQuerySatisfied() && queryResult.queryType.equals(QueryType.EF) 
+			       ||			
+			    (queryResult.isQuerySatisfied() && queryResult.queryType.equals(QueryType.AG)))))
+	 {return "Verification is inconclusive.\nDisable discrete inclusion or add extra tokens and try again.";  }
 		return queryResult.toString();
 	}
 }
