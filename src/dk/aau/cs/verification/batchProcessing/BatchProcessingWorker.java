@@ -28,9 +28,12 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
+import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.NullStats;
+import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerificationOptions;
@@ -226,6 +229,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			timeoutCurrentVerification = false;
 		} else if(!verificationResult.error()) {
 			String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
+				if (query.discreteInclusion() && !verificationResult.isBounded() && 
+						((query.queryType().equals(QueryType.EF) && !verificationResult.getQueryResult().isQuerySatisfied())
+						||
+						(query.queryType().equals(QueryType.AG) && verificationResult.getQueryResult().isQuerySatisfied())))
+				{queryResult = "Inconclusive answer";}
 			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime(), verificationResult.stats());
 		} else {
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), new NullStats());

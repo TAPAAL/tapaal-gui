@@ -60,6 +60,10 @@ public class VerificationResult<TTrace> {
 		return stats.toString();
 	}
 
+	public boolean isBounded() {
+		return queryResult.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded);
+	}
+	
 	public String getResultString() {
 		if (queryResult.isDiscreteIncludion() && !queryResult.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded) &&
 				((!queryResult.isQuerySatisfied() && queryResult.queryType.equals(QueryType.EF) 
