@@ -12,6 +12,7 @@ import dk.aau.cs.verification.Stats;
 public class VerifyTAPNOutputParser {
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
+	private static final String DISCRETE_INCLUSION = "discrete inclusion";
 
 	private static final Pattern discoveredPattern = Pattern.compile("\\s*discovered markings:\\s*(\\d+)\\s*");
 	private static final Pattern exploredPattern = Pattern.compile("\\s*explored markings:\\s*(\\d+)\\s*");
@@ -34,10 +35,12 @@ public class VerifyTAPNOutputParser {
 		boolean result = false;
 		int maxUsedTokens = 0;
 		boolean foundResult = false;
+		boolean discreteInclusion = false;
 		String[] lines = output.split(System.getProperty("line.separator"));
 		try {
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i];
+				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true; }
 				if (line.contains(Query_IS_SATISFIED_STRING)) {
 					result = true;
 					foundResult = true;
@@ -72,7 +75,7 @@ public class VerifyTAPNOutputParser {
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType), new Stats(discovered, explored, stored));
+			return new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType, discreteInclusion), new Stats(discovered, explored, stored));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
