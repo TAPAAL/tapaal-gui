@@ -77,6 +77,7 @@ clean:
 	@rm -rf '$(RELEASE_DIR)'
 	@rm -rf '$(JAR_DIR)'
 	@rm -rf '$(RELEASEJAR_DIR)'
+	@rm -rf 'bin' # Remove the Eclipse build files
 
 
 release: clean 
