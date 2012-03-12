@@ -318,6 +318,6 @@ public class Verifyta implements ModelChecker {
 
 	public static void reset() {
 		verifytapath = "";
-		Preferences.getInstance().setVerifytapnLocation(null);
+		Preferences.getInstance().setVerifytaLocation(null);
 	}
 }
