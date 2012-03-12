@@ -361,8 +361,13 @@ public class VerifyTAPN implements ModelChecker {
 	//	return visitor.isUpwardClosed(query.getProperty());
 	//}
 
+	
 	public static void reset() {
+		//Clear value
+		verifytapnpath = "";
 		Preferences.getInstance().setVerifytapnLocation(null);
+		//Set the detault
+		trySetup();
 	}
 
 	
