@@ -18,10 +18,12 @@ RESOURCE_DIR := $(SOURCE_DIR)/resources
 OUTPUT_DIR  := classes
 
 RELEASE_DIR := release-version
+RELEASEJAR_DIR := releasejar-version
 
 PROJECTNAME := TAPAAL
 
-JAR_FILE := tapaal-version.jar
+JAR_DIR := buildjar
+JAR_FILE := $(JAR_DIR)/tapaal.jar
 
 #Set location of java home
 ifeq (exists, $(shell [ -d /usr/lib/jvm/default-java ]  && echo exists ))
@@ -73,7 +75,8 @@ clean:
 	@rm -f tapaal_version.orig.tar.gz
 	@rm -rf '${OUTPUT_DIR}'
 	@rm -rf '$(RELEASE_DIR)'
-	@rm -rf '$(JAR_FILE)'
+	@rm -rf '$(JAR_DIR)'
+	@rm -rf '$(RELEASEJAR_DIR)'
 
 
 release: clean 
@@ -84,7 +87,14 @@ release: clean
 	cp -R '$(RESOURCE_DIR)' '$(RELEASE_DIR)'
 	cp -R $(DEPEND_DIR)/* '$(RELEASE_DIR)'
 
+releasejar: clean jar
+	@mkdir $(RELEASEJAR_DIR)
+	cp '$(JAR_FILE)' '$(RELEASEJAR_DIR)'
+	cp -R $(DEPEND_DIR)/* '$(RELEASEJAR_DIR)'
+
+
 jar: release 
+	@mkdir $(JAR_DIR)
 	$(JAR) -cfe $(JAR_FILE) TAPAAL -C $(RELEASE_DIR) . 
 
 #Remove BYTE ORDER MARK
