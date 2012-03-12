@@ -69,8 +69,9 @@ public class Verifyta implements ModelChecker {
 				
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
-						verifytapath = file.getAbsolutePath();
-						Preferences.getInstance().setVerifytaLocation(verifytapath);
+						
+						setVerifytaPath(file.getAbsolutePath());
+						
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
 					}
@@ -217,6 +218,7 @@ public class Verifyta implements ModelChecker {
 	
 	public void setVerifytaPath(String path) {
 		verifytapath = path; 
+		Preferences.getInstance().setVerifytaLocation(verifytapath);
 	}
 	
 	public boolean supportsStats(){
@@ -316,5 +318,6 @@ public class Verifyta implements ModelChecker {
 
 	public static void reset() {
 		verifytapath = "";
+		Preferences.getInstance().setVerifytapnLocation(null);
 	}
 }

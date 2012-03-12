@@ -18,17 +18,34 @@ public class Preferences {
 	   }
 	
 	   public String getVerifytaLocation() {
-		   
-		   String location = pref.get("verifytapn.location", "");
-		   
-		   return location;
-		   
+		   	   
+		   return pref.get("verifyta.location", "");
 	   }
 	   
 	   public void setVerifytaLocation(String location) {
+		   final String key = "verifyta.location";
 		   
-		   pref.put("verifytapn.location", location);
+		   if (location == null || location.equals("")){
+			   pref.remove(key);
+		   } else {
+			   pref.put("verifyta.location", location);
+		   }
 		   
+		   
+	   }
+	   
+	   public String getVerifytapnLocation() {
+		   return pref.get("verifytapn.location", "");
+	   }
+	   
+	   public void setVerifytapnLocation(String location) {
+		   final String key = "verifytapn.location";
+		   
+		   if (location == null || location.equals("")){
+			   pref.remove(key);
+		   }else {
+			   pref.put(key, location);   
+		   }
 	   }
 	
 }

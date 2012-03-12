@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -146,6 +147,7 @@ public class VerifyTAPN implements ModelChecker {
 
 	private void resetVerifytapn() {
 		verifytapnpath = null;	
+		Preferences.getInstance().setVerifytapnLocation(null);
 	}
 
 	public void kill() {
@@ -156,6 +158,7 @@ public class VerifyTAPN implements ModelChecker {
 	
 	public void setVerifyTapnPath(String path) {
 		verifytapnpath = path;
+		Preferences.getInstance().setVerifytapnLocation(path);
 	}
 
 	public boolean setup() {
@@ -166,7 +169,7 @@ public class VerifyTAPN implements ModelChecker {
 				File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "");
 				if(file != null){
 					if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
-						verifytapnpath = file.getAbsolutePath();
+						setVerifyTapnPath(file.getAbsolutePath());
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
 					}
@@ -196,8 +199,11 @@ public class VerifyTAPN implements ModelChecker {
 			return true;
 		}
 		
-		//If a value is saved in conf
-		//TODO: kyrke
+		verifytapn = Preferences.getInstance().getVerifytapnLocation();
+		if (verifytapn != null && !verifytapn.isEmpty()) {
+			verifytapnpath = verifytapn;
+			return true;
+		}
 		
 		//Search the installdir for verifytapn
 		File installdir = TAPAAL.getInstallDir();
@@ -356,7 +362,7 @@ public class VerifyTAPN implements ModelChecker {
 	//}
 
 	public static void reset() {
-		verifytapnpath = "";
+		Preferences.getInstance().setVerifytapnLocation(null);
 	}
 
 	
