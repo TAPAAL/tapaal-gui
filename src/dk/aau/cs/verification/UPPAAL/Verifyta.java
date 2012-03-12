@@ -9,6 +9,8 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tapaal.Preferences;
+
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
@@ -68,6 +70,7 @@ public class Verifyta implements ModelChecker {
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
 						verifytapath = file.getAbsolutePath();
+						Preferences.getInstance().setVerifytapnLocation(verifytapath);
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
 					}
@@ -150,6 +153,7 @@ public class Verifyta implements ModelChecker {
 
 	private void resetVerifyta() {
 		verifytapath = null;
+		Preferences.getInstance().setVerifytapnLocation(verifytapath);
 	}
 
 	private boolean isNotSetup() {
@@ -186,8 +190,11 @@ public class Verifyta implements ModelChecker {
 			return true;
 		}
 		
-		//If a value is saved in conf
-		//TODO: kyrke
+		verifyta = Preferences.getInstance().getVerifytapnLocation();
+		if (verifyta != null && !verifyta.equals("")) {
+			verifytapath = verifyta;
+			return true;
+		}
 		
 		return false;
 	}
