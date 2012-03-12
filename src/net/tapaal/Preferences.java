@@ -17,7 +17,7 @@ public class Preferences {
 	      return instance;
 	   }
 	
-	   public String getVerifytapnLocation() {
+	   public String getVerifytaLocation() {
 		   
 		   String location = pref.get("verifytapn.location", "");
 		   
@@ -25,7 +25,7 @@ public class Preferences {
 		   
 	   }
 	   
-	   public void setVerifytapnLocation(String location) {
+	   public void setVerifytaLocation(String location) {
 		   
 		   pref.put("verifytapn.location", location);
 		   
