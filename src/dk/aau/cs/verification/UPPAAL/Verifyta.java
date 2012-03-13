@@ -187,8 +187,10 @@ public class Verifyta implements ModelChecker {
 		//Get from evn (overwrite other values)
 		verifyta = System.getenv("verifyta");
 		if (verifyta != null && !verifyta.equals("")) {
-			verifytapath = verifyta;
-			return true;
+			if (new File(verifyta).exists()){
+				verifytapath = verifyta;
+				return true;
+			}
 		}
 		
 		verifyta = Preferences.getInstance().getVerifytaLocation();

@@ -195,10 +195,13 @@ public class VerifyTAPN implements ModelChecker {
 		//If env is set, it overwrites the value
 		verifytapn = System.getenv("verifytapn");
 		if (verifytapn != null && !verifytapn.isEmpty()) {
-			verifytapnpath = verifytapn;
-			return true;
+			if (new File(verifytapn).exists()){
+				verifytapnpath = verifytapn;
+				return true;
+			}
 		}
 		
+		//If pref is set
 		verifytapn = Preferences.getInstance().getVerifytapnLocation();
 		if (verifytapn != null && !verifytapn.isEmpty()) {
 			verifytapnpath = verifytapn;
