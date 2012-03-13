@@ -109,7 +109,6 @@ public class EngineDialogPanel {
 			Verifyta verifyta = new Verifyta(fileFinder,messenger);
 			verifyta.setVerifytaPath(verifytapath);
 			setPathsAndVersionNumbers();
-			fitDialog();
 		}
 	}
 	
@@ -124,8 +123,10 @@ public class EngineDialogPanel {
 	}
 	
 	private void fitDialog() {
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		if (dialog != null) {
+			dialog.pack();
+			dialog.setLocationRelativeTo(null);	
+		}
 	}
 	
 	private void exit() {
@@ -156,6 +157,7 @@ public class EngineDialogPanel {
 		tapaalVersionLabelVal.setText(verifytapnversion);
 		uppaalLocationLabelVal.setText(verifytaPath);
 		uppaalVersionLabelVal.setText(verifytaversion);
+		fitDialog();
 	}
 
 	private void makeTapaalPanel() {
