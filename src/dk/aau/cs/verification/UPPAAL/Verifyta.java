@@ -9,6 +9,8 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tapaal.Preferences;
+
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
@@ -67,7 +69,9 @@ public class Verifyta implements ModelChecker {
 				
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
-						verifytapath = file.getAbsolutePath();
+						
+						setVerifytaPath(file.getAbsolutePath());
+						
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
 					}
@@ -150,6 +154,7 @@ public class Verifyta implements ModelChecker {
 
 	private void resetVerifyta() {
 		verifytapath = null;
+		Preferences.getInstance().setVerifytaLocation(verifytapath);
 	}
 
 	private boolean isNotSetup() {
@@ -182,12 +187,17 @@ public class Verifyta implements ModelChecker {
 		//Get from evn (overwrite other values)
 		verifyta = System.getenv("verifyta");
 		if (verifyta != null && !verifyta.equals("")) {
+			if (new File(verifyta).exists()){
+				verifytapath = verifyta;
+				return true;
+			}
+		}
+		
+		verifyta = Preferences.getInstance().getVerifytaLocation();
+		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
 			return true;
 		}
-		
-		//If a value is saved in conf
-		//TODO: kyrke
 		
 		return false;
 	}
@@ -210,6 +220,7 @@ public class Verifyta implements ModelChecker {
 	
 	public void setVerifytaPath(String path) {
 		verifytapath = path; 
+		Preferences.getInstance().setVerifytaLocation(verifytapath);
 	}
 	
 	public boolean supportsStats(){
@@ -309,5 +320,6 @@ public class Verifyta implements ModelChecker {
 
 	public static void reset() {
 		verifytapath = "";
+		Preferences.getInstance().setVerifytaLocation(null);
 	}
 }
