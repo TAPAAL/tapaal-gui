@@ -1,9 +1,11 @@
 package pipe.gui.widgets;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -34,6 +36,11 @@ public class EngineDialogPanel {
 	JLabel tapaalVersionLabel = new JLabel("Version: ");
 	JLabel uppaalLocationLabel = new JLabel("Located: ");
 	JLabel uppaalVersionLabel = new JLabel("Version: ");
+	
+	JLabel tapaalLocationLabelVal = new JLabel("Not setup");
+	JLabel tapaalVersionLabelVal = new JLabel("N/A");
+	JLabel uppaalLocationLabelVal = new JLabel("Not setup");
+	JLabel uppaalVersionLabelVal = new JLabel("N/A");
 	
 	private Dimension minimumSize = new Dimension(320,1);
 	private Insets panelInsets = new Insets(5, 5, 5, 5);
@@ -73,8 +80,7 @@ public class EngineDialogPanel {
 		if (verifytapnpath != null) {
 			VerifyTAPN verifyTapn = new VerifyTAPN(fileFinder,messenger);
 			verifyTapn.setVerifyTapnPath(verifytapnpath);
-			tapaalLocationLabel.setText("Located: "+verifytapnpath);
-			tapaalVersionLabel.setText("Version: "+verifyTapn.getVersion());
+			setPathsAndVersionNumbers();
 			fitDialog();
 		}
 	}
@@ -102,27 +108,25 @@ public class EngineDialogPanel {
 		if (verifytapath != null) {
 			Verifyta verifyta = new Verifyta(fileFinder,messenger);
 			verifyta.setVerifytaPath(verifytapath);
-			uppaalLocationLabel.setText("Located: "+verifytapath);
-			uppaalVersionLabel.setText("Version: "+verifyta.getVersion());
-			fitDialog();
+			setPathsAndVersionNumbers();
 		}
 	}
 	
 	private void resetVerifytaEngine() {
 		Verifyta.reset(); 
-		uppaalLocationLabel.setText("Located: Not setup");
-		uppaalVersionLabel.setText("Version: N/A");
+		setPathsAndVersionNumbers();
 	}
 	
-	private void resetTapnEngine() {
+	private void resetVerifytapnEngine() {
 		VerifyTAPN.reset();
-		tapaalLocationLabel.setText("Located: Not setup");
-		tapaalVersionLabel.setText("Version: N/A");
+		setPathsAndVersionNumbers();
 	}
 	
 	private void fitDialog() {
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
+		if (dialog != null) {
+			dialog.pack();
+			dialog.setLocationRelativeTo(null);	
+		}
 	}
 	
 	private void exit() {
@@ -149,10 +153,11 @@ public class EngineDialogPanel {
 		} else {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
-		tapaalLocationLabel.setText(tapaalLocationLabel.getText()+verifytapnPath);
-		tapaalVersionLabel.setText(tapaalVersionLabel.getText()+verifytapnversion);
-		uppaalLocationLabel.setText(uppaalLocationLabel.getText()+verifytaPath);
-		uppaalVersionLabel.setText(uppaalVersionLabel.getText()+verifytaversion);
+		tapaalLocationLabelVal.setText(verifytapnPath);
+		tapaalVersionLabelVal.setText(verifytapnversion);
+		uppaalLocationLabelVal.setText(verifytaPath);
+		uppaalVersionLabelVal.setText(verifytaversion);
+		fitDialog();
 	}
 
 	private void makeTapaalPanel() {
@@ -165,23 +170,29 @@ public class EngineDialogPanel {
 		JPanel tapaalInfoPanel = new JPanel();
 		tapaalInfoPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
-		tapaalLocationLabel = new JLabel("Located: ");
-		tapaalVersionLabel = new JLabel("Version: ");
-
+		
+		JPanel p = new JPanel(new FlowLayout());
+		p.add(tapaalLocationLabel);
+		p.add(tapaalLocationLabelVal);
+		
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		tapaalInfoPanel.add(tapaalLocationLabel,gbc);
+		tapaalInfoPanel.add(p,gbc);
 
+		p = new JPanel(new FlowLayout());
+		p.add(tapaalVersionLabel);
+		p.add(tapaalVersionLabelVal);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		tapaalInfoPanel.add(tapaalVersionLabel,gbc);
+		tapaalInfoPanel.add(p,gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -206,7 +217,7 @@ public class EngineDialogPanel {
 		});
 		tapaalResetButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				resetTapnEngine();
+				resetVerifytapnEngine();
 			}
 		});
 		JPanel tapaalButtonPanel = new JPanel();
@@ -245,23 +256,31 @@ public class EngineDialogPanel {
 		uppaalInfoPanel.setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		uppaalLocationLabel = new JLabel("Located: ");
-		uppaalVersionLabel = new JLabel("Version: ");
 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		uppaalInfoPanel.add(uppaalLocationLabel,gbc);
-
+		
+		JPanel p = new JPanel(new FlowLayout());
+		
+		p.add(uppaalLocationLabel);
+		p.add(uppaalLocationLabelVal);
+		
+		uppaalInfoPanel.add(p,gbc);
+		
+		p = new JPanel(new FlowLayout());
+		p.add(uppaalVersionLabel);
+		p.add(uppaalVersionLabelVal);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		uppaalInfoPanel.add(uppaalVersionLabel,gbc);
+		uppaalInfoPanel.add(p,gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
