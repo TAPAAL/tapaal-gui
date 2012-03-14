@@ -1553,8 +1553,6 @@ public class GuiFrame extends JFrame implements Observer {
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
 						setAnimationMode(!appView.isInAnimationMode());
-						CreateGui.getCurrentTab().setSplitPaneDividerLocationEditor();
-
 					}
 				} catch (Exception e) {
 					System.err.println(e);

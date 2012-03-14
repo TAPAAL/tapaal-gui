@@ -34,6 +34,7 @@ import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
+import dk.aau.cs.gui.components.MultiSplitPane;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -54,12 +55,7 @@ public class TabContent extends JSplitPane {
 	QueryPane queries;
 	ConstantsPane constantsPanel;
 	TemplateExplorer templateExplorer;
-	JSplitPane editorTopSplitPane;
-	JSplitPane editorButtomSplitPane;
-	JSplitPane editorOuterSplitPane;
-	protected double dividerlocationEditorTopSplitPane = 0.5;
-	protected double dividerlocationEditorButtomSplitPane = 0.5;
-	protected double dividerlocationEditorOuterSplitPane = 0.5;
+	MultiSplitPane editorSplitPane;
 
 	// / Animation
 	protected AnimationHistoryComponent animBox;
@@ -74,11 +70,8 @@ public class TabContent extends JSplitPane {
 	protected JSplitPane animationHistorySplitter;
 	protected SharedPlacesAndTransitionsPanel sharedPTPanel;
 	
-	protected JSplitPane animatorOuterSplitPane;
-	protected JSplitPane animatorTopSplitPane;
-	protected double dividerlocationAnimatorOuterSplitPane = 0.5;
-	protected double dividerlocationAnimatorTopSplitPane = 0.5;
-
+	protected MultiSplitPane animatorSplitPane;
+	
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
 			guiModels.put(net, new DataLayer());
@@ -115,18 +108,11 @@ public class TabContent extends JSplitPane {
 		templateExplorer = new TemplateExplorer(this);
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
 		
-		editorTopSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, sharedPTPanel);
-		editorTopSplitPane.setBorder(null);
-		editorTopSplitPane.setResizeWeight(0.5);
-		editorTopSplitPane.setContinuousLayout(true);
-		editorButtomSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queries, constantsPanel);
-		editorButtomSplitPane.setBorder(null);
-		editorButtomSplitPane.setResizeWeight(0.5);
-		editorButtomSplitPane.setContinuousLayout(true);
-		editorOuterSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, editorTopSplitPane, editorButtomSplitPane);
-		editorOuterSplitPane.setBorder(null);
-		editorOuterSplitPane.setResizeWeight(0.5);
-		editorOuterSplitPane.setContinuousLayout(true);
+		editorSplitPane = new MultiSplitPane();
+		editorSplitPane.add(templateExplorer, 0);
+		editorSplitPane.add(sharedPTPanel, 1);
+		editorSplitPane.add(queries, 2);
+		editorSplitPane.add(constantsPanel, 3);
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -134,7 +120,7 @@ public class TabContent extends JSplitPane {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		editorLeftPane.add(editorOuterSplitPane, gbc);
+		editorLeftPane.add(editorSplitPane, gbc);
 	}
 
 	public void updateConstantsList() {
@@ -199,7 +185,7 @@ public class TabContent extends JSplitPane {
 	
 	public void switchToAnimationComponents() {
 		
-		saveSplitPaneDividerlocationsEditor();
+		//saveSplitPaneDividerlocationsEditor();
 		
 		if(animBox == null) createAnimationHistory();
 		if(animControlerBox == null) createAnimationController();
@@ -210,11 +196,9 @@ public class TabContent extends JSplitPane {
 		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
 		templateExplorer.switchToAnimationMode();
 		
-		animatorTopSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, templateExplorer, enabledTransitionsList);
-		animatorTopSplitPane.setResizeWeight(0.5);
-		animatorTopSplitPane.setBorder(null);
-		animatorTopSplitPane.setContinuousLayout(true);
-		animatorTopSplitPane.setOneTouchExpandable(true);
+		animatorSplitPane = new MultiSplitPane();
+		animatorSplitPane.add(templateExplorer, 0);
+		animatorSplitPane.add(enabledTransitionsList, 1);
 		
 		animationControlsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -233,12 +217,7 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 		
-		animatorOuterSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, animatorTopSplitPane, animationControlsPanel);
-		animatorOuterSplitPane.setResizeWeight(0.5);
-		animatorOuterSplitPane.setBorder(null);
-		animatorOuterSplitPane.setContinuousLayout(true);
-		animatorOuterSplitPane.setOneTouchExpandable(true);
-		
+		animatorSplitPane.add(animationControlsPanel, 2);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -246,89 +225,26 @@ public class TabContent extends JSplitPane {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
-		animatorLeftPane.add(animatorOuterSplitPane, gbc);
+		animatorLeftPane.add(animatorSplitPane, gbc);
 		this.setLeftComponent(animatorLeftPane);
 		
-		setSplitPaneDividerLocationAnimator();
 	}
 	
-	public JSplitPane getOuterSplitPane(){
-		return animatorOuterSplitPane;
-	}
-	
-	public JSplitPane getTopSplitPane(){
-		return animatorTopSplitPane;
-	}
-	
-	private void saveSplitPaneDividerlocationsEditor(){
-		if(editorOuterSplitPane != null && editorOuterSplitPane.getHeight() != 0){
-			dividerlocationEditorOuterSplitPane = (double)editorOuterSplitPane.getDividerLocation() / (double)editorOuterSplitPane.getHeight();
-		} else {
-			dividerlocationEditorOuterSplitPane = 0.5;
-		}
-		
-		if(editorTopSplitPane != null && editorTopSplitPane.getHeight() != 0){
-			dividerlocationEditorTopSplitPane = (double)editorTopSplitPane.getDividerLocation() / (double)editorTopSplitPane.getHeight();
-		} else {
-			dividerlocationEditorTopSplitPane = 0.5;
-		}
-		
-		if(editorButtomSplitPane != null && editorButtomSplitPane.getHeight() != 0){
-			dividerlocationEditorButtomSplitPane = (double)editorButtomSplitPane.getDividerLocation() / (double)editorButtomSplitPane.getHeight();
-		} else {
-			dividerlocationEditorButtomSplitPane = 0.5;
-		}
-	}
-	
-	public void setSplitPaneDividerLocationEditor(){
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				int test = editorOuterSplitPane.getHeight();
-				int test2 = editorOuterSplitPane.getDividerLocation();
-				editorOuterSplitPane.setDividerLocation(dividerlocationEditorOuterSplitPane);
-				editorTopSplitPane.setDividerLocation(dividerlocationEditorTopSplitPane);
-				editorButtomSplitPane.setDividerLocation(dividerlocationEditorButtomSplitPane);
-			}
-		});
-	}
-	
-	private void saveSplitPaneDividerlocationsAnimator(){
-		if(animatorOuterSplitPane != null && animatorOuterSplitPane.getHeight() != 0){
-			dividerlocationAnimatorOuterSplitPane = (double)animatorOuterSplitPane.getDividerLocation() / (double)animatorOuterSplitPane.getHeight();
-		} else {
-			dividerlocationAnimatorOuterSplitPane = 0.5;
-		}
-		
-		if(animatorTopSplitPane != null && animatorTopSplitPane.getHeight() != 0){
-			dividerlocationAnimatorTopSplitPane = (double)animatorTopSplitPane.getDividerLocation() / (double)animatorTopSplitPane.getHeight();
-		} else {
-			dividerlocationAnimatorTopSplitPane = 0.5; 
-		}
-	}
-	
-	private void setSplitPaneDividerLocationAnimator(){
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				animatorOuterSplitPane.setDividerLocation(dividerlocationAnimatorOuterSplitPane);
-				animatorTopSplitPane.setDividerLocation(dividerlocationAnimatorTopSplitPane);
-			}
-		});
-	}
-
 	public void switchToEditorComponents() {
 		templateExplorer.switchToEditorMode();
 		
-		saveSplitPaneDividerlocationsAnimator();
-		
+		//TODO
+		/*
 		//It's necessary to use this method as otherwise the dividerlocation is first updated on resizing the window
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				editorTopSplitPane.setLeftComponent(templateExplorer);
 			}
 		});
+		*/
 		this.setLeftComponent(editorLeftPane);
 		
-		setSplitPaneDividerLocationEditor();
+		//setSplitPaneDividerLocationEditor();
 		
 		drawingSurface.repaintAll();
 	}
@@ -538,8 +454,22 @@ public class TabContent extends JSplitPane {
 	}
 	
 	public void showComponents(boolean enable){
-		templateExplorer.setVisible(enable);
-		sharedPTPanel.setVisible(enable);
+		if(enable){
+			editorSplitPane.add(templateExplorer, 0);
+			editorSplitPane.add(sharedPTPanel, 1);
+			
+			if(animatorSplitPane != null){
+				animatorSplitPane.add(templateExplorer, 0);
+			}
+		} else {
+			editorSplitPane.remove(0);
+			editorSplitPane.remove(1);
+			if(animatorSplitPane != null){
+				animatorSplitPane.remove(0);
+			}
+		}
+		//TODO
+		/*
 		editorTopSplitPane.setVisible(enable);
 		editorTopSplitPane.setDividerLocation(dividerlocationEditorTopSplitPane);
 		editorOuterSplitPane.setDividerLocation(dividerlocationEditorOuterSplitPane);
@@ -547,42 +477,28 @@ public class TabContent extends JSplitPane {
 			animatorTopSplitPane.setDividerLocation(dividerlocationEditorTopSplitPane);
 			updateTopSplitPanel();
 		}
+		*/
 	}
 	public void showQueries(boolean enable){
-		queries.setVisible(enable);
-		editorButtomSplitPane.setDividerLocation(dividerlocationEditorButtomSplitPane);
-		
-		if(!constantsPanel.isVisible()){
-			editorButtomSplitPane.setVisible(enable);
-			editorOuterSplitPane.setDividerLocation(dividerlocationEditorOuterSplitPane);
+		if(enable){
+			editorSplitPane.add(queries, 2);
+		} else {
+			editorSplitPane.remove(2);
 		}
 	}
 	public void showConstantsPanel(boolean enable){
-		constantsPanel.setVisible(enable);
-		editorButtomSplitPane.setDividerLocation(dividerlocationEditorButtomSplitPane);
-		
-		if(!queries.isVisible()){
-			editorButtomSplitPane.setVisible(enable);
-			editorOuterSplitPane.setDividerLocation(dividerlocationEditorOuterSplitPane);
+		if(enable){
+			editorSplitPane.add(constantsPanel, 3);
+		} else {
+			editorSplitPane.remove(3);
 		}
 	}
 	public void showEnabledTransitionsList(boolean enable){
-		enabledTransitionsList.setVisible(enable);
-		animatorTopSplitPane.setDividerLocation(dividerlocationAnimatorTopSplitPane);
-		updateTopSplitPanel();
-	}
-	
-	private void updateTopSplitPanel(){
-		if(enabledTransitionsList.isVisible() || templateExplorer.isVisible()){
-			animatorTopSplitPane.setVisible(true);
-			if(animatorOuterSplitPane.getDividerLocation() == 0){
-				animatorOuterSplitPane.setDividerLocation(dividerlocationAnimatorOuterSplitPane);
-			}
+		if(enable){
+			animatorSplitPane.add(enabledTransitionsList, 1);
 		} else {
-			animatorTopSplitPane.setVisible(false);
-			animatorOuterSplitPane.setDividerLocation(0.0);
+			animatorSplitPane.remove(1);
 		}
-		
 	}
 	
 	public void selectFirstElements(){
