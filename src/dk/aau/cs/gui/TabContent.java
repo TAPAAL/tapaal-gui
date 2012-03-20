@@ -113,9 +113,13 @@ public class TabContent extends JSplitPane {
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 		
 		constantsPanel = new ConstantsPane(enableAddButton, this);
+		constantsPanel.setPreferredSize(new Dimension(constantsPanel.getPreferredSize().width, constantsPanel.getMinimumSize().height));
 		queries = new QueryPane(new ArrayList<TAPNQuery>(), this);
+		queries.setPreferredSize(new Dimension(queries.getPreferredSize().width, queries.getMinimumSize().height));
 		templateExplorer = new TemplateExplorer(this);
+		templateExplorer.setPreferredSize(new Dimension(templateExplorer.getPreferredSize().width, templateExplorer.getMinimumSize().height));
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
+		sharedPTPanel.setPreferredSize(new Dimension(sharedPTPanel.getPreferredSize().width, sharedPTPanel.getMinimumSize().height));
 		
 		Leaf constantsLeaf = new Leaf(constantsName);
 		Leaf queriesLeaf = new Leaf(queriesName);
@@ -235,6 +239,8 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 		
+		animationControlsPanel.setPreferredSize(new Dimension(animationControlsPanel.getPreferredSize().width, animationControlsPanel.getMinimumSize().height));
+		enabledTransitionsList.setPreferredSize(new Dimension(enabledTransitionsList.getPreferredSize().width, enabledTransitionsList.getMinimumSize().height));
 		animatorSplitPane.add(animationControlsPanel, animControlName);
 		animatorSplitPane.add(enabledTransitionsList, enabledTransitionsName);
 
