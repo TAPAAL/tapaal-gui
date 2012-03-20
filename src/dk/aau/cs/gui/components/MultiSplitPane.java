@@ -129,15 +129,6 @@ public class MultiSplitPane extends JPanel {
 		this.repaint();
 	}
 	
-	private boolean noComponentsShown(){
-		for(boolean x : isComponentShown){
-			if(x){
-				return false;
-			}
-		}
-		return true;
-	}
-	
 	private void makeTopElement(Component comp){
 		if(super.getComponentCount() != 0){
 			super.remove(0);
@@ -149,80 +140,5 @@ public class MultiSplitPane extends JPanel {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		super.add(comp);
-	}
-	
-	private void showElementZero(Component comp, boolean enable){
-		if(enable){
-			if(noComponentsShown()){
-				makeTopElement(comp);
-			} else if(isComponentShown[1] && isBottom){
-				top.setTopComponent(comp);
-				top.setBottomComponent(outer.getTopComponent());
-				outer.setTopComponent(top);
-				makeTopElement(outer);
-			} else if(!isComponentShown[1] && isBottom){
-				outer.setTopComponent(comp);
-				makeTopElement(outer);
-			} else if(isComponentShown[1] && !isBottom){
-				top.setTopComponent(comp);
-				top.setBottomComponent(this.getComponent(0));
-				makeTopElement(top);
-			}
-			isBottom = true;
-		} else {
-			
-		}
-		
-		isComponentShown[0] = enable;
-	}
-	
-	private void showElementOne(Component comp, boolean enable){
-		if(enable){
-			if(noComponentsShown()){
-				makeTopElement(comp);
-			} else if(isComponentShown[0] && isBottom){
-				top.setBottomComponent(comp);
-				top.setTopComponent(outer.getTopComponent());
-				outer.setTopComponent(top);
-				makeTopElement(outer);
-			} else if(!isComponentShown[0] && isBottom){
-				outer.setTopComponent(comp);
-				makeTopElement(outer);
-			} else if(isComponentShown[0] && !isBottom){
-				top.setBottomComponent(comp);
-				top.setTopComponent(this.getComponent(0));
-				makeTopElement(top);
-			}
-			isBottom = true;
-		} else {
-			
-		}
-	}
-	
-	private void showElementTwo(Component comp, boolean enable){
-		if(enable){
-			if(noComponentsShown()){
-				makeTopElement(comp);
-			} else if(isComponentShown[0] && isBottom){
-				top.setBottomComponent(comp);
-				top.setTopComponent(outer.getTopComponent());
-				outer.setTopComponent(top);
-				makeTopElement(outer);
-			} else if(!isComponentShown[0] && isBottom){
-				outer.setTopComponent(comp);
-				makeTopElement(outer);
-			} else if(isComponentShown[0] && !isBottom){
-				top.setBottomComponent(comp);
-				top.setTopComponent(this.getComponent(0));
-				makeTopElement(top);
-			}
-			isBottom = true;
-		} else {
-			
-		}
-	}
-	
-	private void showElementThree(Component comp, boolean enable){
-		
 	}
 }

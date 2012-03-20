@@ -7,10 +7,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -18,7 +20,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
-import com.sun.org.apache.xpath.internal.operations.And;
+import org.jdesktop.swingx.JXMultiSplitPane;
+import org.jdesktop.swingx.MultiSplitLayout;
+import org.jdesktop.swingx.MultiSplitLayout.Divider;
+import org.jdesktop.swingx.MultiSplitLayout.Leaf;
+import org.jdesktop.swingx.MultiSplitLayout.Node;
+import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -34,7 +41,6 @@ import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
-import dk.aau.cs.gui.components.MultiSplitPane;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -51,11 +57,17 @@ public class TabContent extends JSplitPane {
 	protected File appFile;
 
 	// Normal mode
-	JPanel editorLeftPane;
+	JXMultiSplitPane editorSplitPane;
+	
 	QueryPane queries;
 	ConstantsPane constantsPanel;
 	TemplateExplorer templateExplorer;
-	MultiSplitPane editorSplitPane;
+	SharedPlacesAndTransitionsPanel sharedPTPanel;
+	
+	private static final String constantsName = "constants";
+	private static final String queriesName = "queries";
+	private static final String templateExplorerName = "templateExplorer";
+	private static final String sharedPTName = "sharedPT";
 
 	// / Animation
 	protected AnimationHistoryComponent animBox;
@@ -66,11 +78,9 @@ public class TabContent extends JSplitPane {
 	protected JPanel animationControlsPanel;
 	protected EnabledTransitionsList enabledTransitionsList;
 
-	protected JPanel animatorLeftPane;
 	protected JSplitPane animationHistorySplitter;
-	protected SharedPlacesAndTransitionsPanel sharedPTPanel;
 	
-	protected MultiSplitPane animatorSplitPane;
+	protected JXMultiSplitPane animatorSplitPane;
 	
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
@@ -87,7 +97,7 @@ public class TabContent extends JSplitPane {
 		createEditorLeftPane();
 
 		this.setOrientation(HORIZONTAL_SPLIT);
-		this.setLeftComponent(editorLeftPane);
+		this.setLeftComponent(editorSplitPane);
 		this.setRightComponent(drawingSurfaceScroller);
 
 		this.setContinuousLayout(true);
@@ -97,10 +107,9 @@ public class TabContent extends JSplitPane {
 
 	}
 	
+	Split modelroot;
+	
 	public void createEditorLeftPane() {
-		editorLeftPane = new JPanel(new GridBagLayout());
-		editorLeftPane.setPreferredSize(new Dimension(300, 100)); // height is ignored because the component is stretched
-		editorLeftPane.setMinimumSize(new Dimension(300, 100));
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
 		
 		constantsPanel = new ConstantsPane(enableAddButton, this);
@@ -108,19 +117,28 @@ public class TabContent extends JSplitPane {
 		templateExplorer = new TemplateExplorer(this);
 		sharedPTPanel = new SharedPlacesAndTransitionsPanel(this);
 		
-		editorSplitPane = new MultiSplitPane();
-		editorSplitPane.add(templateExplorer, 0);
-		editorSplitPane.add(sharedPTPanel, 1);
-		editorSplitPane.add(queries, 2);
-		editorSplitPane.add(constantsPanel, 3);
+		Leaf constantsLeaf = new Leaf(constantsName);
+		Leaf queriesLeaf = new Leaf(queriesName);
+		Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
+		Leaf sharedPTLeaf = new Leaf(sharedPTName);
 		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		editorLeftPane.add(editorSplitPane, gbc);
+		constantsLeaf.setWeight(0.25);
+		queriesLeaf.setWeight(0.25);
+		templateExplorerLeaf.setWeight(0.25);
+		sharedPTLeaf.setWeight(0.25);
+		
+		modelroot = new Split(templateExplorerLeaf, new Divider(), sharedPTLeaf, new Divider(), queriesLeaf, new Divider(), constantsLeaf);
+		modelroot.setRowLayout(false);
+		
+		editorSplitPane = new JXMultiSplitPane();
+		editorSplitPane.getMultiSplitLayout().setModel(modelroot);
+		
+		editorSplitPane.add(templateExplorer, templateExplorerName);
+		editorSplitPane.add(sharedPTPanel, sharedPTName);
+		editorSplitPane.add(queries, queriesName);
+		editorSplitPane.add(constantsPanel, constantsName);
+		
+		this.setLeftComponent(editorSplitPane);
 	}
 
 	public void updateConstantsList() {
@@ -182,23 +200,23 @@ public class TabContent extends JSplitPane {
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
+	//TODO
+	private static final String enabledTransitionsName = "enabledTransitions";
+	private static final String animControlName = "animControl";
 	
-	public void switchToAnimationComponents() {
+	private void createAnimatorSlitPane(){
+		Leaf enabledTransitionsListLeaf = new Leaf(enabledTransitionsName);
+		Leaf animControlLeaf = new Leaf(animControlName);
+		Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
 		
-		//saveSplitPaneDividerlocationsEditor();
+		enabledTransitionsListLeaf.setWeight(1.0/3.0);
+		animControlLeaf.setWeight(1.0/3.0);
+		templateExplorerLeaf.setWeight(1.0/3.0);
 		
-		if(animBox == null) createAnimationHistory();
-		if(animControlerBox == null) createAnimationController();
-		if(enabledTransitionsList == null) createEnabledTransitionsList();
-		
-		animatorLeftPane = new JPanel(new GridBagLayout());
-		animatorLeftPane.setPreferredSize(animControlerBox.getPreferredSize()); // height is ignored because the component is stretched
-		animatorLeftPane.setMinimumSize(animControlerBox.getMinimumSize());
-		templateExplorer.switchToAnimationMode();
-		
-		animatorSplitPane = new MultiSplitPane();
-		animatorSplitPane.add(templateExplorer, 0);
-		animatorSplitPane.add(enabledTransitionsList, 1);
+		Split modelRoot = new Split(templateExplorerLeaf, new Divider(), enabledTransitionsListLeaf, new Divider(), animControlLeaf);
+		modelRoot.setRowLayout(false);
+		animatorSplitPane = new JXMultiSplitPane();
+		animatorSplitPane.getMultiSplitLayout().setModel(modelRoot);
 		
 		animationControlsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -217,21 +235,30 @@ public class TabContent extends JSplitPane {
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
 		
-		animatorSplitPane.add(animationControlsPanel, 2);
+		animatorSplitPane.add(animationControlsPanel, animControlName);
+		animatorSplitPane.add(enabledTransitionsList, enabledTransitionsName);
+
+	}
+	
+	public void switchToAnimationComponents() {
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		animatorLeftPane.add(animatorSplitPane, gbc);
-		this.setLeftComponent(animatorLeftPane);
+		if(animBox == null) createAnimationHistory();
+		if(animControlerBox == null) createAnimationController();
+		if(enabledTransitionsList == null) createEnabledTransitionsList();
+		
+		templateExplorer.switchToAnimationMode();
+		
+		if(animatorSplitPane == null) createAnimatorSlitPane();
+		animatorSplitPane.add(templateExplorer, templateExplorerName);
+		
+		this.setLeftComponent(animatorSplitPane);
 		
 	}
 	
 	public void switchToEditorComponents() {
 		templateExplorer.switchToEditorMode();
+		
+		editorSplitPane.add(templateExplorer, templateExplorerName);
 		
 		//TODO
 		/*
@@ -242,7 +269,7 @@ public class TabContent extends JSplitPane {
 			}
 		});
 		*/
-		this.setLeftComponent(editorLeftPane);
+		this.setLeftComponent(editorSplitPane);
 		
 		//setSplitPaneDividerLocationEditor();
 		
@@ -454,50 +481,33 @@ public class TabContent extends JSplitPane {
 	}
 	
 	public void showComponents(boolean enable){
-		if(enable){
-			editorSplitPane.add(templateExplorer, 0);
-			editorSplitPane.add(sharedPTPanel, 1);
-			
-			if(animatorSplitPane != null){
-				animatorSplitPane.add(templateExplorer, 0);
-			}
-		} else {
-			editorSplitPane.remove(0);
-			editorSplitPane.remove(1);
-			if(animatorSplitPane != null){
-				animatorSplitPane.remove(0);
-			}
-		}
-		//TODO
 		/*
-		editorTopSplitPane.setVisible(enable);
-		editorTopSplitPane.setDividerLocation(dividerlocationEditorTopSplitPane);
-		editorOuterSplitPane.setDividerLocation(dividerlocationEditorOuterSplitPane);
-		if(animatorTopSplitPane!=null){
-			animatorTopSplitPane.setDividerLocation(dividerlocationEditorTopSplitPane);
-			updateTopSplitPanel();
-		}
+		System.err.println("components");
+		editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
+		editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
 		*/
 	}
 	public void showQueries(boolean enable){
-		if(enable){
-			editorSplitPane.add(queries, 2);
-		} else {
-			editorSplitPane.remove(2);
-		}
+		System.err.println("queries");
+		/*SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				MultiSplitLayout t = editorSplitPane.getMultiSplitLayout();
+				t.displayNode(queriesName, enable);
+			}
+		});*/
 	}
 	public void showConstantsPanel(boolean enable){
-		if(enable){
-			editorSplitPane.add(constantsPanel, 3);
-		} else {
-			editorSplitPane.remove(3);
-		}
+		/*
+		System.err.println("constants");
+		editorSplitPane.getMultiSplitLayout().displayNode(constantsName, enable);
+		*/
 	}
 	public void showEnabledTransitionsList(boolean enable){
 		if(enable){
-			animatorSplitPane.add(enabledTransitionsList, 1);
+			//animatorSplitPane.add(enabledTransitionsList, 1);
 		} else {
-			animatorSplitPane.remove(1);
+			//animatorSplitPane.remove(1);
 		}
 	}
 	
