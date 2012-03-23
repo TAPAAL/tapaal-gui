@@ -4,17 +4,23 @@ package dk.aau.cs.verification;
 
 public class QueryResult {
 	private boolean satisfied = false;
+	private boolean discreteInclusion = false;
 	protected QueryType queryType;
 	private BoundednessAnalysisResult boundednessAnalysis;
 
-	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, QueryType queryType){
+	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, QueryType queryType, boolean discreteInclusion){
 		this.satisfied = satisfied;
 		this.boundednessAnalysis = boundednessAnalysis;
 		this.queryType = queryType;
+		this.discreteInclusion = discreteInclusion;
 	}
 	
 	public boolean isQuerySatisfied() {
 		return satisfied;
+	}
+	
+	public boolean isDiscreteIncludion() {
+		return discreteInclusion;
 	}
 	
 	@Override

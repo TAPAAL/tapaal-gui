@@ -30,6 +30,10 @@ public class EscapableDialog extends JDialog {
 	public EscapableDialog(Frame frame, String string, boolean modal) {
 		super(frame, string, modal);
 	}
+	
+	public EscapableDialog(JDialog dialog, String string, boolean modal) {
+		super(dialog, string, modal);
+	}
 
 	@Override
 	protected JRootPane createRootPane() {

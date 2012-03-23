@@ -586,7 +586,7 @@ public class GuiFrame extends JFrame implements Observer {
 				BatchProcessingDialog dialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
 				dialog.pack();
 				dialog.setPreferredSize(dialog.getSize());
-				//Set the minimum size to 150 lets than the preferred, to be consistat with theh minimum size of the result panel
+				//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
 				dialog.setMinimumSize(new Dimension(dialog.getWidth(), dialog.getHeight()-150));
 				dialog.setLocationRelativeTo(null);
 				dialog.setResizable(true);
@@ -1539,9 +1539,20 @@ public class GuiFrame extends JFrame implements Observer {
 					
 					if (!appView.isInAnimationMode()) {
 						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
+							CreateGui.getCurrentTab().rememberSelectedTemplate();
+							if (CreateGui.getCurrentTab().currentTemplate().isActive()){
+								CreateGui.getCurrentTab().setSelectedTemplateWasActive();
+							}
 							restoreMode();
 							PetriNetObject.ignoreSelection(true);
 							setAnimationMode(!appView.isInAnimationMode());
+							if (CreateGui.getCurrentTab().templateWasActiveBeforeSimulationMode()) {								
+								CreateGui.getCurrentTab().restoreSelectedTemplate();
+								CreateGui.getCurrentTab().resetSelectedTemplateWasActive();
+							}
+							else {
+								CreateGui.getCurrentTab().selectFirstActiveTemplate();
+							}
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
@@ -1553,6 +1564,7 @@ public class GuiFrame extends JFrame implements Observer {
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
 						setAnimationMode(!appView.isInAnimationMode());
+						CreateGui.getCurrentTab().restoreSelectedTemplate();
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -1575,9 +1587,7 @@ public class GuiFrame extends JFrame implements Observer {
 				a.dispose();
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
-				}
-				
-				CreateGui.getCurrentTab().selectFirstElements();
+				}				
 				
 				break;
 
@@ -1950,7 +1960,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 	}
 	public void showAbout() {
-		StringBuffer buffer = new StringBuffer("About " + TAPAAL.TOOLNAME);
+		StringBuffer buffer = new StringBuffer("About " + TAPAAL.getProgramName());
 		buffer.append("\n\n");
 		buffer.append("TAPAAL is a tool for editing, simulation and verification of timed-arc Petri nets.\n");
 		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
@@ -1966,7 +1976,7 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("\n");
 		
 
-		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.TOOLNAME,
+		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
 	

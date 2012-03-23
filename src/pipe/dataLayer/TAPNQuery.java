@@ -1,8 +1,12 @@
 package pipe.dataLayer;
 
 import pipe.gui.widgets.InclusionPlaces;
+import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.verification.QueryType;
 
 public class TAPNQuery {
 	public enum TraceOption {
@@ -225,4 +229,12 @@ public class TAPNQuery {
 		
 		return copy;
 	}
+	
+	public QueryType queryType(){
+		if(property instanceof TCTLEFNode) return QueryType.EF;
+		else if(property instanceof TCTLEGNode) return QueryType.EG;
+		else if(property instanceof TCTLAFNode) return QueryType.AF;
+		else return QueryType.AG;
+	}
+	
 }

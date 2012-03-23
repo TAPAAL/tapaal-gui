@@ -79,9 +79,12 @@ public class TabContent extends JSplitPane {
 	protected EnabledTransitionsList enabledTransitionsList;
 
 	protected JSplitPane animationHistorySplitter;
-	
+
 	protected JXMultiSplitPane animatorSplitPane;
 	
+	private Integer selectedTemplate = 0;
+	private Boolean selectedTemplateWasActive = false;
+
 	public TabContent() { 
 		for (TimedArcPetriNet net: tapnNetwork.allTemplates()){
 			guiModels.put(net, new DataLayer());
@@ -143,6 +146,30 @@ public class TabContent extends JSplitPane {
 		editorSplitPane.add(constantsPanel, constantsName);
 		
 		this.setLeftComponent(editorSplitPane);
+	}
+	
+	public void selectFirstActiveTemplate(){
+		templateExplorer.selectFirst();
+	}
+	
+	public Boolean templateWasActiveBeforeSimulationMode() {
+		return selectedTemplateWasActive;
+	}
+	
+	public void resetSelectedTemplateWasActive() {
+		selectedTemplateWasActive = false;
+	}
+	
+	public void setSelectedTemplateWasActive() {
+		selectedTemplateWasActive = true;
+	}
+	
+	public void rememberSelectedTemplate() {
+		selectedTemplate = templateExplorer.indexOfSelectedTemplate();
+	}
+	
+	public void restoreSelectedTemplate() {
+		templateExplorer.restoreSelectedTemplate(selectedTemplate);
 	}
 
 	public void updateConstantsList() {
@@ -435,7 +462,6 @@ public class TabContent extends JSplitPane {
 
 	public void setQueries(Iterable<TAPNQuery> queries) {
 		this.queries.setQueries(queries);
-
 	}
 
 	public void removeQuery(TAPNQuery queryToRemove) {

@@ -9,12 +9,16 @@ import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tapaal.Preferences;
+
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -65,7 +69,9 @@ public class Verifyta implements ModelChecker {
 				
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
-						verifytapath = file.getAbsolutePath();
+						
+						setVerifytaPath(file.getAbsolutePath());
+						
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
 					}
@@ -148,6 +154,7 @@ public class Verifyta implements ModelChecker {
 
 	private void resetVerifyta() {
 		verifytapath = null;
+		Preferences.getInstance().setVerifytaLocation(verifytapath);
 	}
 
 	private boolean isNotSetup() {
@@ -180,12 +187,17 @@ public class Verifyta implements ModelChecker {
 		//Get from evn (overwrite other values)
 		verifyta = System.getenv("verifyta");
 		if (verifyta != null && !verifyta.equals("")) {
+			if (new File(verifyta).exists()){
+				verifytapath = verifyta;
+				return true;
+			}
+		}
+		
+		verifyta = Preferences.getInstance().getVerifytaLocation();
+		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
 			return true;
 		}
-		
-		//If a value is saved in conf
-		//TODO: kyrke
 		
 		return false;
 	}
@@ -208,6 +220,7 @@ public class Verifyta implements ModelChecker {
 	
 	public void setVerifytaPath(String path) {
 		verifytapath = path; 
+		Preferences.getInstance().setVerifytaLocation(verifytapath);
 	}
 	
 	public boolean supportsStats(){
@@ -284,7 +297,8 @@ public class Verifyta implements ModelChecker {
 
 		if (trace == null) {
 			if (((VerifytaOptions) options).trace() != TraceOption.NONE) {
-				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()))
+				if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
+				   (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied()))
 					return null;
 				else
 					messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
@@ -306,5 +320,6 @@ public class Verifyta implements ModelChecker {
 
 	public static void reset() {
 		verifytapath = "";
+		Preferences.getInstance().setVerifytaLocation(null);
 	}
 }

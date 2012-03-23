@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -134,7 +135,7 @@ public class VerifyTAPN implements ModelChecker {
 		
 		File file = new File(getPath());
 		if(!file.canExecute()){
-			messenger.displayErrorMessage("The program can not be verified as being verifytapn.\n"
+			messenger.displayErrorMessage("The engine verifytapn is not executable.\n"
 									+ "The verifytapn path will be reset. Please try again, "
 									+ "to manually set the verifytapn path.", "Verifytapn Error");
 			resetVerifytapn();
@@ -146,6 +147,7 @@ public class VerifyTAPN implements ModelChecker {
 
 	private void resetVerifytapn() {
 		verifytapnpath = null;	
+		Preferences.getInstance().setVerifytapnLocation(null);
 	}
 
 	public void kill() {
@@ -156,6 +158,7 @@ public class VerifyTAPN implements ModelChecker {
 	
 	public void setVerifyTapnPath(String path) {
 		verifytapnpath = path;
+		Preferences.getInstance().setVerifytapnLocation(path);
 	}
 
 	public boolean setup() {
@@ -166,7 +169,7 @@ public class VerifyTAPN implements ModelChecker {
 				File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "");
 				if(file != null){
 					if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
-						verifytapnpath = file.getAbsolutePath();
+						setVerifyTapnPath(file.getAbsolutePath());
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
 					}
@@ -192,12 +195,18 @@ public class VerifyTAPN implements ModelChecker {
 		//If env is set, it overwrites the value
 		verifytapn = System.getenv("verifytapn");
 		if (verifytapn != null && !verifytapn.isEmpty()) {
+			if (new File(verifytapn).exists()){
+				verifytapnpath = verifytapn;
+				return true;
+			}
+		}
+		
+		//If pref is set
+		verifytapn = Preferences.getInstance().getVerifytapnLocation();
+		if (verifytapn != null && !verifytapn.isEmpty()) {
 			verifytapnpath = verifytapn;
 			return true;
 		}
-		
-		//If a value is saved in conf
-		//TODO: kyrke
 		
 		//Search the installdir for verifytapn
 		File installdir = TAPAAL.getInstallDir();
@@ -349,13 +358,19 @@ public class VerifyTAPN implements ModelChecker {
 		return true;
 	}
 	
-	private boolean isQueryUpwardClosed(TAPNQuery query) {
-		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
-		return visitor.isUpwardClosed(query.getProperty());
-	}
+	// JS: this is not used any more
+	//private boolean isQueryUpwardClosed(TAPNQuery query) {
+	//	UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
+	//	return visitor.isUpwardClosed(query.getProperty());
+	//}
 
+	
 	public static void reset() {
+		//Clear value
 		verifytapnpath = "";
+		Preferences.getInstance().setVerifytapnLocation(null);
+		//Set the detault
+		trySetup();
 	}
 
 	
