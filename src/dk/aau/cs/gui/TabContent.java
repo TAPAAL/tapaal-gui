@@ -302,19 +302,8 @@ public class TabContent extends JSplitPane {
 			//A component can only be on one splitpane at the time
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
 		}
-		
-		//TODO
-		/*
-		//It's necessary to use this method as otherwise the dividerlocation is first updated on resizing the window
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				editorTopSplitPane.setLeftComponent(templateExplorer);
-			}
-		});
-		*/
+
 		this.setLeftComponent(editorSplitPane);
-		
-		//setSplitPaneDividerLocationEditor();
 		
 		drawingSurface.repaintAll();
 	}
@@ -530,29 +519,24 @@ public class TabContent extends JSplitPane {
 			if(animatorSplitPane != null){
 				animatorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
 			}
+			fixDividersEditor();
 		}
 	}
 	public void showQueries(boolean enable){
-		System.err.println("queries");
-		/*SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				MultiSplitLayout t = editorSplitPane.getMultiSplitLayout();
-				t.displayNode(queriesName, enable);
-			}
-		});*/
+		if(!(enable && queries.isVisible())){
+			editorSplitPane.getMultiSplitLayout().displayNode(queriesName, enable);
+			fixDividersEditor();
+		}
 	}
 	public void showConstantsPanel(boolean enable){
-		/*
-		System.err.println("constants");
-		editorSplitPane.getMultiSplitLayout().displayNode(constantsName, enable);
-		*/
+		if(!(enable && constantsPanel.isVisible())){
+			editorSplitPane.getMultiSplitLayout().displayNode(constantsName, enable);
+			fixDividersEditor();
+		}
 	}
 	public void showEnabledTransitionsList(boolean enable){
-		if(enable){
-			//animatorSplitPane.add(enabledTransitionsList, 1);
-		} else {
-			//animatorSplitPane.remove(1);
+		if(!(enable && enabledTransitionsList.isVisible())){
+			animatorSplitPane.getMultiSplitLayout().displayNode(enabledTransitionsName, enable);
 		}
 	}
 	
@@ -562,4 +546,22 @@ public class TabContent extends JSplitPane {
 		constantsPanel.selectFirst();
 		
 	}	
+	
+	private void fixDividersEditor(){
+		editorSplitPane.getMultiSplitLayout().getModel();
+		
+		java.util.List<Node> t = modelroot.getChildren();
+		for(int i = t.size()-1; i>-1; i--){
+			Node n = t.get(i);
+			if(n.isVisible()){
+				if(n instanceof Divider){
+					n.setVisible(false);
+				}
+				break;
+			}
+		}
+		
+		//editorSplitPane.validate();
+		editorSplitPane.repaint();
+	}
 }
