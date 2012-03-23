@@ -257,6 +257,10 @@ public class TabContent extends JSplitPane {
 		if(animatorSplitPane == null) createAnimatorSlitPane();
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 		
+		//Inserts dummy to avoid nullpointerexceptions from the displaynode method 
+		//A component can only be on one splitpane at the time
+		editorSplitPane.add(new JPanel(), templateExplorerName);
+		
 		this.setLeftComponent(animatorSplitPane);
 		
 	}
@@ -265,6 +269,12 @@ public class TabContent extends JSplitPane {
 		templateExplorer.switchToEditorMode();
 		
 		editorSplitPane.add(templateExplorer, templateExplorerName);
+		if(animatorSplitPane != null){
+			
+			//Inserts dummy to avoid nullpointerexceptions from the displaynode method 
+			//A component can only be on one splitpane at the time
+			animatorSplitPane.add(new JPanel(), templateExplorerName);
+		}
 		
 		//TODO
 		/*
@@ -487,11 +497,14 @@ public class TabContent extends JSplitPane {
 	}
 	
 	public void showComponents(boolean enable){
-		/*
-		System.err.println("components");
-		editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
-		editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
-		*/
+		
+		if(!(enable && templateExplorer.isVisible())){
+			editorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
+			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName, enable);
+			if(animatorSplitPane != null){
+				animatorSplitPane.getMultiSplitLayout().displayNode(templateExplorerName, enable);
+			}
+		}
 	}
 	public void showQueries(boolean enable){
 		System.err.println("queries");
