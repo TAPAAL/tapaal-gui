@@ -58,6 +58,7 @@ public class TabContent extends JSplitPane {
 
 	// Normal mode
 	JXMultiSplitPane editorSplitPane;
+	Split editorModelroot;
 	
 	QueryPane queries;
 	ConstantsPane constantsPanel;
@@ -77,7 +78,10 @@ public class TabContent extends JSplitPane {
 	protected AnimationHistoryComponent abstractAnimationPane = null;
 	protected JPanel animationControlsPanel;
 	protected EnabledTransitionsList enabledTransitionsList;
-
+	
+	private static final String enabledTransitionsName = "enabledTransitions";
+	private static final String animControlName = "animControl";
+	
 	protected JSplitPane animationHistorySplitter;
 
 	protected JXMultiSplitPane animatorSplitPane;
@@ -110,7 +114,7 @@ public class TabContent extends JSplitPane {
 
 	}
 	
-	Split modelroot;
+	
 	
 	public void createEditorLeftPane() {
 		boolean enableAddButton = getModel() == null ? true : !getModel().netType().equals(NetType.UNTIMED);
@@ -134,11 +138,13 @@ public class TabContent extends JSplitPane {
 		templateExplorerLeaf.setWeight(0.25);
 		sharedPTLeaf.setWeight(0.25);
 		
-		modelroot = new Split(templateExplorerLeaf, new Divider(), sharedPTLeaf, new Divider(), queriesLeaf, new Divider(), constantsLeaf);
-		modelroot.setRowLayout(false);
+		editorModelroot = new Split(templateExplorerLeaf, new Divider(), sharedPTLeaf, new Divider(), queriesLeaf, new Divider(), constantsLeaf);
+		editorModelroot.setRowLayout(false);
+		//The modelroot needs to have a parent when we remove all its children (bug in the swingx package)
+		editorModelroot.setParent(new Split());
 		
 		editorSplitPane = new JXMultiSplitPane();
-		editorSplitPane.getMultiSplitLayout().setModel(modelroot);
+		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 		
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		editorSplitPane.add(sharedPTPanel, sharedPTName);
@@ -231,9 +237,6 @@ public class TabContent extends JSplitPane {
 						.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
-	//TODO
-	private static final String enabledTransitionsName = "enabledTransitions";
-	private static final String animControlName = "animControl";
 	
 	private void createAnimatorSlitPane(){
 		Leaf enabledTransitionsListLeaf = new Leaf(enabledTransitionsName);
@@ -547,10 +550,11 @@ public class TabContent extends JSplitPane {
 		
 	}	
 	
+	
+	//When hiding the two bottom children of a JXMultisplitpane something goes wrong and the bottom divider stay there (it should have been removed)
+	//This method removes this extra divider (bug in the swingx package)
 	private void fixDividersEditor(){
-		editorSplitPane.getMultiSplitLayout().getModel();
-		
-		java.util.List<Node> t = modelroot.getChildren();
+		java.util.List<Node> t = editorModelroot.getChildren();
 		for(int i = t.size()-1; i>-1; i--){
 			Node n = t.get(i);
 			if(n.isVisible()){
@@ -561,7 +565,6 @@ public class TabContent extends JSplitPane {
 			}
 		}
 		
-		//editorSplitPane.validate();
 		editorSplitPane.repaint();
 	}
 }
