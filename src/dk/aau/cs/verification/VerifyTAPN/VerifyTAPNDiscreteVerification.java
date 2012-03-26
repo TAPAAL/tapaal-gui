@@ -165,7 +165,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				try {
 					File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "");
 					if(file != null){
-						if(file.getName().matches("^d?verifydtapn.*(?:\\.exe)?$")){
+						if( true ) {//file.getName().matches("^d?verifydtapn.*(?:\\.exe)?$")){
 							setVerifydTapnPath(file.getAbsolutePath());
 						}else{
 							messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
