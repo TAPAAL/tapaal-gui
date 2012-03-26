@@ -118,7 +118,7 @@ public class GuiFrame extends JFrame implements Observer {
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction;
-	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
+	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
 	
@@ -529,6 +529,9 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
 				 453257, "Visit the TAPAAL homepage", "_"));
+		 
+		 addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for Update",
+				 463257, "Check for Update", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
@@ -2026,6 +2029,8 @@ public class GuiFrame extends JFrame implements Observer {
 				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
 			} else if (this == showHomepage){
 				showInBrowser("http://www.tapaal.net");
+			} else if (this == checkUpdate) {
+				pipe.gui.CreateGui.checkForUpdate();
 			}
 		}
 		

@@ -47,37 +47,7 @@ public class CreateGui {
 	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
 
 	
-	
-
-	public static void init() {
-		
-		
-		
-		imgPath = "resources/Images/";
-
-		// make the initial dir for browsing be My Documents (win), ~ (*nix),
-		// etc
-		userPath = null;
-
-		appGui = new GuiFrame(TAPAAL.getProgramName());
-
-		Grid.enableGrid();
-
-		appTab = new JTabbedPane();
-
-		animator = new Animator();
-
-		appGui.setTab(); // sets Tab properties
-
-		appGui.getContentPane().add(appTab);
-
-		// appGui.createNewTabFromFile(null);
-
-		appGui.setVisible(true);
-		appGui.activateSelectAction();
-		Verifyta.trySetup();
-		VerifyTAPN.trySetup();
-
+	public static void checkForUpdate() {
 		VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion()) {
 			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
@@ -118,13 +88,44 @@ public class CreateGui {
 					dialog.setVisible(false);
 					dialog.dispose();
 					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
-				    appGui.exit();
+				//    appGui.exit();
 				}
 			});
 		    updateButton.requestFocusInWindow();	
 		    dialog.getRootPane().setDefaultButton(updateButton);
 		    dialog.setVisible(true);
 		}
+	}
+	
+
+	public static void init() {
+		
+		imgPath = "resources/Images/";
+
+		// make the initial dir for browsing be My Documents (win), ~ (*nix),
+		// etc
+		userPath = null;
+
+		appGui = new GuiFrame(TAPAAL.getProgramName());
+
+		Grid.enableGrid();
+
+		appTab = new JTabbedPane();
+
+		animator = new Animator();
+
+		appGui.setTab(); // sets Tab properties
+
+		appGui.getContentPane().add(appTab);
+
+		// appGui.createNewTabFromFile(null);
+
+		appGui.setVisible(true);
+		appGui.activateSelectAction();
+		Verifyta.trySetup();
+		VerifyTAPN.trySetup();
+
+		checkForUpdate();
 	}
 
 	public static GuiFrame getApp() { // returns a reference to the application
