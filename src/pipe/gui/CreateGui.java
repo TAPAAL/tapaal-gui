@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -20,6 +21,7 @@ import javax.swing.JTabbedPane;
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
+import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
@@ -101,8 +103,10 @@ public class CreateGui {
 		    optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
 		    JButton updateButton, laterButton;
 		    updateButton = new JButton("Update");
+		    updateButton.setMnemonic(KeyEvent.VK_C);
 			optionPane.add(updateButton);
             laterButton = new JButton("Later"); 
+            laterButton.setMnemonic(KeyEvent.VK_C);
             optionPane.add(laterButton);
 		    optionPane.setOptions(new Object[] {updateButton, laterButton});
 		   
@@ -118,11 +122,12 @@ public class CreateGui {
 				public void actionPerformed(ActionEvent e) {
 					dialog.setVisible(false);
 					dialog.dispose();
-					System.out.println("Open URL");
 					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
 				}
 			});
-		    updateButton.requestFocusInWindow();
+	
+		    updateButton.requestFocusInWindow();	
+		    dialog.getRootPane().setDefaultButton(updateButton);
 		    dialog.setVisible(true);
 			
 		}
