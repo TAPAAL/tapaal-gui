@@ -1983,14 +1983,13 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public static void openBrowser(URI url){
 		//open the default bowser on this page
-		
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
 			Logger.log("Cannot open the browser.");
-		//	JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
-		//			"Please open the url in your browser by entering " + url.toString(), 
-		//			"Error opening browser", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
+					"Please open the url in your browser by entering " + url.toString(), 
+					"Error opening browser", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}

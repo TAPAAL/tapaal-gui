@@ -93,11 +93,6 @@ public class CreateGui {
 				message.append('\n');
 				message.append(changelog);
 			}
-
-			//JOptionPane.showMessageDialog(appGui, message.toString(),
-			//		"New version available!", JOptionPane.INFORMATION_MESSAGE);
-			
-			
 			JOptionPane optionPane = new JOptionPane();
 		    optionPane.setMessage(message.toString());
 		    optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
@@ -123,13 +118,12 @@ public class CreateGui {
 					dialog.setVisible(false);
 					dialog.dispose();
 					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
+				    appGui.exit();
 				}
 			});
-	
 		    updateButton.requestFocusInWindow();	
 		    dialog.getRootPane().setDefaultButton(updateButton);
 		    dialog.setVisible(true);
-			
 		}
 	}
 
