@@ -1981,35 +1981,23 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	
 	
-	public void openBrowser(URI url){
+	public static void openBrowser(URI url){
 		//open the default bowser on this page
 		
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
 			Logger.log("Cannot open the browser.");
-			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
-					"Please open the url in your browser by entering " + url.toString(), 
-					"Error opening browser", JOptionPane.ERROR_MESSAGE);
+		//	JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
+		//			"Please open the url in your browser by entering " + url.toString(), 
+		//			"Error opening browser", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}
 	
-	public void showAskQuestion() {
+	public static void showInBrowser(String address) {
 		try {
-			URI url = new URI("https://answers.launchpad.net/tapaal/+addquestion");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public void showReportBug() {
-		try {
-			URI url = new URI("https://bugs.launchpad.net/tapaal/+filebug");
+			URI url = new URI(address);
 			openBrowser(url);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -2018,28 +2006,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 	
-	public void showFAQ() {
-		try {
-			URI url = new URI("https://answers.launchpad.net/tapaal/+faqs");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-	}
-	
-	public void showHomepage() {
-		try {
-			URI url = new URI("http://www.tapaal.net");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-	}
-	
+
 	class HelpAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454639L;
@@ -2053,13 +2020,13 @@ public class GuiFrame extends JFrame implements Observer {
 			if (this == showAboutAction){
 				showAbout();
 			} else if (this == showAskQuestionAction){ 
-				showAskQuestion();
+				showInBrowser("https://answers.launchpad.net/tapaal/+addquestion");
 			} else if (this == showReportBugAction){
-				showReportBug();
+				showInBrowser("https://bugs.launchpad.net/tapaal/+filebug");
 			} else if (this == showFAQAction){
-				showFAQ();
+				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
 			} else if (this == showHomepage){
-				showHomepage();
+				showInBrowser("http://www.tapaal.net");
 			}
 		}
 		

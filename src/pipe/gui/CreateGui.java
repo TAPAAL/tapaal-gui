@@ -25,7 +25,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
-import pipe.gui.GuiFrame;
+
 
 
 
@@ -43,34 +43,6 @@ public class CreateGui {
 	public static String imgPath, userPath; // useful for stuff
 	
 	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
-
-	
-
-	public static void openBrowser(URI url){
-		//open the default bowser on this page
-		
-		try {
-			java.awt.Desktop.getDesktop().browse(url);
-		} catch (IOException e) {
-			Logger.log("Cannot open the browser.");
-		//	JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
-		//			"Please open the url in your browser by entering " + url.toString(), 
-		//			"Error opening browser", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
-	}
-
-	public static void showDownload() {
-		try {
-			URI url = new URI("http://www.tapaal.net/download");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-		
-	}
 
 	
 	
@@ -147,7 +119,7 @@ public class CreateGui {
 					dialog.setVisible(false);
 					dialog.dispose();
 					System.out.println("Open URL");
-					showDownload();
+					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
 				}
 			});
 		    updateButton.requestFocusInWindow();
