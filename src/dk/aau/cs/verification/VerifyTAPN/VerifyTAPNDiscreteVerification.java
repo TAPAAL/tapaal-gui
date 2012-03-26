@@ -41,11 +41,11 @@ import dk.aau.cs.verification.VerificationResult;
 
 public class VerifyTAPNDiscreteVerification implements ModelChecker{
 	
-	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
-			+ "Verifytapn is a part of the TAPAAL distribution and it is\n"
+	private static final String NEED_TO_LOCATE_VERIFYDTAPN_MSG = "TAPAAL needs to know the location of the file verifydtapn.\n\n"
+			+ "Verifydtapn is a part of the TAPAAL distribution and it is\n"
 			+ "normally located in the directory lib.";
 		
-		protected static String verifytapnpath = "";
+		protected static String verifydtapnpath = "";
 		
 		private FileFinder fileFinder;
 		private Messenger messenger;
@@ -58,7 +58,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		public boolean supportsStats(){
-			return true;
+			return false;
 		}
 		
 		public String getStatsExplanation(){
@@ -76,7 +76,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		public String getPath() {
-			return verifytapnpath;
+			return verifydtapnpath;
 		}
 
 		public String getVersion() { // atm. any version of VerifyTAPN will do
@@ -84,7 +84,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 			if (!isNotSetup()) {
 				String[] commands;
-				commands = new String[] { verifytapnpath, "-v" };
+				commands = new String[] { verifydtapnpath, "-v" };
 
 				InputStream stream = null;
 				try {
@@ -124,16 +124,16 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		public boolean isCorrectVersion() {
 			if (isNotSetup()) {
 				messenger.displayErrorMessage(
-						"No dverifytapn specified: The verification is cancelled",
+						"No verifydtapn specified: The verification is cancelled",
 						"Verification Error");
 				return false;
 			}
 			
 			File file = new File(getPath());
 			if(!file.canExecute()){
-				messenger.displayErrorMessage("The engine dverifytapn is not executable.\n"
-										+ "The dverifytapn path will be reset. Please try again, "
-										+ "to manually set the dverifytapn path.", "dVerifytapn Error");
+				messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
+										+ "The verifydtapn path will be reset. Please try again, "
+										+ "to manually set the verifydtapn path.", "Verifydtapn Error");
 				resetVerifytapn();
 				return false;
 			}
@@ -142,8 +142,8 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		private void resetVerifytapn() {
-			verifytapnpath = null;	
-			Preferences.getInstance().setdVerifytapnLocation(null);
+			verifydtapnpath = null;	
+			Preferences.getInstance().setVerifydtapnLocation(null);
 		}
 
 
@@ -153,22 +153,22 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			}
 		}
 		
-		public void setVerifyTapnPath(String path) {
-			verifytapnpath = path;
-			Preferences.getInstance().setdVerifytapnLocation(path);
+		public void setVerifydTapnPath(String path) {
+			verifydtapnpath = path;
+			Preferences.getInstance().setVerifydtapnLocation(path);
 		}
 
 		public boolean setup() {
 			if (isNotSetup()) {
-				messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYTAPN_MSG, "Locate dverifytapn");
+				messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYDTAPN_MSG, "Locate verifydtapn");
 
 				try {
-					File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "");
+					File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "");
 					if(file != null){
-						if(file.getName().matches("^d?verifytapn.*(?:\\.exe)?$")){
-							setVerifyTapnPath(file.getAbsolutePath());
+						if(file.getName().matches("^d?verifydtapn.*(?:\\.exe)?$")){
+							setVerifydTapnPath(file.getAbsolutePath());
 						}else{
-							messenger.displayErrorMessage("The selected executable does not seem to be dverifytapn.");
+							messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
 						}
 					}
 
@@ -182,39 +182,39 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		private boolean isNotSetup() {
-			return verifytapnpath == null || verifytapnpath.equals("");
+			return verifydtapnpath == null || verifydtapnpath.equals("") || !(new File(verifydtapnpath).exists());
 		}
 		
 		public static boolean trySetup() {
 
-			String verifytapn = null;
+			String verifydtapn = null;
 
 			//If env is set, it overwrites the value
-			verifytapn = System.getenv("dverifytapn");
-			if (verifytapn != null && !verifytapn.isEmpty()) {
-				if (new File(verifytapn).exists()){
-					verifytapnpath = verifytapn;
+			verifydtapn = System.getenv("verifydtapn");
+			if (verifydtapn != null && !verifydtapn.isEmpty()) {
+				if (new File(verifydtapn).exists()){
+					verifydtapnpath = verifydtapn;
 					return true;
 				}
 			}
 
 			//If pref is set
-			verifytapn = Preferences.getInstance().getdVerifytapnLocation();
-			if (verifytapn != null && !verifytapn.isEmpty()) {
-				verifytapnpath = verifytapn;
+			verifydtapn = Preferences.getInstance().getVerifydtapnLocation();
+			if (verifydtapn != null && !verifydtapn.isEmpty()) {
+				verifydtapnpath = verifydtapn;
 				return true;
 			}
 
 			//Search the installdir for verifytapn
 			File installdir = TAPAAL.getInstallDir();
 
-			String[] paths = {"/bin/dverifytapn", "/bin/dverifytapn64", "/bin/dverifytapn.exe", "/bin/dverifytapn64.exe"};
+			String[] paths = {"/bin/verifydtapn", "/bin/verifydtapn64", "/bin/verifydtapn.exe", "/bin/verifydtapn64.exe"};
 			for (String s : paths) {
-				File verifytapnfile = new File(installdir + s);
+				File verifydtapnfile = new File(installdir + s);
 
-				if (verifytapnfile.exists()){
+				if (verifydtapnfile.exists()){
 
-					verifytapnpath = verifytapnfile.getAbsolutePath();
+					verifydtapnpath = verifydtapnfile.getAbsolutePath();
 					return true;
 
 				}
@@ -227,10 +227,10 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
 			if(!supportsModel(model.value1()))
-				throw new UnsupportedModelException("Verifytapn does not support the given model.");
+				throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 			
 			if(!supportsQuery(model.value1(), query, options))
-				throw new UnsupportedQueryException("Verifytapn does not support the given query.");
+				throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
 			
 //			if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
@@ -270,7 +270,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
-			runner = new ProcessRunner(verifytapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+			runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
 
 			if (runner.error()) {
@@ -300,7 +300,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 					if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()))
 						return null;
 					else
-						messenger.displayErrorMessage("Verifytapn cannot generate the requested trace for the model. Try another trace option.");
+						messenger.displayErrorMessage("Verifydtapn cannot generate the requested trace for the model. Try another trace option.");
 				}
 			} 
 			return trace;
@@ -364,7 +364,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		public static void reset() {
 			//Clear value
-			verifytapnpath = "";
+			verifydtapnpath = "";
 			Preferences.getInstance().setVerifytapnLocation(null);
 			//Set the detault
 			trySetup();

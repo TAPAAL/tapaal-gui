@@ -38,7 +38,7 @@ public class Preferences {
 		   return pref.get("verifytapn.location", "");
 	   }
 	   
-	   public String getdVerifytapnLocation() {
+	   public String getVerifydtapnLocation() {
 		   return pref.get("dverifytapn.location", "");
 	   }
 	   
@@ -52,7 +52,7 @@ public class Preferences {
 		   }
 	   }
 	   
-	   public void setdVerifytapnLocation(String location) {
+	   public void setVerifydtapnLocation(String location) {
 		   final String key = "dverifytapn.location";
 		   
 		   if (location == null || location.equals("")){
