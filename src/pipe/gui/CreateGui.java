@@ -1,18 +1,32 @@
 package pipe.gui;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import pipe.gui.GuiFrame;
+
 
 public class CreateGui {
 
@@ -28,6 +42,7 @@ public class CreateGui {
 	public static String imgPath, userPath; // useful for stuff
 	
 	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
+	
 
 	public static void init() {
 		imgPath = "resources/Images/";
@@ -71,8 +86,38 @@ public class CreateGui {
 				message.append(changelog);
 			}
 
-			JOptionPane.showMessageDialog(appGui, message.toString(),
-					"New version available!", JOptionPane.INFORMATION_MESSAGE);
+			//JOptionPane.showMessageDialog(appGui, message.toString(),
+			//		"New version available!", JOptionPane.INFORMATION_MESSAGE);
+			
+			
+			JOptionPane optionPane = new JOptionPane();
+		    optionPane.setMessage(message.toString());
+		    optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+		    JButton updateButton, laterButton;
+		    updateButton = new JButton("Update");
+			optionPane.add(updateButton);
+            laterButton = new JButton("Later"); 
+            optionPane.add(laterButton);
+		    optionPane.setOptions(new Object[] {updateButton, laterButton});
+		   
+		  
+		    final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
+		    laterButton.addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e) {
+    				dialog.setVisible(false);
+    				dialog.dispose ();
+    			}
+    		});
+		    updateButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					dialog.setVisible(false);
+					dialog.dispose();
+					System.out.println("Open URL");
+				}
+			});
+		    updateButton.requestFocusInWindow();
+		    dialog.setVisible(true);
+			
 		}
 	}
 
