@@ -48,4 +48,20 @@ public class Preferences {
 		   }
 	   }
 	
+	   
+	   
+	   public String getLatestVersion() {
+		   return pref.get("verifytapn.latestVersion", "");
+	   }
+	   
+	   public void setLatestVersion(String version) {
+		   final String key = "verifytapn.latestVersion";
+		   
+		   if (version == null || version.equals("")){
+			   pref.remove(key);
+		   }else {
+			   pref.put(key, version);   
+		   }
+	   }
+	   
 }

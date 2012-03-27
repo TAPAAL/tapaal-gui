@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import net.tapaal.Preferences;
 
 import net.tapaal.TAPAAL;
 
@@ -25,15 +26,20 @@ public class VersionChecker {
 		}
 	}
 
-	public boolean checkForNewVersion(){
+	public boolean checkForNewVersion(boolean forcecheck){
 		//Disable the version check for DEV versions
 		if (!TAPAAL.VERSION.equalsIgnoreCase("DEV")){
 			if(url != null){
 
 				getNewestVersion();
 
-				if(newestVersion != null && !newestVersion.isEmpty()){
-					return compareVersions();
+				boolean check;
+				String ignoreversion = Preferences.getInstance().getLatestVersion();	
+				if (ignoreversion==null || ignoreversion.isEmpty() || forcecheck || newestVersion==null || newestVersion.isEmpty() ) { check = true;}
+				else { check = compareVersions(ignoreversion);}
+				
+				if(newestVersion != null && !newestVersion.isEmpty() && check){
+					return compareVersions(TAPAAL.VERSION);
 				}
 
 			}
@@ -43,11 +49,12 @@ public class VersionChecker {
 		}
 	}
 
-	private boolean compareVersions() {
+	private boolean compareVersions(String versionString) {
 		int[] currentVersionNumbers = null;
 		int[] newestVersionNumbers = null;
 		try{
-			currentVersionNumbers = getVersionNumbers(TAPAAL.VERSION);
+			//currentVersionNumbers = getVersionNumbers(TAPAAL.VERSION);
+			currentVersionNumbers = getVersionNumbers(versionString);	
 			newestVersionNumbers = getVersionNumbers(newestVersion);
 		}catch(Exception e){
 			return false;

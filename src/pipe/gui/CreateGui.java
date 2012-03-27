@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import net.tapaal.TAPAAL;
+import net.tapaal.Preferences;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.widgets.RequestFocusListener;
@@ -47,9 +48,9 @@ public class CreateGui {
 	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
 
 	
-	public static void checkForUpdate() {
-		VersionChecker versionChecker = new VersionChecker();
-		if (versionChecker.checkForNewVersion()) {
+	public static void checkForUpdate(boolean forcecheck) {
+		final VersionChecker versionChecker = new VersionChecker();
+		if (versionChecker.checkForNewVersion(forcecheck)) {
 			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
 			message.append(TAPAAL.VERSION);
@@ -66,31 +67,45 @@ public class CreateGui {
 			JOptionPane optionPane = new JOptionPane();
 		    optionPane.setMessage(message.toString());
 		    optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
-		    JButton updateButton, laterButton;
-		    updateButton = new JButton("Update");
+		    JButton updateButton, laterButton, ignoreButton;
+		    updateButton = new JButton("Update now");
 		    updateButton.setMnemonic(KeyEvent.VK_C);
 			optionPane.add(updateButton);
-            laterButton = new JButton("Later"); 
+            laterButton = new JButton("Update later"); 
             laterButton.setMnemonic(KeyEvent.VK_C);
             optionPane.add(laterButton);
-		    optionPane.setOptions(new Object[] {updateButton, laterButton});
+            ignoreButton = new JButton("Ignore the version"); 
+            laterButton.setMnemonic(KeyEvent.VK_C);
+            optionPane.add(ignoreButton);
+            
+		    optionPane.setOptions(new Object[] {updateButton, laterButton, ignoreButton});
 		   
 		  
 		    final JDialog dialog = optionPane.createDialog(null, "New Version of TAPAAL");
 		    laterButton.addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent e) {
+    				Preferences.getInstance().setLatestVersion(null);
     				dialog.setVisible(false);
     				dialog.dispose ();
     			}
     		});
 		    updateButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					Preferences.getInstance().setLatestVersion(null);
 					dialog.setVisible(false);
 					dialog.dispose();
 					pipe.gui.GuiFrame.showInBrowser("http://www.tapaal.net/download");
 				//    appGui.exit();
 				}
 			});
+		    ignoreButton.addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e) {
+    				Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
+    				dialog.setVisible(false);
+    				dialog.dispose ();
+    			}
+    		});
+		    
 		    updateButton.requestFocusInWindow();	
 		    dialog.getRootPane().setDefaultButton(updateButton);
 		    dialog.setVisible(true);
@@ -125,7 +140,7 @@ public class CreateGui {
 		Verifyta.trySetup();
 		VerifyTAPN.trySetup();
 
-		checkForUpdate();
+		checkForUpdate(false);
 	}
 
 	public static GuiFrame getApp() { // returns a reference to the application
