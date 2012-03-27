@@ -531,7 +531,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 453257, "Visit the TAPAAL homepage", "_"));
 		 
 		 addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for updates",
-				 463257, "Check for Update", "_"));
+				 463257, "Check if there is a new version of TAPAAL", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
@@ -545,7 +545,7 @@ public class GuiFrame extends JFrame implements Observer {
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
-				 453246, "Show the About Menu", "_"));
+				 453246, "Show the About menu", "_"));
 
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
