@@ -5,15 +5,19 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
+import javax.swing.JOptionPane;
+
 import net.tapaal.Preferences;
 
 import net.tapaal.TAPAAL;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.io.ResourceManager;
 
 public class VersionChecker {
 	private static final String versionURL = "http://www.tapaal.net/fileadmin/version2.txt";
-	private static final int timeoutMs = 6000;
+	private static final int timeoutMs = 2500;
 	private URL url;
 	private String newestVersion;
 
@@ -28,25 +32,31 @@ public class VersionChecker {
 
 	public boolean checkForNewVersion(boolean forcecheck){
 		//Disable the version check for DEV versions
-		if (!TAPAAL.VERSION.equalsIgnoreCase("DEV")){
-			if(url != null){
-
+		if (!TAPAAL.VERSION.equalsIgnoreCase("DEV") && url != null){
 				getNewestVersion();
-
 				boolean check;
 				String ignoreversion = Preferences.getInstance().getLatestVersion();	
 				if (ignoreversion==null || ignoreversion.isEmpty() || forcecheck || newestVersion==null || newestVersion.isEmpty() ) { check = true;}
 				else { check = compareVersions(ignoreversion);}
 				
 				if(newestVersion != null && !newestVersion.isEmpty() && check){
-					return compareVersions(TAPAAL.VERSION);
+					boolean result = compareVersions(TAPAAL.VERSION);
+					if (forcecheck && !result) {
+						JOptionPane.showMessageDialog(null, "There is no new version of TAPAAL available at the moment.", "No Update for " + TAPAAL.getProgramName(),
+								JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
+					}
+					return result;
 				}
-
+				else if (forcecheck)
+				{JOptionPane.showMessageDialog(null, "It is impossible to establish a connection to the server. Try again later.", "No Update for " + TAPAAL.getProgramName(),
+							JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());	
+				}
 			}
-			return false;
-		}else {
-			return false;
+		else if (forcecheck) {
+			JOptionPane.showMessageDialog(null, "The development version of TAPAAL does not support update notification.", "No Update for " + TAPAAL.getProgramName(),
+					JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 		}
+		return false;		
 	}
 
 	private boolean compareVersions(String versionString) {

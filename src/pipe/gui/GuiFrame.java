@@ -2017,7 +2017,6 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		
 		
-		// Less sucky yet far, far simpler to code About dialogue
 		public void actionPerformed(ActionEvent e) {
 			if (this == showAboutAction){
 				showAbout();
@@ -2030,11 +2029,7 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == showHomepage){
 				showInBrowser("http://www.tapaal.net");
 			} else if (this == checkUpdate) {
-				if (!pipe.gui.CreateGui.checkForUpdate(true))
-					{
-					// TODO  add dialog
-					System.out.println("No new version!");
-					}
+				pipe.gui.CreateGui.checkForUpdate(true);
 			}
 		}
 		
