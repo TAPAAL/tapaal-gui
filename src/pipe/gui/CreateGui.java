@@ -48,9 +48,10 @@ public class CreateGui {
 	public static Integer MaximalNumberOfTokensAllowed = new Integer(999);
 
 	
-	public static void checkForUpdate(boolean forcecheck) {
+	public static boolean checkForUpdate(boolean forcecheck) {
 		final VersionChecker versionChecker = new VersionChecker();
-		if (versionChecker.checkForNewVersion(forcecheck)) {
+		if (!versionChecker.checkForNewVersion(forcecheck)) {return false;}
+		else  {
 			StringBuffer message = new StringBuffer("There is a new version of TAPAAL available at www.tapaal.net.");
 			message.append("\n\nCurrent version: ");
 			message.append(TAPAAL.VERSION);
@@ -110,6 +111,7 @@ public class CreateGui {
 		    dialog.getRootPane().setDefaultButton(updateButton);
 		    dialog.setVisible(true);
 		}
+		return true;
 	}
 	
 

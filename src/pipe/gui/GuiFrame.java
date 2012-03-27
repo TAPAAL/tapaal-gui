@@ -2030,7 +2030,11 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == showHomepage){
 				showInBrowser("http://www.tapaal.net");
 			} else if (this == checkUpdate) {
-				pipe.gui.CreateGui.checkForUpdate(true);
+				if (!pipe.gui.CreateGui.checkForUpdate(true))
+					{
+					// TODO  add dialog
+					System.out.println("No new version!");
+					}
 			}
 		}
 		
