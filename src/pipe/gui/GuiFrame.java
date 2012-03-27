@@ -530,16 +530,16 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
 				 453257, "Visit the TAPAAL homepage", "_"));
 		 
-		 addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for Update",
+		 addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for updates",
 				 463257, "Check for Update", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
 				 454256, "See TAPAAL frequently asked questions", "_"));
-		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
+		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a question",
 				 453256, "Ask a question about TAPAAL", "_"));
-		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
+		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report bug",
 				 453254, "Report a bug in TAPAAL", "_"));
 		 
 		 helpMenu.addSeparator();
