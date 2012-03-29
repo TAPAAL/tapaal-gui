@@ -74,7 +74,7 @@ public class CreateGui {
             laterButton = new JButton("Update later"); 
             laterButton.setMnemonic(KeyEvent.VK_C);
             optionPane.add(laterButton);
-            ignoreButton = new JButton("Ignore the version"); 
+            ignoreButton = new JButton("Ignore this update"); 
             laterButton.setMnemonic(KeyEvent.VK_C);
             optionPane.add(ignoreButton);
             
