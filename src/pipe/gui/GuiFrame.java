@@ -118,7 +118,7 @@ public class GuiFrame extends JFrame implements Observer {
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction;
-	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction;
+	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
 	
@@ -530,19 +530,22 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
 				 453257, "Visit the TAPAAL homepage", "_"));
 		 
+		 addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for updates",
+				 463257, "Check if there is a new version of TAPAAL", "_"));
+		 
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
 				 454256, "See TAPAAL frequently asked questions", "_"));
-		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a Question",
+		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a question",
 				 453256, "Ask a question about TAPAAL", "_"));
-		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report Bug",
+		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report bug",
 				 453254, "Report a bug in TAPAAL", "_"));
 		 
 		 helpMenu.addSeparator();
 		 
 		 addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
-				 453246, "Show the About Menu", "_"));
+				 453246, "Show the About menu", "_"));
 
 		 menuBar.add(fileMenu);
 		 menuBar.add(editMenu);
@@ -1981,35 +1984,22 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	
 	
-	public void openBrowser(URI url){
+	public static void openBrowser(URI url){
 		//open the default bowser on this page
-		
 		try {
 			java.awt.Desktop.getDesktop().browse(url);
 		} catch (IOException e) {
 			Logger.log("Cannot open the browser.");
-			JOptionPane.showMessageDialog(this, "There was a problem opening the default bowser \n" +
+			JOptionPane.showMessageDialog(null, "There was a problem opening the default web browser \n" +
 					"Please open the url in your browser by entering " + url.toString(), 
 					"Error opening browser", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}
 	
-	public void showAskQuestion() {
+	public static void showInBrowser(String address) {
 		try {
-			URI url = new URI("https://answers.launchpad.net/tapaal/+addquestion");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public void showReportBug() {
-		try {
-			URI url = new URI("https://bugs.launchpad.net/tapaal/+filebug");
+			URI url = new URI(address);
 			openBrowser(url);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -2018,28 +2008,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 	}
 	
-	public void showFAQ() {
-		try {
-			URI url = new URI("https://answers.launchpad.net/tapaal/+faqs");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-	}
-	
-	public void showHomepage() {
-		try {
-			URI url = new URI("http://www.tapaal.net");
-			openBrowser(url);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Logger.log("Error convering to URL");
-			e.printStackTrace();
-		}
-	}
-	
+
 	class HelpAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454639L;
@@ -2048,18 +2017,19 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		
 		
-		// Less sucky yet far, far simpler to code About dialogue
 		public void actionPerformed(ActionEvent e) {
 			if (this == showAboutAction){
 				showAbout();
 			} else if (this == showAskQuestionAction){ 
-				showAskQuestion();
+				showInBrowser("https://answers.launchpad.net/tapaal/+addquestion");
 			} else if (this == showReportBugAction){
-				showReportBug();
+				showInBrowser("https://bugs.launchpad.net/tapaal/+filebug");
 			} else if (this == showFAQAction){
-				showFAQ();
+				showInBrowser("https://answers.launchpad.net/tapaal/+faqs");
 			} else if (this == showHomepage){
-				showHomepage();
+				showInBrowser("http://www.tapaal.net");
+			} else if (this == checkUpdate) {
+				pipe.gui.CreateGui.checkForUpdate(true);
 			}
 		}
 		
