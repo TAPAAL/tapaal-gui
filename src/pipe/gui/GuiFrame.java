@@ -495,7 +495,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true));
     				 showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
-    		addCheckboxMenuItem(viewMenu, showToolTipsAction = new ViewAction("Show tool tips",
+    		addCheckboxMenuItem(viewMenu, showToolTipsAction = new ViewAction("Display tool tips",
    				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
