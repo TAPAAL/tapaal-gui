@@ -58,6 +58,8 @@ public class ConstantsPane extends JPanel {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
+	private JButton plusButton;
+	private JButton minusButton;
 	
 	private static final String toolTipEditConstant = "Edit the value of the selected constant";
 	private static final String toolTipRemoveConstant = "Remove the selected constant";
@@ -65,6 +67,10 @@ public class ConstantsPane extends JPanel {
 	private static final String toolTipSortConstants = "Sort the constants alphabetically";
 	private final static String toolTipMoveUp = "Move the selected constant up";
 	private final static String toolTipMoveDown = "Move the selected constant down";
+	private final static String toolTipPlusOne = "Add 1 to the value of the constant";
+	private final static String toolTipMinusOne = "Subtract 1 from the value of the constant";
+	private final static String toolTipMinusOneDeactivated = "The value of the constant cannot be increased";
+	private final static String toolTipPlusOneDeactivated = "The value of the constant cannot be decreased";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
 	
 
@@ -76,7 +82,7 @@ public class ConstantsPane extends JPanel {
 
 		listModel = new ConstantsListModel(parent.network());
 		listModel.addListDataListener(new ListDataListener() {
-			public void contentsChanged(ListDataEvent arg0) {
+			public void contentsChanged(ListDataEvent arg0) {				
 			}
 
 			public void intervalAdded(ListDataEvent arg0) {
@@ -99,10 +105,16 @@ public class ConstantsPane extends JPanel {
 					if (constantsList.getSelectedIndex() == -1) {
 						editBtn.setEnabled(false);
 						removeBtn.setEnabled(false);
-
+						plusButton.setEnabled(false);
+						minusButton.setEnabled(false);
 					} else {
 						removeBtn.setEnabled(true);
 						editBtn.setEnabled(true);
+						
+						ListModel model = constantsList.getModel();
+						Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());
+						
+						toggleConstantAddSubtractEnabled(c);
 					}
 					
 					int index = constantsList.getSelectedIndex();
@@ -130,7 +142,7 @@ public class ConstantsPane extends JPanel {
 						Constant c = (Constant) dlm.getElementAt(index);
 						constantsList.ensureIndexIsVisible(index);
 
-						showEditConstantDialog(c);
+						showEditConstantDialog(c,index);						
 					}
 				}
 			}
@@ -148,8 +160,15 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
 		this.setToolTipText("Declaration of global constants that can be used in intervals and age invariants");
-		//this.setToolTipText(toolTipGlobalConstantsLabel);
-		//showConstants();
+		
+		if (constantsList.getSelectedIndex() == -1) {
+			editBtn.setEnabled(false);
+			removeBtn.setEnabled(false);
+			plusButton.setEnabled(false);
+			minusButton.setEnabled(false);
+			plusButton.setToolTipText(toolTipPlusOneDeactivated);	
+			minusButton.setToolTipText(toolTipMinusOneDeactivated);
+		}
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
@@ -158,8 +177,8 @@ public class ConstantsPane extends JPanel {
 		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Constant c = (Constant) constantsList.getSelectedValue();
-				showEditConstantDialog(c);
+				Constant c = (Constant) constantsList.getSelectedValue();				
+				showEditConstantDialog(c,constantsList.getSelectedIndex());
 			}
 		});
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -193,6 +212,30 @@ public class ConstantsPane extends JPanel {
 		gbc.gridx = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addConstantButton, gbc);
+		
+		plusButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Step forward.png")));
+		plusButton.setToolTipText(toolTipPlusOne);
+		plusButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addOneToConstant();
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 4;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(plusButton, gbc);
+		
+		minusButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Step backward.png")));
+		minusButton.setToolTipText(toolTipMinusOne);
+		minusButton.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent arg0) {
+				subtractOneFromConstant();
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.anchor = GridBagConstraints.WEST;
+		buttonsPanel.add(minusButton, gbc);
 	}
 
 	public void showConstants() {
@@ -202,6 +245,47 @@ public class ConstantsPane extends JPanel {
 
 		listModel.updateAll();
 
+	}
+	
+	private void toggleConstantAddSubtractEnabled(Constant constant) {
+		if (constant.lowerBound() == constant.value()){
+			minusButton.setEnabled(false);
+			minusButton.setToolTipText(toolTipMinusOneDeactivated);
+		}
+		else {
+			minusButton.setEnabled(true);
+			minusButton.setToolTipText(toolTipMinusOne);
+		}
+		if (constant.upperBound() == constant.value()){
+			plusButton.setEnabled(false);
+			plusButton.setToolTipText(toolTipPlusOneDeactivated);		
+		}
+		else {
+			plusButton.setEnabled(true);
+			plusButton.setToolTipText(toolTipPlusOne);			
+		}
+	}
+	
+	private void subtractOneFromConstant() {
+		ListModel model = constantsList.getModel();
+		Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());
+		
+		Command edit = parent.network().updateConstant(c.name(), new Constant(
+				c.name(), c.value()-1));
+		CreateGui.getView().getUndoManager().addNewEdit(edit);
+		parent.network().buildConstraints();
+		toggleConstantAddSubtractEnabled(listModel.getElementAt(constantsList.getSelectedIndex()));
+	}
+	
+	private void addOneToConstant(){
+		ListModel model = constantsList.getModel();
+		Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());
+		
+		Command edit = parent.network().updateConstant(c.name(), new Constant(
+				c.name(), c.value()+1));
+		CreateGui.getView().getUndoManager().addNewEdit(edit);
+		parent.network().buildConstraints();
+		toggleConstantAddSubtractEnabled(listModel.getElementAt(constantsList.getSelectedIndex()));
 	}
 
 
@@ -300,6 +384,27 @@ public class ConstantsPane extends JPanel {
 			}
 		panel.showDialog();
 		showConstants();
+	}
+	
+	private void showEditConstantDialog(Constant constant, int selectedIndex) {	
+		ConstantsDialogPanel panel = null;
+		if (constant != null)
+			try {
+				panel = new ConstantsDialogPanel(new JRootPane(),
+						parent.network(), constant);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		else
+			try {
+				panel = new ConstantsDialogPanel(new JRootPane(),
+						parent.network());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		panel.showDialog();
+		showConstants();
+		toggleConstantAddSubtractEnabled(listModel.getElementAt(selectedIndex));
 	}
 
 	protected void removeConstant(String name) {
