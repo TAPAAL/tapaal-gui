@@ -162,8 +162,6 @@ public class ConstantsPane extends JPanel {
 		this.setToolTipText("Declaration of global constants that can be used in intervals and age invariants");
 		
 		if (constantsList.getSelectedIndex() == -1) {
-			editBtn.setEnabled(false);
-			removeBtn.setEnabled(false);
 			plusButton.setEnabled(false);
 			minusButton.setEnabled(false);
 			plusButton.setToolTipText(toolTipPlusOneDeactivated);	
@@ -248,6 +246,7 @@ public class ConstantsPane extends JPanel {
 	}
 	
 	private void toggleConstantAddSubtractEnabled(Constant constant) {
+		//TODO: must also be run after an interval has been edited!!
 		if (constant.lowerBound() == constant.value()){
 			minusButton.setEnabled(false);
 			minusButton.setToolTipText(toolTipMinusOneDeactivated);
@@ -269,7 +268,6 @@ public class ConstantsPane extends JPanel {
 	private void subtractOneFromConstant() {
 		ListModel model = constantsList.getModel();
 		Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());
-		
 		Command edit = parent.network().updateConstant(c.name(), new Constant(
 				c.name(), c.value()-1));
 		CreateGui.getView().getUndoManager().addNewEdit(edit);
@@ -280,7 +278,6 @@ public class ConstantsPane extends JPanel {
 	private void addOneToConstant(){
 		ListModel model = constantsList.getModel();
 		Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());
-		
 		Command edit = parent.network().updateConstant(c.name(), new Constant(
 				c.name(), c.value()+1));
 		CreateGui.getView().getUndoManager().addNewEdit(edit);
