@@ -69,8 +69,8 @@ public class ConstantsPane extends JPanel {
 	private final static String toolTipMoveDown = "Move the selected constant down";
 	private final static String toolTipPlusOne = "Add 1 to the value of the constant";
 	private final static String toolTipMinusOne = "Subtract 1 from the value of the constant";
-	private final static String toolTipMinusOneDeactivated = "The value of the constant cannot be increased";
-	private final static String toolTipPlusOneDeactivated = "The value of the constant cannot be decreased";
+	private final static String toolTipMinusOneDeactivated = "The value of the constant cannot be decreased";
+	private final static String toolTipPlusOneDeactivated = "The value of the constant cannot be increased";
 	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
 	
 
@@ -109,12 +109,8 @@ public class ConstantsPane extends JPanel {
 						minusButton.setEnabled(false);
 					} else {
 						removeBtn.setEnabled(true);
-						editBtn.setEnabled(true);
-						
-						ListModel model = constantsList.getModel();
-						Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());
-						
-						toggleConstantAddSubtractEnabled(c);
+						editBtn.setEnabled(true);						
+						toggleConstantAddSubtractEnabled();
 					}
 					
 					int index = constantsList.getSelectedIndex();
@@ -245,8 +241,13 @@ public class ConstantsPane extends JPanel {
 
 	}
 	
+	public void toggleConstantAddSubtractEnabled() {
+		ListModel model = constantsList.getModel();
+		Constant c = (Constant) model.getElementAt(constantsList.getSelectedIndex());		
+		toggleConstantAddSubtractEnabled(c);
+	}
+	
 	private void toggleConstantAddSubtractEnabled(Constant constant) {
-		//TODO: must also be run after an interval has been edited!!
 		if (constant.lowerBound() == constant.value()){
 			minusButton.setEnabled(false);
 			minusButton.setToolTipText(toolTipMinusOneDeactivated);

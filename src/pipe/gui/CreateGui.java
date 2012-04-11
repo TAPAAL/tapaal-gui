@@ -327,4 +327,9 @@ public class CreateGui {
 	public static boolean showZeroToInfinityIntervals() {
 		return showZeroToInfinityIntervals;
 	}
+	
+	public static void toggleConstantAddSubtractEnabled() {
+		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
+		tab.toggleConstantAddSubtractEnabled();
+	}
 }

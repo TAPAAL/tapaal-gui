@@ -108,6 +108,7 @@ public class GuardDialogue extends JPanel /*
 				undoManager.addEdit(arc.setGuard(guard));
 				CreateGui.getCurrentTab().network().buildConstraints();
 
+				CreateGui.toggleConstantAddSubtractEnabled();
 				exit();
 			}
 

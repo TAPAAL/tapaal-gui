@@ -545,4 +545,8 @@ public class TabContent extends JSplitPane {
 		constantsPanel.selectFirst();
 		
 	}	
+	
+	public void toggleConstantAddSubtractEnabled(){
+		constantsPanel.toggleConstantAddSubtractEnabled();
+	}
 }
