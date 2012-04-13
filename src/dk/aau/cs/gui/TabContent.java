@@ -1,8 +1,10 @@
 package dk.aau.cs.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -231,14 +233,14 @@ public class TabContent extends JSplitPane {
 								animBox.stepBackwards();
 								anim.stepBack();
 								CreateGui.getAnimationController()
-										.setAnimationButtonsEnabled();
+								.setAnimationButtonsEnabled();
 							}
 						} else {
 							for (int i = 0; i < Math.abs(steps); i++) {
 								animBox.stepForward();
 								anim.stepForward();
 								CreateGui.getAnimationController()
-										.setAnimationButtonsEnabled();
+								.setAnimationButtonsEnabled();
 							}
 						}
 					}
@@ -406,7 +408,7 @@ public class TabContent extends JSplitPane {
 				BorderFactory.createTitledBorder("Enabled Transitions"),
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 		enabledTransitionsList
-				.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
+		.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
 	}
 
 	public EnabledTransitionsList getFireabletransitionsList() {
@@ -589,10 +591,21 @@ public class TabContent extends JSplitPane {
 		constantsPanel.selectFirst();
 
 	}
-
-	// When hiding the two bottom children of a JXMultisplitpane something goes
-	// wrong and the bottom divider stay there (it should have been removed)
-	// This method removes this extra divider (bug in the swingx package)
+	
+	/*
+	 * When hiding the two bottom children of a JXMultisplitpane something goes
+	 * wrong and the bottom divider stay there (it should have been removed)
+	 * This method removes this extra divider (bug in the swingx package)
+	 * 
+	 * The method also resets the sizes of the components this is done as if you 
+	 * remove the bottom component, then pulls the bottom component all the way down
+	 * and then adds the removed component again its shown outside the window
+	 * 
+	 * As a last thing it makes sure that if you "show" a component and the main divider is 
+	 * all the way to the left, it's moved such that the component is actually shown.
+	 * 
+	 * This method will hopefully become unnecessary as the JXMultisplitPane matures
+	 */
 	private void fixDividersEditor(java.awt.Component c){
 		//Make sure there are no extra dividers
 		java.util.List<Node> t = editorModelroot.getChildren();
@@ -607,19 +620,28 @@ public class TabContent extends JSplitPane {
 		}
 		
 		//Makes sure all components are visible
+		int heigh = 0;
 		if(c.isVisible()){
 			for(Node n : t){
-				if (n instanceof Divider){
-					//Sets the divider as high as possible 
-					n.setBounds(new Rectangle(0,0,0,0));
+				if(n instanceof Leaf){
+					Component component = editorSplitPane.getMultiSplitLayout().getComponentForNode(n);
+					n.setBounds(new Rectangle(new Point(0, heigh), component.getPreferredSize()));
+					heigh = heigh+component.getPreferredSize().height;
+				} else if (n instanceof Divider){
+					
+					n.setBounds(new Rectangle(0, heigh, n.getBounds().width, n.getBounds().height));
+					heigh = heigh + n.getBounds().height;
 				}
 			}
 		}
 		
-		if(this.getDividerLocation() == 0){
-			this.setDividerLocation(c.getPreferredSize().width);
+		//If you "show" a component and the main divider is all the way to the left, make sure it's moved such that the component is actually shown
+		if(c.isVisible()){
+			if(this.getDividerLocation() == 0){
+				this.setDividerLocation(c.getPreferredSize().width);
+			}
 		}
-		
+
 		editorSplitPane.repaint();
 	}
 }
