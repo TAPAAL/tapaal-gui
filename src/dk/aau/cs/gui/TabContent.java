@@ -314,7 +314,6 @@ public class TabContent extends JSplitPane {
 		// method
 		// A component can only be on one splitpane at the time
 		editorSplitPane.add(new JPanel(), templateExplorerName);
-
 		this.setLeftComponent(animatorSplitPane);
 
 	}
@@ -595,6 +594,7 @@ public class TabContent extends JSplitPane {
 	// wrong and the bottom divider stay there (it should have been removed)
 	// This method removes this extra divider (bug in the swingx package)
 	private void fixDividersEditor(java.awt.Component c){
+		//Make sure there are no extra dividers
 		java.util.List<Node> t = editorModelroot.getChildren();
 		for(int i = t.size()-1; i>-1; i--){
 			Node n = t.get(i);
@@ -606,14 +606,6 @@ public class TabContent extends JSplitPane {
 			}
 		}
 		
-		Rectangle editorBounds = editorSplitPane.getBounds();
-		
-		for(int i = t.size()-1; i>-1; i--){
-			Node n = t.get(i);
-			
-		}
-		
-		
 		//Makes sure all components are visible
 		if(c.isVisible()){
 			for(Node n : t){
@@ -622,6 +614,10 @@ public class TabContent extends JSplitPane {
 					n.setBounds(new Rectangle(0,0,0,0));
 				}
 			}
+		}
+		
+		if(this.getDividerLocation() == 0){
+			this.setDividerLocation(c.getPreferredSize().width);
 		}
 		
 		editorSplitPane.repaint();
