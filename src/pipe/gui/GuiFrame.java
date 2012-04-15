@@ -72,6 +72,7 @@ import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import pipe.gui.widgets.QueryDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
@@ -564,6 +565,9 @@ public class GuiFrame extends JFrame implements Observer {
 		 setJMenuBar(menuBar);
 
 	}
+	
+	ToolAction advancedWorkspaceAction;
+	ToolAction simpleWorkspaceAction;
 
 	private JMenu buildToolsMenu() {
 		JMenu toolsMenu = new JMenu("Tools");
@@ -618,6 +622,30 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
+		toolsMenu.addSeparator();
+		
+		JMenuItem advancedWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show advanced workspace", "Show all panels", ""));
+		advancedWorkspace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				QueryDialog.setAdvancedView(true);
+				showComponents(true);
+				showQueries(true);
+				showConstants(true);
+			}
+		});
+		
+		toolsMenu.add(advancedWorkspace);
+		JMenuItem simpleWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show simple workspace", "Only show the most important panels", ""));
+		simpleWorkspace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				QueryDialog.setAdvancedView(false);
+				showComponents(false);
+				showQueries(true);
+				showConstants(false);
+			}
+		});
+		
+		toolsMenu.add(simpleWorkspace);
 		return toolsMenu;
 	}
 
