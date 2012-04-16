@@ -199,7 +199,7 @@ public class VerifyTAPNDiscreteVerificationLC implements ModelChecker{
 			}
 
 			//If pref is set
-			verifydtapnLC = Preferences.getInstance().getVerifydtapnLocation();
+			verifydtapnLC = Preferences.getInstance().getVerifydtapnLCLocation();
 			if (verifydtapnLC != null && !verifydtapnLC.isEmpty()) {
 				verifydtapnLCpath = verifydtapnLC;
 				return true;

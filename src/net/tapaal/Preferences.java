@@ -42,6 +42,10 @@ public class Preferences {
 		   return pref.get("dverifytapn.location", "");
 	   }
 	   
+	   public String getVerifydtapnLCLocation() {
+		   return pref.get("dverifytapnLC.location", "");
+	   }
+	   
 	   public void setVerifytapnLocation(String location) {
 		   final String key = "verifytapn.location";
 		   

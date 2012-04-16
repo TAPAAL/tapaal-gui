@@ -15,11 +15,13 @@ public class BatchProcessingResultsExporter {
 	private static final String name_OPTIMIZEDSTANDARD = "D: UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "E: UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "F: UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_verifyTAPNDiscreteVerification = "G: TAPAAL Engine - Discrete Verification";
+	private static final String name_verifyTAPNDiscreteVerificationLC = "H: TAPAAL Engine - Discrete Verification LC";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
 	private static final String DELIMITER = ";";
-
+	
 	public void exportToCSV(Iterable<BatchProcessingVerificationResult> results, File outputFile) throws Exception {
 		PrintStream writer = new PrintStream(outputFile);
 		
@@ -97,7 +99,11 @@ public class BatchProcessingResultsExporter {
 				return name_verifyTAPN_discreteInclusion;
 			}else
 				return name_verifyTAPN;
-		}else
+		}else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification){
+			return name_verifyTAPNDiscreteVerification;
+		}else if(reduction == ReductionOption.VerifyTAPNdiscreteVerificationLC){
+			return name_verifyTAPNDiscreteVerificationLC;
+		}
 			return name_BROADCAST;
 	}
 }
