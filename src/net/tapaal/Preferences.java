@@ -61,5 +61,15 @@ public class Preferences {
 			   pref.put(key, location);   
 		   }
 	   }
+	   
+	   public void setVerifydtapnLCLocation(String location) {
+		   final String key = "dverifytapnLC.location";
+		   
+		   if (location == null || location.equals("")){
+			   pref.remove(key);
+		   }else {
+			   pref.put(key, location);   
+		   }
+	   }
 	
 }

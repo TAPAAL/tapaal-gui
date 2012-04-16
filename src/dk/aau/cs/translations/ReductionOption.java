@@ -12,6 +12,7 @@ public enum ReductionOption {
 	KBOUNDOPTMIZATION, 
 	VerifyTAPN,
 	VerifyTAPNdiscreteVerification,
+	VerifyTAPNdiscreteVerificationLC,
 	BatchProcessingKeepQueryOption,
 	BatchProcessingUserDefinedReductions
 }

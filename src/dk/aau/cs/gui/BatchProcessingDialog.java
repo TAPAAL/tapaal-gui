@@ -88,6 +88,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
 	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Engine w. Discrete Inclusion";
 	private static final String name_verifyTAPNDiscreteVerification = "TAPAAL Engine - Discrete Verification";
+	private static final String name_verifyTAPNDiscreteVerificationLC = "TAPAAL Engine - Discrete Verification LC";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -105,6 +106,8 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_BROADCASTDEG2;
 	private static final String name_verifyTAPNDiscreteVerificationWithLegend = "G: "
 			+ name_verifyTAPNDiscreteVerification;
+	private static final String name_verifyTAPNDiscreteVerificationLCWithLegend = "H: "
+			+ name_verifyTAPNDiscreteVerificationLC;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
@@ -1373,6 +1376,7 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox BROADCAST;
 		private JCheckBox BROADCASTDEG2;
 		private JCheckBox verifyTAPNDiscreteVerification;
+		private JCheckBox verifyTAPNDiscreteVerificationLC;
 		
 		JButton selectAll;
 		JButton deselectAll;
@@ -1471,6 +1475,9 @@ public class BatchProcessingDialog extends JDialog {
 			verifyTAPNDiscreteVerification = new JCheckBox(name_verifyTAPNDiscreteVerificationWithLegend);
 			verifyTAPNDiscreteVerification.setEnabled(false);
 			
+			verifyTAPNDiscreteVerificationLC = new JCheckBox(name_verifyTAPNDiscreteVerificationLCWithLegend);
+			verifyTAPNDiscreteVerificationLC.setEnabled(false);
+			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 0;
@@ -1516,10 +1523,16 @@ public class BatchProcessingDialog extends JDialog {
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 6;
-			gbc.insets = new Insets(0, 5, 5, 5);
+			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(verifyTAPNDiscreteVerification, gbc);
-
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 7;
+			gbc.insets = new Insets(0, 5, 5, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(verifyTAPNDiscreteVerificationLC, gbc);
 		}
 
 		private void initLeftPanel() {
@@ -1574,6 +1587,7 @@ public class BatchProcessingDialog extends JDialog {
 				BROADCAST.setEnabled(false);
 				BROADCASTDEG2.setEnabled(false);
 				verifyTAPNDiscreteVerification.setEnabled(false);
+				verifyTAPNDiscreteVerificationLC.setEnabled(false);
 				selectAll.setEnabled(false);
 				deselectAll.setEnabled(false);
 			} else {
@@ -1585,6 +1599,7 @@ public class BatchProcessingDialog extends JDialog {
 				BROADCAST.setEnabled(true);
 				BROADCASTDEG2.setEnabled(true);
 				verifyTAPNDiscreteVerification.setEnabled(true);
+				verifyTAPNDiscreteVerificationLC.setEnabled(true);
 				selectAll.setEnabled(true);
 				deselectAll.setEnabled(true);
 			}
@@ -1598,6 +1613,7 @@ public class BatchProcessingDialog extends JDialog {
 			BROADCAST.setSelected(selected);
 			BROADCASTDEG2.setSelected(selected);
 			verifyTAPNDiscreteVerification.setSelected(selected);
+			verifyTAPNDiscreteVerificationLC.setSelected(selected);
 		}
 		
 		public List<ReductionOption> getChoosenOptions(){
@@ -1619,6 +1635,9 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			if(verifyTAPNDiscreteVerification.isSelected()){
 				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
+			}
+			if(verifyTAPNDiscreteVerificationLC.isSelected()){
+				result.add(ReductionOption.VerifyTAPNdiscreteVerificationLC);
 			}
 			return result;
 		}
