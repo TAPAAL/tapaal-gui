@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.awt.event.KeyEvent;
@@ -127,6 +129,34 @@ public class TemplateExplorer extends JPanel {
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Components"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	    this.setToolTipText("List of compoments. Click a component to display it.");
 		addCreatedComponents(hideButtons);
+		
+		this.addComponentListener(new ComponentListener() {
+			int minimumHegiht = TemplateExplorer.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				
+				if(isInAnimationMode){
+					if(TemplateExplorer.this.getSize().height <= minimumHegiht){
+						sortButton.setVisible(false);
+					} else {
+						sortButton.setVisible(true);
+					}
+				}
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		
+		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
 
 	private void addCreatedComponents(boolean hideButtons) {
