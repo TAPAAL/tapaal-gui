@@ -622,12 +622,16 @@ public class TabContent extends JSplitPane {
 		//Makes sure all components are visible
 		int heigh = 0;
 		if(c.isVisible()){
+			int numberOfShownComponents = getNumberOfShownComponents();
+			int componentHeight = (this.getSize().height - 7 * (numberOfShownComponents -1)) /numberOfShownComponents;
+			System.out.println("this.getSize().height: "+ this.getSize().height + " numberOfShownComponents: " + numberOfShownComponents + " componentHeight: " + componentHeight);
 			for(Node n : t){
-				if(n instanceof Leaf){
+				if(n instanceof Leaf && n.isVisible()){
 					Component component = editorSplitPane.getMultiSplitLayout().getComponentForNode(n);
-					n.setBounds(new Rectangle(new Point(0, heigh), component.getPreferredSize()));
-					heigh = heigh+component.getPreferredSize().height;
-				} else if (n instanceof Divider){
+					n.setBounds(new Rectangle(new Point(0, heigh), new Dimension(component.getPreferredSize().width, componentHeight)));
+					System.out.println(n.getBounds());
+					heigh +=componentHeight;
+				} else if (n instanceof Divider && n.isVisible()){
 					
 					n.setBounds(new Rectangle(0, heigh, n.getBounds().width, n.getBounds().height));
 					heigh = heigh + n.getBounds().height;
@@ -643,5 +647,23 @@ public class TabContent extends JSplitPane {
 		}
 
 		editorSplitPane.repaint();
+	}
+	
+	private int getNumberOfShownComponents(){
+		int result = 0;
+		
+		if(templateExplorer.isVisible()){
+			result++;
+		}
+		if(sharedPTPanel.isVisible()){
+			result++;
+		}
+		if(queries.isVisible()){
+			result++;
+		}
+		if(constantsPanel.isVisible()){
+			result++;
+		}
+		return result;
 	}
 }

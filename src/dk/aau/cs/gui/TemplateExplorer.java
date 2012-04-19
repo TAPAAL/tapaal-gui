@@ -138,7 +138,7 @@ public class TemplateExplorer extends JPanel {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				
-				if(isInAnimationMode){
+				if(!isInAnimationMode){
 					if(TemplateExplorer.this.getSize().height <= minimumHegiht){
 						sortButton.setVisible(false);
 					} else {
