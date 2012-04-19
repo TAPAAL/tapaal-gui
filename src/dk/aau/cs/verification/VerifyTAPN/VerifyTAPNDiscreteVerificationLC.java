@@ -229,8 +229,8 @@ public class VerifyTAPNDiscreteVerificationLC implements ModelChecker{
 			if(!supportsModel(model.value1()))
 				throw new UnsupportedModelException("VerifydtapnLC does not support the given model.");
 			
-			if(!supportsQuery(model.value1(), query, options))
-				throw new UnsupportedQueryException("VerifydtapnLC does not support the given query.");
+			//if(!supportsQuery(model.value1(), query, options))
+				//throw new UnsupportedQueryException("VerifydtapnLC does not support the given query.");
 			
 //			if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
