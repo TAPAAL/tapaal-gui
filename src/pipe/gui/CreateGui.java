@@ -328,8 +328,10 @@ public class CreateGui {
 		return showZeroToInfinityIntervals;
 	}
 	
-	public static void toggleConstantAddSubtractEnabled() {
-		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.toggleConstantAddSubtractEnabled();
+	public static void verifyQuery() {
+		TabContent tab = getCurrentTab();
+		if (tab.isQueryPossible()) {
+			getCurrentTab().verifySelectedQuery();
+		}
 	}
 }

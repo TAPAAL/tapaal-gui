@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.MenuBar;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -127,7 +128,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
-	randomAction, randomAnimateAction, timeAction;
+	randomAction, randomAnimateAction, timeAction, verifyAction;
 
 	public boolean dragging = false;
 
@@ -500,6 +501,10 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
+		 addMenuItem(animateMenu, verifyAction = new AnimateAction(
+				 "Verify Query", ElementType.VERIFY, "Verify Query (Crtl-V)",
+				 "Crtl V", true));
+		 verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', java.awt.event.InputEvent.CTRL_MASK));
 		 animateMenu.addSeparator();
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
 				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
@@ -772,12 +777,11 @@ public class GuiFrame extends JFrame implements Observer {
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 * */
 	private void enableGUIActions() {
-
 		switch (getGUIMode()) {
 		case draw:
 
 			enableAllActions(true);
-
+			
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
@@ -800,6 +804,13 @@ public class GuiFrame extends JFrame implements Observer {
 
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
+			
+			if (CreateGui.getCurrentTab().isQueryPossible()) {
+				verifyAction.setEnabled(true);
+			}
+			else {
+				verifyAction.setEnabled(false);
+			}
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
@@ -836,9 +847,11 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			verifyAction.setEnabled(false);
 
 			break;
 		case noNet:
+			verifyAction.setEnabled(false);
 
 			timedPlaceAction.setEnabled(false);
 			timedArcAction.setEnabled(false);
@@ -1419,6 +1432,13 @@ public class GuiFrame extends JFrame implements Observer {
 		// xxx - This must be refactored when someone findes out excatly what is
 		// gowing on
 		mode = prev_mode;
+		
+		if (CreateGui.getCurrentTab().isQueryPossible()) {
+			verifyAction.setEnabled(true);
+		}
+		else {
+			verifyAction.setEnabled(false);
+		}
 
 		if (placeAction != null) {
 			placeAction.setSelected(mode == ElementType.PLACE);
@@ -1455,6 +1475,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (annotationAction != null)
 			annotationAction.setSelected(mode == ElementType.ANNOTATION);
+		
+		
 
 	}
 
@@ -1622,6 +1644,9 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				break;
+			case VERIFY:
+				CreateGui.getCurrentTab().verifySelectedQuery();
 				break;
 			default:
 				break;
@@ -2135,7 +2160,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 } else if (this == redoAction) {
 					 appView.getUndoManager().redo();
 					 CreateGui.getCurrentTab().network().buildConstraints();
-				 }
+				 }				 
 			}
 		}
 	}

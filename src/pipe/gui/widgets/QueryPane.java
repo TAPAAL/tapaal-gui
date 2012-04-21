@@ -250,12 +250,7 @@ public class QueryPane extends JPanel {
 		verifyButton.setPreferredSize(dimension);
 		verifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
-				
-				if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-					Verifier.runVerifyTAPNVerification(tabContent.network(), query);
-				else
-					Verifier.runUppaalVerification(tabContent.network(), query);
+				verifyQuery();
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -379,5 +374,22 @@ public class QueryPane extends JPanel {
 	public void selectFirst() {
 		queryList.setSelectedIndex(0);
 		
+	}
+	
+	private void verifyQuery() {
+		TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
+		
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+			Verifier.runVerifyTAPNVerification(tabContent.network(), query);
+		else
+			Verifier.runUppaalVerification(tabContent.network(), query);
+	}
+	
+	public boolean isQueryPossible() {
+		return (queryList.getModel().getSize() > 0 );
+	}
+	
+	public void verifySelectedQuery() {
+		verifyQuery();
 	}
 }

@@ -107,8 +107,6 @@ public class GuardDialogue extends JPanel /*
 				dk.aau.cs.model.tapn.TimeInterval guard = composeGuard(arc.getGuard());
 				undoManager.addEdit(arc.setGuard(guard));
 				CreateGui.getCurrentTab().network().buildConstraints();
-
-				CreateGui.toggleConstantAddSubtractEnabled();
 				exit();
 			}
 

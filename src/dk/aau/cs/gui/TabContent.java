@@ -3,6 +3,8 @@ package dk.aau.cs.gui;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -99,7 +101,6 @@ public class TabContent extends JSplitPane {
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
 		this.setDividerSize(8);	
-
 	}
 	
 	public void createEditorLeftPane() {
@@ -546,7 +547,11 @@ public class TabContent extends JSplitPane {
 		
 	}	
 	
-	public void toggleConstantAddSubtractEnabled(){
-		constantsPanel.toggleConstantAddSubtractEnabled();
+	public boolean isQueryPossible() {
+		return queries.isQueryPossible();
+	}
+	
+	public void verifySelectedQuery() {
+		queries.verifySelectedQuery();
 	}
 }
