@@ -620,17 +620,15 @@ public class TabContent extends JSplitPane {
 		}
 		
 		//Makes sure all components are visible
-		int heigh = 0;
 		if(c.isVisible()){
-			int numberOfShownComponents = getNumberOfShownComponents();
-			int componentHeight = (this.getSize().height - 7 * (numberOfShownComponents -1)) /numberOfShownComponents;
-			System.out.println("this.getSize().height: "+ this.getSize().height + " numberOfShownComponents: " + numberOfShownComponents + " componentHeight: " + componentHeight);
+			int heigh = 0;
+			int i = 0;
+			int[] distribution = getComponentDistribution();
 			for(Node n : t){
 				if(n instanceof Leaf && n.isVisible()){
 					Component component = editorSplitPane.getMultiSplitLayout().getComponentForNode(n);
-					n.setBounds(new Rectangle(new Point(0, heigh), new Dimension(component.getPreferredSize().width, componentHeight)));
-					System.out.println(n.getBounds());
-					heigh +=componentHeight;
+					n.setBounds(new Rectangle(new Point(0, heigh), new Dimension(component.getPreferredSize().width, distribution[i])));
+					heigh +=distribution[i++];
 				} else if (n instanceof Divider && n.isVisible()){
 					
 					n.setBounds(new Rectangle(0, heigh, n.getBounds().width, n.getBounds().height));
@@ -664,6 +662,34 @@ public class TabContent extends JSplitPane {
 		if(constantsPanel.isVisible()){
 			result++;
 		}
+		return result;
+	}
+	
+	private int[] getComponentDistribution(){
+		double totalMinSize = 
+				(templateExplorer.isVisible() ? templateExplorer.getMinimumSize().height : 0) + 
+						(sharedPTPanel.isVisible() ? sharedPTPanel.getMinimumSize().height : 0)  +
+								(queries.isVisible() ? queries.getMinimumSize().height : 0) + 
+										(constantsPanel.isVisible() ? constantsPanel.getMinimumSize().height : 0);
+		int i = 0;
+		int numberOfShownComponents = getNumberOfShownComponents();
+		int[] result = new int[numberOfShownComponents];
+		
+		double componentArea = this.getSize().height - 7 * (numberOfShownComponents - 1);
+		
+		if(templateExplorer.isVisible()){
+			result[i++] =  (int)Math.floor((componentArea * ((double)templateExplorer.getMinimumSize().height / totalMinSize))+0.5d);
+		}
+		if(sharedPTPanel.isVisible()){
+			result[i++] =  (int)Math.floor((componentArea * ((double)sharedPTPanel.getMinimumSize().height / totalMinSize))+0.5d);
+		}
+		if(queries.isVisible()){
+			result[i++] =  (int)Math.floor((componentArea * ((double)queries.getMinimumSize().height / totalMinSize))+0.5d);
+		}
+		if(constantsPanel.isVisible()){
+			result[i++] =  (int)Math.floor((componentArea * ((double)constantsPanel.getMinimumSize().height / totalMinSize))+0.5d);
+		}
+		
 		return result;
 	}
 }
