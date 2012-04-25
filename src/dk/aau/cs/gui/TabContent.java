@@ -43,6 +43,7 @@ import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
+import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -60,7 +61,7 @@ public class TabContent extends JSplitPane {
 	protected File appFile;
 
 	// Normal mode
-	JXMultiSplitPane editorSplitPane;
+	BugHandledJXMultisplitPane editorSplitPane;
 	Split editorModelroot;
 
 	QueryPane queries;
@@ -156,7 +157,7 @@ public class TabContent extends JSplitPane {
 		// (bug in the swingx package)
 		editorModelroot.setParent(new Split());
 
-		editorSplitPane = new JXMultiSplitPane();
+		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
@@ -557,7 +558,7 @@ public class TabContent extends JSplitPane {
 				animatorSplitPane.getMultiSplitLayout().displayNode(
 						templateExplorerName, enable);
 			}
-			fixDividersEditor(templateExplorer);
+			makeSureEditorPanelIsVisible(templateExplorer);
 		}
 	}
 
@@ -565,7 +566,7 @@ public class TabContent extends JSplitPane {
 		if (!(enable && queries.isVisible())) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName,
 					enable);
-			fixDividersEditor(queries);
+			makeSureEditorPanelIsVisible(queries);
 			this.repaint();
 		}
 	}
@@ -574,7 +575,7 @@ public class TabContent extends JSplitPane {
 		if (!(enable && constantsPanel.isVisible())) {
 			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
 					enable);
-			fixDividersEditor(constantsPanel);
+			makeSureEditorPanelIsVisible(constantsPanel);
 		}		
 	}
 
@@ -591,105 +592,13 @@ public class TabContent extends JSplitPane {
 		constantsPanel.selectFirst();
 
 	}
-	
-	/*
-	 * When hiding the two bottom children of a JXMultisplitpane something goes
-	 * wrong and the bottom divider stay there (it should have been removed)
-	 * This method removes this extra divider (bug in the swingx package)
-	 * 
-	 * The method also resets the sizes of the components this is done as if you 
-	 * remove the bottom component, then pulls the bottom component all the way down
-	 * and then adds the removed component again its shown outside the window
-	 * 
-	 * As a last thing it makes sure that if you "show" a component and the main divider is 
-	 * all the way to the left, it's moved such that the component is actually shown.
-	 * 
-	 * This method will hopefully become unnecessary as the JXMultisplitPane matures
-	 */
-	private void fixDividersEditor(java.awt.Component c){
-		//Make sure there are no extra dividers
-		java.util.List<Node> t = editorModelroot.getChildren();
-		for(int i = t.size()-1; i>-1; i--){
-			Node n = t.get(i);
-			if(n.isVisible()){
-				if(n instanceof Divider){
-					n.setVisible(false);
-				}
-				break;
-			}
-		}
-		
-		//Makes sure all components are visible
-		if(c.isVisible()){
-			int heigh = 0;
-			int i = 0;
-			int[] distribution = getComponentDistribution();
-			for(Node n : t){
-				if(n instanceof Leaf && n.isVisible()){
-					Component component = editorSplitPane.getMultiSplitLayout().getComponentForNode(n);
-					n.setBounds(new Rectangle(new Point(0, heigh), new Dimension(component.getPreferredSize().width, distribution[i])));
-					heigh +=distribution[i++];
-				} else if (n instanceof Divider && n.isVisible()){
-					
-					n.setBounds(new Rectangle(0, heigh, n.getBounds().width, n.getBounds().height));
-					heigh = heigh + n.getBounds().height;
-				}
-			}
-		}
-		
+
+	public void makeSureEditorPanelIsVisible(Component c){
 		//If you "show" a component and the main divider is all the way to the left, make sure it's moved such that the component is actually shown
 		if(c.isVisible()){
 			if(this.getDividerLocation() == 0){
 				this.setDividerLocation(c.getPreferredSize().width);
 			}
 		}
-
-		editorSplitPane.repaint();
-	}
-	
-	private int getNumberOfShownComponents(){
-		int result = 0;
-		
-		if(templateExplorer.isVisible()){
-			result++;
-		}
-		if(sharedPTPanel.isVisible()){
-			result++;
-		}
-		if(queries.isVisible()){
-			result++;
-		}
-		if(constantsPanel.isVisible()){
-			result++;
-		}
-		return result;
-	}
-	
-	private int[] getComponentDistribution(){
-		double totalMinSize = 
-				(templateExplorer.isVisible() ? templateExplorer.getMinimumSize().height : 0) + 
-						(sharedPTPanel.isVisible() ? sharedPTPanel.getMinimumSize().height : 0)  +
-								(queries.isVisible() ? queries.getMinimumSize().height : 0) + 
-										(constantsPanel.isVisible() ? constantsPanel.getMinimumSize().height : 0);
-		int i = 0;
-		int numberOfShownComponents = getNumberOfShownComponents();
-		int[] result = new int[numberOfShownComponents];
-		
-		double componentArea = this.getSize().height - 7 * (numberOfShownComponents - 1);
-		
-		if(templateExplorer.isVisible()){
-			result[i++] =  (int)Math.floor((componentArea * ((double)templateExplorer.getMinimumSize().height / totalMinSize))+0.5d);
-		}
-		if(sharedPTPanel.isVisible()){
-			result[i++] =  (int)Math.floor((componentArea * ((double)sharedPTPanel.getMinimumSize().height / totalMinSize))+0.5d);
-		}
-		if(queries.isVisible()){
-			result[i++] =  (int)Math.floor((componentArea * ((double)queries.getMinimumSize().height / totalMinSize))+0.5d);
-		}
-		if(constantsPanel.isVisible()){
-			result[i++] =  (int)Math.floor((componentArea * ((double)constantsPanel.getMinimumSize().height / totalMinSize))+0.5d);
-		}
-		
-		return result;
 	}
 }
