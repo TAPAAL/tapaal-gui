@@ -566,7 +566,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
-		verification = new JMenuItem(verifyAction = new ToolAction("Verify Query","Verifies the currently selected query","ctrl V"));
+		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl V"));
 		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', shortcutkey));
 		verification.setMnemonic('v');
 		verification.addActionListener(new ActionListener() {			
