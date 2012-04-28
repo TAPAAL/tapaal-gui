@@ -112,7 +112,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
-	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction;
+	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
@@ -122,13 +122,14 @@ public class GuiFrame extends JFrame implements Observer {
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
+	private JMenuItem verification;
 	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
 
 
 	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
-	randomAction, randomAnimateAction, timeAction, verifyAction;
+	randomAction, randomAnimateAction, timeAction;
 
 	public boolean dragging = false;
 
@@ -501,11 +502,6 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
-		 addMenuItem(animateMenu, verifyAction = new AnimateAction(
-				 "Verify Query", ElementType.VERIFY, "Verify Query (Crtl-V)",
-				 "Crtl V", true));
-		 verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', java.awt.event.InputEvent.CTRL_MASK));
-		 animateMenu.addSeparator();
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
 				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
 		 addMenuItem(animateMenu,
@@ -570,8 +566,15 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
-
-        //statistics = new JMenuItem("Net statistics");	
+		verification = new JMenuItem(verifyAction = new ToolAction("Verify Query","Verifies the currently selected query","ctrl V"));
+		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', shortcutkey));
+		verification.setMnemonic('v');
+		verification.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent arg0) {
+				CreateGui.getCurrentTab().verifySelectedQuery();				
+			}
+		});
+		toolsMenu.add(verification);	
 		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.","ctrl I"));				
 		netStatisticsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('I', shortcutkey));
 		statistics.setMnemonic('n');		
@@ -1644,9 +1647,6 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
-				break;
-			case VERIFY:
-				CreateGui.getCurrentTab().verifySelectedQuery();
 				break;
 			default:
 				break;

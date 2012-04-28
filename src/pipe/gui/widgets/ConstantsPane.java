@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -149,11 +150,11 @@ public class ConstantsPane extends JPanel {
 
 			@Override
 			public void keyReleased(KeyEvent arg0) {
-				if (arg0.getKeyCode() == KeyEvent.VK_V && arg0.getModifiers() == InputEvent.CTRL_MASK) { 
+				if (arg0.getKeyCode() == KeyEvent.VK_V && arg0.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) { 
 					CreateGui.verifyQuery();					
 				}
 			}
-
+			
 			@Override
 			public void keyPressed(KeyEvent arg0) {				
 				ListModel model = constantsList.getModel();
