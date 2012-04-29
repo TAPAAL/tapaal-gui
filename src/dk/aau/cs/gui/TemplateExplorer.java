@@ -101,7 +101,7 @@ public class TemplateExplorer extends JPanel {
 	private final static String toolTipMoveDown = "Move the selected component down";
     //private static final String toolTipComponents ="Here you can manage the different components of the Net.<html><br/></html>" +
     	//	"A Net can be broken up in several components and connected via shared places and transitions.";
-
+	
 	public TemplateExplorer(TabContent parent) {
 		this(parent, false);
 	}
@@ -131,7 +131,7 @@ public class TemplateExplorer extends JPanel {
 		addCreatedComponents(hideButtons);
 		
 		this.addComponentListener(new ComponentListener() {
-			int minimumHegiht = TemplateExplorer.this.getMinimumSize().height;
+			int minimumHegiht = TemplateExplorer.this.getMinimumSize().height + sortButton.getMinimumSize().height;
 			public void componentShown(ComponentEvent e) {
 			}
 			
@@ -155,8 +155,6 @@ public class TemplateExplorer extends JPanel {
 			public void componentHidden(ComponentEvent e) {
 			}
 		});
-		
-		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
 
 	private void addCreatedComponents(boolean hideButtons) {
@@ -167,11 +165,17 @@ public class TemplateExplorer extends JPanel {
 			moveUpButton.setVisible(true);
 			sortButton.setVisible(true);
 			this.add(buttonPanel, BorderLayout.PAGE_END);
+			
+			//Sets the minimum size such that the sortbutton can disappear
+			this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 		} else {
 			this.add(templatePanel, BorderLayout.CENTER);
 			moveDownButton.setVisible(false);
 			moveUpButton.setVisible(false);
 			sortButton.setVisible(false);
+			
+			//Makes the jpanel auto calculate it's minimum size
+			this.setMinimumSize(null);
 		}
 	}
 

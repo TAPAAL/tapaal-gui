@@ -29,7 +29,7 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 			super.displayNode(name, visible);
 			Component c = getComponentForName(name);
 			
-			fixDividersError(c);
+			fixDividersError(c.isVisible());
 		}
 		
 		/*
@@ -46,7 +46,7 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 		 * 
 		 * This method will hopefully become unnecessary as the JXMultisplitPane matures
 		 */
-		private void fixDividersError(java.awt.Component c){
+		private void fixDividersError(boolean redistributeComponents){
 			//Make sure there are no extra dividers
 			java.util.List<Node> t = ((Split) this.getModel()).getChildren();
 			for(int i = t.size()-1; i>-1; i--){
@@ -60,7 +60,7 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 			}
 			
 			//Makes sure all components are visible
-			if(c.isVisible()){
+			if(redistributeComponents){
 				int heigh = 0;
 				int i = 0;
 				int[] distribution = getComponentDistribution();
@@ -106,12 +106,12 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 			int numberOfShownComponents = getNumberOfShownComponents();
 			int[] result = new int[numberOfShownComponents];
 			
-			double componentArea = BugHandledJXMultisplitPane.this.getSize().height - 7 * (numberOfShownComponents - 1);
+			double componentArea = BugHandledJXMultisplitPane.this.getSize().getHeight() - 7 * (numberOfShownComponents - 1);
 			
 			for(Node n : t){
 				if(n instanceof Leaf && n.isVisible()){
 					Component c = getComponentForNode(n);
-					result[i++] = (int)Math.floor((componentArea * ((double)c.getMinimumSize().height / totalMinSize))+0.5d);
+					result[i++] = (int)Math.floor((componentArea * (c.getPreferredSize().getHeight() / totalMinSize))+0.5d);
 				}
 			}
 			

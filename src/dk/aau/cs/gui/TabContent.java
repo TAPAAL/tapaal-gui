@@ -307,8 +307,6 @@ public class TabContent extends JSplitPane {
 		if (enabledTransitionsList == null)
 			createEnabledTransitionsList();
 
-		templateExplorer.switchToAnimationMode();
-
 		if (animatorSplitPane == null)
 			createAnimatorSlitPane();
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
@@ -316,13 +314,18 @@ public class TabContent extends JSplitPane {
 		// Inserts dummy to avoid nullpointerexceptions from the displaynode
 		// method
 		// A component can only be on one splitpane at the time
-		editorSplitPane.add(new JPanel(), templateExplorerName);
+		JPanel dummy = new JPanel();
+		dummy.setMinimumSize(templateExplorer.getMinimumSize());
+		dummy.setPreferredSize(templateExplorer.getPreferredSize());
+		editorSplitPane.add(dummy, templateExplorerName);
+		
+		templateExplorer.switchToAnimationMode();
+		
 		this.setLeftComponent(animatorSplitPane);
 
 	}
 
 	public void switchToEditorComponents() {
-		templateExplorer.switchToEditorMode();
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		if (animatorSplitPane != null) {
@@ -330,9 +333,14 @@ public class TabContent extends JSplitPane {
 			// Inserts dummy to avoid nullpointerexceptions from the displaynode
 			// method
 			// A component can only be on one splitpane at the time
+			JPanel dummy = new JPanel();
+			dummy.setMinimumSize(templateExplorer.getMinimumSize());
+			dummy.setPreferredSize(templateExplorer.getPreferredSize());
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
 		}
-
+		
+		templateExplorer.switchToEditorMode();
+		
 		this.setLeftComponent(editorSplitPane);
 
 		drawingSurface.repaintAll();
