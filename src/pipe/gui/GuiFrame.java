@@ -5,11 +5,14 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.MenuBar;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -30,6 +33,7 @@ import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.concurrent.Delayed;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -143,6 +147,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showConstants = true;
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
+	
+	private boolean commandOrControlWasPressed = false;
 
 	
 	private GUIMode guiMode = GUIMode.noNet;
@@ -216,6 +222,23 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
+		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_V){
+					if (e.getID() == KeyEvent.KEY_PRESSED) {			
+						commandOrControlWasPressed = true;
+						e.consume();
+					}
+				}
+				if (e.getID() == KeyEvent.KEY_TYPED && commandOrControlWasPressed == true) {
+					commandOrControlWasPressed = false;
+					CreateGui.verifyQuery();					
+				}
+				return false;
+			}
+		});
 	}
 	
 	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{

@@ -149,10 +149,7 @@ public class ConstantsPane extends JPanel {
 			}
 
 			@Override
-			public void keyReleased(KeyEvent arg0) {
-				if (arg0.getKeyCode() == KeyEvent.VK_V && arg0.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) { 
-					CreateGui.verifyQuery();					
-				}
+			public void keyReleased(KeyEvent arg0) {			
 			}
 			
 			@Override
