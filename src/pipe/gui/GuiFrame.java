@@ -54,6 +54,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -122,7 +123,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
@@ -147,8 +148,8 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showConstants = true;
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
-	
 	private boolean commandOrControlWasPressed = false;
+	private boolean showToolTips = true;
 
 	
 	private GUIMode guiMode = GUIMode.noNet;
@@ -518,7 +519,11 @@ public class GuiFrame extends JFrame implements Observer {
 				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true));
     				 showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
-		 
+    		addCheckboxMenuItem(viewMenu, showToolTipsAction = new ViewAction("Display tool tips",
+   				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
+    				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
+
+    				 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
@@ -940,6 +945,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showQueriesAction.setEnabled(enable);
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
+		showToolTipsAction.setEnabled(enable);
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -1014,6 +1020,15 @@ public class GuiFrame extends JFrame implements Observer {
 	public void toggleConstants(){
 		showConstants(!showConstants);
 	}
+	
+	public void showToolTips(boolean enable){
+		showToolTips = enable;
+		ToolTipManager.sharedInstance().setEnabled(enable);
+	}
+	public void toggleToolTips(){
+		showToolTips(!showToolTips);
+	}
+	
 	
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
@@ -1392,6 +1407,7 @@ public class GuiFrame extends JFrame implements Observer {
 			showComponents(showComponents);
 			showQueries(showQueries);
 			showConstants(showConstants);
+			showToolTips(showToolTips);
 			
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
 			
@@ -2006,6 +2022,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleZeroToInfinityIntervals();
 			} else if (this == showEnabledTransitionsAction) {
 				toggleEnabledTransitionsList();
+			} else if (this == showToolTipsAction) {
+				toggleToolTips();
 			}
 		}
 		
