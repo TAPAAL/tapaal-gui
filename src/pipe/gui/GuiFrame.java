@@ -627,10 +627,7 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenuItem advancedWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show advanced workspace", "Show all panels", ""));
 		advancedWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				QueryDialog.setAdvancedView(true);
-				showComponents(true);
-				showQueries(true);
-				showConstants(true);
+				showAdvancedWorkspace(true);
 			}
 		});
 		
@@ -638,17 +635,23 @@ public class GuiFrame extends JFrame implements Observer {
 		JMenuItem simpleWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show simple workspace", "Only show the most important panels", ""));
 		simpleWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				QueryDialog.setAdvancedView(false);
-				showComponents(false);
-				showQueries(true);
-				showConstants(false);
+				showAdvancedWorkspace(false);
 			}
 		});
 		
 		toolsMenu.add(simpleWorkspace);
 		return toolsMenu;
 	}
-
+	
+	public void showAdvancedWorkspace(boolean advanced){
+		QueryDialog.setAdvancedView(advanced);
+		showComponents(advanced);
+		showConstants(advanced);
+		
+		//Queries should always be shown
+		showQueries(true);
+	}
+	
 	private void buildToolbar() {
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
