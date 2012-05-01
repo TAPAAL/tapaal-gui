@@ -22,17 +22,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private boolean isInPreSet;
 	private TimedTransportArcComponent connectedTo = null;
 	private TransportArc underlyingTransportArc;
-	
-	public TimedTransportArcComponent(double startPositionXInput,
-			double startPositionYInput, double endPositionXInput,
-			double endPositionYInput, PlaceTransitionObject sourceInput,
-			PlaceTransitionObject targetInput, int weightInput, String idInput,
-			boolean taggedInput) {
-		super(startPositionXInput, startPositionYInput, endPositionXInput,
-				endPositionYInput, sourceInput, targetInput, 0,
-				idInput, taggedInput);
-		setWeight(weightInput);
-	}
 
 	public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr,
 			boolean isInPreSet) {
@@ -52,14 +41,6 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		this.setGroup(group);
 		// hack to reprint the label of the arc
 		updateLabel(true);
-	}
-	
-	public int getWeight(){
-		return underlyingTransportArc.getWeight();
-	}
-	
-	public void setWeight(int weight){
-		underlyingTransportArc.setWeight(weight);
 	}
 
 	public void setUnderlyingArc(TransportArc arc) {
@@ -122,9 +103,8 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			label.setText("");
 		}
 		
-		
-		if(underlyingTransportArc != null && underlyingTransportArc.getWeight() > 1){
-			label.setText(underlyingTransportArc.getWeight()+"x "+label.getText());
+		if(underlyingTransportArc != null && getWeight() > 1){
+					label.setText(getWeight()+"x "+label.getText());
 		}
 		
 		this.setLabelPosition();
@@ -225,6 +205,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+
 		TimeInterval oldTimeInterval = underlyingTransportArc.interval();
 		underlyingTransportArc.setTimeInterval(guard);
 		int oldWeight = getWeight();
@@ -258,6 +239,16 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		arc.setGuiModel(guiModel);
 		
 		return arc;
+	}
+	
+	@Override
+	public void setWeight(int weight){
+		underlyingTransportArc.setWeight(weight);
+	}
+	
+	@Override
+	public int getWeight(){
+		return underlyingTransportArc.getWeight();
 	}
 
 }

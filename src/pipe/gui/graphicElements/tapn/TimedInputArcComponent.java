@@ -24,31 +24,10 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	private static final long serialVersionUID = 8263782840119274756L;
 	private TimedInputArc inputArc;
 	protected String timeInterval;
-	
-	public TimedInputArcComponent(double startPositionXInput,
-			double startPositionYInput, double endPositionXInput,
-			double endPositionYInput, PlaceTransitionObject sourceInput,
-			PlaceTransitionObject targetInput, int weightInput, String idInput,
-			boolean taggedInput) {
-		super(startPositionXInput, startPositionYInput, endPositionXInput,
-				endPositionYInput, sourceInput, targetInput, 0,
-				idInput, taggedInput);
-		if(weightInput > 0){
-			setWeight(weightInput);
-		}
-	}
-	
+
 	public TimedInputArcComponent(PlaceTransitionObject source) {
 		super(source);
 		init();
-	}
-	
-	public int getWeight(){
-		return inputArc.getWeight();
-	}
-	
-	public void setWeight(int weight){
-		inputArc.setWeight(weight);
 	}
 
 	private void init() {
@@ -114,8 +93,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 				else {
 					label.setText(inputArc.interval().toString(showConstantNames));
 				}
-				if(inputArc.getWeight() > 1){
-					label.setText(inputArc.getWeight()+"x "+label.getText());
+				if(getWeight() > 1){
+					label.setText(getWeight()+"x "+label.getText());
 				}
 			}
 			this.setLabelPosition();
@@ -192,5 +171,15 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		arc.setGuiModel(guiModel);
 		
 		return arc;
+	}
+	
+	@Override
+	public void setWeight(int weight){
+		inputArc.setWeight(weight);
+	}
+	
+	@Override
+	public int getWeight(){
+		return inputArc.getWeight();
 	}
 }

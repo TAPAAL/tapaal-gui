@@ -22,17 +22,6 @@ import dk.aau.cs.model.tapn.TimedInhibitorArc;
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
 	private TimedInhibitorArc inhibitorArc;
-	
-	public TimedInhibitorArcComponent(double startPositionXInput,
-			double startPositionYInput, double endPositionXInput,
-			double endPositionYInput, PlaceTransitionObject sourceInput,
-			PlaceTransitionObject targetInput, int weightInput, String idInput,
-			boolean taggedInput) {
-		super(startPositionXInput, startPositionYInput, endPositionXInput,
-				endPositionYInput, sourceInput, targetInput, 0,
-				idInput, taggedInput);
-		setWeight(weightInput);
-	}
 
 	public TimedInhibitorArcComponent(TimedOutputArcComponent arc) {
 		super(arc);
@@ -44,14 +33,6 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	public TimedInhibitorArcComponent(PlaceTransitionObject source) {
 		super(source);
-	}
-	
-	public int getWeight(){
-		return inhibitorArc.getWeight();
-	}
-	
-	public void setWeight(int weight){
-		inhibitorArc.setWeight(weight);
 	}
 
 	public void setUnderlyingArc(TimedInhibitorArc arc) {
@@ -83,6 +64,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+
 		TimeInterval oldTimeInterval = inhibitorArc.interval();
 		inhibitorArc.setTimeInterval(guard);
 		int oldWeight = getWeight();
@@ -161,5 +143,15 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		arc.setGuiModel(guiModel);
 		
 		return arc;
+	}
+	
+	@Override
+	public void setWeight(int weight){
+		inhibitorArc.setWeight(weight);
+	}
+	
+	@Override
+	public int getWeight(){
+		return inhibitorArc.getWeight();
 	}
 }
