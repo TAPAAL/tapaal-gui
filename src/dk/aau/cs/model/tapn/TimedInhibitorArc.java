@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TimedInhibitorArc extends TimedInputArc {
+
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
-		super(source, destination, TimeInterval.ZERO_INF);
+		this(source, destination, interval, 1);
+	}
+	
+	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, int weight) {
+		super(source, destination, TimeInterval.ZERO_INF, weight);
 	}
 	
 	@Override

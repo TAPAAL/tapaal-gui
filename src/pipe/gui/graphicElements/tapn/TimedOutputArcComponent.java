@@ -68,6 +68,17 @@ public class TimedOutputArcComponent extends Arc {
 		super(startPositionXInput, startPositionYInput, endPositionXInput,
 				endPositionYInput, sourceInput, targetInput, weightInput,
 				idInput);
+		if(weightInput > 0){
+			setWeight(weightInput);
+		}
+	}
+	
+	public int getWeight(){
+		return outputArc.getWeight();
+	}
+	
+	public void setWeight(int weight){
+		outputArc.setWeight(weight);
 	}
 
 	/**

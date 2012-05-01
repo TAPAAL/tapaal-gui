@@ -51,12 +51,14 @@ public class GuardDialogue extends JPanel /*
 	private static final long serialVersionUID = 4582651236913407101L;
 	private JRootPane myRootPane;
 	private JPanel guardEditPanel;
+	private JPanel weightEditPanel;
 	private JPanel buttonPanel;
 
 	private JButton okButton;
 	private JButton cancelButton;
 
 	private JLabel label;
+	private JSpinner weightNumber;
 	private JSpinner firstIntervalNumber;
 	private JSpinner secondIntervalNumber;
 
@@ -77,6 +79,7 @@ public class GuardDialogue extends JPanel /*
 		setLayout(new GridBagLayout());
 
 		initTimeGuardPanel();
+		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 
 		myRootPane.setDefaultButton(okButton);
@@ -105,7 +108,7 @@ public class GuardDialogue extends JPanel /*
 				undoManager.newEdit();
 
 				dk.aau.cs.model.tapn.TimeInterval guard = composeGuard(arc.getGuard());
-				undoManager.addEdit(arc.setGuard(guard));
+				undoManager.addEdit(arc.setGuardAndWeight(guard, (Integer) weightNumber.getValue()));
 				CreateGui.getCurrentTab().network().buildConstraints();
 
 				exit();
@@ -177,6 +180,57 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
 		add(buttonPanel, gridBagConstraints);
+	}
+	
+	private void initWeightPanel() {
+		weightEditPanel = new JPanel(new GridBagLayout());
+		weightEditPanel.setBorder(BorderFactory.createTitledBorder("Weight"));
+		
+		label = new JLabel("Weight:");
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(label, gridBagConstraints);
+		
+		Dimension intervalBoxDims = new Dimension(190, 25);
+
+		weightNumber = new JSpinner();
+		weightNumber.setPreferredSize(intervalBoxDims);
+		weightNumber.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if((Integer) weightNumber.getValue() < 1){
+					weightNumber.setValue(1);
+				}
+			}
+		});
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(weightNumber, gridBagConstraints);
+		
+		// hack to ensure the content stays on the left
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(new JLabel(""), gridBagConstraints);
+		
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		add(weightEditPanel, gridBagConstraints);
 	}
 
 	private void initTimeGuardPanel() {
@@ -430,6 +484,9 @@ public class GuardDialogue extends JPanel /*
 		} else {
 			rightDelimiter.setSelectedItem(")");
 		}
+		
+		// Weights
+		weightNumber.setValue(arc.getWeight());
 	}
 
 	private void updateLeftComponents() {
