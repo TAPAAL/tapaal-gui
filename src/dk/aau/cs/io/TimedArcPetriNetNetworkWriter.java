@@ -348,7 +348,9 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			if (inputArc instanceof TimedInputArcComponent) {
 				arcElement.setAttribute("type", getInputArcTypeAsString((TimedInputArcComponent)inputArc));
 				arcElement.setAttribute("inscription", getGuardAsString((TimedInputArcComponent)inputArc));	
-				arcElement.setAttribute("weight", ((TimedInputArcComponent)inputArc).getWeight()+"");
+				if(((TimedInputArcComponent)inputArc).getWeight() > 1){
+					arcElement.setAttribute("weight", ((TimedInputArcComponent)inputArc).getWeight()+"");
+				}
 			} else {
 				arcElement.setAttribute("type", "normal");
 				arcElement.setAttribute("inscription", "1");
