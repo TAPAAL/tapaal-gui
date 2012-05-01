@@ -15,6 +15,7 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationLC;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationWA;
 
 public class CreateGui {
 
@@ -58,6 +59,7 @@ public class CreateGui {
 		VerifyTAPN.trySetup();
 		VerifyTAPNDiscreteVerification.trySetup();
 		VerifyTAPNDiscreteVerificationLC.trySetup();
+		VerifyTAPNDiscreteVerificationWA.trySetup();
 
 		VersionChecker versionChecker = new VersionChecker();
 		if (versionChecker.checkForNewVersion()) {

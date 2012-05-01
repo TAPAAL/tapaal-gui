@@ -13,6 +13,7 @@ public enum ReductionOption {
 	VerifyTAPN,
 	VerifyTAPNdiscreteVerification,
 	VerifyTAPNdiscreteVerificationLC,
+	VerifyTAPNdiscreteVerificationWA,
 	BatchProcessingKeepQueryOption,
 	BatchProcessingUserDefinedReductions
 }

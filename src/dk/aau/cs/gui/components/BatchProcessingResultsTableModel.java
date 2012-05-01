@@ -76,6 +76,8 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 			return "G";
 		else if(reduction == ReductionOption.VerifyTAPNdiscreteVerificationLC)
 			return "H";
+		else if(reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA)
+			return "I";
 		else
 			return "";
 	}

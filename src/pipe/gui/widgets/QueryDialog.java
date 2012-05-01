@@ -217,6 +217,7 @@ public class QueryDialog extends JPanel {
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private String name_DISCRETE = "TAPAAL: Discrete Engine";
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
@@ -390,6 +391,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.DEGREE2BROADCAST;
 		else if (reductionOptionString.equals(name_verifyTAPN))
 			return ReductionOption.VerifyTAPN;
+		else if (reductionOptionString.equals(name_DISCRETE))
+			return ReductionOption.VerifyTAPNdiscreteVerificationWA;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -400,7 +403,7 @@ public class QueryDialog extends JPanel {
 
 	private void refreshTraceOptions() {
 		TraceOption traceOption = getTraceOption();
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
+		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN) || ((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
 			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
 			someTraceRadioButton.setSelected(someTraceRadioButton.isSelected());
@@ -639,13 +642,13 @@ public class QueryDialog extends JPanel {
 		String[] options;
 		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(isNetDegree2)
-				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD };
+				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD, name_DISCRETE };
 			else
-				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2 };
+				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE };
 		} else if(tapnNetwork.hasInhibitorArcs()) {
-			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2 };
+			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE };
 		} else {
-			options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
+			options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE};
 		}
 		
 		reductionOption.removeAllItems();
@@ -2122,7 +2125,7 @@ public class QueryDialog extends JPanel {
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
 						
-						if(reduction == ReductionOption.VerifyTAPN) {
+						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyTAPNdiscreteVerificationLC || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile));
 						} else {

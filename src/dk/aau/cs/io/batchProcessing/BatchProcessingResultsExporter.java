@@ -17,6 +17,7 @@ public class BatchProcessingResultsExporter {
 	private static final String name_BROADCASTDEG2 = "F: UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_verifyTAPNDiscreteVerification = "G: TAPAAL Engine - Discrete Verification";
 	private static final String name_verifyTAPNDiscreteVerificationLC = "H: TAPAAL Engine - Discrete Verification LC";
+	private static final String name_verifyTAPNDiscreteVerificationWA = "I: TAPAAL Engine - Discrete Verification WA";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -103,6 +104,9 @@ public class BatchProcessingResultsExporter {
 			return name_verifyTAPNDiscreteVerification;
 		}else if(reduction == ReductionOption.VerifyTAPNdiscreteVerificationLC){
 			return name_verifyTAPNDiscreteVerificationLC;
+		}
+		else if(reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA){
+			return name_verifyTAPNDiscreteVerificationWA;
 		}
 			return name_BROADCAST;
 	}

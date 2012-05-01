@@ -43,6 +43,7 @@ import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationLC;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationWA;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
@@ -277,12 +278,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return getVerifyTAPNDiscreteVerification();
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationLC)
 			return getVerifyTAPNDiscreteVerificationLC();
+		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationWA)
+			return getVerifyTAPNDiscreteVerificationWA();
 		else
 			return getVerifyta();
 	}
 
 	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationLC)
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationLC || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationWA)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
@@ -313,6 +316,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	private static VerifyTAPNDiscreteVerificationLC getVerifyTAPNDiscreteVerificationLC() {
 		VerifyTAPNDiscreteVerificationLC verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerificationLC(new FileFinderImpl(), new MessengerImpl());
+		verifytapnDiscreteVerification.setup();
+		return verifytapnDiscreteVerification;
+	}
+	
+	private static VerifyTAPNDiscreteVerificationWA getVerifyTAPNDiscreteVerificationWA() {
+		VerifyTAPNDiscreteVerificationWA verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerificationWA(new FileFinderImpl(), new MessengerImpl());
 		verifytapnDiscreteVerification.setup();
 		return verifytapnDiscreteVerification;
 	}
