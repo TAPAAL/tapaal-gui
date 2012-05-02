@@ -2011,8 +2011,8 @@ public class QueryDialog extends JPanel {
 	private void refreshExportButtonText() {
 		ReductionOption reduction = getReductionOption();
 		
-		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
-		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
+		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 	}
 
 	private void refreshQueryEditingButtons() {
@@ -2103,7 +2103,7 @@ public class QueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");
@@ -2141,7 +2141,7 @@ public class QueryDialog extends JPanel {
 								else if(exportException instanceof UnsupportedQueryException)
 									s.append(UNSUPPPORTED_QUERY_TEXT + "\n\n");
 								
-								if(reduction == ReductionOption.VerifyTAPN)
+								if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA)
 									s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
 								else
 									s.append(NO_UPPAAL_XML_FILE_SAVED);
@@ -2150,7 +2150,7 @@ public class QueryDialog extends JPanel {
 							}
 						}
 					} else {
-						JOptionPane.showMessageDialog(CreateGui.getApp(), reduction == ReductionOption.VerifyTAPN ? NO_VERIFYTAPN_XML_FILE_SAVED : NO_UPPAAL_XML_FILE_SAVED);
+						JOptionPane.showMessageDialog(CreateGui.getApp(), reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA ? NO_VERIFYTAPN_XML_FILE_SAVED : NO_UPPAAL_XML_FILE_SAVED);
 					}
 				}
 			});
