@@ -3,6 +3,8 @@
  */
 package pipe.gui;
 
+import java.awt.Dialog.ModalityType;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -10,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -80,6 +84,20 @@ public class RunVerification extends RunVerificationBase {
 			messenger.displayWrappedErrorMessage(message,"Error during verification");
 
 		}
+	}
+	
+	@Override
+	protected void showHumanTrace(VerificationResult<TAPNNetworkTrace> result) {
+		if(result.getHumanTrace() == null) return;
+		//JOptionPane.showMessageDialog(new JFrame(), result.getHumanTrace(), "Trace", JOptionPane.PLAIN_MESSAGE);
+		
+		JOptionPane pane = new JOptionPane(result.getHumanTrace(), JOptionPane.PLAIN_MESSAGE);
+		JDialog d = pane.createDialog("Trace");
+		d.setModalityType(ModalityType.MODELESS);
+		d.setAlwaysOnTop(true);
+		d.pack();
+		d.setVisible(true);
+		
 	}
 
 	private String toHTML(String string){

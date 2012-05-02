@@ -393,4 +393,13 @@ public class TimedArcPetriNetNetwork {
 			sharedTransitions.add(p);
 		}
 	}
+
+	public boolean hasWeights() {
+		for(TimedArcPetriNet t : tapns){
+			if(t.hasWeights()){
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -4,11 +4,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
@@ -115,6 +117,14 @@ public class Verifier {
 		TCTLAbstractProperty inputQuery = query.getProperty();
 
 		int bound = query.getCapacity();
+		
+		//TODO fix the simulator such that this is not necessary
+		if(query.getTraceOption() == TraceOption.SOME){
+			if(query.queryType() == QueryType.EG || query.queryType() == QueryType.AF || tapnNetwork.hasWeights()){
+				query.setTraceOption(TraceOption.HUMAN);
+			}
+		}
+		
 		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 
 		if (inputQuery == null) {

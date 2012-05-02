@@ -284,13 +284,13 @@ public class VerifyTAPNDiscreteVerificationWA implements ModelChecker{
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2()); 
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), standardOutput, queryResult.value2()); 
 				}
 			}
 		}
 
 		private TimedArcPetriNetTrace parseTrace(String output, VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query, QueryResult queryResult) {
-			if (((VerifyTAPNOptions) options).trace() == TraceOption.NONE) return null;
+			if (((VerifyTAPNOptions) options).trace() != TraceOption.SOME) return null;
 			
 			VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1());
 			TimedArcPetriNetTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));

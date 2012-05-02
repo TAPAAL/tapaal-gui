@@ -1,5 +1,6 @@
 package pipe.gui;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -61,7 +62,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime(),
-					result.stats());
+					mapHumanTrace(result.getHumanTrace(), transformedModel),
+					result.stats()
+					);
 		}		
 	}
 	
@@ -75,6 +78,18 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		TAPNTraceDecomposer decomposer = new TAPNTraceDecomposer(trace, model, mapping);
 		return decomposer.decompose();
+	}
+	
+	private String mapHumanTrace(String trace, Tuple<TimedArcPetriNet, NameMapping> transformedModel){
+		if(trace == null) return null;
+		
+		trace = trace.substring(trace.indexOf("Trace:"));
+		
+		for(Entry<String, Tuple<String, String>> e : transformedModel.value2().getMappedToOrg().entrySet()){
+			trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
+		}
+		
+		return trace;
 	}
 
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
@@ -100,6 +115,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			}
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 			showResult(result);
+			showHumanTrace(result);
 
 		} else {
 			modelChecker.kill();
@@ -111,6 +127,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	private void showErrorMessage(String errorMessage) {
 		messenger.displayErrorMessage("An error occured during verification.\n\nReason: " + errorMessage, "Verification Error");
 	}
+	
+	protected void showHumanTrace(VerificationResult<TAPNNetworkTrace> result) { }
 
 	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);
 }

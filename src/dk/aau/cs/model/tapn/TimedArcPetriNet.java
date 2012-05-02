@@ -469,4 +469,33 @@ public class TimedArcPetriNet {
 		
 		return result;
 	}
+
+	public boolean hasWeights() {
+		for(TimedInputArc t : inputArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		for(TimedOutputArc t : outputArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		for(TimedInhibitorArc t : inhibitorArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		for(TransportArc t : transportArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		
+		return false;
+	}
 }
