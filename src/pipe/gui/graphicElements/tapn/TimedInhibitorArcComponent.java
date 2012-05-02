@@ -54,6 +54,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
+		if(getWeight() > 1){
+			label.setText(getWeight()+"x");
+		}
 		this.setLabelPosition();
 	}
 
@@ -63,16 +66,18 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public Command setGuard(TimeInterval guard) {
+	public Command setGuardAndWeight(TimeInterval guard, int weight) {
 
 		TimeInterval oldTimeInterval = inhibitorArc.interval();
 		inhibitorArc.setTimeInterval(guard);
+		int oldWeight = getWeight();
+		setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
 		updateLabel(true);
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval());
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, inhibitorArc.interval(), oldWeight, weight);
 	}
 
 	@Override
@@ -141,5 +146,16 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		arc.setGuiModel(guiModel);
 		
 		return arc;
+	}
+	
+	@Override
+	public void setWeight(int weight){
+		inhibitorArc.setWeight(weight);
+	}
+	
+	@Override
+	public int getWeight(){
+		if(inhibitorArc == null) return 1;		// Hack to support inherited constructor (updateLabel called before inhibitorArc set when opening a saved file)
+		return inhibitorArc.getWeight();
 	}
 }

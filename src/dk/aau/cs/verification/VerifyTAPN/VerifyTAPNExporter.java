@@ -95,7 +95,10 @@ public class VerifyTAPNExporter {
 		
 		modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
-		modelStream.append("target=\"" + inputArc.destination().name() + "\"");
+		modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
+		if(inputArc.getWeight() > 1){
+			modelStream.append("weight=\"" + inputArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}
@@ -105,7 +108,10 @@ public class VerifyTAPNExporter {
 		
 		modelStream.append("inscription=\"1\" " );
 		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
-		modelStream.append("target=\"" + outputArc.destination().name() + "\"");
+		modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
+		if(outputArc.getWeight() > 1){
+			modelStream.append("weight=\"" + outputArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}
@@ -116,7 +122,10 @@ public class VerifyTAPNExporter {
 		modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + transArc.source().name() + "\" ");
 		modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
-		modelStream.append("target=\"" + transArc.destination().name() + "\"");
+		modelStream.append("target=\"" + transArc.destination().name() + "\" ");
+		if(transArc.getWeight() > 1){
+			modelStream.append("weight=\"" + transArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}
@@ -126,7 +135,10 @@ public class VerifyTAPNExporter {
 		
 		modelStream.append("inscription=\"" + inhibArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
-		modelStream.append("target=\"" + inhibArc.destination().name() + "\"");
+		modelStream.append("target=\"" + inhibArc.destination().name() + "\" ");
+		if(inhibArc.getWeight() > 1){
+			modelStream.append("weight=\"" + inhibArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}

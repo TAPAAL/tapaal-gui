@@ -323,7 +323,8 @@ public class QueryPane extends JPanel {
 	}
 
 	private void updateQuery(TAPNQuery oldQuery, TAPNQuery newQuery) {
-		oldQuery.set(newQuery);
+		newQuery.setActive(oldQuery.isActive());
+		listModel.set(listModel.indexOf(oldQuery), newQuery);
 	}
 
 	public Iterable<TAPNQuery> getQueries() {

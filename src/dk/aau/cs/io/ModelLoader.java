@@ -18,6 +18,7 @@ public class ModelLoader {
 			LoadedModel loadedModel = newFormatLoader.load(file);
 			return loadedModel;
 		}catch(Exception e1){
+			System.err.println(e1.getMessage()); 
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader(drawingSurface);
 				LoadedModel loadedModel = oldFormatLoader.load(file);
