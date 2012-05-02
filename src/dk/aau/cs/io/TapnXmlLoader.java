@@ -545,7 +545,7 @@ public class TapnXmlLoader {
 
 			tempArc = parseAndAddTimedInhibitorArc(idInput, taggedArc,
 					inscriptionTempStorage, sourceIn, targetIn, _startx,
-					_starty, _endx, _endy,template, constants);
+					_starty, _endx, _endy,template, constants, weight);
 
 		} else {
 			if (type.equals("timed")) {
@@ -708,7 +708,7 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInhibitorArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants) {
+			double _endx, double _endy, Template template, ConstantStore constants, int weight) {
 		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
 				new TimedInputArcComponent(
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
@@ -723,7 +723,7 @@ public class TapnXmlLoader {
 			firstInhibitorIntervalWarning = false;
 		}
 		
-		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval);
+		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, interval, weight);
 
 		tempArc.setUnderlyingArc(inhibArc);
 		template.guiModel().addPetriNetObject(tempArc);

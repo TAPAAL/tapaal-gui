@@ -54,6 +54,9 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
+		if(getWeight() > 1){
+			label.setText(getWeight()+"x");
+		}
 		this.setLabelPosition();
 	}
 
@@ -152,6 +155,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	
 	@Override
 	public int getWeight(){
+		if(inhibitorArc == null) return 1;		// Hack to support inherited constructor (updateLabel called before inhibitorArc set when opening a saved file)
 		return inhibitorArc.getWeight();
 	}
 }

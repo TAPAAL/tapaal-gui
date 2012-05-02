@@ -61,6 +61,7 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		return inputArc.interval();
 	}
 
+	@Override
 	public Command setGuardAndWeight(TimeInterval guard, int weight) {
 
 		TimeInterval oldTimeInterval = inputArc.interval();
@@ -113,28 +114,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		copy.setTarget(this.getTarget());
 		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), timeInterval);
 		return timedCopy;
-	}
-
-	public void showTimeIntervalEditor() {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Timed Arc", true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add Place editor
-		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-
 	}
 
 	@Override

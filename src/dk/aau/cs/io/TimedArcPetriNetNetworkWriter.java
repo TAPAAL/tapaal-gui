@@ -354,6 +354,9 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			} else {
 				arcElement.setAttribute("type", "normal");
 				arcElement.setAttribute("inscription", "1");
+				if(((TimedOutputArcComponent)inputArc).getWeight() > 1){
+					arcElement.setAttribute("weight", ((TimedOutputArcComponent)inputArc).getWeight()+"");
+				}
 			}
 		} 
 		return arcElement;

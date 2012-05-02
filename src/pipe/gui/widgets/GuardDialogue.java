@@ -32,7 +32,10 @@ import javax.swing.event.ChangeListener;
 
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -78,13 +81,20 @@ public class GuardDialogue extends JPanel /*
 		myRootPane = rootPane;
 		setLayout(new GridBagLayout());
 
-		initTimeGuardPanel();
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+			initTimeGuardPanel();
+		}
+		
 		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 
 		myRootPane.setDefaultButton(okButton);
-
-		setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
+		
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+			setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
+		}
+		// Weights
+		weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight());
 	}
 
 
@@ -103,11 +113,14 @@ public class GuardDialogue extends JPanel /*
 		
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				TimedInputArcComponent arc = (TimedInputArcComponent) objectToBeEdited;
+				TimedOutputArcComponent arc = (TimedOutputArcComponent) objectToBeEdited;
 				UndoManager undoManager = CreateGui.getView().getUndoManager();
 				undoManager.newEdit();
 
-				dk.aau.cs.model.tapn.TimeInterval guard = composeGuard(arc.getGuard());
+				dk.aau.cs.model.tapn.TimeInterval guard  = null;
+				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+					guard = composeGuard(arc.getGuard());
+				}
 				undoManager.addEdit(arc.setGuardAndWeight(guard, (Integer) weightNumber.getValue()));
 				CreateGui.getCurrentTab().network().buildConstraints();
 
@@ -484,9 +497,6 @@ public class GuardDialogue extends JPanel /*
 		} else {
 			rightDelimiter.setSelectedItem(")");
 		}
-		
-		// Weights
-		weightNumber.setValue(arc.getWeight());
 	}
 
 	private void updateLeftComponents() {

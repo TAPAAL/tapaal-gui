@@ -1,6 +1,7 @@
 package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -8,7 +9,10 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 
+import javax.swing.BoxLayout;
+
 import pipe.dataLayer.DataLayer;
+import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
@@ -17,6 +21,11 @@ import pipe.gui.graphicElements.ArcPath;
 import pipe.gui.graphicElements.NameLabel;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.ArcHandler;
+import pipe.gui.undo.ArcTimeIntervalEdit;
+import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.GuardDialogue;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 /**
@@ -89,7 +98,6 @@ public class TimedOutputArcComponent extends Arc {
 		id = arc.id;
 		this.setSource(arc.getSource());
 		this.setTarget(arc.getTarget());
-		
 	}
 
 	public TimedOutputArcComponent paste(double despX, double despY,
@@ -144,9 +152,24 @@ public class TimedOutputArcComponent extends Arc {
 	public TimedOutputArcComponent copy() {
 		return new TimedOutputArcComponent(this);
 	}
+	
+	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+
+		int oldWeight = getWeight();
+		setWeight(weight);
+
+		// hacks - I use the weight to display the TimeInterval
+		updateLabel(true);
+		repaint();
+
+		return new ArcTimeIntervalEdit(this, guard, guard, oldWeight, weight);
+	}
 
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
+		if(getWeight() > 1){
+			label.setText(getWeight()+"x " + label.getText());
+		}
 		setLabelPosition();
 	}
 
@@ -155,6 +178,28 @@ public class TimedOutputArcComponent extends Arc {
 		if (outputArc != null)
 			outputArc.delete();
 		super.delete();
+	}
+	
+	public void showTimeIntervalEditor() {
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Timed Arc", true);
+
+		Container contentPane = guiDialog.getContentPane();
+
+		// 1 Set layout
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+
+		// 2 Add Place editor
+		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this));
+
+		guiDialog.setResizable(false);
+
+		// Make window fit contents' preferred size
+		guiDialog.pack();
+
+		// Move window to the middle of the screen
+		guiDialog.setLocationRelativeTo(null);
+		guiDialog.setVisible(true);
+
 	}
 
 	@Override
@@ -236,6 +281,11 @@ public class TimedOutputArcComponent extends Arc {
 	@Override
 	public int getWeight() {
 		return outputArc.getWeight();
+	}
+
+	public TimeInterval getGuard() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
