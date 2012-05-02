@@ -91,7 +91,7 @@ public class TransportArc extends TAPNElement {
 		return new TransportArc(tapn.getPlaceByName(source.name()), 
 								tapn.getTransitionByName(transition.name()), 
 								tapn.getPlaceByName(destination.name()), 
-								interval.copy());
+								interval.copy(), weight);
 	}
 
 	// Should ONLY be called in relation to sharing/unsharing places

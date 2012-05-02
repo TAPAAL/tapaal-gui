@@ -42,7 +42,7 @@ public class TimedOutputArc extends TAPNElement {
 	}
 
 	public TimedOutputArc copy(TimedArcPetriNet tapn) {
-		return new TimedOutputArc(tapn.getTransitionByName(source.name()), tapn.getPlaceByName(destination.name()));
+		return new TimedOutputArc(tapn.getTransitionByName(source.name()), tapn.getPlaceByName(destination.name()), weight);
 	}
 
 	public void setDestination(TimedPlace place) {

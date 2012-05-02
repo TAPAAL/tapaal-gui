@@ -77,7 +77,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public TimedInputArc copy(TimedArcPetriNet tapn) {
-		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy());
+		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy(), weight);
 	}
 
 	// This method should ONLY be called in relation to sharing/unsharing a place
