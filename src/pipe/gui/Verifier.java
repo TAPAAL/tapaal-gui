@@ -7,10 +7,13 @@ import pipe.dataLayer.TAPNQuery;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationWA;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
@@ -33,6 +36,22 @@ public class Verifier {
 		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
 		verifytapn.setup();
 		return verifytapn;
+	}
+	
+	private static VerifyTAPNDiscreteVerificationWA getVerifydTAPN() {
+		VerifyTAPNDiscreteVerificationWA verifytapn = new VerifyTAPNDiscreteVerificationWA(new FileFinderImpl(), new MessengerImpl());
+		verifytapn.setup();
+		return verifytapn;
+	}
+	
+	private static ModelChecker getModelChecker(TAPNQuery query) {
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
+			return getVerifyTAPN();
+		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationWA){
+			return getVerifydTAPN();
+		} else{
+			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
+		}
 	}
 
 	public static void analyzeKBound(
@@ -87,7 +106,7 @@ public class Verifier {
 	
 
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
-		VerifyTAPN verifytapn = getVerifyTAPN();
+		ModelChecker verifytapn = getModelChecker(query);
 
 		if (!verifytapn.isCorrectVersion()) {
 			return;

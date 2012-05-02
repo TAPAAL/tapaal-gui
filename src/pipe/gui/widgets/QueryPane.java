@@ -252,7 +252,7 @@ public class QueryPane extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
 				
-				if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+				if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationWA)
 					Verifier.runVerifyTAPNVerification(tabContent.network(), query);
 				else
 					Verifier.runUppaalVerification(tabContent.network(), query);

@@ -2081,7 +2081,7 @@ public class QueryDialog extends JPanel {
 					exit();
 					TAPNQuery query = getQuery();
 
-					if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+					if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationWA)
 						Verifier.runVerifyTAPNVerification(tapnNetwork, query);
 					else
 						Verifier.runUppaalVerification(tapnNetwork, query);
