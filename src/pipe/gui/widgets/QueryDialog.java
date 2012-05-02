@@ -835,7 +835,9 @@ public class QueryDialog extends JPanel {
 			reduction = name_BROADCAST;
 		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			reduction = name_BROADCASTDEG2;
-		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerificationWA){
+			reduction = name_DISCRETE;
+		}else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
