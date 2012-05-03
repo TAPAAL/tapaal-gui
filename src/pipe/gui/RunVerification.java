@@ -3,6 +3,7 @@
  */
 package pipe.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -12,11 +13,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
@@ -86,15 +92,48 @@ public class RunVerification extends RunVerificationBase {
 		}
 	}
 	
+	JDialog d;
+	
 	@Override
 	protected void showHumanTrace(VerificationResult<TAPNNetworkTrace> result) {
 		if(result.getHumanTrace() == null) return;
 		//JOptionPane.showMessageDialog(new JFrame(), result.getHumanTrace(), "Trace", JOptionPane.PLAIN_MESSAGE);
+		d = new JDialog(CreateGui.getApp(), "Trace");
 		
-		JOptionPane pane = new JOptionPane(result.getHumanTrace(), JOptionPane.PLAIN_MESSAGE);
-		JDialog d = pane.createDialog("Trace");
+		JPanel cpane = new JPanel(new GridBagLayout());
+		
+		JTextArea trace = new JTextArea(result.getHumanTrace(), 20, 30);
+		trace.setEditable(false);
+		trace.setLineWrap(true);
+		JScrollPane pane = new JScrollPane(trace);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		cpane.add(pane, gbc);
+		
+		JButton close = new JButton("Close");
+		close.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				d.setVisible(false);
+			}
+		});
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weighty = 0;
+		cpane.add(close, gbc);
+		
+		d.setUndecorated(false);
+		d.setResizable(true);
+		d.setContentPane(cpane);
 		d.setModalityType(ModalityType.MODELESS);
-		d.setAlwaysOnTop(true);
 		d.pack();
 		d.setVisible(true);
 		
