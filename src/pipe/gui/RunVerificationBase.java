@@ -87,8 +87,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		trace = trace.substring(index);
 		
-		for(Entry<String, Tuple<String, String>> e : transformedModel.value2().getMappedToOrg().entrySet()){
-			trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
+		try{
+			for(Entry<String, Tuple<String, String>> e : transformedModel.value2().getMappedToOrg().entrySet()){
+				trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
+			}
+		}catch(java.lang.OutOfMemoryError e) {
+			trace = "Trace too long; could not display.";
 		}
 		
 		return trace;
