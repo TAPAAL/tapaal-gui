@@ -82,8 +82,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	
 	private String mapHumanTrace(String trace, Tuple<TimedArcPetriNet, NameMapping> transformedModel){
 		if(trace == null) return null;
+		int index = trace.indexOf("Trace:");
+		if(index == -1) return null;
 		
-		trace = trace.substring(trace.indexOf("Trace:"));
+		trace = trace.substring(index);
 		
 		for(Entry<String, Tuple<String, String>> e : transformedModel.value2().getMappedToOrg().entrySet()){
 			trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
