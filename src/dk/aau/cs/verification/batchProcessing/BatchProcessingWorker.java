@@ -28,9 +28,12 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
+import dk.aau.cs.verification.Boundedness;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.NullStats;
+import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerificationOptions;
@@ -102,10 +105,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					
 					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
 					
-					if(queryToVerify.getReductionOption() == ReductionOption.BatchProcessingAllReductions)
-						processQueryForAllReductions(file,composedModel, queryToVerify);
-					else
+					if (batchProcessingVerificationOptions.isReductionOptionUserdefined()){
+						processQueryForUserdefinedReductions(file,composedModel, queryToVerify);
+					} else {
 						processQuery(file, composedModel, queryToVerify);
+					}
 					
 				}
 			}
@@ -115,38 +119,31 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return null;
 	}
 
-	private void processQueryForAllReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
-		if(exiting()) return;
-		pipe.dataLayer.TAPNQuery query = queryToVerify.copy();
-		query.setReductionOption(ReductionOption.VerifyTAPN);
+	private void processQueryForUserdefinedReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
+		pipe.dataLayer.TAPNQuery query = queryToVerify;
 		query.setDiscreteInclusion(false);
-		processQuery(file, composedModel, query);
+		if(batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPN)){
+			query = query.copy();
+			query.setReductionOption(ReductionOption.VerifyTAPN);
+			processQuery(file, composedModel, query);
+		}
 		
-		if(exiting()) return;
+		if(batchProcessingVerificationOptions.discreteInclusion()){
+			query = query.copy();
+			query.setReductionOption(ReductionOption.VerifyTAPN);
+			query.setDiscreteInclusion(true);
+			processQuery(file, composedModel, query);
+		}
+		
 		query = query.copy();
-		query.setDiscreteInclusion(true);
-		processQuery(file, composedModel, query);
-
-		if(exiting()) return;
-		query = query.copy();
-		query.setReductionOption(ReductionOption.STANDARD);
 		query.setDiscreteInclusion(false);
-		processQuery(file, composedModel, query);
-		
-		if(exiting()) return;
-		query = query.copy();
-		query.setReductionOption(ReductionOption.OPTIMIZEDSTANDARD);
-		processQuery(file, composedModel, query);
-		
-		if(exiting()) return;
-		query = query.copy();
-		query.setReductionOption(ReductionOption.BROADCAST);
-		processQuery(file, composedModel, query);
-		
-		if(exiting()) return;
-		query = query.copy();
-		query.setReductionOption(ReductionOption.DEGREE2BROADCAST);
-		processQuery(file, composedModel, query);
+		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
+			if(r == ReductionOption.VerifyTAPN) { continue; }
+			if(exiting()) return;
+			query = query.copy();
+			query.setReductionOption(r);
+			processQuery(file, composedModel, query);
+		}
 	}
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
@@ -165,7 +162,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private pipe.dataLayer.TAPNQuery overrideVerificationOptions(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
 		if(batchProcessingVerificationOptions != null) {
 			SearchOption search = batchProcessingVerificationOptions.searchOption() == SearchOption.BatchProcessingKeepQueryOption ? query.getSearchOption() : batchProcessingVerificationOptions.searchOption();
-			ReductionOption option = batchProcessingVerificationOptions.reductionOption() == ReductionOption.BatchProcessingKeepQueryOption ? query.getReductionOption() : batchProcessingVerificationOptions.reductionOption();
+			ReductionOption option = query.getReductionOption();
 			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
@@ -174,9 +171,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
-			
-			if(changedQuery.getReductionOption() == ReductionOption.VerifyTAPN && batchProcessingVerificationOptions.discreteInclusion())
-				changedQuery.setDiscreteInclusion(true);
 			
 			simplifyQuery(changedQuery);
 			return changedQuery;
@@ -235,6 +229,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			timeoutCurrentVerification = false;
 		} else if(!verificationResult.error()) {
 			String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
+				if (query.discreteInclusion() && !verificationResult.isBounded() && 
+						((query.queryType().equals(QueryType.EF) && !verificationResult.getQueryResult().isQuerySatisfied())
+						||
+						(query.queryType().equals(QueryType.AG) && verificationResult.getQueryResult().isQuerySatisfied())))
+				{queryResult = "Inconclusive answer";}
 			publishResult(file.getName(), query, queryResult,	verificationResult.verificationTime(), verificationResult.stats());
 		} else {
 			publishResult(file.getName(), query, "Error during verification", verificationResult.verificationTime(), new NullStats());

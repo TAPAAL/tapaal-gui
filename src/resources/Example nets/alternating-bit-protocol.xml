@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="Protocol" type="P/T net">
-<labels border="true" height="497" positionX="750" positionY="22" width="134">Classical Alternating Bit Protocol with timeouts for resending messages.
+<labels border="true" height="498" positionX="751" positionY="23" width="135">Classical Alternating Bit Protocol with timeouts for resending messages.
 
 The query asks about violation of the synchronization between sender and receiver. The extra number of tokens in the query gives a bound on the total number of messages in transit (i.e. in places Medium_*). This means that TAPAAL provides a suitable underapproximation and verifies the correctness of the protocol upto a given number of extra tokens.
 
@@ -18,22 +18,22 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 <place id="Medium_D" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Medium_D" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="720.0"/>
 <place id="Receiver_B" initialMarking="0" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="Receiver_B" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="240.0"/>
 <place id="Receiver_C" initialMarking="0" invariant="&lt; inf" markingOffsetX="0.0" markingOffsetY="0.0" name="Receiver_C" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="450.0"/>
-<transition angle="90" id="Ack_rec_0" infiniteServer="false" name="Ack_rec_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="360.0" priority="1" timed="true"/>
-<transition angle="270" id="Send_1" infiniteServer="false" name="Send_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="540.0" priority="1" timed="true"/>
-<transition angle="270" id="Ack_send_0" infiniteServer="false" name="Ack_send_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="360.0" priority="1" timed="true"/>
-<transition angle="270" id="Loss_C" infiniteServer="false" name="Loss_C" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="630.0" priority="1" timed="true"/>
-<transition angle="270" id="Loss_D" infiniteServer="false" name="Loss_D" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="780.0" priority="1" timed="true"/>
-<transition angle="0" id="ReSend_1" infiniteServer="false" name="ReSend_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="240.0" positionY="630.0" priority="1" timed="true"/>
-<transition angle="0" id="Receive_old_1" infiniteServer="false" name="Receive_old_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="480.0" positionY="600.0" priority="1" timed="true"/>
-<transition angle="90" id="Ack_send_1" infiniteServer="false" name="Ack_send_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="720.0" priority="1" timed="true"/>
-<transition angle="270" id="Ack_rec_1" infiniteServer="false" name="Ack_rec_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="720.0" priority="1" timed="true"/>
-<transition angle="270" id="Send_0" infiniteServer="false" name="Send_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="150.0" priority="1" timed="true"/>
-<transition angle="270" id="Receive_0" infiniteServer="false" name="Receive_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="150.0" priority="1" timed="true"/>
-<transition angle="0" id="ReSend_0" infiniteServer="false" name="ReSend_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="240.0" positionY="240.0" priority="1" timed="true"/>
-<transition angle="0" id="Receive_old_0" infiniteServer="false" name="Receive_old_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="480.0" positionY="240.0" priority="1" timed="true"/>
-<transition angle="270" id="Loss_A" infiniteServer="false" name="Loss_A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="240.0" priority="1" timed="true"/>
-<transition angle="270" id="Loss_B" infiniteServer="false" name="Loss_B" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="450.0" priority="1" timed="true"/>
-<transition angle="270" id="Receive_1" infiniteServer="false" name="Receive_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="540.0" priority="1" timed="true"/>
+<transition angle="90" id="Ack_rec_0" infiniteServer="false" name="Ack_rec_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="360.0" priority="0"/>
+<transition angle="270" id="Send_1" infiniteServer="false" name="Send_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="540.0" priority="0"/>
+<transition angle="270" id="Ack_send_0" infiniteServer="false" name="Ack_send_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="360.0" priority="0"/>
+<transition angle="270" id="Loss_C" infiniteServer="false" name="Loss_C" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="630.0" priority="0"/>
+<transition angle="270" id="Loss_D" infiniteServer="false" name="Loss_D" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="780.0" priority="0"/>
+<transition angle="0" id="ReSend_1" infiniteServer="false" name="ReSend_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="240.0" positionY="630.0" priority="0"/>
+<transition angle="0" id="Receive_old_1" infiniteServer="false" name="Receive_old_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="480.0" positionY="600.0" priority="0"/>
+<transition angle="90" id="Ack_send_1" infiniteServer="false" name="Ack_send_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="720.0" priority="0"/>
+<transition angle="270" id="Ack_rec_1" infiniteServer="false" name="Ack_rec_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="720.0" priority="0"/>
+<transition angle="270" id="Send_0" infiniteServer="false" name="Send_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="150.0" positionY="150.0" priority="0"/>
+<transition angle="270" id="Receive_0" infiniteServer="false" name="Receive_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="150.0" priority="0"/>
+<transition angle="0" id="ReSend_0" infiniteServer="false" name="ReSend_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="240.0" positionY="240.0" priority="0"/>
+<transition angle="0" id="Receive_old_0" infiniteServer="false" name="Receive_old_0" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="480.0" positionY="240.0" priority="0"/>
+<transition angle="270" id="Loss_A" infiniteServer="false" name="Loss_A" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="240.0" priority="0"/>
+<transition angle="270" id="Loss_B" infiniteServer="false" name="Loss_B" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="390.0" positionY="450.0" priority="0"/>
+<transition angle="270" id="Receive_1" infiniteServer="false" name="Receive_1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="600.0" positionY="540.0" priority="0"/>
 <arc id="Medium_A to Receive_0" inscription="[0,1]" source="Medium_A" target="Receive_0" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="416" yCoord="161"/>
 <arcpath arcPointType="false" id="1" xCoord="597" yCoord="161"/>
@@ -56,10 +56,10 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="Receiver_A to Receive_0" inscription="[0,inf)" source="Receiver_A" target="Receive_0" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="626" yCoord="792"/>
-<arcpath arcPointType="false" id="1" xCoord="669" yCoord="794"/>
-<arcpath arcPointType="false" id="2" xCoord="718" yCoord="793"/>
-<arcpath arcPointType="false" id="3" xCoord="718" yCoord="133"/>
-<arcpath arcPointType="false" id="4" xCoord="644" yCoord="132"/>
+<arcpath arcPointType="false" id="1" xCoord="670" yCoord="795"/>
+<arcpath arcPointType="false" id="2" xCoord="719" yCoord="794"/>
+<arcpath arcPointType="false" id="3" xCoord="719" yCoord="134"/>
+<arcpath arcPointType="false" id="4" xCoord="645" yCoord="133"/>
 <arcpath arcPointType="false" id="5" xCoord="612" yCoord="157"/>
 </arc>
 <arc id="Sender_A to Send_0" inscription="[0,inf)" source="Sender_A" target="Send_0" type="timed">
@@ -72,7 +72,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="Sender_B to ReSend_0" inscription="[5,6]" source="Sender_B" target="ReSend_0" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="174" yCoord="244"/>
-<arcpath arcPointType="false" id="1" xCoord="208" yCoord="223"/>
+<arcpath arcPointType="false" id="1" xCoord="209" yCoord="224"/>
 <arcpath arcPointType="false" id="2" xCoord="247" yCoord="247"/>
 </arc>
 <arc id="Sender_C to Send_1" inscription="[0,inf)" source="Sender_C" target="Send_1" type="timed">
@@ -81,7 +81,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="Sender_D to ReSend_1" inscription="[5,6]" source="Sender_D" target="ReSend_1" type="timed">
 <arcpath arcPointType="false" id="0" xCoord="174" yCoord="634"/>
-<arcpath arcPointType="false" id="1" xCoord="208" yCoord="613"/>
+<arcpath arcPointType="false" id="1" xCoord="209" yCoord="614"/>
 <arcpath arcPointType="false" id="2" xCoord="247" yCoord="637"/>
 </arc>
 <arc id="Sender_D to Ack_rec_1" inscription="[0,inf)" source="Sender_D" target="Ack_rec_1" type="timed">
@@ -142,7 +142,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="ReSend_1 to Sender_D" inscription="1" source="ReSend_1" target="Sender_D" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="246" yCoord="647"/>
-<arcpath arcPointType="false" id="1" xCoord="208" yCoord="688"/>
+<arcpath arcPointType="false" id="1" xCoord="209" yCoord="689"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="652"/>
 </arc>
 <arc id="ReSend_1 to Medium_C" inscription="1" source="ReSend_1" target="Medium_C" type="normal">
@@ -171,10 +171,10 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="Ack_rec_1 to Sender_A" inscription="1" source="Ack_rec_1" target="Sender_A" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="162" yCoord="737"/>
-<arcpath arcPointType="false" id="1" xCoord="133" yCoord="778"/>
-<arcpath arcPointType="false" id="2" xCoord="73" yCoord="778"/>
-<arcpath arcPointType="false" id="3" xCoord="73" yCoord="43"/>
-<arcpath arcPointType="false" id="4" xCoord="148" yCoord="43"/>
+<arcpath arcPointType="false" id="1" xCoord="134" yCoord="779"/>
+<arcpath arcPointType="false" id="2" xCoord="74" yCoord="779"/>
+<arcpath arcPointType="false" id="3" xCoord="74" yCoord="44"/>
+<arcpath arcPointType="false" id="4" xCoord="149" yCoord="44"/>
 <arcpath arcPointType="false" id="5" xCoord="155" yCoord="58"/>
 </arc>
 <arc id="Send_0 to Medium_A" inscription="1" source="Send_0" target="Medium_A" type="normal">
@@ -195,7 +195,7 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 </arc>
 <arc id="ReSend_0 to Sender_B" inscription="1" source="ReSend_0" target="Sender_B" type="normal">
 <arcpath arcPointType="false" id="0" xCoord="246" yCoord="257"/>
-<arcpath arcPointType="false" id="1" xCoord="208" yCoord="298"/>
+<arcpath arcPointType="false" id="1" xCoord="209" yCoord="299"/>
 <arcpath arcPointType="false" id="2" xCoord="172" yCoord="262"/>
 </arc>
 <arc id="Receive_old_0 to Receiver_B" inscription="1" source="Receive_old_0" target="Receiver_B" type="normal">
@@ -207,5 +207,5 @@ Note that in this example the Reduction with Symmetry runs faster than its optim
 <arcpath arcPointType="false" id="1" xCoord="612" yCoord="597"/>
 </arc>
 </net>
-<query active="true" capacity="11" discreteInclusion="true" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*ALL*" name="Synchronization Violation" query="EF ((Protocol.Sender_A&gt;=1 and Protocol.Receiver_B&gt;=1) or (Protocol.Sender_A&gt;=1 and Protocol.Receiver_C&gt;=1) or (Protocol.Sender_C&gt;=1 and Protocol.Receiver_A&gt;=1) or (Protocol.Sender_C&gt;=1 and Protocol.Receiver_D&gt;=1))" reductionOption="VerifyTAPN" searchOption="DFS" symmetry="true" traceOption="NONE"/>
+<query active="true" capacity="5" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Synchronization Violation" query="EF ((Protocol.Sender_A&gt;=1 and Protocol.Receiver_B&gt;=1) or (Protocol.Sender_A&gt;=1 and Protocol.Receiver_C&gt;=1) or (Protocol.Sender_C&gt;=1 and Protocol.Receiver_A&gt;=1) or (Protocol.Sender_C&gt;=1 and Protocol.Receiver_D&gt;=1))" reductionOption="VerifyTAPN" searchOption="DFS" symmetry="true" traceOption="NONE"/>
 </pnml>

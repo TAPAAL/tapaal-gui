@@ -1,10 +1,13 @@
 package dk.aau.cs.gui;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -51,12 +54,15 @@ import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.TCTL.visitors.BooleanResult;
 import dk.aau.cs.TCTL.visitors.ContainsAtomicPropWithSharedPlaceVisitor;
+import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.gui.undo.DeleteSharedPlaceCommand;
 import dk.aau.cs.gui.undo.DeleteSharedTransitionCommand;
 import dk.aau.cs.gui.undo.RenameTimedPlaceCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
+import dk.aau.cs.gui.undo.SortSharedPlacesCommand;
+import dk.aau.cs.gui.undo.SortSharedTransitionsCommand;
 import dk.aau.cs.gui.undo.UnsharePlaceCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -83,10 +89,28 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private NameGenerator nameGenerator;
 	private TabContent tab;
 
-	private JButton renameButton;
-	private JButton removeButton;
+	private JButton renameButton = new JButton("Rename");
+	private JButton removeButton  = new JButton("Remove");
+	private JButton addButton = new JButton("New");
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
+	
+	private static final String toolTipNewPlace = "Create a new place";
+	private static final String toolTipRemovePlace = "Remove the selected place";
+	private static final String toolTipRenamePlace = "Rename the selected place";
+	private static final String toolTipSortTransitions = "Sort the shared transitions alphabetically";
+	private static final String toolTipSortPlaces = "Sort the shared places alphabetically";
+	private final static String toolTipMoveUp = "Move the selected item up";
+	private final static String toolTipMoveDown = "Move the selected item down";
+	
+	//private static final String toolTipSharedPlacesPanel = "Here you can manage the shared places.<html><br/></html>Shared places can link different components.";
+	private static final String toolTipNewTransition = "Create a new transition";
+	private static final String toolTipRenameTransition = "Rename the selected transition";
+	//private static final String toolTipSharedTransitionsPanel = "Here you can manage the shared transitions.<html><br/></html>" +
+		//	"Shared transitions can link different components.";
+	private static final String toolTipRemoveTransition ="Remove the selected transition";
+	private static final String toolTipChangeBetweenPlacesAndTransitions = "Switch between shared places and transitions";
 
 	public SharedPlacesAndTransitionsPanel(TabContent tab){
 		Require.that(tab != null, "tab cannot be null");
@@ -104,7 +128,33 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Shared Places and Transitions"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)
-		));		
+		));
+		
+		this.setToolTipText("Shared places and transitions define the interface among the different components");
+		this.addComponentListener(new ComponentListener() {
+			int minimumHegiht = SharedPlacesAndTransitionsPanel.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if(SharedPlacesAndTransitionsPanel.this.getSize().height <= minimumHegiht){
+					sortButton.setVisible(false);
+				} else {
+					sortButton.setVisible(true);
+				}
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		
+		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
 	
 	public void setNetwork(TimedArcPetriNetNetwork network) {
@@ -115,7 +165,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 	private void initComponents() {
 		JPanel listPanel = new JPanel(new GridBagLayout());
 		
-		list = new JList();
+		list = new NonsearchableJList();
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){
@@ -155,7 +205,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -164,6 +214,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = list.getSelectedIndex();
@@ -187,6 +238,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = list.getSelectedIndex();
@@ -214,15 +266,57 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		gbc.anchor = GridBagConstraints.NORTH;
 		listPanel.add(moveDownButton,gbc);
 		
+		//Sort button
+		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton.setToolTipText(toolTipSortPlaces);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(isDisplayingTransitions()){
+					Command c = new SortSharedTransitionsCommand(sharedTransitionsListModel);
+					undoManager.addNewEdit(c);
+					c.redo();
+				} else {
+					Command c = new SortSharedPlacesCommand(sharedPlacesListModel);
+					undoManager.addNewEdit(c);
+					c.redo();
+				}
+			}
+		});
+		sortButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if(isDisplayingTransitions()){
+					sortButton.setToolTipText(toolTipSortTransitions);
+				} else {
+					sortButton.setToolTipText(toolTipSortPlaces);
+				}
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		listPanel.add(sortButton,gbc);
+		
 		placesTransitionsComboBox = new JComboBox(new String[]{ PLACES, TRANSITIONS });
+		placesTransitionsComboBox.setToolTipText(toolTipChangeBetweenPlacesAndTransitions);
 		placesTransitionsComboBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				JComboBox source = (JComboBox)e.getSource();
 				String selectedItem = (String)source.getSelectedItem();
 				if(selectedItem.equals(PLACES)){
 					list.setModel(sharedPlacesListModel);
+					renameButton.setToolTipText(toolTipRenamePlace);
+					addButton.setToolTipText(toolTipNewPlace);
+					removeButton.setToolTipText(toolTipRemovePlace);
 				}else if(selectedItem.equals(TRANSITIONS)){
 					list.setModel(sharedTransitionsListModel);
+					renameButton.setToolTipText(toolTipRenameTransition);
+					addButton.setToolTipText(toolTipNewTransition);
+					removeButton.setToolTipText(toolTipRemoveTransition);
 				}
 				
 				if(list.getModel().getSize() > 0) {
@@ -231,6 +325,10 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				} else {
 					moveDownButton.setEnabled(false);
 					moveUpButton.setEnabled(false);
+				}
+				if (list.getModel().getSize() <= 0){
+					renameButton.setEnabled(false);
+					removeButton.setEnabled(false);
 				}
 			}		
 		});
@@ -254,8 +352,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		add(listPanel, gbc);
 		
 		JPanel buttonPanel = new JPanel();
-		renameButton = new JButton("Rename");
 		renameButton.setEnabled(false);
+		if (isDisplayingTransitions()){
+			renameButton.setToolTipText(toolTipRenameTransition);
+		}
+		else {
+			renameButton.setToolTipText(toolTipRenamePlace);
+		}
 		renameButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(isDisplayingTransitions()){
@@ -265,8 +368,13 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				}
 			}		
 		});
-		removeButton = new JButton("Remove");
 		removeButton.setEnabled(false);
+		if (isDisplayingTransitions()){
+			removeButton.setToolTipText(toolTipRemoveTransition);
+		}
+		else {
+			removeButton.setToolTipText(toolTipRemovePlace);
+		}
 		removeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(list.getSelectedValue() != null){
@@ -415,7 +523,12 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			}		
 		});
 
-		JButton addButton = new JButton("Add");
+		if (isDisplayingTransitions()){
+			addButton.setToolTipText(toolTipNewTransition);
+		}
+		else {
+			addButton.setToolTipText(toolTipNewPlace);
+		}
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(isDisplayingTransitions()){
@@ -515,6 +628,17 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void swap(int currentIndex, int newIndex) {
 			network.swapSharedPlaces(currentIndex, newIndex);
 		}
+		
+		public SharedPlace[] sort(){
+			SharedPlace[] oldOrder = network.sortSharedPlaces();
+			fireContentsChanged(this, 0, getSize());
+			return oldOrder;
+		}
+		
+		public void undoSort(SharedPlace[] oldOrder) {
+			network.undoSort(oldOrder);
+			fireContentsChanged(this, 0, getSize());
+		}
 
 		public Object getElementAt(int index) {
 			return network.getSharedPlaceByIndex(index);
@@ -532,6 +656,15 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void removeElement(SharedPlace place) {
 			network.remove(place);
 			fireContentsChanged(this, 0, getSize());
+			int numElements = list.getModel().getSize();
+			if(numElements <= 1) {
+				moveDownButton.setEnabled(false);
+				moveUpButton.setEnabled(false);
+			}
+			if (numElements <= 0) {
+				removeButton.setEnabled(false);
+				renameButton.setEnabled(false);
+			}
 		}
 
 		public void updatedName(){
@@ -543,6 +676,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			this.network = network;
 			fireContentsChanged(this, 0, network.numberOfSharedPlaces());
 		}
+
 	}
 
 	public class SharedTransitionsListModel extends AbstractListModel {
@@ -577,6 +711,17 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void swap(int currentIndex, int newIndex) {
 			network.swapSharedTransitions(currentIndex, newIndex);
 		}
+		
+		public SharedTransition[] sort(){
+			SharedTransition[] oldOrder = network.sortSharedTransitions();
+			fireContentsChanged(this, 0, getSize());
+			return oldOrder;
+		}
+		
+		public void undoSort(SharedTransition[] oldOrder) {
+			network.undoSort(oldOrder);
+			fireContentsChanged(this, 0, getSize());
+		}
 
 		public int getSize() {
 			return network.numberOfSharedTransitions();
@@ -590,6 +735,15 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		public void removeElement(SharedTransition transition) {
 			network.remove(transition);
 			fireContentsChanged(this, 0, getSize());
+			int numElements = list.getModel().getSize();
+			if(numElements <= 1) {
+				moveDownButton.setEnabled(false);
+				moveUpButton.setEnabled(false);
+			}
+			if (numElements <= 0) {
+				removeButton.setEnabled(false);
+				renameButton.setEnabled(false);
+			}
 		}
 
 		public void updatedName() {

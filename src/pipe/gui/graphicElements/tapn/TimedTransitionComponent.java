@@ -73,8 +73,9 @@ public class TimedTransitionComponent extends Transition {
 
 	@Override
 	public void delete() {
-		if (transition != null)
+		if (transition != null) {
 			transition.delete();
+		}
 		super.delete();
 	}
 

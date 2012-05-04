@@ -1,0 +1,31 @@
+ <shortcuts>
+        <skipIfNotSupported/>
+
+        <programGroup defaultName="TAPAAL" location="startMenu"/>
+        <shortcut
+            name="TAPAAL"
+            target="$INSTALL_PATH\bin\tapaal.bat"
+            commandLine=""
+            description="Start TAPAAL"
+            iconFile="$INSTALL_PATH\Path\to\MyApplication\Icons\start.ico"
+            iconIndex="0"
+            desktop="yes"
+            applications="yes"
+            startMenu="yes"
+            startup="no">
+        </shortcut>
+	<shortcut
+            name="Uninstall TAPAAL"
+            target="$INSTALL_PATH\Uninstaller\Uninstaller.jar"
+            commandLine=""
+            description="Uninstall TAPAAL"
+            iconFile="$INSTALL_PATH\Path\to\MyApplication\Icons\start.ico"
+            iconIndex="0"
+            desktop="no"
+            applications="yes"
+            startMenu="yes"
+            startup="no">
+        </shortcut>
+
+    </shortcuts>
+

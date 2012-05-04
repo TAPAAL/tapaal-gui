@@ -30,10 +30,13 @@ public class DeleteTimedPlaceCommand extends TAPNElementCommand {
 	public void undo() {
 		timedPlaceComponent.undelete(view);
 		tapn.add(timedPlace);
+		
 		if(!timedPlace.isShared()){
-		for(int i = 0; i < numberOfTokens; i++)
-			tapn.addToken(new TimedToken(timedPlace));
+			for(int i = 0; i < numberOfTokens; i++) {
+				tapn.addToken(new TimedToken(timedPlace));
+			}
 		}
+		
 		view.repaint();
 	}
 	

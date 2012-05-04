@@ -27,7 +27,7 @@ public class VerifyTAPNIconSelector extends IconSelector {
 			return null;
 		}
 		
-		return inconclusiveIcon;
+		if (result.isDiscreteIncludion()) {return rerunIcon;} 
+		else { return inconclusiveIcon;}
 	}
-
 }

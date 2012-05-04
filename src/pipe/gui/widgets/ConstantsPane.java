@@ -1,22 +1,33 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
@@ -25,11 +36,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
+import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.SortConstantsCommand;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.gui.components.ConstantsListModel;
+import dk.aau.cs.gui.components.NonsearchableJList;
 
 public class ConstantsPane extends JPanel {
 	private static final long serialVersionUID = -7883351020889779067L;
@@ -45,6 +60,16 @@ public class ConstantsPane extends JPanel {
 	private TabContent parent;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
+	private JButton sortButton;
+	
+	private static final String toolTipEditConstant = "Edit the value of the selected constant";
+	private static final String toolTipRemoveConstant = "Remove the selected constant";
+	private static final String toolTipNewConstant = "Create a new constant";
+	private static final String toolTipSortConstants = "Sort the constants alphabetically";
+	private final static String toolTipMoveUp = "Move the selected constant up";
+	private final static String toolTipMoveDown = "Move the selected constant down";
+	//private static final String toolTipGlobalConstantsLabel = "Here you can define a global constant for reuse in different places.";
+	
 
 	public ConstantsPane(boolean enableAddButton, TabContent currentTab) {
 		parent = currentTab;
@@ -69,7 +94,7 @@ public class ConstantsPane extends JPanel {
 			}
 		});
 		
-		constantsList = new JList(listModel);
+		constantsList = new NonsearchableJList(listModel);
 		constantsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		constantsList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
@@ -125,13 +150,40 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createTitledBorder("Global Constants"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 		);
-
+		this.setToolTipText("Declaration of global constants that can be used in intervals and age invariants");
+		//this.setToolTipText(toolTipGlobalConstantsLabel);
 		//showConstants();
+		
+		this.addComponentListener(new ComponentListener() {
+			int minimumHegiht = ConstantsPane.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if(ConstantsPane.this.getSize().height <= minimumHegiht){
+					sortButton.setVisible(false);
+				} else {
+					sortButton.setVisible(true);
+				}
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		
+		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
 		editBtn = new JButton("Edit");
 		editBtn.setEnabled(false);
+		editBtn.setToolTipText(toolTipEditConstant);
 		editBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constant c = (Constant) constantsList.getSelectedValue();
@@ -145,6 +197,7 @@ public class ConstantsPane extends JPanel {
 
 		removeBtn = new JButton("Remove");
 		removeBtn.setEnabled(false);
+		removeBtn.setToolTipText(toolTipRemoveConstant);
 		removeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String constName = ((Constant) constantsList.getSelectedValue()).name();
@@ -156,7 +209,8 @@ public class ConstantsPane extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(removeBtn, gbc);
 
-		JButton addConstantButton = new JButton("Add");
+		JButton addConstantButton = new JButton("New");
+		addConstantButton.setToolTipText(toolTipNewConstant);
 		addConstantButton.setEnabled(enableAddButton);
 		addConstantButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -185,7 +239,7 @@ public class ConstantsPane extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridheight = 2;
+		gbc.gridheight = 3;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -194,6 +248,7 @@ public class ConstantsPane extends JPanel {
 		
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
+		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = constantsList.getSelectedIndex();
@@ -214,6 +269,7 @@ public class ConstantsPane extends JPanel {
 		
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
+		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = constantsList.getSelectedIndex();
@@ -231,35 +287,47 @@ public class ConstantsPane extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTH;
 		constantsPanel.add(moveDownButton,gbc);
+		
+		//Sort button
+		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
+		sortButton.setToolTipText(toolTipSortConstants);
+		sortButton.setEnabled(true);
+		sortButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Command sortConstantsCommand = new SortConstantsCommand(parent, ConstantsPane.this);
+				CreateGui.getDrawingSurface().getUndoManager().addNewEdit(sortConstantsCommand);
+				sortConstantsCommand.redo();
+			}
+		});
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.NORTH;
+		constantsPanel.add(sortButton,gbc);
 	}
 
-	private void showEditConstantDialog(Constant constant) {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(),
-				"Edit Constant", true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add editor
+	private void showEditConstantDialog(Constant constant) {	
+		ConstantsDialogPanel panel = null;
 		if (constant != null)
-			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-					parent.network(), constant));
+			try {
+				panel = new ConstantsDialogPanel(new JRootPane(),
+						parent.network(), constant);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		else
-			contentPane.add(new ConstantsDialogPanel(guiDialog.getRootPane(),
-					parent.network()));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-
-		//showConstants();
+			try {
+				panel = new ConstantsDialogPanel(new JRootPane(),
+						parent.network());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		panel.showDialog();
+		showConstants();
 	}
 
 	protected void removeConstant(String name) {

@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,7 @@ import pipe.gui.undo.AddConstantEdit;
 import pipe.gui.undo.RemoveConstantEdit;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.util.StringComparator;
 
 public class ConstantStore {
 	private List<Constant> constants = new ArrayList<Constant>();
@@ -74,7 +76,7 @@ public class ConstantStore {
 
 	public boolean containsConstantByName(String name) {
 		for(Constant c : constants) {
-			if(c.name().equals(name))
+			if(c.name().equalsIgnoreCase(name))
 				return true;
 		}
 		return false;
@@ -82,7 +84,7 @@ public class ConstantStore {
 
 	public Constant getConstantByName(String name) {
 		for(Constant c : constants) {
-			if(c.name().equals(name))
+			if(c.name().equalsIgnoreCase(name))
 				return c;
 		}
 		return null;
@@ -147,6 +149,7 @@ public class ConstantStore {
 			add(c);
 			return new AddConstantEdit(c, this);
 		}
+		
 
 		return null;
 	}
@@ -204,7 +207,7 @@ public class ConstantStore {
 	}
 
 	public Command updateConstant(String oldName, Constant updatedConstant,	TimedArcPetriNetNetwork model) {
-		if (oldName.equals(updatedConstant.name()) || !containsConstantByName(updatedConstant.name())) {
+		if (oldName.equalsIgnoreCase(updatedConstant.name()) || !containsConstantByName(updatedConstant.name())) {
 			if (containsConstantByName(oldName)) {
 				Constant old = getConstantByName(oldName);
 				updatedConstant.setLowerBound(old.lowerBound());
@@ -232,6 +235,20 @@ public class ConstantStore {
 		Constant temp = constants.get(currentIndex);
 		constants.set(currentIndex, constants.get(newIndex));
 		constants.set(newIndex, temp);
+	}
+	
+	public Constant[] sortConstants() {
+		Constant[] oldOrder = constants.toArray(new Constant[0]);
+		Collections.sort(constants, new StringComparator());
+		return oldOrder;
+	}
+	
+	public void undoSort(Constant[] oldOrder) {
+		constants.clear();
+		for(Constant c: oldOrder){
+			constants.add(c);
+		}
+		
 	}
 
 	public Constant getConstantByIndex(int index) {

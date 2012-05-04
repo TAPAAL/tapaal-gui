@@ -1,10 +1,12 @@
 package pipe.gui.widgets;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -44,6 +46,25 @@ public class NewTAPNPanel extends JPanel {
 		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		okButton.setMnemonic(KeyEvent.VK_O);
+		GridBagConstraints gbc = new GridBagConstraints();		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.anchor = java.awt.GridBagConstraints.WEST;
+		gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+		buttonPanel.add(okButton,gbc);
+		
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMnemonic(KeyEvent.VK_C);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.EAST;
+		buttonPanel.add(cancelButton,gbc);		
 
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -51,18 +72,8 @@ public class NewTAPNPanel extends JPanel {
 			}
 		});
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		buttonPanel.add(okButton, gbc);
-
 		rootPane.setDefaultButton(okButton);
-
-		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
-		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
-		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
@@ -71,16 +82,9 @@ public class NewTAPNPanel extends JPanel {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(3, 3, 3, 3);
-		buttonPanel.add(cancelButton, gbc);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0, 8, 5, 8);
+		gbc.anchor = GridBagConstraints.EAST;
 		add(buttonPanel, gbc);
 	}
 
@@ -108,6 +112,7 @@ public class NewTAPNPanel extends JPanel {
 							CreateGui.getApp(),
 							"Something went wrong while creating a new model. Please try again.",
 							"Error", JOptionPane.INFORMATION_MESSAGE);
+			e.printStackTrace();
 			return;
 		}
 
@@ -129,7 +134,9 @@ public class NewTAPNPanel extends JPanel {
 
 		String defaultName = String.format("New Petri net %1$d", frame
 				.getNameCounter());
-		nameTextBox = new JTextField(defaultName, 12);
+		nameTextBox = new JTextField(defaultName);
+		Dimension size = new Dimension(330, 25);			
+		nameTextBox.setPreferredSize(size);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
