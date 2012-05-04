@@ -174,6 +174,7 @@ public class Transition extends PlaceTransitionObject {
 		return false;
 	}
 	
+	//Dummy is overridden
 	public boolean isBlueTransition(){
 		return blueTransition;
 	}
