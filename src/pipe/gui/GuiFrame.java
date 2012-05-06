@@ -227,7 +227,7 @@ public class GuiFrame extends JFrame implements Observer {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_V){
+				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
 					if (e.getID() == KeyEvent.KEY_PRESSED) {			
 						commandOrControlWasPressed = true;
 						e.consume();
@@ -594,9 +594,9 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
-		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl V"));
-		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('V', shortcutkey));
-		verification.setMnemonic('v');
+		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl M"));
+		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('M', shortcutkey));
+		verification.setMnemonic('m');
 		verification.addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent arg0) {
 				CreateGui.getCurrentTab().verifySelectedQuery();				
