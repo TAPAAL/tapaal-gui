@@ -610,8 +610,6 @@ public class TabContent extends JSplitPane {
 	public void verifySelectedQuery() {
 		queries.verifySelectedQuery();
 	}
-}
-	}
 
 	public void makeSureEditorPanelIsVisible(Component c){
 		//If you "show" a component and the main divider is all the way to the left, make sure it's moved such that the component is actually shown
