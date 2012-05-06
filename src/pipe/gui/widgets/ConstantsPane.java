@@ -9,9 +9,14 @@ import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
@@ -43,6 +48,7 @@ import javax.swing.event.ListSelectionListener;
 import pipe.gui.CreateGui;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortConstantsCommand;
 import dk.aau.cs.model.tapn.Constant;
@@ -191,6 +197,35 @@ public class ConstantsPane extends JPanel {
 				BorderFactory.createEmptyBorder(3, 3, 3, 3))
 				);
 		this.setToolTipText("Declaration of global constants that can be used in intervals and age invariants");
+
+		//this.setToolTipText(toolTipGlobalConstantsLabel);
+		//showConstants();
+		
+		this.addComponentListener(new ComponentListener() {
+			int minimumHegiht = ConstantsPane.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if(ConstantsPane.this.getSize().height <= minimumHegiht){
+					sortButton.setVisible(false);
+				} else {
+					sortButton.setVisible(true);
+				}
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		
+		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
+
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {

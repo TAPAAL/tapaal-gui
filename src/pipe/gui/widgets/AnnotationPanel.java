@@ -1,8 +1,14 @@
 package pipe.gui.widgets;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.KeyEvent;
 
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import pipe.gui.graphicElements.AnnotationNote;
@@ -41,6 +47,10 @@ public class AnnotationPanel extends javax.swing.JPanel {
 	// <editor-fold defaultstate="collapsed"
 	// desc=" Generated Code ">//GEN-BEGIN:initComponents
 	private void initComponents() {
+		JPanel container;
+		container = new JPanel();
+		container.setLayout(new GridBagLayout());
+		
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		panel = new javax.swing.JPanel();
@@ -66,11 +76,11 @@ public class AnnotationPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		buttonPanel.setLayout(new java.awt.GridBagLayout());
-
 		okButton.setText("OK");
-		okButton.setMaximumSize(new java.awt.Dimension(75, 25));
-		okButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		okButton.setPreferredSize(new java.awt.Dimension(75, 25));
+		okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		okButton.setMnemonic(KeyEvent.VK_O);
 		okButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				okButtonActionPerformed(evt);
@@ -78,50 +88,47 @@ public class AnnotationPanel extends javax.swing.JPanel {
 		});
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 6;
+		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-		gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		buttonPanel.add(okButton, gridBagConstraints);
-
+		
 		cancelButton.setText("Cancel");
-		cancelButton.setMaximumSize(new java.awt.Dimension(75, 25));
-		cancelButton.setMinimumSize(new java.awt.Dimension(75, 25));
-		cancelButton.setPreferredSize(new java.awt.Dimension(75, 25));
+		cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+		cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+		cancelButton.setMnemonic(KeyEvent.VK_C);
 		cancelButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				cancelButtonActionPerformed(evt);
 			}
 		});
-
 		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 6);
 		buttonPanel.add(cancelButton, gridBagConstraints);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 3;
+		gbc.weighty= 3;
+		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		container.add(panel,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		container.add(buttonPanel,gbc);
 
-		JSplitPaneFix split = new JSplitPaneFix(JSplitPane.VERTICAL_SPLIT,
-				panel, buttonPanel) {
-			/**
-		 * 
-		 */
-			private static final long serialVersionUID = -3436043116983340340L;
-
-			@Override
-			public int getMinimumDividerLocation() {
-				return lastDividerLocation;
-			}
-
-			@Override
-			public int getMaximumDividerLocation() {
-				return lastDividerLocation;
-			}
-		};
-		split.setResizeWeight(1.0);
-		split.setDividerLocation(0.88);
-		split.setContinuousLayout(true);
-		split.setDividerSize(0);
-		add(split);
-		this.setPreferredSize(new Dimension(400, 300));
+		add(container);		this.setPreferredSize(new Dimension(400, 300));
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cancelButtonActionPerformed
