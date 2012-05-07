@@ -836,12 +836,7 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
 			
-			if (CreateGui.getCurrentTab().isQueryPossible()) {
-				verifyAction.setEnabled(true);
-			}
-			else {
-				verifyAction.setEnabled(false);
-			}
+			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
