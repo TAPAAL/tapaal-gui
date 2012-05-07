@@ -1470,12 +1470,7 @@ public class GuiFrame extends JFrame implements Observer {
 		// gowing on
 		mode = prev_mode;
 		
-		if (CreateGui.getCurrentTab().isQueryPossible()) {
-			verifyAction.setEnabled(true);
-		}
-		else {
-			verifyAction.setEnabled(false);
-		}
+		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 		if (placeAction != null) {
 			placeAction.setSelected(mode == ElementType.PLACE);
