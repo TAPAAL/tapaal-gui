@@ -662,8 +662,9 @@ public class GuiFrame extends JFrame implements Observer {
 		showComponents(advanced);
 		showConstants(advanced);
 		
-		//Queries should always be shown
+		//Queries and enabled transitions should always be shown
 		showQueries(true);
+		showEnabledTransitionsList(true);
 	}
 	
 	private void buildToolbar() {
