@@ -524,7 +524,25 @@ public class GuiFrame extends JFrame implements Observer {
    				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
-    				 
+    	 viewMenu.addSeparator();
+
+    	 JMenuItem advancedWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show advanced workspace", "Show all panels", ""));
+    	 advancedWorkspace.addActionListener(new ActionListener() {
+    		 public void actionPerformed(ActionEvent arg0) {
+    			 showAdvancedWorkspace(true);
+    		 }
+    	 });
+
+    	 viewMenu.add(advancedWorkspace);
+    	 JMenuItem simpleWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show simple workspace", "Only show the most important panels", ""));
+    	 simpleWorkspace.addActionListener(new ActionListener() {
+    		 public void actionPerformed(ActionEvent arg0) {
+    			 showAdvancedWorkspace(false);
+    		 }
+    	 });
+
+    	 viewMenu.add(simpleWorkspace);
+
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
@@ -652,24 +670,7 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
-		toolsMenu.addSeparator();
-		
-		JMenuItem advancedWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show advanced workspace", "Show all panels", ""));
-		advancedWorkspace.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				showAdvancedWorkspace(true);
-			}
-		});
-		
-		toolsMenu.add(advancedWorkspace);
-		JMenuItem simpleWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show simple workspace", "Only show the most important panels", ""));
-		simpleWorkspace.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				showAdvancedWorkspace(false);
-			}
-		});
-		
-		toolsMenu.add(simpleWorkspace);
+
 		return toolsMenu;
 	}
 	
