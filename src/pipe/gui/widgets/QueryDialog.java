@@ -1004,34 +1004,26 @@ public class QueryDialog extends JPanel {
 	
 	private void toggleAdvancedSimpleView(boolean changeState){
 		//Make sure that the right properties are set when the pane is initialized
-		if(!changeState){
+		if(changeState){
 			advancedView = !advancedView;
 		}
+		
+		Point location = guiDialog.getLocation();
+		
+		searchOptionsPanel.setVisible(advancedView);
+		reductionOptionsPanel.setVisible(advancedView);
+		saveUppaalXMLButton.setVisible(advancedView);
+		
 		if(advancedView){
-			Point location = guiDialog.getLocation();
-			advancedView = false;
 			advancedButton.setText("Advanced view");
 			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-			searchOptionsPanel.setVisible(false);
-			reductionOptionsPanel.setVisible(false);
-			saveUppaalXMLButton.setVisible(false);
-			
-			guiDialog.pack();
-			guiDialog.setLocation(location);
-			
-			
 		} else {
-			Point location = guiDialog.getLocation();
-			advancedView = true;
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
-			searchOptionsPanel.setVisible(true);
-			reductionOptionsPanel.setVisible(true);
-			saveUppaalXMLButton.setVisible(true);
-			
-			guiDialog.pack();
-			guiDialog.setLocation(location);
 		}
+		
+		guiDialog.pack();
+		guiDialog.setLocation(location);		
 	}
 	
 	private void initBoundednessCheckPanel() {

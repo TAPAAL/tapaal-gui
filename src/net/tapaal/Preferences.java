@@ -47,8 +47,6 @@ public class Preferences {
 			   pref.put(key, location);   
 		   }
 	   }
-	
-	   
 	   
 	   public String getLatestVersion() {
 		   return pref.get("tapaal.latestVersion", "");
@@ -64,4 +62,12 @@ public class Preferences {
 		   }
 	   }
 	   
+	   /* Workspace */
+	   public void setAdvancedQueryView(boolean advanced){
+		   pref.putBoolean("queryAdvanced", advanced);
+	   }
+	   
+	   public boolean getAdvancedQueryView(){
+		   return pref.getBoolean("queryAdvanced", false);
+	   }
 }
