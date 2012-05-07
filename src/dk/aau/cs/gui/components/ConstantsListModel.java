@@ -2,6 +2,7 @@ package dk.aau.cs.gui.components;
 
 import javax.swing.AbstractListModel;
 
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
@@ -17,8 +18,7 @@ public class ConstantsListModel extends AbstractListModel {
 	public ConstantsListModel(TimedArcPetriNetNetwork network){
 		listener = new ConstantsListener() {
 			public void constantRemoved(ConstantEvent e) {
-				fireIntervalRemoved(this, e.index(), e.index());
-			}
+				fireIntervalRemoved(this, e.index(), e.index());			}
 			
 			public void constantChanged(ConstantChangedEvent e) {
 				fireContentsChanged(this, e.index(), e.index());
@@ -42,7 +42,7 @@ public class ConstantsListModel extends AbstractListModel {
 		fireContentsChanged(this,0, Integer.MAX_VALUE);
 	}
 	
-	public Object getElementAt(int index) {
+	public Constant getElementAt(int index) {
 		return network.getConstant(index);
 	}
 

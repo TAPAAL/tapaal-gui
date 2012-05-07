@@ -327,4 +327,11 @@ public class CreateGui {
 	public static boolean showZeroToInfinityIntervals() {
 		return showZeroToInfinityIntervals;
 	}
+	
+	public static void verifyQuery() {
+		TabContent tab = getCurrentTab();
+		if (tab.isQueryPossible()) {
+			getCurrentTab().verifySelectedQuery();
+		}
+	}
 }
