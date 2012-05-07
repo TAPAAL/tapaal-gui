@@ -61,6 +61,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -207,7 +208,9 @@ public class GuiFrame extends JFrame implements Observer {
 		this.setMinimumSize(new Dimension(825, 480));
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
+		
+		loadPrefrences();
+		
 		buildMenus();
 
 		// Status bar...
@@ -243,6 +246,23 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 	}
 	
+	private void loadPrefrences() {
+		Preferences prefs = Preferences.getInstance();
+		
+		QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
+		showComponents = prefs.getShowComponents();
+		showQueries = prefs.getShowQueries();
+		showConstants = prefs.getShowConstants();
+		
+		showEnabledTransitions = prefs.getShowEnabledTransitions();
+		
+		showToolTips = prefs.getShowToolTips();
+		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
+			CreateGui.toggleShowZeroToInfinityIntervals();
+		}
+
+	}
+
 	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		if(UIManager.getLookAndFeel().getName().equals("Windows")){
@@ -500,27 +520,27 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 viewMenu.addSeparator();
 		 
-		 	addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
+		 	addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
 				 453243, "Show/hide the list of components.", "ctrl 1", true));
                                  showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
 
-		 	addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
+		 	addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
 				 453244, "Show/hide verification queries.", "ctrl 2", true));
 				 showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
 
-		 	addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
+		 	addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
 				 453245, "Show/hide global constants.", "ctrl 3", true));
 	  	         	 showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
 			
-		 	addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
+		 	addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
 				 453247, "Show/hide the list of enabled transitions","ctrl 4",true));
 				 showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
 
-		 	addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+		 	addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
 				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true));
     				 showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
-    		addCheckboxMenuItem(viewMenu, showToolTipsAction = new ViewAction("Display tool tips",
+    		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
    				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
@@ -803,9 +823,9 @@ public class GuiFrame extends JFrame implements Observer {
 		return item;
 	}
 	
-	private JMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
+	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
 		JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(action);
-		checkBoxItem.setSelected(true);
+		checkBoxItem.setSelected(selected);
 		JMenuItem item = menu.add(checkBoxItem);
 		KeyStroke keystroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
 
@@ -1020,6 +1040,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void showQueries(boolean enable){
 		showQueries = enable;
+		Preferences.getInstance().setShowQueries(showQueries);
 		CreateGui.getCurrentTab().showQueries(enable);
 	}
 	public void toggleQueries(){
@@ -1028,6 +1049,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void showConstants(boolean enable){
 		showConstants = enable;
+		Preferences.getInstance().setShowConstants(showConstants);
 		CreateGui.getCurrentTab().showConstantsPanel(enable);
 	}
 	public void toggleConstants(){
@@ -1036,6 +1058,7 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public void showToolTips(boolean enable){
 		showToolTips = enable;
+		Preferences.getInstance().setShowToolTips(showToolTips);
 		ToolTipManager.sharedInstance().setEnabled(enable);
 	}
 	public void toggleToolTips(){
@@ -1045,11 +1068,13 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
+		Preferences.getInstance().setShowZeroInfIntervals(CreateGui.showZeroToInfinityIntervals());
 		appView.repaintAll();
 	}
 	
 	public void showComponents(boolean enable){
 		showComponents = enable;
+		Preferences.getInstance().setShowComponents(showComponents);
 		CreateGui.getCurrentTab().showComponents(enable);
 	}
 	public void toggleComponents(){
@@ -1058,6 +1083,7 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
+		Preferences.getInstance().setShowEnabledTrasitions(showEnabledTransitions);
 		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
 	}
 	public void toggleEnabledTransitionsList(){

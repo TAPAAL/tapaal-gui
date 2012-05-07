@@ -63,11 +63,64 @@ public class Preferences {
 	   }
 	   
 	   /* Workspace */
+	   //General
+	   public void setShowToolTips(boolean show){
+		   pref.putBoolean("showToolTips", show);
+	   }
+	   
+	   public boolean getShowToolTips(){
+		   return pref.getBoolean("showToolTips", true);
+	   }
+	   
+	   //Queries
 	   public void setAdvancedQueryView(boolean advanced){
 		   pref.putBoolean("queryAdvanced", advanced);
 	   }
 	   
 	   public boolean getAdvancedQueryView(){
 		   return pref.getBoolean("queryAdvanced", false);
+	   }
+	   
+	   //Editor
+	   public void setShowComponents(boolean show){
+		   pref.putBoolean("componentsPanel", show);
+	   }
+	   
+	   public boolean getShowComponents(){
+		   return pref.getBoolean("componentsPanel", true);
+	   }
+	   
+	   public void setShowQueries(boolean show){
+		   pref.putBoolean("QueriesPanel", show);
+	   }
+	   
+	   public boolean getShowQueries(){
+		   return pref.getBoolean("QueriesPanel", true);
+	   }
+	   
+	   public void setShowConstants(boolean show){
+		   pref.putBoolean("constantPanel", show);
+	   }
+	   
+	   public boolean getShowConstants(){
+		   return pref.getBoolean("constantPanel", true);
+	   }
+	   
+	   //Simulator
+	   public void setShowEnabledTrasitions(boolean show){
+		   pref.putBoolean("enabledTransitionsPanel", show);
+	   }
+	   
+	   public boolean getShowEnabledTransitions(){
+		   return pref.getBoolean("enabledTransitionsPanel", true);
+	   }
+	   
+	   //Drawing surface
+	   public void setShowZeroInfIntervals(boolean show){
+		   pref.putBoolean("showZeroInfIntervals", show);
+	   }
+	   
+	   public boolean getShowZeroInfIntervals(){
+		   return pref.getBoolean("showZeroInfIntervals", true);
 	   }
 }

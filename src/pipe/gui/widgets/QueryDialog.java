@@ -1001,16 +1001,14 @@ public class QueryDialog extends JPanel {
 	}
 	
 	public static void setAdvancedView(boolean advanced){
+		advancedView = advanced;
 		Preferences.getInstance().setAdvancedQueryView(advanced);
 	}
 	
 	private void toggleAdvancedSimpleView(boolean changeState){
-		boolean advancedView = Preferences.getInstance().getAdvancedQueryView();
-		
 		//Make sure that the right properties are set when the pane is initialized
 		if(changeState){
-			advancedView = !advancedView;
-			Preferences.getInstance().setAdvancedQueryView(advancedView);
+			setAdvancedView(!advancedView);
 		}
 		
 		Point location = guiDialog.getLocation();
