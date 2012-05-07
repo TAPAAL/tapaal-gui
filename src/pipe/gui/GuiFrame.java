@@ -124,7 +124,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
@@ -525,23 +525,9 @@ public class GuiFrame extends JFrame implements Observer {
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
     	 viewMenu.addSeparator();
-
-    	 JMenuItem advancedWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show advanced workspace", "Show all panels", ""));
-    	 advancedWorkspace.addActionListener(new ActionListener() {
-    		 public void actionPerformed(ActionEvent arg0) {
-    			 showAdvancedWorkspace(true);
-    		 }
-    	 });
-
-    	 viewMenu.add(advancedWorkspace);
-    	 JMenuItem simpleWorkspace = new JMenuItem(advancedWorkspaceAction = new ToolAction("Show simple workspace", "Only show the most important panels", ""));
-    	 simpleWorkspace.addActionListener(new ActionListener() {
-    		 public void actionPerformed(ActionEvent arg0) {
-    			 showAdvancedWorkspace(false);
-    		 }
-    	 });
-
-    	 viewMenu.add(simpleWorkspace);
+    	 
+    	 addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
+    	 addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -606,9 +592,6 @@ public class GuiFrame extends JFrame implements Observer {
 		 setJMenuBar(menuBar);
 
 	}
-	
-	ToolAction advancedWorkspaceAction;
-	ToolAction simpleWorkspaceAction;
 
 	private JMenu buildToolsMenu() {
 		JMenu toolsMenu = new JMenu("Tools");
@@ -973,6 +956,9 @@ public class GuiFrame extends JFrame implements Observer {
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
+		showAdvancedWorkspaceAction.setEnabled(enable);
+		showSimpleWorkspaceAction.setEnabled(enable);
+		
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -2046,6 +2032,10 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleEnabledTransitionsList();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
+			} else if (this == showAdvancedWorkspaceAction){
+				showAdvancedWorkspace(true);
+			} else if (this == showSimpleWorkspaceAction){
+				showAdvancedWorkspace(false);
 			}
 		}
 		
