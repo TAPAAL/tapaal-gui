@@ -1,10 +1,13 @@
 package dk.aau.cs.gui;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -125,8 +128,33 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Shared Places and Transitions"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)
-		));		
+		));
+		
 		this.setToolTipText("Shared places and transitions define the interface among the different components");
+		this.addComponentListener(new ComponentListener() {
+			int minimumHegiht = SharedPlacesAndTransitionsPanel.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if(SharedPlacesAndTransitionsPanel.this.getSize().height <= minimumHegiht){
+					sortButton.setVisible(false);
+				} else {
+					sortButton.setVisible(true);
+				}
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		
+		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
 	
 	public void setNetwork(TimedArcPetriNetNetwork network) {

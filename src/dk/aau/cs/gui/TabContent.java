@@ -43,6 +43,7 @@ import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
+import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -60,7 +61,7 @@ public class TabContent extends JSplitPane {
 	protected File appFile;
 
 	// Normal mode
-	JXMultiSplitPane editorSplitPane;
+	BugHandledJXMultisplitPane editorSplitPane;
 	Split editorModelroot;
 
 	QueryPane queries;
@@ -156,7 +157,7 @@ public class TabContent extends JSplitPane {
 		// (bug in the swingx package)
 		editorModelroot.setParent(new Split());
 
-		editorSplitPane = new JXMultiSplitPane();
+		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
@@ -306,8 +307,6 @@ public class TabContent extends JSplitPane {
 		if (enabledTransitionsList == null)
 			createEnabledTransitionsList();
 
-		templateExplorer.switchToAnimationMode();
-
 		if (animatorSplitPane == null)
 			createAnimatorSlitPane();
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
@@ -315,13 +314,18 @@ public class TabContent extends JSplitPane {
 		// Inserts dummy to avoid nullpointerexceptions from the displaynode
 		// method
 		// A component can only be on one splitpane at the time
-		editorSplitPane.add(new JPanel(), templateExplorerName);
+		JPanel dummy = new JPanel();
+		dummy.setMinimumSize(templateExplorer.getMinimumSize());
+		dummy.setPreferredSize(templateExplorer.getPreferredSize());
+		editorSplitPane.add(dummy, templateExplorerName);
+		
+		templateExplorer.switchToAnimationMode();
+		
 		this.setLeftComponent(animatorSplitPane);
 
 	}
 
 	public void switchToEditorComponents() {
-		templateExplorer.switchToEditorMode();
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		if (animatorSplitPane != null) {
@@ -329,9 +333,14 @@ public class TabContent extends JSplitPane {
 			// Inserts dummy to avoid nullpointerexceptions from the displaynode
 			// method
 			// A component can only be on one splitpane at the time
+			JPanel dummy = new JPanel();
+			dummy.setMinimumSize(templateExplorer.getMinimumSize());
+			dummy.setPreferredSize(templateExplorer.getPreferredSize());
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
 		}
-
+		
+		templateExplorer.switchToEditorMode();
+		
 		this.setLeftComponent(editorSplitPane);
 
 		drawingSurface.repaintAll();
@@ -557,7 +566,7 @@ public class TabContent extends JSplitPane {
 				animatorSplitPane.getMultiSplitLayout().displayNode(
 						templateExplorerName, enable);
 			}
-			fixDividersEditor(templateExplorer);
+			makeSureEditorPanelIsVisible(templateExplorer);
 		}
 	}
 
@@ -565,7 +574,7 @@ public class TabContent extends JSplitPane {
 		if (!(enable && queries.isVisible())) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName,
 					enable);
-			fixDividersEditor(queries);
+			makeSureEditorPanelIsVisible(queries);
 			this.repaint();
 		}
 	}
@@ -574,7 +583,7 @@ public class TabContent extends JSplitPane {
 		if (!(enable && constantsPanel.isVisible())) {
 			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
 					enable);
-			fixDividersEditor(constantsPanel);
+			makeSureEditorPanelIsVisible(constantsPanel);
 		}		
 	}
 
@@ -591,57 +600,13 @@ public class TabContent extends JSplitPane {
 		constantsPanel.selectFirst();
 
 	}
-	
-	/*
-	 * When hiding the two bottom children of a JXMultisplitpane something goes
-	 * wrong and the bottom divider stay there (it should have been removed)
-	 * This method removes this extra divider (bug in the swingx package)
-	 * 
-	 * The method also resets the sizes of the components this is done as if you 
-	 * remove the bottom component, then pulls the bottom component all the way down
-	 * and then adds the removed component again its shown outside the window
-	 * 
-	 * As a last thing it makes sure that if you "show" a component and the main divider is 
-	 * all the way to the left, it's moved such that the component is actually shown.
-	 * 
-	 * This method will hopefully become unnecessary as the JXMultisplitPane matures
-	 */
-	private void fixDividersEditor(java.awt.Component c){
-		//Make sure there are no extra dividers
-		java.util.List<Node> t = editorModelroot.getChildren();
-		for(int i = t.size()-1; i>-1; i--){
-			Node n = t.get(i);
-			if(n.isVisible()){
-				if(n instanceof Divider){
-					n.setVisible(false);
-				}
-				break;
-			}
-		}
-		
-		//Makes sure all components are visible
-		int heigh = 0;
-		if(c.isVisible()){
-			for(Node n : t){
-				if(n instanceof Leaf){
-					Component component = editorSplitPane.getMultiSplitLayout().getComponentForNode(n);
-					n.setBounds(new Rectangle(new Point(0, heigh), component.getPreferredSize()));
-					heigh = heigh+component.getPreferredSize().height;
-				} else if (n instanceof Divider){
-					
-					n.setBounds(new Rectangle(0, heigh, n.getBounds().width, n.getBounds().height));
-					heigh = heigh + n.getBounds().height;
-				}
-			}
-		}
-		
+
+	public void makeSureEditorPanelIsVisible(Component c){
 		//If you "show" a component and the main divider is all the way to the left, make sure it's moved such that the component is actually shown
 		if(c.isVisible()){
 			if(this.getDividerLocation() == 0){
 				this.setDividerLocation(c.getPreferredSize().width);
 			}
 		}
-
-		editorSplitPane.repaint();
 	}
 }

@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import pipe.gui.undo.RemoveQueryCommand;
 import pipe.gui.undo.UndoManager;
 import pipe.gui.widgets.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortQueriesCommand;
 import dk.aau.cs.gui.components.NonsearchableJList;
@@ -128,6 +131,31 @@ public class QueryPane extends JPanel {
 		//this.setToolTipText(toolTipQueryPane);
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Queries"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 		this.setToolTipText("List of verification queries (double click to edit)");
+		
+		this.addComponentListener(new ComponentListener() {
+			int minimumHegiht = QueryPane.this.getMinimumSize().height;
+			public void componentShown(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if(QueryPane.this.getSize().height <= minimumHegiht){
+					sortButton.setVisible(false);
+				} else {
+					sortButton.setVisible(true);
+				}
+			}
+			
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+			
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		
+		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
 	
 	public void updateQueryButtons() {
