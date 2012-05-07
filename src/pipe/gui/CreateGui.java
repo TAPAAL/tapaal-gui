@@ -242,7 +242,7 @@ public class CreateGui {
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	public static void switchToAnimationComponents() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.switchToAnimationComponents();
+		tab.switchToAnimationComponents(true);
 	}
 
 	public static void switchToEditorComponents() {

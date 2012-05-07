@@ -1457,7 +1457,7 @@ public class GuiFrame extends JFrame implements Observer {
 		case animation:
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
-			tab.switchToAnimationComponents();
+			tab.switchToAnimationComponents(showEnabledTransitions);
 			showComponents(showComponents);
 			
 			startAction.setSelected(true);

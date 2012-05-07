@@ -300,7 +300,7 @@ public class TabContent extends JSplitPane {
 
 	}
 
-	public void switchToAnimationComponents() {
+	public void switchToAnimationComponents(boolean showEnabledTransitions) {
 
 		if (animBox == null)
 			createAnimationHistory();
@@ -322,6 +322,7 @@ public class TabContent extends JSplitPane {
 		editorSplitPane.add(dummy, templateExplorerName);
 		
 		templateExplorer.switchToAnimationMode();
+		showEnabledTransitionsList(showEnabledTransitions);
 		
 		this.setLeftComponent(animatorSplitPane);
 
