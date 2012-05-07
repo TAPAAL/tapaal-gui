@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -114,7 +116,7 @@ public class TabContent extends JSplitPane {
 		this.setContinuousLayout(true);
 		this.setOneTouchExpandable(true);
 		this.setBorder(null); // avoid multiple borders
-		this.setDividerSize(8);
+		this.setDividerSize(8);	
 
 	}
 
@@ -598,7 +600,15 @@ public class TabContent extends JSplitPane {
 		templateExplorer.selectFirst();
 		queries.selectFirst();
 		constantsPanel.selectFirst();
-
+		
+	}	
+	
+	public boolean isQueryPossible() {
+		return queries.isQueryPossible();
+	}
+	
+	public void verifySelectedQuery() {
+		queries.verifySelectedQuery();
 	}
 
 	public void makeSureEditorPanelIsVisible(Component c){
