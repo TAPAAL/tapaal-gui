@@ -64,6 +64,8 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import net.tapaal.Preferences;
+
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -999,13 +1001,16 @@ public class QueryDialog extends JPanel {
 	}
 	
 	public static void setAdvancedView(boolean advanced){
-		advancedView = advanced;
+		Preferences.getInstance().setAdvancedQueryView(advanced);
 	}
 	
 	private void toggleAdvancedSimpleView(boolean changeState){
+		boolean advancedView = Preferences.getInstance().getAdvancedQueryView();
+		
 		//Make sure that the right properties are set when the pane is initialized
 		if(changeState){
 			advancedView = !advancedView;
+			Preferences.getInstance().setAdvancedQueryView(advancedView);
 		}
 		
 		Point location = guiDialog.getLocation();
@@ -1015,11 +1020,11 @@ public class QueryDialog extends JPanel {
 		saveUppaalXMLButton.setVisible(advancedView);
 		
 		if(advancedView){
-			advancedButton.setText("Advanced view");
-			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
-		} else {
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
+		} else {
+			advancedButton.setText("Advanced view");
+			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		}
 		
 		guiDialog.pack();
