@@ -87,10 +87,18 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		trace = trace.substring(index);
 		
-		for(Entry<String, Tuple<String, String>> e : transformedModel.value2().getMappedToOrg().entrySet()){
+		Object[] arr = (Object[])transformedModel.value2().getMappedToOrg().entrySet().toArray();
+		for(int i = arr.length-1; i > -1; i--){
+			Entry<String, Tuple<String, String>> e = (Entry<String, Tuple<String, String>>) arr[i];
 			trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
 		}
 		
+		
+		/*
+		for(Entry<String, Tuple<String, String>> e : transformedModel.value2().getMappedToOrg().entrySet()){
+			trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
+		}
+		*/
 		return trace;
 	}
 

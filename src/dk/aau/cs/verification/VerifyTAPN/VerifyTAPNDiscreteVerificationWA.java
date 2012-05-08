@@ -58,7 +58,7 @@ public class VerifyTAPNDiscreteVerificationWA implements ModelChecker{
 		}
 		
 		public boolean supportsStats(){
-			return false;
+			return true;
 		}
 		
 		public String getStatsExplanation(){
