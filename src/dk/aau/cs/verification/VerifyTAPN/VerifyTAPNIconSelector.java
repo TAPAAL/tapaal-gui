@@ -26,7 +26,8 @@ public class VerifyTAPNIconSelector extends IconSelector {
 		case AF:
 		case EG:
 			if(!result.isQuerySatisfied()) return notSatisfiedIcon;
-			else return satisfiedIcon;
+			else if(result.isQuerySatisfied() && result.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return satisfiedIcon;
+			break;
 		default:
 			return null;
 		}
