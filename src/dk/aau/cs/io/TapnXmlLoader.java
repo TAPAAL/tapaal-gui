@@ -843,7 +843,7 @@ public class TapnXmlLoader {
 	private boolean getLocalConstants(Element queryElement) {
 		boolean localConstants;
 		try {
-			localConstants = queryElement.getAttribute("localConstants").equals("true");
+			localConstants = !queryElement.getAttribute("localConstants").equals("false");
 		} catch(Exception e) {
 			localConstants = true;
 		}

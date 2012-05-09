@@ -47,6 +47,7 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -452,6 +453,19 @@ public class QueryDialog extends JPanel {
 //			randomSearch.setSelected(true);
 //		else
 //			breadthFirstSearch.setSelected(true);
+	}
+	
+	private void refreshLocalConstantOption() {
+		ReductionOption r = getReductionOption();
+		if(r == ReductionOption.VerifyTAPNdiscreteVerificationWA){
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					localConstants.setEnabled(true);
+				}
+			});
+		}
+		localConstants.setEnabled(false);
+		localConstants.setSelected(true);
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -2008,6 +2022,7 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshSymmetryReduction();
+		refreshLocalConstantOption();
 		refreshDiscreteInclusion();
 		refreshTraceOptions();
 		refreshSearchOptions();
