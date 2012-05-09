@@ -739,7 +739,7 @@ public class TapnLegacyXmlLoader {
 		
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, hashTableSize,
+					searchOption, reductionOption, symmetry, true, hashTableSize,
 					extrapolationOption,inclusionPlaces);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);

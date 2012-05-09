@@ -44,7 +44,7 @@ public class KBoundAnalyzer {
 	}
 
 	protected VerifyTAPNOptions verificationOptions() {
-		return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true);
+		return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true);
 	}
 
 	protected TAPNQuery getBoundednessQuery() {

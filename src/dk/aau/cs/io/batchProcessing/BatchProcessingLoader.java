@@ -480,6 +480,7 @@ public class BatchProcessingLoader {
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getSymmetryReductionOption(queryElement);
+		boolean localConstants = getLocalConstants(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
@@ -490,7 +491,7 @@ public class BatchProcessingLoader {
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption, inclusionPlaces);
+					searchOption, reductionOption, symmetry, localConstants, hashTableSize, extrapolationOption, inclusionPlaces);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
@@ -559,6 +560,16 @@ public class BatchProcessingLoader {
 			symmetry = true;
 		}
 		return symmetry;	
+	}
+	
+	private boolean getLocalConstants(Element queryElement) {
+		boolean localConstants;
+		try {
+			localConstants = queryElement.getAttribute("localConstants").equals("true");
+		} catch(Exception e) {
+			localConstants = true;
+		}
+		return localConstants;	
 	}
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {

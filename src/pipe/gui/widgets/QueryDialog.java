@@ -193,6 +193,7 @@ public class QueryDialog extends JPanel {
 	private JPanel reductionOptionsPanel;
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
+	private JCheckBox localConstants;
 	private JCheckBox discreteInclusion;
 	private JButton selectInclusionPlacesButton;
 	
@@ -343,7 +344,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reductionOptionToSet = getReductionOption();
 		boolean symmetry = getSymmetry();
 		
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, getLocalConstants(),/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -352,6 +353,10 @@ public class QueryDialog extends JPanel {
 
 	private boolean getSymmetry() {
 		return symmetryReduction.isSelected();
+	}
+	
+	private boolean getLocalConstants(){
+		return localConstants.isSelected();
 	}
 
 	private int getCapacity() {
@@ -830,6 +835,7 @@ public class QueryDialog extends JPanel {
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
 		boolean symmetry = queryToCreateFrom.useSymmetry();
+		boolean localconstants = queryToCreateFrom.useLocalConstants();
 
 		if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
 			reduction = name_BROADCAST;
@@ -852,6 +858,7 @@ public class QueryDialog extends JPanel {
 		}
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
+		localConstants.setSelected(localconstants);
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
@@ -1946,6 +1953,17 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(symmetryReduction, gbc);
+		
+		localConstants = new JCheckBox("Use local constants");
+		localConstants.setSelected(true);
+		localConstants.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(localConstants, gbc);
 
 		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
