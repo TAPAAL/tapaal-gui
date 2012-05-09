@@ -365,7 +365,7 @@ public class VerifyTAPNDiscreteVerificationWA implements ModelChecker{
 		public static void reset() {
 			//Clear value
 			verifydtapnWApath = "";
-			Preferences.getInstance().setVerifytapnLocation(null);
+			Preferences.getInstance().setVerifydtapnWALocation(null);
 			//Set the detault
 			trySetup();
 		}
