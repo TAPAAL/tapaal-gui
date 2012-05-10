@@ -458,14 +458,11 @@ public class QueryDialog extends JPanel {
 	private void refreshLocalConstantOption() {
 		ReductionOption r = getReductionOption();
 		if(r == ReductionOption.VerifyTAPNdiscreteVerificationWA){
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					localConstants.setEnabled(true);
-				}
-			});
+			localConstants.setEnabled(true);
+		} else {
+			localConstants.setEnabled(false);
+			localConstants.setSelected(true);
 		}
-		localConstants.setEnabled(false);
-		localConstants.setSelected(true);
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -673,6 +670,7 @@ public class QueryDialog extends JPanel {
 		reductionOption.removeAllItems();
 		boolean selectedOptionStillAvailable = false;	
 		boolean symmetry = symmetryReduction == null ? false : symmetryReduction.isSelected();
+		boolean lc = localConstants == null ? false : localConstants.isSelected();
 		for (String s : options) {
 			reductionOption.addItem(s);
 			if (s.equals(reductionOptionString)) {
@@ -683,6 +681,7 @@ public class QueryDialog extends JPanel {
 		if (selectedOptionStillAvailable) {
 			reductionOption.setSelectedItem(reductionOptionString);
 			symmetryReduction.setSelected(symmetry);
+			localConstants.setSelected(lc);
 		}
 	}
 
