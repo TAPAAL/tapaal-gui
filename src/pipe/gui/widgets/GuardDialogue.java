@@ -74,6 +74,8 @@ public class GuardDialogue extends JPanel /*
 	private WidthAdjustingComboBox leftConstantsComboBox;
 	private JCheckBox rightUseConstant;
 	private WidthAdjustingComboBox rightConstantsComboBox;
+	private JCheckBox weightUseConstant;
+	private WidthAdjustingComboBox weightConstantsComboBox;
 	
 	private int maxNumberOfPlacesToShowAtOnce = 20;
 
@@ -220,6 +222,7 @@ public class GuardDialogue extends JPanel /*
 				}
 			}
 		});
+		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
@@ -227,9 +230,50 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
 		weightEditPanel.add(weightNumber, gridBagConstraints);
 		
-		// hack to ensure the content stays on the left
+
+		Set<String> constants = CreateGui.getCurrentTab().network()
+		.getConstantNames();
+		String[] constantArray = constants.toArray(new String[constants.size()]);
+	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
+	    
+	    weightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+		weightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+		weightConstantsComboBox.setMaximumRowCount(20);
+		weightConstantsComboBox.setVisible(false);
+		weightConstantsComboBox.setPreferredSize(intervalBoxDims);
+		weightConstantsComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					
+					//TODO save selection
+				}
+			}
+		});
+		
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		weightEditPanel.add(weightConstantsComboBox, gridBagConstraints);
+		
+		
+		boolean enableConstantsCheckBoxes = !constants.isEmpty();
+		weightUseConstant = new JCheckBox("Use Constant                    ");
+		weightUseConstant.setEnabled(enableConstantsCheckBoxes);
+		weightUseConstant.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				weightConstantsComboBox.setVisible(weightUseConstant.isSelected());
+				weightNumber.setVisible(!weightUseConstant.isSelected());
+			}
+		});
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
+		weightEditPanel.add(weightUseConstant, gridBagConstraints);
+		
+		// hack to ensure the content stays on the left
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -590,6 +634,41 @@ public class GuardDialogue extends JPanel /*
 					.getValue()));
 		}
 		return firstValue;
+	}
+	
+	private void updateWeightConstantComboBox() {
+		int value = getFirstValue();
+
+		String oldWeight = weightConstantsComboBox.getSelectedItem() != null ? weightConstantsComboBox
+				.getSelectedItem().toString()
+				: null;
+				weightConstantsComboBox.removeAllItems();
+				Collection<Constant> constants = CreateGui.getCurrentTab().network()
+						.constants();
+
+				//List <Constant> constantList = new ArrayList(constants);
+				List <Constant> constantList = new ArrayList<Constant>();
+				constantList.addAll(constants);
+
+				Collections.sort(constantList,new Comparator<Constant>() {
+					public int compare(Constant o1, Constant o2) {
+						return o1.name().compareToIgnoreCase(o2.name());
+					}
+				});
+
+
+				for (Constant c : constantList) {
+					if (c.value() >= value) {
+						weightConstantsComboBox.addItem(c.name());
+					}
+				}
+
+				// if(rightConstantsComboBox.getItemCount() == 0){
+				// rightUseConstant.setEnabled(false);
+				// }
+
+				if (oldWeight != null)
+					weightConstantsComboBox.setSelectedItem(oldWeight);
 	}
 
 	private void updateRightConstantComboBox() {

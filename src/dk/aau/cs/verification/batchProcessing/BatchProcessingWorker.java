@@ -45,6 +45,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationLC;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerificationWA;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
+import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.LocalConstantsOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 
@@ -168,10 +169,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			ReductionOption option = query.getReductionOption();
 			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
+			boolean localConstants = batchProcessingVerificationOptions.localConstants() == LocalConstantsOption.KeepQueryOption ? query.useLocalConstants() : getLocalConstantsFromBatchProcessingOptions();
+			localConstants = option == ReductionOption.VerifyTAPNdiscreteVerificationWA ? localConstants : true;
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
-			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space"; 
+			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.useLocalConstants(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, localConstants,  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
@@ -189,6 +192,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private boolean getSymmetryFromBatchProcessingOptions() {
 		return batchProcessingVerificationOptions.symmetry() == SymmetryOption.Yes;
+	}
+	
+	private boolean getLocalConstantsFromBatchProcessingOptions(){
+		return batchProcessingVerificationOptions.localConstants() == LocalConstantsOption.Yes;
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
