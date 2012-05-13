@@ -210,9 +210,12 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		underlyingTransportArc.setTimeInterval(guard);
 		int oldWeight = getWeight();
 		setWeight(weight);
+		connectedTo.setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
 		updateLabel(true);
+		connectedTo.updateLabel(true);
+		
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval,
@@ -244,6 +247,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	@Override
 	public void setWeight(int weight){
 		underlyingTransportArc.setWeight(weight);
+		connectedTo.underlyingTransportArc.setWeight(weight);
 	}
 	
 	@Override
