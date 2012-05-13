@@ -269,7 +269,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
-		weightEditPanel.add(weightUseConstant, gridBagConstraints);
+		//weightEditPanel.add(weightUseConstant, gridBagConstraints);
 		
 		// hack to ensure the content stays on the left
 		gridBagConstraints = new GridBagConstraints();
