@@ -1023,6 +1023,9 @@ public class GuiFrame extends JFrame implements Observer {
 	public void toggleToolTips(){
 		showToolTips(!showToolTips);
 	}
+	public boolean isShowingToolTips(){
+		return showToolTips;
+	}
 	
 	
 	public void toggleZeroToInfinityIntervals() {
