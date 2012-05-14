@@ -21,7 +21,7 @@ public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
 		File modelFile = createTempFile(".xml");
 		File queryFile = createTempFile(".q");
-		File oFile = createTempFile(".o");
+		File oFile = createTempFile(".options");
 
 		return export(model, query, modelFile, queryFile, oFile, null);
 	}

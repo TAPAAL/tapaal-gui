@@ -2140,7 +2140,7 @@ public class QueryDialog extends JPanel {
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");
 							queryFile = a[0] + ".q";
-							oFile = a[0] + ".o";
+							oFile = a[0] + ".options";
 						}
 
 					} catch (Exception ex) {
