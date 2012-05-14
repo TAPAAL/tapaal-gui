@@ -45,7 +45,7 @@ public class VerifyTAPNExporter {
 			if(dataLayerQuery == null){
 				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
 			}else{
-				options = new VerifyTAPNOptions(query.getExtraTokens(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useLocalConstants());
+				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useLocalConstants());
 			}
 			oStream.append(options.toString());
 			oStream.close();
