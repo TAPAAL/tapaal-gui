@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -18,12 +21,13 @@ public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
 		File modelFile = createTempFile(".xml");
 		File queryFile = createTempFile(".q");
+		File oFile = createTempFile(".o");
 
-		return export(model, query, modelFile, queryFile);
+		return export(model, query, modelFile, queryFile, oFile, null);
 	}
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile) {
-		if (modelFile == null || queryFile == null)
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, File oFile, pipe.dataLayer.TAPNQuery dataLayerQuery) {
+		if (modelFile == null || queryFile == null || oFile == null)
 			return null;
 
 		try{
@@ -35,6 +39,16 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
 			queryStream.append(query.getProperty().toString());
 			queryStream.close();
+			
+			PrintStream oStream = new PrintStream(oFile);
+			VerifyTAPNOptions options = null;
+			if(dataLayerQuery == null){
+				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
+			}else{
+				options = new VerifyTAPNOptions(query.getExtraTokens(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useLocalConstants());
+			}
+			oStream.append(options.toString());
+			oStream.close();
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;

@@ -2132,7 +2132,7 @@ public class QueryDialog extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					querySaved = true;
 
-					String xmlFile = null, queryFile = null;
+					String xmlFile = null, queryFile = null, oFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
 						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
@@ -2140,6 +2140,7 @@ public class QueryDialog extends JPanel {
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");
 							queryFile = a[0] + ".q";
+							oFile = a[0] + ".o";
 						}
 
 					} catch (Exception ex) {
@@ -2149,7 +2150,7 @@ public class QueryDialog extends JPanel {
 								JOptionPane.ERROR_MESSAGE);
 					}
 
-					if (xmlFile != null && queryFile != null) {
+					if (xmlFile != null && queryFile != null && oFile != null) {
 						TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 						Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
@@ -2161,7 +2162,7 @@ public class QueryDialog extends JPanel {
 						
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyTAPNdiscreteVerificationLC || reduction == ReductionOption.VerifyTAPNdiscreteVerificationWA) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile));
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), new File(oFile), tapnQuery);
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
