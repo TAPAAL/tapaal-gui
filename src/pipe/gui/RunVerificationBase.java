@@ -91,7 +91,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		try{
 		    for(int i = arr.length-1; i > -1; i--){
 			Entry<String, Tuple<String, String>> e = (Entry<String, Tuple<String, String>>) arr[i];
-			trace = trace.replace(e.getKey(), e.getValue().value1() + "." + e.getValue().value2());
+			trace = trace.replace("("+e.getKey()+",", "("+e.getValue().value1() + "." + e.getValue().value2()+",");
 		    }
 		}catch(java.lang.OutOfMemoryError e) {
 			trace = "Trace too long; could not display.";
