@@ -194,7 +194,9 @@ public class TimedTransition extends TAPNElement {
 
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
 		for (TimedOutputArc arc : postset) {
-			producedTokens.add(new TimedToken(arc.destination()));
+			for(int i = 0; i < arc.getWeight(); i++){
+				producedTokens.add(new TimedToken(arc.destination()));
+			}
 		}
 
 		for (TransportArc transportArc : transportArcsGoingThrough) {
