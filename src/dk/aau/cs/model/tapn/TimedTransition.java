@@ -206,7 +206,7 @@ public class TimedTransition extends TAPNElement {
 				}
 			}
 		}
-
+		
 		return producedTokens;
 	}
 

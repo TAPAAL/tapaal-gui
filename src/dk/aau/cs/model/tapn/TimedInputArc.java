@@ -53,7 +53,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public boolean isEnabled() {
-		return getElligibleTokens().size() > 0;
+		return getElligibleTokens().size() >= weight;
 	}
 
 	public boolean isEnabledBy(TimedToken token) {
