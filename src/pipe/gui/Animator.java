@@ -414,56 +414,56 @@ public class Animator {
 	}	
 	
 	enum FillListStatus{
-		zero,
-		one,
-		moreThanOne
+		lessThanWeight,
+		weight,
+		moreThanWeight
 	}
 	
-	//Creates a list of tokens if there is only one token in each of the places
+	//Creates a list of tokens if there is only weight tokens in each of the places
 	//Used by getTokensToConsume
 	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
 		for(TimedInputArc in: transition.getInputArcs()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() == 0){
-				return FillListStatus.zero;
-			} else if(elligibleTokens.size() == 1){
-				listToFill.add(elligibleTokens.get(0));
+			if(elligibleTokens.size() < in.getWeight()){
+				return FillListStatus.lessThanWeight;
+			} else if(elligibleTokens.size() == in.getWeight()){
+				listToFill.addAll(elligibleTokens);
 			} else {
-				return FillListStatus.moreThanOne;
+				return FillListStatus.moreThanWeight;
 			}
 		}
 		for(TransportArc in: transition.getTransportArcsGoingThrough()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() == 0){
-				return FillListStatus.zero;
-			} else if(elligibleTokens.size() == 1){
-				listToFill.add(elligibleTokens.get(0));
+			if(elligibleTokens.size() < in.getWeight()){
+				return FillListStatus.lessThanWeight;
+			} else if(elligibleTokens.size() == in.getWeight()){
+				listToFill.addAll(elligibleTokens);
 			} else {
-				return FillListStatus.moreThanOne;
+				return FillListStatus.moreThanWeight;
 			}
 		}
-		return FillListStatus.one;
+		return FillListStatus.weight;
 	}
 	
 	private List<TimedToken> getTokensToConsume(TimedTransition transition){
-		//If there are only one token in each place
+		//If there are only "weight tokens in each place
 		List<TimedToken> result = new ArrayList<TimedToken>();
 		boolean userShouldChoose = false;
 		if(transition.isShared()){
 			for(TimedTransition t : transition.sharedTransition().transitions()){
 				FillListStatus status = fillList(t, result);
-				if(status == FillListStatus.zero){
+				if(status == FillListStatus.lessThanWeight){
 					return null;
-				} else if(status == FillListStatus.moreThanOne){
+				} else if(status == FillListStatus.moreThanWeight){
 					userShouldChoose = true;
 					break;
 				}
 			}
 		} else {
 			FillListStatus status = fillList(transition, result);
-			if(status == FillListStatus.zero){
+			if(status == FillListStatus.lessThanWeight){
 				return null;
-			} else if(status == FillListStatus.moreThanOne){
+			} else if(status == FillListStatus.moreThanWeight){
 				userShouldChoose = true;
 			}
 		}
