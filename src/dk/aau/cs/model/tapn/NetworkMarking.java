@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 
 import pipe.gui.CreateGui;
 
-import com.sun.xml.internal.stream.Entity;
-
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
