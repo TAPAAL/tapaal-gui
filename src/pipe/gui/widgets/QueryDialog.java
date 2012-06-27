@@ -47,6 +47,7 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -193,6 +194,7 @@ public class QueryDialog extends JPanel {
 	private JPanel reductionOptionsPanel;
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
+	private JCheckBox localConstants;
 	private JCheckBox discreteInclusion;
 	private JButton selectInclusionPlacesButton;
 	
@@ -217,6 +219,7 @@ public class QueryDialog extends JPanel {
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private String name_DISCRETE = "TAPAAL: Discrete Engine";
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
@@ -342,7 +345,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reductionOptionToSet = getReductionOption();
 		boolean symmetry = getSymmetry();
 		
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, getLocalConstants(),/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -351,6 +354,10 @@ public class QueryDialog extends JPanel {
 
 	private boolean getSymmetry() {
 		return symmetryReduction.isSelected();
+	}
+	
+	private boolean getLocalConstants(){
+		return localConstants.isSelected();
 	}
 
 	private int getCapacity() {
@@ -390,6 +397,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.DEGREE2BROADCAST;
 		else if (reductionOptionString.equals(name_verifyTAPN))
 			return ReductionOption.VerifyTAPN;
+		else if (reductionOptionString.equals(name_DISCRETE))
+			return ReductionOption.VerifyTAPNdiscreteVerification;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -400,7 +409,7 @@ public class QueryDialog extends JPanel {
 
 	private void refreshTraceOptions() {
 		TraceOption traceOption = getTraceOption();
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
+		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN) || ((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
 			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
 			someTraceRadioButton.setSelected(someTraceRadioButton.isSelected());
@@ -444,6 +453,16 @@ public class QueryDialog extends JPanel {
 //			randomSearch.setSelected(true);
 //		else
 //			breadthFirstSearch.setSelected(true);
+	}
+	
+	private void refreshLocalConstantOption() {
+		ReductionOption r = getReductionOption();
+		if(r == ReductionOption.VerifyTAPNdiscreteVerification){
+			localConstants.setEnabled(true);
+		} else {
+			localConstants.setEnabled(false);
+			localConstants.setSelected(true);
+		}
 	}
 
 	private void resetQuantifierSelectionButtons() {
@@ -639,18 +658,19 @@ public class QueryDialog extends JPanel {
 		String[] options;
 		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(isNetDegree2)
-				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD };
+				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD, name_DISCRETE };
 			else
-				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2 };
+				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE };
 		} else if(tapnNetwork.hasInhibitorArcs()) {
-			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2 };
+			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE };
 		} else {
-			options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2};
+			options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE};
 		}
 		
 		reductionOption.removeAllItems();
 		boolean selectedOptionStillAvailable = false;	
 		boolean symmetry = symmetryReduction == null ? false : symmetryReduction.isSelected();
+		boolean lc = localConstants == null ? false : localConstants.isSelected();
 		for (String s : options) {
 			reductionOption.addItem(s);
 			if (s.equals(reductionOptionString)) {
@@ -661,6 +681,7 @@ public class QueryDialog extends JPanel {
 		if (selectedOptionStillAvailable) {
 			reductionOption.setSelectedItem(reductionOptionString);
 			symmetryReduction.setSelected(symmetry);
+			localConstants.setSelected(lc);
 		}
 	}
 
@@ -827,12 +848,15 @@ public class QueryDialog extends JPanel {
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
 		boolean symmetry = queryToCreateFrom.useSymmetry();
+		boolean localconstants = queryToCreateFrom.useLocalConstants();
 
 		if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
 			reduction = name_BROADCAST;
 		} else if (queryToCreateFrom.getReductionOption() == ReductionOption.DEGREE2BROADCAST) {
 			reduction = name_BROADCASTDEG2;
-		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
+			reduction = name_DISCRETE;
+		}else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
@@ -847,6 +871,7 @@ public class QueryDialog extends JPanel {
 		}
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
+		localConstants.setSelected(localconstants);
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
@@ -1941,6 +1966,17 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(symmetryReduction, gbc);
+		
+		localConstants = new JCheckBox("Use local constants");
+		localConstants.setSelected(true);
+		localConstants.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(localConstants, gbc);
 
 		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
@@ -1985,6 +2021,7 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshSymmetryReduction();
+		refreshLocalConstantOption();
 		refreshDiscreteInclusion();
 		refreshTraceOptions();
 		refreshSearchOptions();
@@ -2006,8 +2043,8 @@ public class QueryDialog extends JPanel {
 	private void refreshExportButtonText() {
 		ReductionOption reduction = getReductionOption();
 		
-		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
-		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
+		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 	}
 
 	private void refreshQueryEditingButtons() {
@@ -2078,7 +2115,7 @@ public class QueryDialog extends JPanel {
 					exit();
 					TAPNQuery query = getQuery();
 
-					if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+					if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
 						Verifier.runVerifyTAPNVerification(tapnNetwork, query);
 					else
 						Verifier.runUppaalVerification(tapnNetwork, query);
@@ -2098,7 +2135,7 @@ public class QueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");
@@ -2122,9 +2159,9 @@ public class QueryDialog extends JPanel {
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
 						
-						if(reduction == ReductionOption.VerifyTAPN) {
+						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
-							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile));
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
@@ -2136,7 +2173,7 @@ public class QueryDialog extends JPanel {
 								else if(exportException instanceof UnsupportedQueryException)
 									s.append(UNSUPPPORTED_QUERY_TEXT + "\n\n");
 								
-								if(reduction == ReductionOption.VerifyTAPN)
+								if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification)
 									s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
 								else
 									s.append(NO_UPPAAL_XML_FILE_SAVED);
@@ -2145,7 +2182,7 @@ public class QueryDialog extends JPanel {
 							}
 						}
 					} else {
-						JOptionPane.showMessageDialog(CreateGui.getApp(), reduction == ReductionOption.VerifyTAPN ? NO_VERIFYTAPN_XML_FILE_SAVED : NO_UPPAAL_XML_FILE_SAVED);
+						JOptionPane.showMessageDialog(CreateGui.getApp(), reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? NO_VERIFYTAPN_XML_FILE_SAVED : NO_UPPAAL_XML_FILE_SAVED);
 					}
 				}
 			});

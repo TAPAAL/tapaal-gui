@@ -771,6 +771,7 @@ public class TapnXmlLoader {
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getSymmetryReductionOption(queryElement);
+		boolean localConstants = getLocalConstants(queryElement);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
@@ -780,7 +781,7 @@ public class TapnXmlLoader {
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption, inclusionPlaces);
+					searchOption, reductionOption, symmetry, localConstants, hashTableSize, extrapolationOption, inclusionPlaces);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
@@ -837,6 +838,16 @@ public class TapnXmlLoader {
 			symmetry = true;
 		}
 		return symmetry;	
+	}
+	
+	private boolean getLocalConstants(Element queryElement) {
+		boolean localConstants;
+		try {
+			localConstants = !queryElement.getAttribute("localConstants").equals("false");
+		} catch(Exception e) {
+			localConstants = true;
+		}
+		return localConstants;	
 	}
 	
 	private boolean getDiscreteInclusionOption(Element queryElement) {

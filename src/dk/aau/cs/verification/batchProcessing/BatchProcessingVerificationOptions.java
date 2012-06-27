@@ -16,33 +16,40 @@ public class BatchProcessingVerificationOptions {
 		KeepQueryOption, Yes, No
 	};
 	
+	public enum LocalConstantsOption{
+		KeepQueryOption, Yes, No
+	}
+	
 	private List<ReductionOption> reductionOptions;
 	private ReductionOption reductionOption;
 	private SearchOption searchOption;
 	private QueryPropertyOption queryPropertyOption;
 	private SymmetryOption symmetryOption;
+	private LocalConstantsOption lcOption;
 	private boolean keepQueryCapacity;
 	private int capacity;
 	private boolean discreteInclusion = false; // only for VerifyTAPN
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion, List<ReductionOption> reductionOptions) {
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, LocalConstantsOption lcOption, ReductionOption reductionOption, boolean discreteInclusion, List<ReductionOption> reductionOptions) {
 		Require.that(!(reductionOptions == null && reductionOption == ReductionOption.BatchProcessingUserDefinedReductions), "ReductionOption was given as userdefined but a list of reductionoptions was not given");
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
 		this.queryPropertyOption = queryPropertyOption;
 		this.symmetryOption = symmetryOption;
+		this.lcOption = lcOption;
 		this.keepQueryCapacity = keepQueryCapacity;
 		this.capacity = capacity;
 		this.discreteInclusion = discreteInclusion;
 		this.reductionOptions = reductionOptions;
 	}
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion) {
-		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption,reductionOption, discreteInclusion, null); 
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, LocalConstantsOption lcoption, ReductionOption reductionOption, boolean discreteInclusion) {
+		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, lcoption, reductionOption, discreteInclusion, null); 
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
 		this.queryPropertyOption = queryPropertyOption;
 		this.symmetryOption = symmetryOption;
+		this.lcOption = lcoption;
 		this.keepQueryCapacity = keepQueryCapacity;
 		this.capacity = capacity;
 		this.discreteInclusion = discreteInclusion;
@@ -71,6 +78,10 @@ public class BatchProcessingVerificationOptions {
 	
 	public SymmetryOption symmetry() {
 		return symmetryOption;
+	}
+	
+	public LocalConstantsOption localConstants(){
+		return lcOption;
 	}
 	
 	public boolean KeepCapacityFromQuery() {

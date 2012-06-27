@@ -31,6 +31,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.RequireException;
 
@@ -39,6 +40,7 @@ public class Animator {
 	private int currentAction;
 	private ArrayList<NetworkMarking> markings;
 	private int currentMarkingIndex = 0;
+	private TAPNNetworkTrace trace = null;
 
 	public FiringMode firingmode = new RandomFiringMode();
 	private TabContent tab;
@@ -62,6 +64,7 @@ public class Animator {
 
 	public void SetTrace(TAPNNetworkTrace trace) {
 		if (trace.isConcreteTrace()) {
+			this.trace = trace;
 			setTimedTrace(trace);
 		} else {
 			setUntimedTrace(trace);
@@ -98,6 +101,12 @@ public class Animator {
 
 	private void setTimedTrace(TAPNNetworkTrace trace) {
 		for (TAPNNetworkTraceStep step : trace) {
+			addMarking(step, step.performStepFrom(currentMarking()));
+		}
+	}
+	
+	private void addToTimedTrace(List<TAPNNetworkTraceStep> stepList){
+		for (TAPNNetworkTraceStep step : stepList) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 	}
@@ -245,6 +254,17 @@ public class Animator {
 			activeGuiModel().redrawVisibleTokenLists();
 			reportBlockingPlaces();
 
+		}
+		
+		if(currentAction == actionHistory.size() - 1 && trace != null && getTrace().getLoopToIndex() != -1){
+			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
+			int action = currentAction;
+			int markingIndex = currentMarkingIndex;
+			addToTimedTrace(getTrace().getLoopSteps());
+			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+			currentAction = action;
+			currentMarkingIndex = markingIndex;
+			
 		}
 	}
 
@@ -497,5 +517,13 @@ public class Animator {
 	public void reset(){
 		resethistory();
 		isDisplayingUntimedTrace = false;
+	}
+	
+	public void nullSetTrace(){
+		trace = null;
+	}
+	
+	public TimedTAPNNetworkTrace getTrace(){
+		return (TimedTAPNNetworkTrace)trace;
 	}
 }

@@ -54,6 +54,7 @@ public class ProcessRunner {
 		startTimeMs = System.currentTimeMillis();
 
 		try {
+			System.out.println("Running: "+ file + " " + arguments);
 			process = Runtime.getRuntime().exec(file + " " + arguments);
 		} catch (IOException e1) {
 			error = true;

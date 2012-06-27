@@ -7,7 +7,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
-public class TAPNNetworkTimedTransitionStep implements TAPNNetworkTraceStep {
+public class TAPNNetworkTimedTransitionStep extends TAPNNetworkTraceStep {
 	private TimedTransition transition;
 	private List<TimedToken> consumedTokens;
 
@@ -23,6 +23,6 @@ public class TAPNNetworkTimedTransitionStep implements TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return transition.isShared() ? transition.sharedTransition().name() : transition.toString();
+		return (isLoopStep() ? "* " : "") + (transition.isShared() ? transition.sharedTransition().name() : transition.toString());
 	}
 }

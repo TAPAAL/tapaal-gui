@@ -58,6 +58,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		if(result.query() == null) return "";
 		
 		ReductionOption reduction = result.query().getReductionOption();
+		
 		if(reduction == ReductionOption.VerifyTAPN) {
 			if(!result.query().discreteInclusion())
 				return "A";
@@ -71,6 +72,8 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 			return "E";
 		else if(reduction == ReductionOption.DEGREE2BROADCAST)
 			return "F";
+		else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification)
+			return "G";
 		else
 			return "";
 	}

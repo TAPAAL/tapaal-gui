@@ -1,5 +1,6 @@
 package pipe.gui;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -61,7 +62,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime(),
-					result.stats());
+					result.stats()
+					);
 		}		
 	}
 	

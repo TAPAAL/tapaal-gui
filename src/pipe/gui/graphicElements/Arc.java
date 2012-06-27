@@ -49,7 +49,6 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		id = idInput;
 		setSource(sourceInput);
 		setTarget(targetInput);
-		//setWeight(weightInput);
 	}
 	
 	abstract public void setWeight(int weight);

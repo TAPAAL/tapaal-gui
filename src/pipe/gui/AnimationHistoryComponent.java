@@ -8,6 +8,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
+
 public class AnimationHistoryComponent extends JList {
 	private static final long serialVersionUID = -4284885450021683552L;
 
@@ -39,6 +42,7 @@ public class AnimationHistoryComponent extends JList {
 	}
 
 	public void clearStepsForward() {
+		CreateGui.getAnimator().nullSetTrace();
 		DefaultListModel listModel = getListModel();
 		int lastIndex = listModel.size() - 1;
 

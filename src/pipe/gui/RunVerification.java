@@ -3,6 +3,9 @@
  */
 package pipe.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -10,9 +13,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
@@ -81,6 +91,8 @@ public class RunVerification extends RunVerificationBase {
 
 		}
 	}
+	
+	JDialog d;
 
 	private String toHTML(String string){
 		StringBuffer buffer = new StringBuffer("<html>");
