@@ -198,7 +198,7 @@ public class EngineDialogPanel {
 			verifydtapnPath = "Not setup";
 			verifydtapnversion = "N/A";
 		} else {
-			verifydtapnversion = verifyTAPN.getVersion();
+			verifydtapnversion = verifydTAPN.getVersion();
 		}
 		tapaalLocationLabelVal.setText(verifytapnPath);
 		tapaalVersionLabelVal.setText(verifytapnversion);
