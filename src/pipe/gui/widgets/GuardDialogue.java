@@ -125,7 +125,6 @@ public class GuardDialogue extends JPanel /*
 				}
 				undoManager.addEdit(arc.setGuardAndWeight(guard, (Integer) weightNumber.getValue()));
 				CreateGui.getCurrentTab().network().buildConstraints();
-
 				exit();
 			}
 
