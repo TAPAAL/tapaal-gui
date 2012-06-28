@@ -23,6 +23,8 @@ public class TAPNNetworkTimedTransitionStep extends TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return (isLoopStep() ? "* " : "") + (transition.isShared() ? transition.sharedTransition().name() : transition.toString());
+		
+		String toReturn = transition.isShared() ? transition.sharedTransition().name() : transition.toString();
+		return isLoopStep() ? formatAsLoopStep(toReturn) : toReturn;
 	}
 }

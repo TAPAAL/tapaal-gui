@@ -13,6 +13,10 @@ public abstract class TAPNNetworkTraceStep {
 		return loopStep;
 	}
 	
+	protected String formatAsLoopStep(String s){
+		return "<html><i><font color=red>* " + s + "</i></font></html>";
+	}
+	
 	public abstract NetworkMarking performStepFrom(NetworkMarking marking); // TODO: We should
 															// introduce an
 															// interface for

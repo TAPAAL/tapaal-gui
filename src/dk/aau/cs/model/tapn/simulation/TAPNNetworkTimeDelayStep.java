@@ -20,7 +20,8 @@ public class TAPNNetworkTimeDelayStep extends TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return (isLoopStep() ? "* " : "") + "TimeDelay: " + df.format(delay);
+		String toReturn = "TimeDelay: " + df.format(delay);
+		return isLoopStep() ? formatAsLoopStep(toReturn) : toReturn;
 	}
 
 	private static DecimalFormat createDecimalFormat() {
