@@ -89,7 +89,7 @@ public class RunVerification extends RunVerificationBase {
 		return buffer.toString();
 	}
 	
-	private JPanel createMessagePanel(VerificationResult<TAPNNetworkTrace> result) {
+	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -120,6 +120,19 @@ public class RunVerification extends RunVerificationBase {
 			gbc.insets = new Insets(0,10,15,0);
 			gbc.anchor = GridBagConstraints.EAST;
 			panel.add(infoButton, gbc);
+			
+			JButton transitionStatsButton = new JButton("Transition Statistics");
+			transitionStatsButton.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent arg0) {
+					JOptionPane.showMessageDialog(panel,result.getTransitionStatistics() , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 3;
+			gbc.insets = new Insets(10,0,10,0);
+			gbc.anchor = GridBagConstraints.WEST;
+			panel.add(transitionStatsButton, gbc);
 		}
 		
 		gbc = new GridBagConstraints();

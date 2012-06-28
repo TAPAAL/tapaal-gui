@@ -1,11 +1,14 @@
 package dk.aau.cs.verification;
 
+import dk.aau.cs.util.Tuple;
+
 public class VerificationResult<TTrace> {
 	private QueryResult queryResult;
 	private TTrace trace;
 	private String errorMessage = null;
 	private long verificationTime = 0;
 	private Stats stats;
+	private NameMapping nameMapping;
 	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -25,6 +28,25 @@ public class VerificationResult<TTrace> {
 	public VerificationResult(String outputMessage, long verificationTime) {
 		errorMessage = outputMessage;
 		this.verificationTime = verificationTime;
+	}
+	
+	public NameMapping getNameMapping() {
+		return nameMapping;
+	}
+	
+	public void setNameMapping(NameMapping nameMapping) {
+		this.nameMapping = nameMapping;
+	}
+	
+	public String getTransitionStatistics() {
+		StringBuilder returnString = new StringBuilder();
+		for (int i = 0; i < stats.transitionsCount();i++) {
+			Tuple<String,Integer> element = stats.getTransitionStats(i);
+			String transitionName = nameMapping.map(element.value1()).value2();
+			Integer transitionFired = element.value2();
+			returnString.append(transitionName+"   "+transitionFired.toString()+"\n");
+		}
+		return returnString.toString();
 	}
 
 	public QueryResult getQueryResult() {
