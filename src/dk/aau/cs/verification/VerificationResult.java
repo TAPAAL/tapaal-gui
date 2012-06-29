@@ -1,5 +1,10 @@
 package dk.aau.cs.verification;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import dk.aau.cs.util.Tuple;
 
 public class VerificationResult<TTrace> {
@@ -38,15 +43,23 @@ public class VerificationResult<TTrace> {
 		this.nameMapping = nameMapping;
 	}
 	
-	public String getTransitionStatistics() {
-		StringBuilder returnString = new StringBuilder();
+	public List<Tuple<String,Integer>> getTransitionStatistics() {
+		List<Tuple<String,Integer>> returnList = new ArrayList<Tuple<String,Integer>>();
 		for (int i = 0; i < stats.transitionsCount();i++) {
 			Tuple<String,Integer> element = stats.getTransitionStats(i);
-			String transitionName = nameMapping.map(element.value1()).value2();
+			String transitionName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
 			Integer transitionFired = element.value2();
-			returnString.append(transitionName+"   "+transitionFired.toString()+"\n");
+			returnList.add(new Tuple<String, Integer>(transitionName, transitionFired));
 		}
-		return returnString.toString();
+		Collections.sort(returnList,new transitionTupleComparator());
+		return returnList;
+	}
+	
+	public class transitionTupleComparator implements Comparator<Tuple<String,Integer>> {
+		@Override
+		public int compare(Tuple<String,Integer> tuple1,Tuple<String,Integer> tuple2) {
+			return (tuple1.value2() > tuple2.value2() ? -1 : (tuple1.value2() == tuple2.value2() ? 0 : 1));
+		}
 	}
 
 	public QueryResult getQueryResult() {

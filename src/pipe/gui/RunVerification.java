@@ -3,20 +3,25 @@
  */
 package pipe.gui;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
@@ -89,6 +94,86 @@ public class RunVerification extends RunVerificationBase {
 		return buffer.toString();
 	}
 	
+	private JPanel createTransitionStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result) {
+		JPanel panel = new JPanel(new GridBagLayout());
+		JPanel headLinePanel = new JPanel(new GridBagLayout());
+		JPanel fullPanel = new JPanel(new GridBagLayout());
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		//gbc.fill = gbc.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		//gbc.gridwidth = 2;
+		gbc.insets = new Insets(15,0,15,15);
+		gbc.anchor = GridBagConstraints.WEST;
+		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n")), gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		//gbc.fill = gbc.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.insets = new Insets(15,15,15,10);
+		gbc.anchor = GridBagConstraints.WEST;
+		panel.add(new JLabel(toHTML(extractNamesFromTransitionStatistics(result))), gbc);
+		
+		gbc = new GridBagConstraints();
+		//gbc.fill = gbc.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.insets = new Insets(15,10,15,15);
+		gbc.anchor = GridBagConstraints.EAST;		
+		panel.add(new JLabel(toHTML(extractValuesFromTransitionStatistics(result))), gbc);
+		
+		gbc = new GridBagConstraints();
+		//gbc.fill = gbc.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		//gbc.insets = new Insets(15,10,15,15);
+		gbc.anchor = GridBagConstraints.WEST;
+		fullPanel.add(headLinePanel,gbc);
+		
+		gbc = new GridBagConstraints();
+		//gbc.fill = gbc.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		//gbc.insets = new Insets(15,10,15,15);
+		gbc.anchor = GridBagConstraints.WEST;
+		fullPanel.add(panel,gbc);
+		
+		return fullPanel;
+	}
+	
+	private String extractNamesFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+		StringBuilder names = new StringBuilder();
+		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
+		for (int i=0;i<transistionStats.size();i++) {
+			names.append(transistionStats.get(i).value1());
+			names.append(":");
+			names.append("\n");
+		}
+		return names.toString();
+	}
+	
+	private String extractValuesFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+		StringBuilder names = new StringBuilder();
+		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
+		for (int i=0;i<transistionStats.size();i++) {
+			names.append(transistionStats.get(i).value2().toString());
+			names.append("\n");
+		}
+		return names.toString();
+	}
+	
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		
@@ -124,7 +209,7 @@ public class RunVerification extends RunVerificationBase {
 			JButton transitionStatsButton = new JButton("Transition Statistics");
 			transitionStatsButton.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent arg0) {
-					JOptionPane.showMessageDialog(panel,result.getTransitionStatistics() , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(panel,createTransitionStatisticsPanel(result) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 			gbc = new GridBagConstraints();
