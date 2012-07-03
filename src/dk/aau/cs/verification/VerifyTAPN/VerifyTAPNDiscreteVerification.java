@@ -114,7 +114,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				result = null;
 			}
 
-			Pattern pattern = Pattern.compile("^VerifyTAPN (\\d+\\.\\d+\\.\\d+)$");
+			Pattern pattern = Pattern.compile("^VerifyDTAPN (\\d+\\.\\d+\\.\\d+)$");
 			Matcher m = pattern.matcher(versioninfo);
 			m.find();
 			result = m.group(1);
