@@ -657,43 +657,11 @@ public class TabContent extends JSplitPane {
 		}
 	}
 	
-	public static String getEditorModelRoot(){
-		try{
-			BASE64Encoder b64 = new BASE64Encoder();
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(out);
-			
-			//Serialize editorModelroot
-			oos.writeObject(editorModelroot);
-			oos.close();
-			
-			//Base 64 encode the binary data to be able to save as string
-			return b64.encode(out.toByteArray());
-		} catch (IOException e){
-			System.err.println("Something went wrong couldn't save workspace");
-			return null;
-		}
+	public static Split getEditorModelRoot(){
+		return editorModelroot;
 	}
 	
-	public static void setEditorModelRoot(String model){
-		if(model == null){
-			editorModelroot = null;
-			return;
-		}
-		
-		try{
-			BASE64Decoder b64 = new BASE64Decoder();
-
-			//Decode Base 64 and create an inputstream 
-			ByteArrayInputStream in = new ByteArrayInputStream(b64.decodeBuffer(model));
-			ObjectInputStream ois = new ObjectInputStream(in);
-			
-			//Read in the model
-			editorModelroot = (Split)ois.readObject();
-			ois.close();
-		} catch (Exception e){
-			editorModelroot = null;
-			System.err.println("Something went wrong didn't load saved workspace");
-		}
+	public static void setEditorModelRoot(Split model){
+		editorModelroot = model;
 	}
 }

@@ -1,6 +1,13 @@
 package net.tapaal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.prefs.BackingStoreException;
+
+import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 public class Preferences {
 
@@ -116,17 +123,42 @@ public class Preferences {
 		return pref.getBoolean("constantPanel", true);
 	}
 
-	public void setEditorModelRoot(String model){
-		//model = model.replaceAll(">\\s*<",">\n<");
-		System.err.println(java.util.prefs.Preferences.MAX_KEY_LENGTH);
-		System.err.println(java.util.prefs.Preferences.MAX_VALUE_LENGTH + " " + model.length());
-		System.err.println(model);
-		
-		pref.put("editorModelRoot", model);
+	public void setEditorModelRoot(Split modelRoot){
+		if(modelRoot == null){
+			return;
+		}
+		try{
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(out);
+
+			//Serialize model
+			oos.writeObject(modelRoot);
+			oos.close();
+
+			pref.putByteArray("editorModelRoot", out.toByteArray());
+		} catch (IOException e){
+			System.err.println("Something went wrong couldn't save workspace");
+		}
 	}
 
-	public String getEditorModelRoot(){
-		return pref.get("editorModelRoot", null);
+	public Split getEditorModelRoot(){
+		byte[] model = pref.getByteArray("editorModelRoot", null);
+		if(model == null){
+			return null;
+		}
+		Split editorModelroot = null;
+
+		try{ 
+			ByteArrayInputStream in = new ByteArrayInputStream(model);
+			ObjectInputStream ois = new ObjectInputStream(in);
+
+			//Read in the model
+			editorModelroot = (Split)ois.readObject();
+			ois.close();
+		} catch (Exception e){
+			System.err.println("Something went wrong didn't load saved workspace");
+		}
+		return editorModelroot;
 	}
 
 	//Simulator
