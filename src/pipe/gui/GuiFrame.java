@@ -77,6 +77,7 @@ import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import pipe.gui.widgets.QueryDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
@@ -123,7 +124,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
@@ -523,7 +524,11 @@ public class GuiFrame extends JFrame implements Observer {
    				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
-    				 
+    	 viewMenu.addSeparator();
+    	 
+    	 addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
+    	 addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
@@ -648,9 +653,20 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
+
 		return toolsMenu;
 	}
-
+	
+	public void showAdvancedWorkspace(boolean advanced){
+		QueryDialog.setAdvancedView(advanced);
+		showComponents(advanced);
+		showConstants(advanced);
+		
+		//Queries and enabled transitions should always be shown
+		showQueries(true);
+		showEnabledTransitionsList(true);
+	}
+	
 	private void buildToolbar() {
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
@@ -941,6 +957,9 @@ public class GuiFrame extends JFrame implements Observer {
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
+		showAdvancedWorkspaceAction.setEnabled(enable);
+		showSimpleWorkspaceAction.setEnabled(enable);
+		
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -2017,6 +2036,10 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleEnabledTransitionsList();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
+			} else if (this == showAdvancedWorkspaceAction){
+				showAdvancedWorkspace(true);
+			} else if (this == showSimpleWorkspaceAction){
+				showAdvancedWorkspace(false);
 			}
 		}
 		
