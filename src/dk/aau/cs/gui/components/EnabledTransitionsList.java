@@ -51,6 +51,9 @@ public class EnabledTransitionsList extends JPanel{
 		});
 		
 		scrollPane = new JScrollPane(transitionsList);
+		//Add 10 pixel to the minimumsize of the scrollpane
+		scrollPane.setMinimumSize(new Dimension(scrollPane.getMinimumSize().width, scrollPane.getMinimumSize().height + 10));
+		
 		
 		fireButton = new JButton("Fire");
 		fireButton.addActionListener(new ActionListener() {

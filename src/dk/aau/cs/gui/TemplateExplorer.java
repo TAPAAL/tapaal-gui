@@ -218,6 +218,8 @@ public class TemplateExplorer extends JPanel {
 		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
+		//Add 10 pixel to the minimumsize of the scrollpane
+		scrollpane.setMinimumSize(new Dimension(scrollpane.getMinimumSize().width, scrollpane.getMinimumSize().height + 10));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;

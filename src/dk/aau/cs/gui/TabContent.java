@@ -270,6 +270,8 @@ public class TabContent extends JSplitPane {
 				.createCompoundBorder(
 						BorderFactory.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		//Add 10 pixel to the minimumsize of the scrollpane
+		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 10));
 	}
 
 	private void createAnimatorSlitPane() {
