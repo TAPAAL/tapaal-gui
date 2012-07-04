@@ -536,13 +536,13 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
+				 ElementType.STEPBACKWARD, "Step backward", "released UP"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "typed 6"));
+						 ElementType.STEPFORWARD, "Step forward", "released DOWN"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
-				 ElementType.TIMEPASS, "Let time pass one time unit", "typed 1"));
+				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -1451,6 +1451,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
@@ -1611,6 +1612,12 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			animBox = CreateGui.getAnimationHistory();
+			
+			// Hack to ensure the toolbar is not in focus
+			if(CreateGui.getAnimationController() != null){
+				CreateGui.getAnimationController().requestFocusInWindow();
+			}
+
 
 			switch (typeID) {
 			case START:
