@@ -17,6 +17,10 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;
@@ -126,6 +130,20 @@ public class CreateGui {
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
+		
+		//TODO
+		/*
+		appTab.addChangeListener(new ChangeListener() {
+			int oldIndex = 0;
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				Split model = getTab(oldIndex).getModelRoot();
+				getCurrentTab().setModelRoot(model);
+				oldIndex = appTab.getSelectedIndex();
+			}
+		});
+		*/
+		
 
 		animator = new Animator();
 

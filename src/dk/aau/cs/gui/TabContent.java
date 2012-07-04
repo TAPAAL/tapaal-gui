@@ -10,11 +10,30 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -45,6 +64,8 @@ import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.Constant;
@@ -64,7 +85,7 @@ public class TabContent extends JSplitPane {
 
 	// Normal mode
 	BugHandledJXMultisplitPane editorSplitPane;
-	Split editorModelroot;
+	static Split editorModelroot = null;
 
 	QueryPane queries;
 	ConstantsPane constantsPanel;
@@ -140,34 +161,50 @@ public class TabContent extends JSplitPane {
 		sharedPTPanel.setPreferredSize(new Dimension(sharedPTPanel
 				.getPreferredSize().width,
 				sharedPTPanel.getMinimumSize().height));
+		
+		boolean floatingDividers = false;
+		if(editorModelroot == null){
+			Leaf constantsLeaf = new Leaf(constantsName);
+			Leaf queriesLeaf = new Leaf(queriesName);
+			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
+			Leaf sharedPTLeaf = new Leaf(sharedPTName);
 
-		Leaf constantsLeaf = new Leaf(constantsName);
-		Leaf queriesLeaf = new Leaf(queriesName);
-		Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
-		Leaf sharedPTLeaf = new Leaf(sharedPTName);
+			constantsLeaf.setWeight(0.25);
+			queriesLeaf.setWeight(0.25);
+			templateExplorerLeaf.setWeight(0.25);
+			sharedPTLeaf.setWeight(0.25);
 
-		constantsLeaf.setWeight(0.25);
-		queriesLeaf.setWeight(0.25);
-		templateExplorerLeaf.setWeight(0.25);
-		sharedPTLeaf.setWeight(0.25);
-
-		editorModelroot = new Split(templateExplorerLeaf, new Divider(),
-				sharedPTLeaf, new Divider(), queriesLeaf, new Divider(),
-				constantsLeaf);
-		editorModelroot.setRowLayout(false);
-		// The modelroot needs to have a parent when we remove all its children
-		// (bug in the swingx package)
-		editorModelroot.setParent(new Split());
-
+			editorModelroot = new Split(templateExplorerLeaf, new Divider(),
+					sharedPTLeaf, new Divider(), queriesLeaf, new Divider(),
+					constantsLeaf);
+			editorModelroot.setRowLayout(false);
+			// The modelroot needs to have a parent when we remove all its children
+			// (bug in the swingx package)
+			editorModelroot.setParent(new Split());
+			floatingDividers = true;
+		} else {
+			for(Node n : editorModelroot.getChildren()){
+				if(n instanceof Leaf){
+					n.setWeight(0);
+				}
+			}
+		}
 		editorSplitPane = new BugHandledJXMultisplitPane();
+		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
+		
+		editorSplitPane.setSize(editorModelroot.getBounds().width, editorModelroot.getBounds().height);
+		
 		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		editorSplitPane.add(sharedPTPanel, sharedPTName);
 		editorSplitPane.add(queries, queriesName);
 		editorSplitPane.add(constantsPanel, constantsName);
-
+		
 		this.setLeftComponent(editorSplitPane);
+		
+		editorSplitPane.repaint();
 	}
 
 	public void selectFirstActiveTemplate() {
@@ -320,7 +357,7 @@ public class TabContent extends JSplitPane {
 		dummy.setMinimumSize(templateExplorer.getMinimumSize());
 		dummy.setPreferredSize(templateExplorer.getPreferredSize());
 		editorSplitPane.add(dummy, templateExplorerName);
-		
+
 		templateExplorer.switchToAnimationMode();
 		showEnabledTransitionsList(showEnabledTransitions);
 		
@@ -341,9 +378,9 @@ public class TabContent extends JSplitPane {
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
 		}
-		
+
 		templateExplorer.switchToEditorMode();
-		
+
 		this.setLeftComponent(editorSplitPane);
 
 		drawingSurface.repaintAll();
@@ -559,8 +596,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showComponents(boolean enable) {
-
-		if (!(enable && templateExplorer.isVisible())) {
+		if (enable != templateExplorer.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(
 					templateExplorerName, enable);
 			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName,
@@ -574,7 +610,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showQueries(boolean enable) {
-		if (!(enable && queries.isVisible())) {
+		if (enable != queries.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName,
 					enable);
 			makeSureEditorPanelIsVisible(queries);
@@ -583,7 +619,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showConstantsPanel(boolean enable) {
-		if (!(enable && constantsPanel.isVisible())) {
+		if (enable != constantsPanel.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
 					enable);
 			makeSureEditorPanelIsVisible(constantsPanel);
@@ -596,7 +632,7 @@ public class TabContent extends JSplitPane {
 					enabledTransitionsName, enable);
 		}
 	}
-
+	
 	public void selectFirstElements() {
 		templateExplorer.selectFirst();
 		queries.selectFirst();
@@ -618,6 +654,46 @@ public class TabContent extends JSplitPane {
 			if(this.getDividerLocation() == 0){
 				this.setDividerLocation(c.getPreferredSize().width);
 			}
+		}
+	}
+	
+	public static String getEditorModelRoot(){
+		try{
+			BASE64Encoder b64 = new BASE64Encoder();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(out);
+			
+			//Serialize editorModelroot
+			oos.writeObject(editorModelroot);
+			oos.close();
+			
+			//Base 64 encode the binary data to be able to save as string
+			return b64.encode(out.toByteArray());
+		} catch (IOException e){
+			System.err.println("Something went wrong couldn't save workspace");
+			return null;
+		}
+	}
+	
+	public static void setEditorModelRoot(String model){
+		if(model == null){
+			editorModelroot = null;
+			return;
+		}
+		
+		try{
+			BASE64Decoder b64 = new BASE64Decoder();
+
+			//Decode Base 64 and create an inputstream 
+			ByteArrayInputStream in = new ByteArrayInputStream(b64.decodeBuffer(model));
+			ObjectInputStream ois = new ObjectInputStream(in);
+			
+			//Read in the model
+			editorModelroot = (Split)ois.readObject();
+			ois.close();
+		} catch (Exception e){
+			editorModelroot = null;
+			System.err.println("Something went wrong didn't load saved workspace");
 		}
 	}
 }

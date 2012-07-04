@@ -62,6 +62,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.tapaal.Preferences;
+import org.jdesktop.swingx.MultiSplitLayout;
+
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -125,7 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
@@ -250,6 +252,7 @@ public class GuiFrame extends JFrame implements Observer {
 		Preferences prefs = Preferences.getInstance();
 		
 		QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
+		TabContent.setEditorModelRoot(prefs.getEditorModelRoot());
 		showComponents = prefs.getShowComponents();
 		showQueries = prefs.getShowQueries();
 		showConstants = prefs.getShowConstants();
@@ -548,6 +551,7 @@ public class GuiFrame extends JFrame implements Observer {
     	 
     	 addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
     	 addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+    	 addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save Workspace", 453250, "Save current workspace ad default", "", false));
 
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
@@ -685,6 +689,19 @@ public class GuiFrame extends JFrame implements Observer {
 		//Queries and enabled transitions should always be shown
 		showQueries(true);
 		showEnabledTransitionsList(true);
+	}
+	
+	public void saveWorkspace(){
+		Preferences prefs = Preferences.getInstance();
+		
+		prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
+		prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
+		
+		prefs.setShowComponents(showComponents);
+		prefs.setShowQueries(showQueries);
+		prefs.setShowConstants(showConstants);
+		
+		prefs.setShowEnabledTrasitions(showEnabledTransitions);
 	}
 	
 	private void buildToolbar() {
@@ -979,6 +996,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showToolTipsAction.setEnabled(enable);
 		showAdvancedWorkspaceAction.setEnabled(enable);
 		showSimpleWorkspaceAction.setEnabled(enable);
+		saveWorkSpaceAction.setEnabled(enable);
 		
 
 		// Simulator
@@ -1041,7 +1059,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void showQueries(boolean enable){
 		showQueries = enable;
-		Preferences.getInstance().setShowQueries(showQueries);
 		CreateGui.getCurrentTab().showQueries(enable);
 	}
 	public void toggleQueries(){
@@ -1050,7 +1067,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void showConstants(boolean enable){
 		showConstants = enable;
-		Preferences.getInstance().setShowConstants(showConstants);
 		CreateGui.getCurrentTab().showConstantsPanel(enable);
 	}
 	public void toggleConstants(){
@@ -1075,7 +1091,6 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public void showComponents(boolean enable){
 		showComponents = enable;
-		Preferences.getInstance().setShowComponents(showComponents);
 		CreateGui.getCurrentTab().showComponents(enable);
 	}
 	public void toggleComponents(){
@@ -1084,7 +1099,6 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
-		Preferences.getInstance().setShowEnabledTrasitions(showEnabledTransitions);
 		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
 	}
 	public void toggleEnabledTransitionsList(){
@@ -1184,7 +1198,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
-
+		
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
@@ -2063,6 +2077,8 @@ public class GuiFrame extends JFrame implements Observer {
 				showAdvancedWorkspace(true);
 			} else if (this == showSimpleWorkspaceAction){
 				showAdvancedWorkspace(false);
+			} else if (this == saveWorkSpaceAction){
+				saveWorkspace();
 			}
 		}
 		

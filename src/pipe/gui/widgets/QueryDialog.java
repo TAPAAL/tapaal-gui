@@ -1002,7 +1002,10 @@ public class QueryDialog extends JPanel {
 	
 	public static void setAdvancedView(boolean advanced){
 		advancedView = advanced;
-		Preferences.getInstance().setAdvancedQueryView(advanced);
+	}
+	
+	public static boolean getAdvancedView(){
+		return advancedView;
 	}
 	
 	private void toggleAdvancedSimpleView(boolean changeState){
