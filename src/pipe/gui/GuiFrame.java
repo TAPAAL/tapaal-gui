@@ -1432,6 +1432,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
@@ -1592,6 +1593,12 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			animBox = CreateGui.getAnimationHistory();
+			
+			// Hack to ensure the toolbar is not in focus
+			if(CreateGui.getAnimationController() != null){
+				CreateGui.getAnimationController().requestFocusInWindow();
+			}
+
 
 			switch (typeID) {
 			case START:
