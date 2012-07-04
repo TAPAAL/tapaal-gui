@@ -221,6 +221,9 @@ public class Verifyta implements ModelChecker {
 	public void setVerifytaPath(String path) {
 		verifytapath = path; 
 		Preferences.getInstance().setVerifytaLocation(verifytapath);
+		if(!isCorrectVersion()){
+			reset();
+		}
 	}
 	
 	public boolean supportsStats(){
