@@ -147,7 +147,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
-		fireVerificationTaskStarted();
 		if(queryToVerify.isActive()) { 
 			VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
 			
@@ -251,7 +250,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		VerificationOptions options = getVerificationOptionsFromQuery(query);
 		modelChecker = getModelChecker(query);
-		
+		fireVerificationTaskStarted();
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
 		return verificationResult;
 	}
