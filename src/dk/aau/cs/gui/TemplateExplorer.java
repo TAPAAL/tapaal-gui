@@ -787,16 +787,21 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public void updateTemplateList() {
-		listModel.clear();
+		int selectedIndex = templateList.getSelectedIndex();
+		DefaultListModel newList = new DefaultListModel();
+		
 		if(isInAnimationMode) {
 			for (Template net : parent.activeTemplates()) {
-				listModel.addElement(net);
+				newList.addElement(net);
 			}
 		} else {
 			for (Template net : parent.allTemplates()) {
-				listModel.addElement(net);
+				newList.addElement(net);
 			}
 		}
+		listModel = newList;
+		templateList.setModel(listModel);
+		templateList.setSelectedIndex(selectedIndex);
 	}
 	
 	public void selectFirst() {
