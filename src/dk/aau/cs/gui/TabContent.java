@@ -86,6 +86,7 @@ public class TabContent extends JSplitPane {
 	// Normal mode
 	BugHandledJXMultisplitPane editorSplitPane;
 	static Split editorModelroot = null;
+	static Split simulatorModelRoot = null;
 
 	QueryPane queries;
 	ConstantsPane constantsPanel;
@@ -182,16 +183,9 @@ public class TabContent extends JSplitPane {
 			// (bug in the swingx package)
 			editorModelroot.setParent(new Split());
 			floatingDividers = true;
-		} else {
-			for(Node n : editorModelroot.getChildren()){
-				if(n instanceof Leaf){
-					n.setWeight(0);
-				}
-			}
 		}
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
-		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
 		
 		editorSplitPane.setSize(editorModelroot.getBounds().width, editorModelroot.getBounds().height);
 		
@@ -295,19 +289,27 @@ public class TabContent extends JSplitPane {
 	}
 
 	private void createAnimatorSlitPane() {
-		Leaf enabledTransitionsListLeaf = new Leaf(enabledTransitionsName);
-		Leaf animControlLeaf = new Leaf(animControlName);
-		Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
+		boolean floatingDividers = false;
+		if(simulatorModelRoot == null){
+			Leaf enabledTransitionsListLeaf = new Leaf(enabledTransitionsName);
+			Leaf animControlLeaf = new Leaf(animControlName);
+			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
 
-		enabledTransitionsListLeaf.setWeight(1.0 / 3.0);
-		animControlLeaf.setWeight(1.0 / 3.0);
-		templateExplorerLeaf.setWeight(1.0 / 3.0);
+			enabledTransitionsListLeaf.setWeight(1.0 / 3.0);
+			animControlLeaf.setWeight(1.0 / 3.0);
+			templateExplorerLeaf.setWeight(1.0 / 3.0);
 
-		Split modelRoot = new Split(templateExplorerLeaf, new Divider(),
-				enabledTransitionsListLeaf, new Divider(), animControlLeaf);
-		modelRoot.setRowLayout(false);
+			simulatorModelRoot = new Split(templateExplorerLeaf, new Divider(),
+					enabledTransitionsListLeaf, new Divider(), animControlLeaf);
+			simulatorModelRoot.setRowLayout(false);
+			floatingDividers = true;
+		}
 		animatorSplitPane = new JXMultiSplitPane();
-		animatorSplitPane.getMultiSplitLayout().setModel(modelRoot);
+		
+		animatorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
+		
+		animatorSplitPane.getMultiSplitLayout().setModel(simulatorModelRoot);
 
 		animationControlsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();

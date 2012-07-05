@@ -124,41 +124,21 @@ public class Preferences {
 	}
 
 	public void setEditorModelRoot(Split modelRoot){
-		if(modelRoot == null){
-			return;
-		}
 		try{
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(out);
-
-			//Serialize model
-			oos.writeObject(modelRoot);
-			oos.close();
-
-			pref.putByteArray("editorModelRoot", out.toByteArray());
+			saveSerilizableObject("editorModelRoot", modelRoot);
 		} catch (IOException e){
-			System.err.println("Something went wrong couldn't save workspace");
+			System.err.println("Something went wrong couldn't save editorResizings");
 		}
 	}
 
 	public Split getEditorModelRoot(){
-		byte[] model = pref.getByteArray("editorModelRoot", null);
-		if(model == null){
-			return null;
-		}
-		Split editorModelroot = null;
-
-		try{ 
-			ByteArrayInputStream in = new ByteArrayInputStream(model);
-			ObjectInputStream ois = new ObjectInputStream(in);
-
-			//Read in the model
-			editorModelroot = (Split)ois.readObject();
-			ois.close();
+		Split result = null;
+		try{
+			result =  (Split)getSerilizableObject("editorModelRoot");
 		} catch (Exception e){
-			System.err.println("Something went wrong didn't load saved workspace");
+			System.err.println("Something went wrong didn't load editorResizings");
 		}
-		return editorModelroot;
+		return result;
 	}
 
 	//Simulator
@@ -170,6 +150,24 @@ public class Preferences {
 		return pref.getBoolean("enabledTransitionsPanel", true);
 	}
 
+	public void setSimulatorModelRoot(Split model){
+		try{
+			saveSerilizableObject("simulatorModelRoot", model);
+		} catch (IOException e){
+			System.err.println("Something went wrong couldn't save simulatorResizings");
+		}
+	}
+
+	public Split getSimulatorModelRoot(){
+		Split result = null;
+		try{
+			result =  (Split)getSerilizableObject("simulatorModelRoot");
+		} catch (Exception e){
+			System.err.println("Something went wrong didn't load simulatorResizings");
+		}
+		return result;
+	}
+
 	//Drawing surface
 	public void setShowZeroInfIntervals(boolean show){
 		pref.putBoolean("showZeroInfIntervals", show);
@@ -177,5 +175,38 @@ public class Preferences {
 
 	public boolean getShowZeroInfIntervals(){
 		return pref.getBoolean("showZeroInfIntervals", true);
+	}
+
+	
+	//Helper functions
+	private void saveSerilizableObject(String key, Object o) throws IOException{
+		if(o == null){
+			throw new NullPointerException();
+		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(out);
+
+		//Serialize object
+		oos.writeObject(o);
+		oos.close();
+
+		pref.putByteArray(key, out.toByteArray());
+	}
+
+	private Object getSerilizableObject(String key) throws ClassNotFoundException, IOException{
+		byte[] model = pref.getByteArray(key, null);
+		if(model == null){
+			return null;
+		}
+		Object object = null;
+
+		ByteArrayInputStream in = new ByteArrayInputStream(model);
+		ObjectInputStream ois = new ObjectInputStream(in);
+
+		//Read in the model
+		object = ois.readObject();
+		ois.close();
+
+		return object;
 	}
 }
