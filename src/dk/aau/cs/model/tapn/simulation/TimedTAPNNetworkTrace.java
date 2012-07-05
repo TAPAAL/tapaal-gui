@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
+
 public class TimedTAPNNetworkTrace implements TAPNNetworkTrace {
 	private List<TAPNNetworkTraceStep> steps = new ArrayList<TAPNNetworkTraceStep>();
-
+	TraceType traceType;
 	private int loopToIndex;
 	
 	public TimedTAPNNetworkTrace(int loopToIndex) {
@@ -38,5 +40,13 @@ public class TimedTAPNNetworkTrace implements TAPNNetworkTrace {
 	
 	public int getLoopToIndex(){
 		return loopToIndex;
+	}
+	
+	public TraceType getTraceType(){
+		return traceType;
+	}
+	
+	public void setTraceType(TraceType traceType){
+		this.traceType = traceType;
 	}
 }

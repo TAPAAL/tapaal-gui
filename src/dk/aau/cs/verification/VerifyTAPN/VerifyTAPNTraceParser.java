@@ -55,10 +55,14 @@ public class VerifyTAPNTraceParser {
 					TimeDelayStep step = parseTimeDelay(element);
 					if(element.getTextContent().equals("forever")){
 						trace.nextIsLoop();
+						trace.setTraceType(TraceType.EG_DELAY_FOREVER);
 					}
 					trace.add(step);
 				}else if(element.getTagName().equals("loop")){
 					trace.nextIsLoop();
+					trace.setTraceType(TraceType.EG_LOOP);
+				}else if(element.getTagName().equals("deadlock"));{
+					trace.setTraceType(TraceType.EG_DEADLOCK);
 				}
 			}
 		}

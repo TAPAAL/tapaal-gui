@@ -50,6 +50,7 @@ public class TAPNTraceDecomposer {
 
 	private TAPNNetworkTrace decomposeTimedTrace() {
 		TimedTAPNNetworkTrace decomposedTrace = new TimedTAPNNetworkTrace(trace.getLoopToIndex());
+		decomposedTrace.setTraceType(trace.getTraceType());
 
 		for (TimedArcPetriNetStep action : trace) {
 			decomposedTrace.add(decomposeAction(action));

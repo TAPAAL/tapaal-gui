@@ -5,14 +5,17 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class AnimationHistoryComponent extends JList {
 	private static final long serialVersionUID = -4284885450021683552L;
+	private TraceType lastShown = TraceType.NOT_EG;
 
 	public AnimationHistoryComponent() {
 		super();
@@ -33,12 +36,21 @@ public class AnimationHistoryComponent extends JList {
 	}
 
 	public void addHistoryItem(String transitionName) {
-		getListModel().addElement(transitionName);
-		setSelectedIndex(getListModel().size() - 1);
+		if(lastShown == TraceType.NOT_EG){
+			getListModel().addElement(transitionName);
+			setSelectedIndex(getListModel().size() - 1);
+		} else {
+			getListModel().add(getListModel().size()-1, transitionName);
+			setSelectedIndex(getListModel().size() - 1);
+		}
 	}
 
 	public void addHistoryItemDontChange(String transitionName) {
-		getListModel().addElement(transitionName);
+		if(lastShown == TraceType.NOT_EG){
+			getListModel().addElement(transitionName);
+		} else {
+			getListModel().add(getListModel().size()-1, transitionName);
+		}
 	}
 
 	public void clearStepsForward() {
@@ -49,6 +61,7 @@ public class AnimationHistoryComponent extends JList {
 		if (listModel.size() > 1 && getSelectedIndex() < lastIndex) {
 			listModel.removeRange(getSelectedIndex() + 1, lastIndex);
 		}
+		setLastShown(TraceType.NOT_EG);
 	}
 
 	public void stepForward() {
@@ -66,7 +79,11 @@ public class AnimationHistoryComponent extends JList {
 	}
 
 	public boolean isStepForwardAllowed() {
-		return getSelectedIndex() < getListModel().size() - 1;
+		if(lastShown != TraceType.EG_DEADLOCK){
+			return getSelectedIndex() < getListModel().size() - 1;
+		} else {
+			return getSelectedIndex() < getListModel().size() - 2;
+		}
 	}
 
 	public boolean isStepBackAllowed() {
@@ -95,5 +112,24 @@ public class AnimationHistoryComponent extends JList {
 		getListModel().clear();
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
+		setLastShown(TraceType.NOT_EG);
+	}
+	
+	public void setLastShown(TraceType tracetype){
+		if(lastShown != TraceType.NOT_EG){
+			getListModel().remove(getListModel().size()-1);
+		}
+		lastShown = tracetype;
+		
+		switch (tracetype) {
+		case EG_DEADLOCK:
+			getListModel().addElement("<html><i><font color=red>" + "Deadlock" + "</i></font></html>");
+			break;
+		case EG_DELAY_FOREVER:
+			getListModel().addElement("<html><i><font color=red>" + "Delay forever" + "</i></font></html>");
+			break;
+		case EG_LOOP:
+			getListModel().addElement("<html><i><font color=red>" + "Goto *" + "</i></font></html>");
+		}
 	}
 }
