@@ -10,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -17,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
@@ -95,7 +98,6 @@ public class RunVerification extends RunVerificationBase {
 	}
 	
 	private JPanel createTransitionStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result) {
-		JPanel panel = new JPanel(new GridBagLayout());
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
 		JPanel fullPanel = new JPanel(new GridBagLayout());
 		
@@ -110,27 +112,14 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.WEST;
 		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n")), gbc);
 		
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		//gbc.fill = gbc.HORIZONTAL;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.insets = new Insets(15,15,15,10);
-		gbc.anchor = GridBagConstraints.WEST;
-		panel.add(new JLabel(toHTML(extractNamesFromTransitionStatistics(result))), gbc);
-		
-		gbc = new GridBagConstraints();
-		//gbc.fill = gbc.HORIZONTAL;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.insets = new Insets(15,10,15,15);
-		gbc.anchor = GridBagConstraints.EAST;		
-		panel.add(new JLabel(toHTML(extractValuesFromTransitionStatistics(result))), gbc);
-		
-		JScrollPane scrollPane = new JScrollPane(panel);
+		//Setup table
+		String[] columnNames = {"Count",
+                "Transition"};
+		String[][] data = extractArrayFromTransitionStatistics(result);
+		JTable table = new JTable(data, columnNames);
+		table.setAutoCreateRowSorter(true);
+				
+		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane
@@ -163,25 +152,14 @@ public class RunVerification extends RunVerificationBase {
 		return fullPanel;
 	}
 	
-	private String extractNamesFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
-		StringBuilder names = new StringBuilder();
+	private String[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
 		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
+		String[][] out = new String[transistionStats.size()][2];
 		for (int i=0;i<transistionStats.size();i++) {
-			names.append(transistionStats.get(i).value1());
-			names.append(":");
-			names.append("\n");
+			String[] line = {transistionStats.get(i).value2().toString(),transistionStats.get(i).value1()};
+			out[i] = line;
 		}
-		return names.toString();
-	}
-	
-	private String extractValuesFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
-		StringBuilder names = new StringBuilder();
-		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
-		for (int i=0;i<transistionStats.size();i++) {
-			names.append(transistionStats.get(i).value2().toString());
-			names.append("\n");
-		}
-		return names.toString();
+		return out;
 	}
 	
 	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
