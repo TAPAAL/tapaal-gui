@@ -240,7 +240,10 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index > 0) {
 					parent.swapTemplates(index, index-1);
-					updateTemplateList();
+					Object o = listModel.getElementAt(index);
+                    listModel.setElementAt(listModel.getElementAt(index-1), index);
+                    listModel.setElementAt(o, index-1);
+                    templateList.ensureIndexIsVisible(index+1);
 					templateList.setSelectedIndex(index-1);
 				}
 			}
@@ -261,7 +264,10 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index < parent.network().allTemplates().size() - 1) {
 					parent.swapTemplates(index, index+1);
-					updateTemplateList();
+					Object o = listModel.getElementAt(index);
+                    listModel.setElementAt(listModel.getElementAt(index+1), index);
+                    listModel.setElementAt(o, index+1);
+                    templateList.ensureIndexIsVisible(index+1);
 					templateList.setSelectedIndex(index+1);
 				}
 			}
@@ -781,16 +787,21 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public void updateTemplateList() {
-		listModel.clear();
+		int selectedIndex = templateList.getSelectedIndex();
+		DefaultListModel newList = new DefaultListModel();
+		
 		if(isInAnimationMode) {
 			for (Template net : parent.activeTemplates()) {
-				listModel.addElement(net);
+				newList.addElement(net);
 			}
 		} else {
 			for (Template net : parent.allTemplates()) {
-				listModel.addElement(net);
+				newList.addElement(net);
 			}
 		}
+		listModel = newList;
+		templateList.setModel(listModel);
+		templateList.setSelectedIndex(selectedIndex);
 	}
 	
 	public void selectFirst() {

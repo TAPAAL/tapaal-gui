@@ -5,10 +5,14 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.MenuBar;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -29,6 +33,7 @@ import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.concurrent.Delayed;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -74,6 +79,7 @@ import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import pipe.gui.widgets.QueryDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
@@ -114,16 +120,17 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
-	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction;
+	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
+	private JMenuItem verification;
 	
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
@@ -144,6 +151,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showConstants = true;
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
+	private boolean commandOrControlWasPressed = false;
 	private boolean showToolTips = true;
 
 	
@@ -218,6 +226,23 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
+		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
+					if (e.getID() == KeyEvent.KEY_PRESSED) {			
+						commandOrControlWasPressed = true;
+						e.consume();
+					}
+				}
+				if (e.getID() == KeyEvent.KEY_TYPED && commandOrControlWasPressed == true) {
+					commandOrControlWasPressed = false;
+					CreateGui.verifyQuery();					
+				}
+				return false;
+			}
+		});
 	}
 	
 	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
@@ -501,22 +526,25 @@ public class GuiFrame extends JFrame implements Observer {
    				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
-    				 
+    	 viewMenu.addSeparator();
+    	 
+    	 addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
+    	 addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
-		 animateMenu.addSeparator();
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
+				 ElementType.STEPBACKWARD, "Step backward", "released UP"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "typed 6"));
+						 ElementType.STEPFORWARD, "Step forward", "released DOWN"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
-				 ElementType.TIMEPASS, "Let time pass one time unit", "typed 1"));
+				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -573,8 +601,15 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
-
-        //statistics = new JMenuItem("Net statistics");	
+		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl M"));
+		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('M', shortcutkey));
+		verification.setMnemonic('m');
+		verification.addActionListener(new ActionListener() {			
+			public void actionPerformed(ActionEvent arg0) {
+				CreateGui.getCurrentTab().verifySelectedQuery();				
+			}
+		});
+		toolsMenu.add(verification);	
 		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.","ctrl I"));				
 		netStatisticsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('I', shortcutkey));
 		statistics.setMnemonic('n');		
@@ -620,9 +655,20 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
+
 		return toolsMenu;
 	}
-
+	
+	public void showAdvancedWorkspace(boolean advanced){
+		QueryDialog.setAdvancedView(advanced);
+		showComponents(advanced);
+		showConstants(advanced);
+		
+		//Queries and enabled transitions should always be shown
+		showQueries(true);
+		showEnabledTransitionsList(true);
+	}
+	
 	private void buildToolbar() {
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
@@ -780,12 +826,11 @@ public class GuiFrame extends JFrame implements Observer {
 	 * @author Kenneth Yrke Joergensen (kyrke)
 	 * */
 	private void enableGUIActions() {
-
 		switch (getGUIMode()) {
 		case draw:
 
 			enableAllActions(true);
-
+			
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
@@ -808,6 +853,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
+			
+			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
@@ -844,9 +891,11 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			verifyAction.setEnabled(false);
 
 			break;
 		case noNet:
+			verifyAction.setEnabled(false);
 
 			timedPlaceAction.setEnabled(false);
 			timedArcAction.setEnabled(false);
@@ -910,6 +959,9 @@ public class GuiFrame extends JFrame implements Observer {
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
+		showAdvancedWorkspaceAction.setEnabled(enable);
+		showSimpleWorkspaceAction.setEnabled(enable);
+		
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -991,6 +1043,9 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleToolTips(){
 		showToolTips(!showToolTips);
+	}
+	public boolean isShowingToolTips(){
+		return showToolTips;
 	}
 	
 	
@@ -1398,6 +1453,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
@@ -1438,6 +1494,8 @@ public class GuiFrame extends JFrame implements Observer {
 		// xxx - This must be refactored when someone findes out excatly what is
 		// gowing on
 		mode = prev_mode;
+		
+		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 		if (placeAction != null) {
 			placeAction.setSelected(mode == ElementType.PLACE);
@@ -1474,6 +1532,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (annotationAction != null)
 			annotationAction.setSelected(mode == ElementType.ANNOTATION);
+		
+		
 
 	}
 
@@ -1554,6 +1614,12 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			animBox = CreateGui.getAnimationHistory();
+			
+			// Hack to ensure the toolbar is not in focus
+			if(CreateGui.getAnimationController() != null){
+				CreateGui.getAnimationController().requestFocusInWindow();
+			}
+
 
 			switch (typeID) {
 			case START:
@@ -1979,6 +2045,10 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleEnabledTransitionsList();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
+			} else if (this == showAdvancedWorkspaceAction){
+				showAdvancedWorkspace(true);
+			} else if (this == showSimpleWorkspaceAction){
+				showAdvancedWorkspace(false);
 			}
 		}
 		
@@ -2156,7 +2226,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 } else if (this == redoAction) {
 					 appView.getUndoManager().redo();
 					 CreateGui.getCurrentTab().network().buildConstraints();
-				 }
+				 }				 
 			}
 		}
 	}

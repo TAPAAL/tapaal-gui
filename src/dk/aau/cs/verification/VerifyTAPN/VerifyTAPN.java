@@ -185,7 +185,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private boolean isNotSetup() {
-		return verifytapnpath == null || verifytapnpath.equals("");
+		return verifytapnpath == null || verifytapnpath.equals("") || !(new File(verifytapnpath)).exists();
 	}
 	
 	public static boolean trySetup() {

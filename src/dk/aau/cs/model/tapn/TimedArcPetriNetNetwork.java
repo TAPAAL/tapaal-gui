@@ -393,4 +393,14 @@ public class TimedArcPetriNetNetwork {
 			sharedTransitions.add(p);
 		}
 	}
+	
+
+	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
+		for(TimedArcPetriNet tapn : this.activeTemplates()){
+			for(TimedPlace timedPlace : tapn.places()){
+				if(timedPlace.equals(place)) return true;
+			}
+		}
+		return false;
+	}
 }

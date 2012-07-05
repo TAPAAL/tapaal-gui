@@ -158,7 +158,7 @@ public class Verifyta implements ModelChecker {
 	}
 
 	private boolean isNotSetup() {
-		return verifytapath == null || verifytapath.equals("");
+		return verifytapath == null || verifytapath.equals("") || !(new File(verifytapath)).exists();
 	}
 
 	private String readVersionNumberFrom(InputStream stream) {
@@ -221,6 +221,9 @@ public class Verifyta implements ModelChecker {
 	public void setVerifytaPath(String path) {
 		verifytapath = path; 
 		Preferences.getInstance().setVerifytaLocation(verifytapath);
+		if(!isCorrectVersion()){
+			reset();
+		}
 	}
 	
 	public boolean supportsStats(){
