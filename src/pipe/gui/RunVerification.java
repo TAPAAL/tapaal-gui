@@ -130,6 +130,16 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.EAST;		
 		panel.add(new JLabel(toHTML(extractValuesFromTransitionStatistics(result))), gbc);
 		
+		JScrollPane scrollPane = new JScrollPane(panel);
+		scrollPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		Dimension scrollPanePrefDims = new Dimension(375, 250);
+		Dimension scrollPaneMinDims = new Dimension(375, 250-150);
+		scrollPane.setMinimumSize(scrollPaneMinDims);
+		scrollPane.setPreferredSize(scrollPanePrefDims);
+		
 		gbc = new GridBagConstraints();
 		//gbc.fill = gbc.HORIZONTAL;
 		gbc.weightx = 1;
@@ -148,7 +158,7 @@ public class RunVerification extends RunVerificationBase {
 		gbc.gridy = 1;
 		//gbc.insets = new Insets(15,10,15,15);
 		gbc.anchor = GridBagConstraints.WEST;
-		fullPanel.add(panel,gbc);
+		fullPanel.add(scrollPane,gbc);
 		
 		return fullPanel;
 	}
