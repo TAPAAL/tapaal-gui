@@ -206,18 +206,20 @@ public class RunVerification extends RunVerificationBase {
 			gbc.anchor = GridBagConstraints.EAST;
 			panel.add(infoButton, gbc);
 			
-			JButton transitionStatsButton = new JButton("Transition Statistics");
-			transitionStatsButton.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent arg0) {
-					JOptionPane.showMessageDialog(panel,createTransitionStatisticsPanel(result) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
-				}
-			});
-			gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 3;
-			gbc.insets = new Insets(10,0,10,0);
-			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(transitionStatsButton, gbc);
+			if(!result.getTransitionStatistics().isEmpty()){
+				JButton transitionStatsButton = new JButton("Transition Statistics");
+				transitionStatsButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						JOptionPane.showMessageDialog(panel,createTransitionStatisticsPanel(result) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+				gbc = new GridBagConstraints();
+				gbc.gridx = 0;
+				gbc.gridy = 3;
+				gbc.insets = new Insets(10,0,10,0);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(transitionStatsButton, gbc);
+			}
 		}
 		
 		gbc = new GridBagConstraints();

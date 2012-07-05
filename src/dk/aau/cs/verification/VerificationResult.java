@@ -48,6 +48,9 @@ public class VerificationResult<TTrace> {
 		for (int i = 0; i < stats.transitionsCount();i++) {
 			Tuple<String,Integer> element = stats.getTransitionStats(i);
 			String transitionName = nameMapping.map(element.value1()).value1()+ "." + nameMapping.map(element.value1()).value2();
+			if(transitionName.charAt(0) == '.'){
+				transitionName = "Shared"+transitionName;
+			}
 			Integer transitionFired = element.value2();
 			returnList.add(new Tuple<String, Integer>(transitionName, transitionFired));
 		}
