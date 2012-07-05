@@ -666,4 +666,12 @@ public class TabContent extends JSplitPane {
 	public static void setEditorModelRoot(Split model){
 		editorModelroot = model;
 	}
+	
+	public static Split getSimulatorModelRoot(){
+		return simulatorModelRoot;
+	}
+	
+	public static void setSimulatorModelRoot(Split model){
+		simulatorModelRoot = model;
+	}
 }

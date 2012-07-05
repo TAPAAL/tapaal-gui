@@ -253,6 +253,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
 		TabContent.setEditorModelRoot(prefs.getEditorModelRoot());
+		TabContent.setSimulatorModelRoot(prefs.getSimulatorModelRoot());
 		showComponents = prefs.getShowComponents();
 		showQueries = prefs.getShowQueries();
 		showConstants = prefs.getShowConstants();
@@ -696,6 +697,7 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
 		prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
+		prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
 		
 		prefs.setShowComponents(showComponents);
 		prefs.setShowQueries(showQueries);
