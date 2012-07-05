@@ -64,6 +64,8 @@ import javax.swing.event.ChangeListener;
 import net.tapaal.Preferences;
 import org.jdesktop.swingx.MultiSplitLayout;
 
+import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -278,6 +280,9 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		}
 	}
+	
+	//TODO
+	JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
 
 	/**
 	 * This method does build the menus
@@ -541,7 +546,8 @@ public class GuiFrame extends JFrame implements Observer {
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true));
+				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true),
+				showZeroToInfinityIntervalsCheckBox = new JCheckBoxMenuItem());
 		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
@@ -552,7 +558,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
 		addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
-		addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save current workspace ad default", "", false));
+		addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
 
 		/* Simulator */
 		JMenu animateMenu = new JMenu("Simulator");
@@ -691,6 +697,10 @@ public class GuiFrame extends JFrame implements Observer {
 		showQueries(true);
 		showEnabledTransitionsList(true);
 		CreateGui.getCurrentTab().setResizeingDefault();
+		if(!CreateGui.showZeroToInfinityIntervals()){
+			showZeroToInfinityIntervalsCheckBox.setSelected(true);
+			toggleZeroToInfinityIntervals();
+		}
 	}
 
 	public void saveWorkspace(){
@@ -850,7 +860,11 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
-		JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(action);
+		return addCheckboxMenuItem(menu, selected, action, new JCheckBoxMenuItem());
+	}
+	
+	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action, JCheckBoxMenuItem checkBoxItem) {
+		checkBoxItem.setAction(action);
 		checkBoxItem.setSelected(selected);
 		JMenuItem item = menu.add(checkBoxItem);
 		KeyStroke keystroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
