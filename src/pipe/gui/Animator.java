@@ -236,7 +236,7 @@ public class Animator {
 	 */
 
 	public void stepForward() {
-		if(currentAction == actionHistory.size() && trace != null && getTrace().getLoopToIndex() != -1){
+		if(currentAction == actionHistory.size()-1 && trace != null && getTrace().getLoopToIndex() != -1){
 			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
