@@ -151,6 +151,7 @@ public class Preferences {
 	}
 
 	public void setSimulatorModelRoot(Split model){
+		if(model == null) return;
 		try{
 			saveSerilizableObject("simulatorModelRoot", model);
 		} catch (IOException e){
