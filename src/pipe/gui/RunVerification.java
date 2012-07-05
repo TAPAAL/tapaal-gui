@@ -4,12 +4,16 @@
 package pipe.gui;
 
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
@@ -99,18 +104,15 @@ public class RunVerification extends RunVerificationBase {
 	
 	private JPanel createTransitionStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result) {
 		JPanel headLinePanel = new JPanel(new GridBagLayout());
-		JPanel fullPanel = new JPanel(new GridBagLayout());
+		final JPanel fullPanel = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		//gbc.fill = gbc.HORIZONTAL;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		//gbc.gridwidth = 2;
 		gbc.insets = new Insets(15,0,15,15);
 		gbc.anchor = GridBagConstraints.WEST;
-		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n")), gbc);
+		gbc.weightx = 2;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
 		
 		//Setup table
 		String[] columnNames = {"Count",
@@ -124,30 +126,43 @@ public class RunVerification extends RunVerificationBase {
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		Dimension scrollPanePrefDims = new Dimension(375, 250);
-		Dimension scrollPaneMinDims = new Dimension(375, 250-150);
-		scrollPane.setMinimumSize(scrollPaneMinDims);
-		scrollPane.setPreferredSize(scrollPanePrefDims);
+
 		
 		gbc = new GridBagConstraints();
-		//gbc.fill = gbc.HORIZONTAL;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		//gbc.insets = new Insets(15,10,15,15);
 		gbc.anchor = GridBagConstraints.WEST;
 		fullPanel.add(headLinePanel,gbc);
 		
 		gbc = new GridBagConstraints();
-		//gbc.fill = gbc.HORIZONTAL;
+		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		//gbc.insets = new Insets(15,10,15,15);
 		gbc.anchor = GridBagConstraints.WEST;
 		fullPanel.add(scrollPane,gbc);
+		
+		// Make window resizeable
+		fullPanel.addHierarchyListener(new HierarchyListener() {
+			 public void hierarchyChanged(HierarchyEvent e) {
+			  //when the hierarchy changes get the ancestor for the message
+			  Window window = SwingUtilities.getWindowAncestor(fullPanel);
+			  //check to see if the ancestor is an instance of Dialog and isn't resizable
+			  if (window instanceof Dialog) {
+			   Dialog dialog = (Dialog)window;
+			   if (!dialog.isResizable()) {
+			    //set resizable to true
+			    dialog.setResizable(true);
+				dialog.setMinimumSize(new Dimension(350, 300));
+				dialog.setPreferredSize(new Dimension(450, 400));
+			   }
+			  }
+			 }
+			}); 
 		
 		return fullPanel;
 	}
