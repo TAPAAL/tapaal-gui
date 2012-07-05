@@ -291,13 +291,13 @@ public class TabContent extends JSplitPane {
 	private void createAnimatorSlitPane() {
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
+			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
 			Leaf enabledTransitionsListLeaf = new Leaf(enabledTransitionsName);
 			Leaf animControlLeaf = new Leaf(animControlName);
-			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
 
-			enabledTransitionsListLeaf.setWeight(1.0 / 3.0);
-			animControlLeaf.setWeight(1.0 / 3.0);
-			templateExplorerLeaf.setWeight(1.0 / 3.0);
+			templateExplorerLeaf.setWeight(0.25);
+			enabledTransitionsListLeaf.setWeight(0.25);
+			animControlLeaf.setWeight(0.5);
 
 			simulatorModelRoot = new Split(templateExplorerLeaf, new Divider(),
 					enabledTransitionsListLeaf, new Divider(), animControlLeaf);
@@ -657,6 +657,17 @@ public class TabContent extends JSplitPane {
 				this.setDividerLocation(c.getPreferredSize().width);
 			}
 		}
+	}
+	
+	public void setResizeingDefault(){
+		if(animatorSplitPane != null){
+			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+			animatorSplitPane.getMultiSplitLayout().layoutByWeight(animatorSplitPane);
+			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
+		}
+		editorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+		editorSplitPane.getMultiSplitLayout().layoutByWeight(editorSplitPane);
+		editorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
 	}
 	
 	public static Split getEditorModelRoot(){
