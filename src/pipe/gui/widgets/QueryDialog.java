@@ -194,7 +194,6 @@ public class QueryDialog extends JPanel {
 	private JPanel reductionOptionsPanel;
 	private JComboBox reductionOption;
 	private JCheckBox symmetryReduction;
-	private JCheckBox localConstants;
 	private JCheckBox discreteInclusion;
 	private JButton selectInclusionPlacesButton;
 	
@@ -345,7 +344,7 @@ public class QueryDialog extends JPanel {
 		ReductionOption reductionOptionToSet = getReductionOption();
 		boolean symmetry = getSymmetry();
 		
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, getLocalConstants(),/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -356,10 +355,6 @@ public class QueryDialog extends JPanel {
 		return symmetryReduction.isSelected();
 	}
 	
-	private boolean getLocalConstants(){
-		return localConstants.isSelected();
-	}
-
 	private int getCapacity() {
 		return (Integer) ((JSpinner) boundednessCheckPanel.getComponent(1)).getValue();
 	}
@@ -455,16 +450,6 @@ public class QueryDialog extends JPanel {
 //			breadthFirstSearch.setSelected(true);
 	}
 	
-	private void refreshLocalConstantOption() {
-		ReductionOption r = getReductionOption();
-		if(r == ReductionOption.VerifyTAPNdiscreteVerification){
-			localConstants.setEnabled(true);
-		} else {
-			localConstants.setEnabled(false);
-			localConstants.setSelected(true);
-		}
-	}
-
 	private void resetQuantifierSelectionButtons() {
 		quantificationRadioButtonGroup.clearSelection();
 	}
@@ -670,7 +655,6 @@ public class QueryDialog extends JPanel {
 		reductionOption.removeAllItems();
 		boolean selectedOptionStillAvailable = false;	
 		boolean symmetry = symmetryReduction == null ? false : symmetryReduction.isSelected();
-		boolean lc = localConstants == null ? false : localConstants.isSelected();
 		for (String s : options) {
 			reductionOption.addItem(s);
 			if (s.equals(reductionOptionString)) {
@@ -681,7 +665,6 @@ public class QueryDialog extends JPanel {
 		if (selectedOptionStillAvailable) {
 			reductionOption.setSelectedItem(reductionOptionString);
 			symmetryReduction.setSelected(symmetry);
-			localConstants.setSelected(lc);
 		}
 	}
 
@@ -848,7 +831,6 @@ public class QueryDialog extends JPanel {
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		String reduction = "";
 		boolean symmetry = queryToCreateFrom.useSymmetry();
-		boolean localconstants = queryToCreateFrom.useLocalConstants();
 
 		if (queryToCreateFrom.getReductionOption() == ReductionOption.BROADCAST) {
 			reduction = name_BROADCAST;
@@ -871,7 +853,6 @@ public class QueryDialog extends JPanel {
 		}
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
-		localConstants.setSelected(localconstants);
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
@@ -1966,17 +1947,6 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(symmetryReduction, gbc);
-		
-		localConstants = new JCheckBox("Use local constants");
-		localConstants.setSelected(true);
-		localConstants.setToolTipText(TOOL_TIP_SYMMETRY_REDUCTION);
-
-		gbc = new GridBagConstraints();
-		gbc.gridx = 3;
-		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(localConstants, gbc);
 
 		discreteInclusion = new JCheckBox("Use discrete inclusion");
 		discreteInclusion.setVisible(true);
@@ -2021,7 +1991,6 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshSymmetryReduction();
-		refreshLocalConstantOption();
 		refreshDiscreteInclusion();
 		refreshTraceOptions();
 		refreshSearchOptions();

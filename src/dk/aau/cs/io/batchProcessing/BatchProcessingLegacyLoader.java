@@ -457,7 +457,7 @@ ReductionOption reductionOption;
 		
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, true,  hashTableSize,
+					searchOption, reductionOption, symmetry,  hashTableSize,
 					extrapolationOption,inclusionPlaces);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);

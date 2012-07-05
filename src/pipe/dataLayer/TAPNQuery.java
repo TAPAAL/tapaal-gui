@@ -31,7 +31,6 @@ public class TAPNQuery {
 	private SearchOption searchOption;
 	private ReductionOption reductionOption;
 	private boolean symmetry;
-	private boolean localConstants;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
@@ -138,10 +137,6 @@ public class TAPNQuery {
 	public boolean useSymmetry() {
 		return symmetry;
 	}
-	
-	public boolean useLocalConstants(){
-		return localConstants;
-	}
 
 	/**
 	 * @param hashTableSize
@@ -177,12 +172,12 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, true, hashTabelSize, extrapolationOption, new InclusionPlaces());
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, hashTabelSize, extrapolationOption, new InclusionPlaces());
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry, boolean localConstants, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
 		this.setName(name);
 		this.setCapacity(capacity);
@@ -191,7 +186,6 @@ public class TAPNQuery {
 		this.setSearchOption(searchOption);
 		this.setReductionOption(reductionOption);
 		this.symmetry = symmetry;
-		this.localConstants = localConstants;
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
@@ -210,7 +204,6 @@ public class TAPNQuery {
 		searchOption = newQuery.getSearchOption();
 		reductionOption = newQuery.getReductionOption();
 		symmetry = newQuery.useSymmetry();
-		localConstants = newQuery.localConstants;
 		hashTableSize = newQuery.getHashTableSize();
 		extrapolationOption = newQuery.getExtrapolationOption();
 		discreteInclusion = newQuery.discreteInclusion();
@@ -230,7 +223,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, localConstants, hashTableSize, extrapolationOption, inclusionPlaces);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, hashTableSize, extrapolationOption, inclusionPlaces);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		

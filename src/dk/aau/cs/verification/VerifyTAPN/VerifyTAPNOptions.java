@@ -17,27 +17,25 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private int extraTokens;
 	private int tokensInModel;
 	private boolean symmetry;
-	private boolean localConstants;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean localConstants) {
-		this(extraTokens, traceOption, search, symmetry, localConstants, false, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
+		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean localConstants, boolean discreteInclusion) {
-		this(extraTokens,traceOption, search, symmetry, localConstants, discreteInclusion, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
+		this(extraTokens,traceOption, search, symmetry, discreteInclusion, new InclusionPlaces());
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean localConstants, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		searchOption = search;
 		this.symmetry = symmetry;
-		this.localConstants = localConstants;
 		this.discreteInclusion = discreteInclusion;
 		this.inclusionPlaces = inclusionPlaces;
 	}
@@ -48,10 +46,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	
 	public boolean symmetry() {
 		return symmetry;
-	}
-	
-	public boolean localConstants() {
-		return localConstants;
 	}
 	
 	public boolean discreteInclusion(){
@@ -74,7 +68,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(searchMap.get(searchOption));
 		result.append(' ');
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
-		result.append(localConstants ? "" : "-g"); // localConstants is on by default in verifyTAPN so "-g" disables it
 		result.append(' ');
 		result.append(discreteInclusion ? " -f 1" : "");
 		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");

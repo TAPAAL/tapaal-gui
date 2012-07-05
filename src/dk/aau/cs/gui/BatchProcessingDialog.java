@@ -74,7 +74,6 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
-import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.LocalConstantsOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
@@ -183,7 +182,6 @@ public class BatchProcessingDialog extends JDialog {
 	private CustomJSpinner numberOfExtraTokensInNet;
 	private JCheckBox keepQueryCapacity;
 	private JComboBox symmetryOption;
-	private JComboBox localConstantsOption;
 	private JCheckBox noTimeoutCheckbox;
 	private CustomJSpinner timeoutValue;
 	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
@@ -404,7 +402,6 @@ public class BatchProcessingDialog extends JDialog {
 		initQueryPropertyOptionsComponents();
 		initSearchOptionsComponents();
 		initSymmetryOptionsComponents();
-		initLocalConstantsOptionComponents();
 		initReductionOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
@@ -582,29 +579,6 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.gridwidth = 2;
 		verificationOptionsPanel.add(symmetryOption, gbc);
 	}
-	
-	private void initLocalConstantsOptionComponents() {
-		JLabel localConstantsLabel = new JLabel("LocalConstants:");
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 3;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.anchor = GridBagConstraints.WEST;
-		verificationOptionsPanel.add(localConstantsLabel, gbc);
-
-		String[] options = new String[] { name_KeepQueryOption, "Use Local Constants",
-				"Use Global Constants" };
-		localConstantsOption = new JComboBox(options);
-
-		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.gridy = 3;
-		gbc.anchor = GridBagConstraints.WEST;
-		gbc.insets = new Insets(0, 0, 5, 0);
-		gbc.gridwidth = 2;
-		verificationOptionsPanel.add(localConstantsOption, gbc);
-	}
 
 	private SearchOption getSearchOption() {
 		if (((String) searchOption.getSelectedItem()).equals(name_DFS))
@@ -640,7 +614,7 @@ public class BatchProcessingDialog extends JDialog {
 		
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(),
 				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
-				getSearchOption(), getSymmetryOption(), getLocalConstantsOption(), reductionOption,
+				getSearchOption(), getSymmetryOption(), reductionOption,
 				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.getChoosenOptions());
 	}
 
@@ -656,16 +630,6 @@ public class BatchProcessingDialog extends JDialog {
 			return SymmetryOption.No;
 		else
 			return SymmetryOption.KeepQueryOption;
-	}
-	
-	private LocalConstantsOption getLocalConstantsOption() {
-		String localConstantsString = (String) localConstantsOption.getSelectedItem();
-		if (localConstantsString.equals("Use Local Constants"))
-			return LocalConstantsOption.Yes;
-		else if (localConstantsString.equals("Use Global Constants"))
-			return LocalConstantsOption.No;
-		else
-			return LocalConstantsOption.KeepQueryOption;
 	}
 
 	private QueryPropertyOption getQueryPropertyOption() {
