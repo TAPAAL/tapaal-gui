@@ -590,7 +590,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		if (!(enable && enabledTransitionsList.isVisible())) {
+		if (enabledTransitionsList != null && !(enable && enabledTransitionsList.isVisible())) {
 			animatorSplitPane.getMultiSplitLayout().displayNode(
 					enabledTransitionsName, enable);
 		}
