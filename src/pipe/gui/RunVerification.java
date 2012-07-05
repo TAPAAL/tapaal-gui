@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -25,6 +26,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
@@ -117,9 +120,19 @@ public class RunVerification extends RunVerificationBase {
 		//Setup table
 		String[] columnNames = {"Count",
                 "Transition"};
-		String[][] data = extractArrayFromTransitionStatistics(result);
+		Object[][] data = extractArrayFromTransitionStatistics(result);
 		JTable table = new JTable(data, columnNames);
-		table.setAutoCreateRowSorter(true);
+
+		Comparator<Integer> comparator = new Comparator<Integer>() {
+			@Override
+			public int compare(Integer arg0, Integer arg1) {
+				return arg0-arg1;
+			}
+		};
+		
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+		sorter.setComparator(0, comparator);
+		table.setRowSorter(sorter);
 				
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane
@@ -167,11 +180,11 @@ public class RunVerification extends RunVerificationBase {
 		return fullPanel;
 	}
 	
-	private String[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
 		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
-		String[][] out = new String[transistionStats.size()][2];
+		Object[][] out = new Object[transistionStats.size()][2];
 		for (int i=0;i<transistionStats.size();i++) {
-			String[] line = {transistionStats.get(i).value2().toString(),transistionStats.get(i).value1()};
+			Object[] line = {transistionStats.get(i).value2(),transistionStats.get(i).value1()};
 			out[i] = line;
 		}
 		return out;
