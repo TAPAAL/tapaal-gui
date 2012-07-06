@@ -3,20 +3,36 @@
  */
 package pipe.gui;
 
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import pipe.gui.GuiFrame.GUIMode;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerificationResult;
@@ -89,7 +105,92 @@ public class RunVerification extends RunVerificationBase {
 		return buffer.toString();
 	}
 	
-	private JPanel createMessagePanel(VerificationResult<TAPNNetworkTrace> result) {
+	private JPanel createTransitionStatisticsPanel(final VerificationResult<TAPNNetworkTrace> result) {
+		JPanel headLinePanel = new JPanel(new GridBagLayout());
+		final JPanel fullPanel = new JPanel(new GridBagLayout());
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(15,0,15,15);
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 2;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		headLinePanel.add(new JLabel(toHTML("Number of times transitions were enabled during the search.\n"), JLabel.LEFT), gbc);
+		
+		//Setup table
+		String[] columnNames = {"Count",
+                "Transition"};
+		Object[][] data = extractArrayFromTransitionStatistics(result);
+		JTable table = new JTable(data, columnNames);
+
+		Comparator<Integer> comparator = new Comparator<Integer>() {
+			@Override
+			public int compare(Integer arg0, Integer arg1) {
+				return arg0-arg1;
+			}
+		};
+		
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+		sorter.setComparator(0, comparator);
+		table.setRowSorter(sorter);
+				
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		fullPanel.add(headLinePanel,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		fullPanel.add(scrollPane,gbc);
+		
+		// Make window resizeable
+		fullPanel.addHierarchyListener(new HierarchyListener() {
+			 public void hierarchyChanged(HierarchyEvent e) {
+			  //when the hierarchy changes get the ancestor for the message
+			  Window window = SwingUtilities.getWindowAncestor(fullPanel);
+			  //check to see if the ancestor is an instance of Dialog and isn't resizable
+			  if (window instanceof Dialog) {
+			   Dialog dialog = (Dialog)window;
+			   if (!dialog.isResizable()) {
+			    //set resizable to true
+			    dialog.setResizable(true);
+				dialog.setMinimumSize(new Dimension(350, 300));
+				dialog.setPreferredSize(new Dimension(450, 400));
+			   }
+			  }
+			 }
+			}); 
+		
+		return fullPanel;
+	}
+	
+	private Object[][] extractArrayFromTransitionStatistics(final VerificationResult<TAPNNetworkTrace> result) {
+		List<Tuple<String,Integer>> transistionStats = result.getTransitionStatistics();
+		Object[][] out = new Object[transistionStats.size()][2];
+		for (int i=0;i<transistionStats.size();i++) {
+			Object[] line = {transistionStats.get(i).value2(),transistionStats.get(i).value1()};
+			out[i] = line;
+		}
+		return out;
+	}
+	
+	private JPanel createMessagePanel(final VerificationResult<TAPNNetworkTrace> result) {
 		final JPanel panel = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -120,6 +221,21 @@ public class RunVerification extends RunVerificationBase {
 			gbc.insets = new Insets(0,10,15,0);
 			gbc.anchor = GridBagConstraints.EAST;
 			panel.add(infoButton, gbc);
+			
+			if(!result.getTransitionStatistics().isEmpty()){
+				JButton transitionStatsButton = new JButton("Transition Statistics");
+				transitionStatsButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						JOptionPane.showMessageDialog(panel,createTransitionStatisticsPanel(result) , "Transition Statistics", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+				gbc = new GridBagConstraints();
+				gbc.gridx = 0;
+				gbc.gridy = 3;
+				gbc.insets = new Insets(10,0,10,0);
+				gbc.anchor = GridBagConstraints.WEST;
+				panel.add(transitionStatsButton, gbc);
+			}
 		}
 		
 		gbc = new GridBagConstraints();

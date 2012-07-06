@@ -345,7 +345,6 @@ public class VerifyTAPN implements ModelChecker {
 		return result;
 	}
 	
-	
 	boolean supportsModel(TimedArcPetriNet model) {
 		return true;
 	}

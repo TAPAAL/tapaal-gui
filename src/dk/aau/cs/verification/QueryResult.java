@@ -1,7 +1,5 @@
 package dk.aau.cs.verification;
 
-
-
 public class QueryResult {
 	private boolean satisfied = false;
 	private boolean discreteInclusion = false;
