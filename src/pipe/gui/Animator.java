@@ -31,9 +31,11 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.RequireException;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class Animator {
 	private ArrayList<TAPNNetworkTraceStep> actionHistory;
@@ -236,11 +238,18 @@ public class Animator {
 	 */
 
 	public void stepForward() {
-		if(currentAction == actionHistory.size()-1 && trace != null && getTrace().getLoopToIndex() != -1){
+		if(currentAction == actionHistory.size()-1 && trace != null){
 			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
 			int action = currentAction;
 			int markingIndex = currentMarkingIndex;
-			addToTimedTrace(getTrace().getLoopSteps());
+			
+			if(getTrace().getTraceType() == TraceType.EG_DELAY_FOREVER){
+				addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
+			}
+			if(getTrace().getLoopToIndex() != -1){
+				addToTimedTrace(getTrace().getLoopSteps());
+			}
+			
 			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
 			currentAction = action;
 			currentMarkingIndex = markingIndex;

@@ -52,12 +52,12 @@ public class VerifyTAPNTraceParser {
 					TimedTransitionStep step = parseTransitionStep(element);
 					trace.add(step);
 				}else if(element.getTagName().equals("delay")){
-					TimeDelayStep step = parseTimeDelay(element);
 					if(element.getTextContent().equals("forever")){
-						trace.nextIsLoop();
 						trace.setTraceType(TraceType.EG_DELAY_FOREVER);
+					} else {
+						TimeDelayStep step = parseTimeDelay(element);
+						trace.add(step);
 					}
-					trace.add(step);
 				}else if(element.getTagName().equals("loop")){
 					trace.nextIsLoop();
 					trace.setTraceType(TraceType.EG_LOOP);
@@ -91,11 +91,7 @@ public class VerifyTAPNTraceParser {
 	}
 
 	private TimeDelayStep parseTimeDelay(Element element) {
-		if(element.getTextContent().equals("forever")){
-			return new TimeDelayStep(BigDecimal.ONE);
-		} else {
-			return new TimeDelayStep(new BigDecimal(element.getTextContent()));
-		}
+		return new TimeDelayStep(new BigDecimal(element.getTextContent()));
 	}
 
 	private Document loadDocument(BufferedReader reader) {
