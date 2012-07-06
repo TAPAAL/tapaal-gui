@@ -61,6 +61,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jdesktop.swingx.MultiSplitLayout;
+
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -1161,7 +1163,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
-
+		
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);

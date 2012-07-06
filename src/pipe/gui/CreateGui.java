@@ -17,6 +17,10 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;

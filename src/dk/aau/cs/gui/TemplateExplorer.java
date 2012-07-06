@@ -166,8 +166,6 @@ public class TemplateExplorer extends JPanel {
 			sortButton.setVisible(true);
 			this.add(buttonPanel, BorderLayout.PAGE_END);
 			
-			//Sets the minimum size such that the sortbutton can disappear
-			this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 		} else {
 			this.add(templatePanel, BorderLayout.CENTER);
 			moveDownButton.setVisible(false);
@@ -220,6 +218,8 @@ public class TemplateExplorer extends JPanel {
 		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
+		//Add 10 pixel to the minimumsize of the scrollpane
+		scrollpane.setMinimumSize(new Dimension(scrollpane.getMinimumSize().width, scrollpane.getMinimumSize().height + 20));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
