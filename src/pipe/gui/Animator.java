@@ -103,6 +103,8 @@ public class Animator {
 		for (TAPNNetworkTraceStep step : trace) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
+		System.err.println(getTrace().getTraceType());
+		CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
 	}
 	
 	private void addToTimedTrace(List<TAPNNetworkTraceStep> stepList){
@@ -234,6 +236,16 @@ public class Animator {
 	 */
 
 	public void stepForward() {
+		if(currentAction == actionHistory.size()-1 && trace != null && getTrace().getLoopToIndex() != -1){
+			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
+			int action = currentAction;
+			int markingIndex = currentMarkingIndex;
+			addToTimedTrace(getTrace().getLoopSteps());
+			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+			currentAction = action;
+			currentMarkingIndex = markingIndex;
+		}
+		
 		if (currentAction < actionHistory.size() - 1) {
 			TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
 			if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
@@ -254,17 +266,6 @@ public class Animator {
 			activeGuiModel().redrawVisibleTokenLists();
 			reportBlockingPlaces();
 
-		}
-		
-		if(currentAction == actionHistory.size() - 1 && trace != null && getTrace().getLoopToIndex() != -1){
-			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
-			int action = currentAction;
-			int markingIndex = currentMarkingIndex;
-			addToTimedTrace(getTrace().getLoopSteps());
-			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
-			currentAction = action;
-			currentMarkingIndex = markingIndex;
-			
 		}
 	}
 
