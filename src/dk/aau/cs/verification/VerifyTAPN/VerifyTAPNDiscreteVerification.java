@@ -297,9 +297,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			
 			if (trace == null) {
 				if (((VerifyTAPNOptions) options).trace() != TraceOption.NONE) {
-					if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()))
+					if((query.getProperty() instanceof TCTLEFNode && !queryResult.isQuerySatisfied()) || 
+							(query.getProperty() instanceof TCTLAGNode && queryResult.isQuerySatisfied()) || 
+							(query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || 
+							(query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())){
 						return null;
-					else{
+					} else{
 						messenger.displayErrorMessage("Verifydtapn cannot generate the requested trace for the model. Try another trace option.");
 					}
 				}
