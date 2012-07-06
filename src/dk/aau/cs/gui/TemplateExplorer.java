@@ -799,6 +799,12 @@ public class TemplateExplorer extends JPanel {
 				newList.addElement(net);
 			}
 		}
+		// When removing a component, the listModel has already been updated but the index is invalid (-1), thus we select the last component as the active one
+		// When adding a component, this function updates the listModel thus it has a new length and the index should be corrected accordingly
+		templateList.setSelectedIndex(selectedIndex);
+		if(newList.size() != listModel.size() || selectedIndex == -1){
+			selectedIndex = newList.size()-1;
+		}
 		listModel = newList;
 		templateList.setModel(listModel);
 		templateList.setSelectedIndex(selectedIndex);
