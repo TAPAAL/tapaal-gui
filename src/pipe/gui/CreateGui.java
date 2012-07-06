@@ -130,20 +130,6 @@ public class CreateGui {
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
-		
-		//TODO
-		/*
-		appTab.addChangeListener(new ChangeListener() {
-			int oldIndex = 0;
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				Split model = getTab(oldIndex).getModelRoot();
-				getCurrentTab().setModelRoot(model);
-				oldIndex = appTab.getSelectedIndex();
-			}
-		});
-		*/
-		
 
 		animator = new Animator();
 
