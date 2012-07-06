@@ -43,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -1665,16 +1666,17 @@ public class GuiFrame extends JFrame implements Observer {
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
 					
-				// XXX
-				// This is a fix for bug #812694 where on mac some menues are gray after
-				// changing from simulation mode, when displaying a trace. Showing and 
-				// hiding a menu seems to fix this problem 
-				Dialog a = new Dialog(CreateGui.appGui);
-				a.setVisible(true);
-				a.setVisible(false);
-				a.dispose();
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
+					
+					// XXX
+					// This is a fix for bug #812694 where on mac some menues are gray after
+					// changing from simulation mode, when displaying a trace. Showing and 
+					// hiding a menu seems to fix this problem 
+					JDialog a = new JDialog(CreateGui.appGui, false);
+					a.setUndecorated(true);
+					a.setVisible(true);
+					a.dispose();
 				}				
 				
 				break;
