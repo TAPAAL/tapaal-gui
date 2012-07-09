@@ -58,14 +58,19 @@ public class Verifier {
 
 	public static void analyzeKBound(
 			TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
-		VerifyTAPN verifytapn = getVerifyTAPN();
+		ModelChecker modelChecker;
+		if(tapnNetwork.hasWeights()){
+			modelChecker = getVerifydTAPN();
+		} else {
+			modelChecker = getVerifyTAPN();
+		}
 
-		if (!verifytapn.isCorrectVersion()) {
-			System.err.println("Verifytapn not found, or you are running an old version of verifytapn.\n"
+		if (!modelChecker.isCorrectVersion()) {
+			System.err.println("The model checker not found, or you are running an old version of it.\n"
 							+ "Update to the latest development version.");
 			return;
 		}
-		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, verifytapn, new MessengerImpl(), tokensControl);
+		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, new MessengerImpl(), tokensControl);
 		optimizer.analyze();
 	}
 
