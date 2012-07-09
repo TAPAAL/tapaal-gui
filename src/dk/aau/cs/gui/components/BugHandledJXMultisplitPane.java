@@ -29,7 +29,7 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 			super.displayNode(name, visible);
 			Component c = getComponentForName(name);
 			
-			fixDividersError(c.isVisible());
+			fixDividersError(c);
 		}
 		
 		/*
@@ -46,7 +46,7 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 		 * 
 		 * This method will hopefully become unnecessary as the JXMultisplitPane matures
 		 */
-		private void fixDividersError(boolean redistributeComponents){
+		private void fixDividersError(Component changedComponent){
 			//Make sure there are no extra dividers
 			java.util.List<Node> t = ((Split) this.getModel()).getChildren();
 			for(int i = t.size()-1; i>-1; i--){
@@ -60,7 +60,7 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 			}
 			
 			//Makes sure all components are visible
-			if(redistributeComponents){
+			if(changedComponent.isVisible() && getNodeForComponent(changedComponent).isVisible()){
 				int heigh = 0;
 				int i = 0;
 				int[] distribution = getComponentDistribution();

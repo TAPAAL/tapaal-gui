@@ -1016,6 +1016,10 @@ public class QueryDialog extends JPanel {
 		add(splitter, gridBagConstraints);
 	}
 	
+	public static void setAdvancedView(boolean advanced){
+		advancedView = advanced;
+	}
+	
 	private void toggleAdvancedSimpleView(boolean changeState){
 		//Make sure that the right properties are set when the pane is initialized
 		if(!changeState){

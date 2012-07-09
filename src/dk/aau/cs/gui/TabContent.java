@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.XMLEncoder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +65,7 @@ public class TabContent extends JSplitPane {
 
 	// Normal mode
 	BugHandledJXMultisplitPane editorSplitPane;
-	Split editorModelroot;
+	static Split editorModelroot = null;
 
 	QueryPane queries;
 	ConstantsPane constantsPanel;
@@ -140,34 +141,50 @@ public class TabContent extends JSplitPane {
 		sharedPTPanel.setPreferredSize(new Dimension(sharedPTPanel
 				.getPreferredSize().width,
 				sharedPTPanel.getMinimumSize().height));
+		
+		boolean floatingDividers = false;
+		if(editorModelroot == null){
+			Leaf constantsLeaf = new Leaf(constantsName);
+			Leaf queriesLeaf = new Leaf(queriesName);
+			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
+			Leaf sharedPTLeaf = new Leaf(sharedPTName);
 
-		Leaf constantsLeaf = new Leaf(constantsName);
-		Leaf queriesLeaf = new Leaf(queriesName);
-		Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
-		Leaf sharedPTLeaf = new Leaf(sharedPTName);
+			constantsLeaf.setWeight(0.25);
+			queriesLeaf.setWeight(0.25);
+			templateExplorerLeaf.setWeight(0.25);
+			sharedPTLeaf.setWeight(0.25);
 
-		constantsLeaf.setWeight(0.25);
-		queriesLeaf.setWeight(0.25);
-		templateExplorerLeaf.setWeight(0.25);
-		sharedPTLeaf.setWeight(0.25);
-
-		editorModelroot = new Split(templateExplorerLeaf, new Divider(),
-				sharedPTLeaf, new Divider(), queriesLeaf, new Divider(),
-				constantsLeaf);
-		editorModelroot.setRowLayout(false);
-		// The modelroot needs to have a parent when we remove all its children
-		// (bug in the swingx package)
-		editorModelroot.setParent(new Split());
-
+			editorModelroot = new Split(templateExplorerLeaf, new Divider(),
+					sharedPTLeaf, new Divider(), queriesLeaf, new Divider(),
+					constantsLeaf);
+			editorModelroot.setRowLayout(false);
+			// The modelroot needs to have a parent when we remove all its children
+			// (bug in the swingx package)
+			editorModelroot.setParent(new Split());
+			floatingDividers = true;
+		} else {
+			for(Node n : editorModelroot.getChildren()){
+				if(n instanceof Leaf){
+					n.setWeight(0);
+				}
+			}
+		}
 		editorSplitPane = new BugHandledJXMultisplitPane();
+		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
+		
+		editorSplitPane.setSize(editorModelroot.getBounds().width, editorModelroot.getBounds().height);
+		
 		editorSplitPane.getMultiSplitLayout().setModel(editorModelroot);
 
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		editorSplitPane.add(sharedPTPanel, sharedPTName);
 		editorSplitPane.add(queries, queriesName);
 		editorSplitPane.add(constantsPanel, constantsName);
-
+		
 		this.setLeftComponent(editorSplitPane);
+		
+		editorSplitPane.repaint();
 	}
 
 	public void selectFirstActiveTemplate() {
@@ -255,6 +272,8 @@ public class TabContent extends JSplitPane {
 				.createCompoundBorder(
 						BorderFactory.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		//Add 10 pixel to the minimumsize of the scrollpane
+		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
 	}
 
 	private void createAnimatorSlitPane() {
@@ -320,9 +339,9 @@ public class TabContent extends JSplitPane {
 		dummy.setMinimumSize(templateExplorer.getMinimumSize());
 		dummy.setPreferredSize(templateExplorer.getPreferredSize());
 		editorSplitPane.add(dummy, templateExplorerName);
-		
+
 		templateExplorer.switchToAnimationMode();
-		
+
 		this.setLeftComponent(animatorSplitPane);
 
 	}
@@ -340,9 +359,9 @@ public class TabContent extends JSplitPane {
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
 		}
-		
+
 		templateExplorer.switchToEditorMode();
-		
+
 		this.setLeftComponent(editorSplitPane);
 
 		drawingSurface.repaintAll();
@@ -558,8 +577,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showComponents(boolean enable) {
-
-		if (!(enable && templateExplorer.isVisible())) {
+		if (enable != templateExplorer.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(
 					templateExplorerName, enable);
 			editorSplitPane.getMultiSplitLayout().displayNode(sharedPTName,
@@ -573,7 +591,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showQueries(boolean enable) {
-		if (!(enable && queries.isVisible())) {
+		if (enable != queries.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(queriesName,
 					enable);
 			makeSureEditorPanelIsVisible(queries);
@@ -582,7 +600,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showConstantsPanel(boolean enable) {
-		if (!(enable && constantsPanel.isVisible())) {
+		if (enable != constantsPanel.isVisible()) {
 			editorSplitPane.getMultiSplitLayout().displayNode(constantsName,
 					enable);
 			makeSureEditorPanelIsVisible(constantsPanel);
@@ -590,12 +608,12 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		if (!(enable && enabledTransitionsList.isVisible())) {
+		if (enabledTransitionsList != null && !(enable && enabledTransitionsList.isVisible())) {
 			animatorSplitPane.getMultiSplitLayout().displayNode(
 					enabledTransitionsName, enable);
 		}
 	}
-
+	
 	public void selectFirstElements() {
 		templateExplorer.selectFirst();
 		queries.selectFirst();

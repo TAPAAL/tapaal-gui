@@ -43,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -61,6 +62,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jdesktop.swingx.MultiSplitLayout;
+
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -77,6 +80,7 @@ import pipe.gui.widgets.EngineDialogPanel;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
+import pipe.gui.widgets.QueryDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
@@ -123,7 +127,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 	
 	private JMenuItem statistics;
@@ -523,7 +527,11 @@ public class GuiFrame extends JFrame implements Observer {
    				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
     				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
-    				 
+    	 viewMenu.addSeparator();
+    	 
+    	 addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
+    	 addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+
 		 /* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
@@ -531,13 +539,13 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "typed 4"));
+				 ElementType.STEPBACKWARD, "Step backward", "released UP"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "typed 6"));
+						 ElementType.STEPFORWARD, "Step forward", "released DOWN"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
-				 ElementType.TIMEPASS, "Let time pass one time unit", "typed 1"));
+				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -648,9 +656,20 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
+
 		return toolsMenu;
 	}
-
+	
+	public void showAdvancedWorkspace(boolean advanced){
+		QueryDialog.setAdvancedView(advanced);
+		showComponents(advanced);
+		showConstants(advanced);
+		
+		//Queries and enabled transitions should always be shown
+		showQueries(true);
+		showEnabledTransitionsList(true);
+	}
+	
 	private void buildToolbar() {
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
@@ -941,6 +960,9 @@ public class GuiFrame extends JFrame implements Observer {
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
+		showAdvancedWorkspaceAction.setEnabled(enable);
+		showSimpleWorkspaceAction.setEnabled(enable);
+		
 
 		// Simulator
 		startAction.setEnabled(enable);
@@ -1142,7 +1164,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
-
+		
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
@@ -1432,6 +1454,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
@@ -1592,6 +1615,12 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			animBox = CreateGui.getAnimationHistory();
+			
+			// Hack to ensure the toolbar is not in focus
+			if(CreateGui.getAnimationController() != null){
+				CreateGui.getAnimationController().requestFocusInWindow();
+			}
+
 
 			switch (typeID) {
 			case START:
@@ -1637,16 +1666,17 @@ public class GuiFrame extends JFrame implements Observer {
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
 					
-				// XXX
-				// This is a fix for bug #812694 where on mac some menues are gray after
-				// changing from simulation mode, when displaying a trace. Showing and 
-				// hiding a menu seems to fix this problem 
-				Dialog a = new Dialog(CreateGui.appGui);
-				a.setVisible(true);
-				a.setVisible(false);
-				a.dispose();
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
+					
+					// XXX
+					// This is a fix for bug #812694 where on mac some menues are gray after
+					// changing from simulation mode, when displaying a trace. Showing and 
+					// hiding a menu seems to fix this problem 
+					JDialog a = new JDialog(CreateGui.appGui, false);
+					a.setUndecorated(true);
+					a.setVisible(true);
+					a.dispose();
 				}				
 				
 				break;
@@ -2017,6 +2047,10 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleEnabledTransitionsList();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
+			} else if (this == showAdvancedWorkspaceAction){
+				showAdvancedWorkspace(true);
+			} else if (this == showSimpleWorkspaceAction){
+				showAdvancedWorkspace(false);
 			}
 		}
 		

@@ -58,12 +58,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		} else {
-			return new VerificationResult<TAPNNetworkTrace>(
+			VerificationResult<TAPNNetworkTrace> value =  new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime(),
-					result.stats()
-					);
+					result.stats());
+			value.setNameMapping(transformedModel.value2());
+			return value;
 		}		
 	}
 	

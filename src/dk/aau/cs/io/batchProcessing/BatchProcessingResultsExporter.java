@@ -33,9 +33,9 @@ public class BatchProcessingResultsExporter {
 				       "Stored States" + DELIMITER + 
 				       "Query Property" + DELIMITER + 
 				       "Extra Tokens" + DELIMITER + 
-				       "Search Order" + DELIMITER + 
+				       "Verification Method" + DELIMITER + 
 				       "Symmetry" + DELIMITER + 
-				       "Verification Method");
+				       "Search Order");
 		
 		for(BatchProcessingVerificationResult result : results) {
 			TAPNQuery query = result.query();
