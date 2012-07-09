@@ -105,7 +105,6 @@ public class Animator {
 		for (TAPNNetworkTraceStep step : trace) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
-		System.err.println(getTrace().getTraceType());
 		CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
 	}
 	
