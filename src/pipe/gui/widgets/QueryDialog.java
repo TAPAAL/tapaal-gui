@@ -21,6 +21,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
@@ -636,20 +637,31 @@ public class QueryDialog extends JPanel {
 			saveUppaalXMLButton.setEnabled(false);
 		}
 	}
-
-	private void setEnabledReductionOptions() {
+	
+	//TODO
+	private void setEnabledReductionOptions(){
 		String reductionOptionString = getReductionOptionAsString();
 		
-		String[] options;
-		if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+		ArrayList<String> options = new ArrayList<String>();
+		if(tapnNetwork.hasWeights()){
+			if(tapnNetwork.isNonStrict()){
+				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+			}
+		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(isNetDegree2)
-				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD, name_DISCRETE };
+				options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
 			else
-				options = new String[]{ name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE };
+				options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
 		} else if(tapnNetwork.hasInhibitorArcs()) {
-			options = new String[]{ name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE };
+			options.addAll(Arrays.asList( name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2));
 		} else {
-			options = new String[] { name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2, name_DISCRETE};
+			options.addAll(Arrays.asList(name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
+		}
+		
+		if(tapnNetwork.isNonStrict()){
+			if(!options.contains(name_DISCRETE)){
+				options.add(name_DISCRETE);
+			}
 		}
 		
 		reductionOption.removeAllItems();

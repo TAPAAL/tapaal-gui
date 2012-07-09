@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
@@ -30,6 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.CreateGui;
 import pipe.gui.Verifier;
 import pipe.gui.undo.AddQueryCommand;
 import pipe.gui.undo.RemoveQueryCommand;
@@ -309,10 +311,16 @@ public class QueryPane extends JPanel {
 		addQueryButton.setToolTipText(toolTipNewQuery);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());
-				if (q != null) {
-					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
-					addQuery(q);
+				if(tabContent.network().hasWeights() && !tabContent.network().isNonStrict()){
+					JOptionPane.showMessageDialog(CreateGui.getApp(),
+							"No reduction option supports bouth strict intervals and weigthed arcs", 
+							"No reduction option", JOptionPane.ERROR_MESSAGE);
+				} else {
+					TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());
+					if (q != null) {
+						undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
+						addQuery(q);
+					}
 				}
 			}
 		});
