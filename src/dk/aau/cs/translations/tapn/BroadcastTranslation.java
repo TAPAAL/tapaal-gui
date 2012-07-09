@@ -67,7 +67,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 	
 	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
-		if(!supportsModel(model)) // has no effect atm since broadcast translation supports all models
+		if(!supportsModel(model))
 			throw new UnsupportedModelException("Broadcast Translation does not support the given model.");
 		
 		if(!supportsQuery(model, query)) // has no effect atm since broadcast translation supports all queries
@@ -770,7 +770,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 
 	
 	public boolean supportsModel(TimedArcPetriNet model) {
-		return true;
+		return !(model.hasWeights());
 	}
 
 

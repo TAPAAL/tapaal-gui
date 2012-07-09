@@ -478,7 +478,7 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 
 	
 	public boolean supportsModel(TimedArcPetriNet model) {
-		return !(model.hasInhibitorArcs());
+		return !(model.hasInhibitorArcs()) && !(model.hasWeights());
 	}
 
 	

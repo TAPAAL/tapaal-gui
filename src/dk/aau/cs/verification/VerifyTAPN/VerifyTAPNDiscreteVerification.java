@@ -348,7 +348,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		
 		boolean supportsModel(TimedArcPetriNet model) {
-			return true;
+			return model.isNonStrict();
 		}
 		
 		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
