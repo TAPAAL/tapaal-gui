@@ -2033,14 +2033,14 @@ public class QueryDialog extends JPanel {
 	}
 
 	private void refreshSymmetryReduction() {
-//		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN)) {
-//			//symmetryReduction.setSelected(true);
-//			//symmetryReduction.setEnabled(false);
-//		}
-//		else{
-//			symmetryReduction.setSelected(symmetryReduction.isSelected());
-//			symmetryReduction.setEnabled(true);
-//		}
+		if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+			symmetryReduction.setSelected(true);
+			symmetryReduction.setEnabled(false);
+		}
+		else{
+			symmetryReduction.setSelected(symmetryReduction.isSelected());
+			symmetryReduction.setEnabled(true);
+		}
 	}
 	
 //	private void queryChanged(){
