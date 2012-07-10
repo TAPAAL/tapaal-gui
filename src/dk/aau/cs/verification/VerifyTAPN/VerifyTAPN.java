@@ -19,6 +19,7 @@ import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
@@ -142,6 +143,23 @@ public class VerifyTAPN implements ModelChecker {
 			return false;
 		}
 		
+		String[] version = getVersion().split("\\.");
+		String[] targetversion = Pipe.verifytapnMinRev.split("\\.");
+		
+		for(int i = 0; i < targetversion.length; i++){
+			if(version.length < i+1)	version[i] = "0";
+			int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+			if(diff > 0){
+				break;
+			}else if(diff < 0){
+				messenger
+				.displayErrorMessage(
+						"The specified version of the file verifytapn is too old.", "Verifytapn Error");
+				resetVerifytapn();
+				return false;
+			}
+		}
+		
 		return true;
 	}
 
@@ -159,6 +177,9 @@ public class VerifyTAPN implements ModelChecker {
 	public void setVerifyTapnPath(String path) {
 		verifytapnpath = path;
 		Preferences.getInstance().setVerifytapnLocation(path);
+		if(!isCorrectVersion()){
+			reset();
+		}
 	}
 
 	public boolean setup() {
