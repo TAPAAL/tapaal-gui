@@ -118,9 +118,6 @@ public class Verifyta implements ModelChecker {
 
 	public boolean isCorrectVersion() {
 		if (isNotSetup()) {
-			messenger.displayErrorMessage(
-					"No verifyta specified: The verification is cancelled",
-					"Verification Error");
 			return false;
 		}
 
@@ -222,6 +219,11 @@ public class Verifyta implements ModelChecker {
 		verifytapath = path; 
 		Preferences.getInstance().setVerifytaLocation(verifytapath);
 		if(!isCorrectVersion()){
+			messenger
+			.displayErrorMessage(
+					"The specified version of the file verifyta is too old.\n\n"
+							+ "Get the latest development version of UPPAAL from \n"
+							+ "www.uppaal.com.", "Verifyta Error");
 			reset();
 		}
 	}
