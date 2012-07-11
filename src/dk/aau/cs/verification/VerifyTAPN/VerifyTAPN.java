@@ -128,9 +128,6 @@ public class VerifyTAPN implements ModelChecker {
 
 	public boolean isCorrectVersion() {
 		if (isNotSetup()) {
-			messenger.displayErrorMessage(
-					"No verifytapn specified: The verification is cancelled",
-					"Verification Error");
 			return false;
 		}
 		
@@ -152,10 +149,6 @@ public class VerifyTAPN implements ModelChecker {
 			if(diff > 0){
 				break;
 			}else if(diff < 0){
-				messenger
-				.displayErrorMessage(
-						"The specified version of the file verifytapn is too old.", "Verifytapn Error");
-				resetVerifytapn();
 				return false;
 			}
 		}
@@ -178,7 +171,10 @@ public class VerifyTAPN implements ModelChecker {
 		verifytapnpath = path;
 		Preferences.getInstance().setVerifytapnLocation(path);
 		if(!isCorrectVersion()){
-			reset();
+			messenger
+			.displayErrorMessage(
+					"The specified version of the file verifytapn is too old.", "Verifytapn Error");
+			resetVerifytapn();
 		}
 	}
 

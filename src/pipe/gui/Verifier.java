@@ -90,6 +90,9 @@ public class Verifier {
 		VerifyTAPN verifytapn = getVerifyTAPN();
 
 		if (!verifytapn.isCorrectVersion()) {
+			new MessengerImpl().displayErrorMessage(
+					"No verifytapn specified: The verification is cancelled",
+					"Verification Error");
 			return;
 		}
 		
