@@ -2101,11 +2101,6 @@ public class QueryDialog extends JPanel {
 			}
 			updateQueryButtonsAccordingToSelection();
 		}
-		String reduction = getReductionOptionAsString();
-		if(reduction.equals(name_verifyTAPN) || reduction.equals(name_STANDARD) || (reduction.equals(name_OPTIMIZEDSTANDARD) && !isNetDegree2)) {
-			existsBox.setEnabled(false);
-			forAllDiamond.setEnabled(false);
-		}
 	}
 
 	private void refreshSymmetryReduction() {
