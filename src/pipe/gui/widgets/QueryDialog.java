@@ -219,7 +219,7 @@ public class QueryDialog extends JPanel {
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private String name_DISCRETE = "TAPAAL: Discrete Engine";
+	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
