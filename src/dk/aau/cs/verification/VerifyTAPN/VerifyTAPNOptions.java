@@ -78,7 +78,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(' ');
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
 		result.append(' ');
-		result.append(dontUseDeadPlaces ? "" : "-d"); //deadPlaces is on by default in verifyTAPN so "-d" disables it
+		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');
 		result.append(discreteInclusion ? " -f 1" : "");
 		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");
