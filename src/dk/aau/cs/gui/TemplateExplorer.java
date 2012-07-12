@@ -112,6 +112,18 @@ public class TemplateExplorer extends JPanel {
 		init(hideButtons);
 	}
 	
+	public void selectPrevious(){
+		int index = templateList.getSelectedIndex()-1;
+		if(index == -1)	index = listModel.getSize()-1;
+		templateList.setSelectedIndex(index);
+	}
+	
+	public void selectNext(){
+		int index = templateList.getSelectedIndex()+1;
+		if(index == listModel.size())	index = 0;
+		templateList.setSelectedIndex(index);
+	}
+	
 	public Integer indexOfSelectedTemplate() {
 		return new Integer(templateList.getSelectedIndex());
 	}
