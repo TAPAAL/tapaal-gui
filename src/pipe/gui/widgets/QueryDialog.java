@@ -648,20 +648,25 @@ public class QueryDialog extends JPanel {
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
 			}
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+			if(tapnNetwork.isNonStrict()){
+				options.add(name_DISCRETE);
+			}
 			if(isNetDegree2)
 				options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
 			else
 				options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
 		} else if(tapnNetwork.hasInhibitorArcs()) {
-			options.addAll(Arrays.asList( name_verifyTAPN, name_BROADCAST, name_BROADCASTDEG2));
+			options.add( name_verifyTAPN );
+			if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
+			}					
+			options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2 ));
 		} else {
-			options.addAll(Arrays.asList(name_verifyTAPN, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
-		}
-		
-		if(tapnNetwork.isNonStrict()){
-			if(!options.contains(name_DISCRETE)){
-				options.add(name_DISCRETE);
+			options.add( name_verifyTAPN);
+			if(tapnNetwork.isNonStrict()){
+					options.add(name_DISCRETE);
 			}
+			options.addAll(Arrays.asList( name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
 		}
 		
 		reductionOption.removeAllItems();
