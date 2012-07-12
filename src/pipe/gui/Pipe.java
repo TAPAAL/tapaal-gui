@@ -20,8 +20,9 @@ public class Pipe {
 		//Fast modes
 		FAST_TRANSITION, FAST_PLACE, 
 		//Others (refactore?)
-		STOP, STEPBACKWARD, STEPFORWARD, FIRE, START, RANDOM, ANIMATE, TIMEPASS, VERIFY
-		
+		    STOP, STEPBACKWARD, STEPFORWARD, FIRE, START, RANDOM, ANIMATE, TIMEPASS, VERIFY,
+		//Components
+		PREVCOMPONENT, NEXTCOMPONENT
 	}
 
 	public static final ElementType DEFAULT_ELEMENT_TYPE = ElementType.SELECT;
@@ -88,7 +89,8 @@ public class Pipe {
 
 	public static final int MAX_NODES = 20000;
 
-	public static final int verifytaMinRev = 4800; //4543;// 4409;
+	public static final int verifytaMinRev = 4800;
+	public static final String verifytapnMinRev = "1.1.1";
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
