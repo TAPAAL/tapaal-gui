@@ -547,15 +547,15 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
 						 ElementType.STEPFORWARD, "Step forward", "released DOWN"));
-		 
-		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-						 ElementType.PREVCOMPONENT, "Previous component", "released LEFT"));
-		 
-		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-						 ElementType.NEXTCOMPONENT, "Next component", "released RIGHT"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
+		 
+		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
+				 ElementType.PREVCOMPONENT, "Previous component", "released LEFT"));
+ 
+		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
+				 ElementType.NEXTCOMPONENT, "Next component", "released RIGHT"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
