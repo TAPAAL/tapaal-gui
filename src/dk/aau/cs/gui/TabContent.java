@@ -120,7 +120,11 @@ public class TabContent extends JSplitPane {
 		this.setDividerSize(8);	
 
 	}
-
+	
+	public TemplateExplorer getTemplateExplorer(){
+		return templateExplorer;
+	}
+	
 	public void createEditorLeftPane() {
 		boolean enableAddButton = getModel() == null ? true : !getModel()
 				.netType().equals(NetType.UNTIMED);
