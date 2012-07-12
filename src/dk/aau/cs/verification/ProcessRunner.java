@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
+import dk.aau.cs.debug.Logger;
+
 public class ProcessRunner {
 
 	private String file;
@@ -54,7 +56,7 @@ public class ProcessRunner {
 		startTimeMs = System.currentTimeMillis();
 
 		try {
-			System.out.println("Running: "+ file + " " + arguments);
+			Logger.log("Running: "+ file + " " + arguments);
 			process = Runtime.getRuntime().exec(file + " " + arguments);
 		} catch (IOException e1) {
 			error = true;
