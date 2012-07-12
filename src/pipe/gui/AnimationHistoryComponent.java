@@ -54,7 +54,6 @@ public class AnimationHistoryComponent extends JList {
 	}
 
 	public void clearStepsForward() {
-		CreateGui.getAnimator().nullSetTrace();
 		DefaultListModel listModel = getListModel();
 		int lastIndex = listModel.size() - 1;
 

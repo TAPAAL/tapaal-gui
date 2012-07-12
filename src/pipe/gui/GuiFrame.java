@@ -1648,7 +1648,12 @@ public class GuiFrame extends JFrame implements Observer {
 									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
-
+						if(CreateGui.getAnimator().isShowingTrace()){ //Warn about deleting trace
+							int answer = JOptionPane.showConfirmDialog(GuiFrame.this, 
+									"If you exit the simulator you'll lose the trace shown", 
+									"Exiting simulator", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+							if(answer == JOptionPane.CANCEL_OPTION) break;
+						}
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();

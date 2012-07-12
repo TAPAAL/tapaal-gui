@@ -474,6 +474,13 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
+		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"No reduction option supports bouth strict intervals and weigthed arcs", 
+					"No reduction option", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		
 		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 
 		Container contentPane = guiDialog.getContentPane();

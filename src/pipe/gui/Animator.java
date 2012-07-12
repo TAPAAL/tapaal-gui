@@ -280,7 +280,7 @@ public class Animator {
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
 		
-		CreateGui.getAnimationHistory().clearStepsForward();
+		clearStepsForward();
 		
 		NetworkMarking next = null;
 		try{
@@ -333,7 +333,8 @@ public class Animator {
 	}
 
 	public boolean letTimePass(BigDecimal delay) {
-		CreateGui.getAnimationHistory().clearStepsForward();
+		
+		clearStepsForward();
 		
 		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
@@ -526,13 +527,23 @@ public class Animator {
 	public void reset(){
 		resethistory();
 		isDisplayingUntimedTrace = false;
+		trace = null;
 	}
 	
-	public void nullSetTrace(){
+	public void removeSetTrace(){
 		trace = null;
 	}
 	
 	public TimedTAPNNetworkTrace getTrace(){
 		return (TimedTAPNNetworkTrace)trace;
+	}
+	
+	private void clearStepsForward(){
+		removeSetTrace();
+		CreateGui.getAnimationHistory().clearStepsForward();
+	}
+	
+	public boolean isShowingTrace(){
+		return isDisplayingUntimedTrace || trace != null;
 	}
 }
