@@ -96,15 +96,15 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
 			+ name_verifyTAPNDiscreteInclusion;
-	private static final String name_STANDARDWithLegend = "C: " + name_STANDARD;
-	private static final String name_OPTIMIZEDSTANDARDWithLegend = "D: "
-			+ name_OPTIMIZEDSTANDARD;
-	private static final String name_BROADCASTWithLegend = "E: "
-			+ name_BROADCAST;
-	private static final String name_BROADCASTDEG2WithLegend = "F: "
-			+ name_BROADCASTDEG2;
-	private static final String name_verifyTAPNDiscreteVerificationWithLegend = "G: "
+	private static final String name_verifyTAPNDiscreteVerificationWithLegend = "C: "
 			+ name_verifyTAPNDiscreteVerification;
+	private static final String name_STANDARDWithLegend = "D: " + name_STANDARD;
+	private static final String name_OPTIMIZEDSTANDARDWithLegend = "E: "
+			+ name_OPTIMIZEDSTANDARD;
+	private static final String name_BROADCASTWithLegend = "F: "
+			+ name_BROADCAST;
+	private static final String name_BROADCASTDEG2WithLegend = "G: "
+			+ name_BROADCASTDEG2;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
@@ -1490,35 +1490,35 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.gridy = 2;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(STANDARD, gbc);
+			rightPanel.add(verifyTAPNDiscreteVerification, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 3;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			rightPanel.add(STANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCAST, gbc);
+			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 5;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCASTDEG2, gbc);
+			rightPanel.add(BROADCAST, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 8;
-			gbc.insets = new Insets(0, 5, 5, 5);
+			gbc.gridy = 6;
+			gbc.insets = new Insets(0, 5, 5	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteVerification, gbc);
+			rightPanel.add(BROADCASTDEG2, gbc);
 		}
 
 		private void initLeftPanel() {
@@ -1604,6 +1604,9 @@ public class BatchProcessingDialog extends JDialog {
 			if(verifyTAPN.isSelected()){
 				result.add(ReductionOption.VerifyTAPN);
 			}
+			if(verifyTAPNDiscreteVerification.isSelected()){
+				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
+			}
 			if(STANDARD.isSelected()){
 				result.add(ReductionOption.STANDARD);
 			}
@@ -1615,9 +1618,6 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			if(BROADCASTDEG2.isSelected()){
 				result.add(ReductionOption.DEGREE2BROADCAST);
-			}
-			if(verifyTAPNDiscreteVerification.isSelected()){
-				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
 			}
 			return result;
 		}

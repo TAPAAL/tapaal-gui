@@ -11,11 +11,11 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 public class BatchProcessingResultsExporter {
 	private static final String name_verifyTAPN = "A: TAPAAL Engine";
 	private static final String name_verifyTAPN_discreteInclusion = "B: TAPAAL Engine w. Discrete Inclusion";
-	private static final String name_STANDARD = "C: UPPAAL: Standard Reduction";
-	private static final String name_OPTIMIZEDSTANDARD = "D: UPPAAL: Optimised Standard Reduction";
-	private static final String name_BROADCAST = "E: UPPAAL: Broadcast Reduction";
-	private static final String name_BROADCASTDEG2 = "F: UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_verifyTAPNDiscreteVerification = "G: TAPAAL Engine - Discrete Verification";
+	private static final String name_verifyTAPNDiscreteVerification = "C: TAPAAL Engine - Discrete Verification";
+	private static final String name_STANDARD = "D: UPPAAL: Standard Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "E: UPPAAL: Optimised Standard Reduction";
+	private static final String name_BROADCAST = "F: UPPAAL: Broadcast Reduction";
+	private static final String name_BROADCASTDEG2 = "G: UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";

@@ -64,15 +64,15 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 				return "A";
 			else
 				return "B";
-		} else if(reduction == ReductionOption.STANDARD)
-			return "C";
-		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
+		} else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification)
+			return "C"; 
+		else if(reduction == ReductionOption.STANDARD)
 			return "D";
-		else if(reduction == ReductionOption.BROADCAST)
+		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
 			return "E";
-		else if(reduction == ReductionOption.DEGREE2BROADCAST)
+		else if(reduction == ReductionOption.BROADCAST)
 			return "F";
-		else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification)
+		else if(reduction == ReductionOption.DEGREE2BROADCAST)
 			return "G";
 		else
 			return "";
