@@ -526,11 +526,14 @@ public class Animator {
 
 	public void reset(){
 		resethistory();
-		isDisplayingUntimedTrace = false;
-		trace = null;
+		removeSetTrace();
 	}
 	
 	public void removeSetTrace(){
+		if(isDisplayingUntimedTrace){
+			CreateGui.removeAbstractAnimationPane();
+		}
+		isDisplayingUntimedTrace = false;
 		trace = null;
 	}
 	
