@@ -315,7 +315,7 @@ public class Animator {
 					if (fireTransition == JOptionPane.NO_OPTION){
 						return;
 					}else{
-						CreateGui.removeAbstractAnimationPane();
+						removeSetTrace();
 						isDisplayingUntimedTrace = false;
 					}
 				}
@@ -542,7 +542,9 @@ public class Animator {
 	}
 	
 	private void clearStepsForward(){
-		removeSetTrace();
+		if(!isDisplayingUntimedTrace){
+			removeSetTrace();
+		}
 		CreateGui.getAnimationHistory().clearStepsForward();
 	}
 	
