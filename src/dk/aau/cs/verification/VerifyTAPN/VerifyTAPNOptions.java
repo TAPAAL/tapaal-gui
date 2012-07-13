@@ -82,7 +82,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(' ');
 		result.append(discreteInclusion ? " -f 1" : "");
 		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");
-		System.err.println(result);
 		return result.toString();
 	}
 
