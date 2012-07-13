@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -81,10 +83,12 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
@@ -138,7 +142,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
-	randomAction, randomAnimateAction, timeAction;
+	randomAction, randomAnimateAction, timeAction, prevcomponentAction, nextcomponentAction;
 
 	public boolean dragging = false;
 
@@ -546,6 +550,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
+		 
+		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
+				 ElementType.PREVCOMPONENT, "Previous component", "released LEFT"));
+ 
+		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
+				 ElementType.NEXTCOMPONENT, "Next component", "released RIGHT"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -794,6 +804,7 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomComboBox.setMinimumSize(zoomComboBoxDimension);
 		zoomComboBox.setPreferredSize(zoomComboBoxDimension);
 		zoomComboBox.setAction(action);
+		zoomComboBox.setFocusable(false);
 		toolBar.add(zoomComboBox);
 	}
 
@@ -851,6 +862,8 @@ public class GuiFrame extends JFrame implements Observer {
 			timeAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
+			prevcomponentAction.setEnabled(false);
+			nextcomponentAction.setEnabled(false);
 
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
@@ -888,12 +901,15 @@ public class GuiFrame extends JFrame implements Observer {
 
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);
+			prevcomponentAction.setEnabled(true);
+			nextcomponentAction.setEnabled(true);
 
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			verifyAction.setEnabled(false);
@@ -1045,10 +1061,10 @@ public class GuiFrame extends JFrame implements Observer {
 	public void toggleToolTips(){
 		showToolTips(!showToolTips);
 	}
-	public boolean isShowingToolTips(){
-		return showToolTips;
-	}
-	
+
+  	public boolean isShowingToolTips(){
+ 		return showToolTips;
+        }	
 	
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
@@ -1621,7 +1637,6 @@ public class GuiFrame extends JFrame implements Observer {
 				CreateGui.getAnimationController().requestFocusInWindow();
 			}
 
-
 			switch (typeID) {
 			case START:
 				try {
@@ -1709,6 +1724,12 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				break;
+			case PREVCOMPONENT:
+				CreateGui.getCurrentTab().getTemplateExplorer().selectPrevious();
+				break;
+			case NEXTCOMPONENT:
+				CreateGui.getCurrentTab().getTemplateExplorer().selectNext();
 				break;
 			default:
 				break;
