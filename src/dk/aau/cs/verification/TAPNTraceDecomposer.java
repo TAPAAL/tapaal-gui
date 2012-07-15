@@ -2,6 +2,7 @@ package dk.aau.cs.verification;
 
 import java.util.ArrayList;
 
+import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -48,7 +49,8 @@ public class TAPNTraceDecomposer {
 	}
 
 	private TAPNNetworkTrace decomposeTimedTrace() {
-		TimedTAPNNetworkTrace decomposedTrace = new TimedTAPNNetworkTrace();
+		TimedTAPNNetworkTrace decomposedTrace = new TimedTAPNNetworkTrace(trace.getLoopToIndex());
+		decomposedTrace.setTraceType(trace.getTraceType());
 
 		for (TimedArcPetriNetStep action : trace) {
 			decomposedTrace.add(decomposeAction(action));
@@ -78,7 +80,11 @@ public class TAPNTraceDecomposer {
 			for (TimedToken token : transitionFiring.consumedTokens()) {
 				Tuple<String, String> remappedName = mapping.map(token.place().name());
 				TimedPlace place = (remappedName.value1() == null || remappedName.value1().isEmpty()) ? tapnNetwork.getSharedPlaceByName(remappedName.value2()) : tapnNetwork.getTAPNByName(remappedName.value1()).getPlaceByName(remappedName.value2());
-				convertedTokens.add(new TimedToken(place, token.age()));
+				if(token instanceof TraceToken){
+					convertedTokens.add(new TraceToken(place, token.age(), ((TraceToken)token).isGreaterThanOrEqual()));
+				} else {
+					convertedTokens.add(new TimedToken(place, token.age()));
+				}
 			}
 		}
 

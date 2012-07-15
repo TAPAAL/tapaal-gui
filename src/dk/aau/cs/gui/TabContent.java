@@ -419,7 +419,7 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
-		this.repaint();
+		animatorSplitPane.validate();
 
 	}
 

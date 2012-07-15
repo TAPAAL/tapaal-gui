@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import pipe.gui.Pipe;
 import dk.aau.cs.model.tapn.NetworkMarking;
 
-public class TAPNNetworkTimeDelayStep implements TAPNNetworkTraceStep {
+public class TAPNNetworkTimeDelayStep extends TAPNNetworkTraceStep {
 	private BigDecimal delay;
 	private static final DecimalFormat df = createDecimalFormat();
 
@@ -20,7 +20,8 @@ public class TAPNNetworkTimeDelayStep implements TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return "TimeDelay: " + df.format(delay);
+		String toReturn = "TimeDelay: " + df.format(delay);
+		return isLoopStep() ? formatAsLoopStep(toReturn) : toReturn;
 	}
 
 	private static DecimalFormat createDecimalFormat() {

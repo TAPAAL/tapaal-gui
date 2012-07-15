@@ -1,5 +1,10 @@
 package dk.aau.cs.model.tapn.simulation;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.TimedToken;
@@ -7,19 +12,18 @@ import dk.aau.cs.util.Require;
 
 public class OldestFiringMode implements FiringMode {
 
-	public TimedToken pickTokenFrom(List<TimedToken> elligibleTokens) {
-		Require.that(elligibleTokens.size() > 0,
-				"There has to be at least one token");
-
-		TimedToken oldest = elligibleTokens.get(0);
-
-		for (TimedToken token : elligibleTokens) {
-			if (token.age().compareTo(oldest.age()) > 0) {
-				oldest = token;
+	public List<TimedToken> pickTokensFrom(List<TimedToken> elligibleTokens, int numberOfTokensToPick) {
+		Require.that(elligibleTokens.size() >= numberOfTokensToPick,
+				"There has to be at least numberOfTokensToPick tokens");
+		
+		Collections.sort(elligibleTokens, new Comparator<TimedToken>() {
+			public int compare(TimedToken o1, TimedToken o2) {
+				//Sort decreasing
+				return o1.age().compareTo(o2.age()) * -1;
 			}
-		}
+		});
 
-		return oldest;
+		return elligibleTokens.subList(0, numberOfTokensToPick);
 	}
 
 	@Override

@@ -1663,7 +1663,6 @@ public class GuiFrame extends JFrame implements Observer {
 									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
-
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();

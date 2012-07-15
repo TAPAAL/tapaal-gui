@@ -38,8 +38,49 @@ public class Preferences {
 		   return pref.get("verifytapn.location", "");
 	   }
 	   
+	   public String getVerifydtapnLocation() {
+		   return pref.get("dverifytapn.location", "");
+	   }
+	   
+	   public String getVerifydtapnLCLocation() {
+		   return pref.get("dverifytapnLC.location", "");
+	   }
+	   public String getVerifydtapnWALocation() {
+		   return pref.get("dverifytapnWA.location", "");
+	   }
+	   
 	   public void setVerifytapnLocation(String location) {
 		   final String key = "verifytapn.location";
+		   
+		   if (location == null || location.equals("")){
+			   pref.remove(key);
+		   }else {
+			   pref.put(key, location);   
+		   }
+	   }
+	   
+	   public void setVerifydtapnLocation(String location) {
+		   final String key = "dverifytapn.location";
+		   
+		   if (location == null || location.equals("")){
+			   pref.remove(key);
+		   }else {
+			   pref.put(key, location);   
+		   }
+	   }
+	   
+	   public void setVerifydtapnLCLocation(String location) {
+		   final String key = "dverifytapnLC.location";
+		   
+		   if (location == null || location.equals("")){
+			   pref.remove(key);
+		   }else {
+			   pref.put(key, location);   
+		   }
+	   }
+	   
+	   public void setVerifydtapnWALocation(String location) {
+		   final String key = "dverifytapnWA.location";
 		   
 		   if (location == null || location.equals("")){
 			   pref.remove(key);

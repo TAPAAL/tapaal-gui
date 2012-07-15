@@ -346,7 +346,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	boolean supportsModel(TimedArcPetriNet model) {
-		return true;
+		return !model.hasWeights();
 	}
 	
 	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {

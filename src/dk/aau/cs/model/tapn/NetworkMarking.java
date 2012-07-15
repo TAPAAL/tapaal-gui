@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.CreateGui;
 
 import dk.aau.cs.model.tapn.simulation.FiringMode;
@@ -251,7 +252,15 @@ public class NetworkMarking implements TimedMarking {
 		TimedPlace place = token.place();
 		if(place.isShared()){
 			if(sharedPlacesTokens.containsKey(place)){
-				sharedPlacesTokens.get(place).remove(token);
+				List<TimedToken> tokens = sharedPlacesTokens.get(place); 
+				if(!tokens.remove(token) && token instanceof TraceToken){
+					for(TimedToken t : tokens){
+						if(t.age().compareTo(token.age()) >= 0){
+							tokens.remove(t);
+							break;
+						}
+					}
+				}
 			}
 		}else{
 			getMarkingFor(((LocalTimedPlace)place).model()).remove(token); // TODO: this is ugly but only way to obtain the model?
