@@ -22,6 +22,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -59,6 +60,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -72,6 +75,7 @@ import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
@@ -753,6 +757,13 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 		});
+		
+		// Enable sorting
+		Comparator<Object> comparator = new StringComparator();
+		
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+		sorter.setComparator(0, comparator);
+		table.setRowSorter(sorter);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane
