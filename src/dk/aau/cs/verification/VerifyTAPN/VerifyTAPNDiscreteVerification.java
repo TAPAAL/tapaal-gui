@@ -152,24 +152,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			}
 			
 			return true;
-			/*
-			if (isNotSetup()) {
-				messenger.displayErrorMessage(
-						"No verifydtapn specified: The verification is cancelled",
-						"Verification Error");
-				return false;
-			}
-			
-			File file = new File(getPath());
-			if(!file.canExecute()){
-				messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
-										+ "The verifydtapn path will be reset. Please try again, "
-										+ "to manually set the verifydtapn path.", "Verifydtapn Error");
-				resetVerifytapn();
-				return false;
-			}
-			
-			return true;*/
 		}
 
 		private void resetVerifytapn() {
