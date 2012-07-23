@@ -433,7 +433,7 @@ public class StandardTranslation implements ModelTranslator<TimedArcPetriNet, TA
 
 
 	public boolean supportsModel(TimedArcPetriNet model) {
-		return !(model.hasInhibitorArcs());
+		return !(model.hasInhibitorArcs()) && !(model.hasWeights());
 	}
 
 

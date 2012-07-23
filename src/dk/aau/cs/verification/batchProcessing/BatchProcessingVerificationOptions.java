@@ -38,7 +38,7 @@ public class BatchProcessingVerificationOptions {
 	}
 	
 	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion) {
-		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption,reductionOption, discreteInclusion, null); 
+		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, reductionOption, discreteInclusion, null); 
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
 		this.queryPropertyOption = queryPropertyOption;

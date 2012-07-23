@@ -367,22 +367,28 @@ public class BatchProcessingLoader {
 		String targetId = idResolver.get(tapn.name(), arc.getAttribute("target"));
 		String inscription = arc.getAttribute("inscription");
 		String type = arc.getAttribute("type");
+		
+		//Get weight if any
+		int weight = 1;
+		if(arc.hasAttribute("weight")){
+			weight = Integer.parseInt(arc.getAttribute("weight"));
+		}
 
 		if (type.equals("tapnInhibitor"))
-			parseAndAddTimedInhibitorArc(sourceId, targetId, inscription, tapn, constants);
+			parseAndAddTimedInhibitorArc(sourceId, targetId, inscription, tapn, constants, weight);
 		else if (type.equals("timed"))
-				parseAndAddTimedInputArc(sourceId, targetId, inscription, tapn, constants);
+				parseAndAddTimedInputArc(sourceId, targetId, inscription, tapn, constants, weight);
 		else if (type.equals("transport"))
-			parseAndAddTransportArc(sourceId, targetId, inscription, tapn, constants);
+			parseAndAddTransportArc(sourceId, targetId, inscription, tapn, constants, weight);
 		else
-			parseAndAddTimedOutputArc(sourceId, targetId, inscription, tapn);
+			parseAndAddTimedOutputArc(sourceId, targetId, inscription, tapn, weight);
 	}
 
-	private void parseAndAddTimedOutputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn) throws FormatException {
+	private void parseAndAddTimedOutputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, int weight) throws FormatException {
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(sourceId));
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(targetId));
 
-		TimedOutputArc outputArc = new TimedOutputArc(transition, place);
+		TimedOutputArc outputArc = new TimedOutputArc(transition, place, weight);
 		
 		if(tapn.hasArcFromTransitionToPlace(outputArc.source(),outputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
@@ -391,7 +397,7 @@ public class BatchProcessingLoader {
 		tapn.add(outputArc);
 	}
 
-	private void parseAndAddTransportArc(String sourceId, String targetId,	String inscription, TimedArcPetriNet tapn, ConstantStore constants) {
+	private void parseAndAddTransportArc(String sourceId, String targetId,	String inscription, TimedArcPetriNet tapn, ConstantStore constants, int weight) {
 		String[] inscriptionSplit = {};
 		if (inscription.contains(":")) {
 			inscriptionSplit = inscription.split(":");
@@ -417,7 +423,7 @@ public class BatchProcessingLoader {
 				assert (transition != null);
 				assert (destPlace != null);
 
-				TransportArc transArc = new TransportArc(sourcePlace, transition, destPlace, interval);
+				TransportArc transArc = new TransportArc(sourcePlace, transition, destPlace, interval, weight);
 				tapn.add(transArc);
 
 				postsetArcs.remove(hashKey);
@@ -438,7 +444,7 @@ public class BatchProcessingLoader {
 				assert (trans != null);
 				assert (destPlace != null);
 
-				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval);
+				TransportArc transArc = new TransportArc(sourcePlace, trans, destPlace, interval, weight);
 				tapn.add(transArc);
 
 				presetArcs.remove(hashKey);
@@ -449,12 +455,12 @@ public class BatchProcessingLoader {
 		}
 	}
 
-	private void parseAndAddTimedInputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants) throws FormatException {
+	private void parseAndAddTimedInputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants, int weight) throws FormatException {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		TimeInterval interval = TimeInterval.parse(inscription, constants);
 
-		TimedInputArc inputArc = new TimedInputArc(place, transition, interval);
+		TimedInputArc inputArc = new TimedInputArc(place, transition, interval, weight);
 
 		if(tapn.hasArcFromPlaceToTransition(inputArc.source(), inputArc.destination())) {
 			throw new FormatException("Multiple arcs between a place and a transition is not allowed");
@@ -463,11 +469,11 @@ public class BatchProcessingLoader {
 		tapn.add(inputArc);
 	}
 
-	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants) {
+	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants, int weight) {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		
-		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF);
+		TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF, weight);
 		tapn.add(inhibArc);
 	}
 

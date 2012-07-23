@@ -4,13 +4,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
@@ -34,17 +39,38 @@ public class Verifier {
 		verifytapn.setup();
 		return verifytapn;
 	}
+	
+	private static VerifyTAPNDiscreteVerification getVerifydTAPN() {
+		VerifyTAPNDiscreteVerification verifydtapn = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+		verifydtapn.setup();
+		return verifydtapn;
+	}
+	
+	private static ModelChecker getModelChecker(TAPNQuery query) {
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
+			return getVerifyTAPN();
+		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
+			return getVerifydTAPN();
+		} else{
+			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
+		}
+	}
 
 	public static void analyzeKBound(
 			TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
-		VerifyTAPN verifytapn = getVerifyTAPN();
+		ModelChecker modelChecker;
+		if(tapnNetwork.hasWeights()){
+			modelChecker = getVerifydTAPN();
+		} else {
+			modelChecker = getVerifyTAPN();
+		}
 
-		if (!verifytapn.isCorrectVersion()) {
-			System.err.println("Verifytapn not found, or you are running an old version of verifytapn.\n"
+		if (!modelChecker.isCorrectVersion()) {
+			System.err.println("The model checker not found, or you are running an old version of it.\n"
 							+ "Update to the latest development version.");
 			return;
 		}
-		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, verifytapn, new MessengerImpl(), tokensControl);
+		KBoundAnalyzer optimizer = new KBoundAnalyzer(tapnNetwork, k, modelChecker, new MessengerImpl(), tokensControl);
 		optimizer.analyze();
 	}
 
@@ -87,7 +113,7 @@ public class Verifier {
 	
 
 	public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query) {
-		VerifyTAPN verifytapn = getVerifyTAPN();
+		ModelChecker verifytapn = getModelChecker(query);
 
 		if (!verifytapn.isCorrectVersion()) {
 			new MessengerImpl().displayErrorMessage(
@@ -99,6 +125,7 @@ public class Verifier {
 		TCTLAbstractProperty inputQuery = query.getProperty();
 
 		int bound = query.getCapacity();
+		
 		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 
 		if (inputQuery == null) {

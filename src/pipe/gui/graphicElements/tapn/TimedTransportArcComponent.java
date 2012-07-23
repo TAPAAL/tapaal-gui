@@ -103,6 +103,9 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			label.setText("");
 		}
 		
+		if(underlyingTransportArc != null && getWeight() > 1){
+					label.setText(getWeight()+"x "+label.getText());
+		}
 		
 		this.setLabelPosition();
 	}
@@ -201,17 +204,22 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public Command setGuard(TimeInterval guard) {
+	public Command setGuardAndWeight(TimeInterval guard, int weight) {
 
 		TimeInterval oldTimeInterval = underlyingTransportArc.interval();
 		underlyingTransportArc.setTimeInterval(guard);
+		int oldWeight = getWeight();
+		setWeight(weight);
+		connectedTo.setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
 		updateLabel(true);
+		connectedTo.updateLabel(true);
+		
 		repaint();
 
 		return new ArcTimeIntervalEdit(this, oldTimeInterval,
-				underlyingTransportArc.interval());
+				underlyingTransportArc.interval(), oldWeight, weight);
 	}
 	
 	public TimedTransportArcComponent copy(TimedArcPetriNet tapn, DataLayer guiModel, Hashtable<PlaceTransitionObject, PlaceTransitionObject> oldToNewMapping) {
@@ -234,6 +242,17 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		arc.setGuiModel(guiModel);
 		
 		return arc;
+	}
+	
+	@Override
+	public void setWeight(int weight){
+		underlyingTransportArc.setWeight(weight);
+		connectedTo.underlyingTransportArc.setWeight(weight);
+	}
+	
+	@Override
+	public int getWeight(){
+		return underlyingTransportArc.getWeight();
 	}
 
 }

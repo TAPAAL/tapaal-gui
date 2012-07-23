@@ -73,7 +73,7 @@ public class Degree2BroadcastTranslation implements
 	}
 	
 	public Tuple<NTA, UPPAALQuery> translate(TimedArcPetriNet model, TAPNQuery query) throws Exception {
-		if(!supportsModel(model)) // has no effect atm since the translation supports all models
+		if(!supportsModel(model))
 			throw new UnsupportedModelException("Degree 2 Broadcast Translation does not support the given model.");
 		
 		if(!supportsQuery(model, query)) // has no effect atm since the translation supports all queries
@@ -795,7 +795,7 @@ public class Degree2BroadcastTranslation implements
 
 
 	public boolean supportsModel(TimedArcPetriNet model) {
-		return true;
+		return !(model.hasWeights());
 	}
 
 

@@ -19,6 +19,8 @@ import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.FileFinderImpl;
+import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
@@ -214,7 +216,13 @@ public class VerifyTAPN implements ModelChecker {
 		if (verifytapn != null && !verifytapn.isEmpty()) {
 			if (new File(verifytapn).exists()){
 				verifytapnpath = verifytapn;
-				return true;
+				VerifyTAPN v = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+				if(v.isCorrectVersion()){
+					return true;
+				}else{
+					verifytapn = null;
+					verifytapnpath = null;
+				}
 			}
 		}
 		
@@ -235,7 +243,13 @@ public class VerifyTAPN implements ModelChecker {
 			if (verifytapnfile.exists()){
 
 				verifytapnpath = verifytapnfile.getAbsolutePath();
-				return true;
+				VerifyTAPN v = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+				if(v.isCorrectVersion()){
+					return true;
+				}else{
+					verifytapn = null;
+					verifytapnpath = null;
+				}
 
 			}
 		}
@@ -363,7 +377,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 	
 	boolean supportsModel(TimedArcPetriNet model) {
-		return true;
+		return !model.hasWeights();
 	}
 	
 	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {

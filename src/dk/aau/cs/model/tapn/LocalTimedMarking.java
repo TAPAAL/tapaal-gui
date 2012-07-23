@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
@@ -46,7 +47,14 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 			parent.remove(token);
 		} else if (placesToTokensMap.containsKey(token.place())) {
 			List<TimedToken> tokens = placesToTokensMap.get(token.place());
-			tokens.remove(token);
+			if(!tokens.remove(token) && token instanceof TraceToken){
+				for(TimedToken t : tokens){
+					if(t.age().compareTo(token.age()) >= 0){
+						tokens.remove(t);
+						break;
+					}
+				}
+			}
 		}
 	}
 

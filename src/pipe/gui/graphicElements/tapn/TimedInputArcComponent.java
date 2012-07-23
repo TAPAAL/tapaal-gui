@@ -61,16 +61,19 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		return inputArc.interval();
 	}
 
-	public Command setGuard(TimeInterval guard) {
+	@Override
+	public Command setGuardAndWeight(TimeInterval guard, int weight) {
 
 		TimeInterval oldTimeInterval = inputArc.interval();
 		inputArc.setTimeInterval(guard);
+		int oldWeight = getWeight();
+		setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
 		updateLabel(true);
 		repaint();
 
-		return new ArcTimeIntervalEdit(this, oldTimeInterval, inputArc.interval());
+		return new ArcTimeIntervalEdit(this, oldTimeInterval, inputArc.interval(), oldWeight, weight);
 	}
 
 	// hacks - I use the weight to display the TimeInterval
@@ -91,6 +94,9 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 				else {
 					label.setText(inputArc.interval().toString(showConstantNames));
 				}
+				if(getWeight() > 1){
+					label.setText(getWeight()+"x "+label.getText());
+				}
 			}
 			this.setLabelPosition();
 		}
@@ -108,28 +114,6 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		copy.setTarget(this.getTarget());
 		TimedInputArcComponent timedCopy = new TimedInputArcComponent(copy.paste(despX, despY, toAnotherView), timeInterval);
 		return timedCopy;
-	}
-
-	public void showTimeIntervalEditor() {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Timed Arc", true);
-
-		Container contentPane = guiDialog.getContentPane();
-
-		// 1 Set layout
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-
-		// 2 Add Place editor
-		contentPane.add(new GuardDialogue(guiDialog.getRootPane(), this));
-
-		guiDialog.setResizable(false);
-
-		// Make window fit contents' preferred size
-		guiDialog.pack();
-
-		// Move window to the middle of the screen
-		guiDialog.setLocationRelativeTo(null);
-		guiDialog.setVisible(true);
-
 	}
 
 	@Override
@@ -166,5 +150,15 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 		arc.setGuiModel(guiModel);
 		
 		return arc;
+	}
+	
+	@Override
+	public void setWeight(int weight){
+		inputArc.setWeight(weight);
+	}
+	
+	@Override
+	public int getWeight(){
+		return inputArc.getWeight();
 	}
 }

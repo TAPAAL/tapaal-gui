@@ -17,6 +17,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -51,8 +52,17 @@ public class VerifyTAPNTraceParser {
 					TimedTransitionStep step = parseTransitionStep(element);
 					trace.add(step);
 				}else if(element.getTagName().equals("delay")){
-					TimeDelayStep step = parseTimeDelay(element);
-					trace.add(step);
+					if(element.getTextContent().equals("forever")){
+						trace.setTraceType(TraceType.EG_DELAY_FOREVER);
+					} else {
+						TimeDelayStep step = parseTimeDelay(element);
+						trace.add(step);
+					}
+				}else if(element.getTagName().equals("loop")){
+					trace.nextIsLoop();
+					trace.setTraceType(TraceType.EG_LOOP);
+				}else if(element.getTagName().equals("deadlock")){
+					trace.setTraceType(TraceType.EG_DEADLOCK);
 				}
 			}
 		}
@@ -73,7 +83,8 @@ public class VerifyTAPNTraceParser {
 
 				TimedPlace place = tapn.getPlaceByName(tokenElement.getAttribute("place"));
 				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
-				consumedTokens.add(new TimedToken(place, age));
+				boolean greaterThanOrEqual = Boolean.parseBoolean(tokenElement.getAttribute("greaterThanOrEqual"));
+				consumedTokens.add(new TraceToken(place, age, greaterThanOrEqual));
 			}
 		}
 		return new TimedTransitionStep(transition, consumedTokens);

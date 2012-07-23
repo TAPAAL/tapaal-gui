@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -19,10 +22,10 @@ public class VerifyTAPNExporter {
 		File modelFile = createTempFile(".xml");
 		File queryFile = createTempFile(".q");
 
-		return export(model, query, modelFile, queryFile);
+		return export(model, query, modelFile, queryFile, null);
 	}
 
-	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile) {
+	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query, File modelFile, File queryFile, pipe.dataLayer.TAPNQuery dataLayerQuery) {
 		if (modelFile == null || queryFile == null)
 			return null;
 
@@ -35,6 +38,13 @@ public class VerifyTAPNExporter {
 			PrintStream queryStream = new PrintStream(queryFile);
 			queryStream.append(query.getProperty().toString());
 			queryStream.close();
+			
+			VerifyTAPNOptions options = null;
+			if(dataLayerQuery == null){
+				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
+			}else{
+				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry());
+			}
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
 			return null;
@@ -95,7 +105,10 @@ public class VerifyTAPNExporter {
 		
 		modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
-		modelStream.append("target=\"" + inputArc.destination().name() + "\"");
+		modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
+		if(inputArc.getWeight() > 1){
+			modelStream.append("weight=\"" + inputArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}
@@ -105,7 +118,10 @@ public class VerifyTAPNExporter {
 		
 		modelStream.append("inscription=\"1\" " );
 		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
-		modelStream.append("target=\"" + outputArc.destination().name() + "\"");
+		modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
+		if(outputArc.getWeight() > 1){
+			modelStream.append("weight=\"" + outputArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}
@@ -116,7 +132,10 @@ public class VerifyTAPNExporter {
 		modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + transArc.source().name() + "\" ");
 		modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
-		modelStream.append("target=\"" + transArc.destination().name() + "\"");
+		modelStream.append("target=\"" + transArc.destination().name() + "\" ");
+		if(transArc.getWeight() > 1){
+			modelStream.append("weight=\"" + transArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}
@@ -126,7 +145,10 @@ public class VerifyTAPNExporter {
 		
 		modelStream.append("inscription=\"" + inhibArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
-		modelStream.append("target=\"" + inhibArc.destination().name() + "\"");
+		modelStream.append("target=\"" + inhibArc.destination().name() + "\" ");
+		if(inhibArc.getWeight() > 1){
+			modelStream.append("weight=\"" + inhibArc.getWeight() + "\"");
+		}
 		
 		modelStream.append("/>\n");
 	}

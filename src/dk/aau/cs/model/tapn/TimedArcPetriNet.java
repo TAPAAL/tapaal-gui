@@ -7,6 +7,7 @@ import java.util.List;
 
 import pipe.gui.undo.AddArcPathPointEdit;
 
+import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNet {
@@ -468,5 +469,56 @@ public class TimedArcPetriNet {
 		}
 		
 		return result;
+	}
+
+	public boolean hasWeights() {
+		for(TimedInputArc t : inputArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		for(TimedOutputArc t : outputArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		for(TimedInhibitorArc t : inhibitorArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		for(TransportArc t : transportArcs){
+			if(t.getWeight() != 1){
+				return true;
+			}
+		}
+		
+		
+		return false;
+	}
+	
+	public boolean isNonStrict(){
+		for(TimedInputArc t : inputArcs){
+			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
+				return false;
+			}
+		}
+		
+		for(TransportArc t : transportArcs){
+			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){
+				return false;
+			}
+		}
+		
+		for(TimedPlace p : places){
+			if(!p.invariant().isUpperNonstrict() && !(p.invariant().upperBound() instanceof InfBound)){
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

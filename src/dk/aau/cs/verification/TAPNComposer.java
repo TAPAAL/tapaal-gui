@@ -219,7 +219,7 @@ public class TAPNComposer {
 				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
-				constructedModel.add(new TimedInputArc(source, target, arc.interval()));
+				constructedModel.add(new TimedInputArc(source, target, arc.interval(), arc.getWeight()));
 			}
 		}
 	}
@@ -234,7 +234,7 @@ public class TAPNComposer {
 				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
-				constructedModel.add(new TimedOutputArc(source, target));
+				constructedModel.add(new TimedOutputArc(source, target, arc.getWeight()));
 			}
 		}
 	}
@@ -252,7 +252,7 @@ public class TAPNComposer {
 				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
-				constructedModel.add(new TransportArc(source, transition,target, arc.interval()));
+				constructedModel.add(new TransportArc(source, transition,target, arc.interval(), arc.getWeight()));
 			}
 		}
 	}
@@ -267,7 +267,7 @@ public class TAPNComposer {
 				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
-				constructedModel.add(new TimedInhibitorArc(source, target, arc.interval()));
+				constructedModel.add(new TimedInhibitorArc(source, target, arc.interval(), arc.getWeight()));
 			}
 		}
 	}
