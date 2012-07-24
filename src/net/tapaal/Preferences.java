@@ -1,5 +1,7 @@
 package net.tapaal;
 
+import java.util.prefs.BackingStoreException;
+
 public class Preferences {
 
 	   private static Preferences instance = null;
@@ -72,6 +74,10 @@ public class Preferences {
 		   }else {
 			   pref.put(key, version);   
 		   }
+	   }
+	   
+	   public static void clearPreferences() throws BackingStoreException{
+		   pref.clear();
 	   }
 	   
 }

@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.Delayed;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -676,9 +677,17 @@ public class GuiFrame extends JFrame implements Observer {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Verifyta.reset();
-				VerifyTAPN.reset();
-				VerifyTAPNDiscreteVerification.reset();
+				try {
+					// Clear persistent storage
+					Preferences.clearPreferences();
+					// Engines reset individually to remove preferences for already setup engines
+					Verifyta.reset();
+					VerifyTAPN.reset();
+					VerifyTAPNDiscreteVerification.reset();
+				} catch (BackingStoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		toolsMenu.add(clearPreferences);
