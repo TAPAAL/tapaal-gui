@@ -369,7 +369,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		public static void reset() {
 			//Clear value
 			verifydtapnpath = "";
-			Preferences.getInstance().setVerifytapnLocation(null);
+			Preferences.getInstance().setVerifydtapnLocation(null);
 			//Set the detault
 			trySetup();
 		}

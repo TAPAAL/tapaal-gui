@@ -66,6 +66,7 @@ import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.MultiSplitLayout;
 
+import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -98,6 +99,9 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
 public class GuiFrame extends JFrame implements Observer {
@@ -666,6 +670,18 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
+		
+		JMenuItem clearPreferences = new JMenuItem("Clear all preferences");
+		clearPreferences.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Verifyta.reset();
+				VerifyTAPN.reset();
+				VerifyTAPNDiscreteVerification.reset();
+			}
+		});
+		toolsMenu.add(clearPreferences);
 
 		return toolsMenu;
 	}
