@@ -15,6 +15,9 @@ import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.FileFinderImpl;
+import pipe.gui.MessengerImpl;
+import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
@@ -123,19 +126,29 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		public boolean isCorrectVersion() {
 			if (isNotSetup()) {
-				messenger.displayErrorMessage(
-						"No verifydtapn specified: The verification is cancelled",
-						"Verification Error");
 				return false;
 			}
 			
 			File file = new File(getPath());
 			if(!file.canExecute()){
 				messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
-										+ "The verifydtapn path will be reset. Please try again, "
-										+ "to manually set the verifydtapn path.", "Verifydtapn Error");
+						+ "The verifydtapn path will be reset. Please try again, "
+						+ "to manually set the verifydtapn path.", "Verifydtapn Error");
 				resetVerifytapn();
 				return false;
+			}
+			
+			String[] version = getVersion().split("\\.");
+			String[] targetversion = Pipe.verifydtapnMinRev.split("\\.");
+			
+			for(int i = 0; i < targetversion.length; i++){
+				if(version.length < i+1)	version[i] = "0";
+				int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+				if(diff > 0){
+					break;
+				}else if(diff < 0){
+					return false;
+				}
 			}
 			
 			return true;
@@ -156,6 +169,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		public void setVerifydTapnPath(String path) {
 			verifydtapnpath = path;
 			Preferences.getInstance().setVerifydtapnLocation(path);
+			if(!isCorrectVersion()){
+				messenger
+				.displayErrorMessage(
+						"The specified version of the file verifytapn is too old.", "Verifytapn Error");
+				resetVerifytapn();
+			}
 		}
 
 		public boolean setup() {
@@ -165,7 +184,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				try {
 					File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "");
 					if(file != null){
-						if( true ) {//file.getName().matches("^d?verifydtapn.*(?:\\.exe)?$")){
+						if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
 							setVerifydTapnPath(file.getAbsolutePath());
 						}else{
 							messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
@@ -194,7 +213,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			if (verifydtapn != null && !verifydtapn.isEmpty()) {
 				if (new File(verifydtapn).exists()){
 					verifydtapnpath = verifydtapn;
-					return true;
+					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+					if(v.isCorrectVersion()){
+						return true;
+					}else{
+						verifydtapn = null;
+						verifydtapnpath = null;
+					}
 				}
 			}
 
@@ -215,7 +240,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				if (verifydtapnfile.exists()){
 
 					verifydtapnpath = verifydtapnfile.getAbsolutePath();
-					return true;
+					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+					if(v.isCorrectVersion()){
+						return true;
+					}else{
+						verifydtapn = null;
+						verifydtapnpath = null;
+					}
 
 				}
 			}
@@ -369,7 +400,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		public static void reset() {
 			//Clear value
 			verifydtapnpath = "";
-			Preferences.getInstance().setVerifytapnLocation(null);
+			Preferences.getInstance().setVerifydtapnLocation(null);
 			//Set the detault
 			trySetup();
 		}

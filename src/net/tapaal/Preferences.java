@@ -8,6 +8,8 @@ public class Preferences {
 	   protected Preferences() {
 	      // Exists only to defeat instantiation.
 		   pref = java.util.prefs.Preferences.userNodeForPackage(this.getClass());
+		   // Set subtree to version specific node
+		   pref = pref.node(pref.absolutePath() + TAPAAL.VERSION);
 	   }
 	   
 	   public static Preferences getInstance() {

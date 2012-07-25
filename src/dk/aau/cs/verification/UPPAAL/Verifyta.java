@@ -13,6 +13,8 @@ import net.tapaal.Preferences;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.FileFinderImpl;
+import pipe.gui.MessengerImpl;
 import pipe.gui.Pipe;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.TCTLAFNode;
@@ -118,9 +120,6 @@ public class Verifyta implements ModelChecker {
 
 	public boolean isCorrectVersion() {
 		if (isNotSetup()) {
-			messenger.displayErrorMessage(
-					"No verifyta specified: The verification is cancelled",
-					"Verification Error");
 			return false;
 		}
 
@@ -139,12 +138,6 @@ public class Verifyta implements ModelChecker {
 			int version = Integer.parseInt(versionAsString);
 
 			if (version < Pipe.verifytaMinRev) {
-				messenger
-						.displayErrorMessage(
-								"The specified version of the file verifyta is too old.\n\n"
-										+ "Get the latest development version of UPPAAL from \n"
-										+ "www.uppaal.com.", "Verifyta Error");
-				resetVerifyta();
 				return false;
 			}
 		}
@@ -189,14 +182,26 @@ public class Verifyta implements ModelChecker {
 		if (verifyta != null && !verifyta.equals("")) {
 			if (new File(verifyta).exists()){
 				verifytapath = verifyta;
-				return true;
+				Verifyta v = new Verifyta(new FileFinderImpl(), new MessengerImpl());
+				if(v.isCorrectVersion()){
+					return true;
+				}else{
+					verifyta = null;
+					verifytapath = null;
+				}
 			}
 		}
 		
 		verifyta = Preferences.getInstance().getVerifytaLocation();
 		if (verifyta != null && !verifyta.equals("")) {
 			verifytapath = verifyta;
-			return true;
+			Verifyta v = new Verifyta(new FileFinderImpl(), new MessengerImpl());
+			if(v.isCorrectVersion()){
+				return true;
+			}else{
+				verifyta = null;
+				v.resetVerifyta();
+			}
 		}
 		
 		return false;
@@ -222,7 +227,12 @@ public class Verifyta implements ModelChecker {
 		verifytapath = path; 
 		Preferences.getInstance().setVerifytaLocation(verifytapath);
 		if(!isCorrectVersion()){
-			reset();
+			messenger
+			.displayErrorMessage(
+					"The specified version of the file verifyta is too old.\n\n"
+							+ "Get the latest development version of UPPAAL from \n"
+							+ "www.uppaal.com.", "Verifyta Error");
+			resetVerifyta();
 		}
 	}
 	

@@ -116,6 +116,9 @@ public class Verifier {
 		ModelChecker verifytapn = getModelChecker(query);
 
 		if (!verifytapn.isCorrectVersion()) {
+			new MessengerImpl().displayErrorMessage(
+					"No verifytapn specified: The verification is cancelled",
+					"Verification Error");
 			return;
 		}
 		

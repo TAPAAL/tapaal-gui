@@ -89,7 +89,9 @@ public class Pipe {
 
 	public static final int MAX_NODES = 20000;
 
-	public static final int verifytaMinRev = 4800; //4543;// 4409;
+	public static final int verifytaMinRev = 4800;
+	public static final String verifytapnMinRev = "1.1.1";
+	public static final String verifydtapnMinRev = "1.0.0";
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 
