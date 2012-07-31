@@ -543,19 +543,19 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "released UP"));
+				 ElementType.STEPBACKWARD, "Step backward", "released LEFT"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "released DOWN"));
+						 ElementType.STEPFORWARD, "Step forward", "released RIGHT"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-				 ElementType.PREVCOMPONENT, "Previous component", "released LEFT"));
+				 ElementType.PREVCOMPONENT, "Previous component", "released UP"));
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-				 ElementType.NEXTCOMPONENT, "Next component", "released RIGHT"));
+				 ElementType.NEXTCOMPONENT, "Next component", "released DOWN"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",

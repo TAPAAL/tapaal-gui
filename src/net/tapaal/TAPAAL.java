@@ -23,7 +23,7 @@ public class TAPAAL {
 	 * @author Kenneth Yrke Joergensen (kenneth@yrke.dk)
 	 */
 	
-	public static final String TOOLNAME = "TAPAAL";
+	public static final String TOOLNAME = "TAPAAL beta";
 	public static final String VERSION = "DEV"; 
 
 	public static String getProgramName(){
