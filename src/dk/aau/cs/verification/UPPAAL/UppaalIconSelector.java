@@ -12,18 +12,19 @@ public class UppaalIconSelector extends IconSelector {
 	public ImageIcon getIconFor(QueryResult result){
 		switch(result.queryType())
 		{
-		case AF:
 		case EF:
 			if(result.isQuerySatisfied()) return satisfiedIcon;
 			break;
-		case EG:
 		case AG:
 			if(!result.isQuerySatisfied()) return notSatisfiedIcon;
 			break;
+		case AF: return inconclusiveIcon;
+		case EG: return inconclusiveIcon;
 		default:
 			return null;
 		}
-		
+
 		return inconclusiveIcon;
+		
 	}
 }
