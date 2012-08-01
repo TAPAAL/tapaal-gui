@@ -1,5 +1,7 @@
 package net.tapaal;
 
+import java.util.prefs.BackingStoreException;
+
 public class Preferences {
 
 	   private static Preferences instance = null;
@@ -32,8 +34,6 @@ public class Preferences {
 		   } else {
 			   pref.put("verifyta.location", location);
 		   }
-		   
-		   
 	   }
 	   
 	   public String getVerifytapnLocation() {
@@ -42,13 +42,6 @@ public class Preferences {
 	   
 	   public String getVerifydtapnLocation() {
 		   return pref.get("dverifytapn.location", "");
-	   }
-	   
-	   public String getVerifydtapnLCLocation() {
-		   return pref.get("dverifytapnLC.location", "");
-	   }
-	   public String getVerifydtapnWALocation() {
-		   return pref.get("dverifytapnWA.location", "");
 	   }
 	   
 	   public void setVerifytapnLocation(String location) {
@@ -71,28 +64,6 @@ public class Preferences {
 		   }
 	   }
 	   
-	   public void setVerifydtapnLCLocation(String location) {
-		   final String key = "dverifytapnLC.location";
-		   
-		   if (location == null || location.equals("")){
-			   pref.remove(key);
-		   }else {
-			   pref.put(key, location);   
-		   }
-	   }
-	   
-	   public void setVerifydtapnWALocation(String location) {
-		   final String key = "dverifytapnWA.location";
-		   
-		   if (location == null || location.equals("")){
-			   pref.remove(key);
-		   }else {
-			   pref.put(key, location);   
-		   }
-	   }
-	
-	   
-	   
 	   public String getLatestVersion() {
 		   return pref.get("tapaal.latestVersion", "");
 	   }
@@ -105,6 +76,10 @@ public class Preferences {
 		   }else {
 			   pref.put(key, version);   
 		   }
+	   }
+	   
+	   public static void clearPreferences() throws BackingStoreException{
+		   pref.clear();
 	   }
 	   
 }
