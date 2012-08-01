@@ -135,7 +135,7 @@ public class RunVerification extends RunVerificationBase {
 		JTable table = new JTable(data, columnNames);
 
 		Comparator<Integer> comparator = new Comparator<Integer>() {
-			@Override
+		
 			public int compare(Integer arg0, Integer arg1) {
 				return arg0-arg1;
 			}

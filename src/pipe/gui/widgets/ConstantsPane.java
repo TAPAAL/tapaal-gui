@@ -150,15 +150,15 @@ public class ConstantsPane extends JPanel {
 
 		constantsList.addKeyListener(new KeyListener() {
 
-			@Override
+			
 			public void keyTyped(KeyEvent arg0) {		
 			}
 
-			@Override
+			
 			public void keyReleased(KeyEvent arg0) {			
 			}
 			
-			@Override
+		
 			public void keyPressed(KeyEvent arg0) {				
 				ListModel model = constantsList.getModel();
 				if (model.getSize()>0) {
@@ -206,7 +206,7 @@ public class ConstantsPane extends JPanel {
 			public void componentShown(ComponentEvent e) {
 			}
 			
-			@Override
+			
 			public void componentResized(ComponentEvent e) {
 				if(ConstantsPane.this.getSize().height <= minimumHegiht){
 					sortButton.setVisible(false);
@@ -215,11 +215,11 @@ public class ConstantsPane extends JPanel {
 				}
 			}
 			
-			@Override
+			
 			public void componentMoved(ComponentEvent e) {
 			}
 			
-			@Override
+			
 			public void componentHidden(ComponentEvent e) {
 			}
 		});

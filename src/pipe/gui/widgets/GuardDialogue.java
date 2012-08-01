@@ -214,7 +214,7 @@ public class GuardDialogue extends JPanel /*
 		weightNumber.setPreferredSize(intervalBoxDims);
 		weightNumber.addChangeListener(new ChangeListener() {
 			
-			@Override
+			
 			public void stateChanged(ChangeEvent e) {
 				if((Integer) weightNumber.getValue() < 1){
 					weightNumber.setValue(1);

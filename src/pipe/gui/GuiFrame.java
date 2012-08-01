@@ -233,7 +233,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setGUIMode(GUIMode.noNet);
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
-			@Override
+		
 			public boolean dispatchKeyEvent(KeyEvent e) {
 				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
 					if (e.getID() == KeyEvent.KEY_PRESSED) {			
