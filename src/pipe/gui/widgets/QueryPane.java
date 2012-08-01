@@ -139,7 +139,7 @@ public class QueryPane extends JPanel {
 			public void componentShown(ComponentEvent e) {
 			}
 
-			@Override
+			
 			public void componentResized(ComponentEvent e) {
 				if(QueryPane.this.getSize().height <= minimumHegiht){
 					sortButton.setVisible(false);
@@ -148,11 +148,11 @@ public class QueryPane extends JPanel {
 				}
 			}
 
-			@Override
+			
 			public void componentMoved(ComponentEvent e) {
 			}
 
-			@Override
+			
 			public void componentHidden(ComponentEvent e) {
 			}
 		});

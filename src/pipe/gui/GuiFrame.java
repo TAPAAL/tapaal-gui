@@ -238,7 +238,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setGUIMode(GUIMode.noNet);
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
-			@Override
+		
 			public boolean dispatchKeyEvent(KeyEvent e) {
 				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
 					if (e.getID() == KeyEvent.KEY_PRESSED) {			
@@ -548,19 +548,19 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "released UP"));
+				 ElementType.STEPBACKWARD, "Step backward", "released LEFT"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "released DOWN"));
+						 ElementType.STEPFORWARD, "Step forward", "released RIGHT"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-				 ElementType.PREVCOMPONENT, "Previous component", "released LEFT"));
+				 ElementType.PREVCOMPONENT, "Previous component", "released UP"));
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-				 ElementType.NEXTCOMPONENT, "Next component", "released RIGHT"));
+				 ElementType.NEXTCOMPONENT, "Next component", "released DOWN"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -2105,15 +2105,18 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("\n\n");
 		buffer.append("TAPAAL is a tool for editing, simulation and verification of timed-arc Petri nets.\n");
 		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
-		buffer.append("License information and more is avaialbe at: www.tapaal.net\n\n");
+		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\n");
-		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller, Jiri Srba and Jakob H. Taankvist\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen, Kenneth Y. Joergensen,\n");
+		buffer.append("Mikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2012\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
 		buffer.append("Aalborg University 2011-2012\n\n");
+		buffer.append("TAPAAL Discrete Engine:\n");
+                buffer.append("Mathias Andersen, Heine G. Larsen, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
+                buffer.append("Aalborg University 2012\n\n");
 		buffer.append("\n");
 		
 

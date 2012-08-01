@@ -41,6 +41,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 
 
 	public Object getValueAt(int row, int col) {
+		if(row >= results.size())	return null;
 		BatchProcessingVerificationResult result = results.get(row);
 		
 		switch(col){
@@ -84,7 +85,11 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 	}
 	
 	public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
+		Object t = getValueAt(0, c);
+		if(t == null){
+			return Object.class;
+		}
+        return t.getClass();
     }
 
 	public Iterable<BatchProcessingVerificationResult> getResults() {
