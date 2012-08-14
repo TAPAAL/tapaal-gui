@@ -266,6 +266,11 @@ public class GuiFrame extends JFrame implements Observer {
 		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
 			CreateGui.toggleShowZeroToInfinityIntervals();
 		}
+		
+		Dimension dimension = prefs.getWindowSize();
+		if(dimension != null){
+			this.setSize(dimension);
+		}
 
 	}
 
@@ -709,6 +714,7 @@ public class GuiFrame extends JFrame implements Observer {
 		prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
 		prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
 		prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
+		prefs.setWindowSize(this.getSize());
 
 		prefs.setShowComponents(showComponents);
 		prefs.setShowQueries(showQueries);

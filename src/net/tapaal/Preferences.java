@@ -1,10 +1,12 @@
 package net.tapaal;
 
+import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.prefs.BackingStoreException;
 
 import org.jdesktop.swingx.MultiSplitLayout.Split;
@@ -87,6 +89,23 @@ public class Preferences {
 
 	public boolean getShowToolTips(){
 		return pref.getBoolean("showToolTips", true);
+	}
+	
+	public void setWindowSize(Dimension size) {
+		try{
+			saveSerilizableObject("appSize", size);
+		} catch (Exception e){
+			System.err.println("Something went wrong - couldn't save the app size");
+		}
+	}
+	
+	public Dimension getWindowSize(){
+		try{
+			return (Dimension)getSerilizableObject("appSize");
+		} catch (Exception e){
+			System.err.println("Something went wrong - couldn't load the appSize");
+			return null;
+		}
 	}
 
 	//Queries
@@ -180,7 +199,7 @@ public class Preferences {
 
 	
 	//Helper functions
-	private void saveSerilizableObject(String key, Object o) throws IOException{
+	private void saveSerilizableObject(String key, Serializable o) throws IOException{
 		if(o == null){
 			throw new NullPointerException();
 		}
