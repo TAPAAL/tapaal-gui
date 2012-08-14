@@ -6,16 +6,16 @@ import java.util.List;
 import dk.aau.cs.util.Require;
 
 public class TimedInputArc extends TAPNElement {
-	private int weight = 1;
+	private Weight weight = new IntWeight(1);
 	private TimedPlace source;
 	private TimeInterval interval;
 	private TimedTransition destination;
 
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
-		this(source, destination, interval, 1);
+		this(source, destination, interval, new IntWeight(1));
 	}
 	
-	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, int weight) {
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
@@ -26,11 +26,11 @@ public class TimedInputArc extends TAPNElement {
 		this.weight = weight;
 	}
 	
-	public int getWeight(){
+	public Weight getWeight(){
 		return weight;
 	}
 	
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		this.weight = weight;
 	}
 
@@ -53,7 +53,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public boolean isEnabled() {
-		return getElligibleTokens().size() >= weight;
+		return getElligibleTokens().size() >= weight.value();
 	}
 
 	public boolean isEnabledBy(TimedToken token) {

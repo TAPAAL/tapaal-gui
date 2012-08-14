@@ -87,12 +87,12 @@ public class AnimationSelectmodeDialog extends JPanel {
 
 	private void createDropDownsForTransition(TimedTransition transition, JPanel presetPanelContainer) {
 		for (TimedInputArc arc : transition.getInputArcs()) {
-			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens(), arc.getWeight());
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens(), arc.getWeight().value());
 			presetPanelContainer.add(tokenPanel);
 		}
 		
 		for (TransportArc arc : transition.getTransportArcsGoingThrough()) {
-			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens(), arc.getWeight());
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens(), arc.getWeight().value());
 			presetPanelContainer.add(tokenPanel);
 		}
 	}

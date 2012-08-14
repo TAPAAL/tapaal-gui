@@ -3,15 +3,15 @@ package dk.aau.cs.model.tapn;
 import dk.aau.cs.util.Require;
 
 public class TimedOutputArc extends TAPNElement {
-	private int weight;
+	private Weight weight;
 	private TimedTransition source;
 	private TimedPlace destination;
 	
 	public TimedOutputArc(TimedTransition source, TimedPlace destination){
-		this(source, destination, 1);
+		this(source, destination, new IntWeight(1));
 	}
 
-	public TimedOutputArc(TimedTransition source, TimedPlace destination, int weight) {
+	public TimedOutputArc(TimedTransition source, TimedPlace destination, Weight weight) {
 		Require.that(source != null, "An arc must have a non-null source transition");
 		Require.that(destination != null, "An arc must have a non-null destination place");
 		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
@@ -20,11 +20,11 @@ public class TimedOutputArc extends TAPNElement {
 		this.weight = weight;
 	}
 	
-	public int getWeight(){
+	public Weight getWeight(){
 		return weight;
 	}
 	
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		this.weight = weight;
 	}
 

@@ -6,7 +6,7 @@ import java.util.List;
 import dk.aau.cs.util.Require;
 
 public class TransportArc extends TAPNElement {
-	private int weight;
+	private Weight weight;
 	private TimedPlace source;
 	private TimedTransition transition;
 	private TimedPlace destination;
@@ -14,10 +14,10 @@ public class TransportArc extends TAPNElement {
 	private TimeInterval interval;
 	
 	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval){
-		this(source, transition, destination, interval, 1);
+		this(source, transition, destination, interval, new IntWeight(1));
 	}
 
-	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, int weight) {
+	public TransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination, TimeInterval interval, Weight weight) {
 		Require.that(source != null, "The source place cannot be null");
 		Require.that(transition != null, "The associated transition cannot be null");
 		Require.that(destination != null, "The destination place cannot be null");
@@ -31,11 +31,11 @@ public class TransportArc extends TAPNElement {
 		this.weight = weight;
 	}
 	
-	public int getWeight(){
+	public Weight getWeight(){
 		return weight;
 	}
 	
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		this.weight = weight;
 	}
 
@@ -62,7 +62,7 @@ public class TransportArc extends TAPNElement {
 	}
 
 	public boolean isEnabled() {
-		return getElligibleTokens().size() >= weight;
+		return getElligibleTokens().size() >= weight.value();
 	}
 
 	public boolean isEnabledBy(TimedToken token) {
