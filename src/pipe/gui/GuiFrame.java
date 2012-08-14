@@ -1198,7 +1198,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public void createNewTab(String name, NetType netType) {
-		int freeSpace = CreateGui.getFreeSpace();
+		int freeSpace = CreateGui.getFreeSpace(netType);
 
 		setObjects(freeSpace);
 		CreateGui.getModel(freeSpace).setNetType(netType);
@@ -1235,7 +1235,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            tab
 	 */
 	public void createNewTabFromFile(InputStream file, String namePrefix) {
-		int freeSpace = CreateGui.getFreeSpace();
+		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name = "";
 
 		setObjects(freeSpace);
@@ -1301,7 +1301,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            tab
 	 */
 	public void createNewTabFromFile(File file) {
-		int freeSpace = CreateGui.getFreeSpace();
+		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name = "";
 
 		setObjects(freeSpace);

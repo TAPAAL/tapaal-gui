@@ -4,37 +4,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.prefs.Preferences;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -44,11 +19,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
-import org.jdesktop.swingx.JXMultiSplitPane;
-import org.jdesktop.swingx.MultiSplitLayout;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
-import org.jdesktop.swingx.MultiSplitLayout.Node;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import pipe.dataLayer.DataLayer;
@@ -64,8 +36,6 @@ import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.model.tapn.Constant;
@@ -112,12 +82,12 @@ public class TabContent extends JSplitPane {
 
 	protected JSplitPane animationHistorySplitter;
 
-	protected JXMultiSplitPane animatorSplitPane;
+	protected BugHandledJXMultisplitPane animatorSplitPane;
 
 	private Integer selectedTemplate = 0;
 	private Boolean selectedTemplateWasActive = false;
 
-	public TabContent() {
+	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
@@ -130,6 +100,7 @@ public class TabContent extends JSplitPane {
 		drawingSurfaceScroller.setWheelScrollingEnabled(true);
 
 		createEditorLeftPane();
+		createAnimatorSplitPane(netType);
 
 		this.setOrientation(HORIZONTAL_SPLIT);
 		this.setLeftComponent(editorSplitPane);
@@ -288,7 +259,14 @@ public class TabContent extends JSplitPane {
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 
-	private void createAnimatorSlitPane() {
+	private void createAnimatorSplitPane(NetType netType) {
+		if (animBox == null)
+			createAnimationHistory();
+		if (animControlerBox == null)
+			createAnimationController(netType);
+		if (enabledTransitionsList == null)
+			createEnabledTransitionsList();
+		
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
 			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
@@ -304,7 +282,7 @@ public class TabContent extends JSplitPane {
 			simulatorModelRoot.setRowLayout(false);
 			floatingDividers = true;
 		}
-		animatorSplitPane = new JXMultiSplitPane();
+		animatorSplitPane = new BugHandledJXMultisplitPane();
 		
 		animatorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
 		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
@@ -340,22 +318,20 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
-
-		if (animBox == null)
-			createAnimationHistory();
-		if (animControlerBox == null)
-			createAnimationController();
-		if (enabledTransitionsList == null)
-			createEnabledTransitionsList();
-
-		if (animatorSplitPane == null)
-			createAnimatorSlitPane();
+		
+		//Remove dummy
+		Component dummy = animatorSplitPane.getMultiSplitLayout().getComponentForNode(animatorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
+		if(dummy != null){
+			animatorSplitPane.remove(dummy);
+		}
+		
+		//Add the templateExplorer
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
 		// Inserts dummy to avoid nullpointerexceptions from the displaynode
 		// method
 		// A component can only be on one splitpane at the time
-		JPanel dummy = new JPanel();
+		dummy = new JButton("EditorDummy");
 		dummy.setMinimumSize(templateExplorer.getMinimumSize());
 		dummy.setPreferredSize(templateExplorer.getPreferredSize());
 		editorSplitPane.add(dummy, templateExplorerName);
@@ -368,14 +344,21 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void switchToEditorComponents() {
-
+		
+		//Remove dummy
+		Component dummy = editorSplitPane.getMultiSplitLayout().getComponentForNode(editorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
+		if(dummy != null){
+			editorSplitPane.remove(dummy);
+		}
+		
+		//Add the templateexplorer again
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		if (animatorSplitPane != null) {
 
 			// Inserts dummy to avoid nullpointerexceptions from the displaynode
 			// method
 			// A component can only be on one splitpane at the time
-			JPanel dummy = new JPanel();
+			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
@@ -384,8 +367,8 @@ public class TabContent extends JSplitPane {
 		templateExplorer.switchToEditorMode();
 
 		this.setLeftComponent(editorSplitPane);
-
-		drawingSurface.repaintAll();
+		
+		this.validate();
 	}
 
 	public AnimationHistoryComponent getUntimedAnimationHistory() {
@@ -440,8 +423,8 @@ public class TabContent extends JSplitPane {
 
 	}
 
-	private void createAnimationController() {
-		animControlerBox = new AnimationController();
+	private void createAnimationController(NetType netType) {
+		animControlerBox = new AnimationController(netType);
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
 		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -664,6 +647,8 @@ public class TabContent extends JSplitPane {
 			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
 			animatorSplitPane.getMultiSplitLayout().layoutByWeight(animatorSplitPane);
 			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
+		} else {
+			simulatorModelRoot = null;
 		}
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
 		editorSplitPane.getMultiSplitLayout().layoutByWeight(editorSplitPane);

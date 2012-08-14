@@ -26,6 +26,7 @@ import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
 import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
@@ -219,8 +220,8 @@ public class CreateGui {
 
 	}
 
-	public static int getFreeSpace() {
-		tabs.add(new TabContent());
+	public static int getFreeSpace(NetType netType) {
+		tabs.add(new TabContent(netType));
 		return tabs.size() - 1;
 	}
 
