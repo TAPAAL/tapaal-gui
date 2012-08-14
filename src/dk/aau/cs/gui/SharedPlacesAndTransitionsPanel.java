@@ -378,14 +378,25 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 		removeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(list.getSelectedValue() != null){
-					JCheckBox checkBox = new JCheckBox("Delete from all components");
+					boolean showMessage;
+					if(isDisplayingTransitions()){
+						showMessage = ((SharedTransition)list.getSelectedValue()).transitions().size() > 0;
+					} else {
+						showMessage = ((SharedPlace)list.getSelectedValue()).hasInstantiations();
+					}
+					
+					int choice = JOptionPane.OK_OPTION;
+					boolean deleteFromTemplates = false;
+					if(showMessage){
+						JCheckBox checkBox = new JCheckBox("Delete from all components");
 
-					JLabel label = new JLabel(isDisplayingTransitions() ? TRANSITION_IS_USED_MESSAGE : PLACE_IS_USED_MESSAGE);
-					Object[] params = {label, checkBox};
-					int choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
+						JLabel label = new JLabel(isDisplayingTransitions() ? TRANSITION_IS_USED_MESSAGE : PLACE_IS_USED_MESSAGE);
+						Object[] params = {label, checkBox};
+						choice = JOptionPane.showConfirmDialog(CreateGui.getApp(), params, "Warning", JOptionPane.WARNING_MESSAGE);
+						deleteFromTemplates = checkBox.isSelected();
+					}
+						
 					if(choice == JOptionPane.OK_OPTION){
-						boolean deleteFromTemplates = checkBox.isSelected();
-
 						undoManager.newEdit();
 						if(isDisplayingTransitions()){
 							deleteSharedTransition(deleteFromTemplates);

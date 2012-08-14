@@ -141,6 +141,10 @@ public class SharedPlace implements TimedPlace{
 		}
 	}
 	
+	public boolean hasInstantiations(){
+		return listeners.size() >0;
+	}
+	
 	@Override
 	public String toString() {
 		return name;
