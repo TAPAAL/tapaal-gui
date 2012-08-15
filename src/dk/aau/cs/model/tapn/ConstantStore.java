@@ -91,18 +91,18 @@ public class ConstantStore {
 	}
 	
 	private void buildConstraints(TimedInputArc inputArc) {
-		buildConstraintsFromTimeInterval(inputArc.interval());
+		buildConstraintsFromTimeIntervalAndWeight(inputArc.interval(), inputArc.getWeight());
 	}
 
 	private void buildConstraints(TransportArc transArc) {
-		buildConstraintsFromTimeInterval(transArc.interval());
+		buildConstraintsFromTimeIntervalAndWeight(transArc.interval(), transArc.getWeight());
 	}
 
 	private void buildConstraints(TimedInhibitorArc inhibArc) {
-		buildConstraintsFromTimeInterval(inhibArc.interval());
+		buildConstraintsFromTimeIntervalAndWeight(inhibArc.interval(), inhibArc.getWeight());
 	}
 
-	private void buildConstraintsFromTimeInterval(TimeInterval interval) {
+	private void buildConstraintsFromTimeIntervalAndWeight(TimeInterval interval, Weight weight) {
 		Bound lower = interval.lowerBound();
 		Bound upper = interval.upperBound();
 
@@ -136,6 +136,13 @@ public class ConstantStore {
 			upperConstant.setIsUsed(true);
 			if (lower.value() + diff > upperConstant.lowerBound()) {
 				upperConstant.setLowerBound(lower.value() + diff);
+			}
+		}
+		
+		if(weight instanceof ConstantWeight){
+			Constant weightConstant = getConstantByName(((ConstantWeight) weight).constant().name());
+			if(weightConstant.lowerBound() < 1){
+				weightConstant.setLowerBound(1);
 			}
 		}
 	}

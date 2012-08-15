@@ -169,7 +169,7 @@ public class TimedOutputArcComponent extends Arc {
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
 		if(getWeight().value() > 1){
-			label.setText(getWeight()+"x " + label.getText());
+			label.setText(getWeight()+" x " + label.getText());
 		}
 		setLabelPosition();
 	}

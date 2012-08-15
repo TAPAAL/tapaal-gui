@@ -57,7 +57,7 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
 		if(getWeight().value() > 1){
-			label.setText(getWeight().toString(displayConstantNames)+"x");
+			label.setText(getWeight().toString(displayConstantNames)+" x");
 		}
 		this.setLabelPosition();
 	}

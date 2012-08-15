@@ -252,7 +252,17 @@ public class GuardDialogue extends JPanel /*
 
 		Set<String> constants = CreateGui.getCurrentTab().network()
 		.getConstantNames();
-		String[] constantArray = constants.toArray(new String[constants.size()]);
+		ArrayList<String> filteredConstants = new ArrayList<String>();
+		for(String constant : constants){
+			if(CreateGui.getCurrentTab().network().getConstantValue(constant) != 0){
+				filteredConstants.add(constant);
+			}
+		}
+		
+		
+		String[] constantArray = filteredConstants.toArray(new String[filteredConstants.size()]);
+		
+		
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 	    
 	    weightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
@@ -267,7 +277,7 @@ public class GuardDialogue extends JPanel /*
 		weightEditPanel.add(weightConstantsComboBox, gridBagConstraints);
 		
 		
-		boolean enableConstantsCheckBoxes = !constants.isEmpty();
+		boolean enableConstantsCheckBoxes = !filteredConstants.isEmpty();
 		weightUseConstant = new JCheckBox("Use Constant");
 		weightUseConstant.setEnabled(enableConstantsCheckBoxes);
 		weightUseConstant.addActionListener(new ActionListener() {
@@ -551,6 +561,11 @@ public class GuardDialogue extends JPanel /*
 			rightDelimiter.setSelectedItem("]");
 		} else {
 			rightDelimiter.setSelectedItem(")");
+		}
+		
+		if(arc.getWeight() instanceof ConstantWeight){
+			weightConstantsComboBox.setSelectedItem(((ConstantWeight)arc.getWeight()).constant().name());
+			weightUseConstant.doClick();
 		}
 	}
 
