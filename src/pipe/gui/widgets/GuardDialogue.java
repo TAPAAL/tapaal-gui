@@ -142,7 +142,7 @@ public class GuardDialogue extends JPanel /*
 							.getSelectedItem().toString();
 					weight = new ConstantWeight(CreateGui.getCurrentTab().network().getConstant(constantName));
 				} else {
-					weight = new IntWeight((int)weightNumber.getValue());
+					weight = new IntWeight(((Integer)weightNumber.getValue()).intValue());
 				}
 				
 				return weight;
