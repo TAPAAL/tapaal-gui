@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -30,12 +31,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.Delayed;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -43,6 +46,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -60,6 +64,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.jdesktop.swingx.MultiSplitLayout;
 
 import net.tapaal.Preferences;
 import org.jdesktop.swingx.MultiSplitLayout;
@@ -83,10 +89,12 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
@@ -96,6 +104,9 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
 public class GuiFrame extends JFrame implements Observer {
@@ -140,7 +151,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
-	randomAction, randomAnimateAction, timeAction;
+	randomAction, randomAnimateAction, timeAction, prevcomponentAction, nextcomponentAction;
 
 	public boolean dragging = false;
 
@@ -233,7 +244,7 @@ public class GuiFrame extends JFrame implements Observer {
 		setGUIMode(GUIMode.noNet);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
-			@Override
+		
 			public boolean dispatchKeyEvent(KeyEvent e) {
 				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
 					if (e.getID() == KeyEvent.KEY_PRESSED) {			
@@ -566,31 +577,37 @@ public class GuiFrame extends JFrame implements Observer {
 		addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
 
 		/* Simulator */
-		JMenu animateMenu = new JMenu("Simulator");
-		animateMenu.setMnemonic('A');
-		addMenuItem(animateMenu, startAction = new AnimateAction(
-				"Simulation mode", ElementType.START, "Toggle simulation mode (M)",
-				"M", true));
-		addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				ElementType.STEPBACKWARD, "Step backward", "typed 4"));
-		addMenuItem(animateMenu,
-				stepforwardAction = new AnimateAction("Step forward",
-						ElementType.STEPFORWARD, "Step forward", "typed 6"));
+		 JMenu animateMenu = new JMenu("Simulator");
+		 animateMenu.setMnemonic('A');
+		 addMenuItem(animateMenu, startAction = new AnimateAction(
+				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
+				 "M", true));
+		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
+				 ElementType.STEPBACKWARD, "Step backward", "released LEFT"));
+		 addMenuItem(animateMenu,
+				 stepforwardAction = new AnimateAction("Step forward",
+						 ElementType.STEPFORWARD, "Step forward", "released RIGHT"));
 
-		addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
-				ElementType.TIMEPASS, "Let time pass one time unit", "typed 1"));
+		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
+				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
+		 
+		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
+				 ElementType.PREVCOMPONENT, "Previous component", "released UP"));
+ 
+		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
+				 ElementType.NEXTCOMPONENT, "Next component", "released DOWN"));
 
-		/*
-		 * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
-		 * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
-		 * addMenuItem(animateMenu, randomAnimateAction = new
-		 * AnimateAction("Simulate", Pipe.ANIMATE,
-		 * "Randomly fire a number of transitions", "typed 7",true));
-		 */
-		randomAction = new AnimateAction("Random", ElementType.RANDOM,
-				"Randomly fire a transition", "typed 5");
-		randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
-				"Randomly fire a number of transitions", "typed 7", true);
+		 /*
+		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
+		  * Pipe.RANDOM, "Randomly fire a transition", "typed 5"));
+		  * addMenuItem(animateMenu, randomAnimateAction = new
+		  * AnimateAction("Simulate", Pipe.ANIMATE,
+		  * "Randomly fire a number of transitions", "typed 7",true));
+		  */
+		 randomAction = new AnimateAction("Random", ElementType.RANDOM,
+				 "Randomly fire a transition", "typed 5");
+		 randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
+				 "Randomly fire a number of transitions", "typed 7", true);
 
 
 		/* The help part */
@@ -689,6 +706,21 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(engineSelection);
+		
+		JMenuItem clearPreferences = new JMenuItem("Clear all preferences");
+		clearPreferences.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// Clear persistent storage
+				Preferences.getInstance().clear();
+				// Engines reset individually to remove preferences for already setup engines
+				Verifyta.reset();
+				VerifyTAPN.reset();
+				VerifyTAPNDiscreteVerification.reset();
+			}
+		});
+		toolsMenu.add(clearPreferences);
 
 		return toolsMenu;
 	}
@@ -852,6 +884,7 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomComboBox.setMinimumSize(zoomComboBoxDimension);
 		zoomComboBox.setPreferredSize(zoomComboBoxDimension);
 		zoomComboBox.setAction(action);
+		zoomComboBox.setFocusable(false);
 		toolBar.add(zoomComboBox);
 	}
 
@@ -893,7 +926,7 @@ public class GuiFrame extends JFrame implements Observer {
 		case draw:
 
 			enableAllActions(true);
-
+			
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
 			inhibarcAction.setEnabled(true);
@@ -913,9 +946,13 @@ public class GuiFrame extends JFrame implements Observer {
 			timeAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
+			prevcomponentAction.setEnabled(false);
+			nextcomponentAction.setEnabled(false);
 
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
+			
+			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
@@ -950,12 +987,15 @@ public class GuiFrame extends JFrame implements Observer {
 
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);
+			prevcomponentAction.setEnabled(true);
+			nextcomponentAction.setEnabled(true);
 
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			verifyAction.setEnabled(false);
@@ -1110,7 +1150,10 @@ public class GuiFrame extends JFrame implements Observer {
 		showToolTips(!showToolTips);
 	}
 
-
+  	public boolean isShowingToolTips(){
+ 		return showToolTips;
+        }	
+	
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
 		Preferences.getInstance().setShowZeroInfIntervals(CreateGui.showZeroToInfinityIntervals());
@@ -1226,7 +1269,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		appView.setNetChanged(false); // Status is unchanged
 		appView.updatePreferredSize();
-
+		
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
@@ -1516,6 +1559,7 @@ public class GuiFrame extends JFrame implements Observer {
 			selectAction.setSelected(false);
 			// Set a light blue backgound color for animation mode
 			tab.drawingSurface().setBackground(Pipe.ANIMATION_BACKGROUND_COLOR);
+			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
 			// Disable All Actions
@@ -1556,6 +1600,8 @@ public class GuiFrame extends JFrame implements Observer {
 		// xxx - This must be refactored when someone findes out excatly what is
 		// gowing on
 		mode = prev_mode;
+		
+		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
@@ -1594,6 +1640,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		if (annotationAction != null)
 			annotationAction.setSelected(mode == ElementType.ANNOTATION);
+		
+		
 
 
 
@@ -1676,6 +1724,11 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 
 			animBox = CreateGui.getAnimationHistory();
+			
+			// Hack to ensure the toolbar is not in focus
+			if(CreateGui.getAnimationController() != null){
+				CreateGui.getAnimationController().requestFocusInWindow();
+			}
 
 			switch (typeID) {
 			case START:
@@ -1703,7 +1756,6 @@ public class GuiFrame extends JFrame implements Observer {
 									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
-
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(false);
 						appView.getSelectionObject().clearSelection();
@@ -1720,17 +1772,18 @@ public class GuiFrame extends JFrame implements Observer {
 
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
-
-				// XXX
-				// This is a fix for bug #812694 where on mac some menues are gray after
-				// changing from simulation mode, when displaying a trace. Showing and 
-				// hiding a menu seems to fix this problem 
-				Dialog a = new Dialog(CreateGui.appGui);
-				a.setVisible(true);
-				a.setVisible(false);
-				a.dispose();
+					
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();
+					
+					// XXX
+					// This is a fix for bug #812694 where on mac some menues are gray after
+					// changing from simulation mode, when displaying a trace. Showing and 
+					// hiding a menu seems to fix this problem 
+					JDialog a = new JDialog(CreateGui.appGui, false);
+					a.setUndecorated(true);
+					a.setVisible(true);
+					a.dispose();
 				}				
 
 				break;
@@ -1763,6 +1816,12 @@ public class GuiFrame extends JFrame implements Observer {
 					}
 				}
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				break;
+			case PREVCOMPONENT:
+				CreateGui.getCurrentTab().getTemplateExplorer().selectPrevious();
+				break;
+			case NEXTCOMPONENT:
+				CreateGui.getCurrentTab().getTemplateExplorer().selectNext();
 				break;
 			default:
 				break;
@@ -2116,15 +2175,18 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("\n\n");
 		buffer.append("TAPAAL is a tool for editing, simulation and verification of timed-arc Petri nets.\n");
 		buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
-		buffer.append("License information and more is avaialbe at: www.tapaal.net\n\n");
+		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\n");
-		buffer.append("Kenneth Yrke Joergensen, Mikael H. Moeller, Jiri Srba and Jakob H. Taankvist\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen, Kenneth Y. Joergensen,\n");
+		buffer.append("Mikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2012\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
 		buffer.append("Aalborg University 2011-2012\n\n");
+		buffer.append("TAPAAL Discrete Engine:\n");
+                buffer.append("Mathias Andersen, Heine G. Larsen, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
+                buffer.append("Aalborg University 2012\n\n");
 		buffer.append("\n");
 
 

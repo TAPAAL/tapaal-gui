@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import pipe.dataLayer.NetType;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Grid;
@@ -51,25 +52,23 @@ public class ArcHandler extends PetriNetObjectHandler {
 		}
 		return popup;
 	}
-
-	@Override
+	
 	public void mousePressed(MouseEvent e) {
-		super.mousePressed(e);
-		if (!(CreateGui.getApp().isEditionAllowed())) {
-			return;
-		}
-		if (e.getClickCount() == 2) {
-			Arc arc = (Arc) myObject;
-			if (e.isControlDown()) {
-				CreateGui.getView().getUndoManager().addNewEdit(
-						arc.getArcPath().insertPoint(
-								new Point2D.Float(arc.getX() + e.getX(), arc
-										.getY()
-										+ e.getY()), e.isAltDown()));
+		if (CreateGui.getApp().isEditionAllowed()) {
+			if (e.getClickCount() == 2) {
+				Arc arc = (Arc) myObject;
+				if (e.isControlDown()) {
+					CreateGui.getView().getUndoManager().addNewEdit(
+							arc.getArcPath().insertPoint(
+									new Point2D.Float(arc.getX() + e.getX(),
+											arc.getY() + e.getY()),
+									e.isAltDown()));
+				} else if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+					((TimedOutputArcComponent) myObject).showTimeIntervalEditor();
+				}
 			} else {
-				arc.getSource().select();
-				arc.getTarget().select();
-				justSelected = true;
+				getPopup(e);
+				super.mousePressed(e);
 			}
 		}
 	}

@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import dk.aau.cs.model.NTA.trace.TraceToken;
+import pipe.gui.CreateGui;
+
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
@@ -56,37 +59,46 @@ public class NetworkMarking implements TimedMarking {
 //	}
 
 	public boolean isDelayPossible(BigDecimal delay) {
-		for(List<TimedToken> listOfTokens: sharedPlacesTokens.values()){
-			for(TimedToken token : listOfTokens){
-				TimeInvariant invariant = token.place().invariant();
-				if (!invariant.isSatisfied(token.age().add(delay))) {
-					return false;
+		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
+			if(CreateGui.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
+				for(TimedToken token : entry.getValue()){
+					TimeInvariant invariant = token.place().invariant();
+					if (!invariant.isSatisfied(token.age().add(delay))) {
+						return false;
+					}
 				}
 			}
 		}
 		
-		for (LocalTimedMarking marking : markings.values()) {
-			if (!marking.isDelayPossible(delay))
-				return false;
+		
+		for(Entry<TimedArcPetriNet, LocalTimedMarking> pair : markings.entrySet()){
+			if(pair.getKey().isActive()){
+				if (!pair.getValue().isDelayPossible(delay))
+					return false;
+			}
 		}
 		return true;
 	}
 	
 	public List<TimedPlace> getBlockingPlaces(BigDecimal delay){
 		List<TimedPlace> result = new ArrayList<TimedPlace>();
-		for(List<TimedToken> listOfTokens: sharedPlacesTokens.values()){
-			for(TimedToken token : listOfTokens){
-				TimeInvariant invariant = token.place().invariant();
-				if (!invariant.isSatisfied(token.age().add(delay))) {
-					if(!result.contains(token.place())){
-						result.add(token.place());
+		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
+			if(CreateGui.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
+				for(TimedToken token : entry.getValue()){
+					TimeInvariant invariant = token.place().invariant();
+					if (!invariant.isSatisfied(token.age().add(delay))) {
+						if(!result.contains(token.place())){
+							result.add(token.place());
+						}
 					}
 				}
 			}
 		}
 		
-		for (LocalTimedMarking marking : markings.values()) {
-			result.addAll(marking.getBlockingPlaces(delay));
+		for(Entry<TimedArcPetriNet, LocalTimedMarking> pair : markings.entrySet()){
+			if(pair.getKey().isActive()){
+				result.addAll(pair.getValue().getBlockingPlaces(delay));
+			}
 		}
 
 		return result;
@@ -106,7 +118,9 @@ public class NetworkMarking implements TimedMarking {
 		}
 		
 		for (Entry<TimedArcPetriNet, LocalTimedMarking> entry : markings.entrySet()) {
-			newMarking.addMarking(entry.getKey(), entry.getValue().delay(amount));
+			if(entry.getKey().isActive()){
+				newMarking.addMarking(entry.getKey(), entry.getValue().delay(amount));
+			}
 		}
 		return newMarking;
 	}
@@ -238,7 +252,15 @@ public class NetworkMarking implements TimedMarking {
 		TimedPlace place = token.place();
 		if(place.isShared()){
 			if(sharedPlacesTokens.containsKey(place)){
-				sharedPlacesTokens.get(place).remove(token);
+				List<TimedToken> tokens = sharedPlacesTokens.get(place); 
+				if(!tokens.remove(token) && token instanceof TraceToken){
+					for(TimedToken t : tokens){
+						if(t.age().compareTo(token.age()) >= 0){
+							tokens.remove(t);
+							break;
+						}
+					}
+				}
 			}
 		}else{
 			getMarkingFor(((LocalTimedPlace)place).model()).remove(token); // TODO: this is ugly but only way to obtain the model?

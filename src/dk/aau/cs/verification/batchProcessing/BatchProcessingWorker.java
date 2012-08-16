@@ -41,6 +41,7 @@ import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.SymmetryOption;
@@ -147,7 +148,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private void processQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
-		fireVerificationTaskStarted();
 		if(queryToVerify.isActive()) { 
 			VerificationResult<TimedArcPetriNetTrace> verificationResult = verifyQuery(file, composedModel, queryToVerify);
 			
@@ -166,9 +166,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			TCTLAbstractProperty property = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getProperty() : generateSearchWholeStateSpaceProperty(model);
 			boolean symmetry = batchProcessingVerificationOptions.symmetry() == SymmetryOption.KeepQueryOption ? query.useSymmetry() : getSymmetryFromBatchProcessingOptions();
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
-			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space"; 
+			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry,  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
@@ -251,7 +251,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		VerificationOptions options = getVerificationOptionsFromQuery(query);
 		modelChecker = getModelChecker(query);
-		
+		fireVerificationTaskStarted();
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
 		return verificationResult;
 	}
@@ -271,12 +271,14 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private ModelChecker getModelChecker(pipe.dataLayer.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return getVerifyTAPN();
+		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
+			return getVerifyTAPNDiscreteVerification();
 		else
 			return getVerifyta();
 	}
 
 	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
@@ -297,6 +299,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
 		verifytapn.setup();
 		return verifytapn;
+	}
+	
+	private static VerifyTAPNDiscreteVerification getVerifyTAPNDiscreteVerification() {
+		VerifyTAPNDiscreteVerification verifytapnDiscreteVerification = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+		verifytapnDiscreteVerification.setup();
+		return verifytapnDiscreteVerification;
 	}
 	
 	private LoadedBatchProcessingModel loadModel(File modelFile) {

@@ -23,6 +23,17 @@ public class VerifyTAPNIconSelector extends IconSelector {
 			if(!result.isQuerySatisfied()) return notSatisfiedIcon;
 			else if(result.isQuerySatisfied() && result.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return satisfiedIcon;
 			break;
+		case AF:
+			if(!result.isQuerySatisfied() && result.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)){
+				return notSatisfiedIcon;
+			} else if(result.isQuerySatisfied() && result.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)){
+				return satisfiedIcon;
+			}
+			break;
+		case EG:
+			if(result.isQuerySatisfied() && result.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return satisfiedIcon;
+			else if(!result.isQuerySatisfied() && result.boundednessAnalysis().boundednessResult().equals(Boundedness.Bounded)) return notSatisfiedIcon;
+			break;
 		default:
 			return null;
 		}

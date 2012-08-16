@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 import pipe.gui.CreateGui;
 import pipe.gui.FileFinder;
@@ -28,17 +29,22 @@ public class EngineDialogPanel {
 	private EscapableDialog dialog;
 	private JPanel enginePanel;
 	private JPanel tapaalPanel;
+	private JPanel tapaalDiscretePanel;
 	private JPanel uppaalPanel;
 	
 	JButton closeButton;
 	
 	JLabel tapaalLocationLabel = new JLabel("Located: ");
 	JLabel tapaalVersionLabel = new JLabel("Version: ");
+	JLabel dtapaalLocationLabel = new JLabel("Located: ");
+	JLabel dtapaalVersionLabel = new JLabel("Version: ");
 	JLabel uppaalLocationLabel = new JLabel("Located: ");
 	JLabel uppaalVersionLabel = new JLabel("Version: ");
 	
 	JLabel tapaalLocationLabelVal = new JLabel("Not setup");
 	JLabel tapaalVersionLabelVal = new JLabel("N/A");
+	JLabel dtapaalLocationLabelVal = new JLabel("Not setup");
+	JLabel dtapaalVersionLabelVal = new JLabel("N/A");
 	JLabel uppaalLocationLabelVal = new JLabel("Not setup");
 	JLabel uppaalVersionLabelVal = new JLabel("N/A");
 	
@@ -57,6 +63,7 @@ public class EngineDialogPanel {
 	public void initComponents() {
 		makeTapaalPanel();
 		makeUppaalPanel();
+		makeDiscreteTapaalPanel();
 		makeEnginePanel();
 		setPathsAndVersionNumbers();
 	}	
@@ -80,6 +87,30 @@ public class EngineDialogPanel {
 		if (verifytapnpath != null) {
 			VerifyTAPN verifyTapn = new VerifyTAPN(fileFinder,messenger);
 			verifyTapn.setVerifyTapnPath(verifytapnpath);
+			setPathsAndVersionNumbers();
+			fitDialog();
+		}
+	}
+	
+	private void selectdTapnEngine() {
+		FileFinder fileFinder = new FileFinderImpl();
+		MessengerImpl messenger = new MessengerImpl();
+		String verifytapnpath = null;
+		try {
+			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "");
+			if(file != null){
+				if(true){//file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
+					verifytapnpath = file.getAbsolutePath();
+				}else{
+					messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
+				}
+			}
+		} catch (Exception e) {
+			messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
+		}
+		if (verifytapnpath != null) {
+			VerifyTAPNDiscreteVerification verifyTapn = new VerifyTAPNDiscreteVerification(fileFinder,messenger);
+			verifyTapn.setVerifydTapnPath(verifytapnpath);
 			setPathsAndVersionNumbers();
 			fitDialog();
 		}
@@ -122,6 +153,11 @@ public class EngineDialogPanel {
 		setPathsAndVersionNumbers();
 	}
 	
+	private void resetVerifydtapnEngine() {
+		VerifyTAPNDiscreteVerification.reset();
+		setPathsAndVersionNumbers();
+	}
+	
 	private void fitDialog() {
 		if (dialog != null) {
 			dialog.pack();
@@ -153,8 +189,21 @@ public class EngineDialogPanel {
 		} else {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
+		
+		VerifyTAPNDiscreteVerification verifydTAPN = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+		String verifydtapnPath = verifydTAPN.getPath();
+		String verifydtapnversion = "";
+
+		if (verifydtapnPath == null || verifydtapnPath.isEmpty()) {
+			verifydtapnPath = "Not setup";
+			verifydtapnversion = "N/A";
+		} else {
+			verifydtapnversion = verifydTAPN.getVersion();
+		}
 		tapaalLocationLabelVal.setText(verifytapnPath);
 		tapaalVersionLabelVal.setText(verifytapnversion);
+		dtapaalLocationLabelVal.setText(verifydtapnPath);
+		dtapaalVersionLabelVal.setText(verifydtapnversion);
 		uppaalLocationLabelVal.setText(verifytaPath);
 		uppaalVersionLabelVal.setText(verifytaversion);
 		fitDialog();
@@ -244,6 +293,92 @@ public class EngineDialogPanel {
 		gbc.insets = panelInsets;
 		tapaalPanel.add(tapaalButtonPanel,gbc);
 	}
+	
+	private void makeDiscreteTapaalPanel() {
+		//make tapaal panel
+		tapaalDiscretePanel = new JPanel();
+		tapaalDiscretePanel.setBorder(BorderFactory.createTitledBorder("Discrete TAPAAL Engine (verifydtapn) Information"));
+		tapaalDiscretePanel.setLayout(new GridBagLayout());
+
+		//add info panel to tapaal panel
+		JPanel tapaalDiscreteInfoPanel = new JPanel();
+		tapaalDiscreteInfoPanel.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		
+		JPanel p = new JPanel(new FlowLayout());
+		p.add(dtapaalLocationLabel);
+		p.add(dtapaalLocationLabelVal);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		tapaalDiscreteInfoPanel.add(p,gbc);
+
+		p = new JPanel(new FlowLayout());
+		p.add(dtapaalVersionLabel);
+		p.add(dtapaalVersionLabelVal);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		tapaalDiscreteInfoPanel.add(p,gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = smallPanelInsets;
+		tapaalDiscretePanel.add(tapaalDiscreteInfoPanel,gbc);
+
+		//add TapaalButtonPanel to  tapaalpanel
+		JButton SelectButton = new JButton("Select");
+		SelectButton.setMnemonic(KeyEvent.VK_E);
+		SelectButton.setToolTipText(toolTipSelect);
+		JButton ResetButton = new JButton("Reset");
+		ResetButton.setToolTipText(toolTipReset);
+		ResetButton.setMnemonic(KeyEvent.VK_T);
+		SelectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectdTapnEngine();
+			}
+		});
+		ResetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				resetVerifydtapnEngine();
+			}
+		});
+		JPanel ButtonPanel = new JPanel();
+		ButtonPanel.setLayout(new GridBagLayout());
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;		
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		ButtonPanel.add(SelectButton,gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.insets = buttonInsets;
+		gbc.anchor = GridBagConstraints.EAST;		
+		ButtonPanel.add(ResetButton,gbc);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = panelInsets;
+		tapaalDiscretePanel.add(ButtonPanel,gbc);
+	}
+
 
 	private void makeUppaalPanel() {
 		//make uppaal panel
@@ -354,6 +489,15 @@ public class EngineDialogPanel {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = panelInsets;
+		enginePanel.add(tapaalDiscretePanel,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.insets = panelInsets;
 		enginePanel.add(uppaalPanel,gbc);
 		
 		JPanel closeButtonPanel = new JPanel();
@@ -373,7 +517,7 @@ public class EngineDialogPanel {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(0,5,2,5);
 		enginePanel.add(closeButtonPanel,gbc);	

@@ -33,5 +33,4 @@ public class TimeDelayStep implements TimedArcPetriNetStep {
 		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
 		return df;
 	}
-
 }

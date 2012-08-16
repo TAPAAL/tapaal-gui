@@ -32,7 +32,10 @@ import javax.swing.event.ChangeListener;
 
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.gui.undo.UndoManager;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -51,12 +54,14 @@ public class GuardDialogue extends JPanel /*
 	private static final long serialVersionUID = 4582651236913407101L;
 	private JRootPane myRootPane;
 	private JPanel guardEditPanel;
+	private JPanel weightEditPanel;
 	private JPanel buttonPanel;
 
 	private JButton okButton;
 	private JButton cancelButton;
 
 	private JLabel label;
+	private JSpinner weightNumber;
 	private JSpinner firstIntervalNumber;
 	private JSpinner secondIntervalNumber;
 
@@ -69,6 +74,8 @@ public class GuardDialogue extends JPanel /*
 	private WidthAdjustingComboBox leftConstantsComboBox;
 	private JCheckBox rightUseConstant;
 	private WidthAdjustingComboBox rightConstantsComboBox;
+	private JCheckBox weightUseConstant;
+	private WidthAdjustingComboBox weightConstantsComboBox;
 	
 	private int maxNumberOfPlacesToShowAtOnce = 20;
 
@@ -76,12 +83,20 @@ public class GuardDialogue extends JPanel /*
 		myRootPane = rootPane;
 		setLayout(new GridBagLayout());
 
-		initTimeGuardPanel();
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+			initTimeGuardPanel();
+		}
+		
+		initWeightPanel();
 		initButtonPanel(objectToBeEdited);
 
 		myRootPane.setDefaultButton(okButton);
-
-		setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
+		
+		if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+			setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
+		}
+		// Weights
+		weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight());
 	}
 
 
@@ -100,12 +115,15 @@ public class GuardDialogue extends JPanel /*
 		
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				TimedInputArcComponent arc = (TimedInputArcComponent) objectToBeEdited;
+				TimedOutputArcComponent arc = (TimedOutputArcComponent) objectToBeEdited;
 				UndoManager undoManager = CreateGui.getView().getUndoManager();
 				undoManager.newEdit();
 
-				dk.aau.cs.model.tapn.TimeInterval guard = composeGuard(arc.getGuard());
-				undoManager.addEdit(arc.setGuard(guard));
+				dk.aau.cs.model.tapn.TimeInterval guard  = null;
+				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
+					guard = composeGuard(arc.getGuard());
+				}
+				undoManager.addEdit(arc.setGuardAndWeight(guard, (Integer) weightNumber.getValue()));
 				CreateGui.getCurrentTab().network().buildConstraints();
 				exit();
 			}
@@ -176,6 +194,99 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints.anchor = GridBagConstraints.CENTER;
 		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
 		add(buttonPanel, gridBagConstraints);
+	}
+	
+	private void initWeightPanel() {
+		weightEditPanel = new JPanel(new GridBagLayout());
+		weightEditPanel.setBorder(BorderFactory.createTitledBorder("Weight"));
+		
+		label = new JLabel("Weight:");
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(label, gridBagConstraints);
+		
+		Dimension intervalBoxDims = new Dimension(190, 25);
+
+		weightNumber = new JSpinner();
+		weightNumber.setPreferredSize(intervalBoxDims);
+		weightNumber.addChangeListener(new ChangeListener() {
+			
+			
+			public void stateChanged(ChangeEvent e) {
+				if((Integer) weightNumber.getValue() < 1){
+					weightNumber.setValue(1);
+				}
+			}
+		});
+		
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(weightNumber, gridBagConstraints);
+		
+
+		Set<String> constants = CreateGui.getCurrentTab().network()
+		.getConstantNames();
+		String[] constantArray = constants.toArray(new String[constants.size()]);
+	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
+	    
+	    weightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+		weightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+		weightConstantsComboBox.setMaximumRowCount(20);
+		weightConstantsComboBox.setVisible(false);
+		weightConstantsComboBox.setPreferredSize(intervalBoxDims);
+		weightConstantsComboBox.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					
+					//TODO save selection
+				}
+			}
+		});
+		
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		weightEditPanel.add(weightConstantsComboBox, gridBagConstraints);
+		
+		
+		boolean enableConstantsCheckBoxes = !constants.isEmpty();
+		weightUseConstant = new JCheckBox("Use Constant                    ");
+		weightUseConstant.setEnabled(enableConstantsCheckBoxes);
+		weightUseConstant.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				weightConstantsComboBox.setVisible(weightUseConstant.isSelected());
+				weightNumber.setVisible(!weightUseConstant.isSelected());
+			}
+		});
+
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
+		//weightEditPanel.add(weightUseConstant, gridBagConstraints);
+		
+		// hack to ensure the content stays on the left
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(3, 3, 3, 3);
+		weightEditPanel.add(new JLabel(""), gridBagConstraints);
+		
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		add(weightEditPanel, gridBagConstraints);
 	}
 
 	private void initTimeGuardPanel() {
@@ -522,6 +633,41 @@ public class GuardDialogue extends JPanel /*
 					.getValue()));
 		}
 		return firstValue;
+	}
+	
+	private void updateWeightConstantComboBox() {
+		int value = getFirstValue();
+
+		String oldWeight = weightConstantsComboBox.getSelectedItem() != null ? weightConstantsComboBox
+				.getSelectedItem().toString()
+				: null;
+				weightConstantsComboBox.removeAllItems();
+				Collection<Constant> constants = CreateGui.getCurrentTab().network()
+						.constants();
+
+				//List <Constant> constantList = new ArrayList(constants);
+				List <Constant> constantList = new ArrayList<Constant>();
+				constantList.addAll(constants);
+
+				Collections.sort(constantList,new Comparator<Constant>() {
+					public int compare(Constant o1, Constant o2) {
+						return o1.name().compareToIgnoreCase(o2.name());
+					}
+				});
+
+
+				for (Constant c : constantList) {
+					if (c.value() >= value) {
+						weightConstantsComboBox.addItem(c.name());
+					}
+				}
+
+				// if(rightConstantsComboBox.getItemCount() == 0){
+				// rightUseConstant.setEnabled(false);
+				// }
+
+				if (oldWeight != null)
+					weightConstantsComboBox.setSelectedItem(oldWeight);
 	}
 
 	private void updateRightConstantComboBox() {

@@ -12,14 +12,15 @@ import java.util.prefs.BackingStoreException;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 public class Preferences {
-
 	private static Preferences instance = null;
 	private static java.util.prefs.Preferences pref;
 
-	protected Preferences() {
-		// Exists only to defeat instantiation.
-		pref = java.util.prefs.Preferences.userNodeForPackage(this.getClass());
-	}
+        protected Preferences() {
+	      // Exists only to defeat instantiation.
+		   pref = java.util.prefs.Preferences.userNodeForPackage(this.getClass());
+		   // Set subtree to version specific node
+		   pref = pref.node(pref.absolutePath() + TAPAAL.VERSION);
+	   }
 
 	public void clear(){
 		try {
@@ -59,6 +60,20 @@ public class Preferences {
 
 	public void setVerifytapnLocation(String location) {
 		final String key = "verifytapn.location";
+
+		if (location == null || location.equals("")){
+			pref.remove(key);
+		}else {
+			pref.put(key, location);   
+		}
+	}
+	
+	public String getVerifydtapnLocation() {
+		return pref.get("dverifytapn.location", "");
+	}
+
+	public void setVerifydtapnLocation(String location) {
+		final String key = "dverifytapn.location";
 
 		if (location == null || location.equals("")){
 			pref.remove(key);

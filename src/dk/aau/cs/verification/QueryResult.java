@@ -1,7 +1,5 @@
 package dk.aau.cs.verification;
 
-
-
 public class QueryResult {
 	private boolean satisfied = false;
 	private boolean discreteInclusion = false;
@@ -38,8 +36,8 @@ public class QueryResult {
 	
 	private boolean shouldAddExplanation() {
 		return (queryType.equals(QueryType.EF) && !isQuerySatisfied()) 
-		|| (queryType.equals(QueryType.EG) && isQuerySatisfied()) 
-		|| (queryType.equals(QueryType.AF) && !isQuerySatisfied())
+		|| (queryType.equals(QueryType.EG)) // && !isQuerySatisfied()) 
+		|| (queryType.equals(QueryType.AF)) // && isQuerySatisfied())
 		|| (queryType.equals(QueryType.AG) && isQuerySatisfied());
 	}
 	

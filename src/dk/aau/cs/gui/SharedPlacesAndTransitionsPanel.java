@@ -136,7 +136,7 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 			public void componentShown(ComponentEvent e) {
 			}
 			
-			@Override
+			
 			public void componentResized(ComponentEvent e) {
 				if(SharedPlacesAndTransitionsPanel.this.getSize().height <= minimumHegiht){
 					sortButton.setVisible(false);
@@ -145,11 +145,11 @@ public class SharedPlacesAndTransitionsPanel extends JPanel {
 				}
 			}
 			
-			@Override
+		
 			public void componentMoved(ComponentEvent e) {
 			}
 			
-			@Override
+			
 			public void componentHidden(ComponentEvent e) {
 			}
 		});

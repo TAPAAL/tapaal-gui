@@ -392,5 +392,32 @@ public class TimedArcPetriNetNetwork {
 		for(SharedTransition p : oldOrder){
 			sharedTransitions.add(p);
 		}
+	}	
+
+	public boolean hasWeights() {
+		for(TimedArcPetriNet t : tapns){
+			if(t.hasWeights()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isNonStrict(){
+		for(TimedArcPetriNet t : tapns){
+			if(t.isNonStrict()){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
+		for(TimedArcPetriNet tapn : this.activeTemplates()){
+			for(TimedPlace timedPlace : tapn.places()){
+				if(timedPlace.equals(place)) return true;
+			}
+		}
+		return false;
 	}
 }

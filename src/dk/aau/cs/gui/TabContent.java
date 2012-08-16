@@ -4,8 +4,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.XMLEncoder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +26,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
+import org.jdesktop.swingx.MultiSplitLayout.Node;
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import pipe.dataLayer.DataLayer;
@@ -112,7 +118,11 @@ public class TabContent extends JSplitPane {
 		this.setDividerSize(8);	
 
 	}
-
+	
+	public TemplateExplorer getTemplateExplorer(){
+		return templateExplorer;
+	}
+	
 	public void createEditorLeftPane() {
 		boolean enableAddButton = getModel() == null ? true : !getModel()
 				.netType().equals(NetType.UNTIMED);
@@ -154,9 +164,16 @@ public class TabContent extends JSplitPane {
 			// (bug in the swingx package)
 			editorModelroot.setParent(new Split());
 			floatingDividers = true;
+		} else {
+			for(Node n : editorModelroot.getChildren()){
+				if(n instanceof Leaf){
+					n.setWeight(0);
+				}
+			}
 		}
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
 		
 		editorSplitPane.setSize(editorModelroot.getBounds().width, editorModelroot.getBounds().height);
 		
@@ -257,6 +274,8 @@ public class TabContent extends JSplitPane {
 				.createCompoundBorder(
 						BorderFactory.createTitledBorder("Simulation History"),
 						BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+		//Add 10 pixel to the minimumsize of the scrollpane
+		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
 	}
 
 	private void createAnimatorSplitPane(NetType netType) {
@@ -367,8 +386,8 @@ public class TabContent extends JSplitPane {
 		templateExplorer.switchToEditorMode();
 
 		this.setLeftComponent(editorSplitPane);
-		
-		this.validate();
+
+		drawingSurface.repaintAll();
 	}
 
 	public AnimationHistoryComponent getUntimedAnimationHistory() {
@@ -419,7 +438,7 @@ public class TabContent extends JSplitPane {
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		animationControlsPanel.add(animationHistoryScrollPane, gbc);
-		this.repaint();
+		animatorSplitPane.validate();
 
 	}
 

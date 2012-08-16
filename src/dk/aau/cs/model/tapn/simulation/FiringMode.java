@@ -5,5 +5,5 @@ import java.util.List;
 import dk.aau.cs.model.tapn.TimedToken;
 
 public interface FiringMode {
-	TimedToken pickTokenFrom(List<TimedToken> elligibleTokens);
+	List<TimedToken> pickTokensFrom(List<TimedToken> elligibleTokens, int numberOfTokensToPick);
 }

@@ -34,4 +34,8 @@ public class NameMapping {
 	public String map(String templateName, String objectName) {
 		return originalToMappedNames.get(new Tuple<String, String>(templateName, objectName));
 	}
+	
+	public HashMap<String, Tuple<String, String>> getMappedToOrg(){
+		return mappedNamesToOriginalNames;
+	}
 }

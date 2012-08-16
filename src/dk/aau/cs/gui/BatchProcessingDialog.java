@@ -2,7 +2,6 @@ package dk.aau.cs.gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -11,7 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -22,6 +20,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -30,7 +29,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -38,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -59,6 +56,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -72,6 +71,7 @@ import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions.QueryPropertyOption;
@@ -87,6 +87,7 @@ public class BatchProcessingDialog extends JDialog {
 
 	private static final String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
 	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Engine w. Discrete Inclusion";
+	private static final String name_verifyTAPNDiscreteVerification = "TAPAAL Engine - Discrete Verification";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -95,12 +96,14 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
 			+ name_verifyTAPNDiscreteInclusion;
-	private static final String name_STANDARDWithLegend = "C: " + name_STANDARD;
-	private static final String name_OPTIMIZEDSTANDARDWithLegend = "D: "
+	private static final String name_verifyTAPNDiscreteVerificationWithLegend = "C: "
+			+ name_verifyTAPNDiscreteVerification;
+	private static final String name_STANDARDWithLegend = "D: " + name_STANDARD;
+	private static final String name_OPTIMIZEDSTANDARDWithLegend = "E: "
 			+ name_OPTIMIZEDSTANDARD;
-	private static final String name_BROADCASTWithLegend = "E: "
+	private static final String name_BROADCASTWithLegend = "F: "
 			+ name_BROADCAST;
-	private static final String name_BROADCASTDEG2WithLegend = "F: "
+	private static final String name_BROADCASTDEG2WithLegend = "G: "
 			+ name_BROADCASTDEG2;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
@@ -445,7 +448,7 @@ public class BatchProcessingDialog extends JDialog {
 		capacityLabel.setToolTipText(TOOL_TIP_CapacityLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(capacityLabel, gbc);
@@ -459,7 +462,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(numberOfExtraTokensInNet, gbc);
@@ -478,7 +481,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.anchor = GridBagConstraints.WEST;
 		verificationOptionsPanel.add(keepQueryCapacity, gbc);
@@ -489,7 +492,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutLabel.setToolTipText(TOOL_TIP_TimeoutLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 5;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
@@ -505,7 +508,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 5;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
@@ -524,7 +527,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 5;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
@@ -535,7 +538,7 @@ public class BatchProcessingDialog extends JDialog {
 		reductionLabel.setToolTipText(TOOL_TIP_ReductionLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(reductionLabel, gbc);
@@ -545,7 +548,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 1;
-		gbc.gridy = 3;
+		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		gbc.gridwidth = 2;
@@ -750,6 +753,13 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 		});
+		
+		// Enable sorting
+		Comparator<Object> comparator = new StringComparator();
+		
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+		sorter.setComparator(0, comparator);
+		table.setRowSorter(sorter);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane
@@ -1369,6 +1379,7 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox OPTIMIZEDSTANDARD;
 		private JCheckBox BROADCAST;
 		private JCheckBox BROADCASTDEG2;
+		private JCheckBox verifyTAPNDiscreteVerification;
 		
 		JButton selectAll;
 		JButton deselectAll;
@@ -1464,6 +1475,9 @@ public class BatchProcessingDialog extends JDialog {
 			//BROADCASTDEG2.setMnemonic('F');
 			BROADCASTDEG2.setEnabled(false);
 			
+			verifyTAPNDiscreteVerification = new JCheckBox(name_verifyTAPNDiscreteVerificationWithLegend);
+			verifyTAPNDiscreteVerification.setEnabled(false);
+			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 0;
@@ -1483,29 +1497,35 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.gridy = 2;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(STANDARD, gbc);
+			rightPanel.add(verifyTAPNDiscreteVerification, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 3;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			rightPanel.add(STANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCAST, gbc);
+			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 5;
-			gbc.insets = new Insets(0, 5, 5, 5);
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(BROADCAST, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 6;
+			gbc.insets = new Insets(0, 5, 5	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(BROADCASTDEG2, gbc);
-
 		}
 
 		private void initLeftPanel() {
@@ -1559,6 +1579,7 @@ public class BatchProcessingDialog extends JDialog {
 				OPTIMIZEDSTANDARD.setEnabled(false);
 				BROADCAST.setEnabled(false);
 				BROADCASTDEG2.setEnabled(false);
+				verifyTAPNDiscreteVerification.setEnabled(false);
 				selectAll.setEnabled(false);
 				deselectAll.setEnabled(false);
 			} else {
@@ -1569,6 +1590,7 @@ public class BatchProcessingDialog extends JDialog {
 				OPTIMIZEDSTANDARD.setEnabled(true);
 				BROADCAST.setEnabled(true);
 				BROADCASTDEG2.setEnabled(true);
+				verifyTAPNDiscreteVerification.setEnabled(true);
 				selectAll.setEnabled(true);
 				deselectAll.setEnabled(true);
 			}
@@ -1581,12 +1603,16 @@ public class BatchProcessingDialog extends JDialog {
 			OPTIMIZEDSTANDARD.setSelected(selected);
 			BROADCAST.setSelected(selected);
 			BROADCASTDEG2.setSelected(selected);
+			verifyTAPNDiscreteVerification.setSelected(selected);
 		}
 		
 		public List<ReductionOption> getChoosenOptions(){
 			ArrayList<ReductionOption> result = new ArrayList<ReductionOption>();
 			if(verifyTAPN.isSelected()){
 				result.add(ReductionOption.VerifyTAPN);
+			}
+			if(verifyTAPNDiscreteVerification.isSelected()){
+				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
 			}
 			if(STANDARD.isSelected()){
 				result.add(ReductionOption.STANDARD);

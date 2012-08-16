@@ -1,5 +1,6 @@
 package pipe.gui;
 
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
@@ -12,6 +13,7 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
@@ -57,11 +59,13 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		} else {
-			return new VerificationResult<TAPNNetworkTrace>(
+			VerificationResult<TAPNNetworkTrace> value =  new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime(),
 					result.stats());
+			value.setNameMapping(transformedModel.value2());
+			return value;
 		}		
 	}
 	
@@ -94,7 +98,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				showErrorMessage(e.getMessage());
 				return;
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				if(!(e.getCause() instanceof UnsupportedModelException)){
+					e.printStackTrace();
+				}
 				showErrorMessage(e.getMessage());
 				return;
 			}

@@ -181,11 +181,13 @@ public class AnimationController extends JPanel {
 			    final int defaultInitalDelay = ToolTipManager.sharedInstance().getInitialDelay();
 			    final int defaultReshowDelay = ToolTipManager.sharedInstance().getReshowDelay();
 			    final int dismissDelayMinutes = Integer.MAX_VALUE;
+			    
 			    @Override
 			    public void mouseEntered(MouseEvent e) {
 			        ToolTipManager.sharedInstance().setDismissDelay(dismissDelayMinutes);
 			        ToolTipManager.sharedInstance().setInitialDelay(0);
 			        ToolTipManager.sharedInstance().setReshowDelay(0);
+			        ToolTipManager.sharedInstance().setEnabled(true);
 			    }
 			    
 			    @Override
@@ -193,6 +195,7 @@ public class AnimationController extends JPanel {
 			        ToolTipManager.sharedInstance().setDismissDelay(defaultDismissTimeout);
 			        ToolTipManager.sharedInstance().setInitialDelay(defaultInitalDelay);
 			        ToolTipManager.sharedInstance().setReshowDelay(defaultReshowDelay);
+			        ToolTipManager.sharedInstance().setEnabled(CreateGui.getApp().isShowingToolTips());
 			    }
 			});
 

@@ -112,6 +112,18 @@ public class TemplateExplorer extends JPanel {
 		init(hideButtons);
 	}
 	
+	public void selectPrevious(){
+		int index = templateList.getSelectedIndex()-1;
+		if(index == -1)	index = listModel.getSize()-1;
+		templateList.setSelectedIndex(index);
+	}
+	
+	public void selectNext(){
+		int index = templateList.getSelectedIndex()+1;
+		if(index == listModel.size())	index = 0;
+		templateList.setSelectedIndex(index);
+	}
+	
 	public Integer indexOfSelectedTemplate() {
 		return new Integer(templateList.getSelectedIndex());
 	}
@@ -135,7 +147,7 @@ public class TemplateExplorer extends JPanel {
 			public void componentShown(ComponentEvent e) {
 			}
 			
-			@Override
+			
 			public void componentResized(ComponentEvent e) {
 				
 				if(!isInAnimationMode){
@@ -147,11 +159,11 @@ public class TemplateExplorer extends JPanel {
 				}
 			}
 			
-			@Override
+			
 			public void componentMoved(ComponentEvent e) {
 			}
 			
-			@Override
+			
 			public void componentHidden(ComponentEvent e) {
 			}
 		});
@@ -218,6 +230,8 @@ public class TemplateExplorer extends JPanel {
 		//templateList.setFocusTraversalKeysEnabled(false);
 
 		scrollpane = new JScrollPane(templateList);
+		//Add 10 pixel to the minimumsize of the scrollpane
+		scrollpane.setMinimumSize(new Dimension(scrollpane.getMinimumSize().width, scrollpane.getMinimumSize().height + 20));
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -238,7 +252,10 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index > 0) {
 					parent.swapTemplates(index, index-1);
-					updateTemplateList();
+					Object o = listModel.getElementAt(index);
+                    listModel.setElementAt(listModel.getElementAt(index-1), index);
+                    listModel.setElementAt(o, index-1);
+                    templateList.ensureIndexIsVisible(index+1);
 					templateList.setSelectedIndex(index-1);
 				}
 			}
@@ -259,7 +276,10 @@ public class TemplateExplorer extends JPanel {
 				
 				if(index < parent.network().allTemplates().size() - 1) {
 					parent.swapTemplates(index, index+1);
-					updateTemplateList();
+					Object o = listModel.getElementAt(index);
+                    listModel.setElementAt(listModel.getElementAt(index+1), index);
+                    listModel.setElementAt(o, index+1);
+                    templateList.ensureIndexIsVisible(index+1);
 					templateList.setSelectedIndex(index+1);
 				}
 			}
@@ -779,16 +799,27 @@ public class TemplateExplorer extends JPanel {
 	}
 
 	public void updateTemplateList() {
-		listModel.clear();
+		int selectedIndex = templateList.getSelectedIndex();
+		DefaultListModel newList = new DefaultListModel();
+		
 		if(isInAnimationMode) {
 			for (Template net : parent.activeTemplates()) {
-				listModel.addElement(net);
+				newList.addElement(net);
 			}
 		} else {
 			for (Template net : parent.allTemplates()) {
-				listModel.addElement(net);
+				newList.addElement(net);
 			}
 		}
+		// When removing a component, the listModel has already been updated but the index is invalid (-1), thus we select the last component as the active one
+		// When adding a component, this function updates the listModel thus it has a new length and the index should be corrected accordingly
+		templateList.setSelectedIndex(selectedIndex);
+		if(newList.size() != listModel.size() || selectedIndex == -1){
+			selectedIndex = newList.size()-1;
+		}
+		listModel = newList;
+		templateList.setModel(listModel);
+		templateList.setSelectedIndex(selectedIndex);
 	}
 	
 	public void selectFirst() {

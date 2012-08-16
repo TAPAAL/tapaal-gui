@@ -33,6 +33,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
 
@@ -158,6 +159,7 @@ public class CreateGui {
 		appGui.activateSelectAction();
 		Verifyta.trySetup();
 		VerifyTAPN.trySetup();
+		VerifyTAPNDiscreteVerification.trySetup();
 
 		checkForUpdate(false);
 	}
