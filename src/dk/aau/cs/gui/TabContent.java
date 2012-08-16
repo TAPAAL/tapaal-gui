@@ -164,13 +164,7 @@ public class TabContent extends JSplitPane {
 			// (bug in the swingx package)
 			editorModelroot.setParent(new Split());
 			floatingDividers = true;
-		} else {
-			for(Node n : editorModelroot.getChildren()){
-				if(n instanceof Leaf){
-					n.setWeight(0);
-				}
-			}
-		}
+		} 
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
 		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
