@@ -743,6 +743,7 @@ public class GuiFrame extends JFrame implements Observer {
 		//Queries and enabled transitions should always be shown
 		showQueries(true);
 		showEnabledTransitionsList(true);
+		showToolTips(true);
 		CreateGui.getCurrentTab().setResizeingDefault();
 		if(!CreateGui.showZeroToInfinityIntervals()){
 			showZeroToInfinityIntervalsCheckBox.doClick();
