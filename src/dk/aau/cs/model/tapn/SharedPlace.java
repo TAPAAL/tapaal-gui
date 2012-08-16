@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import pipe.dataLayer.Template;
+import pipe.gui.CreateGui;
+
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
@@ -141,8 +144,15 @@ public class SharedPlace implements TimedPlace{
 		}
 	}
 	
-	public boolean hasInstantiations(){
-		return listeners.size() >0;
+	public ArrayList<String> getComponentsUsingThisPlace(){
+		ArrayList<String> components = new ArrayList<String>();
+		for(Template t : CreateGui.getCurrentTab().allTemplates()){
+			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
+			if(tp != null){
+				components.add(t.model().name());
+			}
+		}
+		return components;
 	}
 	
 	@Override
