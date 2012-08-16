@@ -74,8 +74,8 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 
 public class SharedPlacesAndTransitionsPanel extends JPanel {
-	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition may be used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
-	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place may be used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
+	private static final String TRANSITION_IS_USED_MESSAGE = "<html>The shared transition is used in one or more components.<br/>TAPAAL will unshare all transitions under this name,<br/>but leave the transitions in the components.</html>";
+	private static final String PLACE_IS_USED_MESSAGE = "<html>The shared place is used in one or more components.<br/>TAPAAL will unshare all places under this name,<br/>but leave the places in the components.</html>";
 
 	private static final long serialVersionUID = 1L;
 	private static final String TRANSITIONS = "Transitions";
