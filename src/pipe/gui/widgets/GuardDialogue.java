@@ -472,7 +472,7 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
 		rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		rightConstantsComboBox.setModel(new DefaultComboBoxModel(constants.toArray()));
+		rightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
 		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
 	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
@@ -724,9 +724,11 @@ public class GuardDialogue extends JPanel /*
 					}
 				}
 
-				// if(rightConstantsComboBox.getItemCount() == 0){
-				// rightUseConstant.setEnabled(false);
-				// }
+				if(rightConstantsComboBox.getItemCount() == 0){
+					rightUseConstant.setEnabled(false);
+				} else {
+					rightUseConstant.setEnabled(true);
+				}
 
 				if (oldRight != null)
 					rightConstantsComboBox.setSelectedItem(oldRight);
