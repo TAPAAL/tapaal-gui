@@ -215,6 +215,10 @@ public class TimedArcPetriNetNetwork {
 			for (TimedInhibitorArc inhibArc : tapn.inhibitorArcs()) {
 				updateTimeIntervalAndWeight(oldName, newConstant, inhibArc.interval(), inhibArc.getWeight());
 			}
+			
+			for (TimedOutputArc outputArc : tapn.outputArcs()) {
+				updateWeight(oldName, newConstant, outputArc.getWeight());
+			}
 		}
 
 	}
