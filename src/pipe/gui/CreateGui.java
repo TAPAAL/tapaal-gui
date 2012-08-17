@@ -26,6 +26,7 @@ import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
 import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
@@ -131,6 +132,20 @@ public class CreateGui {
 		Grid.enableGrid();
 
 		appTab = new JTabbedPane();
+		
+		//TODO
+		/*
+		appTab.addChangeListener(new ChangeListener() {
+			int oldIndex = 0;
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				Split model = getTab(oldIndex).getModelRoot();
+				getCurrentTab().setModelRoot(model);
+				oldIndex = appTab.getSelectedIndex();
+			}
+		});
+		*/
+		
 
 		animator = new Animator();
 
@@ -207,8 +222,8 @@ public class CreateGui {
 
 	}
 
-	public static int getFreeSpace() {
-		tabs.add(new TabContent());
+	public static int getFreeSpace(NetType netType) {
+		tabs.add(new TabContent(netType));
 		return tabs.size() - 1;
 	}
 
@@ -248,7 +263,7 @@ public class CreateGui {
 	/** Creates a new animationHistory text area, and returns a reference to it */
 	public static void switchToAnimationComponents() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		tab.switchToAnimationComponents();
+		tab.switchToAnimationComponents(true);
 	}
 
 	public static void switchToEditorComponents() {

@@ -100,7 +100,7 @@ public class AnimationController extends JPanel {
 	AnimateAction startAction, stepforwardAction, stepbackwardAction,
 			randomAction, randomAnimateAction, timeAction;
 
-	public AnimationController() {
+	public AnimationController(NetType netType) {
 		startAction = CreateGui.appGui.startAction;
 
 		stepbackwardAction = CreateGui.appGui.stepbackwardAction;
@@ -147,7 +147,7 @@ public class AnimationController extends JPanel {
 		c.gridy = 1;
 		add(animationToolBar, c);
 
-		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+		if (!netType.equals(NetType.UNTIMED)) {
 			JPanel firemode = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 			JLabel label = new JLabel("Token selection: ");

@@ -1,6 +1,7 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Checkbox;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
@@ -68,6 +69,10 @@ import javax.swing.event.ChangeListener;
 import org.jdesktop.swingx.MultiSplitLayout;
 
 import net.tapaal.Preferences;
+import org.jdesktop.swingx.MultiSplitLayout;
+
+import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+
 import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.DataLayer;
@@ -125,7 +130,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
 	exportPSAction, exportToTikZAction;
-	
+
 	private VerificationAction runUppaalVerification;
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
@@ -136,12 +141,12 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
-	
+
 	private JMenuItem statistics;
 	private JMenuItem verification;
-	
+
 	private TypeAction timedArcAction;
 	private TypeAction transportArcAction;
 
@@ -156,6 +161,13 @@ public class GuiFrame extends JFrame implements Observer {
 	public enum GUIMode {
 		draw, animation, noNet
 	}
+	
+	private JCheckBoxMenuItem showZeroToInfinityIntervalsCheckBox;
+	private JCheckBoxMenuItem showComponentsCheckBox;
+	private JCheckBoxMenuItem showQueriesCheckBox;
+	private JCheckBoxMenuItem showEnabledTransitionsCheckBox;
+	private JCheckBoxMenuItem showConstantsCheckBox;
+	private JCheckBoxMenuItem showToolTipsCheckBox;
 
 	private boolean showComponents = true;
 	private boolean showConstants = true;
@@ -164,19 +176,19 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean commandOrControlWasPressed = false;
 	private boolean showToolTips = true;
 
-	
+
 	private GUIMode guiMode = GUIMode.noNet;
 	private JMenu exportMenu, zoomMenu;
 
-	
+
 	public boolean isMac(){
 		return System.getProperty("mrj.version") != null;
 	}
-	
+
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
 		// name to be appended to basic window title
-		
+
 		frameTitle = title;
 		setTitle(null);
 		try {
@@ -193,7 +205,7 @@ public class GuiFrame extends JFrame implements Observer {
 				try {
 					//Load class to see if its there
 					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-					
+
 					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
@@ -206,7 +218,7 @@ public class GuiFrame extends JFrame implements Observer {
 		} catch (Exception exc) {
 			System.err.println("Error loading L&F: " + exc);
 		}
-		
+
 		if (isMac()){ 
 			new SpecialMacHandler();
 		}
@@ -219,6 +231,8 @@ public class GuiFrame extends JFrame implements Observer {
 		this.setMinimumSize(new Dimension(825, 480));
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		loadPrefrences();
 
 		buildMenus();
 
@@ -236,7 +250,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
-		
+
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
 		
 			public boolean dispatchKeyEvent(KeyEvent e) {
@@ -254,16 +268,40 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 	}
-	
+
+	private void loadPrefrences() {
+		Preferences prefs = Preferences.getInstance();
+
+		QueryDialog.setAdvancedView(prefs.getAdvancedQueryView());
+		TabContent.setEditorModelRoot(prefs.getEditorModelRoot());
+		TabContent.setSimulatorModelRoot(prefs.getSimulatorModelRoot());
+		showComponents = prefs.getShowComponents();
+		showQueries = prefs.getShowQueries();
+		showConstants = prefs.getShowConstants();
+
+		showEnabledTransitions = prefs.getShowEnabledTransitions();
+
+		showToolTips = prefs.getShowToolTips();
+		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
+			CreateGui.toggleShowZeroToInfinityIntervals();
+		}
+		
+		Dimension dimension = prefs.getWindowSize();
+		if(dimension != null){
+			this.setSize(dimension);
+		}
+
+	}
+
 	private void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException{
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		if(UIManager.getLookAndFeel().getName().equals("Windows")){
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            break;
-		        }
-		    }
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
 		}
 	}
 
@@ -287,22 +325,22 @@ public class GuiFrame extends JFrame implements Observer {
 		fileMenu.setMnemonic('F');
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		
+
 		addMenuItem(fileMenu, createAction = new FileAction("New",
 				"Create a new Petri net", "ctrl N"));
 		createAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('N', shortcutkey));
-		
+
 		addMenuItem(fileMenu, openAction = new FileAction("Open", "Open",
-		"ctrl O"));
+				"ctrl O"));
 		openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('O', shortcutkey));
-		
+
 		addMenuItem(fileMenu, closeAction = new FileAction("Close",
 				"Close the current tab", "ctrl W"));
 		closeAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('W', shortcutkey));
 		fileMenu.addSeparator();
 
 		addMenuItem(fileMenu, saveAction = new FileAction("Save", "Save",
-		"ctrl S"));
+				"ctrl S"));
 		saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', shortcutkey));
 		addMenuItem(fileMenu, saveAsAction = new FileAction("Save as",
 				"Save as...", null));
@@ -328,7 +366,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
-		"ctrl P"));
+				"ctrl P"));
 		printAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('P', shortcutkey));
 		fileMenu.addSeparator();
 
@@ -344,43 +382,43 @@ public class GuiFrame extends JFrame implements Observer {
 			 */
 
 			String[] nets = null;
-			
-			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
-		      if (dirURL != null && dirURL.getProtocol().equals("file")) {
-		        /* A file path: easy enough */
-		        nets = new File(dirURL.toURI()).list();
-		      } 
 
-		      if (dirURL == null) {
-		        /* 
-		         * In case of a jar file, we can't actually find a directory.
-		         * Have to assume the same jar as clazz.
-		         */
-		        String me = this.getName().replace(".", "/")+".class";
-		        dirURL = Thread.currentThread().getContextClassLoader().getResource(me);
-		      }
-		      
-		      if (dirURL.getProtocol().equals("jar")) {
-		        /* A JAR path */
-		        String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); //strip out only the JAR file
-		        JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-		        Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
-		        Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
-		        while(entries.hasMoreElements()) {
-		          String name = entries.nextElement().getName();
-		          if (name.startsWith("resources/Example nets/")) { //filter according to the path
-		            String entry = name.substring("resources/Example nets/".length());
-		            int checkSubdir = entry.indexOf('/');
-		            if (checkSubdir >= 0) {
-		              // if it is a subdirectory, we just return the directory name
-		              entry = entry.substring(0, checkSubdir);
-		            }
-		            result.add(entry);
-		          }
-		        }
-		        nets = result.toArray(new String[result.size()]);
-		      } 
-		        
+			URL dirURL = Thread.currentThread().getContextClassLoader().getResource("resources/Example nets/");
+			if (dirURL != null && dirURL.getProtocol().equals("file")) {
+				/* A file path: easy enough */
+				nets = new File(dirURL.toURI()).list();
+			} 
+
+			if (dirURL == null) {
+				/* 
+				 * In case of a jar file, we can't actually find a directory.
+				 * Have to assume the same jar as clazz.
+				 */
+				String me = this.getName().replace(".", "/")+".class";
+				dirURL = Thread.currentThread().getContextClassLoader().getResource(me);
+			}
+
+			if (dirURL.getProtocol().equals("jar")) {
+				/* A JAR path */
+				String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')); //strip out only the JAR file
+				JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+				Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+				Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
+				while(entries.hasMoreElements()) {
+					String name = entries.nextElement().getName();
+					if (name.startsWith("resources/Example nets/")) { //filter according to the path
+						String entry = name.substring("resources/Example nets/".length());
+						int checkSubdir = entry.indexOf('/');
+						if (checkSubdir >= 0) {
+							// if it is a subdirectory, we just return the directory name
+							entry = entry.substring(0, checkSubdir);
+						}
+						result.add(entry);
+					}
+				}
+				nets = result.toArray(new String[result.size()]);
+			} 
+
 			Arrays.sort(nets, new Comparator<String>() {
 				public int compare(String one, String two) {
 
@@ -408,15 +446,15 @@ public class GuiFrame extends JFrame implements Observer {
 				for (int i = 0; i < nets.length; i++) {
 					if (nets[i].toLowerCase().endsWith(".xml")) {
 						//addMenuItem(exampleMenu, new ExampleFileAction(nets[i], (k < 10) ? "ctrl " + (k++) : null));
-						
+
 						ExampleFileAction tmp = new ExampleFileAction(nets[i], nets[i].replace(".xml", ""), null);
 						if (k < 10) {
-						
+
 							//tmp.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke(""+k).getKeyCode(), shortcutkey));
-							
+
 						}
 						k++;
-						
+
 						addMenuItem(exampleMenu, tmp);
 					}
 				}
@@ -442,106 +480,113 @@ public class GuiFrame extends JFrame implements Observer {
 		redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('Y', shortcutkey));
 		editMenu.addSeparator();
 
-		 addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
-				 "Delete selection", "DELETE"));
+		addMenuItem(editMenu, deleteAction = new DeleteAction("Delete",
+				"Delete selection", "DELETE"));
 
-		 // Bind delete to backspace also
-		 editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				 KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
-		 editMenu.getActionMap().put("Delete", deleteAction);
+		// Bind delete to backspace also
+		editMenu.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke("BACK_SPACE"), "Delete");
+		editMenu.getActionMap().put("Delete", deleteAction);
 
-		 /* Draw menu */
-		 JMenu drawMenu = new JMenu("Draw");
-		 drawMenu.setMnemonic('D');
-		 addMenuItem(drawMenu, selectAction = new TypeAction("Select",
-				 ElementType.SELECT, "Select components (S)", "S", true));
-		 drawMenu.addSeparator();
+		/* Draw menu */
+		JMenu drawMenu = new JMenu("Draw");
+		drawMenu.setMnemonic('D');
+		addMenuItem(drawMenu, selectAction = new TypeAction("Select",
+				ElementType.SELECT, "Select components (S)", "S", true));
+		drawMenu.addSeparator();
 
-		 addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
-				 ElementType.TAPNPLACE, "Add a place (P)", "P", true));
+		addMenuItem(drawMenu, timedPlaceAction = new TypeAction("Place",
+				ElementType.TAPNPLACE, "Add a place (P)", "P", true));
 
-		 addMenuItem(drawMenu, transAction = new TypeAction("Transition",
-				 ElementType.TAPNTRANS, "Add a transition (T)", "T", true));
+		addMenuItem(drawMenu, transAction = new TypeAction("Transition",
+				ElementType.TAPNTRANS, "Add a transition (T)", "T", true));
 
-		 addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
-				 ElementType.TAPNARC, "Add an arc (A)", "A", true));
+		addMenuItem(drawMenu, timedArcAction = new TypeAction("Arc",
+				ElementType.TAPNARC, "Add an arc (A)", "A", true));
 
-		 addMenuItem(drawMenu, transportArcAction = new TypeAction(
-				 "Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
-				 true));
+		addMenuItem(drawMenu, transportArcAction = new TypeAction(
+				"Transport arc", ElementType.TRANSPORTARC, "Add a transport arc (R)", "R",
+				true));
 
-		 addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor arc",
-				 ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
+		addMenuItem(drawMenu, inhibarcAction = new TypeAction("Inhibitor arc",
+				ElementType.TAPNINHIBITOR_ARC, "Add an inhibitor arc (I)", "I", true));
 
-		 addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
-				 ElementType.ANNOTATION, "Add an annotation (N)", "N", true));
-		 
-		 drawMenu.addSeparator();
-		 
-		 addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
-				 ElementType.ADDTOKEN, "Add a token (+)", "typed +", true));
+		addMenuItem(drawMenu, annotationAction = new TypeAction("Annotation",
+				ElementType.ANNOTATION, "Add an annotation (N)", "N", true));
 
-		 addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
-				 "Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
-				 true));
+		drawMenu.addSeparator();
 
-		 /* ViewMenu */
-		 JMenu viewMenu = new JMenu("View");
-		 viewMenu.setMnemonic('V');
+		addMenuItem(drawMenu, tokenAction = new TypeAction("Add token",
+				ElementType.ADDTOKEN, "Add a token (+)", "typed +", true));
 
-		 zoomMenu = new JMenu("Zoom");
-		 zoomMenu.setIcon(new ImageIcon(Thread.currentThread()
-				 .getContextClassLoader().getResource(
-						 CreateGui.imgPath + "Zoom.png")));
-		 addZoomMenuItems(zoomMenu);
+		addMenuItem(drawMenu, deleteTokenAction = new TypeAction(
+				"Delete token", ElementType.DELTOKEN, "Delete a token (-)", "typed -",
+				true));
 
-		 addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
-				 "Zoom in by 10% ", "ctrl J"));
-		 zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("J").getKeyCode(), shortcutkey));
+		/* ViewMenu */
+		JMenu viewMenu = new JMenu("View");
+		viewMenu.setMnemonic('V');
 
-		 addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
-				 "Zoom out by 10% ", "ctrl K"));
-		 zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("K").getKeyCode(), shortcutkey));
-		 viewMenu.add(zoomMenu);
+		zoomMenu = new JMenu("Zoom");
+		zoomMenu.setIcon(new ImageIcon(Thread.currentThread()
+				.getContextClassLoader().getResource(
+						CreateGui.imgPath + "Zoom.png")));
+		addZoomMenuItems(zoomMenu);
 
-		 viewMenu.addSeparator();
-		 addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
-				 "Change the grid size", "G"));
-		 addMenuItem(viewMenu, dragAction = new TypeAction("Drag", ElementType.DRAG,
-				 "Drag the drawing", "D", true));
-		 
-		 viewMenu.addSeparator();
-		 
-		 	addCheckboxMenuItem(viewMenu, showComponentsAction = new ViewAction("Display components", 
-				 453243, "Show/hide the list of components.", "ctrl 1", true));
-                                 showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
+		addMenuItem(viewMenu, zoomInAction = new ZoomAction("Zoom in",
+				"Zoom in by 10% ", "ctrl J"));
+		zoomInAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("J").getKeyCode(), shortcutkey));
 
-		 	addCheckboxMenuItem(viewMenu, showQueriesAction = new ViewAction("Display queries", 
-				 453244, "Show/hide verification queries.", "ctrl 2", true));
-				 showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
+		addMenuItem(viewMenu, zoomOutAction = new ZoomAction("Zoom out",
+				"Zoom out by 10% ", "ctrl K"));
+		zoomOutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyStroke.getKeyStroke("K").getKeyCode(), shortcutkey));
+		viewMenu.add(zoomMenu);
 
-		 	addCheckboxMenuItem(viewMenu, showConstantsAction = new ViewAction("Display constants", 
-				 453245, "Show/hide global constants.", "ctrl 3", true));
-	  	         	 showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
-			
-		 	addCheckboxMenuItem(viewMenu, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
-				 453247, "Show/hide the list of enabled transitions","ctrl 4",true));
-				 showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
+		viewMenu.addSeparator();
+		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
+				"Change the grid size", "G"));
+		addMenuItem(viewMenu, dragAction = new TypeAction("Drag", ElementType.DRAG,
+				"Drag the drawing", "D", true));
 
-		 	addCheckboxMenuItem(viewMenu, showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				 453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true));
-    				 showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
+		viewMenu.addSeparator();
 
-    		addCheckboxMenuItem(viewMenu, showToolTipsAction = new ViewAction("Display tool tips",
-   				 453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true));
-    				showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
+		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
+				453243, "Show/hide the list of components.", "ctrl 1", true),
+				showComponentsCheckBox = new JCheckBoxMenuItem());
+		showComponentsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('1', shortcutkey));
 
-    	 viewMenu.addSeparator();
-    	 
-    	 addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
-    	 addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+		addCheckboxMenuItem(viewMenu, showQueries, showQueriesAction = new ViewAction("Display queries", 
+				453244, "Show/hide verification queries.", "ctrl 2", true),
+				showQueriesCheckBox= new JCheckBoxMenuItem());
+		showQueriesAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('2', shortcutkey));
 
-		 /* Simulator */
+		addCheckboxMenuItem(viewMenu, showConstants, showConstantsAction = new ViewAction("Display constants", 
+				453245, "Show/hide global constants.", "ctrl 3", true),
+				showConstantsCheckBox = new JCheckBoxMenuItem());
+		showConstantsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('3', shortcutkey));
+
+		addCheckboxMenuItem(viewMenu, showEnabledTransitions, showEnabledTransitionsAction = new ViewAction("Display enabled transitions",
+				453247, "Show/hide the list of enabled transitions","ctrl 4",true),
+				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
+		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
+
+		addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
+				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true),
+				showZeroToInfinityIntervalsCheckBox = new JCheckBoxMenuItem());
+		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
+
+		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
+				453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true),
+				showToolTipsCheckBox = new JCheckBoxMenuItem());
+		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
+
+		viewMenu.addSeparator();
+
+		addMenuItem(viewMenu, showSimpleWorkspaceAction = new ViewAction("Show simple workspace", 453249, "Show only the most important panels", "", false));
+		addMenuItem(viewMenu, showAdvancedWorkspaceAction = new ViewAction("Show advanced workspace", 453248, "Show all panels", "", false));
+		addMenuItem(viewMenu, saveWorkSpaceAction = new ViewAction("Save workspace", 453250, "Save the current workspace as the default one", "", false));
+
+		/* Simulator */
 		 JMenu animateMenu = new JMenu("Simulator");
 		 animateMenu.setMnemonic('A');
 		 addMenuItem(animateMenu, startAction = new AnimateAction(
@@ -574,49 +619,49 @@ public class GuiFrame extends JFrame implements Observer {
 		 randomAnimateAction = new AnimateAction("Simulate", ElementType.ANIMATE,
 				 "Randomly fire a number of transitions", "typed 7", true);
 
-		 
-		 /* The help part */
-		 JMenu helpMenu = new JMenu("Help");
-		 helpMenu.setMnemonic('H');
-		 
-		 addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
-				 453257, "Visit the TAPAAL homepage", "_"));
-		 
-		 addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for updates",
-				 463257, "Check if there is a new version of TAPAAL", "_"));
-		 
-		 helpMenu.addSeparator();
-		 
-		 addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
-				 454256, "See TAPAAL frequently asked questions", "_"));
-		 addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a question",
-				 453256, "Ask a question about TAPAAL", "_"));
-		 addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report bug",
-				 453254, "Report a bug in TAPAAL", "_"));
-		 
-		 helpMenu.addSeparator();
-		 
-		 addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
-				 453246, "Show the About menu", "_"));
 
-		 menuBar.add(fileMenu);
-		 menuBar.add(editMenu);
-		 menuBar.add(viewMenu);
-		 menuBar.add(drawMenu);
-		 menuBar.add(animateMenu);
-		 menuBar.add(buildToolsMenu());
-		 menuBar.add(helpMenu);
-		 
-		 setJMenuBar(menuBar);
+		/* The help part */
+		JMenu helpMenu = new JMenu("Help");
+		helpMenu.setMnemonic('H');
+
+		addMenuItem(helpMenu, showHomepage = new HelpAction("Visit TAPAAL home",
+				453257, "Visit the TAPAAL homepage", "_"));
+
+		addMenuItem(helpMenu, checkUpdate = new HelpAction("Check for updates",
+				463257, "Check if there is a new version of TAPAAL", "_"));
+
+		helpMenu.addSeparator();
+
+		addMenuItem(helpMenu, showFAQAction = new HelpAction("Show FAQ",
+				454256, "See TAPAAL frequently asked questions", "_"));
+		addMenuItem(helpMenu, showAskQuestionAction = new HelpAction("Ask a question",
+				453256, "Ask a question about TAPAAL", "_"));
+		addMenuItem(helpMenu, showReportBugAction = new HelpAction("Report bug",
+				453254, "Report a bug in TAPAAL", "_"));
+
+		helpMenu.addSeparator();
+
+		addMenuItem(helpMenu, showAboutAction = new HelpAction("About",
+				453246, "Show the About menu", "_"));
+
+		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
+		menuBar.add(viewMenu);
+		menuBar.add(drawMenu);
+		menuBar.add(animateMenu);
+		menuBar.add(buildToolsMenu());
+		menuBar.add(helpMenu);
+
+		setJMenuBar(menuBar);
 
 	}
 
 	private JMenu buildToolsMenu() {
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.setMnemonic('t');
-		
+
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-		
+
 		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl M"));
 		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('M', shortcutkey));
 		verification.setMnemonic('m');
@@ -635,12 +680,12 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});		
 		toolsMenu.add(statistics);		
-		
-		
+
+
 		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
 		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries","ctrl B"));				
 		batchProcessingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('B', shortcutkey));
-		
+
 		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -656,14 +701,14 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(batchProcessing);
-		
-		
+
+
 		toolsMenu.addSeparator();
-		
+
 		//JMenuItem engineSelection = new JMenuItem("Verification engines");
 		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines","ctrl E"));				
 		engineSelectionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('E', shortcutkey));
-		
+
 		engineSelection.setMnemonic('v');		
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -677,34 +722,54 @@ public class GuiFrame extends JFrame implements Observer {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					// Clear persistent storage
-					Preferences.clearPreferences();
-					// Engines reset individually to remove preferences for already setup engines
-					Verifyta.reset();
-					VerifyTAPN.reset();
-					VerifyTAPNDiscreteVerification.reset();
-				} catch (BackingStoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				// Clear persistent storage
+				Preferences.getInstance().clear();
+				// Engines reset individually to remove preferences for already setup engines
+				Verifyta.reset();
+				VerifyTAPN.reset();
+				VerifyTAPNDiscreteVerification.reset();
 			}
 		});
 		toolsMenu.add(clearPreferences);
 
 		return toolsMenu;
 	}
-	
+
 	public void showAdvancedWorkspace(boolean advanced){
 		QueryDialog.setAdvancedView(advanced);
 		showComponents(advanced);
 		showConstants(advanced);
-		
+
 		//Queries and enabled transitions should always be shown
 		showQueries(true);
 		showEnabledTransitionsList(true);
+		showToolTips(true);
+		CreateGui.getCurrentTab().setResizeingDefault();
+		if(!CreateGui.showZeroToInfinityIntervals()){
+			showZeroToInfinityIntervalsCheckBox.doClick();
+		}
 	}
-	
+
+	public void saveWorkspace(){
+		Preferences prefs = Preferences.getInstance();
+
+		prefs.setAdvancedQueryView(QueryDialog.getAdvancedView());
+		prefs.setEditorModelRoot(TabContent.getEditorModelRoot());
+		prefs.setSimulatorModelRoot(TabContent.getSimulatorModelRoot());
+		prefs.setWindowSize(this.getSize());
+
+		prefs.setShowComponents(showComponents);
+		prefs.setShowQueries(showQueries);
+		prefs.setShowConstants(showConstants);
+
+		prefs.setShowEnabledTrasitions(showEnabledTransitions);
+
+		JOptionPane.showMessageDialog(this, 
+				"The workspace has now been saved into your preferences.\n" 
+						+ "It will be used as the initial workspace next time you run the tool.",
+						"Workspace Saved", JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	private void buildToolbar() {
 		// Create the toolbar
 		JToolBar toolBar = new JToolBar();
@@ -803,9 +868,9 @@ public class GuiFrame extends JFrame implements Observer {
 	private void addZoomMenuItems(JMenu zoomMenu) {
 		for (int i = 0; i <= zoomExamples.length - 1; i++) {
 			ZoomAction a = new ZoomAction(zoomExamples[i], "Select zoom percentage", "");
-			
+
 			JMenuItem newItem = new JMenuItem(a);
-			
+
 			zoomMenu.add(newItem);
 		}
 	}
@@ -842,10 +907,14 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		return item;
 	}
+
+	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action) {
+		return addCheckboxMenuItem(menu, selected, action, new JCheckBoxMenuItem());
+	}
 	
-	private JMenuItem addCheckboxMenuItem(JMenu menu, Action action) {
-		JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(action);
-		checkBoxItem.setSelected(true);
+	private JMenuItem addCheckboxMenuItem(JMenu menu, boolean selected, Action action, JCheckBoxMenuItem checkBoxItem) {
+		checkBoxItem.setAction(action);
+		checkBoxItem.setSelected(selected);
 		JMenuItem item = menu.add(checkBoxItem);
 		KeyStroke keystroke = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
 
@@ -895,6 +964,8 @@ public class GuiFrame extends JFrame implements Observer {
 			
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
+			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
 
@@ -915,7 +986,7 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			selectAction.setEnabled(false);
 			deleteTokenAction.setEnabled(false);
-			
+
 			showConstantsAction.setEnabled(false);
 			showQueriesAction.setEnabled(false);
 
@@ -994,7 +1065,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		toggleGrid.setEnabled(enable);
 		dragAction.setEnabled(enable);
-		
+
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
 		showQueriesAction.setEnabled(enable);
@@ -1003,11 +1074,12 @@ public class GuiFrame extends JFrame implements Observer {
 		showToolTipsAction.setEnabled(enable);
 		showAdvancedWorkspaceAction.setEnabled(enable);
 		showSimpleWorkspaceAction.setEnabled(enable);
-		
+		saveWorkSpaceAction.setEnabled(enable);
+
 
 		// Simulator
 		startAction.setEnabled(enable);
-		
+
 		// Tools
 		statistics.setEnabled(enable);
 
@@ -1051,7 +1123,7 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		appGui = CreateGui.getApp();
 		appView = CreateGui.getView();
-		
+
 	}
 
 
@@ -1066,6 +1138,7 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showQueries(boolean enable){
 		showQueries = enable;
 		CreateGui.getCurrentTab().showQueries(enable);
+		showQueriesCheckBox.setSelected(enable);
 	}
 	public void toggleQueries(){
 		showQueries(!showQueries);
@@ -1074,13 +1147,16 @@ public class GuiFrame extends JFrame implements Observer {
 	public void showConstants(boolean enable){
 		showConstants = enable;
 		CreateGui.getCurrentTab().showConstantsPanel(enable);
+		showConstantsCheckBox.setSelected(enable);
 	}
 	public void toggleConstants(){
 		showConstants(!showConstants);
 	}
-	
+
 	public void showToolTips(boolean enable){
 		showToolTips = enable;
+		Preferences.getInstance().setShowToolTips(showToolTips);
+		showToolTipsCheckBox.setSelected(enable);
 		ToolTipManager.sharedInstance().setEnabled(enable);
 	}
 	public void toggleToolTips(){
@@ -1093,25 +1169,28 @@ public class GuiFrame extends JFrame implements Observer {
 	
 	public void toggleZeroToInfinityIntervals() {
 		CreateGui.toggleShowZeroToInfinityIntervals();
+		Preferences.getInstance().setShowZeroInfIntervals(CreateGui.showZeroToInfinityIntervals());
 		appView.repaintAll();
 	}
-	
+
 	public void showComponents(boolean enable){
 		showComponents = enable;
 		CreateGui.getCurrentTab().showComponents(enable);
+		showComponentsCheckBox.setSelected(enable);
 	}
 	public void toggleComponents(){
 		showComponents(!showComponents);
 	}
-	
+
 	public void showEnabledTransitionsList(boolean enable){
 		showEnabledTransitions = enable;
 		CreateGui.getCurrentTab().showEnabledTransitionsList(enable);
+		showEnabledTransitionsCheckBox.setSelected(enable);
 	}
 	public void toggleEnabledTransitionsList(){
 		showEnabledTransitionsList(!showEnabledTransitions);
 	}
-	
+
 	public void saveOperation(boolean forceSave){
 		saveOperation(appTab.getSelectedIndex(), forceSave);
 	}
@@ -1159,7 +1238,7 @@ public class GuiFrame extends JFrame implements Observer {
 					currentTab.allTemplates(), 
 					currentTab.queries(), 
 					currentTab.network().constants()
-			);
+					);
 
 			tapnWriter.savePNML(outFile);
 
@@ -1183,7 +1262,7 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public void createNewTab(String name, NetType netType) {
-		int freeSpace = CreateGui.getFreeSpace();
+		int freeSpace = CreateGui.getFreeSpace(netType);
 
 		setObjects(freeSpace);
 		CreateGui.getModel(freeSpace).setNetType(netType);
@@ -1211,7 +1290,7 @@ public class GuiFrame extends JFrame implements Observer {
 		selectAction.actionPerformed(null);
 	}
 
-	
+
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * 
@@ -1220,13 +1299,13 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            tab
 	 */
 	public void createNewTabFromFile(InputStream file, String namePrefix) {
-		int freeSpace = CreateGui.getFreeSpace();
+		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name = "";
 
 		setObjects(freeSpace);
 		int currentlySelected = appTab.getSelectedIndex();
 
-		
+
 		if (namePrefix == null || namePrefix.equals("")) {
 			name = "New Petri net " + (newNameCounter++) + ".xml";
 		} else {
@@ -1248,14 +1327,14 @@ public class GuiFrame extends JFrame implements Observer {
 
 				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
 				LoadedModel loadedModel = loader.load(file);
-								
+
 				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
 				currentTab.setQueries(loadedModel.queries());
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 				currentTab.selectFirstElements();
-				
+
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1277,7 +1356,7 @@ public class GuiFrame extends JFrame implements Observer {
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
 	}
-	
+
 	/**
 	 * Creates a new tab with the selected file, or a new file if filename==null
 	 * 
@@ -1286,7 +1365,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            tab
 	 */
 	public void createNewTabFromFile(File file) {
-		int freeSpace = CreateGui.getFreeSpace();
+		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name = "";
 
 		setObjects(freeSpace);
@@ -1313,14 +1392,14 @@ public class GuiFrame extends JFrame implements Observer {
 
 				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
 				LoadedModel loadedModel = loader.load(file);
-								
+
 				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
 				currentTab.setQueries(loadedModel.queries());
 				currentTab.setConstants(loadedModel.network().constants());
 				currentTab.setupNameGeneratorsFromTemplates(loadedModel.templates());
 
 				currentTab.selectFirstElements();
-				
+
 				if (CreateGui.getApp() != null) {
 					CreateGui.getApp().restoreMode();
 				}
@@ -1341,8 +1420,8 @@ public class GuiFrame extends JFrame implements Observer {
 		setTitle(name);// Change the program caption
 		appTab.setTitleAt(freeSpace, name);
 		selectAction.actionPerformed(null);
-		
-		
+
+
 	}
 
 	private void undoAddTab(int currentlySelected) {
@@ -1363,9 +1442,9 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 
 	public boolean checkForSave(int index) {
-		
+
 		if(index < 0) return false;
-				
+
 		if (CreateGui.getDrawingSurface(index).getNetChanged()) {
 			int result = JOptionPane.showConfirmDialog(GuiFrame.this,
 					"The net has been modified. Save the current net?",
@@ -1469,18 +1548,18 @@ public class GuiFrame extends JFrame implements Observer {
 			showQueries(showQueries);
 			showConstants(showConstants);
 			showToolTips(showToolTips);
-			
+
 			CreateGui.getView().setBackground(Pipe.ELEMENT_FILL_COLOUR);
-			
+
 			activateSelectAction();
 			selectAction.setSelected(true);
 			break;
 		case animation:
 			TabContent tab = (TabContent) appTab.getSelectedComponent();
 			CreateGui.getAnimator().setTabContent(tab);
-			tab.switchToAnimationComponents();
+			tab.switchToAnimationComponents(showEnabledTransitions);
 			showComponents(showComponents);
-			
+
 			startAction.setSelected(true);
 			tab.drawingSurface().changeAnimationMode(true);
 			tab.drawingSurface().repaintAll();
@@ -1539,6 +1618,8 @@ public class GuiFrame extends JFrame implements Observer {
 		
 		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
+		verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+
 		if (placeAction != null) {
 			placeAction.setSelected(mode == ElementType.PLACE);
 		}
@@ -1576,6 +1657,8 @@ public class GuiFrame extends JFrame implements Observer {
 			annotationAction.setSelected(mode == ElementType.ANNOTATION);
 		
 		
+
+
 
 	}
 
@@ -1665,7 +1748,7 @@ public class GuiFrame extends JFrame implements Observer {
 			switch (typeID) {
 			case START:
 				try {
-					
+
 					if (!appView.isInAnimationMode()) {
 						if (CreateGui.getCurrentTab().numberOfActiveTemplates() > 0) {
 							CreateGui.getCurrentTab().rememberSelectedTemplate();
@@ -1701,7 +1784,7 @@ public class GuiFrame extends JFrame implements Observer {
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
 				}
-				
+
 				stepforwardAction.setEnabled(false);
 				stepbackwardAction.setEnabled(false);
 					
@@ -1717,7 +1800,7 @@ public class GuiFrame extends JFrame implements Observer {
 					a.setVisible(true);
 					a.dispose();
 				}				
-				
+
 				break;
 
 			case TIMEPASS:
@@ -1826,30 +1909,30 @@ public class GuiFrame extends JFrame implements Observer {
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 					: JOptionPane.YES_OPTION;
 
-			if (choice == JOptionPane.YES_OPTION) {
-				appView.getUndoManager().newEdit(); // new "transaction""
-				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-					for (TAPNQuery q : queriesToDelete) {
-						currentTab.removeQuery(q);
-					}
-				}
-				
-				// remove the places from the list of inclusion places
-				for (PetriNetObject p : selection) {
-					if (p instanceof TimedPlaceComponent) {
-						for (TAPNQuery q : queries) {
-							TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
-							q.inclusionPlaces().removePlace(place);
+					if (choice == JOptionPane.YES_OPTION) {
+						appView.getUndoManager().newEdit(); // new "transaction""
+						if (queriesAffected) {
+							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+							for (TAPNQuery q : queriesToDelete) {
+								currentTab.removeQuery(q);
+							}
 						}
+
+						// remove the places from the list of inclusion places
+						for (PetriNetObject p : selection) {
+							if (p instanceof TimedPlaceComponent) {
+								for (TAPNQuery q : queries) {
+									TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
+									q.inclusionPlaces().removePlace(place);
+								}
+							}
+						}
+
+						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+						appView.getSelectionObject().deleteSelection();
+						appView.repaint();
+						CreateGui.getCurrentTab().network().buildConstraints();
 					}
-				}
-				
-				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-				appView.getSelectionObject().deleteSelection();
-				appView.repaint();
-				CreateGui.getCurrentTab().network().buildConstraints();
-			}
 		}
 
 	}
@@ -1874,7 +1957,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			
+
 			this.setSelected(true);
 
 			// deselect other actions
@@ -1885,7 +1968,7 @@ public class GuiFrame extends JFrame implements Observer {
 			if (this != timedArcAction) {
 				timedArcAction.setSelected(false);
 			}
-			
+
 			if (this != timedPlaceAction) {
 				timedPlaceAction.setSelected(false);
 			}
@@ -1964,7 +2047,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 	}
-	
+
 	class ToolAction extends GuiAction {
 
 		/**
@@ -1979,7 +2062,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -2022,22 +2105,22 @@ public class GuiFrame extends JFrame implements Observer {
 					if (e.getSource() instanceof JMenuItem) {
 						selectedZoomLevel = ((JMenuItem) e.getSource()).getText();
 					}
-					
+
 					//parse selected zoom level, and strip of %.
 					newZoomLevel = Integer.parseInt(selectedZoomLevel.replace("%",""));
-					
+
 					didZoom = zoomer.setZoom(newZoomLevel);
 				}
 				if (didZoom) {
 					updateZoomCombo();
-					
+
 					double midpointX = Zoomer.getUnzoomedValue(thisView.getViewPosition().x
-										+ (thisView.getWidth() * 0.5), zoomer.getPercent());
+							+ (thisView.getWidth() * 0.5), zoomer.getPercent());
 					double midpointY = Zoomer.getUnzoomedValue(thisView.getViewPosition().y
-										+ (thisView.getHeight() * 0.5), zoomer.getPercent());
-					
+							+ (thisView.getHeight() * 0.5), zoomer.getPercent());
+
 					java.awt.Point midpoint = new java.awt.Point((int) midpointX, (int) midpointY);
-					
+
 					appView.zoomTo(midpoint);
 				}
 			} catch (ClassCastException cce) {
@@ -2068,7 +2151,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 
 	}
-	
+
 	class ViewAction extends GuiAction {
 
 		private static final long serialVersionUID = -5145846750992454638L;
@@ -2076,10 +2159,10 @@ public class GuiFrame extends JFrame implements Observer {
 				boolean toggleable) {
 			super(name, tooltip, keystroke, toggleable);
 		}
-		
-		
+
+
 		public void actionPerformed(ActionEvent arg0) {
-			
+
 			if (this == showComponentsAction){
 				toggleComponents();
 			} else if (this == showQueriesAction){
@@ -2096,9 +2179,11 @@ public class GuiFrame extends JFrame implements Observer {
 				showAdvancedWorkspace(true);
 			} else if (this == showSimpleWorkspaceAction){
 				showAdvancedWorkspace(false);
+			} else if (this == saveWorkSpaceAction){
+				saveWorkspace();
 			}
 		}
-		
+
 	}
 	public void showAbout() {
 		StringBuffer buffer = new StringBuffer("About " + TAPAAL.getProgramName());
@@ -2118,13 +2203,13 @@ public class GuiFrame extends JFrame implements Observer {
                 buffer.append("Mathias Andersen, Heine G. Larsen, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
                 buffer.append("Aalborg University 2012\n\n");
 		buffer.append("\n");
-		
+
 
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
-	
-	
+
+
 	public static void openBrowser(URI url){
 		//open the default bowser on this page
 		try {
@@ -2137,7 +2222,7 @@ public class GuiFrame extends JFrame implements Observer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void showInBrowser(String address) {
 		try {
 			URI url = new URI(address);
@@ -2148,7 +2233,7 @@ public class GuiFrame extends JFrame implements Observer {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 	class HelpAction extends GuiAction {
 
@@ -2156,8 +2241,8 @@ public class GuiFrame extends JFrame implements Observer {
 		HelpAction(String name, int typeID, String tooltip, String keystroke) {
 			super(name, tooltip, keystroke, false);
 		}
-		
-		
+
+
 		public void actionPerformed(ActionEvent e) {
 			if (this == showAboutAction){
 				showAbout();
@@ -2173,19 +2258,19 @@ public class GuiFrame extends JFrame implements Observer {
 				pipe.gui.CreateGui.checkForUpdate(true);
 			}
 		}
-		
-		
-		
+
+
+
 	}
 
-	
+
 	public void exit(){
 		if (checkForSaveAll()) {
 			dispose();
 			System.exit(0);
 		}
 	}
-	
+
 	class FileAction extends GuiAction {
 
 		/**
@@ -2223,7 +2308,7 @@ public class GuiFrame extends JFrame implements Observer {
 				int index = appTab.getSelectedIndex();
 				appTab.remove(index);
 				CreateGui.removeTab(index);
-				
+
 				// Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);
