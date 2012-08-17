@@ -27,6 +27,7 @@ import pipe.gui.widgets.GuardDialogue;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.Weight;
 
 /**
  * <b>Arc</b> - Petri-Net Normal Arc Class
@@ -153,9 +154,9 @@ public class TimedOutputArcComponent extends Arc {
 		return new TimedOutputArcComponent(this);
 	}
 	
-	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
-		int oldWeight = getWeight();
+		Weight oldWeight = getWeight();
 		setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
@@ -167,9 +168,7 @@ public class TimedOutputArcComponent extends Arc {
 
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
-		if(getWeight() > 1){
-			label.setText(getWeight()+"x " + label.getText());
-		}
+		label.setText(getWeight().toString(displayConstantNames)+" " + label.getText());
 		setLabelPosition();
 	}
 
@@ -274,12 +273,12 @@ public class TimedOutputArcComponent extends Arc {
 	}
 
 	@Override
-	public void setWeight(int weight) {
+	public void setWeight(Weight weight) {
 		outputArc.setWeight(weight);
 	}
 
 	@Override
-	public int getWeight() {
+	public Weight getWeight() {
 		return outputArc.getWeight();
 	}
 

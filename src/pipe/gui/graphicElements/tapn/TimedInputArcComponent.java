@@ -18,6 +18,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.Weight;
 
 public class TimedInputArcComponent extends TimedOutputArcComponent {
 	
@@ -62,11 +63,11 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 
 	@Override
-	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
 		TimeInterval oldTimeInterval = inputArc.interval();
 		inputArc.setTimeInterval(guard);
-		int oldWeight = getWeight();
+		Weight oldWeight = getWeight();
 		setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
@@ -94,9 +95,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 				else {
 					label.setText(inputArc.interval().toString(showConstantNames));
 				}
-				if(getWeight() > 1){
-					label.setText(getWeight()+"x "+label.getText());
-				}
+				
+				label.setText(getWeight().toString(showConstantNames)+" "+label.getText());
 			}
 			this.setLabelPosition();
 		}
@@ -153,12 +153,12 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	}
 	
 	@Override
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		inputArc.setWeight(weight);
 	}
 	
 	@Override
-	public int getWeight(){
+	public Weight getWeight(){
 		return inputArc.getWeight();
 	}
 }

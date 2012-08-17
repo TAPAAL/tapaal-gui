@@ -31,6 +31,7 @@ import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.io.IdResolver;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -46,6 +47,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
@@ -369,9 +371,9 @@ public class BatchProcessingLoader {
 		String type = arc.getAttribute("type");
 		
 		//Get weight if any
-		int weight = 1;
+		Weight weight = new IntWeight(1);
 		if(arc.hasAttribute("weight")){
-			weight = Integer.parseInt(arc.getAttribute("weight"));
+			weight = Weight.parseWeight(arc.getAttribute("weight"), constants);
 		}
 
 		if (type.equals("tapnInhibitor"))
@@ -384,7 +386,7 @@ public class BatchProcessingLoader {
 			parseAndAddTimedOutputArc(sourceId, targetId, inscription, tapn, weight);
 	}
 
-	private void parseAndAddTimedOutputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, int weight) throws FormatException {
+	private void parseAndAddTimedOutputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, Weight weight) throws FormatException {
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(sourceId));
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(targetId));
 
@@ -397,7 +399,7 @@ public class BatchProcessingLoader {
 		tapn.add(outputArc);
 	}
 
-	private void parseAndAddTransportArc(String sourceId, String targetId,	String inscription, TimedArcPetriNet tapn, ConstantStore constants, int weight) {
+	private void parseAndAddTransportArc(String sourceId, String targetId,	String inscription, TimedArcPetriNet tapn, ConstantStore constants, Weight weight) {
 		String[] inscriptionSplit = {};
 		if (inscription.contains(":")) {
 			inscriptionSplit = inscription.split(":");
@@ -455,7 +457,7 @@ public class BatchProcessingLoader {
 		}
 	}
 
-	private void parseAndAddTimedInputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants, int weight) throws FormatException {
+	private void parseAndAddTimedInputArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants, Weight weight) throws FormatException {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		TimeInterval interval = TimeInterval.parse(inscription, constants);
@@ -469,7 +471,7 @@ public class BatchProcessingLoader {
 		tapn.add(inputArc);
 	}
 
-	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants, int weight) {
+	private void parseAndAddTimedInhibitorArc(String sourceId, String targetId, String inscription, TimedArcPetriNet tapn, ConstantStore constants, Weight weight) {
 		TimedPlace place = tapn.getPlaceByName(placeIDToName.get(sourceId));
 		TimedTransition transition = tapn.getTransitionByName(transitionIDToName.get(targetId));
 		

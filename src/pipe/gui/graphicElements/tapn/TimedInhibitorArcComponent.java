@@ -15,9 +15,11 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
+import dk.aau.cs.model.tapn.Weight;
 
 public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 5492180277264669192L;
@@ -54,8 +56,8 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
 		label.setText("");
-		if(getWeight() > 1){
-			label.setText(getWeight()+"x");
+		if(getWeight().value() > 1 || displayConstantNames){
+			label.setText(getWeight().toString(displayConstantNames));
 		}
 		this.setLabelPosition();
 	}
@@ -66,11 +68,11 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
 		TimeInterval oldTimeInterval = inhibitorArc.interval();
 		inhibitorArc.setTimeInterval(guard);
-		int oldWeight = getWeight();
+		Weight oldWeight = getWeight();
 		setWeight(weight);
 
 		// hacks - I use the weight to display the TimeInterval
@@ -149,13 +151,13 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 	}
 	
 	@Override
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		inhibitorArc.setWeight(weight);
 	}
 	
 	@Override
-	public int getWeight(){
-		if(inhibitorArc == null) return 1;		// Hack to support inherited constructor (updateLabel called before inhibitorArc set when opening a saved file)
+	public Weight getWeight(){
+		if(inhibitorArc == null) return new IntWeight(1);		// Hack to support inherited constructor (updateLabel called before inhibitorArc set when opening a saved file)
 		return inhibitorArc.getWeight();
 	}
 }

@@ -189,7 +189,7 @@ public class TimedArcPetriNetNetwork {
 		Command edit = constants.updateConstant(oldName, constant, this);
 
 		if (edit != null) {
-			updateGuardsWithNewConstant(oldName, constant);
+			updateGuardsAndWeightsWithNewConstant(oldName, constant);
 			for(ConstantsListener listener : constantsListeners){
 				listener.constantChanged(new ConstantChangedEvent(old, constant, index));
 			}
@@ -198,22 +198,26 @@ public class TimedArcPetriNetNetwork {
 		return edit;
 	}
 
-	public void updateGuardsWithNewConstant(String oldName, Constant newConstant) {
+	public void updateGuardsAndWeightsWithNewConstant(String oldName, Constant newConstant) {
 		for (TimedArcPetriNet tapn : allTemplates()) {
 			for (TimedPlace place : tapn.places()) {
 				updatePlaceInvariant(oldName, newConstant, place);
 			}
 
 			for (TimedInputArc inputArc : tapn.inputArcs()) {
-				updateTimeInterval(oldName, newConstant, inputArc.interval());
+				updateTimeIntervalAndWeight(oldName, newConstant, inputArc.interval(), inputArc.getWeight());
 			}
 
 			for (TransportArc transArc : tapn.transportArcs()) {
-				updateTimeInterval(oldName, newConstant, transArc.interval());
+				updateTimeIntervalAndWeight(oldName, newConstant, transArc.interval(), transArc.getWeight());
 			}
 
 			for (TimedInhibitorArc inhibArc : tapn.inhibitorArcs()) {
-				updateTimeInterval(oldName, newConstant, inhibArc.interval());
+				updateTimeIntervalAndWeight(oldName, newConstant, inhibArc.interval(), inhibArc.getWeight());
+			}
+			
+			for (TimedOutputArc outputArc : tapn.outputArcs()) {
+				updateWeight(oldName, newConstant, outputArc.getWeight());
 			}
 		}
 
@@ -223,9 +227,10 @@ public class TimedArcPetriNetNetwork {
 		updateBound(oldName, newConstant, place.invariant().upperBound());
 	}
 
-	private void updateTimeInterval(String oldName, Constant newConstant, TimeInterval interval) {
+	private void updateTimeIntervalAndWeight(String oldName, Constant newConstant, TimeInterval interval, Weight weight) {
 		updateBound(oldName, newConstant, interval.lowerBound());
 		updateBound(oldName, newConstant, interval.upperBound());
+		updateWeight(oldName, newConstant, weight);
 	}
 
 	private void updateBound(String oldName, Constant newConstant, Bound bound) {
@@ -236,6 +241,17 @@ public class TimedArcPetriNetNetwork {
 				cb.setConstant(newConstant);
 			}
 		}
+	}
+	
+	private void updateWeight(String oldName, Constant newConstant, Weight weight) {
+		if(weight instanceof ConstantWeight){
+			ConstantWeight cw = (ConstantWeight) weight;
+			
+			if(cw.constant().name().equals(oldName)){
+				cw.setConstant(newConstant);
+			}
+		}
+		
 	}
 
 	public Collection<Constant> constants() {

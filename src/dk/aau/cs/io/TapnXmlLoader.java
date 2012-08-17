@@ -61,6 +61,8 @@ import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
+import dk.aau.cs.model.tapn.ConstantWeight;
+import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -76,6 +78,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.Weight;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.Require;
@@ -534,9 +537,9 @@ public class TapnXmlLoader {
 		int _endy = targetIn.getY() + targetIn.centreOffsetTop();
 		
 		//Get weight if any
-		int weight = 1;
+		Weight weight = new IntWeight(1);
 		if(arc.hasAttribute("weight")){
-			weight = Integer.parseInt(arc.getAttribute("weight"));
+			weight = Weight.parseWeight(arc.getAttribute("weight"), constants);
 		}
 
 		Arc tempArc;
@@ -572,7 +575,7 @@ public class TapnXmlLoader {
 	private TimedOutputArcComponent parseAndAddTimedOutputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, int weight) throws FormatException {
+			double _endx, double _endy, Template template, Weight weight) throws FormatException {
 
 		TimedOutputArcComponent tempArc = new TimedOutputArcComponent(_startx, _starty, _endx, _endy, 
 				sourceIn, targetIn,	Integer.valueOf(inscriptionTempStorage), idInput, taggedArc);
@@ -599,7 +602,7 @@ public class TapnXmlLoader {
 	private TimedTransportArcComponent parseAndAddTransportArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants, int weight) {
+			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) {
 
 		
 		String[] inscriptionSplit = {};
@@ -678,7 +681,7 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInputArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants, int weight) throws FormatException {
+			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) throws FormatException {
 		Arc tempArc;
 		tempArc = new TimedInputArcComponent(new TimedOutputArcComponent(
 				_startx, _starty, _endx, _endy, sourceIn, targetIn, 1, idInput,
@@ -708,7 +711,7 @@ public class TapnXmlLoader {
 	private Arc parseAndAddTimedInhibitorArc(String idInput, boolean taggedArc,
 			String inscriptionTempStorage, PlaceTransitionObject sourceIn,
 			PlaceTransitionObject targetIn, double _startx, double _starty,
-			double _endx, double _endy, Template template, ConstantStore constants, int weight) {
+			double _endx, double _endy, Template template, ConstantStore constants, Weight weight) {
 		TimedInhibitorArcComponent tempArc = new TimedInhibitorArcComponent(
 				new TimedInputArcComponent(
 						new TimedOutputArcComponent(_startx, _starty, _endx, _endy,	sourceIn, targetIn, 1, idInput, taggedArc)
