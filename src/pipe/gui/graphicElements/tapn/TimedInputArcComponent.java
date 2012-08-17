@@ -95,9 +95,8 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 				else {
 					label.setText(inputArc.interval().toString(showConstantNames));
 				}
-				if(getWeight().value() > 1){
-					label.setText(getWeight().toString(showConstantNames)+"x "+label.getText());
-				}
+				
+				label.setText(getWeight().toString(showConstantNames)+" "+label.getText());
 			}
 			this.setLabelPosition();
 		}

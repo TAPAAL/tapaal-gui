@@ -20,7 +20,11 @@ public class IntWeight extends Weight{
 	
 	@Override
 	public String toString() {
-		return Integer.toString(value);
+		if(value > 1){
+			return Integer.toString(value) + "x";
+		} else {
+			return "";
+		}
 	}
 	
 	public String toString(boolean displayConstantNames) {

@@ -104,8 +104,8 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			label.setText("");
 		}
 		
-		if(underlyingTransportArc != null && getWeight().value() > 1){
-					label.setText(getWeight().toString(displayConstantNames)+"x "+label.getText());
+		if(underlyingTransportArc != null){
+					label.setText(getWeight().toString(displayConstantNames)+" "+label.getText());
 		}
 		
 		this.setLabelPosition();
