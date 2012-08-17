@@ -99,7 +99,15 @@ public class GuardDialogue extends JPanel /*
 			setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
 		}
 		// Weights
-		weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight().value());
+		if(objectToBeEdited instanceof TimedOutputArcComponent){
+			TimedOutputArcComponent arc = (TimedOutputArcComponent)objectToBeEdited;
+			if(arc.getWeight() instanceof ConstantWeight){
+				weightConstantsComboBox.setSelectedItem(((ConstantWeight)arc.getWeight()).constant().name());
+				weightUseConstant.doClick();
+			}
+			
+			weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight().value());
+		}
 	}
 
 
@@ -561,11 +569,6 @@ public class GuardDialogue extends JPanel /*
 			rightDelimiter.setSelectedItem("]");
 		} else {
 			rightDelimiter.setSelectedItem(")");
-		}
-		
-		if(arc.getWeight() instanceof ConstantWeight){
-			weightConstantsComboBox.setSelectedItem(((ConstantWeight)arc.getWeight()).constant().name());
-			weightUseConstant.doClick();
 		}
 	}
 
