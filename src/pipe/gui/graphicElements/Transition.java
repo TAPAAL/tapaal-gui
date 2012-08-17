@@ -18,6 +18,7 @@ import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
 
 /**
  * Petri-Net Transition Class for Drawing Transitions
@@ -177,6 +178,11 @@ public class Transition extends PlaceTransitionObject {
 	//Dummy is overridden
 	public boolean isBlueTransition(){
 		return blueTransition;
+	}
+	
+	//Dummy is overridden
+	public TimeInterval getDInterval(){
+		return null;
 	}
 	
 	/* Called at the end of animation to reset Transitions to false */

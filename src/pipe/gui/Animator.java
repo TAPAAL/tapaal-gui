@@ -162,7 +162,7 @@ public class Animator {
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if ((tempTransition.isEnabled(true))) {
+				if (tempTransition.isEnabled(true) || tempTransition.isBlueTransition(true)) {
 					fireableTrans.addTransition(temp, tempTransition);
 				}
 			}

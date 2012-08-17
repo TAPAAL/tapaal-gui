@@ -112,6 +112,10 @@ public class TimedTransitionComponent extends Transition {
 	public boolean isBlueTransition() {
 		return transition.isDEnabled();
 	}
+	
+	public TimeInterval getDInterval(){
+		return transition.getdInterval();
+	}
 
 	public dk.aau.cs.model.tapn.TimedTransition underlyingTransition() {
 		return transition;

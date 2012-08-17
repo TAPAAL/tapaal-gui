@@ -14,6 +14,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
@@ -51,9 +52,6 @@ public class EnabledTransitionsList extends JPanel{
 		});
 		
 		scrollPane = new JScrollPane(transitionsList);
-		//Add 10 pixel to the minimumsize of the scrollpane
-		scrollPane.setMinimumSize(new Dimension(scrollPane.getMinimumSize().width, scrollPane.getMinimumSize().height + 20));
-		
 		
 		fireButton = new JButton("Fire");
 		fireButton.addActionListener(new ActionListener() {
@@ -91,14 +89,16 @@ public class EnabledTransitionsList extends JPanel{
 	}
 	
 	public void addTransition(Template template, Transition transition){
-		ListItem item = new ListItem(transition, template, template.model().getTransitionByName(transition.getName()).isShared());
+		ListItem item = new ListItem(transition, template);
+		
+		transition.isBlueTransition();
 		if(!transitions.contains(item)){
 			transitions.addElement(item);
 		}
 	}
 	
 	public void removeTransition(Template template, Transition transition){
-		ListItem item = new ListItem(transition, template, template.model().getTransitionByName(transition.getName()).isShared());
+		ListItem item = new ListItem(transition, template);
 		transitions.removeElement(item);
 	}
 	
@@ -119,28 +119,38 @@ public class EnabledTransitionsList extends JPanel{
 		ListItem item = (ListItem)transitionsList.getSelectedValue();
 		
 		if(item != null) {
-			CreateGui.getAnimator().fireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
+			if(item.getTransition().isEnabled(true)){
+				CreateGui.getAnimator().fireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
+			} else {
+				CreateGui.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
+			}
 		}
 	}
 	
 	class ListItem implements Comparable<ListItem>{
 		private Transition transition;
 		private Template template;
-		private boolean isShared;
 		
-		public ListItem(Transition transition, Template template, boolean isShared){
+		public ListItem(Transition transition, Template template){
 			this.transition = transition;
 			this.template = template;
-			this.isShared = isShared;
 		}
 		
 		@Override
 		public String toString() {
+			String result;
+			
 			if(isShared()){
-				return getTransition().getName() + " (shared)";
+				result = getTransition().getName() + " (shared)";
 			} else {
-				return getTemplate() + "." + getTransition().getName();
+				result = getTemplate() + "." + getTransition().getName();
 			}
+			
+			if(transition.isBlueTransition() && transition.getDInterval().lowerBound().value() != 0){
+				result += " " + transition.getDInterval().toString();
+			}
+			
+			return result;
 		}
 		
 		@Override
@@ -161,7 +171,7 @@ public class EnabledTransitionsList extends JPanel{
 		}
 
 		public boolean isShared() {
-			return isShared;
+			return template.model().getTransitionByName(transition.getName()).isShared();
 		}
 
 	
