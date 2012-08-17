@@ -6,11 +6,12 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import pipe.gui.widgets.ArcTokenSelector.ArcTokenSelectorListener;
+import pipe.gui.widgets.ArcTokenSelector.ArcTokenSelectorListenerEvent;
 
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -23,7 +24,7 @@ public class AnimationSelectmodeDialog extends JPanel {
 
 	TimedTransition transition = null;
 
-	public ArrayList<JComboBox> presetPanels = new ArrayList<JComboBox>();
+	public ArrayList<ArcTokenSelector> arcTokenSelectors = new ArrayList<ArcTokenSelector>();
 
 	private JPanel namePanel;
 
@@ -80,35 +81,42 @@ public class AnimationSelectmodeDialog extends JPanel {
 			}
 		});
 
+		updateOkButton();
 		add(okButton, c);
 	}
 
 	private void createDropDownsForTransition(TimedTransition transition, JPanel presetPanelContainer) {
 		for (TimedInputArc arc : transition.getInputArcs()) {
-			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens());
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens(), arc.getWeight());
 			presetPanelContainer.add(tokenPanel);
 		}
 		
 		for (TransportArc arc : transition.getTransportArcsGoingThrough()) {
-			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens());
+			JPanel tokenPanel = createDropDownForArc(arc.source().toString(), arc.getElligibleTokens(), arc.getWeight());
 			presetPanelContainer.add(tokenPanel);
 		}
 	}
 
-	private JPanel createDropDownForArc(String placeName, List<TimedToken> elligibleTokens) {
-		JPanel presetPanel = new JPanel(new FlowLayout());
+	private JPanel createDropDownForArc(String placeName, List<TimedToken> elligibleTokens, int weight) {
+		ArcTokenSelector tokenSelector = new ArcTokenSelector(placeName, elligibleTokens, weight);
+		tokenSelector.addArcTokenSelectorListener(new ArcTokenSelectorListener() {
 
-		// For each place in the preset create a box for selecting tokens
-
-		presetPanel.setBorder(BorderFactory.createTitledBorder("Place " + placeName));
-		presetPanel.add(new JLabel("Select token"));
+			public void arcTokenSelectorActionPreformed(ArcTokenSelectorListenerEvent e) {
+				updateOkButton();
+			}
+		});
 		
-		JComboBox selectTokenBox = new JComboBox(elligibleTokens.toArray());
-		selectTokenBox.setSelectedIndex(0);
-
-		presetPanel.add(selectTokenBox);
-		presetPanels.add(selectTokenBox);
-		return presetPanel;
+		arcTokenSelectors.add(tokenSelector);
+		return tokenSelector;
+	}
+	
+	private void updateOkButton(){
+		boolean enable = true;
+		for(ArcTokenSelector selector : arcTokenSelectors){
+			enable = enable && selector.allChosen(); 
+		}
+		
+		okButton.setEnabled(enable);
 	}
 
 	private void exit() {
@@ -119,8 +127,8 @@ public class AnimationSelectmodeDialog extends JPanel {
 		if(cancelled) return null;
 		
 		List<TimedToken> tokens = new ArrayList<TimedToken>();
-		for(JComboBox box : presetPanels){
-			tokens.add((TimedToken)box.getSelectedItem());
+		for(ArcTokenSelector selector : arcTokenSelectors){
+			tokens.addAll(selector.getSelected());
 		}
 		
 		return tokens;

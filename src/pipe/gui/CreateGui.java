@@ -17,6 +17,10 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.jdesktop.swingx.MultiSplitLayout.Split;
 
 import net.tapaal.TAPAAL;
 import net.tapaal.Preferences;
@@ -28,6 +32,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
 
 
@@ -139,6 +144,7 @@ public class CreateGui {
 		appGui.activateSelectAction();
 		Verifyta.trySetup();
 		VerifyTAPN.trySetup();
+		VerifyTAPNDiscreteVerification.trySetup();
 
 		checkForUpdate(false);
 	}
@@ -326,5 +332,12 @@ public class CreateGui {
 	
 	public static boolean showZeroToInfinityIntervals() {
 		return showZeroToInfinityIntervals;
+	}
+	
+	public static void verifyQuery() {
+		TabContent tab = getCurrentTab();
+		if (tab.isQueryPossible()) {
+			getCurrentTab().verifySelectedQuery();
+		}
 	}
 }

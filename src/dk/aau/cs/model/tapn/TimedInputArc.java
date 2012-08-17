@@ -11,11 +11,16 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimedInputArc extends TAPNElement {
+	private int weight = 1;
 	private TimedPlace source;
 	private TimeInterval interval;
 	private TimedTransition destination;
 
-	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
+		this(source, destination, interval, 1);
+	}
+	
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, int weight) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
@@ -23,6 +28,15 @@ public class TimedInputArc extends TAPNElement {
 		this.source = source;
 		this.destination = destination;
 		setTimeInterval(interval);
+		this.weight = weight;
+	}
+	
+	public int getWeight(){
+		return weight;
+	}
+	
+	public void setWeight(int weight){
+		this.weight = weight;
 	}
 
 	public TimedPlace source() {
@@ -44,7 +58,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public boolean isEnabled() {
-		return getElligibleTokens().size() > 0;
+		return getElligibleTokens().size() >= weight;
 	}
 
 	public boolean isEnabledBy(TimedToken token) {
@@ -68,7 +82,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public TimedInputArc copy(TimedArcPetriNet tapn) {
-		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy());
+		return new TimedInputArc(tapn.getPlaceByName(source.name()), tapn.getTransitionByName(destination.name()), interval.copy(), weight);
 	}
 
 	// This method should ONLY be called in relation to sharing/unsharing a place

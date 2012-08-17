@@ -41,6 +41,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 
 
 	public Object getValueAt(int row, int col) {
+		if(row >= results.size())	return null;
 		BatchProcessingVerificationResult result = results.get(row);
 		
 		switch(col){
@@ -58,19 +59,22 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		if(result.query() == null) return "";
 		
 		ReductionOption reduction = result.query().getReductionOption();
+		
 		if(reduction == ReductionOption.VerifyTAPN) {
 			if(!result.query().discreteInclusion())
 				return "A";
 			else
 				return "B";
-		} else if(reduction == ReductionOption.STANDARD)
-			return "C";
-		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
+		} else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification)
+			return "C"; 
+		else if(reduction == ReductionOption.STANDARD)
 			return "D";
-		else if(reduction == ReductionOption.BROADCAST)
+		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
 			return "E";
-		else if(reduction == ReductionOption.DEGREE2BROADCAST)
+		else if(reduction == ReductionOption.BROADCAST)
 			return "F";
+		else if(reduction == ReductionOption.DEGREE2BROADCAST)
+			return "G";
 		else
 			return "";
 	}
@@ -81,7 +85,11 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 	}
 	
 	public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
+		Object t = getValueAt(0, c);
+		if(t == null){
+			return Object.class;
+		}
+        return t.getClass();
     }
 
 	public Iterable<BatchProcessingVerificationResult> getResults() {

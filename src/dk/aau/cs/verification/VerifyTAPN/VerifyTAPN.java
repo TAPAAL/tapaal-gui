@@ -19,6 +19,9 @@ import net.tapaal.TAPAAL;
 
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
+import pipe.gui.FileFinderImpl;
+import pipe.gui.MessengerImpl;
+import pipe.gui.Pipe;
 import pipe.gui.widgets.InclusionPlaces;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.Messenger;
@@ -127,9 +130,6 @@ public class VerifyTAPN implements ModelChecker {
 
 	public boolean isCorrectVersion() {
 		if (isNotSetup()) {
-			messenger.displayErrorMessage(
-					"No verifytapn specified: The verification is cancelled",
-					"Verification Error");
 			return false;
 		}
 		
@@ -140,6 +140,19 @@ public class VerifyTAPN implements ModelChecker {
 									+ "to manually set the verifytapn path.", "Verifytapn Error");
 			resetVerifytapn();
 			return false;
+		}
+		
+		String[] version = getVersion().split("\\.");
+		String[] targetversion = Pipe.verifytapnMinRev.split("\\.");
+		
+		for(int i = 0; i < targetversion.length; i++){
+			if(version.length < i+1)	version[i] = "0";
+			int diff = Integer.parseInt(version[i]) - Integer.parseInt(targetversion[i]);
+			if(diff > 0){
+				break;
+			}else if(diff < 0){
+				return false;
+			}
 		}
 		
 		return true;
@@ -159,6 +172,12 @@ public class VerifyTAPN implements ModelChecker {
 	public void setVerifyTapnPath(String path) {
 		verifytapnpath = path;
 		Preferences.getInstance().setVerifytapnLocation(path);
+		if(!isCorrectVersion()){
+			messenger
+			.displayErrorMessage(
+					"The specified version of the file verifytapn is too old.", "Verifytapn Error");
+			resetVerifytapn();
+		}
 	}
 
 	public boolean setup() {
@@ -185,7 +204,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	private boolean isNotSetup() {
-		return verifytapnpath == null || verifytapnpath.equals("");
+		return verifytapnpath == null || verifytapnpath.equals("") || !(new File(verifytapnpath)).exists();
 	}
 	
 	public static boolean trySetup() {
@@ -197,7 +216,13 @@ public class VerifyTAPN implements ModelChecker {
 		if (verifytapn != null && !verifytapn.isEmpty()) {
 			if (new File(verifytapn).exists()){
 				verifytapnpath = verifytapn;
-				return true;
+				VerifyTAPN v = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+				if(v.isCorrectVersion()){
+					return true;
+				}else{
+					verifytapn = null;
+					verifytapnpath = null;
+				}
 			}
 		}
 		
@@ -218,7 +243,13 @@ public class VerifyTAPN implements ModelChecker {
 			if (verifytapnfile.exists()){
 
 				verifytapnpath = verifytapnfile.getAbsolutePath();
-				return true;
+				VerifyTAPN v = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
+				if(v.isCorrectVersion()){
+					return true;
+				}else{
+					verifytapn = null;
+					verifytapnpath = null;
+				}
 
 			}
 		}
@@ -345,9 +376,8 @@ public class VerifyTAPN implements ModelChecker {
 		return result;
 	}
 	
-	
 	boolean supportsModel(TimedArcPetriNet model) {
-		return true;
+		return !model.hasWeights();
 	}
 	
 	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {

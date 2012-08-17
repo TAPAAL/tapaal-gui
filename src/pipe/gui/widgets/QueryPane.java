@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
@@ -30,6 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.dataLayer.TAPNQuery;
+import pipe.gui.CreateGui;
 import pipe.gui.Verifier;
 import pipe.gui.undo.AddQueryCommand;
 import pipe.gui.undo.RemoveQueryCommand;
@@ -62,7 +64,7 @@ public class QueryPane extends JPanel {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private JButton sortButton;
-	
+
 	private static final String toolTipNewQuery = "Create a new query";
 	private static final String toolTipEditQuery="Edit the selected query";
 	private static final String toolTipRemoveQuery="Remove the selected query";
@@ -70,7 +72,7 @@ public class QueryPane extends JPanel {
 	private static final String toolTipSortQueries="Sort the queries alphabetically";
 	private final static String toolTipMoveUp = "Move the selected query up";
 	private final static String toolTipMoveDown = "Move the selected query down";
-	
+
 	//private static final String toolTipQueryPane = "Here you can manage queries. Queries can explore properties of the Net.";
 
 	public QueryPane(ArrayList<TAPNQuery> queriesToSet,	TabContent tabContent) {
@@ -79,7 +81,7 @@ public class QueryPane extends JPanel {
 		queryCollectionPanel = new JPanel(new GridBagLayout());
 		buttonsPanel = new JPanel(new GridBagLayout());
 		listModel = new DefaultListModel();
-		
+
 		listModel.addListDataListener(new ListDataListener() {
 			public void contentsChanged(ListDataEvent arg0) {
 			}
@@ -131,13 +133,13 @@ public class QueryPane extends JPanel {
 		//this.setToolTipText(toolTipQueryPane);
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Queries"), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 		this.setToolTipText("List of verification queries (double click to edit)");
-		
+
 		this.addComponentListener(new ComponentListener() {
 			int minimumHegiht = QueryPane.this.getMinimumSize().height;
 			public void componentShown(ComponentEvent e) {
 			}
+
 			
-			@Override
 			public void componentResized(ComponentEvent e) {
 				if(QueryPane.this.getSize().height <= minimumHegiht){
 					sortButton.setVisible(false);
@@ -145,19 +147,19 @@ public class QueryPane extends JPanel {
 					sortButton.setVisible(true);
 				}
 			}
+
 			
-			@Override
 			public void componentMoved(ComponentEvent e) {
 			}
+
 			
-			@Override
 			public void componentHidden(ComponentEvent e) {
 			}
 		});
-		
+
 		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 	}
-	
+
 	public void updateQueryButtons() {
 		TAPNQuery query = (TAPNQuery)queryList.getSelectedValue();
 		if (queryList.getSelectedIndex() == -1 || !query.isActive()) {
@@ -174,8 +176,8 @@ public class QueryPane extends JPanel {
 			moveUpButton.setEnabled(true);
 		else
 			moveUpButton.setEnabled(false);
-				
-			
+
+
 		if(index < listModel.size()-1)
 			moveDownButton.setEnabled(true);
 		else
@@ -184,7 +186,7 @@ public class QueryPane extends JPanel {
 
 	private void addQueriesComponents() {
 		queryScroller = new JScrollPane(queryList);
-		
+
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -194,47 +196,47 @@ public class QueryPane extends JPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		queryCollectionPanel.add(queryScroller, gbc);
-		
+
 		moveUpButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Up.png")));
 		moveUpButton.setEnabled(false);
 		moveUpButton.setToolTipText(toolTipMoveUp);
 		moveUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
-				
+
 				if(index > 0) {
 					swapQueries(index, index-1);
 					queryList.setSelectedIndex(index-1);
 				}
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.SOUTH;
 		queryCollectionPanel.add(moveUpButton,gbc);
-		
+
 		moveDownButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Down.png")));
 		moveDownButton.setEnabled(false);
 		moveDownButton.setToolTipText(toolTipMoveDown);
 		moveDownButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int index = queryList.getSelectedIndex();
-				
+
 				if(index < listModel.size()-1) {
 					swapQueries(index, index+1);
 					queryList.setSelectedIndex(index+1);
 				}
 			}
 		});
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.NORTH;
 		queryCollectionPanel.add(moveDownButton,gbc);
-		
+
 		//Sort button
 		sortButton = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("resources/Images/Sort.png")));
 		sortButton.setToolTipText(toolTipSortQueries);
@@ -278,12 +280,7 @@ public class QueryPane extends JPanel {
 		verifyButton.setPreferredSize(dimension);
 		verifyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
-				
-				if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-					Verifier.runVerifyTAPNVerification(tabContent.network(), query);
-				else
-					Verifier.runUppaalVerification(tabContent.network(), query);
+				verifyQuery();
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -328,7 +325,7 @@ public class QueryPane extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		buttonsPanel.add(addQueryButton, gbc);
 	}
-	
+
 	private void swapQueries(int currentIndex, int newIndex) {
 		TAPNQuery temp = (TAPNQuery)listModel.get(currentIndex);
 		listModel.set(currentIndex, listModel.get(newIndex));
@@ -340,7 +337,7 @@ public class QueryPane extends JPanel {
 		if(q.isActive()) {
 			TAPNQuery newQuery = QueryDialog.showQueryDialogue(
 					QueryDialogueOption.Save, q, tabContent.network());
-	
+
 			if (newQuery != null)
 				updateQuery(q, newQuery);
 		}
@@ -378,7 +375,7 @@ public class QueryPane extends JPanel {
 	public void removeQuery(TAPNQuery queryToRemove) {
 		listModel.removeElement(queryToRemove);
 	}
-	
+
 	private class QueryCellRenderer extends JLabel implements ListCellRenderer {
 		private static final long serialVersionUID = 3071924451912979500L;
 
@@ -407,6 +404,23 @@ public class QueryPane extends JPanel {
 
 	public void selectFirst() {
 		queryList.setSelectedIndex(0);
-		
+
+	}
+
+	private void verifyQuery() {
+		TAPNQuery query = (TAPNQuery) queryList.getSelectedValue();
+
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
+			Verifier.runVerifyTAPNVerification(tabContent.network(), query);
+		else
+			Verifier.runUppaalVerification(tabContent.network(), query);
+	}
+
+	public boolean isQueryPossible() {
+		return (queryList.getModel().getSize() > 0 );
+	}
+
+	public void verifySelectedQuery() {
+		verifyQuery();
 	}
 }

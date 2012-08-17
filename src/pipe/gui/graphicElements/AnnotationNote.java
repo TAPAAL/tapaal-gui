@@ -32,6 +32,8 @@ public class AnnotationNote extends Note {
 	private ResizePoint[] dragPoints = new ResizePoint[8];
 
 	private AffineTransform prova = new AffineTransform();
+	
+	private boolean isNew = true;
 
 	public AnnotationNote(int x, int y) {
 		super(x, y);
@@ -334,6 +336,14 @@ public class AnnotationNote extends Note {
 		annotation.getNote().addMouseMotionListener(noteHandler);
 		
 		return annotation;
+	}
+	
+	public boolean isNew(){
+		if(isNew){
+			isNew = false;
+			return true;
+		}
+		return false;
 	}
 
 }

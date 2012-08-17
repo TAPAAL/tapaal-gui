@@ -208,26 +208,25 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public boolean isEnabledBy(List<TimedToken> tokens) {
-		if (presetSize() != tokens.size()) return false;
-
-		boolean validToken = false;
-		for (TimedToken token : tokens) {
-			for (TimedInputArc inputArc : preset) {
+		
+		for(TimedInputArc inputArc : preset){
+			int tokensMissing = inputArc.getWeight();
+			for (TimedToken token : tokens) {
 				if (inputArc.source().equals(token.place()) && inputArc.isEnabledBy(token)) {
-					validToken = true;
-					break;
+					tokensMissing--;
 				}
 			}
-
-			for (TransportArc transportArc : transportArcsGoingThrough) {
+			if(tokensMissing != 0) return false;
+		}
+		
+		for(TransportArc transportArc : transportArcsGoingThrough){
+			int tokensMissing = transportArc.getWeight();
+			for (TimedToken token : tokens) {
 				if (transportArc.source().equals(token.place()) && transportArc.isEnabledBy(token)) {
-					validToken = true;
-					break;
+					tokensMissing--;
 				}
 			}
-
-			if (!validToken)
-				return false;
+			if(tokensMissing != 0) return false;
 		}
 
 		return true;
@@ -238,7 +237,9 @@ public class TimedTransition extends TAPNElement {
 
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
 		for (TimedOutputArc arc : postset) {
-			producedTokens.add(new TimedToken(arc.destination()));
+			for(int i = 0; i < arc.getWeight(); i++){
+				producedTokens.add(new TimedToken(arc.destination()));
+			}
 		}
 
 		for (TransportArc transportArc : transportArcsGoingThrough) {
@@ -248,7 +249,7 @@ public class TimedTransition extends TAPNElement {
 				}
 			}
 		}
-
+		
 		return producedTokens;
 	}
 
@@ -256,13 +257,13 @@ public class TimedTransition extends TAPNElement {
 		List<TimedToken> tokensToConsume = new ArrayList<TimedToken>();
 
 		for (TimedInputArc arc : preset) {
-			TimedToken token = firingMode.pickTokenFrom(arc.getElligibleTokens());
-			tokensToConsume.add(token);
+			List<TimedToken> tokens = firingMode.pickTokensFrom(arc.getElligibleTokens(), arc.getWeight());
+			tokensToConsume.addAll(tokens);
 		}
 
 		for (TransportArc arc : transportArcsGoingThrough) {
-			TimedToken token = firingMode.pickTokenFrom(arc.getElligibleTokens());
-			tokensToConsume.add(token);
+			List<TimedToken> tokens = firingMode.pickTokensFrom(arc.getElligibleTokens(), arc.getWeight());
+			tokensToConsume.addAll(tokens);
 		}
 
 		return tokensToConsume;

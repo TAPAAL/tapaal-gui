@@ -33,15 +33,19 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class Animator {
 	private ArrayList<TAPNNetworkTraceStep> actionHistory;
 	private int currentAction;
 	private ArrayList<NetworkMarking> markings;
 	private int currentMarkingIndex = 0;
+	private TAPNNetworkTrace trace = null;
 
 	public FiringMode firingmode = new RandomFiringMode();
 	private TabContent tab;
@@ -65,6 +69,7 @@ public class Animator {
 
 	public void SetTrace(TAPNNetworkTrace trace) {
 		if (trace.isConcreteTrace()) {
+			this.trace = trace;
 			setTimedTrace(trace);
 		} else {
 			setUntimedTrace(trace);
@@ -89,18 +94,25 @@ public class Animator {
 
 		JOptionPane.showMessageDialog(CreateGui.getApp(),
 				"The verification process returned an untimed trace.\n\n"
-				+ "This means that with appropriate time delays the displayed\n"
-				+ "sequence of discrete transitions can become a concrete trace.\n"
-				+ "In case of liveness properties (EG, AF) the untimed trace\n"
-				+ "either ends in a deadlock, a time divergent computation without\n"
-				+ "any discrete transitions, or it loops back to some earlier configuration.\n"
-				+ "The user may experiment in the simulator with different time delays\n"
-				+ "in order to realize the suggested untimed trace in the model.",
-				"Verification Information", JOptionPane.INFORMATION_MESSAGE);
+						+ "This means that with appropriate time delays the displayed\n"
+						+ "sequence of discrete transitions can become a concrete trace.\n"
+						+ "In case of liveness properties (EG, AF) the untimed trace\n"
+						+ "either ends in a deadlock, a time divergent computation without\n"
+						+ "any discrete transitions, or it loops back to some earlier configuration.\n"
+						+ "The user may experiment in the simulator with different time delays\n"
+						+ "in order to realize the suggested untimed trace in the model.",
+						"Verification Information", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void setTimedTrace(TAPNNetworkTrace trace) {
 		for (TAPNNetworkTraceStep step : trace) {
+			addMarking(step, step.performStepFrom(currentMarking()));
+		}
+		CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+	}
+
+	private void addToTimedTrace(List<TAPNNetworkTraceStep> stepList){
+		for (TAPNNetworkTraceStep step : stepList) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
 	}
@@ -141,11 +153,11 @@ public class Animator {
 			}
 		}
 	}
-	
+
 	public void updateFireableTransitions(){
 		EnabledTransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
 		fireableTrans.startReInit();
-		
+
 		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
@@ -155,7 +167,7 @@ public class Animator {
 				}
 			}
 		}
-		
+
 		fireableTrans.reInitDone();
 	}
 
@@ -229,6 +241,23 @@ public class Animator {
 	 */
 
 	public void stepForward() {
+		if(currentAction == actionHistory.size()-1 && trace != null){
+			int selectedIndex = CreateGui.getAnimationHistory().getSelectedIndex();
+			int action = currentAction;
+			int markingIndex = currentMarkingIndex;
+
+			if(getTrace().getTraceType() == TraceType.EG_DELAY_FOREVER){
+				addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
+			}
+			if(getTrace().getLoopToIndex() != -1){
+				addToTimedTrace(getTrace().getLoopSteps());
+			}
+
+			CreateGui.getAnimationHistory().setSelectedIndex(selectedIndex);
+			currentAction = action;
+			currentMarkingIndex = markingIndex;
+		}
+
 		if (currentAction < actionHistory.size() - 1) {
 			TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction+1);
 			if(isDisplayingUntimedTrace && nextStep instanceof TAPNNetworkTimedTransitionStep){
@@ -268,9 +297,11 @@ public class Animator {
 
 	// TODO: Clean up this method
 	public void fireTransition(TimedTransition transition) {
-		
-		CreateGui.getAnimationHistory().clearStepsForward();
-		
+
+		if(!clearStepsForward()){
+			return;
+		}
+
 		NetworkMarking next = null;
 		try{
 			if (getFiringmode() != null) {
@@ -298,14 +329,13 @@ public class Animator {
 				}else{
 					int fireTransition = JOptionPane.showConfirmDialog(CreateGui.getApp(),
 							"Are you sure you want to fire a transition which does not follow the untimed trace?\n"
-							+ "Firing this transition will discard the untimed trace and revert to standard simulation.",
-							"Discrading Untimed Trace", JOptionPane.YES_NO_OPTION );
+									+ "Firing this transition will discard the untimed trace and revert to standard simulation.",
+									"Discrading Untimed Trace", JOptionPane.YES_NO_OPTION );
 
 					if (fireTransition == JOptionPane.NO_OPTION){
 						return;
 					}else{
-						CreateGui.removeAbstractAnimationPane();
-						isDisplayingUntimedTrace = false;
+						removeSetTrace(false);
 					}
 				}
 			}
@@ -322,24 +352,27 @@ public class Animator {
 	}
 
 	public boolean letTimePass(BigDecimal delay) {
-		CreateGui.getAnimationHistory().clearStepsForward();
-		
+
+		if(!clearStepsForward()){
+			return false;
+		}
+
 		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
 			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
 			result = true;
 		}
-		
+
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
 		reportBlockingPlaces();
 		return result;
 	}
-	
+
 	public void reportBlockingPlaces(){
-		
+
 		try{
 			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
 			if(delay.compareTo(new BigDecimal(0))<=0){
@@ -430,62 +463,62 @@ public class Animator {
 		CreateGui.getAnimationController().updateFiringModeComboBox();
 		CreateGui.getAnimationController().setToolTipText("Select a method for choosing tokens during transition firing");
 	}	
-	
+
 	enum FillListStatus{
-		zero,
-		one,
-		moreThanOne
+		lessThanWeight,
+		weight,
+		moreThanWeight
 	}
-	
-	//Creates a list of tokens if there is only one token in each of the places
+
+	//Creates a list of tokens if there is only weight tokens in each of the places
 	//Used by getTokensToConsume
 	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
 		for(TimedInputArc in: transition.getInputArcs()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() == 0){
-				return FillListStatus.zero;
-			} else if(elligibleTokens.size() == 1){
-				listToFill.add(elligibleTokens.get(0));
+			if(elligibleTokens.size() < in.getWeight()){
+				return FillListStatus.lessThanWeight;
+			} else if(elligibleTokens.size() == in.getWeight()){
+				listToFill.addAll(elligibleTokens);
 			} else {
-				return FillListStatus.moreThanOne;
+				return FillListStatus.moreThanWeight;
 			}
 		}
 		for(TransportArc in: transition.getTransportArcsGoingThrough()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() == 0){
-				return FillListStatus.zero;
-			} else if(elligibleTokens.size() == 1){
-				listToFill.add(elligibleTokens.get(0));
+			if(elligibleTokens.size() < in.getWeight()){
+				return FillListStatus.lessThanWeight;
+			} else if(elligibleTokens.size() == in.getWeight()){
+				listToFill.addAll(elligibleTokens);
 			} else {
-				return FillListStatus.moreThanOne;
+				return FillListStatus.moreThanWeight;
 			}
 		}
-		return FillListStatus.one;
+		return FillListStatus.weight;
 	}
-	
+
 	private List<TimedToken> getTokensToConsume(TimedTransition transition){
-		//If there are only one token in each place
+		//If there are only "weight tokens in each place
 		List<TimedToken> result = new ArrayList<TimedToken>();
 		boolean userShouldChoose = false;
 		if(transition.isShared()){
 			for(TimedTransition t : transition.sharedTransition().transitions()){
 				FillListStatus status = fillList(t, result);
-				if(status == FillListStatus.zero){
+				if(status == FillListStatus.lessThanWeight){
 					return null;
-				} else if(status == FillListStatus.moreThanOne){
+				} else if(status == FillListStatus.moreThanWeight){
 					userShouldChoose = true;
 					break;
 				}
 			}
 		} else {
 			FillListStatus status = fillList(transition, result);
-			if(status == FillListStatus.zero){
+			if(status == FillListStatus.lessThanWeight){
 				return null;
-			} else if(status == FillListStatus.moreThanOne){
+			} else if(status == FillListStatus.moreThanWeight){
 				userShouldChoose = true;
 			}
 		}
-		
+
 		if (userShouldChoose){
 			return showSelectSimulatorDialogue(transition);
 		} else {
@@ -514,6 +547,40 @@ public class Animator {
 
 	public void reset(){
 		resethistory();
+		removeSetTrace(false);
+	}
+
+	public boolean removeSetTrace(boolean askUser){
+		if(askUser && isShowingTrace()){ //Warn about deleting trace
+			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
+					"You are about to remove the current trace.", 
+					"Removing Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(answer == JOptionPane.CANCEL_OPTION) return false;
+		}
+		if(isDisplayingUntimedTrace){
+			CreateGui.removeAbstractAnimationPane();
+		}
 		isDisplayingUntimedTrace = false;
+		trace = null;
+		return true;
+	}
+
+	public TimedTAPNNetworkTrace getTrace(){
+		return (TimedTAPNNetworkTrace)trace;
+	}
+
+	private boolean clearStepsForward(){
+		boolean answer = true;
+		if(!isDisplayingUntimedTrace){
+			answer = removeSetTrace(true);
+		}
+		if(answer){
+			CreateGui.getAnimationHistory().clearStepsForward();
+		}
+		return answer;
+	}
+
+	public boolean isShowingTrace(){
+		return isDisplayingUntimedTrace || trace != null;
 	}
 }
