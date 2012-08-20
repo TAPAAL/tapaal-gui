@@ -147,7 +147,17 @@ public class TransportArc extends TAPNElement {
 			result = IntervalOperations.union(temp, result);
 		}
 		
-		//TODO Consider invariants (both on destination and source)
+		if(source.tokens().size() > 0){
+			//Invariants on destination
+			TimedToken youngestToken = source.tokens().get(0);
+			for(TimedToken t : source.tokens()){
+				if(t.age().compareTo(youngestToken.age()) < 0){
+					youngestToken = t;
+				}
+			}
+			
+			result = IntervalOperations.intersection(destination.invariant().subtractToken(youngestToken.age()), result);
+		}
 		return result;
 	}
 	

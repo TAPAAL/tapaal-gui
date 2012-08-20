@@ -25,6 +25,7 @@ public class TimeInterval {
 		this.lower = lower;
 		this.upper = upper;
 		this.isUpperIncluded = isUpperIncluded;
+		
 		Require.that(isValidInterval(), "The constructed interval "
 				+ toString() + " is empty.");
 	}
@@ -40,7 +41,7 @@ public class TimeInterval {
 
 	private boolean isValidInterval() {
 		boolean canBoundsBeEqual = isLowerIncluded && isUpperIncluded;
-		boolean upperIsInfinity = upper == Bound.Infinity;
+		boolean upperIsInfinity = (upper instanceof InfBound);
 		boolean equalBounds = !upperIsInfinity
 				&& IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) == 0;
 		boolean lowerIsNotInfinity = lower != Bound.Infinity;
