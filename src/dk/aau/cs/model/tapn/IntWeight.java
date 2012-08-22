@@ -30,4 +30,8 @@ public class IntWeight extends Weight{
 	public String toString(boolean displayConstantNames) {
 		return toString();
 	}
+	
+	public String nameForSaving(boolean writeConstantNames){
+		return Integer.toString(value);
+	}
 }

@@ -4,6 +4,7 @@ public abstract class Weight {
 	public abstract int value();
 	public abstract Weight copy();
 	public abstract String toString(boolean displayConstantnames);
+	public abstract String nameForSaving(boolean writeConstantNames);
 	
 	public static Weight parseWeight(String attribute, ConstantStore constants) {
 		Weight weight;

@@ -107,7 +107,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
 		modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
 		if(inputArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + inputArc.getWeight().toString(false) + "\"");
+			modelStream.append("weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
@@ -120,7 +120,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
 		modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
 		if(outputArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + outputArc.getWeight().toString(false) + "\"");
+			modelStream.append("weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
@@ -134,7 +134,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
 		modelStream.append("target=\"" + transArc.destination().name() + "\" ");
 		if(transArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + transArc.getWeight().toString(false) + "\"");
+			modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
@@ -147,7 +147,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
 		modelStream.append("target=\"" + inhibArc.destination().name() + "\" ");
 		if(inhibArc.getWeight().value() > 1){
-			modelStream.append("weight=\"" + inhibArc.getWeight().toString(false) + "\"");
+			modelStream.append("weight=\"" + inhibArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
