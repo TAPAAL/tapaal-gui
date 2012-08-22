@@ -348,6 +348,9 @@ public class TimedTransition extends TAPNElement {
 	 * Returns the dInterval lastly calculated
 	 */
 	public TimeInterval getdInterval() {
+		if(dInterval == null){
+			dInterval = calculateDInterval();
+		}
 		return dInterval;
 	}
 }

@@ -86,7 +86,7 @@ public class EnabledTransitionsList extends JPanel{
 	public void reInitDone(){
 		updateFireButton();
 		//Trick to make the "splitter" appear
-		transitions.addElement(new SplitterListItem());
+		//transitions.addElement(new SplitterListItem());
 		//sort the transitions
 		Object[] temp = (Object[])transitions.toArray();
 		Arrays.sort(temp);
@@ -171,11 +171,11 @@ public class EnabledTransitionsList extends JPanel{
 			this.template = template;
 		}
 
-		@Override
-		public String toString() {
+		public String toString(boolean showIntervals) {
 
-			String result = getTransition().getName() + " " + transition.getDInterval().toString();
-
+			String result = getTransition().getName()  + (transition.getDInterval() == null && showIntervals ? 
+					"" : " " + transition.getDInterval().toString());
+ 
 			if(isShared()){
 				result += " (shared)";
 			} else {
@@ -183,6 +183,10 @@ public class EnabledTransitionsList extends JPanel{
 			}
 
 			return "<html><font color=" + (transition.highlighted ? "red" : "blue") + ">" + result + "</font></html>";
+		}
+		
+		public String toString(){
+			return toString(true);
 		}
 
 		@Override

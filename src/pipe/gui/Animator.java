@@ -284,13 +284,8 @@ public class Animator {
 	public void dFireTransition(TimedTransition transition){
 		TimeInterval dInterval = transition.getdInterval();
 		
-		if(dInterval.IsLowerBoundNonStrict()){
-			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound());
-		} else {
-			BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
-			
-			letTimePass(IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(delayGranularity, new MathContext(Pipe.AGE_PRECISION)));
-		}
+		BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
+		letTimePass(CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity));
 		
 		fireTransition(transition);
 	}
