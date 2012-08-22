@@ -41,4 +41,13 @@ public class ConstantWeight extends Weight{
 			return "";
 		}
 	}
+	
+	public String nameForSaving(boolean writeConstantNames){
+		if(writeConstantNames){
+			return constant.name();
+		} else {
+			return Integer.toString(constant.value());
+		}
+		
+	}
 }
