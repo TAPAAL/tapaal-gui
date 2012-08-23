@@ -353,4 +353,36 @@ public class TimedTransition extends TAPNElement {
 		}
 		return dInterval;
 	}
+
+	public int getLagestAssociatedConstant() {
+		int biggestConstant = -1;
+		for(TimedInputArc arc : preset){
+			Bound max = IntervalOperations.getMaxNoInfBound(arc.interval());
+			if(max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+			max = arc.source().invariant().upperBound();
+			if(max instanceof InfBound && max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+		}
+		
+		for(TransportArc arc : transportArcsGoingThrough){
+			Bound max = IntervalOperations.getMaxNoInfBound(arc.interval());
+			if(max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+			max = arc.source().invariant().upperBound();
+			if(max instanceof InfBound && max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+			
+			max = arc.destination().invariant().upperBound();
+			if(max instanceof InfBound && max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+		}
+		
+		return biggestConstant;
+	}
 }

@@ -420,4 +420,34 @@ public class TimedArcPetriNetNetwork {
 		}
 		return false;
 	}
+	
+	/**
+	 * Finds the biggest constant in the active part of the network
+	 * @return The biggest constant in the active part of the network or -1 if there are no constants in the net
+	 */
+	public int biggestConstantInActiveNet(){
+		int biggestConstant = -1;
+		for(TimedArcPetriNet tapn : this.activeTemplates()){
+			int tmp = tapn.getBiggestConstant();
+			if(tmp > biggestConstant){
+				biggestConstant = tmp;
+			}
+		}
+		return biggestConstant;
+	}
+	
+	/**
+	 * Finds the biggest constant which is associated with an enabled transition in the active part of the network
+	 * @return The biggest constant which is associated with an enabled transition in the active part of the net or -1 if there are no such constants 
+	 */
+	public int biggestContantInActiveNetEnabledTransitions(){
+		int biggestConstant = -1;
+		for(TimedArcPetriNet tapn : this.activeTemplates()){
+			int tmp = tapn.getBiggestConstantEnabledTransitions();
+			if(tmp > biggestConstant){
+				biggestConstant = tmp;
+			}
+		}
+		return biggestConstant;
+	}
 }

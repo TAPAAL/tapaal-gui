@@ -106,4 +106,12 @@ public class IntervalOperations {
 			return i1;
 		}
 	}
+	
+	public static Bound getMaxNoInfBound(TimeInterval interval){
+		if(interval.upperBound() instanceof Bound.InfBound){
+			return interval.lowerBound();
+		} else {
+			return interval.upperBound();
+		}
+	}
 }
