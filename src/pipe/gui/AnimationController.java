@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
@@ -300,7 +301,9 @@ public class AnimationController extends JPanel {
 	
 	public BigDecimal getCurrentDelay() throws NumberFormatException, ParseException{
 		String oldText = TimeDelayField.getText();
-		if (Pattern.matches("^(([1-9]([0-9])*)?|0)(\\.([0-9]){6,})?$",  oldText)) {			
+		char localDecimalseparator = DecimalFormatSymbols.getInstance().getDecimalSeparator();
+
+		if (Pattern.matches("^(([1-9]([0-9])*)?|0)(" + Pattern.quote(Character.toString(localDecimalseparator)) + "([0-9]){6,})?$",  oldText)) {
 			if (oldText.indexOf('.') != -1) {
 				TimeDelayField.setText(oldText.substring(0,oldText.indexOf('.')+6));	
 				JOptionPane.showMessageDialog(CreateGui.getApp(),
@@ -355,7 +358,7 @@ public class AnimationController extends JPanel {
 	
 	private void initializeDocumentFilterForDelayInput() {
 		javax.swing.text.Document doc = TimeDelayField.getDocument();
-		((AbstractDocument)doc).setDocumentFilter(new DecimalOnlyDocumentFilter());
+		((AbstractDocument)doc).setDocumentFilter(new DecimalOnlyDocumentFilter(5));
 	}
 
 	JTextField TimeDelayField = new JTextField();

@@ -1,5 +1,7 @@
 package pipe.gui.widgets;
 
+import java.text.DecimalFormatSymbols;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.text.AttributeSet;
@@ -7,6 +9,16 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 public class DecimalOnlyDocumentFilter extends DocumentFilter{
+		
+		int numberOfDecimalPlaces;
+	
+		public DecimalOnlyDocumentFilter() {
+			this(-1);
+		}
+	
+		public DecimalOnlyDocumentFilter(int numberOfDecimalPlaces){
+			this.numberOfDecimalPlaces = numberOfDecimalPlaces;
+		}
 	
 		@Override
 		public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -33,7 +45,10 @@ public class DecimalOnlyDocumentFilter extends DocumentFilter{
 			}
 		}
 		private boolean stringIsValidDecimal(String text) {
-			return Pattern.matches("^(([1-9]([0-9])*)?|0)(\\.([0-9])*)?$",text);
+			char localDecimalseparator = DecimalFormatSymbols.getInstance().getDecimalSeparator();
+			Pattern pattern = Pattern.compile("^(([1-9]([0-9])*)?|0)(" + Pattern.quote(Character.toString(localDecimalseparator)) + "([0-9]*))?$");
+			Matcher m = pattern.matcher(text);
+			return m.matches() && (numberOfDecimalPlaces < 0 || m.group(5) == null || m.group(5).length() <= numberOfDecimalPlaces);
 		}
 	}
 
