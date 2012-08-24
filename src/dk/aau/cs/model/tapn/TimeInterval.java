@@ -78,15 +78,17 @@ public class TimeInterval {
 	}
 
 	private boolean satisfiesLowerBound(BigDecimal value) {
-		int compare = value.compareTo(new BigDecimal(lower.value()));
+		BigDecimal lowerAsBigDec = IntervalOperations.getRatBound(lower).getBound();
+		int compare = value.compareTo(lowerAsBigDec);
 		return isLowerIncluded ? (compare >= 0) : (compare > 0);
 	}
 
 	private boolean satisfiesUpperBound(BigDecimal value) {
 		if (upper instanceof InfBound)
 			return true;
-
-		int compare = value.compareTo(new BigDecimal(upper.value()));
+		
+		BigDecimal upperAsBigDec = IntervalOperations.getRatBound(upper).getBound();
+		int compare = value.compareTo(upperAsBigDec);
 		return isUpperIncluded ? (compare <= 0) : (compare < 0);
 	}
 

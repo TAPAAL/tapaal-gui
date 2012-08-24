@@ -285,11 +285,23 @@ public class Animator {
 		TimeInterval dInterval = transition.getdInterval();
 		
 		BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
-		BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
-		if(delay != null){
-			letTimePass(delay);
+		//Make sure the granularity is small enough
+		BigDecimal lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
+		if(!dInterval.IsLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
+			do{
+				delayGranularity = delayGranularity.divide(BigDecimal.TEN);
+			} while (delayGranularity.compareTo(new BigDecimal("0.00001")) >= 0 && !dInterval.isIncluded(lowerBound.add(delayGranularity)));
+		}
 		
-			fireTransition(transition);
+		if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
+		} else {
+			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
+			if(delay != null){
+				letTimePass(delay);
+			
+				fireTransition(transition);
+			}
 		}
 	}
 
