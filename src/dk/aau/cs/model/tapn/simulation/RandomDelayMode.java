@@ -52,7 +52,6 @@ public class RandomDelayMode implements DelayMode{
 			//if the number 100000 is generated and the integerpart is maxToGenerate
 			//if 100000 is generated otherwise the number is considered invalid and a new is generated
 			int fractionalPart = r.nextInt((int)Math.pow(10, numberOfDecimals) + 1);
-			System.err.println("Int: " + integerPart + " Frac: " + fractionalPart + " lol: " + (int)Math.pow(10, numberOfDecimals));
 			if(fractionalPart == (int)Math.pow(10, numberOfDecimals)){
 				if(integerPart == maxValue -1){
 					integerPart = maxValue;

@@ -285,9 +285,12 @@ public class Animator {
 		TimeInterval dInterval = transition.getdInterval();
 		
 		BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
-		letTimePass(CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity));
+		BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
+		if(delay != null){
+			letTimePass(delay);
 		
-		fireTransition(transition);
+			fireTransition(transition);
+		}
 	}
 
 	// TODO: Clean up this method
