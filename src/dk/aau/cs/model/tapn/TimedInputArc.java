@@ -15,16 +15,16 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimedInputArc extends TAPNElement {
-	private int weight = 1;
+	private Weight weight = new IntWeight(1);
 	private TimedPlace source;
 	private TimeInterval interval;
 	private TimedTransition destination;
 
 	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval){
-		this(source, destination, interval, 1);
+		this(source, destination, interval, new IntWeight(1));
 	}
 	
-	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, int weight) {
+	public TimedInputArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
 		Require.that(source != null, "A timed input arc cannot have a null source place");
 		Require.that(destination != null, "A timed input arc cannot have a null destination transition");
 		Require.that(!source.isShared() || !destination.isShared(), "You cannot draw an arc between a shared transition and shared place.");
@@ -35,11 +35,11 @@ public class TimedInputArc extends TAPNElement {
 		this.weight = weight;
 	}
 	
-	public int getWeight(){
+	public Weight getWeight(){
 		return weight;
 	}
 	
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		this.weight = weight;
 	}
 
@@ -62,7 +62,7 @@ public class TimedInputArc extends TAPNElement {
 	}
 
 	public boolean isEnabled() {
-		return getElligibleTokens().size() >= weight;
+		return getElligibleTokens().size() >= weight.value();
 	}
 
 	public boolean isEnabledBy(TimedToken token) {
@@ -106,15 +106,17 @@ public class TimedInputArc extends TAPNElement {
 		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound();
 		
 		List<TimedToken> sortedTokens = source.sortedTokens();
+		boolean overrideLowerInclusion = false;
 		
-		for(int i = 0; i + weight -1 < sortedTokens.size(); i++){
-			int j = i + weight -1;
+		for(int i = 0; i + getWeight().value() -1 < sortedTokens.size(); i++){
+			int j = i + getWeight().value() -1;
 			TimedToken oldestToken = sortedTokens.get(i);
 			TimedToken youngestToken = sortedTokens.get(j);
 			TimeInterval temp = null;
 			if( oldestToken.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
 				BigDecimal newLower = iLow.subtract(youngestToken.age(), new MathContext(Pipe.AGE_PRECISION));
 				if(newLower.compareTo(BigDecimal.ZERO) < 0){
+					overrideLowerInclusion = true;
 					newLower = BigDecimal.ZERO;
 				}
 				
@@ -129,7 +131,7 @@ public class TimedInputArc extends TAPNElement {
 					} else if (newUpper.compareTo(newLower) == 0 && interval.IsLowerBoundNonStrict() && interval.IsUpperBoundNonStrict()){
 						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newLower.compareTo(newUpper) < 0){
-						temp = new  TimeInterval(interval.IsLowerBoundNonStrict(), new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
+						temp = new  TimeInterval(interval.IsLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
 					} else { //new bounds are wrong
 						temp = null;
 					}

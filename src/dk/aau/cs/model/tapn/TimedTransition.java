@@ -210,7 +210,7 @@ public class TimedTransition extends TAPNElement {
 	public boolean isEnabledBy(List<TimedToken> tokens) {
 		
 		for(TimedInputArc inputArc : preset){
-			int tokensMissing = inputArc.getWeight();
+			int tokensMissing = inputArc.getWeight().value();
 			for (TimedToken token : tokens) {
 				if (inputArc.source().equals(token.place()) && inputArc.isEnabledBy(token)) {
 					tokensMissing--;
@@ -220,7 +220,7 @@ public class TimedTransition extends TAPNElement {
 		}
 		
 		for(TransportArc transportArc : transportArcsGoingThrough){
-			int tokensMissing = transportArc.getWeight();
+			int tokensMissing = transportArc.getWeight().value();
 			for (TimedToken token : tokens) {
 				if (transportArc.source().equals(token.place()) && transportArc.isEnabledBy(token)) {
 					tokensMissing--;
@@ -237,7 +237,7 @@ public class TimedTransition extends TAPNElement {
 
 		ArrayList<TimedToken> producedTokens = new ArrayList<TimedToken>();
 		for (TimedOutputArc arc : postset) {
-			for(int i = 0; i < arc.getWeight(); i++){
+			for(int i = 0; i < arc.getWeight().value(); i++){
 				producedTokens.add(new TimedToken(arc.destination()));
 			}
 		}
@@ -257,12 +257,12 @@ public class TimedTransition extends TAPNElement {
 		List<TimedToken> tokensToConsume = new ArrayList<TimedToken>();
 
 		for (TimedInputArc arc : preset) {
-			List<TimedToken> tokens = firingMode.pickTokensFrom(arc.getElligibleTokens(), arc.getWeight());
+			List<TimedToken> tokens = firingMode.pickTokensFrom(arc.getElligibleTokens(), arc.getWeight().value());
 			tokensToConsume.addAll(tokens);
 		}
 
 		for (TransportArc arc : transportArcsGoingThrough) {
-			List<TimedToken> tokens = firingMode.pickTokensFrom(arc.getElligibleTokens(), arc.getWeight());
+			List<TimedToken> tokens = firingMode.pickTokensFrom(arc.getElligibleTokens(), arc.getWeight().value());
 			tokensToConsume.addAll(tokens);
 		}
 

@@ -25,7 +25,7 @@ public class UpdateConstantEdit extends Command {
 	public void redo() {
 		store.remove(oldConstant);
 		store.add(newConstant);
-		model.updateGuardsWithNewConstant(oldConstant.name(), newConstant);
+		model.updateGuardsAndWeightsWithNewConstant(oldConstant.name(), newConstant);
 		CreateGui.updateConstantsList();
 	}
 
@@ -33,7 +33,7 @@ public class UpdateConstantEdit extends Command {
 	public void undo() {
 		store.remove(newConstant);
 		store.add(oldConstant);
-		model.updateGuardsWithNewConstant(newConstant.name(), oldConstant);
+		model.updateGuardsAndWeightsWithNewConstant(newConstant.name(), oldConstant);
 		CreateGui.updateConstantsList();
 
 	}

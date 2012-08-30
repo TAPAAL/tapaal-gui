@@ -13,10 +13,8 @@ import java.awt.event.MouseEvent;
 import java.beans.XMLEncoder;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -26,8 +24,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
-import org.jdesktop.swingx.JXMultiSplitPane;
-import org.jdesktop.swingx.MultiSplitLayout;
 import org.jdesktop.swingx.MultiSplitLayout.Divider;
 import org.jdesktop.swingx.MultiSplitLayout.Leaf;
 import org.jdesktop.swingx.MultiSplitLayout.Node;
@@ -68,6 +64,7 @@ public class TabContent extends JSplitPane {
 	// Normal mode
 	BugHandledJXMultisplitPane editorSplitPane;
 	static Split editorModelroot = null;
+	static Split simulatorModelRoot = null;
 
 	QueryPane queries;
 	ConstantsPane constantsPanel;
@@ -92,13 +89,13 @@ public class TabContent extends JSplitPane {
 	private static final String animControlName = "animControl";
 
 	protected JSplitPane animationHistorySplitter;
-    
-	protected JXMultiSplitPane animatorSplitPane;
+
+	protected BugHandledJXMultisplitPane animatorSplitPane;
 
 	private Integer selectedTemplate = 0;
 	private Boolean selectedTemplateWasActive = false;
 
-	public TabContent() {
+	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
 			guiModels.put(net, new DataLayer());
 			zoomLevels.put(net, new Zoomer());
@@ -111,6 +108,7 @@ public class TabContent extends JSplitPane {
 		drawingSurfaceScroller.setWheelScrollingEnabled(true);
 
 		createEditorLeftPane();
+		createAnimatorSplitPane(netType);
 
 		this.setOrientation(HORIZONTAL_SPLIT);
 		this.setLeftComponent(editorSplitPane);
@@ -168,13 +166,7 @@ public class TabContent extends JSplitPane {
 			// (bug in the swingx package)
 			editorModelroot.setParent(new Split());
 			floatingDividers = true;
-		} else {
-			for(Node n : editorModelroot.getChildren()){
-				if(n instanceof Leaf){
-					n.setWeight(0);
-				}
-			}
-		}
+		} 
 		editorSplitPane = new BugHandledJXMultisplitPane();
 		editorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
 		editorSplitPane.getMultiSplitLayout().setLayoutByWeight(false);
@@ -284,21 +276,35 @@ public class TabContent extends JSplitPane {
 	
 	private final static String blueTransitionControlName = "blueTransitionControl"; 
 
-	private void createAnimatorSlitPane() {
-		Leaf transitionFireingLeaf = new Leaf(transitionFireingName);
-		Leaf animControlLeaf = new Leaf(animControlName);
-		Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
-		int numberOfItems = 3;
+	private void createAnimatorSplitPane(NetType netType) {
+		if (animBox == null)
+			createAnimationHistory();
+		if (animControlerBox == null)
+			createAnimationController(netType);
+		if (transitionFireing == null)
+			createTransitionFireing();
+		
+		boolean floatingDividers = false;
+		if(simulatorModelRoot == null){
+			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
+			Leaf enabledTransitionsListLeaf = new Leaf(transitionFireingName);
+			Leaf animControlLeaf = new Leaf(animControlName);
 
-		transitionFireingLeaf.setWeight(1.0 / numberOfItems);
-		animControlLeaf.setWeight(1.0 / numberOfItems);
-		templateExplorerLeaf.setWeight(1.0 / numberOfItems);
+			templateExplorerLeaf.setWeight(0.25);
+			enabledTransitionsListLeaf.setWeight(0.25);
+			animControlLeaf.setWeight(0.5);
 
-		Split modelRoot = new Split(templateExplorerLeaf, new Divider(),
-				transitionFireingLeaf, new Divider(), animControlLeaf);
-		modelRoot.setRowLayout(false);
-		animatorSplitPane = new JXMultiSplitPane();
-		animatorSplitPane.getMultiSplitLayout().setModel(modelRoot);
+			simulatorModelRoot = new Split(templateExplorerLeaf, new Divider(),
+					enabledTransitionsListLeaf, new Divider(), animControlLeaf);
+			simulatorModelRoot.setRowLayout(false);
+			floatingDividers = true;
+		}
+		animatorSplitPane = new BugHandledJXMultisplitPane();
+		
+		animatorSplitPane.getMultiSplitLayout().setFloatingDividers(floatingDividers);
+		animatorSplitPane.setSize(simulatorModelRoot.getBounds().width, simulatorModelRoot.getBounds().height);
+		
+		animatorSplitPane.getMultiSplitLayout().setModel(simulatorModelRoot);
 
 		animationControlsPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -327,42 +333,48 @@ public class TabContent extends JSplitPane {
 		animatorSplitPane.add(transitionFireing, transitionFireingName);
 	}
 
-	public void switchToAnimationComponents() {
-
-		if (animBox == null)
-			createAnimationHistory();
-		if (animControlerBox == null)
-			createAnimationController();
-		if (transitionFireing == null)
-			createTransitionFireing();
-
-		if (animatorSplitPane == null)
-			createAnimatorSlitPane();
+	public void switchToAnimationComponents(boolean showEnabledTransitions) {
+		
+		//Remove dummy
+		Component dummy = animatorSplitPane.getMultiSplitLayout().getComponentForNode(animatorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
+		if(dummy != null){
+			animatorSplitPane.remove(dummy);
+		}
+		
+		//Add the templateExplorer
 		animatorSplitPane.add(templateExplorer, templateExplorerName);
 
 		// Inserts dummy to avoid nullpointerexceptions from the displaynode
 		// method
 		// A component can only be on one splitpane at the time
-		JPanel dummy = new JPanel();
+		dummy = new JButton("EditorDummy");
 		dummy.setMinimumSize(templateExplorer.getMinimumSize());
 		dummy.setPreferredSize(templateExplorer.getPreferredSize());
 		editorSplitPane.add(dummy, templateExplorerName);
 
 		templateExplorer.switchToAnimationMode();
-
+		showEnabledTransitionsList(showEnabledTransitions);
+		
 		this.setLeftComponent(animatorSplitPane);
 
 	}
 
 	public void switchToEditorComponents() {
-
+		
+		//Remove dummy
+		Component dummy = editorSplitPane.getMultiSplitLayout().getComponentForNode(editorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
+		if(dummy != null){
+			editorSplitPane.remove(dummy);
+		}
+		
+		//Add the templateexplorer again
 		editorSplitPane.add(templateExplorer, templateExplorerName);
 		if (animatorSplitPane != null) {
 
 			// Inserts dummy to avoid nullpointerexceptions from the displaynode
 			// method
 			// A component can only be on one splitpane at the time
-			JPanel dummy = new JPanel();
+			dummy = new JButton("AnimatorDummy");
 			dummy.setMinimumSize(templateExplorer.getMinimumSize());
 			dummy.setPreferredSize(templateExplorer.getPreferredSize());
 			animatorSplitPane.add(new JPanel(), templateExplorerName);
@@ -431,8 +443,8 @@ public class TabContent extends JSplitPane {
 
 	}
 
-	private void createAnimationController() {
-		animControlerBox = new AnimationController();
+	private void createAnimationController(NetType netType) {
+		animControlerBox = new AnimationController(netType);
 
 		animationControllerScrollPane = new JScrollPane(animControlerBox);
 		animationControllerScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -642,5 +654,34 @@ public class TabContent extends JSplitPane {
 				this.setDividerLocation(c.getPreferredSize().width);
 			}
 		}
+	}
+	
+	public void setResizeingDefault(){
+		if(animatorSplitPane != null){
+			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+			animatorSplitPane.getMultiSplitLayout().layoutByWeight(animatorSplitPane);
+			animatorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
+		} else {
+			simulatorModelRoot = null;
+		}
+		editorSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+		editorSplitPane.getMultiSplitLayout().layoutByWeight(editorSplitPane);
+		editorSplitPane.getMultiSplitLayout().setFloatingDividers(false);
+	}
+	
+	public static Split getEditorModelRoot(){
+		return editorModelroot;
+	}
+	
+	public static void setEditorModelRoot(Split model){
+		editorModelroot = model;
+	}
+	
+	public static Split getSimulatorModelRoot(){
+		return simulatorModelRoot;
+	}
+	
+	public static void setSimulatorModelRoot(Split model){
+		simulatorModelRoot = model;
 	}
 }

@@ -15,6 +15,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.Weight;
 
 public class TimedTransportArcComponent extends TimedInputArcComponent {
 	private static final long serialVersionUID = 3728885532894319528L;
@@ -103,8 +104,8 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 			label.setText("");
 		}
 		
-		if(underlyingTransportArc != null && getWeight() > 1){
-					label.setText(getWeight()+"x "+label.getText());
+		if(underlyingTransportArc != null){
+					label.setText(getWeight().toString(displayConstantNames)+" "+label.getText());
 		}
 		
 		this.setLabelPosition();
@@ -204,11 +205,11 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 
 	@Override
-	public Command setGuardAndWeight(TimeInterval guard, int weight) {
+	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
 
 		TimeInterval oldTimeInterval = underlyingTransportArc.interval();
 		underlyingTransportArc.setTimeInterval(guard);
-		int oldWeight = getWeight();
+		Weight oldWeight = getWeight();
 		setWeight(weight);
 		connectedTo.setWeight(weight);
 
@@ -245,13 +246,13 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	}
 	
 	@Override
-	public void setWeight(int weight){
+	public void setWeight(Weight weight){
 		underlyingTransportArc.setWeight(weight);
 		connectedTo.underlyingTransportArc.setWeight(weight);
 	}
 	
 	@Override
-	public int getWeight(){
+	public Weight getWeight(){
 		return underlyingTransportArc.getWeight();
 	}
 

@@ -7,15 +7,15 @@ import java.util.List;
 public class TimedInhibitorArc extends TimedInputArc {
 
 	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval) {
-		this(source, destination, interval, 1);
+		this(source, destination, interval, new IntWeight(1));
 	}
 	
-	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, int weight) {
+	public TimedInhibitorArc(TimedPlace source, TimedTransition destination, TimeInterval interval, Weight weight) {
 		super(source, destination, TimeInterval.ZERO_INF, weight);
 	}
 	
 	public TimeInterval getDEnabledInterval(){
-		if(source().tokens().size() < getWeight()){
+		if(source().tokens().size() < getWeight().value()){
 			return new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false);
 		} else {
 			return null;

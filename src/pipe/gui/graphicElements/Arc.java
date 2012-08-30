@@ -10,6 +10,7 @@ import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Pipe;
 import pipe.gui.undo.AddArcPathPointEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.Weight;
 
 /**
    Implementation of Element for drawing an arc
@@ -51,8 +52,8 @@ public abstract class Arc extends PetriNetObject implements Cloneable {
 		setTarget(targetInput);
 	}
 	
-	abstract public void setWeight(int weight);
-	abstract public int getWeight();
+	abstract public void setWeight(Weight weight);
+	abstract public Weight getWeight();
 
 	/**
 	 * Create Petri-Net Arc object

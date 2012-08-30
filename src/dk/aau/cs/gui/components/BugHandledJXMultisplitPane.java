@@ -41,9 +41,6 @@ public class BugHandledJXMultisplitPane extends JXMultiSplitPane {
 		 * remove the bottom component, then pulls the bottom component all the way down
 		 * and then adds the removed component again its shown outside the window
 		 * 
-		 * As a last thing it makes sure that if you "show" a component and the main divider is 
-		 * all the way to the left, it's moved such that the component is actually shown.
-		 * 
 		 * This method will hopefully become unnecessary as the JXMultisplitPane matures
 		 */
 		private void fixDividersError(Component changedComponent){

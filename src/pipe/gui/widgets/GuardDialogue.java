@@ -41,7 +41,10 @@ import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.ConstantWeight;
 import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.IntWeight;
+import dk.aau.cs.model.tapn.Weight;
 
 public class GuardDialogue extends JPanel /*
  * implements ActionListener,
@@ -96,7 +99,15 @@ public class GuardDialogue extends JPanel /*
 			setNoncoloredInitialState((TimedInputArcComponent) objectToBeEdited);
 		}
 		// Weights
-		weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight());
+		if(objectToBeEdited instanceof TimedOutputArcComponent){
+			TimedOutputArcComponent arc = (TimedOutputArcComponent)objectToBeEdited;
+			if(arc.getWeight() instanceof ConstantWeight){
+				weightConstantsComboBox.setSelectedItem(((ConstantWeight)arc.getWeight()).constant().name());
+				weightUseConstant.doClick();
+			}
+			
+			weightNumber.setValue(((TimedOutputArcComponent)objectToBeEdited).getWeight().value());
+		}
 	}
 
 
@@ -123,9 +134,26 @@ public class GuardDialogue extends JPanel /*
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)){
 					guard = composeGuard(arc.getGuard());
 				}
-				undoManager.addEdit(arc.setGuardAndWeight(guard, (Integer) weightNumber.getValue()));
+				
+				Weight weight = composeWeight();
+				undoManager.addEdit(arc.setGuardAndWeight(guard, weight));
 				CreateGui.getCurrentTab().network().buildConstraints();
 				exit();
+			}
+			
+			private Weight composeWeight(){
+				
+				Weight weight;
+				
+				if(weightUseConstant.isSelected()){
+					String constantName = weightConstantsComboBox
+							.getSelectedItem().toString();
+					weight = new ConstantWeight(CreateGui.getCurrentTab().network().getConstant(constantName));
+				} else {
+					weight = new IntWeight(((Integer)weightNumber.getValue()).intValue());
+				}
+				
+				return weight;
 			}
 
 			private dk.aau.cs.model.tapn.TimeInterval composeGuard(
@@ -232,7 +260,17 @@ public class GuardDialogue extends JPanel /*
 
 		Set<String> constants = CreateGui.getCurrentTab().network()
 		.getConstantNames();
-		String[] constantArray = constants.toArray(new String[constants.size()]);
+		ArrayList<String> filteredConstants = new ArrayList<String>();
+		for(String constant : constants){
+			if(CreateGui.getCurrentTab().network().getConstantValue(constant) != 0){
+				filteredConstants.add(constant);
+			}
+		}
+		
+		
+		String[] constantArray = filteredConstants.toArray(new String[filteredConstants.size()]);
+		
+		
 	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
 	    
 	    weightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
@@ -240,14 +278,6 @@ public class GuardDialogue extends JPanel /*
 		weightConstantsComboBox.setMaximumRowCount(20);
 		weightConstantsComboBox.setVisible(false);
 		weightConstantsComboBox.setPreferredSize(intervalBoxDims);
-		weightConstantsComboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					
-					//TODO save selection
-				}
-			}
-		});
 		
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -255,8 +285,8 @@ public class GuardDialogue extends JPanel /*
 		weightEditPanel.add(weightConstantsComboBox, gridBagConstraints);
 		
 		
-		boolean enableConstantsCheckBoxes = !constants.isEmpty();
-		weightUseConstant = new JCheckBox("Use Constant                    ");
+		boolean enableConstantsCheckBoxes = !filteredConstants.isEmpty();
+		weightUseConstant = new JCheckBox("Use Constant");
 		weightUseConstant.setEnabled(enableConstantsCheckBoxes);
 		weightUseConstant.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -268,7 +298,7 @@ public class GuardDialogue extends JPanel /*
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
-		//weightEditPanel.add(weightUseConstant, gridBagConstraints);
+		weightEditPanel.add(weightUseConstant, gridBagConstraints);
 		
 		// hack to ensure the content stays on the left
 		gridBagConstraints = new GridBagConstraints();
@@ -450,7 +480,7 @@ public class GuardDialogue extends JPanel /*
 		guardEditPanel.add(rightUseConstant, gridBagConstraints);
 
 		rightConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-		rightConstantsComboBox.setModel(new DefaultComboBoxModel(constants.toArray()));
+		rightConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
 		rightConstantsComboBox.setMaximumRowCount(20);
 		rightConstantsComboBox.setVisible(false);
 	//	rightConstantsComboBox.setMaximumSize(intervalBoxDims);
@@ -697,9 +727,11 @@ public class GuardDialogue extends JPanel /*
 					}
 				}
 
-				// if(rightConstantsComboBox.getItemCount() == 0){
-				// rightUseConstant.setEnabled(false);
-				// }
+				if(rightConstantsComboBox.getItemCount() == 0){
+					rightUseConstant.setEnabled(false);
+				} else {
+					rightUseConstant.setEnabled(true);
+				}
 
 				if (oldRight != null)
 					rightConstantsComboBox.setSelectedItem(oldRight);

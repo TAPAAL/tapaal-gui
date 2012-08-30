@@ -389,7 +389,7 @@ public class TimedArcPetriNet {
 				} else {
 					numberOfUntimedInputArcs++;
 				}
-				if(!networkWeighted && in.getWeight() > 1){
+				if(!networkWeighted && in.getWeight().value() > 1){
 					networkWeighted = true;
 				}
 			}
@@ -400,7 +400,7 @@ public class TimedArcPetriNet {
 				} else {
 					numberOfUntimedTransportArcs++;
 				}
-				if(!networkWeighted && in.getWeight() > 1){
+				if(!networkWeighted && in.getWeight().value() > 1){
 					networkWeighted = true;
 				}
 			}
@@ -408,7 +408,7 @@ public class TimedArcPetriNet {
 			// Test all output arcs for weights
 			if(!networkWeighted){
 				for(TimedOutputArc in : t.outputArcs()){
-					if(in.getWeight() > 1){
+					if(in.getWeight().value() > 1){
 						networkWeighted = true;
 						break;
 					}
@@ -418,7 +418,7 @@ public class TimedArcPetriNet {
 			// Test all inhibitor arcs for weights
 			if(!networkWeighted){
 				for(TimedInhibitorArc in : t.inhibitorArcs()){
-					if(in.getWeight() > 1){
+					if(in.getWeight().value() > 1){
 						networkWeighted = true;
 						break;
 					}
@@ -504,25 +504,25 @@ public class TimedArcPetriNet {
 
 	public boolean hasWeights() {
 		for(TimedInputArc t : inputArcs){
-			if(t.getWeight() != 1){
+			if(t.getWeight().value() != 1){
 				return true;
 			}
 		}
 		
 		for(TimedOutputArc t : outputArcs){
-			if(t.getWeight() != 1){
+			if(t.getWeight().value() != 1){
 				return true;
 			}
 		}
 		
 		for(TimedInhibitorArc t : inhibitorArcs){
-			if(t.getWeight() != 1){
+			if(t.getWeight().value() != 1){
 				return true;
 			}
 		}
 		
 		for(TransportArc t : transportArcs){
-			if(t.getWeight() != 1){
+			if(t.getWeight().value() != 1){
 				return true;
 			}
 		}

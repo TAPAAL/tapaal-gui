@@ -240,7 +240,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 					CreateGui.getApp(),
 					"The specified value is invalid for the current net.\n"
 					+ "Updating the constant to the specified value invalidates the guard\n"
-					+ "on one or more arcs.",
+					+ "on one or more arcs, or it sets the weight of an arc to 0.",
 					"Constant value invalid for current net",
 					JOptionPane.ERROR_MESSAGE);
 			valueSpinner.requestFocusInWindow();
@@ -287,7 +287,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							CreateGui.getApp(),
 							"The specified value is invalid for the current net.\n"
 							+ "Updating the constant to the specified value invalidates the guard\n"
-							+ "on one or more arcs.",
+							+ "on one or more arcs, or it sets the weight of an arc to 0.",
 							"Constant value invalid for current net",
 							JOptionPane.ERROR_MESSAGE);
 					valueSpinner.requestFocusInWindow();
@@ -301,7 +301,7 @@ public class ConstantsDialogPanel extends javax.swing.JPanel {
 							CreateGui.getApp(),
 							"The specified value is invalid for the current net.\n"
 							+ "Updating the constant to the specified value invalidates the guard\n"
-							+ "on one or more arcs.",
+							+ "on one or more arcs, or it sets the weight of an arc to 0.",
 							"Constant value invalid for current net",
 							JOptionPane.ERROR_MESSAGE);
 					valueSpinner.requestFocusInWindow();

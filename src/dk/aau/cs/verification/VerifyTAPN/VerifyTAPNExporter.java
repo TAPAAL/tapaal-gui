@@ -106,8 +106,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + inputArc.source().name() + "\" ");
 		modelStream.append("target=\"" + inputArc.destination().name() + "\" ");
-		if(inputArc.getWeight() > 1){
-			modelStream.append("weight=\"" + inputArc.getWeight() + "\"");
+		if(inputArc.getWeight().value() > 1){
+			modelStream.append("weight=\"" + inputArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
@@ -119,8 +119,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("inscription=\"1\" " );
 		modelStream.append("source=\"" + outputArc.source().name() + "\" ");
 		modelStream.append("target=\"" + outputArc.destination().name() + "\" ");
-		if(outputArc.getWeight() > 1){
-			modelStream.append("weight=\"" + outputArc.getWeight() + "\"");
+		if(outputArc.getWeight().value() > 1){
+			modelStream.append("weight=\"" + outputArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
@@ -133,8 +133,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("source=\"" + transArc.source().name() + "\" ");
 		modelStream.append("transition=\"" + transArc.transition().name() + "\" ");
 		modelStream.append("target=\"" + transArc.destination().name() + "\" ");
-		if(transArc.getWeight() > 1){
-			modelStream.append("weight=\"" + transArc.getWeight() + "\"");
+		if(transArc.getWeight().value() > 1){
+			modelStream.append("weight=\"" + transArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");
@@ -146,8 +146,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("inscription=\"" + inhibArc.interval().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("source=\"" + inhibArc.source().name() + "\" ");
 		modelStream.append("target=\"" + inhibArc.destination().name() + "\" ");
-		if(inhibArc.getWeight() > 1){
-			modelStream.append("weight=\"" + inhibArc.getWeight() + "\"");
+		if(inhibArc.getWeight().value() > 1){
+			modelStream.append("weight=\"" + inhibArc.getWeight().nameForSaving(false) + "\"");
 		}
 		
 		modelStream.append("/>\n");

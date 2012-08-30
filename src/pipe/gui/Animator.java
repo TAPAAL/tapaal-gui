@@ -485,9 +485,9 @@ public class Animator {
 	private  FillListStatus fillList(TimedTransition transition, List<TimedToken> listToFill){
 		for(TimedInputArc in: transition.getInputArcs()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() < in.getWeight()){
+			if(elligibleTokens.size() < in.getWeight().value()){
 				return FillListStatus.lessThanWeight;
-			} else if(elligibleTokens.size() == in.getWeight()){
+			} else if(elligibleTokens.size() == in.getWeight().value()){
 				listToFill.addAll(elligibleTokens);
 			} else {
 				return FillListStatus.moreThanWeight;
@@ -495,9 +495,9 @@ public class Animator {
 		}
 		for(TransportArc in: transition.getTransportArcsGoingThrough()){
 			List<TimedToken> elligibleTokens = in.getElligibleTokens();
-			if(elligibleTokens.size() < in.getWeight()){
+			if(elligibleTokens.size() < in.getWeight().value()){
 				return FillListStatus.lessThanWeight;
-			} else if(elligibleTokens.size() == in.getWeight()){
+			} else if(elligibleTokens.size() == in.getWeight().value()){
 				listToFill.addAll(elligibleTokens);
 			} else {
 				return FillListStatus.moreThanWeight;

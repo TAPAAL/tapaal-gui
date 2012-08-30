@@ -3,16 +3,17 @@ package pipe.gui.undo;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.Weight;
 
 public class ArcTimeIntervalEdit extends Command {
 	private TimedOutputArcComponent arc;
 	TimeInterval oldTimeInterval;
 	TimeInterval newTimeInterval;
-	int oldWeight;
-	int newWeight;
+	Weight oldWeight;
+	Weight newWeight;
 
 	public ArcTimeIntervalEdit(TimedOutputArcComponent arc,
-			TimeInterval oldTimeInterval, TimeInterval newTimeInterval, int oldWeight, int newWeight) {
+			TimeInterval oldTimeInterval, TimeInterval newTimeInterval, Weight oldWeight, Weight newWeight) {
 		this.arc = arc;
 		this.oldTimeInterval = oldTimeInterval;
 		this.newTimeInterval = newTimeInterval;
