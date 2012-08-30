@@ -173,16 +173,18 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String result = getTransition().getName()  + (transition.getDInterval() == null && showIntervals ? 
-					"" : " " + transition.getDInterval().toString());
- 
+			String interval = transition.getDInterval() == null && showIntervals ? 
+					"" : transition.getDInterval().toString() + " ";
+			
+			String transitionName = getTransition().getName(); 
 			if(isShared()){
-				result += " (shared)";
+				transitionName +=  " (shared)";
 			} else {
-				result = getTemplate() + "." + result;
+				transitionName = getTemplate() + "." + transitionName;
 			}
+			String result = interval + transitionName;
 
-			return "<html><font color=" + (transition.highlighted ? "red" : "blue") + ">" + result + "</font></html>";
+			return result;
 		}
 		
 		public String toString(){

@@ -104,7 +104,7 @@ public class BlueTransitionControl extends JPanel{
 		add(delayMode, gbc);
 		
 		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Blue transitions controller"), 
+				BorderFactory.createTitledBorder("Delay controller"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 	//0 corresponds to 0.0001, 4 corresponds to 1 (   thus x corresponds to 1/(10^(4−x))  )
