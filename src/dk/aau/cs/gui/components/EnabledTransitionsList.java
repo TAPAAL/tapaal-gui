@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.GraphicAttribute;
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
@@ -28,6 +29,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
@@ -221,25 +223,29 @@ public class EnabledTransitionsList extends JPanel{
 		}
 
 		public int compareTo(TransitionListItem o) {
-			if(this.transition.isEnabled() == o.transition.isEnabled()){
-				if(this.isShared() == o.isShared()){
-					//if the transitions is from different templates - don't change the order
-					if(this .template != o.template){
-						return 0;
-					} else {
-						return compareToString(o);
-					}
-				} else {
-					return this.isShared() ?  -1 : 1;
-				}
-			} else {
-				return this.transition.isEnabled() ? -1 : 1;
-			}
-		}
-
-		private int compareToString(TransitionListItem o){
+			BigDecimal thisLower = IntervalOperations.getRatBound(this.transition.getDInterval().lowerBound()).getBound();
+			BigDecimal otherLower = IntervalOperations.getRatBound(o.transition.getDInterval().lowerBound()).getBound();
 			StringComparator s = new StringComparator();
-			return s.compare(this.transition.getName(), o.transition.getName());
+			//Sort according to lower bound
+			int result = thisLower.compareTo(otherLower);
+			//According to strict non strict
+			if(result == 0 && this.transition.getDInterval().IsLowerBoundNonStrict() != o.transition.getDInterval().IsLowerBoundNonStrict()){
+				if(this.transition.getDInterval().IsLowerBoundNonStrict()){
+					result = -1;
+				} else {
+					result = 1;
+				}				
+			}
+			//According to template name
+			if(result == 0){
+				result = s.compare(this.template.model().name(), o.template.model().name()); 
+			}
+			//According to transition name
+			if(result == 0){
+				result = s.compare(this.transition.getName(), o.transition.getName());
+			}
+			
+			return result;
 		}
 	}
 
