@@ -20,7 +20,7 @@ import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
-import dk.aau.cs.model.tapn.simulation.YoungestDelayMode;
+import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 
 import java.lang.reflect.Field;
 
@@ -67,7 +67,7 @@ public class BlueTransitionControl extends JPanel{
 			e.printStackTrace();
 		}*/
 		
-		String[] items = {YoungestDelayMode.name(), RandomDelayMode.name(), ManualDelayMode.name()};
+		String[] items = {ShortestDelayMode.name(), RandomDelayMode.name(), ManualDelayMode.name()};
 		delayMode = new JComboBox(items);
         
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -119,8 +119,8 @@ public class BlueTransitionControl extends JPanel{
 			return new ManualDelayMode();
 		} else if(selectedItem == RandomDelayMode.name()){
 			return new RandomDelayMode();
-		} else if(selectedItem == YoungestDelayMode.name()){
-			return new YoungestDelayMode();
+		} else if(selectedItem == ShortestDelayMode.name()){
+			return new ShortestDelayMode();
 		} else{
 			return null;
 		}

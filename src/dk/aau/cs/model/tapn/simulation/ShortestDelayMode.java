@@ -10,7 +10,7 @@ import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.IntervalOperations;
 
-public class YoungestDelayMode implements DelayMode{
+public class ShortestDelayMode implements DelayMode{
 
 	@Override
 	public BigDecimal GetDelay(TimedTransition transition,
@@ -28,7 +28,7 @@ public class YoungestDelayMode implements DelayMode{
 	}
 	
 	public static String name(){
-		return "Random delay";
+		return "Shortest delay";
 	}
 
 }
