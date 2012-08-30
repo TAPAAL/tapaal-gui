@@ -18,14 +18,14 @@ import javax.swing.UIManager;
 import dk.aau.cs.model.tapn.simulation.DelayMode;
 import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
+import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
+import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.model.tapn.simulation.YoungestDelayMode;
 
 import java.lang.reflect.Field;
 
 public class BlueTransitionControl extends JPanel{
-	private static final String YOUNGEST = "Youngest";
-	private static final String RANDOM = "Random";
-	private static final String MANUAL = "Manual";
+
 	/**
 	 * 
 	 */
@@ -67,7 +67,7 @@ public class BlueTransitionControl extends JPanel{
 			e.printStackTrace();
 		}*/
 		
-		String[] items = {"Youngest", "Random", "Manual"};
+		String[] items = {YoungestDelayMode.name(), RandomDelayMode.name(), ManualDelayMode.name()};
 		delayMode = new JComboBox(items);
         
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -115,11 +115,11 @@ public class BlueTransitionControl extends JPanel{
 	public DelayMode getDelayMode(){
 		String selectedItem = (String)delayMode.getSelectedItem();
 		
-		if(selectedItem == MANUAL){
+		if(selectedItem == ManualDelayMode.name()){
 			return new ManualDelayMode();
-		} else if(selectedItem == RANDOM){
+		} else if(selectedItem == RandomDelayMode.name()){
 			return new RandomDelayMode();
-		} else if(selectedItem == YOUNGEST){
+		} else if(selectedItem == YoungestDelayMode.name()){
 			return new YoungestDelayMode();
 		} else{
 			return null;

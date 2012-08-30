@@ -91,4 +91,12 @@ public class RandomDelayMode implements DelayMode{
 		} while (!range.isIncluded(result));
 		return result;
 	}
+	
+	public String toString() {
+		return name();
+	}
+	
+	public static String name(){
+		return "Random delay";
+	}
 }

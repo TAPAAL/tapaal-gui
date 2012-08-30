@@ -116,16 +116,21 @@ public class TransportArc extends TAPNElement {
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();
 		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound(); 
 		
-		for(TimedToken token : source.tokens()){
+		List<TimedToken> sortedTokens = source.sortedTokens();
+		
+		for(int i = 0; i + weight -1 < sortedTokens.size(); i++){
+			int j = i + weight -1;
+			TimedToken oldestToken = sortedTokens.get(i);
+			TimedToken youngestToken = sortedTokens.get(j);
 			TimeInterval temp = null;
-			if( token.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
-				BigDecimal newLower = iLow.subtract(token.age(), new MathContext(Pipe.AGE_PRECISION));
+			if( oldestToken.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
+				BigDecimal newLower = iLow.subtract(youngestToken.age(), new MathContext(Pipe.AGE_PRECISION));
 				if(newLower.compareTo(BigDecimal.ZERO) < 0){
 					newLower = BigDecimal.ZERO;
 				}
 				
 				if(iHeigh.compareTo(BigDecimal.ZERO) >= 0){//not infinite
-					BigDecimal newUpper = iHeigh.subtract(token.age(), new MathContext(Pipe.AGE_PRECISION));
+					BigDecimal newUpper = iHeigh.subtract(oldestToken.age(), new MathContext(Pipe.AGE_PRECISION));
 					if(newUpper.compareTo(BigDecimal.ZERO) < 0){
 						newUpper = BigDecimal.ZERO;
 					}
@@ -144,17 +149,18 @@ public class TransportArc extends TAPNElement {
 				}
 			}
 			
-			result = IntervalOperations.union(temp, result);
+			temp = IntervalOperations.union(temp, result);
+			if(temp == null && result != null){
+				//No more unionable intervals
+				break;
+			} else {
+				result = temp;
+			}
 		}
 		
-		if(source.tokens().size() > 0){
+		if(sortedTokens.size() > 0){
 			//Invariants on destination
-			TimedToken youngestToken = source.tokens().get(0);
-			for(TimedToken t : source.tokens()){
-				if(t.age().compareTo(youngestToken.age()) < 0){
-					youngestToken = t;
-				}
-			}
+			TimedToken youngestToken = sortedTokens.get(sortedTokens.size()-1);
 			
 			result = IntervalOperations.intersection(destination.invariant().subtractToken(youngestToken.age()), result);
 		}

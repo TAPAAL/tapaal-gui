@@ -49,6 +49,14 @@ public class ManualDelayMode implements DelayMode{
 	JButton okButton;
 	boolean okPressed = false;
 	JDialog dialog;
+	
+	public String toString() {
+		return name();
+	}
+	
+	public static String name(){
+		return "Manual delay";
+	}
 
 	@Override
 	public BigDecimal GetDelay(TimedTransition transition,

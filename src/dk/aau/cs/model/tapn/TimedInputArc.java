@@ -3,7 +3,11 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import com.sun.tools.example.debug.expr.Token;
 
 import pipe.gui.Pipe;
 
@@ -101,16 +105,21 @@ public class TimedInputArc extends TAPNElement {
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();
 		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound();
 		
-		for(TimedToken token : source.tokens()){
+		List<TimedToken> sortedTokens = source.sortedTokens();
+		
+		for(int i = 0; i + weight -1 < sortedTokens.size(); i++){
+			int j = i + weight -1;
+			TimedToken oldestToken = sortedTokens.get(i);
+			TimedToken youngestToken = sortedTokens.get(j);
 			TimeInterval temp = null;
-			if( token.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
-				BigDecimal newLower = iLow.subtract(token.age(), new MathContext(Pipe.AGE_PRECISION));
+			if( oldestToken.age().compareTo(iHeigh) <= 0 || iHeigh.compareTo(BigDecimal.ZERO) < 0){//token's age is smaller than the upper bound of the interval (or the intervals upperbound is infinite)
+				BigDecimal newLower = iLow.subtract(youngestToken.age(), new MathContext(Pipe.AGE_PRECISION));
 				if(newLower.compareTo(BigDecimal.ZERO) < 0){
 					newLower = BigDecimal.ZERO;
 				}
 				
 				if(iHeigh.compareTo(BigDecimal.ZERO) >= 0){//not infinite
-					BigDecimal newUpper = iHeigh.subtract(token.age(), new MathContext(Pipe.AGE_PRECISION));
+					BigDecimal newUpper = iHeigh.subtract(oldestToken.age(), new MathContext(Pipe.AGE_PRECISION));
 					if(newUpper.compareTo(BigDecimal.ZERO) < 0){
 						newUpper = BigDecimal.ZERO;
 					}
@@ -130,8 +139,13 @@ public class TimedInputArc extends TAPNElement {
 			}
 			
 			
-			
-			result = IntervalOperations.union(temp, result);
+			temp = IntervalOperations.union(temp, result);
+			if(temp == null && result != null){
+				//No more unionable intervals
+				break;
+			} else {
+				result = temp;
+			}
 		}
 		
 		return result;

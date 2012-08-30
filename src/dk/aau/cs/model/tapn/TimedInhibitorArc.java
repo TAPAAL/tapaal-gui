@@ -15,7 +15,7 @@ public class TimedInhibitorArc extends TimedInputArc {
 	}
 	
 	public TimeInterval getDEnabledInterval(){
-		if(source().tokens().size() == 0){
+		if(source().tokens().size() < getWeight()){
 			return new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false);
 		} else {
 			return null;

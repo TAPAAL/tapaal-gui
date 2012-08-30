@@ -1,6 +1,8 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -8,7 +10,7 @@ import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
 
-public class LocalTimedPlace  implements TimedPlace {
+public class LocalTimedPlace  extends TimedPlace {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
 	private String name;

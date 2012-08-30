@@ -30,6 +30,11 @@ public class IntervalOperations {
 			return i1;
 		}
 		
+		//The intervals cannot be unioned to a single interval
+		if(intersection(i1, i2) == null){
+			return null;
+		}
+		
 		TimeInterval lower = min(i1, i2, BoundToCheck.lower);
 		TimeInterval upper = max(i1, i2, BoundToCheck.upper);
 		

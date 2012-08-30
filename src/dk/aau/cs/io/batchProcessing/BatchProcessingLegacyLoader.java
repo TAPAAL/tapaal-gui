@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.swing.JOptionPane;
@@ -32,6 +33,7 @@ import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -138,7 +140,8 @@ public class BatchProcessingLegacyLoader {
 			}
 		}
 		
-		for(TimedPlace p : network.sharedPlaces()) {
+		Collection<SharedPlace> sharedPlaces = network.sharedPlaces();
+		for(TimedPlace p : sharedPlaces) {
 			templatePlaceNames.add(new Tuple<String, String>("", p.name()));
 		}
 		return templatePlaceNames;

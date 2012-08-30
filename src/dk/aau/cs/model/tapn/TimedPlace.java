@@ -1,25 +1,28 @@
 package dk.aau.cs.model.tapn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 
-public interface TimedPlace {
-	void addTimedPlaceListener(TimedPlaceListener listener);
-	void removeTimedPlaceListener(TimedPlaceListener listener);
+public abstract class TimedPlace {
+	public abstract void addTimedPlaceListener(TimedPlaceListener listener);
+	public abstract void removeTimedPlaceListener(TimedPlaceListener listener);
 
-	boolean isShared();
+	public abstract boolean isShared();
 
-	String name();
-	void setName(String newName);
+	public abstract String name();
+	public abstract void setName(String newName);
 
-	TimeInvariant invariant();
-	void setInvariant(TimeInvariant invariant);
+	public abstract TimeInvariant invariant();
+	public abstract void setInvariant(TimeInvariant invariant);
 
-	List<TimedToken> tokens();
-	int numberOfTokens();
+	public abstract List<TimedToken> tokens();
+	public abstract int numberOfTokens();
 
-	void setCurrentMarking(TimedMarking marking);
+	public abstract void setCurrentMarking(TimedMarking marking);
 	
 	public abstract void addToken(TimedToken timedToken);
 	public abstract void addTokens(Iterable<TimedToken> tokens);
@@ -28,6 +31,17 @@ public interface TimedPlace {
 	public abstract void removeToken();
 	
 	public abstract TimedPlace copy();
+	
+	public List<TimedToken> sortedTokens(){
+		List<TimedToken> copy = new ArrayList<TimedToken>(tokens());
+		Collections.sort(copy, new Comparator<TimedToken>() {
+			public int compare(TimedToken o1, TimedToken o2) {
+				return o1.age().compareTo(o2.age()) * -1;
+			}
+		});
+		
+		return copy;
+	}
 	
 	
 //	public abstract void addInhibitorArc(TimedInhibitorArc arc);

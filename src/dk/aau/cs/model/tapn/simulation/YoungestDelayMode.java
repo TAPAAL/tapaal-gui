@@ -22,5 +22,13 @@ public class YoungestDelayMode implements DelayMode{
 			return IntervalOperations.getRatBound(dInterval.lowerBound()).getBound().add(delayGranularity, new MathContext(Pipe.AGE_PRECISION));
 		}
 	}
+	
+	public String toString() {
+		return name();
+	}
+	
+	public static String name(){
+		return "Random delay";
+	}
 
 }
