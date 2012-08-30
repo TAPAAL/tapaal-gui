@@ -13,11 +13,13 @@ import dk.aau.cs.util.IntervalOperations;
 
 public class RandomDelayMode implements DelayMode{
 	
-	final static int numberOfDecimals = 1;
+	int numberOfDecimals = -1;
 
 	@Override
 	public BigDecimal GetDelay(TimedTransition transition,
 			TimeInterval dInterval, BigDecimal delayGranularity) {
+		
+		setNumberOfDecimalsAccordingToGranularity(delayGranularity);
 		
 		BigDecimal lower = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 		BigDecimal upper = IntervalOperations.getRatBound(dInterval.upperBound()).getBound();
@@ -35,6 +37,16 @@ public class RandomDelayMode implements DelayMode{
 		
 		result = result.add(lower);
 		return result;
+	}
+	
+	private void setNumberOfDecimalsAccordingToGranularity(BigDecimal granularity){
+		granularity = granularity.stripTrailingZeros();
+		int scale = granularity.scale();
+		if(scale >= 0){
+			numberOfDecimals = scale;
+		} else {
+			throw new IllegalArgumentException("The granularity supplied has a negative scale");
+		}
 	}
 	
 	private BigDecimal randomBigDecimal(TimeInterval range){
@@ -63,9 +75,9 @@ public class RandomDelayMode implements DelayMode{
 			}
 			
 			String integerPartAsString = Integer.toString(integerPart);
-			String fractionalPartAsString = String.format("%0" + numberOfDecimals + "d", fractionalPart);
+			String fractionalPartAsString = numberOfDecimals == 0 ? "" : String.format("%0" + numberOfDecimals + "d", fractionalPart);
 			
-			String resultAsString = integerPartAsString + "." + fractionalPartAsString;
+			String resultAsString = integerPartAsString + (numberOfDecimals == 0 ? "" : "." + fractionalPartAsString);
 			result = new BigDecimal(resultAsString);
 		} while (!validValue || !range.isIncluded(result));
 
