@@ -219,7 +219,7 @@ public class DeleteSharedPlaceOrTransition implements ActionListener{
 		if(deleteFromTemplates){
 			for(Template template : tab.allTemplates()){ // TODO: Get rid of pipe references somehow
 				TimedTransitionComponent transition = (TimedTransitionComponent)template.guiModel().getTransitionByName(sharedTransition.name());
-				if(transition == null){
+				if(transition != null){
 					undoManager.addEdit(new DeleteTimedTransitionCommand(transition, transition.underlyingTransition().model(), template.guiModel(), tab.drawingSurface()));
 					transition.delete();
 				}
