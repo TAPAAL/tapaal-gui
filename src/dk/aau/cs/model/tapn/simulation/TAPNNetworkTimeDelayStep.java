@@ -8,7 +8,6 @@ import dk.aau.cs.model.tapn.NetworkMarking;
 
 public class TAPNNetworkTimeDelayStep implements TAPNNetworkTraceStep {
 	private BigDecimal delay;
-	private static final DecimalFormat df = createDecimalFormat();
 
 	public TAPNNetworkTimeDelayStep(BigDecimal delay) {
 		this.delay = delay;
@@ -20,13 +19,6 @@ public class TAPNNetworkTimeDelayStep implements TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return "TimeDelay: " + df.format(delay);
-	}
-
-	private static DecimalFormat createDecimalFormat() {
-		DecimalFormat df = new DecimalFormat();
-		df.setMaximumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		df.setMinimumFractionDigits(Pipe.AGE_DECIMAL_PRECISION);
-		return df;
+		return "TimeDelay: " + delay;
 	}
 }
