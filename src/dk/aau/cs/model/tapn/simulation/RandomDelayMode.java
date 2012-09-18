@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn.simulation;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Random;
 
 import dk.aau.cs.model.tapn.Bound;
@@ -90,8 +91,8 @@ public class RandomDelayMode implements DelayMode{
 		Random r = new Random();
 		
 		TimedArcPetriNetNetwork network = transition.model().parentNetwork();
-		int biggestConstant = network.biggestConstantInActiveNet();
-		int biggestConstantEnabled = network.biggestContantInActiveNetEnabledTransitions();
+		double biggestConstant = network.biggestConstantInActiveNet();
+		double biggestConstantEnabled = network.biggestContantInActiveNetEnabledTransitions();
 		double factor = 1d/(biggestConstantEnabled * 0.6d + biggestConstant * 0.4d);
 		
 		do{
@@ -99,6 +100,7 @@ public class RandomDelayMode implements DelayMode{
 			
 			double number = Math.log(1 - uniformDistribution)/(factor * -1);
 			result = new BigDecimal(number);
+			result = result.setScale(numberOfDecimals, RoundingMode.DOWN);
 		//If the lower bound of the interval is noninclusive and the number generated is 0 - a new number must be found
 		} while (!range.isIncluded(result));
 		return result;
