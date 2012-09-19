@@ -3,6 +3,7 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import pipe.gui.Pipe;
@@ -111,8 +112,11 @@ public class TransportArc extends TAPNElement {
 		destination = place;		
 	}
 	
-	public TimeInterval getDEnabledInterval(){
-		TimeInterval result = null;
+	public ArrayList<TimeInterval> getDEnabledInterval(){
+		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
+		//We need to take the invariant on the destination into account
+		TimeInterval interval = IntervalOperations.intersection(this.interval, destination().invariant().asIterval());
+		
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();
 		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound(); 
 		
@@ -151,21 +155,11 @@ public class TransportArc extends TAPNElement {
 				}
 			}
 			
-			temp = IntervalOperations.union(temp, result);
-			if(temp == null && result != null){
-				//No more unionable intervals
-				break;
-			} else {
-				result = temp;
+			if(temp != null){
+				result = IntervalOperations.unionIntervalSequences(Arrays.asList(temp), result);
 			}
 		}
-		
-		if(sortedTokens.size() > 0){
-			//Invariants on destination
-			TimedToken youngestToken = sortedTokens.get(sortedTokens.size()-1);
-			
-			result = IntervalOperations.intersection(destination.invariant().subtractToken(youngestToken.age()), result);
-		}
+
 		return result;
 	}
 	

@@ -87,6 +87,10 @@ public class TimeInvariant {
 			return new TimeInterval(true, new IntBound(0), new RatBound(newUpper), isUpperNonstrict());
 		}
 	}
+	
+	public TimeInterval asIterval(){
+		return new TimeInterval(true, new IntBound(0), upperBound(), isUpperNonstrict());
+	}
 
 	@Override
 	public String toString() {

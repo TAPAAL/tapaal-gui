@@ -1,6 +1,7 @@
 package dk.aau.cs.model.tapn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -155,32 +156,37 @@ public class TimedTransition extends TAPNElement {
 	}
 	
 	public TimeInterval calculateDInterval(){
-		TimeInterval result = TimeInterval.ZERO_INF;
+		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
+		result.add(TimeInterval.ZERO_INF);
 		
 		for(TimedInputArc arc : this.getInputArcs()){
-			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
+			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
 		}
 		
 		for(TransportArc arc : this.getTransportArcsGoingThrough()){
-			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
+			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
 		}
 		
 		for(TimedInhibitorArc arc : this.getInhibitorArcs()){
-			result = IntervalOperations.intersection(arc.getDEnabledInterval(), result);
+			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
 		}
 		
 		for(TimedPlace place : model().places()){
 			if(!(place.invariant().upperBound() instanceof InfBound)){
 				for(TimedToken x : place.tokens()){
-					result = IntervalOperations.intersection(result, place.invariant().subtractToken(x.age()));
+					result = IntervalOperations.intersectingInterval(result, Arrays.asList(place.invariant().subtractToken(x.age())));
 				}
 			}
 		}
 		
 		//cache result
-		dInterval = result;
+		if(result.isEmpty()){
+			dInterval = null;
+		} else {
+			dInterval = result.get(0);
+		}
 		
-		return result;
+		return dInterval;
 	}
 	
 	public boolean isEnabled() {

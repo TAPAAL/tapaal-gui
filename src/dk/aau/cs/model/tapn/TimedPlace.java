@@ -32,6 +32,9 @@ public abstract class TimedPlace {
 	
 	public abstract TimedPlace copy();
 	
+	/**
+	 * Returns the tokens in the place, sorted decreasing
+	 */
 	public List<TimedToken> sortedTokens(){
 		List<TimedToken> copy = new ArrayList<TimedToken>(tokens());
 		Collections.sort(copy, new Comparator<TimedToken>() {

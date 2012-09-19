@@ -3,6 +3,7 @@ package dk.aau.cs.model.tapn;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -100,8 +101,8 @@ public class TimedInputArc extends TAPNElement {
 		return "From " + source.name() + " to " + destination.name() + " with interval " + interval().toString();
 	}
 	
-	public TimeInterval getDEnabledInterval(){
-		TimeInterval result = null;
+	public List<TimeInterval> getDEnabledInterval(){
+		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();
 		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound();
 		
@@ -140,13 +141,8 @@ public class TimedInputArc extends TAPNElement {
 				}
 			}
 			
-			
-			temp = IntervalOperations.union(temp, result);
-			if(temp == null && result != null){
-				//No more unionable intervals
-				break;
-			} else {
-				result = temp;
+			if(temp != null){
+				result = IntervalOperations.unionIntervalSequences(Arrays.asList(temp), result);
 			}
 		}
 		

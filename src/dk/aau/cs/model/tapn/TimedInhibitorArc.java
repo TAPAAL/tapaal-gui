@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TimedInhibitorArc extends TimedInputArc {
@@ -14,11 +15,11 @@ public class TimedInhibitorArc extends TimedInputArc {
 		super(source, destination, TimeInterval.ZERO_INF, weight);
 	}
 	
-	public TimeInterval getDEnabledInterval(){
+	public List<TimeInterval> getDEnabledInterval(){
 		if(source().tokens().size() < getWeight().value()){
-			return new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false);
+			return Arrays.asList(new TimeInterval(true, new RatBound(BigDecimal.ZERO), Bound.Infinity, false));
 		} else {
-			return null;
+			return new ArrayList<TimeInterval>();
 		}
 	}
 	
