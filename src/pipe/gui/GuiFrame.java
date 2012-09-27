@@ -1765,6 +1765,8 @@ public class GuiFrame extends JFrame implements Observer {
 							else {
 								CreateGui.getCurrentTab().selectFirstActiveTemplate();
 							}
+							//Enable simulator focus traversal policy							
+							CreateGui.appGui.setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
@@ -1776,6 +1778,8 @@ public class GuiFrame extends JFrame implements Observer {
 						appView.getSelectionObject().clearSelection();
 						setAnimationMode(!appView.isInAnimationMode());
 						CreateGui.getCurrentTab().restoreSelectedTemplate();
+						//Enable editor focus traversal policy
+						CreateGui.appGui.setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -2438,6 +2442,17 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
+	}
+	
+
+	public void setStepShotcutEnabled(boolean enabled){
+		if(enabled){
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released LEFT"));
+		} else {
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
+		}
 	}
 
 	public int getNameCounter() {

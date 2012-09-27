@@ -105,6 +105,14 @@ public class TabContent extends JSplitPane {
 		drawingSurfaceScroller.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		drawingSurfaceScroller.setWheelScrollingEnabled(true);
 
+		// Make clicking the drawing area move focus to GuiFrame
+		drawingSurface.addMouseListener(new MouseAdapter() {	
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				CreateGui.getApp().requestFocus();
+			}
+		});
+		
 		createEditorLeftPane();
 		createAnimatorSplitPane(netType);
 
@@ -261,6 +269,8 @@ public class TabContent extends JSplitPane {
 						}
 					}
 				}
+				// Remove focus
+				CreateGui.getApp().requestFocus();
 			}
 		});
 		animationHistoryScrollPane = new JScrollPane(animBox);
