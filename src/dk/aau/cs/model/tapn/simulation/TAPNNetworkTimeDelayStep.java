@@ -2,6 +2,7 @@ package dk.aau.cs.model.tapn.simulation;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import pipe.gui.Pipe;
 import dk.aau.cs.model.tapn.NetworkMarking;
@@ -19,6 +20,18 @@ public class TAPNNetworkTimeDelayStep implements TAPNNetworkTraceStep {
 
 	@Override
 	public String toString() {
-		return "TimeDelay: " + delay;
+		
+		String number = delay.toString();
+		int index = number.indexOf(".");
+		index = index < 0 ? number.length() : index;
+		String padding = "";
+		
+		if(index < 4){
+			//We multiply by two as in the used font a space only takes up half the space of a number
+			int numberOfSpacesToPad = (4-index)*2;
+			padding = new String(new char[numberOfSpacesToPad]).replace("\0", " ");
+		}
+		
+		return "TimeDelay: " + padding + number;
 	}
 }

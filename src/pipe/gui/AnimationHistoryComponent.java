@@ -30,7 +30,6 @@ public class AnimationHistoryComponent extends JList {
 	}
 
 	public void addHistoryItem(String transitionName) {
-		System.err.println(transitionName);
 		getListModel().addElement(transitionName);
 		setSelectedIndex(getListModel().size() - 1);
 	}
