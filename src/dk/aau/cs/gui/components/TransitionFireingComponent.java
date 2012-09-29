@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import pipe.gui.BlueTransitionControl;
+import pipe.gui.CreateGui;
 
 public class TransitionFireingComponent extends JPanel {
 	private static final long serialVersionUID = -1208007964368671066L;
@@ -20,6 +21,7 @@ public class TransitionFireingComponent extends JPanel {
 		super(new GridBagLayout());
 		
 		blueTransitionControl = new BlueTransitionControl();
+		blueTransitionControl.setVisible(CreateGui.getApp().isShowingBlueTransitions());
 		enabledTransitionsList = new EnabledTransitionsList();
 		
 		enabledTransitionsList.setBorder(BorderFactory.createCompoundBorder(
@@ -57,5 +59,11 @@ public class TransitionFireingComponent extends JPanel {
 	
 	public BlueTransitionControl getBlueTransitionControl() {
 		return blueTransitionControl;
+	}
+
+	public void showBlueTransitions(boolean enable) {
+		if(blueTransitionControl != null){
+			blueTransitionControl.setVisible(enable);
+		}
 	}
 }

@@ -632,6 +632,13 @@ public class TabContent extends JSplitPane {
 		}
 	}
 	
+	public void showBlueTransitions(boolean enable){
+		transitionFireing.showBlueTransitions(enable);
+		drawingSurface.repaint();
+		
+		CreateGui.getAnimator().updateFireableTransitions();
+	}
+	
 	public void selectFirstElements() {
 		templateExplorer.selectFirst();
 		queries.selectFirst();

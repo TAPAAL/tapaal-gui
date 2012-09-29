@@ -36,7 +36,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-
+//TODO clean up!!! 
 public class EnabledTransitionsList extends JPanel{
 
 	private static final long serialVersionUID = -121639323606689256L;

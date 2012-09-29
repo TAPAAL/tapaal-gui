@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
@@ -98,7 +99,7 @@ public class Transition extends PlaceTransitionObject {
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		} else if (blueTransition) {
+		} else if (blueTransition && CreateGui.getApp().isShowingBlueTransitions()) {
 			g2.setPaint(Pipe.BLUE_TRANSITION_COLOR);
 		} else if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);

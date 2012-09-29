@@ -141,7 +141,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
 	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
-	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
+	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showBlueTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
 	private JMenuItem statistics;
@@ -166,6 +166,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private JCheckBoxMenuItem showComponentsCheckBox;
 	private JCheckBoxMenuItem showQueriesCheckBox;
 	private JCheckBoxMenuItem showEnabledTransitionsCheckBox;
+	private JCheckBoxMenuItem showBlueTransitionsCheckBox;
 	private JCheckBoxMenuItem showConstantsCheckBox;
 	private JCheckBoxMenuItem showToolTipsCheckBox;
 
@@ -173,6 +174,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showConstants = true;
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
+	private boolean showBlueTransitions = true;
 	private boolean commandOrControlWasPressed = false;
 	private boolean showToolTips = true;
 
@@ -280,6 +282,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showConstants = prefs.getShowConstants();
 
 		showEnabledTransitions = prefs.getShowEnabledTransitions();
+		showBlueTransitions = prefs.getShowBlueTransitions();
 
 		showToolTips = prefs.getShowToolTips();
 		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
@@ -569,16 +572,21 @@ public class GuiFrame extends JFrame implements Observer {
 				453247, "Show/hide the list of enabled transitions","ctrl 4",true),
 				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
+		
+		addCheckboxMenuItem(viewMenu, showBlueTransitions, showBlueTransitionsAction = new ViewAction("Display blue transitions",
+				453247, "Highlight transitions which can be enabled after a delay","ctrl 5",true),
+				showBlueTransitionsCheckBox = new JCheckBoxMenuItem());
+		showBlueTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, CreateGui.showZeroToInfinityIntervals(), showZeroToInfinityIntervalsAction = new ViewAction("Display intervals [0,inf)",
-				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 5",true),
+				453246, "Show/hide intervals [0,inf) that do not restrict transition firing in any way.","ctrl 6",true),
 				showZeroToInfinityIntervalsCheckBox = new JCheckBoxMenuItem());
-		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
+		showZeroToInfinityIntervalsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
 
 		addCheckboxMenuItem(viewMenu, showToolTips, showToolTipsAction = new ViewAction("Display tool tips",
-				453246, "Show/hide tool tips when mouse is over an element","ctrl 6",true),
+				453246, "Show/hide tool tips when mouse is over an element","ctrl 7",true),
 				showToolTipsCheckBox = new JCheckBoxMenuItem());
-		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('6', shortcutkey));
+		showToolTipsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('7', shortcutkey));
 
 		viewMenu.addSeparator();
 
@@ -763,6 +771,7 @@ public class GuiFrame extends JFrame implements Observer {
 		prefs.setShowConstants(showConstants);
 
 		prefs.setShowEnabledTrasitions(showEnabledTransitions);
+		prefs.setShowBlueTransitions(showBlueTransitions);
 
 		JOptionPane.showMessageDialog(this, 
 				"The workspace has now been saved into your preferences.\n" 
@@ -961,6 +970,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 			deleteAction.setEnabled(true);
 			showEnabledTransitionsAction.setEnabled(false);
+			showBlueTransitionsAction.setEnabled(false);
 			
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
@@ -1071,6 +1081,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showQueriesAction.setEnabled(enable);
 		showZeroToInfinityIntervalsAction.setEnabled(enable);
 		showEnabledTransitionsAction.setEnabled(enable);
+		showBlueTransitionsAction.setEnabled(enable);
 		showToolTipsAction.setEnabled(enable);
 		showAdvancedWorkspaceAction.setEnabled(enable);
 		showSimpleWorkspaceAction.setEnabled(enable);
@@ -1189,6 +1200,15 @@ public class GuiFrame extends JFrame implements Observer {
 	}
 	public void toggleEnabledTransitionsList(){
 		showEnabledTransitionsList(!showEnabledTransitions);
+	}
+	
+	public void showBlueTransitions(boolean enable){
+		showBlueTransitions = enable;
+		CreateGui.getCurrentTab().showBlueTransitions(enable);
+		showBlueTransitionsCheckBox.setSelected(enable);
+	}
+	public void toggleBlueTransitions(){
+		showBlueTransitions(!showBlueTransitions);
 	}
 
 	public void saveOperation(boolean forceSave){
@@ -2173,6 +2193,8 @@ public class GuiFrame extends JFrame implements Observer {
 				toggleZeroToInfinityIntervals();
 			} else if (this == showEnabledTransitionsAction) {
 				toggleEnabledTransitionsList();
+			} else if (this == showBlueTransitionsAction) {
+				toggleBlueTransitions();
 			} else if (this == showToolTipsAction) {
 				toggleToolTips();
 			} else if (this == showAdvancedWorkspaceAction){
@@ -2448,4 +2470,8 @@ public class GuiFrame extends JFrame implements Observer {
 		newNameCounter++;
 	}
 
+	public boolean isShowingBlueTransitions() {
+		return showBlueTransitions;
+	}
+	
 }
