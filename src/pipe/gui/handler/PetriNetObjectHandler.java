@@ -75,14 +75,6 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 	public void mousePressed(MouseEvent e) {
 		if(CreateGui.getApp().getGUIMode().equals(GUIMode.animation)) return;
 		
-		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
-			checkForPopup(e);
-		}
-
-		if (!SwingUtilities.isLeftMouseButton(e)) {
-			return;
-		}
-
 		if (CreateGui.getApp().getMode() == ElementType.SELECT) {
 			if (!myObject.isSelected()) {
 				if (!e.isShiftDown()) {
@@ -93,6 +85,10 @@ public class PetriNetObjectHandler extends javax.swing.event.MouseInputAdapter
 				justSelected = true;
 			}
 			dragInit = e.getPoint();
+		}
+		
+		if (CreateGui.getApp().isEditionAllowed() && enablePopup) {
+			checkForPopup(e);
 		}
 	}
 
