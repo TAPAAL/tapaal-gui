@@ -77,6 +77,8 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.ResourceManager;
@@ -1716,17 +1718,9 @@ public class GuiFrame extends JFrame implements Observer {
 				if (queriesAffected) {
 					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
 					for (TAPNQuery q : queriesToDelete) {
-						currentTab.removeQuery(q);
-					}
-				}
-				
-				// remove the places from the list of inclusion places
-				for (PetriNetObject p : selection) {
-					if (p instanceof TimedPlaceComponent) {
-						for (TAPNQuery q : queries) {
-							TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
-							q.inclusionPlaces().removePlace(place);
-						}
+						Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+						cmd.redo();
+						appView.getUndoManager().addEdit(cmd);
 					}
 				}
 				
