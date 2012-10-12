@@ -182,6 +182,7 @@ public class TimedPlaceControl extends PetriNetElementControl {
 		JMenuItem deleteItem = new JMenuItem("Delete");
 		deleteItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("test");
 				// delete();
 			}
 		});
