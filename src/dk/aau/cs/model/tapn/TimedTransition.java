@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import pipe.gui.CreateGui;
+
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
 import dk.aau.cs.model.tapn.event.TimedTransitionListener;
@@ -14,7 +16,7 @@ import dk.aau.cs.util.Require;
 
 public class TimedTransition extends TAPNElement {
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
-	
+
 	private String name;
 	private List<TimedOutputArc> postset = new ArrayList<TimedOutputArc>();
 	private List<TimedInputArc> preset = new ArrayList<TimedInputArc>();
@@ -83,7 +85,7 @@ public class TimedTransition extends TAPNElement {
 			listener.nameChanged(new TimedTransitionEvent(this));
 		}
 	}
-	
+
 	private void fireSharedStateChanged() {
 		for(TimedTransitionListener listener : listeners){
 			listener.sharedStateChanged(new TimedTransitionEvent(this));
@@ -139,14 +141,14 @@ public class TimedTransition extends TAPNElement {
 	public int presetSize() {
 		return preset.size() + transportArcsGoingThrough.size();
 	}
-	
+
 	public int postsetSize() {
 		return postset.size() + transportArcsGoingThrough.size();
 	}
-	
+
 	public boolean isDEnabled(){
 		TimeInterval dInterval = calculateDInterval();
-		
+
 		if(dInterval != null){
 			return true;
 		}
@@ -154,27 +156,23 @@ public class TimedTransition extends TAPNElement {
 			return false; 
 		}
 	}
-	
+
 	public TimeInterval calculateDInterval(){
 		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
-		result.add(TimeInterval.ZERO_INF);
-		
-		for(TimedInputArc arc : this.getInputArcs()){
-			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
+		if(this.isShared()){
+			result = sharedTransition.calculateDInterval();
+		} else {
+			result = this.calculateDIntervalAlone();
 		}
 		
-		for(TransportArc arc : this.getTransportArcsGoingThrough()){
-			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
-		}
 		
-		for(TimedInhibitorArc arc : this.getInhibitorArcs()){
-			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
-		}
-		
-		for(TimedPlace place : model().places()){
-			if(!(place.invariant().upperBound() instanceof InfBound)){
-				for(TimedToken x : place.tokens()){
-					result = IntervalOperations.intersectingInterval(result, Arrays.asList(place.invariant().subtractToken(x.age())));
+		//Invariants
+		for(TimedArcPetriNet model : model().parentNetwork().activeTemplates()){
+			for(TimedPlace place : model.places()){
+				if(!(place.invariant().upperBound() instanceof InfBound)){
+					for(TimedToken x : place.tokens()){
+						result = IntervalOperations.intersectingInterval(result, Arrays.asList(place.invariant().subtractToken(x.age())));
+					}
 				}
 			}
 		}
@@ -185,10 +183,28 @@ public class TimedTransition extends TAPNElement {
 		} else {
 			dInterval = result.get(0);
 		}
-		
 		return dInterval;
 	}
-	
+
+	public ArrayList<TimeInterval> calculateDIntervalAlone(){
+		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
+		result.add(TimeInterval.ZERO_INF);
+
+		for(TimedInputArc arc : this.getInputArcs()){
+			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
+		}
+
+		for(TransportArc arc : this.getTransportArcsGoingThrough()){
+			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
+		}
+
+		for(TimedInhibitorArc arc : this.getInhibitorArcs()){
+			result = IntervalOperations.intersectingInterval(arc.getDEnabledInterval(), result);
+		}
+
+		return result;
+	}
+
 	public boolean isEnabled() {
 		if(isShared()){
 			return sharedTransition.isEnabled();
@@ -214,7 +230,7 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public boolean isEnabledBy(List<TimedToken> tokens) {
-		
+
 		for(TimedInputArc inputArc : preset){
 			int tokensMissing = inputArc.getWeight().value();
 			for (TimedToken token : tokens) {
@@ -224,7 +240,7 @@ public class TimedTransition extends TAPNElement {
 			}
 			if(tokensMissing != 0) return false;
 		}
-		
+
 		for(TransportArc transportArc : transportArcsGoingThrough){
 			int tokensMissing = transportArc.getWeight().value();
 			for (TimedToken token : tokens) {
@@ -255,7 +271,7 @@ public class TimedTransition extends TAPNElement {
 				}
 			}
 		}
-		
+
 		return producedTokens;
 	}
 
@@ -274,7 +290,7 @@ public class TimedTransition extends TAPNElement {
 
 		return tokensToConsume;
 	}
-	
+
 	public boolean hasInhibitorArcs() {
 		return inhibitorArcs.size() > 0;
 	}
@@ -282,7 +298,7 @@ public class TimedTransition extends TAPNElement {
 	public List<TimedInputArc> getInputArcs(){
 		return preset;
 	}
-	
+
 	public List<TimedOutputArc> getOutputArcs() {
 		return postset;
 	}
@@ -290,11 +306,11 @@ public class TimedTransition extends TAPNElement {
 	public List<TransportArc> getTransportArcsGoingThrough(){
 		return transportArcsGoingThrough;
 	}
-	
+
 	public int getNumberOfTransportArcsGoingThrough() {
 		return transportArcsGoingThrough.size();
 	}
-	
+
 	public List<TimedInhibitorArc> getInhibitorArcs() {
 		return inhibitorArcs;
 	}
@@ -310,7 +326,7 @@ public class TimedTransition extends TAPNElement {
 		else
 			return name;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -349,7 +365,7 @@ public class TimedTransition extends TAPNElement {
 			return presetSize() == 0 && postsetSize() == 0;
 		}
 	}
-	
+
 	/*
 	 * Returns the dInterval lastly calculated
 	 */
@@ -372,7 +388,7 @@ public class TimedTransition extends TAPNElement {
 				biggestConstant = max.value();
 			}
 		}
-		
+
 		for(TransportArc arc : transportArcsGoingThrough){
 			Bound max = IntervalOperations.getMaxNoInfBound(arc.interval());
 			if(max.value() > biggestConstant){
@@ -382,13 +398,13 @@ public class TimedTransition extends TAPNElement {
 			if(max instanceof InfBound && max.value() > biggestConstant){
 				biggestConstant = max.value();
 			}
-			
+
 			max = arc.destination().invariant().upperBound();
 			if(max instanceof InfBound && max.value() > biggestConstant){
 				biggestConstant = max.value();
 			}
 		}
-		
+
 		return biggestConstant;
 	}
 }
