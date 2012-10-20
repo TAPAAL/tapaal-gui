@@ -417,7 +417,7 @@ public class TapnXmlLoader {
 			borderInput = true;
 		}
 		AnnotationNote an = new AnnotationNote(text, positionXInput,
-				positionYInput, widthInput, heightInput, borderInput);
+				positionYInput, widthInput, heightInput, borderInput, false);
 		return an;
 	}
 

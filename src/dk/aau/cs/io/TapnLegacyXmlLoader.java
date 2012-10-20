@@ -540,7 +540,7 @@ public class TapnLegacyXmlLoader {
 			borderInput = true;
 		}
 		AnnotationNote an = new AnnotationNote(text, positionXInput,
-				positionYInput, widthInput, heightInput, borderInput);
+				positionYInput, widthInput, heightInput, borderInput, false);
 		guiModel.addPetriNetObject(an);
 		addListeners(an);
 	}
