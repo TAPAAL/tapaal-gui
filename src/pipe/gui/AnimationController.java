@@ -274,7 +274,6 @@ public class AnimationController extends JPanel {
 
 	private void addTimeDelayToHistory() {
 		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
-		animBox.clearStepsForward();
 		try {
 
 			// Hack to allow usage of localised numbes
