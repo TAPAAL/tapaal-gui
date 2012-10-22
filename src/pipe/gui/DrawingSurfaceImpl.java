@@ -671,7 +671,7 @@ Printable, DrawingSurface {
 				case ANNOTATION:
 					p = adjustPoint(e.getPoint(), view.getZoom());
 
-					pnObject = new AnnotationNote(p.x, p.y);
+					pnObject = new AnnotationNote(p.x, p.y, true);
 					guiModel.addPetriNetObject(pnObject);
 					view.addNewPetriNetObject(pnObject);
 					getUndoManager()
