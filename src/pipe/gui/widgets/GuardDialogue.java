@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -292,6 +293,7 @@ public class GuardDialogue extends JPanel /*
 			public void actionPerformed(ActionEvent e) {
 				weightConstantsComboBox.setVisible(weightUseConstant.isSelected());
 				weightNumber.setVisible(!weightUseConstant.isSelected());
+				repackIfWindow();
 			}
 		});
 
@@ -589,7 +591,7 @@ public class GuardDialogue extends JPanel /*
 		secondIntervalNumber.setVisible(!value);
 		rightConstantsComboBox.setVisible(value);
 
-		((JDialog) myRootPane.getParent()).pack();
+		repackIfWindow();
 		setDelimiterModels();
 	}
 
@@ -756,5 +758,11 @@ public class GuardDialogue extends JPanel /*
 
 	private void secondSpinnerStateChanged(ChangeEvent evt) {
 		setDelimiterModels();
+	}
+	
+	private void repackIfWindow() {
+		if(myRootPane.getParent() instanceof Window){
+			((Window)myRootPane.getParent()).pack();
+		}
 	}
 }
