@@ -1581,6 +1581,9 @@ public class GuiFrame extends JFrame implements Observer {
 		case noNet:
 			// Disable All Actions
 			statusBar.changeText(statusBar.textforNoNet);
+			if(CreateGui.appGui != null){
+				CreateGui.appGui.setFocusTraversalPolicy(null);
+			}
 			break;
 
 		default:
