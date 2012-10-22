@@ -7,6 +7,7 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.MenuBar;
@@ -142,7 +143,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
-	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
+	selectAction, deleteTokenAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
@@ -547,9 +548,7 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.addSeparator();
 		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				"Change the grid size", "G"));
-		addMenuItem(viewMenu, dragAction = new TypeAction("Drag", ElementType.DRAG,
-				"Drag the drawing", "D", true));
-
+		
 		viewMenu.addSeparator();
 
 		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
@@ -811,13 +810,11 @@ public class GuiFrame extends JFrame implements Observer {
 
 		toolBar.addSeparator();
 		toolBar.add(toggleGrid);
-		toolBar.add(new ToggleButton(dragAction));
 		toolBar.add(new ToggleButton(startAction));
 
 		// Start drawingToolBar
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
-
 		drawingToolBar.addSeparator();
 
 		// Normal arraw
@@ -1066,7 +1063,6 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomMenu.setEnabled(enable);
 
 		toggleGrid.setEnabled(enable);
-		dragAction.setEnabled(enable);
 
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
@@ -1992,9 +1988,6 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 			if (this != annotationAction) {
 				annotationAction.setSelected(false);
-			}
-			if (this != dragAction) {
-				dragAction.setSelected(false);
 			}
 
 			if (appView == null) {
