@@ -1,6 +1,8 @@
 package pipe.gui.widgets;
 
+import java.awt.FileDialog;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
@@ -24,41 +26,29 @@ import pipe.gui.ExtensionFilter;
 
 public class FileBrowser {
 	private static String lastPath;
+	private FileDialog fc;
 
-	private JFileChooser fc;
-	private String ext;
-
-	public FileBrowser(String filetype, String ext, String path) {
-		fc = new JFileChooser();
+	public FileBrowser(String filetype, final String ext, String path) {
+		fc = new FileDialog(CreateGui.appGui, filetype);
 		
 		if (filetype == null) {
 			filetype = "file";
 		}
 		if(path == null) path = lastPath;
 		
-		if (path != null) {
-			File f = new File(path);
-			if (f.exists()) {
-				fc.setCurrentDirectory(f);
-			}
-			if (!f.isDirectory()) {
-				fc.setSelectedFile(f);
-			}
-		}
+		fc.setFile("*."+ext);
+		fc.setDirectory(path);
 
-		this.ext = ext;
-		ExtensionFilter filter = new ExtensionFilter(ext, filetype);
-
-		fc.setFileFilter(filter);
-		fc.setAcceptAllFileFilterUsed(false);
-		fc.setFileFilter(filter);
-		// JS: copied the line above again in order to fix the mac filter issues
-		// By default hide hidden files
-		fc.setFileHidingEnabled(true);
+		fc.setFilenameFilter(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith( "." + ext );
+			}
+		});
 	}
 
 	public FileBrowser(String path) {
-		this("Petri net", "xml", path); // default parameters
+		this("Petri Net", "xml", path); // default parameters
 	}
 
 	public FileBrowser() {
@@ -67,57 +57,27 @@ public class FileBrowser {
 
 	public File openFile() {
 		setupLastPath();
-		if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			try {
-				File file = fc.getSelectedFile().getCanonicalFile();
-				lastPath = file.getParent();
-				return file;
-			} catch (IOException e) {
-				/* gulp */
-			}
-		}
-		return null;
+		fc.setMode(FileDialog.LOAD);
+		fc.setVisible(true);
+		String selectedFile = fc.getFile();
+		String selectedDir = fc.getDirectory();
+		lastPath = selectedDir;
+		File file = new File(selectedDir + selectedFile);
+		return file;
 	}
 
 	private void setupLastPath() {
 		if(lastPath != null){
-			File path = new File(lastPath);
-			if(path.exists()){
-				fc.setCurrentDirectory(path);
-			}
+			fc.setDirectory(lastPath);
 		}
 	}
 
 	public String saveFile() {
 		setupLastPath();
-		if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-			try {
-				File f = fc.getSelectedFile();
-				if (!f.getName().endsWith("." + ext)) {
-					f = new File(f.getCanonicalPath() + "." + ext); // force
-																	// extension
-				}
-				
-				//The GTKFileBrowser does not check if the file with the extension appended exists
-				if (/*!CreateGui.usingGTKFileBrowser() &&*/ f.exists()) {
-					int overRide = JOptionPane.showConfirmDialog(fc, f.getCanonicalPath() + "\nDo you want to overwrite this file?");
-					switch (overRide) {
-						case JOptionPane.NO_OPTION:
-							return saveFile();
-						case JOptionPane.YES_OPTION:
-							break;
-						default:
-							return null;
-					}
-				}
-				String path =  f.getCanonicalPath();
-				lastPath = f.getParent();
-				return path;
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(CreateGui.getApp(), "An error occurred while trying to save the file. Please try again", "Error Saving File", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		return null;
+		fc.setMode(FileDialog.SAVE);
+		fc.setVisible(true);
+		lastPath = fc.getDirectory();
+		return fc.getFile() == null? null: lastPath + fc.getFile();
 	}
 
 }
