@@ -10,6 +10,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -46,6 +48,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
@@ -102,6 +105,7 @@ public class ConstantsPane extends JPanel {
 				constantsList.setSelectedIndex(index);
 				constantsList.ensureIndexIsVisible(index);
 			}
+			
 		});
 
 		constantsList = new NonsearchableJList(listModel);
@@ -136,18 +140,21 @@ public class ConstantsPane extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!constantsList.isSelectionEmpty()) {
+					
+					int index = constantsList.locationToIndex(arg0.getPoint());
+					ListModel dlm = constantsList.getModel();
+					Constant c = (Constant) dlm.getElementAt(index);
+					constantsList.ensureIndexIsVisible(index);
+					
+					highlightConstant(index);
+					
 					if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
-						int index = constantsList.locationToIndex(arg0.getPoint());
-						ListModel dlm = constantsList.getModel();
-						Constant c = (Constant) dlm.getElementAt(index);
-						constantsList.ensureIndexIsVisible(index);
-
 						showEditConstantDialog(c,index);						
 					}
 				}
 			}
 		});
-
+		
 		constantsList.addKeyListener(new KeyListener() {
 
 			
@@ -178,6 +185,16 @@ public class ConstantsPane extends JPanel {
 										c.name(), c.value()+1));
 								CreateGui.getView().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
+							}
+						} 
+						else if (arg0.getKeyCode() == KeyEvent.VK_UP) {
+							if(constantsList.getSelectedIndex() > 0){
+								highlightConstant(constantsList.getSelectedIndex()-1);
+							}
+						}
+						else if (arg0.getKeyCode() == KeyEvent.VK_DOWN) {
+							if(constantsList.getSelectedIndex() < constantsList.getModel().getSize()-1){
+								highlightConstant(constantsList.getSelectedIndex()+1);
 							}
 						}
 					}
@@ -226,6 +243,27 @@ public class ConstantsPane extends JPanel {
 		
 		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 
+	}
+	
+	private void highlightConstant(int index){
+		ListModel model = constantsList.getModel();
+		Constant c = (Constant) model.getElementAt(index);
+		
+		if(c != null && !c.hasFocus()){
+			for(int i = 0; i < model.getSize(); i++){
+				((Constant) model.getElementAt(i)).setFocused(false);
+			}
+			c.setFocused(true);
+			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+		}
+	}
+	
+	public void removeConstantHighlights(){
+		ListModel model = constantsList.getModel();
+		for(int i = 0; i < model.getSize(); i++){
+			((Constant) model.getElementAt(i)).setFocused(false);
+		}
+		CreateGui.getCurrentTab().drawingSurface().repaintAll();
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {

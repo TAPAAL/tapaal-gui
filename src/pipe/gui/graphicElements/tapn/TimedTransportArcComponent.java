@@ -7,11 +7,14 @@ import java.util.Hashtable;
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.Pipe;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TransportArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import pipe.gui.undo.TransportArcGroupEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.ConstantWeight;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TransportArc;
@@ -98,6 +101,30 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 							+ " : " + getGroup());
 				}				
 			}
+			
+			// Handle constant highlighting
+			boolean focusedConstant = false;
+			if(underlyingTransportArc.interval().lowerBound() instanceof ConstantBound){
+				if(((ConstantBound) underlyingTransportArc.interval().lowerBound()).constant().hasFocus()){
+					focusedConstant = true;
+				}
+			}
+			if(underlyingTransportArc.interval().upperBound() instanceof ConstantBound){
+				if(((ConstantBound) underlyingTransportArc.interval().upperBound()).constant().hasFocus()){
+					focusedConstant = true;
+				}
+			}
+			if(getWeight() instanceof ConstantWeight){
+				if(((ConstantWeight) getWeight()).constant().hasFocus()){
+					focusedConstant = true;
+				}
+			}
+			if(focusedConstant){
+				label.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+			}else{
+				label.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+			}
+			
 		} else if (!isInPreSet) {
 			label.setText(" : " + String.valueOf(getGroup()));
 		} else {

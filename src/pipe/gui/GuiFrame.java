@@ -1004,6 +1004,9 @@ public class GuiFrame extends JFrame implements Observer {
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
+			// Remove constant highlight
+			CreateGui.getCurrentTab().removeConstantHighlights();
+			
 			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
