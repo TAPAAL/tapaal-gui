@@ -39,11 +39,11 @@ public class BlueTransitionControl extends JPanel{
 		//0 corresponds to 0.0001, 4 corresponds to 1 (   thus x corresponds to 1/(10^(4−x))  )
 		bluePrecision = new JSlider(JSlider.HORIZONTAL, 0, 4, 3);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(0), new JLabel(Double.toString(0.0001)));
-		labelTable.put(new Integer(1), new JLabel(Double.toString(0.001)));
-		labelTable.put(new Integer(2), new JLabel(Double.toString(0.01)));
-		labelTable.put(new Integer(3), new JLabel(Double.toString(0.1)));
-		labelTable.put(new Integer(4), new JLabel(Double.toString(1)));
+		labelTable.put(new Integer(0), new JLabel("0.0001"));
+		labelTable.put(new Integer(1), new JLabel("0.001"));
+		labelTable.put(new Integer(2), new JLabel("0.01"));
+		labelTable.put(new Integer(3), new JLabel("0.1"));
+		labelTable.put(new Integer(4), new JLabel("1"));
 		
 		bluePrecision.setLabelTable(labelTable);
 		bluePrecision.setSnapToTicks(true);

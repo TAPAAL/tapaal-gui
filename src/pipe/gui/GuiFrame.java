@@ -573,7 +573,7 @@ public class GuiFrame extends JFrame implements Observer {
 				showEnabledTransitionsCheckBox = new JCheckBoxMenuItem());
 		showEnabledTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('4', shortcutkey));
 		
-		addCheckboxMenuItem(viewMenu, showBlueTransitions, showBlueTransitionsAction = new ViewAction("Display blue transitions",
+		addCheckboxMenuItem(viewMenu, showBlueTransitions, showBlueTransitionsAction = new ViewAction("Display future-enabled transitions",
 				453247, "Highlight transitions which can be enabled after a delay","ctrl 5",true),
 				showBlueTransitionsCheckBox = new JCheckBoxMenuItem());
 		showBlueTransitionsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('5', shortcutkey));
