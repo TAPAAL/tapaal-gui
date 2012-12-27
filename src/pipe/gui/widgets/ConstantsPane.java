@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
@@ -37,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle;
@@ -48,6 +50,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.GuiFrame;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
@@ -201,9 +204,16 @@ public class ConstantsPane extends JPanel {
 				}
 			}
 		});
-
+		
 		addConstantsComponents();
 		addConstantsButtons(enableAddButton);
+		
+		constantsList.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				removeConstantHighlights();
+			}
+		});
 
 		setLayout(new BorderLayout());
 		this.add(constantsPanel, BorderLayout.CENTER);
@@ -263,7 +273,11 @@ public class ConstantsPane extends JPanel {
 		for(int i = 0; i < model.getSize(); i++){
 			((Constant) model.getElementAt(i)).setFocused(false);
 		}
-		CreateGui.getCurrentTab().drawingSurface().repaintAll();
+		try{
+			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+		}catch(Exception e){
+			// It is okay, the tab has just been closed
+		}
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {
