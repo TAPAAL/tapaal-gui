@@ -113,11 +113,7 @@ public class EnabledTransitionsList extends JPanel{
 		TransitionListItem item = (TransitionListItem)transitionsList.getSelectedValue();
 
 		if(item != null) {
-			if(item.getTransition().isEnabled(true)){
-				CreateGui.getAnimator().fireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
-			} else {
-				CreateGui.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
-			}
+			CreateGui.getAnimator().dFireTransition(((TimedTransitionComponent)item.getTransition()).underlyingTransition());
 		}
 	}
 

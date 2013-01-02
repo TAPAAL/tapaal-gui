@@ -283,6 +283,11 @@ public class Animator {
 	}
 	
 	public void dFireTransition(TimedTransition transition){
+		if(!CreateGui.getApp().isShowingBlueTransitions()){
+			fireTransition(transition);
+			return;
+		}
+		
 		TimeInterval dInterval = transition.getdInterval();
 		
 		BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
@@ -299,7 +304,9 @@ public class Animator {
 		} else {
 			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
 			if(delay != null){
-				letTimePass(delay);
+				if(delay.compareTo(BigDecimal.ZERO) != 0){
+					letTimePass(delay);
+				}
 			
 				fireTransition(transition);
 			}
@@ -307,7 +314,7 @@ public class Animator {
 	}
 
 	// TODO: Clean up this method
-	public void fireTransition(TimedTransition transition) {
+	private void fireTransition(TimedTransition transition) {
 
 		if(!clearStepsForward()){
 			return;

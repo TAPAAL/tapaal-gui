@@ -37,7 +37,7 @@ public class TransitionFireingComponent extends JPanel {
 				enabledTransitionsList.getPreferredSize().width,
 				enabledTransitionsList.getMinimumSize().height));
 		
-		fireButton = new JButton("Fire");
+		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
 		fireButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -112,5 +112,6 @@ public class TransitionFireingComponent extends JPanel {
 
 	public void showBlueTransitions(boolean enable) {
 		settingsButton.setVisible(enable);
+		fireButton.setText(enable ? "Delay & Fire" : "Fire");
 	}
 }

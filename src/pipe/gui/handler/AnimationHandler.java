@@ -29,12 +29,7 @@ public class AnimationHandler extends javax.swing.event.MouseInputAdapter {
 			TimedTransition transition = ((TimedTransitionComponent) e.getComponent()).underlyingTransition();
 
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				if (transition.isEnabled()){
-
-					CreateGui.getAnimationHistory().clearStepsForward();
-					CreateGui.getAnimator().fireTransition(transition);
-					CreateGui.getApp().setRandomAnimationMode(false);
-				} else if(transition.isDEnabled()){
+				if(transition.isDEnabled()){
 					CreateGui.getAnimationHistory().clearStepsForward();
 					CreateGui.getAnimator().dFireTransition(transition);
 					CreateGui.getApp().setRandomAnimationMode(false);
