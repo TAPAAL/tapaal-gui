@@ -5,11 +5,15 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -123,16 +127,38 @@ public class BlueTransitionControl extends JPanel{
 	}
 	
 	private static BlueTransitionControl instance;
+	private static JButton closeDialogButton;
+	private static JDialog dialog;
 	
 	public static void showBlueTransitionDialog(){
-		JDialog dialog = new EscapableDialog(CreateGui.getApp(), "Delay controller", true);
-		dialog.setContentPane(getInstance());
+		JPanel contentPane = new JPanel(new GridBagLayout());
+		
+		closeDialogButton = new JButton("Close");
+		closeDialogButton.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent arg0) {
+				dialog.setVisible(false);
+			}
+		});
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 3, 0, 3);
+		contentPane.add(getInstance(), gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = new Insets(0, 3, 0, 3);
+		gbc.gridy = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		contentPane.add(closeDialogButton, gbc);
+		
+		dialog = new EscapableDialog(CreateGui.getApp(), "Delay controller", true);
+		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(CreateGui.getApp());
 		dialog.setVisible(true);
-		
-		//TODO: Create closebutton
 	}
 	
 	public static BlueTransitionControl getInstance(){
