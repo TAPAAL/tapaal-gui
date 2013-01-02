@@ -50,7 +50,6 @@ public class EnabledTransitionsList extends JPanel{
 	DefaultListModel transitions;
 	JList transitionsList;
 	JScrollPane scrollPane;
-	JButton fireButton;
 	TransitionListItem lastSelected;
 
 	public void initPanel(){
@@ -69,15 +68,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		scrollPane = new JScrollPane(transitionsList);
 
-		fireButton = new JButton("Fire");
-		fireButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				fireSelectedTransition();
-			}
-		});
-
 		this.add(scrollPane, BorderLayout.CENTER);
-		this.add(fireButton, BorderLayout.SOUTH);
 	}
 
 	public void startReInit(){
@@ -86,7 +77,6 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void reInitDone(){
-		updateFireButton();
 		//Trick to make the "splitter" appear
 		//transitions.addElement(new SplitterListItem());
 		//sort the transitions
@@ -119,20 +109,7 @@ public class EnabledTransitionsList extends JPanel{
 		transitions.removeElement(item);
 	}
 
-	public static final String FIRE_BUTTON_DEACTIVATED_TOOL_TIP = "No transitions are enabled";
-	public static final String FIRE_BUTTON_ENABLED_TOOL_TIP = "Press to fire the selected transition";
-
-	public void updateFireButton(){
-		if(transitions.size() == 0){
-			fireButton.setEnabled(false);
-			fireButton.setToolTipText(FIRE_BUTTON_DEACTIVATED_TOOL_TIP);
-		} else {
-			fireButton.setEnabled(true);
-			fireButton.setToolTipText(FIRE_BUTTON_ENABLED_TOOL_TIP);
-		}
-	}
-
-	private void fireSelectedTransition(){
+	public void fireSelectedTransition(){
 		TransitionListItem item = (TransitionListItem)transitionsList.getSelectedValue();
 
 		if(item != null) {
@@ -294,5 +271,9 @@ public class EnabledTransitionsList extends JPanel{
 				return insets;
 			}
 		}
+	}
+
+	public int getNumberOfTransitions() {
+		return transitions.size();
 	}
 }

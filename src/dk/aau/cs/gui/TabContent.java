@@ -459,8 +459,8 @@ public class TabContent extends JSplitPane {
 		transitionFireing = new TransitionFireingComponent();
 	}
 
-	public EnabledTransitionsList getFireabletransitionsList() {
-		return transitionFireing.getEnabledTransitionList();
+	public TransitionFireingComponent getTransitionFireingComponent() {
+		return transitionFireing;
 	}
 
 	public JScrollPane drawingSurfaceScrollPane() {

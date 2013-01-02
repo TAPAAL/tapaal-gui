@@ -2,6 +2,7 @@ package pipe.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.math.BigDecimal;
@@ -10,30 +11,25 @@ import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.UIManager;
+
+import pipe.gui.widgets.EscapableDialog;
 
 import dk.aau.cs.model.tapn.simulation.DelayMode;
 import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
 import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
-import dk.aau.cs.model.tapn.simulation.RandomFiringMode;
-import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
-
-import java.lang.reflect.Field;
 
 public class BlueTransitionControl extends JPanel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5735674907635981304L;
 	JSlider bluePrecision;
 	JComboBox delayMode;
 	
-	public BlueTransitionControl() {
+	private BlueTransitionControl() {
 		super(new GridBagLayout());
 		
 		//0 corresponds to 0.0001, 4 corresponds to 1 (   thus x corresponds to 1/(10^(4−x))  )
@@ -124,5 +120,25 @@ public class BlueTransitionControl extends JPanel{
 		} else{
 			return null;
 		}
+	}
+	
+	private static BlueTransitionControl instance;
+	
+	public static void showBlueTransitionDialog(){
+		JDialog dialog = new EscapableDialog(CreateGui.getApp(), "Delay controller", true);
+		dialog.setContentPane(getInstance());
+		dialog.pack();
+		dialog.setResizable(false);
+		dialog.setLocationRelativeTo(CreateGui.getApp());
+		dialog.setVisible(true);
+		
+		//TODO: Create closebutton
+	}
+	
+	public static BlueTransitionControl getInstance(){
+		if(instance == null){
+			instance = new BlueTransitionControl();
+		}
+		return instance;
 	}
 }

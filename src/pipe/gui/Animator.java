@@ -19,6 +19,7 @@ import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
+import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -155,20 +156,20 @@ public class Animator {
 	}
 
 	public void updateFireableTransitions(){
-		EnabledTransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
-		fireableTrans.startReInit();
+		TransitionFireingComponent transFireComponent = CreateGui.getTransitionFireingComponent();
+		transFireComponent.startReInit();
 
 		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
 				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions())) {
-					fireableTrans.addTransition(temp, tempTransition);
+					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
 		}
 
-		fireableTrans.reInitDone();
+		transFireComponent.reInitDone();
 	}
 
 	/**
