@@ -14,6 +14,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -158,16 +159,7 @@ public class ConstantsPane extends JPanel {
 			}
 		});
 		
-		constantsList.addKeyListener(new KeyListener() {
-
-			
-			public void keyTyped(KeyEvent arg0) {		
-			}
-
-			
-			public void keyReleased(KeyEvent arg0) {			
-			}
-			
+		constantsList.addKeyListener(new KeyAdapter() {
 		
 			public void keyPressed(KeyEvent arg0) {				
 				ListModel model = constantsList.getModel();
