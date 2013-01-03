@@ -36,14 +36,15 @@ public class BlueTransitionControl extends JPanel{
 	private BlueTransitionControl() {
 		super(new GridBagLayout());
 		
-		//0 corresponds to 0.0001, 4 corresponds to 1 (   thus x corresponds to 1/(10^(4−x))  )
-		bluePrecision = new JSlider(JSlider.HORIZONTAL, 0, 4, 3);
+		//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
+		bluePrecision = new JSlider(JSlider.HORIZONTAL, 0, 5, 4);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(0), new JLabel("0.0001"));
-		labelTable.put(new Integer(1), new JLabel("0.001"));
-		labelTable.put(new Integer(2), new JLabel("0.01"));
-		labelTable.put(new Integer(3), new JLabel("0.1"));
-		labelTable.put(new Integer(4), new JLabel("1"));
+		labelTable.put(new Integer(0), new JLabel("0.00001"));
+		labelTable.put(new Integer(1), new JLabel("0.0001"));
+		labelTable.put(new Integer(2), new JLabel("0.001"));
+		labelTable.put(new Integer(3), new JLabel("0.01"));
+		labelTable.put(new Integer(4), new JLabel("0.1"));
+		labelTable.put(new Integer(5), new JLabel("1"));
 		
 		bluePrecision.setLabelTable(labelTable);
 		bluePrecision.setSnapToTicks(true);
@@ -51,6 +52,7 @@ public class BlueTransitionControl extends JPanel{
 		bluePrecision.setPaintLabels(true);
 		bluePrecision.setPaintTicks(true);
 		bluePrecision.setPaintTrack(false);
+		bluePrecision.setPreferredSize(new Dimension(340, bluePrecision.getPreferredSize().height));
 		//UIManager.put("Slider.paintValue", false);
 		//UIManager.getLookAndFeelDefaults().put("Slider.paintValue", false);
 		
@@ -107,9 +109,10 @@ public class BlueTransitionControl extends JPanel{
 				BorderFactory.createTitledBorder("Delay controller"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
-	//0 corresponds to 0.0001, 4 corresponds to 1 (   thus x corresponds to 1/(10^(4−x))  )
+	
+	//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
 	public BigDecimal getValue(){
-		return new BigDecimal(1.0/(Math.pow(10.0, (4.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
+		return new BigDecimal(1.0/(Math.pow(10.0, (5.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
 	}
 	
 	public DelayMode getDelayMode(){

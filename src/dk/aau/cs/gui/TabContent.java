@@ -456,7 +456,7 @@ public class TabContent extends JSplitPane {
 	}
 
 	private void createTransitionFireing() {
-		transitionFireing = new TransitionFireingComponent();
+		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingBlueTransitions());
 	}
 
 	public TransitionFireingComponent getTransitionFireingComponent() {

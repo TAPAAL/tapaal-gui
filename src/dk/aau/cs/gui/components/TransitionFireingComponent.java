@@ -23,7 +23,7 @@ public class TransitionFireingComponent extends JPanel {
 	private JButton fireButton;
 	private JButton settingsButton;
 	
-	public TransitionFireingComponent() {
+	public TransitionFireingComponent(boolean showBlueTransitions) {
 		super(new GridBagLayout());
 		
 		enabledTransitionsList = new EnabledTransitionsList();
@@ -79,6 +79,8 @@ public class TransitionFireingComponent extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.SOUTHWEST;
 		this.add(settingsButton, gbc);
+		
+		showBlueTransitions(showBlueTransitions);
 	}
 	
 	public static final String FIRE_BUTTON_DEACTIVATED_TOOL_TIP = "No transitions are enabled";
