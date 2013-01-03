@@ -304,7 +304,7 @@ public class Animator {
 		} else {
 			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
 			if(delay != null){
-				if(delay.compareTo(BigDecimal.ZERO) != 0){
+				if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
 					letTimePass(delay);
 				}
 			

@@ -144,11 +144,12 @@ public class BlueTransitionControl extends JPanel{
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 3, 0, 3);
+		gbc.fill = GridBagConstraints.BOTH;
 		contentPane.add(getInstance(), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.insets = new Insets(0, 3, 0, 3);
+		gbc.insets = new Insets(3, 3, 0, 3);
 		gbc.gridy = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(closeDialogButton, gbc);
