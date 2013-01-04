@@ -37,19 +37,19 @@ public class TransitionFireingComponent extends JPanel {
 				enabledTransitionsList.getPreferredSize().width,
 				enabledTransitionsList.getMinimumSize().height));
 		
-		fireButton = new JButton("Delay & Fire");
-		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
-		fireButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				enabledTransitionsList.fireSelectedTransition();
-			}
-		});
-		
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
 		settingsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				BlueTransitionControl.showBlueTransitionDialog();
+			}
+		});
+		
+		fireButton = new JButton("Delay & Fire");
+		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
+		fireButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				enabledTransitionsList.fireSelectedTransition();
 			}
 		});
 		
@@ -70,7 +70,7 @@ public class TransitionFireingComponent extends JPanel {
 		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.SOUTHWEST;
-		this.add(fireButton, gbc);
+		this.add(settingsButton, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -78,7 +78,7 @@ public class TransitionFireingComponent extends JPanel {
 		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.SOUTHWEST;
-		this.add(settingsButton, gbc);
+		this.add(fireButton, gbc);
 		
 		showBlueTransitions(showBlueTransitions);
 	}

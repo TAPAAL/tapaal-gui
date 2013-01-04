@@ -148,7 +148,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null && showIntervals ? 
+			String interval = transition.getDInterval() == null || !showIntervals ? 
 					"" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 
@@ -163,7 +163,11 @@ public class EnabledTransitionsList extends JPanel{
 		}
 		
 		public String toString(){
-			return toString(true);
+			if(CreateGui.getApp().isShowingBlueTransitions()){
+				return toString(true);
+			} else {
+				return toString(false);
+			}
 		}
 
 		@Override
