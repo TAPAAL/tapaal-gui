@@ -7,9 +7,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.prefs.BackingStoreException;
 
 import org.jdesktop.swingx.MultiSplitLayout.Split;
+
+import sun.security.provider.PolicyParser.GrantEntry;
+
+import dk.aau.cs.model.tapn.simulation.DelayMode;
+import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
+import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
+import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 
 public class Preferences {
 	private static Preferences instance = null;
@@ -190,6 +198,37 @@ public class Preferences {
 
 	public boolean getShowBlueTransitions(){
 		return pref.getBoolean("enabledBlueTransitions", true);
+	}
+	
+	public void setBlueTransitionGranularity(BigDecimal granularity){
+		pref.put("blueTransitionGranularity", granularity.toString());
+	}
+	
+	public BigDecimal getBlueTransitionGranularity(){
+		return new BigDecimal(pref.get("blueTransitionGranularity", "0.1"));
+		
+	}
+	
+	public void setBlueTransitionDelayMode(DelayMode delayMode){
+		if(delayMode instanceof ManualDelayMode){
+			pref.putInt("blueTransitionDelayMode", 0);
+		} else if(delayMode instanceof RandomDelayMode){
+			pref.putInt("blueTransitionDelayMode", 1);
+		} else if(delayMode instanceof ShortestDelayMode){
+			pref.putInt("blueTransitionDelayMode", 2);
+		} else {
+			throw new IllegalArgumentException("Can only save ManualDelayMode, RandomDelayMode and ShortestDelayMode");
+		}
+	}
+	
+	public DelayMode getBlueTransitionDelayMode(){
+		switch (pref.getInt("blueTransitionDelayMode", 2)) {
+		case 0: return ManualDelayMode.getInstance();
+		case 1: return RandomDelayMode.getInstance();
+		case 2: return ShortestDelayMode.getInstance();
+		default:
+			throw new RuntimeException();
+		}
 	}
 
 	public void setSimulatorModelRoot(Split model){

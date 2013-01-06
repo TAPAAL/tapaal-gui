@@ -14,6 +14,17 @@ import dk.aau.cs.util.IntervalOperations;
 
 public class RandomDelayMode implements DelayMode{
 	
+	private static RandomDelayMode instance;
+	
+	public static RandomDelayMode getInstance(){
+		if(instance == null){
+			instance = new RandomDelayMode();
+		}
+		return instance;
+	}
+	
+	private RandomDelayMode(){};
+	
 	int numberOfDecimals = -1;
 
 	@Override

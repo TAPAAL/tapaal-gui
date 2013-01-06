@@ -11,6 +11,17 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.IntervalOperations;
 
 public class ShortestDelayMode implements DelayMode{
+	
+	private static ShortestDelayMode instance;
+	
+	public static ShortestDelayMode getInstance(){
+		if(instance == null){
+			instance = new ShortestDelayMode();
+		}
+		return instance;
+	}
+	
+	private ShortestDelayMode(){}
 
 	@Override
 	public BigDecimal GetDelay(TimedTransition transition,

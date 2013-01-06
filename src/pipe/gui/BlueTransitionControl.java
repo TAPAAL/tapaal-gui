@@ -30,6 +30,9 @@ import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 public class BlueTransitionControl extends JPanel{
 
 	private static final long serialVersionUID = -5735674907635981304L;
+	private static DelayMode defaultDelayMode = ShortestDelayMode.getInstance();
+	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
+	
 	JSlider bluePrecision;
 	JComboBox delayMode;
 	
@@ -53,6 +56,7 @@ public class BlueTransitionControl extends JPanel{
 		bluePrecision.setPaintTicks(true);
 		bluePrecision.setPaintTrack(false);
 		bluePrecision.setPreferredSize(new Dimension(340, bluePrecision.getPreferredSize().height));
+		setValue(defaultGranularity);
 		//UIManager.put("Slider.paintValue", false);
 		//UIManager.getLookAndFeelDefaults().put("Slider.paintValue", false);
 		
@@ -69,8 +73,9 @@ public class BlueTransitionControl extends JPanel{
 			e.printStackTrace();
 		}*/
 		
-		String[] items = {ShortestDelayMode.name(), RandomDelayMode.name(), ManualDelayMode.name()};
+		DelayMode[] items = {ShortestDelayMode.getInstance(), RandomDelayMode.getInstance(), ManualDelayMode.getInstance()};
 		delayMode = new JComboBox(items);
+		setDelayMode(defaultDelayMode);
         
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = 2;
@@ -110,23 +115,31 @@ public class BlueTransitionControl extends JPanel{
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 	}
 	
+	private int getValueFromDecimal(BigDecimal decimal) {
+		if(new BigDecimal("0.00001").compareTo(decimal) == 0) return 0;
+		if(new BigDecimal("0.0001").compareTo(decimal) == 0) return 1;
+		if(new BigDecimal("0.001").compareTo(decimal) == 0) return 2;
+		if(new BigDecimal("0.01").compareTo(decimal) == 0) return 3;
+		if(new BigDecimal("0.1").compareTo(decimal) == 0) return 4;
+		if(new BigDecimal("1").compareTo(decimal) == 0) return 5;
+		return 4;
+	}
+
 	//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
 	public BigDecimal getValue(){
 		return new BigDecimal(1.0/(Math.pow(10.0, (5.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
 	}
 	
+	public void setValue(BigDecimal value){
+		bluePrecision.setValue(getValueFromDecimal(value));
+	}
+	
 	public DelayMode getDelayMode(){
-		String selectedItem = (String)delayMode.getSelectedItem();
-		
-		if(selectedItem == ManualDelayMode.name()){
-			return new ManualDelayMode();
-		} else if(selectedItem == RandomDelayMode.name()){
-			return new RandomDelayMode();
-		} else if(selectedItem == ShortestDelayMode.name()){
-			return new ShortestDelayMode();
-		} else{
-			return null;
-		}
+		return (DelayMode)delayMode.getSelectedItem();
+	}
+	
+	public void setDelayMode(DelayMode delayMode){
+		this.delayMode.setSelectedItem(delayMode);
 	}
 	
 	private static BlueTransitionControl instance;
@@ -170,5 +183,29 @@ public class BlueTransitionControl extends JPanel{
 			instance = new BlueTransitionControl();
 		}
 		return instance;
+	}
+	
+	public static void setDefaultDelayMode(DelayMode delayMode){
+		defaultDelayMode = delayMode;
+	}
+	
+	public static DelayMode getDefaultDelayMode(){
+		if(instance != null){
+			return getInstance().getDelayMode();
+		} else {
+			return defaultDelayMode;
+		}
+	}
+	
+	public static void setDefaultGranularity(BigDecimal granularity){
+		defaultGranularity = granularity;
+	}
+	
+	public static BigDecimal getDefaultGranularity(){
+		if(instance != null){
+			return getInstance().getValue();
+		} else {
+			return defaultGranularity;
+		}
 	}
 }

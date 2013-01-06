@@ -105,6 +105,7 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -283,6 +284,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		showEnabledTransitions = prefs.getShowEnabledTransitions();
 		showBlueTransitions = prefs.getShowBlueTransitions();
+		BlueTransitionControl.setDefaultDelayMode(prefs.getBlueTransitionDelayMode());
+		BlueTransitionControl.setDefaultGranularity(prefs.getBlueTransitionGranularity());
 
 		showToolTips = prefs.getShowToolTips();
 		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
@@ -756,6 +759,8 @@ public class GuiFrame extends JFrame implements Observer {
 		if(!CreateGui.showZeroToInfinityIntervals()){
 			showZeroToInfinityIntervalsCheckBox.doClick();
 		}
+		BlueTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
+		BlueTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
 	}
 
 	public void saveWorkspace(){
@@ -772,6 +777,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 		prefs.setShowEnabledTrasitions(showEnabledTransitions);
 		prefs.setShowBlueTransitions(showBlueTransitions);
+		prefs.setBlueTransitionDelayMode(BlueTransitionControl.getDefaultDelayMode());
+		prefs.setBlueTransitionGranularity(BlueTransitionControl.getDefaultGranularity());
 
 		JOptionPane.showMessageDialog(this, 
 				"The workspace has now been saved into your preferences.\n" 

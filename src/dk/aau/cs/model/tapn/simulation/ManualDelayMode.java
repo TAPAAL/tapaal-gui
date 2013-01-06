@@ -45,6 +45,17 @@ import dk.aau.cs.util.IntervalOperations;
 
 public class ManualDelayMode implements DelayMode{
 	
+	private static ManualDelayMode instance;
+	
+	public static ManualDelayMode getInstance(){
+		if(instance == null){
+			instance = new ManualDelayMode();
+		}
+		return instance;
+	}
+	
+	private ManualDelayMode(){};
+	
 	TimeInterval dInterval; 
 	JButton okButton;
 	boolean okPressed = false;
