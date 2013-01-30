@@ -5,12 +5,15 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+
+import com.sun.jdi.Method;
 
 import pipe.gui.CreateGui;
 import dk.aau.cs.debug.Logger;
@@ -76,7 +79,9 @@ public class TAPAAL {
 
 			}
 		}
-
+		
+		// Load SWT
+		//loadSwtJar();
 	}
 	
 	public static File getInstallDir() {
@@ -139,6 +144,34 @@ public class TAPAAL {
 		}
 		return null;
 
+	}
+	
+	public static void loadSwtJar() {
+		String swtFileName = "";
+	    try {
+	        String osName = System.getProperty("os.name").toLowerCase();
+	        String osArch = System.getProperty("os.arch").toLowerCase();
+	      
+	        String swtFileNameOsPart = 
+	            osName.contains("win") ? "win32" :
+	            osName.contains("mac") ? "macosx" :
+	            osName.contains("linux") || osName.contains("nix") ? "linux_gtk" :
+	            ""; // throw new RuntimeException("Unknown OS name: "+osName)
+
+	        String swtFileNameArchPart = osArch.contains("64") ? "x64" : "x86";
+	        swtFileName = "libs/swt_"+swtFileNameOsPart+"_"+swtFileNameArchPart+".jar";
+	        
+	        URL url = new File(swtFileName).toURI().toURL(); 
+	        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader(); 
+	        Class<?> urlClass = URLClassLoader.class; 
+	        java.lang.reflect.Method method = urlClass.getDeclaredMethod("addURL", new Class<?>[] { URL.class });
+        	method.setAccessible(true); 
+	        method.invoke(urlClassLoader, new Object[] { url });      
+	    }
+	    catch(Exception e) {
+	        System.out.println("Unable to add the swt jar to the class path: "+swtFileName);
+	        e.printStackTrace();
+	    }
 	}
 	
 

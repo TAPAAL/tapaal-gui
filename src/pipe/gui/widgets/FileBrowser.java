@@ -1,15 +1,15 @@
 package pipe.gui.widgets;
 
-import java.awt.FileDialog;
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 
 import pipe.gui.CreateGui;
-import pipe.gui.ExtensionFilter;
 
 /**
  * @author Maxim
@@ -25,26 +25,25 @@ import pipe.gui.ExtensionFilter;
  */
 
 public class FileBrowser {
-	private static String lastPath;
+	private Display display;
+	private Shell shell;
 	private FileDialog fc;
-
-	public FileBrowser(String filetype, final String ext, String path) {
-		fc = new FileDialog(CreateGui.appGui, filetype);
-		
-		if (filetype == null) {
-			filetype = "file";
-		}
+	private static String lastPath;
+	private String ext;
+	private String filetype;
+	
+	public FileBrowser(String filetype, final String ext, String path) {				
 		if(path == null) path = lastPath;
-		
-		fc.setFile("*."+ext);
-		fc.setDirectory(path);
-
-		fc.setFilenameFilter(new FilenameFilter() {
+		this.ext = ext;
+		this.filetype = filetype;
+		SwingUtilities.invokeLater(new Runnable() {
+			
 			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith( "." + ext );
+			public void run() {
+				display = new Display();
+				shell = new Shell(display);
 			}
-		});
+		});	
 	}
 
 	public FileBrowser(String path) {
@@ -57,11 +56,18 @@ public class FileBrowser {
 
 	public File openFile() {
 		setupLastPath();
-		fc.setMode(FileDialog.LOAD);
-		fc.setVisible(true);
-		String selectedFile = fc.getFile();
-		String selectedDir = fc.getDirectory();
-		lastPath = selectedDir;
+		// File standard dialog
+	    fc = new FileDialog(shell, SWT.OPEN);
+	    // Set the text
+	    fc.setText(filetype);
+	    // Set filter on .txt files
+	    fc.setFilterExtensions(new String[] { "*.txt" });
+	    // Put in a readable name for the filter
+	    fc.setFilterNames(new String[] { "Textfiles(*.txt)" });
+		// Show dialog
+		String selected = fc.open();
+		File f = new File(selected);
+		lastPath = f.get;
 		File file = new File(selectedDir + selectedFile);
 		return file;
 	}
@@ -75,9 +81,14 @@ public class FileBrowser {
 	public String saveFile() {
 		setupLastPath();
 		fc.setMode(FileDialog.SAVE);
+		fc.setFile("*."+ext);
 		fc.setVisible(true);
 		lastPath = fc.getDirectory();
-		return fc.getFile() == null? null: lastPath + fc.getFile();
+		String file = fc.getFile() == null? null: lastPath + fc.getFile();
+		if(!file.endsWith("."+ext)){
+			
+		}
+		return file;
 	}
 
 }
