@@ -1,15 +1,15 @@
 package pipe.gui.widgets;
 
+import java.awt.FileDialog;
 import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
-import javax.swing.SwingUtilities;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import pipe.gui.CreateGui;
+import pipe.gui.ExtensionFilter;
 
 /**
  * @author Maxim
@@ -25,29 +25,30 @@ import pipe.gui.CreateGui;
  */
 
 public class FileBrowser {
-	private Display display;
-	private Shell shell;
-	private FileDialog fc;
 	private static String lastPath;
-	private String ext;
-	private String filetype;
-	
-	public FileBrowser(String filetype, final String ext, String path) {				
+	private FileDialog fc;
+
+	public FileBrowser(String filetype, final String ext, String path) {
+		fc = new FileDialog(CreateGui.appGui, filetype);
+
+		if (filetype == null) {
+			filetype = "file";
+		}
 		if(path == null) path = lastPath;
-		this.ext = ext;
-		this.filetype = filetype;
-		SwingUtilities.invokeLater(new Runnable() {
-			
+
+		fc.setFile("*."+ext);
+		fc.setDirectory(path);
+
+		fc.setFilenameFilter(new FilenameFilter() {
 			@Override
-			public void run() {
-				display = new Display();
-				shell = new Shell(display);
+			public boolean accept(File dir, String name) {
+				return name.endsWith( "." + ext );
 			}
-		});	
+		});
 	}
 
 	public FileBrowser(String path) {
-		this("Petri Net", "xml", path); // default parameters
+		this("Timed-Arc Petri Net", "xml", path); // default parameters
 	}
 
 	public FileBrowser() {
@@ -56,18 +57,11 @@ public class FileBrowser {
 
 	public File openFile() {
 		setupLastPath();
-		// File standard dialog
-	    fc = new FileDialog(shell, SWT.OPEN);
-	    // Set the text
-	    fc.setText(filetype);
-	    // Set filter on .txt files
-	    fc.setFilterExtensions(new String[] { "*.txt" });
-	    // Put in a readable name for the filter
-	    fc.setFilterNames(new String[] { "Textfiles(*.txt)" });
-		// Show dialog
-		String selected = fc.open();
-		File f = new File(selected);
-		lastPath = f.get;
+		fc.setMode(FileDialog.LOAD);
+		fc.setVisible(true);
+		String selectedFile = fc.getFile();
+		String selectedDir = fc.getDirectory();
+		lastPath = selectedDir;
 		File file = new File(selectedDir + selectedFile);
 		return file;
 	}
@@ -81,13 +75,43 @@ public class FileBrowser {
 	public String saveFile() {
 		setupLastPath();
 		fc.setMode(FileDialog.SAVE);
-		fc.setFile("*."+ext);
 		fc.setVisible(true);
+
+		String file = fc.getFile() == null? null: fc.getDirectory() + fc.getFile();
 		lastPath = fc.getDirectory();
-		String file = fc.getFile() == null? null: lastPath + fc.getFile();
-		if(!file.endsWith("."+ext)){
-			
+		
+		if(file == null){
+			return file;
 		}
+		
+		// Windows does not enforce file ending on save
+		else if (!file.endsWith(".xml")) {
+			File source = new File(file);
+			File destination = new File(file+".xml");
+
+			if(destination.exists()){
+				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, file + ".xml" + "\nDo you want to overwrite this file?");
+				switch (overRide) {
+				case JOptionPane.NO_OPTION:
+					source.delete();
+					return saveFile();
+				case JOptionPane.YES_OPTION:
+					destination.delete();
+					break;
+				default:
+					return null;
+				}
+			}
+			
+			source.renameTo(destination);
+			source.delete();
+			try {
+				file = destination.getCanonicalPath();
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
 		return file;
 	}
 
