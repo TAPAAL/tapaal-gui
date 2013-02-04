@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
@@ -34,7 +35,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import com.sun.tools.hat.internal.model.JavaBoolean;
+import com.sun.xml.internal.rngom.binary.PatternBuilder;
 
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.EscapableDialog;
@@ -96,9 +99,7 @@ public class ManualDelayMode implements DelayMode{
 	private class ChooseDelayPanel extends JPanel{
 		private static final long serialVersionUID = -1564890407314003743L;
 
-		JSpinner js;
-		Comparable<BigDecimal> lower;
-		Comparable<BigDecimal> upper;
+		private JSpinner js;
 
 		public ChooseDelayPanel(TimedTransition transition, 
 				TimeInterval dInterval, BigDecimal delayGranularity) {
@@ -109,7 +110,7 @@ public class ManualDelayMode implements DelayMode{
 				value = value.add(delayGranularity);
 			}
 
-			SpinnerModel model = new DelaySpinnerModel(value, lower, upper, BigDecimal.ONE, dInterval); 
+			SpinnerModel model = new DelaySpinnerModel(value, BigDecimal.ONE, dInterval); 
 
 			js = new JSpinner(model);
 			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(js);
@@ -192,20 +193,19 @@ public class ManualDelayMode implements DelayMode{
 				try{	
 					string = string.replace(DecimalFormatSymbols.getInstance().getDecimalSeparator(), '.');
 					if(string == null || string.isEmpty() || string.equals(".")){
-						return null;
-					} 
-					if(string.contains(".") && string.substring(string.indexOf(".")+1).length() > 5){
+						result = null;
+					} else if(string.contains(".") && string.substring(string.indexOf(".")+1).length() > 5){
 						throw new ParseException(string, 0);
+					} else {
+						result = new CustomBigDecimal(string);					
 					}
-						
-					result = new CustomBigDecimal(string);
-					return  result;
 
 				} catch (NumberFormatException e) {
 					throw new ParseException(string, 0);
-				} finally {
-					updateOkButton(result);
 				}
+				
+				updateOkButton(result);
+				return result;
 			}
 			
 			@Override
@@ -214,11 +214,11 @@ public class ManualDelayMode implements DelayMode{
 				
 				if(arg instanceof CustomBigDecimal){
 					CustomBigDecimal number = (CustomBigDecimal) arg;
-					if(number.getTrailingSepatator()){
-						result += DecimalFormatSymbols.getInstance().getDecimalSeparator();
-					}
-					if(number.getLeadingSeparator()){
-						result = result.substring(1, result.length());
+					if(number.getNumberOfTrailingZeros() >= 0){
+						if(!result.contains(Character.toString(DecimalFormatSymbols.getInstance().getDecimalSeparator()))){
+							result += DecimalFormatSymbols.getInstance().getDecimalSeparator();
+						}
+						result += new String(new char[number.getNumberOfTrailingZeros()]).replace("\0", "0");
 					}
 				}
 				return result;
@@ -226,26 +226,23 @@ public class ManualDelayMode implements DelayMode{
 		}
 		
 		private class CustomBigDecimal extends BigDecimal{
-			boolean trailingSeparator = false;
-			boolean leadingSeparator = false;
+			int numberOfTrailingZeros = -1;
 			
-			public boolean getLeadingSeparator() {
-				return leadingSeparator;
-			}
-			
-			public boolean getTrailingSepatator(){
-				return trailingSeparator;
+			public int getNumberOfTrailingZeros() {
+				return numberOfTrailingZeros;
 			}
 			
 			public CustomBigDecimal(String string) {
 				super(string.endsWith(".") ? 
 						string.substring(0, string.length()-1) : string);
 				
-				if(string.endsWith(".")){
-					trailingSeparator = true;
-				}
-				if(string.startsWith(".")){
-					leadingSeparator = true;
+				if(string.contains(".")){
+					String sp = "[0-9]*\\.[0-9]*?(0*)";
+					Pattern p = Pattern.compile(sp);
+					Matcher m = p.matcher(string);
+					if(m.matches()){
+						numberOfTrailingZeros = m.group(1).length();
+					}
 				}
 			}
 		}
@@ -253,8 +250,8 @@ public class ManualDelayMode implements DelayMode{
 		private class DelaySpinnerModel extends SpinnerNumberModel{
 			TimeInterval dInterval;
 
-			public DelaySpinnerModel(Number value, Comparable minimum, Comparable maximum, Number stepSize, TimeInterval dInterval) {
-				super(value, minimum, maximum, stepSize);
+			public DelaySpinnerModel(Number value, Number stepSize, TimeInterval dInterval) {
+				super(value, null, null, stepSize);
 				this.dInterval = dInterval;
 			}
 
