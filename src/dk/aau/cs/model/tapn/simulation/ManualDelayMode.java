@@ -1,7 +1,5 @@
 	package dk.aau.cs.model.tapn.simulation;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -9,35 +7,21 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
-import com.sun.tools.hat.internal.model.JavaBoolean;
-import com.sun.xml.internal.rngom.binary.PatternBuilder;
 
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.EscapableDialog;
@@ -197,9 +181,8 @@ public class ManualDelayMode implements DelayMode{
 					} else if(string.contains(".") && string.substring(string.indexOf(".")+1).length() > 5){
 						throw new ParseException(string, 0);
 					} else {
-						result = new CustomBigDecimal(string);					
+						result = new CustomBigDecimal(string);
 					}
-
 				} catch (NumberFormatException e) {
 					throw new ParseException(string, 0);
 				}
@@ -207,43 +190,27 @@ public class ManualDelayMode implements DelayMode{
 				updateOkButton(result);
 				return result;
 			}
-			
-			@Override
-			public String valueToString(Object arg) throws ParseException {
-				String result = super.valueToString(arg);
-				
-				if(arg instanceof CustomBigDecimal){
-					CustomBigDecimal number = (CustomBigDecimal) arg;
-					if(number.getNumberOfTrailingZeros() >= 0){
-						if(!result.contains(Character.toString(DecimalFormatSymbols.getInstance().getDecimalSeparator()))){
-							result += DecimalFormatSymbols.getInstance().getDecimalSeparator();
-						}
-						result += new String(new char[number.getNumberOfTrailingZeros()]).replace("\0", "0");
-					}
+
+			public String valueToString(Object arg0) throws ParseException {
+				if(arg0 != null){
+					return arg0.toString().replace('.', DecimalFormatSymbols.getInstance().getDecimalSeparator());
+				} else {
+					return null;
 				}
-				return result;
 			}
 		}
 		
 		private class CustomBigDecimal extends BigDecimal{
-			int numberOfTrailingZeros = -1;
-			
-			public int getNumberOfTrailingZeros() {
-				return numberOfTrailingZeros;
-			}
+			String stringRepres;
 			
 			public CustomBigDecimal(String string) {
-				super(string.endsWith(".") ? 
+				super(string.endsWith(".") && !string.matches(".*\\..*\\..*") ? 
 						string.substring(0, string.length()-1) : string);
-				
-				if(string.contains(".")){
-					String sp = "[0-9]*\\.[0-9]*?(0*)";
-					Pattern p = Pattern.compile(sp);
-					Matcher m = p.matcher(string);
-					if(m.matches()){
-						numberOfTrailingZeros = m.group(1).length();
-					}
-				}
+				stringRepres = string;
+			}
+			
+			public String toString() {
+				return stringRepres;
 			}
 		}
 
