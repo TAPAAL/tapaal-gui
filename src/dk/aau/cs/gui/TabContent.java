@@ -218,6 +218,10 @@ public class TabContent extends JSplitPane {
 	public void updateConstantsList() {
 		constantsPanel.showConstants();
 	}
+	
+	public void removeConstantHighlights() {
+		constantsPanel.removeConstantHighlights();
+	}
 
 	public void updateQueryList() {
 		queries.updateQueryButtons();

@@ -12,11 +12,13 @@ public class Constant {
 	private int lowerBound;
 	private int upperBound;
 	private boolean isUsed;
+	private boolean isFocused;
 
 	public Constant(String name, int value) {
 		setName(name);
 		setValue(value);
 		setIsUsed(false);
+		setFocused(false);
 		reset();
 	}
 
@@ -28,6 +30,7 @@ public class Constant {
 		lowerBound = constant.lowerBound;
 		upperBound = constant.upperBound;
 		isUsed = constant.isUsed;
+		isFocused = constant.isFocused;
 	}
 
 	public void setName(String newName) {
@@ -38,6 +41,14 @@ public class Constant {
 
 	private boolean isValid(String newName) {
 		return namePattern.matcher(newName).matches();
+	}
+	
+	public boolean hasFocus(){
+		return isFocused;
+	}
+	
+	public void setFocused(boolean focused){
+		isFocused = focused;
 	}
 
 	public String name() {
