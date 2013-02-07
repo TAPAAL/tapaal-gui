@@ -10,7 +10,11 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -35,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle;
@@ -46,6 +51,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
+import pipe.gui.GuiFrame;
 import pipe.gui.undo.UpdateConstantEdit;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
@@ -102,6 +109,7 @@ public class ConstantsPane extends JPanel {
 				constantsList.setSelectedIndex(index);
 				constantsList.ensureIndexIsVisible(index);
 			}
+			
 		});
 
 		constantsList = new NonsearchableJList(listModel);
@@ -136,28 +144,22 @@ public class ConstantsPane extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (!constantsList.isSelectionEmpty()) {
+					
+					int index = constantsList.locationToIndex(arg0.getPoint());
+					ListModel dlm = constantsList.getModel();
+					Constant c = (Constant) dlm.getElementAt(index);
+					constantsList.ensureIndexIsVisible(index);
+					
+					highlightConstant(index);
+					
 					if (arg0.getButton() == MouseEvent.BUTTON1 && arg0.getClickCount() == 2) {
-						int index = constantsList.locationToIndex(arg0.getPoint());
-						ListModel dlm = constantsList.getModel();
-						Constant c = (Constant) dlm.getElementAt(index);
-						constantsList.ensureIndexIsVisible(index);
-
 						showEditConstantDialog(c,index);						
 					}
 				}
 			}
 		});
-
-		constantsList.addKeyListener(new KeyListener() {
-
-			
-			public void keyTyped(KeyEvent arg0) {		
-			}
-
-			
-			public void keyReleased(KeyEvent arg0) {			
-			}
-			
+		
+		constantsList.addKeyListener(new KeyAdapter() {
 		
 			public void keyPressed(KeyEvent arg0) {				
 				ListModel model = constantsList.getModel();
@@ -179,14 +181,31 @@ public class ConstantsPane extends JPanel {
 								CreateGui.getView().getUndoManager().addNewEdit(edit);
 								parent.network().buildConstraints();
 							}
+						} 
+						else if (arg0.getKeyCode() == KeyEvent.VK_UP) {
+							if(constantsList.getSelectedIndex() > 0){
+								highlightConstant(constantsList.getSelectedIndex()-1);
+							}
+						}
+						else if (arg0.getKeyCode() == KeyEvent.VK_DOWN) {
+							if(constantsList.getSelectedIndex() < constantsList.getModel().getSize()-1){
+								highlightConstant(constantsList.getSelectedIndex()+1);
+							}
 						}
 					}
 				}
 			}
 		});
-
+		
 		addConstantsComponents();
 		addConstantsButtons(enableAddButton);
+		
+		constantsList.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				removeConstantHighlights();
+			}
+		});
 
 		setLayout(new BorderLayout());
 		this.add(constantsPanel, BorderLayout.CENTER);
@@ -226,6 +245,31 @@ public class ConstantsPane extends JPanel {
 		
 		this.setMinimumSize(new Dimension(this.getMinimumSize().width, this.getMinimumSize().height - sortButton.getMinimumSize().height));
 
+	}
+	
+	private void highlightConstant(int index){
+		ListModel model = constantsList.getModel();
+		Constant c = (Constant) model.getElementAt(index);
+		
+		if(c != null && !c.hasFocus()){
+			for(int i = 0; i < model.getSize(); i++){
+				((Constant) model.getElementAt(i)).setFocused(false);
+			}
+			c.setFocused(true);
+			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+		}
+	}
+	
+	public void removeConstantHighlights(){
+		ListModel model = constantsList.getModel();
+		for(int i = 0; i < model.getSize(); i++){
+			((Constant) model.getElementAt(i)).setFocused(false);
+		}
+		try{
+			CreateGui.getCurrentTab().drawingSurface().repaintAll();
+		}catch(Exception e){
+			// It is okay, the tab has just been closed
+		}
 	}
 
 	private void addConstantsButtons(boolean enableAddButton) {

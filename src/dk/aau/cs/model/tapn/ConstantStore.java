@@ -155,6 +155,7 @@ public class ConstantStore {
 		if(weight instanceof ConstantWeight){
 			Constant weightConstant = getConstantByName(((ConstantWeight) weight).constant().name());
 			if(weightConstant.lowerBound() < 1){
+				weightConstant.setIsUsed(true);
 				weightConstant.setLowerBound(1);
 			}
 		}

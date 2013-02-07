@@ -60,6 +60,7 @@ import dk.aau.cs.TCTL.visitors.ContainsAtomicPropositionsWithDisabledTemplateVis
 import dk.aau.cs.gui.components.NonsearchableJList;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.SortTemplatesCommand;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -448,7 +449,13 @@ public class TemplateExplorer extends JPanel {
 				undoManager.addNewEdit(new AddTemplateCommand(TemplateExplorer.this, template, index));
 				
 				parent.addTemplate(template);
-				
+				ArrayList<Constant> tmp = new ArrayList<Constant>();
+				for(Constant c : parent.network().constants()){
+					tmp.add(new Constant(c.name(), c.value()));
+				}
+				for(Constant c : tmp){
+					parent.network().updateConstant(c.name(), c);
+				}
 			}
 		});
 

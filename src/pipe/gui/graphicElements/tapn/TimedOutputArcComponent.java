@@ -180,7 +180,7 @@ public class TimedOutputArcComponent extends Arc {
 	}
 	
 	public void showTimeIntervalEditor() {
-		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Timed Arc", true);
+		EscapableDialog guiDialog = new EscapableDialog(CreateGui.getApp(), "Edit Arc", true);
 
 		Container contentPane = guiDialog.getContentPane();
 

@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -204,6 +206,7 @@ public class AnimationController extends JPanel {
 				public void keyPressed(KeyEvent e) {
 					if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 						addTimeDelayToHistory();
+						TimeDelayField.getFocusCycleRootAncestor().requestFocus();	// Remove focus
 					}
 				}
 
@@ -215,6 +218,16 @@ public class AnimationController extends JPanel {
 
 				}
 
+			});
+			
+			// Disable shortcuts when focused
+			TimeDelayField.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent arg0) {
+					CreateGui.getApp().setStepShotcutEnabled(true);
+				}
+				public void focusGained(FocusEvent arg0) {
+					CreateGui.getApp().setStepShotcutEnabled(false);
+				}
 			});
 
 			DecimalFormat df = new DecimalFormat();
@@ -261,7 +274,6 @@ public class AnimationController extends JPanel {
 
 	private void addTimeDelayToHistory() {
 		AnimationHistoryComponent animBox = CreateGui.getAnimationHistory();
-		animBox.clearStepsForward();
 		try {
 
 			// Hack to allow usage of localised numbes

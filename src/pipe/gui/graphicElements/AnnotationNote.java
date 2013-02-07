@@ -33,21 +33,24 @@ public class AnnotationNote extends Note {
 
 	private AffineTransform prova = new AffineTransform();
 	
-	private boolean isNew = true;
+	private boolean isNew;
 
-	public AnnotationNote(int x, int y) {
+	public AnnotationNote(int x, int y, boolean isNew) {
 		super(x, y);
 		setDragPoints();
+		this.isNew = isNew;
 	}
 
-	public AnnotationNote(String id, String text, int x, int y) {
+	public AnnotationNote(String id, String text, int x, int y, boolean isNew) {
 		super(id, text, x, y);
+		this.isNew = isNew;
 		setDragPoints();
 	}
 
 	public AnnotationNote(String text, int x, int y, int w, int h,
-			boolean border) {
+			boolean border, boolean isNew) {
 		super(text, x, y, w, h, border);
+		this.isNew = isNew;
 		setDragPoints();
 	}
 
@@ -328,7 +331,7 @@ public class AnnotationNote extends Note {
 	}
 	
 	public AnnotationNote copy() {
-		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder());
+		AnnotationNote annotation = new AnnotationNote(note.getText(), getOriginalX(), getOriginalY(),	note.getWidth(), note.getHeight(), this.isShowingBorder(), isNew);
 		AnnotationNoteHandler noteHandler = new AnnotationNoteHandler((DrawingSurfaceImpl)getParent(), annotation);
 		annotation.addMouseListener(noteHandler);
 		annotation.addMouseMotionListener(noteHandler);

@@ -7,8 +7,11 @@ package pipe.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.management.Query;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
@@ -17,6 +20,9 @@ import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.TabContent;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimedPlace;
 
 public class DeletePetriNetObjectAction extends AbstractAction {
@@ -33,16 +39,17 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 		ArrayList<PetriNetObject> selection = CreateGui.getView().getSelectionObject().getSelection();
 		Iterable<TAPNQuery> queries = ((TabContent) CreateGui.getTab().getSelectedComponent()).queries();
 		HashSet<TAPNQuery> queriesToDelete = new HashSet<TAPNQuery>();
-		boolean queriesAffected = false;
 
-		for (PetriNetObject p : selection) {
-			if (p instanceof TimedPlaceComponent) {
-				for (TAPNQuery q : queries) {
-					if (q.getProperty().containsAtomicPropWithSpecificPlace(
-							p.getName())) { // matches(".*" + p.getName() +
-											// "[^\\_a-zA-Z0-9].*")){
-						queriesAffected = true;
-						queriesToDelete.add(q);
+		boolean queriesAffected = false;
+		for (PetriNetObject pn : selection) {
+			if (pn instanceof TimedPlaceComponent) {
+				TimedPlaceComponent place = (TimedPlaceComponent)pn;
+				if(!place.underlyingPlace().isShared()){
+					for (TAPNQuery q : queries) {
+						if (q.getProperty().containsAtomicPropositionWithSpecificPlaceInTemplate(((LocalTimedPlace)place.underlyingPlace()).model().name(),place.underlyingPlace().name())) {
+							queriesAffected = true;
+							queriesToDelete.add(q);
+						}
 					}
 				}
 			}
@@ -55,45 +62,26 @@ public class DeletePetriNetObjectAction extends AbstractAction {
 		}
 		s.append("\nAre you sure you want to remove the current selection and all associated queries?");
 
-		int choice = queriesAffected ? JOptionPane.showConfirmDialog(CreateGui
-				.getApp(), s.toString(), "Warning", JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE) : JOptionPane.YES_OPTION;
+		int choice = queriesAffected ? JOptionPane.showConfirmDialog(
+				CreateGui.getApp(), s.toString(), "Warning",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+				: JOptionPane.YES_OPTION;
 
 		if (choice == JOptionPane.YES_OPTION) {
-			CreateGui.getView().getUndoManager().newEdit(); // new
-															// "transaction""
-
-			if (CreateGui.getView().getSelectionObject().getSelectionCount() <= 1) {
-				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-					for (TAPNQuery q : queriesToDelete) {
-						currentTab.removeQuery(q);
-					}
-				}
-
-				CreateGui.getView().getUndoManager().deleteSelection(selected);
-				selected.delete();
-			} else {
-				if (queriesAffected) {
-					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-					for (TAPNQuery q : queriesToDelete) {
-						currentTab.removeQuery(q);
-					}
-				}
-				CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());
-				CreateGui.getView().getSelectionObject().deleteSelection();
-			}
-
-			// remove the places from the list of inclusion places
-			for (PetriNetObject p : selection) {
-				if (p instanceof TimedPlaceComponent) {
-					for (TAPNQuery q : queries) {
-						TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
-						q.inclusionPlaces().removePlace(place);
-					}
+			CreateGui.getView().getUndoManager().newEdit(); // new "transaction""
+			if (queriesAffected) {
+				TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+				for (TAPNQuery q : queriesToDelete) {
+					Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+					cmd.redo();
+					CreateGui.getView().getUndoManager().addEdit(cmd);
 				}
 			}
+			
+			CreateGui.getView().getUndoManager().deleteSelection(CreateGui.getView().getSelectionObject().getSelection());
+			CreateGui.getView().getSelectionObject().deleteSelection();
+			CreateGui.getView().repaint();
+			CreateGui.getCurrentTab().network().buildConstraints();
 		}
-		
 	}
 }

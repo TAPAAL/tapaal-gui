@@ -7,6 +7,7 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.MenuBar;
@@ -97,6 +98,8 @@ import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
 import dk.aau.cs.io.ResourceManager;
@@ -551,9 +554,7 @@ public class GuiFrame extends JFrame implements Observer {
 		viewMenu.addSeparator();
 		addMenuItem(viewMenu, toggleGrid = new GridAction("Cycle grid",
 				"Change the grid size", "G"));
-		addMenuItem(viewMenu, dragAction = new TypeAction("Drag", ElementType.DRAG,
-				"Drag the drawing", "D", true));
-
+		
 		viewMenu.addSeparator();
 
 		addCheckboxMenuItem(viewMenu, showComponents, showComponentsAction = new ViewAction("Display components", 
@@ -825,13 +826,11 @@ public class GuiFrame extends JFrame implements Observer {
 
 		toolBar.addSeparator();
 		toolBar.add(toggleGrid);
-		toolBar.add(new ToggleButton(dragAction));
 		toolBar.add(new ToggleButton(startAction));
 
 		// Start drawingToolBar
 		drawingToolBar = new JToolBar();
 		drawingToolBar.setFloatable(false);
-
 		drawingToolBar.addSeparator();
 
 		// Normal arraw
@@ -1022,6 +1021,9 @@ public class GuiFrame extends JFrame implements Observer {
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
+			// Remove constant highlight
+			CreateGui.getCurrentTab().removeConstantHighlights();
+			
 			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:
@@ -1081,7 +1083,6 @@ public class GuiFrame extends JFrame implements Observer {
 		zoomMenu.setEnabled(enable);
 
 		toggleGrid.setEnabled(enable);
-		dragAction.setEnabled(enable);
 
 		showComponentsAction.setEnabled(enable);
 		showConstantsAction.setEnabled(enable);
@@ -1606,6 +1607,9 @@ public class GuiFrame extends JFrame implements Observer {
 		case noNet:
 			// Disable All Actions
 			statusBar.changeText(statusBar.textforNoNet);
+			if(CreateGui.appGui != null){
+				CreateGui.appGui.setFocusTraversalPolicy(null);
+			}
 			break;
 
 		default:
@@ -1792,6 +1796,8 @@ public class GuiFrame extends JFrame implements Observer {
 							else {
 								CreateGui.getCurrentTab().selectFirstActiveTemplate();
 							}
+							//Enable simulator focus traversal policy							
+							CreateGui.appGui.setFocusTraversalPolicy(new SimulatorFocusTraversalPolicy());
 						} else {
 							JOptionPane.showMessageDialog(GuiFrame.this, 
 									"You need at least one active template to enter simulation mode",
@@ -1803,6 +1809,8 @@ public class GuiFrame extends JFrame implements Observer {
 						appView.getSelectionObject().clearSelection();
 						setAnimationMode(!appView.isInAnimationMode());
 						CreateGui.getCurrentTab().restoreSelectedTemplate();
+						//Enable editor focus traversal policy
+						CreateGui.appGui.setFocusTraversalPolicy(new EditorFocusTraversalPolicy());
 					}
 				} catch (Exception e) {
 					System.err.println(e);
@@ -1831,7 +1839,6 @@ public class GuiFrame extends JFrame implements Observer {
 				break;
 
 			case TIMEPASS:
-				animBox.clearStepsForward();
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
@@ -1936,30 +1943,22 @@ public class GuiFrame extends JFrame implements Observer {
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 					: JOptionPane.YES_OPTION;
 
-					if (choice == JOptionPane.YES_OPTION) {
-						appView.getUndoManager().newEdit(); // new "transaction""
-						if (queriesAffected) {
-							TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
-							for (TAPNQuery q : queriesToDelete) {
-								currentTab.removeQuery(q);
-							}
-						}
-
-						// remove the places from the list of inclusion places
-						for (PetriNetObject p : selection) {
-							if (p instanceof TimedPlaceComponent) {
-								for (TAPNQuery q : queries) {
-									TimedPlace place = ((TimedPlaceComponent)p).underlyingPlace();
-									q.inclusionPlaces().removePlace(place);
-								}
-							}
-						}
-
-						appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
-						appView.getSelectionObject().deleteSelection();
-						appView.repaint();
-						CreateGui.getCurrentTab().network().buildConstraints();
+			if (choice == JOptionPane.YES_OPTION) {
+				appView.getUndoManager().newEdit(); // new "transaction""
+				if (queriesAffected) {
+					TabContent currentTab = ((TabContent) CreateGui.getTab().getSelectedComponent());
+					for (TAPNQuery q : queriesToDelete) {
+						Command cmd = new DeleteQueriesCommand(currentTab, Arrays.asList(q));
+						cmd.redo();
+						appView.getUndoManager().addEdit(cmd);
 					}
+				}
+				
+				appView.getUndoManager().deleteSelection(appView.getSelectionObject().getSelection());
+				appView.getSelectionObject().deleteSelection();
+				appView.repaint();
+				CreateGui.getCurrentTab().network().buildConstraints();
+			}
 		}
 
 	}
@@ -2019,9 +2018,6 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 			if (this != annotationAction) {
 				annotationAction.setSelected(false);
-			}
-			if (this != dragAction) {
-				dragAction.setSelected(false);
 			}
 
 			if (appView == null) {
@@ -2467,6 +2463,17 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setEnabledStepBackwardAction(boolean b) {
 		stepbackwardAction.setEnabled(b);
+	}
+	
+
+	public void setStepShotcutEnabled(boolean enabled){
+		if(enabled){
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released LEFT"));
+		} else {
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
+		}
 	}
 
 	public int getNameCounter() {
