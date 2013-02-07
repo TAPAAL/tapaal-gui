@@ -141,13 +141,11 @@ public class TransportArc extends TAPNElement {
 						newUpper = BigDecimal.ZERO;
 					}
 					
-					if(newUpper.compareTo(BigDecimal.ZERO) == 0 && interval.IsUpperBoundNonStrict()){
-						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
-					} else if (newUpper.compareTo(newLower) == 0 && interval.IsLowerBoundNonStrict() && interval.IsUpperBoundNonStrict()){
+					if (newUpper.compareTo(newLower) == 0 && interval.IsLowerBoundNonStrict() && interval.IsUpperBoundNonStrict()){
 						temp = new TimeInterval(true, new RatBound(newLower), new RatBound(newUpper), true);
 					} else if (newLower.compareTo(newUpper) < 0){
 						temp = new  TimeInterval(interval.IsLowerBoundNonStrict() || overrideLowerInclusion, new RatBound(newLower), new RatBound(newUpper), interval.IsUpperBoundNonStrict());
-					} else { //new bounds are wrong
+					} else { //new bounds are empty
 						temp = null;
 					}
 				} else { //upper bound is inf
