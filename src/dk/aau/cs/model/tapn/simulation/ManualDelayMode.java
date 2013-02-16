@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
@@ -83,7 +84,7 @@ public class ManualDelayMode implements DelayMode{
 	private class ChooseDelayPanel extends JPanel{
 		private static final long serialVersionUID = -1564890407314003743L;
 
-		private JSpinner js;
+		private JSpinner spinner;
 
 		public ChooseDelayPanel(TimedTransition transition, 
 				TimeInterval dInterval, BigDecimal delayGranularity) {
@@ -96,8 +97,14 @@ public class ManualDelayMode implements DelayMode{
 
 			SpinnerModel model = new DelaySpinnerModel(value, BigDecimal.ONE, dInterval); 
 
-			js = new JSpinner(model);
-			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(js);
+			spinner = new JSpinner(model);
+			JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner);
+			editor.getTextField().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					okButton.requestFocus();
+					okButton.doClick();
+				}
+			});
 
 			editor.getTextField().setFormatterFactory(new AbstractFormatterFactory() {
 				public AbstractFormatter getFormatter(JFormattedTextField tf) {
@@ -109,7 +116,7 @@ public class ManualDelayMode implements DelayMode{
 				}
 			});
 
-			js.setEditor(editor);
+			spinner.setEditor(editor);
 			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = 0;
@@ -117,11 +124,19 @@ public class ManualDelayMode implements DelayMode{
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			gbc.weightx = 1.0;
 			gbc.insets = new Insets(5, 5, 0, 5);
-			this.add(js, gbc);
+			this.add(new JLabel("Choose delay:"), gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			gbc.weightx = 1.0;
+			gbc.insets = new Insets(5, 5, 0, 5);
+			this.add(spinner, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 2;
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			gbc.weightx = 1.0;
 			gbc.insets = new Insets(5, 5, 0, 5);
@@ -132,6 +147,9 @@ public class ManualDelayMode implements DelayMode{
 			JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 			
 			okButton = new JButton("OK");
+			okButton.setPreferredSize(new java.awt.Dimension(100, 25));
+			okButton.setMinimumSize(new java.awt.Dimension(100, 25));
+			okButton.setMaximumSize(new java.awt.Dimension(100, 25));
 			okButton.addActionListener(new ActionListener() {
 				
 				@Override
@@ -141,6 +159,9 @@ public class ManualDelayMode implements DelayMode{
 				}
 			});
 			JButton cancelButton = new JButton("Cancel");
+			cancelButton.setPreferredSize(new java.awt.Dimension(100, 25));
+			cancelButton.setMinimumSize(new java.awt.Dimension(100, 25));
+			cancelButton.setMaximumSize(new java.awt.Dimension(100, 25));
 			cancelButton.addActionListener(new ActionListener() {
 				
 				@Override
@@ -167,7 +188,7 @@ public class ManualDelayMode implements DelayMode{
 		}
 
 		public BigDecimal getResult(){
-			return (BigDecimal) js.getValue();
+			return (BigDecimal) spinner.getValue();
 		}
 		
 		public class CustomNumberFormatter extends 	NumberFormatter{
