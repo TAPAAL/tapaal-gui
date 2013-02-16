@@ -2451,5 +2451,9 @@ public class GuiFrame extends JFrame implements Observer {
 	public void incrementNameCounter() {
 		newNameCounter++;
 	}
+	
+	public String getCurrentTabName(){
+		return appTab.getTitleAt(appTab.getSelectedIndex());
+	}
 
 }

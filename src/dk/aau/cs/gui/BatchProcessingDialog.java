@@ -62,6 +62,7 @@ import javax.swing.table.TableRowSorter;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.gui.CreateGui;
+import pipe.gui.FileFinderImpl;
 import pipe.gui.widgets.CustomJSpinner;
 import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
@@ -351,26 +352,10 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void addFiles() {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				"TAPAAL models", new String[] { "xml" });
-		fileChooser.setFileFilter(filter);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.setFileFilter(filter);
-		// JS: added definition of filter in order to fix mac vs. ubuntu filter
-		// issues
-		fileChooser.setMultiSelectionEnabled(true);
-		if (lastPath != null) {
-			File path = new File(lastPath);
-			if (path.exists()) {
-				fileChooser.setCurrentDirectory(path);
-			}
-		}
-
-		int result = fileChooser.showOpenDialog(BatchProcessingDialog.this);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			File[] filesArray = fileChooser.getSelectedFiles();
+		FileBrowser browser = new FileBrowser("Timed-Arc Petri Nets","xml");
+		
+		File[] filesArray = browser.openFiles();
+		if (filesArray.length>0) {
 			for (File file : filesArray) {
 				lastPath = file.getParent();
 				if (!files.contains(file)) {
@@ -684,7 +669,7 @@ public class BatchProcessingDialog extends JDialog {
 
 			private void exportResults() {
 				String filename = new FileBrowser("CSV file", "csv", "")
-						.saveFile();
+						.saveFile("results");
 				if (filename != null) {
 					File exportFile = new File(filename);
 					BatchProcessingResultsExporter exporter = new BatchProcessingResultsExporter();

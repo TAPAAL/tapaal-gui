@@ -8,8 +8,11 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.gui.TabContent;
+
 import pipe.gui.CreateGui;
 import pipe.gui.ExtensionFilter;
+import pipe.gui.GuiFrame;
 
 /**
  * @author Maxim
@@ -27,7 +30,16 @@ import pipe.gui.ExtensionFilter;
 public class FileBrowser {
 	private static String lastPath;
 	private FileDialog fc;
+	private String ext;
 
+	public FileBrowser(String path) {
+		this("Timed-Arc Petri Net", "xml", path); // default parameters
+	}
+	
+	public FileBrowser(String filetype, final String ext) {
+		this(filetype, ext, null);
+	}
+	
 	public FileBrowser(String filetype, final String ext, String path) {
 		fc = new FileDialog(CreateGui.appGui, filetype);
 
@@ -36,7 +48,7 @@ public class FileBrowser {
 		}
 		if(path == null) path = lastPath;
 
-		fc.setFile("*."+ext);
+		this.ext = ext;
 		fc.setDirectory(path);
 
 		fc.setFilenameFilter(new FilenameFilter() {
@@ -47,17 +59,15 @@ public class FileBrowser {
 		});
 	}
 
-	public FileBrowser(String path) {
-		this("Timed-Arc Petri Net", "xml", path); // default parameters
-	}
-
 	public FileBrowser() {
 		this(null);
 	}
 
 	public File openFile() {
 		setupLastPath();
+		fc.setFile("*."+ext);
 		fc.setMode(FileDialog.LOAD);
+		fc.setMultipleMode(false);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
@@ -65,15 +75,32 @@ public class FileBrowser {
 		File file = new File(selectedDir + selectedFile);
 		return file;
 	}
+	
+	public File[] openFiles() {
+		setupLastPath();
+		fc.setFile("*."+ext);
+		fc.setMultipleMode(true);
+		fc.setMode(FileDialog.LOAD);
+		fc.setVisible(true);
+		File[] selectedFiles = fc.getFiles();
+		String selectedDir = fc.getDirectory();
+		lastPath = selectedDir;
+		return selectedFiles;
+	}
 
 	private void setupLastPath() {
 		if(lastPath != null){
 			fc.setDirectory(lastPath);
 		}
 	}
+	
+	public String saveFile(){
+		return saveFile(CreateGui.appGui.getCurrentTabName());
+	}
 
-	public String saveFile() {
+	public String saveFile(String suggestedName) {
 		setupLastPath();
+		fc.setFile(suggestedName + "."+ext);
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
 
@@ -85,16 +112,16 @@ public class FileBrowser {
 		}
 		
 		// Windows does not enforce file ending on save
-		else if (!file.endsWith(".xml")) {
+		else if (!file.endsWith("."+ext)) {
 			File source = new File(file);
-			File destination = new File(file+".xml");
+			File destination = new File(file+"."+ext);
 
 			if(destination.exists()){
-				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, file + ".xml" + "\nDo you want to overwrite this file?");
+				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, file + "." + ext + "\nDo you want to overwrite this file?");
 				switch (overRide) {
 				case JOptionPane.NO_OPTION:
 					source.delete();
-					return saveFile();
+					return saveFile(suggestedName);
 				case JOptionPane.YES_OPTION:
 					destination.delete();
 					break;
