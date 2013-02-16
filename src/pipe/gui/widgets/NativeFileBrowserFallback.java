@@ -31,26 +31,30 @@ public class NativeFileBrowserFallback extends FileBrowserImplementation {
 		this.ext = ext;
 		fc.setDirectory(path);
 
-		fc.setFilenameFilter(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith( "." + ext );
-			}
-		});
-		
 		/* Setup JFileChooser for multi file selection */
 		fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				filetype, new String[] { ext });
-		fileChooser.setFileFilter(filter);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.setFileFilter(filter);
-		fileChooser.setMultiSelectionEnabled(true);
+		
+		// Setup filter if extension specified
+		if(!ext.equals("")){
+			fc.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith( ext );
+				}
+			});
+			
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					filetype, new String[] { ext });
+			fileChooser.setFileFilter(filter);
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setFileFilter(filter);
+			fileChooser.setMultiSelectionEnabled(true);
+		}
 	}
 
 	public File openFile() {
-		fc.setFile("*."+ext);
+		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMode(FileDialog.LOAD);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
