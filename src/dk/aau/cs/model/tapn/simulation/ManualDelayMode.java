@@ -124,7 +124,7 @@ public class ManualDelayMode implements DelayMode{
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			gbc.weightx = 1.0;
 			gbc.insets = new Insets(5, 5, 0, 5);
-			this.add(new JLabel("Choose delay:"), gbc);
+			this.add(new JLabel("Choose delay from the interval: " + dInterval), gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
