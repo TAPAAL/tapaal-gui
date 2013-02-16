@@ -89,6 +89,7 @@ public class ManualDelayMode implements DelayMode{
 		public ChooseDelayPanel(TimedTransition transition, 
 				TimeInterval dInterval, BigDecimal delayGranularity) {
 			super(new GridBagLayout());
+			JPanel buttonPanel = createButtonPanel();
 			BigDecimal value = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
 
 			if(!dInterval.IsLowerBoundNonStrict()){
@@ -140,7 +141,7 @@ public class ManualDelayMode implements DelayMode{
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			gbc.weightx = 1.0;
 			gbc.insets = new Insets(5, 5, 0, 5);
-			this.add(createButtonPanel(), gbc);
+			this.add(buttonPanel, gbc);
 		}
 
 		private JPanel createButtonPanel() {
@@ -178,7 +179,7 @@ public class ManualDelayMode implements DelayMode{
 			return buttonPanel;
 		}
 		
-		public void updateOkButton(BigDecimal result){
+		private void updateOkButton(BigDecimal result){
 			if(result != null && dInterval.isIncluded(result)){
 				okButton.setEnabled(true);
 			} else {
@@ -190,7 +191,7 @@ public class ManualDelayMode implements DelayMode{
 			return (BigDecimal) spinner.getValue();
 		}
 		
-		public class CustomNumberFormatter extends 	NumberFormatter{
+		private class CustomNumberFormatter extends 	NumberFormatter{
 			
 			public Object stringToValue(String string) throws ParseException {
 				BigDecimal result = null;

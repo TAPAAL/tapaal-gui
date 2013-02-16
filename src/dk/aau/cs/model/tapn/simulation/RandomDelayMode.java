@@ -63,6 +63,9 @@ public class RandomDelayMode implements DelayMode{
 	
 	private BigDecimal randomBigDecimal(TimeInterval range){
 		int maxValue = range.upperBound().value();
+		if(maxValue == 0){
+			return BigDecimal.ZERO;
+		}
 		Random r = new Random();
 		
 		BigDecimal result = null;
