@@ -187,6 +187,10 @@ public class GuiFrame extends JFrame implements Observer {
 	public boolean isMac(){
 		return System.getProperty("mrj.version") != null;
 	}
+	
+	public int getJRE(){
+		return Character.getNumericValue(System.getProperty("java.version").charAt(2));
+	}	
 
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file

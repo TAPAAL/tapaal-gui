@@ -668,7 +668,7 @@ public class BatchProcessingDialog extends JDialog {
 			}
 
 			private void exportResults() {
-				String filename = new FileBrowser("CSV file", "csv", "")
+				String filename = new FileBrowser("CSV file", "csv")
 						.saveFile("results");
 				if (filename != null) {
 					File exportFile = new File(filename);
