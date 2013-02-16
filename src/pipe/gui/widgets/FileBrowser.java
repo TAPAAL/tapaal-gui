@@ -100,7 +100,7 @@ public class FileBrowser {
 
 	public String saveFile(String suggestedName) {
 		setupLastPath();
-		fc.setFile(suggestedName + "."+ext);
+		fc.setFile(suggestedName + (suggestedName.endsWith("."+ext)? "":"."+ext));
 		fc.setMode(FileDialog.SAVE);
 		fc.setVisible(true);
 
