@@ -15,10 +15,6 @@ import pipe.gui.CreateGui;
 import pipe.gui.ExtensionFilter;
 import pipe.gui.GuiFrame;
 
-/**
- * This class bounces to the 
- */
-
 public class NativeFileBrowserFallback extends FileBrowserImplementation {
 	private FileDialog fc;
 	private String ext;

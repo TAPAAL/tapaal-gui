@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -13,10 +15,6 @@ import dk.aau.cs.gui.TabContent;
 import pipe.gui.CreateGui;
 import pipe.gui.ExtensionFilter;
 import pipe.gui.GuiFrame;
-
-/**
- * This class bounces to the 
- */
 
 public class NativeFileBrowser extends FileBrowserImplementation {
 	private FileDialog fc;
