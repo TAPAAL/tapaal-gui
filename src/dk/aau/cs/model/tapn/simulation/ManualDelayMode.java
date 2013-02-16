@@ -64,8 +64,8 @@ public class ManualDelayMode implements DelayMode{
 
 		//Ask the user
 		ChooseDelayPanel panel;
-		panel = new ChooseDelayPanel(transition, dInterval, delayGranularity);
 		dialog = new EscapableDialog(CreateGui.getApp(), "Choose delay", true);
+		panel = new ChooseDelayPanel(transition, dInterval, delayGranularity);
 		dialog.setContentPane(panel);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
@@ -150,9 +150,8 @@ public class ManualDelayMode implements DelayMode{
 			okButton.setPreferredSize(new java.awt.Dimension(100, 25));
 			okButton.setMinimumSize(new java.awt.Dimension(100, 25));
 			okButton.setMaximumSize(new java.awt.Dimension(100, 25));
+			dialog.getRootPane().setDefaultButton(okButton);
 			okButton.addActionListener(new ActionListener() {
-				
-				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					okPressed = true;
 					dialog.setVisible(false);
