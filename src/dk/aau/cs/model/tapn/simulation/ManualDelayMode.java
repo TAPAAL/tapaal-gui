@@ -8,9 +8,12 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.util.Formatter.BigDecimalLayoutForm;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -94,6 +97,7 @@ public class ManualDelayMode implements DelayMode{
 
 			if(!dInterval.IsLowerBoundNonStrict()){
 				value = value.add(delayGranularity);
+				value = value.stripTrailingZeros();
 			}
 
 			SpinnerModel model = new DelaySpinnerModel(value, BigDecimal.ONE, dInterval); 
