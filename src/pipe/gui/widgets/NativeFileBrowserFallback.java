@@ -71,7 +71,7 @@ public class NativeFileBrowserFallback extends FileBrowserImplementation {
 				fileChooser.setCurrentDirectory(path);
 			}
 		}
-		File[] filesArray = null;
+		File[] filesArray = new File[0];
 		int result = fileChooser.showOpenDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			filesArray = fileChooser.getSelectedFiles();
