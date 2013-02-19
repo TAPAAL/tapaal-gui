@@ -17,8 +17,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private int extraTokens;
 	private int tokensInModel;
 	private boolean symmetry;
-	private boolean timeDarts;
-	private boolean pTrie;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
 	
@@ -28,27 +26,25 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean timeDarts, boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
+		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
 	}
 	
 	//Only used for boundedness analysis
-	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean timeDarts, boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
+		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
 		this.dontUseDeadPlaces = dontUseDeadPLaces;
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, boolean timeDarts, boolean pTrie) {
-		this(extraTokens,traceOption, search, symmetry, timeDarts, pTrie, discreteInclusion, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
+		this(extraTokens,traceOption, search, symmetry, discreteInclusion, new InclusionPlaces());
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean timeDarts, boolean pTrie, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		searchOption = search;
 		this.symmetry = symmetry;
-		this.timeDarts = timeDarts;
-		this.pTrie = pTrie;
 		this.discreteInclusion = discreteInclusion;
 		this.inclusionPlaces = inclusionPlaces;
 	}
@@ -59,14 +55,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	
 	public boolean symmetry() {
 		return symmetry;
-	}
-	
-	public boolean timeDarts() {
-		return timeDarts;
-	}
-	
-	public boolean pTrie() {
-		return pTrie;
 	}
 	
 	public boolean discreteInclusion(){
@@ -89,12 +77,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(searchMap.get(searchOption));
 		result.append(' ');
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
-		result.append(' ');
-		result.append("-m ");
-		result.append(timeDarts ? "1" : "0");
-		result.append(' ');
-		result.append("-p ");
-		result.append(pTrie ? "1" : "0");
 		result.append(' ');
 		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');

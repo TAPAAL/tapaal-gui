@@ -16,6 +16,7 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.translations.ReductionOption;
 
 public class VerifyTAPNExporter {
 	public ExportedVerifyTAPNModel export(TimedArcPetriNet model, TAPNQuery query) {
@@ -41,9 +42,11 @@ public class VerifyTAPNExporter {
 			
 			VerifyTAPNOptions options = null;
 			if(dataLayerQuery == null){
-				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true, true, true);
-			}else{
-				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie());
+				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
+			}else if(dataLayerQuery.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
+				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie());
+			} else {
+				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry());
 			}
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
