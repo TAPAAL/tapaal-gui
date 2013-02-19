@@ -199,7 +199,9 @@ public class QueryDialog extends JPanel {
 	private JCheckBox symmetryReduction;
 	private JCheckBox discreteInclusion;
 	private JButton selectInclusionPlacesButton;
-
+	private JCheckBox useTimeDarts;
+	private JCheckBox usePTrie;
+	
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -279,6 +281,8 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SYMMETRY_REDUCTION = "Apply automatic symmetry reduction.";
 	private final static String TOOL_TIP_DISCRETE_INCLUSION = "<html>This optimization will perform a more advanced inclusion check."; 
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
+	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
+	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
@@ -346,8 +350,10 @@ public class QueryDialog extends JPanel {
 
 		ReductionOption reductionOptionToSet = getReductionOption();
 		boolean symmetry = getSymmetry();
+		boolean timeDarts = useTimeDarts.isSelected();
+		boolean pTrie = usePTrie.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -910,6 +916,8 @@ public class QueryDialog extends JPanel {
 		}
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
+		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
+		usePTrie.setSelected(queryToCreateFrom.usePTrie());
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
@@ -2052,7 +2060,29 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);	
 		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
+		
+		useTimeDarts = new JCheckBox("Use Time Darts");
+		useTimeDarts.setSelected(true);
+		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
 
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useTimeDarts, gbc);
+		
+		usePTrie = new JCheckBox("Use PTrie");
+		usePTrie.setSelected(true);
+		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(usePTrie, gbc);
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -2064,6 +2094,7 @@ public class QueryDialog extends JPanel {
 	protected void setEnabledOptionsAccordingToCurrentReduction() {
 		refreshQueryEditingButtons();
 		refreshSymmetryReduction();
+		refreshDiscreteOptions();
 		refreshDiscreteInclusion();
 		updateSearchStrategies();
 		refreshTraceOptions();
@@ -2111,6 +2142,17 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setEnabled(true);
 		}
 	}
+	
+	private void refreshDiscreteOptions(){
+		if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+			usePTrie.setVisible(true);
+			useTimeDarts.setVisible(true);
+		} else {
+			usePTrie.setVisible(false);
+			useTimeDarts.setVisible(false);
+		}
+	}
+		
 
 	//	private void queryChanged(){
 	//		UpwardsClosedVisitor visitor = new UpwardsClosedVisitor();
