@@ -126,7 +126,7 @@ public class Verifier {
 
 		int bound = query.getCapacity();
 		
-		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
+		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
 
 		if (inputQuery == null) {
 			return;

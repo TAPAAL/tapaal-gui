@@ -41,9 +41,9 @@ public class VerifyTAPNExporter {
 			
 			VerifyTAPNOptions options = null;
 			if(dataLayerQuery == null){
-				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
+				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true, true, true);
 			}else{
-				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry());
+				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie());
 			}
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
