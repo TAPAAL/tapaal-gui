@@ -9,6 +9,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import dk.aau.cs.gui.TabContent;
 
@@ -31,28 +32,31 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 		this.ext = ext;
 		fc.setDirectory(path);
 
-		fc.setFilenameFilter(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith( "." + ext );
-			}
-		});
+		// Setup filter if extension specified
+		if(!ext.equals("")){
+			fc.setFilenameFilter(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.endsWith( ext );
+				}
+			});
+		}
 	}
 
 	public File openFile() {
-		fc.setFile("*."+ext);
+		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMode(FileDialog.LOAD);
 		fc.setMultipleMode(false);
 		fc.setVisible(true);
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
 		lastPath = selectedDir;
-		File file = new File(selectedDir + selectedFile);
+		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
 		return file;
 	}
 	
 	public File[] openFiles() {
-		fc.setFile("*."+ext);
+		fc.setFile(ext.equals("")? "":"*."+ext);
 		fc.setMultipleMode(true);
 		fc.setMode(FileDialog.LOAD);
 		fc.setVisible(true);

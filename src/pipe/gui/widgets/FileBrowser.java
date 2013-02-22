@@ -17,7 +17,11 @@ public class FileBrowser extends FileBrowserImplementation {
 	
 	public FileBrowser(String filetype, final String ext, String path) {
 		if(fb == null){
-			fb = new NativeFileBrowserFallback(filetype, ext, path);
+			if(CreateGui.appGui.getJRE() >= 7){
+				fb = new NativeFileBrowser(filetype, ext, path);
+			}else{
+				fb = new NativeFileBrowserFallback(filetype, ext, path);
+			}
 		}
 		if(path != null) fb.lastPath = path;
 	}

@@ -60,7 +60,7 @@ public class NativeFileBrowserFallback extends FileBrowserImplementation {
 		String selectedFile = fc.getFile();
 		String selectedDir = fc.getDirectory();
 		lastPath = selectedDir;
-		File file = new File(selectedDir + selectedFile);
+		File file = selectedFile == null? null:new File(selectedDir + selectedFile);
 		return file;
 	}
 	
