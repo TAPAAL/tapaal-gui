@@ -50,6 +50,7 @@ public class TransitionFireingComponent extends JPanel {
 		fireButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				enabledTransitionsList.fireSelectedTransition();
+				CreateGui.getApp().setRandomAnimationMode(false);
 			}
 		});
 		
