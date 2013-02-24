@@ -34,6 +34,7 @@ import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 //TODO clean up!!! 

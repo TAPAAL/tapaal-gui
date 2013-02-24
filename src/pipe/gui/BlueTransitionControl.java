@@ -14,6 +14,7 @@ import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -35,6 +36,7 @@ public class BlueTransitionControl extends JPanel{
 	
 	JSlider bluePrecision;
 	JComboBox delayMode;
+	JCheckBox randomMode;
 	
 	private BlueTransitionControl() {
 		super(new GridBagLayout());
@@ -76,6 +78,8 @@ public class BlueTransitionControl extends JPanel{
 		DelayMode[] items = {ShortestDelayMode.getInstance(), RandomDelayMode.getInstance(), ManualDelayMode.getInstance()};
 		delayMode = new JComboBox(items);
 		setDelayMode(defaultDelayMode);
+		
+		randomMode = new JCheckBox("Choose next transition randomly");
         
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = 2;
@@ -110,6 +114,13 @@ public class BlueTransitionControl extends JPanel{
 		gbc.gridy = 2;
 		add(delayMode, gbc);
 		
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.weightx = 1.0;
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		add(randomMode, gbc);
+		
 		setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Delay controller"), 
 				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
@@ -136,6 +147,10 @@ public class BlueTransitionControl extends JPanel{
 	
 	public DelayMode getDelayMode(){
 		return (DelayMode)delayMode.getSelectedItem();
+	}
+	
+	public boolean isRandomDelayMode(){
+		return randomMode.isSelected();
 	}
 	
 	public void setDelayMode(DelayMode delayMode){
