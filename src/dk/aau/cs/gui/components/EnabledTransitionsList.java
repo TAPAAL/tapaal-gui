@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.font.GraphicAttribute;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -78,6 +79,10 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void reInitDone(){
+		if(CreateGui.getCurrentTab().getBlueTransitionControl().isRandomDelayMode()){
+			selectRandom();
+			return;
+		}
 		//Trick to make the "splitter" appear
 		//transitions.addElement(new SplitterListItem());
 		//sort the transitions
@@ -94,6 +99,16 @@ public class EnabledTransitionsList extends JPanel{
 		} else if (transitions.size() > 0){
 			transitionsList.setSelectedIndex(0);
 		}
+	}
+
+	private void selectRandom() {
+		if(transitions.size() == 0){
+			return;
+		}
+		Random r = new Random();
+		int randSelect = r.nextInt(transitions.size());
+		transitionsList.setSelectedIndex(randSelect);
+		
 	}
 
 	public void addTransition(Template template, Transition transition){
