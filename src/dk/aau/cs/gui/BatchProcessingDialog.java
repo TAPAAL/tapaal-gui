@@ -995,7 +995,6 @@ public class BatchProcessingDialog extends JDialog {
 						enableButtons();
 						cancelButton.setEnabled(false);
 						skipFileButton.setEnabled(false);
-						memory.setText("");
 						timerLabel.setText("");
 						timer.stop();
 						timeoutTimer.stop();
@@ -1038,6 +1037,8 @@ public class BatchProcessingDialog extends JDialog {
 						+ " verification task"
 						+ (tasksCompleted > 1 ? "s" : "") + " completed");
 				timerLabel.setText("");
+				lastMemory = "N/A";
+				memory.setText("");
 			}
 
 			public void fireStatusChanged(StatusChangedEvent e) {
