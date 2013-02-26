@@ -16,6 +16,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.SimplifyPropositionsVisitor;
+import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.components.BatchProcessingResultsTableModel;
 import dk.aau.cs.io.batchProcessing.BatchProcessingModelLoader;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
@@ -57,7 +58,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private boolean skippingCurrentVerification = false;
 	private boolean timeoutCurrentVerification = false;
 	private int verificationTasksCompleted;
-	
 
 	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
 		super();
@@ -241,7 +241,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private void publishResult(String fileName, pipe.dataLayer.TAPNQuery query, String verificationResult, long verificationTime, Stats stats) {
-		BatchProcessingVerificationResult result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, stats);
+		BatchProcessingVerificationResult result = new BatchProcessingVerificationResult(fileName, query, verificationResult, verificationTime, BatchProcessingDialog.getMemory(), stats);
 		publish(result);
 	}
 
