@@ -34,7 +34,6 @@ public class MemoryMonitor {
 	public static void attach(Process p){
 		PID = getPid(p);
 		peakMemory = -1;
-		System.out.println("Process "+PID+" started.");
 	}
 
 	public static boolean isAttached(){
@@ -64,7 +63,6 @@ public class MemoryMonitor {
 						memory = Double.parseDouble(m.group(1).replace(".", "").replace(",", ""))/1024;
 					}
 				} catch (Exception e) { 
-					System.err.println("Error reading memory: "+e.getMessage());
 				} 
 			}else{
 				try { 
@@ -75,7 +73,6 @@ public class MemoryMonitor {
 					s = input.readLine();	//Actual memory usage is second line output
 					memory = Double.parseDouble(s.replace(" ", ""))/1024;
 				} catch (Exception e) { 
-					System.err.println("Error reading memory: "+e.getMessage());
 				} 
 			}
 
