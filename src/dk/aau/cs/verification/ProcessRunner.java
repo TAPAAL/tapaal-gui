@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 
 import dk.aau.cs.debug.Logger;
+import dk.aau.cs.util.MemoryMonitor;
 
 public class ProcessRunner {
 
@@ -49,15 +50,17 @@ public class ProcessRunner {
 		if (process != null) {
 			process.destroy();
 		}
+		MemoryMonitor.detach(process);
 	}
 
 	public void run() {
 		long startTimeMs = 0, endTimeMs = 0;
 		startTimeMs = System.currentTimeMillis();
-
+		
 		try {
 			Logger.log("Running: "+ file + " " + arguments);
 			process = Runtime.getRuntime().exec(file + " " + arguments);
+			MemoryMonitor.attach(process);
 		} catch (IOException e1) {
 			error = true;
 			return;

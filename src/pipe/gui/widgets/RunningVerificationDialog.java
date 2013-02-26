@@ -26,13 +26,17 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.SwingWorker.StateValue;
 
+import dk.aau.cs.util.MemoryMonitor;
+
 public class RunningVerificationDialog extends JDialog {
 	private static final long serialVersionUID = -1943743974346875737L;
 	private JButton okButton;
 	private long startTimeMs = 0;
 	JLabel timerLabel;
 	JLabel headLineLabel;
-	JLabel progressLabel;	
+	JLabel progressLabel;
+	JLabel resourcesLabel;
+	JLabel usageLabel;
 	private Timer timer; 
 	
 	public RunningVerificationDialog(JFrame owner) {
@@ -51,6 +55,12 @@ public class RunningVerificationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 						/1000 + " s");
+				if(MemoryMonitor.isAttached()){
+					String usage = MemoryMonitor.getUsage();
+					if(usage != null){
+						usageLabel.setText(usage);
+					}
+				}
 			}
 		});		
 		
@@ -59,8 +69,12 @@ public class RunningVerificationDialog extends JDialog {
 		headLineLabel.setText("Verification is running, please wait ...  ");
 		progressLabel = new JLabel();
 		progressLabel.setText("Elapsed time: ");
+		resourcesLabel = new JLabel();
+		resourcesLabel.setText("Memory usage: ");
 		timerLabel = new JLabel();
 		timerLabel.setText("0 s");
+		usageLabel = new JLabel();
+		usageLabel.setText("0 MB");
 		
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
@@ -93,8 +107,24 @@ public class RunningVerificationDialog extends JDialog {
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridy = 2;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = insets;
+		content.add(resourcesLabel,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.insets = insets;
+		content.add(usageLabel,gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridy = 3;
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.insets = insets;
@@ -124,6 +154,7 @@ public class RunningVerificationDialog extends JDialog {
 					StateValue stateValue = (StateValue) event.getNewValue();
 					if (stateValue.equals(StateValue.DONE)) {								
 						setVisible(false);
+						timer.stop();
 						dispose();						
 					}
 				}
