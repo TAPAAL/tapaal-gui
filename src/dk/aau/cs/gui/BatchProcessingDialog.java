@@ -197,8 +197,6 @@ public class BatchProcessingDialog extends JDialog {
 	private List<File> files = new ArrayList<File>();
 	private BatchProcessingWorker currentWorker;
 	
-	private static String lastMemory = "N/A";
-
 	private Timer timer = new Timer(1000, new AbstractAction() {
 		private static final long serialVersionUID = 1327695063762640628L;
 
@@ -208,7 +206,6 @@ public class BatchProcessingDialog extends JDialog {
 			if(MemoryMonitor.isAttached()){
 				String usage = MemoryMonitor.getUsage();
 				if(usage != null){
-					lastMemory = usage;
 					memory.setText(usage);
 				}
 			}
@@ -1037,7 +1034,6 @@ public class BatchProcessingDialog extends JDialog {
 						+ " verification task"
 						+ (tasksCompleted > 1 ? "s" : "") + " completed");
 				timerLabel.setText("");
-				lastMemory = "N/A";
 				memory.setText("");
 			}
 
@@ -1677,10 +1673,6 @@ public class BatchProcessingDialog extends JDialog {
 				this.dontOverride.setSelected(true);			
 			}
 		}
-	}
-	
-	public static String getMemory(){
-		return lastMemory;
 	}
 }
 

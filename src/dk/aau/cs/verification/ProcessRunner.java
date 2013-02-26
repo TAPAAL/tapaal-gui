@@ -50,7 +50,6 @@ public class ProcessRunner {
 		if (process != null) {
 			process.destroy();
 		}
-		MemoryMonitor.detach(process);
 	}
 
 	public void run() {

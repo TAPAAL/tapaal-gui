@@ -29,17 +29,12 @@ public class MemoryMonitor {
 
 	private static int PID = -1;
 	private static Semaphore busy = new Semaphore(1);
+	private static double peakMemory = -1;
 
 	public static void attach(Process p){
 		PID = getPid(p);
+		peakMemory = -1;
 		System.out.println("Process "+PID+" started.");
-	}
-
-	public static void detach(Process p){
-		if(PID == getPid(p)){
-			PID = -1;
-			System.out.println("MemoryMonitor detached.");
-		}
 	}
 
 	public static boolean isAttached(){
@@ -89,6 +84,7 @@ public class MemoryMonitor {
 			if(memory < 0){
 				return null;
 			}else{
+				if(memory > peakMemory)	peakMemory = memory;
 				return formatter.format(memory) + " MB";
 			}
 		}else{
@@ -114,5 +110,11 @@ public class MemoryMonitor {
 		}catch(Exception e){
 			return -1;
 		}
+	}
+	
+	public static String getPeakMemory(){
+		DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+		formatter.setMaximumFractionDigits(0);
+		return peakMemory == -1? "N/A":formatter.format(peakMemory) + " MB";
 	}
 }
