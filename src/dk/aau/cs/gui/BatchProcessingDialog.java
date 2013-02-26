@@ -71,6 +71,7 @@ import dk.aau.cs.gui.components.MultiLineAutoWrappingToolTip;
 import dk.aau.cs.io.batchProcessing.BatchProcessingResultsExporter;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.StringComparator;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingListener;
 import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationOptions;
@@ -172,6 +173,7 @@ public class BatchProcessingDialog extends JDialog {
 	private JButton skipFileButton;
 	private JLabel progressLabel;
 	private JLabel timerLabel;
+	private JLabel memory;
 	private long startTimeMs = 0;
 
 	private JComboBox searchOption;
@@ -201,6 +203,12 @@ public class BatchProcessingDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 					/ 1000 + " s");
+			if(MemoryMonitor.isAttached()){
+				String usage = MemoryMonitor.getUsage();
+				if(usage != null){
+					memory.setText(usage);
+				}
+			}
 		}
 	});
 
@@ -832,11 +840,30 @@ public class BatchProcessingDialog extends JDialog {
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		gbc.gridwidth = 3;
+		gbc.gridwidth = 1;
 		gbc.weightx = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		monitorPanel.add(statusLabel, gbc);
+		
+		JLabel memoryLabel = new JLabel("Memory: ");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 5, 0, 0);
+		monitorPanel.add(memoryLabel, gbc);
+
+		memory = new JLabel("");
+		Dimension timerLabelDim = new Dimension(50, 25);
+		memory.setMinimumSize(timerLabelDim);
+		memory.setPreferredSize(timerLabelDim);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		gbc.anchor = GridBagConstraints.EAST;
+		gbc.insets = new Insets(0, 5, 0, 5);
+		monitorPanel.add(memory, gbc);
 
 		JLabel progress = new JLabel("Progress: ");
 		progress.setToolTipText(TOOL_TIP_ProgressLabel);
@@ -857,7 +884,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 0, 10);
 		monitorPanel.add(progressLabel, gbc);
-
+		
 		JLabel time = new JLabel("Time: ");
 		time.setToolTipText(TOOL_TIP_TimeLabel);
 		gbc = new GridBagConstraints();
@@ -868,9 +895,9 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(time, gbc);
 
 		timerLabel = new JLabel("");
-		Dimension timerLabelDim = new Dimension(50, 25);
-		timerLabel.setMinimumSize(timerLabelDim);
-		timerLabel.setPreferredSize(timerLabelDim);
+		Dimension memoryLabelDim = new Dimension(50, 25);
+		timerLabel.setMinimumSize(memoryLabelDim);
+		timerLabel.setPreferredSize(memoryLabelDim);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
 		gbc.gridy = 2;
@@ -965,6 +992,7 @@ public class BatchProcessingDialog extends JDialog {
 						enableButtons();
 						cancelButton.setEnabled(false);
 						skipFileButton.setEnabled(false);
+						memory.setText("");
 						timerLabel.setText("");
 						timer.stop();
 						timeoutTimer.stop();
@@ -972,6 +1000,7 @@ public class BatchProcessingDialog extends JDialog {
 						disableButtonsDuringProcessing();
 						cancelButton.setEnabled(true);
 						skipFileButton.setEnabled(true);
+						memory.setText("");
 						timerLabel.setText("");
 						progressLabel.setText("0 verification tasks completed");
 					}
