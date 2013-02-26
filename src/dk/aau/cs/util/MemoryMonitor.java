@@ -72,9 +72,9 @@ public class MemoryMonitor {
 				try { 
 					Process p = Runtime.getRuntime().exec("ps -p "+PID+" -o rss"); 
 					BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); 
-					//Actual memory usage is second line output
+					
 					String s = input.readLine();
-					s = input.readLine();
+					s = input.readLine();	//Actual memory usage is second line output
 					memory = Double.parseDouble(s.replace(" ", ""))/1024;
 				} catch (Exception e) { 
 					System.err.println("Error reading memory: "+e.getMessage());

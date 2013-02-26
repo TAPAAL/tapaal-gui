@@ -74,7 +74,7 @@ public class RunningVerificationDialog extends JDialog {
 		timerLabel = new JLabel();
 		timerLabel.setText("0 s");
 		usageLabel = new JLabel();
-		usageLabel.setText("0 MB");
+		usageLabel.setText("initializing...");
 		
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
