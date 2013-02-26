@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +49,8 @@ public class MemoryMonitor {
 	public static String getUsage(){
 		if(busy.tryAcquire()){
 			double memory = -1;
-			DecimalFormat formatter = new DecimalFormat("#,##0.0");
+			DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+			formatter.setMaximumFractionDigits(0);
 			if(Platform.isWindows()){
 				try { 
 					Process p = Runtime.getRuntime().exec("tasklist /FI \"pid eq "+PID+"\" /FO \"LIST\""); 
@@ -85,8 +88,6 @@ public class MemoryMonitor {
 
 			if(memory < 0){
 				return null;
-			}else if(memory >= 1024){
-				return formatter.format(memory/1024) + " GB";
 			}else{
 				return formatter.format(memory) + " MB";
 			}
