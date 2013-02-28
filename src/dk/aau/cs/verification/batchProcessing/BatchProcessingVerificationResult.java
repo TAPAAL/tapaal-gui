@@ -8,14 +8,16 @@ public class BatchProcessingVerificationResult {
 	private String file;
 	private TAPNQuery query;
 	private long verificationTimeInMs;
+	private String verificationMemory;
 	private String verificationResult;
 	private Stats stats;
 	
-	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, Stats stats) {
+	public BatchProcessingVerificationResult(String file, TAPNQuery query, String verificationResult, long verificationTime, String verificationMemory, Stats stats) {
 		this.file = file;
 		this.query = query;
 		this.verificationResult = verificationResult;
 		verificationTimeInMs = verificationTime;
+		this.verificationMemory = verificationMemory;
 		this.stats = stats;
 	}
 	
@@ -38,6 +40,10 @@ public class BatchProcessingVerificationResult {
 	
 	public long verificationTimeInMs() {
 		return verificationTimeInMs;
+	}
+	
+	public String verificationMemory() {
+		return verificationMemory;
 	}
 	
 	public Stats stats() {

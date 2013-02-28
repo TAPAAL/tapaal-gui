@@ -27,7 +27,8 @@ public class BatchProcessingResultsExporter {
 		writer.println("Model" + DELIMITER + 
 				       "Query" + DELIMITER + 
 				       "Result" + DELIMITER + 
-				       "Verification Time" + DELIMITER + 
+				       "Verification Time" + DELIMITER +
+				       "Memory Usage" + DELIMITER +
 				       "Discovered States" + DELIMITER + 
 				       "Explored States" + DELIMITER + 
 				       "Stored States" + DELIMITER + 
@@ -51,6 +52,8 @@ public class BatchProcessingResultsExporter {
 			s.append(result.verificationResult());
 			s.append(DELIMITER);
 			s.append((result.verificationTimeInMs() / 1000.0) + " s");
+			s.append(DELIMITER);
+			s.append(result.verificationMemory());
 			s.append(DELIMITER);
 			s.append(result.hasStats() ? result.stats().discoveredStates() : "");
 			s.append(DELIMITER);

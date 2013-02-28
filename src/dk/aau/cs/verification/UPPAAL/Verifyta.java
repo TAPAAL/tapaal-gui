@@ -25,6 +25,7 @@ import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
@@ -67,7 +68,7 @@ public class Verifyta implements ModelChecker {
 					"Locate UPPAAL Verifyta");
 
 			try {
-				File file = fileFinder.ShowFileBrowserDialog("Uppaal Verifyta", "");
+				File file = fileFinder.ShowFileBrowserDialog("Verifyta", "");
 				
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
