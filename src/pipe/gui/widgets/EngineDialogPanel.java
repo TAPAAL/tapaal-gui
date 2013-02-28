@@ -121,7 +121,7 @@ public class EngineDialogPanel {
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Uppaal Verifyta", "");
+			File file = fileFinder.ShowFileBrowserDialog("Verifyta", "");
 			
 			if(file != null){
 				if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
