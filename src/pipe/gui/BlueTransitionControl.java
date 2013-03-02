@@ -33,6 +33,7 @@ public class BlueTransitionControl extends JPanel{
 	private static final long serialVersionUID = -5735674907635981304L;
 	private static DelayMode defaultDelayMode = ShortestDelayMode.getInstance();
 	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
+	private static boolean defaultIsRandomTrasition;
 	
 	JSlider bluePrecision;
 	JComboBox delayMode;
@@ -80,6 +81,7 @@ public class BlueTransitionControl extends JPanel{
 		setDelayMode(defaultDelayMode);
 		
 		randomMode = new JCheckBox("Choose next transition randomly");
+		setRandomTransitionMode(defaultIsRandomTrasition);
         
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = 2;
@@ -149,12 +151,16 @@ public class BlueTransitionControl extends JPanel{
 		return (DelayMode)delayMode.getSelectedItem();
 	}
 	
-	public boolean isRandomDelayMode(){
+	public void setDelayMode(DelayMode delayMode){
+		this.delayMode.setSelectedItem(delayMode);
+	}
+	
+	public boolean isRandomTransitionMode(){
 		return randomMode.isSelected();
 	}
 	
-	public void setDelayMode(DelayMode delayMode){
-		this.delayMode.setSelectedItem(delayMode);
+	public void setRandomTransitionMode(boolean randomTransition){
+		randomMode.setSelected(randomTransition);
 	}
 	
 	private static BlueTransitionControl instance;
@@ -221,6 +227,18 @@ public class BlueTransitionControl extends JPanel{
 			return getInstance().getValue();
 		} else {
 			return defaultGranularity;
+		}
+	}
+
+	public static void setDefaultIsRandomTransition(boolean blueTransitionIsRandomTransition) {
+		defaultIsRandomTrasition = blueTransitionIsRandomTransition;
+	}
+	
+	public static boolean isRandomTransition(){
+		if(instance != null){
+			return getInstance().isRandomTransitionMode();
+		} else {
+			return defaultIsRandomTrasition;
 		}
 	}
 }

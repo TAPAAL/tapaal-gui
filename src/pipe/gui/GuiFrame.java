@@ -202,7 +202,7 @@ public class GuiFrame extends JFrame implements Observer {
 			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
-			// 2010-05-07, Kenneth Yrke Jørgensen:
+			// 2010-05-07, Kenneth Yrke J��rgensen:
 			// If the native look and feel is GTK replace the useless open
 			// dialog,
 			// with a java-reimplementation.
@@ -289,6 +289,7 @@ public class GuiFrame extends JFrame implements Observer {
 		showBlueTransitions = prefs.getShowBlueTransitions();
 		BlueTransitionControl.setDefaultDelayMode(prefs.getBlueTransitionDelayMode());
 		BlueTransitionControl.setDefaultGranularity(prefs.getBlueTransitionGranularity());
+		BlueTransitionControl.setDefaultIsRandomTransition(prefs.getBlueTransitionIsRandomTransition());
 
 		showToolTips = prefs.getShowToolTips();
 		if(CreateGui.showZeroToInfinityIntervals() != prefs.getShowZeroInfIntervals()){
@@ -762,6 +763,7 @@ public class GuiFrame extends JFrame implements Observer {
 		}
 		BlueTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
 		BlueTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
+		BlueTransitionControl.getInstance().setRandomTransitionMode(false);
 	}
 
 	public void saveWorkspace(){
@@ -780,6 +782,7 @@ public class GuiFrame extends JFrame implements Observer {
 		prefs.setShowBlueTransitions(showBlueTransitions);
 		prefs.setBlueTransitionDelayMode(BlueTransitionControl.getDefaultDelayMode());
 		prefs.setBlueTransitionGranularity(BlueTransitionControl.getDefaultGranularity());
+		prefs.setBlueTransitionIsRandomTransition(BlueTransitionControl.isRandomTransition());
 
 		JOptionPane.showMessageDialog(this, 
 				"The workspace has now been saved into your preferences.\n" 

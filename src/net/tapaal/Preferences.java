@@ -230,6 +230,14 @@ public class Preferences {
 			throw new RuntimeException();
 		}
 	}
+	
+	public void setBlueTransitionIsRandomTransition(boolean isRandomTransition){
+		pref.putBoolean("blueTransitionRandomTransition", isRandomTransition);
+	}
+	
+	public boolean getBlueTransitionIsRandomTransition() {
+		return pref.getBoolean("blueTransitionRandomTransition", false);
+	}
 
 	public void setSimulatorModelRoot(Split model){
 		if(model == null) return;

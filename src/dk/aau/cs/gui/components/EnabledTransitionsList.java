@@ -79,7 +79,7 @@ public class EnabledTransitionsList extends JPanel{
 	}
 
 	public void reInitDone(){
-		if(CreateGui.getCurrentTab().getBlueTransitionControl().isRandomDelayMode()){
+		if(CreateGui.getCurrentTab().getBlueTransitionControl().isRandomTransitionMode()){
 			selectRandom();
 			return;
 		}
