@@ -1329,6 +1329,16 @@ public class BatchProcessingDialog extends JDialog {
 						s.append("Discrete Inclusion Places:\n");
 						s.append(generateListOfInclusionPlaces(query));
 					}
+				} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
+					if(query.useTimeDarts() && query.usePTrie()){
+						s.append(name_verifyTAPNDiscreteVerificationTimeDartPTrie);
+					} else if(query.useTimeDarts()){
+						s.append(name_verifyTAPNDiscreteVerificationTimeDart);
+					} else if(query.usePTrie()){
+						s.append(name_verifyTAPNDiscreteVerificationPTrie);
+					} else {
+						s.append(name_verifyTAPNDiscreteVerificationNone);
+					}
 				} else {
 					s.append(name_BROADCAST);
 				}
