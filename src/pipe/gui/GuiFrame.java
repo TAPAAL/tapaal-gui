@@ -761,6 +761,8 @@ public class GuiFrame extends JFrame implements Observer {
 		if(!CreateGui.showZeroToInfinityIntervals()){
 			showZeroToInfinityIntervalsCheckBox.doClick();
 		}
+		//BlueTransitions
+		showBlueTransitions(advanced);
 		BlueTransitionControl.getInstance().setValue(new BigDecimal("0.1"));
 		BlueTransitionControl.getInstance().setDelayMode(ShortestDelayMode.getInstance());
 		BlueTransitionControl.getInstance().setRandomTransitionMode(false);
