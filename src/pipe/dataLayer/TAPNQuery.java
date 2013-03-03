@@ -144,8 +144,16 @@ public class TAPNQuery {
 		return timeDart;
 	}
 	
+	public void setUseTimeDarts(boolean useTimeDarts){
+		timeDart = useTimeDarts;
+	}
+	
 	public boolean usePTrie(){
 		return pTrie;
+	}
+	
+	public void setUsePTrie(boolean usePTrie){
+		pTrie = usePTrie;
 	}
 
 	/**

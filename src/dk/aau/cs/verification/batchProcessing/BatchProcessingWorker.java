@@ -137,10 +137,43 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			processQuery(file, composedModel, query);
 		}
 		
+		//Make the PTrie/timedarts availible 
+		//TODO This shold be made simpler in the engine refacter process
+		query = query.copy();
+		query.setDiscreteInclusion(false);
+		query.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+		if(batchProcessingVerificationOptions.useTimeDartPTrie()){
+			query = query.copy();
+			query.setUseTimeDarts(true);
+			query.setUsePTrie(true);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.useTimeDart()){
+			query = query.copy();
+			query.setUseTimeDarts(true);
+			query.setUsePTrie(false);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.usePTrie()){
+			query = query.copy();
+			query.setUseTimeDarts(false);
+			query.setUsePTrie(true);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPNdiscreteVerification)){
+			query = query.copy();
+			query.setUseTimeDarts(false);
+			query.setUsePTrie(false);
+			processQuery(file, composedModel, query);
+		}
+		
 		query = query.copy();
 		query.setDiscreteInclusion(false);
 		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(r == ReductionOption.VerifyTAPN) { continue; }
+			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification) { continue; }
 			if(exiting()) return;
 			query = query.copy();
 			query.setReductionOption(r);
