@@ -26,12 +26,12 @@ JAR_DIR := buildjar
 JAR_FILE := $(JAR_DIR)/tapaal.jar
 
 #Set location of java home
-ifeq (exists, $(shell [ -d /usr/lib/jvm/default-java ]  && echo exists ))
-	JAVA_HOME := /usr/lib/jvm/default-java
-endif
-
 ifeq (exists, $(shell [ -d /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home ]  && echo exists ))
 	JAVA_HOME := /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+endif
+
+ifeq (exists, $(shell [ -d /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home ]  && echo exists ))
+	JAVA_HOME := /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home 
 endif
 
 JAVA_LIB  := $(JAVA_HOME)/lib
@@ -39,8 +39,12 @@ JAVA_LIB  := $(JAVA_HOME)/lib
 DEPEND_DIR := libs
 DEPEND := $(DEPEND_DIR)/\*
 
-JFLAGS      := -sourcepath $(SOURCE_DIR) \
-		-cp $(DEPEND)
+JFLAGS      := -source 1.6 -target 1.6 \
+              -bootclasspath /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/rt.jar \
+              -sourcepath $(SOURCE_DIR) -cp $(DEPEND)
+
+#/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar -extdirs " " \
+
 
 # Unix tools
 AWK         := awk
@@ -52,9 +56,9 @@ all_javas := /tmp/tmp
 
 # Java tools
 
-JAVA        := $(JAVA_HOME)/bin/java
-JAVAC       := $(JAVA_HOME)/bin/javac
-JAR       := $(JAVA_HOME)/bin/jar
+JAVA        :=  java
+JAVAC       :=  javac
+JAR       := jar
 
 	MAINCLASS := $(SOURCE_DIR)/TAPAAL
 default: ${MAINCLASS}.class
