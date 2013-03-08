@@ -39,8 +39,10 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.ModelChecker;
@@ -242,7 +244,7 @@ public class RunVerification extends RunVerificationBase {
 				});
 				gbc = new GridBagConstraints();
 				gbc.gridx = 0;
-				gbc.gridy = 3;
+				gbc.gridy = 4;
 				gbc.insets = new Insets(10,0,10,0);
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
@@ -255,6 +257,13 @@ public class RunVerification extends RunVerificationBase {
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel(result.getVerificationTimeString()), gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
 		
 		return panel;
 	}

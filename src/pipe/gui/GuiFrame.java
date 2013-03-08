@@ -72,6 +72,8 @@ import org.jdesktop.swingx.MultiSplitLayout;
 import net.tapaal.Preferences;
 import org.jdesktop.swingx.MultiSplitLayout;
 
+import com.sun.jna.Platform;
+
 
 
 import net.tapaal.TAPAAL;
@@ -185,7 +187,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public boolean isMac(){
-		return System.getProperty("mrj.version") != null;
+		return Platform.isMac();
 	}
 	
 	public int getJRE(){
@@ -1008,6 +1010,9 @@ public class GuiFrame extends JFrame implements Observer {
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
+			// Remove constant highlight
+			CreateGui.getCurrentTab().removeConstantHighlights();
+			
 			CreateGui.getAnimationController().requestFocusInWindow();
 			break;
 		case noNet:

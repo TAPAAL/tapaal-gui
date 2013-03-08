@@ -37,6 +37,7 @@ import pipe.gui.widgets.PlaceEditorPanel;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -314,6 +315,20 @@ public class TimedPlaceComponent extends Place {
 			}else{
 				pnName.setText("");
 			}
+			
+			// Handle constant highlighting
+			boolean focusedConstant = false;
+			if(place.invariant().upperBound() instanceof ConstantBound){
+				if(((ConstantBound) place.invariant().upperBound()).constant().hasFocus()){
+					focusedConstant = true;
+				}
+			}
+			if(focusedConstant){
+				pnName.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+			}else{
+				pnName.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+			}
+			
 		} else {
 			pnName.setName("");
 			pnName.setText("");

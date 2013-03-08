@@ -15,6 +15,7 @@ import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.handler.TimedArcHandler;
 import pipe.gui.undo.ArcTimeIntervalEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.ConstantWeight;
 import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -59,6 +60,19 @@ public class TimedInhibitorArcComponent extends TimedInputArcComponent {
 		if(getWeight().value() > 1 || displayConstantNames){
 			label.setText(getWeight().toString(displayConstantNames));
 		}
+		
+		boolean focusedConstant = false;
+		if(getWeight() instanceof ConstantWeight){
+			if(((ConstantWeight) getWeight()).constant().hasFocus()){
+				focusedConstant = true;
+			}
+		}
+		if(focusedConstant){
+			label.setForeground(Pipe.SELECTION_TEXT_COLOUR);
+		}else{
+			label.setForeground(Pipe.ELEMENT_TEXT_COLOUR);
+		}
+		
 		this.setLabelPosition();
 	}
 

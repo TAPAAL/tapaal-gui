@@ -11,7 +11,7 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 
 public class BatchProcessingResultsTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
-	private final String[] HEADINGS = new String[]{ "Method", "Model", "Query", "Result", "Verification Time" }; // TODO: somehow display discovered/explored/stored states. Maybe in tooltip
+	private final String[] HEADINGS = new String[]{ "Method", "Model", "Query", "Result", "Verification Time", "Memory Usage" }; // TODO: somehow display discovered/explored/stored states. Maybe in tooltip
 	private List<BatchProcessingVerificationResult> results;
 	
 	public BatchProcessingResultsTableModel(){
@@ -50,6 +50,7 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 		case 2: return result.query();
 		case 3: return result.verificationResult();
 		case 4: return (result.verificationTimeInMs() / 1000.0) + " s";
+		case 5: return result.verificationMemory();
 		default:
 			return null;
 		}

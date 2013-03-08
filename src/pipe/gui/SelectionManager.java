@@ -180,6 +180,7 @@ public class SelectionManager extends javax.swing.JComponent implements
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
 	public void mousePressed(MouseEvent e) {	
+		CreateGui.getCurrentTab().removeConstantHighlights();
 		if (e.getButton() == MouseEvent.BUTTON1 && !(e.isControlDown())) {
 			isSelecting = true;
 			drawingSurface.setLayer(this, Pipe.SELECTION_LAYER_OFFSET);
