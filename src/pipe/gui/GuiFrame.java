@@ -72,7 +72,7 @@ import org.jdesktop.swingx.MultiSplitLayout;
 import net.tapaal.Preferences;
 import org.jdesktop.swingx.MultiSplitLayout;
 
-import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+
 
 import net.tapaal.TAPAAL;
 
@@ -203,7 +203,7 @@ public class GuiFrame extends JFrame implements Observer {
 			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
-			// 2010-05-07, Kenneth Yrke Jørgensen:
+			// 2010-05-07, Kenneth Yrke J��rgensen:
 			// If the native look and feel is GTK replace the useless open
 			// dialog,
 			// with a java-reimplementation.
