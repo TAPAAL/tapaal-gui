@@ -40,9 +40,9 @@ DEPEND_DIR := libs
 DEPEND := $(DEPEND_DIR)/\*
 
 JFLAGS      := -source 1.6 -target 1.6 \
-              -bootclasspath /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/rt.jar \
               -sourcepath $(SOURCE_DIR) -cp $(DEPEND)
-
+            
+# -bootclasspath /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/rt.jar \
 #/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar -extdirs " " \
 
 
