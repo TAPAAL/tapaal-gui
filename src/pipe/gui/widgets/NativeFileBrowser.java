@@ -4,6 +4,8 @@ import java.awt.FileDialog;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
@@ -81,10 +83,16 @@ public class NativeFileBrowser extends FileBrowserImplementation {
 		// Windows does not enforce file ending on save
 		else if (!file.endsWith("."+ext)) {
 			File source = new File(file);
-			File destination = new File(file+"."+ext);
+			Pattern p = Pattern.compile(".*\\.(.*)");
+			Matcher m = p.matcher(file);
+			String newName = file + "." + ext;
+			if(m.matches()){
+				newName = file.substring(0, file.length()-m.group(1).length()) + ext;
+			}
+			File destination = new File(newName);
 
 			if(destination.exists()){
-				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, file + "." + ext + "\nDo you want to overwrite this file?");
+				int overRide = JOptionPane.showConfirmDialog(CreateGui.appGui, newName + "\nDo you want to overwrite this file?");
 				switch (overRide) {
 				case JOptionPane.NO_OPTION:
 					source.delete();
