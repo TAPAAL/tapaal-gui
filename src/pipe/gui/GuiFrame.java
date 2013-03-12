@@ -690,8 +690,9 @@ public class GuiFrame extends JFrame implements Observer {
 		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				checkForSaveAll();
-				BatchProcessingDialog.showBatchProcessingDialog();
+				if(checkForSaveAll()){
+					BatchProcessingDialog.showBatchProcessingDialog();
+				}
 			}
 		});
 		toolsMenu.add(batchProcessing);
