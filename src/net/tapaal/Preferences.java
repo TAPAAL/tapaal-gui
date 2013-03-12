@@ -12,7 +12,6 @@ import java.util.prefs.BackingStoreException;
 
 import org.jdesktop.swingx.MultiSplitLayout.Split;
 
-import sun.security.provider.PolicyParser.GrantEntry;
 
 import dk.aau.cs.model.tapn.simulation.DelayMode;
 import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
