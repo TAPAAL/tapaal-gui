@@ -225,6 +225,7 @@ public class Verifyta implements ModelChecker {
 	}
 	
 	public void setVerifytaPath(String path) {
+		String oldPath = verifytapath;
 		verifytapath = path; 
 		Preferences.getInstance().setVerifytaLocation(verifytapath);
 		if(!isCorrectVersion()){
@@ -233,7 +234,8 @@ public class Verifyta implements ModelChecker {
 					"The specified version of the file verifyta is too old.\n\n"
 							+ "Get the latest development version of UPPAAL from \n"
 							+ "www.uppaal.com.", "Verifyta Error");
-			resetVerifyta();
+			verifytapath = oldPath;
+			Preferences.getInstance().setVerifytaLocation(oldPath);
 		}
 	}
 	

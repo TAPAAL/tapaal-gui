@@ -167,13 +167,15 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		public void setVerifydTapnPath(String path) {
+			String oldPath = verifydtapnpath;
 			verifydtapnpath = path;
 			Preferences.getInstance().setVerifydtapnLocation(path);
 			if(!isCorrectVersion()){
 				messenger
 				.displayErrorMessage(
 						"The specified version of the file verifytapn is too old.", "Verifytapn Error");
-				resetVerifytapn();
+				verifydtapnpath = oldPath;
+				Preferences.getInstance().setVerifydtapnLocation(oldPath);
 			}
 		}
 
