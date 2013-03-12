@@ -7,20 +7,28 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.prefs.BackingStoreException;
 
 import org.jdesktop.swingx.MultiSplitLayout.Split;
+
+import sun.security.provider.PolicyParser.GrantEntry;
+
+import dk.aau.cs.model.tapn.simulation.DelayMode;
+import dk.aau.cs.model.tapn.simulation.ManualDelayMode;
+import dk.aau.cs.model.tapn.simulation.RandomDelayMode;
+import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 
 public class Preferences {
 	private static Preferences instance = null;
 	private static java.util.prefs.Preferences pref;
 
-        protected Preferences() {
-	      // Exists only to defeat instantiation.
-		   pref = java.util.prefs.Preferences.userNodeForPackage(this.getClass());
-		   // Set subtree to version specific node
-		   pref = pref.node(pref.absolutePath() + TAPAAL.VERSION);
-	   }
+	protected Preferences() {
+		// Exists only to defeat instantiation.
+		pref = java.util.prefs.Preferences.userNodeForPackage(this.getClass());
+		// Set subtree to version specific node
+		pref = pref.node(pref.absolutePath() + TAPAAL.VERSION);
+	}
 
 	public void clear(){
 		try {
@@ -67,7 +75,7 @@ public class Preferences {
 			pref.put(key, location);   
 		}
 	}
-	
+
 	public String getVerifydtapnLocation() {
 		return pref.get("dverifytapn.location", "");
 	}
@@ -105,7 +113,7 @@ public class Preferences {
 	public boolean getShowToolTips(){
 		return pref.getBoolean("showToolTips", true);
 	}
-	
+
 	public void setWindowSize(Dimension size) {
 		try{
 			saveSerilizableObject("appSize", size);
@@ -113,7 +121,7 @@ public class Preferences {
 			System.err.println("Something went wrong - couldn't save the app size");
 		}
 	}
-	
+
 	public Dimension getWindowSize(){
 		try{
 			return (Dimension)getSerilizableObject("appSize");
@@ -184,6 +192,53 @@ public class Preferences {
 		return pref.getBoolean("enabledTransitionsPanel", true);
 	}
 
+	public void setShowBlueTransitions(boolean show){
+		pref.putBoolean("enabledBlueTransitions", show);
+	}
+
+	public boolean getShowBlueTransitions(){
+		return pref.getBoolean("enabledBlueTransitions", true);
+	}
+	
+	public void setBlueTransitionGranularity(BigDecimal granularity){
+		pref.put("blueTransitionGranularity", granularity.toString());
+	}
+	
+	public BigDecimal getBlueTransitionGranularity(){
+		return new BigDecimal(pref.get("blueTransitionGranularity", "0.1"));
+		
+	}
+	
+	public void setBlueTransitionDelayMode(DelayMode delayMode){
+		if(delayMode instanceof ManualDelayMode){
+			pref.putInt("blueTransitionDelayMode", 0);
+		} else if(delayMode instanceof RandomDelayMode){
+			pref.putInt("blueTransitionDelayMode", 1);
+		} else if(delayMode instanceof ShortestDelayMode){
+			pref.putInt("blueTransitionDelayMode", 2);
+		} else {
+			throw new IllegalArgumentException("Can only save ManualDelayMode, RandomDelayMode and ShortestDelayMode");
+		}
+	}
+	
+	public DelayMode getBlueTransitionDelayMode(){
+		switch (pref.getInt("blueTransitionDelayMode", 2)) {
+		case 0: return ManualDelayMode.getInstance();
+		case 1: return RandomDelayMode.getInstance();
+		case 2: return ShortestDelayMode.getInstance();
+		default:
+			throw new RuntimeException();
+		}
+	}
+	
+	public void setBlueTransitionIsRandomTransition(boolean isRandomTransition){
+		pref.putBoolean("blueTransitionRandomTransition", isRandomTransition);
+	}
+	
+	public boolean getBlueTransitionIsRandomTransition() {
+		return pref.getBoolean("blueTransitionRandomTransition", false);
+	}
+
 	public void setSimulatorModelRoot(Split model){
 		if(model == null) return;
 		try{
@@ -212,7 +267,7 @@ public class Preferences {
 		return pref.getBoolean("showZeroInfIntervals", true);
 	}
 
-	
+
 	//Helper functions
 	private void saveSerilizableObject(String key, Serializable o) throws IOException{
 		if(o == null){

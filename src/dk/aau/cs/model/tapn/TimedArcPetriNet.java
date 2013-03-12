@@ -8,6 +8,7 @@ import java.util.List;
 import pipe.gui.undo.AddArcPathPointEdit;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimedArcPetriNet {
@@ -550,5 +551,53 @@ public class TimedArcPetriNet {
 		}
 		
 		return true;
+	}
+
+	
+	/**
+	 * Finds the biggest constant in the net
+	 * @return the biggest constant in the net or -1 if there are no constants in the net
+	 */
+	public int getBiggestConstant(){
+		int biggestConstant = -1;
+		for(TimedInputArc t : inputArcs){
+			Bound max = IntervalOperations.getMaxNoInfBound(t.interval());
+			if(max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+		}
+		
+		for(TransportArc t : transportArcs){
+			Bound max = IntervalOperations.getMaxNoInfBound(t.interval());
+			if(max.value() > biggestConstant){
+				biggestConstant = max.value();
+			}
+		}
+		
+		for(TimedPlace t : places){
+			if(!(t.invariant().upperBound() instanceof InfBound) && t.invariant().upperBound().value() > biggestConstant){
+				biggestConstant = t.invariant().upperBound().value();
+			}
+		}
+		
+		return biggestConstant;
+	}
+	
+	/**
+	 * Finds the biggest constant which is associated with an enabled transition
+	 * @return the biggest constant which is associated with an enabled transition or -1 if there are no such constants 
+	 */
+	public int getBiggestConstantEnabledTransitions(){
+		int biggestConstant = -1;
+		
+		for(TimedTransition t : transitions){
+			if(t.isDEnabled()){
+				int tmp = t.getLagestAssociatedConstant(); 
+				if(tmp > biggestConstant){
+					biggestConstant = tmp;
+				}
+			}
+		}
+		return biggestConstant;
 	}
 }

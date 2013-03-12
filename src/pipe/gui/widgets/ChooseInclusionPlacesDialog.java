@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +38,7 @@ import javax.swing.event.ListSelectionListener;
 
 import pipe.gui.CreateGui;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
@@ -196,7 +198,8 @@ public class ChooseInclusionPlacesDialog extends JPanel {
 		List<TimedPlace> incPlaces = inclusionPlaces.inclusionPlaces();
 		boolean allPlaces = inclusionPlaces.inclusionOption() == InclusionPlacesOption.AllPlaces;
 		
-		Vector<TimedPlace> tempPlaces = new Vector<TimedPlace>(tapnNetwork.sharedPlaces());
+		Collection<SharedPlace> sharedPlaces = tapnNetwork.sharedPlaces();
+		Vector<TimedPlace> tempPlaces = new Vector<TimedPlace>(sharedPlaces);
 		sortPlacesByName(tempPlaces);
 		for(TimedPlace p : tempPlaces)
 			listModel.addElement(new CheckBoxListItem(p, allPlaces || incPlaces.contains(p)));

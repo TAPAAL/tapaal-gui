@@ -2,6 +2,7 @@ package pipe.gui;
 
 import java.awt.Container;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,7 +19,9 @@ import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
+import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -34,6 +37,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.RequireException;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
@@ -128,7 +132,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true)) {
+			if (tempTransition.isEnabled(true) || tempTransition.isBlueTransition(true)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -144,7 +148,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true))) {
+			if (!(tempTransition.isEnabled(true)) || !tempTransition.isBlueTransition(true)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -152,20 +156,20 @@ public class Animator {
 	}
 
 	public void updateFireableTransitions(){
-		EnabledTransitionsList fireableTrans = CreateGui.getFireabletransitionsList();
-		fireableTrans.startReInit();
+		TransitionFireingComponent transFireComponent = CreateGui.getTransitionFireingComponent();
+		transFireComponent.startReInit();
 
 		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if ((tempTransition.isEnabled(true))) {
-					fireableTrans.addTransition(temp, tempTransition);
+				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions())) {
+					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
 		}
 
-		fireableTrans.reInitDone();
+		transFireComponent.reInitDone();
 	}
 
 	/**
@@ -179,6 +183,7 @@ public class Animator {
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
 				tempTransition.setEnabledFalse();
+				tempTransition.setBlueTransitionFalse();
 				activeGuiModel().notifyObservers();
 				tempTransition.repaint();
 			}
@@ -276,9 +281,40 @@ public class Animator {
 
 		}
 	}
+	
+	public void dFireTransition(TimedTransition transition){
+		if(!CreateGui.getApp().isShowingBlueTransitions()){
+			fireTransition(transition);
+			return;
+		}
+		
+		TimeInterval dInterval = transition.getdInterval();
+		
+		BigDecimal delayGranularity = CreateGui.getCurrentTab().getBlueTransitionControl().getValue();
+		//Make sure the granularity is small enough
+		BigDecimal lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
+		if(!dInterval.IsLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
+			do{
+				delayGranularity = delayGranularity.divide(BigDecimal.TEN);
+			} while (delayGranularity.compareTo(new BigDecimal("0.00001")) >= 0 && !dInterval.isIncluded(lowerBound.add(delayGranularity)));
+		}
+		
+		if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
+		} else {
+			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
+			if(delay != null){
+				if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
+					letTimePass(delay);
+				}
+			
+				fireTransition(transition);
+			}
+		}
+	}
 
 	// TODO: Clean up this method
-	public void fireTransition(TimedTransition transition) {
+	private void fireTransition(TimedTransition transition) {
 
 		if(!clearStepsForward()){
 			return;

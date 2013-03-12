@@ -1,16 +1,20 @@
 package pipe.gui.graphicElements.tapn;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BoxLayout;
+import javax.swing.JTextArea;
 
 import pipe.dataLayer.DataLayer;
 import pipe.gui.CreateGui;
@@ -25,6 +29,7 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.TAPNTransitionEditor;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
@@ -54,7 +59,7 @@ public class TimedTransitionComponent extends Transition {
 				angleInput, priority);
 		listener = timedTransitionListener();
 	}
-	
+
 	private TimedTransitionListener timedTransitionListener(){
 		return new TimedTransitionListener() {
 			public void nameChanged(TimedTransitionEvent e) {
@@ -103,6 +108,15 @@ public class TimedTransitionComponent extends Transition {
 		return transition.isEnabled();
 	}
 
+	@Override
+	public boolean isBlueTransition() {
+		return transition.isDEnabled();
+	}
+	
+	public TimeInterval getDInterval(){
+		return transition.getdInterval();
+	}
+
 	public dk.aau.cs.model.tapn.TimedTransition underlyingTransition() {
 		return transition;
 	}
@@ -122,11 +136,11 @@ public class TimedTransitionComponent extends Transition {
 		transition.setName(nameInput);
 		super.setName(nameInput);
 	}
-	
+
 	public String getName() {
 		return transition != null ? transition.name() : "";
 	}
-	
+
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(transition != null) {
@@ -139,24 +153,24 @@ public class TimedTransitionComponent extends Transition {
 		super.update(displayConstantNames);
 		repaint();
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if(transition.isShared()){
 			Graphics2D graphics = (Graphics2D)g;
 			Stroke oldStroke = graphics.getStroke();
-			
+
 			BasicStroke dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] {5.0f}, 0.0f);
 			graphics.setStroke(dashed);
-			
+
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			graphics.draw(dashedOutline);
-						
+
 			graphics.setStroke(oldStroke);
 		}
 	}
-	
+
 	@Override
 	protected void constructTransition() {
 		super.constructTransition();
@@ -166,7 +180,7 @@ public class TimedTransitionComponent extends Transition {
 		double height = TRANSITION_HEIGHT + Pipe.DASHED_PADDING;
 		dashedOutline = new GeneralPath(new Rectangle2D.Double(x, y, width, height));
 	}
-	
+
 	@Override
 	public Command rotate(int angleInc) {
 		dashedOutline.transform(AffineTransform.getRotateInstance(Math.toRadians(angleInc), (componentWidth) / 2, (componentHeight)  / 2));
@@ -176,22 +190,60 @@ public class TimedTransitionComponent extends Transition {
 	public TimedTransitionComponent copy(TimedArcPetriNet tapn, DataLayer guiModel) {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getPositionXObject(), getPositionYObject(), id, transition.name(), nameOffsetX, nameOffsetY, true, false, getAngle(), 0);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
-		
+
 		LabelHandler labelHandler = new LabelHandler(transitionComponent.getNameLabel(), transitionComponent);
 		transitionComponent.getNameLabel().addMouseListener(labelHandler);
 		transitionComponent.getNameLabel().addMouseMotionListener(labelHandler);
 		transitionComponent.getNameLabel().addMouseWheelListener(labelHandler);
-		
+
 		TransitionHandler transitionHandler = new TAPNTransitionHandler((DrawingSurfaceImpl)getParent(), transitionComponent, guiModel, tapn);
 		transitionComponent.addMouseListener(transitionHandler);
 		transitionComponent.addMouseMotionListener(transitionHandler);
 		transitionComponent.addMouseWheelListener(transitionHandler);
 
 		transitionComponent.addMouseListener(new AnimationHandler());
-	
+
 		transitionComponent.setGuiModel(guiModel);
-		
+
 		return transitionComponent;
 	}
+	
+	public void updateToolTip(boolean show){
+		if(show){ 
+			TimeInterval dInterval = underlyingTransition().getdInterval();
+			if(dInterval == null){
+				this.setToolTipText(null);
+			} else {
+				this.setToolTipText(dInterval.toString());
+			}
+		} else {
+			this.setToolTipText(null);
+		}
+	}
+	
+	Window dIntervalWindow = null;
+	
+	public void showDInterval(boolean show) {
+		
+		if (dIntervalWindow != null){
+			dIntervalWindow.dispose();
+		}
+		
+		// Build interface
+		if (show && (transition.getdInterval() != null)) {
+			dIntervalWindow = new Window(new Frame());
+			dIntervalWindow.add(new JTextArea(transition.getdInterval().toString()));
+			
+			dIntervalWindow.getComponent(0).setBackground(Color.lightGray);
 
+			// Make window fit contents' preferred size
+			dIntervalWindow.pack();
+
+			// Move window to the middle of the screen
+			dIntervalWindow.setLocationRelativeTo(this);
+			dIntervalWindow.setLocation(dIntervalWindow.getLocation().x, dIntervalWindow.getLocation().y - 20);
+			
+			dIntervalWindow.setVisible(show);
+		}
+	}
 }

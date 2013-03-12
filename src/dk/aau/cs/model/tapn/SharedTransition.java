@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class SharedTransition {
@@ -70,6 +71,20 @@ public class SharedTransition {
 				if(!transition.isEnabledAlone()) return false;
 		}
 		return true;
+	}
+	
+	public ArrayList<TimeInterval> calculateDInterval() {
+		if(transitions.size() == 0) return null;
+		
+		ArrayList<TimeInterval> result = new ArrayList<TimeInterval>();
+		result.add(TimeInterval.ZERO_INF);
+		
+		for(TimedTransition transition : transitions){
+			if(transition.model().isActive()){
+				result = IntervalOperations.intersectingInterval(transition.calculateDIntervalAlone(), result);
+			}
+		}
+		return result;
 	}
 
 	public String name() {

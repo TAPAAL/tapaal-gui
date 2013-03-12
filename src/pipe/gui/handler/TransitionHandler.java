@@ -11,6 +11,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.NetType;
+import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
@@ -114,6 +117,41 @@ public class TransitionHandler extends PlaceTransitionObjectHandler implements
 	public void mousePressed(MouseEvent e) {
 		if (CreateGui.getApp().isEditionAllowed()) {
 			super.mousePressed(e);
+		}
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+			if ((myObject instanceof TimedTransitionComponent) && !isDragging) {// &&
+				if (CreateGui.getView().isInAnimationMode()) {
+					((TimedTransitionComponent) myObject).showDInterval(true);
+				}
+			}
+		}
+
+		if (isDragging) {
+			((TimedTransitionComponent) myObject).showDInterval(false);
+		}
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		if ((myObject instanceof TimedTransitionComponent)) {// &&
+			if (CreateGui.getView().isInAnimationMode()) {
+				((TimedTransitionComponent) myObject).showDInterval(false);
+			}
+		}
+	}
+	
+	public void mouseEngfstered(MouseEvent e) {
+		if (!CreateGui.getModel().netType().equals(NetType.UNTIMED)) {
+			if ((myObject instanceof pipe.gui.graphicElements.tapn.TimedTransitionComponent) && !isDragging) {// &&
+				if (CreateGui.getView().isInAnimationMode()) {
+					((TimedTransitionComponent) myObject).updateToolTip(true);
+				} else {
+					((TimedTransitionComponent) myObject).updateToolTip(false);
+				}
+			}
 		}
 	}
 }

@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -61,6 +64,7 @@ import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -196,8 +200,8 @@ public class TapnLegacyXmlLoader {
 				templatePlaceNames.add(new Tuple<String, String>(tapn.name(), p.name()));
 			}
 		}
-		
-		for(TimedPlace p : network.sharedPlaces()) {
+		Collection<SharedPlace> sharedPlaces = network.sharedPlaces();
+		for(TimedPlace p : sharedPlaces) {
 			templatePlaceNames.add(new Tuple<String, String>("", p.name()));
 		}
 		return templatePlaceNames;

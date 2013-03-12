@@ -11,7 +11,7 @@ import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
 
-public class SharedPlace implements TimedPlace{
+public class SharedPlace extends TimedPlace{
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 	
 	private String name;

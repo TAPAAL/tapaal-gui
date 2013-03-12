@@ -31,6 +31,7 @@ import pipe.gui.widgets.RequestFocusListener;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
+import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
@@ -288,9 +289,10 @@ public class CreateGui {
 
 	}
 	
-	public static EnabledTransitionsList getFireabletransitionsList() {
+	
+	public static TransitionFireingComponent getTransitionFireingComponent() {
 		TabContent tab = (tabs.get(appTab.getSelectedIndex()));
-		return tab.getFireabletransitionsList();
+		return tab.getTransitionFireingComponent();
 
 	}	
 

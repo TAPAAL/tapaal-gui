@@ -36,6 +36,7 @@ import pipe.dataLayer.Template;
 import pipe.gui.AnimationController;
 import pipe.gui.AnimationHistoryComponent;
 import pipe.gui.Animator;
+import pipe.gui.BlueTransitionControl;
 import pipe.gui.CreateGui;
 import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.Zoomer;
@@ -44,6 +45,7 @@ import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
+import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -81,9 +83,9 @@ public class TabContent extends JSplitPane {
 	protected JScrollPane animationControllerScrollPane;
 	protected AnimationHistoryComponent abstractAnimationPane = null;
 	protected JPanel animationControlsPanel;
-	protected EnabledTransitionsList enabledTransitionsList;
+	protected TransitionFireingComponent transitionFireing;
 
-	private static final String enabledTransitionsName = "enabledTransitions";
+	private static final String transitionFireingName = "enabledTransitions";
 	private static final String animControlName = "animControl";
 
 	protected JSplitPane animationHistorySplitter;
@@ -285,19 +287,21 @@ public class TabContent extends JSplitPane {
 		//Add 10 pixel to the minimumsize of the scrollpane
 		animationHistoryScrollPane.setMinimumSize(new Dimension(animationHistoryScrollPane.getMinimumSize().width, animationHistoryScrollPane.getMinimumSize().height + 20));
 	}
+	
+	private final static String blueTransitionControlName = "blueTransitionControl"; 
 
 	private void createAnimatorSplitPane(NetType netType) {
 		if (animBox == null)
 			createAnimationHistory();
 		if (animControlerBox == null)
 			createAnimationController(netType);
-		if (enabledTransitionsList == null)
-			createEnabledTransitionsList();
+		if (transitionFireing == null)
+			createTransitionFireing();
 		
 		boolean floatingDividers = false;
 		if(simulatorModelRoot == null){
 			Leaf templateExplorerLeaf = new Leaf(templateExplorerName);
-			Leaf enabledTransitionsListLeaf = new Leaf(enabledTransitionsName);
+			Leaf enabledTransitionsListLeaf = new Leaf(transitionFireingName);
 			Leaf animControlLeaf = new Leaf(animControlName);
 
 			templateExplorerLeaf.setWeight(0.25);
@@ -336,12 +340,11 @@ public class TabContent extends JSplitPane {
 		animationControlsPanel.setPreferredSize(new Dimension(
 				animationControlsPanel.getPreferredSize().width,
 				animationControlsPanel.getMinimumSize().height));
-		enabledTransitionsList.setPreferredSize(new Dimension(
-				enabledTransitionsList.getPreferredSize().width,
-				enabledTransitionsList.getMinimumSize().height));
+		transitionFireing.setPreferredSize(new Dimension(
+				transitionFireing.getPreferredSize().width,
+				transitionFireing.getMinimumSize().height));
 		animatorSplitPane.add(animationControlsPanel, animControlName);
-		animatorSplitPane.add(enabledTransitionsList, enabledTransitionsName);
-
+		animatorSplitPane.add(transitionFireing, transitionFireingName);
 	}
 
 	public void switchToAnimationComponents(boolean showEnabledTransitions) {
@@ -405,6 +408,10 @@ public class TabContent extends JSplitPane {
 	public AnimationController getAnimationController() {
 		return animControlerBox;
 	}
+	
+	public BlueTransitionControl getBlueTransitionControl(){
+		return transitionFireing.getBlueTransitionControl();
+	}
 
 	public void addAbstractAnimationPane() {
 		animationControlsPanel.remove(animationHistoryScrollPane);
@@ -462,18 +469,12 @@ public class TabContent extends JSplitPane {
 		return animBox;
 	}
 
-	private void createEnabledTransitionsList() {
-		enabledTransitionsList = new EnabledTransitionsList();
-
-		enabledTransitionsList.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Enabled Transitions"),
-				BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-		enabledTransitionsList
-		.setToolTipText("List of currently enabled transitions (double click a transition to fire it)");
+	private void createTransitionFireing() {
+		transitionFireing = new TransitionFireingComponent(CreateGui.getApp().isShowingBlueTransitions());
 	}
 
-	public EnabledTransitionsList getFireabletransitionsList() {
-		return enabledTransitionsList;
+	public TransitionFireingComponent getTransitionFireingComponent() {
+		return transitionFireing;
 	}
 
 	public JScrollPane drawingSurfaceScrollPane() {
@@ -639,10 +640,17 @@ public class TabContent extends JSplitPane {
 	}
 
 	public void showEnabledTransitionsList(boolean enable) {
-		if (enabledTransitionsList != null && !(enable && enabledTransitionsList.isVisible())) {
+		if (transitionFireing != null && !(enable && transitionFireing.isVisible())) {
 			animatorSplitPane.getMultiSplitLayout().displayNode(
-					enabledTransitionsName, enable);
+					transitionFireingName, enable);
 		}
+	}
+	
+	public void showBlueTransitions(boolean enable){
+		transitionFireing.showBlueTransitions(enable);
+		drawingSurface.repaint();
+		
+		CreateGui.getAnimator().updateFireableTransitions();
 	}
 	
 	public void selectFirstElements() {

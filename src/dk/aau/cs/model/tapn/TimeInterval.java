@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
 public class TimeInterval {
@@ -24,6 +25,7 @@ public class TimeInterval {
 		this.lower = lower;
 		this.upper = upper;
 		this.isUpperIncluded = isUpperIncluded;
+		
 		Require.that(isValidInterval(), "The constructed interval "
 				+ toString() + " is empty.");
 	}
@@ -39,11 +41,11 @@ public class TimeInterval {
 
 	private boolean isValidInterval() {
 		boolean canBoundsBeEqual = isLowerIncluded && isUpperIncluded;
-		boolean upperIsInfinity = upper == Bound.Infinity;
+		boolean upperIsInfinity = (upper instanceof InfBound);
 		boolean equalBounds = !upperIsInfinity
-				&& lower.value() == upper.value();
+				&& IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) == 0;
 		boolean lowerIsNotInfinity = lower != Bound.Infinity;
-		boolean lowerSmallerThanUpper = lower.value() < upper.value();
+		boolean lowerSmallerThanUpper = IntervalOperations.getRatBound(lower).getBound().compareTo(IntervalOperations.getRatBound(upper).getBound()) < 0;;
 
 		return lowerIsNotInfinity
 				&& ((upperIsInfinity && !isUpperIncluded)
@@ -76,15 +78,17 @@ public class TimeInterval {
 	}
 
 	private boolean satisfiesLowerBound(BigDecimal value) {
-		int compare = value.compareTo(new BigDecimal(lower.value()));
+		BigDecimal lowerAsBigDec = IntervalOperations.getRatBound(lower).getBound();
+		int compare = value.compareTo(lowerAsBigDec);
 		return isLowerIncluded ? (compare >= 0) : (compare > 0);
 	}
 
 	private boolean satisfiesUpperBound(BigDecimal value) {
 		if (upper instanceof InfBound)
 			return true;
-
-		int compare = value.compareTo(new BigDecimal(upper.value()));
+		
+		BigDecimal upperAsBigDec = IntervalOperations.getRatBound(upper).getBound();
+		int compare = value.compareTo(upperAsBigDec);
 		return isUpperIncluded ? (compare <= 0) : (compare < 0);
 	}
 

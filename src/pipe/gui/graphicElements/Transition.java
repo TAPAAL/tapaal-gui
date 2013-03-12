@@ -14,10 +14,12 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import pipe.gui.CreateGui;
+import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
 import pipe.gui.Zoomer;
 import pipe.gui.undo.TransitionRotationEdit;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.model.tapn.TimeInterval;
 
 /**
  * Petri-Net Transition Class for Drawing Transitions
@@ -38,6 +40,7 @@ public class Transition extends PlaceTransitionObject {
 	
 	// Animation Suff
 	protected boolean enabled = false;
+	public boolean blueTransition = false;
 	public boolean highlighted = false;
 
 	private static final double rootThreeOverTwo = 0.5 * Math.sqrt(3);
@@ -96,6 +99,8 @@ public class Transition extends PlaceTransitionObject {
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
+		} else if (blueTransition && CreateGui.getApp().isShowingBlueTransitions()) {
+			g2.setPaint(Pipe.BLUE_TRANSITION_COLOR);
 		} else if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);
 		} else {
@@ -163,6 +168,29 @@ public class Transition extends PlaceTransitionObject {
 		return enabled;
 	}
 
+	public boolean isBlueTransition(boolean animationStatus){
+		if(animationStatus){
+			blueTransition = isBlueTransition();
+			return blueTransition;
+		}
+		return false;
+	}
+	
+	//Dummy is overridden
+	public boolean isBlueTransition(){
+		return blueTransition;
+	}
+	
+	//Dummy is overridden
+	public TimeInterval getDInterval(){
+		return null;
+	}
+	
+	/* Called at the end of animation to reset Transitions to false */
+	public void setBlueTransitionFalse(){
+		blueTransition = false;
+	}
+	
 	/**
 	 * Sets whether Transition is enabled
 	 * 
