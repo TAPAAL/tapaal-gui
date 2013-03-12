@@ -11,11 +11,14 @@ import dk.aau.cs.verification.batchProcessing.BatchProcessingVerificationResult;
 public class BatchProcessingResultsExporter {
 	private static final String name_verifyTAPN = "A: TAPAAL Engine";
 	private static final String name_verifyTAPN_discreteInclusion = "B: TAPAAL Engine w. Discrete Inclusion";
-	private static final String name_verifyTAPNDiscreteVerification = "C: TAPAAL Engine - Discrete Verification";
-	private static final String name_STANDARD = "D: UPPAAL: Standard Reduction";
-	private static final String name_OPTIMIZEDSTANDARD = "E: UPPAAL: Optimised Standard Reduction";
-	private static final String name_BROADCAST = "F: UPPAAL: Broadcast Reduction";
-	private static final String name_BROADCASTDEG2 = "G: UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "C: TAPAAL Engine - Discrete Verification, Time darts and PTrie";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "D: TAPAAL Engine - Discrete Verification, Time darts";
+	private static final String name_verifyTAPNDiscreteVerificationPTrie = "E: TAPAAL Engine - Discrete Verification, PTries";
+	private static final String name_verifyTAPNDiscreteVerificationNone = "F: TAPAAL Engine - Discrete Verification, No optimizations";
+	private static final String name_STANDARD = "G: UPPAAL: Standard Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "H: UPPAAL: Optimised Standard Reduction";
+	private static final String name_BROADCAST = "I: UPPAAL: Broadcast Reduction";
+	private static final String name_BROADCASTDEG2 = "J: UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -102,7 +105,15 @@ public class BatchProcessingResultsExporter {
 			}else
 				return name_verifyTAPN;
 		}else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification){
-			return name_verifyTAPNDiscreteVerification;
+			if(query.useTimeDarts() && query.usePTrie()){
+				return name_verifyTAPNDiscreteVerificationTimeDartPTrie;
+			} else if(query.useTimeDarts()){
+				return name_verifyTAPNDiscreteVerificationTimeDart;
+			} else if(query.usePTrie()){
+				return name_verifyTAPNDiscreteVerificationPTrie;
+			} else {
+				return name_verifyTAPNDiscreteVerificationNone;
+			}
 		}
 			return name_BROADCAST;
 	}

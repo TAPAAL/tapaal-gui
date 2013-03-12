@@ -18,6 +18,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 
 /**
  * Implementes af class for handling integrated Uppaal Verification
@@ -126,7 +127,12 @@ public class Verifier {
 
 		int bound = query.getCapacity();
 		
-		VerifyTAPNOptions verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
+		VerifyTAPNOptions verifytapnOptions;
+		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
+		} else {
+			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
+		}
 
 		if (inputQuery == null) {
 			return;

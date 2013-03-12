@@ -88,7 +88,10 @@ public class BatchProcessingDialog extends JDialog {
 
 	private static final String name_verifyTAPN = "TAPAAL Engine (verifytapn)";
 	private static final String name_verifyTAPNDiscreteInclusion = "TAPAAL Engine w. Discrete Inclusion";
-	private static final String name_verifyTAPNDiscreteVerification = "TAPAAL Engine - Discrete Verification";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrie = "TAPAAL Engine - Discrete Verification, Time darts and PTrie";
+	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Engine - Discrete Verification, Time darts";
+	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Engine - Discrete Verification, PTries";
+	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Engine - Discrete Verification, No optimizations";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -97,14 +100,22 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
 			+ name_verifyTAPNDiscreteInclusion;
-	private static final String name_verifyTAPNDiscreteVerificationWithLegend = "C: "
-			+ name_verifyTAPNDiscreteVerification;
-	private static final String name_STANDARDWithLegend = "D: " + name_STANDARD;
-	private static final String name_OPTIMIZEDSTANDARDWithLegend = "E: "
+	
+	private static final String name_verifyTAPNDiscreteVerificationTimeDartPTrieWithLegend  = "C: " 
+			+ name_verifyTAPNDiscreteVerificationTimeDartPTrie;
+	private static final String name_verifyTAPNDiscreteVerificationTimeDartWithLegend  = "D: "
+			+ name_verifyTAPNDiscreteVerificationTimeDart;
+	private static final String name_verifyTAPNDiscreteVerificationPTrieWithLegend  = "E: "
+			+ name_verifyTAPNDiscreteVerificationPTrie;
+	private static final String name_verifyTAPNDiscreteVerificationNoneWithLegend  = "F: "
+			+ name_verifyTAPNDiscreteVerificationNone;
+
+	private static final String name_STANDARDWithLegend = "G: " + name_STANDARD;
+	private static final String name_OPTIMIZEDSTANDARDWithLegend = "H: "
 			+ name_OPTIMIZEDSTANDARD;
-	private static final String name_BROADCASTWithLegend = "F: "
+	private static final String name_BROADCASTWithLegend = "I: "
 			+ name_BROADCAST;
-	private static final String name_BROADCASTDEG2WithLegend = "G: "
+	private static final String name_BROADCASTDEG2WithLegend = "J: "
 			+ name_BROADCASTDEG2;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
@@ -623,7 +634,8 @@ public class BatchProcessingDialog extends JDialog {
 		return new BatchProcessingVerificationOptions(getQueryPropertyOption(),
 				keepQueryCapacity.isSelected(), getNumberOfExtraTokens(),
 				getSearchOption(), getSymmetryOption(), reductionOption,
-				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.getChoosenOptions());
+				reductionOptionChooser.isDiscreteInclusion(), reductionOptionChooser.useTimeDartsPTrie(), reductionOptionChooser.useTimeDarts(), 
+				reductionOptionChooser.usePTrie(), reductionOptionChooser.getChoosenOptions());
 	}
 
 	private int getNumberOfExtraTokens() {
@@ -1317,6 +1329,16 @@ public class BatchProcessingDialog extends JDialog {
 						s.append("Discrete Inclusion Places:\n");
 						s.append(generateListOfInclusionPlaces(query));
 					}
+				} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification) {
+					if(query.useTimeDarts() && query.usePTrie()){
+						s.append(name_verifyTAPNDiscreteVerificationTimeDartPTrie);
+					} else if(query.useTimeDarts()){
+						s.append(name_verifyTAPNDiscreteVerificationTimeDart);
+					} else if(query.usePTrie()){
+						s.append(name_verifyTAPNDiscreteVerificationPTrie);
+					} else {
+						s.append(name_verifyTAPNDiscreteVerificationNone);
+					}
 				} else {
 					s.append(name_BROADCAST);
 				}
@@ -1386,6 +1408,18 @@ public class BatchProcessingDialog extends JDialog {
 			return reductionOptionDialog.isDiscreteInclusion();
 		}
 		
+		public boolean useTimeDartsPTrie(){
+			return reductionOptionDialog.useTimeDartsPTrie();
+		}
+		
+		public boolean useTimeDarts(){
+			return reductionOptionDialog.useTimeDarts();
+		}
+		
+		public boolean usePTrie(){
+			return reductionOptionDialog.usePTrie();
+		}
+		
 		public void setEnabled(boolean enabled) {
 			super.setEnabled(enabled);
 			for(Component c : getComponents()){
@@ -1404,11 +1438,14 @@ public class BatchProcessingDialog extends JDialog {
 		private JRadioButton override;
 		private JCheckBox verifyTAPN;
 		private JCheckBox verifyTAPNDiscreteInclusion;
+		private JCheckBox verifyTAPNDiscreteVerificationTimeDartPTrie;
+		private JCheckBox verifyTAPNDiscreteVerificationTimeDart;
+		private JCheckBox verifyTAPNDiscreteVerificationPTrie;
+		private JCheckBox verifyTAPNDiscreteVerificationNone;
 		private JCheckBox STANDARD;
 		private JCheckBox OPTIMIZEDSTANDARD;
 		private JCheckBox BROADCAST;
 		private JCheckBox BROADCASTDEG2;
-		private JCheckBox verifyTAPNDiscreteVerification;
 		
 		JButton selectAll;
 		JButton deselectAll;
@@ -1423,7 +1460,7 @@ public class BatchProcessingDialog extends JDialog {
 			
 			initComponents();
 		}
-		
+
 		private void initComponents(){
 			content = new JPanel(new GridBagLayout());
 			
@@ -1488,6 +1525,18 @@ public class BatchProcessingDialog extends JDialog {
 			//verifyTAPNDiscreteInclusion.setMnemonic('B');
 			verifyTAPNDiscreteInclusion.setEnabled(false);
 			
+			verifyTAPNDiscreteVerificationTimeDartPTrie = new JCheckBox(name_verifyTAPNDiscreteVerificationTimeDartPTrieWithLegend);
+			verifyTAPNDiscreteVerificationTimeDartPTrie.setEnabled(false);
+			
+			verifyTAPNDiscreteVerificationTimeDart = new JCheckBox(name_verifyTAPNDiscreteVerificationTimeDartWithLegend);
+			verifyTAPNDiscreteVerificationTimeDart.setEnabled(false);
+			
+			verifyTAPNDiscreteVerificationPTrie = new JCheckBox(name_verifyTAPNDiscreteVerificationPTrieWithLegend);
+			verifyTAPNDiscreteVerificationPTrie.setEnabled(false);
+			
+			verifyTAPNDiscreteVerificationNone = new JCheckBox(name_verifyTAPNDiscreteVerificationNoneWithLegend);
+			verifyTAPNDiscreteVerificationNone.setEnabled(false);
+			
 			STANDARD = new JCheckBox(name_STANDARDWithLegend);
 			//STANDARD.setMnemonic('C');
 			STANDARD.setEnabled(false);
@@ -1503,9 +1552,6 @@ public class BatchProcessingDialog extends JDialog {
 			BROADCASTDEG2 = new JCheckBox(name_BROADCASTDEG2WithLegend);
 			//BROADCASTDEG2.setMnemonic('F');
 			BROADCASTDEG2.setEnabled(false);
-			
-			verifyTAPNDiscreteVerification = new JCheckBox(name_verifyTAPNDiscreteVerificationWithLegend);
-			verifyTAPNDiscreteVerification.setEnabled(false);
 			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = 0;
@@ -1526,32 +1572,53 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.gridy = 2;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(verifyTAPNDiscreteVerification, gbc);
+			rightPanel.add(verifyTAPNDiscreteVerificationTimeDartPTrie, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 3;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(STANDARD, gbc);
+			rightPanel.add(verifyTAPNDiscreteVerificationTimeDart, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			rightPanel.add(verifyTAPNDiscreteVerificationPTrie, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 5;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCAST, gbc);
+			rightPanel.add(verifyTAPNDiscreteVerificationNone, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 6;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(STANDARD, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 7;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 8;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(BROADCAST, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 9;
 			gbc.insets = new Insets(0, 5, 5	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(BROADCASTDEG2, gbc);
@@ -1600,29 +1667,26 @@ public class BatchProcessingDialog extends JDialog {
 		}
 
 		private void toggle(){
-			if(dontOverride.isSelected()){
-				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_DONT_OVERRIDE);
-				verifyTAPN.setEnabled(false);
-				verifyTAPNDiscreteInclusion.setEnabled(false);
-				STANDARD.setEnabled(false);
-				OPTIMIZEDSTANDARD.setEnabled(false);
-				BROADCAST.setEnabled(false);
-				BROADCASTDEG2.setEnabled(false);
-				verifyTAPNDiscreteVerification.setEnabled(false);
-				selectAll.setEnabled(false);
-				deselectAll.setEnabled(false);
-			} else {
+			boolean override = !dontOverride.isSelected();  
+			
+			if(override){
 				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_USERDEF);
-				verifyTAPN.setEnabled(true);
-				verifyTAPNDiscreteInclusion.setEnabled(true);
-				STANDARD.setEnabled(true);
-				OPTIMIZEDSTANDARD.setEnabled(true);
-				BROADCAST.setEnabled(true);
-				BROADCASTDEG2.setEnabled(true);
-				verifyTAPNDiscreteVerification.setEnabled(true);
-				selectAll.setEnabled(true);
-				deselectAll.setEnabled(true);
+			} else {
+				reductionOptionChooser.chooseReductionOptions.setText(ReductionOptionChooser.STATUS_TEXT_DONT_OVERRIDE);
 			}
+			
+			verifyTAPN.setEnabled(override);
+			verifyTAPNDiscreteInclusion.setEnabled(override);
+			STANDARD.setEnabled(override);
+			OPTIMIZEDSTANDARD.setEnabled(override);
+			BROADCAST.setEnabled(override);
+			BROADCASTDEG2.setEnabled(override);
+			verifyTAPNDiscreteVerificationTimeDartPTrie.setEnabled(override);
+			verifyTAPNDiscreteVerificationTimeDart.setEnabled(override);
+			verifyTAPNDiscreteVerificationPTrie.setEnabled(override);
+			verifyTAPNDiscreteVerificationNone.setEnabled(override);
+			selectAll.setEnabled(override);
+			deselectAll.setEnabled(override);
 		}
 		
 		private void setAll(boolean selected){
@@ -1632,7 +1696,10 @@ public class BatchProcessingDialog extends JDialog {
 			OPTIMIZEDSTANDARD.setSelected(selected);
 			BROADCAST.setSelected(selected);
 			BROADCASTDEG2.setSelected(selected);
-			verifyTAPNDiscreteVerification.setSelected(selected);
+			verifyTAPNDiscreteVerificationTimeDartPTrie.setSelected(selected);
+			verifyTAPNDiscreteVerificationTimeDart.setSelected(selected);
+			verifyTAPNDiscreteVerificationPTrie.setSelected(selected);
+			verifyTAPNDiscreteVerificationNone.setSelected(selected);
 		}
 		
 		public List<ReductionOption> getChoosenOptions(){
@@ -1640,7 +1707,7 @@ public class BatchProcessingDialog extends JDialog {
 			if(verifyTAPN.isSelected()){
 				result.add(ReductionOption.VerifyTAPN);
 			}
-			if(verifyTAPNDiscreteVerification.isSelected()){
+			if(verifyTAPNDiscreteVerificationNone.isSelected()){
 				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
 			}
 			if(STANDARD.isSelected()){
@@ -1656,6 +1723,18 @@ public class BatchProcessingDialog extends JDialog {
 				result.add(ReductionOption.DEGREE2BROADCAST);
 			}
 			return result;
+		}
+		
+		public boolean useTimeDartsPTrie() {
+			return verifyTAPNDiscreteVerificationTimeDartPTrie.isSelected();
+		}
+		
+		public boolean useTimeDarts(){
+			return verifyTAPNDiscreteVerificationTimeDart.isSelected();
+		}
+		
+		public boolean usePTrie(){
+			return verifyTAPNDiscreteVerificationPTrie.isSelected();
 		}
 		
 		public boolean isOverwriten(){

@@ -12,6 +12,7 @@ import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
@@ -49,7 +50,7 @@ public class KBoundAnalyzer {
 		if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true);
+			return new VerifyDTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true, true);
 		}
 		return null;
 	}

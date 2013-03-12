@@ -3,6 +3,7 @@ package dk.aau.cs.gui.components;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.Query;
 import javax.swing.table.AbstractTableModel;
 
 import dk.aau.cs.translations.ReductionOption;
@@ -67,15 +68,23 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 			else
 				return "B";
 		} else if(reduction == ReductionOption.VerifyTAPNdiscreteVerification)
-			return "C"; 
+			if(result.query().useTimeDarts() && result.query().usePTrie()){
+				return "C";
+			} else if(result.query().useTimeDarts()){
+				return "D";
+			} else if(result.query().usePTrie()){
+				return "E";
+			} else {
+				return "F";
+			}
 		else if(reduction == ReductionOption.STANDARD)
-			return "D";
-		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
-			return "E";
-		else if(reduction == ReductionOption.BROADCAST)
-			return "F";
-		else if(reduction == ReductionOption.DEGREE2BROADCAST)
 			return "G";
+		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
+			return "H";
+		else if(reduction == ReductionOption.BROADCAST)
+			return "I";
+		else if(reduction == ReductionOption.DEGREE2BROADCAST)
+			return "J";
 		else
 			return "";
 	}

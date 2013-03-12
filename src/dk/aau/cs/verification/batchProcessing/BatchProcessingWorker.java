@@ -42,6 +42,7 @@ import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
@@ -137,10 +138,43 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			processQuery(file, composedModel, query);
 		}
 		
+		//Make the PTrie/timedarts availible 
+		//TODO This shold be made simpler in the engine refacter process
+		query = query.copy();
+		query.setDiscreteInclusion(false);
+		query.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
+		if(batchProcessingVerificationOptions.useTimeDartPTrie()){
+			query = query.copy();
+			query.setUseTimeDarts(true);
+			query.setUsePTrie(true);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.useTimeDart()){
+			query = query.copy();
+			query.setUseTimeDarts(true);
+			query.setUsePTrie(false);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.usePTrie()){
+			query = query.copy();
+			query.setUseTimeDarts(false);
+			query.setUsePTrie(true);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPNdiscreteVerification)){
+			query = query.copy();
+			query.setUseTimeDarts(false);
+			query.setUsePTrie(false);
+			processQuery(file, composedModel, query);
+		}
+		
 		query = query.copy();
 		query.setDiscreteInclusion(false);
 		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(r == ReductionOption.VerifyTAPN) { continue; }
+			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification) { continue; }
 			if(exiting()) return;
 			query = query.copy();
 			query.setReductionOption(r);
@@ -169,7 +203,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry,  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
+			//TODO: Make sure this is updated such that timedart/ptrie is correct!
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, false,  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
@@ -279,8 +314,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
-		if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
+		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
+		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
 	}

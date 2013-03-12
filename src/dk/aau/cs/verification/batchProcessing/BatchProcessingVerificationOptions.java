@@ -24,8 +24,12 @@ public class BatchProcessingVerificationOptions {
 	private boolean keepQueryCapacity;
 	private int capacity;
 	private boolean discreteInclusion = false; // only for VerifyTAPN
+	private boolean useTimeDartPTrie = false;
+	private boolean useTimeDart = false;
+	private boolean usePTrie = false;
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion, List<ReductionOption> reductionOptions) {
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion,
+			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie, List<ReductionOption> reductionOptions) {
 		Require.that(!(reductionOptions == null && reductionOption == ReductionOption.BatchProcessingUserDefinedReductions), "ReductionOption was given as userdefined but a list of reductionoptions was not given");
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
@@ -34,18 +38,15 @@ public class BatchProcessingVerificationOptions {
 		this.keepQueryCapacity = keepQueryCapacity;
 		this.capacity = capacity;
 		this.discreteInclusion = discreteInclusion;
+		this.useTimeDartPTrie = useTimeDartPTrie;
+		this.useTimeDart = useTimeDart;
+		this.usePTrie = usePTrie;
 		this.reductionOptions = reductionOptions;
 	}
 	
-	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion) {
-		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, reductionOption, discreteInclusion, null); 
-		this.searchOption = searchOption;
-		this.reductionOption = reductionOption;
-		this.queryPropertyOption = queryPropertyOption;
-		this.symmetryOption = symmetryOption;
-		this.keepQueryCapacity = keepQueryCapacity;
-		this.capacity = capacity;
-		this.discreteInclusion = discreteInclusion;
+	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion,
+			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie) {
+		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, reductionOption, discreteInclusion, useTimeDartPTrie, useTimeDart, usePTrie, null); 
 	}
 	
 	public boolean isReductionOptionUserdefined(){
@@ -63,6 +64,18 @@ public class BatchProcessingVerificationOptions {
 	
 	public boolean discreteInclusion() {
 		return discreteInclusion;
+	}
+	
+	public boolean useTimeDartPTrie(){
+		return useTimeDartPTrie;
+	}
+	
+	public boolean useTimeDart(){
+		return useTimeDart;
+	}
+	
+	public boolean usePTrie(){
+		return usePTrie;
 	}
 	
 	public QueryPropertyOption queryPropertyOption() {
