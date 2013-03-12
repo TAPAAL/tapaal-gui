@@ -99,10 +99,10 @@ public class EngineDialogPanel {
 		try {
 			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "");
 			if(file != null){
-				if(true){//file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
+				if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
 				}else{
-					messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
+					messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
 				}
 			}
 		} catch (Exception e) {
