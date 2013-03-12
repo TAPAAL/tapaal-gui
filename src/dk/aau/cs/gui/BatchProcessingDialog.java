@@ -766,7 +766,9 @@ public class BatchProcessingDialog extends JDialog {
 		Comparator<Object> comparator = new StringComparator();
 		
 		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
-		sorter.setComparator(0, comparator);
+		for(int i = 0; i < table.getColumnCount(); i++){
+			sorter.setComparator(i, comparator);
+		}
 		table.setRowSorter(sorter);
 
 		JScrollPane scrollPane = new JScrollPane(table);
