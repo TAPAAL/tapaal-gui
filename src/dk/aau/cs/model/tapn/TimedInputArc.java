@@ -4,11 +4,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import com.sun.tools.example.debug.expr.Token;
 
 import pipe.gui.Pipe;
 
