@@ -222,8 +222,23 @@ public class BatchProcessingDialog extends JDialog {
 			}
 		}
 	});
+	
+	static BatchProcessingDialog batchProcessingDialog;
+	
+	public static void showBatchProcessingDialog(){
+		if(batchProcessingDialog == null){
+			batchProcessingDialog = new BatchProcessingDialog(CreateGui.getApp(), "Batch Processing", true);
+			batchProcessingDialog.pack();
+			batchProcessingDialog.setPreferredSize(batchProcessingDialog.getSize());
+			//Set the minimum size to 150 less than the preferred, to be consistent with the minimum size of the result panel
+			batchProcessingDialog.setMinimumSize(new Dimension(batchProcessingDialog.getWidth(), batchProcessingDialog.getHeight()-150));
+			batchProcessingDialog.setLocationRelativeTo(null);
+			batchProcessingDialog.setResizable(true);
+		}
+		batchProcessingDialog.setVisible(true);
+	}
 
-	public BatchProcessingDialog(Frame frame, String title, boolean modal) {
+	private BatchProcessingDialog(Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
 		
 		addWindowListener(new WindowAdapter() {
