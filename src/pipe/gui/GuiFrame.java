@@ -72,7 +72,9 @@ import org.jdesktop.swingx.MultiSplitLayout;
 import net.tapaal.Preferences;
 import org.jdesktop.swingx.MultiSplitLayout;
 
-import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+import com.sun.jna.Platform;
+
+
 
 import net.tapaal.TAPAAL;
 
@@ -188,8 +190,12 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public boolean isMac(){
-		return System.getProperty("mrj.version") != null;
+		return Platform.isMac();
 	}
+	
+	public int getJRE(){
+		return Character.getNumericValue(System.getProperty("java.version").charAt(2));
+	}	
 
 	public GuiFrame(String title) {
 		// HAK-arrange for frameTitle to be initialized and the default file
@@ -2481,6 +2487,10 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void incrementNameCounter() {
 		newNameCounter++;
+	}
+	
+	public String getCurrentTabName(){
+		return appTab.getTitleAt(appTab.getSelectedIndex());
 	}
 
 	public boolean isShowingBlueTransitions() {

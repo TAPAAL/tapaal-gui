@@ -2261,8 +2261,6 @@ public class QueryDialog extends JPanel {
 								JOptionPane.showMessageDialog(CreateGui.getApp(), s.toString());
 							}
 						}
-					} else {
-						JOptionPane.showMessageDialog(CreateGui.getApp(), reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? NO_VERIFYTAPN_XML_FILE_SAVED : NO_UPPAAL_XML_FILE_SAVED);
 					}
 				}
 			});
