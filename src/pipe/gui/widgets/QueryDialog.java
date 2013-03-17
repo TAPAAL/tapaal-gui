@@ -82,6 +82,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLDeadLockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
@@ -175,6 +176,7 @@ public class QueryDialog extends JPanel {
 	private CustomJSpinner placeMarking;
 	private JButton truePredicateButton;
 	private JButton falsePredicateButton;
+	private JButton deadLockPredicateButton;
 
 	// Uppaal options panel (search + trace options)
 	// search options panel
@@ -262,6 +264,7 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_ADDPREDICATEBUTTON = "Add the predicate specified above to the query.";
 	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add the value true to the query.";
 	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add the value false to the query.";
+	private static final String TOOL_TIP_DEADLOCKPREDICATEBUTTON = "Add the deadlock predicate to the query.";
 
 	//Tool tips for editing panel
 	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query.";
@@ -746,6 +749,7 @@ public class QueryDialog extends JPanel {
 		addPredicateButton.setEnabled(false);
 		truePredicateButton.setEnabled(false);
 		falsePredicateButton.setEnabled(false);
+		deadLockPredicateButton.setEnabled(false);
 	}
 
 	private void enableOnlyPathButtons() {
@@ -763,6 +767,7 @@ public class QueryDialog extends JPanel {
 		addPredicateButton.setEnabled(false);
 		truePredicateButton.setEnabled(false);
 		falsePredicateButton.setEnabled(false);
+		deadLockPredicateButton.setEnabled(false);
 	}
 
 	private void enableOnlyStateButtons() {
@@ -779,6 +784,7 @@ public class QueryDialog extends JPanel {
 		placeMarking.setEnabled(true);
 		truePredicateButton.setEnabled(true);
 		falsePredicateButton.setEnabled(true);
+		deadLockPredicateButton.setEnabled(true);
 		setEnablednessOfAddPredicateButton();
 
 	}
@@ -1608,6 +1614,12 @@ public class QueryDialog extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 4;
 		predicatePanel.add(falsePredicateButton, gbc);
+		
+		deadLockPredicateButton = new JButton("DeadLock");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 4;
+		predicatePanel.add(deadLockPredicateButton, gbc);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -1623,6 +1635,7 @@ public class QueryDialog extends JPanel {
 		addPredicateButton.setToolTipText(TOOL_TIP_ADDPREDICATEBUTTON);
 		truePredicateButton.setToolTipText(TOOL_TIP_TRUEPREDICATEBUTTON);
 		falsePredicateButton.setToolTipText(TOOL_TIP_FALSEPREDICATEBUTTON);
+		deadLockPredicateButton.setToolTipText(TOOL_TIP_DEADLOCKPREDICATEBUTTON);
 
 		// Action listeners for predicate panel
 		addPredicateButton.addActionListener(new ActionListener() {
@@ -1662,6 +1675,17 @@ public class QueryDialog extends JPanel {
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), falseNode);
 				newProperty = newProperty.replace(currentSelection.getObject(), falseNode);
 				updateSelection(falseNode);
+				undoSupport.postEdit(edit);
+				//				queryChanged();
+			}
+		});
+		
+		deadLockPredicateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TCTLDeadLockNode deadLockNode = new TCTLDeadLockNode();
+				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), deadLockNode);
+				newProperty = newProperty.replace(currentSelection.getObject(), deadLockNode);
+				updateSelection(deadLockNode);
 				undoSupport.postEdit(edit);
 				//				queryChanged();
 			}

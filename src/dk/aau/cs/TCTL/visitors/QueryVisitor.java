@@ -5,6 +5,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLDeadLockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
@@ -117,6 +118,10 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 	
 	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
 		uppaalQuery.append(tctlFalseNode.toString());
+	}
+	
+	public void visit(TCTLDeadLockNode tctlDeadLockNode, Object context) {
+		uppaalQuery.append(tctlDeadLockNode.toString());
 	}
 
 	protected String operatorConversion(String op) {

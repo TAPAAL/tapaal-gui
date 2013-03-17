@@ -9,6 +9,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLDeadLockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
@@ -112,6 +113,9 @@ public class VerifyPlaceNamesVisitor implements ITCTLVisitor {
 	}
 
 	public void visit(TCTLFalseNode tctlFalseNode, Object context) {
+	}
+	
+	public void visit(TCTLDeadLockNode tctlDeadLockNode, Object context) {
 	}
 
 }
