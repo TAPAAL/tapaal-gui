@@ -68,7 +68,7 @@ public class Verifyta implements ModelChecker {
 					"Locate UPPAAL Verifyta");
 
 			try {
-				File file = fileFinder.ShowFileBrowserDialog("Verifyta", "");
+				File file = fileFinder.ShowFileBrowserDialog("Verifyta", "",System.getProperty("user.home"));
 				
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){

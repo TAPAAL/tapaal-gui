@@ -73,7 +73,7 @@ public class EngineDialogPanel {
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapnpath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "");
+			File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "", (new VerifyTAPN(new FileFinderImpl(), new MessengerImpl())).getPath());
 			if(file != null){
 				if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
@@ -97,7 +97,7 @@ public class EngineDialogPanel {
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapnpath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "");
+			File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "", (new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl())).getPath());
 			if(file != null){
 				if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
@@ -121,7 +121,7 @@ public class EngineDialogPanel {
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapath = null;
 		try {
-			File file = fileFinder.ShowFileBrowserDialog("Verifyta", "");
+			File file = fileFinder.ShowFileBrowserDialog("Verifyta", "",(new Verifyta()).getPath());
 			
 			if(file != null){
 				if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
