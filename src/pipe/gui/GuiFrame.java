@@ -2232,7 +2232,7 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("TAPAAL Discrete Engine:\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2013\n\n");
+                buffer.append("Aalborg University 2012-2013\n\n");
 		buffer.append("\n");
 
 
