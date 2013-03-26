@@ -6,8 +6,9 @@ import pipe.gui.widgets.FileBrowser;
 
 public class FileFinderImpl implements FileFinder {
 
-	public File ShowFileBrowserDialog(String description, String extension) {
-		FileBrowser fileBrowser = new FileBrowser(description, extension, null);
+	public File ShowFileBrowserDialog(String description, String extension, String path) {
+		if (path==null || path=="") { path= System.getProperty("user.home"); }
+		FileBrowser fileBrowser = new FileBrowser(description, extension, path);
 		return fileBrowser.openFile();
 	}
 
