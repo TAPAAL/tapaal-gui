@@ -1,16 +1,11 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.MenuBar;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,15 +28,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.concurrent.Delayed;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.prefs.BackingStoreException;
-
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -61,17 +52,14 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jdesktop.swingx.MultiSplitLayout;
-
 import net.tapaal.Preferences;
-import org.jdesktop.swingx.MultiSplitLayout;
-
 import com.sun.jna.Platform;
 
 
@@ -93,12 +81,10 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
-import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
@@ -109,7 +95,6 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -217,7 +202,6 @@ public class GuiFrame extends JFrame implements Observer {
 				try {
 					//Load class to see if its there
 					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-
 					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
@@ -319,6 +303,15 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 			}
 		}
+		
+		// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
+		UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
+				{
+				  "SPACE", "pressed",
+				  "released SPACE", "released",
+				  "ENTER", "pressed",
+				  "released ENTER", "released"
+				}));
 	}
 
 	/**
