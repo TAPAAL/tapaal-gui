@@ -267,7 +267,8 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_ADDPREDICATEBUTTON = "Add the predicate specified above to the query.";
 	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add the value true to the query.";
 	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add the value false to the query.";
-	private static final String TOOL_TIP_DEADLOCKPREDICATEBUTTON = "Add the deadlock predicate to the query.";
+	private static final String TOOL_TIP_DEADLOCKPREDICATEBUTTON = "<html>Add the deadlock predicate to the query.<br />" +
+               "<br />A marking is a deadlock if there is no delay<br /> after which at least one transition gets enabled.</html>";
 
 	//Tool tips for editing panel
 	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query.";
