@@ -131,7 +131,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
-	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
+	selectAction, deleteTokenAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showBlueTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
@@ -166,7 +166,6 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
 	private boolean showBlueTransitions = true;
-	private boolean commandOrControlWasPressed = false;
 	private boolean showToolTips = true;
 
 
@@ -246,23 +245,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
-
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
-		
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
-					if (e.getID() == KeyEvent.KEY_PRESSED) {			
-						commandOrControlWasPressed = true;
-						e.consume();
-					}
-				}
-				if (e.getID() == KeyEvent.KEY_TYPED && commandOrControlWasPressed == true) {
-					commandOrControlWasPressed = false;
-					CreateGui.verifyQuery();					
-				}
-				return false;
-			}
-		});
 	}
 
 	private void loadPrefrences() {
@@ -674,8 +656,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl M"));
-		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('M', shortcutkey));
+		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query",KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)));
 		verification.setMnemonic('m');
 		verification.addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent arg0) {
@@ -683,9 +664,8 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(verification);	
-		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.","ctrl I"));				
-		netStatisticsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('I', shortcutkey));
-		statistics.setMnemonic('n');		
+		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.",KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)));				
+		statistics.setMnemonic('i');		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				StatisticsPanel.showStatisticsPanel();
@@ -695,9 +675,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
-		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries","ctrl B"));				
-		batchProcessingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('B', shortcutkey));
-
+		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries",KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)));				
 		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -712,10 +690,8 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.addSeparator();
 
 		//JMenuItem engineSelection = new JMenuItem("Verification engines");
-		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines","ctrl E"));				
-		engineSelectionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('E', shortcutkey));
-
-		engineSelection.setMnemonic('v');		
+		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));				
+		engineSelection.setMnemonic('e');		
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new EngineDialogPanel().showDialog();				
@@ -2076,8 +2052,8 @@ public class GuiFrame extends JFrame implements Observer {
 		 */
 		private static final long serialVersionUID = 8910743226610517225L;
 
-		ToolAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
+		ToolAction(String name, String tooltip, KeyStroke keyStroke) {
+			super(name, tooltip, keyStroke);
 		}
 
 
