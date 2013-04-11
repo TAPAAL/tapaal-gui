@@ -441,8 +441,14 @@ public class Degree2BroadcastTranslation implements
 				}
 				
 				for(TransportArc transArc : transition.getTransportArcsGoingThrough()) {
-					TimeInterval newGuard = transArc.interval().intersect(transArc.destination().invariant());
-					String guard = convertGuard(newGuard);
+					
+					String guard = "";
+					try {
+						TimeInterval newGuard = transArc.interval().intersect(transArc.destination().invariant());
+						guard = convertGuard(newGuard);
+					} catch(Exception e) {
+						guard = "false";
+					}
 					Edge e = new Edge(getLocationByName(transArc.source().name()),
 							getLocationByName(transArc.destination().name()),
 							guard, transition.name() + "?", "");

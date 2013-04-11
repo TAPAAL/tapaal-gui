@@ -503,6 +503,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	
 	private String createTransitionGuardWithLock(TransportArc transArc,	TimedPlace destination) {
 		String guard = "";
+		
 		try {
 			TimeInterval newInterval = transArc.interval().intersect(destination.invariant());
 			guard = convertGuard(newInterval);
@@ -556,9 +557,16 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 			String counter = String.format(COUNTER_NAME, i);
 			transportArcsToCounters.put(transArc, counter);
 
-			TimeInterval guard = transArc.interval().intersect(transArc.destination().invariant());
+			String guard = "";
+			
+			try {
+				TimeInterval newInterval = transArc.interval().intersect(transArc.destination().invariant());
+				guard = convertGuard(newInterval);
+			} catch(Exception e) {
+				guard = "false";
+			}
 			createTestFireStructure(ta, t, pairing, transArc.source(), 
-					convertGuard(guard), 
+					guard, 
 					transArc.destination(), 
 					intermediate, counter, true);
 
