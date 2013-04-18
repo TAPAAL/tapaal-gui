@@ -66,6 +66,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
+		urgentCheckBox = new JCheckBox("Urgent");
 		Vector<SharedTransition> sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
 		ArrayList<SharedTransition> usedTransitions = new ArrayList<SharedTransition>();
 		
@@ -131,7 +132,15 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				nameTextFieldFocusLost(evt);
 			}
 		});
-
+		
+		urgentCheckBox.setSelected(transition.isUrgent());
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
+	
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -282,6 +291,9 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		String newName = nameTextField.getText();
 			
 		context.undoManager().newEdit(); // new "transaction""
+		
+		transition.setUrgent(urgentCheckBox.isSelected());
+		
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
 			context.undoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
@@ -362,5 +374,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JPanel transitionEditorPanel;
 	private javax.swing.JCheckBox sharedCheckBox;
 	private javax.swing.JComboBox sharedTransitionsComboBox;
+	private javax.swing.JCheckBox urgentCheckBox;
 
 }

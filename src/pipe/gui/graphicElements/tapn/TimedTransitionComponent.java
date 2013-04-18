@@ -140,6 +140,14 @@ public class TimedTransitionComponent extends Transition {
 	public String getName() {
 		return transition != null ? transition.name() : "";
 	}
+	
+	public boolean isUrgent(){
+		return transition.isUrgent();
+	}
+	
+	public void setUrgent(boolean value){
+		transition.setUrgent(value);
+	}
 
 	@Override
 	public void update(boolean displayConstantNames) {

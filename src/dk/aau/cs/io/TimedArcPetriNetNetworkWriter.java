@@ -331,6 +331,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		transitionElement.setAttribute("infiniteServer", "false");
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
+		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
 
 		return transitionElement;
 	}

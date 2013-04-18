@@ -23,6 +23,7 @@ public class TimedTransition extends TAPNElement {
 	private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
 	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	private TimeInterval dInterval = null;
+	private boolean isUrgent = false;
 
 	private SharedTransition sharedTransition;
 
@@ -40,6 +41,14 @@ public class TimedTransition extends TAPNElement {
 	public void removeListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
 		listeners.remove(listener);
+	}
+	
+	public boolean isUrgent(){
+		return isUrgent;
+	}
+	
+	public void setUrgent(boolean value){
+		isUrgent = value;
 	}
 
 	public boolean isShared(){
