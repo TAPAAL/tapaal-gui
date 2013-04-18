@@ -212,8 +212,11 @@ public class TapnXmlLoader {
 
 	private SharedTransition parseSharedTransition(Element element) {
 		String name = element.getAttribute("name");
+		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
 		
-		return new SharedTransition(name);
+		SharedTransition st = new SharedTransition(name);
+		st.setUrgent(urgent);
+		return st;
 	}
 
 	private Collection<TAPNQuery> parseQueries(Document doc, TimedArcPetriNetNetwork network) {

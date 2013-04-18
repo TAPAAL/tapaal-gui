@@ -48,7 +48,14 @@ public class TimedTransition extends TAPNElement {
 	}
 	
 	public void setUrgent(boolean value){
+		setUrgent(value, true);
+	}
+	
+	public void setUrgent(boolean value, boolean cascade){
 		isUrgent = value;
+		if(isShared() && cascade){
+			sharedTransition.setUrgent(value);
+		}
 	}
 
 	public boolean isShared(){

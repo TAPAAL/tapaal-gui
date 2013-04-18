@@ -89,6 +89,12 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
+		sharedTransitionsComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+			}
+		});
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -258,6 +264,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);		
+		urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
@@ -291,8 +298,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		String newName = nameTextField.getText();
 			
 		context.undoManager().newEdit(); // new "transaction""
-		
-		transition.setUrgent(urgentCheckBox.isSelected());
 		
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
@@ -332,6 +337,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		}
+		
+		transition.setUrgent(urgentCheckBox.isSelected());
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
