@@ -6,10 +6,13 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
@@ -176,6 +179,11 @@ public class TimedTransitionComponent extends Transition {
 			graphics.draw(dashedOutline);
 
 			graphics.setStroke(oldStroke);
+		}
+		if(isUrgent()){
+			Rectangle boundingBox = g.getClipBounds();
+			g.setColor(Color.WHITE);
+			g.fillOval((int)(boundingBox.getCenterX()*0.75), (int)(boundingBox.getCenterY()*0.75), (int)(boundingBox.getWidth()*0.25), (int)(boundingBox.getHeight()*0.25));
 		}
 	}
 
