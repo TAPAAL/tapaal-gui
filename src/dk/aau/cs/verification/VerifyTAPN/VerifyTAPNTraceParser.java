@@ -14,8 +14,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -98,6 +100,23 @@ public class VerifyTAPNTraceParser {
 		try {
 			reader.readLine(); // first line is "Trace:", so ignore it
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			builder.setErrorHandler(new ErrorHandler() {
+				
+				@Override
+				public void warning(SAXParseException exception) throws SAXException {
+					throw exception;
+				}
+				
+				@Override
+				public void fatalError(SAXParseException exception) throws SAXException {
+					throw exception;
+				}
+				
+				@Override
+				public void error(SAXParseException exception) throws SAXException {
+					throw exception;
+				}
+			});
 			return builder.parse(new InputSource(reader));
 		} catch (ParserConfigurationException e) {
 			return null;
