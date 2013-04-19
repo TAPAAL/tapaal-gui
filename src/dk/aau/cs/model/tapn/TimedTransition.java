@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+
 import pipe.gui.CreateGui;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -51,11 +53,38 @@ public class TimedTransition extends TAPNElement {
 		setUrgent(value, true);
 	}
 	
-	public void setUrgent(boolean value, boolean cascade){
+	protected void setUrgent(boolean value, boolean cascade){
 		isUrgent = value;
 		if(isShared() && cascade){
 			sharedTransition.setUrgent(value);
 		}
+	}
+	
+	public boolean hasUntimedPreset(){
+		return hasUntimedPreset(true);
+	}
+	
+	private boolean hasUntimedPreset(boolean cascade){
+		for(TimedInputArc arc : preset){
+			if(!arc.interval().equals(arc.interval().ZERO_INF)){
+				return false;
+			}
+		}
+		for (TransportArc arc : transportArcsGoingThrough){
+			if(!arc.interval().equals(arc.interval().ZERO_INF)){
+				return false;
+			}
+		}
+		
+		if(cascade && isShared()){
+			for(TimedTransition trans : sharedTransition.transitions()){
+				if(!trans.hasUntimedPreset(false)){
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 
 	public boolean isShared(){

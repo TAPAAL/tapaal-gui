@@ -23,6 +23,8 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import com.sun.org.apache.bcel.internal.generic.ISUB;
+
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
@@ -38,6 +40,7 @@ import dk.aau.cs.util.RequireException;
 
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
+	private static final String untimed_preset_warning = "Transitions must have an untimed preset to be urgent. Please change the interval of all ingoing arcs to [0, inf).";
 	private TimedTransitionComponent transition;
 	private JRootPane rootPane;
 	private Context context;
@@ -146,6 +149,17 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
+		
+		urgentCheckBox.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!transition.hasUntimedPreset()){
+					JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
+					urgentCheckBox.setSelected(false);
+				}
+			}
+		});
 	
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -251,6 +265,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gbc.gridy = 1;
 		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
+		urgentCheckBox.setSelected(transition.isUrgent());
 		transitionEditorPanel.add(nameTextField, gbc);	
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -296,6 +311,12 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 
 	private void okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
+		
+		// Check urgent constrain
+		if(urgentCheckBox.isSelected() && !transition.hasUntimedPreset()){
+			JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 			
 		context.undoManager().newEdit(); // new "transaction""
 		

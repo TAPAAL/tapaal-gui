@@ -151,7 +151,11 @@ public class TimedTransitionComponent extends Transition {
 	public void setUrgent(boolean value){
 		transition.setUrgent(value);
 	}
-
+	
+	public boolean hasUntimedPreset(){
+		return transition.hasUntimedPreset();
+	}
+	
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(transition != null) {
