@@ -185,9 +185,8 @@ public class TimedTransitionComponent extends Transition {
 			graphics.setStroke(oldStroke);
 		}
 		if(isUrgent()){
-			Rectangle boundingBox = g.getClipBounds();
 			g.setColor(Color.WHITE);
-			g.fillOval((int)(boundingBox.getCenterX()*0.75), (int)(boundingBox.getCenterY()*0.75), (int)(boundingBox.getWidth()*0.25), (int)(boundingBox.getHeight()*0.25));
+			g.fillOval(11, 11, 8,8);
 		}
 	}
 
