@@ -1792,6 +1792,7 @@ public class GuiFrame extends JFrame implements Observer {
 							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
+					throw new RuntimeException(e);
 				}
 
 				stepforwardAction.setEnabled(false);
