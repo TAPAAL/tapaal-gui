@@ -139,7 +139,8 @@ public class GuardDialogue extends JPanel /*
 				
 				// Check if target transition is urgent
 				if(objectToBeEdited instanceof TimedInputArcComponent && !(objectToBeEdited instanceof TimedInhibitorArcComponent)
-						&& ((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().destination().isUrgent()){
+						&& ((objectToBeEdited instanceof TimedTransportArcComponent && ((TimedTransportArcComponent)objectToBeEdited).underlyingTransportArc().transition().isUrgent()) || 
+						(((TimedInputArcComponent)objectToBeEdited).underlyingTimedInputArc().destination().isUrgent()))){
 					if(!guard.equals(guard.ZERO_INF)){
 						JOptionPane.showMessageDialog(myRootPane, "This arc is in the preset of an urgent transition. Transitions must have an untimed preset to be urgent.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
