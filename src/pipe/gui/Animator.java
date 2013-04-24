@@ -367,12 +367,13 @@ public class Animator {
 			}
 		}
 
-		tab.network().setMarking(currentMarking());
+		tab.network().setMarking(next);
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
-
+		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		
 		reportBlockingPlaces();
 
 	}
@@ -385,8 +386,9 @@ public class Animator {
 
 		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
-			tab.network().setMarking(currentMarking());
-			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
+			NetworkMarking delayedMarking = currentMarking().delay(delay);
+			tab.network().setMarking(delayedMarking);
+			addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
 			result = true;
 		}
 
