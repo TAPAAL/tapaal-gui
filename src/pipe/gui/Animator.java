@@ -122,6 +122,14 @@ public class Animator {
 		return initialMarking;
 	}
 
+	public NetworkMarking getLastMarking(){
+		return markings.get(markings.size()-1);
+	}
+	
+	public NetworkMarking getCurrentMarking(){
+		return markings.get(currentMarkingIndex);
+	}
+	
 	/**
 	 * Highlights enabled transitions
 	 */
@@ -359,8 +367,8 @@ public class Animator {
 			}
 		}
 
-		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
 		tab.network().setMarking(currentMarking());
+		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
 
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
@@ -377,8 +385,8 @@ public class Animator {
 
 		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
-			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
+			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			result = true;
 		}
 

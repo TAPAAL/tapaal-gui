@@ -9,6 +9,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
+import pipe.dataLayer.Template;
+import pipe.gui.graphicElements.Transition;
+
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
@@ -41,8 +44,10 @@ public class AnimationHistoryComponent extends JList {
 			setSelectedIndex(getListModel().size() - 1);
 		} else {
 			getListModel().add(getListModel().size()-1, transitionName);
-			setSelectedIndex(getListModel().size() - 1);
+			setSelectedIndex(getListModel().size() - 2);
 		}
+		
+		updateAccordingToDeadlock();
 	}
 
 	public void addHistoryItemDontChange(String transitionName) {
@@ -51,6 +56,7 @@ public class AnimationHistoryComponent extends JList {
 		} else {
 			getListModel().add(getListModel().size()-1, transitionName);
 		}
+		updateAccordingToDeadlock();
 	}
 
 	public void clearStepsForward() {
@@ -60,7 +66,8 @@ public class AnimationHistoryComponent extends JList {
 		if (listModel.size() > 1 && getSelectedIndex() < lastIndex) {
 			listModel.removeRange(getSelectedIndex() + 1, lastIndex);
 		}
-		setLastShown(TraceType.NOT_EG);
+		lastShown = TraceType.NOT_EG;
+		updateAccordingToDeadlock();
 	}
 
 	public void stepForward() {
@@ -112,23 +119,45 @@ public class AnimationHistoryComponent extends JList {
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
 		setLastShown(TraceType.NOT_EG);
+		updateAccordingToDeadlock();
 	}
+	
+	static final private String deadlockString = "<html><i><font color=red>" + "Deadlock" + "</i></font></html>";
+	static final private String delayForeverString = "<html><i><font color=red>" + "Delay forever" + "</i></font></html>";
+	static final private String gotoString = "<html><i><font color=red>" + "Goto *" + "</i></font></html>";
 	
 	public void setLastShown(TraceType tracetype){
 		if(lastShown != TraceType.NOT_EG){
-			getListModel().remove(getListModel().size()-1);
+				getListModel().remove(getListModel().size()-1);
 		}
 		lastShown = tracetype;
 		
 		switch (tracetype) {
 		case EG_DEADLOCK:
-			getListModel().addElement("<html><i><font color=red>" + "Deadlock" + "</i></font></html>");
+			getListModel().addElement(deadlockString);
 			break;
 		case EG_DELAY_FOREVER:
-			getListModel().addElement("<html><i><font color=red>" + "Delay forever" + "</i></font></html>");
+			getListModel().addElement(delayForeverString);
 			break;
 		case EG_LOOP:
-			getListModel().addElement("<html><i><font color=red>" + "Goto *" + "</i></font></html>");
+			getListModel().addElement(gotoString);
+		case NOT_EG:
+			break;
 		}
+	}
+	
+	private void updateAccordingToDeadlock() {
+		if(CreateGui.getTab().getSelectedIndex() == -1){
+			return;
+		}
+		for (Template t : CreateGui.getCurrentTab().activeTemplates()){
+			for(Transition trans : t.guiModel().getTransitions()){
+				if(trans.isEnabled(true) || trans.isBlueTransition(true)){
+					return;
+				}
+			}
+		}
+		
+		setLastShown(TraceType.EG_DEADLOCK);
 	}
 }
