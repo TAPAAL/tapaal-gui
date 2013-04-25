@@ -3,6 +3,7 @@ package pipe.gui;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import pipe.gui.widgets.QueryPane;
@@ -117,8 +118,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	}
 
 	private void showErrorMessage(String errorMessage) {
-		messenger.displayErrorMessage("The engine choosen in the query cannot verify this model.\nPlease choose another engine.");
-		CreateGui.getCurrentTab().editSelectedQuery();
+		SwingUtilities.invokeLater(new Runnable() { //The invoke later will make sure all the verification is finished before showing the error
+			public void run() {
+				messenger.displayErrorMessage("The engine choosen in the query cannot verify this model.\nPlease choose another engine.");
+				CreateGui.getCurrentTab().editSelectedQuery();
+			}
+		});
 	}
 
 	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);
