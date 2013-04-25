@@ -587,19 +587,19 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "released LEFT"));
+				 ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "released RIGHT"));
+						 ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-				 ElementType.PREVCOMPONENT, "Previous component", "released UP"));
+				 ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-				 ElementType.NEXTCOMPONENT, "Next component", "released DOWN"));
+				 ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -999,6 +999,16 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getCurrentTab().removeConstantHighlights();
 			
 			CreateGui.getAnimationController().requestFocusInWindow();
+			
+			// Event repeater
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_right_hold", stepforwardAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_left_hold", stepbackwardAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_up_hold", prevcomponentAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
 			verifyAction.setEnabled(false);
@@ -2444,8 +2454,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setStepShotcutEnabled(boolean enabled){
 		if(enabled){
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released RIGHT"));
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released LEFT"));
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
 		} else {
 			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
 			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);
