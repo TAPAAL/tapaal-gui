@@ -64,6 +64,10 @@ public class TimedInputArcComponent extends TimedOutputArcComponent {
 	public TimeInterval getGuard() {
 		return inputArc.interval();
 	}
+	
+	public boolean isUrgentTransition(){
+		return inputArc.destination().isUrgent();
+	}
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
