@@ -147,7 +147,7 @@ public class AnimationHistoryComponent extends JList {
 	}
 	
 	private void updateAccordingToDeadlock() {
-		if(CreateGui.getTab().getSelectedIndex() == -1){
+		if(CreateGui.getTab().getSelectedIndex() == -1 || lastShown == TraceType.EG_DELAY_FOREVER){
 			return;
 		}
 		for (Template t : CreateGui.getCurrentTab().activeTemplates()){
