@@ -117,7 +117,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	}
 
 	private void showErrorMessage(String errorMessage) {
-		messenger.displayErrorMessage("The engine choosen in the query cannot verify this model.\nPlease choose another engine.");
+		messenger.displayErrorMessage("The engine selected in the query dialog cannot verify this model.\nPlease choose another engine.");
 		CreateGui.getCurrentTab().editSelectedQuery();
 	}
 
