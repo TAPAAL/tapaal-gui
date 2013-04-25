@@ -5,6 +5,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
+import pipe.gui.widgets.QueryPane;
+
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -115,7 +117,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	}
 
 	private void showErrorMessage(String errorMessage) {
-		messenger.displayErrorMessage("An error occured during verification.\n\nReason: " + errorMessage, "Verification Error");
+		messenger.displayErrorMessage("The engine choosen in the query cannot verify this model.\nPlease choose another engine.");
+		CreateGui.getCurrentTab().editSelectedQuery();
 	}
 
 	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);
