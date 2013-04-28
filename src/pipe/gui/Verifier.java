@@ -14,6 +14,8 @@ import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
@@ -47,11 +49,19 @@ public class Verifier {
 		return verifydtapn;
 	}
 	
+	private static VerifyPN getVerifyPN() {
+		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+		verifypn.setup();
+		return verifypn;
+	}
+	
 	private static ModelChecker getModelChecker(TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
 			return getVerifyTAPN();
 		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			return getVerifydTAPN();
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
+			return getVerifyPN();
 		} else{
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
 		}
@@ -130,6 +140,8 @@ public class Verifier {
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
+			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption());
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 		}

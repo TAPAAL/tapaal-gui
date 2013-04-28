@@ -409,6 +409,15 @@ public class TimedArcPetriNetNetwork {
 			sharedTransitions.add(p);
 		}
 	}	
+	
+	public boolean isUntimed(){
+		for(TimedArcPetriNet t : tapns){
+			if(!t.isUntimed()){
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public boolean hasWeights() {
 		for(TimedArcPetriNet t : tapns){

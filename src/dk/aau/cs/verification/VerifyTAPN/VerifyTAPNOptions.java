@@ -12,10 +12,10 @@ import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifyTAPNOptions implements VerificationOptions{
-	private TraceOption traceOption;
-	private SearchOption searchOption;
-	private int extraTokens;
-	private int tokensInModel;
+	protected TraceOption traceOption;
+	protected SearchOption searchOption;
+	protected int extraTokens;
+	protected int tokensInModel;
 	private boolean symmetry;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
@@ -101,7 +101,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		return s.toString();
 	}
 
-	public static final Map<TraceOption, String> createTraceOptionsMap() {
+	public static Map<TraceOption, String> createTraceOptionsMap() {
 		HashMap<TraceOption, String> map = new HashMap<TraceOption, String>();
 		map.put(TraceOption.SOME, "-t 1 -x");
 		map.put(TraceOption.NONE, "");
@@ -109,7 +109,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		return map;
 	}
 
-	private static final Map<SearchOption, String> createSearchOptionsMap() {
+	private static Map<SearchOption, String> createSearchOptionsMap() {
 		HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
 		map.put(SearchOption.BFS, "-o 0");
 		map.put(SearchOption.DFS, "-o 1");
