@@ -33,6 +33,7 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 
@@ -161,6 +162,7 @@ public class CreateGui {
 		Verifyta.trySetup();
 		VerifyTAPN.trySetup();
 		VerifyTAPNDiscreteVerification.trySetup();
+		VerifyPN.trySetup();
 
 		checkForUpdate(false);
 	}

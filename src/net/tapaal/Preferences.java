@@ -88,6 +88,20 @@ public class Preferences {
 			pref.put(key, location);   
 		}
 	}
+	
+	public String getVerifypnLocation() {
+		return pref.get("verifypn.location", "");
+	}
+
+	public void setVerifypnLocation(String location) {
+		final String key = "verifypn.location";
+
+		if (location == null || location.equals("")){
+			pref.remove(key);
+		}else {
+			pref.put(key, location);   
+		}
+	}
 
 	public String getLatestVersion() {
 		return pref.get("tapaal.latestVersion", "");
