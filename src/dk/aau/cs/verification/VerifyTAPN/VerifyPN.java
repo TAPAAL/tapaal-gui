@@ -60,7 +60,7 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		public boolean supportsStats(){
-			return false;
+			return true;
 		}
 		
 		public String getStatsExplanation(){
@@ -373,7 +373,7 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, QueryType queryType) {
-			VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, queryType);
+			VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, queryType);
 			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
 			return result;
 		}

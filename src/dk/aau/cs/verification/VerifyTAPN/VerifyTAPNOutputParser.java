@@ -22,9 +22,9 @@ public class VerifyTAPNOutputParser {
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
 	private final int totalTokens;
-	private final QueryType queryType;
+	protected final QueryType queryType;
 	private final int extraTokens;
-	private List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
+	protected List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
 	
 	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, QueryType queryType){
 		this.totalTokens = totalTokens;
