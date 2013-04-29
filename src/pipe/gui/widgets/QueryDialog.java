@@ -1031,7 +1031,7 @@ public class QueryDialog extends JPanel {
 				buffer.append("whether there is no reachable marking in the net that would exceed the predefined number of tokens. ");
 				buffer.append("<br/><br/>");
 				buffer.append("<b>Search Strategy Options</b><br/>");
-				buffer.append("A search strategy determines how the chosen verification method performs the search. The possible search strategies are: ");
+				buffer.append("A search strategy determines how the chosen verification engine performs the search. The possible search strategies are: ");
 				buffer.append("<ul>");
 				buffer.append("<li>Heuristic Search<br/> If discrete inclusion optimization is not enabled, this strategy performs a breadth first search. ");
 				buffer.append("If discrete inclusion is enabled, the search attempts to maximize the number of tokens in places where the engine checks for discrete inclusion.</li>");
@@ -2005,7 +2005,7 @@ public class QueryDialog extends JPanel {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
-		reductionOptionsPanel.add(new JLabel("  Verification method:"), gbc);
+		reductionOptionsPanel.add(new JLabel("  Verification engine:"), gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;

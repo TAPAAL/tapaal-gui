@@ -332,7 +332,7 @@ public class QueryPane extends JPanel {
 		listModel.set(newIndex, temp);
 	}
 
-	private void showEditDialog() {
+	public void showEditDialog() {
 		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
 		if(q.isActive()) {
 			TAPNQuery newQuery = QueryDialog.showQueryDialogue(
