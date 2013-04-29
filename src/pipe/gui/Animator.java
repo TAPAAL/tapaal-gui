@@ -15,6 +15,7 @@ import javax.swing.ToolTipManager;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
 import dk.aau.cs.gui.TabContent;
@@ -53,6 +54,11 @@ public class Animator {
 	private NetworkMarking initialMarking;
 
 	private boolean isDisplayingUntimedTrace = false;
+	private static boolean isUrgentTransitionEnabled = false;
+	
+	public static boolean isUrgentTransitionEnabled(){
+		return isUrgentTransitionEnabled;
+	}
 
 	public Animator() {
 		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -132,7 +138,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) || tempTransition.isBlueTransition(true)) {
+			if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && !isUrgentTransitionEnabled)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -148,7 +154,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true)) || !tempTransition.isBlueTransition(true)) {
+			if (!(tempTransition.isEnabled(true)) || !tempTransition.isBlueTransition(true) || (tempTransition.isBlueTransition(true) && isUrgentTransitionEnabled)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -158,12 +164,24 @@ public class Animator {
 	public void updateFireableTransitions(){
 		TransitionFireingComponent transFireComponent = CreateGui.getTransitionFireingComponent();
 		transFireComponent.startReInit();
-
+		isUrgentTransitionEnabled = false;
+		
+		outer: for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+			while (transitionIterator.hasNext()) {
+				Transition tempTransition = transitionIterator.next();
+				if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
+					isUrgentTransitionEnabled = true;
+					break outer;
+				}
+			}
+		}
+		
 		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions())) {
+				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions() && !isUrgentTransitionEnabled)) {
 					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
@@ -376,7 +394,7 @@ public class Animator {
 		}
 
 		boolean result = false;
-		if (currentMarking().isDelayPossible(delay)) {
+		if (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled) {
 			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
 			tab.network().setMarking(currentMarking());
 			result = true;
@@ -391,6 +409,11 @@ public class Animator {
 
 	public void reportBlockingPlaces(){
 
+		if(isUrgentTransitionEnabled){
+			CreateGui.getAnimationController().getOkButton().setEnabled(false);
+			CreateGui.getAnimationController().getOkButton().setToolTipText("Time cannot progress when an urgent transition is enabled");
+			return;
+		}
 		try{
 			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
 			if(delay.compareTo(new BigDecimal(0))<=0){

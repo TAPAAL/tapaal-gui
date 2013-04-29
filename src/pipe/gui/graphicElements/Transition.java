@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 import pipe.gui.Pipe;
@@ -99,7 +100,7 @@ public class Transition extends PlaceTransitionObject {
 
 		if (highlighted) {
 			g2.setPaint(Pipe.ENABLED_TRANSITION_COLOUR);
-		} else if (blueTransition && CreateGui.getApp().isShowingBlueTransitions()) {
+		} else if (blueTransition && CreateGui.getApp().isShowingBlueTransitions() && !Animator.isUrgentTransitionEnabled()) {
 			g2.setPaint(Pipe.BLUE_TRANSITION_COLOR);
 		} else if (selected && !ignoreSelection) {
 			g2.setPaint(Pipe.SELECTION_LINE_COLOUR);

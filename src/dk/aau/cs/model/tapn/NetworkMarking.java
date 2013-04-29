@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
+import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 
 import dk.aau.cs.model.tapn.simulation.FiringMode;
