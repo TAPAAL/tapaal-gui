@@ -313,7 +313,9 @@ public class Animator {
 			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
 			if(delay != null){
 				if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
-					letTimePass(delay);
+					if(!letTimePass(delay)){
+						return;
+					}
 				}
 			
 				fireTransition(transition);
@@ -583,7 +585,7 @@ public class Animator {
 			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
 					"You are about to remove the current trace.", 
 					"Removing Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(answer == JOptionPane.CANCEL_OPTION) return false;
+			if(answer != JOptionPane.OK_OPTION) return false;
 		}
 		if(isDisplayingUntimedTrace){
 			CreateGui.removeAbstractAnimationPane();
