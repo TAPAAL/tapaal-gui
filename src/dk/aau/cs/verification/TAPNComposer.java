@@ -184,7 +184,7 @@ public class TAPNComposer {
 					if(!timedTransition.isOrphan()){
 						String uniqueTransitionName = getUniqueTransitionName();
 	
-						constructedModel.add(new TimedTransition(uniqueTransitionName));
+						constructedModel.add(new TimedTransition(uniqueTransitionName, timedTransition.isUrgent()));
 						if(timedTransition.isShared()){
 							String name = timedTransition.sharedTransition().name();
 							processedSharedObjects.add(name);

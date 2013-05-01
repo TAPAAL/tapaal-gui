@@ -32,7 +32,12 @@ public class TimedTransition extends TAPNElement {
 	private List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
+		this(name, false);
+	}
+	
+	public TimedTransition(String name, boolean isUrgent) {
 		setName(name);
+		setUrgent(isUrgent);
 	}
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
@@ -361,7 +366,7 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public TimedTransition copy() {
-		return new TimedTransition(name);
+		return new TimedTransition(name, isUrgent);
 	}
 
 	@Override
