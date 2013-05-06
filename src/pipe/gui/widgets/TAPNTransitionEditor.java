@@ -2,7 +2,6 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,23 +12,16 @@ import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
-import com.sun.org.apache.bcel.internal.generic.ISUB;
-
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
+import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -41,6 +33,7 @@ import dk.aau.cs.util.RequireException;
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
 	private static final String untimed_preset_warning = "Transitions must have an untimed preset to be urgent. Please change the interval of all ingoing arcs to [0, inf).";
+	private static final String transport_destination_invariant_warning = "Transport arcs going through an urgent transition cannot have an invariant at the destination.";
 	private TimedTransitionComponent transition;
 	private JRootPane rootPane;
 	private Context context;
@@ -154,8 +147,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!transition.hasUntimedPreset()){
-					JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
+				if(!isUrgencyOK()){
 					urgentCheckBox.setSelected(false);
 				}
 			}
@@ -308,13 +300,27 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			// textField.removeChangeListener(this);
 		}
 	};
+	
+	private boolean isUrgencyOK(){
+		if(!transition.hasUntimedPreset()){
+			JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		for(TransportArc arc : transition.underlyingTransition().getTransportArcsGoingThrough()){
+			if(arc.destination().invariant().upperBound() != Bound.Infinity){
+				JOptionPane.showMessageDialog(transitionEditorPanel, transport_destination_invariant_warning, "Error", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+		return true;
+	}
 
 	private void okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
 		
 		// Check urgent constrain
-		if(urgentCheckBox.isSelected() && !transition.hasUntimedPreset()){
-			JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
+		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
 			return;
 		}
 			
