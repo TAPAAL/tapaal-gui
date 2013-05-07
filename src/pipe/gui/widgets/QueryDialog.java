@@ -656,7 +656,12 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 
 		ArrayList<String> options = new ArrayList<String>();
+		
 		if(tapnNetwork.hasWeights()){
+			if(tapnNetwork.isNonStrict()){
+				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+			}
+		} else if(tapnNetwork.hasUrgentTransitions()){
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
 			}
