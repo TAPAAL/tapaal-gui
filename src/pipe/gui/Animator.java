@@ -411,7 +411,19 @@ public class Animator {
 
 		if(isUrgentTransitionEnabled){
 			CreateGui.getAnimationController().getOkButton().setEnabled(false);
-			CreateGui.getAnimationController().getOkButton().setToolTipText("Time cannot progress when an urgent transition is enabled");
+			StringBuilder sb = new StringBuilder();
+			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
+			for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+				while (transitionIterator.hasNext()) {
+					Transition tempTransition = transitionIterator.next();
+					if (tempTransition.isEnabled(true)){
+						sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
+					}
+				}
+			}
+			sb.append("</html>");
+			CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
 			return;
 		}
 		try{
