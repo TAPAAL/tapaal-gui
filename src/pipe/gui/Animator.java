@@ -122,6 +122,14 @@ public class Animator {
 		return initialMarking;
 	}
 
+	public NetworkMarking getLastMarking(){
+		return markings.get(markings.size()-1);
+	}
+	
+	public NetworkMarking getCurrentMarking(){
+		return markings.get(currentMarkingIndex);
+	}
+	
 	/**
 	 * Highlights enabled transitions
 	 */
@@ -305,7 +313,9 @@ public class Animator {
 			BigDecimal delay = CreateGui.getCurrentTab().getBlueTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
 			if(delay != null){
 				if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
-					letTimePass(delay);
+					if(!letTimePass(delay)){
+						return;
+					}
 				}
 			
 				fireTransition(transition);
@@ -359,12 +369,13 @@ public class Animator {
 			}
 		}
 
+		tab.network().setMarking(next);
 		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
-		tab.network().setMarking(currentMarking());
-
+		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		
 		reportBlockingPlaces();
 
 	}
@@ -377,8 +388,9 @@ public class Animator {
 
 		boolean result = false;
 		if (currentMarking().isDelayPossible(delay)) {
-			addMarking(new TAPNNetworkTimeDelayStep(delay), currentMarking().delay(delay));
-			tab.network().setMarking(currentMarking());
+			NetworkMarking delayedMarking = currentMarking().delay(delay);
+			tab.network().setMarking(delayedMarking);
+			addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
 			result = true;
 		}
 
@@ -573,7 +585,7 @@ public class Animator {
 			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
 					"You are about to remove the current trace.", 
 					"Removing Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(answer == JOptionPane.CANCEL_OPTION) return false;
+			if(answer != JOptionPane.OK_OPTION) return false;
 		}
 		if(isDisplayingUntimedTrace){
 			CreateGui.removeAbstractAnimationPane();

@@ -1,16 +1,11 @@
 package pipe.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.MenuBar;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,15 +28,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.concurrent.Delayed;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.prefs.BackingStoreException;
-
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -61,17 +52,14 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jdesktop.swingx.MultiSplitLayout;
-
 import net.tapaal.Preferences;
-import org.jdesktop.swingx.MultiSplitLayout;
-
 import com.sun.jna.Platform;
 
 
@@ -93,12 +81,10 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
-import pipe.gui.widgets.QueryPane;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.TemplateExplorer;
 import dk.aau.cs.gui.components.StatisticsPanel;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
@@ -109,7 +95,6 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.ShortestDelayMode;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
@@ -146,7 +131,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
 	placeAction, transAction, timedtransAction, tokenAction,
-	selectAction, deleteTokenAction, dragAction, timedPlaceAction;
+	selectAction, deleteTokenAction, timedPlaceAction;
 	private ViewAction showComponentsAction, showQueriesAction, showConstantsAction,showZeroToInfinityIntervalsAction,showEnabledTransitionsAction,showBlueTransitionsAction,showToolTipsAction,showAdvancedWorkspaceAction,showSimpleWorkspaceAction,saveWorkSpaceAction;
 	private HelpAction showAboutAction, showHomepage, showAskQuestionAction, showReportBugAction, showFAQAction, checkUpdate;
 
@@ -181,7 +166,6 @@ public class GuiFrame extends JFrame implements Observer {
 	private boolean showQueries = true;
 	private boolean showEnabledTransitions = true;
 	private boolean showBlueTransitions = true;
-	private boolean commandOrControlWasPressed = false;
 	private boolean showToolTips = true;
 
 
@@ -217,7 +201,6 @@ public class GuiFrame extends JFrame implements Observer {
 				try {
 					//Load class to see if its there
 					Class.forName("com.google.code.gtkjfilechooser.ui.GtkFileChooserUI", false, this.getClass().getClassLoader());
-
 					UIManager.put("FileChooserUI", "com.google.code.gtkjfilechooser.ui.GtkFileChooserUI");
 				} catch (ClassNotFoundException exc){
 					System.err.println("Error loading GtkFileChooserUI Look and Feel, using default jvm GTK look and feel instead");
@@ -262,23 +245,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		// Set GUI mode
 		setGUIMode(GUIMode.noNet);
-
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {			
-		
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_M){
-					if (e.getID() == KeyEvent.KEY_PRESSED) {			
-						commandOrControlWasPressed = true;
-						e.consume();
-					}
-				}
-				if (e.getID() == KeyEvent.KEY_TYPED && commandOrControlWasPressed == true) {
-					commandOrControlWasPressed = false;
-					CreateGui.verifyQuery();					
-				}
-				return false;
-			}
-		});
 	}
 
 	private void loadPrefrences() {
@@ -319,6 +285,15 @@ public class GuiFrame extends JFrame implements Observer {
 				}
 			}
 		}
+		
+		// Set enter to select focus button rather than default (makes ENTER selection key on all LAFs)
+		UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]
+				{
+				  "SPACE", "pressed",
+				  "released SPACE", "released",
+				  "ENTER", "pressed",
+				  "released ENTER", "released"
+				}));
 	}
 
 	/**
@@ -612,19 +587,19 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "released LEFT"));
+				 ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "released RIGHT"));
+						 ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-				 ElementType.PREVCOMPONENT, "Previous component", "released UP"));
+				 ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-				 ElementType.NEXTCOMPONENT, "Next component", "released DOWN"));
+				 ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -681,8 +656,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 		int shortcutkey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query","ctrl M"));
-		verifyAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('M', shortcutkey));
+		verification = new JMenuItem(verifyAction = new ToolAction("Verify query","Verifies the currently selected query",KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutkey)));
 		verification.setMnemonic('m');
 		verification.addActionListener(new ActionListener() {			
 			public void actionPerformed(ActionEvent arg0) {
@@ -690,9 +664,8 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(verification);	
-		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.","ctrl I"));				
-		netStatisticsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('I', shortcutkey));
-		statistics.setMnemonic('n');		
+		statistics = new JMenuItem(netStatisticsAction = new ToolAction("Net statistics", "Shows information about the number of transitions, places, arcs, etc.",KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcutkey)));				
+		statistics.setMnemonic('i');		
 		statistics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				StatisticsPanel.showStatisticsPanel();
@@ -702,9 +675,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 		//JMenuItem batchProcessing = new JMenuItem("Batch processing");
-		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries","ctrl B"));				
-		batchProcessingAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('B', shortcutkey));
-
+		JMenuItem batchProcessing = new JMenuItem(batchProcessingAction = new ToolAction("Batch processing", "Batch verification of multiple nets and queries",KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcutkey)));				
 		batchProcessing.setMnemonic('b');				
 		batchProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -719,10 +690,8 @@ public class GuiFrame extends JFrame implements Observer {
 		toolsMenu.addSeparator();
 
 		//JMenuItem engineSelection = new JMenuItem("Verification engines");
-		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines","ctrl E"));				
-		engineSelectionAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('E', shortcutkey));
-
-		engineSelection.setMnemonic('v');		
+		JMenuItem engineSelection = new JMenuItem(engineSelectionAction = new ToolAction("Engine selection", "View and modify the location of verification engines",KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcutkey)));				
+		engineSelection.setMnemonic('e');		
 		engineSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new EngineDialogPanel().showDialog();				
@@ -1030,6 +999,16 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getCurrentTab().removeConstantHighlights();
 			
 			CreateGui.getAnimationController().requestFocusInWindow();
+			
+			// Event repeater
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_right_hold", stepforwardAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_left_hold", stepbackwardAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_up_hold", prevcomponentAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
 			verifyAction.setEnabled(false);
@@ -1826,6 +1805,7 @@ public class GuiFrame extends JFrame implements Observer {
 							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
+					throw new RuntimeException(e);
 				}
 
 				stepforwardAction.setEnabled(false);
@@ -2086,8 +2066,8 @@ public class GuiFrame extends JFrame implements Observer {
 		 */
 		private static final long serialVersionUID = 8910743226610517225L;
 
-		ToolAction(String name, String tooltip, String keystroke) {
-			super(name, tooltip, keystroke);
+		ToolAction(String name, String tooltip, KeyStroke keyStroke) {
+			super(name, tooltip, keyStroke);
 		}
 
 
@@ -2228,13 +2208,14 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("TAPAAL GUI and Translations:\n");
 		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen, Kenneth Y. Joergensen,\n");
 		buffer.append("Mikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2012\n\n");
+		buffer.append("Aalborg University 2009-2013\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2012\n\n");
+		buffer.append("Aalborg University 2011-2013\n\n");
 		buffer.append("TAPAAL Discrete Engine:\n");
-                buffer.append("Mathias Andersen, Heine G. Larsen, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012\n\n");
+                buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
+		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
+                buffer.append("Aalborg University 2012-2013\n\n");
 		buffer.append("\n");
 
 
@@ -2476,8 +2457,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setStepShotcutEnabled(boolean enabled){
 		if(enabled){
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released RIGHT"));
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released LEFT"));
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
 		} else {
 			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
 			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);

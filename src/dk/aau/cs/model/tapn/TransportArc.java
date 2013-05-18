@@ -117,6 +117,9 @@ public class TransportArc extends TAPNElement {
 		//We need to take the invariant on the destination into account
 		TimeInterval interval = IntervalOperations.intersection(this.interval, destination().invariant().asIterval());
 		
+		//The arc can never be enabled 
+		if(interval == null) return result;
+		
 		BigDecimal iLow = IntervalOperations.getRatBound(interval.lowerBound()).getBound();
 		BigDecimal iHeigh = IntervalOperations.getRatBound(interval.upperBound()).getBound(); 
 		

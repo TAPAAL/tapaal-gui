@@ -166,7 +166,7 @@ public class TimeInterval {
 		
 		if (invariantUpper < lower.value() || (invariantUpper == lower.value() && !isLowerIncluded) || (invariantUpper == lower.value() && !invariant.isUpperNonstrict())) {
 			return new TimeInterval(false, new IntBound(0), new IntBound(0), false); // intersection is empty, so return an empty interval
-		} else if (invariantUpper > upper.value()) {
+		} else if (invariantUpper > upper.value() && !upper.equals(Bound.Infinity) || invariantUpper == upper.value() && !upper.equals(Bound.Infinity) && !isUpperIncluded ) {
 			return this.copy();
 		} else {
 			return new TimeInterval(isLowerIncluded, lower.copy(), invariant.upperBound().copy(), invariant.isUpperNonstrict());
