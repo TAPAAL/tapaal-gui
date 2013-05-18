@@ -95,6 +95,7 @@ import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
@@ -504,7 +505,7 @@ public class QueryDialog extends JPanel {
 	}
 	
 	public boolean queryHasDeadlock(){
-		return queryField.getText().contains("deadlock"); //This could also be done with a visitor, would that be better?
+		return new HasDeadlockVisitor().hasDeadLock(newProperty);
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
