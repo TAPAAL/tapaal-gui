@@ -268,7 +268,7 @@ public class Verifyta implements ModelChecker {
 			String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			QueryResult queryResult = parseQueryResult(standardOutput, query.queryType());
+			QueryResult queryResult = parseQueryResult(standardOutput, query);
 
 			if (queryResult == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -299,8 +299,8 @@ public class Verifyta implements ModelChecker {
 		return buffer.toString();
 	}
 
-	private QueryResult parseQueryResult(String output, QueryType queryType) {
-		VerifytaOutputParser outputParser = new VerifytaOutputParser(queryType);
+	private QueryResult parseQueryResult(String output, TAPNQuery query) {
+		VerifytaOutputParser outputParser = new VerifytaOutputParser(query);
 		QueryResult queryResult = outputParser.parseOutput(output);
 		return queryResult;
 	}

@@ -2,7 +2,6 @@ package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLDeadlockNode;
-import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 
 public class HasDeadlockVisitor extends VisitorBase {
 
