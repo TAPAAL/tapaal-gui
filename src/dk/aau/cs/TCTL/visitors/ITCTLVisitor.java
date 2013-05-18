@@ -4,7 +4,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLDeadLockNode;
+import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
@@ -37,5 +37,5 @@ public interface ITCTLVisitor {
 
 	void visit(TCTLTrueNode tctlTrueNode, Object context);
 	void visit(TCTLFalseNode tctlFalseNode, Object context);
-	void visit(TCTLDeadLockNode tctlDeadLockNode, Object context);
+	void visit(TCTLDeadlockNode tctlDeadLockNode, Object context);
 }

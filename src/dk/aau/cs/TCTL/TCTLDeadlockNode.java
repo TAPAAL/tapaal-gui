@@ -2,10 +2,10 @@ package dk.aau.cs.TCTL;
 
 import dk.aau.cs.TCTL.visitors.ITCTLVisitor;
 
-public class TCTLDeadLockNode extends TCTLAbstractStateProperty {
+public class TCTLDeadlockNode extends TCTLAbstractStateProperty {
 
 	public TCTLAbstractStateProperty copy() {
-		return new TCTLDeadLockNode();
+		return new TCTLDeadlockNode();
 	}
 
 	public TCTLAbstractStateProperty replace(TCTLAbstractProperty object1, TCTLAbstractProperty object2) {
@@ -41,7 +41,7 @@ public class TCTLDeadLockNode extends TCTLAbstractStateProperty {
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj instanceof TCTLDeadLockNode) {
+		if (obj instanceof TCTLDeadlockNode) {
 			return true;
 		}
 		return false;

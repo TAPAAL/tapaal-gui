@@ -85,7 +85,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLDeadLockNode;
+import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
@@ -1684,7 +1684,7 @@ public class QueryDialog extends JPanel {
 		
 		deadLockPredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TCTLDeadLockNode deadLockNode = new TCTLDeadLockNode();
+				TCTLDeadlockNode deadLockNode = new TCTLDeadlockNode();
 				UndoableEdit edit = new QueryConstructionEdit(currentSelection.getObject(), deadLockNode);
 				newProperty = newProperty.replace(currentSelection.getObject(), deadLockNode);
 				updateSelection(deadLockNode);
@@ -1780,11 +1780,10 @@ public class QueryDialog extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (queryField.isEditable()) { // in edit mode, this button is now the parse query button.
 					// User has potentially altered the query, so try to parse it
-					TAPAALQueryParser queryParser = new TAPAALQueryParser();
 					TCTLAbstractProperty newQuery = null;
 
 					try {
-						newQuery = queryParser.parse(queryField.getText());
+						newQuery = TAPAALQueryParser.parse(queryField.getText());
 					} catch (Exception ex) {
 						int choice = JOptionPane.showConfirmDialog(
 								CreateGui.getApp(),

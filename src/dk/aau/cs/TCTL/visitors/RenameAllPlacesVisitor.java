@@ -5,7 +5,7 @@ import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractStateProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
-import dk.aau.cs.TCTL.TCTLDeadLockNode;
+import dk.aau.cs.TCTL.TCTLDeadlockNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
@@ -48,7 +48,7 @@ public class RenameAllPlacesVisitor implements ITCTLVisitor {
 	public void visit(TCTLPathPlaceHolder pathPlaceHolderNode, Object context) { }
 	public void visit(TCTLTrueNode tctlTrueNode, Object context) { }
 	public void visit(TCTLFalseNode tctlFalseNode, Object context) { }
-	public void visit(TCTLDeadLockNode tctlDeadLockNode, Object context) { }
+	public void visit(TCTLDeadlockNode tctlDeadLockNode, Object context) { }
 	
 	public void visit(TCTLAndListNode andListNode, Object context) {
 		for (TCTLAbstractStateProperty p : andListNode.getProperties()) {
