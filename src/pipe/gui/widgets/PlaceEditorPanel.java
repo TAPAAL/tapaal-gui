@@ -291,7 +291,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private boolean isUrgencyOK(){
 		for(TransportArc arc : CreateGui.getCurrentTab().currentTemplate().model().transportArcs()){
 			if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
-				JOptionPane.showMessageDialog(rootPane, "Transport arcs going through an urgent transition cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 		}
@@ -299,7 +299,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			for(Template t : CreateGui.getCurrentTab().allTemplates()){
 				for(TransportArc arc : t.model().transportArcs()){
 					if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
-						JOptionPane.showMessageDialog(rootPane, "Transport arcs going through an urgent transition cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
 						return false;
 					}
 				}

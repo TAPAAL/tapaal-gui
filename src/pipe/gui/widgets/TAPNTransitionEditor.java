@@ -32,8 +32,8 @@ import dk.aau.cs.util.RequireException;
 
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
-	private static final String untimed_preset_warning = "Transitions must have an untimed preset to be urgent. Please change the interval of all ingoing arcs to [0, inf).";
-	private static final String transport_destination_invariant_warning = "Transport arcs going through an urgent transition cannot have an invariant at the destination.";
+	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,inf).";
+	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
 	private TimedTransitionComponent transition;
 	private JRootPane rootPane;
 	private Context context;
