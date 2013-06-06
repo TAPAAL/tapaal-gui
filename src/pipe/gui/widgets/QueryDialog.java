@@ -657,7 +657,7 @@ public class QueryDialog extends JPanel {
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
 			}
-		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
+		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") || getQuantificationSelection().equals("")) {
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}
@@ -679,8 +679,8 @@ public class QueryDialog extends JPanel {
 			options.addAll(Arrays.asList( name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
 		}
 		
-		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) && tapnNetwork.isUntimed()){
-			options.addAll(Arrays.asList(name_UNTIMED));
+		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
+			options.add(name_UNTIMED);
 		}
 		
 
