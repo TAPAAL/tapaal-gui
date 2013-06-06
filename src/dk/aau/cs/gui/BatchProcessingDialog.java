@@ -404,7 +404,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 
 	private void removeSelectedFiles() {
-		for (Object o : fileList.getSelectedValues()) {
+		for (Object o : fileList.getSelectedValuesList()) {
 			File file = (File) o;
 			files.remove(file);
 			listModel.removeElement(file);
