@@ -26,7 +26,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append("-k ");
 		result.append(extraTokens+tokensInModel);
 		result.append(traceMap.get(traceOption));
-		result.append(' ');
+		result.append(" -m 0 ");	// Disable memory limit to ensure similar behaviour to other engines
 		result.append(searchMap.get(searchOption));
 		return result.toString();
 	}
