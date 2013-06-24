@@ -143,7 +143,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	public AnimateAction startAction, stepforwardAction, stepbackwardAction,
-	randomAction, randomAnimateAction, timeAction, prevcomponentAction, nextcomponentAction;
+	randomAction, randomAnimateAction, timeAction, delayFireAction, prevcomponentAction, nextcomponentAction;
 
 	public boolean dragging = false;
 
@@ -192,7 +192,7 @@ public class GuiFrame extends JFrame implements Observer {
 			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
-			// 2010-05-07, Kenneth Yrke J��rgensen:
+			// 2010-05-07, Kenneth Yrke Joergensen:
 			// If the native look and feel is GTK replace the useless open
 			// dialog,
 			// with a java-reimplementation.
@@ -595,6 +595,9 @@ public class GuiFrame extends JFrame implements Observer {
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
+		 addMenuItem(animateMenu, delayFireAction = new AnimateAction("Delay and fire",
+				 ElementType.DELAYFIRE, "Delay and fire selected transition", "pressed F"));
+		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
 				 ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
  
@@ -943,6 +946,7 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteTokenAction.setEnabled(true);
 
 			timeAction.setEnabled(false);
+			delayFireAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
 			prevcomponentAction.setEnabled(false);
@@ -984,7 +988,7 @@ public class GuiFrame extends JFrame implements Observer {
 			if (CreateGui.getModel().netType() != NetType.UNTIMED) {
 				timeAction.setEnabled(true);
 			}
-
+			delayFireAction.setEnabled(true);
 			stepbackwardAction.setEnabled(true);
 			stepforwardAction.setEnabled(true);
 			prevcomponentAction.setEnabled(true);
@@ -1026,6 +1030,7 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteTokenAction.setEnabled(false);
 
 			timeAction.setEnabled(false);
+			delayFireAction.setEnabled(false);
 			stepbackwardAction.setEnabled(false);
 			stepforwardAction.setEnabled(false);
 
@@ -1825,6 +1830,11 @@ public class GuiFrame extends JFrame implements Observer {
 
 			case TIMEPASS:
 				CreateGui.getAnimator().letTimePass(BigDecimal.ONE);
+				CreateGui.getAnimationController().setAnimationButtonsEnabled();
+				break;
+			
+			case DELAYFIRE:
+				CreateGui.getCurrentTab().getTransitionFireingComponent().fireSelectedTransition();
 				CreateGui.getAnimationController().setAnimationButtonsEnabled();
 				break;
 
