@@ -6,10 +6,6 @@ import java.util.Map;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.InclusionPlaces;
-import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.util.Require;
-import dk.aau.cs.verification.VerificationOptions;
 
 public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();

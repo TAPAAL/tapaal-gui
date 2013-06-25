@@ -4,13 +4,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
