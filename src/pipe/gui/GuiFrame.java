@@ -355,9 +355,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		fileMenu.add(exportMenu);
 		
-		addMenuItem(fileMenu, exportTraceAction = new FileAction("Export trace",
-				"Export the current trace as text",""));
-
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
 				"ctrl P"));
@@ -603,6 +600,11 @@ public class GuiFrame extends JFrame implements Observer {
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
 				 ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
+		 
+		 animateMenu.addSeparator();
+		 
+		 addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
+					"Export the current trace as text",""));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
