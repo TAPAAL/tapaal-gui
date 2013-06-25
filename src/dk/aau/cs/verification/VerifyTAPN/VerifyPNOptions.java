@@ -16,7 +16,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 	
 	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search) {
-		super(extraTokens, traceOption, search, true, false, new InclusionPlaces());
+		super(extraTokens, traceOption, search, true, false, false, new InclusionPlaces());
 	}
 
 	@Override
@@ -45,6 +45,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		map.put(SearchOption.DFS, "-s DFS");
 		map.put(SearchOption.RANDOM, "-s RDFS");
 		map.put(SearchOption.HEURISTIC, "-s BestFS");
+		map.put(SearchOption.OVERAPPROXIMATE, "-s OverApprox");
 
 		return map;
 	}

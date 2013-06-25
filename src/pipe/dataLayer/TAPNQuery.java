@@ -14,7 +14,7 @@ public class TAPNQuery {
 	};
 
 	public enum SearchOption {
-		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC
+		BFS, DFS, RANDOM, BatchProcessingKeepQueryOption, HEURISTIC, OVERAPPROXIMATE
 	};
 
 	public enum HashTableSize {

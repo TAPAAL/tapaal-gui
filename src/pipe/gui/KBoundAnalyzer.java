@@ -50,7 +50,7 @@ public class KBoundAnalyzer {
 		if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
-			return new VerifyDTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true, true);
+			return new VerifyDTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true, true, false);
 		}
 		return null;
 	}

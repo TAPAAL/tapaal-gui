@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.BoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
@@ -49,8 +50,8 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 			}
 			
 			if(!foundResult) return null;
-			
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, null, queryType, false), new Stats(discovered, explored, explored, transitionStats));
+			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, totalTokens + extraTokens + (foundResult? 0:1), extraTokens);
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType, false), new Stats(discovered, explored, explored, transitionStats));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();

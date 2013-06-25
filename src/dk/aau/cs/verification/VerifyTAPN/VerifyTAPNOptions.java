@@ -17,6 +17,7 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	protected int extraTokens;
 	protected int tokensInModel;
 	private boolean symmetry;
+	private boolean useOverApproximation;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
 	
@@ -26,26 +27,27 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
-		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation) {
+		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces());
 	}
 	
 	//Only used for boundedness analysis
-	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
-		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
+	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation) {
+		this(extraTokens, traceOption, search, symmetry, useOverApproximation, false, new InclusionPlaces());
 		this.dontUseDeadPlaces = dontUseDeadPLaces;
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
-		this(extraTokens,traceOption, search, symmetry, discreteInclusion, new InclusionPlaces());
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion) {
+		this(extraTokens,traceOption, search, symmetry, useOverApproximation, discreteInclusion, new InclusionPlaces());
 	}
 	
-	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
+	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean useOverApproximation, boolean discreteInclusion, InclusionPlaces inclusionPlaces) {
 		this.extraTokens = extraTokens;
 		this.traceOption = traceOption;
 		searchOption = search;
 		this.symmetry = symmetry;
 		this.discreteInclusion = discreteInclusion;
+		this.useOverApproximation = useOverApproximation;
 		this.inclusionPlaces = inclusionPlaces;
 	}
 
@@ -127,5 +129,24 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		Require.that(inclusionPlaces != null, "Inclusion places cannot be null");
 		
 		this.inclusionPlaces = inclusionPlaces;
+	}
+	
+	public boolean useOverApproximation(){
+		return useOverApproximation;
+	}
+
+	@Override
+	public int extraTokens() {
+		return extraTokens;
+	}
+
+	@Override
+	public TraceOption traceOption() {
+		return traceOption;
+	}
+
+	@Override
+	public SearchOption searchOption() {
+		return searchOption;
 	}
 }
