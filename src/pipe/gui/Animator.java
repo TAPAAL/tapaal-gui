@@ -621,7 +621,7 @@ public class Animator {
 		try{
 			Enumeration<String> steps = trace.elements();
 			while(steps.hasMoreElements()){
-				output.append(steps.nextElement() + "\n");
+				output.append(steps.nextElement() + "</br>");
 			}
 			FileBrowser fb = new FileBrowser("Export trace","html");
 			String path = fb.saveFile("trace");
