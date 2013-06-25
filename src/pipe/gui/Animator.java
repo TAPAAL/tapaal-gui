@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
@@ -613,20 +615,19 @@ public class Animator {
 	}
 	
 	public void exportTrace(){
-		TimedTAPNNetworkTrace trace = getTrace();
+		DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
+		
 		StringBuilder output = new StringBuilder();
-		output.append("Initial Marking\n");
 		try{
-			for(TAPNNetworkTraceStep step : trace){
-				output.append(step.toString() + "\n");
+			Enumeration<String> steps = trace.elements();
+			while(steps.hasMoreElements()){
+				output.append(steps.nextElement() + "\n");
 			}
-			FileBrowser fb = new FileBrowser("Export trace","txt");
-			String path = fb.saveFile("trace.txt");
+			FileBrowser fb = new FileBrowser("Export trace","html");
+			String path = fb.saveFile("trace");
 			FileWriter fw = new FileWriter(path);
 			fw.write(output.substring(0,  output.length()-1));
 			fw.close();
-		} catch (NullPointerException e) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), "Trace is empty.", "Error", JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
