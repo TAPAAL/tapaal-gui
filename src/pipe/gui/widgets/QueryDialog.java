@@ -279,7 +279,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
-	private final static String TOOL_TIP_OVERAPPROX = "TODO: write tooltip";	// TODO: write tooltip
+	private final static String TOOL_TIP_OVERAPPROX = "Run over approximation check for EF and AG queries";	// TODO: write tooltip
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
@@ -2092,7 +2092,7 @@ public class QueryDialog extends JPanel {
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
 		
-		useOverApproximation = new JCheckBox("Run over approximation check for EF and AG queries");
+		useOverApproximation = new JCheckBox("Use over approximation check");
 		useOverApproximation.setSelected(false);
 		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
 		

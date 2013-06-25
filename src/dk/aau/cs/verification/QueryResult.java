@@ -42,7 +42,7 @@ public class QueryResult {
 	}
 	
 	protected String getExplanationString(){
-		return boundednessAnalysis == null? "":boundednessAnalysis.toString();
+		return boundednessAnalysis.toString();
 	}
 
 	public BoundednessAnalysisResult boundednessAnalysis() {
