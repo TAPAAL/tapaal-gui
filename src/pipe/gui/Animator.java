@@ -661,7 +661,7 @@ public class Animator {
 		CreateGui.getAnimationHistory().reset();
 		
 		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
-		Pattern delay_p = Pattern.compile("TimeDelay:[\\s]*(\\d+)");
+		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+)");
 		Matcher m = null;
 		
 		try {
