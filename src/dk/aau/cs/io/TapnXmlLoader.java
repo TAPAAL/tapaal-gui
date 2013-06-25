@@ -836,6 +836,9 @@ public class TapnXmlLoader {
 	}
 
 	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {
+		if(!queryElement.hasAttribute(attributeName)){
+			return defaultValue;
+		}
 		boolean result;
 		try {
 			result = queryElement.getAttribute(attributeName).equals("true");
