@@ -1,8 +1,9 @@
 package pipe.gui;
 
 import java.awt.Container;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,15 +11,13 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
-import javax.swing.ToolTipManager;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Transition;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -34,7 +33,6 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
@@ -612,5 +610,25 @@ public class Animator {
 
 	public boolean isShowingTrace(){
 		return isDisplayingUntimedTrace || trace != null;
+	}
+	
+	public void exportTrace(){
+		TimedTAPNNetworkTrace trace = getTrace();
+		StringBuilder output = new StringBuilder();
+		output.append("Initial Marking\n");
+		try{
+			for(TAPNNetworkTraceStep step : trace){
+				output.append(step.toString() + "\n");
+			}
+			FileBrowser fb = new FileBrowser("Export trace","txt");
+			String path = fb.saveFile("trace.txt");
+			FileWriter fw = new FileWriter(path);
+			fw.write(output.substring(0,  output.length()-1));
+			fw.close();
+		} catch (NullPointerException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Trace is empty.", "Error", JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }
