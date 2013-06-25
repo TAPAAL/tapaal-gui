@@ -120,7 +120,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
-	exportPSAction, exportToTikZAction, exportTraceAction;
+	exportPSAction, exportToTikZAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -605,6 +605,8 @@ public class GuiFrame extends JFrame implements Observer {
 		 
 		 addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
 					"Export the current trace",""));
+		 addMenuItem(animateMenu, importTraceAction = new FileAction("Import trace",
+					"Import trace to simulator",""));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -930,6 +932,7 @@ public class GuiFrame extends JFrame implements Observer {
 		case draw:
 			enableAllActions(true);
 			exportTraceAction.setEnabled(false);
+			importTraceAction.setEnabled(false);
 			
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
@@ -1016,6 +1019,7 @@ public class GuiFrame extends JFrame implements Observer {
 			break;
 		case noNet:
 			exportTraceAction.setEnabled(false);
+			importTraceAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
 			timedPlaceAction.setEnabled(false);
@@ -1064,6 +1068,7 @@ public class GuiFrame extends JFrame implements Observer {
 		exportToTikZAction.setEnabled(enable);
 		
 		exportTraceAction.setEnabled(enable);
+		importTraceAction.setEnabled(enable);
 
 		printAction.setEnabled(enable);
 
@@ -2339,6 +2344,8 @@ public class GuiFrame extends JFrame implements Observer {
 				Export.exportGuiView(appView, Export.PRINTER, null);
 			} else if(this == exportTraceAction){
 				CreateGui.getAnimator().exportTrace();
+			} else if(this == importTraceAction){
+				CreateGui.getAnimator().importTrace();
 			}
 		}
 

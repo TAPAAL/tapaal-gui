@@ -1,14 +1,21 @@
 package pipe.gui;
 
 import java.awt.Container;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -23,6 +30,8 @@ import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -616,20 +625,85 @@ public class Animator {
 	
 	public void exportTrace(){
 		DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
-		
 		StringBuilder output = new StringBuilder();
 		try{
 			Enumeration<String> steps = trace.elements();
 			while(steps.hasMoreElements()){
-				output.append(steps.nextElement() + "</br>");
+				output.append(steps.nextElement().replaceAll("\\<.*?>","") + "\n");
 			}
-			FileBrowser fb = new FileBrowser("Export trace","html");
-			String path = fb.saveFile("trace");
+			FileBrowser fb = new FileBrowser("Export Trace","txt");
+			String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
 			FileWriter fw = new FileWriter(path);
 			fw.write(output.substring(0,  output.length()-1));
 			fw.close();
+		} catch (NullPointerException e) {
+			// Aborted by user
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	public void importTrace(){
+		if(CreateGui.getAnimationHistory().getListModel().size() > 1){
+			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
+					"You are about to import a trace. This removes the current trace.", 
+					"Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(answer != JOptionPane.OK_OPTION) return;
+		}
+		
+		FileBrowser fb = new FileBrowser("Import Trace","txt");
+		File f = fb.openFile();
+		
+		if(f == null){
+			return;
+		}
+		
+		CreateGui.getAnimationHistory().reset();
+		
+		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
+		Pattern delay_p = Pattern.compile("TimeDelay:[\\s]*(\\d+)");
+		Matcher m = null;
+		
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+			String line = br.readLine();
+            while(line != null){
+            	m = trans_p.matcher(line);
+            	if(m.matches()){
+            		// Fire transition
+            		TimedArcPetriNet template = null;
+            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
+            			if(pn.name().equals(m.group(1))){
+            				template = pn;
+            				break;
+            			}
+            		}
+            		if( template == null )	throw new IOException();
+            		TimedTransition t = template.getTransitionByName(m.group(2));
+            		if(t == null || !t.isEnabled()){
+            			throw new IOException();
+            		}
+            		fireTransition(t);
+            		line = br.readLine();
+            		continue;
+            	}
+            	m = delay_p.matcher(line);
+            	if(m.matches()){
+            		// Delay
+            		if(!letTimePass(new BigDecimal(m.group(1)))){
+            			throw new IOException();
+            		}
+            		line = br.readLine();
+            		continue;
+            	}
+            	line = br.readLine();
+            }
+		} catch (FileNotFoundException e) {
+			// Will never happen
+		} catch (IOException e) {
+			CreateGui.getAnimationHistory().reset();
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		
 	}
 }
