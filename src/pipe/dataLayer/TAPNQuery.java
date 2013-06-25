@@ -33,6 +33,7 @@ public class TAPNQuery {
 	private boolean symmetry;
 	private boolean pTrie;
 	private boolean timeDart;
+	private boolean overApproximation;
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
@@ -155,6 +156,14 @@ public class TAPNQuery {
 	public void setUsePTrie(boolean usePTrie){
 		pTrie = usePTrie;
 	}
+	
+	public void setUseOverApproximation(boolean useOverApproximation){
+		overApproximation = useOverApproximation;
+	}
+	
+	public boolean useOverApproximation(){
+		return overApproximation;
+	}
 
 	/**
 	 * @param hashTableSize
@@ -188,14 +197,14 @@ public class TAPNQuery {
 
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTabelSize, extrapolationOption, new InclusionPlaces());
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, new InclusionPlaces());
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
-			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
+			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
 		this.setName(name);
 		this.setCapacity(capacity);
@@ -206,6 +215,7 @@ public class TAPNQuery {
 		this.symmetry = symmetry;
 		this.timeDart = timeDart;
 		this.pTrie = pTrie;
+		this.overApproximation = overApproximation;
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
@@ -243,7 +253,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTableSize, extrapolationOption, inclusionPlaces);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		
