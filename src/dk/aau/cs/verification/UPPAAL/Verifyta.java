@@ -21,12 +21,14 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
@@ -248,6 +250,8 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
+			throw new UnsupportedModelException("The chosen engine only support deadlock predicates on degree2 nets.");
 		UppaalExporter exporter = new UppaalExporter();
 		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction(), ((VerifytaOptions) options).symmetry());
 

@@ -6,12 +6,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import pipe.gui.MessengerImpl;
+
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
 import dk.aau.cs.model.tapn.event.ConstantsListener;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.StringComparator;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNComposer;
 
 public class TimedArcPetriNetNetwork {
 	private List<TimedArcPetriNet> tapns = new ArrayList<TimedArcPetriNet>();
@@ -426,6 +431,16 @@ public class TimedArcPetriNetNetwork {
 			}
 		}
 		return false;
+	}
+	
+	public boolean isDegree2(){
+		if(this.hasInhibitorArcs())
+			return false;
+
+		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
+		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
+
+		return composedModel.value1().isDegree2();
 	}
 
 	public boolean isSharedPlaceUsedInTemplates(SharedPlace place) {

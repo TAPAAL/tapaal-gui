@@ -316,27 +316,12 @@ public class QueryDialog extends JPanel {
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
-		isNetDegree2 = checkForDegree2();
+		isNetDegree2 = tapnNetwork.isDegree2();
 
 		setLayout(new GridBagLayout());
 
 		init(option, queryToCreateFrom);
 		toggleAdvancedSimpleView(false);
-	}
-
-	private boolean checkForDegree2() {
-		if(tapnNetwork.hasInhibitorArcs())
-			return false;
-
-		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
-		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(tapnNetwork);
-
-		for(TimedTransition t : composedModel.value1().transitions()) {
-			if(t.presetSize() > 2 || t.postsetSize() > 2)
-				return false;
-		}
-
-		return true;
 	}
 
 	private boolean checkIfSomeReductionOption() {
