@@ -78,6 +78,7 @@ public class Animator {
 		}
 		currentAction = -1;
 		currentMarkingIndex = 0;
+		tab.network().setMarking(markings.get(currentMarkingIndex));
 		CreateGui.getAnimationHistory().setSelectedIndex(0);
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
