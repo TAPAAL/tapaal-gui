@@ -251,7 +251,7 @@ public class Verifyta implements ModelChecker {
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
 		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
-			throw new UnsupportedModelException("The selected engine for a query containing deadlock proposition\nsupports only nets where transitions have at most two input places.");
+			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");
 		UppaalExporter exporter = new UppaalExporter();
 		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction(), ((VerifytaOptions) options).symmetry());
 
@@ -321,7 +321,7 @@ public class Verifyta implements ModelChecker {
 				   (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied()))
 					return null;
 				else
-					messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
+					messenger.displayErrorMessage("UPPAAL could not generate the requested trace for the model. Try another trace option.");
 			}
 		} else {
 			if (exportedModel.namingScheme() == null) { // TODO: get rid of
