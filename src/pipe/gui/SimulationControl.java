@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
@@ -41,6 +42,10 @@ public class SimulationControl extends JPanel {
 			instance = new SimulationControl();
 		}
 		return instance;
+	}
+	
+	public void addRandomSimulationActionListener(ActionListener l){
+		randomSimulation.addActionListener(l);
 	}
 	
 	private SimulationControl() {
@@ -153,11 +158,7 @@ public class SimulationControl extends JPanel {
 		
 		dialog = new EscapableDialog(CreateGui.getApp(), "Simulation controls", false);
 		
-		dialog.addComponentListener(new ComponentListener() {
-			
-			public void componentShown(ComponentEvent e) {}
-			public void componentResized(ComponentEvent e) {}
-			public void componentMoved(ComponentEvent e) {}
+		dialog.addComponentListener(new ComponentAdapter() {
 			public void componentHidden(ComponentEvent e) {
 				getInstance().stop();
 			}

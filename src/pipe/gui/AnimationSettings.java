@@ -12,30 +12,39 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import pipe.gui.widgets.EscapableDialog;
-import sun.security.jca.GetInstance.Instance;
 
-public class AnimationSettings extends JPanel {
+public class AnimationSettings{
 
-	
-	private static AnimationSettings instance;
-	
-	public static AnimationSettings getInstance() {
-		if(instance == null){
-			instance = new AnimationSettings();
-		}
-		return instance;
-	}
-	
-	private AnimationSettings(){
-		super(new BorderLayout());
-		BlueTransitionControl blue = BlueTransitionControl.getInstance();
-		SimulationControl simControl = SimulationControl.getInstance();
-		
-		add(blue, BorderLayout.NORTH);
-		add(simControl, BorderLayout.SOUTH);
-	}
-	
 	private static JDialog dialog;
+	private static BlueTransitionControl blue;
+	private static SimulationControl simControl;
+	
+	private static JPanel getContent(){
+		JPanel content = new JPanel(new BorderLayout());
+		 
+		blue = BlueTransitionControl.getInstance();
+		simControl = SimulationControl.getInstance();
+		if(simControl.randomSimulation()){
+			blue.setEnabled(false);
+		}
+		
+		simControl.addRandomSimulationActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(simControl.randomSimulation()){
+					blue.setEnabled(false);
+				} else {
+					blue.setEnabled(true);
+				}
+				CreateGui.getTransitionFireingComponent().updateFireButton();
+			}
+		});
+		
+		content.add(blue, BorderLayout.NORTH);
+		content.add(simControl, BorderLayout.SOUTH);
+		return content;
+	}
+	
+	
 	public static void showAnimationSettings(){
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
@@ -51,7 +60,7 @@ public class AnimationSettings extends JPanel {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 3, 0, 3);
 		gbc.fill = GridBagConstraints.BOTH;
-		contentPane.add(getInstance(), gbc);
+		contentPane.add(getContent(), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
