@@ -24,6 +24,7 @@ public class AnimationSettings{
 		 
 		blue = BlueTransitionControl.getInstance();
 		simControl = SimulationControl.getInstance();
+		simControl.showCheckbox(true);
 		if(simControl.randomSimulation()){
 			blue.setEnabled(false);
 		}

@@ -25,12 +25,10 @@ import javax.swing.event.ChangeListener;
 
 import pipe.gui.widgets.EscapableDialog;
 
-import dk.aau.cs.gui.components.EnabledTransitionsList;
-
-import sun.security.jca.GetInstance.Instance;
-
 public class SimulationControl extends JPanel {
 
+	private static final long serialVersionUID = -441614107249259116L;
+	
 	JSlider simulationSpeed;
 	JCheckBox randomSimulation;
 	Timer timer;
@@ -46,6 +44,10 @@ public class SimulationControl extends JPanel {
 	
 	public void addRandomSimulationActionListener(ActionListener l){
 		randomSimulation.addActionListener(l);
+	}
+	
+	public void showCheckbox(boolean show){
+		randomSimulation.setVisible(show);
 	}
 	
 	private SimulationControl() {
@@ -143,6 +145,7 @@ public class SimulationControl extends JPanel {
 			}
 		});
 		
+		getInstance().showCheckbox(false);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 3, 0, 3);
