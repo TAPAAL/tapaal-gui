@@ -64,6 +64,7 @@ public class EnabledTransitionsList extends JPanel{
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2){
 					fireSelectedTransition();
+					CreateGui.getApp().setRandomAnimationMode(false);
 				}
 			}
 		});

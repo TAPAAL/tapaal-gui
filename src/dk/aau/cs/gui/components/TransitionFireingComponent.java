@@ -17,8 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import pipe.dataLayer.Template;
+import pipe.gui.AnimationSettings;
 import pipe.gui.BlueTransitionControl;
 import pipe.gui.CreateGui;
+import pipe.gui.SimulationControl;
 import pipe.gui.graphicElements.Transition;
 
 public class TransitionFireingComponent extends JPanel {
@@ -46,7 +48,7 @@ public class TransitionFireingComponent extends JPanel {
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
 		settingsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BlueTransitionControl.showBlueTransitionDialog();
+				AnimationSettings.showAnimationSettings();
 			}
 		});
 		
@@ -54,16 +56,22 @@ public class TransitionFireingComponent extends JPanel {
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size
 		fireButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				enabledTransitionsList.fireSelectedTransition();
-				CreateGui.getApp().setRandomAnimationMode(false);
+				if(SimulationControl.getInstance().randomSimulation()){
+					SimulationControl.startSimulation();
+				} else {
+					fireSelectedTransition();
+				}
 			}
 		});
 		fireButton.addKeyListener(new KeyAdapter() {			
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER){
-					enabledTransitionsList.fireSelectedTransition();
-					CreateGui.getApp().setRandomAnimationMode(false);
+					if(SimulationControl.getInstance().randomSimulation()){
+						SimulationControl.startSimulation();
+					} else {
+						fireSelectedTransition();
+					}
 				}
 			}
 		});
@@ -120,6 +128,11 @@ public class TransitionFireingComponent extends JPanel {
 	public void reInitDone(){
 		updateFireButton();
 		enabledTransitionsList.reInitDone();
+	}
+	
+	public void fireSelectedTransition(){
+		enabledTransitionsList.fireSelectedTransition();
+		CreateGui.getApp().setRandomAnimationMode(false);
 	}
 	
 	public BlueTransitionControl getBlueTransitionControl() {
