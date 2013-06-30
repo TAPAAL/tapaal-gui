@@ -671,10 +671,13 @@ public class QueryDialog extends JPanel {
 		
 		if(queryHasDeadlock()){
 			if(getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-				if (isNetDegree2 && !tapnNetwork.hasWeights()) 
+				if (isNetDegree2 && !tapnNetwork.hasWeights()) {
 					options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2));
-				else options.clear(); 
+                                } else options.clear(); 
 			}
+                        if(tapnNetwork.isNonStrict()){
+                            options.add(name_DISCRETE);
+                        }
 		} else if(tapnNetwork.hasWeights()){
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
