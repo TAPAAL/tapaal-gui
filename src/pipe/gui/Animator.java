@@ -626,10 +626,23 @@ public class Animator {
 	public void exportTrace(){
 		DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
 		StringBuilder output = new StringBuilder();
+		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
+		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+)");
+		Matcher m = null;
 		try{
 			Enumeration<String> steps = trace.elements();
 			while(steps.hasMoreElements()){
-				output.append(steps.nextElement().replaceAll("\\<.*?>","") + "\n");
+				String line = steps.nextElement().replaceAll("\\<.*?>","");
+				m = trans_p.matcher(line);
+				if(m.matches()){
+            		output.append(m.group(1) + "." + m.group(2) + "\n");
+            		continue;
+            	}
+            	m = delay_p.matcher(line);
+            	if(m.matches()){
+            		output.append(m.group(1) + "\n");
+            		continue;
+            	}
 			}
 			FileBrowser fb = new FileBrowser("Export Trace","txt");
 			String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
@@ -660,8 +673,8 @@ public class Animator {
 		
 		CreateGui.getAnimationHistory().reset();
 		
-		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
-		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+)");
+		Pattern trans_p = Pattern.compile("([^\\.\\s]+)\\.([^\\.\\s]+)");
+		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
 		Matcher m = null;
 		
 		try {
@@ -696,7 +709,7 @@ public class Animator {
             		line = br.readLine();
             		continue;
             	}
-            	line = br.readLine();
+            	throw new IOException();
             }
 		} catch (FileNotFoundException e) {
 			// Will never happen
