@@ -1161,6 +1161,9 @@ public class GuiFrame extends JFrame implements Observer {
 		Preferences.getInstance().setShowToolTips(showToolTips);
 		showToolTipsCheckBox.setSelected(enable);
 		ToolTipManager.sharedInstance().setEnabled(enable);
+   		ToolTipManager.sharedInstance().setInitialDelay(400);
+	        ToolTipManager.sharedInstance().setReshowDelay(800);
+	        ToolTipManager.sharedInstance().setDismissDelay(60000);
 	}
 	public void toggleToolTips(){
 		showToolTips(!showToolTips);
