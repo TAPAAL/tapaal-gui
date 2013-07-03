@@ -669,15 +669,16 @@ public class QueryDialog extends JPanel {
 
 		ArrayList<String> options = new ArrayList<String>();
 		
-		if(queryHasDeadlock()){
-			if(getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-				if (isNetDegree2 && !tapnNetwork.hasWeights()) {
-					options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2));
-                                } else options.clear(); 
-			}
-                        if(tapnNetwork.isNonStrict()){
-                            options.add(name_DISCRETE);
+                if (queryHasDeadlock()) {
+                    if (tapnNetwork.isNonStrict()) {
+                        options.add(name_DISCRETE);
+                    }
+                    if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+                        if (isNetDegree2 && !tapnNetwork.hasWeights()) {
+                            options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
                         }
+                    }
+
 		} else if(tapnNetwork.hasWeights()){
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
