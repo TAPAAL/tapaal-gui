@@ -671,8 +671,10 @@ public class Animator {
 			return;
 		}
 		
-		CreateGui.getAnimationHistory().reset();
-		
+		reset();
+		restoreModel();
+		markings.add(initialMarking);
+						
 		Pattern trans_p = Pattern.compile("([^\\.\\s]+)\\.([^\\.\\s]+)");
 		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
 		Matcher m = null;
@@ -714,7 +716,9 @@ public class Animator {
 		} catch (FileNotFoundException e) {
 			// Will never happen
 		} catch (IOException e) {
-			CreateGui.getAnimationHistory().reset();
+			reset();
+			restoreModel();
+			markings.add(initialMarking);
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		
