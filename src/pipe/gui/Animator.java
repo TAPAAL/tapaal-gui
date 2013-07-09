@@ -631,7 +631,7 @@ public class Animator {
 		DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
 		StringBuilder output = new StringBuilder();
 		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
-		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+)");
+		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+\\.?\\d*)");
 		Matcher m = null;
 		try{
 			Enumeration<String> steps = trace.elements();
@@ -679,7 +679,7 @@ public class Animator {
 		restoreModel();
 		markings.add(initialMarking);
 						
-		Pattern trans_p = Pattern.compile("([^\\.\\s]+)\\.([^\\.\\s]+)");
+		Pattern trans_p = Pattern.compile("([^\\d][^\\.\\s]+)\\.([^\\.\\s]+)");
 		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
 		Matcher m = null;
 		
