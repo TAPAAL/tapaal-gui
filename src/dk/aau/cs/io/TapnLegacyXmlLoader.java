@@ -761,12 +761,11 @@ public class TapnLegacyXmlLoader {
 
 	private TCTLAbstractProperty parseQueryPropertyAsOldFormat(Element queryElement) throws FormatException {
 		TCTLAbstractProperty query = null;
-		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 
 		String queryToParse = getChildNodesContentOfValueChildNodeAsString(queryElement, "query");
 
 		try {
-			query = queryParser.parse(queryToParse);
+			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			if(firstQueryParsingWarning ) {
 				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);

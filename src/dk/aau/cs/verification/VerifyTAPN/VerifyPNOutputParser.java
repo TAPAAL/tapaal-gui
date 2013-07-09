@@ -3,6 +3,7 @@ package dk.aau.cs.verification.VerifyTAPN;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
@@ -16,7 +17,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final Pattern discoveredPattern = Pattern.compile("\\s*explored states:\\s*(\\d+)\\s*");
 	private static final Pattern exploredPattern = Pattern.compile("\\s*expanded states:\\s*(\\d+)\\s*");
 	
-	public VerifyPNOutputParser(int totalTokens, int extraTokens, QueryType queryType) {
+	public VerifyPNOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
 		super(totalTokens, extraTokens, queryType);
 	}
 	
@@ -51,7 +52,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 			
 			if(!foundResult) return null;
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, totalTokens + extraTokens + (foundResult? 0:1), extraTokens);
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType, false), new Stats(discovered, explored, explored, transitionStats));
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();

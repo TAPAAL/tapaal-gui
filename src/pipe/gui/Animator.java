@@ -78,6 +78,7 @@ public class Animator {
 		}
 		currentAction = -1;
 		currentMarkingIndex = 0;
+		tab.network().setMarking(markings.get(currentMarkingIndex));
 		CreateGui.getAnimationHistory().setSelectedIndex(0);
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
 	}
@@ -109,7 +110,9 @@ public class Animator {
 		for (TAPNNetworkTraceStep step : trace) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
-		CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+			CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+		}
 	}
 
 	private void addToTimedTrace(List<TAPNNetworkTraceStep> stepList){
@@ -464,6 +467,7 @@ public class Animator {
 		if (currentAction < actionHistory.size() - 1)
 			removeStoredActions(currentAction + 1);
 
+		tab.network().setMarking(marking);
 		CreateGui.getAnimationHistory().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
