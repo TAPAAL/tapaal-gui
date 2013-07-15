@@ -672,6 +672,18 @@ public class QueryDialog extends JPanel {
                 if (queryHasDeadlock()) {
                     if (tapnNetwork.isNonStrict()) {
                         options.add(name_DISCRETE);
+                        // disable timedarts if liveness and deadlock prop
+                        if(queryHasDeadlock() && 
+                                (getQuantificationSelection().equals("E[]") || 
+                                getQuantificationSelection().equals("A<>"))){
+                            if (useTimeDarts != null) {
+                                useTimeDarts.setEnabled(false);
+                                useTimeDarts.setSelected(false);
+                            }
+                        } else {
+                            if(useTimeDarts != null)
+                                useTimeDarts.setEnabled(true);                 
+                        }
                     }
                     if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
                         if (isNetDegree2 && !tapnNetwork.hasWeights()) {
