@@ -120,7 +120,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
-	exportPSAction, exportToTikZAction;
+	exportPSAction, exportToTikZAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -192,7 +192,7 @@ public class GuiFrame extends JFrame implements Observer {
 			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
-			// 2010-05-07, Kenneth Yrke J��rgensen:
+			// 2010-05-07, Kenneth Yrke Joergensen:
 			// If the native look and feel is GTK replace the useless open
 			// dialog,
 			// with a java-reimplementation.
@@ -354,7 +354,7 @@ public class GuiFrame extends JFrame implements Observer {
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
 
 		fileMenu.add(exportMenu);
-
+		
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
 				"ctrl P"));
@@ -600,6 +600,13 @@ public class GuiFrame extends JFrame implements Observer {
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
 				 ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
+		 
+		 animateMenu.addSeparator();
+		 
+		 addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
+					"Export the current trace",""));
+		 addMenuItem(animateMenu, importTraceAction = new FileAction("Import trace",
+					"Import trace to simulator",""));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -923,8 +930,9 @@ public class GuiFrame extends JFrame implements Observer {
 	private void enableGUIActions() {
 		switch (getGUIMode()) {
 		case draw:
-
 			enableAllActions(true);
+			exportTraceAction.setEnabled(false);
+			importTraceAction.setEnabled(false);
 			
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
@@ -962,7 +970,6 @@ public class GuiFrame extends JFrame implements Observer {
 			break;
 
 		case animation:
-
 			enableAllActions(true);
 
 			timedPlaceAction.setEnabled(false);
@@ -1011,6 +1018,8 @@ public class GuiFrame extends JFrame implements Observer {
 			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
+			exportTraceAction.setEnabled(false);
+			importTraceAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
 			timedPlaceAction.setEnabled(false);
@@ -1057,6 +1066,9 @@ public class GuiFrame extends JFrame implements Observer {
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
+		
+		exportTraceAction.setEnabled(enable);
+		importTraceAction.setEnabled(enable);
 
 		printAction.setEnabled(enable);
 
@@ -2333,6 +2345,10 @@ public class GuiFrame extends JFrame implements Observer {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
+			} else if(this == exportTraceAction){
+				CreateGui.getAnimator().exportTrace();
+			} else if(this == importTraceAction){
+				CreateGui.getAnimator().importTrace();
 			}
 		}
 
