@@ -118,7 +118,7 @@ public class AnimationHistoryComponent extends JList {
 		getListModel().clear();
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
-		setLastShown(TraceType.NOT_EG);
+		lastShown = TraceType.NOT_EG;
 		updateAccordingToDeadlock();
 	}
 	
