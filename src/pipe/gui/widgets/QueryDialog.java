@@ -2190,6 +2190,10 @@ public class QueryDialog extends JPanel {
 		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
 			usePTrie.setVisible(true);
 			useTimeDarts.setVisible(true);
+			if(tapnNetwork.hasUrgentTransitions()){
+				useTimeDarts.setSelected(false);
+				useTimeDarts.setEnabled(false);
+			}
 		} else {
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
