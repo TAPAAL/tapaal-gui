@@ -426,7 +426,7 @@ public class TimedArcPetriNetNetwork {
 	
 	public boolean hasUrgentTransitions() {
 		for(TimedArcPetriNet t : tapns){
-			if(t.hasUrgentTransitions()){
+			if(t.isActive() && t.hasUrgentTransitions()){
 				return true;
 			}
 		}
