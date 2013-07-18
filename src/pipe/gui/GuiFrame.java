@@ -596,7 +596,7 @@ public class GuiFrame extends JFrame implements Observer {
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
 		 addMenuItem(animateMenu, delayFireAction = new AnimateAction("Delay and fire",
-				 ElementType.DELAYFIRE, "Delay and fire selected transition", "pressed F"));
+				 ElementType.DELAYFIRE, "Delay and fire selected transition", "F"));
 		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
 				 ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
