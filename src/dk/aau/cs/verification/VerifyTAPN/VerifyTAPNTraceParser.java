@@ -63,8 +63,6 @@ public class VerifyTAPNTraceParser {
 				}else if(element.getTagName().equals("loop")){
 					trace.nextIsLoop();
 					trace.setTraceType(TraceType.EG_LOOP);
-				}else if(element.getTagName().equals("deadlock")){
-					trace.setTraceType(TraceType.EG_DEADLOCK);
 				}
 			}
 		}

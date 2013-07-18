@@ -1,6 +1,7 @@
 package dk.aau.cs.TCTL.visitors;
 
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLDeadlockNode;
 
 public class BroadcastTranslationQueryVisitor extends QueryVisitor {
 	protected static final String ID_TYPE = "id_t";

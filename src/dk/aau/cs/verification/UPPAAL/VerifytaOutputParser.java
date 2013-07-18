@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.UPPAAL;
 
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.verification.InconclusiveBoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
@@ -10,10 +11,10 @@ public class VerifytaOutputParser {
 	private static final String DISCRETE_INCLUSION = "discrete inclusion";
 	private boolean error = false;
 	private boolean discreteInclusion = false;
-	private QueryType queryType;
+	private TAPNQuery query;
 
-	public VerifytaOutputParser(QueryType queryType){
-		this.queryType = queryType;
+	public VerifytaOutputParser(TAPNQuery query){
+		this.query = query;
 	}
 	
 	public boolean error() {
@@ -27,9 +28,9 @@ public class VerifytaOutputParser {
 				String line = lines[i];
 				if (line.contains(DISCRETE_INCLUSION)) { discreteInclusion = true;}
 				if (line.contains(PROPERTY_IS_SATISFIED_STRING)) {
-					return new QueryResult(true, new InconclusiveBoundednessAnalysisResult(), queryType, discreteInclusion);
+					return new QueryResult(true, new InconclusiveBoundednessAnalysisResult(), query, discreteInclusion);
 				} else if (line.contains(PROPERTY_IS_NOT_SATISFIED_STRING)) {
-					return new QueryResult(false, new InconclusiveBoundednessAnalysisResult(), queryType, discreteInclusion);
+					return new QueryResult(false, new InconclusiveBoundednessAnalysisResult(), query, discreteInclusion);
 				}
 			}
 		} catch (Exception e) {

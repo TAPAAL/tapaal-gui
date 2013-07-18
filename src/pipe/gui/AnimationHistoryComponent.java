@@ -118,7 +118,7 @@ public class AnimationHistoryComponent extends JList {
 		getListModel().clear();
 		getListModel().addElement("Initial Marking");
 		setSelectedIndex(0);
-		setLastShown(TraceType.NOT_EG);
+		lastShown = TraceType.NOT_EG;
 		updateAccordingToDeadlock();
 	}
 	
@@ -147,6 +147,7 @@ public class AnimationHistoryComponent extends JList {
 	}
 	
 	private void updateAccordingToDeadlock() {
+		
 		if(CreateGui.getTab().getSelectedIndex() == -1 || lastShown == TraceType.EG_DELAY_FOREVER){
 			return;
 		}

@@ -1,15 +1,18 @@
 package dk.aau.cs.verification;
 
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
+import dk.aau.cs.model.tapn.TAPNQuery;
+
 public class QueryResult {
 	private boolean satisfied = false;
 	private boolean discreteInclusion = false;
-	protected QueryType queryType;
+	private TAPNQuery query;
 	private BoundednessAnalysisResult boundednessAnalysis;
 
-	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, QueryType queryType, boolean discreteInclusion){
+	public QueryResult(boolean satisfied, BoundednessAnalysisResult boundednessAnalysis, TAPNQuery query, boolean discreteInclusion){
 		this.satisfied = satisfied;
 		this.boundednessAnalysis = boundednessAnalysis;
-		this.queryType = queryType;
+		this.query = query;
 		this.discreteInclusion = discreteInclusion;
 	}
 	
@@ -19,6 +22,10 @@ public class QueryResult {
 	
 	public boolean isDiscreteIncludion() {
 		return discreteInclusion;
+	}
+	
+	public boolean hasDeadlock(){
+		return new HasDeadlockVisitor().hasDeadLock(query.getProperty());
 	}
 	
 	@Override
@@ -31,14 +38,15 @@ public class QueryResult {
 	}
 	
 	public QueryType queryType(){
-		return queryType;
+		return query.queryType();
 	}
 	
 	private boolean shouldAddExplanation() {
-		return (queryType.equals(QueryType.EF) && !isQuerySatisfied()) 
-		|| (queryType.equals(QueryType.EG)) // && !isQuerySatisfied()) 
-		|| (queryType.equals(QueryType.AF)) // && isQuerySatisfied())
-		|| (queryType.equals(QueryType.AG) && isQuerySatisfied());
+		return (queryType().equals(QueryType.EF) && !isQuerySatisfied()) 
+		|| (queryType().equals(QueryType.EG)) // && !isQuerySatisfied()) 
+		|| (queryType().equals(QueryType.AF)) // && isQuerySatisfied())
+		|| (queryType().equals(QueryType.AG) && isQuerySatisfied())
+		|| hasDeadlock();
 	}
 	
 	protected String getExplanationString(){
