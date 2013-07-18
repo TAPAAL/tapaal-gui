@@ -34,6 +34,7 @@ import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.StringComparator;
 
 import pipe.dataLayer.Template;
+import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 import pipe.gui.GuiFrame;
 import pipe.gui.graphicElements.Transition;
@@ -164,7 +165,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null || !showIntervals ? 
+			String interval = transition.getDInterval() == null || !showIntervals || Animator.isUrgentTransitionEnabled() ? 
 					"" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 

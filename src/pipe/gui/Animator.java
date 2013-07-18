@@ -321,7 +321,7 @@ public class Animator {
 	}
 	
 	public void dFireTransition(TimedTransition transition){
-		if(!CreateGui.getApp().isShowingBlueTransitions()){
+		if(!CreateGui.getApp().isShowingBlueTransitions() || isUrgentTransitionEnabled()){
 			fireTransition(transition);
 			return;
 		}
