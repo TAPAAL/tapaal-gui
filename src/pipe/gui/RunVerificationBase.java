@@ -3,7 +3,10 @@ package pipe.gui;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+
+import pipe.gui.widgets.QueryPane;
 
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -114,8 +117,15 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		}
 	}
 
+	private String error;
 	private void showErrorMessage(String errorMessage) {
-		messenger.displayErrorMessage("An error occured during verification.\n\nReason: " + errorMessage, "Verification Error");
+		error = errorMessage;
+		SwingUtilities.invokeLater(new Runnable() { //The invoke later will make sure all the verification is finished before showing the error
+			public void run() {
+			    messenger.displayErrorMessage("The engine selected in the query dialog cannot verify this model.\nPlease choose another engine.\n" + error);
+				CreateGui.getCurrentTab().editSelectedQuery();
+			}
+		});
 	}
 
 	protected abstract void showResult(VerificationResult<TAPNNetworkTrace> result);

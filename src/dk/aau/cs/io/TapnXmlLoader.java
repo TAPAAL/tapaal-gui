@@ -840,6 +840,9 @@ public class TapnXmlLoader {
 	}
 
 	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {
+		if(!queryElement.hasAttribute(attributeName)){
+			return defaultValue;
+		}
 		boolean result;
 		try {
 			result = queryElement.getAttribute(attributeName).equals("true");
@@ -861,10 +864,9 @@ public class TapnXmlLoader {
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
 		TCTLAbstractProperty query = null;
-		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 
 		try {
-			query = queryParser.parse(queryToParse);
+			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			if(firstQueryParsingWarning) {
 				JOptionPane.showMessageDialog(CreateGui.getApp(), ERROR_PARSING_QUERY_MESSAGE, "Error Parsing Query", JOptionPane.ERROR_MESSAGE);

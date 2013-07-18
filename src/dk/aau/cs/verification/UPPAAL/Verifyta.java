@@ -21,12 +21,14 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
@@ -248,6 +250,8 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
+			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");
 		UppaalExporter exporter = new UppaalExporter();
 		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction(), ((VerifytaOptions) options).symmetry());
 
@@ -268,7 +272,7 @@ public class Verifyta implements ModelChecker {
 			String errorOutput = readOutput(runner.errorOutput());
 			String standardOutput = readOutput(runner.standardOutput());
 
-			QueryResult queryResult = parseQueryResult(standardOutput, query.queryType());
+			QueryResult queryResult = parseQueryResult(standardOutput, query);
 
 			if (queryResult == null) {
 				return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
@@ -299,8 +303,8 @@ public class Verifyta implements ModelChecker {
 		return buffer.toString();
 	}
 
-	private QueryResult parseQueryResult(String output, QueryType queryType) {
-		VerifytaOutputParser outputParser = new VerifytaOutputParser(queryType);
+	private QueryResult parseQueryResult(String output, TAPNQuery query) {
+		VerifytaOutputParser outputParser = new VerifytaOutputParser(query);
 		QueryResult queryResult = outputParser.parseOutput(output);
 		return queryResult;
 	}
@@ -317,7 +321,7 @@ public class Verifyta implements ModelChecker {
 				   (query.getProperty() instanceof TCTLEGNode && !queryResult.isQuerySatisfied()) || (query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied()))
 					return null;
 				else
-					messenger.displayErrorMessage("Uppaal could not generate the requested trace for the model. Try another trace option.");
+					messenger.displayErrorMessage("UPPAAL could not generate the requested trace for the model. Try another trace option.");
 			}
 		} else {
 			if (exportedModel.namingScheme() == null) { // TODO: get rid of

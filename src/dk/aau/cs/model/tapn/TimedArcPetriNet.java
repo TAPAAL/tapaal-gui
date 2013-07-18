@@ -344,6 +344,14 @@ public class TimedArcPetriNet {
 		return inhibitorArcs.size() > 0;
 	}
 	
+	public boolean isDegree2(){
+		for(TimedTransition t : this.transitions()) {
+			if(t.presetSize() > 2 || t.postsetSize() > 2)
+				return false;
+		}
+		return true;
+	}
+	
 	public boolean isActive() {
 		return isActive;
 	}

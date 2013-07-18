@@ -120,7 +120,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private FileAction createAction, openAction, closeAction, saveAction,
 	saveAsAction, exitAction, printAction, exportPNGAction,
-	exportPSAction, exportToTikZAction;
+	exportPSAction, exportToTikZAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
 
@@ -192,7 +192,7 @@ public class GuiFrame extends JFrame implements Observer {
 			setLookAndFeel();
 			UIManager.put("OptionPane.informationIcon", ResourceManager.infoIcon());
 
-			// 2010-05-07, Kenneth Yrke J��rgensen:
+			// 2010-05-07, Kenneth Yrke Joergensen:
 			// If the native look and feel is GTK replace the useless open
 			// dialog,
 			// with a java-reimplementation.
@@ -354,7 +354,7 @@ public class GuiFrame extends JFrame implements Observer {
 		exportToTikZAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('L', shortcutkey));
 
 		fileMenu.add(exportMenu);
-
+		
 		fileMenu.addSeparator();
 		addMenuItem(fileMenu, printAction = new FileAction("Print", "Print",
 				"ctrl P"));
@@ -587,19 +587,26 @@ public class GuiFrame extends JFrame implements Observer {
 				 "Simulation mode", ElementType.START, "Toggle simulation mode (M)",
 				 "M", true));
 		 addMenuItem(animateMenu, stepbackwardAction = new AnimateAction("Step backward",
-				 ElementType.STEPBACKWARD, "Step backward", "released LEFT"));
+				 ElementType.STEPBACKWARD, "Step backward", "pressed LEFT"));
 		 addMenuItem(animateMenu,
 				 stepforwardAction = new AnimateAction("Step forward",
-						 ElementType.STEPFORWARD, "Step forward", "released RIGHT"));
+						 ElementType.STEPFORWARD, "Step forward", "pressed RIGHT"));
 
 		 addMenuItem(animateMenu, timeAction = new AnimateAction("Delay one time unit",
 				 ElementType.TIMEPASS, "Let time pass one time unit", "W"));
 		 
 		 addMenuItem(animateMenu, prevcomponentAction = new AnimateAction("Previous component",
-				 ElementType.PREVCOMPONENT, "Previous component", "released UP"));
+				 ElementType.PREVCOMPONENT, "Previous component", "pressed UP"));
  
 		 addMenuItem(animateMenu, nextcomponentAction = new AnimateAction("Next component",
-				 ElementType.NEXTCOMPONENT, "Next component", "released DOWN"));
+				 ElementType.NEXTCOMPONENT, "Next component", "pressed DOWN"));
+		 
+		 animateMenu.addSeparator();
+		 
+		 addMenuItem(animateMenu, exportTraceAction = new FileAction("Export trace",
+					"Export the current trace",""));
+		 addMenuItem(animateMenu, importTraceAction = new FileAction("Import trace",
+					"Import trace to simulator",""));
 
 		 /*
 		  * addMenuItem(animateMenu, randomAction = new AnimateAction("Random",
@@ -923,8 +930,9 @@ public class GuiFrame extends JFrame implements Observer {
 	private void enableGUIActions() {
 		switch (getGUIMode()) {
 		case draw:
-
 			enableAllActions(true);
+			exportTraceAction.setEnabled(false);
+			importTraceAction.setEnabled(false);
 			
 			timedPlaceAction.setEnabled(true);
 			timedArcAction.setEnabled(true);
@@ -962,7 +970,6 @@ public class GuiFrame extends JFrame implements Observer {
 			break;
 
 		case animation:
-
 			enableAllActions(true);
 
 			timedPlaceAction.setEnabled(false);
@@ -999,8 +1006,20 @@ public class GuiFrame extends JFrame implements Observer {
 			CreateGui.getCurrentTab().removeConstantHighlights();
 			
 			CreateGui.getAnimationController().requestFocusInWindow();
+			
+			// Event repeater
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "_right_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_right_hold", stepforwardAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "_left_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_left_hold", stepbackwardAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "_up_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_up_hold", prevcomponentAction);
+			((JPanel) CreateGui.getAnimationController()).getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "_down_hold");
+			((JPanel) CreateGui.getAnimationController()).getActionMap().put("_down_hold", nextcomponentAction);
 			break;
 		case noNet:
+			exportTraceAction.setEnabled(false);
+			importTraceAction.setEnabled(false);
 			verifyAction.setEnabled(false);
 
 			timedPlaceAction.setEnabled(false);
@@ -1047,6 +1066,9 @@ public class GuiFrame extends JFrame implements Observer {
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
 		exportToTikZAction.setEnabled(enable);
+		
+		exportTraceAction.setEnabled(enable);
+		importTraceAction.setEnabled(enable);
 
 		printAction.setEnabled(enable);
 
@@ -1151,6 +1173,9 @@ public class GuiFrame extends JFrame implements Observer {
 		Preferences.getInstance().setShowToolTips(showToolTips);
 		showToolTipsCheckBox.setSelected(enable);
 		ToolTipManager.sharedInstance().setEnabled(enable);
+   		ToolTipManager.sharedInstance().setInitialDelay(400);
+	        ToolTipManager.sharedInstance().setReshowDelay(800);
+	        ToolTipManager.sharedInstance().setDismissDelay(60000);
 	}
 	public void toggleToolTips(){
 		showToolTips(!showToolTips);
@@ -1792,6 +1817,7 @@ public class GuiFrame extends JFrame implements Observer {
 							"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 					startAction.setSelected(false);
 					appView.changeAnimationMode(false);
+					throw new RuntimeException(e);
 				}
 
 				stepforwardAction.setEnabled(false);
@@ -2319,6 +2345,10 @@ public class GuiFrame extends JFrame implements Observer {
 				Export.exportGuiView(appView, Export.POSTSCRIPT, null);
 			} else if (this == printAction) {
 				Export.exportGuiView(appView, Export.PRINTER, null);
+			} else if(this == exportTraceAction){
+				CreateGui.getAnimator().exportTrace();
+			} else if(this == importTraceAction){
+				CreateGui.getAnimator().importTrace();
 			}
 		}
 
@@ -2443,8 +2473,8 @@ public class GuiFrame extends JFrame implements Observer {
 
 	public void setStepShotcutEnabled(boolean enabled){
 		if(enabled){
-			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released RIGHT"));
-			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("released LEFT"));
+			stepforwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed RIGHT"));
+			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("pressed LEFT"));
 		} else {
 			stepforwardAction.putValue(Action.ACCELERATOR_KEY, null);
 			stepbackwardAction.putValue(Action.ACCELERATOR_KEY, null);

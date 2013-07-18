@@ -575,10 +575,9 @@ public class BatchProcessingLoader {
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
 		TCTLAbstractProperty query = null;
-		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 
 		try {
-			query = queryParser.parse(queryToParse);
+			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			System.err.println("No query was specified: " + e.getStackTrace().toString());
 		}

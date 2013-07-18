@@ -26,13 +26,14 @@ JAR_DIR := buildjar
 JAR_FILE := $(JAR_DIR)/tapaal.jar
 
 #Set location of java home
-ifeq (exists, $(shell [ -d /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home ]  && echo exists ))
-	JAVA_HOME := /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
-endif
+#ifeq (exists, $(shell [ -d /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home ]  && echo exists ))
+#	JAVA_HOME := /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+#endif
 
-ifeq (exists, $(shell [ -d /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home ]  && echo exists ))
-	JAVA_HOME := /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home 
-endif
+#ifeq (exists, $(shell [ -d /Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home ]  && echo exists ))
+#	JAVA_HOME := /Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home 
+JAVA_HOME := $(/usr/libexec/java_home)
+#endif
 
 JAVA_LIB  := $(JAVA_HOME)/lib
 
@@ -41,8 +42,7 @@ DEPEND := $(DEPEND_DIR)/\*
 
 JFLAGS      := -source 1.6 -target 1.6 \
               -sourcepath $(SOURCE_DIR) -cp $(DEPEND)
-            
-# -bootclasspath /Library/Java/JavaVirtualMachines/jdk1.7.0_12.jdk/Contents/Home/jre/lib/rt.jar \
+# -bootclasspath /Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/jre/lib/rt.jar \
 #/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar -extdirs " " \
 
 
