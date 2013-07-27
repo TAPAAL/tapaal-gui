@@ -380,7 +380,7 @@ public class VerifyPN implements ModelChecker{
 		
 		
 		boolean supportsModel(TimedArcPetriNet model) {
-			return model.isNonStrict();
+			return model.isUntimed();
 		}
 		
 		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
