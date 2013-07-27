@@ -16,6 +16,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 
 	private static final Pattern discoveredPattern = Pattern.compile("\\s*explored states:\\s*(\\d+)\\s*");
 	private static final Pattern exploredPattern = Pattern.compile("\\s*expanded states:\\s*(\\d+)\\s*");
+	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(\\d+)\\s*");
 	
 	public VerifyPNOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
 		super(totalTokens, extraTokens, queryType);
@@ -24,6 +25,7 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	public Tuple<QueryResult, Stats> parseOutput(String output) {
 		int discovered = 0;
 		int explored = 0;
+		int maxUsedTokens = 0;
 		boolean result = false;
 		boolean foundResult = false;
 		String[] lines = output.split(System.getProperty("line.separator"));
@@ -47,11 +49,18 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 					if(matcher.find()){
 						explored = Integer.valueOf(matcher.group(1));
 					}
+					
+					matcher = maxUsedTokensPattern.matcher(line);
+					if(matcher.find()){
+						maxUsedTokens = Integer.valueOf(matcher.group(1));
+						String operator = matcher.group(1) == null ? "" : matcher.group(1);
+						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
+					}
 				}
 			}
 			
 			if(!foundResult) return null;
-			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, totalTokens + extraTokens + (foundResult? 0:1), extraTokens);
+			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
 			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, false), new Stats(discovered, explored, explored, transitionStats));
 			return value; 
 		} catch (Exception e) {
