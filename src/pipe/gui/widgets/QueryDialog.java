@@ -2139,6 +2139,7 @@ public class QueryDialog extends JPanel {
 		refreshSymmetryReduction();
 		refreshDiscreteOptions();
 		refreshDiscreteInclusion();
+		refreshOverApproximationOption();
 		updateSearchStrategies();
 		refreshTraceOptions();
 		refreshSearchOptions();
@@ -2195,6 +2196,21 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(symmetryReduction.isSelected());
 			symmetryReduction.setEnabled(true);
+		}
+	}
+	
+	private void refreshOverApproximationOption() {
+		if(reductionOption.getSelectedItem() == null){
+			useOverApproximation.setVisible(false);
+		} 
+		else if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
+			useOverApproximation.setVisible(true);
+			useOverApproximation.setSelected(true);
+			useOverApproximation.setEnabled(false);
+		}
+		else{
+			useOverApproximation.setVisible(true);
+			useOverApproximation.setEnabled(true);
 		}
 	}
 	
