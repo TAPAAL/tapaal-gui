@@ -20,7 +20,7 @@ public class Pipe {
 		//Fast modes
 		FAST_TRANSITION, FAST_PLACE, 
 		//Others (refactore?)
-		STOP, STEPBACKWARD, STEPFORWARD, FIRE, START, RANDOM, ANIMATE, TIMEPASS, VERIFY,
+		STOP, STEPBACKWARD, STEPFORWARD, FIRE, START, RANDOM, ANIMATE, TIMEPASS, VERIFY, DELAYFIRE,
 		//Components
 		PREVCOMPONENT, NEXTCOMPONENT
 	}
@@ -92,7 +92,7 @@ public class Pipe {
 
 	public static final int verifytaMinRev = 4800;
 	public static final String verifytapnMinRev = "1.2.0";
-	public static final String verifydtapnMinRev = "2.2.0";
+	public static final String verifydtapnMinRev = "2.1.0";
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;
 

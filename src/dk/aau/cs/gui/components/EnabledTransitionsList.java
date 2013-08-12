@@ -165,7 +165,7 @@ public class EnabledTransitionsList extends JPanel{
 
 		public String toString(boolean showIntervals) {
 
-			String interval = transition.getDInterval() == null || !showIntervals || Animator.isUrgentTransitionEnabled() ? 
+			String interval = transition.getDInterval() == null || !showIntervals ? 
 					"" : transition.getDInterval().toString() + " ";
 			
 			String transitionName = getTransition().getName(); 

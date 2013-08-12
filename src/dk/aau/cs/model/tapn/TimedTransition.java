@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import com.sun.corba.se.spi.extension.ZeroPortPolicy;
 
+import pipe.gui.Animator;
 import pipe.gui.CreateGui;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
@@ -423,7 +424,7 @@ public class TimedTransition extends TAPNElement {
 		if(dInterval == null){
 			dInterval = calculateDInterval();
 		}
-		return dInterval;
+		return Animator.isUrgentTransitionEnabled()? TimeInterval.parse("[0, 0]",null) : dInterval;
 	}
 
 	public int getLagestAssociatedConstant() {
