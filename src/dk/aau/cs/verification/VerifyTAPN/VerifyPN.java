@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.FileFinderImpl;
@@ -258,7 +259,7 @@ public class VerifyPN implements ModelChecker{
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
-			if(!supportsModel(model.value1()))
+			if(!supportsModel(model.value1(), options))
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
 			//if(!supportsQuery(model.value1(), query, options))
@@ -379,8 +380,8 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		
-		boolean supportsModel(TimedArcPetriNet model) {
-			return model.isUntimed();
+		boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
+			return model.isUntimed() || options.searchOption() == SearchOption.OVERAPPROXIMATE;
 		}
 		
 		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
