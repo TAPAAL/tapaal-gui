@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import com.sun.corba.se.spi.extension.ZeroPortPolicy;
-
 import pipe.gui.Animator;
-import pipe.gui.CreateGui;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
