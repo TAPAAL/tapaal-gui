@@ -62,7 +62,7 @@ public class TransitionFireingComponent extends JPanel {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER){
-					enabledTransitionsList.fireSelectedTransition();
+					fireSelectedTransition();
 					CreateGui.getApp().setRandomAnimationMode(false);
 				}
 			}
@@ -129,5 +129,9 @@ public class TransitionFireingComponent extends JPanel {
 	public void showBlueTransitions(boolean enable) {
 		settingsButton.setVisible(enable);
 		fireButton.setText(enable ? "Delay & Fire" : "Fire");
+	}
+	
+	public void fireSelectedTransition(){
+		enabledTransitionsList.fireSelectedTransition();
 	}
 }
