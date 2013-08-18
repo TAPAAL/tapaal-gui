@@ -111,6 +111,16 @@ public class TransitionFireingComponent extends JPanel {
 	public static final String SIMULATE_ACTIVATED_TOOL_TIP = "Do a random simulation of the net";
 
 	public void updateFireButton(){
+		//If the simulation is running deactivate the firebutton.
+		if(SimulationControl.getInstance().isRunning()){
+			fireButton.setEnabled(false);
+			return;
+		}
+		
+		//Make sure the firebutton is enabled
+		fireButton.setEnabled(true);
+		
+		//If random simulation is enabled
 		if(CreateGui.getApp().isShowingBlueTransitions() && SimulationControl.getInstance().randomSimulation()){
 			fireButton.setText("Simulate");
 			
@@ -121,7 +131,7 @@ public class TransitionFireingComponent extends JPanel {
 				fireButton.setEnabled(true);
 				fireButton.setToolTipText(SIMULATE_ACTIVATED_TOOL_TIP);
 			}
-		} else {
+		} else { //If random simulation is not enabled.
 			fireButton.setText(CreateGui.getApp().isShowingBlueTransitions() ? "Delay & Fire" : "Fire");
 
 			if(enabledTransitionsList.getNumberOfTransitions() == 0){

@@ -127,10 +127,16 @@ public class SimulationControl extends JPanel {
 	
 	public void start(){
 		timer.start();
+		CreateGui.getTransitionFireingComponent().updateFireButton();
 	}
 	
 	public void stop(){
 		timer.stop();
+		CreateGui.getTransitionFireingComponent().updateFireButton();
+	}
+	
+	public boolean isRunning(){
+		return timer.isRunning();
 	}
 	
 	private static EscapableDialog dialog;
