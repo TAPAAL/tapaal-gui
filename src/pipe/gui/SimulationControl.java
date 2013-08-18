@@ -64,7 +64,7 @@ public class SimulationControl extends JPanel {
 		simulationSpeed.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if(timer != null){
-					setDelay(simulationSpeed.getValue()*20);
+					setDelay((100 - simulationSpeed.getValue())*20);
 				}
 			}
 		});
@@ -104,6 +104,7 @@ public class SimulationControl extends JPanel {
 	private void setDelay(int delay) {
 		timer.setInitialDelay(delay);
 		timer.setDelay(delay);
+		timer.restart();
 	}
 	
 	private void initTimer(){
