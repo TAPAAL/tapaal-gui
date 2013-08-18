@@ -26,15 +26,15 @@ public class AnimationSettings{
 		simControl = SimulationControl.getInstance();
 		simControl.showCheckbox(true);
 		if(simControl.randomSimulation()){
-			blue.setEnabled(false);
+			blue.randomMode.setEnabled(false);
 		}
 		
 		simControl.addRandomSimulationActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(simControl.randomSimulation()){
-					blue.setEnabled(false);
+					blue.randomMode.setEnabled(false);
 				} else {
-					blue.setEnabled(true);
+					blue.randomMode.setEnabled(true);
 				}
 				CreateGui.getTransitionFireingComponent().updateFireButton();
 			}

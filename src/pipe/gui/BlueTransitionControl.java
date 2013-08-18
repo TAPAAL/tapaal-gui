@@ -141,12 +141,8 @@ public class BlueTransitionControl extends JPanel{
 	}
 
 	//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
-	public BigDecimal getValue(){
-		if(SimulationControl.getInstance().randomSimulation()){
-			return new BigDecimal("0.01");
-		} else { 
-			return new BigDecimal(1.0/(Math.pow(10.0, (5.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
-		}
+	public BigDecimal getValue(){ 
+		return new BigDecimal(1.0/(Math.pow(10.0, (5.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
 	}
 	
 	public void setValue(BigDecimal value){
@@ -154,11 +150,7 @@ public class BlueTransitionControl extends JPanel{
 	}
 	
 	public DelayMode getDelayMode(){
-		if(SimulationControl.getInstance().randomSimulation()){
-			return RandomDelayMode.getInstance();
-		} else {
-			return (DelayMode)delayMode.getSelectedItem();
-		}
+		return (DelayMode)delayMode.getSelectedItem();
 	}
 	
 	public void setDelayMode(DelayMode delayMode){

@@ -109,6 +109,11 @@ public class RandomDelayMode implements DelayMode{
 		double biggestConstantEnabled = network.biggestContantInActiveNetEnabledTransitions();
 		double factor = 1d/(biggestConstantEnabled * 0.6d + biggestConstant * 0.4d);
 		
+		//If both the biggest constant enabled and the biggest constant in the net are 0, handle the division by zero. 
+		if(factor == Double.POSITIVE_INFINITY){
+			factor = 1/0.6;
+		}
+		
 		do{
 			double uniformDistribution = r.nextDouble();
 			
