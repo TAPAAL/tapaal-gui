@@ -25,6 +25,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -32,6 +33,7 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
@@ -261,6 +263,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			if(!supportsModel(model.value1()))
 				throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 			
+                        if(!supportsQuery(model.value1(), query, options)){
+                            throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
+                        }
 			//if(!supportsQuery(model.value1(), query, options))
 				//throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
 			
@@ -384,9 +389,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
-				return false;
-			}
+                        // if liveness, has deadlock proposition and uses timedarts, it is not supported
+			if((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
+                                && new HasDeadlockVisitor().hasDeadLock(query.getProperty()) 
+                                && ((VerifyDTAPNOptions)options).timeDarts()){
+                            return false;
+                        }
 			
 			return true;
 		}
