@@ -75,6 +75,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			buffer.append("<br/>");
 			buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
 			buffer.append("passed/waiting list at the end of verification.<br />");
+			buffer.append("<br />If the number of discovered, explored and stored markings are all 0<br />then the query was disproved by using the over-approximation<br />technique (while ignoring all the time intervals).<br />");
 			buffer.append("</html>");
 			return buffer.toString();
 		}

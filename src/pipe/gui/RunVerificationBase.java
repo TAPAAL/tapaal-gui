@@ -56,7 +56,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 		
-		if(options.useOverApproximation() && (query.queryType() == QueryType.EF || query.queryType() == QueryType.AG)){
+		if(options.useOverApproximation() && 
+				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
+				!query.hasDeadlock()){
 			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
 			verifypn.setup();
 			VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE), transformedModel, clonedQuery);

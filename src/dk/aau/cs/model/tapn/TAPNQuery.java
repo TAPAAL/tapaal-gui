@@ -4,6 +4,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
 
 public class TAPNQuery {
@@ -28,6 +29,10 @@ public class TAPNQuery {
 		else if(property instanceof TCTLEGNode) return QueryType.EG;
 		else if(property instanceof TCTLAFNode) return QueryType.AF;
 		else return QueryType.AG;
+	}
+	
+	public boolean hasDeadlock(){
+		return new HasDeadlockVisitor().hasDeadLock(getProperty());
 	}
 
 	@Override
