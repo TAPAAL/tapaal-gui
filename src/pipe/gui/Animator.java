@@ -441,7 +441,7 @@ public class Animator {
 				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 				while (transitionIterator.hasNext()) {
 					Transition tempTransition = transitionIterator.next();
-					if (tempTransition.isEnabled(true)){
+					if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
 						sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
 					}
 				}
