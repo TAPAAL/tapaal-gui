@@ -96,6 +96,7 @@ public class Animator {
 		tab.network().setMarking(markings.get(currentMarkingIndex));
 		CreateGui.getAnimationHistory().setSelectedIndex(0);
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
+		updateFireableTransitions();
 	}
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
