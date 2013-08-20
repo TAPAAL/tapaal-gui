@@ -32,9 +32,7 @@ public class AnimationSettings{
 		simControl.addRandomSimulationActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(simControl.randomSimulation()){
-					blue.randomMode.setEnabled(false);
-				} else {
-					blue.randomMode.setEnabled(true);
+					blue.randomMode.setSelected(true);
 				}
 				CreateGui.getTransitionFireingComponent().updateFireButton();
 			}
@@ -70,7 +68,7 @@ public class AnimationSettings{
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(closeDialogButton, gbc);
 		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Simulation controls", true);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Settings", true);
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);

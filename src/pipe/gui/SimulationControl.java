@@ -104,7 +104,9 @@ public class SimulationControl extends JPanel {
 	private void setDelay(int delay) {
 		timer.setInitialDelay(delay);
 		timer.setDelay(delay);
-		timer.restart();
+		if(timer.isRunning()){
+			timer.restart();
+		}
 	}
 	
 	private void initTimer(){
@@ -166,7 +168,7 @@ public class SimulationControl extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		contentPane.add(stopSimulationButton, gbc);
 		
-		dialog = new EscapableDialog(CreateGui.getApp(), "Simulation controls", false);
+		dialog = new EscapableDialog(CreateGui.getApp(), "Simulation controls", true);
 		
 		dialog.addComponentListener(new ComponentAdapter() {
 			public void componentHidden(ComponentEvent e) {
@@ -174,11 +176,12 @@ public class SimulationControl extends JPanel {
 			}
 		});
 		
+		getInstance().start();
+		
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(CreateGui.getApp());
 		dialog.setVisible(true);
-		getInstance().start();
 	}
 }
