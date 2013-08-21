@@ -25,9 +25,6 @@ public class AnimationSettings{
 		blue = BlueTransitionControl.getInstance();
 		simControl = SimulationControl.getInstance();
 		simControl.showCheckbox(true);
-		if(simControl.randomSimulation()){
-			blue.randomMode.setEnabled(false);
-		}
 		
 		simControl.addRandomSimulationActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -69,6 +66,7 @@ public class AnimationSettings{
 		contentPane.add(closeDialogButton, gbc);
 		
 		dialog = new EscapableDialog(CreateGui.getApp(), "Settings", true);
+		dialog.getRootPane().setDefaultButton(closeDialogButton);
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);

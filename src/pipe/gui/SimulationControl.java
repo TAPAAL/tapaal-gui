@@ -178,10 +178,16 @@ public class SimulationControl extends JPanel {
 		
 		getInstance().start();
 		
+		dialog.getRootPane().setDefaultButton(stopSimulationButton);
 		dialog.setContentPane(contentPane);
 		dialog.pack();
 		dialog.setResizable(false);
-		dialog.setLocationRelativeTo(CreateGui.getApp());
+		
+		//Calculate location
+		int x = CreateGui.getApp().getLocation().x + CreateGui.getApp().getWidth() - dialog.getWidth() - 30;
+		int y = CreateGui.getApp().getLocation().y + 30;
+		
+		dialog.setLocation(x, y);
 		dialog.setVisible(true);
 	}
 }
