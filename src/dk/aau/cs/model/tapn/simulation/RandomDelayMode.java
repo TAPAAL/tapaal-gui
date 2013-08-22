@@ -7,6 +7,7 @@ import java.util.Random;
 
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.RatBound;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -43,7 +44,7 @@ public class RandomDelayMode implements DelayMode{
 			result = exponentialDistribution(range, transition);
 		} else {
 			//This is safe as the difference between the bounds is always ints - and constants in the model is ints as well
-			TimeInterval range = new TimeInterval(dInterval.IsLowerBoundNonStrict(), new IntBound(0), new IntBound(upper.subtract(lower).intValue()), dInterval.IsUpperBoundNonStrict());
+			TimeInterval range = new TimeInterval(dInterval.IsLowerBoundNonStrict(), new IntBound(0), new RatBound(upper.subtract(lower)), dInterval.IsUpperBoundNonStrict());
 			result = randomBigDecimal(range);
 		}
 		
@@ -62,14 +63,23 @@ public class RandomDelayMode implements DelayMode{
 	}
 	
 	private BigDecimal randomBigDecimal(TimeInterval range){
-		int maxValue = range.upperBound().value();
-		if(maxValue == 0){
+		BigDecimal maxValue = ((RatBound)range.upperBound()).getBound();
+		if(maxValue.equals(BigDecimal.ZERO)){
 			return BigDecimal.ZERO;
 		}
-		Random r = new Random();
 		
-		BigDecimal result = null;
+		BigDecimal result;
 		
+		
+		
+		do{
+			BigDecimal randFromDouble = new BigDecimal(Math.random());
+			result = randFromDouble.multiply(maxValue);
+		} while (!range.isIncluded(result));
+		
+		return result.setScale(numberOfDecimals, RoundingMode.DOWN);
+		
+		/*
 		boolean validValue;
 		
 		do{
@@ -95,8 +105,7 @@ public class RandomDelayMode implements DelayMode{
 			String resultAsString = integerPartAsString + (numberOfDecimals == 0 ? "" : "." + fractionalPartAsString);
 			result = new BigDecimal(resultAsString);
 		} while (!validValue || !range.isIncluded(result));
-
-		return result;
+		*/
 	}
 	
 	private BigDecimal exponentialDistribution(TimeInterval range, TimedTransition transition){
