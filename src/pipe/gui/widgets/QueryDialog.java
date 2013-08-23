@@ -669,12 +669,28 @@ public class QueryDialog extends JPanel {
 
 		ArrayList<String> options = new ArrayList<String>();
 		
-		if(queryHasDeadlock()){
-			if(getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")){
-				if (isNetDegree2 && !tapnNetwork.hasWeights()) 
-					options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2));
-				else options.clear(); 
-			}
+                if (queryHasDeadlock()) {
+                    if (tapnNetwork.isNonStrict()) {
+                        options.add(name_DISCRETE);
+                        // disable timedarts if liveness and deadlock prop
+                        if(queryHasDeadlock() && 
+                                (getQuantificationSelection().equals("E[]") || 
+                                getQuantificationSelection().equals("A<>"))){
+                            if (useTimeDarts != null) {
+                                useTimeDarts.setEnabled(false);
+                                useTimeDarts.setSelected(false);
+                            }
+                        } else {
+                            if(useTimeDarts != null)
+                                useTimeDarts.setEnabled(true);                 
+                        }
+                    }
+                    if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+                        if (isNetDegree2 && !tapnNetwork.hasWeights()) {
+                            options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
+                        }
+                    }
+
 		} else if(tapnNetwork.hasWeights()){
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
