@@ -695,6 +695,10 @@ public class QueryDialog extends JPanel {
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
 			}
+		} else if(tapnNetwork.hasUrgentTransitions()){
+			if(tapnNetwork.isNonStrict()){
+				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+			}
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
@@ -2202,6 +2206,10 @@ public class QueryDialog extends JPanel {
 		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
 			usePTrie.setVisible(true);
 			useTimeDarts.setVisible(true);
+			if(tapnNetwork.hasUrgentTransitions()){
+				useTimeDarts.setSelected(false);
+				useTimeDarts.setEnabled(false);
+			}
 		} else {
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
