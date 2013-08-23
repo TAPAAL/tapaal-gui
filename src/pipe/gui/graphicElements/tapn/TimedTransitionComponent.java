@@ -6,10 +6,13 @@ import java.awt.Container;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
@@ -140,7 +143,19 @@ public class TimedTransitionComponent extends Transition {
 	public String getName() {
 		return transition != null ? transition.name() : "";
 	}
-
+	
+	public boolean isUrgent(){
+		return transition.isUrgent();
+	}
+	
+	public void setUrgent(boolean value){
+		transition.setUrgent(value);
+	}
+	
+	public boolean hasUntimedPreset(){
+		return transition.hasUntimedPreset();
+	}
+	
 	@Override
 	public void update(boolean displayConstantNames) {
 		if(transition != null) {
@@ -168,6 +183,10 @@ public class TimedTransitionComponent extends Transition {
 			graphics.draw(dashedOutline);
 
 			graphics.setStroke(oldStroke);
+		}
+		if(isUrgent()){
+			g.setColor(Color.WHITE);
+			g.fillOval(11, 11, 8,8);
 		}
 	}
 

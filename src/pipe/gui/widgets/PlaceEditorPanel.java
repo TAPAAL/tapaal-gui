@@ -2,7 +2,6 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,20 +20,14 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
+import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
@@ -67,7 +60,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private TimedPlaceComponent place;
 	private Context context;
-	
+
 	private Vector<TimedPlace> sharedPlaces;
 	private int maxNumberOfPlacesToShowAtOnce = 20;
 
@@ -104,7 +97,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-	//	gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		//	gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.insets = new Insets(0, 8, 5, 8);
 		add(buttonPanel, gridBagConstraints);
 	}
@@ -137,7 +130,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				exit();
 			}
 		});
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -146,7 +139,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		buttonPanel.add(cancelButton, gridBagConstraints);
 
-		
+
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -165,14 +158,14 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 	private void setupInitialState() {
 		sharedPlaces = new Vector<TimedPlace>(context.network().sharedPlaces());
-		
+
 		List<TimedPlace> usedPlaces = context.activeModel().places();
-		
+
 		sharedPlaces.removeAll(usedPlaces);
 		if (place.underlyingPlace().isShared()){
 			sharedPlaces.add(place.underlyingPlace());
 		}
-		
+
 		Collections.sort(sharedPlaces, new Comparator<TimedPlace>() {
 			public int compare(TimedPlace o1, TimedPlace o2) {
 				return o1.name().compareToIgnoreCase(o2.name());
@@ -180,7 +173,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		});
 		sharedPlacesComboBox.setModel(new DefaultComboBoxModel(sharedPlaces));
 		if(place.underlyingPlace().isShared()) {
-			
+
 			sharedPlacesComboBox.setSelectedItem(place.underlyingPlace());
 		}
 
@@ -199,20 +192,20 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		for(TimedInputArc arc : context.activeModel().inputArcs()){
 			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
 		}
-		
+
 		for(TimedOutputArc arc : context.activeModel().outputArcs()){
 			if(arc.destination().equals(underlyingPlace) && arc.source().isShared()) return true;
 		}
-		
+
 		for(TransportArc arc : context.activeModel().transportArcs()){
 			if(arc.source().equals(underlyingPlace) && arc.transition().isShared()) return true;
 			if(arc.destination().equals(underlyingPlace) && arc.transition().isShared()) return true;
 		}
-		
+
 		for(TimedInhibitorArc arc : context.activeModel().inhibitorArcs()){
 			if(arc.source().equals(underlyingPlace) && arc.destination().isShared()) return true;
 		}
-		
+
 		return false;
 	}
 
@@ -234,7 +227,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				}
 			}		
 		});
-		
+
 		GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 1;
@@ -252,11 +245,11 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		nameTextField = new javax.swing.JTextField();
 		nameTextField.setPreferredSize(new Dimension(290,27));
-		
+
 		sharedPlacesComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
 
 		sharedPlacesComboBox.setPreferredSize(new Dimension(290,27));
-		
+
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				SharedPlace place = (SharedPlace)e.getItem();
@@ -264,7 +257,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				setInvariantControlsBasedOn(place.invariant());
 			}
 		});
-				
+
 		markingLabel = new javax.swing.JLabel("Marking:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -273,9 +266,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(markingLabel, gridBagConstraints);
 
-//		markingSpinner = new javax.swing.JSpinner();
-//		markingSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-//		markingSpinner.setPreferredSize(new Dimension(75,27));
+		//		markingSpinner = new javax.swing.JSpinner();
+		//		markingSpinner.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+		//		markingSpinner.setPreferredSize(new Dimension(75,27));
 		markingSpinner = new CustomJSpinner(0, okButton);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -294,7 +287,27 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
 		basicPropertiesPanel.add(attributesCheckBox, gridBagConstraints);
 	}
-	
+
+	private boolean isUrgencyOK(){
+		for(TransportArc arc : CreateGui.getCurrentTab().currentTemplate().model().transportArcs()){
+			if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
+				JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+		if(place.underlyingPlace().isShared()){
+			for(Template t : CreateGui.getCurrentTab().allTemplates()){
+				for(TransportArc arc : t.model().transportArcs()){
+					if(arc.destination().equals(place.underlyingPlace()) && arc.transition().isUrgent()){
+						JOptionPane.showMessageDialog(rootPane, "Transport arcs going through urgent transitions cannot have an invariant at the destination.", "Error", JOptionPane.ERROR_MESSAGE);
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	private void initTimeInvariantPanel() {
 		timeInvariantPanel = new JPanel();
 		timeInvariantPanel.setLayout(new java.awt.GridBagLayout());
@@ -333,8 +346,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		invariantGroup.add(invRelationConstant, gbc);
 
-	//	invariantSpinner.setMaximumSize(new Dimension(100, 30));
-	//  invariantSpinner.setMinimumSize(new Dimension(230, 30));
+		//	invariantSpinner.setMaximumSize(new Dimension(100, 30));
+		//  invariantSpinner.setMinimumSize(new Dimension(230, 30));
 		//invariantSpinner.setPreferredSize(new Dimension(230, 30));
 
 		gbc = new GridBagConstraints();
@@ -347,6 +360,10 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		invariantInf.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
+				if(!isUrgencyOK()){
+					invariantInf.setSelected(true);
+					return;
+				}
 				if (!invariantInf.isSelected()) {
 					invRelationNormal.setEnabled(true);
 					invariantSpinner.setEnabled(true);
@@ -373,13 +390,13 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		Set<String> constants = context.network().getConstantNames();
 		String[] constantArray = constants.toArray(new String[constants.size()]);
-	    Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
-		
-	    invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
-	    invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
-	//	invConstantsComboBox = new JComboBox(constants.toArray());
+		Arrays.sort(constantArray, String.CASE_INSENSITIVE_ORDER);
+
+		invConstantsComboBox = new WidthAdjustingComboBox(maxNumberOfPlacesToShowAtOnce);
+		invConstantsComboBox.setModel(new DefaultComboBoxModel(constantArray));
+		//	invConstantsComboBox = new JComboBox(constants.toArray());
 		invConstantsComboBox.setMaximumRowCount(20);
-	//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
+		//	invConstantsComboBox.setMinimumSize(new Dimension(100, 30));
 		invConstantsComboBox.setPreferredSize(new Dimension(230, 30));
 		invConstantsComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -582,12 +599,17 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	}
 
 	private void doOK() {
+		// Check urgent constrain
+		if(!invariantInf.isSelected() && !isUrgencyOK()){
+			return;
+		}
+
 		int newMarking = (Integer)markingSpinner.getValue();
 		if (newMarking > CreateGui.MaximalNumberOfTokensAllowed.intValue()) {
 			JOptionPane.showMessageDialog(this,"It is allowed to have at most "+CreateGui.MaximalNumberOfTokensAllowed.toString()+" tokens in a place.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		context.undoManager().newEdit(); // new "transaction""
 
 		TimedPlace underlyingPlace = place.underlyingPlace();
@@ -632,7 +654,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		}
 
 
-		
+
 		if(newMarking != place.underlyingPlace().numberOfTokens()){
 			Command command = new TimedPlaceMarkingEdit(place, newMarking - place.underlyingPlace().numberOfTokens());
 			command.redo();
@@ -674,7 +696,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 	private void exit() {
 		rootPane.getParent().setVisible(false);
 	}
-	
+
 	private javax.swing.JCheckBox attributesCheckBox;
 	private javax.swing.JPanel buttonPanel;
 	private javax.swing.JButton cancelButton;

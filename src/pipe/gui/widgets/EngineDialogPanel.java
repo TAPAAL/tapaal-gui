@@ -573,7 +573,7 @@ public class EngineDialogPanel {
 		case 126:
 			throw new Exception("The selected file is not executable.");
 		default:
-			throw new Exception("Unknown error .");
+			throw new Exception("The selected file is not executable or not compatible with your system.");
 		}
 		
 	}

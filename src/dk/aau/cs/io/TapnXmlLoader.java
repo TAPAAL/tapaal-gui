@@ -212,8 +212,11 @@ public class TapnXmlLoader {
 
 	private SharedTransition parseSharedTransition(Element element) {
 		String name = element.getAttribute("name");
+		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
 		
-		return new SharedTransition(name);
+		SharedTransition st = new SharedTransition(name);
+		st.setUrgent(urgent);
+		return st;
 	}
 
 	private Collection<TAPNQuery> parseQueries(Document doc, TimedArcPetriNetNetwork network) {
@@ -426,6 +429,7 @@ public class TapnXmlLoader {
 		double positionYInput = Double.parseDouble(transition.getAttribute("positionY"));
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
+		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
 		
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
@@ -448,6 +452,7 @@ public class TapnXmlLoader {
 
 		
 		TimedTransition t = new TimedTransition(nameInput);
+		t.setUrgent(isUrgent);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);

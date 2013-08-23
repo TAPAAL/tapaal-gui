@@ -230,6 +230,11 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 	public TimeInterval getGuard() {
 		return underlyingTransportArc.interval();
 	}
+	
+	@Override
+	public boolean isUrgentTransition(){
+		return underlyingTransportArc.transition().isUrgent();
+	}
 
 	@Override
 	public Command setGuardAndWeight(TimeInterval guard, Weight weight) {
