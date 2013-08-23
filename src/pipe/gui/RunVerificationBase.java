@@ -60,15 +60,18 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
 				!query.hasDeadlock()){
 			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
-			verifypn.setup();
-			VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE), transformedModel, clonedQuery);
-			if(!overapprox_result.error() && !overapprox_result.getQueryResult().isQuerySatisfied()){
-				VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 
-						decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()), 
-						overapprox_result.verificationTime(), 
-						overapprox_result.stats());
-				value.setNameMapping(transformedModel.value2());
-				return value;
+			if(!verifypn.setup()){
+				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
+			}else{
+				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE), transformedModel, clonedQuery);
+				if(!overapprox_result.error() && !overapprox_result.getQueryResult().isQuerySatisfied()){
+					VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 
+							decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()), 
+							overapprox_result.verificationTime(), 
+							overapprox_result.stats());
+					value.setNameMapping(transformedModel.value2());
+					return value;
+				}
 			}
 		}
 
