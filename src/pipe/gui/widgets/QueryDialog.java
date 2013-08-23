@@ -2136,7 +2136,7 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.add(usePTrie, gbc);
 		
 		useOverApproximation = new JCheckBox("Use over-approximation check");
-		useOverApproximation.setSelected(false);
+		useOverApproximation.setSelected(true);
 		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
 		
 		gbc = new GridBagConstraints();
