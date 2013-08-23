@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -77,6 +79,12 @@ public class EngineDialogPanel {
 			if(file != null){
 				if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
+					try{
+						checkIfExecutable(verifytapnpath);
+					}catch(Exception e){
+						messenger.displayErrorMessage(e.getMessage());
+						return;
+					}
 				}else{
 					messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
 				}
@@ -85,6 +93,8 @@ public class EngineDialogPanel {
 			messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
 		}
 		if (verifytapnpath != null) {
+			
+			
 			VerifyTAPN verifyTapn = new VerifyTAPN(fileFinder,messenger);
 			verifyTapn.setVerifyTapnPath(verifytapnpath);
 			setPathsAndVersionNumbers();
@@ -101,6 +111,12 @@ public class EngineDialogPanel {
 			if(file != null){
 				if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
 					verifytapnpath = file.getAbsolutePath();
+					try{
+						checkIfExecutable(verifytapnpath);
+					}catch(Exception e){
+						messenger.displayErrorMessage(e.getMessage());
+						return;
+					}
 				}else{
 					messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
 				}
@@ -126,6 +142,12 @@ public class EngineDialogPanel {
 			if(file != null){
 				if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
 					verifytapath = file.getAbsolutePath();
+					try{
+						checkIfExecutable(verifytapath);
+					}catch(Exception e){
+						messenger.displayErrorMessage(e.getMessage());
+						return;
+					}
 				}else{
 					messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
 				}
@@ -535,5 +557,24 @@ public class EngineDialogPanel {
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 	
+	}
+	
+	private void checkIfExecutable(String path) throws Exception{
+		int rcode = -1;
+		try {
+			rcode = Runtime.getRuntime().exec(path).waitFor();
+		} catch (Exception e) {
+			// Do nothing
+		}
+		// Detect executable issues
+		switch(rcode){
+		case 0:
+			break;
+		case 126:
+			throw new Exception("The selected file is not executable.");
+		default:
+			throw new Exception("Unknown error .");
+		}
+		
 	}
 }
