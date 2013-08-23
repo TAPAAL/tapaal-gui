@@ -246,6 +246,7 @@ public class Animator {
 		disableTransitions();
 		tab.network().setMarking(initialMarking);
 		currentAction = -1;
+		updateFireableTransitions();
 	}
 
 	/**
