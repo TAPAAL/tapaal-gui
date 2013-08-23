@@ -98,7 +98,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("<transition ");
 		
 		modelStream.append("id=\"" + t.name() + "\" ");
-		modelStream.append("name=\"" + t.name() + "\"");
+		modelStream.append("name=\"" + t.name() + "\" ");
+		modelStream.append("urgent=\"" + (t.isUrgent()? "true":"false") + "\"");
 		
 		modelStream.append("/>");
 	}

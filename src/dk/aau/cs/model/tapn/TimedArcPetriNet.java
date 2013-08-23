@@ -555,6 +555,16 @@ public class TimedArcPetriNet {
 		return true;
 	}
 	
+	public boolean hasUrgentTransitions() {
+		for(TimedTransition t : transitions){
+			if(t.isUrgent()){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public boolean isNonStrict(){
 		for(TimedInputArc t : inputArcs){
 			if(!t.interval().IsLowerBoundNonStrict() || (!t.interval().IsUpperBoundNonStrict() && !(t.interval().upperBound() instanceof InfBound))){

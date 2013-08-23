@@ -433,6 +433,15 @@ public class TimedArcPetriNetNetwork {
 		return false;
 	}
 	
+	public boolean hasUrgentTransitions() {
+		for(TimedArcPetriNet t : tapns){
+			if(t.isActive() && t.hasUrgentTransitions()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean isNonStrict(){
 		for(TimedArcPetriNet t : tapns){
 			if(t.isNonStrict()){

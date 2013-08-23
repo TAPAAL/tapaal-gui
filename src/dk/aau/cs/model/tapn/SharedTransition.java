@@ -13,6 +13,7 @@ public class SharedTransition {
 	
 	private String name;
 	private List<TimedTransition> transitions = new ArrayList<TimedTransition>();
+	private boolean isUrgent = false;
 
 	private TimedArcPetriNetNetwork network;
 	
@@ -26,6 +27,17 @@ public class SharedTransition {
 	
 	public void setNetwork(TimedArcPetriNetNetwork network){
 		this.network = network;
+	}
+	
+	public boolean isUrgent(){
+		return isUrgent;
+	}
+	
+	public void setUrgent(boolean value){
+		isUrgent = value;
+		for(TimedTransition t : transitions){
+			t.setUrgent(value, false);
+		}
 	}
 
 	public void setName(String newName) {

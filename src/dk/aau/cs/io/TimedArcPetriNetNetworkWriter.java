@@ -136,6 +136,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		for(SharedTransition transition : network.sharedTransitions()){
 			Element element = document.createElement("shared-transition");
 			element.setAttribute("name", transition.name());
+			element.setAttribute("urgent", transition.isUrgent()?"true":"false");
 			root.appendChild(element);
 		}
 	}
@@ -332,6 +333,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		transitionElement.setAttribute("infiniteServer", "false");
 		transitionElement.setAttribute("angle", String.valueOf(inputTransition.getAngle()));
 		transitionElement.setAttribute("priority", "0");
+		transitionElement.setAttribute("urgent", inputTransition.underlyingTransition().isUrgent()?"true":"false");
 
 		return transitionElement;
 	}

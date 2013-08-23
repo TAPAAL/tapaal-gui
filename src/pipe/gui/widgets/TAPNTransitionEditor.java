@@ -2,7 +2,6 @@ package pipe.gui.widgets;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,21 +12,16 @@ import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
+import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -38,6 +32,8 @@ import dk.aau.cs.util.RequireException;
 
 public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1744651413834659994L;
+	private static final String untimed_preset_warning = "Incoming arcs to urgent transitions must have the interval [0,inf).";
+	private static final String transport_destination_invariant_warning = "Transport arcs going through urgent transitions cannot have an invariant at the destination.";
 	private TimedTransitionComponent transition;
 	private JRootPane rootPane;
 	private Context context;
@@ -66,6 +62,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		cancelButton = new javax.swing.JButton();
 		okButton = new javax.swing.JButton();
 		sharedCheckBox = new JCheckBox("Shared");
+		urgentCheckBox = new JCheckBox("Urgent");
 		Vector<SharedTransition> sharedTransitions = new Vector<SharedTransition>(context.network().sharedTransitions());
 		ArrayList<SharedTransition> usedTransitions = new ArrayList<SharedTransition>();
 		
@@ -88,6 +85,12 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		sharedTransitionsComboBox = new WidthAdjustingComboBox(maxNumberOfTransitionsToShowAtOnce);
 		sharedTransitionsComboBox.setModel(new DefaultComboBoxModel(sharedTransitions));
 		sharedTransitionsComboBox.setPreferredSize(new Dimension(290,27));
+		sharedTransitionsComboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+			}
+		});
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -131,7 +134,25 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 				nameTextFieldFocusLost(evt);
 			}
 		});
-
+		
+		urgentCheckBox.setSelected(transition.isUrgent());
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+		transitionEditorPanel.add(urgentCheckBox, gridBagConstraints);
+		
+		urgentCheckBox.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!isUrgencyOK()){
+					urgentCheckBox.setSelected(false);
+				}
+			}
+		});
+	
 		rotationLabel.setText("Rotate:");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -236,6 +257,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gbc.gridy = 1;
 		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
+		urgentCheckBox.setSelected(transition.isUrgent());
 		transitionEditorPanel.add(nameTextField, gbc);	
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
@@ -249,6 +271,7 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);		
+		urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
@@ -277,11 +300,32 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			// textField.removeChangeListener(this);
 		}
 	};
+	
+	private boolean isUrgencyOK(){
+		if(!transition.hasUntimedPreset()){
+			JOptionPane.showMessageDialog(transitionEditorPanel, untimed_preset_warning, "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		for(TransportArc arc : transition.underlyingTransition().getTransportArcsGoingThrough()){
+			if(arc.destination().invariant().upperBound() != Bound.Infinity){
+				JOptionPane.showMessageDialog(transitionEditorPanel, transport_destination_invariant_warning, "Error", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
+		return true;
+	}
 
 	private void okButtonHandler(java.awt.event.ActionEvent evt) {
 		String newName = nameTextField.getText();
+		
+		// Check urgent constrain
+		if(urgentCheckBox.isSelected() && !isUrgencyOK()){
+			return;
+		}
 			
 		context.undoManager().newEdit(); // new "transaction""
+		
 		boolean wasShared = transition.underlyingTransition().isShared() && !sharedCheckBox.isSelected();
 		if(transition.underlyingTransition().isShared()){
 			context.undoManager().addEdit(new UnshareTransitionCommand(transition.underlyingTransition().sharedTransition(), transition.underlyingTransition()));
@@ -320,6 +364,8 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			}
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		}
+		
+		transition.setUrgent(urgentCheckBox.isSelected());
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
@@ -362,5 +408,6 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 	private javax.swing.JPanel transitionEditorPanel;
 	private javax.swing.JCheckBox sharedCheckBox;
 	private javax.swing.JComboBox sharedTransitionsComboBox;
+	private javax.swing.JCheckBox urgentCheckBox;
 
 }

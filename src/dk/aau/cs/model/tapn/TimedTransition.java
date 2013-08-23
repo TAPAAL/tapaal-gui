@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import pipe.gui.CreateGui;
+import pipe.gui.Animator;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
 import dk.aau.cs.model.tapn.event.TimedTransitionEvent;
@@ -23,13 +22,19 @@ public class TimedTransition extends TAPNElement {
 	private List<TransportArc> transportArcsGoingThrough = new ArrayList<TransportArc>();
 	private List<TimedInhibitorArc> inhibitorArcs = new ArrayList<TimedInhibitorArc>();
 	private TimeInterval dInterval = null;
+	private boolean isUrgent = false;
 
 	private SharedTransition sharedTransition;
 
 	private List<TimedTransitionListener> listeners = new ArrayList<TimedTransitionListener>();
 
 	public TimedTransition(String name) {
+		this(name, false);
+	}
+	
+	public TimedTransition(String name, boolean isUrgent) {
 		setName(name);
+		setUrgent(isUrgent);
 	}
 
 	public void addTimedTransitionListener(TimedTransitionListener listener){
@@ -40,6 +45,48 @@ public class TimedTransition extends TAPNElement {
 	public void removeListener(TimedTransitionListener listener){
 		Require.that(listener != null, "listener cannot be null");
 		listeners.remove(listener);
+	}
+	
+	public boolean isUrgent(){
+		return isUrgent;
+	}
+	
+	public void setUrgent(boolean value){
+		setUrgent(value, true);
+	}
+	
+	protected void setUrgent(boolean value, boolean cascade){
+		isUrgent = value;
+		if(isShared() && cascade){
+			sharedTransition.setUrgent(value);
+		}
+	}
+	
+	public boolean hasUntimedPreset(){
+		return hasUntimedPreset(true);
+	}
+	
+	private boolean hasUntimedPreset(boolean cascade){
+		for(TimedInputArc arc : preset){
+			if(!arc.interval().equals(arc.interval().ZERO_INF)){
+				return false;
+			}
+		}
+		for (TransportArc arc : transportArcsGoingThrough){
+			if(!arc.interval().equals(arc.interval().ZERO_INF)){
+				return false;
+			}
+		}
+		
+		if(cascade && isShared()){
+			for(TimedTransition trans : sharedTransition.transitions()){
+				if(!trans.hasUntimedPreset(false)){
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 
 	public boolean isShared(){
@@ -316,7 +363,7 @@ public class TimedTransition extends TAPNElement {
 	}
 
 	public TimedTransition copy() {
-		return new TimedTransition(name);
+		return new TimedTransition(name, isUrgent);
 	}
 
 	@Override
@@ -373,7 +420,7 @@ public class TimedTransition extends TAPNElement {
 		if(dInterval == null){
 			dInterval = calculateDInterval();
 		}
-		return dInterval;
+		return Animator.isUrgentTransitionEnabled()? TimeInterval.parse("[0, 0]",null) : dInterval;
 	}
 
 	public int getLagestAssociatedConstant() {
