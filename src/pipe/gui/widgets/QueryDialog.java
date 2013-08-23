@@ -669,6 +669,11 @@ public class QueryDialog extends JPanel {
 
 		ArrayList<String> options = new ArrayList<String>();
 		
+		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
+			options.add(name_UNTIMED);
+		}
+		
+		
                 if (queryHasDeadlock()) {
                     if (tapnNetwork.isNonStrict()) {
                         options.add(name_DISCRETE);
@@ -716,11 +721,6 @@ public class QueryDialog extends JPanel {
 			}
 			options.addAll(Arrays.asList( name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
 		}
-		
-		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
-			options.add(name_UNTIMED);
-		}
-		
 
 		reductionOption.removeAllItems();
 
