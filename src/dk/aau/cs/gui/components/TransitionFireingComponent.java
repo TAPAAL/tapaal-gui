@@ -157,10 +157,6 @@ public class TransitionFireingComponent extends JPanel {
 		enabledTransitionsList.reInitDone();
 	}
 
-	public void fireSelectedTransition(){
-		enabledTransitionsList.fireSelectedTransition();
-	}
-
 	public BlueTransitionControl getBlueTransitionControl() {
 		return BlueTransitionControl.getInstance();
 	}
