@@ -10,6 +10,8 @@ import dk.aau.cs.verification.QueryResult;
 public class UppaalIconSelector extends IconSelector {	
 	@Override
 	public ImageIcon getIconFor(QueryResult result){
+		if(result.hasDeadlock()) return inconclusiveIcon;
+		
 		switch(result.queryType())
 		{
 		case EF:

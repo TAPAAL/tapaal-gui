@@ -1,27 +1,38 @@
 package pipe.gui;
 
 import java.awt.Container;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import javax.swing.ToolTipManager;
-
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.Template;
 import pipe.gui.graphicElements.Transition;
+import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.widgets.AnimationSelectmodeDialog;
 import pipe.gui.widgets.EscapableDialog;
+import pipe.gui.widgets.FileBrowser;
 import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
@@ -34,7 +45,6 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.YoungestFiringMode;
 import dk.aau.cs.util.IntervalOperations;
@@ -53,6 +63,11 @@ public class Animator {
 	private NetworkMarking initialMarking;
 
 	private boolean isDisplayingUntimedTrace = false;
+	private static boolean isUrgentTransitionEnabled = false;
+	
+	public static boolean isUrgentTransitionEnabled(){
+		return isUrgentTransitionEnabled;
+	}
 
 	public Animator() {
 		actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -78,8 +93,10 @@ public class Animator {
 		}
 		currentAction = -1;
 		currentMarkingIndex = 0;
+		tab.network().setMarking(markings.get(currentMarkingIndex));
 		CreateGui.getAnimationHistory().setSelectedIndex(0);
 		CreateGui.getAnimationController().setAnimationButtonsEnabled();
+		updateFireableTransitions();
 	}
 
 	private void setUntimedTrace(TAPNNetworkTrace trace) {
@@ -109,7 +126,9 @@ public class Animator {
 		for (TAPNNetworkTraceStep step : trace) {
 			addMarking(step, step.performStepFrom(currentMarking()));
 		}
-		CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+		if(getTrace().getTraceType() != TraceType.NOT_EG){ //If the trace was not explicitly set, maybe we have calculated it is deadlock.
+			CreateGui.getAnimationHistory().setLastShown(getTrace().getTraceType());
+		}
 	}
 
 	private void addToTimedTrace(List<TAPNNetworkTraceStep> stepList){
@@ -140,7 +159,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (tempTransition.isEnabled(true) || tempTransition.isBlueTransition(true)) {
+			if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && !isUrgentTransitionEnabled)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -156,7 +175,7 @@ public class Animator {
 		Iterator<Transition> transitionIterator = current.returnTransitions();
 		while (transitionIterator.hasNext()) {
 			Transition tempTransition = transitionIterator.next();
-			if (!(tempTransition.isEnabled(true)) || !tempTransition.isBlueTransition(true)) {
+			if (!(tempTransition.isEnabled(true)) || !tempTransition.isBlueTransition(true) || (tempTransition.isBlueTransition(true) && isUrgentTransitionEnabled)) {
 				current.notifyObservers();
 				tempTransition.repaint();
 			}
@@ -166,12 +185,24 @@ public class Animator {
 	public void updateFireableTransitions(){
 		TransitionFireingComponent transFireComponent = CreateGui.getTransitionFireingComponent();
 		transFireComponent.startReInit();
-
+		isUrgentTransitionEnabled = false;
+		
+		outer: for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+			while (transitionIterator.hasNext()) {
+				Transition tempTransition = transitionIterator.next();
+				if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
+					isUrgentTransitionEnabled = true;
+					break outer;
+				}
+			}
+		}
+		
 		for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
 			Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
 			while (transitionIterator.hasNext()) {
 				Transition tempTransition = transitionIterator.next();
-				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions())) {
+				if (tempTransition.isEnabled(true) || (tempTransition.isBlueTransition(true) && CreateGui.getApp().isShowingBlueTransitions() && !isUrgentTransitionEnabled)) {
 					transFireComponent.addTransition(temp, tempTransition);
 				}
 			}
@@ -215,6 +246,7 @@ public class Animator {
 		disableTransitions();
 		tab.network().setMarking(initialMarking);
 		currentAction = -1;
+		updateFireableTransitions();
 	}
 
 	/**
@@ -291,7 +323,7 @@ public class Animator {
 	}
 	
 	public void dFireTransition(TimedTransition transition){
-		if(!CreateGui.getApp().isShowingBlueTransitions()){
+		if(!CreateGui.getApp().isShowingBlueTransitions() || isUrgentTransitionEnabled()){
 			fireTransition(transition);
 			return;
 		}
@@ -387,7 +419,7 @@ public class Animator {
 		}
 
 		boolean result = false;
-		if (currentMarking().isDelayPossible(delay)) {
+		if (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled) {
 			NetworkMarking delayedMarking = currentMarking().delay(delay);
 			tab.network().setMarking(delayedMarking);
 			addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
@@ -403,6 +435,23 @@ public class Animator {
 
 	public void reportBlockingPlaces(){
 
+		if(isUrgentTransitionEnabled){
+			CreateGui.getAnimationController().getOkButton().setEnabled(false);
+			StringBuilder sb = new StringBuilder();
+			sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
+			for( Template temp : CreateGui.getCurrentTab().activeTemplates()){
+				Iterator<Transition> transitionIterator = temp.guiModel().returnTransitions();
+				while (transitionIterator.hasNext()) {
+					Transition tempTransition = transitionIterator.next();
+					if (tempTransition.isEnabled(true) && temp.model().getTransitionByName(tempTransition.getName()).isUrgent()){
+						sb.append(temp.toString() + "." + tempTransition.getName() + "<br />");
+					}
+				}
+			}
+			sb.append("</html>");
+			CreateGui.getAnimationController().getOkButton().setToolTipText(sb.toString());
+			return;
+		}
 		try{
 			BigDecimal delay = CreateGui.getAnimationController().getCurrentDelay();
 			if(delay.compareTo(new BigDecimal(0))<=0){
@@ -464,6 +513,7 @@ public class Animator {
 		if (currentAction < actionHistory.size() - 1)
 			removeStoredActions(currentAction + 1);
 
+		tab.network().setMarking(marking);
 		CreateGui.getAnimationHistory().addHistoryItem(action.toString());
 		actionHistory.add(action);
 		markings.add(marking);
@@ -612,5 +662,106 @@ public class Animator {
 
 	public boolean isShowingTrace(){
 		return isDisplayingUntimedTrace || trace != null;
+	}
+	
+	public void exportTrace(){
+		DefaultListModel<String> trace = CreateGui.getAnimationHistory().getListModel();
+		StringBuilder output = new StringBuilder();
+		Pattern trans_p = Pattern.compile("[^\\w]*([^\\.\\s]+)\\.([^\\.\\s]+)");
+		Pattern delay_p = Pattern.compile("[^\\w]*TimeDelay:[\\s]*(\\d+\\.?\\d*)");
+		Matcher m = null;
+		try{
+			Enumeration<String> steps = trace.elements();
+			while(steps.hasMoreElements()){
+				String line = steps.nextElement().replaceAll("\\<.*?>","");
+				m = trans_p.matcher(line);
+				if(m.matches()){
+            		output.append(m.group(1) + "." + m.group(2) + "\n");
+            		continue;
+            	}
+            	m = delay_p.matcher(line);
+            	if(m.matches()){
+            		output.append(m.group(1) + "\n");
+            		continue;
+            	}
+			}
+			FileBrowser fb = new FileBrowser("Export Trace","txt");
+			String path = fb.saveFile(CreateGui.appGui.getCurrentTabName().substring(0, CreateGui.appGui.getCurrentTabName().lastIndexOf('.')) + "-trace");
+			FileWriter fw = new FileWriter(path);
+			fw.write(output.substring(0,  output.length()-1));
+			fw.close();
+		} catch (NullPointerException e) {
+			// Aborted by user
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error exporting trace.", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void importTrace(){
+		if(CreateGui.getAnimationHistory().getListModel().size() > 1){
+			int answer = JOptionPane.showConfirmDialog(CreateGui.getApp(), 
+					"You are about to import a trace. This removes the current trace.", 
+					"Import Trace", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(answer != JOptionPane.OK_OPTION) return;
+		}
+		
+		FileBrowser fb = new FileBrowser("Import Trace","txt");
+		File f = fb.openFile();
+		
+		if(f == null){
+			return;
+		}
+		
+		reset();
+		restoreModel();
+		markings.add(initialMarking);
+						
+		Pattern trans_p = Pattern.compile("([^\\d][^\\.\\s]+)\\.([^\\.\\s]+)");
+		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
+		Matcher m = null;
+		
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+			String line = br.readLine();
+            while(line != null){
+            	m = trans_p.matcher(line);
+            	if(m.matches()){
+            		// Fire transition
+            		TimedArcPetriNet template = null;
+            		for(TimedArcPetriNet pn : CreateGui.getCurrentTab().network().allTemplates()){
+            			if(pn.name().equals(m.group(1))){
+            				template = pn;
+            				break;
+            			}
+            		}
+            		if( template == null )	throw new IOException();
+            		TimedTransition t = template.getTransitionByName(m.group(2));
+            		if(t == null || !t.isEnabled()){
+            			throw new IOException();
+            		}
+            		fireTransition(t);
+            		line = br.readLine();
+            		continue;
+            	}
+            	m = delay_p.matcher(line);
+            	if(m.matches()){
+            		// Delay
+            		if(!letTimePass(new BigDecimal(m.group(1)))){
+            			throw new IOException();
+            		}
+            		line = br.readLine();
+            		continue;
+            	}
+            	throw new IOException();
+            }
+		} catch (FileNotFoundException e) {
+			// Will never happen
+		} catch (IOException e) {
+			reset();
+			restoreModel();
+			markings.add(initialMarking);
+			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		
 	}
 }

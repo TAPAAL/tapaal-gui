@@ -300,6 +300,7 @@ public class BatchProcessingLoader {
 	private void parseTransition(Element transition, TimedArcPetriNetNetwork network, TimedArcPetriNet tapn) {
 		String idInput = transition.getAttribute("id");
 		String nameInput = transition.getAttribute("name");
+		boolean isUrgent = Boolean.parseBoolean(transition.getAttribute("urgent"));
 		
 		idResolver.add(tapn.name(), idInput, nameInput);
 		
@@ -312,6 +313,7 @@ public class BatchProcessingLoader {
 		}
 		
 		TimedTransition t = new TimedTransition(nameInput);
+		t.setUrgent(isUrgent);
 		if(network.isNameUsedForShared(nameInput)){
 			t.setName(nameGenerator.getNewTransitionName(tapn)); // introduce temporary name to avoid exceptions
 			tapn.add(t);
@@ -573,10 +575,9 @@ public class BatchProcessingLoader {
 
 	private TCTLAbstractProperty parseQueryProperty(String queryToParse) {
 		TCTLAbstractProperty query = null;
-		TAPAALQueryParser queryParser = new TAPAALQueryParser();
 
 		try {
-			query = queryParser.parse(queryToParse);
+			query = TAPAALQueryParser.parse(queryToParse);
 		} catch (Exception e) {
 			System.err.println("No query was specified: " + e.getStackTrace().toString());
 		}

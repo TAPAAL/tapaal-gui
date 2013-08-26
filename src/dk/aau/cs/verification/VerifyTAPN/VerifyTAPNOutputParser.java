@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
 import dk.aau.cs.verification.QueryResult;
@@ -22,14 +23,14 @@ public class VerifyTAPNOutputParser {
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
 	private final int totalTokens;
-	private final QueryType queryType;
+	private final TAPNQuery query;
 	private final int extraTokens;
 	private List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
 	
-	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, QueryType queryType){
+	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
-		this.queryType = queryType;
+		this.query = query;
 	}
 	
 	public Tuple<QueryResult, Stats> parseOutput(String output) {
@@ -83,7 +84,7 @@ public class VerifyTAPNOutputParser {
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, queryType, discreteInclusion), new Stats(discovered, explored, stored,transitionStats));
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored,transitionStats));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();

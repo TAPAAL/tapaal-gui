@@ -169,4 +169,8 @@ public class TransitionFireingComponent extends JPanel {
 		settingsButton.setVisible(enable);
 		updateFireButton();
 	}
+	
+	public void fireSelectedTransition(){
+		enabledTransitionsList.fireSelectedTransition();
+	}
 }

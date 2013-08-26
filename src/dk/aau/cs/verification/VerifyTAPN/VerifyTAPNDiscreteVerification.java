@@ -25,6 +25,7 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
+import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -262,6 +263,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			if(!supportsModel(model.value1()))
 				throw new UnsupportedModelException("Verifydtapn does not support the given model.");
 			
+                        if(!supportsQuery(model.value1(), query, options)){
+                            throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
+                        }
 			//if(!supportsQuery(model.value1(), query, options))
 				//throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
 			
@@ -312,7 +316,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				String errorOutput = readOutput(runner.errorOutput());
 				String standardOutput = readOutput(runner.standardOutput());
 
-				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query.queryType());
+				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
@@ -373,8 +377,8 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			return buffer.toString();
 		}
 		
-		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, QueryType queryType) {
-			VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, queryType);
+		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
+			VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, query);
 			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
 			return result;
 		}
@@ -385,9 +389,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
-				return false;
-			}
+                        // if liveness, has deadlock proposition and uses timedarts, it is not supported
+			if((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
+                                && new HasDeadlockVisitor().hasDeadLock(query.getProperty()) 
+                                && ((VerifyDTAPNOptions)options).timeDarts()){
+                            return false;
+                        }
 			
 			return true;
 		}
