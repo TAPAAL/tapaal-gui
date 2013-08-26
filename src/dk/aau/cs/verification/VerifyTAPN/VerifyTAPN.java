@@ -31,6 +31,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -166,7 +167,8 @@ public class VerifyTAPN implements ModelChecker {
 		}
 	}
 	
-	public void setVerifyTapnPath(String path) {
+	public void setPath(String path) throws IllegalArgumentException {
+		ExecutabilityChecker.check(path);
 		String oldPath = verifytapnpath; 
 		verifytapnpath = path;
 		Preferences.getInstance().setVerifytapnLocation(path);
@@ -187,14 +189,14 @@ public class VerifyTAPN implements ModelChecker {
 				File file = fileFinder.ShowFileBrowserDialog("Verifytapn", "",System.getProperty("user.home"));
 				if(file != null){
 					if(file.getName().matches("^verifytapn.*(?:\\.exe)?$")){
-						setVerifyTapnPath(file.getAbsolutePath());
+						setPath(file.getAbsolutePath());
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifytapn.");
 					}
 				}
 
 			} catch (Exception e) {
-				messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
+				messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
 			}
 
 		}

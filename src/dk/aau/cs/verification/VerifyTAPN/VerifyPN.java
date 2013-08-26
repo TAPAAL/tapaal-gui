@@ -31,6 +31,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ModelChecker;
@@ -167,7 +168,8 @@ public class VerifyPN implements ModelChecker{
 			}
 		}
 		
-		public void setVerifypnPath(String path) {
+		public void setPath(String path) throws IllegalArgumentException {
+			ExecutabilityChecker.check(path);
 			String oldPath = verifypnpath;
 			verifypnpath = path;
 			Preferences.getInstance().setVerifypnLocation(path);
@@ -188,14 +190,14 @@ public class VerifyPN implements ModelChecker{
 					File file = fileFinder.ShowFileBrowserDialog("Verifypn", "",System.getProperty("user.home"));
 					if(file != null){
 						if(file.getName().matches("^verifypn.*(?:\\.exe)?$")){
-							setVerifypnPath(file.getAbsolutePath());
+							setPath(file.getAbsolutePath());
 						}else{
 							messenger.displayErrorMessage("The selected executable does not seem to be verifypn.");
 						}
 					}
 
 				} catch (Exception e) {
-					messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
+					messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
 				}
 
 			}

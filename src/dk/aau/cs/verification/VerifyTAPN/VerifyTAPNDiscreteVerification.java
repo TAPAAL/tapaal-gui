@@ -31,6 +31,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
@@ -168,14 +169,15 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			}
 		}
 		
-		public void setVerifydTapnPath(String path) {
+		public void setPath(String path) throws IllegalArgumentException{
+			ExecutabilityChecker.check(path);
 			String oldPath = verifydtapnpath;
 			verifydtapnpath = path;
 			Preferences.getInstance().setVerifydtapnLocation(path);
 			if(!isCorrectVersion()){
 				messenger
 				.displayErrorMessage(
-						"The specified version of the file verifytapn is too old.", "Verifytapn Error");
+						"The specified version of the file verifydtapn is too old.", "Verifydtapn Error");
 				verifydtapnpath = oldPath;
 				Preferences.getInstance().setVerifydtapnLocation(oldPath);
 			}
@@ -189,14 +191,14 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 					File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "",System.getProperty("user.home"));
 					if(file != null){
 						if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
-							setVerifydTapnPath(file.getAbsolutePath());
+							setPath(file.getAbsolutePath());
 						}else{
 							messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
 						}
 					}
 
 				} catch (Exception e) {
-					messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
+					messenger.displayErrorMessage("There were errors performing the requested action:\n" + e.getMessage(), "Error");
 				}
 
 			}

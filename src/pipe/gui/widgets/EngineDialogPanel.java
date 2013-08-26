@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -33,9 +35,9 @@ public class EngineDialogPanel {
 	private JPanel tapaalDiscretePanel;
 	private JPanel untimedPanel;
 	private JPanel uppaalPanel;
-	
+
 	JButton closeButton;
-	
+
 	JLabel tapaalLocationLabel = new JLabel("Located: ");
 	JLabel tapaalVersionLabel = new JLabel("Version: ");
 	JLabel dtapaalLocationLabel = new JLabel("Located: ");
@@ -44,7 +46,7 @@ public class EngineDialogPanel {
 	JLabel untimedVersionLabel = new JLabel("Version: ");
 	JLabel uppaalLocationLabel = new JLabel("Located: ");
 	JLabel uppaalVersionLabel = new JLabel("Version: ");
-	
+
 	JLabel tapaalLocationLabelVal = new JLabel("Not setup");
 	JLabel tapaalVersionLabelVal = new JLabel("N/A");
 	JLabel dtapaalLocationLabelVal = new JLabel("Not setup");
@@ -53,19 +55,19 @@ public class EngineDialogPanel {
 	JLabel untimedVersionLabelVal = new JLabel("N/A");
 	JLabel uppaalLocationLabelVal = new JLabel("Not setup");
 	JLabel uppaalVersionLabelVal = new JLabel("N/A");
-	
+
 	private Dimension minimumSize = new Dimension(320,1);
 	private Insets panelInsets = new Insets(5, 5, 5, 5);
 	private Insets smallPanelInsets = new Insets(0, 5, 0, 5);
 	private Insets buttonInsets = new Insets(0, 5, 0, 0);
-	
+
 	private String toolTipSelect = "Select a path to the verification engine.";
 	private String toolTipReset = "Reset the path to the verification engine.";
-	
+
 	public EngineDialogPanel() {
 		initComponents();		
 	}
-	
+
 	public void initComponents() {
 		makeTapaalPanel();
 		makeUppaalPanel();
@@ -74,7 +76,7 @@ public class EngineDialogPanel {
 		makeEnginePanel();
 		setPathsAndVersionNumbers();
 	}	
-	
+
 	private void selectTapnEngine() {
 		FileFinder fileFinder = new FileFinderImpl();
 		MessengerImpl messenger = new MessengerImpl();
@@ -92,13 +94,17 @@ public class EngineDialogPanel {
 			messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
 		}
 		if (verifytapnpath != null) {
-			VerifyTAPN verifyTapn = new VerifyTAPN(fileFinder,messenger);
-			verifyTapn.setVerifyTapnPath(verifytapnpath);
+			try{
+				VerifyTAPN verifyTapn = new VerifyTAPN(fileFinder,messenger);
+				verifyTapn.setPath(verifytapnpath);
+			}catch(IllegalArgumentException e){
+				messenger.displayErrorMessage(e.getMessage(), "Error selecting engine");
+			}
 			setPathsAndVersionNumbers();
 			fitDialog();
 		}
 	}
-	
+
 	private void selectdTapnEngine() {
 		FileFinder fileFinder = new FileFinderImpl();
 		MessengerImpl messenger = new MessengerImpl();
@@ -116,20 +122,24 @@ public class EngineDialogPanel {
 			messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
 		}
 		if (verifytapnpath != null) {
-			VerifyTAPNDiscreteVerification verifyTapn = new VerifyTAPNDiscreteVerification(fileFinder,messenger);
-			verifyTapn.setVerifydTapnPath(verifytapnpath);
+			try{
+				VerifyTAPNDiscreteVerification verifyTapn = new VerifyTAPNDiscreteVerification(fileFinder,messenger);
+				verifyTapn.setPath(verifytapnpath);
+			}catch(IllegalArgumentException e){
+				messenger.displayErrorMessage(e.getMessage(), "Error selecting engine");
+			}
 			setPathsAndVersionNumbers();
 			fitDialog();
 		}
 	}
-	
+
 	private void selectVerifytaEngine() {
 		FileFinder fileFinder = new FileFinderImpl();
 		MessengerImpl messenger = new MessengerImpl();
 		String verifytapath = null;
 		try {
 			File file = fileFinder.ShowFileBrowserDialog("Verifyta", "",(new Verifyta()).getPath());
-			
+
 			if(file != null){
 				if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
 					verifytapath = file.getAbsolutePath();
@@ -144,12 +154,17 @@ public class EngineDialogPanel {
 							+ e, "Error");
 		}
 		if (verifytapath != null) {
-			Verifyta verifyta = new Verifyta(fileFinder,messenger);
-			verifyta.setVerifytaPath(verifytapath);
+			try{
+				Verifyta verifyta = new Verifyta(fileFinder,messenger);
+				verifyta.setPath(verifytapath);
+			}catch(IllegalArgumentException e){
+				messenger.displayErrorMessage(e.getMessage(), "Error selecting engine");
+			}
 			setPathsAndVersionNumbers();
+			fitDialog();
 		}
 	}
-	
+
 	private void selectVerifypnEngine() {
 		FileFinder fileFinder = new FileFinderImpl();
 		MessengerImpl messenger = new MessengerImpl();
@@ -167,23 +182,27 @@ public class EngineDialogPanel {
 			messenger.displayErrorMessage("There were errors performing the requested action:\n" + e, "Error");
 		}
 		if (verifypnpath != null) {
-			VerifyPN verifyPn = new VerifyPN(fileFinder,messenger);
-			verifyPn.setVerifypnPath(verifypnpath);
+			try{
+				VerifyPN verifyPn = new VerifyPN(fileFinder,messenger);
+				verifyPn.setPath(verifypnpath);
+			}catch(IllegalArgumentException e){
+				messenger.displayErrorMessage(e.getMessage(), "Error selecting engine");
+			}
 			setPathsAndVersionNumbers();
 			fitDialog();
 		}
 	}
-	
+
 	private void resetVerifytaEngine() {
 		Verifyta.reset(); 
 		setPathsAndVersionNumbers();
 	}
-	
+
 	private void resetVerifytapnEngine() {
 		VerifyTAPN.reset();
 		setPathsAndVersionNumbers();
 	}
-	
+
 	private void resetVerifydtapnEngine() {
 		VerifyTAPNDiscreteVerification.reset();
 		setPathsAndVersionNumbers();
@@ -193,18 +212,18 @@ public class EngineDialogPanel {
 		VerifyPN.reset();
 		setPathsAndVersionNumbers();
 	}
-	
+
 	private void fitDialog() {
 		if (dialog != null) {
 			dialog.pack();
 			dialog.setLocationRelativeTo(null);	
 		}
 	}
-	
+
 	private void exit() {
 		dialog.setVisible(false);
 	}
-	
+
 	private void setPathsAndVersionNumbers() {
 		Verifyta verifyta = new Verifyta();
 		String verifytaPath = verifyta.getPath();
@@ -225,7 +244,7 @@ public class EngineDialogPanel {
 		} else {
 			verifytapnversion = verifyTAPN.getVersion();
 		}
-		
+
 		VerifyTAPNDiscreteVerification verifydTAPN = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
 		String verifydtapnPath = verifydTAPN.getPath();
 		String verifydtapnversion = "";
@@ -269,11 +288,11 @@ public class EngineDialogPanel {
 		JPanel tapaalInfoPanel = new JPanel();
 		tapaalInfoPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
-		
+
 		JPanel p = new JPanel(new FlowLayout());
 		p.add(tapaalLocationLabel);
 		p.add(tapaalLocationLabelVal);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.weightx = 1;
@@ -284,7 +303,7 @@ public class EngineDialogPanel {
 		p = new JPanel(new FlowLayout());
 		p.add(tapaalVersionLabel);
 		p.add(tapaalVersionLabelVal);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -343,7 +362,7 @@ public class EngineDialogPanel {
 		gbc.insets = panelInsets;
 		tapaalPanel.add(tapaalButtonPanel,gbc);
 	}
-	
+
 	private void makeDiscreteTapaalPanel() {
 		//make tapaal panel
 		tapaalDiscretePanel = new JPanel();
@@ -354,11 +373,11 @@ public class EngineDialogPanel {
 		JPanel tapaalDiscreteInfoPanel = new JPanel();
 		tapaalDiscreteInfoPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
-		
+
 		JPanel p = new JPanel(new FlowLayout());
 		p.add(dtapaalLocationLabel);
 		p.add(dtapaalLocationLabelVal);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.weightx = 1;
@@ -369,7 +388,7 @@ public class EngineDialogPanel {
 		p = new JPanel(new FlowLayout());
 		p.add(dtapaalVersionLabel);
 		p.add(dtapaalVersionLabelVal);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -532,18 +551,18 @@ public class EngineDialogPanel {
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		
+
 		JPanel p = new JPanel(new FlowLayout());
-		
+
 		p.add(uppaalLocationLabel);
 		p.add(uppaalLocationLabelVal);
-		
+
 		uppaalInfoPanel.add(p,gbc);
-		
+
 		p = new JPanel(new FlowLayout());
 		p.add(uppaalVersionLabel);
 		p.add(uppaalVersionLabelVal);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -606,7 +625,7 @@ public class EngineDialogPanel {
 	private void makeEnginePanel() {
 		enginePanel = new JPanel();
 		enginePanel.setLayout(new GridBagLayout());		
-		
+
 		//add panels to engine panel
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -616,7 +635,7 @@ public class EngineDialogPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = panelInsets;
 		enginePanel.add(tapaalPanel,gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -625,7 +644,7 @@ public class EngineDialogPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = panelInsets;
 		enginePanel.add(tapaalDiscretePanel,gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -643,7 +662,7 @@ public class EngineDialogPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets = panelInsets;
 		enginePanel.add(uppaalPanel,gbc);
-		
+
 		JPanel closeButtonPanel = new JPanel();
 		closeButtonPanel.setLayout(new GridBagLayout());
 		closeButton = new JButton("Close");
@@ -658,16 +677,16 @@ public class EngineDialogPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;		
 		closeButtonPanel.add(closeButton,gbc);
-		
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(0,5,2,5);
 		enginePanel.add(closeButtonPanel,gbc);	
-		
+
 	}
-	
+
 	public void showDialog() {
 		dialog = new EscapableDialog(CreateGui.getApp(),
 				"Selection of Verification Engines", true);
@@ -678,6 +697,6 @@ public class EngineDialogPanel {
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
-	
+
 	}
 }

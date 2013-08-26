@@ -26,6 +26,7 @@ import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -74,9 +75,7 @@ public class Verifyta implements ModelChecker {
 				
 				if(file != null){
 					if(file.getName().matches("^verifyta(?:\\d.*)?(?:\\.exe)?$")){
-						
-						setVerifytaPath(file.getAbsolutePath());
-						
+						setPath(file.getAbsolutePath());
 					}else{
 						messenger.displayErrorMessage("The selected executable does not seem to be verifyta.");
 					}
@@ -85,7 +84,7 @@ public class Verifyta implements ModelChecker {
 			} catch (Exception e) {
 				messenger.displayErrorMessage(
 						"There were errors performing the requested action:\n"
-								+ e, "Error");
+								+ e.getMessage(), "Error");
 			}
 
 		}
@@ -226,7 +225,8 @@ public class Verifyta implements ModelChecker {
 		}
 	}
 	
-	public void setVerifytaPath(String path) {
+	public void setPath(String path) throws IllegalArgumentException{
+		ExecutabilityChecker.check(path);
 		String oldPath = verifytapath;
 		verifytapath = path; 
 		Preferences.getInstance().setVerifytaLocation(verifytapath);
