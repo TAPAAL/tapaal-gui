@@ -7,6 +7,7 @@ import java.util.Random;
 
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.IntBound;
+import dk.aau.cs.model.tapn.RatBound;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedTransition;
@@ -43,7 +44,7 @@ public class RandomDelayMode implements DelayMode{
 			result = exponentialDistribution(range, transition);
 		} else {
 			//This is safe as the difference between the bounds is always ints - and constants in the model is ints as well
-			TimeInterval range = new TimeInterval(dInterval.IsLowerBoundNonStrict(), new IntBound(0), new IntBound(upper.subtract(lower).intValue()), dInterval.IsUpperBoundNonStrict());
+			TimeInterval range = new TimeInterval(dInterval.IsLowerBoundNonStrict(), new IntBound(0), new RatBound(upper.subtract(lower)), dInterval.IsUpperBoundNonStrict());
 			result = randomBigDecimal(range);
 		}
 		
@@ -62,41 +63,18 @@ public class RandomDelayMode implements DelayMode{
 	}
 	
 	private BigDecimal randomBigDecimal(TimeInterval range){
-		int maxValue = range.upperBound().value();
-		if(maxValue == 0){
+		BigDecimal maxValue = ((RatBound)range.upperBound()).getBound();
+		if(maxValue.equals(BigDecimal.ZERO)){
 			return BigDecimal.ZERO;
 		}
-		Random r = new Random();
 		
-		BigDecimal result = null;
-		
-		boolean validValue;
-		
+		BigDecimal result;
 		do{
-			validValue=true;
-			int integerPart = r.nextInt(maxValue);
-			//The fractional part is only 5 digits long in the simulator - 
-			//if the number 100000 is generated and the integerpart is maxToGenerate
-			//if 100000 is generated otherwise the number is considered invalid and a new is generated
-			int fractionalPart = r.nextInt((int)Math.pow(10, numberOfDecimals) + 1);
-			if(fractionalPart == (int)Math.pow(10, numberOfDecimals)){
-				if(integerPart == maxValue -1){
-					integerPart = maxValue;
-					fractionalPart = 0;
-				} else {
-					validValue = false;
-					continue;
-				}
-			}
-			
-			String integerPartAsString = Integer.toString(integerPart);
-			String fractionalPartAsString = numberOfDecimals == 0 ? "" : String.format("%0" + numberOfDecimals + "d", fractionalPart);
-			
-			String resultAsString = integerPartAsString + (numberOfDecimals == 0 ? "" : "." + fractionalPartAsString);
-			result = new BigDecimal(resultAsString);
-		} while (!validValue || !range.isIncluded(result));
-
-		return result;
+			BigDecimal randFromDouble = new BigDecimal(Math.random());
+			result = randFromDouble.multiply(maxValue);
+		} while (!range.isIncluded(result));
+		
+		return result.setScale(numberOfDecimals, RoundingMode.DOWN);
 	}
 	
 	private BigDecimal exponentialDistribution(TimeInterval range, TimedTransition transition){
@@ -108,6 +86,11 @@ public class RandomDelayMode implements DelayMode{
 		double biggestConstant = network.biggestConstantInActiveNet();
 		double biggestConstantEnabled = network.biggestContantInActiveNetEnabledTransitions();
 		double factor = 1d/(biggestConstantEnabled * 0.6d + biggestConstant * 0.4d);
+		
+		//If both the biggest constant enabled and the biggest constant in the net are 0, handle the division by zero. 
+		if(factor == Double.POSITIVE_INFINITY){
+			factor = 1/0.6;
+		}
 		
 		do{
 			double uniformDistribution = r.nextDouble();
