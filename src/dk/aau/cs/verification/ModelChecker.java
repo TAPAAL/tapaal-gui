@@ -8,7 +8,8 @@ import dk.aau.cs.util.Tuple;
 // TODO: MJ -- This interface is getting somewhat bloated -- Try to fix it
 public interface ModelChecker {
 	boolean setup();
-
+	void setPath(String path) throws IllegalArgumentException;
+	
 	String getVersion();
 
 	boolean isCorrectVersion();
