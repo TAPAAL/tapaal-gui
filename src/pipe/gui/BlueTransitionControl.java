@@ -35,7 +35,9 @@ public class BlueTransitionControl extends JPanel{
 	private static BigDecimal defaultGranularity = new BigDecimal("0.1");
 	private static boolean defaultIsRandomTrasition;
 	
+	JLabel precitionLabel;
 	JSlider bluePrecision;
+	JLabel delayModeLabel;
 	JComboBox delayMode;
 	JCheckBox randomMode;
 	
@@ -90,7 +92,7 @@ public class BlueTransitionControl extends JPanel{
 		gbc.weightx = 1.0;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		add(new JLabel("Set the delay granularity"), gbc);
+		add(precitionLabel = new JLabel("Set the delay granularity"), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridwidth = 2;
@@ -106,7 +108,7 @@ public class BlueTransitionControl extends JPanel{
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
 		gbc.gridy = 2;
-		add(new JLabel("Delay Mode:"), gbc);
+		add(delayModeLabel = new JLabel("Delay Mode:"), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.WEST;
@@ -139,7 +141,7 @@ public class BlueTransitionControl extends JPanel{
 	}
 
 	//0 corresponds to 0.00001, 5 corresponds to 1 (   thus x corresponds to 1/(10^(5−x))  )
-	public BigDecimal getValue(){
+	public BigDecimal getValue(){ 
 		return new BigDecimal(1.0/(Math.pow(10.0, (5.0-bluePrecision.getValue()))), new MathContext(Pipe.AGE_PRECISION));
 	}
 	
@@ -156,7 +158,11 @@ public class BlueTransitionControl extends JPanel{
 	}
 	
 	public boolean isRandomTransitionMode(){
-		return randomMode.isSelected();
+		if(SimulationControl.getInstance().randomSimulation()){
+			return true;
+		} else {
+			return randomMode.isSelected();
+		}
 	}
 	
 	public void setRandomTransitionMode(boolean randomTransition){
@@ -240,5 +246,15 @@ public class BlueTransitionControl extends JPanel{
 		} else {
 			return defaultIsRandomTrasition;
 		}
+	}
+	
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		precitionLabel.setEnabled(enabled);
+		bluePrecision.setEnabled(enabled);
+		delayModeLabel.setEnabled(enabled);
+		delayMode.setEnabled(enabled);
+		randomMode.setEnabled(enabled);
 	}
 }
