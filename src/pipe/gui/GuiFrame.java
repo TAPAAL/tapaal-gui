@@ -1595,7 +1595,7 @@ public class GuiFrame extends JFrame implements Observer {
 			startAction.setSelected(true);
 			tab.drawingSurface().changeAnimationMode(true);
 			tab.drawingSurface().repaintAll();
-			CreateGui.getAnimator().reset();
+			CreateGui.getAnimator().reset(false);
 			CreateGui.getAnimator().storeModel();
 			CreateGui.getAnimator().highlightEnabledTransitions();
 			CreateGui.getAnimator().reportBlockingPlaces();
