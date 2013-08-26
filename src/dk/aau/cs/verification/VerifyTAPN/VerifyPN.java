@@ -410,5 +410,8 @@ public class VerifyPN implements ModelChecker{
 			trySetup();
 		}
 
-
+		@Override
+		public String toString() {
+			return "verifypn";
+		}
 }

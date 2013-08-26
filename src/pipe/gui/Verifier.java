@@ -126,7 +126,7 @@ public class Verifier {
 
 		if (!verifytapn.isCorrectVersion()) {
 			new MessengerImpl().displayErrorMessage(
-					"No verifytapn specified: The verification is cancelled",
+					"No "+verifytapn+" specified: The verification is cancelled",
 					"Verification Error");
 			return;
 		}

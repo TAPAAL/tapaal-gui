@@ -417,5 +417,8 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			trySetup();
 		}
 
-
+		@Override
+		public String toString() {
+			return "verifydtapn";
+		}
 }

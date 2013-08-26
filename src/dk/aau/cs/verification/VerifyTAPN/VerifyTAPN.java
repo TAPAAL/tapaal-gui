@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
-
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.FileFinderImpl;
@@ -404,5 +403,8 @@ public class VerifyTAPN implements ModelChecker {
 		trySetup();
 	}
 
-	
+	@Override
+	public String toString() {
+		return "verifytapn";
+	}
 }
