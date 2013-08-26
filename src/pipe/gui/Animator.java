@@ -246,7 +246,6 @@ public class Animator {
 		disableTransitions();
 		tab.network().setMarking(initialMarking);
 		currentAction = -1;
-		updateFireableTransitions();
 	}
 
 	/**
@@ -625,9 +624,15 @@ public class Animator {
 		return animationSelectmodeDialog.getTokens();
 	}
 
-	public void reset(){
+	public void reset(boolean keepInitial){
 		resethistory();
 		removeSetTrace(false);
+		if(keepInitial && initialMarking != null){
+			markings.add(initialMarking);
+			tab.network().setMarking(initialMarking);
+			currentAction = -1;
+			updateFireableTransitions();
+		}
 	}
 
 	public boolean removeSetTrace(boolean askUser){
@@ -712,9 +717,7 @@ public class Animator {
 			return;
 		}
 		
-		reset();
-		restoreModel();
-		markings.add(initialMarking);
+		reset(true);
 						
 		Pattern trans_p = Pattern.compile("([^\\d][^\\.\\s]+)\\.([^\\.\\s]+)");
 		Pattern delay_p = Pattern.compile("(\\d+\\.?\\d*)");
@@ -757,9 +760,7 @@ public class Animator {
 		} catch (FileNotFoundException e) {
 			// Will never happen
 		} catch (IOException e) {
-			reset();
-			restoreModel();
-			markings.add(initialMarking);
+			reset(true);
 			JOptionPane.showMessageDialog(CreateGui.getApp(), "Error importing trace. Does the trace belong to this model?", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		
