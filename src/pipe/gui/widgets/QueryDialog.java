@@ -902,6 +902,8 @@ public class QueryDialog extends JPanel {
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
 
+		setEnabledReductionOptions();
+		
 		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
@@ -922,7 +924,6 @@ public class QueryDialog extends JPanel {
 		setupQuantificationFromQuery(queryToCreateFrom);
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
-		setEnabledReductionOptions(); // fix for if an query with an invalid reduction option had been saved due to a bug.
 		setupTraceOptionsFromQuery(queryToCreateFrom);
 	}
 
