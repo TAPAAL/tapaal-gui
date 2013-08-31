@@ -9,6 +9,7 @@ import dk.aau.cs.util.Tuple;
 public interface ModelChecker {
 	boolean setup();
 	void setPath(String path) throws IllegalArgumentException;
+	boolean useDiscreteSemantics();
 	
 	String getVersion();
 

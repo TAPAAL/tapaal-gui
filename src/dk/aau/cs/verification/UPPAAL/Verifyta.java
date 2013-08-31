@@ -342,4 +342,8 @@ public class Verifyta implements ModelChecker {
 		verifytapath = "";
 		Preferences.getInstance().setVerifytaLocation(null);
 	}
+
+	public boolean useDiscreteSemantics() {
+		return false;
+	}
 }
