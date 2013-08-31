@@ -416,5 +416,10 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			trySetup();
 		}
 
+		@Override
+		public boolean useDiscreteSemantics() {
+			return true;
+		}
+
 
 }

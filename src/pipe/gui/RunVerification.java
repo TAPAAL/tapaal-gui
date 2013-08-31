@@ -46,6 +46,8 @@ import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.ModelChecker;
+import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
 
 public class RunVerification extends RunVerificationBase {
@@ -264,6 +266,18 @@ public class RunVerification extends RunVerificationBase {
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel.add(new JLabel("Estimated memory usage: "+MemoryMonitor.getPeakMemory()), gbc);
+		
+		//Show discrete semantics warning if needed
+		QueryResult queryResult = result.getQueryResult();
+		if((queryResult.hasDeadlock() || queryResult.queryType() == QueryType.EG || queryResult.queryType() == QueryType.AF) 
+				&& modelChecker.useDiscreteSemantics()){
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = modelChecker.supportsStats() ? 5 : 4;
+			gbc.gridwidth = 2;
+			gbc.anchor = GridBagConstraints.WEST;
+			panel.add(new JLabel("<html><font color=red>The verification answer is valid only<br /> for the discrete semantics (integer delays only).</font></html>"), gbc);
+		}
 		
 		return panel;
 	}
