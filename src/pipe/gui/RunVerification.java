@@ -276,7 +276,7 @@ public class RunVerification extends RunVerificationBase {
 			gbc.gridy = modelChecker.supportsStats() ? 5 : 4;
 			gbc.gridwidth = 2;
 			gbc.anchor = GridBagConstraints.WEST;
-			panel.add(new JLabel("<html><font color=red>The verification answer is valid only<br /> for the discrete semantics (integer delays only).</font></html>"), gbc);
+			panel.add(new JLabel("<html><font color=red>The verification answer is guaranteed for<br/>the discrete semantics only (integer delays).</font></html>"), gbc);
 		}
 		
 		return panel;
