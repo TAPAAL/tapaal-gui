@@ -252,7 +252,7 @@ public class Verifyta implements ModelChecker {
 	
 	@Override
 	public boolean supportsModel(TimedArcPetriNet model) {
-		if(model.hasUrgentTransitions()){
+		if(model.hasUrgentTransitions() || model.hasWeights()){
 			return false;
 		}
 		
