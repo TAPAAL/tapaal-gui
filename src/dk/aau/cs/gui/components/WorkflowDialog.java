@@ -154,7 +154,7 @@ public class WorkflowDialog extends JDialog{
 				
 				if(checkIfTAWFN()){				
 					GridBagConstraints gbc = new GridBagConstraints();
-					JLabel isWorkflowLabel = new JLabel("This is a TAWFN!");
+					JLabel isWorkflowLabel = new JLabel("TODO: ADD CHECK!");
 					gbc.gridx = 0;
 					gbc.gridy = 2;
 					gbc.gridwidth = 2;
