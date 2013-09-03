@@ -33,6 +33,7 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -60,12 +61,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.tapaal.Preferences;
+
 import com.sun.jna.Platform;
 
 
 
-import net.tapaal.TAPAAL;
 
+import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
@@ -86,6 +88,7 @@ import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.StatisticsPanel;
+import dk.aau.cs.gui.components.WorkflowDialog;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
@@ -126,7 +129,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
-	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction;
+	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
@@ -695,6 +698,14 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(batchProcessing);
+		
+		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", null));				
+		workflowDialog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				WorkflowDialog.showDialog();
+			}
+		});
+		toolsMenu.add(workflowDialog);
 
 
 		toolsMenu.addSeparator();
@@ -967,6 +978,8 @@ public class GuiFrame extends JFrame implements Observer {
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+			
+			workflowDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
@@ -1005,6 +1018,8 @@ public class GuiFrame extends JFrame implements Observer {
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
+			
+			workflowDialogAction.setEnabled(false);
 
 			// Remove constant highlight
 			CreateGui.getCurrentTab().removeConstantHighlights();
@@ -1046,6 +1061,8 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			
+			workflowDialogAction.setEnabled(false);
 
 			enableAllActions(false);
 			break;
