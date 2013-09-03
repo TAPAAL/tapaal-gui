@@ -386,11 +386,11 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		
-		boolean supportsModel(TimedArcPetriNet model) {
+		public boolean supportsModel(TimedArcPetriNet model) {
 			return model.isNonStrict();
 		}
 		
-		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
+		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
                         // if liveness, has deadlock proposition and uses timedarts, it is not supported
 			if((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
                                 && new HasDeadlockVisitor().hasDeadLock(query.getProperty()) 
