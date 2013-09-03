@@ -55,19 +55,12 @@ public abstract class TimedPlace {
 	}
 	public void setInPlace(boolean isInPlace) {
 		this.isInPlace = isInPlace;
-		addToken(new TimedToken(this));
-		while(numberOfTokens() > 1){
-			removeToken();
-		}
 	}
 	public boolean isOutPlace() {
 		return isOutPlace;
 	}
 	public void setOutPlace(boolean isOutPlace) {
 		this.isOutPlace = isOutPlace;
-		while(numberOfTokens() > 1){
-			removeToken();
-		}
 	}
 	
 //	public abstract void addInhibitorArc(TimedInhibitorArc arc);

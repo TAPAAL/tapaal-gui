@@ -1,5 +1,6 @@
 package dk.aau.cs.verification;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 
 import dk.aau.cs.Messenger;
@@ -156,12 +157,16 @@ public class TAPNComposer {
 					String uniquePlaceName = getUniquePlaceName();
 
 					LocalTimedPlace place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
+					place.setInPlace(timedPlace.isInPlace());
+					place.setOutPlace(timedPlace.isOutPlace());
 					constructedModel.add(place);
 					mapping.addMapping(tapn.name(), timedPlace.name(), uniquePlaceName);
-
+					
+					if(place.isOutPlace())	continue;
 					for (TimedToken token : timedPlace.tokens()) {
 						place.addToken(new TimedToken(place, token.age()));
 					}
+					if(place.isInPlace() && timedPlace.tokens().size() == 0)	place.addToken(new TimedToken(place, new BigDecimal(0)));
 				}
 			}
 		}

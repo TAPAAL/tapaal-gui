@@ -201,11 +201,9 @@ public class WorkflowDialog extends JDialog{
 		ArrayList<TimedPlace> in_place_options = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> out_place_options = new ArrayList<TimedPlace>();
 		
-		boolean useTemplatePrefix = CreateGui.getCurrentTab().network().activeTemplates().size() > 1;
-		
 		for(TimedArcPetriNet temp : CreateGui.getCurrentTab().network().activeTemplates()){
-			String prefix = useTemplatePrefix? temp.name() + "." : "";
 			for(TimedPlace p : temp.places()){
+				// TODO remove unusable places
 				in_place_options.add(p);
 				out_place_options.add(p);
 				p.setInPlace(false);
@@ -265,19 +263,5 @@ public class WorkflowDialog extends JDialog{
 		in.setInPlace(true);
 		out.setOutPlace(true);
 		Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab().network(), q);
-	}
-	
-	private TimedPlace stringToPlace(String place){
-		Iterator<Template> i = CreateGui.getCurrentTab().activeTemplates().iterator();
-		TimedArcPetriNet net = null;
-		while(i.hasNext()){
-			net = i.next().model();
-			if(!place.contains(".") || place.startsWith(net.name() + ".")){
-				break;
-			}
-		}
-			
-		TimedPlace p = net.getPlaceByName(place.contains(".")? place.substring(place.indexOf(".")+1):place);
-		return p;
 	}
 }
