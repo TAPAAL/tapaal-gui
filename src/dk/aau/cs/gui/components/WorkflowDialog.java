@@ -155,52 +155,6 @@ public class WorkflowDialog extends JDialog{
 		for(TimedArcPetriNet temp : CreateGui.getCurrentTab().network().activeTemplates()){
 			String prefix = useTemplatePrefix? temp.name() + "." : "";
 			for(TimedPlace p : temp.places()){
-				/*boolean in_in = true;
-				boolean in_out = true;
-				for(TimedTransition t : temp.transitions()){
-					// Ingoing arcs
-					if(in_in){	
-						for(TimedOutputArc arc : t.getOutputArcs()){
-							if(arc.destination().equals(p)){
-								in_in = false;
-								break;
-							}
-						}
-					}
-					
-					// Outgoing arcs
-					if(in_out){
-						for(TimedInputArc arc : t.getInputArcs()){
-							if(arc.source().equals(p)){
-								in_out = false;
-								break;
-							}
-						}
-					}
-					
-					// Transport arcs
-					if(in_out || in_in){
-						for(TransportArc arc : t.getTransportArcsGoingThrough()){
-							if(arc.source().equals(p)){
-								in_out = false;
-							}
-							if(arc.destination().equals(p)){
-								in_in = false;
-							}
-						}
-					}
-					
-					// TODO: shared places
-					
-					// Add to set
-					if(in_in){
-						
-					}
-					
-					if(in_out){
-						out_place_options.add(prefix + p.name());
-					}
-				}*/
 				in_place_options.add(prefix + p.name());
 				out_place_options.add(prefix + p.name());
 			}
