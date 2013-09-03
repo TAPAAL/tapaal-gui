@@ -407,5 +407,10 @@ public class VerifyTAPN implements ModelChecker {
 		trySetup();
 	}
 
+	@Override
+	public boolean useDiscreteSemantics() {
+		return false;
+	}
+
 	
 }

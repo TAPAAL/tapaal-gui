@@ -19,9 +19,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +27,6 @@ import java.util.Comparator;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -45,13 +41,10 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -68,8 +61,6 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
-
-import net.tapaal.Preferences;
 
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -97,13 +88,11 @@ import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
-import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -201,7 +190,7 @@ public class QueryDialog extends JPanel {
 
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
-	private JComboBox reductionOption;
+	private JComboBox<String> reductionOption;
 	private JCheckBox symmetryReduction;
 	private JCheckBox discreteInclusion;
 	private JButton selectInclusionPlacesButton;
@@ -913,6 +902,8 @@ public class QueryDialog extends JPanel {
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
 
+		setEnabledReductionOptions();
+		
 		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
@@ -933,7 +924,6 @@ public class QueryDialog extends JPanel {
 		setupQuantificationFromQuery(queryToCreateFrom);
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
-		setEnabledReductionOptions(); // fix for if an query with an invalid reduction option had been saved due to a bug.
 		setupTraceOptionsFromQuery(queryToCreateFrom);
 	}
 
@@ -960,6 +950,7 @@ public class QueryDialog extends JPanel {
 				reduction = name_OPTIMIZEDSTANDARD;
 			}
 		}
+		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
@@ -2031,14 +2022,11 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
-		reductionOption = new JComboBox();
-		setEnabledReductionOptions();
+		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 		
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox)e.getSource();
-				String selectedItem = (String)source.getSelectedItem();
 				setEnabledOptionsAccordingToCurrentReduction();
 			}
 		});
