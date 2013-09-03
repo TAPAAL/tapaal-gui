@@ -263,7 +263,7 @@ public class Verifyta implements ModelChecker {
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
 			VerificationOptions options) {
 		
-		if(((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST && !model.isDegree2()){
+		if(((VerifytaOptions) options).getReduction() == ReductionOption.DEGREE2BROADCAST && !model.isDegree2()){
 			return false;
 		}
 		
