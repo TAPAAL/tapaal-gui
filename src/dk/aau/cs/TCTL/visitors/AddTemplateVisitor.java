@@ -14,6 +14,7 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.TCTL.TCTLWORKFLOWSOUNDNESSNode;
 
 public class AddTemplateVisitor implements ITCTLVisitor {
 	private String templateName;
@@ -63,6 +64,12 @@ public class AddTemplateVisitor implements ITCTLVisitor {
 	public void visit(TCTLAtomicPropositionNode atomicPropositionNode,
 			Object context) {
 		atomicPropositionNode.setTemplate(templateName);
+	}
+
+	@Override
+	public void visit(TCTLWORKFLOWSOUNDNESSNode tctlworkflowsoundnessNode,
+			Object context) {
+		tctlworkflowsoundnessNode.getProperty().accept(this, context);
 	}
 
 }

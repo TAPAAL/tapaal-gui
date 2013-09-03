@@ -14,6 +14,7 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.TCTL.TCTLWORKFLOWSOUNDNESSNode;
 import dk.aau.cs.verification.NameMapping;
 
 public class RenameAllPlacesVisitor implements ITCTLVisitor {
@@ -38,6 +39,11 @@ public class RenameAllPlacesVisitor implements ITCTLVisitor {
 
 	public void visit(TCTLEGNode egNode, Object context) {
 		egNode.getProperty().accept(this, context);
+	}
+	
+	public void visit(TCTLWORKFLOWSOUNDNESSNode tctlworkflowsoundnessNode,
+			Object context) {
+		tctlworkflowsoundnessNode.getProperty().accept(this, context);
 	}
 
 	public void visit(TCTLNotNode notNode, Object context) {

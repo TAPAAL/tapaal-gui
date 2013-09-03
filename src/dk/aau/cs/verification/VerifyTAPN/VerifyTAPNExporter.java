@@ -90,6 +90,8 @@ public class VerifyTAPNExporter {
 		modelStream.append("name=\"" + p.name() + "\" ");
 		modelStream.append("invariant=\"" + p.invariant().toString(false).replace("<", "&lt;") + "\" ");
 		modelStream.append("initialMarking=\"" + p.numberOfTokens() + "\" ");
+		modelStream.append("in=\"" + p.isInPlace() + "\" ");
+		modelStream.append("out=\"" + p.isOutPlace() + "\" ");
 		
 		modelStream.append("/>\n");
 	}

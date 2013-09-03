@@ -8,6 +8,7 @@ import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
+import dk.aau.cs.TCTL.TCTLWORKFLOWSOUNDNESSNode;
 
 public class UpwardsClosedVisitor extends VisitorBase {
 	public boolean isUpwardClosed(TCTLAbstractProperty query){
@@ -23,6 +24,11 @@ public class UpwardsClosedVisitor extends VisitorBase {
 	public void visit(TCTLEFNode efNode, Object context) {
 		((Context)context).queryType = QueryType.EF;
 		super.visit(efNode, context);
+	}
+	
+	public void visit(TCTLWORKFLOWSOUNDNESSNode wfsNode, Object context) {
+		((Context)context).queryType = QueryType.WORKFLOWSOUNDNESS;
+		super.visit(wfsNode, context);
 	}
 	
 	public void visit(TCTLEGNode egNode, Object context) {
@@ -75,7 +81,7 @@ public class UpwardsClosedVisitor extends VisitorBase {
 //
 //	}
 	
-	private enum QueryType { EF, AG, AF, EG }
+	private enum QueryType { EF, AG, AF, EG, WORKFLOWSOUNDNESS }
 	private class Context
 	{
 		public boolean result;

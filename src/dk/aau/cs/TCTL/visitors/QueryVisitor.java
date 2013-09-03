@@ -14,11 +14,12 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.TCTL.TCTLWORKFLOWSOUNDNESSNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 
 public abstract class QueryVisitor implements ITCTLVisitor {
 	protected enum QueryType {
-		EF, EG, AF, AG
+		EF, EG, AF, AG, WORKFLOWSOUNDNESS
 	}
 
 	private StringBuffer uppaalQuery;
@@ -51,7 +52,11 @@ public abstract class QueryVisitor implements ITCTLVisitor {
 		agNode.getProperty().accept(this, context);
 		addEnding(QueryType.AG);
 	}
-
+	
+	public void visit(TCTLWORKFLOWSOUNDNESSNode wfsNode, Object context) {
+		assert(false);	// We should never send this to uppaal!
+	}
+	
 	public void visit(TCTLEFNode efNode, Object context) {
 		uppaalQuery.append("E<> ");
 		efNode.getProperty().accept(this, context);
