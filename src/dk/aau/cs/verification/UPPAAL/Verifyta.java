@@ -262,11 +262,7 @@ public class Verifyta implements ModelChecker {
 	@Override
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
 			VerificationOptions options) {
-		
-		if(((VerifytaOptions) options).getReduction() == ReductionOption.DEGREE2BROADCAST && !model.isDegree2()){
-			return false;
-		}
-		
+
 		if(query.hasDeadlock() &&
 				((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
 					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST){
@@ -277,6 +273,10 @@ public class Verifyta implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+		
+		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
+			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");
+		
 		if(!supportsModel(model.value1()))
 			throw new UnsupportedModelException("Verifyta does not support the given model.");
 		
