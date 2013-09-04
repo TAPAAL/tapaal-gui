@@ -46,22 +46,6 @@ public abstract class TimedPlace {
 		return copy;
 	}
 	
-/* TAWFN attributes */
-	
-	private boolean isInPlace = false;
-	private boolean isOutPlace = false;
-	public boolean isInPlace() {
-		return isInPlace;
-	}
-	public void setInPlace(boolean isInPlace) {
-		this.isInPlace = isInPlace;
-	}
-	public boolean isOutPlace() {
-		return isOutPlace;
-	}
-	public void setOutPlace(boolean isOutPlace) {
-		this.isOutPlace = isOutPlace;
-	}
 	
 //	public abstract void addInhibitorArc(TimedInhibitorArc arc);
 //	public abstract void addToPreset(TransportArc arc);

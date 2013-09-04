@@ -13,7 +13,6 @@ import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.TCTLPathPlaceHolder;
 import dk.aau.cs.TCTL.TCTLStatePlaceHolder;
 import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.TCTL.TCTLWORKFLOWSOUNDNESSNode;
 
 public interface ITCTLVisitor {
 	void visit(TCTLAFNode afNode, Object context);
@@ -39,6 +38,4 @@ public interface ITCTLVisitor {
 	void visit(TCTLTrueNode tctlTrueNode, Object context);
 	void visit(TCTLFalseNode tctlFalseNode, Object context);
 	void visit(TCTLDeadlockNode tctlDeadLockNode, Object context);
-
-	void visit(TCTLWORKFLOWSOUNDNESSNode tctlworkflowsoundnessNode, Object context);
 }
