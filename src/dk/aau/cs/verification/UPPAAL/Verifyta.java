@@ -263,10 +263,18 @@ public class Verifyta implements ModelChecker {
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
 			VerificationOptions options) {
 
-		if(query.hasDeadlock() &&
-				((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
+		if(query.hasDeadlock()){
+				// Only broadcast translations supports deadlock.
+				if(((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
 					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST){
-			return false;
+						return false;
+				}
+				
+				// Broadcast translations do not support EG and AF queries that contain a deadlock.
+				if(query.getProperty() instanceof TCTLEGNode || 
+						query.getProperty() instanceof TCTLAFNode){
+					return false;
+				}
 		}
 		
 		return true;
