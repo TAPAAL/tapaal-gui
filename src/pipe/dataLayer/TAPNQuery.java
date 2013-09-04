@@ -24,6 +24,10 @@ public class TAPNQuery {
 	public enum ExtrapolationOption {
 		AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP
 	};
+	
+	public enum ModelType{
+		TAPN, TAWFN
+	}
 
 	private String name;
 	private int capacity;
@@ -36,6 +40,7 @@ public class TAPNQuery {
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
+	private ModelType modelType;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -189,6 +194,14 @@ public class TAPNQuery {
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption, ModelType modelType) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTabelSize, extrapolationOption);
+		this.modelType = modelType;
+	}
+	
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTabelSize, extrapolationOption, new InclusionPlaces());
 	}
@@ -210,7 +223,7 @@ public class TAPNQuery {
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
 	}
-
+	
 	@Override
 	public String toString() {
 		return getName();

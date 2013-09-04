@@ -1,5 +1,6 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import pipe.dataLayer.TAPNQuery.ModelType;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.InclusionPlaces;
@@ -8,7 +9,15 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
 	private boolean timeDarts;
 	private boolean pTrie;
+	private ModelType modelType;
 
+	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
+			SearchOption search, boolean symmetry, boolean timeDarts,
+			boolean pTrie, ModelType modelType) {
+		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie);
+		this.modelType = modelType;
+	}
+	
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie) {
@@ -42,6 +51,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		result.append(' ');
 		result.append("-p ");
 		result.append(pTrie ? "1" : "0");
+		if(modelType == ModelType.TAWFN){
+			result.append(" -w");
+		}
 		return result.toString();
 	}
 

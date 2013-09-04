@@ -1,44 +1,35 @@
 package dk.aau.cs.gui.components;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSplitPane;
 
 import pipe.gui.*;
-import pipe.gui.graphicElements.Place;
-import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
-import pipe.gui.undo.DeleteTimedTransitionCommand;
-import pipe.gui.undo.UndoManager;
 import pipe.dataLayer.*;
-import dk.aau.cs.gui.BatchProcessingDialog;
-import dk.aau.cs.gui.TabContent;
-import dk.aau.cs.gui.undo.Command;
+import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
+import pipe.dataLayer.TAPNQuery.ModelType;
+import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.util.Tuple;
+import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.verification.QueryType;
 
 public class WorkflowDialog extends JDialog{
 
@@ -48,8 +39,9 @@ public class WorkflowDialog extends JDialog{
 
 	private JPanel panel;
 	
-	private JComboBox inplace;
-	private JComboBox outplace;
+	private JButton checkIfWorkflow;
+	private TimedPlace in;
+	private TimedPlace out;
 	
 	public static void showDialog(){
 		dialog = new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true);
@@ -70,74 +62,49 @@ public class WorkflowDialog extends JDialog{
 	private void initComponents() {
 		panel = new JPanel(new GridBagLayout());
 		
-		/* In place */
-		JLabel inplaceLabel = new JLabel("Select one place as IN-place:");
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.VERTICAL;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(5, 5, 0, 0);
-		gbc.anchor = GridBagConstraints.WEST;
-		panel.add(inplaceLabel, gbc);
-		
-		Tuple<String[], String[]> place_options = getInOutPlaces();
-		
-		inplace = new JComboBox(place_options.value1());
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(5, 0, 0, 5);
-		panel.add(inplace, gbc);
-		
-		int i = 0;
-		int selectedIndex = 0;
-		for(String p : place_options.value1()){
-			if(p.toLowerCase().equals("in") || p.toLowerCase().endsWith(".in")){
-				selectedIndex = i;
-				break;
-			}
-			i++;
-		}
-		
-		if(selectedIndex > 0){
-			inplace.setSelectedIndex(selectedIndex);
-		}
-		
-		/* Out place */
-		JLabel outplaceLabel = new JLabel("Select one place as OUT-place:");
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.insets = new Insets(0, 5, 0, 0);
-		panel.add(outplaceLabel, gbc);
-		
-		outplace = new JComboBox(place_options.value2());
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.insets = new Insets(0, 0, 0, 5);
-		panel.add(outplace, gbc);
-		
-		i = 0;
-		selectedIndex = 0;
-		for(String p : place_options.value2()){
-			if(p.toLowerCase().equals("out") || p.toLowerCase().endsWith(".out")){
-				selectedIndex = i;
-				break;
-			}
-			i++;
-		}
-		
-		if(selectedIndex > 0){
-			outplace.setSelectedIndex(selectedIndex);
-		}
-		
 		/* Check if workflow net */
-		JButton checkIfWorkflow = new JButton("Check if net is TAWFN");
+		checkIfWorkflow = new JButton("Analyze net");
 		checkIfWorkflow.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO check if TAWFN
+				checkIfWorkflow.setEnabled(false);
+				try{
+					checkIfTAWFN();
+					GridBagConstraints gbc = new GridBagConstraints();
+					JLabel isWorkflowLabel = new JLabel("The net is a TAWFN!");
+					gbc.gridx = 0;
+					gbc.gridy = 2;
+					gbc.gridwidth = 2;
+					gbc.insets = new Insets(5, 0, 5, 5);
+					gbc.fill = GridBagConstraints.HORIZONTAL;
+					panel.add(isWorkflowLabel, gbc);
+					
+					/* Check if workflow net is sound */
+					JButton checkIfSound = new JButton("Check if TAWFN is sound");
+					checkIfSound.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							checkTAWFNSoundness(in, out);
+						}
+					});
+					gbc.gridx = 0;
+					gbc.gridy = 3;
+					gbc.gridwidth = 2;
+					gbc.insets = new Insets(0, 0, 5, 0);
+					gbc.fill = GridBagConstraints.HORIZONTAL;
+					panel.add(checkIfSound, gbc);
+					
+					panel.remove(checkIfWorkflow);
+					dialog.pack();
+				}catch(Exception ee){
+					JOptionPane.showMessageDialog(CreateGui.getApp(), ee.getMessage(), "Net is not TAWFN", JOptionPane.ERROR_MESSAGE);
+				}
 			}
-		});
+		});		
+		
+		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 2;
@@ -146,28 +113,121 @@ public class WorkflowDialog extends JDialog{
 		panel.add(checkIfWorkflow, gbc);
 	}
 	
-	private Tuple<String[], String[]> getInOutPlaces(){
-		ArrayList<String> in_place_options = new ArrayList<String>();
-		ArrayList<String> out_place_options = new ArrayList<String>();
+	private boolean checkIfTAWFN() throws Exception{
+		List<TimedArcPetriNet> tapns = CreateGui.getCurrentTab().network().activeTemplates();
+		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();	
+		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
+		in = null;
+		out = null;
 		
-		boolean useTemplatePrefix = CreateGui.getCurrentTab().network().activeTemplates().size() > 1;
+		boolean isin;
+		boolean isout;
 		
-		for(TimedArcPetriNet temp : CreateGui.getCurrentTab().network().activeTemplates()){
-			String prefix = useTemplatePrefix? temp.name() + "." : "";
-			for(TimedPlace p : temp.places()){
-				in_place_options.add(prefix + p.name());
-				out_place_options.add(prefix + p.name());
+		for(TimedArcPetriNet tapn: tapns){ 
+			
+			/*if(!tapn.inputArcs().iterator().hasNext() && !tapn.outputArcs().iterator().hasNext()
+					&& !tapn.inhibitorArcs().iterator().hasNext() && !tapn.transportArcs().iterator().hasNext()){ // A net without arcs
+				return false;
+			}*/
+			
+			
+			
+			for(TimedPlace p : tapn.places()){
+				isin = true;
+				isout = true;
+				
+				// Test for arcs going in to place
+				for(TimedOutputArc arc: tapn.outputArcs()){
+					if(arc.destination().equals(p)){
+						isin = false;
+						break;
+					}
+				}
+				
+				//Test for arcs going out from place
+				for(TimedInputArc arc: tapn.inputArcs()){
+					if(arc.source().equals(p)){
+						isout = false;
+						break;
+					}
+				}
+				
+				// TODO inhibitor arcs in transport places?
+				
+				for(TransportArc arc: tapn.transportArcs()){
+					if(arc.destination().equals(p)){
+						isin = false;
+					}
+					if(arc.source().equals(p)){
+						isout = false;
+					}
+					if(!isin && !isout)	break;
+				}
+				
+				
+				
+				if(p.isShared()){
+					if(isin){
+						sharedInPlaces.add(p);
+					}
+					
+					if(isout){
+						sharedOutPlaces.add(p);
+					}
+				}else if(isin && isout){
+					throw new Exception("Model contains place with no in- or out-going arcs.");
+				}else if(isin){
+					if(in == null){
+						in = p;
+					}else{
+						throw new Exception("Multiple in-places found.");
+					}
+				}else if(isout){
+					if(out == null){
+						out = p;
+					}else{
+						throw new Exception("Multiple out-places found.");
+					}
+				}
 			}
 		}
 		
-		String[] in_place_array = new String[in_place_options.size()];
-		String[] out_place_array = new String[in_place_options.size()];
+		while(sharedInPlaces.size()!=0){
+			TimedPlace p = sharedInPlaces.get(0);
+			while(sharedInPlaces.remove(p)){}
+			if(!sharedOutPlaces.remove(p)){
+				if(in == null){
+					in = p;
+				}else{
+					throw new Exception("Multiple in-places found.");
+				}
+			}
+			while(sharedOutPlaces.remove(p)){}
+		}
 		
-		int i = 0;
-		for(String s : in_place_options)	in_place_array[i++] = s;
-		i = 0;
-		for(String s : out_place_options)	out_place_array[i++] = s;
-
-		return new Tuple<String[], String[]>(in_place_array, out_place_array);
+		if(in == null){
+			throw new Exception("No in-place found.");
+		}
+		
+		while(sharedOutPlaces.size() > 0){
+			if(out == null){
+				TimedPlace p = sharedOutPlaces.get(0);
+				out = p;
+				while(sharedOutPlaces.remove(p)){}
+			}else{
+				throw new Exception("Multiple out-places found.");
+			}
+		}
+		
+		if(out == null){
+			throw new Exception("No in-place found.");
+		}
+		
+		return true;
+	}
+	
+	private void checkTAWFNSoundness(TimedPlace in, TimedPlace out){
+		TAPNQuery q = new TAPNQuery("Workflow soundness checking", 10, new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyTAPNdiscreteVerification, true, false, false, null, ExtrapolationOption.AUTOMATIC, ModelType.TAWFN);
+		Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab().network(), q);
 	}
 }
