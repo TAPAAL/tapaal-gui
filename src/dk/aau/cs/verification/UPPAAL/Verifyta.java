@@ -275,6 +275,11 @@ public class Verifyta implements ModelChecker {
 						query.getProperty() instanceof TCTLAFNode){
 					return false;
 				}
+				
+				// No translation support inhibitor arcs with deadlock queries
+				if(model.hasInhibitorArcs()){
+					return false;
+				}
 		}
 		
 		return true;
