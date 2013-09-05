@@ -395,8 +395,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			if((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
                                 && query.hasDeadlock() 
                                 && ((VerifyDTAPNOptions)options).timeDarts()){
-                            return false;
-                        }
+                return false;
+            }
+			
+			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
+				return false;
+			}
 			
 			return true;
 		}
