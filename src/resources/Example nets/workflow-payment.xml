@@ -30,11 +30,11 @@
 <arcpath arcPointType="false" id="0" xCoord="181" yCoord="342"/>
 <arcpath arcPointType="false" id="1" xCoord="270" yCoord="421"/>
 </arc>
-<arc id="booking to book" inscription="[0,5]:1" source="booking" target="book" type="transport" weight="1">
+<arc id="booking to book" inscription="[3,5]:1" source="booking" target="book" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="191" yCoord="207"/>
 <arcpath arcPointType="false" id="1" xCoord="291" yCoord="207"/>
 </arc>
-<arc id="book to payment" inscription="[0,5]:1" source="book" target="payment" type="transport" weight="1">
+<arc id="book to payment" inscription="[3,5]:1" source="book" target="payment" type="transport" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="301" yCoord="207"/>
 <arcpath arcPointType="false" id="1" xCoord="402" yCoord="207"/>
 </arc>
@@ -47,13 +47,13 @@
 <arcpath arcPointType="false" id="1" xCoord="642" yCoord="207"/>
 </arc>
 <arc id="succesful to empty" inscription="[0,inf)" source="succesful" target="empty" type="timed" weight="1">
-<arcpath arcPointType="false" id="0" xCoord="643" yCoord="214"/>
-<arcpath arcPointType="true" id="1" xCoord="557" yCoord="287"/>
+<arcpath arcPointType="false" id="0" xCoord="644" yCoord="214"/>
+<arcpath arcPointType="true" id="1" xCoord="558" yCoord="288"/>
 <arcpath arcPointType="false" id="2" xCoord="527" yCoord="337"/>
 </arc>
 <arc id="empty to succesful" inscription="1" source="empty" target="succesful" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="526" yCoord="347"/>
-<arcpath arcPointType="true" id="1" xCoord="632" yCoord="272"/>
+<arcpath arcPointType="true" id="1" xCoord="633" yCoord="273"/>
 <arcpath arcPointType="false" id="2" xCoord="651" yCoord="221"/>
 </arc>
 <arc id="attempts to empty" inscription="[0,inf)" source="attempts" target="empty" type="timed" weight="1">
@@ -70,12 +70,12 @@
 </arc>
 <arc id="booking to restart1" inscription="[0,inf)" source="booking" target="restart1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="180" yCoord="221"/>
-<arcpath arcPointType="true" id="1" xCoord="197" yCoord="257"/>
+<arcpath arcPointType="true" id="1" xCoord="198" yCoord="258"/>
 <arcpath arcPointType="false" id="2" xCoord="231" yCoord="297"/>
 </arc>
 <arc id="restart1 to booking" inscription="1" source="restart1" target="booking" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="237" yCoord="282"/>
-<arcpath arcPointType="true" id="1" xCoord="227" yCoord="257"/>
+<arcpath arcPointType="true" id="1" xCoord="228" yCoord="258"/>
 <arcpath arcPointType="false" id="2" xCoord="187" yCoord="217"/>
 </arc>
 <arc id="attempts to restart1" inscription="[0,inf)" source="attempts" target="restart1" type="timed" weight="1">
@@ -96,8 +96,8 @@
 </arc>
 <arc id="attempts to success" inscription="[0,inf)" source="attempts" target="success" type="tapnInhibitor" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="296" yCoord="433"/>
-<arcpath arcPointType="true" id="1" xCoord="569" yCoord="444"/>
-<arcpath arcPointType="true" id="2" xCoord="707" yCoord="407"/>
+<arcpath arcPointType="true" id="1" xCoord="570" yCoord="445"/>
+<arcpath arcPointType="true" id="2" xCoord="708" yCoord="408"/>
 <arcpath arcPointType="false" id="3" xCoord="732" yCoord="357"/>
 </arc>
 <arc id="attempts to fail1" inscription="[0,inf)" source="attempts" target="fail1" type="tapnInhibitor" weight="1">
@@ -110,33 +110,33 @@
 </arc>
 <arc id="booking to fail1" inscription="[5,5]" source="booking" target="fail1" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="166" yCoord="217"/>
-<arcpath arcPointType="true" id="1" xCoord="62" yCoord="332"/>
-<arcpath arcPointType="true" id="2" xCoord="59" yCoord="418"/>
-<arcpath arcPointType="true" id="3" xCoord="122" yCoord="497"/>
+<arcpath arcPointType="true" id="1" xCoord="63" yCoord="333"/>
+<arcpath arcPointType="true" id="2" xCoord="60" yCoord="419"/>
+<arcpath arcPointType="true" id="3" xCoord="123" yCoord="498"/>
 <arcpath arcPointType="false" id="4" xCoord="171" yCoord="531"/>
 </arc>
 <arc id="fail1 to out" inscription="1" source="fail1" target="out" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="191" yCoord="537"/>
-<arcpath arcPointType="true" id="1" xCoord="617" yCoord="527"/>
-<arcpath arcPointType="true" id="2" xCoord="782" yCoord="467"/>
+<arcpath arcPointType="true" id="1" xCoord="618" yCoord="528"/>
+<arcpath arcPointType="true" id="2" xCoord="783" yCoord="468"/>
 <arcpath arcPointType="false" id="3" xCoord="790" yCoord="356"/>
 </arc>
 <arc id="payment to fail2" inscription="[10,10]" source="payment" target="fail2" type="timed" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="412" yCoord="192"/>
-<arcpath arcPointType="true" id="1" xCoord="332" yCoord="122"/>
-<arcpath arcPointType="true" id="2" xCoord="92" yCoord="122"/>
-<arcpath arcPointType="true" id="3" xCoord="17" yCoord="227"/>
-<arcpath arcPointType="true" id="4" xCoord="62" yCoord="512"/>
-<arcpath arcPointType="true" id="5" xCoord="317" yCoord="617"/>
+<arcpath arcPointType="true" id="1" xCoord="333" yCoord="123"/>
+<arcpath arcPointType="true" id="2" xCoord="93" yCoord="123"/>
+<arcpath arcPointType="true" id="3" xCoord="18" yCoord="228"/>
+<arcpath arcPointType="true" id="4" xCoord="63" yCoord="513"/>
+<arcpath arcPointType="true" id="5" xCoord="318" yCoord="618"/>
 <arcpath arcPointType="false" id="6" xCoord="401" yCoord="597"/>
 </arc>
 <arc id="fail2 to out" inscription="1" source="fail2" target="out" type="normal" weight="1">
 <arcpath arcPointType="false" id="0" xCoord="431" yCoord="597"/>
-<arcpath arcPointType="true" id="1" xCoord="722" yCoord="602"/>
-<arcpath arcPointType="true" id="2" xCoord="827" yCoord="452"/>
+<arcpath arcPointType="true" id="1" xCoord="723" yCoord="603"/>
+<arcpath arcPointType="true" id="2" xCoord="828" yCoord="453"/>
 <arcpath arcPointType="false" id="3" xCoord="796" yCoord="356"/>
 </arc>
 </net>
 <query active="true" capacity="3" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Workflow Termination" pTrie="true" query="AF out=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
-<query active="true" capacity="3" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Unique Final Marking" pTrie="true" query="AG (!(out&gt;=1) or (out=1 and in=0 and workflow.booking=0 and workflow.payment=0 and workflow.attempts=0 and workflow.succesful=0))" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
+<query active="true" capacity="3" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Unique Final Marking" pTrie="true" query="AG (!(out&gt;=1) or (out=1 and in=0 and workflow.booking=0 and workflow.payment=0 and workflow.attempts=0 and workflow.succesful=0))" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
 </pnml>
