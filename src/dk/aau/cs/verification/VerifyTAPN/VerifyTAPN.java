@@ -380,12 +380,19 @@ public class VerifyTAPN implements ModelChecker {
 		return result;
 	}
 	
-	boolean supportsModel(TimedArcPetriNet model) {
-		return !model.hasWeights();
+	public boolean supportsModel(TimedArcPetriNet model) {
+		if(model.hasWeights() || 
+				model.hasUrgentTransitions()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
-	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
+		if(query.getProperty() instanceof TCTLEGNode || 
+				query.getProperty() instanceof TCTLAFNode ||
+				query.hasDeadlock()) {
 			return false;
 		}
 		
