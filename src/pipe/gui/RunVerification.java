@@ -269,7 +269,8 @@ public class RunVerification extends RunVerificationBase {
 		
 		//Show discrete semantics warning if needed
 		QueryResult queryResult = result.getQueryResult();
-		if((queryResult.hasDeadlock() || queryResult.queryType() == QueryType.EG || queryResult.queryType() == QueryType.AF) 
+		if((queryResult.hasDeadlock() || (queryResult.queryType() == QueryType.EG && !queryResult.isQuerySatisfied()) || 
+										 (queryResult.queryType() == QueryType.AF && queryResult.isQuerySatisfied())) 
 				&& modelChecker.useDiscreteSemantics()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
