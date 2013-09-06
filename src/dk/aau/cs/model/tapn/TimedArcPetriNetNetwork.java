@@ -417,7 +417,7 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean hasWeights() {
 		for(TimedArcPetriNet t : tapns){
-			if(t.hasWeights()){
+			if(t.isActive() && t.hasWeights()){
 				return true;
 			}
 		}
@@ -435,11 +435,11 @@ public class TimedArcPetriNetNetwork {
 	
 	public boolean isNonStrict(){
 		for(TimedArcPetriNet t : tapns){
-			if(t.isNonStrict()){
-				return true;
+			if(t.isActive() && !t.isNonStrict()){
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	public boolean isDegree2(){
