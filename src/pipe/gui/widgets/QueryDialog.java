@@ -900,10 +900,10 @@ public class QueryDialog extends JPanel {
 		initReductionOptionsPanel();
 		initButtonPanel(option);
 
+		setEnabledReductionOptions();
+		
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
-
-		setEnabledReductionOptions();
 		
 		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
@@ -951,7 +951,7 @@ public class QueryDialog extends JPanel {
 				reduction = name_OPTIMIZEDSTANDARD;
 			}
 		}
-		reductionOption.addItem(reduction); 
+		
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
