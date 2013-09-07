@@ -129,10 +129,12 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces(), query.getModelType());
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 		}
+		
+		System.out.println(verifytapnOptions);
 
 		if (inputQuery == null) {
 			return;

@@ -317,7 +317,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces(), query.getModelType());
 		else
 			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
 	}

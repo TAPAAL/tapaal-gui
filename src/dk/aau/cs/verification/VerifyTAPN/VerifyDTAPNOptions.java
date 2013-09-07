@@ -21,24 +21,25 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces(), ModelType.TAPN);
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean discreteInclusion,
 			boolean timeDarts, boolean pTrie) {
 		this(extraTokens, traceOption, search, symmetry,
-				timeDarts, pTrie, discreteInclusion, new InclusionPlaces());
+				timeDarts, pTrie, discreteInclusion, new InclusionPlaces(), ModelType.TAPN);
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie, boolean discreteInclusion,
-			InclusionPlaces inclusionPlaces) {
+			InclusionPlaces inclusionPlaces, ModelType modelType) {
 		super(extraTokens, traceOption, search, symmetry,
 				discreteInclusion, inclusionPlaces);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;
+		this.modelType = modelType;
 	}
 	
 	@Override

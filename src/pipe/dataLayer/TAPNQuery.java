@@ -196,7 +196,7 @@ public class TAPNQuery {
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, ModelType modelType) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTabelSize, extrapolationOption);
-		this.modelType = modelType;
+		this.setModelType(modelType);
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
@@ -268,6 +268,14 @@ public class TAPNQuery {
 		else if(property instanceof TCTLEGNode) return QueryType.EG;
 		else if(property instanceof TCTLAFNode) return QueryType.AF;
 		else return QueryType.AG;
+	}
+
+	public ModelType getModelType() {
+		return modelType;
+	}
+
+	public void setModelType(ModelType modelType) {
+		this.modelType = modelType;
 	}
 	
 }

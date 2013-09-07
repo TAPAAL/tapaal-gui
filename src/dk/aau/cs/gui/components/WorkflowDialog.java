@@ -23,10 +23,12 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.verification.QueryType;
@@ -39,9 +41,15 @@ public class WorkflowDialog extends JDialog{
 
 	private JPanel panel;
 	
-	private JButton checkIfWorkflow;
 	private TimedPlace in;
 	private TimedPlace out;
+	
+	private enum TAWFNTypes{
+		ETAWFN, MTAWFN, NOTTAWFN
+	}
+	
+	private String msg = "";
+	TAWFNTypes netType;
 	
 	public static void showDialog(){
 		dialog = new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true);
@@ -63,78 +71,69 @@ public class WorkflowDialog extends JDialog{
 		panel = new JPanel(new GridBagLayout());
 		
 		/* Check if workflow net */
-		checkIfWorkflow = new JButton("Analyze net");
-		checkIfWorkflow.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkIfWorkflow.setEnabled(false);
-				try{
-					checkIfTAWFN();
-					GridBagConstraints gbc = new GridBagConstraints();
-					JLabel isWorkflowLabel = new JLabel("The net is a TAWFN!");
-					gbc.gridx = 0;
-					gbc.gridy = 2;
-					gbc.gridwidth = 2;
-					gbc.insets = new Insets(5, 0, 5, 5);
-					gbc.fill = GridBagConstraints.HORIZONTAL;
-					panel.add(isWorkflowLabel, gbc);
-					
-					/* Check if workflow net is sound */
-					JButton checkIfSound = new JButton("Check if TAWFN is sound");
-					checkIfSound.addActionListener(new ActionListener() {
-						
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							checkTAWFNSoundness(in, out);
-						}
-					});
-					gbc.gridx = 0;
-					gbc.gridy = 3;
-					gbc.gridwidth = 2;
-					gbc.insets = new Insets(0, 0, 5, 0);
-					gbc.fill = GridBagConstraints.HORIZONTAL;
-					panel.add(checkIfSound, gbc);
-					
-					panel.remove(checkIfWorkflow);
-					dialog.pack();
-				}catch(Exception ee){
-					JOptionPane.showMessageDialog(CreateGui.getApp(), ee.getMessage(), "Net is not TAWFN", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});		
+		netType = checkIfTAWFN();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
+		JLabel workflowTypeLabel = new JLabel("The net is a TAWFN!");
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 2;
-		gbc.insets = new Insets(0, 0, 5, 0);
+		gbc.insets = new Insets(5, 0, 5, 5);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		panel.add(checkIfWorkflow, gbc);
+		panel.add(workflowTypeLabel, gbc);
+		
+		switch(netType){
+		case MTAWFN:
+			workflowTypeLabel.setText("This net is a MTAWFN.");
+			break;
+		case ETAWFN:
+			workflowTypeLabel.setText("This net is a ETAWFN.");
+			break;
+		case NOTTAWFN:
+			workflowTypeLabel.setText("This net is not a TAWFN for the following reason:\n\n"+msg);
+			break;
+		}
+		
+		if(netType != TAWFNTypes.NOTTAWFN){
+			JButton checkIfSound = new JButton("Check if model is sound");
+			checkIfSound.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					checkTAWFNSoundness(in, out);
+				}
+			});
+			gbc.gridx = 0;
+			gbc.gridy = 3;
+			gbc.gridwidth = 2;
+			gbc.insets = new Insets(0, 0, 5, 0);
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			panel.add(checkIfSound, gbc);
+		}
 	}
 	
-	private boolean checkIfTAWFN() throws Exception{
+	private TAWFNTypes checkIfTAWFN(){
 		List<TimedArcPetriNet> tapns = CreateGui.getCurrentTab().network().activeTemplates();
 		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();	
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
 		in = null;
 		out = null;
+		msg = "";
 		
 		boolean isin;
 		boolean isout;
+		boolean isMonotonic = true;
 		
-		for(TimedArcPetriNet tapn: tapns){ 
-			
-			/*if(!tapn.inputArcs().iterator().hasNext() && !tapn.outputArcs().iterator().hasNext()
-					&& !tapn.inhibitorArcs().iterator().hasNext() && !tapn.transportArcs().iterator().hasNext()){ // A net without arcs
-				return false;
-			}*/
-			
-			
+		for(TimedArcPetriNet tapn: tapns){ 			
 			
 			for(TimedPlace p : tapn.places()){
 				isin = true;
 				isout = true;
+				
+				p.invariant().asIterval();
+				if(isMonotonic && !p.invariant().asIterval().equals(TimeInterval.ZERO_INF)){
+					isMonotonic = false;
+				}
 				
 				// Test for arcs going in to place
 				for(TimedOutputArc arc: tapn.outputArcs()){
@@ -152,8 +151,7 @@ public class WorkflowDialog extends JDialog{
 					}
 				}
 				
-				// TODO inhibitor arcs in transport places?
-				
+				// Transport arcs
 				for(TransportArc arc: tapn.transportArcs()){
 					if(arc.destination().equals(p)){
 						isin = false;
@@ -175,19 +173,33 @@ public class WorkflowDialog extends JDialog{
 						sharedOutPlaces.add(p);
 					}
 				}else if(isin && isout){
-					throw new Exception("Model contains place with no in- or out-going arcs.");
+					msg += "Model contains place with no in- or out-going arcs.";
+					return TAWFNTypes.NOTTAWFN;
 				}else if(isin){
 					if(in == null){
 						in = p;
 					}else{
-						throw new Exception("Multiple in-places found.");
+						msg += "Multiple in-places found.";
+						return TAWFNTypes.NOTTAWFN;
 					}
 				}else if(isout){
 					if(out == null){
 						out = p;
 					}else{
-						throw new Exception("Multiple out-places found.");
+						msg += "Multiple out-places found.";
+						return TAWFNTypes.NOTTAWFN;
 					}
+				}
+			}
+			
+			for(TimedTransition t : tapn.transitions()){
+					msg += "Transition "+t.name()+" has empty preset.";
+					if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
+					return TAWFNTypes.NOTTAWFN;
+				}
+				
+				if(isMonotonic && (t.isUrgent() || !t.getInhibitorArcs().isEmpty())){
+					isMonotonic = false;
 				}
 			}
 		}
@@ -199,14 +211,16 @@ public class WorkflowDialog extends JDialog{
 				if(in == null){
 					in = p;
 				}else{
-					throw new Exception("Multiple in-places found.");
+					msg += "Multiple in-places found.";
+					return TAWFNTypes.NOTTAWFN;
 				}
 			}
 			while(sharedOutPlaces.remove(p)){}
 		}
 		
 		if(in == null){
-			throw new Exception("No in-place found.");
+			msg += "No in-place found.";
+			return TAWFNTypes.NOTTAWFN;
 		}
 		
 		while(sharedOutPlaces.size() > 0){
@@ -215,15 +229,19 @@ public class WorkflowDialog extends JDialog{
 				out = p;
 				while(sharedOutPlaces.remove(p)){}
 			}else{
-				throw new Exception("Multiple out-places found.");
+				msg += "Multiple out-places found.";
+				return TAWFNTypes.NOTTAWFN;
 			}
 		}
 		
 		if(out == null){
-			throw new Exception("No in-place found.");
+			msg += "No in-place found.";
+			return TAWFNTypes.NOTTAWFN;
 		}
 		
-		return true;
+		
+		
+		return isMonotonic ? TAWFNTypes.MTAWFN : TAWFNTypes.ETAWFN;
 	}
 	
 	private void checkTAWFNSoundness(TimedPlace in, TimedPlace out){
