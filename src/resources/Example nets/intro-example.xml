@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
 <net active="true" id="IntroExample" type="P/T net">
-<labels border="true" height="702" positionX="563" positionY="55" width="346">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
+<labels border="true" height="689" positionX="564" positionY="56" width="347">This is an example net to introduce the modelling, verification and simulation features of TAPAAL.
 
 The circles are called places and rectangles transitions. They are connected either by standard arcs from place to transition or transition to place, or they can be connected by transport arcs (these arcs always come in pairs) like from P1 to T3 and T3 to P6.
 
@@ -11,7 +11,7 @@ A transition can fire if in every of its input places there is at least one toke
 
 The place P2 contains so-called invariant &lt;=5. This means that any token in that place cannot be older than 5 time units. So another behaviour of the net are so called time-delays. This means that all tokens in the net grow older by a some amount of time, as long as none of the invariants are violated.
 
-Finally, the transition T4 (with a white dot) is an urgent transition, meaning that once it becomes enabled (the tokens arrive to the places P6 and P5, no time delay can happen and some of the currently enabled transitions have to fired. In our example only T4 will be enabled but in general there can be more enabled transitions and none of them has a priority over the other ones. Enabled urgent transition simply implies that time cannot delay.
+Finally, the transition T4 (with a white dot) is an urgent transition, meaning that once it becomes enabled (the tokens arrive to the places P6 and P5), no time delay can happen and some of the currently enabled transitions have to fired. In our example only T4 will be enabled but in general there can be more enabled transitions and none of them has a priority over the other ones. Enabled urgent transition simply implies that time cannot delay.
 
 -----------------------------
 
@@ -90,5 +90,5 @@ One may observe that two extra tokens are needed in the intermediate markings in
 <arcpath arcPointType="false" id="1" xCoord="56" yCoord="387"/>
 </arc>
 </net>
-<query active="true" capacity="2" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Target Reachable" pTrie="true" query="EF IntroExample.Target=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="BFS" symmetry="true" timeDarts="false" traceOption="SOME"/>
+<query active="true" capacity="2" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Target Reachable" pTrie="true" query="EF IntroExample.Target=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="BFS" symmetry="true" timeDarts="false" traceOption="SOME"/>
 </pnml>
