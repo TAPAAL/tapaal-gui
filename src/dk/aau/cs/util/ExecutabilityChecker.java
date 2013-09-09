@@ -4,7 +4,7 @@ public class ExecutabilityChecker {
 	public static void check(String path) throws IllegalArgumentException{
 		int rcode = -1;
 		try {
-			rcode = Runtime.getRuntime().exec(path).waitFor();
+			rcode = Runtime.getRuntime().exec(path + " -v").waitFor();	// Requires binary to accept -v flag
 		} catch (Exception e) {
 			// Do nothing
 		}
