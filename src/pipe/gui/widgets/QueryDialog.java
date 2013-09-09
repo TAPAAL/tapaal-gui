@@ -225,6 +225,8 @@ public class QueryDialog extends JPanel {
 	private JTextField queryName;
 
 	private static Boolean advancedView = false;
+	
+	private static boolean hasForcedDisabledTimeDarts = false;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -659,7 +661,10 @@ public class QueryDialog extends JPanel {
 		ArrayList<String> options = new ArrayList<String>();
 		
 		if(useTimeDarts != null){
-        	useTimeDarts.setSelected(true);
+			if(hasForcedDisabledTimeDarts){
+				hasForcedDisabledTimeDarts = false;
+				useTimeDarts.setSelected(true);
+			}
             useTimeDarts.setEnabled(true);     
         }
 		
@@ -670,6 +675,9 @@ public class QueryDialog extends JPanel {
                 if((getQuantificationSelection().equals("E[]") || 
                         getQuantificationSelection().equals("A<>"))){
                     if (useTimeDarts != null) {
+                    	if(useTimeDarts.isSelected()){
+                    		hasForcedDisabledTimeDarts = true;
+                    	}
                         useTimeDarts.setEnabled(false);
                         useTimeDarts.setSelected(false);
                     }
@@ -900,10 +908,10 @@ public class QueryDialog extends JPanel {
 		initReductionOptionsPanel();
 		initButtonPanel(option);
 
-		setEnabledReductionOptions();
-		
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
+
+		setEnabledReductionOptions();
 		
 		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
@@ -951,7 +959,7 @@ public class QueryDialog extends JPanel {
 				reduction = name_OPTIMIZEDSTANDARD;
 			}
 		}
-		
+		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
