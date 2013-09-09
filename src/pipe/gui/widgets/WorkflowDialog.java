@@ -1,4 +1,4 @@
-package dk.aau.cs.gui.components;
+package pipe.gui.widgets;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -123,9 +123,10 @@ public class WorkflowDialog extends JDialog{
 		boolean isin;
 		boolean isout;
 		boolean isMonotonic = true;
+		int numberOfTokensInNet = 0;
+		ArrayList<TimedPlace> countedSharedPlaces = new ArrayList<TimedPlace>();
 		
-		for(TimedArcPetriNet tapn: tapns){ 			
-			
+		for(TimedArcPetriNet tapn: tapns){ 		
 			for(TimedPlace p : tapn.places()){
 				isin = true;
 				isout = true;
@@ -190,11 +191,18 @@ public class WorkflowDialog extends JDialog{
 						return TAWFNTypes.NOTTAWFN;
 					}
 				}
+				
+				if(p.isShared() && !countedSharedPlaces.contains(p)){
+					numberOfTokensInNet += p.numberOfTokens();
+					countedSharedPlaces.add(p);
+				}else if(!p.isShared()){
+					numberOfTokensInNet += p.numberOfTokens();
+				}
 			}
 			
 			for(TimedTransition t : tapn.transitions()){
+				if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
 					msg += "Transition "+t.name()+" has empty preset.";
-					if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
 					return TAWFNTypes.NOTTAWFN;
 				}
 				
@@ -239,6 +247,10 @@ public class WorkflowDialog extends JDialog{
 			return TAWFNTypes.NOTTAWFN;
 		}
 		
+		if(numberOfTokensInNet != 1 || in.tokens().size() != 1){
+			msg += "The current marking is not a valid initial marking.";
+			return TAWFNTypes.NOTTAWFN;
+		}
 		
 		
 		return isMonotonic ? TAWFNTypes.MTAWFN : TAWFNTypes.ETAWFN;

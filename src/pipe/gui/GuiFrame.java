@@ -67,6 +67,7 @@ import com.sun.jna.Platform;
 
 
 
+
 import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
@@ -83,12 +84,12 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
 import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.gui.components.StatisticsPanel;
-import dk.aau.cs.gui.components.WorkflowDialog;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
@@ -699,7 +700,8 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(batchProcessing);
 		
-		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", null));				
+		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcutkey)));				
+		workflowDialog.setMnemonic('a');
 		workflowDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				WorkflowDialog.showDialog();
