@@ -169,7 +169,7 @@ public class Verifyta implements ModelChecker {
 			result = null;
 		}
 
-		Pattern pattern = Pattern.compile("\\(rev. (\\d+)\\)");
+		Pattern pattern = Pattern.compile("\\((?:rev. )?(\\d+)\\)");
 		Matcher m = pattern.matcher(versioninfo);
 		m.find();
 		result = m.group(1);
