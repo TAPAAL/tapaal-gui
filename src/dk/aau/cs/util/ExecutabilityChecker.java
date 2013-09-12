@@ -10,6 +10,8 @@ public class ExecutabilityChecker {
 		}
 		// Detect executable issues
 		switch(rcode){
+		case -1:
+			break;
 		case 0:
 			break;
 		case 126:
