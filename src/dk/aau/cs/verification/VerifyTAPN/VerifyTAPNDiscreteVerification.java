@@ -84,7 +84,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			return verifydtapnpath;
 		}
 
-		public String getVersion() { // atm. any version of VerifyTAPN will do
+		public String getVersion() {
 			String result = null;
 
 			if (!isNotSetup()) {
@@ -94,14 +94,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				InputStream stream = null;
 				try {
 					Process child = Runtime.getRuntime().exec(commands);
-					child.waitFor();
 					stream = child.getInputStream();
+					if (stream != null) {
+						result = readVersionNumberFrom(stream);
+					}
+					child.waitFor();
 				} catch (IOException e) {
 				} catch (InterruptedException e) {
-				}
-
-				if (stream != null) {
-					result = readVersionNumberFrom(stream);
 				}
 			}
 
@@ -115,6 +114,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			String versioninfo = null;
 			try {
 				versioninfo = bufferedReader.readLine();
+				while(bufferedReader.readLine() != null){}	// Empty buffer
 			} catch (IOException e) {
 				result = null;
 			}

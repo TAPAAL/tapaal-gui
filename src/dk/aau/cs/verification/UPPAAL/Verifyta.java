@@ -107,14 +107,13 @@ public class Verifyta implements ModelChecker {
 			InputStream stream = null;
 			try {
 				Process child = Runtime.getRuntime().exec(commands);
-				child.waitFor();
 				stream = child.getInputStream();
+				if (stream != null) {
+					result = readVersionNumberFrom(stream);
+				}
+				child.waitFor();
 			} catch (IOException e) {
 			} catch (InterruptedException e) {
-			}
-
-			if (stream != null) {
-				result = readVersionNumberFrom(stream);
 			}
 		}
 
@@ -165,10 +164,11 @@ public class Verifyta implements ModelChecker {
 		String versioninfo = null;
 		try {
 			versioninfo = bufferedReader.readLine();
+			while(bufferedReader.readLine() != null){}	// Empty buffer
 		} catch (IOException e) {
 			result = null;
 		}
-
+		
 		Pattern pattern = Pattern.compile("\\((?:rev. )?(\\d+)\\)");
 		Matcher m = pattern.matcher(versioninfo);
 		m.find();

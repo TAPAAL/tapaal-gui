@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
-
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.FileFinderImpl;
@@ -87,7 +86,7 @@ public class VerifyTAPN implements ModelChecker {
 		return verifytapnpath;
 	}
 
-	public String getVersion() { // atm. any version of VerifyTAPN will do
+	public String getVersion() {
 		String result = null;
 
 		if (!isNotSetup()) {
@@ -97,14 +96,13 @@ public class VerifyTAPN implements ModelChecker {
 			InputStream stream = null;
 			try {
 				Process child = Runtime.getRuntime().exec(commands);
-				child.waitFor();
 				stream = child.getInputStream();
+				if (stream != null) {
+					result = readVersionNumberFrom(stream);
+				}
+				child.waitFor();
 			} catch (IOException e) {
 			} catch (InterruptedException e) {
-			}
-
-			if (stream != null) {
-				result = readVersionNumberFrom(stream);
 			}
 		}
 
@@ -118,6 +116,7 @@ public class VerifyTAPN implements ModelChecker {
 		String versioninfo = null;
 		try {
 			versioninfo = bufferedReader.readLine();
+			while(bufferedReader.readLine() != null){}	// Empty buffer
 		} catch (IOException e) {
 			result = null;
 		}
