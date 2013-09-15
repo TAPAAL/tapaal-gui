@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
-
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.FileFinderImpl;
@@ -26,10 +25,12 @@ import dk.aau.cs.model.NTA.trace.UppaalTrace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
@@ -106,14 +107,13 @@ public class Verifyta implements ModelChecker {
 			InputStream stream = null;
 			try {
 				Process child = Runtime.getRuntime().exec(commands);
-				child.waitFor();
 				stream = child.getInputStream();
+				if (stream != null) {
+					result = readVersionNumberFrom(stream);
+				}
+				child.waitFor();
 			} catch (IOException e) {
 			} catch (InterruptedException e) {
-			}
-
-			if (stream != null) {
-				result = readVersionNumberFrom(stream);
 			}
 		}
 
@@ -164,11 +164,12 @@ public class Verifyta implements ModelChecker {
 		String versioninfo = null;
 		try {
 			versioninfo = bufferedReader.readLine();
+			while(bufferedReader.readLine() != null){}	// Empty buffer
 		} catch (IOException e) {
 			result = null;
 		}
-
-		Pattern pattern = Pattern.compile("\\(rev. (\\d+)\\)");
+		
+		Pattern pattern = Pattern.compile("\\((?:rev. )?(\\d+)\\)");
 		Matcher m = pattern.matcher(versioninfo);
 		m.find();
 		result = m.group(1);
@@ -248,10 +249,53 @@ public class Verifyta implements ModelChecker {
 	public String getStatsExplanation(){
 		return "";
 	}
+	
+	@Override
+	public boolean supportsModel(TimedArcPetriNet model) {
+		if(model.hasUrgentTransitions() || model.hasWeights()){
+			return false;
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
+			VerificationOptions options) {
+
+		if(query.hasDeadlock()){
+				// Only broadcast translations supports deadlock.
+				if(((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
+					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST){
+						return false;
+				}
+				
+				// Broadcast translations do not support EG and AF queries that contain a deadlock.
+				if(query.getProperty() instanceof TCTLEGNode || 
+						query.getProperty() instanceof TCTLAFNode){
+					return false;
+				}
+				
+				// No translation support inhibitor arcs with deadlock queries
+				if(model.hasInhibitorArcs()){
+					return false;
+				}
+		}
+		
+		return true;
+	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {
+		
 		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
 			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");
+		
+		if(!supportsModel(model.value1()))
+			throw new UnsupportedModelException("Verifyta does not support the given model.");
+		
+		if(!supportsQuery(model.value1(), query, options))
+			throw new UnsupportedQueryException("Verifyta does not support the given query.");
+		
 		UppaalExporter exporter = new UppaalExporter();
 		ExportedModel exportedModel = exporter.export(model.value1(), query, ((VerifytaOptions) options).getReduction(), ((VerifytaOptions) options).symmetry());
 

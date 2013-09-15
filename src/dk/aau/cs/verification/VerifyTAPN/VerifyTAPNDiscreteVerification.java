@@ -84,7 +84,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			return verifydtapnpath;
 		}
 
-		public String getVersion() { // atm. any version of VerifyTAPN will do
+		public String getVersion() {
 			String result = null;
 
 			if (!isNotSetup()) {
@@ -94,14 +94,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				InputStream stream = null;
 				try {
 					Process child = Runtime.getRuntime().exec(commands);
-					child.waitFor();
 					stream = child.getInputStream();
+					if (stream != null) {
+						result = readVersionNumberFrom(stream);
+					}
+					child.waitFor();
 				} catch (IOException e) {
 				} catch (InterruptedException e) {
-				}
-
-				if (stream != null) {
-					result = readVersionNumberFrom(stream);
 				}
 			}
 
@@ -115,6 +114,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			String versioninfo = null;
 			try {
 				versioninfo = bufferedReader.readLine();
+				while(bufferedReader.readLine() != null){}	// Empty buffer
 			} catch (IOException e) {
 				result = null;
 			}
@@ -386,17 +386,21 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		
-		boolean supportsModel(TimedArcPetriNet model) {
+		public boolean supportsModel(TimedArcPetriNet model) {
 			return model.isNonStrict();
 		}
 		
-		boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
+		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
                         // if liveness, has deadlock proposition and uses timedarts, it is not supported
 			if((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
-                                && new HasDeadlockVisitor().hasDeadLock(query.getProperty()) 
+                                && query.hasDeadlock() 
                                 && ((VerifyDTAPNOptions)options).timeDarts()){
-                            return false;
-                        }
+                return false;
+            }
+			
+			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
+				return false;
+			}
 			
 			return true;
 		}
