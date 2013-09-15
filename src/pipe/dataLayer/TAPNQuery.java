@@ -41,6 +41,9 @@ public class TAPNQuery {
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
 	private ModelType modelType;
+	public boolean checkStrong = false;
+	public boolean findMin = false;
+	public boolean findMax = false;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -194,9 +197,12 @@ public class TAPNQuery {
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, ModelType modelType) {
+			ExtrapolationOption extrapolationOption, ModelType modelType, boolean checkStrongSoundness, boolean findMin, boolean findMax) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTabelSize, extrapolationOption);
 		this.setModelType(modelType);
+		this.checkStrong = checkStrongSoundness;
+		this.findMin = findMin;
+		this.findMax = findMax;
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,

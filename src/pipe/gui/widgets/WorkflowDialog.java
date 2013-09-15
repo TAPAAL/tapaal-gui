@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -47,6 +48,8 @@ public class WorkflowDialog extends JDialog{
 	private JCheckBox strongSoundness;
 	private JCheckBox min;
 	private JCheckBox max;
+	
+	private CustomJSpinner numberOfExtraTokensInNet;
 
 	private TimedPlace in;
 	private TimedPlace out;
@@ -106,7 +109,7 @@ public class WorkflowDialog extends JDialog{
 			workflowTypeLabel.setText("This net is a MTAWFN.");
 			break;
 		case ETAWFN:
-			workflowTypeLabel.setText("This net is a ETAWFN.");
+			workflowTypeLabel.setText("This net is an ETAWFN.");
 			break;
 		case NOTTAWFN:
 			workflowTypeLabel.setText("<html>This net is not a TAWFN for the following reason:<br>"+msg+"</html>");
@@ -161,8 +164,22 @@ public class WorkflowDialog extends JDialog{
 				}
 			}
 		});
+		
+		if(netType == TAWFNTypes.ETAWFN){
+			gbc.gridx = 1;
+			gbc.gridy = 1;
+			panel.add(new JLabel(" Number of extra tokens:  "), gbc);
+			
+			numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
+			numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
+			numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
+			numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
+			gbc.gridx = 1;
+			gbc.gridy = 2;
+			panel.add(numberOfExtraTokensInNet, gbc);
+		}
 
-		JButton checkIfSound = new JButton("Check if model is sound");
+		JButton checkIfSound = new JButton("Check workflow soundness");
 		checkIfSound.addActionListener(new ActionListener() {
 
 			@Override
@@ -170,8 +187,9 @@ public class WorkflowDialog extends JDialog{
 				checkTAWFNSoundness(in, out);
 			}
 		});
-		gbc.gridx = 1;
-		gbc.gridy = 2;
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		gbc.gridwidth = 2;
 		panel.add(checkIfSound, gbc);
 	}
 
@@ -320,7 +338,7 @@ public class WorkflowDialog extends JDialog{
 	}
 
 	private void checkTAWFNSoundness(TimedPlace in, TimedPlace out){
-		TAPNQuery q = new TAPNQuery("Workflow soundness checking", 10, new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyTAPNdiscreteVerification, true, false, false, null, ExtrapolationOption.AUTOMATIC, ModelType.TAWFN);
+		TAPNQuery q = new TAPNQuery("Workflow soundness checking", numberOfExtraTokensInNet == null? 0 : (Integer) numberOfExtraTokensInNet.getValue(), new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyTAPNdiscreteVerification, true, false, false, null, ExtrapolationOption.AUTOMATIC, ModelType.TAWFN, strongSoundness.isSelected(), min.isSelected(), max.isSelected());
 		Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab().network(), q);
 	}
 }
