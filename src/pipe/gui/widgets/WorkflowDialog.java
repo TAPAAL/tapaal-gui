@@ -26,6 +26,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -133,15 +134,15 @@ public class WorkflowDialog extends JDialog{
 		gbc.gridy = 1;	
 		panel.add(soundness, gbc);
 
-		strongSoundness = new JCheckBox("Check strong soundness.");
-		gbc.gridx = 0;
-		gbc.gridy = 2;	
-		panel.add(strongSoundness, gbc);
-
 		min = new JCheckBox("Calculate minimum duration.");
 		gbc.gridx = 0;
-		gbc.gridy = 3;	
+		gbc.gridy = 2;	
 		panel.add(min, gbc);
+		
+		strongSoundness = new JCheckBox("Check strong soundness.");
+		gbc.gridx = 0;
+		gbc.gridy = 3;	
+		panel.add(strongSoundness, gbc);
 
 		max = new JCheckBox("Calculate maximum duration.");
 		gbc.gridx = 0;
@@ -149,17 +150,14 @@ public class WorkflowDialog extends JDialog{
 		gbc.insets = new Insets(0, 0, 5, 0);
 		panel.add(max, gbc);
 		
-		min.setEnabled(strongSoundness.isSelected());
 		max.setEnabled(strongSoundness.isSelected());
 		
 		strongSoundness.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				min.setEnabled(strongSoundness.isSelected());
 				max.setEnabled(strongSoundness.isSelected());
 				if(!strongSoundness.isSelected()){
-					min.setSelected(false);
 					max.setSelected(false);
 				}
 			}
@@ -197,6 +195,7 @@ public class WorkflowDialog extends JDialog{
 		List<TimedArcPetriNet> tapns = CreateGui.getCurrentTab().network().activeTemplates();
 		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();	
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
+		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();	
 		in = null;
 		out = null;
 		msg = "";
@@ -255,20 +254,20 @@ public class WorkflowDialog extends JDialog{
 						sharedOutPlaces.add(p);
 					}
 				}else if(isin && isout){
-					msg += "Model contains place with no in- or out-going arcs.";
+					msg += "Place " +p+ " has no in- or out-going arcs.";
 					return TAWFNTypes.NOTTAWFN;
 				}else if(isin){
 					if(in == null){
 						in = p;
 					}else{
-						msg += "Multiple in-places found.";
+						msg += "Multiple in-places found ("+in+" and "+p+").";
 						return TAWFNTypes.NOTTAWFN;
 					}
 				}else if(isout){
 					if(out == null){
 						out = p;
 					}else{
-						msg += "Multiple out-places found.";
+						msg += "Multiple out-places found ("+out+" and "+ p +").";
 						return TAWFNTypes.NOTTAWFN;
 					}
 				}
@@ -282,7 +281,9 @@ public class WorkflowDialog extends JDialog{
 			}
 
 			for(TimedTransition t : tapn.transitions()){
-				if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
+				if(t.isShared()){
+					sharedTransitions.add(t.sharedTransition());
+				}else if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
 					msg += "Transition "+t.name()+" has empty preset.";
 					return TAWFNTypes.NOTTAWFN;
 				}
@@ -293,6 +294,23 @@ public class WorkflowDialog extends JDialog{
 			}
 		}
 
+		outer: while(sharedTransitions.size() > 0){
+			SharedTransition st = sharedTransitions.get(0);
+			for(TimedTransition t : st.transitions()){
+				if(!t.getTransportArcsGoingThrough().isEmpty() || !t.getInputArcs().isEmpty()){
+					while(sharedTransitions.remove(st)){}
+					continue outer;
+				}
+			}
+			msg += "Transition "+st.name()+" has empty preset.";
+			return TAWFNTypes.NOTTAWFN;
+		}
+		
+		if(!sharedTransitions.isEmpty()){
+			msg += "Transition "+sharedTransitions.get(0).name()+" has empty preset.";
+			return TAWFNTypes.NOTTAWFN;
+		}
+		
 		while(sharedInPlaces.size()!=0){
 			TimedPlace p = sharedInPlaces.get(0);
 			while(sharedInPlaces.remove(p)){}
@@ -300,7 +318,7 @@ public class WorkflowDialog extends JDialog{
 				if(in == null){
 					in = p;
 				}else{
-					msg += "Multiple in-places found.";
+					msg += "Multiple in-places found ("+in+" and "+p+").";
 					return TAWFNTypes.NOTTAWFN;
 				}
 			}
@@ -313,12 +331,13 @@ public class WorkflowDialog extends JDialog{
 		}
 
 		while(sharedOutPlaces.size() > 0){
+			TimedPlace p = null;
 			if(out == null){
-				TimedPlace p = sharedOutPlaces.get(0);
+				p = sharedOutPlaces.get(0);
 				out = p;
 				while(sharedOutPlaces.remove(p)){}
 			}else{
-				msg += "Multiple out-places found.";
+				msg += "Multiple out-places found ("+out+" and "+ p +").";
 				return TAWFNTypes.NOTTAWFN;
 			}
 		}
@@ -328,7 +347,7 @@ public class WorkflowDialog extends JDialog{
 			return TAWFNTypes.NOTTAWFN;
 		}
 
-		if(numberOfTokensInNet != 1 || in.tokens().size() != 1){
+		if(numberOfTokensInNet > 1 || in.tokens().size() != 1){
 			msg += "The current marking is not a valid initial marking.";
 			return TAWFNTypes.NOTTAWFN;
 		}
