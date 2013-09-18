@@ -1,5 +1,6 @@
 package pipe.gui.widgets;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -9,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,8 +37,11 @@ import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.QueryType;
+import dk.aau.cs.verification.VerificationResult;
 
 public class WorkflowDialog extends JDialog{
 
@@ -49,6 +55,11 @@ public class WorkflowDialog extends JDialog{
 	private JCheckBox strongSoundness;
 	private JCheckBox min;
 	private JCheckBox max;
+	
+	private static JLabel soundnessResult;
+	private static JLabel strongSoundnessResult;
+	private static JLabel minResult;
+	private static JLabel maxResult;
 	
 	private CustomJSpinner numberOfExtraTokensInNet;
 
@@ -91,26 +102,23 @@ public class WorkflowDialog extends JDialog{
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(5, 5, 5, 0);
+		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 2;
 		panel.add(informationPanel, gbc);
 
-		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(0, 0, 0, 0);
 
-		informationPanel.add(new JLabel("TODO print properties"), gbc);
-
-		JLabel workflowTypeLabel = new JLabel("The net is a TAWFN!");
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		panel.add(workflowTypeLabel, gbc);
+		JLabel workflowTypeLabel = new JLabel();
+		informationPanel.add(workflowTypeLabel, gbc);
 
 		switch(netType){
 		case MTAWFN:
-			workflowTypeLabel.setText("This net is a MTAWFN.");
+			workflowTypeLabel.setText("This net is a MTAWFN");
 			break;
 		case ETAWFN:
-			workflowTypeLabel.setText("This net is an ETAWFN.");
+			workflowTypeLabel.setText("This net is an ETAWFN");
 			break;
 		case NOTTAWFN:
 			workflowTypeLabel.setText("<html>This net is not a TAWFN for the following reason:<br>"+msg+"</html>");
@@ -118,6 +126,14 @@ public class WorkflowDialog extends JDialog{
 		}
 
 		if(netType != TAWFNTypes.NOTTAWFN){
+			JLabel inPlaceLabel = new JLabel("In-place: "+in.name());
+			gbc.gridy = 1;
+			informationPanel.add(inPlaceLabel, gbc);
+			
+			JLabel outPlaceLabel = new JLabel("Out-place: "+out.name());
+			gbc.gridy = 2;
+			informationPanel.add(outPlaceLabel, gbc);
+			
 			initValidationPanel();
 		}
 	}
@@ -126,6 +142,7 @@ public class WorkflowDialog extends JDialog{
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(5, 5, 5, 5);
 
 		soundness = new JCheckBox("Check soundness.");
 		soundness.setSelected(true);
@@ -133,22 +150,37 @@ public class WorkflowDialog extends JDialog{
 		gbc.gridx = 0;
 		gbc.gridy = 1;	
 		panel.add(soundness, gbc);
+		
+		soundnessResult = new JLabel();
+		gbc.gridx = 1;
+		panel.add(soundnessResult, gbc);
 
 		min = new JCheckBox("Calculate minimum duration.");
 		gbc.gridx = 0;
 		gbc.gridy = 2;	
 		panel.add(min, gbc);
 		
+		minResult = new JLabel();
+		gbc.gridx = 1;
+		panel.add(minResult, gbc);
+		
 		strongSoundness = new JCheckBox("Check strong soundness.");
 		gbc.gridx = 0;
 		gbc.gridy = 3;	
 		panel.add(strongSoundness, gbc);
+		
+		strongSoundnessResult = new JLabel();
+		gbc.gridx = 1;
+		panel.add(strongSoundnessResult, gbc);
 
 		max = new JCheckBox("Calculate maximum duration.");
 		gbc.gridx = 0;
 		gbc.gridy = 4;	
-		gbc.insets = new Insets(0, 0, 5, 0);
 		panel.add(max, gbc);
+		
+		maxResult = new JLabel();
+		gbc.gridx = 1;
+		panel.add(maxResult, gbc);
 		
 		max.setEnabled(strongSoundness.isSelected());
 		
@@ -164,16 +196,16 @@ public class WorkflowDialog extends JDialog{
 		});
 		
 		if(netType == TAWFNTypes.ETAWFN){
-			gbc.gridx = 1;
-			gbc.gridy = 1;
+			gbc.gridx = 0;
+			gbc.gridy = 5;
 			panel.add(new JLabel(" Number of extra tokens:  "), gbc);
 			
 			numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
 			numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
-			gbc.gridx = 1;
-			gbc.gridy = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 6;
 			panel.add(numberOfExtraTokensInNet, gbc);
 		}
 
@@ -186,7 +218,7 @@ public class WorkflowDialog extends JDialog{
 			}
 		});
 		gbc.gridx = 0;
-		gbc.gridy = 5;
+		gbc.gridy = 7;
 		gbc.gridwidth = 2;
 		panel.add(checkIfSound, gbc);
 	}
@@ -357,7 +389,37 @@ public class WorkflowDialog extends JDialog{
 	}
 
 	private void checkTAWFNSoundness(TimedPlace in, TimedPlace out){
-		TAPNQuery q = new TAPNQuery("Workflow soundness checking", numberOfExtraTokensInNet == null? 0 : (Integer) numberOfExtraTokensInNet.getValue(), new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyTAPNdiscreteVerification, true, false, false, null, ExtrapolationOption.AUTOMATIC, ModelType.TAWFN, strongSoundness.isSelected(), min.isSelected(), max.isSelected());
-		Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab().network(), q);
+		final TAPNQuery q = new TAPNQuery("Workflow soundness checking", numberOfExtraTokensInNet == null? 0 : (Integer) numberOfExtraTokensInNet.getValue(), new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyTAPNdiscreteVerification, true, false, false, null, ExtrapolationOption.AUTOMATIC, ModelType.TAWFN, strongSoundness.isSelected(), min.isSelected(), max.isSelected());
+		Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab().network(), q, new VerificationCallback() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void run(VerificationResult<TAPNNetworkTrace> result) {
+				if(result.isQuerySatisfied()){
+					soundnessResult.setText("True");
+					soundnessResult.setForeground(Color.green);
+				}else{
+					soundnessResult.setText("False");
+					soundnessResult.setForeground(Color.red);
+				}
+
+				if(q.findMin && result.isQuerySatisfied()){
+					if(result.stats().minimumExecutionTime() >= 0){
+						minResult.setText(result.stats().minimumExecutionTime() + "");
+						minResult.setForeground(Color.green);
+					}else{
+						minResult.setText("ERROR!");
+						minResult.setForeground(Color.red);
+					}
+				}
+				dialog.pack();
+			}
+		});
+		
 	}
 }

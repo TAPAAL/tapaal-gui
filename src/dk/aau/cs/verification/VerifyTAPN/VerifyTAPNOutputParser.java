@@ -22,6 +22,7 @@ public class VerifyTAPNOutputParser {
 	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
+	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (\\d*)");
 	private final int totalTokens;
 	private final TAPNQuery query;
 	private final int extraTokens;
@@ -37,6 +38,7 @@ public class VerifyTAPNOutputParser {
 		int discovered = 0;
 		int explored = 0;
 		int stored = 0;
+		int WFminExecutionTime = -1;
 		boolean result = false;
 		int maxUsedTokens = 0;
 		boolean foundResult = false;
@@ -78,13 +80,19 @@ public class VerifyTAPNOutputParser {
 						String operator = matcher.group(1) == null ? "" : matcher.group(1);
 						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
 					}
+					
+					matcher = wfMinExecutionPattern.matcher(line);
+					if(matcher.find()){
+						WFminExecutionTime = Integer.valueOf(matcher.group(1));
+					}
+					
 				}
 			}
 			
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored,transitionStats));
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored,transitionStats, WFminExecutionTime));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();
