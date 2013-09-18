@@ -87,7 +87,7 @@ clean:
 release: clean 
 	@mkdir $(OUTPUT_DIR)
 	@mkdir $(RELEASE_DIR)
-	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ '$(MAINCLASS).java'
+	$(JAVAC) $(JFLAGS) -d $(OUTPUT_DIR)/ '$(MAINCLASS).java' -encoding UTF8
 	cp -R $(OUTPUT_DIR)/* '$(RELEASE_DIR)'
 	cp -R '$(RESOURCE_DIR)' '$(RELEASE_DIR)'
 	cp -R $(DEPEND_DIR)/* '$(RELEASE_DIR)'
