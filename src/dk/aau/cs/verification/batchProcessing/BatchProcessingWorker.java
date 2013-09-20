@@ -95,17 +95,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	@Override
 	protected Void doInBackground() throws Exception {
 		for(File file : files){
-			if(exiting()) {
-				return null;
-			}
-			
+
 			fireFileChanged(file.getName());
 			LoadedBatchProcessingModel model = loadModel(file);
 			if(model != null) {
 				Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
 				
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
-					
+                                        if(exiting()) {
+                                                return null;
+                                        }					
 					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
 					
 					if (batchProcessingVerificationOptions.isReductionOptionUserdefined()){
@@ -125,13 +124,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	private void processQueryForUserdefinedReductions(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery queryToVerify) throws Exception {
 		pipe.dataLayer.TAPNQuery query = queryToVerify;
 		query.setDiscreteInclusion(false);
-		if(batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPN)){
+		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPN)){
 			query = query.copy();
 			query.setReductionOption(ReductionOption.VerifyTAPN);
 			processQuery(file, composedModel, query);
 		}
 		
-		if(batchProcessingVerificationOptions.discreteInclusion()){
+		if(!exiting() && batchProcessingVerificationOptions.discreteInclusion()){
 			query = query.copy();
 			query.setReductionOption(ReductionOption.VerifyTAPN);
 			query.setDiscreteInclusion(true);
@@ -143,28 +142,28 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		query = query.copy();
 		query.setDiscreteInclusion(false);
 		query.setReductionOption(ReductionOption.VerifyTAPNdiscreteVerification);
-		if(batchProcessingVerificationOptions.useTimeDartPTrie()){
+		if(!exiting() && batchProcessingVerificationOptions.useTimeDartPTrie()){
 			query = query.copy();
 			query.setUseTimeDarts(true);
 			query.setUsePTrie(true);
 			processQuery(file, composedModel, query);
 		}
 		
-		if(batchProcessingVerificationOptions.useTimeDart()){
+		if(!exiting() && batchProcessingVerificationOptions.useTimeDart()){
 			query = query.copy();
 			query.setUseTimeDarts(true);
 			query.setUsePTrie(false);
 			processQuery(file, composedModel, query);
 		}
 		
-		if(batchProcessingVerificationOptions.usePTrie()){
+		if(!exiting() && batchProcessingVerificationOptions.usePTrie()){
 			query = query.copy();
 			query.setUseTimeDarts(false);
 			query.setUsePTrie(true);
 			processQuery(file, composedModel, query);
 		}
 		
-		if(batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPNdiscreteVerification)){
+		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyTAPNdiscreteVerification)){
 			query = query.copy();
 			query.setUseTimeDarts(false);
 			query.setUsePTrie(false);
