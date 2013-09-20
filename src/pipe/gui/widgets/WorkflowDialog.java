@@ -55,17 +55,17 @@ public class WorkflowDialog extends JDialog{
 
 	private JPanel panel;
 
-	private JCheckBox soundness;
-	private JCheckBox strongSoundness;
-	private JCheckBox min;
-	private JCheckBox max;
+	private static JCheckBox soundness = null;
+	private static JCheckBox strongSoundness = null;
+	private static JCheckBox min = null;
+	private static JCheckBox max = null;
 	
 	private static JLabel soundnessResult;
 	private static JLabel strongSoundnessResult;
 	private static JLabel minResult;
 	private static JLabel maxResult;
 	
-	private CustomJSpinner numberOfExtraTokensInNet;
+	private static CustomJSpinner numberOfExtraTokensInNet = null;
 	
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
 
@@ -164,46 +164,64 @@ public class WorkflowDialog extends JDialog{
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(5, 5, 5, 5);
+		
+		JPanel soundnessPanel = new JPanel();
+		soundnessPanel.setBorder(BorderFactory.createTitledBorder("Soundness"));
+		soundnessPanel.setLayout(new GridBagLayout());
+		gbc.gridx = 0;
+		gbc.gridy = 1;	
+		gbc.gridwidth = 2;
+		panel.add(soundnessPanel, gbc);
+		
+		gbc.gridwidth = 1;
 
-		soundness = new JCheckBox("Check soundness.");
+		if(soundness == null)	soundness = new JCheckBox("Check soundness.");
 		soundness.setSelected(true);
 		soundness.setEnabled(false);
 		gbc.gridx = 0;
 		gbc.gridy = 1;	
-		panel.add(soundness, gbc);
+		soundnessPanel.add(soundness, gbc);
 		
 		soundnessResult = new JLabel();
 		gbc.gridx = 1;
-		panel.add(soundnessResult, gbc);
+		soundnessPanel.add(soundnessResult, gbc);
 
-		min = new JCheckBox("Calculate minimum duration.");
+		if(min == null)	min = new JCheckBox("Calculate minimum duration.");
 		gbc.gridx = 0;
 		gbc.gridy = 2;	
-		panel.add(min, gbc);
+		soundnessPanel.add(min, gbc);
 		
 		minResult = new JLabel();
 		gbc.gridx = 1;
-		panel.add(minResult, gbc);
+		soundnessPanel.add(minResult, gbc);
 		
-		strongSoundness = new JCheckBox("Check strong soundness.");
+		JPanel strongSoundnessPanel = new JPanel();
+		strongSoundnessPanel.setBorder(BorderFactory.createTitledBorder("Strong Soundness"));
+		strongSoundnessPanel.setLayout(new GridBagLayout());
+		gbc.gridx = 0;
+		gbc.gridy = 2;	
+		gbc.gridwidth = 2;
+		panel.add(strongSoundnessPanel, gbc);
+		
+		if(strongSoundness == null)	strongSoundness = new JCheckBox("Check strong soundness.");
 		gbc.gridx = 0;
 		gbc.gridy = 3;	
-		panel.add(strongSoundness, gbc);
+		strongSoundnessPanel.add(strongSoundness, gbc);
 		
 		strongSoundnessResult = new JLabel();
 		gbc.gridx = 1;
-		panel.add(strongSoundnessResult, gbc);
+		strongSoundnessPanel.add(strongSoundnessResult, gbc);
 
-		max = new JCheckBox("Calculate maximum duration.");
+		if(max == null)	max = new JCheckBox("Calculate maximum duration.");
 		gbc.gridx = 0;
 		gbc.gridy = 4;	
-		panel.add(max, gbc);
+		strongSoundnessPanel.add(max, gbc);
 		
 		maxResult = new JLabel();
 		gbc.gridx = 1;
 		panel.add(maxResult, gbc);
 		
-		max.setEnabled(strongSoundness.isSelected());
+		strongSoundnessPanel.setEnabled(strongSoundness.isSelected());
 		
 		strongSoundness.addActionListener(new ActionListener() {
 
@@ -221,7 +239,7 @@ public class WorkflowDialog extends JDialog{
 			gbc.gridy = 5;
 			panel.add(new JLabel(" Number of extra tokens:  "), gbc);
 			
-			numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
+			if(numberOfExtraTokensInNet == null)	numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
 			numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
