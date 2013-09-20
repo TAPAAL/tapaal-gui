@@ -414,6 +414,9 @@ public class WorkflowDialog extends JDialog{
 				if(result.isQuerySatisfied()){
 					soundnessResult.setText("True");
 					soundnessResult.setForeground(Color.green);
+				}else if(!result.isBounded()){
+					soundnessResult.setText("Inconclusive");
+					soundnessResult.setForeground(Color.yellow);
 				}else{
 					soundnessResult.setText("False");
 					soundnessResult.setForeground(Color.red);
