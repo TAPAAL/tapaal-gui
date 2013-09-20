@@ -143,6 +143,19 @@ public class WorkflowDialog extends JDialog{
 			
 			initValidationPanel();
 		}
+		
+		gbc.gridx = netType == TAWFNTypes.NOTTAWFN? 0:1;
+		gbc.gridy = 7;
+		JButton close_button = new JButton("Close");
+		close_button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dialog.dispose();
+			}
+		});
+		
+		panel.add(close_button, gbc);
 	}
 
 	private void initValidationPanel(){
@@ -226,7 +239,6 @@ public class WorkflowDialog extends JDialog{
 		});
 		gbc.gridx = 0;
 		gbc.gridy = 7;
-		gbc.gridwidth = 2;
 		panel.add(checkIfSound, gbc);
 	}
 
