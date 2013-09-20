@@ -31,6 +31,7 @@ import pipe.dataLayer.TAPNQuery.ModelType;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -227,6 +228,18 @@ public class WorkflowDialog extends JDialog{
 			gbc.gridx = 0;
 			gbc.gridy = 6;
 			panel.add(numberOfExtraTokensInNet, gbc);
+			
+			JButton checkBound = new JButton("Check bound");
+			gbc.gridx = 1;
+			panel.add(checkBound, gbc);
+			
+			checkBound.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					checkBound();
+				}
+			});
 		}
 
 		JButton checkIfSound = new JButton("Check workflow soundness");
@@ -435,5 +448,9 @@ public class WorkflowDialog extends JDialog{
 			}
 		});
 		
+	}
+	
+	private void checkBound(){
+		Verifier.analyzeKBound(CreateGui.getCurrentTab().network(), (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet);
 	}
 }
