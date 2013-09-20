@@ -20,6 +20,9 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ErrorMessages;
 
 import pipe.gui.*;
 import pipe.dataLayer.*;
@@ -62,6 +65,8 @@ public class WorkflowDialog extends JDialog{
 	private static JLabel maxResult;
 	
 	private CustomJSpinner numberOfExtraTokensInNet;
+	
+	private ArrayList<String> errorMsgs = new ArrayList<String>();
 
 	private TimedPlace in;
 	private TimedPlace out;
@@ -70,7 +75,6 @@ public class WorkflowDialog extends JDialog{
 		ETAWFN, MTAWFN, NOTTAWFN
 	}
 
-	private String msg = "";
 	TAWFNTypes netType;
 
 	public static void showDialog(){
@@ -78,7 +82,7 @@ public class WorkflowDialog extends JDialog{
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setResizable(true);
-		dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
@@ -121,7 +125,10 @@ public class WorkflowDialog extends JDialog{
 			workflowTypeLabel.setText("This net is an ETAWFN");
 			break;
 		case NOTTAWFN:
-			workflowTypeLabel.setText("<html>This net is not a TAWFN for the following reason:<br>"+msg+"</html>");
+			StringBuilder sb = new StringBuilder();
+			String sep = "<br>";
+			for (String e : errorMsgs) sb.append(sep).append("- ").append(e);
+			workflowTypeLabel.setText("<html>This net is not a TAWFN for the following reason(s):"+sb.toString()+"</html>");
 			break;
 		}
 
@@ -230,8 +237,8 @@ public class WorkflowDialog extends JDialog{
 		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();	
 		in = null;
 		out = null;
-		msg = "";
-
+		errorMsgs = new ArrayList<String>();
+		
 		boolean isin;
 		boolean isout;
 		boolean isMonotonic = true;
@@ -286,21 +293,18 @@ public class WorkflowDialog extends JDialog{
 						sharedOutPlaces.add(p);
 					}
 				}else if(isin && isout){
-					msg += "Place " +p+ " has no in- or out-going arcs.";
-					return TAWFNTypes.NOTTAWFN;
+					errorMsgs.add("Place " +p+ " has no in- or out-going arcs.");
 				}else if(isin){
 					if(in == null){
 						in = p;
 					}else{
-						msg += "Multiple in-places found ("+in+" and "+p+").";
-						return TAWFNTypes.NOTTAWFN;
+						errorMsgs.add("Multiple in-places found ("+in+" and "+p+").");
 					}
 				}else if(isout){
 					if(out == null){
 						out = p;
 					}else{
-						msg += "Multiple out-places found ("+out+" and "+ p +").";
-						return TAWFNTypes.NOTTAWFN;
+						errorMsgs.add("Multiple out-places found ("+out+" and "+ p +").");
 					}
 				}
 
@@ -316,8 +320,7 @@ public class WorkflowDialog extends JDialog{
 				if(t.isShared()){
 					sharedTransitions.add(t.sharedTransition());
 				}else if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
-					msg += "Transition "+t.name()+" has empty preset.";
-					return TAWFNTypes.NOTTAWFN;
+					errorMsgs.add("Transition "+t.name()+" has empty preset.");
 				}
 
 				if(isMonotonic && (t.isUrgent() || !t.getInhibitorArcs().isEmpty())){
@@ -334,13 +337,11 @@ public class WorkflowDialog extends JDialog{
 					continue outer;
 				}
 			}
-			msg += "Transition "+st.name()+" has empty preset.";
-			return TAWFNTypes.NOTTAWFN;
+			errorMsgs.add("Transition "+st.name()+" has empty preset.");
 		}
 		
 		if(!sharedTransitions.isEmpty()){
-			msg += "Transition "+sharedTransitions.get(0).name()+" has empty preset.";
-			return TAWFNTypes.NOTTAWFN;
+			errorMsgs.add("Transition "+sharedTransitions.get(0).name()+" has empty preset.");
 		}
 		
 		while(sharedInPlaces.size()!=0){
@@ -350,16 +351,14 @@ public class WorkflowDialog extends JDialog{
 				if(in == null){
 					in = p;
 				}else{
-					msg += "Multiple in-places found ("+in+" and "+p+").";
-					return TAWFNTypes.NOTTAWFN;
+					errorMsgs.add("Multiple in-places found ("+in+" and "+p+").");
 				}
 			}
 			while(sharedOutPlaces.remove(p)){}
 		}
 
 		if(in == null){
-			msg += "No in-place found.";
-			return TAWFNTypes.NOTTAWFN;
+			errorMsgs.add("No in-place found.");
 		}
 
 		while(sharedOutPlaces.size() > 0){
@@ -369,21 +368,21 @@ public class WorkflowDialog extends JDialog{
 				out = p;
 				while(sharedOutPlaces.remove(p)){}
 			}else{
-				msg += "Multiple out-places found ("+out+" and "+ p +").";
-				return TAWFNTypes.NOTTAWFN;
+				errorMsgs.add("Multiple out-places found ("+out+" and "+ p +").");
 			}
 		}
 
 		if(out == null){
-			msg += "No in-place found.";
-			return TAWFNTypes.NOTTAWFN;
+			errorMsgs.add("No in-place found.");
 		}
 
 		if(numberOfTokensInNet > 1 || in.tokens().size() != 1){
-			msg += "The current marking is not a valid initial marking.";
-			return TAWFNTypes.NOTTAWFN;
+			errorMsgs.add("The current marking is not a valid initial marking.");
 		}
 
+		if(!errorMsgs.isEmpty()){
+			return TAWFNTypes.NOTTAWFN;
+		}
 
 		return isMonotonic ? TAWFNTypes.MTAWFN : TAWFNTypes.ETAWFN;
 	}
