@@ -490,4 +490,18 @@ public class TimedArcPetriNetNetwork {
 		}
 		return biggestConstant;
 	}
+	
+	public TimedArcPetriNetNetwork copy(){
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+		
+		for(Constant c : constants()){
+			network.addConstant(c.name(), c.value());
+		}
+		
+		for(TimedArcPetriNet t : tapns){
+			network.add(t.copy());
+		}
+		
+		return network;
+	}
 }

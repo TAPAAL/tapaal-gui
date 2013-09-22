@@ -1,6 +1,5 @@
 package pipe.gui.widgets;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -8,21 +7,24 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ErrorMessages;
+import org.w3c.dom.DOMException;
 
 import pipe.gui.*;
 import pipe.dataLayer.*;
@@ -30,24 +32,35 @@ import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.ModelType;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantBound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
+import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
+import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
-public class WorkflowDialog extends JDialog{
+public class WorkflowDialog extends JDialog {
 
 	private static final long serialVersionUID = 5613743579411748200L;
 
@@ -59,27 +72,41 @@ public class WorkflowDialog extends JDialog{
 	private static JCheckBox strongSoundness = null;
 	private static JCheckBox min = null;
 	private static JCheckBox max = null;
-	
+
 	private static JLabel soundnessResult;
 	private static JLabel strongSoundnessResult;
+	private static JLabel soundnessResultExplanation;
+	private static JLabel strongSoundnessResultExplanation;
 	private static JLabel minResult;
 	private static JLabel maxResult;
-	
+	private static JLabel soundnessVerificationStats;
+	private static JLabel strongSoundnessVerificationStats;
+
 	private static CustomJSpinner numberOfExtraTokensInNet = null;
-	
+
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
+	private ArrayList<Runnable> verificationQueue = new ArrayList<Runnable>();
 
 	private TimedPlace in;
 	private TimedPlace out;
 
-	private enum TAWFNTypes{
+	private static boolean isSound = false;
+	private static long m;
+	private static int B;
+	private static long strongSoundnessSequenceTimer;
+	private static long strongSoundnessPeakMemory;
+	private static Constant c = null;
+	private static TimedPlace done = null;
+
+	private enum TAWFNTypes {
 		ETAWFN, MTAWFN, NOTTAWFN
 	}
 
 	TAWFNTypes netType;
 
-	public static void showDialog(){
-		dialog = new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true);
+	public static void showDialog() {
+		dialog = new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis",
+				true);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setResizable(true);
@@ -101,7 +128,8 @@ public class WorkflowDialog extends JDialog{
 		netType = checkIfTAWFN();
 
 		JPanel informationPanel = new JPanel();
-		informationPanel.setBorder(BorderFactory.createTitledBorder("Properties"));
+		informationPanel.setBorder(BorderFactory
+				.createTitledBorder("Properties"));
 		informationPanel.setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -118,7 +146,7 @@ public class WorkflowDialog extends JDialog{
 		JLabel workflowTypeLabel = new JLabel();
 		informationPanel.add(workflowTypeLabel, gbc);
 
-		switch(netType){
+		switch (netType) {
 		case MTAWFN:
 			workflowTypeLabel.setText("This net is a MTAWFN");
 			break;
@@ -128,133 +156,179 @@ public class WorkflowDialog extends JDialog{
 		case NOTTAWFN:
 			StringBuilder sb = new StringBuilder();
 			String sep = "<br>";
-			for (String e : errorMsgs) sb.append(sep).append("- ").append(e);
-			workflowTypeLabel.setText("<html>This net is not a TAWFN for the following reason(s):"+sb.toString()+"</html>");
+			for (String e : errorMsgs)
+				sb.append(sep).append("- ").append(e);
+			workflowTypeLabel
+					.setText("<html>This net is not a TAWFN for the following reason(s):"
+							+ sb.toString() + "</html>");
 			break;
 		}
 
-		if(netType != TAWFNTypes.NOTTAWFN){
-			JLabel inPlaceLabel = new JLabel("In-place: "+in.name());
+		if (netType != TAWFNTypes.NOTTAWFN) {
+			JLabel inPlaceLabel = new JLabel("In-place: " + in.name());
 			gbc.gridy = 1;
 			informationPanel.add(inPlaceLabel, gbc);
-			
-			JLabel outPlaceLabel = new JLabel("Out-place: "+out.name());
+
+			JLabel outPlaceLabel = new JLabel("Out-place: " + out.name());
 			gbc.gridy = 2;
 			informationPanel.add(outPlaceLabel, gbc);
-			
+
 			initValidationPanel();
 		}
-		
-		gbc.gridx = netType == TAWFNTypes.NOTTAWFN? 0:1;
+
+		gbc.gridx = netType == TAWFNTypes.NOTTAWFN ? 0 : 1;
 		gbc.gridy = 7;
 		JButton close_button = new JButton("Close");
 		close_button.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dialog.dispose();
 			}
 		});
-		
+
 		panel.add(close_button, gbc);
 	}
 
-	private void initValidationPanel(){
+	private void initValidationPanel() {
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		
+
 		JPanel soundnessPanel = new JPanel();
 		soundnessPanel.setBorder(BorderFactory.createTitledBorder("Soundness"));
 		soundnessPanel.setLayout(new GridBagLayout());
 		gbc.gridx = 0;
-		gbc.gridy = 1;	
+		gbc.gridy = 1;
 		gbc.gridwidth = 2;
 		panel.add(soundnessPanel, gbc);
-		
+
 		gbc.gridwidth = 1;
 
-		if(soundness == null)	soundness = new JCheckBox("Check soundness.");
+		if (soundness == null)
+			soundness = new JCheckBox("Check soundness.");
 		soundness.setSelected(true);
 		soundness.setEnabled(false);
 		gbc.gridx = 0;
-		gbc.gridy = 1;	
+		gbc.gridy = 1;
 		soundnessPanel.add(soundness, gbc);
-		
+
 		soundnessResult = new JLabel();
 		gbc.gridx = 1;
 		soundnessPanel.add(soundnessResult, gbc);
 
-		if(min == null)	min = new JCheckBox("Calculate minimum duration.");
+		soundnessResultExplanation = new JLabel();
 		gbc.gridx = 0;
-		gbc.gridy = 2;	
+		gbc.gridy = 2;
+		gbc.gridwidth = 2;
+		soundnessResultExplanation.setVisible(false);
+		soundnessPanel.add(soundnessResultExplanation, gbc);
+
+		gbc.gridwidth = 1;
+
+		if (min == null)
+			min = new JCheckBox("Calculate minimum duration.");
+		gbc.gridx = 0;
+		gbc.gridy = 3;
 		soundnessPanel.add(min, gbc);
-		
+
 		minResult = new JLabel();
 		gbc.gridx = 1;
 		soundnessPanel.add(minResult, gbc);
-		
+
+		soundnessVerificationStats = new JLabel();
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.gridwidth = 2;
+		soundnessVerificationStats.setVisible(false);
+		soundnessPanel.add(soundnessVerificationStats, gbc);
+
+		gbc.gridwidth = 1;
+
 		JPanel strongSoundnessPanel = new JPanel();
-		strongSoundnessPanel.setBorder(BorderFactory.createTitledBorder("Strong Soundness"));
+		strongSoundnessPanel.setBorder(BorderFactory
+				.createTitledBorder("Strong Soundness"));
 		strongSoundnessPanel.setLayout(new GridBagLayout());
 		gbc.gridx = 0;
-		gbc.gridy = 2;	
+		gbc.gridy = 2;
 		gbc.gridwidth = 2;
 		panel.add(strongSoundnessPanel, gbc);
-		
+
 		gbc.gridwidth = 1;
-		
-		if(strongSoundness == null)	strongSoundness = new JCheckBox("Check strong soundness.");
+
+		if (strongSoundness == null)
+			strongSoundness = new JCheckBox("Check strong soundness.");
 		gbc.gridx = 0;
-		gbc.gridy = 3;	
+		gbc.gridy = 1;
 		strongSoundnessPanel.add(strongSoundness, gbc);
-		
+
 		strongSoundnessResult = new JLabel();
 		gbc.gridx = 1;
 		strongSoundnessPanel.add(strongSoundnessResult, gbc);
 
-		if(max == null)	max = new JCheckBox("Calculate maximum duration.");
+		strongSoundnessResultExplanation = new JLabel();
 		gbc.gridx = 0;
-		gbc.gridy = 4;	
+		gbc.gridy = 2;
+		gbc.gridwidth = 2;
+		strongSoundnessResultExplanation.setVisible(false);
+		strongSoundnessPanel.add(strongSoundnessResultExplanation, gbc);
+
+		gbc.gridwidth = 1;
+
+		if (max == null)
+			max = new JCheckBox("Calculate maximum duration.");
+		gbc.gridx = 0;
+		gbc.gridy = 4;
 		strongSoundnessPanel.add(max, gbc);
-		
+
 		maxResult = new JLabel();
 		gbc.gridx = 1;
 		panel.add(maxResult, gbc);
-		
+
+		strongSoundnessVerificationStats = new JLabel();
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		gbc.gridwidth = 2;
+		strongSoundnessVerificationStats.setVisible(false);
+		strongSoundnessPanel.add(strongSoundnessVerificationStats, gbc);
+
+		gbc.gridwidth = 1;
+
 		strongSoundnessPanel.setEnabled(strongSoundness.isSelected());
-		
+
 		strongSoundness.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				max.setEnabled(strongSoundness.isSelected());
-				if(!strongSoundness.isSelected()){
+				if (!strongSoundness.isSelected()) {
 					max.setSelected(false);
 				}
 			}
 		});
-		
-		if(netType == TAWFNTypes.ETAWFN){
+
+		if (netType == TAWFNTypes.ETAWFN) {
 			gbc.gridx = 0;
 			gbc.gridy = 5;
 			panel.add(new JLabel(" Number of extra tokens:  "), gbc);
-			
-			if(numberOfExtraTokensInNet == null)	numberOfExtraTokensInNet = new CustomJSpinner(3, 0, Integer.MAX_VALUE);	
+
+			if (numberOfExtraTokensInNet == null)
+				numberOfExtraTokensInNet = new CustomJSpinner(3, 0,
+						Integer.MAX_VALUE);
 			numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
 			gbc.gridx = 0;
 			gbc.gridy = 6;
 			panel.add(numberOfExtraTokensInNet, gbc);
-			
+
 			JButton checkBound = new JButton("Check bound");
 			gbc.gridx = 1;
 			panel.add(checkBound, gbc);
-			
+
 			checkBound.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					checkBound();
@@ -267,7 +341,7 @@ public class WorkflowDialog extends JDialog{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				checkTAWFNSoundness(in, out);
+				checkTAWFNSoundness();
 			}
 		});
 		gbc.gridx = 0;
@@ -275,202 +349,459 @@ public class WorkflowDialog extends JDialog{
 		panel.add(checkIfSound, gbc);
 	}
 
-	private TAWFNTypes checkIfTAWFN(){
-		List<TimedArcPetriNet> tapns = CreateGui.getCurrentTab().network().activeTemplates();
-		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();	
+	private TAWFNTypes checkIfTAWFN() {
+		List<TimedArcPetriNet> tapns = CreateGui.getCurrentTab().network()
+				.activeTemplates();
+		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
-		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();	
+		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 		in = null;
 		out = null;
 		errorMsgs = new ArrayList<String>();
-		
+
 		boolean isin;
 		boolean isout;
 		boolean isMonotonic = true;
 		int numberOfTokensInNet = 0;
 		ArrayList<TimedPlace> countedSharedPlaces = new ArrayList<TimedPlace>();
 
-		for(TimedArcPetriNet tapn: tapns){ 		
-			for(TimedPlace p : tapn.places()){
+		for (TimedArcPetriNet tapn : tapns) {
+			for (TimedPlace p : tapn.places()) {
 				isin = true;
 				isout = true;
 
 				p.invariant().asIterval();
-				if(isMonotonic && !p.invariant().asIterval().equals(TimeInterval.ZERO_INF)){
+				if (isMonotonic
+						&& !p.invariant().asIterval()
+								.equals(TimeInterval.ZERO_INF)) {
 					isMonotonic = false;
 				}
 
 				// Test for arcs going in to place
-				for(TimedOutputArc arc: tapn.outputArcs()){
-					if(arc.destination().equals(p)){
+				for (TimedOutputArc arc : tapn.outputArcs()) {
+					if (arc.destination().equals(p)) {
 						isin = false;
 						break;
 					}
 				}
 
-				//Test for arcs going out from place
-				for(TimedInputArc arc: tapn.inputArcs()){
-					if(arc.source().equals(p)){
+				// Test for arcs going out from place
+				for (TimedInputArc arc : tapn.inputArcs()) {
+					if (arc.source().equals(p)) {
 						isout = false;
 						break;
 					}
 				}
 
 				// Transport arcs
-				for(TransportArc arc: tapn.transportArcs()){
-					if(arc.destination().equals(p)){
+				for (TransportArc arc : tapn.transportArcs()) {
+					if (arc.destination().equals(p)) {
 						isin = false;
 					}
-					if(arc.source().equals(p)){
+					if (arc.source().equals(p)) {
 						isout = false;
 					}
-					if(!isin && !isout)	break;
+					if (!isin && !isout)
+						break;
 				}
 
-
-
-				if(p.isShared()){
-					if(isin){
+				if (p.isShared()) {
+					if (isin) {
 						sharedInPlaces.add(p);
 					}
 
-					if(isout){
+					if (isout) {
 						sharedOutPlaces.add(p);
 					}
-				}else if(isin && isout){
-					errorMsgs.add("Place " +p+ " has no in- or out-going arcs.");
-				}else if(isin){
-					if(in == null){
+				} else if (isin && isout) {
+					errorMsgs.add("Place " + p
+							+ " has no in- or out-going arcs.");
+				} else if (isin) {
+					if (in == null) {
 						in = p;
-					}else{
-						errorMsgs.add("Multiple in-places found ("+in+" and "+p+").");
+					} else {
+						errorMsgs.add("Multiple in-places found (" + in
+								+ " and " + p + ").");
 					}
-				}else if(isout){
-					if(out == null){
+				} else if (isout) {
+					if (out == null) {
 						out = p;
-					}else{
-						errorMsgs.add("Multiple out-places found ("+out+" and "+ p +").");
+					} else {
+						errorMsgs.add("Multiple out-places found (" + out
+								+ " and " + p + ").");
 					}
 				}
 
-				if(p.isShared() && !countedSharedPlaces.contains(p)){
+				if (p.isShared() && !countedSharedPlaces.contains(p)) {
 					numberOfTokensInNet += p.numberOfTokens();
 					countedSharedPlaces.add(p);
-				}else if(!p.isShared()){
+				} else if (!p.isShared()) {
 					numberOfTokensInNet += p.numberOfTokens();
 				}
 			}
 
-			for(TimedTransition t : tapn.transitions()){
-				if(t.isShared()){
+			for (TimedTransition t : tapn.transitions()) {
+				if (t.isShared()) {
 					sharedTransitions.add(t.sharedTransition());
-				}else if(t.getInputArcs().isEmpty() && t.getTransportArcsGoingThrough().isEmpty()){
-					errorMsgs.add("Transition "+t.name()+" has empty preset.");
+				} else if (t.getInputArcs().isEmpty()
+						&& t.getTransportArcsGoingThrough().isEmpty()) {
+					errorMsgs.add("Transition " + t.name()
+							+ " has empty preset.");
 				}
 
-				if(isMonotonic && (t.isUrgent() || !t.getInhibitorArcs().isEmpty())){
+				if (isMonotonic
+						&& (t.isUrgent() || !t.getInhibitorArcs().isEmpty())) {
 					isMonotonic = false;
 				}
 			}
 		}
 
-		outer: while(sharedTransitions.size() > 0){
+		outer: while (sharedTransitions.size() > 0) {
 			SharedTransition st = sharedTransitions.get(0);
-			for(TimedTransition t : st.transitions()){
-				if(!t.getTransportArcsGoingThrough().isEmpty() || !t.getInputArcs().isEmpty()){
-					while(sharedTransitions.remove(st)){}
+			for (TimedTransition t : st.transitions()) {
+				if (!t.getTransportArcsGoingThrough().isEmpty()
+						|| !t.getInputArcs().isEmpty()) {
+					while (sharedTransitions.remove(st)) {
+					}
 					continue outer;
 				}
 			}
-			errorMsgs.add("Transition "+st.name()+" has empty preset.");
+			errorMsgs.add("Transition " + st.name() + " has empty preset.");
 		}
-		
-		if(!sharedTransitions.isEmpty()){
-			errorMsgs.add("Transition "+sharedTransitions.get(0).name()+" has empty preset.");
+
+		if (!sharedTransitions.isEmpty()) {
+			errorMsgs.add("Transition " + sharedTransitions.get(0).name()
+					+ " has empty preset.");
 		}
-		
-		while(sharedInPlaces.size()!=0){
+
+		while (sharedInPlaces.size() != 0) {
 			TimedPlace p = sharedInPlaces.get(0);
-			while(sharedInPlaces.remove(p)){}
-			if(!sharedOutPlaces.remove(p)){
-				if(in == null){
+			while (sharedInPlaces.remove(p)) {
+			}
+			if (!sharedOutPlaces.remove(p)) {
+				if (in == null) {
 					in = p;
-				}else{
-					errorMsgs.add("Multiple in-places found ("+in+" and "+p+").");
+				} else {
+					errorMsgs.add("Multiple in-places found (" + in + " and "
+							+ p + ").");
 				}
 			}
-			while(sharedOutPlaces.remove(p)){}
-		}
-
-		if(in == null){
-			errorMsgs.add("No in-place found.");
-		}
-
-		while(sharedOutPlaces.size() > 0){
-			TimedPlace p = null;
-			if(out == null){
-				p = sharedOutPlaces.get(0);
-				out = p;
-				while(sharedOutPlaces.remove(p)){}
-			}else{
-				errorMsgs.add("Multiple out-places found ("+out+" and "+ p +").");
+			while (sharedOutPlaces.remove(p)) {
 			}
 		}
 
-		if(out == null){
+		if (in == null) {
 			errorMsgs.add("No in-place found.");
 		}
 
-		if(numberOfTokensInNet > 1 || in.tokens().size() != 1){
-			errorMsgs.add("The current marking is not a valid initial marking.");
+		while (sharedOutPlaces.size() > 0) {
+			TimedPlace p = null;
+			if (out == null) {
+				p = sharedOutPlaces.get(0);
+				out = p;
+				while (sharedOutPlaces.remove(p)) {
+				}
+			} else {
+				errorMsgs.add("Multiple out-places found (" + out + " and " + p
+						+ ").");
+			}
 		}
 
-		if(!errorMsgs.isEmpty()){
+		if (out == null) {
+			errorMsgs.add("No in-place found.");
+		}
+
+		if (numberOfTokensInNet > 1 || in.tokens().size() != 1) {
+			errorMsgs
+					.add("The current marking is not a valid initial marking.");
+		}
+
+		if (!errorMsgs.isEmpty()) {
 			return TAWFNTypes.NOTTAWFN;
 		}
 
 		return isMonotonic ? TAWFNTypes.MTAWFN : TAWFNTypes.ETAWFN;
 	}
 
-	private void checkTAWFNSoundness(TimedPlace in, TimedPlace out){
-		final TAPNQuery q = new TAPNQuery("Workflow soundness checking", numberOfExtraTokensInNet == null? 0 : (Integer) numberOfExtraTokensInNet.getValue(), new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE, SearchOption.HEURISTIC, ReductionOption.VerifyTAPNdiscreteVerification, true, false, false, null, ExtrapolationOption.AUTOMATIC, ModelType.TAWFN, strongSoundness.isSelected(), min.isSelected(), max.isSelected());
-		Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab().network(), q, new VerificationCallback() {
+	private void checkTAWFNSoundness() {
+		// Clear old results
+		soundnessResult.setText("");
+		minResult.setText("");
+		strongSoundnessResult.setText("");
+		maxResult.setText("");
+		soundnessResultExplanation.setVisible(false);
+		soundnessVerificationStats.setVisible(false);
+		strongSoundnessResultExplanation.setVisible(false);
+		strongSoundnessVerificationStats.setVisible(false);
+
+		dialog.pack();
+		verificationQueue.clear();
+		isSound = false;
+
+		verificationQueue.add(getSoundnessRunnable());
+
+		if (strongSoundness.isSelected()) {
+			verificationQueue.add(getInitialStrongSoundnessRunnable());
+		}
+
+		// Run steps
+		while (!verificationQueue.isEmpty()) {
+			verificationQueue.get(0).run();
+			verificationQueue.remove(0);
+		}
+	}
+
+	private void setCValue(int value) {
+		c.setValue(value);
+	}
+
+	private TimedArcPetriNetNetwork composeStrongSoundnessModel() {
+		int i = 0;
+		outer: for(TimedArcPetriNet t : CreateGui.getCurrentTab().network().activeTemplates()){
+			for(TimedPlace p : t.places()){
+				if(p.equals(out)){
+					break outer;
+				}
+			}
+			i++;
+		}
+		
+		TimedArcPetriNetNetwork network = CreateGui.getCurrentTab().network().copy();
+		TimedArcPetriNet out_template = network.activeTemplates().get(i);
+		TimedPlace out_hook = null;
+		
+		for(TimedPlace p : out_template.places()){
+			if(p.name().equals(out.name())){
+				out_hook = p;
+				break;
+			}
+		}
+		
+		// Add new components	- TODO prevent name clashing
+		Constant c = new Constant("C", (int) m*B+1); 
+		network.constants().add(c);
+		TimedTransition nok_t = new TimedTransition("NOK", true);
+		out_template.add(nok_t);
+		TimedTransition tick_t = new TimedTransition("TICK", false);
+		out_template.add(tick_t);
+		TimedTransition ok_t = new TimedTransition("OK", true);
+		out_template.add(ok_t);
+		TimedPlace timer_p = new LocalTimedPlace("TIMER", new TimeInvariant(true, new ConstantBound(c)));
+		out_template.add(timer_p);
+		TimedPlace ready_p = new LocalTimedPlace("READY");
+		out_template.add(ready_p);
+		done = new LocalTimedPlace("DONE");
+		out_template.add(done);
+		
+		out_template.add(new TimedInputArc(out_hook, nok_t, TimeInterval.ZERO_INF));
+		out_template.add(new TimedInputArc(out_hook, ok_t, TimeInterval.ZERO_INF));
+		out_template.add(new TimedInputArc(timer_p, tick_t, new TimeInterval(true, new ConstantBound(c), new ConstantBound(c), true)));
+		out_template.add(new TimedOutputArc(tick_t, ready_p));
+		out_template.add(new TimedInputArc(ready_p, ok_t, TimeInterval.ZERO_INF));
+		out_template.add(new TimedOutputArc(ok_t, done));
+		
+		out_template.addToken(new TimedToken(timer_p));
+		
+		return network;
+	}
+
+	private Runnable getInitialStrongSoundnessRunnable() {
+		
+		strongSoundnessSequenceTimer = new Date().getTime();
+		strongSoundnessPeakMemory = 0;
+		
+		return new Runnable() {
+
+			@Override
+			public void run() {
+
+				// Check preliminary conditions
+				if(!isSound){
+					setStrongSoundnessResult(false,"Model is not sound.");
+					return;
+				}
+				
+				B = Integer.MAX_VALUE;
+				for (TimedArcPetriNet t : CreateGui.getCurrentTab().network()
+						.activeTemplates()) {
+					for (TimedPlace p : t.places()) {
+						if (p.invariant().upperBound().equals(Bound.Infinity)) {
+							if (!p.equals(out)) {
+								setStrongSoundnessResult(false,
+										"Place " + p.name()
+												+ " has no invariant.");
+								return;
+							} else {
+								continue;
+							}
+						}
+						B = Math.min(B, p.invariant().upperBound().value());
+					}
+				}
+
+				final TAPNQuery q = new TAPNQuery(
+						"Workflow strong soundness initial check",
+						numberOfExtraTokensInNet == null ? 0
+								: (Integer) numberOfExtraTokensInNet.getValue(),
+						new TCTLEFNode(new TCTLFalseNode()), TraceOption.NONE,
+						SearchOption.HEURISTIC,
+						ReductionOption.VerifyTAPNdiscreteVerification, true,
+						false, false, null, ExtrapolationOption.AUTOMATIC,
+						ModelType.TAPN, strongSoundness.isSelected(), min
+								.isSelected(), max.isSelected());
+				Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab()
+						.network(), q, new VerificationCallback() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void run(VerificationResult<TAPNNetworkTrace> result) {
+						m = result.stats().exploredStates();
+						verificationQueue.add(getStrongSoundnessRunnable());
+					}
+				});
+			}
+		};
+	}
+
+	private Runnable getStrongSoundnessRunnable() {
+		final TimedArcPetriNetNetwork model = composeStrongSoundnessModel();		
+		return new Runnable() {
 			
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void run(VerificationResult<TAPNNetworkTrace> result) {
-				if(result.isQuerySatisfied()){
-					soundnessResult.setText("True");
-					soundnessResult.setForeground(Color.green);
-				}else if(!result.isBounded()){
-					soundnessResult.setText("Inconclusive");
-					soundnessResult.setForeground(Color.yellow);
-				}else{
-					soundnessResult.setText("False");
-					soundnessResult.setForeground(Color.red);
-				}
+				// TODO get place name correct s.t. it is mapped
+				final TAPNQuery q = new TAPNQuery(
+						"Workflow strong soundness checking",
+						numberOfExtraTokensInNet == null ? 0
+								: (Integer) numberOfExtraTokensInNet.getValue(),
+						new TCTLEFNode(new TCTLAtomicPropositionNode(done.toString(), "=", 1)), TraceOption.NONE,
+						SearchOption.HEURISTIC,
+						ReductionOption.VerifyTAPNdiscreteVerification, true,
+						false, false, null, ExtrapolationOption.AUTOMATIC);
+				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
-				if(q.findMin && result.isQuerySatisfied()){
-					if(result.stats().minimumExecutionTime() >= 0){
-						minResult.setText(result.stats().minimumExecutionTime() + "");
-						minResult.setForeground(Color.green);
-					}else{
-						minResult.setText("ERROR!");
-						minResult.setForeground(Color.red);
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+
 					}
-				}
-				dialog.pack();
+
+					@Override
+					public void run(VerificationResult<TAPNNetworkTrace> result) {
+						if(result.isQuerySatisfied()){
+							setStrongSoundnessResult(true, null);
+						}else{
+							setStrongSoundnessResult(false, null);
+						}
+					}
+				});
 			}
-		});
-		
+		};
 	}
-	
-	private void checkBound(){
-		Verifier.analyzeKBound(CreateGui.getCurrentTab().network(), (Integer) numberOfExtraTokensInNet.getValue(), numberOfExtraTokensInNet);
+
+	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
+		if (satisfied) {
+			strongSoundnessResult.setText("The property is satisfied.");
+			strongSoundnessResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+		} else {
+			strongSoundnessResult.setText("The property is NOT satisfied.");
+			strongSoundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+			if(max.isSelected()){
+				maxResult.setText("Not available.");
+				maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+			}
+		}
+
+		if (explanation != null) {
+			strongSoundnessResultExplanation.setText(explanation);
+			strongSoundnessResultExplanation.setVisible(true);
+		}
+		
+		strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory: " + strongSoundnessPeakMemory + "MB.");
+		strongSoundnessVerificationStats.setVisible(true);
+		dialog.pack();
+	}
+
+	private Runnable getSoundnessRunnable() {
+		Runnable r = new Runnable() {
+
+			@Override
+			public void run() {
+				final TAPNQuery q = new TAPNQuery(
+						"Workflow soundness checking",
+						numberOfExtraTokensInNet == null ? 0
+								: (Integer) numberOfExtraTokensInNet.getValue(),
+						new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE,
+						SearchOption.HEURISTIC,
+						ReductionOption.VerifyTAPNdiscreteVerification, true,
+						false, false, null, ExtrapolationOption.AUTOMATIC,
+						ModelType.TAWFN, strongSoundness.isSelected(), min
+								.isSelected(), max.isSelected());
+				Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab()
+						.network(), q, new VerificationCallback() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void run(VerificationResult<TAPNNetworkTrace> result) {
+						if (result.isQuerySatisfied()) {
+							soundnessResult
+									.setText("The property is satisfied.");
+							soundnessResult
+									.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+							isSound = true;
+						} else if (!result.isBounded()) {
+							soundnessResult
+									.setText("The search was inconclusive (k-bound exceeded).");
+							soundnessResult
+									.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+						} else {
+							soundnessResult
+									.setText("The property is NOT satisfied.");
+							soundnessResult
+									.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+						}
+
+						if (q.findMin && result.isQuerySatisfied()) {
+							if (result.stats().minimumExecutionTime() >= 0) {
+								minResult.setText(result.stats()
+										.minimumExecutionTime()
+										+ " time units.");
+								minResult
+										.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+							} else {
+								minResult.setText("ERROR!");
+								minResult
+										.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+							}
+						}
+
+						soundnessVerificationStats.setText(result
+								.getVerificationTimeString()
+								+ ", peak memory usage: "
+								+ MemoryMonitor.getPeakMemory());
+						soundnessVerificationStats.setVisible(true);
+
+						dialog.pack();
+					}
+				});
+			}
+		};
+		return r;
+	}
+
+	private void checkBound() {
+		Verifier.analyzeKBound(CreateGui.getCurrentTab().network(),
+				(Integer) numberOfExtraTokensInNet.getValue(),
+				numberOfExtraTokensInNet);
 	}
 }
