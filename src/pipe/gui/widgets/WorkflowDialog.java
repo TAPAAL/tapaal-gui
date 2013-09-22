@@ -203,6 +203,8 @@ public class WorkflowDialog extends JDialog{
 		gbc.gridwidth = 2;
 		panel.add(strongSoundnessPanel, gbc);
 		
+		gbc.gridwidth = 1;
+		
 		if(strongSoundness == null)	strongSoundness = new JCheckBox("Check strong soundness.");
 		gbc.gridx = 0;
 		gbc.gridy = 3;	
