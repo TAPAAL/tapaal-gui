@@ -494,7 +494,7 @@ public class TimedArcPetriNetNetwork {
 	public TimedArcPetriNetNetwork copy(){
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 		
-		network.setMarking(marking());
+		network.setMarking(marking().clone());
 		
 		for(SharedPlace p : sharedPlaces){
 			network.add(p);	// TODO This is okay for now

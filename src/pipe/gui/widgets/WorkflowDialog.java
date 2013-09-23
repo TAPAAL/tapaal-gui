@@ -29,6 +29,7 @@ import org.w3c.dom.DOMException;
 import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
 
 import pipe.gui.*;
+import pipe.gui.GuiFrame.GUIMode;
 import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.ModelType;
@@ -43,6 +44,7 @@ import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -55,12 +57,17 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class WorkflowDialog extends JDialog {
@@ -81,6 +88,8 @@ public class WorkflowDialog extends JDialog {
 	private static JLabel soundnessResultExplanation;
 	private static JLabel strongSoundnessResultExplanation;
 	private static JLabel minResult;
+	private static JButton minResultTraceButton;
+	private static TAPNNetworkTrace minResultTrace = null;
 	private static JLabel maxResult;
 	private static JLabel soundnessVerificationStats;
 	private static JLabel strongSoundnessVerificationStats;
@@ -261,11 +270,25 @@ public class WorkflowDialog extends JDialog {
 		minResult = new JLabel();
 		gbc.gridx = 1;
 		soundnessPanel.add(minResult, gbc);
+		
+		minResultTraceButton = new JButton("Show trace");
+		gbc.gridx = 2;
+		minResultTraceButton.setVisible(false);
+		minResultTraceButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getApp().setGUIMode(GUIMode.animation);
+				CreateGui.getAnimator().SetTrace(minResultTrace);
+				dialog.dispose();
+			}
+		});
+		soundnessPanel.add(minResultTraceButton, gbc);
 
 		soundnessVerificationStats = new JLabel();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
-		gbc.gridwidth = 2;
+		gbc.gridwidth = 3;
 		soundnessVerificationStats.setVisible(false);
 		soundnessPanel.add(soundnessVerificationStats, gbc);
 
@@ -549,6 +572,7 @@ public class WorkflowDialog extends JDialog {
 		// Clear old results
 		soundnessResult.setText("");
 		minResult.setText("");
+		minResultTraceButton.setVisible(false);
 		strongSoundnessResult.setText("");
 		maxResult.setText("");
 		soundnessResultExplanation.setVisible(false);
@@ -831,7 +855,7 @@ public class WorkflowDialog extends JDialog {
 						"Workflow soundness checking",
 						numberOfExtraTokensInNet == null ? 0
 								: (Integer) numberOfExtraTokensInNet.getValue(),
-						new TCTLEFNode(new TCTLTrueNode()), TraceOption.NONE,
+						new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 						SearchOption.HEURISTIC,
 						ReductionOption.VerifyTAPNdiscreteVerification, true,
 						false, false, null, ExtrapolationOption.AUTOMATIC,
@@ -870,17 +894,12 @@ public class WorkflowDialog extends JDialog {
 
 						if (q.findMin) {
 							if(result.isQuerySatisfied()){
-								if (result.stats().minimumExecutionTime() >= 0) {
-									minResult.setText(result.stats()
+								minResult.setText(result.stats()
 											.minimumExecutionTime()
 											+ " time units.");
-									minResult
-											.setForeground(Pipe.QUERY_SATISFIED_COLOR);
-								} else {
-									minResult.setText("ERROR!");
-									minResult
-											.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
-								}
+								minResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+								minResultTrace = mapTraceToRealModel((TimedTAPNNetworkTrace) result.getTrace());
+								minResultTraceButton.setVisible(true);
 							}else{
 								minResult.setText("Not available.");
 								minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
@@ -905,5 +924,40 @@ public class WorkflowDialog extends JDialog {
 		Verifier.analyzeKBound(model,
 				(Integer) numberOfExtraTokensInNet.getValue(),
 				numberOfExtraTokensInNet);
+	}
+	
+	private TAPNNetworkTrace mapTraceToRealModel(TimedTAPNNetworkTrace trace){
+		TimedTAPNNetworkTrace real_trace = new TimedTAPNNetworkTrace(trace.getLoopToIndex());
+		TimedArcPetriNetNetwork real_model = CreateGui.getCurrentTab().network();
+		
+		NetworkMarking parent = real_model.marking();
+		
+		for(TAPNNetworkTraceStep s : trace){
+			TAPNNetworkTraceStep real_s = null;
+			if(s instanceof TAPNNetworkTimedTransitionStep){
+				TAPNNetworkTimedTransitionStep tmp = (TAPNNetworkTimedTransitionStep) s;
+				TimedTransition t = real_model.getTAPNByName(tmp.getTransition().model().name()).getTransitionByName(tmp.getTransition().name());
+				List<TimedToken> tokens = new ArrayList<TimedToken>();
+				for(TimedToken token : tmp.getConsumedTokens()){
+					TimedPlace p = null;
+					if(token.place().isShared()){
+						p = real_model.getSharedPlaceByName(token.place().name());
+					}else{
+						LocalTimedPlace pp = (LocalTimedPlace) token.place();
+						p = real_model.getTAPNByName(pp.model().name()).getPlaceByName(pp.name());
+					}
+					tokens.add(new TimedToken(p, token.age()));
+				}
+				real_s = new TAPNNetworkTimedTransitionStep(t, tokens);
+			}else{
+				real_s = s;
+			}
+			parent = real_s.performStepFrom(parent);
+			real_trace.add(real_s);
+		}
+		
+		real_trace.setTraceType(TraceType.NOT_EG);
+		
+		return real_trace;
 	}
 }

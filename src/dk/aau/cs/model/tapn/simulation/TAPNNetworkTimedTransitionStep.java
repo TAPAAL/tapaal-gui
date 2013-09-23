@@ -20,6 +20,14 @@ public class TAPNNetworkTimedTransitionStep extends TAPNNetworkTraceStep {
 	public NetworkMarking performStepFrom(NetworkMarking marking) {
 		return marking.fireTransition(transition, consumedTokens);
 	}
+	
+	public TimedTransition getTransition(){
+		return transition;
+	}
+	
+	public List<TimedToken> getConsumedTokens(){
+		return consumedTokens;
+	}
 
 	@Override
 	public String toString() {
