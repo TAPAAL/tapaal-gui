@@ -18,8 +18,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.ModelType;
@@ -668,24 +670,30 @@ public class WorkflowDialog extends JDialog {
 					return;
 				}
 				
+				ArrayList<TimedPlace> toVerify = new ArrayList<TimedPlace>();
 				B = Integer.MAX_VALUE;
 				for (TimedArcPetriNet t : model
 						.activeTemplates()) {
+					toVerify.clear();
 					for (TimedPlace p : t.places()) {
 						if (p.invariant().upperBound().equals(Bound.Infinity)) {
 							if (!p.equals(out)) {
-								setStrongSoundnessResult(false,
-										"Place " + p.name()
-												+ " has no invariant.");
-								return;
-							} else {
-								continue;
-							}
+								toVerify.add(p);
+							} 
+							continue;
 						}
 						B = Math.min(B, p.invariant().upperBound().value());
 					}
+					
+					for(TimedPlace p : toVerify){
+						setStrongSoundnessResult(false,
+								"Place " + p.name()
+										+ " has no invariant.");
+						return;
+					}
 				}
 				B++;
+				
 
 				final TAPNQuery q = new TAPNQuery(
 						"Workflow strong soundness initial check",
