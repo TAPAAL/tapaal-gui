@@ -51,7 +51,7 @@ public class Stats {
 		return stored;
 	}
 	
-	public long minimumExecutionTime(){
+	public int minimumExecutionTime(){
 		return minExecutionTime;
 	}
 	

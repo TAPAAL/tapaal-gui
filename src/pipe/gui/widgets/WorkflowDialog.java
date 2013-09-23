@@ -69,6 +69,8 @@ public class WorkflowDialog extends JDialog {
 	private static JLabel strongSoundnessResult;
 	private static JLabel soundnessResultExplanation;
 	private static JLabel strongSoundnessResultExplanation;
+	private static JButton soundnessResultTraceButton;
+	private static TAPNNetworkTrace soundnessResultTrace = null;
 	private static JLabel minResult;
 	private static JButton minResultTraceButton;
 	private static TAPNNetworkTrace minResultTrace = null;
@@ -88,6 +90,7 @@ public class WorkflowDialog extends JDialog {
 	private static boolean isSound = false;
 	private static long m;
 	private static int B;
+	private static int min_exec;
 	private static long strongSoundnessSequenceTimer;
 	private static int strongSoundnessPeakMemory;
 	private static Constant c = null;
@@ -233,10 +236,24 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 1;
 		soundnessPanel.add(soundnessResult, gbc);
 
+		soundnessResultTraceButton = new JButton("Show trace");
+		gbc.gridx = 2;
+		soundnessResultTraceButton.setVisible(false);
+		soundnessResultTraceButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CreateGui.getApp().setGUIMode(GUIMode.animation);
+				CreateGui.getAnimator().SetTrace(soundnessResultTrace);
+				dialog.dispose();
+			}
+		});
+		soundnessPanel.add(soundnessResultTraceButton, gbc);
+		
 		soundnessResultExplanation = new JLabel();
 		gbc.gridx = 0;
 		gbc.gridy = 2;
-		gbc.gridwidth = 2;
+		gbc.gridwidth = 3;
 		soundnessResultExplanation.setVisible(false);
 		soundnessResultExplanation.setEnabled(false);
 		soundnessPanel.add(soundnessResultExplanation, gbc);
@@ -553,6 +570,7 @@ public class WorkflowDialog extends JDialog {
 	private void checkTAWFNSoundness() {
 		// Clear old results
 		soundnessResult.setText("");
+		soundnessResultTraceButton.setVisible(false);
 		minResult.setText("");
 		minResultTraceButton.setVisible(false);
 		strongSoundnessResult.setText("");
@@ -565,6 +583,7 @@ public class WorkflowDialog extends JDialog {
 		dialog.pack();
 		verificationQueue.clear();
 		isSound = false;
+		min_exec = -1;
 
 		verificationQueue.add(getSoundnessRunnable());
 
@@ -735,7 +754,7 @@ public class WorkflowDialog extends JDialog {
 						}else{
 							setStrongSoundnessResult(true, null);
 							if(max.isSelected()){
-								setMaxResult(model, 0, (int) (m*B+1));
+								setMaxResult(model, min_exec, (int) (m*B+1));
 							}
 						}
 					}
@@ -859,6 +878,7 @@ public class WorkflowDialog extends JDialog {
 							soundnessResult
 									.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 							isSound = true;
+							min_exec = result.stats().minimumExecutionTime();
 						} else if (!result.isBounded()) {
 							soundnessResult
 									.setText("The search was inconclusive.");
@@ -872,6 +892,8 @@ public class WorkflowDialog extends JDialog {
 									.setText("The property is NOT satisfied.");
 							soundnessResult
 									.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+							soundnessResultTrace = mapTraceToRealModel(result.getTrace());
+							soundnessResultTraceButton.setVisible(true);
 						}
 
 						if (q.findMin) {
