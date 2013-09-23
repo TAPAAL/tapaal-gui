@@ -43,6 +43,7 @@ import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
@@ -88,6 +89,7 @@ public class WorkflowDialog extends JDialog {
 
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
 	private ArrayList<Runnable> verificationQueue = new ArrayList<Runnable>();
+	private static ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
 
 	private TimedPlace in;
 	private TimedPlace out;
@@ -99,6 +101,8 @@ public class WorkflowDialog extends JDialog {
 	private static int strongSoundnessPeakMemory;
 	private static Constant c = null;
 	private static TimedPlace done = null;
+	
+	private static TimedArcPetriNetNetwork model = null;
 
 	private enum TAWFNTypes {
 		ETAWFN, MTAWFN, NOTTAWFN
@@ -107,6 +111,23 @@ public class WorkflowDialog extends JDialog {
 	TAWFNTypes netType;
 
 	public static void showDialog() {
+		
+		/* Copy model */
+		
+		model = CreateGui.getCurrentTab().network().copy();
+		// Fix - remove unused shared places
+		unusedSharedPlaces.clear();
+		for(SharedPlace p : model.sharedPlaces()){
+			if(p.getComponentsUsingThisPlace().isEmpty()){
+				unusedSharedPlaces.add(p);
+			}
+		}
+		for(SharedPlace p : unusedSharedPlaces){
+			model.remove(p);
+		}
+		
+		/* Make dialog */
+		
 		dialog = new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis",
 				true);
 		dialog.pack();
@@ -352,8 +373,7 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private TAWFNTypes checkIfTAWFN() {
-		List<TimedArcPetriNet> tapns = CreateGui.getCurrentTab().network()
-				.activeTemplates();
+		List<TimedArcPetriNet> tapns = model.activeTemplates();
 		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
 		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
@@ -469,11 +489,8 @@ public class WorkflowDialog extends JDialog {
 				}
 			}
 			errorMsgs.add("Transition " + st.name() + " has empty preset.");
-		}
-
-		if (!sharedTransitions.isEmpty()) {
-			errorMsgs.add("Transition " + sharedTransitions.get(0).name()
-					+ " has empty preset.");
+			while (sharedTransitions.remove(st)) {
+			}
 		}
 
 		while (sharedInPlaces.size() != 0) {
@@ -559,7 +576,7 @@ public class WorkflowDialog extends JDialog {
 
 	private TimedArcPetriNetNetwork composeStrongSoundnessModel() {
 		int i = 0;
-		outer: for(TimedArcPetriNet t : CreateGui.getCurrentTab().network().activeTemplates()){
+		outer: for(TimedArcPetriNet t : model.activeTemplates()){
 			for(TimedPlace p : t.places()){
 				if(p.equals(out)){
 					break outer;
@@ -568,7 +585,7 @@ public class WorkflowDialog extends JDialog {
 			i++;
 		}
 		
-		TimedArcPetriNetNetwork network = CreateGui.getCurrentTab().network().copy();
+		TimedArcPetriNetNetwork network = model.copy();
 		TimedArcPetriNet out_template = network.activeTemplates().get(i);
 		TimedPlace out_hook = null;
 		
@@ -624,7 +641,7 @@ public class WorkflowDialog extends JDialog {
 				}
 				
 				B = Integer.MAX_VALUE;
-				for (TimedArcPetriNet t : CreateGui.getCurrentTab().network()
+				for (TimedArcPetriNet t : model
 						.activeTemplates()) {
 					for (TimedPlace p : t.places()) {
 						if (p.invariant().upperBound().equals(Bound.Infinity)) {
@@ -652,8 +669,7 @@ public class WorkflowDialog extends JDialog {
 						false, false, null, ExtrapolationOption.AUTOMATIC,
 						ModelType.TAPN, strongSoundness.isSelected(), min
 								.isSelected(), max.isSelected());
-				Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab()
-						.network(), q, new VerificationCallback() {
+				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
 					public void run() {
@@ -678,7 +694,7 @@ public class WorkflowDialog extends JDialog {
 			
 			@Override
 			public void run() {
-				String template = done.isShared()? "":((LocalTimedPlace) done).model().name();
+				String template = done.isShared()? ((SharedPlace) done).getComponentsUsingThisPlace().get(0):((LocalTimedPlace) done).model().name();
 				// TODO get place name correct s.t. it is mapped
 				final TAPNQuery q = new TAPNQuery(
 						"Workflow strong soundness checking",
@@ -818,8 +834,7 @@ public class WorkflowDialog extends JDialog {
 						false, false, null, ExtrapolationOption.AUTOMATIC,
 						ModelType.TAWFN, strongSoundness.isSelected(), min
 								.isSelected(), max.isSelected());
-				Verifier.runVerifyTAPNVerification(CreateGui.getCurrentTab()
-						.network(), q, new VerificationCallback() {
+				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
 					public void run() {
@@ -876,7 +891,7 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private void checkBound() {
-		Verifier.analyzeKBound(CreateGui.getCurrentTab().network(),
+		Verifier.analyzeKBound(model,
 				(Integer) numberOfExtraTokensInNet.getValue(),
 				numberOfExtraTokensInNet);
 	}

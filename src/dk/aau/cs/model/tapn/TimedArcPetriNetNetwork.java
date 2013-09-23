@@ -494,6 +494,14 @@ public class TimedArcPetriNetNetwork {
 	public TimedArcPetriNetNetwork copy(){
 		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 		
+		for(SharedPlace p : sharedPlaces){
+			network.add(p);	// TODO This is okay for now
+		}
+		
+		for(SharedTransition t : sharedTransitions){
+			network.add(t);	// TODO This is okay for now
+		}
+		
 		for(Constant c : constants()){
 			network.addConstant(c.name(), c.value());
 		}
