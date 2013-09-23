@@ -304,6 +304,8 @@ public class TimedArcPetriNet {
 		for(TimedInhibitorArc inhibArc : inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
 
+		tapn.setActive(isActive());
+		
 		return tapn;
 	}
 

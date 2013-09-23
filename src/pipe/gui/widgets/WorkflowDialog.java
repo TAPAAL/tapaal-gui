@@ -936,7 +936,8 @@ public class WorkflowDialog extends JDialog {
 			TAPNNetworkTraceStep real_s = null;
 			if(s instanceof TAPNNetworkTimedTransitionStep){
 				TAPNNetworkTimedTransitionStep tmp = (TAPNNetworkTimedTransitionStep) s;
-				TimedTransition t = real_model.getTAPNByName(tmp.getTransition().model().name()).getTransitionByName(tmp.getTransition().name());
+				TimedTransition t = tmp.getTransition().isShared()? real_model.getSharedTransitionByName(tmp.getTransition().name()).transitions().iterator().next()
+						: real_model.getTAPNByName(tmp.getTransition().model().name()).getTransitionByName(tmp.getTransition().name());
 				List<TimedToken> tokens = new ArrayList<TimedToken>();
 				for(TimedToken token : tmp.getConsumedTokens()){
 					TimedPlace p = null;
