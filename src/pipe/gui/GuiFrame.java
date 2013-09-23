@@ -700,8 +700,8 @@ public class GuiFrame extends JFrame implements Observer {
 		});
 		toolsMenu.add(batchProcessing);
 		
-		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcutkey)));				
-		workflowDialog.setMnemonic('a');
+		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)));				
+		workflowDialog.setMnemonic('f');
 		workflowDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				WorkflowDialog.showDialog();

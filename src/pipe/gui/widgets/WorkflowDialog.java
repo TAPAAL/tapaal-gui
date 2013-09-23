@@ -66,6 +66,9 @@ import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
+import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.TAPNTraceDecomposer;
+import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
@@ -898,7 +901,7 @@ public class WorkflowDialog extends JDialog {
 											.minimumExecutionTime()
 											+ " time units.");
 								minResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
-								minResultTrace = mapTraceToRealModel((TimedTAPNNetworkTrace) result.getTrace());
+								minResultTrace = mapTraceToRealModel(result.getTrace());
 								minResultTraceButton.setVisible(true);
 							}else{
 								minResult.setText("Not available.");
@@ -926,39 +929,8 @@ public class WorkflowDialog extends JDialog {
 				numberOfExtraTokensInNet);
 	}
 	
-	private TAPNNetworkTrace mapTraceToRealModel(TimedTAPNNetworkTrace trace){
-		TimedTAPNNetworkTrace real_trace = new TimedTAPNNetworkTrace(trace.getLoopToIndex());
-		TimedArcPetriNetNetwork real_model = CreateGui.getCurrentTab().network();
-		
-		NetworkMarking parent = real_model.marking();
-		
-		for(TAPNNetworkTraceStep s : trace){
-			TAPNNetworkTraceStep real_s = null;
-			if(s instanceof TAPNNetworkTimedTransitionStep){
-				TAPNNetworkTimedTransitionStep tmp = (TAPNNetworkTimedTransitionStep) s;
-				TimedTransition t = tmp.getTransition().isShared()? real_model.getSharedTransitionByName(tmp.getTransition().name()).transitions().iterator().next()
-						: real_model.getTAPNByName(tmp.getTransition().model().name()).getTransitionByName(tmp.getTransition().name());
-				List<TimedToken> tokens = new ArrayList<TimedToken>();
-				for(TimedToken token : tmp.getConsumedTokens()){
-					TimedPlace p = null;
-					if(token.place().isShared()){
-						p = real_model.getSharedPlaceByName(token.place().name());
-					}else{
-						LocalTimedPlace pp = (LocalTimedPlace) token.place();
-						p = real_model.getTAPNByName(pp.model().name()).getPlaceByName(pp.name());
-					}
-					tokens.add(new TimedToken(p, token.age()));
-				}
-				real_s = new TAPNNetworkTimedTransitionStep(t, tokens);
-			}else{
-				real_s = s;
-			}
-			parent = real_s.performStepFrom(parent);
-			real_trace.add(real_s);
-		}
-		
-		real_trace.setTraceType(TraceType.NOT_EG);
-		
-		return real_trace;
+	private TAPNNetworkTrace mapTraceToRealModel(TAPNNetworkTrace tapnNetworkTrace){
+		TraceConverter converter = new TraceConverter(tapnNetworkTrace, CreateGui.getCurrentTab().network());
+		return converter.convert();
 	}
 }

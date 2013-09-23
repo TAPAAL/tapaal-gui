@@ -501,7 +501,7 @@ public class TimedArcPetriNetNetwork {
 		}
 		
 		for(SharedTransition t : sharedTransitions){
-			network.add(t);	// TODO This is okay for now
+			network.add(new SharedTransition(t.name()));	// TODO This is okay for now
 		}
 		
 		for(Constant c : constants()){
@@ -509,7 +509,13 @@ public class TimedArcPetriNetNetwork {
 		}
 		
 		for(TimedArcPetriNet t : tapns){
-			network.add(t.copy());
+			TimedArcPetriNet new_t = t.copy();
+			network.add(new_t);
+			for(TimedTransition trans : new_t.transitions()){
+				if(trans.isShared()){
+					network.getSharedTransitionByName(trans.name()).makeShared(trans);
+				}
+			}
 		}
 		
 		return network;
