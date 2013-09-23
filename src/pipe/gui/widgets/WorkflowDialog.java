@@ -26,6 +26,8 @@ import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.DOMException;
 
+import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+
 import pipe.gui.*;
 import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
@@ -94,7 +96,7 @@ public class WorkflowDialog extends JDialog {
 	private static long m;
 	private static int B;
 	private static long strongSoundnessSequenceTimer;
-	private static long strongSoundnessPeakMemory;
+	private static int strongSoundnessPeakMemory;
 	private static Constant c = null;
 	private static TimedPlace done = null;
 
@@ -284,7 +286,7 @@ public class WorkflowDialog extends JDialog {
 
 		maxResult = new JLabel();
 		gbc.gridx = 1;
-		panel.add(maxResult, gbc);
+		strongSoundnessPanel.add(maxResult, gbc);
 
 		strongSoundnessVerificationStats = new JLabel();
 		gbc.gridx = 0;
@@ -578,7 +580,7 @@ public class WorkflowDialog extends JDialog {
 		}
 		
 		// Add new components	- TODO prevent name clashing
-		Constant c = new Constant("C", (int) m*B+1); 
+		c = new Constant("C", (int) m*B+1); 
 		network.constants().add(c);
 		TimedTransition nok_t = new TimedTransition("NOK", true);
 		out_template.add(nok_t);
@@ -638,6 +640,7 @@ public class WorkflowDialog extends JDialog {
 						B = Math.min(B, p.invariant().upperBound().value());
 					}
 				}
+				B++;
 
 				final TAPNQuery q = new TAPNQuery(
 						"Workflow strong soundness initial check",
@@ -661,6 +664,7 @@ public class WorkflowDialog extends JDialog {
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
 						m = result.stats().exploredStates();
+						
 						verificationQueue.add(getStrongSoundnessRunnable());
 					}
 				});
@@ -674,12 +678,13 @@ public class WorkflowDialog extends JDialog {
 			
 			@Override
 			public void run() {
+				String template = done.isShared()? "":((LocalTimedPlace) done).model().name();
 				// TODO get place name correct s.t. it is mapped
 				final TAPNQuery q = new TAPNQuery(
 						"Workflow strong soundness checking",
 						numberOfExtraTokensInNet == null ? 0
 								: (Integer) numberOfExtraTokensInNet.getValue(),
-						new TCTLEFNode(new TCTLAtomicPropositionNode(done.toString(), "=", 1)), TraceOption.NONE,
+						new TCTLEFNode(new TCTLAtomicPropositionNode(template, done.name(), "=", 1)), TraceOption.NONE,
 						SearchOption.HEURISTIC,
 						ReductionOption.VerifyTAPNdiscreteVerification, true,
 						false, false, null, ExtrapolationOption.AUTOMATIC);
@@ -693,15 +698,84 @@ public class WorkflowDialog extends JDialog {
 
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
+						updatePeakMemory();
 						if(result.isQuerySatisfied()){
-							setStrongSoundnessResult(true, null);
-						}else{
 							setStrongSoundnessResult(false, null);
+							
+							if(max.isSelected()){
+								maxResult.setText("Not defined.");
+								maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+								maxResult.setVisible(true);
+							}
+						}else{
+							setStrongSoundnessResult(true, null);
+							if(max.isSelected()){
+								setMaxResult(model, 0, (int) (m*B+1));
+							}
 						}
 					}
 				});
 			}
 		};
+	}
+	
+	private Runnable getMaxSearchRunnable(final TimedArcPetriNetNetwork model, final int lower, final int upper){
+		final int bound = (int) Math.ceil(lower+((upper-lower)/2));
+		setCValue(bound);
+		
+		return new Runnable() {
+			
+			@Override
+			public void run() {
+				String template = done.isShared()? "":((LocalTimedPlace) done).model().name();
+				// TODO get place name correct s.t. it is mapped
+				final TAPNQuery q = new TAPNQuery(
+						"Workflow strong soundness checking",
+						numberOfExtraTokensInNet == null ? 0
+								: (Integer) numberOfExtraTokensInNet.getValue(),
+						new TCTLEFNode(new TCTLAtomicPropositionNode(template, done.name(), "=", 1)), TraceOption.NONE,
+						SearchOption.HEURISTIC,
+						ReductionOption.VerifyTAPNdiscreteVerification, true,
+						false, false, null, ExtrapolationOption.AUTOMATIC);
+				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void run(VerificationResult<TAPNNetworkTrace> result) {
+						updatePeakMemory();
+						if(result.isQuerySatisfied()){
+							setMaxResult(model, bound, upper);
+						}else{
+							setMaxResult(model, lower, bound);
+						}
+					}
+				});
+			}
+		};
+	}
+	
+	private void updatePeakMemory(){
+		strongSoundnessPeakMemory = Math.max(strongSoundnessPeakMemory, MemoryMonitor.getPeakMemoryValue());
+	}
+	
+	private void setMaxResult(TimedArcPetriNetNetwork model, int lower, int upper){
+		if(lower == upper-1){
+			// Found max!
+			maxResult.setText(lower + " time units.");
+			maxResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+			strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
+			strongSoundnessVerificationStats.setVisible(true);
+			dialog.pack();
+		}else{
+			maxResult.setText(lower + " <= max < "+upper);
+			maxResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+			verificationQueue.add(getMaxSearchRunnable(model, lower, upper));
+		}
 	}
 
 	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
@@ -722,8 +796,10 @@ public class WorkflowDialog extends JDialog {
 			strongSoundnessResultExplanation.setVisible(true);
 		}
 		
-		strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory: " + strongSoundnessPeakMemory + "MB.");
-		strongSoundnessVerificationStats.setVisible(true);
+		if(!max.isSelected() || !satisfied){
+			strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
+			strongSoundnessVerificationStats.setVisible(true);
+		}
 		dialog.pack();
 	}
 
