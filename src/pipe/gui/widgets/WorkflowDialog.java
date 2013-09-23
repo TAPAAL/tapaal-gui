@@ -161,20 +161,20 @@ public class WorkflowDialog extends JDialog {
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = 2;
+		gbc.weightx = 1;
 		panel.add(informationPanel, gbc);
 
 		gbc.gridwidth = 1;
-		gbc.insets = new Insets(0, 0, 0, 0);
 
 		JLabel workflowTypeLabel = new JLabel();
 		informationPanel.add(workflowTypeLabel, gbc);
 
 		switch (netType) {
 		case MTAWFN:
-			workflowTypeLabel.setText("This net is a MTAWFN");
+			workflowTypeLabel.setText("This net is a monotonic workflow net..");
 			break;
 		case ETAWFN:
-			workflowTypeLabel.setText("This net is an ETAWFN");
+			workflowTypeLabel.setText("This net is an extended workflow net.");
 			break;
 		case NOTTAWFN:
 			StringBuilder sb = new StringBuilder();
@@ -182,17 +182,17 @@ public class WorkflowDialog extends JDialog {
 			for (String e : errorMsgs)
 				sb.append(sep).append("- ").append(e);
 			workflowTypeLabel
-					.setText("<html>This net is not a TAWFN for the following reason(s):"
+					.setText("<html>This net is not a workflow net for the following reason(s):"
 							+ sb.toString() + "</html>");
 			break;
 		}
 
 		if (netType != TAWFNTypes.NOTTAWFN) {
-			JLabel inPlaceLabel = new JLabel("In-place: " + in.name());
+			JLabel inPlaceLabel = new JLabel(in.name() + " is the in-place.");
 			gbc.gridy = 1;
 			informationPanel.add(inPlaceLabel, gbc);
 
-			JLabel outPlaceLabel = new JLabel("Out-place: " + out.name());
+			JLabel outPlaceLabel = new JLabel(out.name() + " is the out-place.");
 			gbc.gridy = 2;
 			informationPanel.add(outPlaceLabel, gbc);
 
@@ -217,6 +217,7 @@ public class WorkflowDialog extends JDialog {
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1;
 		gbc.insets = new Insets(5, 5, 5, 5);
 
 		JPanel soundnessPanel = new JPanel();
@@ -246,6 +247,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 2;
 		gbc.gridwidth = 2;
 		soundnessResultExplanation.setVisible(false);
+		soundnessResultExplanation.setEnabled(false);
 		soundnessPanel.add(soundnessResultExplanation, gbc);
 
 		gbc.gridwidth = 1;
@@ -295,6 +297,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 2;
 		gbc.gridwidth = 2;
 		strongSoundnessResultExplanation.setVisible(false);
+		strongSoundnessResultExplanation.setEnabled(false);
 		strongSoundnessPanel.add(strongSoundnessResultExplanation, gbc);
 
 		gbc.gridwidth = 1;
@@ -786,12 +789,12 @@ public class WorkflowDialog extends JDialog {
 			maxResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 			strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
 			strongSoundnessVerificationStats.setVisible(true);
-			dialog.pack();
 		}else{
 			maxResult.setText(lower + " <= max < "+upper);
 			maxResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
 			verificationQueue.add(getMaxSearchRunnable(model, lower, upper));
 		}
+		dialog.pack();
 	}
 
 	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
@@ -852,9 +855,12 @@ public class WorkflowDialog extends JDialog {
 							isSound = true;
 						} else if (!result.isBounded()) {
 							soundnessResult
-									.setText("The search was inconclusive (k-bound exceeded).");
+									.setText("The search was inconclusive.");
 							soundnessResult
 									.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+							
+							soundnessResultExplanation.setText("Try to increase the number of extra tokens.");
+							soundnessResultExplanation.setVisible(true);
 						} else {
 							soundnessResult
 									.setText("The property is NOT satisfied.");
@@ -862,17 +868,22 @@ public class WorkflowDialog extends JDialog {
 									.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 						}
 
-						if (q.findMin && result.isQuerySatisfied()) {
-							if (result.stats().minimumExecutionTime() >= 0) {
-								minResult.setText(result.stats()
-										.minimumExecutionTime()
-										+ " time units.");
-								minResult
-										.setForeground(Pipe.QUERY_SATISFIED_COLOR);
-							} else {
-								minResult.setText("ERROR!");
-								minResult
-										.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+						if (q.findMin) {
+							if(result.isQuerySatisfied()){
+								if (result.stats().minimumExecutionTime() >= 0) {
+									minResult.setText(result.stats()
+											.minimumExecutionTime()
+											+ " time units.");
+									minResult
+											.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+								} else {
+									minResult.setText("ERROR!");
+									minResult
+											.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+								}
+							}else{
+								minResult.setText("Not available.");
+								minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 							}
 						}
 
