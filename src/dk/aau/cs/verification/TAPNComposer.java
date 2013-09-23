@@ -219,9 +219,6 @@ public class TAPNComposer {
 				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
-				if(source == null){
-					System.out.println("break");
-				}
 				constructedModel.add(new TimedInputArc(source, target, arc.interval(), arc.getWeight()));
 			}
 		}
