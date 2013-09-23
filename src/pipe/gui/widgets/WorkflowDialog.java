@@ -7,8 +7,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,14 +18,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.w3c.dom.DOMException;
-
-import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
-
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.dataLayer.*;
@@ -39,12 +29,10 @@ import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLFalseNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
-import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -57,21 +45,12 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
-import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
-import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
-import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
-import dk.aau.cs.verification.NameMapping;
-import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
-import dk.aau.cs.verification.VerifyTAPN.TraceType;
-import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class WorkflowDialog extends JDialog {
 
