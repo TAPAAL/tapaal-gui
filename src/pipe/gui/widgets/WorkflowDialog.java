@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -35,6 +36,7 @@ import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -47,7 +49,9 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.VerificationCallback;
@@ -83,6 +87,7 @@ public class WorkflowDialog extends JDialog {
 	private static CustomJSpinner numberOfExtraTokensInNet = null;
 
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
+	private int errors = 0;
 	private ArrayList<Runnable> verificationQueue = new ArrayList<Runnable>();
 	private static ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
 
@@ -407,6 +412,7 @@ public class WorkflowDialog extends JDialog {
 		in = null;
 		out = null;
 		errorMsgs = new ArrayList<String>();
+		errors = 0;
 
 		boolean isin;
 		boolean isout;
@@ -463,12 +469,16 @@ public class WorkflowDialog extends JDialog {
 						sharedOutPlaces.add(p);
 					}
 				} else if (isin && isout) {
+					if(errorMsgs.size() > 5)	errors++;
+					else
 					errorMsgs.add("Place " + p
 							+ " has no in- or out-going arcs.");
 				} else if (isin) {
 					if (in == null) {
 						in = p;
 					} else {
+						if(errorMsgs.size() > 5)	errors++;
+						else
 						errorMsgs.add("Multiple in-places found (" + in
 								+ " and " + p + ").");
 					}
@@ -476,6 +486,8 @@ public class WorkflowDialog extends JDialog {
 					if (out == null) {
 						out = p;
 					} else {
+						if(errorMsgs.size() > 5)	errors++;
+						else
 						errorMsgs.add("Multiple out-places found (" + out
 								+ " and " + p + ").");
 					}
@@ -494,6 +506,8 @@ public class WorkflowDialog extends JDialog {
 					sharedTransitions.add(t.sharedTransition());
 				} else if (t.getInputArcs().isEmpty()
 						&& t.getTransportArcsGoingThrough().isEmpty()) {
+					if(errorMsgs.size() > 5)	errors++;
+					else
 					errorMsgs.add("Transition " + t.name()
 							+ " has empty preset.");
 				}
@@ -515,6 +529,8 @@ public class WorkflowDialog extends JDialog {
 					continue outer;
 				}
 			}
+			if(errorMsgs.size() > 5)	errors++;
+			else
 			errorMsgs.add("Transition " + st.name() + " has empty preset.");
 			while (sharedTransitions.remove(st)) {
 			}
@@ -528,6 +544,8 @@ public class WorkflowDialog extends JDialog {
 				if (in == null) {
 					in = p;
 				} else {
+					if(errorMsgs.size() > 5)	errors++;
+					else
 					errorMsgs.add("Multiple in-places found (" + in + " and "
 							+ p + ").");
 				}
@@ -537,32 +555,40 @@ public class WorkflowDialog extends JDialog {
 		}
 
 		if (in == null) {
+			if(errorMsgs.size() > 5)	errors++;
+			else
 			errorMsgs.add("No in-place found.");
 		}
 
 		while (sharedOutPlaces.size() > 0) {
-			TimedPlace p = null;
+			TimedPlace p = sharedOutPlaces.get(0);
 			if (out == null) {
-				p = sharedOutPlaces.get(0);
 				out = p;
-				while (sharedOutPlaces.remove(p)) {
-				}
 			} else {
+				if(errorMsgs.size() > 5)	errors++;
+				else
 				errorMsgs.add("Multiple out-places found (" + out + " and " + p
 						+ ").");
+			}
+			while (sharedOutPlaces.remove(p)) {
 			}
 		}
 
 		if (out == null) {
+			if(errorMsgs.size() > 5)	errors++;
+			else
 			errorMsgs.add("No in-place found.");
 		}
 
 		if (numberOfTokensInNet > 1 || in.tokens().size() != 1) {
+			if(errorMsgs.size() > 5)	errors++;
+			else
 			errorMsgs
 					.add("The current marking is not a valid initial marking.");
 		}
 
 		if (!errorMsgs.isEmpty()) {
+			if(errors > 0)	errorMsgs.add("and "+errors+" other problems.");
 			return TAWFNTypes.NOTTAWFN;
 		}
 
@@ -692,7 +718,6 @@ public class WorkflowDialog extends JDialog {
 						return;
 					}
 				}
-				B++;
 				
 
 				final TAPNQuery q = new TAPNQuery(
@@ -887,7 +912,7 @@ public class WorkflowDialog extends JDialog {
 									.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 							isSound = true;
 							min_exec = result.stats().minimumExecutionTime();
-						} else if (!result.isBounded()) {
+						} else if (netType == TAWFNTypes.ETAWFN && !result.isBounded()) {
 							soundnessResult
 									.setText("The search was inconclusive.");
 							soundnessResult
@@ -902,6 +927,8 @@ public class WorkflowDialog extends JDialog {
 									.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 							soundnessResultTrace = mapTraceToRealModel(result.getTrace());
 							soundnessResultTraceButton.setVisible(true);
+							soundnessResultExplanation.setText(calculateSoundnessError(result.getTrace()));
+							soundnessResultExplanation.setVisible(true);
 						}
 
 						if (q.findMin) {
@@ -925,6 +952,21 @@ public class WorkflowDialog extends JDialog {
 						soundnessVerificationStats.setVisible(true);
 
 						dialog.pack();
+					}
+
+					private String calculateSoundnessError(
+							TAPNNetworkTrace trace) {
+						String output = "Marking reached with no trace to " + out.name() + ".";
+						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
+						NetworkMarking final_marking = model.marking().clone(); 
+						while(iter.hasNext()) final_marking = iter.next().performStepFrom(final_marking);
+						
+						int out_size = final_marking.getTokensFor(out).size();
+						if(out_size > 0 && final_marking.size() > out_size){
+							return "Non-final marking with token in "+ out.name() + " reached.";
+						}
+						
+						return output;
 					}
 				});
 			}
