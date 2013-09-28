@@ -82,6 +82,11 @@ public class WorkflowDialog extends JDialog {
 	private static JLabel maxResult;
 	private static JLabel soundnessVerificationStats;
 	private static JLabel strongSoundnessVerificationStats;
+	
+	private static JLabel soundnessResultLabel;
+	private static JLabel minResultLabel;
+	private static JLabel strongSoundnessResultLabel;
+	private static JLabel maxResultLabel;
 
 	private static CustomJSpinner numberOfExtraTokensInNet = null;
 
@@ -152,7 +157,7 @@ public class WorkflowDialog extends JDialog {
 
 		JPanel informationPanel = new JPanel();
 		informationPanel.setBorder(BorderFactory
-				.createTitledBorder("Properties"));
+				.createTitledBorder("About Model"));
 		informationPanel.setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -165,37 +170,77 @@ public class WorkflowDialog extends JDialog {
 		panel.add(informationPanel, gbc);
 
 		gbc.gridwidth = 1;
-
-		JLabel workflowTypeLabel = new JLabel();
+		
+		JLabel workflowType = new JLabel("Type of workflow:");
+		informationPanel.add(workflowType, gbc);
+		
+		gbc.gridx = 0;
+		
+		JLabel workflowTypeLabel = new JLabel("");
+		informationPanel.add(workflowTypeLabel, gbc);
+		
+		JLabel workflowTypeError = new JLabel("");
+		workflowTypeError.setVisible(false);
+		gbc.gridy = 0;
+		gbc.gridx = 1;
 		informationPanel.add(workflowTypeLabel, gbc);
 
 		switch (netType) {
 		case MTAWFN:
-			workflowTypeLabel.setText("This net is a monotonic workflow net..");
+			workflowTypeLabel.setText("Monotonic workflow net");
 			break;
 		case ETAWFN:
-			workflowTypeLabel.setText("This net is an extended workflow net.");
+			workflowTypeLabel.setText("Extended workflow net");
 			break;
 		case NOTTAWFN:
+			workflowType.setVisible(false);
+			workflowTypeLabel.setVisible(false);
 			StringBuilder sb = new StringBuilder();
 			String sep = "<br>";
 			for (String e : errorMsgs)
 				sb.append(sep).append("- ").append(e);
-			workflowTypeLabel
+			workflowTypeError
 			.setText("<html>This net is not a workflow net for the following reason(s):"
 					+ sb.toString() + "</html>");
+			workflowTypeError.setVisible(true);
 			break;
 		}
 
 		if (netType != TAWFNTypes.NOTTAWFN) {
-			JLabel inPlaceLabel = new JLabel(in.name() + " is the in-place.");
 			gbc.gridy = 1;
+			gbc.gridx = 0;
+			informationPanel.add(new JLabel("Input place of workflow:"), gbc);
+			
+			JLabel inPlaceLabel = new JLabel(in.name());
+			gbc.gridx = 1;
 			informationPanel.add(inPlaceLabel, gbc);
 
-			JLabel outPlaceLabel = new JLabel(out.name() + " is the out-place.");
 			gbc.gridy = 2;
+			gbc.gridx = 0;
+			informationPanel.add(new JLabel("Output place of workflow:"), gbc);
+			JLabel outPlaceLabel = new JLabel(out.name());
+			gbc.gridx = 1;
 			informationPanel.add(outPlaceLabel, gbc);
+			
+			gbc.gridy = 3;
+			gbc.gridx = 0;
+			informationPanel.add(new JLabel("Inhibitor arcs:"), gbc);
+			gbc.gridx = 1;
+			informationPanel.add(new JLabel(model.hasInhibitorArcs()? "Yes":"No"), gbc);
+			
+			gbc.gridy = 4;
+			gbc.gridx = 0;
+			informationPanel.add(new JLabel("Urgent transitions:"), gbc);
+			gbc.gridx = 1;
+			informationPanel.add(new JLabel(model.hasUrgentTransitions()? "Yes":"No"), gbc);
 
+			gbc.gridy = 5;
+			gbc.gridx = 0;
+			informationPanel.add(new JLabel("Invariants:"), gbc);
+			gbc.gridx = 1;
+			informationPanel.add(new JLabel(model.hasInvariants()? "Yes":"No"), gbc);
+
+			
 			initValidationPanel();
 		}
 
@@ -221,7 +266,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.insets = new Insets(5, 5, 5, 5);
 
 		JPanel soundnessPanel = new JPanel();
-		soundnessPanel.setBorder(BorderFactory.createTitledBorder("Soundness"));
+		soundnessPanel.setBorder(BorderFactory.createTitledBorder("Check Properties"));
 		soundnessPanel.setLayout(new GridBagLayout());
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -238,9 +283,63 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 1;
 		soundnessPanel.add(soundness, gbc);
 
+		if (min == null)
+			min = new JCheckBox("Calculate minimum duration.");
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		soundnessPanel.add(min, gbc);
+
+		if (strongSoundness == null)
+			strongSoundness = new JCheckBox("Check strong soundness.");
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		soundnessPanel.add(strongSoundness, gbc);
+
+		if (max == null)
+			max = new JCheckBox("Calculate maximum duration.");
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		soundnessPanel.add(max, gbc);
+		
+		strongSoundness.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				max.setEnabled(strongSoundness.isSelected());
+				if (!strongSoundness.isSelected()) {
+					max.setSelected(false);
+				}
+			}
+		});
+		
+		// Initialize correct state
+		max.setEnabled(strongSoundness.isSelected());
+		if (!strongSoundness.isSelected()) {
+			max.setSelected(false);
+		}
+		
+		/* Result panel */
+		
+		JPanel resultPanel = new JPanel();
+		resultPanel.setBorder(BorderFactory
+				.createTitledBorder("Results"));
+		resultPanel.setLayout(new GridBagLayout());
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.gridwidth = 2;
+		panel.add(resultPanel, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		soundnessResultLabel = new JLabel("Model is sound:");
+		resultPanel.add(soundnessResultLabel, gbc);
+		soundnessResultLabel.setVisible(false);
+		
 		soundnessResult = new JLabel();
 		gbc.gridx = 1;
-		soundnessPanel.add(soundnessResult, gbc);
+		resultPanel.add(soundnessResult, gbc);
+		soundnessResult.setVisible(false);
 
 		soundnessResultTraceButton = new JButton("Show trace");
 		gbc.gridx = 2;
@@ -254,27 +353,29 @@ public class WorkflowDialog extends JDialog {
 				dialog.dispose();
 			}
 		});
-		soundnessPanel.add(soundnessResultTraceButton, gbc);
-
+		resultPanel.add(soundnessResultTraceButton, gbc);
+		
 		soundnessResultExplanation = new JLabel();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 1;
 		gbc.gridwidth = 3;
 		soundnessResultExplanation.setVisible(false);
 		soundnessResultExplanation.setEnabled(false);
-		soundnessPanel.add(soundnessResultExplanation, gbc);
+		resultPanel.add(soundnessResultExplanation, gbc);
 
 		gbc.gridwidth = 1;
-
-		if (min == null)
-			min = new JCheckBox("Calculate minimum duration.");
+		
+		// Min 
+		gbc.gridy = 2;
 		gbc.gridx = 0;
-		gbc.gridy = 3;
-		soundnessPanel.add(min, gbc);
-
+		minResultLabel = new JLabel("Minimum execution time:");
+		resultPanel.add(minResultLabel, gbc);
+		minResultLabel.setVisible(false);
+		
 		minResult = new JLabel();
 		gbc.gridx = 1;
-		soundnessPanel.add(minResult, gbc);
+		resultPanel.add(minResult, gbc);
+		minResult.setVisible(false);
 
 		minResultTraceButton = new JButton("Show trace");
 		gbc.gridx = 2;
@@ -288,79 +389,44 @@ public class WorkflowDialog extends JDialog {
 				dialog.dispose();
 			}
 		});
-		soundnessPanel.add(minResultTraceButton, gbc);
-
-		soundnessVerificationStats = new JLabel();
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.gridwidth = 3;
-		soundnessVerificationStats.setVisible(false);
-		soundnessPanel.add(soundnessVerificationStats, gbc);
-
+		resultPanel.add(minResultTraceButton, gbc);
+		
+		// Strong soundness
+		
 		gbc.gridwidth = 1;
-
-		JPanel strongSoundnessPanel = new JPanel();
-		strongSoundnessPanel.setBorder(BorderFactory
-				.createTitledBorder("Strong Soundness"));
-		strongSoundnessPanel.setLayout(new GridBagLayout());
+		gbc.gridy = 3;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.gridwidth = 2;
-		panel.add(strongSoundnessPanel, gbc);
-
-		gbc.gridwidth = 1;
-
-		if (strongSoundness == null)
-			strongSoundness = new JCheckBox("Check strong soundness.");
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		strongSoundnessPanel.add(strongSoundness, gbc);
-
+		strongSoundnessResultLabel = new JLabel("Model is strongly sound:");
+		resultPanel.add(strongSoundnessResultLabel, gbc);
+		strongSoundnessResultLabel.setVisible(false);
+		
 		strongSoundnessResult = new JLabel();
 		gbc.gridx = 1;
-		strongSoundnessPanel.add(strongSoundnessResult, gbc);
+		resultPanel.add(strongSoundnessResult, gbc);
+		strongSoundnessResult.setVisible(false);
 
 		strongSoundnessResultExplanation = new JLabel();
 		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.gridwidth = 2;
+		gbc.gridy = 4;
+		gbc.gridwidth = 3;
 		strongSoundnessResultExplanation.setVisible(false);
 		strongSoundnessResultExplanation.setEnabled(false);
-		strongSoundnessPanel.add(strongSoundnessResultExplanation, gbc);
+		resultPanel.add(strongSoundnessResultExplanation, gbc);
 
+		// Max 
+		
 		gbc.gridwidth = 1;
-
-		if (max == null)
-			max = new JCheckBox("Calculate maximum duration.");
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		strongSoundnessPanel.add(max, gbc);
-
+		gbc.gridy = 5;
+		maxResultLabel = new JLabel("Maximum execution time:");
+		resultPanel.add(maxResultLabel, gbc);
+		maxResultLabel.setVisible(false);
+		
 		maxResult = new JLabel();
 		gbc.gridx = 1;
-		strongSoundnessPanel.add(maxResult, gbc);
-
-		strongSoundnessVerificationStats = new JLabel();
-		gbc.gridx = 0;
-		gbc.gridy = 5;
-		gbc.gridwidth = 2;
-		strongSoundnessVerificationStats.setVisible(false);
-		strongSoundnessPanel.add(strongSoundnessVerificationStats, gbc);
-
-		gbc.gridwidth = 1;
-
-		strongSoundnessPanel.setEnabled(strongSoundness.isSelected());
-
-		strongSoundness.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				max.setEnabled(strongSoundness.isSelected());
-				if (!strongSoundness.isSelected()) {
-					max.setSelected(false);
-				}
-			}
-		});
+		resultPanel.add(maxResult, gbc);
+		maxResult.setVisible(false);
+		
+		/* K-bound panel */
 
 		if (netType == TAWFNTypes.ETAWFN) {
 			gbc.gridx = 0;
@@ -388,6 +454,33 @@ public class WorkflowDialog extends JDialog {
 					checkBound();
 				}
 			});
+			
+			
+			/* TODO To add */
+			
+			
+		
+
+			soundnessVerificationStats = new JLabel();
+			gbc.gridx = 0;
+			gbc.gridy = 4;
+			gbc.gridwidth = 3;
+			soundnessVerificationStats.setVisible(false);
+			//soundnessPanel.add(soundnessVerificationStats, gbc);
+
+			
+
+			strongSoundnessVerificationStats = new JLabel();
+			gbc.gridx = 0;
+			gbc.gridy = 5;
+			gbc.gridwidth = 2;
+			strongSoundnessVerificationStats.setVisible(false);
+			//strongSoundnessPanel.add(strongSoundnessVerificationStats, gbc);
+
+			gbc.gridwidth = 1;
+
+			//strongSoundnessPanel.setEnabled(strongSoundness.isSelected());
+
 		}
 
 		JButton checkIfSound = new JButton("Check workflow soundness");
@@ -597,17 +690,26 @@ public class WorkflowDialog extends JDialog {
 	private void checkTAWFNSoundness() {
 		// Clear old results
 		soundnessResult.setText("");
+		soundnessResult.setVisible(false);
+		soundnessResultLabel.setVisible(false);
 		soundnessResultTraceButton.setVisible(false);
 		minResult.setText("");
+		minResult.setVisible(false);
+		minResultLabel.setVisible(false);
 		minResultTraceButton.setVisible(false);
 		strongSoundnessResult.setText("");
+		strongSoundnessResult.setVisible(false);
+		strongSoundnessResultLabel.setVisible(false);
 		maxResult.setText("");
+		maxResult.setVisible(false);
+		maxResultLabel.setVisible(false);
 		soundnessResultExplanation.setVisible(false);
-		soundnessVerificationStats.setVisible(false);
+		//soundnessVerificationStats.setVisible(false);
 		strongSoundnessResultExplanation.setVisible(false);
-		strongSoundnessVerificationStats.setVisible(false);
+		//strongSoundnessVerificationStats.setVisible(false);
 
 		dialog.pack();
+		
 		verificationQueue.clear();
 		isSound = false;
 		min_exec = -1;
@@ -750,6 +852,8 @@ public class WorkflowDialog extends JDialog {
 						B = Math.min(B, p.invariant().upperBound().value());
 					}
 				}
+				if(B == Integer.MAX_VALUE)	B = 0;
+				
 
 				final TimedArcPetriNetNetwork model = composeStrongSoundnessModel();		
 
@@ -798,6 +902,8 @@ public class WorkflowDialog extends JDialog {
 	private void setMaxResult(TimedArcPetriNetNetwork model, int value){
 		maxResult.setText(value + " time units.");
 		maxResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
+		maxResult.setVisible(true);
+		maxResultLabel.setVisible(true);
 		dialog.pack();
 	}
 
@@ -811,6 +917,8 @@ public class WorkflowDialog extends JDialog {
 			if(max.isSelected()){
 				maxResult.setText("Not available.");
 				maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+				maxResultLabel.setVisible(true);
+				maxResult.setVisible(true);
 			}
 		}
 
@@ -818,6 +926,8 @@ public class WorkflowDialog extends JDialog {
 			strongSoundnessResultExplanation.setText(explanation);
 			strongSoundnessResultExplanation.setVisible(true);
 		}
+		strongSoundnessResultLabel.setVisible(true);
+		strongSoundnessResult.setVisible(true);
 
 		strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
 		strongSoundnessVerificationStats.setVisible(true);
@@ -874,6 +984,8 @@ public class WorkflowDialog extends JDialog {
 							soundnessResultExplanation.setText(calculateSoundnessError(result.getTrace()));
 							soundnessResultExplanation.setVisible(true);
 						}
+						soundnessResult.setVisible(true);
+						soundnessResultLabel.setVisible(true);
 
 						if (min.isSelected()) {
 							if(result.isQuerySatisfied()){
@@ -887,13 +999,15 @@ public class WorkflowDialog extends JDialog {
 								minResult.setText("Not available.");
 								minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 							}
+							minResultLabel.setVisible(true);
+							minResult.setVisible(true);
 						}
 
-						soundnessVerificationStats.setText(result
+						/*soundnessVerificationStats.setText(result
 								.getVerificationTimeString()
 								+ ", peak memory usage: "
 								+ MemoryMonitor.getPeakMemory());
-						soundnessVerificationStats.setVisible(true);
+						soundnessVerificationStats.setVisible(true);*/
 
 						m = result.stats().exploredStates();
 

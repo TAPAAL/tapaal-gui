@@ -340,7 +340,7 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean hasInhibitorArcs() {
 		for(TimedArcPetriNet tapn : tapns) {
-			if(tapn.hasInhibitorArcs())
+			if(tapn.isActive() && tapn.hasInhibitorArcs())
 				return true;
 		}
 		return false;
@@ -428,6 +428,19 @@ public class TimedArcPetriNetNetwork {
 		for(TimedArcPetriNet t : tapns){
 			if(t.isActive() && t.hasUrgentTransitions()){
 				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasInvariants() {
+		for(TimedArcPetriNet t : tapns){
+			if(t.isActive()){
+				for(TimedPlace p : t.places()){
+					if(!p.invariant().upperBound().equals(Bound.Infinity)){
+						return true;
+					}
+				}
 			}
 		}
 		return false;
