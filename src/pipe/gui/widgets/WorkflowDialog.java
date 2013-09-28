@@ -58,6 +58,18 @@ import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
 
 public class WorkflowDialog extends JDialog {
+	
+	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of workflow:";
+	private static final String LABEL_INPUT_PLACE = "Input place of workflow:";
+	private static final String LABEL_OUTPUT_PLACE = "Output place of workflow:";
+	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
+	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
+	private static final String LABEL_INVARIANTS = "Invariants:";
+	
+	private static final String LABEL_RESULT_SOUND = "Model is sound:";
+	private static final String LABEL_RESULT_MIN = "Minimum execution time:";
+	private static final String LABEL_RESULT_STRONG_SOUND = "Model is strongly sound:";
+	private static final String LABEL_RESULT_MAX = "Maximum execution time:";
 
 	private static final long serialVersionUID = 5613743579411748200L;
 
@@ -172,7 +184,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridwidth = 1;
 		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-		JLabel workflowType = new JLabel("Type of workflow:");
+		JLabel workflowType = new JLabel(LABEL_TYPE_OF_WORKFLOW);
 		informationPanel.add(workflowType, gbc);
 		
 		gbc.gridx = 1;
@@ -215,7 +227,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridy = 1;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-			informationPanel.add(new JLabel("Input place of workflow:"), gbc);
+			informationPanel.add(new JLabel(LABEL_INPUT_PLACE), gbc);
 			
 			JLabel inPlaceLabel = new JLabel(in.name());
 			gbc.gridx = 1;
@@ -225,7 +237,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridy = 2;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-			informationPanel.add(new JLabel("Output place of workflow:"), gbc);
+			informationPanel.add(new JLabel(LABEL_OUTPUT_PLACE), gbc);
 			JLabel outPlaceLabel = new JLabel(out.name());
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
@@ -234,7 +246,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridy = 3;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-			informationPanel.add(new JLabel("Inhibitor arcs:"), gbc);
+			informationPanel.add(new JLabel(LABEL_INHIBITOR_ARCS), gbc);
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasInhibitorArcs()? "Yes":"No"), gbc);
@@ -242,7 +254,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridy = 4;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-			informationPanel.add(new JLabel("Urgent transitions:"), gbc);
+			informationPanel.add(new JLabel(LABEL_URGENT_TRANSITIONS), gbc);
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasUrgentTransitions()? "Yes":"No"), gbc);
@@ -250,7 +262,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridy = 5;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-			informationPanel.add(new JLabel("Invariants:"), gbc);
+			informationPanel.add(new JLabel(LABEL_INVARIANTS), gbc);
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasInvariants()? "Yes":"No"), gbc);
@@ -348,7 +360,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
-		soundnessResultLabel = new JLabel("Model is sound:");
+		soundnessResultLabel = new JLabel(LABEL_RESULT_SOUND);
 		resultPanel.add(soundnessResultLabel, gbc);
 		soundnessResultLabel.setVisible(false);
 		
@@ -384,7 +396,7 @@ public class WorkflowDialog extends JDialog {
 		// Min 
 		gbc.gridy = 2;
 		gbc.gridx = 0;
-		minResultLabel = new JLabel("Minimum execution time:");
+		minResultLabel = new JLabel(LABEL_RESULT_MIN);
 		resultPanel.add(minResultLabel, gbc);
 		minResultLabel.setVisible(false);
 		
@@ -412,7 +424,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridwidth = 1;
 		gbc.gridy = 3;
 		gbc.gridx = 0;
-		strongSoundnessResultLabel = new JLabel("Model is strongly sound:");
+		strongSoundnessResultLabel = new JLabel(LABEL_RESULT_STRONG_SOUND);
 		resultPanel.add(strongSoundnessResultLabel, gbc);
 		strongSoundnessResultLabel.setVisible(false);
 		
@@ -433,7 +445,7 @@ public class WorkflowDialog extends JDialog {
 		
 		gbc.gridwidth = 1;
 		gbc.gridy = 5;
-		maxResultLabel = new JLabel("Maximum execution time:");
+		maxResultLabel = new JLabel(LABEL_RESULT_MAX);
 		resultPanel.add(maxResultLabel, gbc);
 		maxResultLabel.setVisible(false);
 		
