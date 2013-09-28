@@ -100,6 +100,7 @@ import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class QueryDialog extends JPanel {
@@ -110,6 +111,7 @@ public class QueryDialog extends JPanel {
 	private static final String UNSUPPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
+	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
@@ -303,6 +305,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
+	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
@@ -2188,8 +2191,8 @@ public class QueryDialog extends JPanel {
 		ReductionOption reduction = getReductionOption();
 		if (reduction == null) {saveUppaalXMLButton.setEnabled(false);}
 		else {
-			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
-			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
+			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
 			saveUppaalXMLButton.setEnabled(true);
 		}
 	}
@@ -2349,8 +2352,11 @@ public class QueryDialog extends JPanel {
 						RenameAllPlacesVisitor visitor = new RenameAllPlacesVisitor(transformedModel.value2());
 						clonedQuery.getProperty().accept(visitor, null);
 
-						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN) {
+						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
+						} else if(reduction == ReductionOption.VerifyPN){
+							VerifyPNExporter exporter = new VerifyPNExporter();
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
