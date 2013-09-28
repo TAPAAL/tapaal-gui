@@ -169,21 +169,26 @@ public class WorkflowDialog extends JDialog {
 		gbc.weightx = 1;
 		panel.add(informationPanel, gbc);
 
+		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridwidth = 1;
-		
+		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 		JLabel workflowType = new JLabel("Type of workflow:");
 		informationPanel.add(workflowType, gbc);
 		
-		gbc.gridx = 0;
+		gbc.gridx = 1;
 		
 		JLabel workflowTypeLabel = new JLabel("");
+		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 		informationPanel.add(workflowTypeLabel, gbc);
 		
 		JLabel workflowTypeError = new JLabel("");
 		workflowTypeError.setVisible(false);
-		gbc.gridy = 0;
-		gbc.gridx = 1;
-		informationPanel.add(workflowTypeLabel, gbc);
+		gbc.gridy = 1;
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
+		informationPanel.add(workflowTypeError, gbc);
+		gbc.gridwidth = 1;
 
 		switch (netType) {
 		case MTAWFN:
@@ -209,43 +214,54 @@ public class WorkflowDialog extends JDialog {
 		if (netType != TAWFNTypes.NOTTAWFN) {
 			gbc.gridy = 1;
 			gbc.gridx = 0;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel("Input place of workflow:"), gbc);
 			
 			JLabel inPlaceLabel = new JLabel(in.name());
 			gbc.gridx = 1;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(inPlaceLabel, gbc);
 
 			gbc.gridy = 2;
 			gbc.gridx = 0;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel("Output place of workflow:"), gbc);
 			JLabel outPlaceLabel = new JLabel(out.name());
 			gbc.gridx = 1;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(outPlaceLabel, gbc);
 			
 			gbc.gridy = 3;
 			gbc.gridx = 0;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel("Inhibitor arcs:"), gbc);
 			gbc.gridx = 1;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasInhibitorArcs()? "Yes":"No"), gbc);
 			
 			gbc.gridy = 4;
 			gbc.gridx = 0;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel("Urgent transitions:"), gbc);
 			gbc.gridx = 1;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasUrgentTransitions()? "Yes":"No"), gbc);
 
 			gbc.gridy = 5;
 			gbc.gridx = 0;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel("Invariants:"), gbc);
 			gbc.gridx = 1;
+			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasInvariants()? "Yes":"No"), gbc);
 
 			
 			initValidationPanel();
 		}
 
-		gbc.gridx = netType == TAWFNTypes.NOTTAWFN ? 0 : 1;
+		gbc.gridx = 0;
 		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.EAST;
 		JButton close_button = new JButton("Close");
 		close_button.addActionListener(new ActionListener() {
 
@@ -491,8 +507,9 @@ public class WorkflowDialog extends JDialog {
 				checkTAWFNSoundness();
 			}
 		});
-		gbc.gridx = 0;
+		gbc.gridx = 1;
 		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.EAST;
 		panel.add(checkIfSound, gbc);
 	}
 
