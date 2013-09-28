@@ -25,8 +25,8 @@ public class TAPNQuery {
 		AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP
 	};
 	
-	public enum ModelType{
-		TAPN, TAWFN
+	public enum WorkflowMode{
+		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS
 	}
 
 	private String name;
@@ -40,10 +40,7 @@ public class TAPNQuery {
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
-	private ModelType modelType;
-	public boolean checkStrong = false;
-	public boolean findMin = false;
-	public boolean findMax = false;
+	private WorkflowMode workflow;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -197,12 +194,9 @@ public class TAPNQuery {
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, ModelType modelType, boolean checkStrongSoundness, boolean findMin, boolean findMax) {
+			ExtrapolationOption extrapolationOption, WorkflowMode workflow) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, hashTabelSize, extrapolationOption);
-		this.setModelType(modelType);
-		this.checkStrong = checkStrongSoundness;
-		this.findMin = findMin;
-		this.findMax = findMax;
+		this.setWorkflowMode(workflow);
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
@@ -276,12 +270,12 @@ public class TAPNQuery {
 		else return QueryType.AG;
 	}
 
-	public ModelType getModelType() {
-		return modelType;
+	public WorkflowMode getWorkflowMode() {
+		return workflow;
 	}
 
-	public void setModelType(ModelType modelType) {
-		this.modelType = modelType;
+	public void setWorkflowMode(WorkflowMode workflow) {
+		this.workflow = workflow;
 	}
 	
 }

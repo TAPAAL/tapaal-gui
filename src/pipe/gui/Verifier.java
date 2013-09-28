@@ -132,7 +132,7 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces(), query.getModelType(), query.checkStrong, query.findMin, query.findMax);
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
 		} else {
 			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
 		}

@@ -11,15 +11,17 @@ public class Stats {
 	private long explored;
 	private long stored;
 	private int minExecutionTime;
+	private int maxExecutionTime;
 	private List<Tuple<String,Integer>> transitionStats;
 	
-	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, int minExecutionTime)
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, int minExecutionTime, int maxExecutionTime)
 	{
 		this.discovered = discovered;
 		this.explored = explored;
 		this.stored = stored;	
 		this.transitionStats = transitionStats;
 		this.minExecutionTime = minExecutionTime;
+		this.maxExecutionTime = maxExecutionTime;
 	}
 	
 	public Stats(long discovered, long explored, long stored)
@@ -29,6 +31,7 @@ public class Stats {
 		this.stored = stored;	
 		this.transitionStats = new ArrayList<Tuple<String,Integer>>(); 	
 		this.minExecutionTime = -1;
+		this.maxExecutionTime = -1;
 	}
 	
 	public Integer transitionsCount() {
@@ -53,6 +56,10 @@ public class Stats {
 	
 	public int minimumExecutionTime(){
 		return minExecutionTime;
+	}
+	
+	public int maximumExecutionTime(){
+		return maxExecutionTime;
 	}
 	
 	@Override
