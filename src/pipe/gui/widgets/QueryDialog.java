@@ -19,9 +19,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +45,6 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -97,7 +93,6 @@ import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -195,7 +190,7 @@ public class QueryDialog extends JPanel {
 
 	// Reduction options panel
 	private JPanel reductionOptionsPanel;
-	private JComboBox reductionOption;
+	private JComboBox<String> reductionOption;
 	private JCheckBox symmetryReduction;
 	private JCheckBox discreteInclusion;
 	private JButton selectInclusionPlacesButton;
@@ -232,6 +227,8 @@ public class QueryDialog extends JPanel {
 	private JTextField queryName;
 
 	private static Boolean advancedView = false;
+	
+	private static boolean hasForcedDisabledTimeDarts = false;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -668,33 +665,40 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 
 		ArrayList<String> options = new ArrayList<String>();
-
+		
 		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
 		}
-
-		if (queryHasDeadlock()) {
-			if (tapnNetwork.isNonStrict()) {
-				options.add(name_DISCRETE);
-				// disable timedarts if liveness and deadlock prop
-				if(queryHasDeadlock() && 
-						(getQuantificationSelection().equals("E[]") || 
-								getQuantificationSelection().equals("A<>"))){
-					if (useTimeDarts != null) {
-						useTimeDarts.setEnabled(false);
-						useTimeDarts.setSelected(false);
-					}
-				} else {
-					if(useTimeDarts != null)
-						useTimeDarts.setEnabled(true);                 
-				}
+		
+		if(useTimeDarts != null){
+			if(hasForcedDisabledTimeDarts){
+				hasForcedDisabledTimeDarts = false;
+				useTimeDarts.setSelected(true);
 			}
-			if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-				if (isNetDegree2 && !tapnNetwork.hasWeights()) {
-					options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
-				}
-			}
-
+            useTimeDarts.setEnabled(true);     
+        }
+		
+        if (queryHasDeadlock()) {
+            if (tapnNetwork.isNonStrict()) {
+                options.add(name_DISCRETE);
+                // disable timedarts if liveness and deadlock prop
+                if((getQuantificationSelection().equals("E[]") || 
+                        getQuantificationSelection().equals("A<>"))){
+                    if (useTimeDarts != null) {
+                    	if(useTimeDarts.isSelected()){
+                    		hasForcedDisabledTimeDarts = true;
+                    	}
+                        useTimeDarts.setEnabled(false);
+                        useTimeDarts.setSelected(false);
+                    }
+                }
+            }
+            if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+                if (isNetDegree2 && !tapnNetwork.hasWeights()) {
+                    options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
+                }
+            }
+            
 		} else if(tapnNetwork.hasWeights()){
 			if(tapnNetwork.isNonStrict()){
 				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
@@ -917,6 +921,8 @@ public class QueryDialog extends JPanel {
 		if(queryToCreateFrom != null)
 			setupFromQuery(queryToCreateFrom);
 
+		setEnabledReductionOptions();
+		
 		rootPane.setDefaultButton(saveAndVerifyButton);
 		disableAllQueryButtons();
 		setSaveButtonsEnabled();
@@ -937,7 +943,6 @@ public class QueryDialog extends JPanel {
 		setupQuantificationFromQuery(queryToCreateFrom);
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
-		setEnabledReductionOptions(); // fix for if an query with an invalid reduction option had been saved due to a bug.
 		setupTraceOptionsFromQuery(queryToCreateFrom);
 	}
 
@@ -967,6 +972,7 @@ public class QueryDialog extends JPanel {
 			}
 		}
 
+		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
@@ -2039,14 +2045,11 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.setBorder(BorderFactory.createTitledBorder("Verification Options"));
 		Dimension d = new Dimension(898, 100);
 		reductionOptionsPanel.setPreferredSize(d);
-		reductionOption = new JComboBox();
-		setEnabledReductionOptions();
+		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
 
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JComboBox source = (JComboBox)e.getSource();
-				String selectedItem = (String)source.getSelectedItem();
 				setEnabledOptionsAccordingToCurrentReduction();
 			}
 		});

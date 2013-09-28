@@ -224,6 +224,11 @@ public class TimedTransition extends TAPNElement {
 			}
 		}
 		
+		//prevent delay if urgent transition is enabled
+		if(Animator.isUrgentTransitionEnabled()){
+			result = IntervalOperations.intersectingInterval(result, Arrays.asList(new TimeInterval(true, new IntBound(0), new IntBound(0), true)));
+		}
+		
 		//cache result
 		if(result.isEmpty()){
 			dInterval = null;
@@ -420,7 +425,7 @@ public class TimedTransition extends TAPNElement {
 		if(dInterval == null){
 			dInterval = calculateDInterval();
 		}
-		return Animator.isUrgentTransitionEnabled()? TimeInterval.parse("[0, 0]",null) : dInterval;
+		return dInterval;
 	}
 
 	public int getLagestAssociatedConstant() {

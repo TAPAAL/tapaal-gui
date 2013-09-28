@@ -2,7 +2,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>lib/tapaal.jar</jar>
-  <outfile>/Users/srba/Dropbox/TAPAAL/Release-2.1/tapaal-2.1.0/tapaal-2.1.0-win/tapaal.exe</outfile>
+  <outfile>/Users/srba/Dropbox/TAPAAL/Release-2.4/tapaal.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -12,7 +12,7 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>/Users/srba/dev/2.1/tools/img/icon.ico</icon>
+  <icon>/Users/srba/Dropbox/TAPAAL/Icon/tapaal-2-4.ico</icon>
   <classPath>
     <mainClass>TAPAAL</mainClass>
     <cp>lib/*</cp>
@@ -24,12 +24,12 @@
     <jdkPreference>preferJre</jdkPreference>
   </jre>
   <versionInfo>
-    <fileVersion>2.1.0.0</fileVersion>
-    <txtFileVersion>2.1.0.0</txtFileVersion>
+    <fileVersion>2.4.0.0</fileVersion>
+    <txtFileVersion>2.4.0.0</txtFileVersion>
     <fileDescription>TAPAAL</fileDescription>
-    <copyright>TAPAAL Team 2008-2012</copyright>
-    <productVersion>2.1.0.0</productVersion>
-    <txtProductVersion>2.0.0.0</txtProductVersion>
+    <copyright>TAPAAL Team 2008-2013</copyright>
+    <productVersion>2.4.0.0</productVersion>
+    <txtProductVersion>2.4.0.0</txtProductVersion>
     <productName>TAPAAL</productName>
     <companyName></companyName>
     <internalName>tapaal</internalName>

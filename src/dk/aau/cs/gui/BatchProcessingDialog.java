@@ -1089,7 +1089,6 @@ public class BatchProcessingDialog extends JDialog {
 				currentWorker.notifyExiting();
 				cancelled = currentWorker.cancel(true);
 			} while (!cancelled);
-			System.out.print("Batch processing terminated");
 		}
 	}
 

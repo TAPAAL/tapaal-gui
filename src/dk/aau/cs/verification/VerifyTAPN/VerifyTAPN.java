@@ -83,7 +83,7 @@ public class VerifyTAPN implements ModelChecker {
 		return verifytapnpath;
 	}
 
-	public String getVersion() { // atm. any version of VerifyTAPN will do
+	public String getVersion() {
 		String result = null;
 
 		if (!isNotSetup()) {
@@ -93,14 +93,13 @@ public class VerifyTAPN implements ModelChecker {
 			InputStream stream = null;
 			try {
 				Process child = Runtime.getRuntime().exec(commands);
-				child.waitFor();
 				stream = child.getInputStream();
+				if (stream != null) {
+					result = readVersionNumberFrom(stream);
+				}
+				child.waitFor();
 			} catch (IOException e) {
 			} catch (InterruptedException e) {
-			}
-
-			if (stream != null) {
-				result = readVersionNumberFrom(stream);
 			}
 		}
 
@@ -114,6 +113,7 @@ public class VerifyTAPN implements ModelChecker {
 		String versioninfo = null;
 		try {
 			versioninfo = bufferedReader.readLine();
+			while(bufferedReader.readLine() != null){}	// Empty buffer
 		} catch (IOException e) {
 			result = null;
 		}
@@ -376,12 +376,19 @@ public class VerifyTAPN implements ModelChecker {
 		return result;
 	}
 	
-	boolean supportsModel(TimedArcPetriNet model) {
-		return !model.hasWeights();
+	public boolean supportsModel(TimedArcPetriNet model) {
+		if(model.hasWeights() || 
+				model.hasUrgentTransitions()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
-	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-		if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
+	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
+		if(query.getProperty() instanceof TCTLEGNode || 
+				query.getProperty() instanceof TCTLAFNode ||
+				query.hasDeadlock()) {
 			return false;
 		}
 		
@@ -406,5 +413,9 @@ public class VerifyTAPN implements ModelChecker {
 	@Override
 	public String toString() {
 		return "verifytapn";
+	}
+	
+	public boolean useDiscreteSemantics() {
+		return false;
 	}
 }
