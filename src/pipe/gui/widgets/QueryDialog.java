@@ -2230,7 +2230,7 @@ public class QueryDialog extends JPanel {
 			useOverApproximation.setSelected(true);
 			useOverApproximation.setEnabled(false);
 		}
-		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasWeights()){
 			useOverApproximation.setVisible(true);
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);
