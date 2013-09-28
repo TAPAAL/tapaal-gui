@@ -665,8 +665,8 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 
 		ArrayList<String> options = new ArrayList<String>();
-		
-		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed() && !tapnNetwork.hasWeights() && !tapnNetwork.hasUrgentTransitions()){
+
+		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
 			options.add(name_UNTIMED);
 		}
 		
@@ -701,11 +701,11 @@ public class QueryDialog extends JPanel {
             
 		} else if(tapnNetwork.hasWeights()){
 			if(tapnNetwork.isNonStrict()){
-				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+				options.add(name_DISCRETE);
 			}
 		} else if(tapnNetwork.hasUrgentTransitions()){
 			if(tapnNetwork.isNonStrict()){
-				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+				options.add(name_DISCRETE);
 			}
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(tapnNetwork.isNonStrict()){
@@ -2230,7 +2230,7 @@ public class QueryDialog extends JPanel {
 			useOverApproximation.setSelected(true);
 			useOverApproximation.setEnabled(false);
 		}
-		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>") || tapnNetwork.hasUrgentTransitions() || tapnNetwork.hasWeights()){
+		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			useOverApproximation.setVisible(true);
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);

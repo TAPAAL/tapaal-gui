@@ -30,6 +30,7 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
@@ -38,7 +39,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -273,7 +273,7 @@ public class VerifyPN implements ModelChecker{
 			
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 			
-			VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+			VerifyPNExporter exporter = new VerifyPNExporter();
 			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
 
 			if (exportedModel == null) {
@@ -384,17 +384,12 @@ public class VerifyPN implements ModelChecker{
 		
 		
 		boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
-			return supportsModel(model) && (model.isUntimed() || options.searchOption() == SearchOption.OVERAPPROXIMATE);
+			return supportsModel(model) || options.searchOption() == SearchOption.OVERAPPROXIMATE;
 		}
 		
 		@Override
 		public boolean supportsModel(TimedArcPetriNet model) {
-			if(model.hasWeights() || 
-					model.hasUrgentTransitions()) {
-				return false;
-			}
-			
-			return true;
+			return model.isUntimed();
 		}
 		
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {

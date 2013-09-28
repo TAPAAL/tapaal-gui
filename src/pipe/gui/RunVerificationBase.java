@@ -60,6 +60,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
 				!query.hasDeadlock()){
 			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+			if(!verifypn.supportsModel(transformedModel.value1())){
+				// Skip over-approximation if model is not supported.
+				// Prevents verification from displaying error.
+			}
 			if(!verifypn.setup()){
 				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 			}else{
