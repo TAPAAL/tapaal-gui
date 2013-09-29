@@ -561,6 +561,7 @@ public class WorkflowDialog extends JDialog {
 		List<TimedArcPetriNet> tapns = model.activeTemplates();
 		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
+		ArrayList<TimedPlace> sharedAcceptedPlaces = new ArrayList<TimedPlace>();
 		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 		in = null;
 		out = null;
@@ -621,6 +622,11 @@ public class WorkflowDialog extends JDialog {
 					if (isout) {
 						sharedOutPlaces.add(p);
 					}
+					
+					if(!isin && !isout){
+						sharedAcceptedPlaces.add(p);
+					}
+					
 				} else if (isin && isout) {
 					if(errorMsgs.size() > 5)	errors++;
 					else
@@ -686,6 +692,13 @@ public class WorkflowDialog extends JDialog {
 			else
 				errorMsgs.add("Transition " + st.name() + " has empty preset.");
 			while (sharedTransitions.remove(st)) {
+			}
+		}
+		
+		for(TimedPlace p : sharedAcceptedPlaces){
+			while (sharedInPlaces.remove(p)) {
+			}
+			while (sharedOutPlaces.remove(p)) {
 			}
 		}
 
