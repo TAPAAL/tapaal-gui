@@ -11,8 +11,8 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 	
-	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search) {
-		super(extraTokens, traceOption, search, true, false, false, new InclusionPlaces());
+	public VerifyPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean useOverApproximation) {
+		super(extraTokens, traceOption, search, true, useOverApproximation, false, new InclusionPlaces());
 	}
 
 	@Override
@@ -24,6 +24,7 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		result.append(traceMap.get(traceOption));
 		result.append(" -m 0 ");	// Disable memory limit to ensure similar behaviour to other engines
 		result.append(searchMap.get(searchOption));
+		result.append(useOverApproximation()? "":" -d ");	// Disable over-approximation if disabled
 		return result.toString();
 	}
 

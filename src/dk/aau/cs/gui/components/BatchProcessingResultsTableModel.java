@@ -85,8 +85,8 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 			return "I";
 		else if(reduction == ReductionOption.DEGREE2BROADCAST)
 			return "J";
-		else if(reduction == ReductionOption.VerifyPN)
-			return "K";
+		else if(reduction == ReductionOption.VerifyPN || reduction == ReductionOption.VerifyPNApprox)
+			return result.query().useOverApproximation()? "L":"K";
 		else
 			return "";
 	}

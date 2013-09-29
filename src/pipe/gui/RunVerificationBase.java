@@ -58,7 +58,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		if(options.useOverApproximation() &&
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
-				!query.hasDeadlock()){
+				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
 			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
 			if(!verifypn.supportsModel(transformedModel.value1())){
 				// Skip over-approximation if model is not supported.
@@ -67,7 +67,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			if(!verifypn.setup()){
 				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 			}else{
-				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE), transformedModel, clonedQuery);
+				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true), transformedModel, clonedQuery);
 				if(!overapprox_result.error() && !overapprox_result.getQueryResult().isQuerySatisfied()){
 					VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 
 							decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()), 

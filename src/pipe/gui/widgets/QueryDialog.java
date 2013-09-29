@@ -2227,11 +2227,6 @@ public class QueryDialog extends JPanel {
 	private void refreshOverApproximationOption() {
 		if(reductionOption.getSelectedItem() == null){
 			useOverApproximation.setVisible(false);
-		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
-			useOverApproximation.setVisible(true);
-			useOverApproximation.setSelected(true);
-			useOverApproximation.setEnabled(false);
 		}
 		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
 			useOverApproximation.setVisible(true);
