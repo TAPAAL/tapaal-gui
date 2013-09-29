@@ -835,7 +835,7 @@ public class WorkflowDialog extends JDialog {
 		
 		/* Create transitions */
 		
-		name = "NOK";
+		name = "nok";
 		while(out_template.getTransitionByName(name) != null){
 			name += "x";
 		}
@@ -843,14 +843,14 @@ public class WorkflowDialog extends JDialog {
 		nok_t.setUrgent(true);
 		out_template.add(nok_t);
 		
-		name = "TICK";
+		name = "tick";
 		while(out_template.getTransitionByName(name) != null){
 			name += "x";
 		}
 		TimedTransition tick_t = new TimedTransition(name, false);
 		out_template.add(tick_t);
 		
-		name = "OK";
+		name = "ok";
 		while(out_template.getTransitionByName(name) != null){
 			name += "x";
 		}
@@ -860,28 +860,28 @@ public class WorkflowDialog extends JDialog {
 		
 		/* Create places */
 		
-		name = "TIMER";
+		name = "timer";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
 		TimedPlace timer_p = new LocalTimedPlace(name, new TimeInvariant(true, new ConstantBound(c)));
 		out_template.add(timer_p);
 		
-		name = "READY";
+		name = "ready";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
 		TimedPlace ready_p = new LocalTimedPlace(name);
 		out_template.add(ready_p);
 		
-		name = "FINISHED";
+		name = "finished";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
 		TimedPlace finished_p = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
 		out_template.add(finished_p);
 		
-		name = "DONE";
+		name = "done";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
