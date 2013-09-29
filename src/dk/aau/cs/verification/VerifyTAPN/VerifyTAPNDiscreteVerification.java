@@ -309,7 +309,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
-			System.out.println(createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
 

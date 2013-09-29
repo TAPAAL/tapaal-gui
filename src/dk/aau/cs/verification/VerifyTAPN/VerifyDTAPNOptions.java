@@ -52,8 +52,10 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		result.append(' ');
 		result.append("-p ");
 		result.append(pTrie ? "1" : "0");
-		if(workflow != WorkflowMode.NOT_WORKFLOW){
-			result.append(" -w "+(workflow == WorkflowMode.WORKFLOW_SOUNDNESS? 1:2));
+		if(workflow == WorkflowMode.WORKFLOW_SOUNDNESS){
+			result.append(" -w 1");
+		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
+			result.append(" -w 2");
 		}
 		return result.toString();
 	}
