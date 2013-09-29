@@ -52,7 +52,8 @@ public class TraceConverter {
 		decomposedTrace.setTraceType(((TimedTAPNNetworkTrace) trace).getTraceType());
 
 		for (TAPNNetworkTraceStep action : trace) {
-			decomposedTrace.add(decomposeAction(action));
+			TAPNNetworkTraceStep step = decomposeAction(action);
+			if(step != null)	decomposedTrace.add(step);
 		}
 
 		return decomposedTrace;
@@ -84,6 +85,6 @@ public class TraceConverter {
 			}
 		}
 
-		return new TAPNNetworkTimedTransitionStep(transition, convertedTokens);
+		return transition == null? null:new TAPNNetworkTimedTransitionStep(transition, convertedTokens);
 	}
 }

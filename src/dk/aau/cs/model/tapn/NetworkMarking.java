@@ -107,6 +107,9 @@ public class NetworkMarking implements TimedMarking {
 	
 	public NetworkMarking delay(BigDecimal amount) {
 		Require.that(amount != null, "Delay must not be null");
+		if(!isDelayPossible(amount)){
+			System.out.println("error");
+		}
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
 
 		NetworkMarking newMarking = new NetworkMarking();
