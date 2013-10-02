@@ -19,21 +19,12 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	private boolean symmetry;
 	private boolean discreteInclusion;
 	private InclusionPlaces inclusionPlaces;
-	
-	//only used for boundedness analysis
-	private boolean dontUseDeadPlaces = false;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
 		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
-	}
-	
-	//Only used for boundedness analysis
-	public VerifyTAPNOptions(boolean dontUseDeadPLaces, int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry) {
-		this(extraTokens, traceOption, search, symmetry, false, new InclusionPlaces());
-		this.dontUseDeadPlaces = dontUseDeadPLaces;
 	}
 	
 	public VerifyTAPNOptions(int extraTokens, TraceOption traceOption, SearchOption search, boolean symmetry, boolean discreteInclusion) {
@@ -77,8 +68,6 @@ public class VerifyTAPNOptions implements VerificationOptions{
 		result.append(searchMap.get(searchOption));
 		result.append(' ');
 		result.append(symmetry ? "" : "-s"); // symmetry is on by default in verifyTAPN so "-s" disables it
-		result.append(' ');
-		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');
 		result.append(discreteInclusion ? " -f 1" : "");
 		result.append(discreteInclusion ? " -i " + generateDiscretePlacesList() : "");
