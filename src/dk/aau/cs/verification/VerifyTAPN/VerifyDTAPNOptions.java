@@ -8,11 +8,22 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	
 	private boolean timeDarts;
 	private boolean pTrie;
+	
+	//only used for boundedness analysis
+	private boolean dontUseDeadPlaces = false;
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie) {
 		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+	}
+	
+	//Only used for boundedness analysis
+	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
+			SearchOption search, boolean symmetry, boolean timeDarts,
+			boolean pTrie) {
+		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
@@ -42,6 +53,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		result.append(' ');
 		result.append("-p ");
 		result.append(pTrie ? "1" : "0");
+		result.append(' ');
+		result.append(dontUseDeadPlaces ? "-d" : "");
 		return result.toString();
 	}
 
