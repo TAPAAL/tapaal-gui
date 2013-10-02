@@ -35,6 +35,7 @@ import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
@@ -265,8 +266,8 @@ public class VerifyPN implements ModelChecker{
 			if(!supportsModel(model.value1(), options))
 				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
-			//if(!supportsQuery(model.value1(), query, options))
-				//throw new UnsupportedQueryException("verifypn does not support the given query.");
+			if(!supportsQuery(model.value1(), query, options))
+				throw new UnsupportedQueryException("verifypn does not support the given query.");
 			
 //			if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
