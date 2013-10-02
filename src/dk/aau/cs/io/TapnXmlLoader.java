@@ -781,7 +781,7 @@ public class TapnXmlLoader {
 		boolean symmetry = getReductionOption(queryElement, "symmetry", true);
 		boolean timeDarts = getReductionOption(queryElement, "timeDarts", true);
 		boolean pTrie = getReductionOption(queryElement, "pTrie", true);
-		boolean overApproximation = getReductionOption(queryElement, "overApproximation", false);
+		boolean overApproximation = getReductionOption(queryElement, "overApproximation", true);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
