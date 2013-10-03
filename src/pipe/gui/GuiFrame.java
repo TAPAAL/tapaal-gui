@@ -2238,9 +2238,10 @@ public class GuiFrame extends JFrame implements Observer {
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
                 buffer.append("Aalborg University 2012-2013\n\n");
+		buffer.append("TAPAAL Untimed Engine:\n");
+                buffer.append("Jonas F. Jensen, Thomas S. Nielsen, Lars K. Oestergaard and Jiri Srba\n");
+                buffer.append("Aalborg University 2013\n\n");
 		buffer.append("\n");
-
-
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());
 	}
