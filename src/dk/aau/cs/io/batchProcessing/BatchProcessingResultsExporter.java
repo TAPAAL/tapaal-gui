@@ -19,6 +19,8 @@ public class BatchProcessingResultsExporter {
 	private static final String name_OPTIMIZEDSTANDARD = "H: UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "I: UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "J: UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_UNTIMED = "K: VerifyPN: Untimed engine";
+	private static final String name_UNTIMEDAPPROX = "L: VerifyPN: Untimed engine, with over-approximation";	
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -114,6 +116,10 @@ public class BatchProcessingResultsExporter {
 			} else {
 				return name_verifyTAPNDiscreteVerificationNone;
 			}
+		}else if(reduction == ReductionOption.VerifyPN){
+			return name_UNTIMED;
+		}else if(reduction == ReductionOption.VerifyPNApprox){
+			return name_UNTIMEDAPPROX;
 		}
 			return name_BROADCAST;
 	}

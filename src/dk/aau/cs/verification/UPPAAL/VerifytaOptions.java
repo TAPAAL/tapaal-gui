@@ -14,17 +14,19 @@ public class VerifytaOptions implements VerificationOptions {
 	private boolean untimedTrace;
 	private ReductionOption reduction;
 	private boolean symmetry;
+	private boolean useOverApproximation;
 
 	private static final Map<TraceOption, String> traceMap = createTraceOptionsMap();
 	private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
 
 	public VerifytaOptions(TraceOption trace, SearchOption search,
-			boolean untimedTrace, ReductionOption reduction, boolean symmetry) {
+			boolean untimedTrace, ReductionOption reduction, boolean symmetry, boolean useOverApproximation) {
 		traceOption = trace;
 		searchOption = search;
 		this.untimedTrace = untimedTrace;
 		this.reduction = reduction;
 		this.symmetry = symmetry;
+		this.useOverApproximation = useOverApproximation;
 	}
 
 	public TraceOption trace() {
@@ -69,5 +71,26 @@ public class VerifytaOptions implements VerificationOptions {
 
 	public ReductionOption getReduction() {
 		return reduction;
+	}
+
+	@Override
+	public boolean useOverApproximation() {
+		return useOverApproximation;
+	}
+
+	@Override
+	public int extraTokens() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public TraceOption traceOption() {
+		return traceOption;
+	}
+
+	@Override
+	public SearchOption searchOption() {
+		return searchOption;
 	}
 }

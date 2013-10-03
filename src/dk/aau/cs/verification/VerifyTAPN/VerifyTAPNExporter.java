@@ -44,9 +44,9 @@ public class VerifyTAPNExporter {
 			if(dataLayerQuery == null){
 				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
 			}else if(dataLayerQuery.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie());
+				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie(), dataLayerQuery.useOverApproximation());
 			} else {
-				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry());
+				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useOverApproximation());
 			}
 		} catch(FileNotFoundException e) {
 			System.err.append("An error occurred while exporting the model to verifytapn. Verification cancelled.");
@@ -104,7 +104,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("/>");
 	}
 
-	private void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
+	protected void outputInputArc(TimedInputArc inputArc, PrintStream modelStream) {
 		modelStream.append("<inputArc ");
 		
 		modelStream.append("inscription=\"" + inputArc.interval().toString(false).replace("<", "&lt;") + "\" ");
@@ -117,7 +117,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("/>\n");
 	}
 
-	private void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
+	protected void outputOutputArc(TimedOutputArc outputArc, PrintStream modelStream) {
 		modelStream.append("<outputArc ");
 		
 		modelStream.append("inscription=\"1\" " );
@@ -130,7 +130,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("/>\n");
 	}
 
-	private void outputTransportArc(TransportArc transArc, PrintStream modelStream) {
+	protected void outputTransportArc(TransportArc transArc, PrintStream modelStream) {
 		modelStream.append("<transportArc ");
 		
 		modelStream.append("inscription=\"" + transArc.interval().toString(false).replace("<", "&lt;") + "\" ");
@@ -144,7 +144,7 @@ public class VerifyTAPNExporter {
 		modelStream.append("/>\n");
 	}
 
-	private void outputInhibitorArc(TimedInhibitorArc inhibArc,	PrintStream modelStream) {
+	protected void outputInhibitorArc(TimedInhibitorArc inhibArc,	PrintStream modelStream) {
 		modelStream.append("<inhibitorArc ");
 		
 		modelStream.append("inscription=\"" + inhibArc.interval().toString(false).replace("<", "&lt;") + "\" ");

@@ -43,6 +43,8 @@ import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
@@ -170,13 +172,29 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			processQuery(file, composedModel, query);
 		}
 		
+		// VerifyTA reductions
 		query = query.copy();
 		query.setDiscreteInclusion(false);
 		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification) { continue; }
+			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN) { continue; }
 			if(exiting()) return;
 			query = query.copy();
 			query.setReductionOption(r);
+			processQuery(file, composedModel, query);
+		}
+		
+		// VerifyPN reductions
+		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyPN)){
+			query = query.copy();
+			query.setReductionOption(ReductionOption.VerifyPN);
+			query.setUseOverApproximation(false);
+			processQuery(file, composedModel, query);
+		}
+		
+		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyPNApprox)){
+			query = query.copy();
+			query.setReductionOption(ReductionOption.VerifyPNApprox);
+			query.setUseOverApproximation(true);
 			processQuery(file, composedModel, query);
 		}
 	}
@@ -203,7 +221,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
 			
 			//TODO: Make sure this is updated such that timedart/ptrie is correct!
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, false,  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, false, query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
@@ -308,17 +326,21 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return getVerifyTAPN();
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
 			return getVerifyTAPNDiscreteVerification();
+		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
+			return getVerifyPN();
 		else
 			return getVerifyta();
 	}
 
 	private VerificationOptions getVerificationOptionsFromQuery(pipe.dataLayer.TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
-			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
+			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces());
+		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
+			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation());
 		else
-			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry());
+			return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false);
 	}
 	
 	private void MapQueryToNewNames(TAPNQuery query, NameMapping mapping) {
@@ -336,6 +358,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		VerifyTAPN verifytapn = new VerifyTAPN(new FileFinderImpl(), new MessengerImpl());
 		verifytapn.setup();
 		return verifytapn;
+	}
+	
+	private static VerifyPN getVerifyPN() {
+		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+		verifypn.setup();
+		return verifypn;
 	}
 	
 	private static VerifyTAPNDiscreteVerification getVerifyTAPNDiscreteVerification() {

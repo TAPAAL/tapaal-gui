@@ -14,30 +14,30 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
-			boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+			boolean pTrie, boolean useOverApproximation) {
+		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, useOverApproximation, false, new InclusionPlaces());
 	}
 	
 	//Only used for boundedness analysis
 	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces());
+		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, false, new InclusionPlaces());
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean discreteInclusion,
-			boolean timeDarts, boolean pTrie) {
+			boolean timeDarts, boolean pTrie, boolean useOverApproximation) {
 		this(extraTokens, traceOption, search, symmetry,
-				timeDarts, pTrie, discreteInclusion, new InclusionPlaces());
+				timeDarts, pTrie, useOverApproximation, discreteInclusion, new InclusionPlaces());
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
-			boolean pTrie, boolean discreteInclusion,
+			boolean pTrie, boolean useOverApproximation, boolean discreteInclusion,
 			InclusionPlaces inclusionPlaces) {
-		super(extraTokens, traceOption, search, symmetry,
+		super(extraTokens, traceOption, search, symmetry, useOverApproximation,
 				discreteInclusion, inclusionPlaces);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;

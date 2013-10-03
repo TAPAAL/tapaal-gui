@@ -539,6 +539,22 @@ public class TimedArcPetriNet {
 		return false;
 	}
 	
+	public boolean isUntimed() {
+		for(TimedInputArc t : inputArcs){
+			if(!t.interval().equals(t.interval().ZERO_INF)){
+				return false;
+			}
+		}
+		
+		for(TransportArc t : transportArcs){
+			if(!t.interval().equals(t.interval().ZERO_INF)){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	public boolean hasUrgentTransitions() {
 		for(TimedTransition t : transitions){
 			if(t.isUrgent()){

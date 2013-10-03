@@ -46,7 +46,9 @@ public class QueryResult {
 		|| (queryType().equals(QueryType.EG)) // && !isQuerySatisfied()) 
 		|| (queryType().equals(QueryType.AF)) // && isQuerySatisfied())
 		|| (queryType().equals(QueryType.AG) && isQuerySatisfied())
-		|| hasDeadlock();
+		|| (hasDeadlock() && 
+				(!isQuerySatisfied() && queryType().equals(QueryType.EF)) || 
+				(isQuerySatisfied() && queryType().equals(QueryType.AG)));
 	}
 	
 	protected String getExplanationString(){
