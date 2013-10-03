@@ -35,4 +35,17 @@ public class TAPNNetworkTimedTransitionStep extends TAPNNetworkTraceStep {
 		String toReturn = transition.isShared() ? transition.sharedTransition().name() : transition.toString();
 		return isLoopStep() ? formatAsLoopStep(toReturn) : toReturn;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if(!(obj instanceof TAPNNetworkTimedTransitionStep))	return false; 
+		TAPNNetworkTimedTransitionStep other = (TAPNNetworkTimedTransitionStep) obj;
+		if(!transition.equals(other.transition))	return false;
+		if(!consumedTokens.equals(other.consumedTokens))	return false;
+		return true;
+	}
 }

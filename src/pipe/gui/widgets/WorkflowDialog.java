@@ -49,13 +49,17 @@ import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.MemoryMonitor;
+import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.TraceConverter;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class WorkflowDialog extends JDialog {
 	
@@ -70,6 +74,9 @@ public class WorkflowDialog extends JDialog {
 	private static final String LABEL_RESULT_MIN = "Minimum execution time:";
 	private static final String LABEL_RESULT_STRONG_SOUND = "Model is strongly sound:";
 	private static final String LABEL_RESULT_MAX = "Maximum execution time:";
+	
+	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
+	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
 
 	private static final long serialVersionUID = 5613743579411748200L;
 
@@ -315,8 +322,10 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 1;
 		soundnessPanel.add(soundness, gbc);
 
-		if (min == null)
+		if (min == null){
 			min = new JCheckBox("Calculate minimum duration.");
+			min.setSelected(true);
+		}
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		soundnessPanel.add(min, gbc);
@@ -340,6 +349,8 @@ public class WorkflowDialog extends JDialog {
 				max.setEnabled(strongSoundness.isSelected());
 				if (!strongSoundness.isSelected()) {
 					max.setSelected(false);
+				}else{
+					max.setSelected(true);
 				}
 			}
 		});
@@ -364,6 +375,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
+		gbc.insets = new Insets(5, 5, 0, 5);
 		soundnessResultLabel = new JLabel(LABEL_RESULT_SOUND);
 		resultPanel.add(soundnessResultLabel, gbc);
 		soundnessResultLabel.setVisible(false);
@@ -391,6 +403,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 3;
+		gbc.insets = new Insets(0, 5, 0, 5);
 		soundnessResultExplanation.setVisible(false);
 		soundnessResultExplanation.setEnabled(false);
 		resultPanel.add(soundnessResultExplanation, gbc);
@@ -400,6 +413,7 @@ public class WorkflowDialog extends JDialog {
 		// Min 
 		gbc.gridy = 2;
 		gbc.gridx = 0;
+		gbc.insets = new Insets(10, 5, 5, 5);
 		minResultLabel = new JLabel(LABEL_RESULT_MIN);
 		resultPanel.add(minResultLabel, gbc);
 		minResultLabel.setVisible(false);
@@ -428,6 +442,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridwidth = 1;
 		gbc.gridy = 3;
 		gbc.gridx = 0;
+		gbc.insets = new Insets(5, 5, 0, 5);
 		strongSoundnessResultLabel = new JLabel(LABEL_RESULT_STRONG_SOUND);
 		resultPanel.add(strongSoundnessResultLabel, gbc);
 		strongSoundnessResultLabel.setVisible(false);
@@ -455,6 +470,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.gridwidth = 3;
+		gbc.insets = new Insets(0, 5, 0, 5);
 		strongSoundnessResultExplanation.setVisible(false);
 		strongSoundnessResultExplanation.setEnabled(false);
 		resultPanel.add(strongSoundnessResultExplanation, gbc);
@@ -463,6 +479,7 @@ public class WorkflowDialog extends JDialog {
 		
 		gbc.gridwidth = 1;
 		gbc.gridy = 5;
+		gbc.insets = new Insets(10, 5, 5, 5);
 		maxResultLabel = new JLabel(LABEL_RESULT_MAX);
 		resultPanel.add(maxResultLabel, gbc);
 		maxResultLabel.setVisible(false);
@@ -485,6 +502,8 @@ public class WorkflowDialog extends JDialog {
 			}
 		});
 		resultPanel.add(maxResultTraceButton, gbc);
+		
+		gbc.insets = new Insets(5, 5, 5, 5);
 		
 		/* K-bound panel */
 
@@ -638,7 +657,7 @@ public class WorkflowDialog extends JDialog {
 					} else {
 						if(errorMsgs.size() > 5)	errors++;
 						else
-							errorMsgs.add("Multiple in-places found (" + in
+							errorMsgs.add(ERROR_MULTIPLE_IN+" (" + in
 									+ " and " + p + ").");
 					}
 				} else if (isout) {
@@ -647,7 +666,7 @@ public class WorkflowDialog extends JDialog {
 					} else {
 						if(errorMsgs.size() > 5)	errors++;
 						else
-							errorMsgs.add("Multiple out-places found (" + out
+							errorMsgs.add(ERROR_MULTIPLE_OUT + " (" + out
 									+ " and " + p + ").");
 					}
 				}
@@ -712,7 +731,7 @@ public class WorkflowDialog extends JDialog {
 				} else {
 					if(errorMsgs.size() > 5)	errors++;
 					else
-						errorMsgs.add("Multiple in-places found (" + in + " and "
+						errorMsgs.add(ERROR_MULTIPLE_IN+" (" + in + " and "
 								+ p + ").");
 				}
 			}
@@ -723,7 +742,7 @@ public class WorkflowDialog extends JDialog {
 		if (in == null) {
 			if(errorMsgs.size() > 5)	errors++;
 			else
-				errorMsgs.add("No in-place found.");
+				errorMsgs.add("No input place found.");
 		}
 
 		while (sharedOutPlaces.size() > 0) {
@@ -733,7 +752,7 @@ public class WorkflowDialog extends JDialog {
 			} else {
 				if(errorMsgs.size() > 5)	errors++;
 				else
-					errorMsgs.add("Multiple out-places found (" + out + " and " + p
+					errorMsgs.add(ERROR_MULTIPLE_OUT + " (" + out + " and " + p
 							+ ").");
 			}
 			while (sharedOutPlaces.remove(p)) {
@@ -743,7 +762,7 @@ public class WorkflowDialog extends JDialog {
 		if (out == null) {
 			if(errorMsgs.size() > 5)	errors++;
 			else
-				errorMsgs.add("No in-place found.");
+				errorMsgs.add("No input place found.");
 		}
 
 		if (numberOfTokensInNet > 1 || in.tokens().size() != 1) {
@@ -954,8 +973,8 @@ public class WorkflowDialog extends JDialog {
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
 						if(result.isQuerySatisfied()){
-							setStrongSoundnessResult(false, "TODO: Determine reason from trace");
-							strongSoundnessResultTrace = mapTraceToRealModel(result.getTrace());
+							
+							strongSoundnessResultTrace = determineError(mapTraceToRealModel(result.getTrace()));
 							strongSoundnessResultTraceButton.setVisible(true);
 							
 							if(max.isSelected()){
@@ -971,6 +990,55 @@ public class WorkflowDialog extends JDialog {
 								maxResultTraceButton.setVisible(true);
 							}
 						}
+					}
+					
+					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
+						TimedTAPNNetworkTrace tmpTrace = new TimedTAPNNetworkTrace(trace.length());
+						TraceType type = null;
+						ArrayList<Tuple<TAPNNetworkTraceStep, Tuple<Integer, Integer>>> detectLoops = new ArrayList<Tuple<TAPNNetworkTraceStep,Tuple<Integer,Integer>>>();
+						int loopIndex = -1;
+						int delay = 0;
+						int maxDelay = 0;
+						int divergentIndex = -1;
+						// Get trace until bound violated						
+						outer: for(TAPNNetworkTraceStep step : trace){
+							if(step instanceof TAPNNetworkTimeDelayStep){
+								delay += ((TAPNNetworkTimeDelayStep) step).getDelay().intValue();
+								if(((TAPNNetworkTimeDelayStep) step).getDelay().intValue() > maxDelay){
+									maxDelay = ((TAPNNetworkTimeDelayStep) step).getDelay().intValue();
+									divergentIndex = tmpTrace.length();
+								}
+							}else{
+								for(Tuple<TAPNNetworkTraceStep, Tuple<Integer, Integer>> checkStep : detectLoops){
+									if(checkStep.value1().equals(step) && checkStep.value2().value1() < delay){
+										loopIndex = checkStep.value2().value2();
+										setStrongSoundnessResult(false, "Infinite computation found.");
+										type = TraceType.EG_LOOP;
+										break outer;
+									}
+								}
+								detectLoops.add(new Tuple<TAPNNetworkTraceStep, Tuple<Integer,Integer>>(step, new Tuple<Integer, Integer>(delay, tmpTrace.length())));
+							}
+							tmpTrace.add(step);
+						}
+						
+						if(type == null){
+							type = TraceType.EG_DELAY_FOREVER;
+							setStrongSoundnessResult(false, "Time divergent marking found.");
+							loopIndex = divergentIndex;
+						}
+						
+						TimedTAPNNetworkTrace realTrace = new TimedTAPNNetworkTrace(loopIndex);
+						for(TAPNNetworkTraceStep step : tmpTrace){
+							if(type == TraceType.EG_DELAY_FOREVER && realTrace.length() == loopIndex){
+								break;
+							}
+							realTrace.add(step);
+						}
+						
+						realTrace.setTraceType(type);
+						
+						return realTrace;
 					}
 				});
 			}
@@ -1007,8 +1075,8 @@ public class WorkflowDialog extends JDialog {
 		strongSoundnessResultLabel.setVisible(true);
 		strongSoundnessResult.setVisible(true);
 
-		strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
-		strongSoundnessVerificationStats.setVisible(true);
+		//strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
+		//strongSoundnessVerificationStats.setVisible(true);
 
 		dialog.pack();
 	}
@@ -1094,6 +1162,8 @@ public class WorkflowDialog extends JDialog {
 
 					private String calculateSoundnessError(
 							TAPNNetworkTrace trace) {
+						// TODO detect deadlocks
+						// TODO detect subset result
 						String output = "Marking reached with no trace to " + out.name() + ".";
 						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
 						NetworkMarking final_marking = model.marking().clone(); 
