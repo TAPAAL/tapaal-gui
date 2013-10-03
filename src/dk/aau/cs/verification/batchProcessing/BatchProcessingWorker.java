@@ -172,6 +172,18 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			processQuery(file, composedModel, query);
 		}
 		
+		// VerifyTA reductions
+		query = query.copy();
+		query.setDiscreteInclusion(false);
+		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
+			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN) { continue; }
+			if(exiting()) return;
+			query = query.copy();
+			query.setReductionOption(r);
+			processQuery(file, composedModel, query);
+		}
+		
+		// VerifyPN reductions
 		if(!exiting() && batchProcessingVerificationOptions.reductionOptions().contains(ReductionOption.VerifyPN)){
 			query = query.copy();
 			query.setReductionOption(ReductionOption.VerifyPN);
@@ -183,16 +195,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			query = query.copy();
 			query.setReductionOption(ReductionOption.VerifyPNApprox);
 			query.setUseOverApproximation(true);
-			processQuery(file, composedModel, query);
-		}
-		
-		query = query.copy();
-		query.setDiscreteInclusion(false);
-		for(ReductionOption r : batchProcessingVerificationOptions.reductionOptions()){
-			if(r == ReductionOption.VerifyTAPN || r == ReductionOption.VerifyTAPNdiscreteVerification || r == ReductionOption.VerifyPNApprox || r == ReductionOption.VerifyPN) { continue; }
-			if(exiting()) return;
-			query = query.copy();
-			query.setReductionOption(r);
 			processQuery(file, composedModel, query);
 		}
 	}
