@@ -1269,7 +1269,7 @@ public class WorkflowDialog extends JDialog {
 							while (transitionIterator.hasNext()) {
 								TimedTransition tempTransition = transitionIterator.next();
 								if (tempTransition.isDEnabled()){
-									output = "Marking reached with no trace to " + out.name() + ".";
+									output = "Marking reached with no trace to a final marking.";
 									break outer;
 								}
 							}
