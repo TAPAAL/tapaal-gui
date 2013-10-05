@@ -1076,6 +1076,15 @@ public class WorkflowDialog extends JDialog {
 								maxResultTraceButton.setVisible(true);
 							}
 						}
+						
+						strongSoundnessResult.setToolTipText(result
+								.getVerificationTimeString()
+								+ ", peak memory usage: "
+								+ MemoryMonitor.getPeakMemory());
+						maxResult.setToolTipText(result
+								.getVerificationTimeString()
+								+ ", peak memory usage: "
+								+ MemoryMonitor.getPeakMemory());
 					}
 
 					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
@@ -1160,7 +1169,7 @@ public class WorkflowDialog extends JDialog {
 		}
 		strongSoundnessResultLabel.setVisible(true);
 		strongSoundnessResult.setVisible(true);
-
+		
 		//strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
 		//strongSoundnessVerificationStats.setVisible(true);
 
@@ -1235,6 +1244,14 @@ public class WorkflowDialog extends JDialog {
 							minResult.setVisible(true);
 						}
 
+						soundnessResult.setToolTipText(result
+								.getVerificationTimeString()
+								+ ", peak memory usage: "
+								+ MemoryMonitor.getPeakMemory());
+						minResult.setToolTipText(result
+								.getVerificationTimeString()
+								+ ", peak memory usage: "
+								+ MemoryMonitor.getPeakMemory());
 						/*soundnessVerificationStats.setText(result
 								.getVerificationTimeString()
 								+ ", peak memory usage: "
