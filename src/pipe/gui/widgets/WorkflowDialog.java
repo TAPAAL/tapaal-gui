@@ -1138,7 +1138,7 @@ public class WorkflowDialog extends JDialog {
 			strongSoundnessResult.setText("The property is NOT satisfied.");
 			strongSoundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 			if(max.isSelected()){
-				maxResult.setText("Not available.");
+				maxResult.setText("Not defined.");
 				maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 				maxResultLabel.setVisible(true);
 				maxResult.setVisible(true);
@@ -1219,7 +1219,7 @@ public class WorkflowDialog extends JDialog {
 								minResultTrace = mapTraceToRealModel(result.getTrace());
 								minResultTraceButton.setVisible(true);
 							}else{
-								minResult.setText("Not available.");
+								minResult.setText("Not defined.");
 								minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 							}
 							minResultLabel.setVisible(true);
