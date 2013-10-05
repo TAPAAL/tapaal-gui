@@ -34,6 +34,7 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
+import pipe.gui.widgets.WorkflowDialog;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
@@ -84,6 +85,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 			appendConstants(document, pnmlRootNode);
 			appendTemplates(document, pnmlRootNode);
 			appendQueries(document, pnmlRootNode);
+			appendDefaultBound(document, pnmlRootNode);
 
 			document.normalize();
 			// Create Transformer with XSL Source File
@@ -120,6 +122,12 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 							+ "\" transformer=\""
 							+ transformer.getURIResolver() + "\"" + e);
 		}
+	}
+	
+	private void appendDefaultBound(Document document, Element root) {
+		Element element = document.createElement("k-bound");
+		element.setAttribute("bound", network.getDefaultBound() + "");
+		root.appendChild(element);
 	}
 	
 	private void appendSharedPlaces(Document document, Element root) {

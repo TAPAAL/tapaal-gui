@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import pipe.gui.MessengerImpl;
-
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
@@ -25,6 +24,8 @@ public class TimedArcPetriNetNetwork {
 	
 	private NetworkMarking currentMarking;
 	private ConstantStore constants;
+	
+	private int defaultBound = 3;
 	
 	private List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
 	
@@ -531,6 +532,17 @@ public class TimedArcPetriNetNetwork {
 			}
 		}
 		
+		network.setDefaultBound(getDefaultBound());
+		
 		return network;
 	}
+
+	public int getDefaultBound() {
+		return defaultBound;
+	}
+	
+	public void setDefaultBound(int defaultBound) {
+		this.defaultBound = defaultBound;
+	}
+
 }

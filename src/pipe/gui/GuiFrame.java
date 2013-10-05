@@ -704,7 +704,7 @@ public class GuiFrame extends JFrame implements Observer {
 		workflowDialog.setMnemonic('f');
 		workflowDialog.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				WorkflowDialog.showDialog();
+				WorkflowDialog.showDialog(true);
 			}
 		});
 		toolsMenu.add(workflowDialog);
@@ -986,6 +986,10 @@ public class GuiFrame extends JFrame implements Observer {
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
 
+			if(WorkflowDialog.restoreDialog()){
+				WorkflowDialog.showDialog(false);
+			}
+			
 			break;
 
 		case animation:

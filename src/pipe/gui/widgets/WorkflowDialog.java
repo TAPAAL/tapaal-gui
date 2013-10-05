@@ -19,6 +19,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
@@ -110,6 +112,8 @@ public class WorkflowDialog extends JDialog {
 	private static JLabel minResultLabel;
 	private static JLabel strongSoundnessResultLabel;
 	private static JLabel maxResultLabel;
+	
+	private static JPanel resultPanel = null;
 
 	private static CustomJSpinner numberOfExtraTokensInNet = null;
 
@@ -131,6 +135,12 @@ public class WorkflowDialog extends JDialog {
 	private static TimedPlace done = null;
 
 	private static TimedArcPetriNetNetwork model = null;
+	
+	private static boolean restoreDialog = false;
+	
+	public static boolean restoreDialog(){
+		return restoreDialog;
+	}
 
 	private enum TAWFNTypes {
 		ETAWFN, MTAWFN, NOTTAWFN
@@ -138,7 +148,7 @@ public class WorkflowDialog extends JDialog {
 
 	TAWFNTypes netType;
 
-	public static void showDialog() {
+	public static void showDialog(boolean clearResults) {
 
 		/* Copy model */
 
@@ -156,19 +166,28 @@ public class WorkflowDialog extends JDialog {
 
 		/* Make dialog */
 
-		dialog = new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis",
-				true);
+		dialog = new WorkflowDialog(clearResults, CreateGui.getApp(), "Workflow Analysis",
+				false);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setResizable(true);
 		dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		dialog.setVisible(true);
+		restoreDialog = false;
 	}
-
-	private WorkflowDialog(Frame frame, String title, boolean modal) {
+	
+	private void switchToTrace(TAPNNetworkTrace trace){
+		restoreDialog = true;
+		dialog.setVisible(false);
+		CreateGui.getApp().setGUIMode(GUIMode.animation);
+		CreateGui.getAnimator().SetTrace(trace);
+	}
+	
+	private WorkflowDialog(boolean clearResults, Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
 
 		initComponents();
+		if(clearResults)	resultPanel.setVisible(false);
 		setContentPane(panel);
 	}
 
@@ -363,10 +382,12 @@ public class WorkflowDialog extends JDialog {
 		
 		/* Result panel */
 		
-		JPanel resultPanel = new JPanel();
-		resultPanel.setBorder(BorderFactory
-				.createTitledBorder("Results"));
-		resultPanel.setLayout(new GridBagLayout());
+		if(resultPanel == null){
+			resultPanel = new JPanel();
+			resultPanel.setBorder(BorderFactory
+					.createTitledBorder("Results"));
+			resultPanel.setLayout(new GridBagLayout());
+		}
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 2;
@@ -392,9 +413,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getApp().setGUIMode(GUIMode.animation);
-				CreateGui.getAnimator().SetTrace(soundnessResultTrace);
-				dialog.dispose();
+				switchToTrace(soundnessResultTrace);
 			}
 		});
 		resultPanel.add(soundnessResultTraceButton, gbc);
@@ -430,9 +449,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getApp().setGUIMode(GUIMode.animation);
-				CreateGui.getAnimator().SetTrace(minResultTrace);
-				dialog.dispose();
+				switchToTrace(minResultTrace);
 			}
 		});
 		resultPanel.add(minResultTraceButton, gbc);
@@ -459,9 +476,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getApp().setGUIMode(GUIMode.animation);
-				CreateGui.getAnimator().SetTrace(strongSoundnessResultTrace);
-				dialog.dispose();
+				switchToTrace(strongSoundnessResultTrace);
 			}
 		});
 		resultPanel.add(strongSoundnessResultTraceButton, gbc);
@@ -496,9 +511,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CreateGui.getApp().setGUIMode(GUIMode.animation);
-				CreateGui.getAnimator().SetTrace(maxResultTrace);
-				dialog.dispose();
+				switchToTrace(maxResultTrace);
 			}
 		});
 		resultPanel.add(maxResultTraceButton, gbc);
@@ -513,7 +526,7 @@ public class WorkflowDialog extends JDialog {
 			panel.add(new JLabel(" Number of extra tokens:  "), gbc);
 
 			if (numberOfExtraTokensInNet == null)
-				numberOfExtraTokensInNet = new CustomJSpinner(3, 0,
+				numberOfExtraTokensInNet = new CustomJSpinner(model.getDefaultBound(), 0,
 						Integer.MAX_VALUE);
 			numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
@@ -521,6 +534,16 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 0;
 			gbc.gridy = 6;
 			panel.add(numberOfExtraTokensInNet, gbc);
+			
+			numberOfExtraTokensInNet.addChangeListener(new ChangeListener() {
+				
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+					CreateGui.getCurrentTab().network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
+					CreateGui.getDrawingSurface().setNetChanged(true);
+				}
+			});
 
 			JButton checkBound = new JButton("Check bound");
 			gbc.gridx = 1;
@@ -802,6 +825,7 @@ public class WorkflowDialog extends JDialog {
 		//soundnessVerificationStats.setVisible(false);
 		strongSoundnessResultExplanation.setVisible(false);
 		//strongSoundnessVerificationStats.setVisible(false);
+		resultPanel.setVisible(true);
 
 		dialog.pack();
 		
