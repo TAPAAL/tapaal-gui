@@ -596,6 +596,7 @@ public class WorkflowDialog extends JDialog {
 			numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
 			gbc.gridx = 0;
 			gbc.gridy = 6;
+			gbc.gridwidth = 2;
 			panel.add(numberOfExtraTokensInNet, gbc);
 
 			numberOfExtraTokensInNet.addChangeListener(new ChangeListener() {
@@ -608,8 +609,10 @@ public class WorkflowDialog extends JDialog {
 				}
 			});
 
+			gbc.gridwidth = 1;
+			
 			JButton checkBound = new JButton("Check bound");
-			gbc.gridx = 1;
+			gbc.gridx = 2;
 			panel.add(checkBound, gbc);
 
 			checkBound.addActionListener(new ActionListener() {
