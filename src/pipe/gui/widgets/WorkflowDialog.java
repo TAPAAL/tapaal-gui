@@ -84,6 +84,11 @@ public class WorkflowDialog extends JDialog {
 		return buffer.toString(); 
 	}
 	
+	private static final String TOOLTIP_SOUNDNESS = "Soundness";
+	private static final String TOOLTIP_MIN = "Minimum duration";
+	private static final String TOOLTIP_STRONGSOUNDNESS = "Strong soundness";
+	private static final String TOOLTIP_MAX = "Maximum duration";
+	
 	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of workflow:";
 	private static final String LABEL_INPUT_PLACE = "Input place of workflow:";
 	private static final String LABEL_OUTPUT_PLACE = "Output place of workflow:";
@@ -384,6 +389,7 @@ public class WorkflowDialog extends JDialog {
 
 		if (soundness == null)
 			soundness = new JCheckBox("Check soundness.");
+		soundness.setToolTipText(TOOLTIP_SOUNDNESS);
 		soundness.setSelected(true);
 		soundness.setEnabled(false);
 		gbc.gridx = 0;
@@ -393,6 +399,7 @@ public class WorkflowDialog extends JDialog {
 		if (min == null){
 			min = new JCheckBox("Calculate minimum duration.");
 			min.setSelected(true);
+			min.setToolTipText(TOOLTIP_MIN);
 		}
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -400,12 +407,14 @@ public class WorkflowDialog extends JDialog {
 
 		if (strongSoundness == null)
 			strongSoundness = new JCheckBox("Check strong soundness.");
+		strongSoundness.setToolTipText(TOOLTIP_STRONGSOUNDNESS);
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		soundnessPanel.add(strongSoundness, gbc);
 
 		if (max == null)
 			max = new JCheckBox("Calculate maximum duration.");
+		max.setToolTipText(TOOLTIP_MAX);
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		soundnessPanel.add(max, gbc);
