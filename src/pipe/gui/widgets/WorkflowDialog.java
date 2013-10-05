@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -17,7 +18,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -67,6 +71,19 @@ import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class WorkflowDialog extends JDialog {
 
+	private String getHelpMessage(){ 
+		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<html>");
+		buffer.append("<b>Headline</b><br/>");
+		buffer.append("Some text. Bla bla.");
+		buffer.append("<br/><br/>");
+		buffer.append("<b>New Headlone</b><br/>");
+		buffer.append("Any HTML tag can be used.");
+		buffer.append("</html>");
+		return buffer.toString(); 
+	}
+	
 	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of workflow:";
 	private static final String LABEL_INPUT_PLACE = "Input place of workflow:";
 	private static final String LABEL_OUTPUT_PLACE = "Output place of workflow:";
@@ -209,7 +226,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = 2;
+		gbc.gridwidth = 3;
 		gbc.weightx = 1;
 		panel.add(informationPanel, gbc);
 
@@ -302,9 +319,22 @@ public class WorkflowDialog extends JDialog {
 
 			initValidationPanel();
 		}
-
+		
 		gbc.gridx = 0;
 		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.WEST;
+		JButton help_button = new JButton("Help");
+		help_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(CreateGui.appGui, getMessageComponent(), "Help", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+
+		panel.add(help_button, gbc);
+
+		gbc.gridx = 1;
 		gbc.anchor = GridBagConstraints.EAST;
 		JButton close_button = new JButton("Close");
 		close_button.addActionListener(new ActionListener() {
@@ -316,6 +346,23 @@ public class WorkflowDialog extends JDialog {
 		});
 
 		panel.add(close_button, gbc);
+	}
+	
+	private Object getMessageComponent(){
+		JTextPane pane = new JTextPane();
+		pane.setContentType("text/html");
+		pane.setText(getHelpMessage());
+		pane.setEditable(false);
+		pane.setCaretPosition(0);
+		for(MouseListener listener : pane.getMouseListeners()){
+			pane.removeMouseListener(listener);
+		}
+		Dimension dim = new Dimension(500,400);
+		pane.setPreferredSize(dim);  
+		pane.setMargin(new Insets(5,5,5,5));  
+		JScrollPane scrollPane = new JScrollPane(pane);  
+		scrollPane.setPreferredSize(dim);  
+		return scrollPane;  
 	}
 
 	private void initValidationPanel() {
@@ -330,7 +377,7 @@ public class WorkflowDialog extends JDialog {
 		soundnessPanel.setLayout(new GridBagLayout());
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.gridwidth = 2;
+		gbc.gridwidth = 3;
 		panel.add(soundnessPanel, gbc);
 
 		gbc.gridwidth = 1;
@@ -392,7 +439,7 @@ public class WorkflowDialog extends JDialog {
 		}
 		gbc.gridx = 0;
 		gbc.gridy = 2;
-		gbc.gridwidth = 2;
+		gbc.gridwidth = 3;
 		panel.add(resultPanel, gbc);
 
 		gbc.gridx = 0;
@@ -591,7 +638,7 @@ public class WorkflowDialog extends JDialog {
 
 		}
 
-		JButton checkIfSound = new JButton("Check workflow soundness");
+		JButton checkIfSound = new JButton("Check properties");
 		checkIfSound.addActionListener(new ActionListener() {
 
 			@Override
@@ -599,7 +646,7 @@ public class WorkflowDialog extends JDialog {
 				checkTAWFNSoundness();
 			}
 		});
-		gbc.gridx = 1;
+		gbc.gridx = 2;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.EAST;
 		panel.add(checkIfSound, gbc);
