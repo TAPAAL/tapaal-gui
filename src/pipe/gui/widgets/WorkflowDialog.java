@@ -24,6 +24,7 @@ import javax.swing.event.ChangeListener;
 
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
+import pipe.gui.graphicElements.Transition;
 import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -32,6 +33,7 @@ import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -64,19 +66,19 @@ import dk.aau.cs.verification.VerificationResult;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class WorkflowDialog extends JDialog {
-	
+
 	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of workflow:";
 	private static final String LABEL_INPUT_PLACE = "Input place of workflow:";
 	private static final String LABEL_OUTPUT_PLACE = "Output place of workflow:";
 	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
 	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
 	private static final String LABEL_INVARIANTS = "Invariants:";
-	
+
 	private static final String LABEL_RESULT_SOUND = "Model is sound:";
 	private static final String LABEL_RESULT_MIN = "Minimum execution time:";
 	private static final String LABEL_RESULT_STRONG_SOUND = "Model is strongly sound:";
 	private static final String LABEL_RESULT_MAX = "Maximum execution time:";
-	
+
 	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
 	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
 
@@ -107,12 +109,12 @@ public class WorkflowDialog extends JDialog {
 	private static JButton strongSoundnessResultTraceButton;
 	private static JLabel soundnessVerificationStats;
 	private static JLabel strongSoundnessVerificationStats;
-	
+
 	private static JLabel soundnessResultLabel;
 	private static JLabel minResultLabel;
 	private static JLabel strongSoundnessResultLabel;
 	private static JLabel maxResultLabel;
-	
+
 	private static JPanel resultPanel = null;
 
 	private static CustomJSpinner numberOfExtraTokensInNet = null;
@@ -135,9 +137,9 @@ public class WorkflowDialog extends JDialog {
 	private static TimedPlace done = null;
 
 	private static TimedArcPetriNetNetwork model = null;
-	
+
 	private static boolean restoreDialog = false;
-	
+
 	public static boolean restoreDialog(){
 		return restoreDialog;
 	}
@@ -175,14 +177,14 @@ public class WorkflowDialog extends JDialog {
 		dialog.setVisible(true);
 		restoreDialog = false;
 	}
-	
+
 	private void switchToTrace(TAPNNetworkTrace trace){
 		restoreDialog = true;
 		dialog.setVisible(false);
 		CreateGui.getApp().setGUIMode(GUIMode.animation);
 		CreateGui.getAnimator().SetTrace(trace);
 	}
-	
+
 	private WorkflowDialog(boolean clearResults, Frame frame, String title, boolean modal) {
 		super(frame, title, modal);
 
@@ -216,13 +218,13 @@ public class WorkflowDialog extends JDialog {
 		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 		JLabel workflowType = new JLabel(LABEL_TYPE_OF_WORKFLOW);
 		informationPanel.add(workflowType, gbc);
-		
+
 		gbc.gridx = 1;
-		
+
 		JLabel workflowTypeLabel = new JLabel("");
 		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 		informationPanel.add(workflowTypeLabel, gbc);
-		
+
 		JLabel workflowTypeError = new JLabel("");
 		workflowTypeError.setVisible(false);
 		gbc.gridy = 1;
@@ -258,7 +260,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(LABEL_INPUT_PLACE), gbc);
-			
+
 			JLabel inPlaceLabel = new JLabel(in.name());
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
@@ -272,7 +274,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(outPlaceLabel, gbc);
-			
+
 			gbc.gridy = 3;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
@@ -280,7 +282,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 1;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasInhibitorArcs()? "Yes":"No"), gbc);
-			
+
 			gbc.gridy = 4;
 			gbc.gridx = 0;
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
@@ -297,7 +299,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
 			informationPanel.add(new JLabel(model.hasInvariants()? "Yes":"No"), gbc);
 
-			
+
 			initValidationPanel();
 		}
 
@@ -360,7 +362,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		soundnessPanel.add(max, gbc);
-		
+
 		strongSoundness.addActionListener(new ActionListener() {
 
 			@Override
@@ -373,15 +375,15 @@ public class WorkflowDialog extends JDialog {
 				}
 			}
 		});
-		
+
 		// Initialize correct state
 		max.setEnabled(strongSoundness.isSelected());
 		if (!strongSoundness.isSelected()) {
 			max.setSelected(false);
 		}
-		
+
 		/* Result panel */
-		
+
 		if(resultPanel == null){
 			resultPanel = new JPanel();
 			resultPanel.setBorder(BorderFactory
@@ -392,132 +394,136 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 2;
 		gbc.gridwidth = 2;
 		panel.add(resultPanel, gbc);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.insets = new Insets(5, 5, 0, 5);
-		soundnessResultLabel = new JLabel(LABEL_RESULT_SOUND);
-		resultPanel.add(soundnessResultLabel, gbc);
-		soundnessResultLabel.setVisible(false);
 		
-		soundnessResult = new JLabel();
-		gbc.gridx = 1;
-		resultPanel.add(soundnessResult, gbc);
-		soundnessResult.setVisible(false);
+		/* Initialize results panel on first invokation */
+		if(soundnessResultLabel == null){
+			soundnessResultLabel = new JLabel(LABEL_RESULT_SOUND);
+			resultPanel.add(soundnessResultLabel, gbc);
+			soundnessResultLabel.setVisible(false);
 
-		soundnessResultTraceButton = new JButton("Show trace");
-		gbc.gridx = 2;
-		soundnessResultTraceButton.setVisible(false);
-		soundnessResultTraceButton.addActionListener(new ActionListener() {
+			soundnessResult = new JLabel();
+			gbc.gridx = 1;
+			resultPanel.add(soundnessResult, gbc);
+			soundnessResult.setVisible(false);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				switchToTrace(soundnessResultTrace);
-			}
-		});
-		resultPanel.add(soundnessResultTraceButton, gbc);
-		
-		soundnessResultExplanation = new JLabel();
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.gridwidth = 3;
-		gbc.insets = new Insets(0, 5, 0, 5);
-		soundnessResultExplanation.setVisible(false);
-		soundnessResultExplanation.setEnabled(false);
-		resultPanel.add(soundnessResultExplanation, gbc);
+			soundnessResultTraceButton = new JButton("Show trace");
+			gbc.gridx = 2;
+			soundnessResultTraceButton.setVisible(false);
+			soundnessResultTraceButton.addActionListener(new ActionListener() {
 
-		gbc.gridwidth = 1;
-		
-		// Min 
-		gbc.gridy = 2;
-		gbc.gridx = 0;
-		gbc.insets = new Insets(10, 5, 5, 5);
-		minResultLabel = new JLabel(LABEL_RESULT_MIN);
-		resultPanel.add(minResultLabel, gbc);
-		minResultLabel.setVisible(false);
-		
-		minResult = new JLabel();
-		gbc.gridx = 1;
-		resultPanel.add(minResult, gbc);
-		minResult.setVisible(false);
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					switchToTrace(soundnessResultTrace);
+				}
+			});
+			resultPanel.add(soundnessResultTraceButton, gbc);
 
-		minResultTraceButton = new JButton("Show trace");
-		gbc.gridx = 2;
-		minResultTraceButton.setVisible(false);
-		minResultTraceButton.addActionListener(new ActionListener() {
+			soundnessResultExplanation = new JLabel();
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.gridwidth = 3;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			soundnessResultExplanation.setVisible(false);
+			soundnessResultExplanation.setEnabled(false);
+			resultPanel.add(soundnessResultExplanation, gbc);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				switchToTrace(minResultTrace);
-			}
-		});
-		resultPanel.add(minResultTraceButton, gbc);
-		
-		// Strong soundness
-		
-		gbc.gridwidth = 1;
-		gbc.gridy = 3;
-		gbc.gridx = 0;
-		gbc.insets = new Insets(5, 5, 0, 5);
-		strongSoundnessResultLabel = new JLabel(LABEL_RESULT_STRONG_SOUND);
-		resultPanel.add(strongSoundnessResultLabel, gbc);
-		strongSoundnessResultLabel.setVisible(false);
-		
-		strongSoundnessResult = new JLabel();
-		gbc.gridx = 1;
-		resultPanel.add(strongSoundnessResult, gbc);
-		strongSoundnessResult.setVisible(false);
-		
-		strongSoundnessResultTraceButton = new JButton("Show trace");
-		gbc.gridx = 2;
-		strongSoundnessResultTraceButton.setVisible(false);
-		strongSoundnessResultTraceButton.addActionListener(new ActionListener() {
+			gbc.gridwidth = 1;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				switchToTrace(strongSoundnessResultTrace);
-			}
-		});
-		resultPanel.add(strongSoundnessResultTraceButton, gbc);
+			// Min 
+			gbc.gridy = 2;
+			gbc.gridx = 0;
+			gbc.insets = new Insets(10, 5, 5, 5);
+			minResultLabel = new JLabel(LABEL_RESULT_MIN);
+			resultPanel.add(minResultLabel, gbc);
+			minResultLabel.setVisible(false);
 
-		strongSoundnessResultExplanation = new JLabel();
-		gbc.gridx = 0;
-		gbc.gridy = 4;
-		gbc.gridwidth = 3;
-		gbc.insets = new Insets(0, 5, 0, 5);
-		strongSoundnessResultExplanation.setVisible(false);
-		strongSoundnessResultExplanation.setEnabled(false);
-		resultPanel.add(strongSoundnessResultExplanation, gbc);
+			minResult = new JLabel();
+			gbc.gridx = 1;
+			resultPanel.add(minResult, gbc);
+			minResult.setVisible(false);
 
-		// Max 
-		
-		gbc.gridwidth = 1;
-		gbc.gridy = 5;
-		gbc.insets = new Insets(10, 5, 5, 5);
-		maxResultLabel = new JLabel(LABEL_RESULT_MAX);
-		resultPanel.add(maxResultLabel, gbc);
-		maxResultLabel.setVisible(false);
-		
-		maxResult = new JLabel();
-		gbc.gridx = 1;
-		resultPanel.add(maxResult, gbc);
-		maxResult.setVisible(false);
-		
-		maxResultTraceButton = new JButton("Show trace");
-		gbc.gridx = 2;
-		maxResultTraceButton.setVisible(false);
-		maxResultTraceButton.addActionListener(new ActionListener() {
+			minResultTraceButton = new JButton("Show trace");
+			gbc.gridx = 2;
+			minResultTraceButton.setVisible(false);
+			minResultTraceButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				switchToTrace(maxResultTrace);
-			}
-		});
-		resultPanel.add(maxResultTraceButton, gbc);
-		
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					switchToTrace(minResultTrace);
+				}
+			});
+			resultPanel.add(minResultTraceButton, gbc);
+
+			// Strong soundness
+
+			gbc.gridwidth = 1;
+			gbc.gridy = 3;
+			gbc.gridx = 0;
+			gbc.insets = new Insets(5, 5, 0, 5);
+			strongSoundnessResultLabel = new JLabel(LABEL_RESULT_STRONG_SOUND);
+			resultPanel.add(strongSoundnessResultLabel, gbc);
+			strongSoundnessResultLabel.setVisible(false);
+
+			strongSoundnessResult = new JLabel();
+			gbc.gridx = 1;
+			resultPanel.add(strongSoundnessResult, gbc);
+			strongSoundnessResult.setVisible(false);
+
+			strongSoundnessResultTraceButton = new JButton("Show trace");
+			gbc.gridx = 2;
+			strongSoundnessResultTraceButton.setVisible(false);
+			strongSoundnessResultTraceButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					switchToTrace(strongSoundnessResultTrace);
+				}
+			});
+			resultPanel.add(strongSoundnessResultTraceButton, gbc);
+
+			strongSoundnessResultExplanation = new JLabel();
+			gbc.gridx = 0;
+			gbc.gridy = 4;
+			gbc.gridwidth = 3;
+			gbc.insets = new Insets(0, 5, 0, 5);
+			strongSoundnessResultExplanation.setVisible(false);
+			strongSoundnessResultExplanation.setEnabled(false);
+			resultPanel.add(strongSoundnessResultExplanation, gbc);
+
+			// Max 
+
+			gbc.gridwidth = 1;
+			gbc.gridy = 5;
+			gbc.insets = new Insets(10, 5, 5, 5);
+			maxResultLabel = new JLabel(LABEL_RESULT_MAX);
+			resultPanel.add(maxResultLabel, gbc);
+			maxResultLabel.setVisible(false);
+
+			maxResult = new JLabel();
+			gbc.gridx = 1;
+			resultPanel.add(maxResult, gbc);
+			maxResult.setVisible(false);
+
+			maxResultTraceButton = new JButton("Show trace");
+			gbc.gridx = 2;
+			maxResultTraceButton.setVisible(false);
+			maxResultTraceButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					switchToTrace(maxResultTrace);
+				}
+			});
+			resultPanel.add(maxResultTraceButton, gbc);
+		}
+
 		gbc.insets = new Insets(5, 5, 5, 5);
-		
+
 		/* K-bound panel */
 
 		if (netType == TAWFNTypes.ETAWFN) {
@@ -534,9 +540,9 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 0;
 			gbc.gridy = 6;
 			panel.add(numberOfExtraTokensInNet, gbc);
-			
+
 			numberOfExtraTokensInNet.addChangeListener(new ChangeListener() {
-				
+
 				@Override
 				public void stateChanged(ChangeEvent e) {
 					model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
@@ -556,12 +562,12 @@ public class WorkflowDialog extends JDialog {
 					checkBound();
 				}
 			});
-			
-			
+
+
 			/* TODO To add */
-			
-			
-		
+
+
+
 
 			soundnessVerificationStats = new JLabel();
 			gbc.gridx = 0;
@@ -570,7 +576,7 @@ public class WorkflowDialog extends JDialog {
 			soundnessVerificationStats.setVisible(false);
 			//soundnessPanel.add(soundnessVerificationStats, gbc);
 
-			
+
 
 			strongSoundnessVerificationStats = new JLabel();
 			gbc.gridx = 0;
@@ -664,11 +670,11 @@ public class WorkflowDialog extends JDialog {
 					if (isout) {
 						sharedOutPlaces.add(p);
 					}
-					
+
 					if(!isin && !isout){
 						sharedAcceptedPlaces.add(p);
 					}
-					
+
 				} else if (isin && isout) {
 					if(errorMsgs.size() > 5)	errors++;
 					else
@@ -736,7 +742,7 @@ public class WorkflowDialog extends JDialog {
 			while (sharedTransitions.remove(st)) {
 			}
 		}
-		
+
 		for(TimedPlace p : sharedAcceptedPlaces){
 			while (sharedInPlaces.remove(p)) {
 			}
@@ -828,7 +834,7 @@ public class WorkflowDialog extends JDialog {
 		resultPanel.setVisible(true);
 
 		dialog.pack();
-		
+
 		verificationQueue.clear();
 		isSound = false;
 		min_exec = -1;
@@ -875,9 +881,9 @@ public class WorkflowDialog extends JDialog {
 		}
 		c = new Constant(name, (int) m*B+1); 
 		network.constants().add(c);
-		
+
 		/* Create transitions */
-		
+
 		name = "nok";
 		while(out_template.getTransitionByName(name) != null){
 			name += "x";
@@ -885,14 +891,14 @@ public class WorkflowDialog extends JDialog {
 		TimedTransition nok_t = new TimedTransition(name, true);
 		nok_t.setUrgent(true);
 		out_template.add(nok_t);
-		
+
 		name = "tick";
 		while(out_template.getTransitionByName(name) != null){
 			name += "x";
 		}
 		TimedTransition tick_t = new TimedTransition(name, false);
 		out_template.add(tick_t);
-		
+
 		name = "ok";
 		while(out_template.getTransitionByName(name) != null){
 			name += "x";
@@ -900,40 +906,40 @@ public class WorkflowDialog extends JDialog {
 		TimedTransition ok_t = new TimedTransition(name, true);
 		ok_t.setUrgent(true);
 		out_template.add(ok_t);
-		
+
 		/* Create places */
-		
+
 		name = "timer";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
 		TimedPlace timer_p = new LocalTimedPlace(name, new TimeInvariant(true, new ConstantBound(c)));
 		out_template.add(timer_p);
-		
+
 		name = "ready";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
 		TimedPlace ready_p = new LocalTimedPlace(name);
 		out_template.add(ready_p);
-		
+
 		name = "finished";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
 		TimedPlace finished_p = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
 		out_template.add(finished_p);
-		
+
 		name = "done";
 		while(out_template.getPlaceByName(name) != null){
 			name += "x";
 		}
-		
+
 		done = new LocalTimedPlace(name, new TimeInvariant(true, new IntBound(0)));
 		out_template.add(done);
 
 		/* Create arcs */
-		
+
 		out_template.add(new TimedInputArc(out_hook, nok_t, TimeInterval.ZERO_INF));
 		out_template.add(new TimedInputArc(out_hook, ok_t, TimeInterval.ZERO_INF));
 		out_template.add(new TimedInputArc(timer_p, tick_t, new TimeInterval(true, new ConstantBound(c), new ConstantBound(c), true)));
@@ -997,10 +1003,10 @@ public class WorkflowDialog extends JDialog {
 					@Override
 					public void run(VerificationResult<TAPNNetworkTrace> result) {
 						if(result.isQuerySatisfied()){
-							
+
 							strongSoundnessResultTrace = determineError(mapTraceToRealModel(result.getTrace()));
 							strongSoundnessResultTraceButton.setVisible(true);
-							
+
 							if(max.isSelected()){
 								maxResult.setText("Not defined.");
 								maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
@@ -1015,7 +1021,7 @@ public class WorkflowDialog extends JDialog {
 							}
 						}
 					}
-					
+
 					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
 						TimedTAPNNetworkTrace tmpTrace = new TimedTAPNNetworkTrace(trace.length());
 						TraceType type = null;
@@ -1045,13 +1051,13 @@ public class WorkflowDialog extends JDialog {
 							}
 							tmpTrace.add(step);
 						}
-						
+
 						if(type == null){
 							type = TraceType.EG_DELAY_FOREVER;
 							setStrongSoundnessResult(false, "Time divergent marking found.");
 							loopIndex = divergentIndex;
 						}
-						
+
 						TimedTAPNNetworkTrace realTrace = new TimedTAPNNetworkTrace(loopIndex);
 						for(TAPNNetworkTraceStep step : tmpTrace){
 							if(type == TraceType.EG_DELAY_FOREVER && realTrace.length() == loopIndex){
@@ -1059,9 +1065,9 @@ public class WorkflowDialog extends JDialog {
 							}
 							realTrace.add(step);
 						}
-						
+
 						realTrace.setTraceType(type);
-						
+
 						return realTrace;
 					}
 				});
@@ -1186,9 +1192,9 @@ public class WorkflowDialog extends JDialog {
 
 					private String calculateSoundnessError(
 							TAPNNetworkTrace trace) {
-						// TODO detect deadlocks
+
 						// TODO detect subset result
-						String output = "Marking reached with no trace to " + out.name() + ".";
+						
 						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
 						NetworkMarking final_marking = model.marking().clone(); 
 						while(iter.hasNext()) final_marking = iter.next().performStepFrom(final_marking);
@@ -1198,6 +1204,22 @@ public class WorkflowDialog extends JDialog {
 							return "Non-final marking with token in "+ out.name() + " reached.";
 						}
 
+						// Detect if any transition is dEnabled from last marking (not deadlock)
+						String output = "Deadlock reached.";
+						NetworkMarking oldMarking = model.marking();
+						model.setMarking(final_marking);
+						outer: for( TimedArcPetriNet temp : model.activeTemplates()){
+							Iterator<TimedTransition> transitionIterator = temp.transitions().iterator();
+							while (transitionIterator.hasNext()) {
+								TimedTransition tempTransition = transitionIterator.next();
+								if (tempTransition.isDEnabled()){
+									output = "Marking reached with no trace to " + out.name() + ".";
+									break outer;
+								}
+							}
+						}
+						model.setMarking(oldMarking);
+						
 						return output;
 					}
 				});
@@ -1211,7 +1233,7 @@ public class WorkflowDialog extends JDialog {
 				(Integer) numberOfExtraTokensInNet.getValue(),
 				numberOfExtraTokensInNet);
 	}
-	
+
 	private TAPNNetworkTrace mapTraceToRealModel(TAPNNetworkTrace tapnNetworkTrace){
 		TraceConverter converter = new TraceConverter(tapnNetworkTrace, CreateGui.getCurrentTab().network());
 		return converter.convert();
