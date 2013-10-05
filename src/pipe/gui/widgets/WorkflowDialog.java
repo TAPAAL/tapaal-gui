@@ -211,7 +211,7 @@ public class WorkflowDialog extends JDialog {
 		super(frame, title, modal);
 
 		initComponents();
-		if(clearResults)	resultPanel.setVisible(false);
+		if(clearResults && resultPanel != null)	resultPanel.setVisible(false);
 		setContentPane(panel);
 	}
 
@@ -445,6 +445,7 @@ public class WorkflowDialog extends JDialog {
 			resultPanel.setBorder(BorderFactory
 					.createTitledBorder("Results"));
 			resultPanel.setLayout(new GridBagLayout());
+			resultPanel.setVisible(false);
 		}
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -1107,7 +1108,7 @@ public class WorkflowDialog extends JDialog {
 								for(Tuple<TAPNNetworkTraceStep, Tuple<Integer, Integer>> checkStep : detectLoops){
 									if(checkStep.value1().equals(step) && checkStep.value2().value1() < delay){
 										loopIndex = checkStep.value2().value2();
-										setStrongSoundnessResult(false, "Infinite computation found.");
+										setStrongSoundnessResult(false, "Infinite trace found.");
 										type = TraceType.EG_LOOP;
 										break outer;
 									}
