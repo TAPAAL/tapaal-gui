@@ -86,6 +86,8 @@ public class WorkflowDialog extends JDialog {
 	private static final String TOOLTIP_STRONGSOUNDNESS = "Strong soundness";
 	private static final String TOOLTIP_MAX = "Maximum duration";
 	
+	private static final String DISCRETE_SEMANTICS_WARNING = "Because the model contains age intervals and/or urgent transitions, results are only valid with the discrete semantics.";
+	
 	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of workflow:";
 	private static final String LABEL_INPUT_PLACE = "Input place of workflow:";
 	private static final String LABEL_OUTPUT_PLACE = "Output place of workflow:";
