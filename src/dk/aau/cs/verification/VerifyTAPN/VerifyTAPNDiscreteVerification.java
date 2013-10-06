@@ -311,6 +311,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 			runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
+		System.out.println(createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 
 			if (runner.error()) {
 				return null;

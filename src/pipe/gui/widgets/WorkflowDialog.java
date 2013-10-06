@@ -150,6 +150,7 @@ public class WorkflowDialog extends JDialog {
 	private TimedPlace out;
 
 	private static boolean isSound = false;
+	private static boolean isConclusive = true;
 	private static long m;
 	private static int B;
 	private static int min_exec;
@@ -897,6 +898,7 @@ public class WorkflowDialog extends JDialog {
 
 		verificationQueue.clear();
 		isSound = false;
+		isConclusive = true;
 		min_exec = -1;
 
 		verificationQueue.add(getSoundnessRunnable());
@@ -1022,7 +1024,7 @@ public class WorkflowDialog extends JDialog {
 
 				// Check preliminary conditions
 				if(!isSound){
-					setStrongSoundnessResult(false,"Model is not sound.");
+					setStrongSoundnessResult(false,isConclusive?"Model is not sound.":"Model soundness check was inconclusive.", isConclusive);
 					return;
 				}
 
@@ -1151,14 +1153,23 @@ public class WorkflowDialog extends JDialog {
 		maxResultLabel.setVisible(true);
 		dialog.pack();
 	}
-
+	
 	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
+		setStrongSoundnessResult(satisfied, explanation, true);
+	}
+
+	private void setStrongSoundnessResult(boolean satisfied, String explanation, boolean conclusive) {
 		if (satisfied) {
 			strongSoundnessResult.setText("The property is satisfied.");
 			strongSoundnessResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 		} else {
-			strongSoundnessResult.setText("The property is NOT satisfied.");
-			strongSoundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+			if(conclusive){
+				strongSoundnessResult.setText("The property is NOT satisfied.");
+				strongSoundnessResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
+			}else{
+				strongSoundnessResult.setText("The result is inconclusive.");
+				strongSoundnessResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
+			}
 			if(max.isSelected()){
 				maxResult.setText("Not defined.");
 				maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
@@ -1216,7 +1227,7 @@ public class WorkflowDialog extends JDialog {
 							.setText("The search was inconclusive.");
 							soundnessResult
 							.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
-
+							isConclusive = false;
 							soundnessResultExplanation.setText("Try to increase the number of extra tokens.");
 							soundnessResultExplanation.setVisible(true);
 						} else {
