@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import javax.swing.event.ChangeListener;
 
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
-import pipe.gui.graphicElements.Transition;
 import pipe.dataLayer.*;
 import pipe.dataLayer.TAPNQuery.ExtrapolationOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -37,7 +35,6 @@ import pipe.dataLayer.TAPNQuery.WorkflowMode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLTrueNode;
-import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantBound;
@@ -153,9 +150,6 @@ public class WorkflowDialog extends JDialog {
 	private static boolean isConclusive = true;
 	private static long m;
 	private static int B;
-	private static int min_exec;
-	private static long strongSoundnessSequenceTimer;
-	private static int strongSoundnessPeakMemory;
 	private static Constant c = null;
 	private static TimedPlace done = null;
 
@@ -480,11 +474,16 @@ public class WorkflowDialog extends JDialog {
 				}
 			});
 			resultPanel.add(soundnessResultTraceButton, gbc);
+			
+			gbc.gridx = 3;
+			soundnessVerificationStats = new JLabel();
+			soundnessVerificationStats.setVisible(false);
+			resultPanel.add(soundnessVerificationStats, gbc);
 
 			soundnessResultExplanation = new JLabel();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
-			gbc.gridwidth = 3;
+			gbc.gridwidth = 4;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			soundnessResultExplanation.setVisible(false);
 			soundnessResultExplanation.setEnabled(false);
@@ -543,11 +542,16 @@ public class WorkflowDialog extends JDialog {
 				}
 			});
 			resultPanel.add(strongSoundnessResultTraceButton, gbc);
-
+			
+			strongSoundnessVerificationStats = new JLabel();
+			gbc.gridx = 3;
+			strongSoundnessVerificationStats.setVisible(false);
+			resultPanel.add(strongSoundnessVerificationStats, gbc);
+			
 			strongSoundnessResultExplanation = new JLabel();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
-			gbc.gridwidth = 3;
+			gbc.gridwidth = 4;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			strongSoundnessResultExplanation.setVisible(false);
 			strongSoundnessResultExplanation.setEnabled(false);
@@ -586,7 +590,7 @@ public class WorkflowDialog extends JDialog {
 
 		if (netType == TAWFNTypes.ETAWFN) {
 			gbc.gridx = 0;
-			gbc.gridy = 5;
+			gbc.gridy = 6;
 			panel.add(new JLabel(" Number of extra tokens:  "), gbc);
 
 			if (numberOfExtraTokensInNet == null)
@@ -623,33 +627,6 @@ public class WorkflowDialog extends JDialog {
 					checkBound();
 				}
 			});
-
-
-			/* TODO To add */
-
-
-
-
-			soundnessVerificationStats = new JLabel();
-			gbc.gridx = 0;
-			gbc.gridy = 4;
-			gbc.gridwidth = 3;
-			soundnessVerificationStats.setVisible(false);
-			//soundnessPanel.add(soundnessVerificationStats, gbc);
-
-
-
-			strongSoundnessVerificationStats = new JLabel();
-			gbc.gridx = 0;
-			gbc.gridy = 5;
-			gbc.gridwidth = 2;
-			strongSoundnessVerificationStats.setVisible(false);
-			//strongSoundnessPanel.add(strongSoundnessVerificationStats, gbc);
-
-			gbc.gridwidth = 1;
-
-			//strongSoundnessPanel.setEnabled(strongSoundness.isSelected());
-
 		}
 
 		JButton checkIfSound = new JButton("Check properties");
@@ -889,9 +866,9 @@ public class WorkflowDialog extends JDialog {
 		maxResultLabel.setVisible(false);
 		maxResultTraceButton.setVisible(false);
 		soundnessResultExplanation.setVisible(false);
-		//soundnessVerificationStats.setVisible(false);
+		soundnessVerificationStats.setVisible(false);
 		strongSoundnessResultExplanation.setVisible(false);
-		//strongSoundnessVerificationStats.setVisible(false);
+		strongSoundnessVerificationStats.setVisible(false);
 		resultPanel.setVisible(true);
 
 		dialog.pack();
@@ -899,7 +876,6 @@ public class WorkflowDialog extends JDialog {
 		verificationQueue.clear();
 		isSound = false;
 		isConclusive = true;
-		min_exec = -1;
 
 		verificationQueue.add(getSoundnessRunnable());
 
@@ -1083,14 +1059,14 @@ public class WorkflowDialog extends JDialog {
 							}
 						}
 						
-						strongSoundnessResult.setToolTipText(result
-								.getVerificationTimeString()
-								+ ", peak memory usage: "
+						
+						strongSoundnessVerificationStats.setText(result
+								.getVerificationTimeString().replace("Estimated verification time", "Est. time")
+								+ ", memory: "
 								+ MemoryMonitor.getPeakMemory());
-						maxResult.setToolTipText(result
-								.getVerificationTimeString()
-								+ ", peak memory usage: "
-								+ MemoryMonitor.getPeakMemory());
+						strongSoundnessVerificationStats.setVisible(true);
+						
+						dialog.pack();
 					}
 
 					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
@@ -1221,7 +1197,6 @@ public class WorkflowDialog extends JDialog {
 							soundnessResult
 							.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 							isSound = true;
-							min_exec = result.stats().minimumExecutionTime();
 						} else if (netType == TAWFNTypes.ETAWFN && !result.isBounded()) {
 							soundnessResult
 							.setText("The search was inconclusive.");
@@ -1259,19 +1234,11 @@ public class WorkflowDialog extends JDialog {
 							minResult.setVisible(true);
 						}
 
-						soundnessResult.setToolTipText(result
-								.getVerificationTimeString()
-								+ ", peak memory usage: "
+						soundnessVerificationStats.setText(result
+								.getVerificationTimeString().replace("Estimated verification time", "Est. time")
+								+ ", memory: "
 								+ MemoryMonitor.getPeakMemory());
-						minResult.setToolTipText(result
-								.getVerificationTimeString()
-								+ ", peak memory usage: "
-								+ MemoryMonitor.getPeakMemory());
-						/*soundnessVerificationStats.setText(result
-								.getVerificationTimeString()
-								+ ", peak memory usage: "
-								+ MemoryMonitor.getPeakMemory());
-						soundnessVerificationStats.setVisible(true);*/
+						soundnessVerificationStats.setVisible(true);
 
 						m = result.stats().exploredStates();
 
