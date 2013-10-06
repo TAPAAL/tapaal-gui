@@ -599,9 +599,8 @@ public class WorkflowDialog extends JDialog {
 			numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 			numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
-			gbc.gridx = 0;
+			gbc.gridx = 1;
 			gbc.gridy = 6;
-			gbc.gridwidth = 2;
 			panel.add(numberOfExtraTokensInNet, gbc);
 
 			numberOfExtraTokensInNet.addChangeListener(new ChangeListener() {
