@@ -189,7 +189,7 @@ public class WorkflowDialog extends JDialog {
 		if(CreateGui.getCurrentTab().getWorkflowDialog() == null){
 			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true));
 		}
-		if(!CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode){
+		if(!CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode && CreateGui.getCurrentTab().getWorkflowDialog().resultPanel != null){
 			CreateGui.getCurrentTab().getWorkflowDialog().resultPanel.setVisible(false);
 			CreateGui.getCurrentTab().getWorkflowDialog().pack();
 			
@@ -853,7 +853,7 @@ public class WorkflowDialog extends JDialog {
 				errorMsgs.add("No output place found.");
 		}
 
-		if (numberOfTokensInNet > 1 || in.tokens().size() != 1) {
+		if (numberOfTokensInNet > 1 || (in != null && in.tokens().size() != 1)) {
 			if(errorMsgs.size() > 5)	errors++;
 			else
 				errorMsgs
