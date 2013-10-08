@@ -82,45 +82,45 @@ public class WorkflowDialog extends JDialog {
 		return buffer.toString(); 
 	}
 	
-	private static final String TOOLTIP_SOUNDNESS = "Soundness";
-	private static final String TOOLTIP_MIN = "Minimum duration";
-	private static final String TOOLTIP_STRONGSOUNDNESS = "Strong soundness";
-	private static final String TOOLTIP_MAX = "Maximum duration";
+	private static final String TOOLTIP_SOUNDNESS = "Soundness (option for proper termination)";
+	private static final String TOOLTIP_MIN = "Compute the minimum duration of the workflow";
+	private static final String TOOLTIP_STRONGSOUNDNESS = "Strong soundness (proper termination within a bounded time";
+	private static final String TOOLTIP_MAX = "Compute the maximum duration of the workflow";
 	
-	private static final String DISCRETE_SEMANTICS_WARNING = "<html>Because the workflow contains age intervals and/or urgent transitions,<br /> this result is only valid with the discrete semantics.</html>";
+	private static final String DISCRETE_SEMANTICS_WARNING = "<html>Because the workflow contains age invariants and/or urgent transitions,<br /> this result is only valid for the discrete semantics (integer delays).</html>";
 	
-	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of workflow:";
-	private static final String LABEL_INPUT_PLACE = "Input place of workflow:";
-	private static final String LABEL_OUTPUT_PLACE = "Output place of workflow:";
+	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of the workflow:";
+	private static final String LABEL_INPUT_PLACE = "Input place of the workflow:";
+	private static final String LABEL_OUTPUT_PLACE = "Output place of the workflow:";
 	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
 	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
 	private static final String LABEL_INVARIANTS = "Invariants:";
 
 	private static final String LABEL_RESULT_SOUND = "Soundness:";
-	private static final String LABEL_RESULT_MIN = "Minimum execution time:";
+	private static final String LABEL_RESULT_MIN = "Minimum duration:";
 	private static final String LABEL_RESULT_STRONG_SOUND = "Strong soundness:";
-	private static final String LABEL_RESULT_MAX = "Maximum execution time:";
+	private static final String LABEL_RESULT_MAX = "Maximum duration:";
 	
 	private static final String RESULT_STRING_SATISFIED = "Satisfied";
 	private static final String RESULT_STRING_NOT_SATISFIED = "Not satisfied";
 	private static final String RESULT_STRING_INCONCLUSIVE = "Inconclusive";
-	private static final String RESULT_NOT_DEFINED = "Not defined";
+	private static final String RESULT_NOT_DEFINED = "Undefined";
 	
 	private static final String ERROR_INCREASE_BOUND = "Try to increase the number of extra tokens.";
 
 	/* Soundness */
 	
-	private static final String RESULT_ERROR_NONFINAL_REACHED = "Non-final marking with token in output place reached.";
-	private static final String RESULT_ERROR_NO_TRACE_TO_FINAL = "Marking reached with no trace to a final marking.";
+	private static final String RESULT_ERROR_NONFINAL_REACHED = "A non-final marking with a token in the output place is reachable.";
+	private static final String RESULT_ERROR_NO_TRACE_TO_FINAL = "A marking is reachable from which a final marking cannot be reached.";
 	
 	/* Strong Soundness */
 	
-	private static final String RESULT_ERROR_CYCLE = "Infinite trace found.";
-	private static final String RESULT_ERROR_TIME = "Time divergent marking found.";
+	private static final String RESULT_ERROR_CYCLE = "The workflow has an infinite time-diverging execution.";
+	private static final String RESULT_ERROR_TIME = "A time divergent marking is reachable.";
 	/* Syntax */
 	
-	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
-	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
+	private static final String ERROR_MULTIPLE_IN = "Multiple input places found.";
+	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found.";
 
 	private static final long serialVersionUID = 5613743579411748200L;
 
@@ -248,7 +248,7 @@ public class WorkflowDialog extends JDialog {
 
 		JPanel informationPanel = new JPanel();
 		informationPanel.setBorder(BorderFactory
-				.createTitledBorder("About Workflow"));
+				.createTitledBorder("About the Workflow"));
 		informationPanel.setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -407,7 +407,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.insets = new Insets(5, 5, 5, 5);
 
 		JPanel soundnessPanel = new JPanel();
-		soundnessPanel.setBorder(BorderFactory.createTitledBorder("Check Properties"));
+		soundnessPanel.setBorder(BorderFactory.createTitledBorder("Workflow Properties"));
 		soundnessPanel.setLayout(new GridBagLayout());
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -460,7 +460,7 @@ public class WorkflowDialog extends JDialog {
 		if(resultPanel == null){
 			resultPanel = new JPanel();
 			resultPanel.setBorder(BorderFactory
-					.createTitledBorder("Results"));
+					.createTitledBorder("Analysis Results"));
 			resultPanel.setLayout(new GridBagLayout());
 			resultPanel.setVisible(false);
 		}
@@ -656,7 +656,7 @@ public class WorkflowDialog extends JDialog {
 			}
 		});
 
-		JButton checkIfSound = new JButton("Verify workflow");
+		JButton checkIfSound = new JButton("Analyse the workflow");
 		getRootPane().setDefaultButton(checkIfSound);
 		checkIfSound.addActionListener(new ActionListener() {
 
@@ -745,7 +745,7 @@ public class WorkflowDialog extends JDialog {
 					if(errorMsgs.size() > 5)	errors++;
 					else
 						errorMsgs.add("Place " + p
-								+ " has no in- or out-going arcs.");
+								+ " has no incoming or outgoing arcs.");
 				} else if (isin) {
 					if (in == null) {
 						in = p;
@@ -782,7 +782,7 @@ public class WorkflowDialog extends JDialog {
 					if(errorMsgs.size() > 5)	errors++;
 					else
 						errorMsgs.add("Transition " + t.name()
-								+ " has empty preset.");
+								+ " has no incoming arcs.");
 				}
 
 				if (isMonotonic
@@ -804,7 +804,7 @@ public class WorkflowDialog extends JDialog {
 			}
 			if(errorMsgs.size() > 5)	errors++;
 			else
-				errorMsgs.add("Transition " + st.name() + " has empty preset.");
+				errorMsgs.add("Transition " + st.name() + " has no incoming arcs.");
 			while (sharedTransitions.remove(st)) {
 			}
 		}
@@ -1030,7 +1030,7 @@ public class WorkflowDialog extends JDialog {
 
 				// Check preliminary conditions
 				if(!isSound){
-					setStrongSoundnessResult(false,isConclusive?"Workflow is not sound.":"Workflow soundness check was inconclusive.", isConclusive);
+					setStrongSoundnessResult(false,isConclusive?"The workflow is not sound.":"The workflow soundness check was inconclusive.", isConclusive);
 					return;
 				}
 
@@ -1311,7 +1311,7 @@ public class WorkflowDialog extends JDialog {
 										soundnessResultTrace = mapTraceToRealModel(result.getTrace());
 										soundnessResultTraceButton.setVisible(true);
 									}else{
-										soundnessResultExplanation.setText("<html>"+ explanationText + "<br />Could not generate trace with "+numberOfExtraTokensInNet.getValue().toString() + "extra tokens.</html>");
+										soundnessResultExplanation.setText("<html>"+ explanationText + "<br />Could not generate trace with "+numberOfExtraTokensInNet.getValue().toString() + " extra tokens.</html>");
 									}
 								}
 							}
