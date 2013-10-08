@@ -108,6 +108,8 @@ public class WorkflowDialog extends JDialog {
 	private static final String RESULT_STRING_NOT_SATISFIED = "Not satisfied";
 	private static final String RESULT_STRING_INCONCLUSIVE = "Inconclusive";
 
+	private static final String ERROR_NONFINAL_REACHED = "Non-final marking with token in output place reached.";
+	
 	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
 	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
 
@@ -1270,8 +1272,7 @@ public class WorkflowDialog extends JDialog {
 										new TCTLEFNode(new TCTLAtomicPropositionNode(out.isShared()?"":out_template.name(), out.name(), ">=",1)), TraceOption.SOME,
 										SearchOption.HEURISTIC,
 										ReductionOption.VerifyTAPNdiscreteVerification, true,
-										false, false, null, ExtrapolationOption.AUTOMATIC,
-										WorkflowMode.NOT_WORKFLOW);
+										true, true, null, ExtrapolationOption.AUTOMATIC);
 						Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 							@Override
@@ -1280,11 +1281,26 @@ public class WorkflowDialog extends JDialog {
 
 							@Override
 							public void run(VerificationResult<TAPNNetworkTrace> result) {
-								// TODO add trace
-								
-								soundnessResultExplanation.setText(explanationText);
-								soundnessResultTraceButton.setVisible(true);
 								model.setMarking(oldMarking);
+								soundnessResultExplanation.setText(explanationText);
+								if(result.isQuerySatisfied()){
+									appendTrace(mapTraceToRealModel(result.getTrace()));
+									soundnessResultExplanation.setText(ERROR_NONFINAL_REACHED);
+									soundnessResultTraceButton.setVisible(true);
+								}else{
+									if(result.isBounded()){
+										soundnessResultTrace = mapTraceToRealModel(result.getTrace());
+										soundnessResultTraceButton.setVisible(true);
+									}else{
+										soundnessResultExplanation.setText("<html>"+ explanationText + "<br />Could not generate trace with "+numberOfExtraTokensInNet.getValue().toString() + "extra tokens.</html>");
+									}
+								}
+							}
+
+							private void appendTrace(TAPNNetworkTrace trace) {
+								for(TAPNNetworkTraceStep step : trace){
+									((TimedTAPNNetworkTrace) soundnessResultTrace).add(step);
+								}
 							}
 						});
 
@@ -1301,7 +1317,7 @@ public class WorkflowDialog extends JDialog {
 
 						int out_size = final_marking.getTokensFor(out).size();
 						if(out_size > 0 && final_marking.size() > out_size){
-							return "Non-final marking with token in "+ out.name() + " reached.";
+							return ERROR_NONFINAL_REACHED;
 						}
 
 						// Detect if any transition is dEnabled from last marking (not deadlock)
