@@ -1348,7 +1348,7 @@ public class WorkflowDialog extends JDialog {
 						}
 
 						// Detect if any transition is dEnabled from last marking (not deadlock)
-						String output = "Deadlock reached.";
+						String output = "A non-final deadlock marking is reachable.";
 						NetworkMarking oldMarking = model.marking();
 						model.setMarking(final_marking);
 						outer: for( TimedArcPetriNet temp : model.activeTemplates()){
