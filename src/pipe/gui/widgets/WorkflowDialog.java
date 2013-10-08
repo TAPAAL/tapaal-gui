@@ -239,10 +239,10 @@ public class WorkflowDialog extends JDialog {
 		setContentPane(panel);
 
 		pack();
-		final Toolkit toolkit = Toolkit.getDefaultToolkit();
-		final Dimension screenSize = toolkit.getScreenSize();
-		final int x = (screenSize.width - getWidth()) / 2;
-		final int y = (int) ((screenSize.height - getHeight()) / 2 * 0.8);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screenSize = toolkit.getScreenSize();
+		int x = (screenSize.width - getWidth()) / 2;
+		int y = (int) ((screenSize.height - getHeight()) / 2 * 0.8);
 		setLocation(x, y);
 		setResizable(true);
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
