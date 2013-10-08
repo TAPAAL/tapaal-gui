@@ -86,10 +86,10 @@ public class WorkflowDialog extends JDialog {
 		return buffer.toString(); 
 	}
 	
-	private static final String TOOLTIP_SOUNDNESS = "Soundness (option for proper termination)";
-	private static final String TOOLTIP_MIN = "Compute the minimum duration of the workflow";
-	private static final String TOOLTIP_STRONGSOUNDNESS = "Strong soundness (proper termination within a bounded time";
-	private static final String TOOLTIP_MAX = "Compute the maximum duration of the workflow";
+	private static final String TOOLTIP_SOUNDNESS = "Soundness (option for proper termination).";
+	private static final String TOOLTIP_MIN = "Calculate the minimum duration of the workflow.";
+	private static final String TOOLTIP_STRONGSOUNDNESS = "Strong soundness (proper termination within a bounded time).";
+	private static final String TOOLTIP_MAX = "Calculate the maximum duration of the workflow.";
 	
 	private static final String DISCRETE_SEMANTICS_WARNING = "<html>Because the workflow contains age invariants and/or urgent transitions,<br /> this result is only valid for the discrete semantics (integer delays).</html>";
 	
