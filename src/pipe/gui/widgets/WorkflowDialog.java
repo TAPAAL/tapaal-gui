@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,6 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
@@ -69,7 +71,7 @@ import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class WorkflowDialog extends JDialog {
 
-	private String getHelpMessage(){ 
+	private static String getHelpMessage(){ 
 		// There is automatic word wrapping in the control that displays the text, so you don't need line breaks in paragraphs.
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<html>");
@@ -124,64 +126,58 @@ public class WorkflowDialog extends JDialog {
 
 	private static final long serialVersionUID = 5613743579411748200L;
 
-	static WorkflowDialog dialog;
-
 	private JPanel panel;
 
-	private static JCheckBox soundness = null;
-	private static JCheckBox strongSoundness = null;
-	private static JCheckBox min = null;
-	private static JCheckBox max = null;
+	private JCheckBox soundness = null;
+	private JCheckBox strongSoundness = null;
+	private JCheckBox min = null;
+	private JCheckBox max = null;
 
-	private static JLabel soundnessResult;
-	private static JLabel strongSoundnessResult;
-	private static JLabel soundnessResultExplanation;
-	private static JLabel strongSoundnessResultExplanation;
-	private static JButton soundnessResultTraceButton;
-	private static TAPNNetworkTrace soundnessResultTrace = null;
-	private static JLabel minResult;
-	private static JButton minResultTraceButton;
-	private static TAPNNetworkTrace minResultTrace = null;
-	private static JLabel maxResult;
-	private static TAPNNetworkTrace maxResultTrace = null;
-	private static JButton maxResultTraceButton;
-	private static TAPNNetworkTrace strongSoundnessResultTrace = null;
-	private static JButton strongSoundnessResultTraceButton;
-	private static JLabel soundnessVerificationStats;
-	private static JLabel strongSoundnessVerificationStats;
+	private JLabel soundnessResult;
+	private JLabel strongSoundnessResult;
+	private JLabel soundnessResultExplanation;
+	private JLabel strongSoundnessResultExplanation;
+	private JButton soundnessResultTraceButton;
+	private TAPNNetworkTrace soundnessResultTrace = null;
+	private JLabel minResult;
+	private JButton minResultTraceButton;
+	private TAPNNetworkTrace minResultTrace = null;
+	private JLabel maxResult;
+	private TAPNNetworkTrace maxResultTrace = null;
+	private JButton maxResultTraceButton;
+	private TAPNNetworkTrace strongSoundnessResultTrace = null;
+	private JButton strongSoundnessResultTraceButton;
+	private JLabel soundnessVerificationStats;
+	private JLabel strongSoundnessVerificationStats;
 
-	private static JLabel soundnessResultLabel;
-	private static JLabel minResultLabel;
-	private static JLabel strongSoundnessResultLabel;
-	private static JLabel maxResultLabel;
+	private JLabel soundnessResultLabel;
+	private JLabel minResultLabel;
+	private JLabel strongSoundnessResultLabel;
+	private JLabel maxResultLabel;
 
-	private static JPanel resultPanel = null;
+	private JPanel resultPanel = null;
 
-	private static CustomJSpinner numberOfExtraTokensInNet = null;
+	private CustomJSpinner numberOfExtraTokensInNet = null;
 
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
 	private int errors = 0;
 	private LinkedList<Runnable> verificationQueue = new LinkedList<Runnable>();
-	private static ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
+	private ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
 
 	private TimedPlace in;
 	private TimedPlace out;
 	private TimedArcPetriNet out_template;
 
-	private static boolean isSound = false;
-	private static boolean isConclusive = true;
-	private static long m;
-	private static int B;
-	private static Constant c = null;
-	private static TimedPlace done = null;
+	private boolean isSound = false;
+	private boolean isConclusive = true;
+	private long m;
+	private int B;
+	private Constant c = null;
+	private TimedPlace done = null;
 
-	private static TimedArcPetriNetNetwork model = null;
-
-	private static boolean restoreDialog = false;
-
-	public static boolean restoreDialog(){
-		return restoreDialog;
-	}
+	private TimedArcPetriNetNetwork model = null;
+	
+	private boolean isInTraceMode = false;
 
 	private enum TAWFNTypes {
 		ETAWFN, MTAWFN, NOTTAWFN
@@ -189,7 +185,32 @@ public class WorkflowDialog extends JDialog {
 
 	TAWFNTypes netType;
 
-	public static void showDialog(boolean clearResults) {
+	public static void showDialog() {
+		if(CreateGui.getCurrentTab().getWorkflowDialog() == null){
+			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true));
+		}
+		if(!CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode){
+			CreateGui.getCurrentTab().getWorkflowDialog().resultPanel.setVisible(false);
+			CreateGui.getCurrentTab().getWorkflowDialog().pack();
+			
+		}
+		CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode = false;
+		CreateGui.getCurrentTab().getWorkflowDialog().setVisible(true);
+	}
+
+	public boolean restoreWindow(){
+		return isInTraceMode;
+	}
+	
+	private void switchToTrace(TAPNNetworkTrace trace){
+		isInTraceMode = true;
+		setVisible(false);
+		CreateGui.getApp().setGUIMode(GUIMode.animation);
+		CreateGui.getAnimator().SetTrace(trace);
+	}
+
+	private WorkflowDialog(Frame frame, String title, boolean modal) {
+		super(frame, title, modal);
 
 		/* Copy model */
 
@@ -207,29 +228,13 @@ public class WorkflowDialog extends JDialog {
 
 		/* Make dialog */
 
-		dialog = new WorkflowDialog(clearResults, CreateGui.getApp(), "Workflow Analysis", false);
-		dialog.setModal(false);
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
-		dialog.setResizable(true);
-		dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		dialog.setVisible(true);
-		restoreDialog = false;
-	}
-
-	private void switchToTrace(TAPNNetworkTrace trace){
-		restoreDialog = true;
-		dialog.setVisible(false);
-		CreateGui.getApp().setGUIMode(GUIMode.animation);
-		CreateGui.getAnimator().SetTrace(trace);
-	}
-
-	private WorkflowDialog(boolean clearResults, Frame frame, String title, boolean modal) {
-		super(frame, title, modal);
-
 		initComponents();
-		if(clearResults && resultPanel != null)	resultPanel.setVisible(false);
 		setContentPane(panel);
+		
+		pack();
+		setLocationRelativeTo(null);
+		setResizable(true);
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 	}
 
 	private void initComponents() {
@@ -351,7 +356,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dialog.dispose();
+				setVisible(false);
 			}
 		});
 
@@ -899,7 +904,7 @@ public class WorkflowDialog extends JDialog {
 		strongSoundnessVerificationStats.setVisible(false);
 		resultPanel.setVisible(true);
 
-		dialog.pack();
+		pack();
 
 		verificationQueue.clear();
 		isSound = false;
@@ -1081,7 +1086,7 @@ public class WorkflowDialog extends JDialog {
 								+ MemoryMonitor.getPeakMemory());
 						strongSoundnessVerificationStats.setVisible(true);
 						
-						dialog.pack();
+						pack();
 					}
 
 					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
@@ -1142,7 +1147,7 @@ public class WorkflowDialog extends JDialog {
 		maxResult.setForeground(Pipe.QUERY_SATISFIED_COLOR);
 		maxResult.setVisible(true);
 		maxResultLabel.setVisible(true);
-		dialog.pack();
+		pack();
 	}
 	
 	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
@@ -1176,7 +1181,7 @@ public class WorkflowDialog extends JDialog {
 		strongSoundnessResultLabel.setVisible(true);
 		strongSoundnessResult.setVisible(true);
 		
-		dialog.pack();
+		pack();
 	}
 
 	private Runnable getSoundnessRunnable() {
@@ -1261,7 +1266,7 @@ public class WorkflowDialog extends JDialog {
 
 						m = result.stats().exploredStates();
 
-						dialog.pack();
+						pack();
 					}
 
 					private void completeSoundnessTrace(final VerificationResult<TAPNNetworkTrace> soundnessResult, final NetworkMarking coveredMarking) {
