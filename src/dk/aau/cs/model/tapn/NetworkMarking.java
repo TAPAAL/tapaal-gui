@@ -281,4 +281,14 @@ public class NetworkMarking implements TimedMarking {
 		}
 		
 	}
+	
+	/**
+	 * Removes all tokens from marking
+	 */
+	public void clear(){
+		sharedPlacesTokens.clear();
+		for(TimedArcPetriNet key : markings.keySet()){
+			markings.get(key).clear();
+		}
+	}
 }

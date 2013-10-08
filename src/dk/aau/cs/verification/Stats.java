@@ -1,8 +1,12 @@
 package dk.aau.cs.verification;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -17,10 +21,10 @@ public class Stats {
 	private long stored;
 	private int minExecutionTime;
 	private int maxExecutionTime;
-	private NetworkMarking coveredMarking;
+	private ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking;
 	private List<Tuple<String,Integer>> transitionStats;
 	
-	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, int minExecutionTime, int maxExecutionTime, NetworkMarking coveredMarking)
+	public Stats(long discovered, long explored, long stored, List<Tuple<String,Integer>> transitionStats, int minExecutionTime, int maxExecutionTime, ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking)
 	{
 		this.discovered = discovered;
 		this.explored = explored;
@@ -69,7 +73,7 @@ public class Stats {
 		return maxExecutionTime;
 	}
 	
-	public NetworkMarking getCoveredMarking(){
+	public ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> getCoveredMarking(){
 		return coveredMarking;
 	}
 	
@@ -87,24 +91,5 @@ public class Stats {
 		buffer.append("Stored markings: ");
 		buffer.append(stored);
 		return buffer.toString();
-	}
-
-	public Stats decomposeCoveredMarking(TimedArcPetriNetNetwork model,
-			Tuple<TimedArcPetriNet, NameMapping> transformedModel) {
-		if(coveredMarking != null){
-			NetworkMarking m = new NetworkMarking();
-			for(TimedPlace p : transformedModel.value1().places()){
-				List<TimedToken> tokens = coveredMarking.getTokensFor(p);
-				if(tokens != null){
-					Tuple<String, String> originalName = transformedModel.value2().map(p.name());
-					TimedPlace real_p = (originalName.value1() == null || originalName.value1().isEmpty()) ? model.getSharedPlaceByName(originalName.value2()) : model.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
-					for(TimedToken t : tokens){
-						m.add(new TimedToken(real_p, t.age()));
-					}
-				}
-			}
-			coveredMarking = m;
-		}
-		return this;
 	}
 }

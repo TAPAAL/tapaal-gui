@@ -10,7 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -142,11 +144,12 @@ public class WorkflowDialog extends JDialog {
 
 	private ArrayList<String> errorMsgs = new ArrayList<String>();
 	private int errors = 0;
-	private ArrayList<Runnable> verificationQueue = new ArrayList<Runnable>();
+	private LinkedList<Runnable> verificationQueue = new LinkedList<Runnable>();
 	private static ArrayList<SharedPlace> unusedSharedPlaces = new ArrayList<SharedPlace>();
 
 	private TimedPlace in;
 	private TimedPlace out;
+	private TimedArcPetriNet out_template;
 
 	private static boolean isSound = false;
 	private static boolean isConclusive = true;
@@ -187,8 +190,8 @@ public class WorkflowDialog extends JDialog {
 
 		/* Make dialog */
 
-		dialog = new WorkflowDialog(clearResults, CreateGui.getApp(), "Workflow Analysis",
-				false);
+		dialog = new WorkflowDialog(clearResults, CreateGui.getApp(), "Workflow Analysis", false);
+		dialog.setModal(false);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setResizable(true);
@@ -844,6 +847,18 @@ public class WorkflowDialog extends JDialog {
 			if(errors > 0)	errorMsgs.add("and "+errors+" other problems.");
 			return TAWFNTypes.NOTTAWFN;
 		}
+		
+		int i = 0;
+		outer: for(TimedArcPetriNet t : model.activeTemplates()){
+			for(TimedPlace p : t.places()){
+				if(p.equals(out)){
+					break outer;
+				}
+			}
+			i++;
+		}
+
+		out_template = model.activeTemplates().get(i);
 
 		return isMonotonic ? TAWFNTypes.MTAWFN : TAWFNTypes.ETAWFN;
 	}
@@ -892,18 +907,8 @@ public class WorkflowDialog extends JDialog {
 	}
 
 	private TimedArcPetriNetNetwork composeStrongSoundnessModel() {
-		int i = 0;
-		outer: for(TimedArcPetriNet t : model.activeTemplates()){
-			for(TimedPlace p : t.places()){
-				if(p.equals(out)){
-					break outer;
-				}
-			}
-			i++;
-		}
-
 		TimedArcPetriNetNetwork network = model.copy();
-		TimedArcPetriNet out_template = network.activeTemplates().get(i);
+		TimedArcPetriNet out_template = network.getTAPNByName(this.out_template.name());
 		TimedPlace out_hook = null;
 
 		for(TimedPlace p : out_template.places()){
@@ -1035,8 +1040,6 @@ public class WorkflowDialog extends JDialog {
 
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
-
 					}
 
 					@Override
@@ -1186,8 +1189,6 @@ public class WorkflowDialog extends JDialog {
 
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
-
 					}
 
 					@Override
@@ -1215,6 +1216,11 @@ public class WorkflowDialog extends JDialog {
 							soundnessResultTraceButton.setVisible(true);
 							soundnessResultExplanation.setText(calculateSoundnessError(result.getTrace()));
 							soundnessResultExplanation.setVisible(true);
+							
+							NetworkMarking coveredMarking = result.getCoveredMarking(model);
+							if(coveredMarking != null){
+								completeSoundnessTrace(result, coveredMarking);
+							}
 						}
 						soundnessResult.setVisible(true);
 						soundnessResultLabel.setVisible(true);
@@ -1244,6 +1250,41 @@ public class WorkflowDialog extends JDialog {
 						m = result.stats().exploredStates();
 
 						dialog.pack();
+					}
+
+					private void completeSoundnessTrace(final VerificationResult<TAPNNetworkTrace> soundnessResult, final NetworkMarking coveredMarking) {
+						final String explanationText = soundnessResultExplanation.getText();
+						soundnessResultExplanation.setText(explanationText + " Computing trace.");
+						soundnessResultTraceButton.setVisible(false);
+						
+						final NetworkMarking oldMarking = model.marking();
+						model.setMarking(coveredMarking);
+
+						final TAPNQuery q = new TAPNQuery(
+								"Workflow computing trace",
+								numberOfExtraTokensInNet == null ? 0
+										: (Integer) numberOfExtraTokensInNet.getValue(),
+										new TCTLEFNode(new TCTLAtomicPropositionNode(out.isShared()?"":out_template.name(), out.name(), ">=",1)), TraceOption.SOME,
+										SearchOption.HEURISTIC,
+										ReductionOption.VerifyTAPNdiscreteVerification, true,
+										false, false, null, ExtrapolationOption.AUTOMATIC,
+										WorkflowMode.NOT_WORKFLOW);
+						Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
+
+							@Override
+							public void run() {
+							}
+
+							@Override
+							public void run(VerificationResult<TAPNNetworkTrace> result) {
+								// TODO add trace
+								
+								soundnessResultExplanation.setText(explanationText);
+								soundnessResultTraceButton.setVisible(true);
+								model.setMarking(oldMarking);
+							}
+						});
+
 					}
 
 					private String calculateSoundnessError(

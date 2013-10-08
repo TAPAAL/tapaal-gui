@@ -1,11 +1,18 @@
 package dk.aau.cs.verification;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
+import dk.aau.cs.model.tapn.NetworkMarking;
+import dk.aau.cs.model.tapn.SharedPlace;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Tuple;
 
 public class VerificationResult<TTrace> {
@@ -110,5 +117,24 @@ public class VerificationResult<TTrace> {
 			    (queryResult.isQuerySatisfied() && queryResult.queryType().equals(QueryType.AG)))))
 	 {return "Verification is inconclusive.\nDisable discrete inclusion or add extra tokens and try again.";  }
 		return queryResult.toString();
+	}
+	
+	public NetworkMarking getCoveredMarking(TimedArcPetriNetNetwork model){
+		
+		if(stats.getCoveredMarking() == null)	return null;
+		
+		NetworkMarking m = model.marking().clone();
+		
+		m.clear();
+		
+		for(Tuple<String, Tuple<BigDecimal, Integer>> token : stats.getCoveredMarking()){
+			Tuple<String, String> originalName = nameMapping.map(token.value1());
+			TimedPlace p = (originalName.value1() == null || originalName.value1().isEmpty()) ? model.getSharedPlaceByName(originalName.value2()) : model.getTAPNByName(originalName.value1()).getPlaceByName(originalName.value2());
+			for(int i = 0; i < token.value2().value2(); i++){
+				m.add(new TimedToken(p, token.value2().value1()));
+			}
+		}
+		
+		return m;
 	}
 }

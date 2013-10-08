@@ -66,7 +66,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					result.verificationTime(),
-					result.stats().decomposeCoveredMarking(model, transformedModel));
+					result.stats());
 			value.setNameMapping(transformedModel.value2());
 			return value;
 		}		
