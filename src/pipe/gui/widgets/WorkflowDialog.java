@@ -1,6 +1,5 @@
 package pipe.gui.widgets;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -13,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -107,8 +104,20 @@ public class WorkflowDialog extends JDialog {
 	private static final String RESULT_STRING_SATISFIED = "Satisfied";
 	private static final String RESULT_STRING_NOT_SATISFIED = "Not satisfied";
 	private static final String RESULT_STRING_INCONCLUSIVE = "Inconclusive";
+	private static final String RESULT_NOT_DEFINED = "Not defined";
+	
+	private static final String ERROR_INCREASE_BOUND = "Try to increase the number of extra tokens.";
 
-	private static final String ERROR_NONFINAL_REACHED = "Non-final marking with token in output place reached.";
+	/* Soundness */
+	
+	private static final String RESULT_ERROR_NONFINAL_REACHED = "Non-final marking with token in output place reached.";
+	private static final String RESULT_ERROR_NO_TRACE_TO_FINAL = "Marking reached with no trace to a final marking.";
+	
+	/* Strong Soundness */
+	
+	private static final String RESULT_ERROR_CYCLE = "Infinite trace found.";
+	private static final String RESULT_ERROR_TIME = "Time divergent marking found.";
+	/* Syntax */
 	
 	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
 	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
@@ -602,6 +611,8 @@ public class WorkflowDialog extends JDialog {
 		if (numberOfExtraTokensInNet == null)
 			numberOfExtraTokensInNet = new CustomJSpinner(model.getDefaultBound(), 0,
 					100000);	// Allow at most 100.000 extra tokens.
+		else
+			numberOfExtraTokensInNet.setValue(model.getDefaultBound());
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
@@ -834,7 +845,7 @@ public class WorkflowDialog extends JDialog {
 		if (out == null) {
 			if(errorMsgs.size() > 5)	errors++;
 			else
-				errorMsgs.add("No input place found.");
+				errorMsgs.add("No output place found.");
 		}
 
 		if (numberOfTokensInNet > 1 || in.tokens().size() != 1) {
@@ -1028,7 +1039,6 @@ public class WorkflowDialog extends JDialog {
 				/* Call engine */
 
 				String template = done.isShared()? ((SharedPlace) done).getComponentsUsingThisPlace().get(0):((LocalTimedPlace) done).model().name();
-				// TODO get place name correct s.t. it is mapped
 				final TAPNQuery q = new TAPNQuery(
 						"Workflow strong soundness checking",
 						numberOfExtraTokensInNet == null ? 0
@@ -1051,7 +1061,7 @@ public class WorkflowDialog extends JDialog {
 							strongSoundnessResultTraceButton.setVisible(true);
 
 							if(max.isSelected()){
-								maxResult.setText("Not defined.");
+								maxResult.setText(RESULT_NOT_DEFINED);
 								maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 								maxResult.setVisible(true);
 							}
@@ -1094,7 +1104,7 @@ public class WorkflowDialog extends JDialog {
 								for(Tuple<TAPNNetworkTraceStep, Tuple<Integer, Integer>> checkStep : detectLoops){
 									if(checkStep.value1().equals(step) && checkStep.value2().value1() < delay){
 										loopIndex = checkStep.value2().value2();
-										setStrongSoundnessResult(false, "Infinite trace found.");
+										setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
 										type = TraceType.EG_LOOP;
 										break outer;
 									}
@@ -1106,7 +1116,7 @@ public class WorkflowDialog extends JDialog {
 
 						if(type == null){
 							type = TraceType.EG_DELAY_FOREVER;
-							setStrongSoundnessResult(false, "Time divergent marking found.");
+							setStrongSoundnessResult(false, RESULT_ERROR_TIME);
 							loopIndex = divergentIndex;
 						}
 
@@ -1152,7 +1162,7 @@ public class WorkflowDialog extends JDialog {
 				strongSoundnessResult.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
 			}
 			if(max.isSelected()){
-				maxResult.setText("Not defined.");
+				maxResult.setText(RESULT_NOT_DEFINED);
 				maxResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 				maxResultLabel.setVisible(true);
 				maxResult.setVisible(true);
@@ -1166,9 +1176,6 @@ public class WorkflowDialog extends JDialog {
 		strongSoundnessResultLabel.setVisible(true);
 		strongSoundnessResult.setVisible(true);
 		
-		//strongSoundnessVerificationStats.setText("Estimated verification time: "+ ((new Date().getTime()-strongSoundnessSequenceTimer) / 1000) + "s, peak memory usage: " + strongSoundnessPeakMemory + "MB");
-		//strongSoundnessVerificationStats.setVisible(true);
-
 		dialog.pack();
 	}
 
@@ -1210,7 +1217,7 @@ public class WorkflowDialog extends JDialog {
 							soundnessResult
 							.setForeground(Pipe.QUERY_INCONCLUSIVE_COLOR);
 							isConclusive = false;
-							soundnessResultExplanation.setText("Try to increase the number of extra tokens.");
+							soundnessResultExplanation.setText(ERROR_INCREASE_BOUND);
 							soundnessResultExplanation.setVisible(true);
 						} else {
 							soundnessResult
@@ -1239,7 +1246,7 @@ public class WorkflowDialog extends JDialog {
 								minResultTrace = mapTraceToRealModel(result.getTrace());
 								minResultTraceButton.setVisible(true);
 							}else{
-								minResult.setText("Not defined.");
+								minResult.setText(RESULT_NOT_DEFINED);
 								minResult.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 							}
 							minResultLabel.setVisible(true);
@@ -1285,7 +1292,7 @@ public class WorkflowDialog extends JDialog {
 								soundnessResultExplanation.setText(explanationText);
 								if(result.isQuerySatisfied()){
 									appendTrace(mapTraceToRealModel(result.getTrace()));
-									soundnessResultExplanation.setText(ERROR_NONFINAL_REACHED);
+									soundnessResultExplanation.setText(RESULT_ERROR_NONFINAL_REACHED);
 									soundnessResultTraceButton.setVisible(true);
 								}else{
 									if(result.isBounded()){
@@ -1317,7 +1324,7 @@ public class WorkflowDialog extends JDialog {
 
 						int out_size = final_marking.getTokensFor(out).size();
 						if(out_size > 0 && final_marking.size() > out_size){
-							return ERROR_NONFINAL_REACHED;
+							return RESULT_ERROR_NONFINAL_REACHED;
 						}
 
 						// Detect if any transition is dEnabled from last marking (not deadlock)
@@ -1329,7 +1336,7 @@ public class WorkflowDialog extends JDialog {
 							while (transitionIterator.hasNext()) {
 								TimedTransition tempTransition = transitionIterator.next();
 								if (tempTransition.isDEnabled()){
-									output = "Marking reached with no trace to a final marking.";
+									output = RESULT_ERROR_NO_TRACE_TO_FINAL;
 									break outer;
 								}
 							}
