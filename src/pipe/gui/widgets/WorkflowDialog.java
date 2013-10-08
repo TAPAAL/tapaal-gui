@@ -26,8 +26,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.dataLayer.*;
@@ -299,7 +297,24 @@ public class WorkflowDialog extends JDialog {
 			workflowTypeError.setVisible(true);
 			break;
 		}
+		
+		/* Initialize component to store settings */
+		if (soundness == null)
+			soundness = new JCheckBox("Check soundness.");
 
+		if (min == null){
+			min = new JCheckBox("Calculate minimum duration.");
+			min.setSelected(true);
+			min.setToolTipText(TOOLTIP_MIN);
+		}
+		
+		if (strongSoundness == null)
+			strongSoundness = new JCheckBox("Check strong soundness.");
+		
+		if (max == null)
+			max = new JCheckBox("Calculate maximum duration.");
+		
+		
 		if (netType != TAWFNTypes.NOTTAWFN) {
 			gbc.gridy = 1;
 			gbc.gridx = 0;
@@ -341,6 +356,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridx = 0;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.NONE;
 		JButton help_button = new JButton("Help");
 		help_button.addActionListener(new ActionListener() {
 
@@ -400,33 +416,21 @@ public class WorkflowDialog extends JDialog {
 
 		gbc.gridwidth = 1;
 
-		if (soundness == null)
-			soundness = new JCheckBox("Check soundness.");
 		soundness.setToolTipText(TOOLTIP_SOUNDNESS);
 		soundness.setSelected(true);
 		soundness.setEnabled(false);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		soundnessPanel.add(soundness, gbc);
-
-		if (min == null){
-			min = new JCheckBox("Calculate minimum duration.");
-			min.setSelected(true);
-			min.setToolTipText(TOOLTIP_MIN);
-		}
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		soundnessPanel.add(min, gbc);
 
-		if (strongSoundness == null)
-			strongSoundness = new JCheckBox("Check strong soundness.");
 		strongSoundness.setToolTipText(TOOLTIP_STRONGSOUNDNESS);
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		soundnessPanel.add(strongSoundness, gbc);
 
-		if (max == null)
-			max = new JCheckBox("Calculate maximum duration.");
 		max.setToolTipText(TOOLTIP_MAX);
 		gbc.gridx = 1;
 		gbc.gridy = 2;
