@@ -5,6 +5,9 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
@@ -26,6 +29,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import pipe.gui.*;
 import pipe.gui.GuiFrame.GUIMode;
 import pipe.dataLayer.*;
@@ -174,7 +178,7 @@ public class WorkflowDialog extends JDialog {
 	private TimedPlace done = null;
 
 	private TimedArcPetriNetNetwork model = null;
-	
+
 	private boolean isInTraceMode = false;
 
 	private enum TAWFNTypes {
@@ -196,7 +200,7 @@ public class WorkflowDialog extends JDialog {
 			newDialog.max.setSelected(oldDialog.max.isSelected());
 			newDialog.max.setEnabled(oldDialog.max.isEnabled());
 		}
-		
+
 		CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode = false;
 		CreateGui.getCurrentTab().getWorkflowDialog().setVisible(true);
 	}
@@ -204,7 +208,7 @@ public class WorkflowDialog extends JDialog {
 	public boolean restoreWindow(){
 		return isInTraceMode;
 	}
-	
+
 	private void switchToTrace(TAPNNetworkTrace trace){
 		isInTraceMode = true;
 		setVisible(false);
@@ -233,9 +237,13 @@ public class WorkflowDialog extends JDialog {
 
 		initComponents();
 		setContentPane(panel);
-		
+
 		pack();
-		setLocationRelativeTo(null);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screenSize = toolkit.getScreenSize();
+		int x = (screenSize.width - getWidth()) / 2;
+		int y = (int) ((screenSize.height - getHeight()) / 2 * 0.8);
+		setLocation(x, y);
 		setResizable(true);
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 	}
@@ -297,7 +305,7 @@ public class WorkflowDialog extends JDialog {
 			workflowTypeError.setVisible(true);
 			break;
 		}
-		
+
 		/* Initialize component to store settings */
 		if (soundness == null)
 			soundness = new JCheckBox("Check soundness.");
@@ -307,14 +315,14 @@ public class WorkflowDialog extends JDialog {
 			min.setSelected(true);
 			min.setToolTipText(TOOLTIP_MIN);
 		}
-		
+
 		if (strongSoundness == null)
 			strongSoundness = new JCheckBox("Check strong soundness.");
-		
+
 		if (max == null)
 			max = new JCheckBox("Calculate maximum duration.");
-		
-		
+
+
 		if (netType != TAWFNTypes.NOTTAWFN) {
 			gbc.gridy = 1;
 			gbc.gridx = 0;
@@ -352,7 +360,7 @@ public class WorkflowDialog extends JDialog {
 
 			initValidationPanel();
 		}
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
@@ -381,7 +389,7 @@ public class WorkflowDialog extends JDialog {
 
 		panel.add(close_button, gbc);
 	}
-	
+
 	private Object getMessageComponent(){
 		JTextPane pane = new JTextPane();
 		pane.setContentType("text/html");
@@ -473,7 +481,7 @@ public class WorkflowDialog extends JDialog {
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.insets = new Insets(5, 5, 0, 5);
-		
+
 		/* Initialize results panel on first invokation */
 		if(soundnessResultLabel == null){
 			soundnessResultLabel = new JLabel(LABEL_RESULT_SOUND);
@@ -499,9 +507,9 @@ public class WorkflowDialog extends JDialog {
 			soundnessResultExplanation.setVisible(false);
 			soundnessResultExplanation.setEnabled(false);
 			resultPanel.add(soundnessResultExplanation, gbc);
-			
+
 			gbc.gridwidth = 1;
-			
+
 			soundnessResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			soundnessResultTraceButton.setVisible(false);
@@ -560,7 +568,7 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 2;
 			strongSoundnessVerificationStats.setVisible(false);
 			resultPanel.add(strongSoundnessVerificationStats, gbc);
-			
+
 			strongSoundnessResultExplanation = new JLabel();
 			gbc.gridx = 0;
 			gbc.gridy = 4;
@@ -569,9 +577,9 @@ public class WorkflowDialog extends JDialog {
 			strongSoundnessResultExplanation.setVisible(false);
 			strongSoundnessResultExplanation.setEnabled(false);
 			resultPanel.add(strongSoundnessResultExplanation, gbc);
-			
+
 			gbc.gridwidth = 1;
-			
+
 			strongSoundnessResultTraceButton = new JButton("Show trace");
 			gbc.gridx = 2;
 			strongSoundnessResultTraceButton.setVisible(false);
@@ -643,7 +651,7 @@ public class WorkflowDialog extends JDialog {
 		});
 
 		gbc.gridwidth = 1;
-		
+
 		JButton checkBound = new JButton("Check boundedness");
 		gbc.gridx = 2;
 		panel.add(checkBound, gbc);
@@ -871,7 +879,7 @@ public class WorkflowDialog extends JDialog {
 			if(errors > 0)	errorMsgs.add("and "+errors+" other problems.");
 			return TAWFNTypes.NOTTAWFN;
 		}
-		
+
 		int i = 0;
 		outer: for(TimedArcPetriNet t : model.activeTemplates()){
 			for(TimedPlace p : t.places()){
@@ -1085,14 +1093,14 @@ public class WorkflowDialog extends JDialog {
 								maxResultTraceButton.setVisible(true);
 							}
 						}
-						
-						
+
+
 						strongSoundnessVerificationStats.setText(result
 								.getVerificationTimeString().replace("Estimated verification time", "Est. time")
 								+ ", memory: "
 								+ MemoryMonitor.getPeakMemory());
 						strongSoundnessVerificationStats.setVisible(true);
-						
+
 						pack();
 					}
 
@@ -1156,7 +1164,7 @@ public class WorkflowDialog extends JDialog {
 		maxResultLabel.setVisible(true);
 		pack();
 	}
-	
+
 	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
 		setStrongSoundnessResult(satisfied, explanation, true);
 	}
@@ -1187,7 +1195,7 @@ public class WorkflowDialog extends JDialog {
 		}
 		strongSoundnessResultLabel.setVisible(true);
 		strongSoundnessResult.setVisible(true);
-		
+
 		pack();
 	}
 
@@ -1240,7 +1248,7 @@ public class WorkflowDialog extends JDialog {
 							soundnessResultTraceButton.setVisible(true);
 							soundnessResultExplanation.setText(calculateSoundnessError(result.getTrace()));
 							soundnessResultExplanation.setVisible(true);
-							
+
 							NetworkMarking coveredMarking = result.getCoveredMarking(model);
 							if(coveredMarking != null){
 								completeSoundnessTrace(result, coveredMarking);
@@ -1280,7 +1288,7 @@ public class WorkflowDialog extends JDialog {
 						final String explanationText = soundnessResultExplanation.getText();
 						soundnessResultExplanation.setText(explanationText + " Computing trace.");
 						soundnessResultTraceButton.setVisible(false);
-						
+
 						final NetworkMarking oldMarking = model.marking();
 						model.setMarking(coveredMarking);
 
@@ -1329,7 +1337,7 @@ public class WorkflowDialog extends JDialog {
 							TAPNNetworkTrace trace) {
 
 						// TODO detect subset result
-						
+
 						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
 						NetworkMarking final_marking = model.marking().clone(); 
 						while(iter.hasNext()) final_marking = iter.next().performStepFrom(final_marking);
@@ -1354,7 +1362,7 @@ public class WorkflowDialog extends JDialog {
 							}
 						}
 						model.setMarking(oldMarking);
-						
+
 						return output;
 					}
 				});
