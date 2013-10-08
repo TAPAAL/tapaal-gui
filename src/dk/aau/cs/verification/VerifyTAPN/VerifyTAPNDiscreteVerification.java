@@ -311,7 +311,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
 			runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
-		System.out.println(createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 
 			if (runner.error()) {
 				return null;
@@ -319,7 +318,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				String errorOutput = readOutput(runner.errorOutput());
 				String standardOutput = readOutput(runner.standardOutput());
 
-				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
@@ -380,8 +379,8 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			return buffer.toString();
 		}
 		
-		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query) {
-			VerifyTAPNOutputParser outputParser = new VerifyTAPNOutputParser(totalTokens, extraTokens, query);
+		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query, TimedArcPetriNet model) {
+			VerifyDTAPNOutputParser outputParser = new VerifyDTAPNOutputParser(totalTokens, extraTokens, query, model);
 			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
 			return result;
 		}
