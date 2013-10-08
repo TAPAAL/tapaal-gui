@@ -262,10 +262,8 @@ public class WorkflowDialog extends JDialog {
 		gbc.weightx = 1;
 		panel.add(informationPanel, gbc);
 
-		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridwidth = 1;
-		gbc.anchor = (gbc.gridx == 0 && gbc.gridwidth == 1) ? GridBagConstraints.EAST : GridBagConstraints.WEST;
-		JLabel workflowType = new JLabel(LABEL_TYPE_OF_WORKFLOW);
+		JLabel workflowType = new JLabel(LABEL_TYPE_OF_WORKFLOW, SwingConstants.RIGHT);
 		informationPanel.add(workflowType, gbc);
 
 		gbc.gridx = 1;
@@ -305,7 +303,7 @@ public class WorkflowDialog extends JDialog {
 		if (netType != TAWFNTypes.NOTTAWFN) {
 			gbc.gridy = 1;
 			gbc.gridx = 0;
-			informationPanel.add(new JLabel(LABEL_INPUT_PLACE), gbc);
+			informationPanel.add(new JLabel(LABEL_INPUT_PLACE, SwingConstants.RIGHT), gbc);
 
 			JLabel inPlaceLabel = new JLabel(in.name());
 			gbc.gridx = 1;
@@ -313,7 +311,7 @@ public class WorkflowDialog extends JDialog {
 
 			gbc.gridy = 2;
 			gbc.gridx = 0;
-			informationPanel.add(new JLabel(LABEL_OUTPUT_PLACE), gbc);
+			informationPanel.add(new JLabel(LABEL_OUTPUT_PLACE, SwingConstants.RIGHT), gbc);
 			JLabel outPlaceLabel = new JLabel(out.name());
 			gbc.gridx = 1;
 			informationPanel.add(outPlaceLabel, gbc);
