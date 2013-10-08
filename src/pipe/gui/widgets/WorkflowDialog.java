@@ -188,12 +188,17 @@ public class WorkflowDialog extends JDialog {
 	public static void showDialog() {
 		if(CreateGui.getCurrentTab().getWorkflowDialog() == null){
 			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true));
+		}else if(!CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode){
+			WorkflowDialog oldDialog = CreateGui.getCurrentTab().getWorkflowDialog();
+			CreateGui.getCurrentTab().setWorkflowDialog(new WorkflowDialog(CreateGui.getApp(), "Workflow Analysis", true));
+			WorkflowDialog newDialog = CreateGui.getCurrentTab().getWorkflowDialog();
+			newDialog.soundness.setSelected(oldDialog.soundness.isSelected());
+			newDialog.min.setSelected(oldDialog.min.isSelected());
+			newDialog.strongSoundness.setSelected(oldDialog.strongSoundness.isSelected());
+			newDialog.max.setSelected(oldDialog.max.isSelected());
+			newDialog.max.setEnabled(oldDialog.max.isEnabled());
 		}
-		if(!CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode && CreateGui.getCurrentTab().getWorkflowDialog().resultPanel != null){
-			CreateGui.getCurrentTab().getWorkflowDialog().resultPanel.setVisible(false);
-			CreateGui.getCurrentTab().getWorkflowDialog().pack();
-			
-		}
+		
 		CreateGui.getCurrentTab().getWorkflowDialog().isInTraceMode = false;
 		CreateGui.getCurrentTab().getWorkflowDialog().setVisible(true);
 	}
