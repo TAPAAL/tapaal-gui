@@ -132,8 +132,8 @@ public class WorkflowDialog extends JDialog {
 	private static final String DISCRETE_SEMANTICS_WARNING = "<html>Because the workflow contains age invariants and/or urgent transitions,<br /> this result is only valid for the discrete semantics (integer delays).</html>";
 	
 	private static final String LABEL_TYPE_OF_WORKFLOW = "Type of the workflow:";
-	private static final String LABEL_INPUT_PLACE = "Input place of the workflow:";
-	private static final String LABEL_OUTPUT_PLACE = "Output place of the workflow:";
+	private static final String LABEL_INPUT_PLACE = "Input place:";
+	private static final String LABEL_OUTPUT_PLACE = "Output place:";
 	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
 	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
 	private static final String LABEL_INVARIANTS = "Age Invariants:";
