@@ -81,7 +81,7 @@ public class WorkflowDialog extends JDialog {
 		buffer.append("A workflow net must contain exactly one <em>input</em> place with no incoming arcs,\n");
                 buffer.append("exactly one <em>output</em> place with no outgoing arcs and every other place has\n");
                 buffer.append("at least one incoming and one outgoing arc. Every transition must have\n");
-                buffer.append("at least one incoming arc.<br/><br/>");
+                buffer.append("at least one incoming arc. Strict intervals are not allowed.<br/><br/>");
                 buffer.append("Workflow nets that contain inhibitor arcs, age invariants or urgent transitions\n");
                 buffer.append("are called <em>extended</em> workflow nets. Nets without these features are\n");
                 buffer.append("called <em>monotonic</em>.\n");
@@ -136,7 +136,7 @@ public class WorkflowDialog extends JDialog {
 	private static final String LABEL_OUTPUT_PLACE = "Output place of the workflow:";
 	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
 	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
-	private static final String LABEL_INVARIANTS = "Invariants:";
+	private static final String LABEL_INVARIANTS = "Age Invariants:";
 
 	private static final String LABEL_RESULT_SOUND = "Soundness:";
 	private static final String LABEL_RESULT_MIN = "Minimum duration:";
@@ -1389,7 +1389,7 @@ public class WorkflowDialog extends JDialog {
 						}
 
 						// Detect if any transition is dEnabled from last marking (not deadlock)
-						String output = "A non-final deadlock marking is reachable.";
+						String output = "A deadlock marking is reachable.";
 						NetworkMarking oldMarking = model.marking();
 						model.setMarking(final_marking);
 						outer: for( TimedArcPetriNet temp : model.activeTemplates()){
