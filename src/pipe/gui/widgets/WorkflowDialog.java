@@ -81,7 +81,7 @@ public class WorkflowDialog extends JDialog {
 		buffer.append("A workflow net must contain exactly one <em>input</em> place with no incoming arcs,\n");
                 buffer.append("exactly one <em>output</em> place with no outgoing arcs and every other place has\n");
                 buffer.append("at least one incoming and one outgoing arc. Every transition must have\n");
-                buffer.append("at least one incoming arc. Strict intervals are not allowed.<br/><br/>");
+                buffer.append("at least one incoming arc (inhibitor arcs do not count). Strict time intervals are not allowed.<br/><br/>");
                 buffer.append("Workflow nets that contain inhibitor arcs, age invariants or urgent transitions\n");
                 buffer.append("are called <em>extended</em> workflow nets. Nets without these features are\n");
                 buffer.append("called <em>monotonic</em>.\n");
@@ -157,7 +157,7 @@ public class WorkflowDialog extends JDialog {
 	
 	/* Strong Soundness */
 	
-	private static final String RESULT_ERROR_CYCLE = "The workflow has an infinite time-diverging execution.";
+	private static final String RESULT_ERROR_CYCLE = "The workflow has an infinite time-divergent execution.";
 	private static final String RESULT_ERROR_TIME = "A time divergent marking is reachable.";
 	/* Syntax */
 	
@@ -1082,7 +1082,7 @@ public class WorkflowDialog extends JDialog {
 
 				// Check preliminary conditions
 				if(!isSound){
-					setStrongSoundnessResult(false,isConclusive?"The workflow is not sound.":"The workflow soundness check was inconclusive.", isConclusive);
+					setStrongSoundnessResult(false,isConclusive?"The workflow is not sound.":"The soundness check was inconclusive.", isConclusive);
 					return;
 				}
 
