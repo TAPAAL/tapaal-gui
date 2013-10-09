@@ -81,7 +81,10 @@ public class WorkflowDialog extends JDialog {
 		buffer.append("A workflow net must contain exactly one <em>input</em> place with no incoming arcs,\n");
                 buffer.append("exactly one <em>output</em> place with no outgoing arcs and every other place has\n");
                 buffer.append("at least one incoming and one outgoing arc. Every transition must have\n");
-                buffer.append("at least one incoming arc.");
+                buffer.append("at least one incoming arc.<br/><br/>");
+                buffer.append("Workflow nets that contain inhibitor arcs, age invariants or urgent transitions\n");
+                buffer.append("are called <em>extended</em> workflow nets. Nets without these features are\n");
+                buffer.append("called <em>monotonic</em>.\n");
 		buffer.append("<br/><br/>");
 		buffer.append("<b>Initial Marking, Final Markings</b><br/>");
 		buffer.append("The <em>initial marking</em> has just one token of age 0 in the input place.\n");
@@ -103,8 +106,10 @@ public class WorkflowDialog extends JDialog {
 		buffer.append("<br/><br/>");
 		buffer.append("<b>Extra Number of Tokens</b><br/>");
                 buffer.append("The user can set up the extra number of tokens in order to limit\n");
-                buffer.append("the state-space during the verification. If the analysis answer is\n");
-                buffer.append("inconclusive, try to increase the extra number of tokens.\n");
+                buffer.append("the state-space during the verification. This is necessary for extended\n");
+                buffer.append("workflow nets as soundness is otherwise undecidable. For monotonic nets\n");
+                buffer.append("the tool provides conclusive answers also for unbounded nets but increasing\n");
+                buffer.append("the number of extra tokens can speedup the verification and help with trace generation\n");
 		buffer.append("<br/><br/>");
 		buffer.append("<b>Typical Reasons for Breaking Soundness</b><br/>");
                 buffer.append("<ul><li>A reachable deadlock marking (no available transition firing after any delay).</li>\n");
