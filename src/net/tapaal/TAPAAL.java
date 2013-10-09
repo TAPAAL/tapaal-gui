@@ -24,7 +24,7 @@ public class TAPAAL {
 	 */
 	
 	public static final String TOOLNAME = "TAPAAL";
-	public static final String VERSION = "DEV"; 
+	public static final String VERSION = "2.4.99"; 
 
 	public static String getProgramName(){
 		return "" + TAPAAL.TOOLNAME + " " + TAPAAL.VERSION;
