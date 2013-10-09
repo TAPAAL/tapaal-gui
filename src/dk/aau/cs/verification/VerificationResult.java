@@ -13,6 +13,8 @@ import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 
 public class VerificationResult<TTrace> {
@@ -22,6 +24,7 @@ public class VerificationResult<TTrace> {
 	private long verificationTime = 0;
 	private Stats stats;
 	private NameMapping nameMapping;
+	private TTrace secondaryTrace;
 	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -43,6 +46,14 @@ public class VerificationResult<TTrace> {
 		this.verificationTime = verificationTime;
 	}
 	
+	public VerificationResult(QueryResult value1,
+			TTrace tapnTrace,
+			TTrace secondaryTrace2, long runningTime,
+			Stats value2) {
+		this(value1, tapnTrace, runningTime, value2);
+		this.secondaryTrace = secondaryTrace2;
+	}
+
 	public NameMapping getNameMapping() {
 		return nameMapping;
 	}
@@ -79,6 +90,10 @@ public class VerificationResult<TTrace> {
 
 	public TTrace getTrace() {
 		return trace;
+	}
+	
+	public TTrace getSecondaryTrace() {
+		return secondaryTrace;
 	}
 
 	public String errorMessage() {

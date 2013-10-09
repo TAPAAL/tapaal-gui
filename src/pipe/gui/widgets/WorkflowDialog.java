@@ -1353,10 +1353,11 @@ public class WorkflowDialog extends JDialog {
 									soundnessResultTraceButton.setVisible(true);
 								}else{
 									if(result.isBounded()){
-										soundnessResultTrace = mapTraceToRealModel(result.getTrace());
+										// Compute trace to covered marking
+										soundnessResultTrace = mapTraceToRealModel(soundnessResult.getSecondaryTrace());
 										soundnessResultTraceButton.setVisible(true);
 									}else{
-										soundnessResultExplanation.setText("<html>"+ explanationText + "<br />Could not generate trace with "+numberOfExtraTokensInNet.getValue().toString() + " extra tokens.</html>");
+										soundnessResultExplanation.setText("<html>The monotonic workflow net has a reachable marking covering another one.<br/>Try to increase the number of extra tokens so that a trace can be generated.</html>");
 									}
 								}
 							}
