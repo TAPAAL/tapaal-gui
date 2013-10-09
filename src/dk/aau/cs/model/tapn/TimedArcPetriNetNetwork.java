@@ -1,5 +1,6 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -510,6 +511,11 @@ public class TimedArcPetriNetNetwork {
 		
 		for(SharedPlace p : sharedPlaces){
 			network.add(p);	// TODO This is okay for now
+			
+			/* Copy markings for shared places */
+			for(TimedToken token : currentMarking.getTokensFor(p)){
+				network.currentMarking.add(token.clone());
+			}
 		}
 		
 		for(SharedTransition t : sharedTransitions){
