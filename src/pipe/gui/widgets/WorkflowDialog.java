@@ -136,7 +136,7 @@ public class WorkflowDialog extends JDialog {
 	private static final String LABEL_OUTPUT_PLACE = "Output place of the workflow:";
 	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
 	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
-	private static final String LABEL_INVARIANTS = "Invariants:";
+	private static final String LABEL_INVARIANTS = "Age Invariants:";
 
 	private static final String LABEL_RESULT_SOUND = "Soundness:";
 	private static final String LABEL_RESULT_MIN = "Minimum duration:";
@@ -1391,7 +1391,7 @@ public class WorkflowDialog extends JDialog {
 						}
 
 						// Detect if any transition is dEnabled from last marking (not deadlock)
-						String output = "A non-final deadlock marking is reachable.";
+						String output = "A deadlock marking is reachable.";
 						NetworkMarking oldMarking = model.marking();
 						model.setMarking(final_marking);
 						outer: for( TimedArcPetriNet temp : model.activeTemplates()){
