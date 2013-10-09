@@ -81,7 +81,7 @@ public class WorkflowDialog extends JDialog {
 		buffer.append("A workflow net must contain exactly one <em>input</em> place with no incoming arcs,\n");
                 buffer.append("exactly one <em>output</em> place with no outgoing arcs and every other place has\n");
                 buffer.append("at least one incoming and one outgoing arc. Every transition must have\n");
-                buffer.append("at least one incoming arc.<br/><br/>");
+                buffer.append("at least one incoming arc. Strict intervals are not allowed.<br/><br/>");
                 buffer.append("Workflow nets that contain inhibitor arcs, age invariants or urgent transitions\n");
                 buffer.append("are called <em>extended</em> workflow nets. Nets without these features are\n");
                 buffer.append("called <em>monotonic</em>.\n");
