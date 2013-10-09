@@ -1379,14 +1379,12 @@ public class WorkflowDialog extends JDialog {
 					private String calculateSoundnessError(
 							TAPNNetworkTrace trace) {
 
-						// TODO detect subset result
-
 						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
 						NetworkMarking final_marking = model.marking().clone(); 
 						while(iter.hasNext()) final_marking = iter.next().performStepFrom(final_marking);
 
 						int out_size = final_marking.getTokensFor(out).size();
-						if(out_size > 0 && final_marking.size() > out_size){
+						if(out_size > 0 && final_marking.size() != 1){
 							return RESULT_ERROR_NONFINAL_REACHED;
 						}
 
