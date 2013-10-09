@@ -473,11 +473,13 @@ public class WorkflowDialog extends JDialog {
 		soundnessPanel.add(min, gbc);
 
 		strongSoundness.setToolTipText(TOOLTIP_STRONGSOUNDNESS);
+		strongSoundness.setSelected(true);
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		soundnessPanel.add(strongSoundness, gbc);
 
 		max.setToolTipText(TOOLTIP_MAX);
+		max.setSelected(true);
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		soundnessPanel.add(max, gbc);
