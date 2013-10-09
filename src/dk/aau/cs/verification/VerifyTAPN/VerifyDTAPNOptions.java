@@ -10,6 +10,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	private boolean timeDarts;
 	private boolean pTrie;
 	private WorkflowMode workflow;
+	//only used for boundedness analysis
+	private boolean dontUseDeadPlaces = false;
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
@@ -22,6 +24,14 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie) {
 		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW);
+	}
+	
+	//Only used for boundedness analysis
+	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
+			SearchOption search, boolean symmetry, boolean timeDarts,
+			boolean pTrie) {
+		this(extraTokens, traceOption, search, symmetry, timeDarts, pTrie, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW);
+		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
 	public VerifyDTAPNOptions(int extraTokens, TraceOption traceOption,
@@ -57,6 +67,8 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		}else if(workflow == WorkflowMode.WORKFLOW_STRONG_SOUNDNESS){
 			result.append(" -w 2");
 		}
+		result.append(' ');
+		result.append(dontUseDeadPlaces ? "-d" : "");
 		return result.toString();
 	}
 
