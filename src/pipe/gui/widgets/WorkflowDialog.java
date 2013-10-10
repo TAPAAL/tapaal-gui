@@ -5,8 +5,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -154,6 +152,7 @@ public class WorkflowDialog extends JDialog {
 	
 	private static final String RESULT_ERROR_NONFINAL_REACHED = "A non-final marking with a token in the output place is reachable.";
 	private static final String RESULT_ERROR_NO_TRACE_TO_FINAL = "A marking is reachable from which a final marking cannot be reached.";
+	private static final String LABEL_UNUSED_TRANSITIONS = "The workflow contains the following redundant transitions that are never enabled:";
 	
 	/* Strong Soundness */
 	
@@ -163,7 +162,7 @@ public class WorkflowDialog extends JDialog {
 	
 	private static final String ERROR_MULTIPLE_IN = "Multiple input places found.";
 	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found.";
-
+	
 	private static final long serialVersionUID = 5613743579411748200L;
 
 	private JPanel panel;
@@ -189,6 +188,7 @@ public class WorkflowDialog extends JDialog {
 	private JButton strongSoundnessResultTraceButton;
 	private JLabel soundnessVerificationStats;
 	private JLabel strongSoundnessVerificationStats;
+	private JLabel unusedTransitions;
 
 	private JLabel soundnessResultLabel;
 	private JLabel minResultLabel;
@@ -658,6 +658,13 @@ public class WorkflowDialog extends JDialog {
 				}
 			});
 			resultPanel.add(maxResultTraceButton, gbc);
+			
+			unusedTransitions = new JLabel();
+			gbc.gridy = 6;
+			gbc.gridx = 0;
+			gbc.gridwidth = 3;
+			unusedTransitions.setVisible(false);
+			resultPanel.add(unusedTransitions, gbc);
 		}
 
 		gbc.insets = new Insets(5, 5, 5, 5);
@@ -666,6 +673,7 @@ public class WorkflowDialog extends JDialog {
 
 		gbc.gridx = 0;
 		gbc.gridy = 6;
+		gbc.gridwidth = 1;
 		panel.add(new JLabel(" Number of extra tokens:  "), gbc);
 
 		if (numberOfExtraTokensInNet == null)
@@ -961,6 +969,8 @@ public class WorkflowDialog extends JDialog {
 		soundnessVerificationStats.setVisible(false);
 		strongSoundnessResultExplanation.setVisible(false);
 		strongSoundnessVerificationStats.setVisible(false);
+		unusedTransitions.setVisible(false);
+		unusedTransitions.setText("");
 		resultPanel.setVisible(true);
 
 		pack();
@@ -1275,6 +1285,26 @@ public class WorkflowDialog extends JDialog {
 								soundnessResultExplanation.setVisible(true);
 							}
 							isSound = true;
+							
+							// Detect unused transitions
+							boolean hasUnusedTransitions = false;
+							StringBuilder sb = new StringBuilder();
+							sb.append("<html>").append(LABEL_UNUSED_TRANSITIONS).append("<br />");
+							for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
+								if(stat.value2() == 0){
+									if(!hasUnusedTransitions){
+										hasUnusedTransitions = true;
+									}else{
+										sb.append(", ");
+									}
+									sb.append(stat.value1());
+								}
+							}
+							sb.append("</html>");
+							if(hasUnusedTransitions){
+								unusedTransitions.setText(sb.toString());
+								unusedTransitions.setVisible(true);
+							}
 						} else if (netType == TAWFNTypes.ETAWFN && !result.isBounded()) {
 							soundnessResult
 							.setText(RESULT_STRING_INCONCLUSIVE);
