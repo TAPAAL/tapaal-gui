@@ -188,6 +188,7 @@ public class WorkflowDialog extends JDialog {
 	private JButton strongSoundnessResultTraceButton;
 	private JLabel soundnessVerificationStats;
 	private JLabel strongSoundnessVerificationStats;
+	private JLabel unusedTransitionsLabel;
 	private JLabel unusedTransitions;
 
 	private JLabel soundnessResultLabel;
@@ -659,11 +660,20 @@ public class WorkflowDialog extends JDialog {
 			});
 			resultPanel.add(maxResultTraceButton, gbc);
 			
-			unusedTransitions = new JLabel();
+			unusedTransitionsLabel = new JLabel();
 			gbc.gridy = 6;
 			gbc.gridx = 0;
 			gbc.gridwidth = 3;
+			gbc.insets = new Insets(10, 5, 0, 5);
+			unusedTransitionsLabel.setText(LABEL_UNUSED_TRANSITIONS);
+			unusedTransitionsLabel.setVisible(false);
+			resultPanel.add(unusedTransitionsLabel, gbc);
+			
+			unusedTransitions = new JLabel();
+			gbc.gridy = 7;
+			gbc.insets = new Insets(0, 5, 5, 5);
 			unusedTransitions.setVisible(false);
+			unusedTransitions.setEnabled(false);
 			resultPanel.add(unusedTransitions, gbc);
 		}
 
@@ -969,6 +979,7 @@ public class WorkflowDialog extends JDialog {
 		soundnessVerificationStats.setVisible(false);
 		strongSoundnessResultExplanation.setVisible(false);
 		strongSoundnessVerificationStats.setVisible(false);
+		unusedTransitionsLabel.setVisible(false);
 		unusedTransitions.setVisible(false);
 		unusedTransitions.setText("");
 		resultPanel.setVisible(true);
@@ -1291,7 +1302,7 @@ public class WorkflowDialog extends JDialog {
 							StringBuilder sb = new StringBuilder();
 							int lineLength = 0;
 							int maxLength = LABEL_UNUSED_TRANSITIONS.length();
-							sb.append("<html>").append(LABEL_UNUSED_TRANSITIONS).append("<br />");
+							sb.append("<html>");
 							for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
 								if(stat.value2() == 0){
 									if(!hasUnusedTransitions){
@@ -1310,6 +1321,7 @@ public class WorkflowDialog extends JDialog {
 							}
 							sb.append("</html>");
 							if(hasUnusedTransitions){
+								unusedTransitionsLabel.setVisible(true);
 								unusedTransitions.setText(sb.toString());
 								unusedTransitions.setVisible(true);
 							}
