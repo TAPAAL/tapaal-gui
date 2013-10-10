@@ -1289,6 +1289,8 @@ public class WorkflowDialog extends JDialog {
 							// Detect unused transitions
 							boolean hasUnusedTransitions = false;
 							StringBuilder sb = new StringBuilder();
+							int lineLength = 0;
+							int maxLength = LABEL_UNUSED_TRANSITIONS.length();
 							sb.append("<html>").append(LABEL_UNUSED_TRANSITIONS).append("<br />");
 							for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
 								if(stat.value2() == 0){
@@ -1296,8 +1298,14 @@ public class WorkflowDialog extends JDialog {
 										hasUnusedTransitions = true;
 									}else{
 										sb.append(", ");
+										lineLength += 2;
+										if(lineLength > maxLength - stat.value1().length()){
+											sb.append("<br />");
+											lineLength = 0;
+										}
 									}
 									sb.append(stat.value1());
+									lineLength += stat.value1().length();
 								}
 							}
 							sb.append("</html>");
