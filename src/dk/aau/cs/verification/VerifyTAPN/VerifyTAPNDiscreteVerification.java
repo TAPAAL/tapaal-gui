@@ -25,7 +25,6 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -39,7 +38,6 @@ import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.ProcessRunner;
 import dk.aau.cs.verification.QueryResult;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -323,13 +321,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				TimedArcPetriNetTrace secondaryTrace = null;
 				// Parse covered trace
 				if(queryResult.value2().getCoveredMarking() != null){
-					secondaryTrace = parseTrace(("Trace: \n" + errorOutput.split("Trace: \n")[2]), options, model, exportedModel, query, queryResult.value1());
+					secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
 				}
 				
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
-					TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace: \n")?errorOutput:("Trace: \n" + errorOutput.split("Trace: \n")[1]), options, model, exportedModel, query, queryResult.value1());
+					TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:")?errorOutput:(errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
 					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2()); 
 				}
 			}
