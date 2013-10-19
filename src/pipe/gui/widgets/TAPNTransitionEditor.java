@@ -88,7 +88,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		sharedTransitionsComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+				if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
+					((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+				}else{
+					urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+				}
 			}
 		});
 
@@ -271,7 +275,11 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gbc.insets = new java.awt.Insets(3, 3, 3, 3);
 		transitionEditorPanel.add(sharedTransitionsComboBox, gbc);		
-		urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+		if(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).transitions().isEmpty()){
+			((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).setUrgent(urgentCheckBox.isSelected());
+		}else{
+			urgentCheckBox.setSelected(((SharedTransition)sharedTransitionsComboBox.getSelectedItem()).isUrgent());
+		}
 		transitionEditorPanel.validate();
 		transitionEditorPanel.repaint();
 	}
