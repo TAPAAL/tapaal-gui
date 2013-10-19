@@ -1,27 +1,22 @@
 package pipe.gui.widgets;
 
-import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.lang.ProcessBuilder.Redirect;
 import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
-import javax.swing.KeyStroke;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
-import javax.swing.text.DocumentFilter.FilterBypass;
 
 public class CustomJSpinner extends JSpinner{
 	

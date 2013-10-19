@@ -1,24 +1,55 @@
 package pipe.gui.widgets;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
+import java.nio.ByteOrder;
+import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.IIOByteBuffer;
+import javax.imageio.stream.ImageInputStream;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.InternationalFormatter;
+import javax.swing.text.NumberFormatter;
+import javax.swing.text.DocumentFilter.FilterBypass;
+
 import pipe.gui.CreateGui;
 import dk.aau.cs.gui.undo.Command;
+import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 
