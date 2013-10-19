@@ -73,9 +73,6 @@ public class SharedTransition {
 	public void unshare(TimedTransition timedTransition) {
 		Require.that(timedTransition != null, "timedTransition cannot be null");
 		transitions.remove(timedTransition);
-		if(isUrgent() && transitions.isEmpty()){
-			setUrgent(false);
-		}
 	}	
 
 	public boolean isEnabled() {
