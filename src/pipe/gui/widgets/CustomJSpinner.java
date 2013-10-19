@@ -8,6 +8,7 @@ import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.lang.ProcessBuilder.Redirect;
 import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
@@ -131,12 +132,7 @@ public class CustomJSpinner extends JSpinner{
 						try
 						{
 							spinner.commitEdit();
-							try { 
-								Robot robot = new Robot(); 
-								robot.keyPress(KeyEvent.VK_ENTER); 
-							} catch (AWTException e) { 
-								e.printStackTrace(); 
-							} 
+							KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(spinner, ke);
 						}catch(Exception e){}
 					}
 					return false;
