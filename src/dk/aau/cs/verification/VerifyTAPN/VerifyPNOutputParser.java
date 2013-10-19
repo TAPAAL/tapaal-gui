@@ -14,8 +14,8 @@ public class VerifyPNOutputParser extends VerifyTAPNOutputParser{
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 
-	private static final Pattern discoveredPattern = Pattern.compile("\\s*explored states:\\s*(\\d+)\\s*");
-	private static final Pattern exploredPattern = Pattern.compile("\\s*expanded states:\\s*(\\d+)\\s*");
+	private static final Pattern discoveredPattern = Pattern.compile("\\s*discovered states:\\s*(\\d+)\\s*");
+	private static final Pattern exploredPattern = Pattern.compile("\\s*explored states:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*max tokens:\\s*(\\d+)\\s*");
 	
 	public VerifyPNOutputParser(int totalTokens, int extraTokens, TAPNQuery queryType) {
