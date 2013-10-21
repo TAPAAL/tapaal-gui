@@ -261,6 +261,7 @@ public class WorkflowDialog extends JDialog {
 		/* Copy model */
 
 		model = CreateGui.getCurrentTab().network().copy();
+		
 		// Fix - remove unused shared places
 		unusedSharedPlaces.clear();
 		for(SharedPlace p : model.sharedPlaces()){
@@ -291,7 +292,7 @@ public class WorkflowDialog extends JDialog {
 		panel = new JPanel(new GridBagLayout());
 
 		/* Check if workflow net */
-		netType = checkIfTAWFN();
+		netType = getWorkflowType();
 
 		JPanel informationPanel = new JPanel();
 		informationPanel.setBorder(BorderFactory
@@ -691,6 +692,7 @@ public class WorkflowDialog extends JDialog {
 					100000);	// Allow at most 100.000 extra tokens.
 		else
 			numberOfExtraTokensInNet.setValue(model.getDefaultBound());
+		
 		numberOfExtraTokensInNet.setMaximumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setMinimumSize(new Dimension(55, 30));
 		numberOfExtraTokensInNet.setPreferredSize(new Dimension(55, 30));
@@ -728,7 +730,7 @@ public class WorkflowDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				checkTAWFNSoundness();
+				checkProperties();
 			}
 		});
 		gbc.gridx = 2;
@@ -737,7 +739,7 @@ public class WorkflowDialog extends JDialog {
 		panel.add(checkIfSound, gbc);
 	}
 
-	private TAWFNTypes checkIfTAWFN() {
+	private TAWFNTypes getWorkflowType() {
 		List<TimedArcPetriNet> tapns = model.activeTemplates();
 		ArrayList<TimedPlace> sharedInPlaces = new ArrayList<TimedPlace>();
 		ArrayList<TimedPlace> sharedOutPlaces = new ArrayList<TimedPlace>();
@@ -957,7 +959,7 @@ public class WorkflowDialog extends JDialog {
 		return isMonotonic ? TAWFNTypes.MTAWFN : TAWFNTypes.ETAWFN;
 	}
 
-	private void checkTAWFNSoundness() {
+	private void checkProperties() {
 		// Clear old results
 		soundnessResult.setText("");
 		soundnessResult.setVisible(false);
@@ -1340,7 +1342,7 @@ public class WorkflowDialog extends JDialog {
 							.setForeground(Pipe.QUERY_NOT_SATISFIED_COLOR);
 							soundnessResultTrace = mapTraceToRealModel(result.getTrace());
 							soundnessResultTraceButton.setVisible(true);
-							soundnessResultExplanation.setText(calculateSoundnessError(result.getTrace()));
+							soundnessResultExplanation.setText(determineSoundnessError(result.getTrace()));
 							soundnessResultExplanation.setVisible(true);
 
 							NetworkMarking coveredMarking = result.getCoveredMarking(model);
@@ -1428,7 +1430,7 @@ public class WorkflowDialog extends JDialog {
 
 					}
 
-					private String calculateSoundnessError(
+					private String determineSoundnessError(
 							TAPNNetworkTrace trace) {
 
 						Iterator<TAPNNetworkTraceStep> iter = trace.iterator();
