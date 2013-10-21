@@ -1,13 +1,11 @@
 package pipe.gui;
 
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import pipe.gui.widgets.QueryPane;
-
+import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.model.tapn.TAPNQuery;
@@ -19,10 +17,13 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
+import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
@@ -54,6 +55,29 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
+		
+		if(options.useOverApproximation() &&
+				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
+				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
+			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+			if(!verifypn.supportsModel(transformedModel.value1())){
+				// Skip over-approximation if model is not supported.
+				// Prevents verification from displaying error.
+			}
+			if(!verifypn.setup()){
+				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
+			}else{
+				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true), transformedModel, clonedQuery);
+				if(!overapprox_result.error() && !overapprox_result.getQueryResult().isQuerySatisfied()){
+					VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 
+							decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()), 
+							overapprox_result.verificationTime(), 
+							overapprox_result.stats());
+					value.setNameMapping(transformedModel.value2());
+					return value;
+				}
+			}
+		}
 
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (isCancelled()) {

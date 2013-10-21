@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,7 +25,6 @@ import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLEGNode;
-import dk.aau.cs.TCTL.visitors.UpwardsClosedVisitor;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -78,6 +74,7 @@ public class VerifyTAPN implements ModelChecker {
 		buffer.append("<br/>");
 		buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
 		buffer.append("passed/waiting list at the end of verification.<br />");
+		buffer.append("<br />If the number of discovered, explored and stored markings are all 0<br />then the query was disproved by using the over-approximation<br />technique (while ignoring all the time intervals).<br />");
 		buffer.append("</html>");
 		return buffer.toString();
 	}
@@ -414,9 +411,11 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	@Override
+	public String toString() {
+		return "verifytapn";
+	}
+	
 	public boolean useDiscreteSemantics() {
 		return false;
 	}
-
-	
 }

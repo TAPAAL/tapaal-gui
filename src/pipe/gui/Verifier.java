@@ -4,17 +4,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 
 import pipe.dataLayer.TAPNQuery;
-import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.widgets.RunningVerificationDialog;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.ModelChecker;
-import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.UPPAAL.UppaalIconSelector;
 import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNIconSelector;
@@ -48,11 +48,19 @@ public class Verifier {
 		return verifydtapn;
 	}
 	
+	private static VerifyPN getVerifyPN() {
+		VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
+		verifypn.setup();
+		return verifypn;
+	}
+	
 	private static ModelChecker getModelChecker(TAPNQuery query) {
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN){
 			return getVerifyTAPN();
 		} else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			return getVerifydTAPN();
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
+			return getVerifyPN();
 		} else{
 			throw new RuntimeException("Verification method: " + query.getReductionOption() + ", should not be send here");
 		}
@@ -91,7 +99,7 @@ public class Verifier {
 
 		TCTLAbstractProperty inputQuery = input.getProperty();
 
-		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption(), input.useSymmetry());
+		VerifytaOptions verifytaOptions = new VerifytaOptions(input.getTraceOption(), input.getSearchOption(), untimedTrace, input.getReductionOption(), input.useSymmetry(), input.useOverApproximation());
 
 		if (inputQuery == null) {
 			return;
@@ -121,7 +129,7 @@ public class Verifier {
 
 		if (!verifytapn.isCorrectVersion()) {
 			new MessengerImpl().displayErrorMessage(
-					"No verifytapn specified: The verification is cancelled",
+					"No "+verifytapn+" specified: The verification is cancelled",
 					"Verification Error");
 			return;
 		}
@@ -132,9 +140,11 @@ public class Verifier {
 		
 		VerifyTAPNOptions verifytapnOptions;
 		if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
+			verifytapnOptions = new VerifyDTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
+		} else if(query.getReductionOption() == ReductionOption.VerifyPN){
+			verifytapnOptions = new VerifyPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useOverApproximation());
 		} else {
-			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.discreteInclusion(), query.inclusionPlaces());
+			verifytapnOptions = new VerifyTAPNOptions(bound, query.getTraceOption(), query.getSearchOption(), query.useSymmetry(), query.useOverApproximation(), query.discreteInclusion(), query.inclusionPlaces());
 		}
 		
 		if (inputQuery == null) {

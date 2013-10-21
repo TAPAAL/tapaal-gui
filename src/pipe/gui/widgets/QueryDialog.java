@@ -100,6 +100,7 @@ import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
 
 public class QueryDialog extends JPanel {
@@ -110,6 +111,7 @@ public class QueryDialog extends JPanel {
 	private static final String UNSUPPPORTED_QUERY_TEXT = "The query is not supported by the chosen reduction.";
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
+	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
 
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
@@ -196,7 +198,8 @@ public class QueryDialog extends JPanel {
 	private JButton selectInclusionPlacesButton;
 	private JCheckBox useTimeDarts;
 	private JCheckBox usePTrie;
-	
+	private JCheckBox useOverApproximation;
+
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -213,12 +216,13 @@ public class QueryDialog extends JPanel {
 	private boolean isNetDegree2;
 	private InclusionPlaces inclusionPlaces;
 
-	private String name_verifyTAPN = "TAPAAL Engine (verifytapn) - Recommended";
+	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
+	private String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
 	private boolean userChangedAtomicPropSelection = true;
 
 	private TCTLAbstractProperty newProperty;
@@ -260,7 +264,7 @@ public class QueryDialog extends JPanel {
 	private static final String TOOL_TIP_TRUEPREDICATEBUTTON = "Add the value true to the query.";
 	private static final String TOOL_TIP_FALSEPREDICATEBUTTON = "Add the value false to the query.";
 	private static final String TOOL_TIP_DEADLOCKPREDICATEBUTTON = "<html>Add the deadlock predicate to the query.<br />" +
-               "<br />A marking is a deadlock if there is no delay<br /> after which at least one transition gets enabled.</html>";
+			"<br />A marking is a deadlock if there is no delay<br /> after which at least one transition gets enabled.</html>";
 
 	//Tool tips for editing panel
 	private static final String TOOL_TIP_DELETEBUTTON = "Delete the currently selected part of the query.";
@@ -282,6 +286,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
+	private final static String TOOL_TIP_OVERAPPROX = "Run over approximation check for EF and AG queries";	// TODO: write tooltip
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
@@ -300,6 +305,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
+	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
@@ -317,11 +323,11 @@ public class QueryDialog extends JPanel {
 
 	private boolean checkIfSomeReductionOption() {
 		if (reductionOption.getSelectedItem() == null){
-                	JOptionPane.showMessageDialog(CreateGui.getApp(),
-                        "No verification engine supports the combination of this query and the current model",
-                        "No verification engine", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(CreateGui.getApp(),
+					"No verification engine supports the combination of this query and the current model",
+					"No verification engine", JOptionPane.ERROR_MESSAGE);
 			return false;
-                }
+		}
 		return true;
 	}
 
@@ -346,8 +352,9 @@ public class QueryDialog extends JPanel {
 		boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
+		boolean overApproximation = useOverApproximation.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -398,6 +405,8 @@ public class QueryDialog extends JPanel {
 			return ReductionOption.VerifyTAPN;
 		else if (reductionOptionString.equals(name_DISCRETE))
 			return ReductionOption.VerifyTAPNdiscreteVerification;
+		else if (reductionOptionString.equals(name_UNTIMED))
+			return ReductionOption.VerifyPN;
 		else
 			return ReductionOption.BROADCAST;
 	}
@@ -410,9 +419,9 @@ public class QueryDialog extends JPanel {
 		if(reductionOption.getSelectedItem() == null){
 			return;
 		}
-		
+
 		TraceOption traceOption = getTraceOption();
-		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN) || ((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+		if(((String)reductionOption.getSelectedItem()).equals(name_verifyTAPN) || ((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
 			someTraceRadioButton.setText(VERIFYTAPN_SOME_TRACE_STRING);
 			someTraceRadioButton.setEnabled(true);
 			someTraceRadioButton.setSelected(someTraceRadioButton.isSelected());
@@ -479,7 +488,7 @@ public class QueryDialog extends JPanel {
 			return "";
 		}
 	}
-	
+
 	public boolean queryHasDeadlock(){
 		return new HasDeadlockVisitor().hasDeadLock(newProperty);
 	}
@@ -491,7 +500,7 @@ public class QueryDialog extends JPanel {
 					"No reduction option", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
-		
+
 		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 
 		Container contentPane = guiDialog.getContentPane();
@@ -555,7 +564,7 @@ public class QueryDialog extends JPanel {
 		}
 
 		updateQueryButtonsAccordingToSelection();
-		
+
 	}
 
 	// update selection based on some change to the query.
@@ -659,6 +668,10 @@ public class QueryDialog extends JPanel {
 		String reductionOptionString = getReductionOptionAsString();
 
 		ArrayList<String> options = new ArrayList<String>();
+
+		if((getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]") || getQuantificationSelection().equals("")) && tapnNetwork.isUntimed()){
+			options.add(name_UNTIMED);
+		}
 		
 		if(useTimeDarts != null){
 			if(hasForcedDisabledTimeDarts){
@@ -691,11 +704,11 @@ public class QueryDialog extends JPanel {
             
 		} else if(tapnNetwork.hasWeights()){
 			if(tapnNetwork.isNonStrict()){
-				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+				options.add(name_DISCRETE);
 			}
 		} else if(tapnNetwork.hasUrgentTransitions()){
 			if(tapnNetwork.isNonStrict()){
-				options = new ArrayList<String>(Arrays.asList( name_DISCRETE));
+				options.add(name_DISCRETE);
 			}
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(tapnNetwork.isNonStrict()){
@@ -740,7 +753,7 @@ public class QueryDialog extends JPanel {
 		if(reductionOption.getSelectedItem() == null){
 			return;
 		}
-		
+
 		JRadioButton currentselected;
 		if(heuristicSearch.isSelected()){
 			currentselected = heuristicSearch;
@@ -751,8 +764,8 @@ public class QueryDialog extends JPanel {
 		}else{
 			currentselected = randomSearch;
 		}
-		
-		
+
+
 		heuristicSearch.setEnabled(true);
 		breadthFirstSearch.setEnabled(true);
 		String reductionOptionString = getReductionOptionAsString();
@@ -762,7 +775,7 @@ public class QueryDialog extends JPanel {
 				heuristicSearch.setEnabled(false);
 			}
 		}
-		
+
 		if(!currentselected.isEnabled()){
 			if(heuristicSearch.isEnabled()){
 				heuristicSearch.setSelected(true);
@@ -946,7 +959,9 @@ public class QueryDialog extends JPanel {
 			reduction = name_BROADCASTDEG2;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
 			reduction = name_DISCRETE;
-		}else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
+		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
+			reduction = name_UNTIMED;
+		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;
 			} else if (queryToCreateFrom.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD) {
@@ -959,11 +974,13 @@ public class QueryDialog extends JPanel {
 				reduction = name_OPTIMIZEDSTANDARD;
 			}
 		}
+
 		reductionOption.addItem(reduction); 
 		reductionOption.setSelectedItem(reduction);
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
 		usePTrie.setSelected(queryToCreateFrom.usePTrie());
+		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
 	}
@@ -1115,27 +1132,27 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		add(splitter, gridBagConstraints);
 	}
-	
+
 	public static void setAdvancedView(boolean advanced){
 		advancedView = advanced;
 	}
-	
+
 	public static boolean getAdvancedView(){
 		return advancedView;
 	}
-	
+
 	private void toggleAdvancedSimpleView(boolean changeState){
 		//Make sure that the right properties are set when the pane is initialized
 		if(changeState){
 			setAdvancedView(!advancedView);
 		}
-		
+
 		Point location = guiDialog.getLocation();
-		
+
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
-		
+
 		if(advancedView){
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
@@ -1143,7 +1160,7 @@ public class QueryDialog extends JPanel {
 			advancedButton.setText("Advanced view");
 			advancedButton.setToolTipText(TOOL_TIP_ADVANCED_VIEW_BUTTON);
 		}
-		
+
 		guiDialog.pack();
 		guiDialog.setLocation(location);		
 	}
@@ -1637,7 +1654,7 @@ public class QueryDialog extends JPanel {
 		gbc.gridy = 4;
 		gbc.insets = new Insets(0, -88, 0,0);
 		predicatePanel.add(falsePredicateButton, gbc);
-		
+
 		deadLockPredicateButton = new JButton("Deadlock");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
@@ -1704,7 +1721,7 @@ public class QueryDialog extends JPanel {
 				queryChanged();
 			}
 		});
-		
+
 		deadLockPredicateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TCTLDeadlockNode deadLockNode = new TCTLDeadlockNode();
@@ -2033,7 +2050,7 @@ public class QueryDialog extends JPanel {
 		reductionOptionsPanel.setPreferredSize(d);
 		reductionOption = new JComboBox<String>();
 		reductionOption.setToolTipText(TOOL_TIP_REDUCTION_OPTION);
-		
+
 		reductionOption.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setEnabledOptionsAccordingToCurrentReduction();
@@ -2100,7 +2117,7 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);	
 		reductionOptionsPanel.add(selectInclusionPlacesButton, gbc);
-		
+
 		useTimeDarts = new JCheckBox("Use Time Darts");
 		useTimeDarts.setSelected(true);
 		useTimeDarts.setToolTipText(TOOL_TIP_TIME_DARTS);
@@ -2111,7 +2128,7 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(useTimeDarts, gbc);
-		
+
 		usePTrie = new JCheckBox("Use PTrie");
 		usePTrie.setSelected(true);
 		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
@@ -2122,7 +2139,18 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
-		
+
+		useOverApproximation = new JCheckBox("Use over-approximation check");
+		useOverApproximation.setSelected(true);
+		useOverApproximation.setToolTipText(TOOL_TIP_OVERAPPROX);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 2;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useOverApproximation, gbc);
+
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -2136,6 +2164,7 @@ public class QueryDialog extends JPanel {
 		refreshSymmetryReduction();
 		refreshDiscreteOptions();
 		refreshDiscreteInclusion();
+		refreshOverApproximationOption();
 		updateSearchStrategies();
 		refreshTraceOptions();
 		refreshSearchOptions();
@@ -2161,10 +2190,10 @@ public class QueryDialog extends JPanel {
 	private void refreshExportButtonText() {
 		ReductionOption reduction = getReductionOption();
 		if (reduction == null) {saveUppaalXMLButton.setEnabled(false);}
-                else {
-		saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
-		saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
-		saveUppaalXMLButton.setEnabled(true);
+		else {
+			saveUppaalXMLButton.setText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? EXPORT_VERIFYTAPN_BTN_TEXT : reduction == ReductionOption.VerifyPN ? EXPORT_VERIFYPN_BTN_TEXT : EXPORT_UPPAAL_BTN_TEXT);
+			saveUppaalXMLButton.setToolTipText(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? TOOL_TIP_SAVE_TAPAAL_BUTTON : reduction == ReductionOption.VerifyPN ? TOOL_TIP_SAVE_PN_BUTTON : TOOL_TIP_SAVE_UPPAAL_BUTTON);
+			saveUppaalXMLButton.setEnabled(true);
 		}
 	}
 
@@ -2183,7 +2212,7 @@ public class QueryDialog extends JPanel {
 		if(reductionOption.getSelectedItem() == null){
 			symmetryReduction.setVisible(false);
 		} 
-		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE) || ((String)reductionOption.getSelectedItem()).equals(name_UNTIMED)) {
 			symmetryReduction.setVisible(true);
 			symmetryReduction.setSelected(true);
 			symmetryReduction.setEnabled(false);
@@ -2194,7 +2223,25 @@ public class QueryDialog extends JPanel {
 			symmetryReduction.setEnabled(true);
 		}
 	}
-	
+
+	private void refreshOverApproximationOption() {
+		if(reductionOption.getSelectedItem() == null){
+			useOverApproximation.setVisible(false);
+		}
+		else if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+			useOverApproximation.setVisible(true);
+			useOverApproximation.setSelected(false);
+			useOverApproximation.setEnabled(false);
+		}
+		else{
+			useOverApproximation.setVisible(true);
+			if(!useOverApproximation.isEnabled()){
+				useOverApproximation.setSelected(true);
+			}
+			useOverApproximation.setEnabled(true);
+		}
+	}
+
 	private void refreshDiscreteOptions(){
 		if(reductionOption.getSelectedItem() == null){
 			usePTrie.setVisible(false);
@@ -2212,10 +2259,11 @@ public class QueryDialog extends JPanel {
 			useTimeDarts.setVisible(false);
 		}
 	}
-		
+
 
 	private void queryChanged(){
 		setEnabledReductionOptions();
+		refreshOverApproximationOption();
 	}
 
 	private void initButtonPanel(QueryDialogueOption option) {
@@ -2239,27 +2287,27 @@ public class QueryDialog extends JPanel {
 					// TODO make save 
 					// save();
 					if (checkIfSomeReductionOption()) {
-					querySaved = true;
-					// Now if a query is saved, the net is marked as modified
-					CreateGui.getView().setNetChanged(true);
-					exit();
+						querySaved = true;
+						// Now if a query is saved, the net is marked as modified
+						CreateGui.getView().setNetChanged(true);
+						exit();
 					}
 				}
 			});
 			saveAndVerifyButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
-				if (checkIfSomeReductionOption()) {
-					querySaved = true;
-					// Now if a query is saved and verified, the net is marked as modified
-					CreateGui.getView().setNetChanged(true);
-					exit();
-					TAPNQuery query = getQuery();
+					if (checkIfSomeReductionOption()) {
+						querySaved = true;
+						// Now if a query is saved and verified, the net is marked as modified
+						CreateGui.getView().setNetChanged(true);
+						exit();
+						TAPNQuery query = getQuery();
 
-					if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-						Verifier.runVerifyTAPNVerification(tapnNetwork, query);
-					else
-						Verifier.runUppaalVerification(tapnNetwork, query);
-				}}
+						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query);
+						else
+							Verifier.runUppaalVerification(tapnNetwork, query);
+					}}
 			});
 			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -2275,7 +2323,7 @@ public class QueryDialog extends JPanel {
 					String xmlFile = null, queryFile = null;
 					ReductionOption reduction = getReductionOption();
 					try {
-						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
+						FileBrowser browser = new FileBrowser(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN ? "Verifytapn XML" : "Uppaal XML",	"xml", xmlFile);
 						xmlFile = browser.saveFile();
 						if (xmlFile != null) {
 							String[] a = xmlFile.split(".xml");
@@ -2302,6 +2350,9 @@ public class QueryDialog extends JPanel {
 						if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification) {
 							VerifyTAPNExporter exporter = new VerifyTAPNExporter();
 							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
+						} else if(reduction == ReductionOption.VerifyPN){
+							VerifyPNExporter exporter = new VerifyPNExporter();
+							exporter.export(transformedModel.value1(), clonedQuery, new File(xmlFile), new File(queryFile), tapnQuery);
 						} else {
 							UppaalExporter exporter = new UppaalExporter();
 							try {
@@ -2313,7 +2364,7 @@ public class QueryDialog extends JPanel {
 								else if(exportException instanceof UnsupportedQueryException)
 									s.append(UNSUPPPORTED_QUERY_TEXT + "\n\n");
 
-								if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification)
+								if(reduction == ReductionOption.VerifyTAPN || reduction == ReductionOption.VerifyTAPNdiscreteVerification || reduction == ReductionOption.VerifyPN)
 									s.append(NO_VERIFYTAPN_XML_FILE_SAVED);
 								else
 									s.append(NO_UPPAAL_XML_FILE_SAVED);

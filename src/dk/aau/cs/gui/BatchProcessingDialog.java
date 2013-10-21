@@ -97,6 +97,8 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_UNTIMED = "VerifyPN: Untimed engine";
+	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with over-approximation";
 	private static final String name_verifyTAPNWithLegend = "A: "
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
@@ -118,6 +120,10 @@ public class BatchProcessingDialog extends JDialog {
 			+ name_BROADCAST;
 	private static final String name_BROADCASTDEG2WithLegend = "J: "
 			+ name_BROADCASTDEG2;
+	private static final String name_UNTIMEDWithLegend = "K: "
+			+ name_UNTIMED;
+	private static final String name_UNTIMED_APPROXWithLegend = "L: "
+			+ name_UNTIMED_APPROX;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
 	private static final String name_HEURISTIC = "Heuristic search";
@@ -1340,6 +1346,11 @@ public class BatchProcessingDialog extends JDialog {
 					} else {
 						s.append(name_verifyTAPNDiscreteVerificationNone);
 					}
+				} else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox){
+					if(query.useOverApproximation())
+						s.append(name_UNTIMED_APPROX);
+					else
+						s.append(name_UNTIMED);
 				} else {
 					s.append(name_BROADCAST);
 				}
@@ -1447,6 +1458,8 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox OPTIMIZEDSTANDARD;
 		private JCheckBox BROADCAST;
 		private JCheckBox BROADCASTDEG2;
+		private JCheckBox UNTIMED;
+		private JCheckBox UNTIMEDAPPROX;
 		
 		JButton selectAll;
 		JButton deselectAll;
@@ -1554,6 +1567,12 @@ public class BatchProcessingDialog extends JDialog {
 			//BROADCASTDEG2.setMnemonic('F');
 			BROADCASTDEG2.setEnabled(false);
 			
+			UNTIMED = new JCheckBox(name_UNTIMEDWithLegend);
+			UNTIMED.setEnabled(false);
+			
+			UNTIMEDAPPROX = new JCheckBox(name_UNTIMED_APPROXWithLegend);
+			UNTIMEDAPPROX.setEnabled(false);
+			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 0;
@@ -1620,9 +1639,23 @@ public class BatchProcessingDialog extends JDialog {
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 9;
-			gbc.insets = new Insets(0, 5, 5	, 5);
+			gbc.insets = new Insets(0, 5, 0	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(BROADCASTDEG2, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 10;
+			gbc.insets = new Insets(0, 5, 0	, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(UNTIMED, gbc);
+		
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 11;
+			gbc.insets = new Insets(0, 5, 5	, 5);
+			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(UNTIMEDAPPROX, gbc);
 		}
 
 		private void initLeftPanel() {
@@ -1682,6 +1715,8 @@ public class BatchProcessingDialog extends JDialog {
 			OPTIMIZEDSTANDARD.setEnabled(override);
 			BROADCAST.setEnabled(override);
 			BROADCASTDEG2.setEnabled(override);
+			UNTIMED.setEnabled(override);
+			UNTIMEDAPPROX.setEnabled(override);
 			verifyTAPNDiscreteVerificationTimeDartPTrie.setEnabled(override);
 			verifyTAPNDiscreteVerificationTimeDart.setEnabled(override);
 			verifyTAPNDiscreteVerificationPTrie.setEnabled(override);
@@ -1697,6 +1732,8 @@ public class BatchProcessingDialog extends JDialog {
 			OPTIMIZEDSTANDARD.setSelected(selected);
 			BROADCAST.setSelected(selected);
 			BROADCASTDEG2.setSelected(selected);
+			UNTIMED.setSelected(selected);
+			UNTIMEDAPPROX.setSelected(selected);
 			verifyTAPNDiscreteVerificationTimeDartPTrie.setSelected(selected);
 			verifyTAPNDiscreteVerificationTimeDart.setSelected(selected);
 			verifyTAPNDiscreteVerificationPTrie.setSelected(selected);
@@ -1722,6 +1759,12 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			if(BROADCASTDEG2.isSelected()){
 				result.add(ReductionOption.DEGREE2BROADCAST);
+			}
+			if(UNTIMED.isSelected()){
+				result.add(ReductionOption.VerifyPN);
+			}
+			if(UNTIMEDAPPROX.isSelected()){
+				result.add(ReductionOption.VerifyPNApprox);
 			}
 			return result;
 		}

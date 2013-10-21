@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import net.tapaal.Preferences;
 import net.tapaal.TAPAAL;
+import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.FileFinderImpl;
@@ -29,6 +30,7 @@ import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedPlace;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.ExecutabilityChecker;
 import dk.aau.cs.util.Tuple;
@@ -42,20 +44,20 @@ import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
 
-public class VerifyTAPNDiscreteVerification implements ModelChecker{
+public class VerifyPN implements ModelChecker{
 	
-	private static final String NEED_TO_LOCATE_VERIFYDTAPN_MSG = "TAPAAL needs to know the location of the file verifydtapn.\n\n"
-			+ "Verifydtapn is a part of the TAPAAL distribution and it is\n"
+	private static final String NEED_TO_LOCATE_verifypn_MSG = "TAPAAL needs to know the location of the file verifypn.\n\n"
+			+ "Verifypn is a part of the TAPAAL distribution and it is\n"
 			+ "normally located in the directory lib.";
 		
-		protected static String verifydtapnpath = "";
+		protected static String verifypnpath = "";
 		
 		private FileFinder fileFinder;
 		private Messenger messenger;
 
 		private ProcessRunner runner;
 		
-		public VerifyTAPNDiscreteVerification(FileFinder fileFinder, Messenger messenger) {
+		public VerifyPN(FileFinder fileFinder, Messenger messenger) {
 			this.fileFinder = fileFinder;
 			this.messenger = messenger;
 		}
@@ -80,7 +82,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		public String getPath() {
-			return verifydtapnpath;
+			return verifypnpath;
 		}
 
 		public String getVersion() {
@@ -88,7 +90,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 			if (!isNotSetup()) {
 				String[] commands;
-				commands = new String[] { verifydtapnpath, "-v" };
+				commands = new String[] { verifypnpath, "-v" };
 
 				InputStream stream = null;
 				try {
@@ -118,7 +120,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				result = null;
 			}
 
-			Pattern pattern = Pattern.compile("^VerifyDTAPN (\\d+\\.\\d+\\.\\d+)$");
+			Pattern pattern = Pattern.compile("^VerifyPN.*(\\d+\\.\\d+).*$", Pattern.DOTALL);
 			Matcher m = pattern.matcher(versioninfo);
 			m.find();
 			result = m.group(1);
@@ -132,15 +134,15 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			
 			File file = new File(getPath());
 			if(!file.canExecute()){
-				messenger.displayErrorMessage("The engine verifydtapn is not executable.\n"
-						+ "The verifydtapn path will be reset. Please try again, "
-						+ "to manually set the verifydtapn path.", "Verifydtapn Error");
-				resetVerifytapn();
+				messenger.displayErrorMessage("The engine verifypn is not executable.\n"
+						+ "The verifypn path will be reset. Please try again, "
+						+ "to manually set the verifypn path.", "VerifyPN Error");
+				resetVerifypn();
 				return false;
 			}
 			
 			String[] version = getVersion().split("\\.");
-			String[] targetversion = Pipe.verifydtapnMinRev.split("\\.");
+			String[] targetversion = Pipe.verifypnMinRev.split("\\.");
 			
 			for(int i = 0; i < targetversion.length; i++){
 				if(version.length < i+1)	version[i] = "0";
@@ -155,9 +157,9 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			return true;
 		}
 
-		private void resetVerifytapn() {
-			verifydtapnpath = null;	
-			Preferences.getInstance().setVerifydtapnLocation(null);
+		private void resetVerifypn() {
+			verifypnpath = null;	
+			Preferences.getInstance().setVerifypnLocation(null);
 		}
 
 
@@ -167,31 +169,31 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			}
 		}
 		
-		public void setPath(String path) throws IllegalArgumentException{
+		public void setPath(String path) throws IllegalArgumentException {
 			ExecutabilityChecker.check(path);
-			String oldPath = verifydtapnpath;
-			verifydtapnpath = path;
-			Preferences.getInstance().setVerifydtapnLocation(path);
+			String oldPath = verifypnpath;
+			verifypnpath = path;
+			Preferences.getInstance().setVerifypnLocation(path);
 			if(!isCorrectVersion()){
 				messenger
 				.displayErrorMessage(
-						"The specified version of the file verifydtapn is too old.", "Verifydtapn Error");
-				verifydtapnpath = oldPath;
-				Preferences.getInstance().setVerifydtapnLocation(oldPath);
+						"The specified version of the file verifypn is too old.", "Verifypn Error");
+				verifypnpath = oldPath;
+				Preferences.getInstance().setVerifypnLocation(oldPath);
 			}
 		}
 
 		public boolean setup() {
 			if (isNotSetup()) {
-				messenger.displayInfoMessage(NEED_TO_LOCATE_VERIFYDTAPN_MSG, "Locate verifydtapn");
+				messenger.displayInfoMessage(NEED_TO_LOCATE_verifypn_MSG, "Locate verifypn");
 
 				try {
-					File file = fileFinder.ShowFileBrowserDialog("Verifydtapn", "",System.getProperty("user.home"));
+					File file = fileFinder.ShowFileBrowserDialog("Verifypn", "",System.getProperty("user.home"));
 					if(file != null){
-						if(file.getName().matches("^verifydtapn.*(?:\\.exe)?$")){
+						if(file.getName().matches("^verifypn.*(?:\\.exe)?$")){
 							setPath(file.getAbsolutePath());
 						}else{
-							messenger.displayErrorMessage("The selected executable does not seem to be verifydtapn.");
+							messenger.displayErrorMessage("The selected executable does not seem to be verifypn.");
 						}
 					}
 
@@ -205,51 +207,51 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		private boolean isNotSetup() {
-			return verifydtapnpath == null || verifydtapnpath.equals("") || !(new File(verifydtapnpath).exists());
+			return verifypnpath == null || verifypnpath.equals("") || !(new File(verifypnpath).exists());
 		}
 		
 		public static boolean trySetup() {
 
-			String verifydtapn = null;
+			String verifypn = null;
 
 			//If env is set, it overwrites the value
-			verifydtapn = System.getenv("verifydtapn");
-			if (verifydtapn != null && !verifydtapn.isEmpty()) {
-				if (new File(verifydtapn).exists()){
-					verifydtapnpath = verifydtapn;
-					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+			verifypn = System.getenv("verifypn");
+			if (verifypn != null && !verifypn.isEmpty()) {
+				if (new File(verifypn).exists()){
+					verifypnpath = verifypn;
+					VerifyPN v = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
 					if(v.isCorrectVersion()){
 						return true;
 					}else{
-						verifydtapn = null;
-						verifydtapnpath = null;
+						verifypn = null;
+						verifypnpath = null;
 					}
 				}
 			}
 
 			//If pref is set
-			verifydtapn = Preferences.getInstance().getVerifydtapnLocation();
-			if (verifydtapn != null && !verifydtapn.isEmpty()) {
-				verifydtapnpath = verifydtapn;
+			verifypn = Preferences.getInstance().getVerifypnLocation();
+			if (verifypn != null && !verifypn.isEmpty()) {
+				verifypnpath = verifypn;
 				return true;
 			}
 
 			//Search the installdir for verifytapn
 			File installdir = TAPAAL.getInstallDir();
 
-			String[] paths = {"/bin/verifydtapn", "/bin/verifydtapn64", "/bin/verifydtapn.exe", "/bin/verifydtapn64.exe"};
+			String[] paths = {"/bin/verifypn", "/bin/verifypn64", "/bin/verifypn.exe", "/bin/verifypn64.exe"};
 			for (String s : paths) {
-				File verifydtapnfile = new File(installdir + s);
+				File verifypnfile = new File(installdir + s);
 
-				if (verifydtapnfile.exists()){
+				if (verifypnfile.exists()){
 
-					verifydtapnpath = verifydtapnfile.getAbsolutePath();
-					VerifyTAPNDiscreteVerification v = new VerifyTAPNDiscreteVerification(new FileFinderImpl(), new MessengerImpl());
+					verifypnpath = verifypnfile.getAbsolutePath();
+					VerifyPN v = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
 					if(v.isCorrectVersion()){
 						return true;
 					}else{
-						verifydtapn = null;
-						verifydtapnpath = null;
+						verifypn = null;
+						verifypnpath = null;
 					}
 
 				}
@@ -261,21 +263,18 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
-			if(!supportsModel(model.value1()))
-				throw new UnsupportedModelException("Verifydtapn does not support the given model.");
+			if(!supportsModel(model.value1(), options))
+				throw new UnsupportedModelException("Verifypn does not support the given model.");
 			
-                        if(!supportsQuery(model.value1(), query, options)){
-                            throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
-                        }
-			//if(!supportsQuery(model.value1(), query, options))
-				//throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
+			if(!supportsQuery(model.value1(), query, options))
+				throw new UnsupportedQueryException("verifypn does not support the given query.");
 			
 //			if(((VerifyTAPNOptions)options).discreteInclusion() && !isQueryUpwardClosed(query))
 //				throw new UnsupportedQueryException("Discrete inclusion check only supports upward closed queries.");
 			
 			if(((VerifyTAPNOptions)options).discreteInclusion()) mapDiscreteInclusionPlacesToNewNames(options, model);
 			
-			VerifyTAPNExporter exporter = new VerifyTAPNExporter();
+			VerifyPNExporter exporter = new VerifyPNExporter();
 			ExportedVerifyTAPNModel exportedModel = exporter.export(model.value1(), query);
 
 			if (exportedModel == null) {
@@ -308,7 +307,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 		private VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, ExportedVerifyTAPNModel exportedModel, TAPNQuery query) {
 			((VerifyTAPNOptions)options).setTokensInModel(model.value1().marking().size()); // TODO: get rid of me
-			runner = new ProcessRunner(verifydtapnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
+			runner = new ProcessRunner(verifypnpath, createArgumentString(exportedModel.modelFile(), exportedModel.queryFile(), options));
 			runner.run();
 
 			if (runner.error()) {
@@ -317,19 +316,12 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 				String errorOutput = readOutput(runner.errorOutput());
 				String standardOutput = readOutput(runner.standardOutput());
 
-				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
-				
-				TimedArcPetriNetTrace secondaryTrace = null;
-				// Parse covered trace
-				if(queryResult.value2().getCoveredMarking() != null){
-					secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
-				}
-				
+				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
-					TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:")?errorOutput:(errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2()); 
+					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2()); 
 				}
 			}
 		}
@@ -348,7 +340,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 							(query.getProperty() instanceof TCTLAFNode && queryResult.isQuerySatisfied())){
 						return null;
 					} else{
-						messenger.displayErrorMessage("Verifydtapn cannot generate the requested trace for the model. Try another trace option.");
+						messenger.displayErrorMessage("verifypn cannot generate the requested trace for the model. Try another trace option.");
 					}
 				}
 			} 
@@ -385,26 +377,24 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			return buffer.toString();
 		}
 		
-		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery query, TimedArcPetriNet model) {
-			VerifyDTAPNOutputParser outputParser = new VerifyDTAPNOutputParser(totalTokens, extraTokens, query);
+		private Tuple<QueryResult, Stats> parseQueryResult(String output, int totalTokens, int extraTokens, TAPNQuery queryType) {
+			VerifyTAPNOutputParser outputParser = new VerifyPNOutputParser(totalTokens, extraTokens, queryType);
 			Tuple<QueryResult, Stats> result = outputParser.parseOutput(output);
 			return result;
 		}
 		
 		
+		boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
+			return supportsModel(model) || options.searchOption() == SearchOption.OVERAPPROXIMATE;
+		}
+		
+		@Override
 		public boolean supportsModel(TimedArcPetriNet model) {
-			return model.isNonStrict();
+			return model.isUntimed();
 		}
 		
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
-                        // if liveness, has deadlock proposition and uses timedarts, it is not supported
-			if((query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode)
-                                && query.hasDeadlock() 
-                                && ((VerifyDTAPNOptions)options).timeDarts()){
-                return false;
-            }
-			
-			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
+			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
 				return false;
 			}
 			
@@ -420,18 +410,20 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		
 		public static void reset() {
 			//Clear value
-			verifydtapnpath = "";
-			Preferences.getInstance().setVerifydtapnLocation(null);
+			verifypnpath = "";
+			Preferences.getInstance().setVerifypnLocation(null);
 			//Set the detault
 			trySetup();
 		}
 
 		@Override
 		public String toString() {
-			return "verifydtapn";
+			return "verifypn";
 		}
-		
+
+		@Override
 		public boolean useDiscreteSemantics() {
-			return true;
+			// TODO Auto-generated method stub
+			return false;
 		}
 }

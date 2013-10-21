@@ -1133,7 +1133,7 @@ public class WorkflowDialog extends JDialog {
 								new TCTLEFNode(new TCTLAtomicPropositionNode(template, done.name(), "=", 1)), TraceOption.SOME,
 								SearchOption.HEURISTIC,
 								ReductionOption.VerifyTAPNdiscreteVerification, true,
-								false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
+								false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
 					@Override
@@ -1278,7 +1278,7 @@ public class WorkflowDialog extends JDialog {
 								new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 								SearchOption.HEURISTIC,
 								ReductionOption.VerifyTAPNdiscreteVerification, true,
-								false, false, null, ExtrapolationOption.AUTOMATIC,
+								false, false, false, null, ExtrapolationOption.AUTOMATIC,
 								WorkflowMode.WORKFLOW_SOUNDNESS);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 

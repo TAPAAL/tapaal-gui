@@ -1,8 +1,11 @@
 package pipe.gui.widgets;
 
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
@@ -14,7 +17,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.InternationalFormatter;
-import javax.swing.text.DocumentFilter.FilterBypass;
 
 public class CustomJSpinner extends JSpinner{
 	
@@ -40,7 +42,7 @@ public class CustomJSpinner extends JSpinner{
 	public CustomJSpinner(Integer value, final Integer minimumValue, final Integer maximumValue) {
 		JSpinner.NumberEditor jsEditor =
 				(JSpinner.NumberEditor)this.getEditor();
-			JFormattedTextField textField = jsEditor.getTextField();
+			final JFormattedTextField textField = jsEditor.getTextField();
 			final DocumentFilter digitOnlyFilter = new DocumentFilter() {
 				@Override
 				public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -114,6 +116,23 @@ public class CustomJSpinner extends JSpinner{
 			this.setPreferredSize(new Dimension(100, 25));
 			this.setMaximumSize(new Dimension(100, 25));
 			this.setMinimumSize(new Dimension(100, 25));
+			
+			final JSpinner spinner = this;
+
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher(){
+				public boolean dispatchKeyEvent(KeyEvent ke){
+					if(ke.getID()==KeyEvent.KEY_PRESSED && ke.getKeyCode() == KeyEvent.VK_ENTER &&
+							KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == textField)
+					{
+						try
+						{
+							spinner.commitEdit();
+							KeyboardFocusManager.getCurrentKeyboardFocusManager().redispatchEvent(spinner, ke);
+						}catch(Exception e){}
+					}
+					return false;
+				}
+			});
 	}
 	
 	public CustomJSpinner(Integer value, final JButton okButton) {
