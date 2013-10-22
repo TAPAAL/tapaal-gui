@@ -10,9 +10,9 @@ import dk.aau.cs.util.Require;
 
 // This class assumes that the transition is conservative
 public class Pairing {
-	protected TimedTransition transition;
+	private TimedTransition transition;
 	
-	protected Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
+	private Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
 	
 	public Pairing(TimedTransition t) {
 		transition = t;
@@ -42,6 +42,17 @@ public class Pairing {
 		Require.that(inputArcToOutputArc.containsKey(inputArc), "The given input arc is not in the preset of the transition");
 		
 		return inputArcToOutputArc.get(inputArc);
+	}
+	
+	protected TimedTransition getTransition(){
+		return transition;
+	}
+	
+	protected Hashtable<TimedInputArc,TimedOutputArc> getInputArcToOutputArc(){
+		if(inputArcToOutputArc == null){
+			generatePairing();
+		}
+		return inputArcToOutputArc;
 	}
 	
 }
