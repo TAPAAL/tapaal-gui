@@ -357,7 +357,7 @@ public class Verifyta implements ModelChecker {
 		TimedArcPetriNetTrace tapnTrace = null;
 
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
-		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
+		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)), (VerifytaOptions) options);
 
 		if (trace == null) {
 			if (((VerifytaOptions) options).trace() != TraceOption.NONE) {
