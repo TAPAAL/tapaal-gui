@@ -252,10 +252,7 @@ public class Verifyta implements ModelChecker {
 	
 	@Override
 	public boolean supportsModel(TimedArcPetriNet model) {
-		if(model.hasUrgentTransitions() || model.hasWeights()){
-			return false;
-		}
-		
+		//The combi translation supports all models.
 		return true;
 	}
 
@@ -263,6 +260,16 @@ public class Verifyta implements ModelChecker {
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
 			VerificationOptions options) {
 
+		//Combi supports all
+		if(((VerifytaOptions)options).getReduction() == ReductionOption.COMBI){
+			return true;
+		}
+		
+		//Only combi supports this combination
+		if(model.hasUrgentTransitions() || model.hasWeights()){
+			return false;
+		}
+		
 		if(query.hasDeadlock()){
 				// Only broadcast translations supports deadlock.
 				if(((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&

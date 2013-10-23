@@ -217,6 +217,7 @@ public class QueryDialog extends JPanel {
 	private InclusionPlaces inclusionPlaces;
 
 	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
+	private String name_COMBI = "UPPAAL: Combi reduction";
 	private String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private String name_STANDARD = "UPPAAL: Standard Reduction";
 	private String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -397,6 +398,8 @@ public class QueryDialog extends JPanel {
 			return null;
 		else if (reductionOptionString.equals(name_STANDARD))
 			return ReductionOption.STANDARD;
+		else if (reductionOptionString.equals(name_COMBI))
+			return ReductionOption.COMBI;
 		else if (reductionOptionString.equals(name_OPTIMIZEDSTANDARD))
 			return ReductionOption.OPTIMIZEDSTANDARD;
 		else if (reductionOptionString.equals(name_BROADCASTDEG2))
@@ -494,13 +497,6 @@ public class QueryDialog extends JPanel {
 	}
 
 	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
-		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
-			JOptionPane.showMessageDialog(CreateGui.getApp(),
-					"No reduction option supports both strict intervals and weigthed arcs", 
-					"No reduction option", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-
 		guiDialog = new EscapableDialog(CreateGui.getApp(),	"Edit Query", true);
 
 		Container contentPane = guiDialog.getContentPane();
@@ -696,6 +692,7 @@ public class QueryDialog extends JPanel {
                     }
                 }
             }
+            options.add(name_COMBI);
             if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
                 if (isNetDegree2 && !tapnNetwork.hasWeights()) {
                     options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
@@ -706,14 +703,17 @@ public class QueryDialog extends JPanel {
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}
+			options.add(name_COMBI);
 		} else if(tapnNetwork.hasUrgentTransitions()){
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}
+			options.add(name_COMBI);
 		} else if (getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")) {
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}
+			options.add(name_COMBI);
 			if(isNetDegree2)
 				options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
 			else
@@ -723,13 +723,13 @@ public class QueryDialog extends JPanel {
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}					
-			options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2 ));
+			options.addAll(Arrays.asList(name_COMBI, name_BROADCAST, name_BROADCASTDEG2 ));
 		} else {
 			options.add( name_verifyTAPN);
 			if(tapnNetwork.isNonStrict()){
 				options.add(name_DISCRETE);
 			}
-			options.addAll(Arrays.asList( name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
+			options.addAll(Arrays.asList(name_COMBI, name_OPTIMIZEDSTANDARD, name_STANDARD, name_BROADCAST, name_BROADCASTDEG2));
 		}
 
 		reductionOption.removeAllItems();
@@ -961,6 +961,8 @@ public class QueryDialog extends JPanel {
 			reduction = name_DISCRETE;
 		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.VerifyPN){
 			reduction = name_UNTIMED;
+		} else if(queryToCreateFrom.getReductionOption() == ReductionOption.COMBI){
+			reduction = name_COMBI;
 		} else if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
 			if (queryToCreateFrom.getReductionOption() == ReductionOption.STANDARD) {
 				reduction = name_STANDARD;

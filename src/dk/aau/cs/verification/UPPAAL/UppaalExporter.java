@@ -8,6 +8,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.ReductionOption;
 import dk.aau.cs.translations.tapn.BroadcastTranslation;
+import dk.aau.cs.translations.tapn.CombiTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastKBoundOptimizeTranslation;
 import dk.aau.cs.translations.tapn.Degree2BroadcastTranslation;
 import dk.aau.cs.translations.tapn.OptimizedStandardTranslation;
@@ -39,6 +40,8 @@ public class UppaalExporter {
 			translator = new Degree2BroadcastTranslation(symmetry || reduction == ReductionOption.KBOUNDANALYSIS);
 		} else if (reduction == ReductionOption.KBOUNDOPTMIZATION) {
 			translator = new Degree2BroadcastKBoundOptimizeTranslation();
+		} else if (reduction == ReductionOption.COMBI){
+			translator = new CombiTranslation(symmetry);
 		} else {
 			throw new RuntimeException("Invalid reduction selected. Please try again");
 		}

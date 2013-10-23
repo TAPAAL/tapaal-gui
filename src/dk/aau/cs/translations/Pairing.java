@@ -16,7 +16,6 @@ public class Pairing {
 	
 	public Pairing(TimedTransition t) {
 		transition = t;
-		generatePairing();
 	}
 
 	protected void generatePairing() {
@@ -35,13 +34,13 @@ public class Pairing {
 	}
 
 	protected void add(TimedInputArc inputArc, TimedOutputArc outputArc) {
-		inputArcToOutputArc.put(inputArc, outputArc);
+		getInputArcToOutputArc().put(inputArc, outputArc);
 	}
 	
 	public TimedOutputArc getOutputArcFor(TimedInputArc inputArc) {
-		Require.that(inputArcToOutputArc.containsKey(inputArc), "The given input arc is not in the preset of the transition");
+		Require.that(getInputArcToOutputArc().containsKey(inputArc), "The given input arc is not in the preset of the transition");
 		
-		return inputArcToOutputArc.get(inputArc);
+		return getInputArcToOutputArc().get(inputArc);
 	}
 	
 	protected TimedTransition getTransition(){
