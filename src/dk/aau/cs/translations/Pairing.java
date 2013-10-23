@@ -12,13 +12,14 @@ import dk.aau.cs.util.Require;
 public class Pairing {
 	private TimedTransition transition;
 	
-	private Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
+	private Hashtable<TimedInputArc,TimedOutputArc> inputArcToOutputArc = null;
 	
 	public Pairing(TimedTransition t) {
 		transition = t;
 	}
 
 	protected void generatePairing() {
+		System.err.println("Parent called");
 		List<TimedInputArc> inputArcs = transition.getInputArcs();
 		List<TimedOutputArc> outputArcs = transition.getOutputArcs();
 		
@@ -49,6 +50,7 @@ public class Pairing {
 	
 	protected Hashtable<TimedInputArc,TimedOutputArc> getInputArcToOutputArc(){
 		if(inputArcToOutputArc == null){
+			inputArcToOutputArc = new Hashtable<TimedInputArc, TimedOutputArc>();
 			generatePairing();
 		}
 		return inputArcToOutputArc;

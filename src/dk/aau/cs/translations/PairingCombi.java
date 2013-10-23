@@ -15,15 +15,22 @@ import dk.aau.cs.util.Require;
 // This class assumes that the transition is conservative
 public class PairingCombi extends Pairing {
 	
-	private Hashtable<String, Boolean> placeNameToTimed = null;
+	private Hashtable<String, Boolean> placeNameToTimed;
 	
 	public PairingCombi(TimedTransition t, Hashtable<String, Boolean> placeNameToTimed) {
 		super(t);
 		this.placeNameToTimed = placeNameToTimed;
+		
+		//This forces the instantiation of inputArcToOutputArc, this is necessary since
+		//the generateParings method in this class has side effects.
+		//The first time the placeNameToTimed is read, is when iterating over the transitions preset,  
+		//and as generatePairing alters this, the normal lazy instantiation done in Pairing will fail.
+		getInputArcToOutputArc();
 	}
 
 	//TODO this method is way too long
 	protected void generatePairing() {
+		System.err.println("Child called");
 		List<TimedInputArc> inputArcs = getTransition().getInputArcs();
 		List<TimedOutputArc> outputArcs = getTransition().getOutputArcs();
 		
