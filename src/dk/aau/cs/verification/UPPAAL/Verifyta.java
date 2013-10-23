@@ -265,7 +265,7 @@ public class Verifyta implements ModelChecker {
 			return true;
 		}
 		
-		//Only combi supports this combination
+		//The only translation to UPPAAL that supports this combination is Combi
 		if(model.hasUrgentTransitions() || model.hasWeights()){
 			return false;
 		}
