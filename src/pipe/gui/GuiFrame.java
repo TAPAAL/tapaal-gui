@@ -2326,8 +2326,8 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == saveAsAction) {
 				saveOperation(true); // code for Save As operations
 			} else if (this == openAction) { // code for Open operation
-				File[] filePath = new FileBrowser(CreateGui.userPath).openFiles();
-				for(File f : filePath){
+				File[] files = new FileBrowser(CreateGui.userPath).openFiles();
+				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()) {
 						CreateGui.userPath = f.getParent();
 						createNewTabFromFile(f);
