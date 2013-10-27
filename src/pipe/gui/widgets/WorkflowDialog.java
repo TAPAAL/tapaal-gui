@@ -160,8 +160,8 @@ public class WorkflowDialog extends JDialog {
 	private static final String RESULT_ERROR_TIME = "A time divergent marking is reachable.";
 	/* Syntax */
 	
-	private static final String ERROR_MULTIPLE_IN = "Multiple input places found.";
-	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found.";
+	private static final String ERROR_MULTIPLE_IN = "Multiple input places found";
+	private static final String ERROR_MULTIPLE_OUT = "Multiple output places found";
 	
 	private static final long serialVersionUID = 5613743579411748200L;
 
@@ -215,6 +215,9 @@ public class WorkflowDialog extends JDialog {
 	private int B;
 	private Constant c = null;
 	private TimedPlace done = null;
+	
+	private static int numErrorsShown = 5;
+	private static int maxStringLength = LABEL_UNUSED_TRANSITIONS.length();
 
 	private TimedArcPetriNetNetwork model = null;
 
@@ -340,7 +343,7 @@ public class WorkflowDialog extends JDialog {
 			for (String e : errorMsgs)
 				sb.append(sep).append("- ").append(e);
 			workflowTypeError
-			.setText("<html>This net is not a workflow net for the following reason(s):"
+			.setText("<html>This net is not a workflow net for the following reason"+(errorMsgs.size() > 1?"s":"")+":"
 					+ sb.toString() + "</html>");
 			workflowTypeError.setVisible(true);
 			break;
@@ -747,6 +750,8 @@ public class WorkflowDialog extends JDialog {
 		ArrayList<SharedTransition> sharedTransitions = new ArrayList<SharedTransition>();
 		in = null;
 		out = null;
+		ArrayList<TimedPlace> inCandidates = new ArrayList<TimedPlace>();
+		ArrayList<TimedPlace> outCandidates = new ArrayList<TimedPlace>();
 		errorMsgs = new ArrayList<String>();
 		errors = 0;
 		
@@ -819,23 +824,9 @@ public class WorkflowDialog extends JDialog {
 						errorMsgs.add("Place " + p
 								+ " has no incoming or outgoing arcs.");
 				} else if (isin) {
-					if (in == null) {
-						in = p;
-					} else {
-						if(errorMsgs.size() > 5)	errors++;
-						else
-							errorMsgs.add(ERROR_MULTIPLE_IN+" (" + in
-									+ " and " + p + ").");
-					}
+					inCandidates.add(p);
 				} else if (isout) {
-					if (out == null) {
-						out = p;
-					} else {
-						if(errorMsgs.size() > 5)	errors++;
-						else
-							errorMsgs.add(ERROR_MULTIPLE_OUT + " (" + out
-									+ " and " + p + ").");
-					}
+					outCandidates.add(p);
 				}
 
 				if (p.isShared() && !countedSharedPlaces.contains(p)) {
@@ -893,44 +884,69 @@ public class WorkflowDialog extends JDialog {
 			while (sharedInPlaces.remove(p)) {
 			}
 			if (!sharedOutPlaces.remove(p)) {
-				if (in == null) {
-					in = p;
-				} else {
-					if(errorMsgs.size() > 5)	errors++;
-					else
-						errorMsgs.add(ERROR_MULTIPLE_IN+" (" + in + " and "
-								+ p + ").");
-				}
+				inCandidates.add(p);
 			}
 			while (sharedOutPlaces.remove(p)) {
 			}
-		}
-
-		if (in == null) {
-			if(errorMsgs.size() > 5)	errors++;
-			else
-				errorMsgs.add("No input place found.");
 		}
 
 		while (sharedOutPlaces.size() > 0) {
 			TimedPlace p = sharedOutPlaces.get(0);
-			if (out == null) {
-				out = p;
-			} else {
-				if(errorMsgs.size() > 5)	errors++;
-				else
-					errorMsgs.add(ERROR_MULTIPLE_OUT + " (" + out + " and " + p
-							+ ").");
-			}
+			outCandidates.add(p);
 			while (sharedOutPlaces.remove(p)) {
 			}
 		}
-
-		if (out == null) {
+		
+		if(inCandidates.isEmpty()){
+			if(errorMsgs.size() > 5)	errors++;
+			else
+				errorMsgs.add("No input place found.");
+		}else if(inCandidates.size() > 1){
+			if(errorMsgs.size() > 5)	errors++;
+			else{
+				StringBuilder errorString = new StringBuilder(ERROR_MULTIPLE_IN + " (");
+				int lineLength = errorString.length();
+				for(TimedPlace p : inCandidates){
+					if(lineLength + p.toString().length() > maxStringLength){
+						errorString.append("<br>");
+						lineLength = 0;
+					}
+					errorString.append(p + ", ");
+					lineLength += p.toString().length() + 2;
+				}
+				errorString.delete(errorString.length()-2, errorString.length());
+				errorString.append(").");
+				errorMsgs.add(errorString.toString());
+			}
+		}else{
+			in = inCandidates.get(0);
+		}
+		
+		if(outCandidates.isEmpty()){
 			if(errorMsgs.size() > 5)	errors++;
 			else
 				errorMsgs.add("No output place found.");
+		}else if(outCandidates.size() > 1){
+			if(errorMsgs.size() > 5)	errors++;
+			else{
+				StringBuilder errorString = new StringBuilder(ERROR_MULTIPLE_OUT + " (");
+				int lineLength = errorString.length();
+				for(TimedPlace p : outCandidates){
+					if(lineLength + p.toString().length() > maxStringLength){
+						errorString.append("<br>");
+						lineLength = 0;
+					}
+					errorString.append(p + ", ");
+					lineLength += p.toString().length() + 2;
+				}
+				errorString.delete(errorString.length()-2, errorString.length());
+				errorString.append(").");
+				errorMsgs.add(errorString.toString());
+			}
+		}else{
+			out = outCandidates.get(0);
 		}
+
 
 		if (numberOfTokensInNet > 1 || (in != null && in.tokens().size() != 1)) {
 			if(errorMsgs.size() > 5)	errors++;
@@ -1303,7 +1319,6 @@ public class WorkflowDialog extends JDialog {
 							boolean hasUnusedTransitions = false;
 							StringBuilder sb = new StringBuilder();
 							int lineLength = 0;
-							int maxLength = LABEL_UNUSED_TRANSITIONS.length();
 							sb.append("<html>");
 							for(Tuple<String, Integer> stat : result.getTransitionStatistics()){
 								if(stat.value2() == 0){
@@ -1312,7 +1327,7 @@ public class WorkflowDialog extends JDialog {
 									}else{
 										sb.append(", ");
 										lineLength += 2;
-										if(lineLength > maxLength - stat.value1().length()){
+										if(lineLength > maxStringLength - stat.value1().length()){
 											sb.append("<br />");
 											lineLength = 0;
 										}
