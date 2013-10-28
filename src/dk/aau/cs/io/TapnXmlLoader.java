@@ -159,9 +159,18 @@ public class TapnXmlLoader {
 		Collection<TAPNQuery> queries = parseQueries(doc, network);
 
 		network.buildConstraints();
+		
+		parseBound(doc, network);
+		
 		return new LoadedModel(network, templates, queries);
 	}
 
+	private void parseBound(Document doc, TimedArcPetriNetNetwork network){
+		if(doc.getElementsByTagName("k-bound").getLength() > 0){
+			int i = Integer.parseInt(doc.getElementsByTagName("k-bound").item(0).getAttributes().getNamedItem("bound").getNodeValue());
+			network.setDefaultBound(i);
+		}
+	}
 
 	private void parseSharedPlaces(Document doc, TimedArcPetriNetNetwork network, ConstantStore constants) {
 		NodeList sharedPlaceNodes = doc.getElementsByTagName("shared-place");

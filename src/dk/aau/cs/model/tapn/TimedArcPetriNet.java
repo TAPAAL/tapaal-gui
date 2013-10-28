@@ -222,7 +222,7 @@ public class TimedArcPetriNet {
 
 	public TimedPlace getPlaceByName(String placeName) {
 		for (TimedPlace p : places) {
-			if (p.name().equals(placeName)) {
+			if (p.name().toLowerCase().equals(placeName.toLowerCase())) {
 				return p;
 			}
 		}
@@ -231,7 +231,7 @@ public class TimedArcPetriNet {
 
 	public TimedTransition getTransitionByName(String transitionName) {
 		for (TimedTransition t : transitions) {
-			if (t.name().equals(transitionName)) {
+			if (t.name().toLowerCase().equals(transitionName.toLowerCase())) {
 				return t;
 			}
 		}
@@ -304,6 +304,8 @@ public class TimedArcPetriNet {
 		for(TimedInhibitorArc inhibArc : inhibitorArcs)
 			tapn.add(inhibArc.copy(tapn));
 
+		tapn.setActive(isActive());
+		
 		return tapn;
 	}
 
