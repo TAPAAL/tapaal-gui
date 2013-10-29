@@ -97,7 +97,6 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		extraTokens = query.getExtraTokens();
 		NTA nta = transformModel(model);
 		UPPAALQuery uppaalQuery = transformQuery(query, model);
-		System.out.println("Combi translate");
 		return new Tuple<NTA, UPPAALQuery>(nta, uppaalQuery);
 	}
 

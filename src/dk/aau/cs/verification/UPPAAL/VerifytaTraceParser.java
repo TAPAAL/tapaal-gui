@@ -3,6 +3,7 @@ package dk.aau.cs.verification.UPPAAL;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import dk.aau.cs.debug.Logger;
 import dk.aau.cs.model.NTA.trace.SymbolicState;
 import dk.aau.cs.model.NTA.trace.TimeDelayFiringAction;
 import dk.aau.cs.model.NTA.trace.TransitionFiring;
@@ -165,7 +166,7 @@ public class VerifytaTraceParser {
 						}
 						delayValue = 0;
 						previous = newElement;
-						System.out.println("state " + newElement);
+						Logger.log("state " + newElement);
 						SymbolicState state = SymbolicState.parse(newElement);
 						trace.addState(state);
 						previousState = state;
@@ -174,7 +175,7 @@ public class VerifytaTraceParser {
 							previousTransitionFiring = null;
 						}
 					} else if (element.contains("Delay:")) {
-						System.out.println("Delay " + element);
+						Logger.log("Delay " + element);
 						int colon = element.indexOf(":");
 						int end = element.indexOf("\n");
 						delayValue = Double.parseDouble(element.substring(colon+2, end));
@@ -214,7 +215,7 @@ public class VerifytaTraceParser {
 									}
 								}
 							}
-							System.out.println("transition " + element);
+							Logger.log("transition " + element);
 							TransitionFiring transition = TransitionFiring.parse(
 									previousState, element);
 							trace.addFiringAction(transition);

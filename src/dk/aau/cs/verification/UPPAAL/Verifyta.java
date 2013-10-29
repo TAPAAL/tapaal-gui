@@ -265,13 +265,13 @@ public class Verifyta implements ModelChecker {
 			return true;
 		}
 		
-		//The only translation to UPPAAL that supports this combination is Combi
+		//The only translation to UPPAAL that supports these are Combi
 		if(model.hasUrgentTransitions() || model.hasWeights()){
 			return false;
 		}
 		
 		if(query.hasDeadlock()){
-				// Only broadcast translations supports deadlock.
+				// Only broadcast translations and combi supports deadlock.
 				if(((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
 					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST){
 						return false;

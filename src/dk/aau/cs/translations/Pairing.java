@@ -19,7 +19,6 @@ public class Pairing {
 	}
 
 	protected void generatePairing() {
-		System.err.println("Parent called");
 		List<TimedInputArc> inputArcs = transition.getInputArcs();
 		List<TimedOutputArc> outputArcs = transition.getOutputArcs();
 		

@@ -30,7 +30,6 @@ public class PairingCombi extends Pairing {
 
 	//TODO this method is way too long
 	protected void generatePairing() {
-		System.err.println("Child called");
 		List<TimedInputArc> inputArcs = getTransition().getInputArcs();
 		List<TimedOutputArc> outputArcs = getTransition().getOutputArcs();
 		
