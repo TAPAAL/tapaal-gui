@@ -319,15 +319,16 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query, model.value1());
 				
-				TimedArcPetriNetTrace secondaryTrace = null;
-				// Parse covered trace
-				if(queryResult.value2().getCoveredMarking() != null){
-					secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
-				}
-				
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
+					
+					// Parse covered trace
+					TimedArcPetriNetTrace secondaryTrace = null;
+					if(queryResult.value2().getCoveredMarking() != null){
+						secondaryTrace = parseTrace((errorOutput.split("Trace:")[2]), options, model, exportedModel, query, queryResult.value1());
+					}
+					
 					TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:")?errorOutput:(errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
 					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2()); 
 				}
