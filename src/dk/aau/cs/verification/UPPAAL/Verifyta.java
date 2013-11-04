@@ -259,32 +259,28 @@ public class Verifyta implements ModelChecker {
 	@Override
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
 			VerificationOptions options) {
-
-		//Combi supports all
-		if(((VerifytaOptions)options).getReduction() == ReductionOption.COMBI){
-			return true;
-		}
 		
 		//The only translation to UPPAAL that supports these are Combi
-		if(model.hasUrgentTransitions() || model.hasWeights()){
+		if((model.hasUrgentTransitions() || model.hasWeights()) && ((VerifytaOptions)options).getReduction() != ReductionOption.COMBI){
 			return false;
 		}
 		
 		if(query.hasDeadlock()){
 				// Only broadcast translations and combi supports deadlock.
 				if(((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
-					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST){
+					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST &&
+					((VerifytaOptions)options).getReduction() != ReductionOption.COMBI){
 						return false;
 				}
 				
-				// Broadcast translations do not support EG and AF queries that contain a deadlock.
+				// Broadcast translations and combi do not support EG and AF queries that contain a deadlock.
 				if(query.getProperty() instanceof TCTLEGNode || 
 						query.getProperty() instanceof TCTLAFNode){
 					return false;
 				}
 				
 				// No translation support inhibitor arcs with deadlock queries
-				if(model.hasInhibitorArcs()){
+				if(model.hasInhibitorArcs() && ((VerifytaOptions)options).getReduction() != ReductionOption.COMBI){
 					return false;
 				}
 		}

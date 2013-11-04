@@ -692,10 +692,12 @@ public class QueryDialog extends JPanel {
                     }
                 }
             }
-            options.add(name_COMBI);
             if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-                if (isNetDegree2 && !tapnNetwork.hasWeights()) {
-                    options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
+                if (isNetDegree2) {
+                	options.add(name_COMBI);
+                	if(!tapnNetwork.hasWeights()) {
+                		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
+                	}
                 }
             }
             
