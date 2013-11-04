@@ -280,7 +280,7 @@ public class Verifyta implements ModelChecker {
 				}
 				
 				// No translation support inhibitor arcs with deadlock queries
-				if(model.hasInhibitorArcs() && ((VerifytaOptions)options).getReduction() != ReductionOption.COMBI){
+				if(model.hasInhibitorArcs()){
 					return false;
 				}
 		}
