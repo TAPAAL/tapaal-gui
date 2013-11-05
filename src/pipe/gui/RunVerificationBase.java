@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
+import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -32,7 +33,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	private VerificationOptions options;
 	protected TimedArcPetriNetNetwork model;
 	protected TAPNQuery query;
-
+	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
+	
+	
 	protected Messenger messenger;
 
 	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
@@ -41,17 +44,26 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		this.messenger = messenger;
 	}
 
-	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query) {
+	
+	public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, pipe.dataLayer.TAPNQuery dataLayerQuery) {
 		this.model = model;
 		this.options = options;
 		this.query = query;
+		this.dataLayerQuery = dataLayerQuery;
 		execute();
 	}
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		TAPNComposer composer = new TAPNComposer(messenger);
+		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
+		
+		if (dataLayerQuery != null && dataLayerQuery.isApproximationEnabled())
+		{
+			OverApproximation overaprx = new OverApproximation();
+			overaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
+		}
 
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());

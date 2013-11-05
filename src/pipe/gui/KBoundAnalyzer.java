@@ -42,7 +42,7 @@ public class KBoundAnalyzer {
 		RunningVerificationDialog dialog = new RunningVerificationDialog(CreateGui.getApp());
 		dialog.setupListeners(analyzer);
 
-		analyzer.execute(options, tapnNetwork, query);
+		analyzer.execute(options, tapnNetwork, query, null);
 		dialog.setVisible(true);
 	}
 
