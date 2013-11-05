@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -62,6 +63,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
@@ -89,6 +91,7 @@ import dk.aau.cs.TCTL.Parsing.TAPAALQueryParser;
 import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
+import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -199,7 +202,12 @@ public class QueryDialog extends JPanel {
 	private JCheckBox useTimeDarts;
 	private JCheckBox usePTrie;
 	private JCheckBox useOverApproximation;
-
+	
+	// Overapproximation options panel
+	private JPanel overApproximationOptionsPanel;
+	private JCheckBox overApproximationEnable;
+	private CustomJSpinner overApproximationDenominator;
+	
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
 	private JButton cancelButton;
@@ -211,6 +219,7 @@ public class QueryDialog extends JPanel {
 	private StringPosition currentSelection = null;
 
 	private final TimedArcPetriNetNetwork tapnNetwork;
+	private final HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 	private boolean isNetDegree2;
@@ -308,8 +317,9 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
-			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork) {
+			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		this.tapnNetwork = tapnNetwork;
+		this.guiModels = guiModels;
 		inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
@@ -354,7 +364,7 @@ public class QueryDialog extends JPanel {
 		boolean pTrie = usePTrie.isSelected();
 		boolean overApproximation = useOverApproximation.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -493,7 +503,7 @@ public class QueryDialog extends JPanel {
 		return new HasDeadlockVisitor().hasDeadLock(newProperty);
 	}
 
-	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork) {
+	public static TAPNQuery showQueryDialogue(QueryDialogueOption option, TAPNQuery queryToRepresent, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		if(CreateGui.getCurrentTab().network().hasWeights() && !CreateGui.getCurrentTab().network().isNonStrict()){
 			JOptionPane.showMessageDialog(CreateGui.getApp(),
 					"No reduction option supports both strict intervals and weigthed arcs", 
@@ -510,7 +520,7 @@ public class QueryDialog extends JPanel {
 		contentPane.setLayout(new GridBagLayout());
 
 		// 2 Add query editor
-		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork);
+		QueryDialog queryDialogue = new QueryDialog(guiDialog, option, queryToRepresent, tapnNetwork, guiModels);
 		contentPane.add(queryDialogue);
 
 		guiDialog.setResizable(false);
@@ -919,6 +929,7 @@ public class QueryDialog extends JPanel {
 		initQueryPanel();
 		initUppaalOptionsPanel();
 		initReductionOptionsPanel();
+		initOverApproximationPanel();
 		initButtonPanel(option);
 
 		if(queryToCreateFrom != null)
@@ -947,6 +958,12 @@ public class QueryDialog extends JPanel {
 		setupSearchOptionsFromQuery(queryToCreateFrom);		
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
+		setupApproximationOptionsFromQuery(queryToCreateFrom);
+	}
+	
+	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
+		if (queryToCreateFrom.isApproximationEnabled())
+			overApproximationEnable.setSelected(true);
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2041,6 +2058,42 @@ public class QueryDialog extends JPanel {
 		uppaalOptionsPanel.add(traceOptionsPanel, gridBagConstraints);
 
 	}
+	
+	private void initOverApproximationPanel() {
+		overApproximationOptionsPanel = new JPanel(new GridBagLayout());
+		overApproximationOptionsPanel.setVisible(true);
+		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Over approximation Options"));
+		
+		overApproximationEnable = new JCheckBox("Enable over approximation");
+		overApproximationEnable.setVisible(true);
+		overApproximationEnable.setToolTipText("Enable over approximation");
+		GridBagConstraints gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
+		overApproximationEnable.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		
+		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
+		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
+		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
+		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
+		overApproximationDenominator.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
+		overApproximationOptionsPanel.add(overApproximationDenominator);
+	
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.anchor = GridBagConstraints.WEST;
+		gridBagConstraints.insets = new Insets(5,10,5,10);
+		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+		
+		add(overApproximationOptionsPanel, gridBagConstraints);
+	}
 
 	private void initReductionOptionsPanel() {
 		reductionOptionsPanel = new JPanel(new GridBagLayout());
@@ -2415,7 +2468,7 @@ public class QueryDialog extends JPanel {
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 6;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.insets = new Insets(0, 10, 5, 10);

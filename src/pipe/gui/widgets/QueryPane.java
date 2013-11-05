@@ -311,7 +311,7 @@ public class QueryPane extends JPanel {
 		addQueryButton.setToolTipText(toolTipNewQuery);
 		addQueryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network());
+				TAPNQuery q = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, null, tabContent.network(), tabContent.getGuiModels());
 				if (q != null) {
 					undoManager.addNewEdit(new AddQueryCommand(q, tabContent));
 					addQuery(q);
@@ -336,7 +336,7 @@ public class QueryPane extends JPanel {
 		TAPNQuery q = (TAPNQuery) queryList.getSelectedValue();
 		if(q.isActive()) {
 			TAPNQuery newQuery = QueryDialog.showQueryDialogue(
-					QueryDialogueOption.Save, q, tabContent.network());
+					QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels());
 
 			if (newQuery != null)
 				updateQuery(q, newQuery);
