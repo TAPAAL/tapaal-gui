@@ -2252,8 +2252,9 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\nPeter G. Jensen, ");
-		buffer.append("Kenneth Y. Joergensen, Mikael H. Moeller,\nJiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
+                buffer.append("Lasse Jacobsen, Morten Jacobsen, Peter G. Jensen, ");
+		buffer.append("Kenneth Y. Joergensen,\nMikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2013\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
