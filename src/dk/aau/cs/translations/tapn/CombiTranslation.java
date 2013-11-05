@@ -69,6 +69,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 	protected static final String CAPOUT_TOKENS = "CapacityOutTokens";
 
 	protected static int maxDegDif = 0;
+	protected static int maxTimeIn = 0;
 	protected static int capInTokens;
 
 	private Hashtable<String, Location> namesToLocations = new Hashtable<String, Location>();
@@ -121,7 +122,9 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		NTA nta = new NTA();
 		
 		maxDegDif=largestTimedDegreeDifference(conservativeModel);
-		if(!(maxDegDif==0 && initTransitions==0)){
+		maxTimeIn=largestTimedDegreeIn(conservativeModel);
+		
+		if(!(maxDegDif==0 && initTransitions==0 && maxTimeIn==0)){
 			if (useSymmetry || conservativeModel.marking().size() + extraTokens == 0) {
 				capInTokens=model.getNumberOfTokensInNet()+extraTokens;
 				TimedAutomaton tokenTemplate = createTokenTemplate(conservativeModel);
@@ -174,7 +177,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 
 
 	private String createSystemDeclaration(int tokensInModel) {
-		if(maxDegDif==0 && initTransitions==0){
+		if(maxDegDif==0 && initTransitions==0 && maxTimeIn == 0){
 			return "system " + CONTROL_TEMPLATE_NAME + ";";
 		}
 		else if (useSymmetry || tokensInModel + extraTokens == 0) {
@@ -198,8 +201,10 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 	private String createGlobalDeclarations(TimedArcPetriNet model) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("const int N = ");
-		if(maxDegDif==0 && initTransitions==0){
+		if(maxDegDif==0 && initTransitions==0 && maxTimeIn ==0){
 			builder.append("0");
+		}else if(maxDegDif==0 && initTransitions==0){
+			builder.append(maxTimeIn);
 		}else if(maxDegDif==0){
 			builder.append(initTransitions);
 		}else{
@@ -207,7 +212,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		}
 		builder.append(";\n");
 
-		if (useSymmetry && !(maxDegDif==0 && initTransitions==0)) {
+		if (useSymmetry && !(maxDegDif==0 && initTransitions==0 && maxTimeIn==0)) {
 			builder.append("typedef ");
 			builder.append("scalar[N] ");
 			builder.append(ID_TYPE);
@@ -269,8 +274,13 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 
 
 		}
+		
+		int max = largestPresetSize;
+		if(max<maxTimeIn){
+			max = maxTimeIn;
+		}
 
-		for (int i = 0; i < largestPresetSize; i++) {
+		for (int i = 0; i < max ; i++) {
 			builder.append("int[0,N] ");
 			builder.append(String.format(COUNTER_NAME, i));
 			builder.append(";\n");
@@ -338,8 +348,9 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		} else {
 			control.setInitLocation(lock);
 		}
-
+		
 		createTransitionSimulations(control, lock, model);
+		
 
 		return control;
 	}
@@ -387,11 +398,13 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 	}
 
 	private String createControlGuard(TimedTransition transition) {
+
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("(" + CAPOUT_TOKENS + " == " + maxDegDif + " || " + CAPIN_TOKENS + " == 0)");
 
 		Hashtable<String, Integer> weightTable = new Hashtable<String, Integer>();
+
 		for(TimedInputArc ia : transition.getInputArcs()){
 			if(!placeNameToTimed.get(ia.source().name())){
 				builder.append(" && ");
@@ -668,7 +681,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 
 			if(presetSize == 0)
 				continue;
-
+			
 			if (presetSize > largestPresetSize) {
 				largestPresetSize = presetSize;
 			}
@@ -1417,6 +1430,17 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 		int maxDeg = 0;
 		for (TimedTransition transition : model.transitions()) {
 			int deg=timedDegreeDifference(transition);
+			if (deg>maxDeg){
+				maxDeg=deg;
+			}
+		}
+		return maxDeg;
+	}
+	
+	public int largestTimedDegreeIn(TimedArcPetriNet model){
+		int maxDeg = 0;
+		for (TimedTransition transition : model.transitions()) {
+			int deg= timedDegreeIn(transition);
 			if (deg>maxDeg){
 				maxDeg=deg;
 			}
