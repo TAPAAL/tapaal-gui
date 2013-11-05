@@ -87,12 +87,16 @@ public class Pipe {
 
 	public static Color BACKGROUND_COLOR = new Color(255, 255, 255, 200);
 	public static Color ANIMATION_BACKGROUND_COLOR = new Color(246, 250, 255);
+	
+	public static Color QUERY_SATISFIED_COLOR = new Color(44, 103, 0);
+	public static Color QUERY_NOT_SATISFIED_COLOR = new Color(204, 0, 0);
+	public static Color QUERY_INCONCLUSIVE_COLOR = new Color(255, 153, 0);
 
 	public static final int MAX_NODES = 20000;
 
 	public static final int verifytaMinRev = 4800;
 	public static final String verifytapnMinRev = "1.2.0";
-	public static final String verifydtapnMinRev = "2.1.0";
+	public static final String verifydtapnMinRev = "2.2.0";
 	public static final String verifypnMinRev = "0.1";
 	public static final int AGE_DECIMAL_PRECISION = 5;
 	public static final int AGE_PRECISION = AGE_DECIMAL_PRECISION + 4;

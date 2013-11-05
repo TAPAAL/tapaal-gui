@@ -221,7 +221,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				if(box.isSelected()){
 					switchToNameDropDown();
 				}else{
-					setInvariantControlsBasedOn(TimeInvariant.LESS_THAN_INFINITY);
 					setMarking(0);
 					switchToNameTextField();
 				}
@@ -254,7 +253,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 			public void itemStateChanged(ItemEvent e) {
 				SharedPlace place = (SharedPlace)e.getItem();
 				setMarking(place.numberOfTokens());
-				setInvariantControlsBasedOn(place.invariant());
+				setInvariantControlsBasedOn(place);
 			}
 		});
 
@@ -559,7 +558,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		basicPropertiesPanel.repaint();
 
 		SharedPlace selected = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
-		setInvariantControlsBasedOn(selected.invariant());
+		setInvariantControlsBasedOn(selected);
 		setMarking(selected.numberOfTokens());
 	}
 
@@ -567,6 +566,12 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		markingSpinner.setValue(numberOfTokens);
 	}
 
+	private void setInvariantControlsBasedOn(TimedPlace place) {
+		if(place instanceof SharedPlace && ((SharedPlace) place).getComponentsUsingThisPlace().size() > 0){
+			setInvariantControlsBasedOn(place.invariant());
+		}
+	}
+	
 	private void setInvariantControlsBasedOn(TimeInvariant invariant) {
 		if(invariant.upperBound() instanceof ConstantBound){
 			constantInvRadioButton.setSelected(true);

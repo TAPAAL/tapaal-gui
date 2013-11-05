@@ -156,6 +156,9 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_TimeoutLabel = null;
 	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
+	private final static String TOOL_TIP_OOMLabel = null;
+	private final static String TOOL_TIP_OOMValue = "<html>Enter the maximum amount of available memory to the verification.<br>Verification is skipped as soon as it is detected that this amount of memory is exceeded.</html>";
+	private final static String TOOL_TIP_NoOOMCheckBox = "Choose whether to use memory restrictions";
 	
 	//Tool tips for monitor panel
 	private final static String TOOL_TIP_FileLabel = "Currently verified net";
@@ -205,7 +208,9 @@ public class BatchProcessingDialog extends JDialog {
 	private JCheckBox keepQueryCapacity;
 	private JComboBox symmetryOption;
 	private JCheckBox noTimeoutCheckbox;
+	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
+	private CustomJSpinner oomValue;
 	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			timeoutCurrentVerificationTask();
@@ -227,6 +232,9 @@ public class BatchProcessingDialog extends JDialog {
 				String usage = MemoryMonitor.getUsage();
 				if(usage != null){
 					memory.setText(usage);
+				}
+				if(useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()){
+					oomCurrentVerificationTask();
 				}
 			}
 		}
@@ -432,6 +440,7 @@ public class BatchProcessingDialog extends JDialog {
 		initReductionOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
+		initOOMComponents();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -558,6 +567,50 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
+	}
+	
+	private void initOOMComponents() {
+		JLabel oomLabel = new JLabel("Max memory (in MB): ");
+		oomLabel.setToolTipText(TOOL_TIP_OOMLabel);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(oomLabel, gbc);
+
+		oomValue = new CustomJSpinner(2048,1,Integer.MAX_VALUE);
+		oomValue.setToolTipText(TOOL_TIP_OOMValue);
+		oomValue.setMaximumSize(new Dimension(70, 30));
+		oomValue.setMinimumSize(new Dimension(70, 30));
+		oomValue.setPreferredSize(new Dimension(70, 30));
+		oomValue.setEnabled(true);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 10);
+		verificationOptionsPanel.add(oomValue, gbc);
+
+		noOOMCheckbox = new JCheckBox("Do not limit memory usage");
+		noOOMCheckbox.setToolTipText(TOOL_TIP_NoOOMCheckBox);
+		noOOMCheckbox.setSelected(false);
+		noOOMCheckbox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (noOOMCheckbox.isSelected())
+					oomValue.setEnabled(false);
+				else
+					oomValue.setEnabled(true);
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 7;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(noOOMCheckbox, gbc);
 	}
 
 	private void initReductionOptionsComponents() {
@@ -1086,6 +1139,10 @@ public class BatchProcessingDialog extends JDialog {
 	private boolean useTimeout() {
 		return !noTimeoutCheckbox.isSelected();
 	}
+	
+	private boolean useOOM() {
+		return !noOOMCheckbox.isSelected();
+	}
 
 	private void terminateBatchProcessing() {
 		if (currentWorker != null && !currentWorker.isDone()) {
@@ -1106,6 +1163,12 @@ public class BatchProcessingDialog extends JDialog {
 	private void timeoutCurrentVerificationTask() {
 		if (currentWorker != null && !currentWorker.isDone()) {
 			currentWorker.notifyTimeoutCurrentVerificationTask();
+		}
+	}
+	
+	private void oomCurrentVerificationTask() {
+		if (currentWorker != null && !currentWorker.isDone()) {
+			currentWorker.notifyOOMCurrentVerificationTask();
 		}
 	}
 

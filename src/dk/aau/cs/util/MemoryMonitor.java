@@ -114,4 +114,8 @@ public class MemoryMonitor {
 		formatter.setMaximumFractionDigits(0);
 		return peakMemory == -1? "N/A":formatter.format(peakMemory) + " MB";
 	}
+	
+	public static int getPeakMemoryValue(){
+		return peakMemory == -1? 0:(int) peakMemory;
+	}
 }
