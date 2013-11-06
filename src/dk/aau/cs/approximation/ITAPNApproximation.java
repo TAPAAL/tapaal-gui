@@ -5,5 +5,5 @@ import dk.aau.cs.model.tapn.TimedArcPetriNet;
 
 public interface ITAPNApproximation {
 	//Returns a copy of a network which is the approximated network
-	public TimedArcPetriNet modifyTAPN(TimedArcPetriNet net, TAPNQuery query);
+	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query);
 }
