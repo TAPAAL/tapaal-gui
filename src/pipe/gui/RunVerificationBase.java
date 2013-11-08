@@ -1,10 +1,12 @@
 package pipe.gui;
 
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -16,10 +18,12 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
+import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -34,14 +38,16 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	protected TimedArcPetriNetNetwork model;
 	protected TAPNQuery query;
 	protected pipe.dataLayer.TAPNQuery dataLayerQuery;
+	protected HashMap<TimedArcPetriNet, DataLayer> guiModels;
 	
 	
 	protected Messenger messenger;
 
-	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger) {
+	public RunVerificationBase(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		super();
 		this.modelChecker = modelChecker;
 		this.messenger = messenger;
+		this.guiModels = guiModels;
 	}
 
 	
@@ -55,7 +61,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
-		TAPNComposer composer = new TAPNComposer(messenger);
+		ITAPNComposer composer;
+		if (this.guiModels != null) {
+			composer = new TAPNComposerExtended(messenger, guiModels);
+		} else {
+			composer = new TAPNComposer(messenger);			
+		}
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		

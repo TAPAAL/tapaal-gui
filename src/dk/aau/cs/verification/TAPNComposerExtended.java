@@ -1,8 +1,31 @@
 package dk.aau.cs.verification;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
+import javax.swing.filechooser.FileSystemView;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.w3c.dom.DOMException;
+
+import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
+import pipe.gui.Zoomer;
+import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PetriNetObject;
+import pipe.gui.graphicElements.Place;
+import pipe.gui.graphicElements.PlaceTransitionObject;
+import pipe.gui.graphicElements.Transition;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -16,7 +39,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
-public class TAPNComposerExtended {
+public class TAPNComposerExtended implements ITAPNComposer {
 	private static final String PLACE_FORMAT = "P%1$d";
 	private static final String TRANSITION_FORMAT = "T%1$d";
 
@@ -27,9 +50,17 @@ public class TAPNComposerExtended {
 	private int nextTransitionIndex;
 
 	private HashSet<String> processedSharedObjects;
+	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
 
-	public TAPNComposerExtended(Messenger messenger){
+	public TAPNComposerExtended(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels){
 		this.messenger = messenger;
+		
+		HashMap<TimedArcPetriNet, DataLayer> newGuiModels = new HashMap<TimedArcPetriNet, DataLayer>();
+		for(Entry<TimedArcPetriNet, DataLayer> entry : guiModels.entrySet()) {
+			newGuiModels.put(entry.getKey(), entry.getValue().copy(entry.getKey()));
+		}
+		
+		this.guiModels = newGuiModels;
 	}
 	
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
@@ -37,6 +68,7 @@ public class TAPNComposerExtended {
 		nextTransitionIndex = -1;
 		processedSharedObjects = new HashSet<String>();
 		TimedArcPetriNet tapn = new TimedArcPetriNet("ComposedModel");
+		DataLayer guiModel = new DataLayer();
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
 
@@ -47,10 +79,77 @@ public class TAPNComposerExtended {
 		createOutputArcs(model, tapn, mapping);
 		createTransportArcs(model, tapn, mapping);
 		createInhibitorArcs(model, tapn, mapping);
+		
+		// Combine DataLayers to be used in XMLWriter
+		int i = 0;
+		for(Entry<TimedArcPetriNet, DataLayer> entry : this.guiModels.entrySet()) {
+			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
+			
+			for(PetriNetObject netObject : entry.getValue().getPetriNetObjects()) {
+				if (netObject instanceof PlaceTransitionObject) {
+					PlaceTransitionObject netObjectPlace = (PlaceTransitionObject) netObject;
+					// Modify netObjectPlace to arrange components
+					netObjectPlace.setPositionX(netObjectPlace.getPositionX() + (offset.value1() * 200));
+					netObjectPlace.setPositionY(netObjectPlace.getPositionY() + (offset.value2() * 200));
+					
+					guiModel.addPetriNetObject(netObjectPlace);
+				} else if (netObject instanceof Arc) {
+					Arc netObjectArc = (Arc) netObject;
+					// Modify netObjectArc to arrange components
+					netObjectArc.updateArcPosition();
+					
+					guiModel.addPetriNetObject(netObjectArc);
+				}
+				
+			}
+			i++;
+		}
+		
+		ArrayList<Template> templates = new ArrayList<Template>(1);
+		templates.add(new Template(tapn, guiModel, new Zoomer()));
+		
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+		network.add(tapn);
+		
+		PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), new ArrayList<Constant>(0));
 
-		//dumpToConsole(tapn, mapping);
+		try {
+			String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().toString() + "\\output_2.xml";
+			tapnWriter.savePNML(new File(outputPath));
+		} catch (NullPointerException | DOMException
+				| IOException
+				| ParserConfigurationException | TransformerException e) {
+			e.printStackTrace();
+		}
+
+		dumpToConsole(tapn, mapping);
 
 		return new Tuple<TimedArcPetriNet, NameMapping>(tapn, mapping);
+	}
+	
+	private Tuple<Integer, Integer> calculateComponentPosition(int netNumber) {
+		Integer x = netNumber % 2;
+		Integer y = (int) Math.floor(netNumber / 2d);
+		
+		return new Tuple<Integer, Integer>(x, y);		
+	}
+	
+	private PlaceTransitionObject getRightmostObject(DataLayer guiModel) {
+		PlaceTransitionObject returnObject = null;
+		
+		for (PlaceTransitionObject currentObject : guiModel.getPlaces()) {
+			if (returnObject == null || returnObject.getPositionX() < currentObject.getPositionX()) {
+				returnObject = currentObject;
+			}
+		}
+		
+		for (PlaceTransitionObject currentObject : guiModel.getTransitions()) {
+			if (returnObject == null || returnObject.getPositionX() < currentObject.getPositionX()) {
+				returnObject = currentObject;
+			}
+		}
+		
+		return returnObject;
 	}
 
 	@SuppressWarnings("unused")
@@ -151,9 +250,14 @@ public class TAPNComposerExtended {
 
 	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
-			for (TimedPlace timedPlace : tapn.places()) {
+			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			
+			for (TimedPlace timedPlace : tapn.places()) {			
 				if(!timedPlace.isShared()){
 					String uniquePlaceName = getUniquePlaceName();
+					
+					Place oldPlace = currentGuiModel.getPlaceByName(timedPlace.name());
+					oldPlace.setName(uniquePlaceName);
 
 					LocalTimedPlace place = new LocalTimedPlace(uniquePlaceName, timedPlace.invariant());
 					constructedModel.add(place);
@@ -174,6 +278,8 @@ public class TAPNComposerExtended {
 
 	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			
 			for (TimedTransition timedTransition : tapn.transitions()) {
 				if(!processedSharedObjects.contains(timedTransition.name())){
 					
@@ -183,6 +289,9 @@ public class TAPNComposerExtended {
 					// ONLY THE IF SENTENCE SHOULD BE REMOVED. REST OF CODE SHOULD BE LEFT INTACT
 					if(!timedTransition.isOrphan()){
 						String uniqueTransitionName = getUniqueTransitionName();
+						
+						Transition oldTransition = currentGuiModel.getTransitionByName(timedTransition.name());
+						oldTransition.setName(uniqueTransitionName);											
 	
 						constructedModel.add(new TimedTransition(uniqueTransitionName, timedTransition.isUrgent()));
 						if(timedTransition.isShared()){
@@ -209,9 +318,10 @@ public class TAPNComposerExtended {
 		return String.format(TRANSITION_FORMAT, nextTransitionIndex);
 	}
 
-	private void createInputArcs(TimedArcPetriNetNetwork model,
-			TimedArcPetriNet constructedModel, NameMapping mapping) {
+	private void createInputArcs(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
+			DataLayer currentGuiModel = this.guiModels.get(tapn);
+			
 			for (TimedInputArc arc : tapn.inputArcs()) {
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));

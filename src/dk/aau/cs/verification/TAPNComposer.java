@@ -16,7 +16,7 @@ import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.util.Tuple;
 
-public class TAPNComposer {
+public class TAPNComposer implements ITAPNComposer {
 	private static final String PLACE_FORMAT = "P%1$d";
 	private static final String TRANSITION_FORMAT = "T%1$d";
 
@@ -32,6 +32,10 @@ public class TAPNComposer {
 		this.messenger = messenger;
 	}
 	
+	/* (non-Javadoc)
+	 * @see dk.aau.cs.verification.ITAPNComposer#transformModel(dk.aau.cs.model.tapn.TimedArcPetriNetNetwork)
+	 */
+	@Override
 	public Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model) {
 		nextPlaceIndex = -1;
 		nextTransitionIndex = -1;

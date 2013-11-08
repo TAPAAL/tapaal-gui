@@ -31,6 +31,7 @@ import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.Boundedness;
+import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.NullStats;
@@ -242,7 +243,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		TAPNComposer composer = new TAPNComposer(new Messenger(){
+		ITAPNComposer composer = new TAPNComposer(new Messenger(){
 			public void displayInfoMessage(String message) { }
 			public void displayInfoMessage(String message, String title) {}
 			public void displayErrorMessage(String message) {}
