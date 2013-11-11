@@ -48,7 +48,7 @@ public class KBoundAnalyzer {
 
 	protected VerifyTAPNOptions verificationOptions() {
 		if(modelChecker instanceof VerifyTAPN){
-			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, true);
+			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
 			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, tapnNetwork.hasUrgentTransitions()?false:true, true);
 		}
