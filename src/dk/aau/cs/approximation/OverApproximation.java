@@ -36,7 +36,7 @@ public class OverApproximation implements ITAPNApproximation {
 		// Fix invariants in places
 		for (TimedPlace place : net.places()) {
 			if ( ! (place.invariant().upperBound() instanceof Bound.InfBound) && place.invariant().upperBound().value() > 0) {					
-				TimeInvariant oldInvariant = place.invariant().copy();
+				TimeInvariant oldInvariant = place.invariant();
 				place.setInvariant(new TimeInvariant(oldInvariant.isUpperNonstrict(), new IntBound((int) Math.ceil(oldInvariant.upperBound().value() / (double)query.approximationDenominator()))));
 			}
 		}
@@ -45,20 +45,19 @@ public class OverApproximation implements ITAPNApproximation {
 	//Returns a copy of an approximated interval
 	private TimeInterval modifyIntervals(TimeInterval oldInterval, int denominator){
 		int newUpperBoundValue = oldInterval.upperBound().value();
-		IntBound newUpperBound;
+		Bound newUpperBound;
 		// Do not calculate upper bound for infinite
 		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound)) {
-			
 			 // Calculate the new upper bound value. If the value is fx. 22 the new value needs to be 3  
 			newUpperBoundValue = oldInterval.upperBound().value();
 			newUpperBound = new IntBound((int) Math.ceil((double)newUpperBoundValue /  denominator));
 		}		
 		else
-			newUpperBound = new IntBound(oldInterval.upperBound().value());
+			newUpperBound = Bound.Infinity;
 		 
 		// Calculate the new lower bound
 		IntBound newLowerBound = new IntBound((int) Math.floor(oldInterval.lowerBound().value() / denominator));
-		
+
 		return new TimeInterval(
 			 oldInterval.IsLowerBoundNonStrict(),
 			 newLowerBound,
