@@ -44,13 +44,12 @@ public class OverApproximation implements ITAPNApproximation {
 	
 	//Returns a copy of an approximated interval
 	private TimeInterval modifyIntervals(TimeInterval oldInterval, int denominator){
-		int newUpperBoundValue = oldInterval.upperBound().value();
 		Bound newUpperBound;
 		// Do not calculate upper bound for infinite
 		if ( ! (oldInterval.upperBound() instanceof Bound.InfBound)) {
 			 // Calculate the new upper bound value. If the value is fx. 22 the new value needs to be 3  
-			newUpperBoundValue = oldInterval.upperBound().value();
-			newUpperBound = new IntBound((int) Math.ceil((double)newUpperBoundValue /  denominator));
+			int oldUpperBoundValue = oldInterval.upperBound().value();
+			newUpperBound = new IntBound((int) Math.ceil((double)oldUpperBoundValue /  denominator));
 		}		
 		else
 			newUpperBound = Bound.Infinity;
