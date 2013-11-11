@@ -16,10 +16,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretListener;
+
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import dk.aau.cs.gui.Context;
 import dk.aau.cs.gui.undo.MakeTransitionSharedCommand;
 import dk.aau.cs.gui.undo.RenameTimedTransitionCommand;
+import dk.aau.cs.gui.undo.ToggleTransitionUrgent;
 import dk.aau.cs.gui.undo.UnshareTransitionCommand;
 import dk.aau.cs.model.tapn.Bound;
 import dk.aau.cs.model.tapn.SharedTransition;
@@ -373,7 +375,10 @@ public class TAPNTransitionEditor extends javax.swing.JPanel {
 			context.nameGenerator().updateIndices(transition.underlyingTransition().model(), newName);
 		}
 		
-		transition.setUrgent(urgentCheckBox.isSelected());
+		if(transition.isUrgent() != urgentCheckBox.isSelected()){
+			context.undoManager().addEdit(new ToggleTransitionUrgent(transition.underlyingTransition()));
+			transition.setUrgent(urgentCheckBox.isSelected());
+		}
 
 		Integer rotationIndex = rotationComboBox.getSelectedIndex();
 		if (rotationIndex > 0) {
