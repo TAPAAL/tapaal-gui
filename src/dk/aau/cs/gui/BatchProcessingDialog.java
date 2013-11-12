@@ -236,13 +236,13 @@ public class BatchProcessingDialog extends JDialog {
 		if(memoryTimer.isRunning()){
 			memoryTimer.stop();
 		}
-		memoryTimer.setDelay(50);
+		memoryTimer.setDelay(20);
 		memoryTimerCount = 0;
 		memoryTimerMode = 0;
 		memoryTimer.start();
 	}
 	
-	private Timer memoryTimer = new Timer(50, new AbstractAction() {
+	private Timer memoryTimer = new Timer(20, new AbstractAction() {
 		private static final long serialVersionUID = 1327695063762640628L;
 
 		public void actionPerformed(ActionEvent e) {
@@ -256,7 +256,7 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 			
-			if(memoryTimerMode == 0 && memoryTimerCount == 4){
+			if(memoryTimerMode == 0 && memoryTimerCount == 10){
 				memoryTimerCount = 0;
 				memoryTimerMode++;
 				memoryTimer.setDelay(200);
@@ -558,7 +558,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutLabel.setToolTipText(TOOL_TIP_TimeoutLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
@@ -574,7 +574,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
@@ -593,7 +593,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
@@ -604,7 +604,7 @@ public class BatchProcessingDialog extends JDialog {
 		oomLabel.setToolTipText(TOOL_TIP_OOMLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 7;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(oomLabel, gbc);
@@ -618,7 +618,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 7;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(oomValue, gbc);
@@ -637,7 +637,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 7;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noOOMCheckbox, gbc);
