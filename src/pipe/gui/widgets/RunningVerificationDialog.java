@@ -39,8 +39,8 @@ public class RunningVerificationDialog extends JDialog {
 	JLabel usageLabel;
 	private Timer timer; 
 	
-	private static int memoryTimerCount = 0;
-	private static int memoryTimerMode = 0;
+	private int memoryTimerCount = 0;
+	private int memoryTimerMode = 0;
 	
 	private void startMemoryTimer(){
 		if(memoryTimer.isRunning()){
