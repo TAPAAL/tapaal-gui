@@ -791,6 +791,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void exit() {
+		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
 	}
 
@@ -838,7 +839,6 @@ public class BatchProcessingDialog extends JDialog {
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
-				
 			}
 		});
 		gbc = new GridBagConstraints();
