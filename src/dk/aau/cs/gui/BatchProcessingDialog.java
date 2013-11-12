@@ -232,7 +232,9 @@ public class BatchProcessingDialog extends JDialog {
 	private static int memoryTimerCount = 0;
 	
 	private void startMemoryTimer(){
-		memoryTimer.stop();
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
 		memoryTimer.setDelay(200);
 		memoryTimerCount = 0;
 		memoryTimer.start();
