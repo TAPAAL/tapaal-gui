@@ -229,10 +229,20 @@ public class BatchProcessingDialog extends JDialog {
 		}
 	});
 	
+	private static int memoryTimerCount = 0;
+	
+	private void startMemoryTimer(){
+		memoryTimer.stop();
+		memoryTimer.setDelay(200);
+		memoryTimerCount = 0;
+		memoryTimer.start();
+	}
+	
 	private Timer memoryTimer = new Timer(200, new AbstractAction() {
 		private static final long serialVersionUID = 1327695063762640628L;
 
 		public void actionPerformed(ActionEvent e) {
+			memoryTimerCount++;
 			if(MemoryMonitor.isAttached()){
 				String usage = MemoryMonitor.getUsage();
 				if(usage != null){
@@ -241,6 +251,9 @@ public class BatchProcessingDialog extends JDialog {
 				if(useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()){
 					oomCurrentVerificationTask();
 				}
+			}
+			if(memoryTimerCount >= 10){
+				memoryTimer.setDelay(1000);
 			}
 		}
 	});
@@ -1094,10 +1107,7 @@ public class BatchProcessingDialog extends JDialog {
 				else
 					timer.start();
 				
-				if (memoryTimer.isRunning())
-					memoryTimer.restart();
-				else
-					memoryTimer.start();
+				startMemoryTimer();
 
 				if (useTimeout()) {
 					if (timeoutTimer.isRunning())
