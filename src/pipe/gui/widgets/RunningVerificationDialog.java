@@ -39,6 +39,27 @@ public class RunningVerificationDialog extends JDialog {
 	JLabel usageLabel;
 	private Timer timer; 
 	
+	private static int memoryTimerCount = 0;
+	private static int memoryTimerMode = 0;
+	
+	private void startMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+		memoryTimer.setDelay(50);
+		memoryTimerCount = 0;
+		memoryTimerMode = 0;
+		memoryTimer.start();
+	}
+	
+	private void stopMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+	}
+	
+	private Timer memoryTimer;
+	
 	public RunningVerificationDialog(JFrame owner) {
 		super(owner, "Verification in Progress", true);		
 		initComponents();			
@@ -55,14 +76,37 @@ public class RunningVerificationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 						/1000 + " s");
+			}
+		});	
+		
+		memoryTimer = new Timer(50, new AbstractAction() {
+			private static final long serialVersionUID = 1327695063762640628L;
+
+			public void actionPerformed(ActionEvent e) {
 				if(MemoryMonitor.isAttached()){
 					String usage = MemoryMonitor.getUsage();
 					if(usage != null){
 						usageLabel.setText(usage);
 					}
+					
+					if(memoryTimerMode == 0 && memoryTimerCount == 2){
+						memoryTimerCount = 0;
+						memoryTimerMode++;
+						memoryTimer.setDelay(100);
+					}else if(memoryTimerMode == 1 && memoryTimerCount == 4){
+						memoryTimerCount = 0;
+						memoryTimerMode++;
+						memoryTimer.setDelay(200);
+					}else if(memoryTimerMode == 2 && memoryTimerCount == 5){
+						memoryTimerCount = 0;
+						memoryTimerMode++;
+						memoryTimer.setDelay(1000);
+					}else if(memoryTimerMode < 3){
+						memoryTimerCount++;
+					}
 				}
 			}
-		});		
+		});	
 		
 		okButton = new JButton("Interrupt Verification");
 		headLineLabel = new JLabel();
@@ -132,6 +176,7 @@ public class RunningVerificationDialog extends JDialog {
 		
 		startTimeMs = System.currentTimeMillis();
 		timer.start();
+		memoryTimer.start();
 	}
 
 	public void setupListeners(final SwingWorker<?, ?> worker) {
@@ -155,6 +200,7 @@ public class RunningVerificationDialog extends JDialog {
 					if (stateValue.equals(StateValue.DONE)) {								
 						setVisible(false);
 						timer.stop();
+						stopMemoryTimer();
 						dispose();						
 					}
 				}
