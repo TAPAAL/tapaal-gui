@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.Semaphore;
@@ -30,9 +31,24 @@ public class MemoryMonitor {
 	private static int PID = -1;
 	private static Semaphore busy = new Semaphore(1);
 	private static double peakMemory = -1;
+	private static DecimalFormat formatter = null;
+	
+	private static DecimalFormat getFormatter(){
+		if(formatter == null){
+			formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+			formatter.setGroupingUsed(false);
+			formatter.setMaximumFractionDigits(0);
+		}
+		return formatter;
+	}
 
 	public static void attach(Process p){
 		PID = getPid(p);
+		peakMemory = -1;
+	}
+	
+	public static void detach(){
+		PID = -1;
 		peakMemory = -1;
 	}
 
@@ -43,8 +59,6 @@ public class MemoryMonitor {
 	public static String getUsage(){
 		if(busy.tryAcquire()){
 			double memory = -1;
-			DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
-			formatter.setMaximumFractionDigits(0);
 			if(Platform.isWindows()){
 				try { 
 					Process p = Runtime.getRuntime().exec("tasklist /FI \"pid eq "+PID+"\" /FO \"LIST\""); 
@@ -82,7 +96,7 @@ public class MemoryMonitor {
 				return null;
 			}else{
 				if(memory > peakMemory)	peakMemory = memory;
-				return formatter.format(memory) + " MB";
+				return getFormatter().format(memory) + " MB";
 			}
 		}else{
 			return null;
@@ -110,12 +124,10 @@ public class MemoryMonitor {
 	}
 	
 	public static String getPeakMemory(){
-		DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
-		formatter.setMaximumFractionDigits(0);
-		return peakMemory == -1? "N/A":formatter.format(peakMemory) + " MB";
+		return peakMemory == -1? "N/A":getFormatter().format(Math.ceil(peakMemory)) + " MB";
 	}
 	
 	public static int getPeakMemoryValue(){
-		return peakMemory == -1? 0:(int) peakMemory;
+		return peakMemory == -1? 0:(int) Math.ceil(peakMemory);
 	}
 }
