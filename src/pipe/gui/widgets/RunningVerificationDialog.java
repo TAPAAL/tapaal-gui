@@ -41,11 +41,13 @@ public class RunningVerificationDialog extends JDialog {
 	
 	private int memoryTimerCount = 0;
 	private int memoryTimerMode = 0;
+	private int peakMemory = -1;
 	
 	private void startMemoryTimer(){
 		if(memoryTimer.isRunning()){
 			memoryTimer.stop();
 		}
+		peakMemory = -1;
 		memoryTimer.setDelay(50);
 		memoryTimerCount = 0;
 		memoryTimerMode = 0;
@@ -76,6 +78,7 @@ public class RunningVerificationDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 						/1000 + " s");
+				usageLabel.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
 			}
 		});	
 		
@@ -84,10 +87,8 @@ public class RunningVerificationDialog extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				if(MemoryMonitor.isAttached()){
-					String usage = MemoryMonitor.getUsage();
-					if(usage != null){
-						usageLabel.setText(usage);
-					}
+					MemoryMonitor.getUsage();
+					peakMemory = MemoryMonitor.getPeakMemoryValue();
 					
 					if(memoryTimerMode == 0 && memoryTimerCount == 2){
 						memoryTimerCount = 0;

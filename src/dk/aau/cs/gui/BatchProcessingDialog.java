@@ -226,11 +226,13 @@ public class BatchProcessingDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 					/ 1000 + " s");
+			memory.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
 		}
 	});
 	
 	private static int memoryTimerCount = 0;
 	private static int memoryTimerMode = 0;
+	private static int peakMemory = -1;
 	
 	private void startMemoryTimer(){
 		if(memoryTimer.isRunning()){
@@ -239,6 +241,7 @@ public class BatchProcessingDialog extends JDialog {
 		memoryTimer.setDelay(50);
 		memoryTimerCount = 0;
 		memoryTimerMode = 0;
+		peakMemory = -1;
 		memoryTimer.start();
 	}
 	
@@ -254,10 +257,9 @@ public class BatchProcessingDialog extends JDialog {
 
 		public void actionPerformed(ActionEvent e) {
 			if(MemoryMonitor.isAttached()){
-				String usage = MemoryMonitor.getUsage();
-				if(usage != null){
-					memory.setText(usage);
-				}
+				MemoryMonitor.getUsage();
+				peakMemory = MemoryMonitor.getPeakMemoryValue();
+				
 				if(useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()){
 					oomCurrentVerificationTask();
 				}
