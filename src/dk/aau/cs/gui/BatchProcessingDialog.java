@@ -236,13 +236,20 @@ public class BatchProcessingDialog extends JDialog {
 		if(memoryTimer.isRunning()){
 			memoryTimer.stop();
 		}
-		memoryTimer.setDelay(20);
+		memoryTimer.setDelay(50);
 		memoryTimerCount = 0;
 		memoryTimerMode = 0;
 		memoryTimer.start();
 	}
 	
-	private Timer memoryTimer = new Timer(20, new AbstractAction() {
+	private void stopMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+		MemoryMonitor.detach();
+	}
+	
+	private Timer memoryTimer = new Timer(50, new AbstractAction() {
 		private static final long serialVersionUID = 1327695063762640628L;
 
 		public void actionPerformed(ActionEvent e) {
@@ -256,15 +263,19 @@ public class BatchProcessingDialog extends JDialog {
 				}
 			}
 			
-			if(memoryTimerMode == 0 && memoryTimerCount == 10){
+			if(memoryTimerMode == 0 && memoryTimerCount == 2){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(100);
+			}else if(memoryTimerMode == 1 && memoryTimerCount == 4){
 				memoryTimerCount = 0;
 				memoryTimerMode++;
 				memoryTimer.setDelay(200);
-			}else if(memoryTimerMode == 1 && memoryTimerCount == 9){
+			}else if(memoryTimerMode == 2 && memoryTimerCount == 5){
 				memoryTimerCount = 0;
 				memoryTimerMode++;
 				memoryTimer.setDelay(1000);
-			}else if(memoryTimerMode < 2){
+			}else if(memoryTimerMode < 3){
 				memoryTimerCount++;
 			}
 		}
@@ -855,6 +866,7 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
+		table.getColumn("Memory Usage").setCellRenderer(renderer);
 
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
@@ -1099,8 +1111,7 @@ public class BatchProcessingDialog extends JDialog {
 						skipFileButton.setEnabled(false);
 						timerLabel.setText("");
 						timer.stop();
-						memoryTimer.stop();
-						MemoryMonitor.detach();
+						stopMemoryTimer();
 						timeoutTimer.stop();
 					} else if ((StateValue) evt.getNewValue() == StateValue.STARTED) {
 						disableButtonsDuringProcessing();
@@ -1136,10 +1147,7 @@ public class BatchProcessingDialog extends JDialog {
 					VerificationTaskCompleteEvent e) {
 				if (timer.isRunning())
 					timer.stop();
-				if (memoryTimer.isRunning()){
-					memoryTimer.stop();
-					MemoryMonitor.detach();
-				}
+				stopMemoryTimer();
 				if (timeoutTimer.isRunning())
 					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
@@ -1342,7 +1350,8 @@ public class BatchProcessingDialog extends JDialog {
 					setText(newQuery.getName());
 				} else if (table.getColumnName(column).equals(
 						"Verification Time")
-						|| table.getColumnName(column).equals("Method")) {
+						|| table.getColumnName(column).equals("Method")
+						|| table.getColumnName(column).equals("Memory Usage")) {
 					setText(value.toString());
 					Point mousePos = table.getMousePosition();
 					BatchProcessingVerificationResult result = null;
@@ -1354,6 +1363,9 @@ public class BatchProcessingDialog extends JDialog {
 
 					if (table.getColumnName(column).equals("Verification Time"))
 						setToolTipText(result != null ? generateStatsToolTipText(result)
+								: value.toString());
+					else if (table.getColumnName(column).equals("Memory Usage"))
+						setToolTipText(result != null ? generateMemoryToolTipText(result)
 								: value.toString());
 					else
 						setToolTipText(result != null ? generateReductionString(result
@@ -1382,6 +1394,14 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(result.stats().toString());
 			}
 
+			return s.toString();
+		}
+		
+		private String generateMemoryToolTipText(
+				BatchProcessingVerificationResult result) {
+			StringBuilder s = new StringBuilder();
+			s.append("Peak memory usage (estimate): ");
+			s.append(result.verificationMemory());
 			return s.toString();
 		}
 
