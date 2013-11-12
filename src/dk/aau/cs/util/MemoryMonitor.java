@@ -35,6 +35,11 @@ public class MemoryMonitor {
 		PID = getPid(p);
 		peakMemory = -1;
 	}
+	
+	public static void detach(){
+		PID = -1;
+		peakMemory = -1;
+	}
 
 	public static boolean isAttached(){
 		return PID != -1;
@@ -44,6 +49,7 @@ public class MemoryMonitor {
 		if(busy.tryAcquire()){
 			double memory = -1;
 			DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+			formatter.setDecimalSeparatorAlwaysShown(false);
 			formatter.setMaximumFractionDigits(0);
 			if(Platform.isWindows()){
 				try { 

@@ -1100,6 +1100,7 @@ public class BatchProcessingDialog extends JDialog {
 						timerLabel.setText("");
 						timer.stop();
 						memoryTimer.stop();
+						MemoryMonitor.detach();
 						timeoutTimer.stop();
 					} else if ((StateValue) evt.getNewValue() == StateValue.STARTED) {
 						disableButtonsDuringProcessing();
@@ -1135,8 +1136,10 @@ public class BatchProcessingDialog extends JDialog {
 					VerificationTaskCompleteEvent e) {
 				if (timer.isRunning())
 					timer.stop();
-				if (memoryTimer.isRunning())
+				if (memoryTimer.isRunning()){
 					memoryTimer.stop();
+					MemoryMonitor.detach();
+				}
 				if (timeoutTimer.isRunning())
 					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
