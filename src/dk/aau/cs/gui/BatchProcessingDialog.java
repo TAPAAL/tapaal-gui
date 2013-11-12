@@ -1402,6 +1402,11 @@ public class BatchProcessingDialog extends JDialog {
 			StringBuilder s = new StringBuilder();
 			s.append("Peak memory usage (estimate): ");
 			s.append(result.verificationMemory());
+			if (result.hasStats()) {
+				s.append(System.getProperty("line.separator"));
+				s.append(System.getProperty("line.separator"));
+				s.append(result.stats().toString());
+			}
 			return s.toString();
 		}
 
