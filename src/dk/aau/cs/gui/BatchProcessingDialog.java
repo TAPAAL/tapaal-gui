@@ -230,19 +230,19 @@ public class BatchProcessingDialog extends JDialog {
 	});
 	
 	private static int memoryTimerCount = 0;
-	private static boolean memoryTimerStartupMode = true;
+	private static int memoryTimerMode = 0;
 	
 	private void startMemoryTimer(){
 		if(memoryTimer.isRunning()){
 			memoryTimer.stop();
 		}
-		memoryTimer.setDelay(200);
+		memoryTimer.setDelay(50);
 		memoryTimerCount = 0;
-		memoryTimerStartupMode = true;
+		memoryTimerMode = 0;
 		memoryTimer.start();
 	}
 	
-	private Timer memoryTimer = new Timer(200, new AbstractAction() {
+	private Timer memoryTimer = new Timer(50, new AbstractAction() {
 		private static final long serialVersionUID = 1327695063762640628L;
 
 		public void actionPerformed(ActionEvent e) {
@@ -255,10 +255,16 @@ public class BatchProcessingDialog extends JDialog {
 					oomCurrentVerificationTask();
 				}
 			}
-			if(memoryTimerStartupMode && memoryTimerCount >= 10){
-				memoryTimerStartupMode = false;
+			
+			if(memoryTimerMode == 0 && memoryTimerCount == 4){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(200);
+			}else if(memoryTimerMode == 1 && memoryTimerCount == 9){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
 				memoryTimer.setDelay(1000);
-			}else{
+			}else if(memoryTimerMode < 2){
 				memoryTimerCount++;
 			}
 		}
