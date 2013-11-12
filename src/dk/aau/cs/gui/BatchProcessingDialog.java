@@ -226,6 +226,13 @@ public class BatchProcessingDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 					/ 1000 + " s");
+		}
+	});
+	
+	private Timer memoryTimer = new Timer(200, new AbstractAction() {
+		private static final long serialVersionUID = 1327695063762640628L;
+
+		public void actionPerformed(ActionEvent e) {
 			if(MemoryMonitor.isAttached()){
 				String usage = MemoryMonitor.getUsage();
 				if(usage != null){
@@ -1067,6 +1074,7 @@ public class BatchProcessingDialog extends JDialog {
 						skipFileButton.setEnabled(false);
 						timerLabel.setText("");
 						timer.stop();
+						memoryTimer.stop();
 						timeoutTimer.stop();
 					} else if ((StateValue) evt.getNewValue() == StateValue.STARTED) {
 						disableButtonsDuringProcessing();
@@ -1085,6 +1093,11 @@ public class BatchProcessingDialog extends JDialog {
 					timer.restart();
 				else
 					timer.start();
+				
+				if (memoryTimer.isRunning())
+					memoryTimer.restart();
+				else
+					memoryTimer.start();
 
 				if (useTimeout()) {
 					if (timeoutTimer.isRunning())
@@ -1100,6 +1113,8 @@ public class BatchProcessingDialog extends JDialog {
 					VerificationTaskCompleteEvent e) {
 				if (timer.isRunning())
 					timer.stop();
+				if (memoryTimer.isRunning())
+					memoryTimer.stop();
 				if (timeoutTimer.isRunning())
 					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
