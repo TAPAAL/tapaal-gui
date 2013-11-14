@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -43,6 +44,7 @@ import pipe.gui.Zoomer;
 import pipe.gui.widgets.ConstantsPane;
 import pipe.gui.widgets.JSplitPaneFix;
 import pipe.gui.widgets.QueryPane;
+import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.gui.components.BugHandledJXMultisplitPane;
 import dk.aau.cs.gui.components.EnabledTransitionsList;
 import dk.aau.cs.gui.components.TransitionFireingComponent;
@@ -94,6 +96,8 @@ public class TabContent extends JSplitPane {
 
 	private Integer selectedTemplate = 0;
 	private Boolean selectedTemplateWasActive = false;
+	
+	private WorkflowDialog workflowDialog = null;
 
 	public TabContent(NetType netType) {
 		for (TimedArcPetriNet net : tapnNetwork.allTemplates()) {
@@ -708,5 +712,17 @@ public class TabContent extends JSplitPane {
 	
 	public static void setSimulatorModelRoot(Split model){
 		simulatorModelRoot = model;
+	}
+	
+	public boolean restoreWorkflowDialog(){
+		return workflowDialog != null && workflowDialog.restoreWindow();
+	}
+	
+	public WorkflowDialog getWorkflowDialog() {
+		return workflowDialog;
+	}
+	
+	public void setWorkflowDialog(WorkflowDialog dialog) {
+		this.workflowDialog = dialog;
 	}
 }

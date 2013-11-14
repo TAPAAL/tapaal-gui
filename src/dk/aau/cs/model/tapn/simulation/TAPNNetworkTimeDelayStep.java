@@ -17,6 +17,10 @@ public class TAPNNetworkTimeDelayStep extends TAPNNetworkTraceStep {
 	public NetworkMarking performStepFrom(NetworkMarking marking) {
 		return marking.delay(delay);
 	}
+	
+	public BigDecimal getDelay(){
+		return delay;
+	}
 
 	@Override
 	public String toString() {

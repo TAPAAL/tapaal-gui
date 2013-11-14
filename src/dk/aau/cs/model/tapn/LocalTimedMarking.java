@@ -172,6 +172,13 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		}
 		return size;
 	}
+
+	/**
+	 * Removes all tokens from marking
+	 */
+	public void clear() {
+		placesToTokensMap.clear();
+	}
 	
 	
 }

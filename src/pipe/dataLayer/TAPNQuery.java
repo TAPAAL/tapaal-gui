@@ -24,6 +24,10 @@ public class TAPNQuery {
 	public enum ExtrapolationOption {
 		AUTOMATIC, NONE, DIFF, LOCAL, LOW_UP
 	};
+	
+	public enum WorkflowMode{
+		NOT_WORKFLOW, WORKFLOW_SOUNDNESS, WORKFLOW_STRONG_SOUNDNESS
+	}
 
 	private String name;
 	private int capacity;
@@ -37,6 +41,7 @@ public class TAPNQuery {
 	private HashTableSize hashTableSize;
 	private ExtrapolationOption extrapolationOption;
 	private InclusionPlaces inclusionPlaces;
+	private WorkflowMode workflow;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -198,8 +203,16 @@ public class TAPNQuery {
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption) {
+			ExtrapolationOption extrapolationOption, WorkflowMode workflow) {
 		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, overApproximation, hashTabelSize, extrapolationOption, new InclusionPlaces());
+		this.setWorkflowMode(workflow);
+	}
+	
+	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
+			TraceOption traceOption, SearchOption searchOption,
+			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, HashTableSize hashTabelSize,
+			ExtrapolationOption extrapolationOption) {
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, false, hashTabelSize, extrapolationOption, new InclusionPlaces());
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
@@ -220,7 +233,7 @@ public class TAPNQuery {
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
 	}
-
+	
 	@Override
 	public String toString() {
 		return getName();
@@ -265,6 +278,14 @@ public class TAPNQuery {
 		else if(property instanceof TCTLEGNode) return QueryType.EG;
 		else if(property instanceof TCTLAFNode) return QueryType.AF;
 		else return QueryType.AG;
+	}
+
+	public WorkflowMode getWorkflowMode() {
+		return workflow;
+	}
+
+	public void setWorkflowMode(WorkflowMode workflow) {
+		this.workflow = workflow;
 	}
 	
 }

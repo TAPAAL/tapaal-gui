@@ -33,6 +33,7 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -60,12 +61,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.tapaal.Preferences;
+
 import com.sun.jna.Platform;
 
 
 
-import net.tapaal.TAPAAL;
 
+
+
+import net.tapaal.TAPAAL;
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.NetType;
 import pipe.dataLayer.PNMLWriter;
@@ -81,6 +85,7 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.FileBrowser;
 import pipe.gui.widgets.NewTAPNPanel;
 import pipe.gui.widgets.QueryDialog;
+import pipe.gui.widgets.WorkflowDialog;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.gui.BatchProcessingDialog;
 import dk.aau.cs.gui.TabComponent;
@@ -126,7 +131,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 	private EditAction /* copyAction, cutAction, pasteAction, */undoAction, redoAction;
 	private GridAction toggleGrid;
-	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction;
+	private ToolAction netStatisticsAction, batchProcessingAction, engineSelectionAction, verifyAction, workflowDialogAction;
 	private ZoomAction zoomOutAction, zoomInAction;
 	private DeleteAction deleteAction;
 	private TypeAction annotationAction, arcAction, inhibarcAction,
@@ -695,6 +700,15 @@ public class GuiFrame extends JFrame implements Observer {
 			}
 		});
 		toolsMenu.add(batchProcessing);
+		
+		JMenuItem workflowDialog = new JMenuItem(workflowDialogAction = new ToolAction("Workflow analysis", "Analyse net as a TAWFN", KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcutkey)));				
+		workflowDialog.setMnemonic('f');
+		workflowDialog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				WorkflowDialog.showDialog();
+			}
+		});
+		toolsMenu.add(workflowDialog);
 
 
 		toolsMenu.addSeparator();
@@ -967,10 +981,16 @@ public class GuiFrame extends JFrame implements Observer {
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
 
 			verifyAction.setEnabled(CreateGui.getCurrentTab().isQueryPossible());
+			
+			workflowDialogAction.setEnabled(true);
 
 			// Undo/Redo is enabled based on undo/redo manager
 			appView.getUndoManager().setUndoRedoStatus();
 
+			if(CreateGui.getCurrentTab().restoreWorkflowDialog()){
+				WorkflowDialog.showDialog();
+			}
+			
 			break;
 
 		case animation:
@@ -1005,6 +1025,8 @@ public class GuiFrame extends JFrame implements Observer {
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			verifyAction.setEnabled(false);
+			
+			workflowDialogAction.setEnabled(false);
 
 			// Remove constant highlight
 			CreateGui.getCurrentTab().removeConstantHighlights();
@@ -1046,6 +1068,8 @@ public class GuiFrame extends JFrame implements Observer {
 			deleteAction.setEnabled(false);
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			
+			workflowDialogAction.setEnabled(false);
 
 			enableAllActions(false);
 			break;
@@ -2228,8 +2252,9 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("License information and more is availabe at: www.tapaal.net\n\n");
 		buffer.append("Credits\n\n");
 		buffer.append("TAPAAL GUI and Translations:\n");
-		buffer.append("Mathias Andersen, Joakim Byg, Lasse Jacobsen, Morten Jacobsen,\nPeter G. Jensen, ");
-		buffer.append("Kenneth Y. Joergensen, Mikael H. Moeller,\nJiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
+		buffer.append("Mathias Andersen, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
+                buffer.append("Lasse Jacobsen, Morten Jacobsen, Peter G. Jensen, ");
+		buffer.append("Kenneth Y. Joergensen,\nMikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
 		buffer.append("Aalborg University 2009-2013\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
@@ -2326,12 +2351,12 @@ public class GuiFrame extends JFrame implements Observer {
 			} else if (this == saveAsAction) {
 				saveOperation(true); // code for Save As operations
 			} else if (this == openAction) { // code for Open operation
-				File filePath = new FileBrowser(CreateGui.userPath).openFile();
-				if ((filePath != null) && filePath.exists()
-						&& filePath.isFile() && filePath.canRead()) {
-					CreateGui.userPath = filePath.getParent();
-					createNewTabFromFile(filePath);
-
+				File[] files = new FileBrowser(CreateGui.userPath).openFiles();
+				for(File f : files){
+					if(f.exists() && f.isFile() && f.canRead()) {
+						CreateGui.userPath = f.getParent();
+						createNewTabFromFile(f);
+					}
 				}
 			} else if (this == createAction) {
 				showNewPNDialog();

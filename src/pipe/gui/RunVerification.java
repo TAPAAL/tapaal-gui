@@ -44,6 +44,7 @@ import dk.aau.cs.Messenger;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
+import dk.aau.cs.util.VerificationCallback;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.QueryResult;
@@ -52,28 +53,38 @@ import dk.aau.cs.verification.VerificationResult;
 
 public class RunVerification extends RunVerificationBase {
 	private IconSelector iconSelector;
-	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
+	private VerificationCallback callback;
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger, VerificationCallback callback) {
 		super(modelChecker, messenger);
 		iconSelector = selector;
+		this.callback = callback;
+	}
+	
+	public RunVerification(ModelChecker modelChecker, IconSelector selector, Messenger messenger) {
+		this(modelChecker, selector, messenger, null);
 	}
 
 	@Override
 	protected void showResult(VerificationResult<TAPNNetworkTrace> result) {
 		if (result != null && !result.error()) {
-			JOptionPane.showMessageDialog(CreateGui.getApp(), 
-					createMessagePanel(result),
-					"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result.getQueryResult()));
-
-			if (result.getTrace() != null) {
-				// DataLayer model = CreateGui.getModel();
-				// TraceTransformer interpreter = model.isUsingColors() ? new
-				// ColoredTraceTransformer(model) : new TraceTransformer(model);
-				// TAPNTrace trace =
-				// interpreter.interpretTrace(result.getTrace());
-				CreateGui.getApp().setGUIMode(GUIMode.animation);
-
-				CreateGui.getAnimator().SetTrace(result.getTrace());
-
+			if(callback != null){
+				callback.run(result);
+			}else{
+				JOptionPane.showMessageDialog(CreateGui.getApp(), 
+						createMessagePanel(result),
+						"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result.getQueryResult()));
+	
+				if (result.getTrace() != null) {
+					// DataLayer model = CreateGui.getModel();
+					// TraceTransformer interpreter = model.isUsingColors() ? new
+					// ColoredTraceTransformer(model) : new TraceTransformer(model);
+					// TAPNTrace trace =
+					// interpreter.interpretTrace(result.getTrace());
+					CreateGui.getApp().setGUIMode(GUIMode.animation);
+	
+					CreateGui.getAnimator().SetTrace(result.getTrace());
+	
+				}
 			}
 
 		}else{

@@ -61,6 +61,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
 	private boolean skippingCurrentVerification = false;
 	private boolean timeoutCurrentVerification = false;
+	private boolean oomCurrentVerification = false;
 	private int verificationTasksCompleted;
 
 	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
@@ -88,6 +89,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	public synchronized void notifyTimeoutCurrentVerificationTask() {
 		timeoutCurrentVerification = true;
+		if(modelChecker != null) {
+			modelChecker.kill();
+		}
+	}
+	
+	public synchronized void notifyOOMCurrentVerificationTask() {
+		oomCurrentVerification = true;
 		if(modelChecker != null) {
 			modelChecker.kill();
 		}
@@ -280,6 +288,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		} else if(timeoutCurrentVerification) {
 			publishResult(file.getName(), query, "Skipped - due to timeout", verificationResult.verificationTime(), new NullStats());
 			timeoutCurrentVerification = false;
+		} else if(oomCurrentVerification) {
+			publishResult(file.getName(), query, "Skipped - due to OOM", verificationResult.verificationTime(), new NullStats());
+			oomCurrentVerification = false;
 		} else if(!verificationResult.error()) {
 			String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
 				if (query.discreteInclusion() && !verificationResult.isBounded() && 
@@ -336,7 +347,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
 			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation());
 		else

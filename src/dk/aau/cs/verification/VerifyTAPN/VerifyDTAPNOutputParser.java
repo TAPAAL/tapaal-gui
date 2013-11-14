@@ -1,18 +1,24 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TAPNQuery;
+import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.BoundednessAnalysisResult;
+import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 
-public class VerifyTAPNOutputParser {
+public class VerifyDTAPNOutputParser {
 	private static final String Query_IS_NOT_SATISFIED_STRING = "Query is NOT satisfied";
 	private static final String Query_IS_SATISFIED_STRING = "Query is satisfied";
 	private static final String DISCRETE_INCLUSION = "discrete inclusion";
@@ -22,13 +28,15 @@ public class VerifyTAPNOutputParser {
 	private static final Pattern storedPattern = Pattern.compile("\\s*stored markings:\\s*(\\d+)\\s*");
 	private static final Pattern maxUsedTokensPattern = Pattern.compile("\\s*Max number of tokens found in any reachable marking:\\s*(>)?(\\d+)\\s*");
 	private static final Pattern transitionStatsPattern = Pattern.compile("<([^:\\s]+):(\\d+)>");
-
-	protected final int totalTokens;
-	protected final TAPNQuery query;
-	protected final int extraTokens;
-	protected List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
+	private static final Pattern wfMinExecutionPattern = Pattern.compile("Minimum execution time: (\\d*)");
+	private static final Pattern wfMaxExecutionPattern = Pattern.compile("Maximum execution time: (\\d*)");
+	private static final Pattern wfCoveredMarkingPattern = Pattern.compile("Covered marking: (.*)");
+	private final int totalTokens;
+	private final TAPNQuery query;
+	private final int extraTokens;
+	private List<Tuple<String,Integer>> transitionStats = new ArrayList<Tuple<String,Integer>>();
 	
-	public VerifyTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
+	public VerifyDTAPNOutputParser(int totalTokens, int extraTokens, TAPNQuery query){
 		this.totalTokens = totalTokens;
 		this.extraTokens = extraTokens;
 		this.query = query;
@@ -38,6 +46,9 @@ public class VerifyTAPNOutputParser {
 		int discovered = 0;
 		int explored = 0;
 		int stored = 0;
+		int WFminExecutionTime = -1;
+		int WFmaxExecutionTime = -1;
+		ArrayList<Tuple<String, Tuple<BigDecimal, Integer>>> coveredMarking = null;
 		boolean result = false;
 		int maxUsedTokens = 0;
 		boolean foundResult = false;
@@ -79,13 +90,37 @@ public class VerifyTAPNOutputParser {
 						String operator = matcher.group(1) == null ? "" : matcher.group(1);
 						if(operator.equals(">")) maxUsedTokens += 1; // Indicate non-k-boundedness by encoding that an extra token was used.
 					}
+					
+					matcher = wfMinExecutionPattern.matcher(line);
+					if(matcher.find()){
+						WFminExecutionTime = Integer.valueOf(matcher.group(1));
+					}
+					
+					matcher = wfMaxExecutionPattern.matcher(line);
+					if(matcher.find()){
+						WFmaxExecutionTime = Integer.valueOf(matcher.group(1));
+					}
+					
+					matcher = wfCoveredMarkingPattern.matcher(line);
+					if(matcher.find()){
+						coveredMarking = new ArrayList<Tuple<String,Tuple<BigDecimal,Integer>>>();
+						Pattern pattern = Pattern.compile("\\(([^,]*), (\\d), (\\d)\\)?");
+						for(String s : matcher.group(1).split("\\), ")){
+							Matcher m = pattern.matcher(s);
+							if(m.matches()){
+								for(int ii = 0; ii < Integer.parseInt(m.group(3)); ii++){
+									coveredMarking.add(new Tuple<String, Tuple<BigDecimal,Integer>>(m.group(1), new Tuple<BigDecimal, Integer>(new BigDecimal(m.group(2)), Integer.parseInt(m.group(3)))));
+								}
+							}
+						}
+					}
 				}
 			}
 			
 			if(!foundResult) return null;
 			
 			BoundednessAnalysisResult boundedAnalysis = new BoundednessAnalysisResult(totalTokens, maxUsedTokens, extraTokens);
-			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored, transitionStats));
+			Tuple<QueryResult, Stats> value = new Tuple<QueryResult, Stats>(new QueryResult(result, boundedAnalysis, query, discreteInclusion), new Stats(discovered, explored, stored,transitionStats, WFminExecutionTime, WFmaxExecutionTime, coveredMarking));
 			return value; 
 		} catch (Exception e) {
 			e.printStackTrace();

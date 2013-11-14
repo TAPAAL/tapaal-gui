@@ -1,5 +1,6 @@
 package dk.aau.cs.model.tapn;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import pipe.gui.MessengerImpl;
-
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.model.tapn.event.ConstantChangedEvent;
 import dk.aau.cs.model.tapn.event.ConstantEvent;
@@ -25,6 +25,8 @@ public class TimedArcPetriNetNetwork {
 	
 	private NetworkMarking currentMarking;
 	private ConstantStore constants;
+	
+	private int defaultBound = 3;
 	
 	private List<ConstantsListener> constantsListeners = new ArrayList<ConstantsListener>();
 	
@@ -340,7 +342,7 @@ public class TimedArcPetriNetNetwork {
 
 	public boolean hasInhibitorArcs() {
 		for(TimedArcPetriNet tapn : tapns) {
-			if(tapn.hasInhibitorArcs())
+			if(tapn.isActive() && tapn.hasInhibitorArcs())
 				return true;
 		}
 		return false;
@@ -442,6 +444,19 @@ public class TimedArcPetriNetNetwork {
 		return false;
 	}
 	
+	public boolean hasInvariants() {
+		for(TimedArcPetriNet t : tapns){
+			if(t.isActive()){
+				for(TimedPlace p : t.places()){
+					if(!p.invariant().upperBound().equals(Bound.Infinity)){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
 	public boolean isNonStrict(){
 		for(TimedArcPetriNet t : tapns){
 			if(t.isActive() && !t.isNonStrict()){
@@ -496,4 +511,48 @@ public class TimedArcPetriNetNetwork {
 		}
 		return biggestConstant;
 	}
+	
+	public TimedArcPetriNetNetwork copy(){
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+		
+		for(SharedPlace p : sharedPlaces){
+			network.add(p);	// TODO This is okay for now
+			
+			/* Copy markings for shared places */
+			for(TimedToken token : currentMarking.getTokensFor(p)){
+				network.currentMarking.add(token.clone());
+			}
+		}
+		
+		for(SharedTransition t : sharedTransitions){
+			network.add(new SharedTransition(t.name()));	// TODO This is okay for now
+		}
+		
+		for(Constant c : constants()){
+			network.addConstant(c.name(), c.value());
+		}
+		
+		for(TimedArcPetriNet t : tapns){
+			TimedArcPetriNet new_t = t.copy();
+			network.add(new_t);
+			for(TimedTransition trans : new_t.transitions()){
+				if(trans.isShared()){
+					network.getSharedTransitionByName(trans.name()).makeShared(trans);
+				}
+			}
+		}
+		
+		network.setDefaultBound(getDefaultBound());
+		
+		return network;
+	}
+
+	public int getDefaultBound() {
+		return defaultBound;
+	}
+	
+	public void setDefaultBound(int defaultBound) {
+		this.defaultBound = defaultBound;
+	}
+
 }
