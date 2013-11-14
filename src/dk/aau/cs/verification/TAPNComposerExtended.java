@@ -120,7 +120,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), new ArrayList<Constant>(0));
 
 		try {
-			String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().toString() + "\\output_2.xml";
+			String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().toString() + "/output_2.xml";
 			tapnWriter.savePNML(new File(outputPath));
 		} catch (NullPointerException | DOMException
 				| IOException

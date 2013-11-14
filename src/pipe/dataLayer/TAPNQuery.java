@@ -43,7 +43,8 @@ public class TAPNQuery {
 	private InclusionPlaces inclusionPlaces;
 	private WorkflowMode workflow;
 	
-	private boolean enableApproximation = false;
+	private boolean enableOverApproximation = false;
+	private boolean enableUnderApproximation = false;
 	private int denominator = 2;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
@@ -66,8 +67,12 @@ public class TAPNQuery {
 		return name;
 	}
 	
-	public boolean isApproximationEnabled() {
-		return this.enableApproximation;
+	public boolean isOverApproximationEnabled() {
+		return this.enableOverApproximation;
+	}
+	
+	public boolean isUnderApproximationEnabled() {
+		return this.enableUnderApproximation;
 	}
 	
 	public int approximationDenominator() {
@@ -230,13 +235,13 @@ public class TAPNQuery {
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
 			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces) {
-		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, false, hashTabelSize, extrapolationOption, new InclusionPlaces(), false, 0);
+		this(name, capacity, property, traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, false, hashTabelSize, extrapolationOption, new InclusionPlaces(), false, false, 0);
 	}
 	
 	public TAPNQuery(String name, int capacity, TCTLAbstractProperty property,
 			TraceOption traceOption, SearchOption searchOption,
 			ReductionOption reductionOption, boolean symmetry, boolean timeDart, boolean pTrie, boolean overApproximation, HashTableSize hashTabelSize,
-			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableApproximation, int approximationDenominator) {
+			ExtrapolationOption extrapolationOption, InclusionPlaces inclusionPlaces, boolean enableOverApproximation, boolean enableUnderApproximation, int approximationDenominator) {
 		this.setName(name);
 		this.setCapacity(capacity);
 		this.property = property;
@@ -250,7 +255,8 @@ public class TAPNQuery {
 		this.setHashTableSize(hashTabelSize);
 		this.setExtrapolationOption(extrapolationOption);
 		this.inclusionPlaces = inclusionPlaces;
-		this.enableApproximation = enableApproximation;
+		this.enableOverApproximation = enableOverApproximation;
+		this.enableUnderApproximation = enableUnderApproximation;
 		this.denominator = approximationDenominator;
 	}
 
