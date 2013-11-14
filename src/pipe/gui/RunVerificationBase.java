@@ -11,6 +11,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -70,10 +71,15 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
-		if (dataLayerQuery != null && dataLayerQuery.isApproximationEnabled())
+		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled())
 		{
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
+		}
+		else if (dataLayerQuery != null && dataLayerQuery.isUnderApproximationEnabled())
+		{
+			UnderApproximation underaprx = new UnderApproximation();
+			underaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
 		}
 
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
@@ -116,7 +122,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				result.verificationTime(),
 				result.stats());
 		
-		if (dataLayerQuery.isApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
+		if (dataLayerQuery.isOverApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
 			OverApproximation overaprx = new OverApproximation();
 			
 			//Create N''
@@ -134,6 +140,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			
 			//if no then new r
 		}
+		// TODO: Handle under approximation
 		
 		value.setNameMapping(transformedModel.value2());
 		return value;

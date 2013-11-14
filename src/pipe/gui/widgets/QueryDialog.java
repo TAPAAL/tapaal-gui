@@ -207,6 +207,7 @@ public class QueryDialog extends JPanel {
 	// Overapproximation options panel
 	private JPanel overApproximationOptionsPanel;
 	private JCheckBox overApproximationEnable;
+	private JCheckBox underApproximationEnable;
 	private CustomJSpinner overApproximationDenominator;
 	
 	// Buttons in the bottom of the dialogue
@@ -365,7 +366,7 @@ public class QueryDialog extends JPanel {
 		boolean pTrie = usePTrie.isSelected();
 		boolean overApproximation = useOverApproximation.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -963,8 +964,10 @@ public class QueryDialog extends JPanel {
 	}
 	
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
-		if (queryToCreateFrom.isApproximationEnabled())
+		if (queryToCreateFrom.isOverApproximationEnabled())
 			overApproximationEnable.setSelected(true);
+		if (queryToCreateFrom.isUnderApproximationEnabled())
+			underApproximationEnable.setSelected(true);
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -2068,17 +2071,26 @@ public class QueryDialog extends JPanel {
 		overApproximationEnable = new JCheckBox("Enable over approximation");
 		overApproximationEnable.setVisible(true);
 		overApproximationEnable.setToolTipText("Enable over approximation");
+		underApproximationEnable = new JCheckBox("Enable under approximation");
+		underApproximationEnable.setVisible(true);
+		underApproximationEnable.setToolTipText("Enable under approximation");
+		//underApproximationEnable.set
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
 		overApproximationEnable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
 			}
 		});
-		
+		underApproximationEnable.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
