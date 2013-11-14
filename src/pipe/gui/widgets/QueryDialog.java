@@ -740,6 +740,7 @@ public class QueryDialog extends JPanel {
 
 		boolean selectedOptionStillAvailable = false;	
 		boolean symmetry = symmetryReduction == null ? false : symmetryReduction.isSelected();
+		TraceOption trace = getTraceOption();
 		for (String s : options) {
 			reductionOption.addItem(s);
 			if (s.equals(reductionOptionString)) {
@@ -750,6 +751,9 @@ public class QueryDialog extends JPanel {
 		if (selectedOptionStillAvailable) {
 			reductionOption.setSelectedItem(reductionOptionString);
 			symmetryReduction.setSelected(symmetry);
+			if(trace == TraceOption.SOME && someTraceRadioButton.isEnabled()){
+				someTraceRadioButton.setSelected(true);
+			}
 		}
 	}
 
