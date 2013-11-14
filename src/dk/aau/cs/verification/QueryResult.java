@@ -54,6 +54,10 @@ public class QueryResult {
 	protected String getExplanationString(){
 		return boundednessAnalysis.toString();
 	}
+	
+	public TAPNQuery getQuery() {
+		return query;
+	}
 
 	public BoundednessAnalysisResult boundednessAnalysis() {
 		return boundednessAnalysis;

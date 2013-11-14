@@ -1,13 +1,10 @@
 package dk.aau.cs.approximation;
 
-import dk.aau.cs.model.tapn.Bound;
-import dk.aau.cs.model.tapn.IntBound;
-import dk.aau.cs.model.tapn.TimeInterval;
-import dk.aau.cs.model.tapn.TimeInvariant;
-import dk.aau.cs.model.tapn.TimedArcPetriNet;
-import dk.aau.cs.model.tapn.TimedInputArc;
-import dk.aau.cs.model.tapn.TimedPlace;
-import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
+import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.model.tapn.simulation.*;
+import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.TAPNQuery;
 
 public class OverApproximation implements ITAPNApproximation {
@@ -63,6 +60,38 @@ public class OverApproximation implements ITAPNApproximation {
 			 newUpperBound,
 			 oldInterval.IsUpperBoundNonStrict()
 			 );
+	}
+	
+	public void makeTraceTAPN(TimedArcPetriNet net, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
+		
+		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
+		TimedToken currentToken = new TimedToken(currentPlace); 
+		net.add(currentPlace);
+		currentPlace.addToken(currentToken);
+		
+		int integerName = 0;
+		TAPNNetworkTrace trace = result.getTrace();
+				
+		for(TAPNNetworkTraceStep step : trace) {
+			if (step instanceof TAPNNetworkTimedTransitionStep) {
+				TimedTransition currentTransition = net.getTransitionByName(((TAPNNetworkTimedTransitionStep) step).getTransition().name());
+				net.add(new TimedInputArc(currentPlace, currentTransition, TimeInterval.ZERO_INF));
+				for (TimedTransition transition : net.transitions()) {
+					if(currentTransition != transition){
+						net.add(new TimedInhibitorArc(currentPlace, transition, TimeInterval.ZERO_INF));
+					}
+				}
+				
+				integerName += 1;
+				currentPlace = new LocalTimedPlace("PTRACE" + Integer.toString(integerName));
+				
+				net.add(currentPlace);
+				net.add(new TimedOutputArc(currentTransition, currentPlace));
+			}
+		}
+		
+		query = new dk.aau.cs.model.tapn.TAPNQuery(new TCTLEFNode(new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1)), result.getQueryResult().getQuery().getExtraTokens());
+		
 	}
 
 }

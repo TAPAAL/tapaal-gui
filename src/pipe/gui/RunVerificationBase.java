@@ -62,11 +62,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		ITAPNComposer composer;
-		if (this.guiModels != null) {
-			composer = new TAPNComposerExtended(messenger, guiModels);
-		} else {
+//		if (this.guiModels != null) {
+//			composer = new TAPNComposerExtended(messenger, guiModels);
+//		} else {
 			composer = new TAPNComposer(messenger);			
-		}
+//		}
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
@@ -101,23 +101,42 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				}
 			}
 		}
-
+		
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (isCancelled()) {
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 		}
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
-		} else {
-			VerificationResult<TAPNNetworkTrace> value =  new VerificationResult<TAPNNetworkTrace>(
-					result.getQueryResult(),
-					decomposeTrace(result.getTrace(), transformedModel.value2()),
-					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
-					result.verificationTime(),
-					result.stats());
-			value.setNameMapping(transformedModel.value2());
-			return value;
-		}		
+		}
+		VerificationResult<TAPNNetworkTrace> value =  new VerificationResult<TAPNNetworkTrace>(
+				result.getQueryResult(),
+				decomposeTrace(result.getTrace(), transformedModel.value2()),
+				decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+				result.verificationTime(),
+				result.stats());
+		
+		if (dataLayerQuery.isApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
+			OverApproximation overaprx = new OverApproximation();
+			
+			//Create N''
+			Tuple<TimedArcPetriNet, NameMapping> tempmodel = composer.transformModel(model); //TODO: Find a proper way to copy the old net
+			overaprx.makeTraceTAPN(tempmodel.value1(), value, clonedQuery);
+			
+			//run model checker again
+			result = modelChecker.verify(options, tempmodel, clonedQuery);
+			if (isCancelled()) {
+				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+			}
+			if (result.error()) {
+				return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
+			}
+			
+			//if no then new r
+		}
+		
+		value.setNameMapping(transformedModel.value2());
+		return value;
 	}
 	
 	protected int kBound(){
