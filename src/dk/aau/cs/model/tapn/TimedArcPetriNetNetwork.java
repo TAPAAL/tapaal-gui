@@ -452,9 +452,6 @@ public class TimedArcPetriNetNetwork {
 	}
 	
 	public boolean isDegree2(){
-		if(this.hasInhibitorArcs())
-			return false;
-
 		TAPNComposer composer = new TAPNComposer(new MessengerImpl());
 		Tuple<TimedArcPetriNet,NameMapping> composedModel = composer.transformModel(this);
 

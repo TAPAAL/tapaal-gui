@@ -214,6 +214,7 @@ public class QueryDialog extends JPanel {
 	private QueryConstructionUndoManager undoManager;
 	private UndoableEditSupport undoSupport;
 	private boolean isNetDegree2;
+	private boolean hasInhibitorArcs;
 	private InclusionPlaces inclusionPlaces;
 
 	private String name_verifyTAPN = "TAPAAL: Continous Engine (verifytapn)";
@@ -315,6 +316,7 @@ public class QueryDialog extends JPanel {
 		newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
 		rootPane = me.getRootPane();
 		isNetDegree2 = tapnNetwork.isDegree2();
+		hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
 
 		setLayout(new GridBagLayout());
 
@@ -695,7 +697,7 @@ public class QueryDialog extends JPanel {
             if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
                 if (isNetDegree2) {
                 	options.add(name_COMBI);
-                	if(!tapnNetwork.hasWeights()) {
+                	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
                 		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
                 	}
                 }
@@ -716,7 +718,7 @@ public class QueryDialog extends JPanel {
 				options.add(name_DISCRETE);
 			}
 			options.add(name_COMBI);
-			if(isNetDegree2)
+			if(isNetDegree2 && !hasInhibitorArcs)
 				options.addAll(Arrays.asList( name_BROADCAST, name_BROADCASTDEG2, name_OPTIMIZEDSTANDARD));
 			else
 				options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
