@@ -974,7 +974,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(memoryLabel, gbc);
 
 		memory = new JLabel("");
-		Dimension timerLabelDim = new Dimension(50, 25);
+		Dimension timerLabelDim = new Dimension(70, 25);
 		memory.setMinimumSize(timerLabelDim);
 		memory.setPreferredSize(timerLabelDim);
 		gbc = new GridBagConstraints();
@@ -1014,7 +1014,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(time, gbc);
 
 		timerLabel = new JLabel("");
-		Dimension memoryLabelDim = new Dimension(50, 25);
+		Dimension memoryLabelDim = new Dimension(70, 25);
 		timerLabel.setMinimumSize(memoryLabelDim);
 		timerLabel.setPreferredSize(memoryLabelDim);
 		gbc = new GridBagConstraints();
