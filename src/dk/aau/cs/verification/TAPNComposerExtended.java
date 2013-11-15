@@ -27,6 +27,7 @@ import pipe.gui.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
+import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Constant;
@@ -81,8 +82,8 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		createTransitions(model, tapn, mapping, guiModel);
 		createInputArcs(model, tapn, mapping, guiModel);
 		createOutputArcs(model, tapn, mapping, guiModel);
-		createTransportArcs(model, tapn, mapping);
-		createInhibitorArcs(model, tapn, mapping);
+		createTransportArcs(model, tapn, mapping, guiModel);
+		createInhibitorArcs(model, tapn, mapping, guiModel);
 		
 		// Combine DataLayers to be used in XMLWriter
 		/*
@@ -426,9 +427,38 @@ public class TAPNComposerExtended implements ITAPNComposer {
 	}
 
 	private void createTransportArcs(TimedArcPetriNetNetwork model,
-			TimedArcPetriNet constructedModel, NameMapping mapping) {
+			TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TransportArc arc : tapn.transportArcs()) {
+				String sourceTemplate = arc.source().isShared() ? "" : tapn.name();
+				TimedPlace source = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
+				
+				String targetTemplate = arc.destination().isShared() ? "" : tapn.name();
+				
+				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
+
+				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.destination().name()));
+				
+				TransportArc addedArc = new TransportArc(source, target, destination, arc.interval(), arc.getWeight());
+				
+				constructedModel.add(addedArc);
+				
+				/*  constructors for TimedTransportArcComponent
+				 * 	public TimedTransportArcComponent(TimedInputArcComponent timedArc, int group, boolean isInPreSet) 
+					
+					public TimedTransportArcComponent(PlaceTransitionObject newSource, int groupNr, boolean isInPreSet) 
+				 */
+				
+				TimedTransportArcComponent newArc = new TimedTransportArcComponent(
+						guiModel.getTransitionByName(mapping.map(sourceTemplate, arc.source().name())),
+						arc.getWeight().value(),
+						false
+						);
+				
+				newArc.setUnderlyingArc(addedArc);
+				newArc.updateArcPosition();
+				guiModel.addArc(newArc);
+				/*
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 				
@@ -439,21 +469,54 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				TimedPlace target = constructedModel.getPlaceByName(mapping.map(template, arc.destination().name()));
 
 				constructedModel.add(new TransportArc(source, transition,target, arc.interval(), arc.getWeight()));
+				 */
 			}
 		}
 	}
 
+	
+	
 	private void createInhibitorArcs(TimedArcPetriNetNetwork model,
-			TimedArcPetriNet constructedModel, NameMapping mapping) {
+			TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
+				
+				String sourceTemplate = arc.source().isShared() ? "" : tapn.name();
+				TimedPlace source = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
+				
+				String targetTemplate = arc.destination().isShared() ? "" : tapn.name();
+				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
+
+				TimedInputArc addedArc = new TimedInputArc(source, target, arc.interval(), arc.getWeight());
+				constructedModel.add(addedArc);
+				
+				Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
+				Transition guiTarget = guiModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
+				Arc newArc = new TimedInputArcComponent(new TimedOutputArcComponent(
+						0d,
+						0d,
+						0d,
+						0d,
+						guiSource,
+						guiTarget,
+						arc.getWeight().value(),
+						mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
+						false
+						));
+				((TimedInputArcComponent) newArc).setUnderlyingArc(addedArc);
+				newArc.updateArcPosition();
+				guiModel.addPetriNetObject(newArc);
+				guiSource.addConnectFrom(newArc);
+				guiTarget.addConnectTo(newArc);
+				
+				/*
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 
 				template = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(template, arc.destination().name()));
 
-				constructedModel.add(new TimedInhibitorArc(source, target, arc.interval(), arc.getWeight()));
+				constructedModel.add(new TimedInhibitorArc(source, target, arc.interval(), arc.getWeight()));*/
 			}
 		}
 	}
