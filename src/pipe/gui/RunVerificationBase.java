@@ -152,27 +152,20 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 			}
 			//Create the result from N''
-			VerificationResult<TAPNNetworkTrace> value2 = new VerificationResult<TAPNNetworkTrace>(
+			VerificationResult<TAPNNetworkTrace> valueTraceTAPN = new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 					result.verificationTime(),
 					result.stats());
-			value.setNameMapping(transformedModel.value2());
+			valueTraceTAPN.setNameMapping(transformedModel.value2());
 			
 			if (result.getQueryResult().isQuerySatisfied()) {
 				//Recreate the approximation result with delays from N''
-				 value = new VerificationResult<TAPNNetworkTrace>(
-						approxResult.getQueryResult(),
-						decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
-						decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
-						approxResult.verificationTime(),
-						approxResult.stats());
-				 changeDelaysInTrace(value.getTrace(), value2.getTrace());
-				 value.setNameMapping(transformedModel.value2());
+				 changeDelaysInTrace(value.getTrace(), valueTraceTAPN.getTrace());
 			}
 			else {
-				value = value2;
+				value = valueTraceTAPN;
 			}
 		}
 		else {
