@@ -1,5 +1,7 @@
 package pipe.gui;
 
+import java.math.BigDecimal;
+
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -14,7 +16,11 @@ import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -75,10 +81,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
 		}
-
+		
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
-		
+
 		if(options.useOverApproximation() &&
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
 				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
@@ -102,6 +108,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			}
 		}
 		
+		VerificationResult<TAPNNetworkTrace> value = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (isCancelled()) {
 			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
@@ -109,34 +116,77 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-		VerificationResult<TAPNNetworkTrace> value =  new VerificationResult<TAPNNetworkTrace>(
-				result.getQueryResult(),
-				decomposeTrace(result.getTrace(), transformedModel.value2()),
-				decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
-				result.verificationTime(),
-				result.stats());
-		
-		if (dataLayerQuery.isApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
+		else if (dataLayerQuery != null && dataLayerQuery.isApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
+			System.out.println("Query for approximation is satisfied");
+			//Create the verification satisfied result for the approximation
+			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+			value =  new VerificationResult<TAPNNetworkTrace>(
+					approxResult.getQueryResult(),
+					decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
+					decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
+					approxResult.verificationTime(),
+					approxResult.stats());
+			value.setNameMapping(transformedModel.value2());
+			
 			OverApproximation overaprx = new OverApproximation();
-			
-			//Create N''
-			Tuple<TimedArcPetriNet, NameMapping> tempmodel = composer.transformModel(model); //TODO: Find a proper way to copy the old net
-			overaprx.makeTraceTAPN(tempmodel.value1(), value, clonedQuery);
-			
-			//run model checker again
-			result = modelChecker.verify(options, tempmodel, clonedQuery);
+
+			//Create N'' from the trace
+			System.out.println("Creating N''");
+			Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
+			overaprx.makeTraceTAPN(transformedOriginalModel, value, clonedQuery);
+			System.out.println(clonedQuery.toString());
+			//run model checker again for N''
+			System.out.println("Verifying N''");
+			result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 			if (isCancelled()) {
 				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 			}
 			if (result.error()) {
 				return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 			}
+			//Create the result from N''
+			VerificationResult<TAPNNetworkTrace> value2 = new VerificationResult<TAPNNetworkTrace>(
+					result.getQueryResult(),
+					decomposeTrace(result.getTrace(), transformedModel.value2()),
+					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+					result.verificationTime(),
+					result.stats());
+			value.setNameMapping(transformedModel.value2());
 			
-			//if no then new r
+			if (result.getQueryResult().isQuerySatisfied()) {
+				//Recreate the approximation result with delays from N''
+				 value = new VerificationResult<TAPNNetworkTrace>(
+						approxResult.getQueryResult(),
+						decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
+						decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
+						approxResult.verificationTime(),
+						approxResult.stats());
+				 changeDelaysInTrace(value.getTrace(), value2.getTrace());
+				 value.setNameMapping(transformedModel.value2());
+			}
+		}
+		else {
+			value =  new VerificationResult<TAPNNetworkTrace>(
+					result.getQueryResult(),
+					decomposeTrace(result.getTrace(), transformedModel.value2()),
+					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+					result.verificationTime(),
+					result.stats());
+			value.setNameMapping(transformedModel.value2());
 		}
 		
-		value.setNameMapping(transformedModel.value2());
 		return value;
+	}
+
+	private void changeDelaysInTrace(TAPNNetworkTrace approxResult, TAPNNetworkTrace trace) {
+		//Loop over trace and accumulate delays
+		int delay = 0;
+		for(TAPNNetworkTraceStep step : approxResult) {
+			if (step instanceof TAPNNetworkTimeDelayStep) {
+				((TAPNNetworkTimeDelayStep) step).setDelay(new BigDecimal(delay));
+			}
+		}
+		 
 	}
 	
 	protected int kBound(){

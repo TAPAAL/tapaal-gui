@@ -1,9 +1,14 @@
 package dk.aau.cs.approximation;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
+import dk.aau.cs.util.Tuple;
+import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.VerificationResult;
 import pipe.dataLayer.TAPNQuery;
 
@@ -62,36 +67,49 @@ public class OverApproximation implements ITAPNApproximation {
 			 );
 	}
 	
-	public void makeTraceTAPN(TimedArcPetriNet net, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
-		
+	public dk.aau.cs.model.tapn.TAPNQuery makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
+		TimedArcPetriNet net = transformedModel.value1();
+
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
+		TimedTransition currentTransition = new TimedTransition("TTRACE0");
 		TimedToken currentToken = new TimedToken(currentPlace); 
 		net.add(currentPlace);
+		net.add(currentTransition);
 		currentPlace.addToken(currentToken);
-		
 		int integerName = 0;
 		TAPNNetworkTrace trace = result.getTrace();
-				
+		HashMap<String,String> reversedNameMap = reverseNameMapping(transformedModel.value2().getMappedToOrg());
+
 		for(TAPNNetworkTraceStep step : trace) {
 			if (step instanceof TAPNNetworkTimedTransitionStep) {
-				TimedTransition currentTransition = net.getTransitionByName(((TAPNNetworkTimedTransitionStep) step).getTransition().name());
+				TimedTransition firedTransition = net.getTransitionByName(reversedNameMap.get(((TAPNNetworkTimedTransitionStep) step).getTransition().name()));
 				net.add(new TimedInputArc(currentPlace, currentTransition, TimeInterval.ZERO_INF));
 				for (TimedTransition transition : net.transitions()) {
-					if(currentTransition != transition){
+					if(firedTransition != transition && currentTransition != transition){
 						net.add(new TimedInhibitorArc(currentPlace, transition, TimeInterval.ZERO_INF));
 					}
 				}
-				
+				if (currentPlace == null)
+					System.out.println("Current place is null");
+				if (currentTransition == null)
+					System.out.println("Current transition is null");
 				integerName += 1;
 				currentPlace = new LocalTimedPlace("PTRACE" + Integer.toString(integerName));
 				
 				net.add(currentPlace);
 				net.add(new TimedOutputArc(currentTransition, currentPlace));
+				currentTransition = new TimedTransition("TTRACE" + Integer.toString(integerName));
+				net.add(currentTransition);
 			}
 		}
-		
-		query = new dk.aau.cs.model.tapn.TAPNQuery(new TCTLEFNode(new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1)), result.getQueryResult().getQuery().getExtraTokens());
-		
+		return new dk.aau.cs.model.tapn.TAPNQuery(new TCTLEFNode(new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1)), result.getQueryResult().getQuery().getExtraTokens() + 1);
 	}
-
+	
+	public static HashMap<String,String> reverseNameMapping(HashMap<String,Tuple<String,String>> map) {
+		HashMap<String,String> newMap = new HashMap<String,String>();
+		for ( Entry<String, Tuple<String,String>> entry : map.entrySet() ) {
+		    newMap.put(entry.getValue().value2(), entry.getKey());
+		}
+		return newMap;
+	}
 }
