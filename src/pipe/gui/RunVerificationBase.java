@@ -140,7 +140,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			//Create N'' from the trace
 			System.out.println("Creating N''");
 			Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
-			overaprx.makeTraceTAPN(transformedOriginalModel, value, clonedQuery);
+			overaprx.makeTraceTAPN(transformedOriginalModel, value);
 			System.out.println(clonedQuery.toString());
 			//run model checker again for N''
 			System.out.println("Verifying N''");
@@ -170,6 +170,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						approxResult.stats());
 				 changeDelaysInTrace(value.getTrace(), value2.getTrace());
 				 value.setNameMapping(transformedModel.value2());
+			}
+			else {
+				value = value2;
 			}
 		}
 		else {

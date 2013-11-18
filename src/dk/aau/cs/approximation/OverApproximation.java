@@ -67,7 +67,7 @@ public class OverApproximation implements ITAPNApproximation {
 			 );
 	}
 	
-	public dk.aau.cs.model.tapn.TAPNQuery makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
+	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result) {
 		TimedArcPetriNet net = transformedModel.value1();
 
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
@@ -102,7 +102,6 @@ public class OverApproximation implements ITAPNApproximation {
 				net.add(currentTransition);
 			}
 		}
-		return new dk.aau.cs.model.tapn.TAPNQuery(new TCTLEFNode(new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1)), result.getQueryResult().getQuery().getExtraTokens() + 1);
 	}
 	
 	public static HashMap<String,String> reverseNameMapping(HashMap<String,Tuple<String,String>> map) {
