@@ -1,8 +1,9 @@
 package pipe.gui;
 
 import java.math.BigDecimal;
-
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
@@ -166,6 +167,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			}
 			else {
 				value = valueTraceTAPN;
+
 			}
 		}
 		else {
@@ -184,14 +186,41 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 	private void changeDelaysInTrace(TAPNNetworkTrace approxResult, TAPNNetworkTrace trace) {
 		//Loop over trace and accumulate delays
-		int delay = 0;
+		int delay;
+		TAPNNetworkTimeDelayStep currentDelay;
+		TAPNNetworkTraceStep tempStep;
+		Iterator<TAPNNetworkTraceStep> traceIterator = trace.iterator();
 		for(TAPNNetworkTraceStep step : approxResult) {
 			if (step instanceof TAPNNetworkTimeDelayStep) {
-				((TAPNNetworkTimeDelayStep) step).setDelay(new BigDecimal(delay));
+				currentDelay = (TAPNNetworkTimeDelayStep) step;
 			}
+			else {
+				delay = 0;
+				boolean goOn = true;
+				while(goOn){
+					try {
+					 tempStep = traceIterator.next();
+					}
+					catch(NoSuchElementException e){
+						break;
+					}
+					if(tempStep instanceof TAPNNetworkTimeDelayStep)
+					{
+						delay += ((TAPNNetworkTimeDelayStep) tempStep).getDelay().intValue();
+					}
+					else{
+						if(((TAPNNetworkTimedTransitionStep) tempStep).getTransition().name() == ((TAPNNetworkTimedTransitionStep) step).getTransition().name()){
+							goOn = false;
+						}
+					}
+				}
+				
+			}
+				
 		}
+}
 		 
-	}
+
 	
 	protected int kBound(){
 		return model.marking().size() + query.getExtraTokens();
