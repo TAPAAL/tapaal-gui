@@ -13,6 +13,7 @@ import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -76,12 +77,17 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
-		if (dataLayerQuery != null && dataLayerQuery.isApproximationEnabled())
+		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled())
 		{
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
 		}
-		
+		else if (dataLayerQuery != null && dataLayerQuery.isUnderApproximationEnabled())
+		{
+			UnderApproximation underaprx = new UnderApproximation();
+			underaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
+		}
+
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());
 		MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
@@ -116,7 +122,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-		else if (dataLayerQuery != null && dataLayerQuery.isApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
+
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
 			System.out.println("Query for approximation is satisfied");
 			//Create the verification satisfied result for the approximation
 			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
@@ -127,7 +134,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					approxResult.verificationTime(),
 					approxResult.stats());
 			value.setNameMapping(transformedModel.value2());
-			
+
 			OverApproximation overaprx = new OverApproximation();
 
 			//Create N'' from the trace
@@ -174,6 +181,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					result.stats());
 			value.setNameMapping(transformedModel.value2());
 		}
+		// TODO: Handle under approximation
 		
 		return value;
 	}
