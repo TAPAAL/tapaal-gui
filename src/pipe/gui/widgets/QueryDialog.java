@@ -695,7 +695,7 @@ public class QueryDialog extends JPanel {
                 }
             }
             if (getQuantificationSelection().equals("E<>") || getQuantificationSelection().equals("A[]")) {
-                if (isNetDegree2) {
+                if (isNetDegree2 && !hasInhibitorArcs) {
                 	options.add(name_COMBI);
                 	if(!tapnNetwork.hasWeights() && !hasInhibitorArcs) {
                 		options.addAll(Arrays.asList(name_BROADCAST, name_BROADCASTDEG2));
