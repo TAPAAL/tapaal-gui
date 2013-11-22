@@ -124,9 +124,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		try {
 			String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().toString() + "/output_2.xml";
 			tapnWriter.savePNML(new File(outputPath));
-		} catch (NullPointerException | DOMException
-				| IOException
-				| ParserConfigurationException | TransformerException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
