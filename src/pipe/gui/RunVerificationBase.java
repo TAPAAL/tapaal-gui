@@ -70,11 +70,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		ITAPNComposer composer;
-//		if (this.guiModels != null) {
-//			composer = new TAPNComposerExtended(messenger, guiModels);
-//		} else {
+		if (this.guiModels != null) {
+			composer = new TAPNComposerExtended(messenger, guiModels);
+		} else {
 			composer = new TAPNComposer(messenger);			
-//		}
+		}
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		

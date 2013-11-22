@@ -458,7 +458,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				
 				String targetTemplate = arc.destination().isShared() ? "" : tapn.name();
 				
-				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
+				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.transition().name()));
 
 				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.destination().name()));
 				
@@ -504,7 +504,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 							0d,
 							guiSourceOut,
 							guiTargetOut,
-							arc.getWeight().value(),
+							1,
 							mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
 							false
 							)), 
@@ -534,7 +534,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				String targetTemplate = arc.destination().isShared() ? "" : tapn.name();
 				TimedTransition target = constructedModel.getTransitionByName(mapping.map(targetTemplate, arc.destination().name()));
 
-				TimedInputArc addedArc = new TimedInputArc(source, target, arc.interval(), arc.getWeight());
+				TimedInhibitorArc addedArc = new TimedInhibitorArc(source, target, arc.interval(), arc.getWeight());
 				constructedModel.add(addedArc);
 				
 				Place guiSource = guiModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
@@ -549,7 +549,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 						arc.getWeight().value(),
 						mapping.map(sourceTemplate, arc.source().name()) + "_to_" + mapping.map(targetTemplate, arc.destination().name()),
 						false
-						));
+						), "");
 				((TimedInhibitorArcComponent) newArc).setUnderlyingArc(addedArc);
 				newArc.updateArcPosition();
 				guiModel.addPetriNetObject(newArc);
