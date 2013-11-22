@@ -1831,6 +1831,9 @@ public class GuiFrame extends JFrame implements Observer {
 									"You need at least one active template to enter simulation mode",
 									"Simulation Mode Error", JOptionPane.ERROR_MESSAGE);
 						}
+						
+						stepforwardAction.setEnabled(false);
+						stepbackwardAction.setEnabled(false);
 					} else {
 						setMode(typeID);
 						PetriNetObject.ignoreSelection(false);
@@ -1848,9 +1851,6 @@ public class GuiFrame extends JFrame implements Observer {
 					appView.changeAnimationMode(false);
 					throw new RuntimeException(e);
 				}
-
-				stepforwardAction.setEnabled(false);
-				stepbackwardAction.setEnabled(false);
 					
 				if(getGUIMode().equals(GUIMode.draw)){
 					activateSelectAction();

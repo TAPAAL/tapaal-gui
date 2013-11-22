@@ -228,14 +228,59 @@ public class BatchProcessingDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 					/ 1000 + " s");
+			memory.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
+		}
+	});
+	
+	private static int memoryTimerCount = 0;
+	private static int memoryTimerMode = 0;
+	private static int peakMemory = -1;
+	
+	private void startMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+		memoryTimer.setDelay(50);
+		memoryTimerCount = 0;
+		memoryTimerMode = 0;
+		peakMemory = -1;
+		memoryTimer.start();
+	}
+	
+	private void stopMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+		MemoryMonitor.detach();
+	}
+	
+	private Timer memoryTimer = new Timer(50, new AbstractAction() {
+		private static final long serialVersionUID = 1327695063762640628L;
+
+		public void actionPerformed(ActionEvent e) {
 			if(MemoryMonitor.isAttached()){
-				String usage = MemoryMonitor.getUsage();
-				if(usage != null){
-					memory.setText(usage);
-				}
+				MemoryMonitor.getUsage();
+				peakMemory = MemoryMonitor.getPeakMemoryValue();
+				
 				if(useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()){
 					oomCurrentVerificationTask();
 				}
+			}
+			
+			if(memoryTimerMode == 0 && memoryTimerCount == 2){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(100);
+			}else if(memoryTimerMode == 1 && memoryTimerCount == 4){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(200);
+			}else if(memoryTimerMode == 2 && memoryTimerCount == 5){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(1000);
+			}else if(memoryTimerMode < 3){
+				memoryTimerCount++;
 			}
 		}
 	});
@@ -528,7 +573,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutLabel.setToolTipText(TOOL_TIP_TimeoutLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
@@ -544,7 +589,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
@@ -563,7 +608,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
@@ -574,7 +619,7 @@ public class BatchProcessingDialog extends JDialog {
 		oomLabel.setToolTipText(TOOL_TIP_OOMLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 7;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(oomLabel, gbc);
@@ -588,7 +633,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 7;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(oomValue, gbc);
@@ -607,7 +652,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 7;
+		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noOOMCheckbox, gbc);
@@ -748,6 +793,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void exit() {
+		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
 	}
 
@@ -795,7 +841,6 @@ public class BatchProcessingDialog extends JDialog {
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
-				
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -825,6 +870,7 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
+		table.getColumn("Memory Usage").setCellRenderer(renderer);
 
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
@@ -930,7 +976,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(memoryLabel, gbc);
 
 		memory = new JLabel("");
-		Dimension timerLabelDim = new Dimension(50, 25);
+		Dimension timerLabelDim = new Dimension(70, 25);
 		memory.setMinimumSize(timerLabelDim);
 		memory.setPreferredSize(timerLabelDim);
 		gbc = new GridBagConstraints();
@@ -970,7 +1016,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(time, gbc);
 
 		timerLabel = new JLabel("");
-		Dimension memoryLabelDim = new Dimension(50, 25);
+		Dimension memoryLabelDim = new Dimension(70, 25);
 		timerLabel.setMinimumSize(memoryLabelDim);
 		timerLabel.setPreferredSize(memoryLabelDim);
 		gbc = new GridBagConstraints();
@@ -1069,6 +1115,7 @@ public class BatchProcessingDialog extends JDialog {
 						skipFileButton.setEnabled(false);
 						timerLabel.setText("");
 						timer.stop();
+						stopMemoryTimer();
 						timeoutTimer.stop();
 					} else if ((StateValue) evt.getNewValue() == StateValue.STARTED) {
 						disableButtonsDuringProcessing();
@@ -1087,6 +1134,8 @@ public class BatchProcessingDialog extends JDialog {
 					timer.restart();
 				else
 					timer.start();
+				
+				startMemoryTimer();
 
 				if (useTimeout()) {
 					if (timeoutTimer.isRunning())
@@ -1102,6 +1151,7 @@ public class BatchProcessingDialog extends JDialog {
 					VerificationTaskCompleteEvent e) {
 				if (timer.isRunning())
 					timer.stop();
+				stopMemoryTimer();
 				if (timeoutTimer.isRunning())
 					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
@@ -1304,7 +1354,8 @@ public class BatchProcessingDialog extends JDialog {
 					setText(newQuery.getName());
 				} else if (table.getColumnName(column).equals(
 						"Verification Time")
-						|| table.getColumnName(column).equals("Method")) {
+						|| table.getColumnName(column).equals("Method")
+						|| table.getColumnName(column).equals("Memory Usage")) {
 					setText(value.toString());
 					Point mousePos = table.getMousePosition();
 					BatchProcessingVerificationResult result = null;
@@ -1316,6 +1367,9 @@ public class BatchProcessingDialog extends JDialog {
 
 					if (table.getColumnName(column).equals("Verification Time"))
 						setToolTipText(result != null ? generateStatsToolTipText(result)
+								: value.toString());
+					else if (table.getColumnName(column).equals("Memory Usage"))
+						setToolTipText(result != null ? generateMemoryToolTipText(result)
 								: value.toString());
 					else
 						setToolTipText(result != null ? generateReductionString(result
@@ -1344,6 +1398,19 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(result.stats().toString());
 			}
 
+			return s.toString();
+		}
+		
+		private String generateMemoryToolTipText(
+				BatchProcessingVerificationResult result) {
+			StringBuilder s = new StringBuilder();
+			s.append("Peak memory usage (estimate): ");
+			s.append(result.verificationMemory());
+			if (result.hasStats()) {
+				s.append(System.getProperty("line.separator"));
+				s.append(System.getProperty("line.separator"));
+				s.append(result.stats().toString());
+			}
 			return s.toString();
 		}
 
