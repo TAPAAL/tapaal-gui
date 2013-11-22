@@ -207,6 +207,8 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 			builder.append(maxTimeIn);
 		}else if(maxDegDif==0){
 			builder.append(initTransitions);
+		}else if(model.marking().size() + extraTokens == 0){
+			builder.append("1");
 		}else{
 			builder.append(model.marking().size() + extraTokens);
 		}
@@ -1445,6 +1447,7 @@ public class CombiTranslation implements ModelTranslator<TimedArcPetriNet, TAPNQ
 				maxDeg=deg;
 			}
 		}
+		
 		return maxDeg;
 	}
 
