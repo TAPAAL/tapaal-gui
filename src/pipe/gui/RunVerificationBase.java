@@ -30,6 +30,7 @@ import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.QueryType;
+import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
@@ -153,8 +154,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			//Create the result from trace TAPN
 			removeTraceTransitions(result.getTrace());
 			removeTraceTransitions(result.getSecondaryTrace());
+			QueryResult queryResult= result.getQueryResult();
+			if (!queryResult.isQuerySatisfied())
+				queryResult.setApproximationInconclusive(true);
 			value = new VerificationResult<TAPNNetworkTrace>(
-					result.getQueryResult(),
+					queryResult,
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 					approxResult.verificationTime(),

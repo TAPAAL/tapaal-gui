@@ -5,6 +5,7 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 
 public class QueryResult {
 	private boolean satisfied = false;
+	private boolean approximationInconclusive = false;
 	private boolean discreteInclusion = false;
 	private TAPNQuery query;
 	private BoundednessAnalysisResult boundednessAnalysis;
@@ -20,6 +21,14 @@ public class QueryResult {
 		return satisfied;
 	}
 	
+	public boolean isApproximationInconclusive() {
+		return approximationInconclusive;
+	}
+	
+	public void setApproximationInconclusive(boolean result) {
+		approximationInconclusive = result;
+	}
+	
 	public boolean isDiscreteIncludion() {
 		return discreteInclusion;
 	}
@@ -30,8 +39,13 @@ public class QueryResult {
 	
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer( "Property is ");
-		buffer.append(satisfied ? "satisfied." : "not satisfied.");
+		StringBuffer buffer = new StringBuffer();
+		if(approximationInconclusive)
+			buffer.append(getInconclusiveString());
+		else {
+			buffer.append("Property is ");
+			buffer.append(satisfied ? "satisfied." : "not satisfied.");
+		}
 		if(shouldAddExplanation())
 			buffer.append(getExplanationString());
 		return buffer.toString();
@@ -53,6 +67,12 @@ public class QueryResult {
 	
 	protected String getExplanationString(){
 		return boundednessAnalysis.toString();
+	}
+	
+	protected String getInconclusiveString(){
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("The result of the approximation was inconclusive.");
+		return buffer.toString();
 	}
 	
 	public TAPNQuery getQuery() {
