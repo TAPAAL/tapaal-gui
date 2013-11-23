@@ -60,4 +60,13 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 	public void setTraceType(TraceType traceType){
 		this.traceType = traceType;
 	}
+	
+	public void removeTransitionsByNameMatch(String match) {
+		List<TimedArcPetriNetStep> stepsToRemove = new ArrayList<TimedArcPetriNetStep>();
+		for (TimedArcPetriNetStep step : steps)
+			if (step instanceof TimedTransitionStep && ((TimedTransitionStep) step).transition().name().startsWith(match)) {
+				stepsToRemove.add(step);
+		}	
+		steps.removeAll(stepsToRemove);
+	}
 }

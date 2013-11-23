@@ -102,6 +102,14 @@ public class OverApproximation implements ITAPNApproximation {
 				net.add(currentTransition);
 			}
 		}
+		
+		for (TimedTransition transition : net.transitions()) {
+			if(!transition.name().startsWith("TTRACE")){
+				net.add(new TimedInhibitorArc(currentPlace, transition, TimeInterval.ZERO_INF));
+			}
+		}
+		
+		net.remove(currentTransition); //Removing last orphan transition
 	}
 	
 	public static HashMap<String,String> reverseNameMapping(HashMap<String,Tuple<String,String>> map) {

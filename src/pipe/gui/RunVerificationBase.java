@@ -125,7 +125,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		}
 
 		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
-			System.out.println("Query for approximation is satisfied");
 			//Create the verification satisfied result for the approximation
 			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
 			value =  new VerificationResult<TAPNNetworkTrace>(
@@ -135,16 +134,15 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					approxResult.verificationTime(),
 					approxResult.stats());
 			value.setNameMapping(transformedModel.value2());
-
+			
 			OverApproximation overaprx = new OverApproximation();
+			
 
-			//Create N'' from the trace
-			System.out.println("Creating N''");
+			//Create trace TAPN from the trace
 			Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
 			overaprx.makeTraceTAPN(transformedOriginalModel, value);
-			System.out.println(clonedQuery.toString());
-			//run model checker again for N''
-			System.out.println("Verifying N''");
+
+			//run model checker again for trace TAPN
 			result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 			if (isCancelled()) {
 				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
@@ -152,23 +150,16 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			if (result.error()) {
 				return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 			}
-			//Create the result from N''
-			VerificationResult<TAPNNetworkTrace> valueTraceTAPN = new VerificationResult<TAPNNetworkTrace>(
+			//Create the result from trace TAPN
+			removeTraceTransitions(result.getTrace());
+			removeTraceTransitions(result.getSecondaryTrace());
+			value = new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
-					result.verificationTime(),
-					result.stats());
-			valueTraceTAPN.setNameMapping(transformedModel.value2());
-			
-			if (result.getQueryResult().isQuerySatisfied()) {
-				//Recreate the approximation result with delays from N''
-				 changeDelaysInTrace(value.getTrace(), valueTraceTAPN.getTrace());
-			}
-			else {
-				value = valueTraceTAPN;
-
-			}
+					approxResult.verificationTime(),
+					approxResult.stats());
+			value.setNameMapping(transformedModel.value2());
 		}
 		else {
 			value =  new VerificationResult<TAPNNetworkTrace>(
@@ -183,45 +174,12 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		return value;
 	}
-
-	private void changeDelaysInTrace(TAPNNetworkTrace approxResult, TAPNNetworkTrace trace) {
-		//Loop over trace and accumulate delays
-		int delay;
-		TAPNNetworkTimeDelayStep currentDelay;
-		TAPNNetworkTraceStep tempStep;
-		Iterator<TAPNNetworkTraceStep> traceIterator = trace.iterator();
-		for(TAPNNetworkTraceStep step : approxResult) {
-			if (step instanceof TAPNNetworkTimeDelayStep) {
-				currentDelay = (TAPNNetworkTimeDelayStep) step;
-			}
-			else {
-				delay = 0;
-				boolean goOn = true;
-				while(goOn){
-					try {
-					 tempStep = traceIterator.next();
-					}
-					catch(NoSuchElementException e){
-						break;
-					}
-					if(tempStep instanceof TAPNNetworkTimeDelayStep)
-					{
-						delay += ((TAPNNetworkTimeDelayStep) tempStep).getDelay().intValue();
-					}
-					else{
-						if(((TAPNNetworkTimedTransitionStep) tempStep).getTransition().name() == ((TAPNNetworkTimedTransitionStep) step).getTransition().name()){
-							goOn = false;
-						}
-					}
-				}
-				
-			}
-				
-		}
-}
-		 
-
 	
+	private void removeTraceTransitions(TimedArcPetriNetTrace trace) {
+		if (trace != null)
+			trace.removeTransitionsByNameMatch("TTRACE");
+	}
+
 	protected int kBound(){
 		return model.marking().size() + query.getExtraTokens();
 	}
