@@ -1148,7 +1148,7 @@ public class WorkflowDialog extends JDialog {
 								: (Integer) numberOfExtraTokensInNet.getValue(),
 								new TCTLEFNode(new TCTLAtomicPropositionNode(template, done.name(), "=", 1)), TraceOption.SOME,
 								SearchOption.HEURISTIC,
-								ReductionOption.VerifyTAPNdiscreteVerification, true,
+								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 								false, false, false, null, ExtrapolationOption.AUTOMATIC, WorkflowMode.WORKFLOW_STRONG_SOUNDNESS);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
@@ -1293,7 +1293,7 @@ public class WorkflowDialog extends JDialog {
 								: (Integer) numberOfExtraTokensInNet.getValue(),
 								new TCTLEFNode(new TCTLTrueNode()), TraceOption.SOME,
 								SearchOption.HEURISTIC,
-								ReductionOption.VerifyTAPNdiscreteVerification, true,
+								ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 								false, false, false, null, ExtrapolationOption.AUTOMATIC,
 								WorkflowMode.WORKFLOW_SOUNDNESS);
 				Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
@@ -1409,7 +1409,7 @@ public class WorkflowDialog extends JDialog {
 										: (Integer) numberOfExtraTokensInNet.getValue(),
 										new TCTLEFNode(new TCTLAtomicPropositionNode(out.isShared()?"":out_template.name(), out.name(), ">=",1)), TraceOption.SOME,
 										SearchOption.HEURISTIC,
-										ReductionOption.VerifyTAPNdiscreteVerification, true,
+										ReductionOption.VerifyTAPNdiscreteVerification, true, true,
 										true, true, null, ExtrapolationOption.AUTOMATIC);
 						Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 

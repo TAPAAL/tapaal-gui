@@ -44,7 +44,7 @@ public class VerifyTAPNExporter {
 			if(dataLayerQuery == null){
 				options = new VerifyTAPNOptions(query.getExtraTokens(), TraceOption.NONE, SearchOption.HEURISTIC, true, true);
 			}else if(dataLayerQuery.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification){
-				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie(), dataLayerQuery.useOverApproximation());
+				options = new VerifyDTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useGCD(), dataLayerQuery.useTimeDarts(), dataLayerQuery.usePTrie(), dataLayerQuery.useOverApproximation());
 			} else {
 				options = new VerifyTAPNOptions(dataLayerQuery.getCapacity()+model.getNumberOfTokensInNet(), dataLayerQuery.getTraceOption(), dataLayerQuery.getSearchOption(),dataLayerQuery.useSymmetry(), dataLayerQuery.useOverApproximation());
 			}
