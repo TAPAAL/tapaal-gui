@@ -57,6 +57,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 
 	private HashSet<String> processedSharedObjects;
 	private HashMap<TimedArcPetriNet, DataLayer> guiModels;
+	private DataLayer composedGuiModel;
 
 	public TAPNComposerExtended(Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels){
 		this.messenger = messenger;
@@ -86,51 +87,16 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		createTransportArcs(model, tapn, mapping, guiModel);
 		createInhibitorArcs(model, tapn, mapping, guiModel);
 		
-		// Combine DataLayers to be used in XMLWriter
-		/*
-		int i = 0;
-		for(Entry<TimedArcPetriNet, DataLayer> entry : this.guiModels.entrySet()) {
-			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
-			
-			for(PetriNetObject netObject : entry.getValue().getPetriNetObjects()) {
-				if (netObject instanceof PlaceTransitionObject) {
-					PlaceTransitionObject netObjectPlace = (PlaceTransitionObject) netObject;
-					// Modify netObjectPlace to arrange components
-					netObjectPlace.setPositionX(netObjectPlace.getPositionX() + (offset.value1() * 200));
-					netObjectPlace.setPositionY(netObjectPlace.getPositionY() + (offset.value2() * 200));
-					
-					guiModel.addPetriNetObject(netObjectPlace);
-				} else if (netObject instanceof Arc) {
-					Arc netObjectArc = (Arc) netObject;
-					// Modify netObjectArc to arrange components
-					netObjectArc.updateArcPosition();
-					
-					guiModel.addPetriNetObject(netObjectArc);
-				}
-				
-			}
-			i++;
-		}
-		*/
-		
-		ArrayList<Template> templates = new ArrayList<Template>(1);
-		templates.add(new Template(tapn, guiModel, new Zoomer()));
-		
-		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
-		network.add(tapn);
-		
-		PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<TAPNQuery>(0), new ArrayList<Constant>(0));
+		// Set composed guiModel in the instance variable
+		this.composedGuiModel = guiModel;
 
-		try {
-			String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().toString() + "/output_2.xml";
-			tapnWriter.savePNML(new File(outputPath));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		dumpToConsole(tapn, mapping);
+		//dumpToConsole(tapn, mapping);
 
 		return new Tuple<TimedArcPetriNet, NameMapping>(tapn, mapping);
+	}
+	
+	public DataLayer getGuiModel() {
+		return this.composedGuiModel;
 	}
 	
 	private Tuple<Integer, Integer> calculateComponentPosition(int netNumber) {

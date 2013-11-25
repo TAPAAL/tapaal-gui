@@ -968,6 +968,9 @@ public class QueryDialog extends JPanel {
 			overApproximationEnable.setSelected(true);
 		if (queryToCreateFrom.isUnderApproximationEnabled())
 			underApproximationEnable.setSelected(true);
+		if (queryToCreateFrom.approximationDenominator() > 0) {
+			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
+		}
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
