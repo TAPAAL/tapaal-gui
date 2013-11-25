@@ -791,6 +791,11 @@ public class TapnXmlLoader {
 		boolean timeDarts = getReductionOption(queryElement, "timeDarts", true);
 		boolean pTrie = getReductionOption(queryElement, "pTrie", true);
 		boolean overApproximation = getReductionOption(queryElement, "overApproximation", true);
+		boolean isOverApproximationEnabled = getApproximationOption(queryElement, "enableOverApproximation", false);
+		boolean isUnderApproximationEnabled = getApproximationOption(queryElement, "enableUnderApproximation", false);
+		int approximationDenominator = getApproximationValue(queryElement, "approximationDenominator", 1); //TODO: Change the 1 to 2 if you read this (don't ask)
+		boolean saveApproximatedNet = getApproximationOption(queryElement, "saveApproximatedNet", false);
+		boolean saveComposedNet = getApproximationOption(queryElement, "saveComposedNet", false);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);
@@ -800,7 +805,8 @@ public class TapnXmlLoader {
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, timeDarts, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces);
+					searchOption, reductionOption, symmetry, timeDarts, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces,
+					isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, saveApproximatedNet, saveComposedNet);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
@@ -850,6 +856,34 @@ public class TapnXmlLoader {
 	}
 
 	private boolean getReductionOption(Element queryElement, String attributeName, boolean defaultValue) {
+		if(!queryElement.hasAttribute(attributeName)){
+			return defaultValue;
+		}
+		boolean result;
+		try {
+			result = queryElement.getAttribute(attributeName).equals("true");
+		} catch(Exception e) {
+			result = defaultValue;
+		}
+		return result;	
+	}
+	
+	private int getApproximationValue(Element queryElement, String attributeName, int defaultValue)
+	{
+		if(!queryElement.hasAttribute(attributeName)){
+			return defaultValue;
+		}
+		int result;
+		try {
+			result = Integer.parseInt(queryElement.getAttribute(attributeName));
+		} catch(Exception e) {
+			result = defaultValue;
+		}
+		return result;
+	}
+	
+	private boolean getApproximationOption(Element queryElement, String attributeName, boolean defaultValue)
+	{
 		if(!queryElement.hasAttribute(attributeName)){
 			return defaultValue;
 		}

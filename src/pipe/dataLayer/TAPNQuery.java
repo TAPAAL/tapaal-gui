@@ -46,8 +46,8 @@ public class TAPNQuery {
 	private boolean enableOverApproximation = false;
 	private boolean enableUnderApproximation = false;
 	private int denominator = 2;
-	private boolean saveComposedNet;
-	private boolean saveApproximatedNet;
+	private boolean saveComposedNet = false;
+	private boolean saveApproximatedNet = false;
 	
 	private boolean discreteInclusion = false; // Only for VerifyTAPN
 
@@ -76,6 +76,7 @@ public class TAPNQuery {
 	public boolean isUnderApproximationEnabled() {
 		return this.enableUnderApproximation;
 	}
+
 	
 	public int approximationDenominator() {
 		return this.denominator;
@@ -305,7 +306,7 @@ public class TAPNQuery {
 	}
 
 	public TAPNQuery copy() {
-		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces);
+		TAPNQuery copy = new TAPNQuery(name, capacity, property.copy(), traceOption, searchOption, reductionOption, symmetry, timeDart, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces, enableOverApproximation, enableUnderApproximation, denominator, saveApproximatedNet, saveApproximatedNet);
 		copy.setDiscreteInclusion(discreteInclusion);
 		copy.setActive(isActive);
 		
