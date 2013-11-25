@@ -125,7 +125,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
 
-		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && result.getQueryResult().isQuerySatisfied()) {
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {
 			//Create the verification satisfied result for the approximation
 			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
 			value =  new VerificationResult<TAPNNetworkTrace>(
@@ -155,7 +155,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			removeTraceTransitions(result.getTrace());
 			removeTraceTransitions(result.getSecondaryTrace());
 			QueryResult queryResult= result.getQueryResult();
-			if (!queryResult.isQuerySatisfied())
+			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()))
 				queryResult.setApproximationInconclusive(true);
 			value = new VerificationResult<TAPNNetworkTrace>(
 					queryResult,

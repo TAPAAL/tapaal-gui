@@ -10,6 +10,8 @@ public class VerifyTAPNIconSelector extends IconSelector {
 
 	@Override
 	public ImageIcon getIconFor(QueryResult result) {
+		if (result.isApproximationInconclusive())
+			return inconclusiveIcon;
 		switch(result.queryType())
 		{
 		case EF:
