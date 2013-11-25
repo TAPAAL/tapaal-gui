@@ -2083,7 +2083,9 @@ public class QueryDialog extends JPanel {
 		underApproximationEnable.setVisible(true);
 		underApproximationEnable.setToolTipText("Enable under approximation");
 
-		saveApproximatedNet = new JCheckBox("Save approximation(s)");
+		saveApproximatedNet = new JCheckBox("Save approximation(s) to file");
+		saveApproximatedNet.setVisible(true);
+		saveApproximatedNet.setToolTipText("Save the composed approximated net");
 		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
@@ -2098,6 +2100,7 @@ public class QueryDialog extends JPanel {
 		
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(saveApproximatedNet, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
 	
 		gridBagConstraints = new GridBagConstraints();
@@ -2341,7 +2344,7 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
 			
-			saveComposedNet = new JCheckBox("Save composed net");
+			saveComposedNet = new JCheckBox("Save composed net to file");
 			//Only show in advanced mode
 			saveComposedNet.setVisible(false);
 			
