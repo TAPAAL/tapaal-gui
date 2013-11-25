@@ -124,9 +124,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		}
 		
 		// If selected, save the composed net after approximations have been made
-		if (false) {
+		if (dataLayerQuery.shouldSaveApproximatedNet()) {
+			DataLayer approximatedGuiModel = ((TAPNComposerExtended) composer).getGuiModel().copy(transformedModel.value1());
 			ArrayList<Template> templates = new ArrayList<Template>(1);
-			templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
+			templates.add(new Template(transformedModel.value1(), approximatedGuiModel, new Zoomer()));
 			
 			TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
 			network.add(transformedModel.value1());
