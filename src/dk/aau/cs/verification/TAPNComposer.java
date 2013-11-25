@@ -261,6 +261,8 @@ public class TAPNComposer {
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
+				if(arc.destination().isOrphan())	continue;
+				
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 
