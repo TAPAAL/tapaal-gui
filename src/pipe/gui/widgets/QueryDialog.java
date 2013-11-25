@@ -204,11 +204,13 @@ public class QueryDialog extends JPanel {
 	private JCheckBox usePTrie;
 	private JCheckBox useOverApproximation;
 	
-	// Overapproximation options panel
+	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
 	private JCheckBox overApproximationEnable;
 	private JCheckBox underApproximationEnable;
 	private CustomJSpinner overApproximationDenominator;
+	private JCheckBox saveApproximatedNet;
+	private JCheckBox saveComposedNet;
 	
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
@@ -315,9 +317,10 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
+	private final static String TOOL_TIP_SAVE_COMPOSED_CHECKBOX = "Check to save the composed net once it's generated just before verification";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
-
+	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		this.tapnNetwork = tapnNetwork;
@@ -366,7 +369,7 @@ public class QueryDialog extends JPanel {
 		boolean pTrie = usePTrie.isSelected();
 		boolean overApproximation = useOverApproximation.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue(), saveApproximatedNet.isSelected(), saveComposedNet.isSelected());
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -968,6 +971,9 @@ public class QueryDialog extends JPanel {
 			overApproximationEnable.setSelected(true);
 		if (queryToCreateFrom.isUnderApproximationEnabled())
 			underApproximationEnable.setSelected(true);
+		if (queryToCreateFrom.approximationDenominator() > 0) {
+			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
+		}
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1173,7 +1179,8 @@ public class QueryDialog extends JPanel {
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
-
+		saveComposedNet.setVisible(advancedView);
+		
 		if(advancedView){
 			advancedButton.setText("Simple view");
 			advancedButton.setToolTipText(TOOL_TIP_SIMPLE_VIEW_BUTTON);
@@ -2071,31 +2078,29 @@ public class QueryDialog extends JPanel {
 		overApproximationEnable = new JCheckBox("Enable over approximation");
 		overApproximationEnable.setVisible(true);
 		overApproximationEnable.setToolTipText("Enable over approximation");
+		
 		underApproximationEnable = new JCheckBox("Enable under approximation");
 		underApproximationEnable.setVisible(true);
 		underApproximationEnable.setToolTipText("Enable under approximation");
-		//underApproximationEnable.set
+
+		saveApproximatedNet = new JCheckBox("Save approximation(s) to file");
+		saveApproximatedNet.setVisible(true);
+		saveApproximatedNet.setToolTipText("Save the composed approximated net");
+		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
-		overApproximationEnable.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		underApproximationEnable.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
+		
 		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
 		overApproximationDenominator.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
+		
+		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(saveApproximatedNet, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
 	
 		gridBagConstraints = new GridBagConstraints();
@@ -2338,15 +2343,21 @@ public class QueryDialog extends JPanel {
 			saveButton = new JButton("Save");
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
+			
+			saveComposedNet = new JCheckBox("Save composed net to file");
+			//Only show in advanced mode
+			saveComposedNet.setVisible(false);
+			
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 			//Only show in advanced mode
 			saveUppaalXMLButton.setVisible(false);
-
+			
 			//Add tool tips
 			saveButton.setToolTipText(TOOL_TIP_SAVE_BUTTON);
 			saveAndVerifyButton.setToolTipText(TOOL_TIP_SAVE_AND_VERIFY_BUTTON);
 			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
 			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
+			saveComposedNet.setToolTipText(TOOL_TIP_SAVE_COMPOSED_CHECKBOX);
 
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -2370,7 +2381,7 @@ public class QueryDialog extends JPanel {
 						TAPNQuery query = getQuery();
 
 						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-							Verifier.runVerifyTAPNVerification(tapnNetwork, query);
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels);
 						else
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
@@ -2462,6 +2473,7 @@ public class QueryDialog extends JPanel {
 		if (option == QueryDialogueOption.Save) {
 			JPanel leftButtomPanel = new JPanel(new FlowLayout());
 			JPanel rightButtomPanel = new JPanel(new FlowLayout());
+			leftButtomPanel.add(saveComposedNet, FlowLayout.LEFT);
 			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
 
 			rightButtomPanel.add(cancelButton);

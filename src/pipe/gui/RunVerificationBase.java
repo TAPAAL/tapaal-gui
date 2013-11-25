@@ -1,6 +1,8 @@
 package pipe.gui;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -8,13 +10,18 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileSystemView;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -78,6 +85,24 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		}
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
+		
+		// If selected, save the composed net before any approximations are being made
+		// Write composed model to file
+		ArrayList<Template> templates = new ArrayList<Template>(1);
+		templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
+		
+		TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+		network.add(transformedModel.value1());
+		
+		PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
+
+		try {
+			FileFinder fileFinder = new FileFinderImpl();
+			tapnWriter.savePNML(fileFinder.ShowFileBrowserDialog("Choose where to save composed net", ".xml", null));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		
 		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled())
 		{
