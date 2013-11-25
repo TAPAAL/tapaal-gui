@@ -964,6 +964,7 @@ public class QueryDialog extends JPanel {
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
 		setupApproximationOptionsFromQuery(queryToCreateFrom);
+		saveComposedNet.setSelected(queryToCreateFrom.shouldSaveComposedNet());
 	}
 	
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -974,6 +975,7 @@ public class QueryDialog extends JPanel {
 		if (queryToCreateFrom.approximationDenominator() > 0) {
 			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
 		}
+		saveApproximatedNet.setSelected(queryToCreateFrom.shouldSaveApproximatedNet());
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
