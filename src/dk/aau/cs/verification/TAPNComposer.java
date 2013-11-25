@@ -115,7 +115,7 @@ public class TAPNComposer {
 					}else{
 						if(!hasShownMessage){
 							messenger.displayInfoMessage("There are orphan transitions (no incoming and no outgoing arcs) in the model."
-									+ System.getProperty("line.separator") + "They will be removed before the verification.");
+									+ System.getProperty("line.separator") + "They will be removed (together with any connected inhibitor arcs) before the verification.");
 							hasShownMessage = true;
 						}
 					}
@@ -181,6 +181,8 @@ public class TAPNComposer {
 			TimedArcPetriNet constructedModel, NameMapping mapping) {
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			for (TimedInhibitorArc arc : tapn.inhibitorArcs()) {
+				if(arc.destination().isOrphan())	continue;
+				
 				String template = arc.source().isShared() ? "" : tapn.name();
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(template, arc.source().name()));
 
