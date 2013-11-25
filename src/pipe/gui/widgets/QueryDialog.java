@@ -2074,31 +2074,24 @@ public class QueryDialog extends JPanel {
 		overApproximationEnable = new JCheckBox("Enable over approximation");
 		overApproximationEnable.setVisible(true);
 		overApproximationEnable.setToolTipText("Enable over approximation");
+		
 		underApproximationEnable = new JCheckBox("Enable under approximation");
 		underApproximationEnable.setVisible(true);
 		underApproximationEnable.setToolTipText("Enable under approximation");
-		//underApproximationEnable.set
+
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
-		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
-		overApproximationEnable.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		underApproximationEnable.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
+		
 		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
 		overApproximationDenominator.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
+		
+		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
 	
 		gridBagConstraints = new GridBagConstraints();
@@ -2373,7 +2366,7 @@ public class QueryDialog extends JPanel {
 						TAPNQuery query = getQuery();
 
 						if(query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification || query.getReductionOption() == ReductionOption.VerifyPN)
-							Verifier.runVerifyTAPNVerification(tapnNetwork, query);
+							Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels);
 						else
 							Verifier.runUppaalVerification(tapnNetwork, query);
 					}}
