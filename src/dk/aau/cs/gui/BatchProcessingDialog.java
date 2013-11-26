@@ -93,6 +93,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Engine - Discrete Verification, Time darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Engine - Discrete Verification, PTries";
 	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Engine - Discrete Verification, No optimizations";
+	private static final String name_COMBI = "UPPAAL: Combi Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -113,16 +114,17 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_verifyTAPNDiscreteVerificationNoneWithLegend  = "F: "
 			+ name_verifyTAPNDiscreteVerificationNone;
 
-	private static final String name_STANDARDWithLegend = "G: " + name_STANDARD;
-	private static final String name_OPTIMIZEDSTANDARDWithLegend = "H: "
+	private static final String name_COMBIWithLegend = "G: " + name_COMBI;
+	private static final String name_STANDARDWithLegend = "H: " + name_STANDARD;
+	private static final String name_OPTIMIZEDSTANDARDWithLegend = "I: "
 			+ name_OPTIMIZEDSTANDARD;
-	private static final String name_BROADCASTWithLegend = "I: "
+	private static final String name_BROADCASTWithLegend = "J: "
 			+ name_BROADCAST;
-	private static final String name_BROADCASTDEG2WithLegend = "J: "
+	private static final String name_BROADCASTDEG2WithLegend = "K: "
 			+ name_BROADCASTDEG2;
-	private static final String name_UNTIMEDWithLegend = "K: "
+	private static final String name_UNTIMEDWithLegend = "L: "
 			+ name_UNTIMED;
-	private static final String name_UNTIMED_APPROXWithLegend = "L: "
+	private static final String name_UNTIMED_APPROXWithLegend = "M: "
 			+ name_UNTIMED_APPROX;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
@@ -1448,7 +1450,9 @@ public class BatchProcessingDialog extends JDialog {
 			StringBuilder s = new StringBuilder();
 			if (query != null) {
 				s.append("Reduction: \n");
-				if (query.getReductionOption() == ReductionOption.STANDARD)
+				if (query.getReductionOption() == ReductionOption.COMBI)
+					s.append(name_COMBI);
+				else if (query.getReductionOption() == ReductionOption.STANDARD)
 					s.append(name_STANDARD);
 				else if (query.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD)
 					s.append(name_OPTIMIZEDSTANDARD);
@@ -1584,6 +1588,7 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox verifyTAPNDiscreteVerificationTimeDart;
 		private JCheckBox verifyTAPNDiscreteVerificationPTrie;
 		private JCheckBox verifyTAPNDiscreteVerificationNone;
+		private JCheckBox COMBI;
 		private JCheckBox STANDARD;
 		private JCheckBox OPTIMIZEDSTANDARD;
 		private JCheckBox BROADCAST;
@@ -1681,6 +1686,10 @@ public class BatchProcessingDialog extends JDialog {
 			verifyTAPNDiscreteVerificationNone = new JCheckBox(name_verifyTAPNDiscreteVerificationNoneWithLegend);
 			verifyTAPNDiscreteVerificationNone.setEnabled(false);
 			
+			COMBI = new JCheckBox(name_COMBIWithLegend);
+			//STANDARD.setMnemonic('C');
+			COMBI.setEnabled(false);
+			
 			STANDARD = new JCheckBox(name_STANDARDWithLegend);
 			//STANDARD.setMnemonic('C');
 			STANDARD.setEnabled(false);
@@ -1750,39 +1759,46 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.gridy = 6;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(STANDARD, gbc);
+			rightPanel.add(COMBI, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 7;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			rightPanel.add(STANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 8;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCAST, gbc);
+			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 9;
-			gbc.insets = new Insets(0, 5, 0	, 5);
+			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCASTDEG2, gbc);
+			rightPanel.add(BROADCAST, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 10;
 			gbc.insets = new Insets(0, 5, 0	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(BROADCASTDEG2, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 11;
+			gbc.insets = new Insets(0, 5, 0	, 5);
+			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(UNTIMED, gbc);
 		
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 11;
+			gbc.gridy = 12;
 			gbc.insets = new Insets(0, 5, 5	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(UNTIMEDAPPROX, gbc);
@@ -1841,6 +1857,7 @@ public class BatchProcessingDialog extends JDialog {
 			
 			verifyTAPN.setEnabled(override);
 			verifyTAPNDiscreteInclusion.setEnabled(override);
+			COMBI.setEnabled(override);
 			STANDARD.setEnabled(override);
 			OPTIMIZEDSTANDARD.setEnabled(override);
 			BROADCAST.setEnabled(override);
@@ -1858,6 +1875,7 @@ public class BatchProcessingDialog extends JDialog {
 		private void setAll(boolean selected){
 			verifyTAPN.setSelected(selected);
 			verifyTAPNDiscreteInclusion.setSelected(selected);
+			COMBI.setSelected(selected);
 			STANDARD.setSelected(selected);
 			OPTIMIZEDSTANDARD.setSelected(selected);
 			BROADCAST.setSelected(selected);
@@ -1877,6 +1895,9 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			if(verifyTAPNDiscreteVerificationNone.isSelected()){
 				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
+			}
+			if(COMBI.isSelected()){
+				result.add(ReductionOption.COMBI);
 			}
 			if(STANDARD.isSelected()){
 				result.add(ReductionOption.STANDARD);
