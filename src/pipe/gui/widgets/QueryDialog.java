@@ -206,8 +206,10 @@ public class QueryDialog extends JPanel {
 	
 	// Approximation options panel
 	private JPanel overApproximationOptionsPanel;
-	private JCheckBox overApproximationEnable;
-	private JCheckBox underApproximationEnable;
+	private ButtonGroup approximationRadioButtonGroup;
+	private JRadioButton noApproximationEnable;
+	private JRadioButton overApproximationEnable;
+	private JRadioButton underApproximationEnable;
 	private CustomJSpinner overApproximationDenominator;
 	private JCheckBox saveApproximatedNet;
 	private JCheckBox saveComposedNet;
@@ -625,24 +627,14 @@ public class QueryDialog extends JPanel {
 			userChangedAtomicPropSelection = true;
 		} else if (currentSelection.getObject() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
-			overApproximationEnable.setEnabled(true);
-			underApproximationEnable.setEnabled(true);
 		} else if (currentSelection.getObject() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
-			overApproximationEnable.setSelected(false);
-			underApproximationEnable.setSelected(false);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
+			noApproximationEnable.setSelected(true);
 		} else if (currentSelection.getObject() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
-			overApproximationEnable.setEnabled(true);
-			underApproximationEnable.setEnabled(true);
 		} else if (currentSelection.getObject() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
-			overApproximationEnable.setSelected(false);
-			underApproximationEnable.setSelected(false);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
+			noApproximationEnable.setSelected(true);
 		}
 	}
 
@@ -982,8 +974,10 @@ public class QueryDialog extends JPanel {
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
 		if (queryToCreateFrom.isOverApproximationEnabled())
 			overApproximationEnable.setSelected(true);
-		if (queryToCreateFrom.isUnderApproximationEnabled())
+		else if (queryToCreateFrom.isUnderApproximationEnabled())
 			underApproximationEnable.setSelected(true);
+		else
+			noApproximationEnable.setSelected(true);
 		if (queryToCreateFrom.approximationDenominator() > 0) {
 			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
 		}
@@ -1051,24 +1045,14 @@ public class QueryDialog extends JPanel {
 		// node (we cant have nested quantifiers)	
 		if (queryToCreateFrom.getProperty() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
-			overApproximationEnable.setEnabled(true);
-			underApproximationEnable.setEnabled(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
-			overApproximationEnable.setSelected(false);
-			underApproximationEnable.setSelected(false);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
+			noApproximationEnable.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
-			overApproximationEnable.setSelected(false);
-			underApproximationEnable.setSelected(false);
-			overApproximationEnable.setEnabled(false);
-			underApproximationEnable.setEnabled(false);
+			noApproximationEnable.setSelected(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
-			overApproximationEnable.setEnabled(true);
-			underApproximationEnable.setEnabled(true);
 		}
 	}
 
@@ -1359,6 +1343,7 @@ public class QueryDialog extends JPanel {
 		quantificationPanel = new JPanel(new GridBagLayout());
 		quantificationPanel.setBorder(BorderFactory.createTitledBorder("Quantification"));
 		quantificationRadioButtonGroup = new ButtonGroup();
+		approximationRadioButtonGroup = new ButtonGroup();
 
 		existsDiamond = new JRadioButton("(EF) There exists some reachable marking that satisifies:");
 		existsBox = new JRadioButton("(EG) There exists a trace on which every marking satisfies:");
@@ -2099,19 +2084,28 @@ public class QueryDialog extends JPanel {
 	private void initOverApproximationPanel() {
 		overApproximationOptionsPanel = new JPanel(new GridBagLayout());
 		overApproximationOptionsPanel.setVisible(true);
-		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Over approximation Options"));
+		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Approximation Options"));
+		approximationRadioButtonGroup = new ButtonGroup();
 		
-		overApproximationEnable = new JCheckBox("Enable over approximation");
+		noApproximationEnable = new JRadioButton("No approximation method");
+		noApproximationEnable.setVisible(true);
+		noApproximationEnable.setToolTipText("Enable over-approximation");
+		
+		overApproximationEnable = new JRadioButton("Enable over-approximation");
 		overApproximationEnable.setVisible(true);
-		overApproximationEnable.setToolTipText("Enable over approximation");
+		overApproximationEnable.setToolTipText("Enable over-approximation");
 		
-		underApproximationEnable = new JCheckBox("Enable under approximation");
+		underApproximationEnable = new JRadioButton("Enable under-approximation");
 		underApproximationEnable.setVisible(true);
-		underApproximationEnable.setToolTipText("Enable under approximation");
+		underApproximationEnable.setToolTipText("Enable under-approximation");
 
 		saveApproximatedNet = new JCheckBox("Save approximation(s) to file");
 		saveApproximatedNet.setVisible(true);
 		saveApproximatedNet.setToolTipText("Save the composed approximated net");
+		
+		approximationRadioButtonGroup.add(noApproximationEnable);
+		approximationRadioButtonGroup.add(overApproximationEnable);
+		approximationRadioButtonGroup.add(underApproximationEnable);
 		
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridy = 0;
@@ -2124,6 +2118,7 @@ public class QueryDialog extends JPanel {
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
 		overApproximationDenominator.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
 		
+		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(saveApproximatedNet, gridBagConstraints);
