@@ -14,22 +14,18 @@ import pipe.dataLayer.TAPNQuery;
 
 public class OverApproximation implements ITAPNApproximation {
 	@Override
-	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query) {	
-		
-		
+	public void modifyTAPN(TimedArcPetriNet net, TAPNQuery query) {
+		// Fix input arcs
 		for (TimedInputArc arc : net.inputArcs()) {
-			 //Fix input arcs
 			TimeInterval oldInterval = arc.interval();
-			
 			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
 			
 			arc.setTimeInterval(newInterval);
 		}
 		 
+		// Fix transport arcs
 		for (TransportArc arc : net.transportArcs()) {
-			//fix transport arcs
 			TimeInterval oldInterval = arc.interval();
-			
 			TimeInterval newInterval = modifyIntervals(oldInterval, query.approximationDenominator());
 			
 			arc.setTimeInterval(newInterval);
@@ -52,9 +48,9 @@ public class OverApproximation implements ITAPNApproximation {
 			 // Calculate the new upper bound value. If the value is fx. 22 the new value needs to be 3  
 			int oldUpperBoundValue = oldInterval.upperBound().value();
 			newUpperBound = new IntBound((int) Math.ceil((double)oldUpperBoundValue /  denominator));
-		}		
-		else
+		} else {
 			newUpperBound = Bound.Infinity;
+		}
 		 
 		// Calculate the new lower bound
 		IntBound newLowerBound = new IntBound((int) Math.floor(oldInterval.lowerBound().value() / denominator));

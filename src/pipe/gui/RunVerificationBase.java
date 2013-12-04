@@ -16,8 +16,10 @@ import javax.swing.filechooser.FileSystemView;
 
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
+import pipe.gui.widgets.InclusionPlaces;
 import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
@@ -45,8 +47,10 @@ import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 public abstract class RunVerificationBase extends SwingWorker<VerificationResult<TAPNNetworkTrace>, Void> {
 
@@ -111,7 +115,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			}
 		}
 		
-		
 		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled())
 		{
 			OverApproximation overaprx = new OverApproximation();
@@ -172,6 +175,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				}
 			}
 		}
+		// If options is of an instance of VerifyTAPNOptions then save the inclusion places before verify alters them
+		InclusionPlaces oldInclusionPlaces = null;
+		if (options instanceof VerifyTAPNOptions)
+			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
 		VerificationResult<TAPNNetworkTrace> value = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
@@ -181,7 +188,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-
 		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {
 			//Create the verification satisfied result for the approximation
 			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
@@ -199,6 +205,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			//Create trace TAPN from the trace
 			Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
 			overaprx.makeTraceTAPN(transformedOriginalModel, value);
+			
+			// Reset the inclusion places in order to avoid NullPointerExceptions
+			if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
+				((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 
 			//run model checker again for trace TAPN
 			result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
@@ -221,8 +231,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					approxResult.verificationTime(),
 					approxResult.stats());
 			value.setNameMapping(transformedModel.value2());
-		}
-		else {
+		} else {
 			value =  new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
