@@ -31,4 +31,19 @@ public class InclusionPlaces {
 	public void removePlace(TimedPlace place) {
 		inclusionPlaces.remove(place);
 	}
+	
+	/**
+	 * Perform a deep copy of the object and return it
+	 * 
+	 * @return
+	 */
+	public InclusionPlaces copy() {
+		InclusionPlaces copy = new InclusionPlaces();
+		copy.inclusionOption = (this.inclusionOption == InclusionPlacesOption.AllPlaces) ? InclusionPlacesOption.AllPlaces : InclusionPlacesOption.UserSpecified;
+		for (TimedPlace place : this.inclusionPlaces) {
+			copy.inclusionPlaces.add(place.copy());
+		}
+		
+		return copy;
+	}
 }

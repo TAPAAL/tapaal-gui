@@ -144,6 +144,10 @@ public class VerifyTAPNOptions implements VerificationOptions{
 	public TraceOption traceOption() {
 		return traceOption;
 	}
+	
+	public void setTraceOption(TraceOption option) {
+		traceOption = option;
+	}
 
 	@Override
 	public SearchOption searchOption() {

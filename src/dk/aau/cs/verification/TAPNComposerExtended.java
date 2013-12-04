@@ -79,7 +79,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
 
-		createSharedPlaces(model, tapn, mapping);
+		createSharedPlaces(model, tapn, mapping, guiModel);
 		createPlaces(model, tapn, mapping, guiModel);
 		createTransitions(model, tapn, mapping, guiModel);
 		createInputArcs(model, tapn, mapping, guiModel);
@@ -222,7 +222,16 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		System.out.println();
 	}
 	
-	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping) {
+	private Place getSharedPlace(String name) {
+		for(Entry<TimedArcPetriNet, DataLayer> hashmapEntry : guiModels.entrySet()) {
+			Place findPlace = hashmapEntry.getValue().getPlaceByName(name);
+			if (findPlace != null)
+				return findPlace;
+		}
+		return null;
+	}
+	
+	private void createSharedPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		for(SharedPlace place : model.sharedPlaces()){
 			String uniquePlaceName = getUniquePlaceName();
 			
@@ -235,6 +244,23 @@ public class TAPNComposerExtended implements ITAPNComposer {
 					constructedPlace.addToken(new TimedToken(constructedPlace, token.age()));
 				}
 			}
+			
+			Place oldPlace = getSharedPlace(place.name());
+			TimedPlaceComponent newPlace = new TimedPlaceComponent(
+					oldPlace.getPositionX(),
+					oldPlace.getPositionY(),
+					oldPlace.getId(),
+					uniquePlaceName,
+					oldPlace.getNameOffsetX(),
+					oldPlace.getNameOffsetY(),
+					0,
+					oldPlace.getMarkingOffsetXObject().doubleValue(),
+					oldPlace.getMarkingOffsetYObject().doubleValue(),
+					0
+					);
+			newPlace.setUnderlyingPlace(constructedPlace);
+			newPlace.setName(uniquePlaceName);
+			guiModel.addPlace(newPlace);
 		}
 	}
 
