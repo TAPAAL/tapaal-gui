@@ -161,6 +161,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				// Skip over-approximation if model is not supported.
 				// Prevents verification from displaying error.
 			}
+
+
 			if(!verifypn.setup()){
 				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 			}else{
@@ -180,6 +182,11 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (options instanceof VerifyTAPNOptions)
 			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
+		// Enable SOME_TRACE if not already
+		TraceOption oldTraceOption = options.traceOption();
+		if (dataLayerQuery != null && (dataLayerQuery.isOverApproximationEnabled() || dataLayerQuery.isUnderApproximationEnabled()))
+			options.setTraceOption(TraceOption.SOME);
+		
 		VerificationResult<TAPNNetworkTrace> value = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
 		if (isCancelled()) {
@@ -188,10 +195,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {		
 			//Create the verification satisfied result for the approximation
 			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-			value =  new VerificationResult<TAPNNetworkTrace>(
+			value = new VerificationResult<TAPNNetworkTrace>(
 					approxResult.getQueryResult(),
 					decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
 					decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
@@ -241,6 +248,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			value.setNameMapping(transformedModel.value2());
 		}
 		// TODO: Handle under approximation
+		
+		options.setTraceOption(oldTraceOption);
 		
 		return value;
 	}
