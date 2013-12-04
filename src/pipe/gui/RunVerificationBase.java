@@ -84,7 +84,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	@Override
 	protected VerificationResult<TAPNNetworkTrace> doInBackground() throws Exception {
 		ITAPNComposer composer;
-		if (false && this.guiModels != null) {
+		if (this.guiModels != null) {
 			composer = new TAPNComposerExtended(messenger, guiModels);
 		} else {
 			composer = new TAPNComposer(messenger);			
