@@ -625,12 +625,24 @@ public class QueryDialog extends JPanel {
 			userChangedAtomicPropSelection = true;
 		} else if (currentSelection.getObject() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
+			overApproximationEnable.setEnabled(true);
+			underApproximationEnable.setEnabled(true);
 		} else if (currentSelection.getObject() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
+			overApproximationEnable.setSelected(false);
+			underApproximationEnable.setSelected(false);
+			overApproximationEnable.setEnabled(false);
+			underApproximationEnable.setEnabled(false);
 		} else if (currentSelection.getObject() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
+			overApproximationEnable.setEnabled(true);
+			underApproximationEnable.setEnabled(true);
 		} else if (currentSelection.getObject() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
+			overApproximationEnable.setSelected(false);
+			underApproximationEnable.setSelected(false);
+			overApproximationEnable.setEnabled(false);
+			underApproximationEnable.setEnabled(false);
 		}
 	}
 
@@ -1039,12 +1051,24 @@ public class QueryDialog extends JPanel {
 		// node (we cant have nested quantifiers)	
 		if (queryToCreateFrom.getProperty() instanceof TCTLEFNode) {
 			existsDiamond.setSelected(true);
+			overApproximationEnable.setEnabled(true);
+			underApproximationEnable.setEnabled(true);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLEGNode) {
 			existsBox.setSelected(true);
+			overApproximationEnable.setSelected(false);
+			underApproximationEnable.setSelected(false);
+			overApproximationEnable.setEnabled(false);
+			underApproximationEnable.setEnabled(false);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAFNode) {
 			forAllDiamond.setSelected(true);
+			overApproximationEnable.setSelected(false);
+			underApproximationEnable.setSelected(false);
+			overApproximationEnable.setEnabled(false);
+			underApproximationEnable.setEnabled(false);
 		} else if (queryToCreateFrom.getProperty() instanceof TCTLAGNode) {
 			forAllBox.setSelected(true);
+			overApproximationEnable.setEnabled(true);
+			underApproximationEnable.setEnabled(true);
 		}
 	}
 
