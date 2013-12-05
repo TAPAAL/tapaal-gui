@@ -10,5 +10,5 @@ public abstract class IconSelector {
 	protected static ImageIcon inconclusiveIcon = ResourceManager.inconclusiveIcon();
 	protected static ImageIcon rerunIcon = ResourceManager.rerunIcon();
 	
-	public abstract ImageIcon getIconFor(QueryResult result);
+	public abstract ImageIcon getIconFor(VerificationResult<?> result);
 }

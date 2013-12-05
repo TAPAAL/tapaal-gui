@@ -72,7 +72,7 @@ public class RunVerification extends RunVerificationBase {
 			}else{
 				JOptionPane.showMessageDialog(CreateGui.getApp(), 
 						createMessagePanel(result),
-						"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result.getQueryResult()));
+						"Verification Result", JOptionPane.INFORMATION_MESSAGE, iconSelector.getIconFor(result));
 	
 				if (result.getTrace() != null) {
 					// DataLayer model = CreateGui.getModel();

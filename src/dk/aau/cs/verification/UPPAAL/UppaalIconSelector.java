@@ -3,16 +3,19 @@ package dk.aau.cs.verification.UPPAAL;
 
 import javax.swing.ImageIcon;
 
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.verification.IconSelector;
 import dk.aau.cs.verification.QueryResult;
+import dk.aau.cs.verification.VerificationResult;
 
 
 public class UppaalIconSelector extends IconSelector {	
 	@Override
-	public ImageIcon getIconFor(QueryResult result){
-		if(result.hasDeadlock()) return inconclusiveIcon;
+	public ImageIcon getIconFor(VerificationResult<?> result){
+		if(result.isOverApproximationResult())	return result.isQuerySatisfied()? satisfiedIcon:notSatisfiedIcon;
+		if(result.getQueryResult().hasDeadlock()) return inconclusiveIcon;
 		
-		switch(result.queryType())
+		switch(result.getQueryResult().queryType())
 		{
 		case EF:
 			if(result.isQuerySatisfied()) return satisfiedIcon;
