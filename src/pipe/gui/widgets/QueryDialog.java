@@ -64,12 +64,17 @@ import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PNMLWriter;
 import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
 import pipe.dataLayer.TAPNQuery.SearchOption;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.gui.CreateGui;
+import pipe.gui.FileFinder;
+import pipe.gui.FileFinderImpl;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Verifier;
+import pipe.gui.Zoomer;
 import dk.aau.cs.TCTL.StringPosition;
 import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
@@ -92,6 +97,9 @@ import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
+import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -103,6 +111,7 @@ import dk.aau.cs.util.UnsupportedQueryException;
 import dk.aau.cs.verification.ITAPNComposer;
 import dk.aau.cs.verification.NameMapping;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.UPPAAL.UppaalExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
@@ -116,7 +125,8 @@ public class QueryDialog extends JPanel {
 	private static final String EXPORT_UPPAAL_BTN_TEXT = "Export UPPAAL XML";
 	private static final String EXPORT_VERIFYTAPN_BTN_TEXT = "Export TAPAAL XML";
 	private static final String EXPORT_VERIFYPN_BTN_TEXT = "Export PN XML";
-
+	private static final String EXPORT_COMPOSED_BTN_TEXT = "Export composed net to XML";
+	
 	private static final String UPPAAL_SOME_TRACE_STRING = "Some trace       ";
 	private static final String VERIFYTAPN_SOME_TRACE_STRING = "Some trace       ";
 	private static final String SHARED = "Shared";
@@ -211,8 +221,6 @@ public class QueryDialog extends JPanel {
 	private JRadioButton overApproximationEnable;
 	private JRadioButton underApproximationEnable;
 	private CustomJSpinner overApproximationDenominator;
-	private JCheckBox saveApproximatedNet;
-	private JCheckBox saveComposedNet;
 	
 	// Buttons in the bottom of the dialogue
 	private JPanel buttonPanel;
@@ -220,6 +228,7 @@ public class QueryDialog extends JPanel {
 	private JButton saveButton;
 	private JButton saveAndVerifyButton;
 	private JButton saveUppaalXMLButton;
+	private JButton saveComposedXMLButton;
 
 	// Private Members
 	private StringPosition currentSelection = null;
@@ -319,7 +328,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_AND_VERIFY_BUTTON = "Save and verify the query.";
 	private final static String TOOL_TIP_CANCEL_BUTTON = "Cancel the changes made in this dialog.";
 	private final static String TOOL_TIP_SAVE_UPPAAL_BUTTON = "Export an xml file that can be opened in UPPAAL GUI.";
-	private final static String TOOL_TIP_SAVE_COMPOSED_CHECKBOX = "Check to save the composed net once it's generated just before verification";
+	private final static String TOOL_TIP_SAVE_COMPOSED_BUTTON = "Export an xml file of composed net and approximated net if enabled";
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 	
@@ -371,7 +380,7 @@ public class QueryDialog extends JPanel {
 		boolean pTrie = usePTrie.isSelected();
 		boolean overApproximation = useOverApproximation.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue(), saveApproximatedNet.isSelected(), saveComposedNet.isSelected());
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces, overApproximationEnable.isSelected(), underApproximationEnable.isSelected(), (Integer) overApproximationDenominator.getValue());
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -676,10 +685,12 @@ public class QueryDialog extends JPanel {
 			saveButton.setEnabled(isQueryOk);
 			saveAndVerifyButton.setEnabled(isQueryOk);
 			saveUppaalXMLButton.setEnabled(isQueryOk);
+			saveComposedXMLButton.setEnabled(isQueryOk);
 		} else {
 			saveButton.setEnabled(false);
 			saveAndVerifyButton.setEnabled(false);
 			saveUppaalXMLButton.setEnabled(false);
+			saveComposedXMLButton.setEnabled(false);
 		}
 	}
 
@@ -968,7 +979,6 @@ public class QueryDialog extends JPanel {
 		setupReductionOptionsFromQuery(queryToCreateFrom);
 		setupTraceOptionsFromQuery(queryToCreateFrom);
 		setupApproximationOptionsFromQuery(queryToCreateFrom);
-		saveComposedNet.setSelected(queryToCreateFrom.shouldSaveComposedNet());
 	}
 	
 	private void setupApproximationOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -981,7 +991,6 @@ public class QueryDialog extends JPanel {
 		if (queryToCreateFrom.approximationDenominator() > 0) {
 			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
 		}
-		saveApproximatedNet.setSelected(queryToCreateFrom.shouldSaveApproximatedNet());
 	}
 
 	private void setupReductionOptionsFromQuery(TAPNQuery queryToCreateFrom) {
@@ -1189,7 +1198,7 @@ public class QueryDialog extends JPanel {
 		searchOptionsPanel.setVisible(advancedView);
 		reductionOptionsPanel.setVisible(advancedView);
 		saveUppaalXMLButton.setVisible(advancedView);
-		saveComposedNet.setVisible(advancedView);
+		saveComposedXMLButton.setVisible(advancedView);
 		
 		if(advancedView){
 			advancedButton.setText("Simple view");
@@ -2081,6 +2090,10 @@ public class QueryDialog extends JPanel {
 
 	}
 	
+	
+	
+	
+	
 	private void initOverApproximationPanel() {
 		overApproximationOptionsPanel = new JPanel(new GridBagLayout());
 		overApproximationOptionsPanel.setVisible(true);
@@ -2099,10 +2112,6 @@ public class QueryDialog extends JPanel {
 		underApproximationEnable.setVisible(true);
 		underApproximationEnable.setToolTipText("Enable under-approximation");
 
-		saveApproximatedNet = new JCheckBox("Save approximation(s) to file");
-		saveApproximatedNet.setVisible(true);
-		saveApproximatedNet.setToolTipText("Save the composed approximated net");
-		
 		approximationRadioButtonGroup.add(noApproximationEnable);
 		approximationRadioButtonGroup.add(overApproximationEnable);
 		approximationRadioButtonGroup.add(underApproximationEnable);
@@ -2121,7 +2130,6 @@ public class QueryDialog extends JPanel {
 		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
-		overApproximationOptionsPanel.add(saveApproximatedNet, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
 	
 		gridBagConstraints = new GridBagConstraints();
@@ -2358,6 +2366,7 @@ public class QueryDialog extends JPanel {
 		refreshOverApproximationOption();
 	}
 
+	
 	private void initButtonPanel(QueryDialogueOption option) {
 		buttonPanel = new JPanel(new BorderLayout());
 		if (option == QueryDialogueOption.Save) {
@@ -2365,9 +2374,8 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton = new JButton("Save and Verify");
 			cancelButton = new JButton("Cancel");
 			
-			saveComposedNet = new JCheckBox("Save composed net to file");
-			//Only show in advanced mode
-			saveComposedNet.setVisible(false);
+			saveComposedXMLButton = new JButton(EXPORT_COMPOSED_BTN_TEXT);
+			saveComposedXMLButton.setVisible(false);
 			
 			saveUppaalXMLButton = new JButton(EXPORT_UPPAAL_BTN_TEXT);
 			//Only show in advanced mode
@@ -2378,8 +2386,8 @@ public class QueryDialog extends JPanel {
 			saveAndVerifyButton.setToolTipText(TOOL_TIP_SAVE_AND_VERIFY_BUTTON);
 			cancelButton.setToolTipText(TOOL_TIP_CANCEL_BUTTON);
 			saveUppaalXMLButton.setToolTipText(TOOL_TIP_SAVE_UPPAAL_BUTTON);
-			saveComposedNet.setToolTipText(TOOL_TIP_SAVE_COMPOSED_CHECKBOX);
-
+			saveComposedXMLButton.setToolTipText(TOOL_TIP_SAVE_COMPOSED_BUTTON);
+			
 			saveButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					// TODO make save 
@@ -2473,6 +2481,46 @@ public class QueryDialog extends JPanel {
 					}
 				}
 			});
+			
+			saveComposedXMLButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					TAPNComposerExtended composer = new TAPNComposerExtended(new MessengerImpl(), guiModels);
+					Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
+					
+					ArrayList<Template> templates = new ArrayList<Template>(1);
+					querySaved = true;	//Setting this to true will make sure that new values will be used.
+					if (overApproximationEnable.isSelected())
+					{
+						OverApproximation overaprx = new OverApproximation();
+						overaprx.modifyTAPN(transformedModel.value1(), getQuery());
+					}
+					else if (underApproximationEnable.isSelected())
+					{
+						UnderApproximation underaprx = new UnderApproximation();
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery());
+					}
+					templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
+					
+					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+					network.add(transformedModel.value1());
+					
+					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
+			
+					try {
+						FileFinder fileFinder = new FileFinderImpl();
+						File choosenFile = fileFinder.ShowFileBrowserDialog("Choose where to save composed net", ".xml", null);
+						if (choosenFile != null) {
+							tapnWriter.savePNML(choosenFile);					
+						} else {
+							JOptionPane.showMessageDialog(null, "The composed net was not saved");
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			});
+			
+			
 		} else if (option == QueryDialogueOption.Export) {
 			saveButton = new JButton("export");
 			cancelButton = new JButton("Cancel");
@@ -2494,9 +2542,10 @@ public class QueryDialog extends JPanel {
 		if (option == QueryDialogueOption.Save) {
 			JPanel leftButtomPanel = new JPanel(new FlowLayout());
 			JPanel rightButtomPanel = new JPanel(new FlowLayout());
-			leftButtomPanel.add(saveComposedNet, FlowLayout.LEFT);
+			leftButtomPanel.add(saveComposedXMLButton, FlowLayout.LEFT);
 			leftButtomPanel.add(saveUppaalXMLButton, FlowLayout.LEFT);
-
+			
+			
 			rightButtomPanel.add(cancelButton);
 
 			rightButtomPanel.add(saveButton);

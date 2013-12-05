@@ -92,29 +92,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
-		// If selected, save the composed net before any approximations are being made
-		if (dataLayerQuery.shouldSaveComposedNet()) {
-			ArrayList<Template> templates = new ArrayList<Template>(1);
-			templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
-			
-			TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
-			network.add(transformedModel.value1());
-			
-			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
-	
-			try {
-				FileFinder fileFinder = new FileFinderImpl();
-				File choosenFile = fileFinder.ShowFileBrowserDialog("Choose where to save composed net", ".xml", null);
-				if (choosenFile != null) {
-					tapnWriter.savePNML(choosenFile);					
-				} else {
-					JOptionPane.showMessageDialog(null, "The composed net was not saved");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled())
 		{
 			OverApproximation overaprx = new OverApproximation();
@@ -124,30 +101,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		{
 			UnderApproximation underaprx = new UnderApproximation();
 			underaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
-		}
-		
-		// If selected, save the composed net after approximations have been made
-		if (dataLayerQuery.shouldSaveApproximatedNet()) {
-			DataLayer approximatedGuiModel = ((TAPNComposerExtended) composer).getGuiModel().copy(transformedModel.value1());
-			ArrayList<Template> templates = new ArrayList<Template>(1);
-			templates.add(new Template(transformedModel.value1(), approximatedGuiModel, new Zoomer()));
-			
-			TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
-			network.add(transformedModel.value1());
-			
-			PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
-	
-			try {
-				FileFinder fileFinder = new FileFinderImpl();
-				File choosenFile = fileFinder.ShowFileBrowserDialog("Choose where to save approximated net", ".xml", null);
-				if (choosenFile != null) {
-					tapnWriter.savePNML(choosenFile);					
-				} else {
-					JOptionPane.showMessageDialog(null, "The approximated net was not saved");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 
 		TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens());

@@ -806,7 +806,7 @@ public class TapnXmlLoader {
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
 					searchOption, reductionOption, symmetry, timeDarts, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces,
-					isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator, saveApproximatedNet, saveComposedNet);
+					isOverApproximationEnabled, isUnderApproximationEnabled, approximationDenominator);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;
