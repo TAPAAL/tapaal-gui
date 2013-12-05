@@ -289,7 +289,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
-	private final static String TOOL_TIP_GCD = "Calculate GCD to minimize constants in model during verification";
+	private final static String TOOL_TIP_GCD = "Calculate GCD to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run over approximation check for EF and AG queries";	// TODO: write tooltip
 
 	//Tool tips for search options panel
