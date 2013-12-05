@@ -19,8 +19,8 @@ public class Degree2Pairing extends Pairing {
 	
 	@Override
 	protected void generatePairing() {
-		List<TimedInputArc> inputArcs = transition.getInputArcs();
-		List<TimedOutputArc> outputArcs = transition.getOutputArcs();
+		List<TimedInputArc> inputArcs = getTransition().getInputArcs();
+		List<TimedOutputArc> outputArcs = getTransition().getOutputArcs();
 		
 		int presetSize = inputArcs.size();
 		int postsetSize = outputArcs.size();
@@ -28,22 +28,22 @@ public class Degree2Pairing extends Pairing {
 		Require.that(presetSize == postsetSize, "The provided model is not conservative");
 		Require.that(presetSize <= 2, "The provided model is more than degree 2");
 
-		if(transition.presetSize() == 0)
+		if(getTransition().presetSize() == 0)
 			return;
-		else if(transition.getInputArcs().size() == 1)
-			add(transition.getInputArcs().get(0), transition.getOutputArcs().get(0));
+		else if(getTransition().getInputArcs().size() == 1)
+			add(getTransition().getInputArcs().get(0), getTransition().getOutputArcs().get(0));
 		else {
 			for(TimedInputArc inputArc : inputArcs) {
 				if(isPartOfLockTemplate(inputArc.source().name())) {
 					for(TimedOutputArc outputArc : outputArcs) {
-						if(isPartOfLockTemplate(outputArc.destination().name()) && !inputArcToOutputArc.containsValue(outputArc)) {		
+						if(isPartOfLockTemplate(outputArc.destination().name()) && !getInputArcToOutputArc().containsValue(outputArc)) {		
 							add(inputArc,outputArc);
 							break;
 						}
 					}
 				} else {
 					for(TimedOutputArc outputArc : outputArcs) {
-						if(!isPartOfLockTemplate(outputArc.destination().name()) && !inputArcToOutputArc.containsValue(outputArc)) {
+						if(!isPartOfLockTemplate(outputArc.destination().name()) && !getInputArcToOutputArc().containsValue(outputArc)) {
 							add(inputArc,outputArc);
 							break;
 						}

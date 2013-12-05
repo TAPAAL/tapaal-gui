@@ -15,12 +15,13 @@ public class BatchProcessingResultsExporter {
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "D: TAPAAL Engine - Discrete Verification, Time darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "E: TAPAAL Engine - Discrete Verification, PTries";
 	private static final String name_verifyTAPNDiscreteVerificationNone = "F: TAPAAL Engine - Discrete Verification, No optimizations";
-	private static final String name_STANDARD = "G: UPPAAL: Standard Reduction";
-	private static final String name_OPTIMIZEDSTANDARD = "H: UPPAAL: Optimised Standard Reduction";
-	private static final String name_BROADCAST = "I: UPPAAL: Broadcast Reduction";
-	private static final String name_BROADCASTDEG2 = "J: UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_UNTIMED = "K: VerifyPN: Untimed engine";
-	private static final String name_UNTIMEDAPPROX = "L: VerifyPN: Untimed engine, with over-approximation";	
+	private static final String name_COMBI = "G: UPPAAL: Combi Reduction";
+	private static final String name_STANDARD = "H: UPPAAL: Standard Reduction";
+	private static final String name_OPTIMIZEDSTANDARD = "I: UPPAAL: Optimised Standard Reduction";
+	private static final String name_BROADCAST = "J: UPPAAL: Broadcast Reduction";
+	private static final String name_BROADCASTDEG2 = "K: UPPAAL: Broadcast Degree 2 Reduction";
+	private static final String name_UNTIMED = "L: VerifyPN: Untimed engine";
+	private static final String name_UNTIMEDAPPROX = "M: VerifyPN: Untimed engine, with over-approximation";	
 	private static final String name_BFS = "Breadth First Search";
 	private static final String name_DFS = "Depth First Search";
 	private static final String name_RandomDFS = "Random Depth First Search";
@@ -95,7 +96,9 @@ public class BatchProcessingResultsExporter {
 	private Object getSearchOrder(TAPNQuery query) {
 		ReductionOption reduction = query.getReductionOption();
 		
-		if(reduction == ReductionOption.STANDARD)
+		if(reduction == ReductionOption.COMBI)
+			return name_COMBI;
+		else if(reduction == ReductionOption.STANDARD)
 			return name_STANDARD;
 		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
 			return name_OPTIMIZEDSTANDARD;
