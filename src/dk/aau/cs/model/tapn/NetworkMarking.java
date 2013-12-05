@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
-
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 
@@ -287,5 +286,21 @@ public class NetworkMarking implements TimedMarking {
 		for(TimedArcPetriNet key : markings.keySet()){
 			markings.get(key).clear();
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this)	return true;
+		if(!(obj instanceof NetworkMarking))	return false;
+		NetworkMarking other = (NetworkMarking) obj;
+		if(markings.size() != other.markings.size())	return false;
+		for(TimedArcPetriNet key : markings.keySet()){
+			if(other.markings.get(key) == null || !other.markings.get(key).equals(markings.get(key)))	return false;
+		}
+		if(sharedPlacesTokens.size() != other.sharedPlacesTokens.size())	return false;
+		for(TimedPlace key : sharedPlacesTokens.keySet()){
+			if(other.sharedPlacesTokens.get(key) == null || !other.sharedPlacesTokens.get(key).equals(sharedPlacesTokens.get(key)))	return false;
+		}
+		return true;
 	}
 }

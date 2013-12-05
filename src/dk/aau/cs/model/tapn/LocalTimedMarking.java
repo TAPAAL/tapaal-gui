@@ -180,5 +180,19 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		placesToTokensMap.clear();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj)	return true;
+		if(!(obj instanceof LocalTimedMarking))	return false;
+		LocalTimedMarking other = (LocalTimedMarking) obj;
+		
+		if(placesToTokensMap.size() != other.placesToTokensMap.size())	return false;
+		for(TimedPlace key : placesToTokensMap.keySet()){
+			if(other.placesToTokensMap.get(key) == null || !other.placesToTokensMap.get(key).equals(placesToTokensMap.get(key)))	return false;
+		}
+		
+		return true;
+	}
+	
 	
 }
