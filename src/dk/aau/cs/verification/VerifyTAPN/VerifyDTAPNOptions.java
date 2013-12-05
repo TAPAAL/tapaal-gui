@@ -31,7 +31,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 	public VerifyDTAPNOptions(boolean dontUseDeadPlaces, int extraTokens, TraceOption traceOption,
 			SearchOption search, boolean symmetry, boolean timeDarts,
 			boolean pTrie) {
-		this(extraTokens, traceOption, search, symmetry, false, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW);
+		this(extraTokens, traceOption, search, symmetry, true, timeDarts, pTrie, false, false, new InclusionPlaces(), WorkflowMode.NOT_WORKFLOW);
 		this.dontUseDeadPlaces = dontUseDeadPlaces;
 	}
 
