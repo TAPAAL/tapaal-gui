@@ -179,8 +179,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 			}
 			//Create the result from trace TAPN
-			removeTraceTransitions(result.getTrace());
-			removeTraceTransitions(result.getSecondaryTrace());
+			renameTraceTransitions(result.getTrace());
+			renameTraceTransitions(result.getSecondaryTrace());
 			QueryResult queryResult= result.getQueryResult();
 			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()))
 				queryResult.setApproximationInconclusive(true);
@@ -207,9 +207,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		return value;
 	}
 	
-	private void removeTraceTransitions(TimedArcPetriNetTrace trace) {
+	private void renameTraceTransitions(TimedArcPetriNetTrace trace) {
 		if (trace != null)
-			trace.removeTransitionsByNameMatch("TTRACE");
+			trace.reduceTraceForOriginalNet("_traceNet_", "PTRACE");
 	}
 
 	protected int kBound(){

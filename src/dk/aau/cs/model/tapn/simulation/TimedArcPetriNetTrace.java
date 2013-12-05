@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 
 public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
@@ -61,12 +62,18 @@ public class TimedArcPetriNetTrace implements Iterable<TimedArcPetriNetStep> {
 		this.traceType = traceType;
 	}
 	
-	public void removeTransitionsByNameMatch(String match) {
-		List<TimedArcPetriNetStep> stepsToRemove = new ArrayList<TimedArcPetriNetStep>();
-		for (TimedArcPetriNetStep step : steps)
-			if (step instanceof TimedTransitionStep && ((TimedTransitionStep) step).transition().name().startsWith(match)) {
-				stepsToRemove.add(step);
-		}	
-		steps.removeAll(stepsToRemove);
+	public void reduceTraceForOriginalNet(String matchForTransition, String matchTokenRemoval) {
+		for (TimedArcPetriNetStep step : steps){
+			if (step instanceof TimedTransitionStep && ((TimedTransitionStep) step).transition().name().contains(matchForTransition)) {
+				((TimedTransitionStep) step).transition().setName(((TimedTransitionStep) step).transition().name().substring(0, ((TimedTransitionStep) step).transition().name().indexOf(matchForTransition)));
+				
+				for (TimedToken token : ((TimedTransitionStep) step).consumedTokens()){
+					if(token.place().name().contains(matchTokenRemoval)){
+						((TimedTransitionStep) step).consumedTokens().remove(token);
+						break;
+					}
+				}
+			}
+		}
 	}
 }
