@@ -198,6 +198,7 @@ public class QueryDialog extends JPanel {
 	private JButton selectInclusionPlacesButton;
 	private JCheckBox useTimeDarts;
 	private JCheckBox usePTrie;
+	private JCheckBox useGCD;
 	private JCheckBox useOverApproximation;
 
 	// Buttons in the bottom of the dialogue
@@ -288,6 +289,7 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
+	private final static String TOOL_TIP_GCD = "Calculate GCD to minimize constants in the model";
 	private final static String TOOL_TIP_OVERAPPROX = "Run over approximation check for EF and AG queries";	// TODO: write tooltip
 
 	//Tool tips for search options panel
@@ -355,9 +357,10 @@ public class QueryDialog extends JPanel {
 		boolean symmetry = getSymmetry();
 		boolean timeDarts = useTimeDarts.isSelected();
 		boolean pTrie = usePTrie.isSelected();
+		boolean gcd = useGCD.isSelected();
 		boolean overApproximation = useOverApproximation.isSelected();
 
-		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
+		TAPNQuery query = new TAPNQuery(name, capacity, newProperty.copy(), traceOption, searchOption, reductionOptionToSet, symmetry, gcd, timeDarts, pTrie, overApproximation,/* hashTableSizeToSet */ null, /* extrapolationOptionToSet */null, inclusionPlaces);
 		if(reductionOptionToSet.equals(ReductionOption.VerifyTAPN)){
 			query.setDiscreteInclusion(discreteInclusion.isSelected());
 		}
@@ -990,6 +993,7 @@ public class QueryDialog extends JPanel {
 		symmetryReduction.setSelected(symmetry);
 		useTimeDarts.setSelected(queryToCreateFrom.useTimeDarts());
 		usePTrie.setSelected(queryToCreateFrom.usePTrie());
+		useGCD.setSelected(queryToCreateFrom.useGCD());
 		useOverApproximation.setSelected(queryToCreateFrom.useOverApproximation());
 		discreteInclusion.setSelected(queryToCreateFrom.discreteInclusion());
 		if(queryToCreateFrom.discreteInclusion()) selectInclusionPlacesButton.setEnabled(true);
@@ -2138,14 +2142,25 @@ public class QueryDialog extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(useTimeDarts, gbc);
+		
+		useGCD = new JCheckBox("Use GCD");
+		useGCD.setSelected(true);
+		useGCD.setToolTipText(TOOL_TIP_GCD);
 
+		gbc = new GridBagConstraints();
+		gbc.gridx = 3;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0,5,0,5);
+		reductionOptionsPanel.add(useGCD, gbc);
+		
 		usePTrie = new JCheckBox("Use PTrie");
 		usePTrie.setSelected(true);
 		usePTrie.setToolTipText(TOOL_TIP_PTRIE);
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 3;
-		gbc.gridy = 0;
+		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0,5,0,5);
 		reductionOptionsPanel.add(usePTrie, gbc);
@@ -2254,10 +2269,12 @@ public class QueryDialog extends JPanel {
 
 	private void refreshDiscreteOptions(){
 		if(reductionOption.getSelectedItem() == null){
+			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
 		} 
 		else if(((String)reductionOption.getSelectedItem()).equals(name_DISCRETE)) {
+			useGCD.setVisible(true);
 			usePTrie.setVisible(true);
 			useTimeDarts.setVisible(true);
 			if(tapnNetwork.hasUrgentTransitions()){
@@ -2265,6 +2282,7 @@ public class QueryDialog extends JPanel {
 				useTimeDarts.setEnabled(false);
 			}
 		} else {
+			useGCD.setVisible(false);
 			usePTrie.setVisible(false);
 			useTimeDarts.setVisible(false);
 		}
