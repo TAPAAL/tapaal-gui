@@ -188,8 +188,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					queryResult,
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
-					approxResult.verificationTime(),
+					approxResult.verificationTime() + result.verificationTime(),
 					approxResult.stats());
+			
 			value.setNameMapping(transformedModel.value2());
 		} else {
 			value =  new VerificationResult<TAPNNetworkTrace>(
