@@ -92,7 +92,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(model);
 		
-		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled())
+		if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && dataLayerQuery.approximationDenominator() > 1)
 		{
 			OverApproximation overaprx = new OverApproximation();
 			overaprx.modifyTAPN(transformedModel.value1(), dataLayerQuery);
@@ -148,51 +148,29 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {		
-			//Create the verification satisfied result for the approximation
-			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-			value = new VerificationResult<TAPNNetworkTrace>(
-					approxResult.getQueryResult(),
-					decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
-					decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
-					approxResult.verificationTime(),
-					approxResult.stats());
-			value.setNameMapping(transformedModel.value2());
-			
-			OverApproximation overaprx = new OverApproximation();
-			
-
-			//Create trace TAPN from the trace
-			Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
-			overaprx.makeTraceTAPN(transformedOriginalModel, value);
-			
-			// Reset the inclusion places in order to avoid NullPointerExceptions
-			if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
-				((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
-
-			//run model checker again for trace TAPN
-			result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
-			if (isCancelled()) {
-				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+		// Handling of result of overapproximation
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled()) {
+			//EF answers yes or AG answers no, both cases gives us a trace to verify in the original TAPN
+			if ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied())) {
+				value = verifyTrace(result, transformedModel, composer, oldInclusionPlaces, clonedQuery);
 			}
-			if (result.error()) {
-				return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
+			//Else EF answers no or AG answers yes
+			else {
+				QueryResult queryResult= result.getQueryResult();
+				if (query.queryType() == QueryType.EF && query.hasDeadlock()) {
+					queryResult.setApproximationInconclusive(true);
+				}
+				value =  new VerificationResult<TAPNNetworkTrace>(
+						queryResult,
+						decomposeTrace(result.getTrace(), transformedModel.value2()),
+						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+						result.verificationTime(),
+						result.stats());
+				value.setNameMapping(transformedModel.value2());
 			}
-			//Create the result from trace TAPN
-			renameTraceTransitions(result.getTrace());
-			renameTraceTransitions(result.getSecondaryTrace());
-			QueryResult queryResult= result.getQueryResult();
-			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()))
-				queryResult.setApproximationInconclusive(true);
-			value = new VerificationResult<TAPNNetworkTrace>(
-					queryResult,
-					decomposeTrace(result.getTrace(), transformedModel.value2()),
-					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
-					approxResult.verificationTime() + result.verificationTime(),
-					approxResult.stats());
-			
-			value.setNameMapping(transformedModel.value2());
-		} else {
+		} 
+		// Normal handling of result if no approximation was used
+		else {
 			value =  new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
@@ -204,6 +182,54 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		// TODO: Handle under approximation
 		
 		options.setTraceOption(oldTraceOption);
+		
+		return value;
+	}
+	
+	private VerificationResult<TAPNNetworkTrace> verifyTrace(VerificationResult<TimedArcPetriNetTrace> result, Tuple<TimedArcPetriNet, NameMapping> transformedModel, ITAPNComposer composer, InclusionPlaces oldInclusionPlaces, TAPNQuery clonedQuery) throws Exception {
+		//Create the verification satisfied result for the approximation
+		VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+		VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(
+				approxResult.getQueryResult(),
+				decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
+				decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
+				approxResult.verificationTime(),
+				approxResult.stats());
+		value.setNameMapping(transformedModel.value2());
+		
+		OverApproximation overaprx = new OverApproximation();
+		
+
+		//Create trace TAPN from the trace
+		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
+		overaprx.makeTraceTAPN(transformedOriginalModel, value);
+		
+		// Reset the inclusion places in order to avoid NullPointerExceptions
+		if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
+			((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
+
+		//run model checker again for trace TAPN
+		result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+		if (isCancelled()) {
+			firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+		}
+		if (result.error()) {
+			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
+		}
+		//Create the result from trace TAPN
+		renameTraceTransitions(result.getTrace());
+		renameTraceTransitions(result.getSecondaryTrace());
+		QueryResult queryResult= result.getQueryResult();
+		if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()))
+			queryResult.setApproximationInconclusive(true);
+		value = new VerificationResult<TAPNNetworkTrace>(
+				queryResult,
+				decomposeTrace(result.getTrace(), transformedModel.value2()),
+				decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+				approxResult.verificationTime() + result.verificationTime(),
+				approxResult.stats());
+		
+		value.setNameMapping(transformedModel.value2());
 		
 		return value;
 	}
