@@ -30,14 +30,25 @@ public class MemoryMonitor {
 	private static int PID = -1;
 	private static Semaphore busy = new Semaphore(1);
 	private static double peakMemory = -1;
+	private static Boolean cumulativePeakMemory = false;
 
 	public static void attach(Process p){
 		PID = getPid(p);
-		peakMemory = -1;
+		
+		if( ! cumulativePeakMemory) {
+			peakMemory = -1;
+		}
 	}
 
 	public static boolean isAttached(){
 		return PID != -1;
+	}
+	
+	public static void setCumulativePeakMemory(Boolean input) {
+		if (input)
+			peakMemory = -1;
+		
+		cumulativePeakMemory = input;
 	}
 
 	public static String getUsage(){
