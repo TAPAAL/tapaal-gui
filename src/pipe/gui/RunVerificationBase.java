@@ -35,6 +35,7 @@ import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.verification.ITAPNComposer;
@@ -137,8 +138,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		
 		// Enable SOME_TRACE if not already
 		TraceOption oldTraceOption = options.traceOption();
-		if (dataLayerQuery != null && (dataLayerQuery.isOverApproximationEnabled() || dataLayerQuery.isUnderApproximationEnabled()))
+		if (dataLayerQuery != null && (dataLayerQuery.isOverApproximationEnabled() || dataLayerQuery.isUnderApproximationEnabled())) {
 			options.setTraceOption(TraceOption.SOME);
+			MemoryMonitor.setCumulativePeakMemory(true);
+		}
 		
 		VerificationResult<TAPNNetworkTrace> value = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery);
@@ -204,6 +207,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		// TODO: Handle under approximation
 		
 		options.setTraceOption(oldTraceOption);
+		MemoryMonitor.setCumulativePeakMemory(false);
 		
 		return value;
 	}
