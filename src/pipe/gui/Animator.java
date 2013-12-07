@@ -401,11 +401,11 @@ public class Animator {
 		}
 
 		tab.network().setMarking(next);
-		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
 		
 		activeGuiModel().repaintPlaces();
 		highlightEnabledTransitions();
 		unhighlightDisabledTransitions();
+		addMarking(new TAPNNetworkTimedTransitionStep(transition, null), next);
 		
 		reportBlockingPlaces();
 
