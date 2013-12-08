@@ -252,7 +252,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				SharedPlace place = (SharedPlace)e.getItem();
-				setMarking(place.numberOfTokens());
+				if(place.getComponentsUsingThisPlace().size() > 0){
+					setMarking(place.numberOfTokens());
+				}
 				setInvariantControlsBasedOn(place);
 			}
 		});
@@ -559,7 +561,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		SharedPlace selected = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
 		setInvariantControlsBasedOn(selected);
-		setMarking(selected.numberOfTokens());
+		if(((SharedPlace) selected).getComponentsUsingThisPlace().size() > 0){
+			setMarking(selected.numberOfTokens());
+		}
 	}
 
 	private void setMarking(int numberOfTokens) {
