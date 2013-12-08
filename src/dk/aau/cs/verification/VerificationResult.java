@@ -160,6 +160,6 @@ public class VerificationResult<TTrace> {
 	}
 	
 	public boolean isOverApproximationResult(){
-		return isOverApproximationResult;
+		return isOverApproximationResult || stats.discoveredStates() == 0;
 	}
 }
