@@ -27,10 +27,13 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
@@ -222,6 +225,7 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 					switchToNameDropDown();
 				}else{
 					switchToNameTextField();
+					nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getDrawingSurface().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
 				}
 			}		
 		});
