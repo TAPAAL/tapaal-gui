@@ -27,10 +27,13 @@ import javax.swing.JRootPane;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
+import pipe.gui.DrawingSurfaceImpl;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import dk.aau.cs.gui.Context;
+import dk.aau.cs.gui.NameGenerator;
 import dk.aau.cs.gui.undo.ChangedInvariantCommand;
 import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.MakePlaceSharedCommand;
@@ -221,8 +224,8 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				if(box.isSelected()){
 					switchToNameDropDown();
 				}else{
-					setMarking(0);
 					switchToNameTextField();
+					nameTextField.setText(place.underlyingPlace().isShared()? CreateGui.getDrawingSurface().getNameGenerator().getNewPlaceName(context.activeModel()) : place.getName());
 				}
 			}		
 		});
@@ -252,7 +255,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 		sharedPlacesComboBox.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				SharedPlace place = (SharedPlace)e.getItem();
-				setMarking(place.numberOfTokens());
+				if(place.getComponentsUsingThisPlace().size() > 0){
+					setMarking(place.numberOfTokens());
+				}
 				setInvariantControlsBasedOn(place);
 			}
 		});
@@ -559,7 +564,9 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 
 		SharedPlace selected = (SharedPlace)sharedPlacesComboBox.getSelectedItem();
 		setInvariantControlsBasedOn(selected);
-		setMarking(selected.numberOfTokens());
+		if(((SharedPlace) selected).getComponentsUsingThisPlace().size() > 0){
+			setMarking(selected.numberOfTokens());
+		}
 	}
 
 	private void setMarking(int numberOfTokens) {
