@@ -227,7 +227,7 @@ public class RunVerification extends RunVerificationBase {
 		gbc.anchor = GridBagConstraints.WEST;		
 		panel.add(new JLabel(toHTML(result.getResultString())), gbc);
 		
-		if(modelChecker.supportsStats()){
+		if(modelChecker.supportsStats() && !result.isOverApproximationResult()){
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 1;
@@ -262,6 +262,15 @@ public class RunVerification extends RunVerificationBase {
 				gbc.anchor = GridBagConstraints.WEST;
 				panel.add(transitionStatsButton, gbc);
 			}
+		}
+		
+		if(result.isOverApproximationResult()){
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0,0,15,0);
+			gbc.anchor = GridBagConstraints.WEST;
+			panel.add(new JLabel(toHTML("The query was resolved using the over-approximation.")), gbc);
 		}
 		
 		gbc = new GridBagConstraints();

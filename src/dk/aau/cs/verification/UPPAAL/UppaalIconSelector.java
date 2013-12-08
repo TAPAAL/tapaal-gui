@@ -12,7 +12,7 @@ import dk.aau.cs.verification.VerificationResult;
 public class UppaalIconSelector extends IconSelector {	
 	@Override
 	public ImageIcon getIconFor(VerificationResult<?> result){
-		if(result.isOverApproximationResult())	return result.isQuerySatisfied()? satisfiedIcon:notSatisfiedIcon;
+		if(result.isOverApproximationResult())	return notSatisfiedIcon;	// If we got a result from over-approximation, this is always "not satisfied".
 		if(result.getQueryResult().hasDeadlock()) return inconclusiveIcon;
 		
 		switch(result.getQueryResult().queryType())
