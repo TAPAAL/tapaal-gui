@@ -221,7 +221,6 @@ public class PlaceEditorPanel extends javax.swing.JPanel {
 				if(box.isSelected()){
 					switchToNameDropDown();
 				}else{
-					setMarking(0);
 					switchToNameTextField();
 				}
 			}		
