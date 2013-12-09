@@ -47,7 +47,7 @@ public class MemoryMonitor {
 	public static void setCumulativePeakMemory(Boolean input) {
 		if (input)
 			peakMemory = -1;
-		
+		 
 		cumulativePeakMemory = input;
 	}
 

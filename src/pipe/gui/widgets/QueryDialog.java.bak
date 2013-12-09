@@ -2497,7 +2497,7 @@ public class QueryDialog extends JPanel {
 					else if (underApproximationEnable.isSelected())
 					{
 						UnderApproximation underaprx = new UnderApproximation();
-						underaprx.modifyTAPN(transformedModel.value1(), getQuery(), ((TAPNComposerExtended) composer).getGuiModel());
+						underaprx.modifyTAPN(transformedModel.value1(), getQuery());
 					}
 					templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
 					
