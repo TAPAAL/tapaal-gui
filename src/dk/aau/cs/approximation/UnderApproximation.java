@@ -78,15 +78,15 @@ public class UnderApproximation implements ITAPNApproximation {
 					if(arc1 instanceof TimedInputArcComponent) //If input arc or transport arc
 					{ 
 						if(arc1 instanceof TimedTransportArcComponent){
-							if (net.getTransitionByName(((TimedTransportArcComponent)arc1).getTransition().getName())==transition){
+							if (net.getTransitionByName(((TimedTransportArcComponent)arc1).getTransition().getName()) == transition){
 								arc1.delete();
 							}
 						}
 						else { //Else we must have an input arc
 						// TEST TO ENSURE THAT WE ARE ACTUALLY WORKING WITH THE CORRECT GUIMODEL (it verifies)
 						//	((TimedInputArcComponent) arc1).setGuardAndWeight(new TimeInterval(true, new IntBound(11), Bound.Infinity, false), arc1.getWeight()); 
-							if(net.getTransitionByName(((Transition)arc1.getTarget()).getName())==transition &&
-							   net.getPlaceByName(((Place)arc1.getSource()).getName())==place){	//If we have the matching arc
+							if(net.getTransitionByName(((Transition)arc1.getTarget()).getName()) == transition &&
+							   net.getPlaceByName(((Place)arc1.getSource()).getName()) == place){	//If we have the matching arc
 						       arc1.delete();
 							}
 						}
@@ -111,8 +111,8 @@ public class UnderApproximation implements ITAPNApproximation {
 							for (Arc arc1 : guiModel.getArcs()){
 								if (arc1.getTarget() instanceof Place) //If arc1 is an output arc
 								{ 
-									if(net.getTransitionByName(((Transition)arc1.getSource()).getName())==((TimedOutputArc)orphanTransitionArc).source() &&
-									   net.getPlaceByName(((Place)arc1.getTarget()).getName())==((TimedOutputArc)orphanTransitionArc).destination()){
+									if(net.getTransitionByName(((Transition)arc1.getSource()).getName()) == ((TimedOutputArc)orphanTransitionArc).source() &&
+									   net.getPlaceByName(((Place)arc1.getTarget()).getName()) == ((TimedOutputArc)orphanTransitionArc).destination()){
 										arc1.delete();
 									}
 								}
@@ -123,10 +123,11 @@ public class UnderApproximation implements ITAPNApproximation {
 						}
 					}
 				}
-				if (guiModel != null)
+				if (guiModel != null) {
 					guiTransition.delete(); //NOT AT ALL SURE THIS ALSO DELETES MODELS TRANSITION (Like what happens with arcs)
-				else
+				} else {
 					transition.delete(); 
+				}
 				
 			}
 		}	
