@@ -3,6 +3,7 @@ package dk.aau.cs.io;
 import java.io.File;
 import java.io.InputStream;
 
+import dk.aau.cs.TCTL.Parsing.ParseException;
 import pipe.gui.DrawingSurfaceImpl;
 
 public class ModelLoader {
@@ -17,14 +18,13 @@ public class ModelLoader {
 		try{
 			LoadedModel loadedModel = newFormatLoader.load(file);
 			return loadedModel;
-		}catch(Exception e1){
-			System.err.println(e1.getMessage()); 
+		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader(drawingSurface);
 				LoadedModel loadedModel = oldFormatLoader.load(file);
 				return loadedModel;
-			} catch(Exception e2) {
-				throw e2;
+			} catch(Throwable e2) {
+				throw new ParseException(e1.getMessage());
 			}
 		}
 	}
@@ -35,13 +35,13 @@ public class ModelLoader {
 		try{
 			LoadedModel loadedModel = newFormatLoader.load(file);
 			return loadedModel;
-		}catch(Exception e1){
+		}catch(Throwable e1){
 			try {
 				TapnLegacyXmlLoader oldFormatLoader = new TapnLegacyXmlLoader(drawingSurface);
 				LoadedModel loadedModel = oldFormatLoader.load(file);
 				return loadedModel;
-			} catch(Exception e2) {
-				throw e2;
+			} catch(Throwable e2) {
+				throw new ParseException(e1.getMessage());
 			}
 		}
 	}

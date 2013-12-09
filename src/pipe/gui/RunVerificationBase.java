@@ -100,7 +100,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 
 							decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()), 
 							overapprox_result.verificationTime(), 
-							overapprox_result.stats());
+							overapprox_result.stats(),
+							true);
 					value.setNameMapping(transformedModel.value2());
 					return value;
 				}
@@ -115,7 +116,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		TraceOption oldTraceOption = options.traceOption();
 		if (dataLayerQuery != null && (dataLayerQuery.isOverApproximationEnabled() || dataLayerQuery.isUnderApproximationEnabled())) {
 			options.setTraceOption(TraceOption.SOME);
-			MemoryMonitor.setCumulativePeakMemory(true);
 		}
 		
 		VerificationResult<TAPNNetworkTrace> value = null;
@@ -181,7 +181,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		// TODO: Handle under approximation
 		
 		options.setTraceOption(oldTraceOption);
-		MemoryMonitor.setCumulativePeakMemory(false);
 		
 		return value;
 	}

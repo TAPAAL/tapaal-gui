@@ -62,6 +62,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	List<BatchProcessingListener> listeners = new ArrayList<BatchProcessingListener>();
 	private boolean skippingCurrentVerification = false;
 	private boolean timeoutCurrentVerification = false;
+	private boolean oomCurrentVerification = false;
 	private int verificationTasksCompleted;
 
 	public BatchProcessingWorker(List<File> files, BatchProcessingResultsTableModel tableModel, BatchProcessingVerificationOptions batchProcessingVerificationOptions) {
@@ -89,6 +90,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	
 	public synchronized void notifyTimeoutCurrentVerificationTask() {
 		timeoutCurrentVerification = true;
+		if(modelChecker != null) {
+			modelChecker.kill();
+		}
+	}
+	
+	public synchronized void notifyOOMCurrentVerificationTask() {
+		oomCurrentVerification = true;
 		if(modelChecker != null) {
 			modelChecker.kill();
 		}
@@ -221,8 +229,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			int capacity = batchProcessingVerificationOptions.KeepCapacityFromQuery() ? query.getCapacity() : batchProcessingVerificationOptions.capacity();
 			String name = batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption ? query.getName() : "Search Whole State Space";
 			
-			//TODO: Make sure this is updated such that timedart/ptrie is correct!
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, false, query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, true, false, false, query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces());
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
 			
@@ -281,6 +288,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		} else if(timeoutCurrentVerification) {
 			publishResult(file.getName(), query, "Skipped - due to timeout", verificationResult.verificationTime(), new NullStats());
 			timeoutCurrentVerification = false;
+		} else if(oomCurrentVerification) {
+			publishResult(file.getName(), query, "Skipped - due to OOM", verificationResult.verificationTime(), new NullStats());
+			oomCurrentVerification = false;
 		} else if(!verificationResult.error()) {
 			String queryResult = verificationResult.getQueryResult().isQuerySatisfied() ? "Satisfied" : "Not Satisfied";
 				if (query.discreteInclusion() && !verificationResult.isBounded() && 
@@ -337,7 +347,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
 			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation());
 		else

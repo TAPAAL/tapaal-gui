@@ -252,31 +252,34 @@ public class Verifyta implements ModelChecker {
 	
 	@Override
 	public boolean supportsModel(TimedArcPetriNet model) {
-		if(model.hasUrgentTransitions() || model.hasWeights()){
-			return false;
-		}
-		
+		//The combi translation supports all models.
 		return true;
 	}
 
 	@Override
 	public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query,
 			VerificationOptions options) {
-
+		
+		//The only translation to UPPAAL that supports these are Combi
+		if((model.hasUrgentTransitions() || model.hasWeights()) && ((VerifytaOptions)options).getReduction() != ReductionOption.COMBI){
+			return false;
+		}
+		
 		if(query.hasDeadlock()){
-				// Only broadcast translations supports deadlock.
+				// Only broadcast translations and combi supports deadlock.
 				if(((VerifytaOptions) options).getReduction() != ReductionOption.BROADCAST &&
-					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST){
+					((VerifytaOptions) options).getReduction() != ReductionOption.DEGREE2BROADCAST &&
+					((VerifytaOptions)options).getReduction() != ReductionOption.COMBI){
 						return false;
 				}
 				
-				// Broadcast translations do not support EG and AF queries that contain a deadlock.
+				// Broadcast translations and combi do not support EG and AF queries that contain a deadlock.
 				if(query.getProperty() instanceof TCTLEGNode || 
 						query.getProperty() instanceof TCTLAFNode){
 					return false;
 				}
 				
-				// No translation support inhibitor arcs with deadlock queries
+				// No translation supports inhibitor arcs with deadlock queries
 				if(model.hasInhibitorArcs()){
 					return false;
 				}
@@ -357,7 +360,7 @@ public class Verifyta implements ModelChecker {
 		TimedArcPetriNetTrace tapnTrace = null;
 
 		VerifytaTraceParser traceParser = new VerifytaTraceParser();
-		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)));
+		UppaalTrace trace = traceParser.parseTrace(new BufferedReader(new StringReader(output)), (VerifytaOptions) options);
 
 		if (trace == null) {
 			if (((VerifytaOptions) options).trace() != TraceOption.NONE) {

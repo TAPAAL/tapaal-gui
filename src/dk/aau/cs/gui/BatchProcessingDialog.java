@@ -93,6 +93,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_verifyTAPNDiscreteVerificationTimeDart = "TAPAAL Engine - Discrete Verification, Time darts";
 	private static final String name_verifyTAPNDiscreteVerificationPTrie = "TAPAAL Engine - Discrete Verification, PTries";
 	private static final String name_verifyTAPNDiscreteVerificationNone = "TAPAAL Engine - Discrete Verification, No optimizations";
+	private static final String name_COMBI = "UPPAAL: Combi Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimised Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
@@ -113,16 +114,17 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_verifyTAPNDiscreteVerificationNoneWithLegend  = "F: "
 			+ name_verifyTAPNDiscreteVerificationNone;
 
-	private static final String name_STANDARDWithLegend = "G: " + name_STANDARD;
-	private static final String name_OPTIMIZEDSTANDARDWithLegend = "H: "
+	private static final String name_COMBIWithLegend = "G: " + name_COMBI;
+	private static final String name_STANDARDWithLegend = "H: " + name_STANDARD;
+	private static final String name_OPTIMIZEDSTANDARDWithLegend = "I: "
 			+ name_OPTIMIZEDSTANDARD;
-	private static final String name_BROADCASTWithLegend = "I: "
+	private static final String name_BROADCASTWithLegend = "J: "
 			+ name_BROADCAST;
-	private static final String name_BROADCASTDEG2WithLegend = "J: "
+	private static final String name_BROADCASTDEG2WithLegend = "K: "
 			+ name_BROADCASTDEG2;
-	private static final String name_UNTIMEDWithLegend = "K: "
+	private static final String name_UNTIMEDWithLegend = "L: "
 			+ name_UNTIMED;
-	private static final String name_UNTIMED_APPROXWithLegend = "L: "
+	private static final String name_UNTIMED_APPROXWithLegend = "M: "
 			+ name_UNTIMED_APPROX;
 	private static final String name_BFS = "Breadth first search";
 	private static final String name_DFS = "Depth first search";
@@ -154,6 +156,9 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_TimeoutLabel = null;
 	private final static String TOOL_TIP_TimeoutValue = "Enter the timeout in seconds";
 	private final static String TOOL_TIP_NoTimeoutCheckBox = "Choose whether to use timeout";
+	private final static String TOOL_TIP_OOMLabel = null;
+	private final static String TOOL_TIP_OOMValue = "<html>Enter the maximum amount of available memory to the verification.<br>Verification is skipped as soon as it is detected that this amount of memory is exceeded.</html>";
+	private final static String TOOL_TIP_NoOOMCheckBox = "Choose whether to use memory restrictions";
 	
 	//Tool tips for monitor panel
 	private final static String TOOL_TIP_FileLabel = "Currently verified net";
@@ -203,7 +208,9 @@ public class BatchProcessingDialog extends JDialog {
 	private JCheckBox keepQueryCapacity;
 	private JComboBox symmetryOption;
 	private JCheckBox noTimeoutCheckbox;
+	private JCheckBox noOOMCheckbox;
 	private CustomJSpinner timeoutValue;
+	private CustomJSpinner oomValue;
 	private Timer timeoutTimer = new Timer(30000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			timeoutCurrentVerificationTask();
@@ -221,11 +228,59 @@ public class BatchProcessingDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			timerLabel.setText((System.currentTimeMillis() - startTimeMs)
 					/ 1000 + " s");
+			memory.setText(peakMemory >= 0? peakMemory + " MB" : "N/A");
+		}
+	});
+	
+	private static int memoryTimerCount = 0;
+	private static int memoryTimerMode = 0;
+	private static int peakMemory = -1;
+	
+	private void startMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+		memoryTimer.setDelay(50);
+		memoryTimerCount = 0;
+		memoryTimerMode = 0;
+		peakMemory = -1;
+		memoryTimer.start();
+	}
+	
+	private void stopMemoryTimer(){
+		if(memoryTimer.isRunning()){
+			memoryTimer.stop();
+		}
+		MemoryMonitor.detach();
+	}
+	
+	private Timer memoryTimer = new Timer(50, new AbstractAction() {
+		private static final long serialVersionUID = 1327695063762640628L;
+
+		public void actionPerformed(ActionEvent e) {
 			if(MemoryMonitor.isAttached()){
-				String usage = MemoryMonitor.getUsage();
-				if(usage != null){
-					memory.setText(usage);
+				MemoryMonitor.getUsage();
+				peakMemory = MemoryMonitor.getPeakMemoryValue();
+				
+				if(useOOM() && MemoryMonitor.getPeakMemoryValue() > (Integer) oomValue.getValue()){
+					oomCurrentVerificationTask();
 				}
+			}
+			
+			if(memoryTimerMode == 0 && memoryTimerCount == 2){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(100);
+			}else if(memoryTimerMode == 1 && memoryTimerCount == 4){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(200);
+			}else if(memoryTimerMode == 2 && memoryTimerCount == 5){
+				memoryTimerCount = 0;
+				memoryTimerMode++;
+				memoryTimer.setDelay(1000);
+			}else if(memoryTimerMode < 3){
+				memoryTimerCount++;
 			}
 		}
 	});
@@ -430,6 +485,7 @@ public class BatchProcessingDialog extends JDialog {
 		initReductionOptionsComponents();
 		initCapacityComponents();
 		initTimeoutComponents();
+		initOOMComponents();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -517,7 +573,7 @@ public class BatchProcessingDialog extends JDialog {
 		timeoutLabel.setToolTipText(TOOL_TIP_TimeoutLabel);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(timeoutLabel, gbc);
@@ -533,7 +589,7 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(timeoutValue, gbc);
@@ -552,10 +608,54 @@ public class BatchProcessingDialog extends JDialog {
 
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(noTimeoutCheckbox, gbc);
+	}
+	
+	private void initOOMComponents() {
+		JLabel oomLabel = new JLabel("Max memory (in MB): ");
+		oomLabel.setToolTipText(TOOL_TIP_OOMLabel);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 6;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(oomLabel, gbc);
+
+		oomValue = new CustomJSpinner(2048,1,Integer.MAX_VALUE);
+		oomValue.setToolTipText(TOOL_TIP_OOMValue);
+		oomValue.setMaximumSize(new Dimension(70, 30));
+		oomValue.setMinimumSize(new Dimension(70, 30));
+		oomValue.setPreferredSize(new Dimension(70, 30));
+		oomValue.setEnabled(true);
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 6;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 10);
+		verificationOptionsPanel.add(oomValue, gbc);
+
+		noOOMCheckbox = new JCheckBox("Do not limit memory usage");
+		noOOMCheckbox.setToolTipText(TOOL_TIP_NoOOMCheckBox);
+		noOOMCheckbox.setSelected(false);
+		noOOMCheckbox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (noOOMCheckbox.isSelected())
+					oomValue.setEnabled(false);
+				else
+					oomValue.setEnabled(true);
+			}
+		});
+
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 6;
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.insets = new Insets(0, 0, 5, 0);
+		verificationOptionsPanel.add(noOOMCheckbox, gbc);
 	}
 
 	private void initReductionOptionsComponents() {
@@ -693,6 +793,7 @@ public class BatchProcessingDialog extends JDialog {
 	}
 	
 	private void exit() {
+		terminateBatchProcessing();
 		rootPane.getParent().setVisible(false);
 	}
 
@@ -740,7 +841,6 @@ public class BatchProcessingDialog extends JDialog {
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exit();
-				
 			}
 		});
 		gbc = new GridBagConstraints();
@@ -770,6 +870,7 @@ public class BatchProcessingDialog extends JDialog {
 		table.getColumn("Query").setCellRenderer(renderer);
 		table.getColumn("Result").setCellRenderer(renderer);
 		table.getColumn("Verification Time").setCellRenderer(renderer);
+		table.getColumn("Memory Usage").setCellRenderer(renderer);
 
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
@@ -875,7 +976,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(memoryLabel, gbc);
 
 		memory = new JLabel("");
-		Dimension timerLabelDim = new Dimension(50, 25);
+		Dimension timerLabelDim = new Dimension(70, 25);
 		memory.setMinimumSize(timerLabelDim);
 		memory.setPreferredSize(timerLabelDim);
 		gbc = new GridBagConstraints();
@@ -915,7 +1016,7 @@ public class BatchProcessingDialog extends JDialog {
 		monitorPanel.add(time, gbc);
 
 		timerLabel = new JLabel("");
-		Dimension memoryLabelDim = new Dimension(50, 25);
+		Dimension memoryLabelDim = new Dimension(70, 25);
 		timerLabel.setMinimumSize(memoryLabelDim);
 		timerLabel.setPreferredSize(memoryLabelDim);
 		gbc = new GridBagConstraints();
@@ -1014,6 +1115,7 @@ public class BatchProcessingDialog extends JDialog {
 						skipFileButton.setEnabled(false);
 						timerLabel.setText("");
 						timer.stop();
+						stopMemoryTimer();
 						timeoutTimer.stop();
 					} else if ((StateValue) evt.getNewValue() == StateValue.STARTED) {
 						disableButtonsDuringProcessing();
@@ -1032,6 +1134,8 @@ public class BatchProcessingDialog extends JDialog {
 					timer.restart();
 				else
 					timer.start();
+				
+				startMemoryTimer();
 
 				if (useTimeout()) {
 					if (timeoutTimer.isRunning())
@@ -1047,6 +1151,7 @@ public class BatchProcessingDialog extends JDialog {
 					VerificationTaskCompleteEvent e) {
 				if (timer.isRunning())
 					timer.stop();
+				stopMemoryTimer();
 				if (timeoutTimer.isRunning())
 					timeoutTimer.stop();
 				int tasksCompleted = e.verificationTasksCompleted();
@@ -1084,6 +1189,10 @@ public class BatchProcessingDialog extends JDialog {
 	private boolean useTimeout() {
 		return !noTimeoutCheckbox.isSelected();
 	}
+	
+	private boolean useOOM() {
+		return !noOOMCheckbox.isSelected();
+	}
 
 	private void terminateBatchProcessing() {
 		if (currentWorker != null && !currentWorker.isDone()) {
@@ -1104,6 +1213,12 @@ public class BatchProcessingDialog extends JDialog {
 	private void timeoutCurrentVerificationTask() {
 		if (currentWorker != null && !currentWorker.isDone()) {
 			currentWorker.notifyTimeoutCurrentVerificationTask();
+		}
+	}
+	
+	private void oomCurrentVerificationTask() {
+		if (currentWorker != null && !currentWorker.isDone()) {
+			currentWorker.notifyOOMCurrentVerificationTask();
 		}
 	}
 
@@ -1239,7 +1354,8 @@ public class BatchProcessingDialog extends JDialog {
 					setText(newQuery.getName());
 				} else if (table.getColumnName(column).equals(
 						"Verification Time")
-						|| table.getColumnName(column).equals("Method")) {
+						|| table.getColumnName(column).equals("Method")
+						|| table.getColumnName(column).equals("Memory Usage")) {
 					setText(value.toString());
 					Point mousePos = table.getMousePosition();
 					BatchProcessingVerificationResult result = null;
@@ -1251,6 +1367,9 @@ public class BatchProcessingDialog extends JDialog {
 
 					if (table.getColumnName(column).equals("Verification Time"))
 						setToolTipText(result != null ? generateStatsToolTipText(result)
+								: value.toString());
+					else if (table.getColumnName(column).equals("Memory Usage"))
+						setToolTipText(result != null ? generateMemoryToolTipText(result)
 								: value.toString());
 					else
 						setToolTipText(result != null ? generateReductionString(result
@@ -1279,6 +1398,19 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(result.stats().toString());
 			}
 
+			return s.toString();
+		}
+		
+		private String generateMemoryToolTipText(
+				BatchProcessingVerificationResult result) {
+			StringBuilder s = new StringBuilder();
+			s.append("Peak memory usage (estimate): ");
+			s.append(result.verificationMemory());
+			if (result.hasStats()) {
+				s.append(System.getProperty("line.separator"));
+				s.append(System.getProperty("line.separator"));
+				s.append(result.stats().toString());
+			}
 			return s.toString();
 		}
 
@@ -1318,7 +1450,9 @@ public class BatchProcessingDialog extends JDialog {
 			StringBuilder s = new StringBuilder();
 			if (query != null) {
 				s.append("Reduction: \n");
-				if (query.getReductionOption() == ReductionOption.STANDARD)
+				if (query.getReductionOption() == ReductionOption.COMBI)
+					s.append(name_COMBI);
+				else if (query.getReductionOption() == ReductionOption.STANDARD)
 					s.append(name_STANDARD);
 				else if (query.getReductionOption() == ReductionOption.OPTIMIZEDSTANDARD)
 					s.append(name_OPTIMIZEDSTANDARD);
@@ -1454,6 +1588,7 @@ public class BatchProcessingDialog extends JDialog {
 		private JCheckBox verifyTAPNDiscreteVerificationTimeDart;
 		private JCheckBox verifyTAPNDiscreteVerificationPTrie;
 		private JCheckBox verifyTAPNDiscreteVerificationNone;
+		private JCheckBox COMBI;
 		private JCheckBox STANDARD;
 		private JCheckBox OPTIMIZEDSTANDARD;
 		private JCheckBox BROADCAST;
@@ -1551,6 +1686,10 @@ public class BatchProcessingDialog extends JDialog {
 			verifyTAPNDiscreteVerificationNone = new JCheckBox(name_verifyTAPNDiscreteVerificationNoneWithLegend);
 			verifyTAPNDiscreteVerificationNone.setEnabled(false);
 			
+			COMBI = new JCheckBox(name_COMBIWithLegend);
+			//STANDARD.setMnemonic('C');
+			COMBI.setEnabled(false);
+			
 			STANDARD = new JCheckBox(name_STANDARDWithLegend);
 			//STANDARD.setMnemonic('C');
 			STANDARD.setEnabled(false);
@@ -1620,39 +1759,46 @@ public class BatchProcessingDialog extends JDialog {
 			gbc.gridy = 6;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(STANDARD, gbc);
+			rightPanel.add(COMBI, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 7;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
+			rightPanel.add(STANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 8;
 			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCAST, gbc);
+			rightPanel.add(OPTIMIZEDSTANDARD, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 9;
-			gbc.insets = new Insets(0, 5, 0	, 5);
+			gbc.insets = new Insets(0, 5, 0, 5);
 			gbc.anchor = GridBagConstraints.WEST;
-			rightPanel.add(BROADCASTDEG2, gbc);
+			rightPanel.add(BROADCAST, gbc);
 			
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
 			gbc.gridy = 10;
 			gbc.insets = new Insets(0, 5, 0	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
+			rightPanel.add(BROADCASTDEG2, gbc);
+			
+			gbc = new GridBagConstraints();
+			gbc.gridx = 0;
+			gbc.gridy = 11;
+			gbc.insets = new Insets(0, 5, 0	, 5);
+			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(UNTIMED, gbc);
 		
 			gbc = new GridBagConstraints();
 			gbc.gridx = 0;
-			gbc.gridy = 11;
+			gbc.gridy = 12;
 			gbc.insets = new Insets(0, 5, 5	, 5);
 			gbc.anchor = GridBagConstraints.WEST;
 			rightPanel.add(UNTIMEDAPPROX, gbc);
@@ -1711,6 +1857,7 @@ public class BatchProcessingDialog extends JDialog {
 			
 			verifyTAPN.setEnabled(override);
 			verifyTAPNDiscreteInclusion.setEnabled(override);
+			COMBI.setEnabled(override);
 			STANDARD.setEnabled(override);
 			OPTIMIZEDSTANDARD.setEnabled(override);
 			BROADCAST.setEnabled(override);
@@ -1728,6 +1875,7 @@ public class BatchProcessingDialog extends JDialog {
 		private void setAll(boolean selected){
 			verifyTAPN.setSelected(selected);
 			verifyTAPNDiscreteInclusion.setSelected(selected);
+			COMBI.setSelected(selected);
 			STANDARD.setSelected(selected);
 			OPTIMIZEDSTANDARD.setSelected(selected);
 			BROADCAST.setSelected(selected);
@@ -1747,6 +1895,9 @@ public class BatchProcessingDialog extends JDialog {
 			}
 			if(verifyTAPNDiscreteVerificationNone.isSelected()){
 				result.add(ReductionOption.VerifyTAPNdiscreteVerification);
+			}
+			if(COMBI.isSelected()){
+				result.add(ReductionOption.COMBI);
 			}
 			if(STANDARD.isSelected()){
 				result.add(ReductionOption.STANDARD);

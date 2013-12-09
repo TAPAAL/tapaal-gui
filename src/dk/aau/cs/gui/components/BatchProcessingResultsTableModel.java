@@ -77,16 +77,18 @@ public class BatchProcessingResultsTableModel extends AbstractTableModel {
 			} else {
 				return "F";
 			}
-		else if(reduction == ReductionOption.STANDARD)
+		else if(reduction == ReductionOption.COMBI)
 			return "G";
-		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
+		else if(reduction == ReductionOption.STANDARD)
 			return "H";
-		else if(reduction == ReductionOption.BROADCAST)
+		else if(reduction == ReductionOption.OPTIMIZEDSTANDARD)
 			return "I";
-		else if(reduction == ReductionOption.DEGREE2BROADCAST)
+		else if(reduction == ReductionOption.BROADCAST)
 			return "J";
+		else if(reduction == ReductionOption.DEGREE2BROADCAST)
+			return "K";
 		else if(reduction == ReductionOption.VerifyPN || reduction == ReductionOption.VerifyPNApprox)
-			return result.query().useOverApproximation()? "L":"K";
+			return result.query().useOverApproximation()? "M":"L";
 		else
 			return "";
 	}
