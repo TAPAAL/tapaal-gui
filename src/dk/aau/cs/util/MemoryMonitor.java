@@ -45,6 +45,7 @@ public class MemoryMonitor {
 
 	public static void attach(Process p){
 		PID = getPid(p);
+		peakMemory = -1;
 	}
 	
 	public static void detach(){
