@@ -1,10 +1,12 @@
 package pipe.gui;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+
 import pipe.dataLayer.DataLayer;
 import pipe.dataLayer.TAPNQuery.TraceOption;
 import pipe.dataLayer.TAPNQuery.SearchOption;
@@ -16,8 +18,12 @@ import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.util.UnsupportedModelException;
@@ -169,7 +175,45 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					approxResult.stats());
 			
 			value.setNameMapping(transformedModel.value2());
-		} else {
+		} 
+		else if (dataLayerQuery != null && dataLayerQuery.isUnderApproximationEnabled()) {
+			if ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied())) {
+				QueryResult queryResult= result.getQueryResult();
+				if (query.queryType() == QueryType.EF && query.hasDeadlock()) {
+					queryResult.setApproximationInconclusive(true);
+				}
+				for (TimedArcPetriNetStep k : result.getTrace()) {
+					if (k instanceof TimeDelayStep){
+						((TimeDelayStep) k).setDelay(((TimeDelayStep) k).delay().multiply(new BigDecimal(dataLayerQuery.approximationDenominator())));
+					}
+					else if (k instanceof TimedTransitionStep) {
+						for (TimedToken a : ((TimedTransitionStep) k).consumedTokens()){
+							a.setAge(a.age().multiply(new BigDecimal(dataLayerQuery.approximationDenominator())));
+						}
+					}
+				}
+				value =  new VerificationResult<TAPNNetworkTrace>(
+						queryResult,
+						decomposeTrace(result.getTrace(), transformedModel.value2()),
+						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+						result.verificationTime(),
+						result.stats());
+				value.setNameMapping(transformedModel.value2());
+			}
+			else
+			{
+				QueryResult queryResult= result.getQueryResult();
+				queryResult.setApproximationInconclusive(true);
+				value =  new VerificationResult<TAPNNetworkTrace>(
+						queryResult,
+						decomposeTrace(result.getTrace(), transformedModel.value2()),
+						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
+						result.verificationTime(),
+						result.stats());
+				value.setNameMapping(transformedModel.value2());
+			}
+		} 
+		else {
 			value =  new VerificationResult<TAPNNetworkTrace>(
 					result.getQueryResult(),
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
