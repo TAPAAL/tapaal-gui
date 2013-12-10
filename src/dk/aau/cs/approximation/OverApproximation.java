@@ -9,6 +9,10 @@ import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.TCTL.TCTLAGNode;
+import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
+import dk.aau.cs.TCTL.TCTLAbstractProperty;
+import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -81,7 +85,7 @@ public class OverApproximation implements ITAPNApproximation {
 			 );
 	}
 	
-	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result) {
+	public void makeTraceTAPN(Tuple<TimedArcPetriNet, NameMapping> transformedModel, VerificationResult<TAPNNetworkTrace> result, dk.aau.cs.model.tapn.TAPNQuery query) {
 		TimedArcPetriNet net = transformedModel.value1();
                 
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
@@ -155,7 +159,21 @@ public class OverApproximation implements ITAPNApproximation {
 		
 		LocalTimedPlace stopPlace = new LocalTimedPlace("PTRACESTOP");
 		net.add(stopPlace);
+		TCTLAbstractProperty topNode = query.getProperty();
+		TCTLAndListNode andList;
+		TCTLAtomicPropositionNode pFinal = new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1);
 		
+		if(topNode instanceof TCTLEFNode)
+		{
+			andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pFinal);
+			((TCTLEFNode) topNode).setProperty(andList);
+		}
+		else if(topNode instanceof TCTLAGNode)
+		{
+			andList = new TCTLAndListNode((((TCTLAGNode) topNode).getProperty()), pFinal);
+			((TCTLAGNode) topNode).setProperty(andList);
+		}
+
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(currentPlace, transition, TimeInterval.ZERO_INF));
 			net.add(new TimedOutputArc(transition, stopPlace));

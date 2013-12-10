@@ -147,7 +147,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 
 			//Create trace TAPN from the trace
 			Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
-			overaprx.makeTraceTAPN(transformedOriginalModel, value);
+			overaprx.makeTraceTAPN(transformedOriginalModel, value, clonedQuery);
 			
 			// Reset the inclusion places in order to avoid NullPointerExceptions
 			if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
