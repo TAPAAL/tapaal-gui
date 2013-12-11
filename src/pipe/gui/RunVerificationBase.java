@@ -122,6 +122,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		TraceOption oldTraceOption = options.traceOption();
 		if (dataLayerQuery != null && (dataLayerQuery.isOverApproximationEnabled() || dataLayerQuery.isUnderApproximationEnabled())) {
 			options.setTraceOption(TraceOption.SOME);
+			MemoryMonitor.setCumulativePeakMemory(true);
 		}
 		
 		VerificationResult<TAPNNetworkTrace> value = null;
@@ -225,6 +226,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		// TODO: Handle under approximation
 		
 		options.setTraceOption(oldTraceOption);
+		MemoryMonitor.setCumulativePeakMemory(false);
 		
 		return value;
 	}
