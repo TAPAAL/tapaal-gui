@@ -53,6 +53,7 @@ import dk.aau.cs.verification.QueryResult;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.Stats;
 import dk.aau.cs.verification.TAPNComposer;
+import dk.aau.cs.verification.TAPNComposerExtended;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
@@ -349,7 +350,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return decomposer.decompose();
 	}
 	
-	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
+	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {	
+		MemoryMonitor.setCumulativePeakMemory(true);
+		
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
 		MapQueryToNewNames(queryToVerify, composedModel.value2());
 		
@@ -360,7 +363,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = new Tuple<TimedArcPetriNet, NameMapping>(composedModel.value1().copy(), composedModel.value2());
 		
-		
+		TraceOption oldTraceOption = options.traceOption();
 		if (query != null && query.isOverApproximationEnabled())
 		{
 			OverApproximation overaprx = new OverApproximation();
@@ -375,14 +378,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		
 		modelChecker = getModelChecker(query);
 		fireVerificationTaskStarted();
-		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);
+		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify);		
 		
+		InclusionPlaces oldInclusionPlaces = null;
+		if (options instanceof VerifyTAPNOptions)
+			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
-		
-		 InclusionPlaces oldInclusionPlaces = null;
-			if (options instanceof VerifyTAPNOptions)
-				oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
-			
 		VerificationResult<TAPNNetworkTrace> valueNetwork = null;
 		VerificationResult<TimedArcPetriNetTrace> value = null;
 		if (verificationResult.error()) {
@@ -409,7 +410,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 
 			//run model checker again for trace TAPN
-		
 			verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 			if (isCancelled()) {
 				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
@@ -477,7 +477,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			value.setNameMapping(composedModel.value2());
 		}
 		
-		
+		options.setTraceOption(oldTraceOption);
+		MemoryMonitor.setCumulativePeakMemory(false);
 		
 		return verificationResult;
 	}
@@ -509,7 +510,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if(query.getReductionOption() == ReductionOption.VerifyTAPN)
 			return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces());	// XXX DISABLES OverApprox
 		else if(query.getReductionOption() == ReductionOption.VerifyTAPNdiscreteVerification)
-			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
+			//return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
+			return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), true, true, false,  query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode());
 		else if(query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox)
 			return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation());
 		else
