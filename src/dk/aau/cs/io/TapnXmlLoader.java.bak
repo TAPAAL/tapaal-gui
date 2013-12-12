@@ -794,7 +794,9 @@ public class TapnXmlLoader {
 		boolean overApproximation = getReductionOption(queryElement, "overApproximation", true);
 		boolean isOverApproximationEnabled = getApproximationOption(queryElement, "enableOverApproximation", false);
 		boolean isUnderApproximationEnabled = getApproximationOption(queryElement, "enableUnderApproximation", false);
-		int approximationDenominator = getApproximationValue(queryElement, "approximationDenominator", 2);
+		int approximationDenominator = getApproximationValue(queryElement, "approximationDenominator", 1); //TODO: Change the 1 to 2 if you read this (don't ask)
+		boolean saveApproximatedNet = getApproximationOption(queryElement, "saveApproximatedNet", false);
+		boolean saveComposedNet = getApproximationOption(queryElement, "saveComposedNet", false);
 		boolean discreteInclusion = getDiscreteInclusionOption(queryElement);
 		boolean active = getActiveStatus(queryElement);
 		InclusionPlaces inclusionPlaces = getInclusionPlaces(queryElement, network);

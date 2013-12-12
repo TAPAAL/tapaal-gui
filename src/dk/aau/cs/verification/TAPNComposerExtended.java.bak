@@ -1,11 +1,25 @@
 package dk.aau.cs.verification;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import javax.swing.filechooser.FileSystemView;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.w3c.dom.DOMException;
+
 import pipe.dataLayer.DataLayer;
+import pipe.dataLayer.PNMLWriter;
+import pipe.dataLayer.TAPNQuery;
+import pipe.dataLayer.Template;
+import pipe.gui.Zoomer;
 import pipe.gui.graphicElements.Arc;
+import pipe.gui.graphicElements.PetriNetObject;
 import pipe.gui.graphicElements.Place;
 import pipe.gui.graphicElements.PlaceTransitionObject;
 import pipe.gui.graphicElements.Transition;
@@ -16,6 +30,8 @@ import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
+import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
@@ -63,17 +79,9 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		NameMapping mapping = new NameMapping();
 		hasShownMessage = false;
 
-		
-		double greatestWidth = 0,
-			   greatestHeight = 0;
-		for (TimedArcPetriNet tapn1 : model.activeTemplates()) {
-			greatestWidth = greatestWidth >= getRightmostObject(guiModels.get(tapn1)).getPositionX() ? greatestWidth : getRightmostObject(guiModels.get(tapn1)).getPositionX();
-			greatestHeight = greatestHeight >= getLowestObject(guiModels.get(tapn1)).getPositionY() ? greatestHeight : getLowestObject(guiModels.get(tapn1)).getPositionY();
-		}
-		
 		createSharedPlaces(model, tapn, mapping, guiModel);
-		createPlaces(model, tapn, mapping, guiModel, greatestWidth, greatestHeight);
-		createTransitions(model, tapn, mapping, guiModel, greatestWidth, greatestHeight);
+		createPlaces(model, tapn, mapping, guiModel);
+		createTransitions(model, tapn, mapping, guiModel);
 		createInputArcs(model, tapn, mapping, guiModel);
 		createOutputArcs(model, tapn, mapping, guiModel);
 		createTransportArcs(model, tapn, mapping, guiModel);
@@ -120,13 +128,13 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		PlaceTransitionObject returnObject = null;
 		
 		for (PlaceTransitionObject currentObject : guiModel.getPlaces()) {
-			if (returnObject == null || returnObject.getPositionY() < currentObject.getPositionY()) {
+			if (returnObject == null || returnObject.getPositionY() > currentObject.getPositionY()) {
 				returnObject = currentObject;
 			}
 		}
 		
 		for (PlaceTransitionObject currentObject : guiModel.getTransitions()) {
-			if (returnObject == null || returnObject.getPositionY() < currentObject.getPositionY()) {
+			if (returnObject == null || returnObject.getPositionY() > currentObject.getPositionY()) {
 				returnObject = currentObject;
 			}
 		}
@@ -257,7 +265,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		}
 	}
 
-	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createPlaces(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
@@ -277,9 +285,8 @@ public class TAPNComposerExtended implements ITAPNComposer {
 					
 					Place oldPlace = currentGuiModel.getPlaceByName(timedPlace.name());
 					TimedPlaceComponent newPlace = new TimedPlaceComponent(
-							oldPlace.getPositionX() + offset.value1() * greatestWidth,
-							oldPlace.getPositionY() + offset.value2() * greatestHeight,
-							
+							oldPlace.getPositionX() + offset.value1() * 400,
+							oldPlace.getPositionY() + offset.value2() * 400,
 							oldPlace.getId(),
 							uniquePlaceName,
 							oldPlace.getNameOffsetX(),
@@ -304,7 +311,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 		return String.format(PLACE_FORMAT, nextPlaceIndex);
 	}
 
-	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel, double greatestWidth, double greatestHeight) {
+	private void createTransitions(TimedArcPetriNetNetwork model, TimedArcPetriNet constructedModel, NameMapping mapping, DataLayer guiModel) {
 		int i = 0;
 		for (TimedArcPetriNet tapn : model.activeTemplates()) {
 			Tuple<Integer, Integer> offset = this.calculateComponentPosition(i);
@@ -324,8 +331,8 @@ public class TAPNComposerExtended implements ITAPNComposer {
 						constructedModel.add(transition);
 						Transition oldTransition = currentGuiModel.getTransitionByName(timedTransition.name());
 						TimedTransitionComponent newTransition = new TimedTransitionComponent(
-								oldTransition.getPositionX() + offset.value1() * greatestWidth,
-								oldTransition.getPositionY() + offset.value2() * greatestHeight,
+								oldTransition.getPositionX() + offset.value1() * 400,
+								oldTransition.getPositionY() + offset.value2() * 400,
 								oldTransition.getId(),
 								uniqueTransitionName,
 								oldTransition.getNameOffsetX(),
