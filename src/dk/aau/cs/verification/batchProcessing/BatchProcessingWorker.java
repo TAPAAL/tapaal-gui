@@ -283,6 +283,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
 		fireStatusChanged(query.getName());
+		System.out.print("Started: " + file.getName() + "\n");
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
 		try {
@@ -350,7 +351,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		return decomposer.decompose();
 	}
 	
-	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {	
+	private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
 		MemoryMonitor.setCumulativePeakMemory(true);
 		
 		TAPNQuery queryToVerify = getTAPNQuery(composedModel.value1(),query);
@@ -399,6 +400,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approxResult.verificationTime(),
 					approxResult.stats());
 			valueNetwork.setNameMapping(composedModel.value2());
+			System.out.print("VerificationResult0\n");
 			
 			OverApproximation overaprx = new OverApproximation();
 
@@ -415,14 +417,16 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 			}
 			if (verificationResult.error()) {
+				System.out.print("VerificationResult1 - Return\n\n");
 				return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 			}
 			//Create the result from trace TAPN
 			renameTraceTransitions(verificationResult.getTrace());
 			renameTraceTransitions(verificationResult.getSecondaryTrace());
 			QueryResult queryResult= verificationResult.getQueryResult();
-			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied()))
+			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied())) {
 				queryResult.setApproximationInconclusive(true);
+			}
 			value = new VerificationResult<TimedArcPetriNetTrace>(
 					queryResult,
 					approxResult.getTrace(),
@@ -430,6 +434,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approxResult.verificationTime() + verificationResult.verificationTime(),
 					approxResult.stats());
 			value.setNameMapping(composedModel.value2());
+			System.out.print("VerificationResult2\n");
 		} else if (query != null && query.isUnderApproximationEnabled()) {
 			if ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied()) || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied())) {
 				QueryResult queryResult= verificationResult.getQueryResult();
@@ -454,6 +459,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						verificationResult.verificationTime(),
 						verificationResult.stats());
 				value.setNameMapping(composedModel.value2());
+				System.out.print("VerificationResult3\n");
 			}
 			else
 			{
@@ -466,6 +472,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						verificationResult.verificationTime(),
 						verificationResult.stats());
 				value.setNameMapping(composedModel.value2());
+				System.out.print("VerificationResult4\n");
 			}
 		} else {
 			value =  new VerificationResult<TimedArcPetriNetTrace>(
@@ -475,12 +482,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					verificationResult.verificationTime(),
 					verificationResult.stats());
 			value.setNameMapping(composedModel.value2());
+			System.out.print("VerificationResult5\n");
 		}
 		
 		options.setTraceOption(oldTraceOption);
 		MemoryMonitor.setCumulativePeakMemory(false);
-		
-		return verificationResult;
+		System.out.print("Return\n\n");
+		return value;
 	}
 
 	private TAPNQuery getTAPNQuery(TimedArcPetriNet model, pipe.dataLayer.TAPNQuery query) throws Exception {
