@@ -39,4 +39,8 @@ public class TAPNQuery {
 	public String toString() {
 		return property.toString();
 	}
+	
+	public void setProperty(TCTLAbstractProperty newProperty){
+		this.property = newProperty;
+	}
 }

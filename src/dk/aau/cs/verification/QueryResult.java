@@ -82,4 +82,8 @@ public class QueryResult {
 	public BoundednessAnalysisResult boundednessAnalysis() {
 		return boundednessAnalysis;
 	}
+	
+	public void flipResult() {
+		this.satisfied = !this.satisfied;
+	}
 }

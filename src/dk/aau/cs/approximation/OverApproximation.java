@@ -161,13 +161,20 @@ public class OverApproximation implements ITAPNApproximation {
 		LocalTimedPlace stopPlace = new LocalTimedPlace("PTRACESTOP");
 		net.add(stopPlace);
 		TCTLAbstractProperty topNode = query.getProperty();
+		TCTLAndListNode andList;
+		TCTLAtomicPropositionNode pFinal = new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1);
 		
 		if(topNode instanceof TCTLEFNode)
 		{
-			TCTLAndListNode andList;
-			TCTLAtomicPropositionNode pFinal = new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1);
 			andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pFinal);
 			((TCTLEFNode) topNode).setProperty(andList);
+		}
+		if(topNode instanceof TCTLAGNode) // Beware: if the function is called with a AG query - the caller needs to flip the result, because the topNode cannot be a NotNode!
+		{
+			TCTLNotNode notNode = new TCTLNotNode(((TCTLAGNode) topNode).getProperty());
+			andList = new TCTLAndListNode(notNode, pFinal);
+			TCTLEFNode newTopNode = new TCTLEFNode(andList);
+			query.setProperty(newTopNode);
 		}
 
 
