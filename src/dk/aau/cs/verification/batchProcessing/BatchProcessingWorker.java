@@ -128,13 +128,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			fireFileChanged(file.getName());
 			LoadedBatchProcessingModel model = loadModel(file);
 			this.model = model;
-			if(model != null) {
-				Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
-				
+			if(model != null) {			
 				for(pipe.dataLayer.TAPNQuery query : model.queries()) {
-                                        if(exiting()) {
-                                                return null;
-                                        }					
+                    if(exiting()) {
+                        return null;
+                    }			
+                    Tuple<TimedArcPetriNet, NameMapping> composedModel = composeModel(model);
+                                        
 					pipe.dataLayer.TAPNQuery queryToVerify = overrideVerificationOptions(composedModel.value1(), query);
 					
 					if (batchProcessingVerificationOptions.isReductionOptionUserdefined()){
