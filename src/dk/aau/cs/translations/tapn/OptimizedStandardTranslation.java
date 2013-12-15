@@ -16,6 +16,7 @@ import dk.aau.cs.model.NTA.StandardUPPAALQuery;
 import dk.aau.cs.model.NTA.TimedAutomaton;
 import dk.aau.cs.model.NTA.UPPAALQuery;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
@@ -78,6 +79,13 @@ public class OptimizedStandardTranslation implements ModelTranslator<TimedArcPet
 	}
 	
 	private NTA transformModel(TimedArcPetriNet model) throws Exception {
+		// if there are no tokens in the model, add an extra place with a token 
+		if(model.marking().size() + extraTokens == 0){
+			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA234526_3452365"); 
+			model.add(extraPlace);
+			model.addToken(new TimedToken(extraPlace));
+		}
+		
 		clearLocationMappings();
 		numberOfInitChannels = 0;
 		

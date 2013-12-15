@@ -14,17 +14,20 @@ import dk.aau.cs.model.NTA.StandardUPPAALQuery;
 import dk.aau.cs.model.NTA.TimedAutomaton;
 import dk.aau.cs.model.NTA.UPPAALQuery;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
 import dk.aau.cs.model.tapn.TimedInputArc;
+import dk.aau.cs.model.tapn.TimedMarking;
 import dk.aau.cs.model.tapn.TimedOutputArc;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
+import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.translations.ModelTranslator;
 import dk.aau.cs.translations.Pairing;
 import dk.aau.cs.translations.TranslationNamingScheme;
@@ -81,6 +84,13 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 	}
 
 	private NTA transformModel(TimedArcPetriNet model) {
+		// if there are no tokens in the model, add an extra place with a token
+		if(model.marking().size() + extraTokens == 0){
+			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA434723_324"); 
+			model.add(extraPlace);
+			model.addToken(new TimedToken(extraPlace));
+		}
+		
 		clearLocationMappings();
 		clearArcMappings();
 		largestPresetSize = 0;
@@ -93,7 +103,7 @@ public class BroadcastTranslation implements ModelTranslator<TimedArcPetriNet, T
 		} catch (Exception e) {
 			return null;
 		}
-
+		
 		NTA nta = new NTA();
 
 		if (useSymmetry || conservativeModel.marking().size() + extraTokens == 0) {
