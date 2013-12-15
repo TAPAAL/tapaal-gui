@@ -14,6 +14,7 @@ import dk.aau.cs.model.NTA.StandardUPPAALQuery;
 import dk.aau.cs.model.NTA.TimedAutomaton;
 import dk.aau.cs.model.NTA.UPPAALQuery;
 import dk.aau.cs.model.tapn.Bound;
+import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimeInvariant;
@@ -87,6 +88,13 @@ public class Degree2BroadcastTranslation implements
 	}
 
 	protected NTA transformModel(TimedArcPetriNet model) throws Exception {
+		 // if there are no tokens in the model, add an extra place with a token
+		if(model.marking().size() + extraTokens == 0){
+			LocalTimedPlace extraPlace = new LocalTimedPlace("EXTRA3242342_234765"); 
+			model.add(extraPlace);
+			model.addToken(new TimedToken(extraPlace));
+		}
+		
 		clearArcMappings();
 		arcGuards.clear();
 		clearLocationMappings();
