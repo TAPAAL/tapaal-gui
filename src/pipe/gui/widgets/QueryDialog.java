@@ -2363,6 +2363,11 @@ public class QueryDialog extends JPanel {
 			useOverApproximation.setVisible(true);
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);
+			
+			noApproximationEnable.setEnabled(false);
+			overApproximationEnable.setEnabled(false);
+			underApproximationEnable.setEnabled(false);
+			overApproximationDenominator.setEnabled(false);
 		}
 		else{
 			useOverApproximation.setVisible(true);
@@ -2370,6 +2375,11 @@ public class QueryDialog extends JPanel {
 				useOverApproximation.setSelected(true);
 			}
 			useOverApproximation.setEnabled(true);
+					
+			noApproximationEnable.setEnabled(true);
+			overApproximationEnable.setEnabled(true);
+			underApproximationEnable.setEnabled(true);
+			overApproximationDenominator.setEnabled(true);
 		}
 	}
 
