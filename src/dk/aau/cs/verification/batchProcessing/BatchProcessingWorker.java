@@ -283,7 +283,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	private VerificationResult<TimedArcPetriNetTrace> verifyQuery(File file, Tuple<TimedArcPetriNet, NameMapping> composedModel, pipe.dataLayer.TAPNQuery query) throws Exception {
 		fireStatusChanged(query.getName());
-		System.out.print("Started: " + file.getName() + "\n");
 		
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = null;
 		try {
@@ -400,7 +399,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approxResult.verificationTime(),
 					approxResult.stats());
 			valueNetwork.setNameMapping(composedModel.value2());
-			System.out.print("VerificationResult0\n");
 			
 			OverApproximation overaprx = new OverApproximation();
 
@@ -417,7 +415,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
 			}
 			if (verificationResult.error()) {
-				System.out.print("VerificationResult1 - Return\n\n");
 				return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 			}
 			//Create the result from trace TAPN
@@ -434,23 +431,11 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					approxResult.verificationTime() + verificationResult.verificationTime(),
 					approxResult.stats());
 			value.setNameMapping(composedModel.value2());
-			System.out.print("VerificationResult2\n");
 		} else if (query != null && query.isUnderApproximationEnabled()) {
 			if ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied()) || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied())) {
 				QueryResult queryResult= verificationResult.getQueryResult();
 				if (query.queryType() == QueryType.EF && queryToVerify.hasDeadlock()) {
 					queryResult.setApproximationInconclusive(true);
-				}
-				for (TimedArcPetriNetStep k : verificationResult.getTrace()){
-					if (k instanceof TimeDelayStep){
-						((TimeDelayStep) k).setDelay(((TimeDelayStep) k).delay().multiply(new BigDecimal(query.approximationDenominator())));
-					}
-					else if (k instanceof TimedTransitionStep)
-					{
-						for (TimedToken a : ((TimedTransitionStep) k).consumedTokens()){
-							a.setAge(a.age().multiply(new BigDecimal(query.approximationDenominator())));
-						}
-					}
 				}
 				value =  new VerificationResult<TimedArcPetriNetTrace>(
 						queryResult,
@@ -459,7 +444,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						verificationResult.verificationTime(),
 						verificationResult.stats());
 				value.setNameMapping(composedModel.value2());
-				System.out.print("VerificationResult3\n");
 			}
 			else
 			{
@@ -472,7 +456,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 						verificationResult.verificationTime(),
 						verificationResult.stats());
 				value.setNameMapping(composedModel.value2());
-				System.out.print("VerificationResult4\n");
 			}
 		} else {
 			value =  new VerificationResult<TimedArcPetriNetTrace>(
@@ -482,12 +465,10 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 					verificationResult.verificationTime(),
 					verificationResult.stats());
 			value.setNameMapping(composedModel.value2());
-			System.out.print("VerificationResult5\n");
 		}
 		
 		options.setTraceOption(oldTraceOption);
 		MemoryMonitor.setCumulativePeakMemory(false);
-		System.out.print("Return\n\n");
 		return value;
 	}
 
