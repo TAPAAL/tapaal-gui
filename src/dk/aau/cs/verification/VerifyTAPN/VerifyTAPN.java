@@ -259,7 +259,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
-		if(!supportsModel(model.value1()))
+		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		
 		if(!supportsQuery(model.value1(), query, options))
@@ -375,7 +375,7 @@ public class VerifyTAPN implements ModelChecker {
 		return result;
 	}
 	
-	public boolean supportsModel(TimedArcPetriNet model) {
+	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		if(model.hasWeights() || 
 				model.hasUrgentTransitions()) {
 			return false;
