@@ -159,29 +159,65 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		LocalTimedPlace stopPlace = new LocalTimedPlace("PTRACESTOP");
+		LocalTimedPlace neverPlace = new LocalTimedPlace("PNEVER", TimeInvariant.LESS_THAN_INFINITY);
 		net.add(stopPlace);
+		net.add(neverPlace);
 		TCTLAbstractProperty topNode = query.getProperty();
 		TCTLAndListNode andList;
 		TCTLAtomicPropositionNode pFinal = new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1);
+		TCTLAtomicPropositionNode pNever = new TCTLAtomicPropositionNode(neverPlace.name(), "=", 0);
 		
 		if(topNode instanceof TCTLEFNode)
 		{
 			andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pFinal);
+			andList.addConjunct(pNever);
 			((TCTLEFNode) topNode).setProperty(andList);
 		}
 		if(topNode instanceof TCTLAGNode) // Beware: if the function is called with a AG query - the caller needs to flip the result, because the topNode cannot be a NotNode!
 		{
 			TCTLNotNode notNode = new TCTLNotNode(((TCTLAGNode) topNode).getProperty());
 			andList = new TCTLAndListNode(notNode, pFinal);
+			andList.addConjunct(pNever);
 			TCTLEFNode newTopNode = new TCTLEFNode(andList);
 			query.setProperty(newTopNode);
 		}
-
-
+		
+		
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(currentPlace, transition, TimeInterval.ZERO_INF));
 			net.add(new TimedOutputArc(transition, stopPlace));
+			
+			// Add copy urgent transitions to the net to make sure, that no illegal delays are made.
+			if(transition.isUrgent()) {
+				TimedTransition copyUrgentTransition = new TimedTransition(transition.name() + "_traceUrgentNet_" + Integer.toString(++transitionInteger), transition.isUrgent());
+				net.add(copyUrgentTransition);
+				net.add(new TimedOutputArc(copyUrgentTransition, neverPlace));
+				
+				for (TimedInputArc arc : originalInput) {
+					if (arc.destination() == transition) {
+						net.add(new TimedInputArc(arc.source(), copyUrgentTransition, arc.interval(), arc.getWeight()));
+					}
+				}
+				for (TimedOutputArc arc : originalOutput) {
+					if (arc.source() == transition) {
+						net.add(new TimedOutputArc(copyUrgentTransition, arc.destination(), arc.getWeight()));
+					}
+				}
+				for (TimedInhibitorArc arc : originalInhibitor) {
+					if (arc.destination() == transition) {
+						net.add(new TimedInhibitorArc(arc.source(), copyUrgentTransition, arc.interval(), arc.getWeight()));
+					}
+				}
+				for (TransportArc arc : originalTransport) {
+					if (arc.transition() == transition) {
+						net.add(new TransportArc(arc.source(), copyUrgentTransition, arc.destination(), arc.interval(), arc.getWeight()));
+					}
+				}
+				
+			}
+			
 		}
+		
 		/*
 		PrintStream modelStream;
 		try {
