@@ -55,8 +55,9 @@ public class VerificationResult<TTrace> {
 	public VerificationResult(QueryResult value1,
 			TTrace tapnTrace,
 			TTrace secondaryTrace2, long runningTime,
-			Stats value2) {
-		this(value1, tapnTrace, runningTime, value2);
+			Stats value2,
+			boolean isOverApproximationResult) {
+		this(value1, tapnTrace, runningTime, value2, isOverApproximationResult);
 		this.secondaryTrace = secondaryTrace2;
 	}
 
@@ -160,6 +161,6 @@ public class VerificationResult<TTrace> {
 	}
 	
 	public boolean isOverApproximationResult(){
-		return isOverApproximationResult || stats.discoveredStates() == 0;
+		return isOverApproximationResult;
 	}
 }
