@@ -134,7 +134,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 		if (result.error()) {
 			return new VerificationResult<TAPNNetworkTrace>(result.errorMessage(), result.verificationTime());
 		}
-		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {		
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && 
+				((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied()))) {		
 			//Create the verification satisfied result for the approximation
 			VerificationResult<TimedArcPetriNetTrace> approxResult = result;
 			value = new VerificationResult<TAPNNetworkTrace>(
@@ -188,6 +189,43 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 			
 			value.setNameMapping(transformedModel.value2());
 		} 
+		/*
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && 
+				result.getQueryResult().queryType() == QueryType.EF && !result.getQueryResult().isQuerySatisfied()) {
+			// If EF AND not satisfied 
+			
+			QueryResult queryResult = result.getQueryResult();
+			if (clonedQuery.hasDeadlock()) {
+				queryResult.setApproximationInconclusive(true);
+				
+				VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+				value = new VerificationResult<TAPNNetworkTrace>(
+						approxResult.getQueryResult(),
+						decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
+						decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
+						approxResult.verificationTime(),
+						approxResult.stats());
+				value.setNameMapping(transformedModel.value2());
+			}
+		}
+		else if (dataLayerQuery != null && dataLayerQuery.isOverApproximationEnabled() && 
+				result.getQueryResult().queryType() == QueryType.AG && result.getQueryResult().isQuerySatisfied()) {
+			// If AG AND satisfied 
+			QueryResult queryResult = result.getQueryResult();
+			if (clonedQuery.hasDeadlock()) {
+				queryResult.setApproximationInconclusive(true);
+				
+				VerificationResult<TimedArcPetriNetTrace> approxResult = result;
+				value = new VerificationResult<TAPNNetworkTrace>(
+						approxResult.getQueryResult(),
+						decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
+						decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
+						approxResult.verificationTime(),
+						approxResult.stats());
+				value.setNameMapping(transformedModel.value2());
+			}
+		}
+		*/
 		else if (dataLayerQuery != null && dataLayerQuery.isUnderApproximationEnabled()) {
 			if ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()) || (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied())) {
 				QueryResult queryResult= result.getQueryResult();
