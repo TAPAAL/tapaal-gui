@@ -260,12 +260,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
-			if(!supportsModel(model.value1()))
+			if(!supportsModel(model.value1(), options)){
 				throw new UnsupportedModelException("Verifydtapn does not support the given model.");
+			}
 			
-                        if(!supportsQuery(model.value1(), query, options)){
-                            throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
-                        }
+            if(!supportsQuery(model.value1(), query, options)){
+                throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
+            }
 			//if(!supportsQuery(model.value1(), query, options))
 				//throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
 			
@@ -392,7 +393,11 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		
-		public boolean supportsModel(TimedArcPetriNet model) {
+		public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
+			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
+				return false;
+			}
+			
 			return model.isNonStrict();
 		}
 		
@@ -403,10 +408,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
                                 && ((VerifyDTAPNOptions)options).timeDarts()){
                 return false;
             }
-			
-			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
-				return false;
-			}
 			
 			return true;
 		}

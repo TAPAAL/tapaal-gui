@@ -383,15 +383,10 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		
-		boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
-			return supportsModel(model) || options.searchOption() == SearchOption.OVERAPPROXIMATE;
+		public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
+			return model.isUntimed() || options.searchOption() == SearchOption.OVERAPPROXIMATE;
 		}
-		
-		@Override
-		public boolean supportsModel(TimedArcPetriNet model) {
-			return model.isUntimed();
-		}
-		
+	
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
 			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
 				return false;
