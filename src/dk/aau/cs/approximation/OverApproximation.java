@@ -90,8 +90,15 @@ public class OverApproximation implements ITAPNApproximation {
 		TimedArcPetriNet net = transformedModel.value1();
                 
 		LocalTimedPlace currentPlace = new LocalTimedPlace("PTRACE0");
-		TimedToken currentToken = new TimedToken(currentPlace); 
+		TimedToken currentToken = new TimedToken(currentPlace);
 		net.add(currentPlace);
+		currentPlace.addToken(currentToken);
+		
+		// Block place, which secures the net makes at most one transition not in the trace.
+		LocalTimedPlace blockPlace = new LocalTimedPlace("PBLOCK", TimeInvariant.LESS_THAN_INFINITY);
+		TimedToken blockToken = new TimedToken(blockPlace);
+		net.add(blockPlace);
+		blockPlace.addToken(blockToken);
 		
 		ArrayList<TimedTransition> originalTransitions = new ArrayList<TimedTransition>();
 		for (TimedTransition transition : net.transitions()) {
@@ -117,12 +124,13 @@ public class OverApproximation implements ITAPNApproximation {
 		for (TransportArc transport : net.transportArcs()) {
 			originalTransport.add(transport);
 		}
-		currentPlace.addToken(currentToken);
+
 		int placeInteger = 0;
 		int transitionInteger = 0;
 		
 		TAPNNetworkTrace trace = result.getTrace();
 		HashMap<String,String> reversedNameMap = reverseNameMapping(transformedModel.value2().getMappedToOrg());
+		
 		for(TAPNNetworkTraceStep step : trace) {
 			if (step instanceof TAPNNetworkTimedTransitionStep) {
 				TimedTransition firedTransition = net.getTransitionByName(reversedNameMap.get(((TAPNNetworkTimedTransitionStep) step).getTransition().name()));
@@ -132,6 +140,9 @@ public class OverApproximation implements ITAPNApproximation {
 				
 				currentPlace = new LocalTimedPlace("PTRACE" + Integer.toString(++placeInteger));
 				net.add(currentPlace);
+				
+				net.add(new TimedInputArc(blockPlace, copyTransition, TimeInterval.ZERO_INF));
+				net.add(new TimedOutputArc(copyTransition, blockPlace));
 				
 				net.add(new TimedOutputArc(copyTransition, currentPlace));
 				
@@ -158,66 +169,28 @@ public class OverApproximation implements ITAPNApproximation {
 			}
 		}
 		
-		LocalTimedPlace stopPlace = new LocalTimedPlace("PTRACESTOP");
-		LocalTimedPlace neverPlace = new LocalTimedPlace("PNEVER", TimeInvariant.LESS_THAN_INFINITY);
-		net.add(stopPlace);
-		net.add(neverPlace);
 		TCTLAbstractProperty topNode = query.getProperty();
 		TCTLAndListNode andList;
-		TCTLAtomicPropositionNode pFinal = new TCTLAtomicPropositionNode(currentPlace.name(), "=", 1);
-		TCTLAtomicPropositionNode pNever = new TCTLAtomicPropositionNode(neverPlace.name(), "=", 0);
+		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(blockPlace.name(), "=", 1);
 		
 		if(topNode instanceof TCTLEFNode)
 		{
-			andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pFinal);
-			andList.addConjunct(pNever);
+			andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pBlock);
 			((TCTLEFNode) topNode).setProperty(andList);
 		}
-		if(topNode instanceof TCTLAGNode) // Beware: if the function is called with a AG query - the caller needs to flip the result, because the topNode cannot be a NotNode!
+		else if(topNode instanceof TCTLAGNode) // Beware: if the function is called with a AG query - the caller needs to flip the result, because the topNode cannot be a NotNode!
 		{
 			TCTLNotNode notNode = new TCTLNotNode(((TCTLAGNode) topNode).getProperty());
-			andList = new TCTLAndListNode(notNode, pFinal);
-			andList.addConjunct(pNever);
+			andList = new TCTLAndListNode(notNode, pBlock);
 			TCTLEFNode newTopNode = new TCTLEFNode(andList);
 			query.setProperty(newTopNode);
 		}
 		
 		
 		for (TimedTransition transition : originalTransitions) {
-			net.add(new TimedInputArc(currentPlace, transition, TimeInterval.ZERO_INF));
-			net.add(new TimedOutputArc(transition, stopPlace));
-			
-			// Add copy urgent transitions to the net to make sure, that no illegal delays are made.
-			if(transition.isUrgent()) {
-				TimedTransition copyUrgentTransition = new TimedTransition(transition.name() + "_traceUrgentNet_" + Integer.toString(++transitionInteger), transition.isUrgent());
-				net.add(copyUrgentTransition);
-				net.add(new TimedOutputArc(copyUrgentTransition, neverPlace));
-				
-				for (TimedInputArc arc : originalInput) {
-					if (arc.destination() == transition) {
-						net.add(new TimedInputArc(arc.source(), copyUrgentTransition, arc.interval(), arc.getWeight()));
-					}
-				}
-				for (TimedOutputArc arc : originalOutput) {
-					if (arc.source() == transition) {
-						net.add(new TimedOutputArc(copyUrgentTransition, arc.destination(), arc.getWeight()));
-					}
-				}
-				for (TimedInhibitorArc arc : originalInhibitor) {
-					if (arc.destination() == transition) {
-						net.add(new TimedInhibitorArc(arc.source(), copyUrgentTransition, arc.interval(), arc.getWeight()));
-					}
-				}
-				for (TransportArc arc : originalTransport) {
-					if (arc.transition() == transition) {
-						net.add(new TransportArc(arc.source(), copyUrgentTransition, arc.destination(), arc.interval(), arc.getWeight()));
-					}
-				}
-				
-			}
-			
+			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
 		}
-		
+				
 		/*
 		PrintStream modelStream;
 		try {
@@ -227,7 +200,6 @@ public class OverApproximation implements ITAPNApproximation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		
             
 	}
 	

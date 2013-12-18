@@ -243,8 +243,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 	}
 	
 	private void renameTraceTransitions(TimedArcPetriNetTrace trace) {
-		if (trace != null)
+		if (trace != null){
 			trace.reduceTraceForOriginalNet("_traceNet_", "PTRACE");
+			trace.removeTokens("PBLOCK");
+		}
 	}
 
 	protected int kBound(){
