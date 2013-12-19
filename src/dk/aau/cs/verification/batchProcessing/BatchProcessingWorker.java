@@ -384,88 +384,220 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 		if (options instanceof VerifyTAPNOptions)
 			oldInclusionPlaces = ((VerifyTAPNOptions) options).inclusionPlaces();
 		
-		VerificationResult<TAPNNetworkTrace> valueNetwork = null;
+		VerificationResult<TAPNNetworkTrace> valueNetwork = null;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
 		VerificationResult<TimedArcPetriNetTrace> value = null;
 		if (verificationResult.error()) {
 			return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 		}
-		else if (query != null && query.isOverApproximationEnabled() && ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied()) || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied()))) {		
-			//Create the verification satisfied result for the approximation
-			VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
-			valueNetwork = new VerificationResult<TAPNNetworkTrace>(
-					approxResult.getQueryResult(),
-					decomposeTrace(approxResult.getTrace(), composedModel.value2()),
-					decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2()),
-					approxResult.verificationTime(),
-					approxResult.stats());
-			valueNetwork.setNameMapping(composedModel.value2());
-			
-			OverApproximation overaprx = new OverApproximation();
-
-			//Create trace TAPN from the trace
-			overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
-			
-			// Reset the inclusion places in order to avoid NullPointerExceptions
-			if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
-				((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
-
-			//run model checker again for trace TAPN
-			verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
-			if (isCancelled()) {
-				firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-			}
-			if (verificationResult.error()) {
-				return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
-			}
-			//Create the result from trace TAPN
-			renameTraceTransitions(verificationResult.getTrace());
-			renameTraceTransitions(verificationResult.getSecondaryTrace());
-			QueryResult queryResult= verificationResult.getQueryResult();
-			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied())) {
-				queryResult.setApproximationInconclusive(true);
-			}
-			value = new VerificationResult<TimedArcPetriNetTrace>(
-					queryResult,
-					approxResult.getTrace(),
-					approxResult.getSecondaryTrace(),
-					approxResult.verificationTime() + verificationResult.verificationTime(),
-					approxResult.stats());
-			value.setNameMapping(composedModel.value2());
-		} else if (query != null && query.isUnderApproximationEnabled()) {
-			if ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied()) || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied())) {
-				QueryResult queryResult= verificationResult.getQueryResult();
-				if (query.queryType() == QueryType.EF && queryToVerify.hasDeadlock()) {
-					queryResult.setApproximationInconclusive(true);
-				}
-				value =  new VerificationResult<TimedArcPetriNetTrace>(
+		else if (query != null && query.isOverApproximationEnabled()) {		
+				//Create the verification satisfied result for the approximation
+	            
+	            // Over-approximation
+				if (query.approximationDenominator() == 1) {
+	                // If r = 1
+	                // No matter what EF and AG answered -> return that answer
+	               QueryResult queryResult = verificationResult.getQueryResult();
+	               value =  new VerificationResult<TimedArcPetriNetTrace>(
 						queryResult,
 						verificationResult.getTrace(),
 						verificationResult.getSecondaryTrace(),
 						verificationResult.verificationTime(),
 						verificationResult.stats());
-				value.setNameMapping(composedModel.value2());
-			}
-			else
-			{
-				QueryResult queryResult= verificationResult.getQueryResult();
-				queryResult.setApproximationInconclusive(true);
-				value =  new VerificationResult<TimedArcPetriNetTrace>(
-						queryResult,
-						verificationResult.getTrace(),
-						verificationResult.getSecondaryTrace(),
-						verificationResult.verificationTime(),
-						verificationResult.stats());
-				value.setNameMapping(composedModel.value2());
-			}
-		} else {
-			value =  new VerificationResult<TimedArcPetriNetTrace>(
-					verificationResult.getQueryResult(),
-					verificationResult.getTrace(),
-					verificationResult.getSecondaryTrace(),
-					verificationResult.verificationTime(),
-					verificationResult.stats());
-			value.setNameMapping(composedModel.value2());
-		}
+					value.setNameMapping(composedModel.value2());
+	        } else {
+	            // If r > 1
+	            if ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied())
+	               || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied())) {
+	                //Create the verification satisfied result for the approximation
+	                 VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
+	                 valueNetwork = new VerificationResult<TAPNNetworkTrace>(
+	                            approxResult.getQueryResult(),
+	                            decomposeTrace(approxResult.getTrace(), composedModel.value2()),
+	                            decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2()),
+	                            approxResult.verificationTime(),
+	                            approxResult.stats());
+	                 valueNetwork.setNameMapping(composedModel.value2());
+	                
+	                OverApproximation overaprx = new OverApproximation();
+
+	                // get the originalQueryType before a a potential AG query is rewritten to an EF query
+	                QueryType originalQueryType = verificationResult.getQueryResult().queryType();
+	                
+	                //Create trace TAPN from the network trace
+	                overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
+	                
+	                // Reset the inclusion places in order to avoid NullPointerExceptions
+	                if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
+	                    ((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
+
+	                //run model checker again for trace TAPN
+	                verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+	                if (isCancelled()) {
+	                    firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+	                }
+	                if (verificationResult.error()) {
+	                    return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
+	                }
+	                //Create the result from trace TAPN
+	                renameTraceTransitions(verificationResult.getTrace());
+	                renameTraceTransitions(verificationResult.getSecondaryTrace());
+	                QueryResult queryResult= verificationResult.getQueryResult();
+	                
+	                // The query were rewritten to an EF query, and since the topNode cannot be a not node we need to flip the result.
+	                if(originalQueryType == QueryType.AG){
+	                    queryResult.flipResult();
+	                }
+	                
+	                // If (EG AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
+	                if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied()) 
+	                    || originalQueryType == QueryType.AG && queryResult.isQuerySatisfied()){
+	                    queryResult.setApproximationInconclusive(true);
+	                }
+	                // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
+	                // This is satisfied for EF and not satisfied for AG
+	                value = new VerificationResult<TimedArcPetriNetTrace>(
+	                        queryResult,
+	                        approxResult.getTrace(),
+	                        approxResult.getSecondaryTrace(),
+	                        approxResult.verificationTime() + verificationResult.verificationTime(),
+	                        approxResult.stats());
+	                value.setNameMapping(composedModel.value2());
+	            }
+	            else if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !verificationResult.getQueryResult().isQuerySatisfied())
+	                   || (verificationResult.getQueryResult().queryType() == QueryType.AG && verificationResult.getQueryResult().isQuerySatisfied())) {
+	                // If (EF AND not satisfied) OR (AG AND satisfied)
+	                        
+	                QueryResult queryResult = verificationResult.getQueryResult();
+	                if (clonedQuery.hasDeadlock()) {
+	                    // If query has deadlock -> return inconclusive
+	                    // Otherwise -> return answer
+	                    queryResult.setApproximationInconclusive(true);
+	                }
+	                
+	                 value =  new VerificationResult<TimedArcPetriNetTrace>(
+							queryResult,
+							verificationResult.getTrace(),
+							verificationResult.getSecondaryTrace(),
+							verificationResult.verificationTime(),
+							verificationResult.stats());
+					    value.setNameMapping(composedModel.value2());
+	            }
+	        }
+	    } 
+	    else if (query != null && query.isUnderApproximationEnabled()) {
+	        // Under-approximation
+			
+	        if (query.approximationDenominator() == 1) { 
+	            // If r = 1
+	            // No matter what EF and AG answered -> return that answer
+	            QueryResult queryResult= verificationResult.getQueryResult();
+	             value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                    queryResult,
+	                    verificationResult.getTrace(),
+	                    verificationResult.getSecondaryTrace(),
+	                    verificationResult.verificationTime(),
+	                    verificationResult.stats());
+	                value.setNameMapping(composedModel.value2());
+	        }
+	        else {
+	            // If r > 1
+	            if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !verificationResult.getQueryResult().isQuerySatisfied()) 
+	             || (verificationResult.getQueryResult().queryType() == QueryType.AG && verificationResult.getQueryResult().isQuerySatisfied())) {
+                    // If (EF AND not satisfied) OR (AG and satisfied) -> Inconclusive
+                    
+                    QueryResult queryResult= verificationResult.getQueryResult();
+                    queryResult.setApproximationInconclusive(true);
+                    value =  new VerificationResult<TimedArcPetriNetTrace>(
+                            queryResult,
+                            verificationResult.getTrace(),
+                            verificationResult.getSecondaryTrace(),
+                            verificationResult.verificationTime(),
+                            verificationResult.stats());
+                    value.setNameMapping(composedModel.value2());
+	                    
+	            } else if (verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied()
+	                     || (verificationResult.getQueryResult().queryType() == QueryType.AG && ! verificationResult.getQueryResult().isQuerySatisfied())) {
+	                    // (EF AND satisfied) OR (AG and not satisfied) -> Check for deadlock
+	                    
+	                    if (!clonedQuery.hasDeadlock()) {
+	                    	QueryResult queryResult= verificationResult.getQueryResult();
+	                        value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                            queryResult,
+	                            verificationResult.getTrace(),
+	                            verificationResult.getSecondaryTrace(),
+	                            verificationResult.verificationTime(),
+	                            verificationResult.stats());
+	                        value.setNameMapping(composedModel.value2());
+	                } else {
+	                    // If query does have deadlock -> create trace TAPN
+	                    //Create the verification satisfied result for the approximation
+	                    valueNetwork = new VerificationResult<TAPNNetworkTrace>(
+	                        verificationResult.getQueryResult(),
+	                        decomposeTrace(verificationResult.getTrace(), composedModel.value2()),
+	                        decomposeTrace(verificationResult.getSecondaryTrace(), composedModel.value2()),
+	                        verificationResult.verificationTime(),
+	                        verificationResult.stats());
+	                    valueNetwork.setNameMapping(composedModel.value2());
+	                    
+	                    OverApproximation overaprx = new OverApproximation();
+	                        
+	                    // get the originalQueryType before a a potential AG query is rewritten to an EF query
+	                    QueryType originalQueryType = verificationResult.getQueryResult().queryType();
+	        
+	                    //Create trace TAPN from the trace
+	                    overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
+	                    
+	                    // Reset the inclusion places in order to avoid NullPointerExceptions
+	                    if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
+	                        ((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
+	        
+	                    //run model checker again for trace TAPN
+	                    verificationResult = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
+	                    if (isCancelled()) {
+	                        firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
+	                    }
+	                    if (verificationResult.error()) {
+	        				return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
+	        			}
+	                    
+	                    //Create the result from trace TAPN
+	                    renameTraceTransitions(verificationResult.getTrace());
+	                    renameTraceTransitions(verificationResult.getSecondaryTrace());
+	                    QueryResult queryResult = verificationResult.getQueryResult();
+	                    
+	                    // The query were rewritten to an EF query, and since the topNode cannot be a not node we need to flip the result.
+	                    if(originalQueryType == QueryType.AG){
+	                        queryResult.flipResult();
+	                    }
+	                    
+	                    // If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
+	                    if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied())
+	                        || originalQueryType == QueryType.AG && queryResult.isQuerySatisfied()) {
+	                        queryResult.setApproximationInconclusive(true);
+	                    }
+	                    
+	                    
+	                    // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
+	                    // This is satisfied for EF and not satisfied for AG
+	                   value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                            verificationResult.getQueryResult(),
+	                            verificationResult.getTrace(),
+	                            verificationResult.getSecondaryTrace(),
+	                            verificationResult.verificationTime(),
+	                            verificationResult.stats());
+	                    value.setNameMapping(composedModel.value2());
+	                }
+	            }
+	        }
+	    } else {
+	        value =  new VerificationResult<TimedArcPetriNetTrace>(
+	                verificationResult.getQueryResult(),
+	                verificationResult.getTrace(),
+	                verificationResult.getSecondaryTrace(),
+	                verificationResult.verificationTime(),
+	                verificationResult.stats());
+	        value.setNameMapping(composedModel.value2());
+	    }
 		
 		options.setTraceOption(oldTraceOption);
 		MemoryMonitor.setCumulativePeakMemory(false);
