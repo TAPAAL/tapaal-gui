@@ -390,33 +390,33 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			return new VerificationResult<TimedArcPetriNetTrace>(verificationResult.errorMessage(), verificationResult.verificationTime());
 		}
 		else if (query != null && query.isOverApproximationEnabled()) {		
-				//Create the verification satisfied result for the approximation
-	            
-	            // Over-approximation
-				if (query.approximationDenominator() == 1) {
-	                // If r = 1
-	                // No matter what EF and AG answered -> return that answer
-	               QueryResult queryResult = verificationResult.getQueryResult();
-	               value =  new VerificationResult<TimedArcPetriNetTrace>(
-						queryResult,
-						verificationResult.getTrace(),
-						verificationResult.getSecondaryTrace(),
-						verificationResult.verificationTime(),
-						verificationResult.stats());
-					value.setNameMapping(composedModel.value2());
+			//Create the verification satisfied result for the approximation
+            
+            // Over-approximation
+			if (query.approximationDenominator() == 1) {
+                // If r = 1
+                // No matter what EF and AG answered -> return that answer
+               QueryResult queryResult = verificationResult.getQueryResult();
+               value =  new VerificationResult<TimedArcPetriNetTrace>(
+					queryResult,
+					verificationResult.getTrace(),
+					verificationResult.getSecondaryTrace(),
+					verificationResult.verificationTime(),
+					verificationResult.stats());
+				value.setNameMapping(composedModel.value2());
 	        } else {
 	            // If r > 1
 	            if ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied())
 	               || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied())) {
 	                //Create the verification satisfied result for the approximation
-	                 VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
-	                 valueNetwork = new VerificationResult<TAPNNetworkTrace>(
+	                VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
+	                valueNetwork = new VerificationResult<TAPNNetworkTrace>(
 	                            approxResult.getQueryResult(),
 	                            decomposeTrace(approxResult.getTrace(), composedModel.value2()),
 	                            decomposeTrace(approxResult.getSecondaryTrace(), composedModel.value2()),
 	                            approxResult.verificationTime(),
 	                            approxResult.stats());
-	                 valueNetwork.setNameMapping(composedModel.value2());
+	                valueNetwork.setNameMapping(composedModel.value2());
 	                
 	                OverApproximation overaprx = new OverApproximation();
 
@@ -464,9 +464,9 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                value.setNameMapping(composedModel.value2());
 	            }
 	            else if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !verificationResult.getQueryResult().isQuerySatisfied())
-	                   || (verificationResult.getQueryResult().queryType() == QueryType.AG && verificationResult.getQueryResult().isQuerySatisfied())) {
+	                  || (verificationResult.getQueryResult().queryType() == QueryType.AG && verificationResult.getQueryResult().isQuerySatisfied())) {
 	                // If (EF AND not satisfied) OR (AG AND satisfied)
-	                        
+	               
 	                QueryResult queryResult = verificationResult.getQueryResult();
 	                if (clonedQuery.hasDeadlock()) {
 	                    // If query has deadlock -> return inconclusive
@@ -474,13 +474,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                    queryResult.setApproximationInconclusive(true);
 	                }
 	                
-	                 value =  new VerificationResult<TimedArcPetriNetTrace>(
-							queryResult,
-							verificationResult.getTrace(),
-							verificationResult.getSecondaryTrace(),
-							verificationResult.verificationTime(),
-							verificationResult.stats());
-					    value.setNameMapping(composedModel.value2());
+	                value =  new VerificationResult<TimedArcPetriNetTrace>(
+						queryResult,
+						verificationResult.getTrace(),
+						verificationResult.getSecondaryTrace(),
+						verificationResult.verificationTime(),
+						verificationResult.stats());
+				    value.setNameMapping(composedModel.value2());
 	            }
 	        }
 	    } 
@@ -491,13 +491,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	            // If r = 1
 	            // No matter what EF and AG answered -> return that answer
 	            QueryResult queryResult= verificationResult.getQueryResult();
-	             value =  new VerificationResult<TimedArcPetriNetTrace>(
-	                    queryResult,
-	                    verificationResult.getTrace(),
-	                    verificationResult.getSecondaryTrace(),
-	                    verificationResult.verificationTime(),
-	                    verificationResult.stats());
-	                value.setNameMapping(composedModel.value2());
+	            value =  new VerificationResult<TimedArcPetriNetTrace>(
+                    queryResult,
+                    verificationResult.getTrace(),
+                    verificationResult.getSecondaryTrace(),
+                    verificationResult.verificationTime(),
+                    verificationResult.stats());
+                value.setNameMapping(composedModel.value2());
 	        }
 	        else {
 	            // If r > 1
@@ -580,7 +580,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	                    // If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
 	                    // This is satisfied for EF and not satisfied for AG
 	                   value =  new VerificationResult<TimedArcPetriNetTrace>(
-	                            verificationResult.getQueryResult(),
+	                		    queryResult,
 	                            verificationResult.getTrace(),
 	                            verificationResult.getSecondaryTrace(),
 	                            verificationResult.verificationTime(),
