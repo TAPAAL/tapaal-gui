@@ -192,14 +192,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							queryResult.flipResult();
 						}
 						
-						// If (EG AND not satisfied trace) OR (AG AND not satisfied trace) -> inconclusive
-						if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied()) || originalQueryType == QueryType.AG && !queryResult.isQuerySatisfied()){
+						// If (EG AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
+						if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied()) || originalQueryType == QueryType.AG && queryResult.isQuerySatisfied()){
 							queryResult.setApproximationInconclusive(true);
-						}
-						
-						// If AG AND satisfied trace -> Flip result so it is not satisfied
-						if(originalQueryType == QueryType.AG){
-							queryResult.flipResult();
 						}
 						
 						// If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
@@ -333,15 +328,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							queryResult.flipResult();
 						}
 						
-						// If (EF AND not satisfied trace) OR (AG AND not satisfied trace) -> inconclusive
+						// If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
 						if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied())
-							|| originalQueryType == QueryType.AG && !queryResult.isQuerySatisfied()) {
+							|| originalQueryType == QueryType.AG && queryResult.isQuerySatisfied()) {
 							queryResult.setApproximationInconclusive(true);
-						}
-						
-						// If AG AND satisfied trace -> Flip result so it is not satisfied
-						if(originalQueryType == QueryType.AG){
-							queryResult.flipResult();
 						}
 						
 						// If (EF AND satisfied trace) OR (AG AND satisfied trace) -> Return result
