@@ -100,6 +100,7 @@ import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Constant;
+import dk.aau.cs.model.tapn.ConstantStore;
 import dk.aau.cs.model.tapn.SharedPlace;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
@@ -2545,10 +2546,17 @@ public class QueryDialog extends JPanel {
 					}
 					templates.add(new Template(transformedModel.value1(), ((TAPNComposerExtended) composer).getGuiModel(), new Zoomer()));
 					
-					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork();
+					// Create a constant store
+					ConstantStore newConstantStore = new ConstantStore();
+					for (Constant constant : tapnNetwork.constants()) {
+						newConstantStore.add(constant);
+					}
+					
+					TimedArcPetriNetNetwork network = new TimedArcPetriNetNetwork(newConstantStore);
+					
 					network.add(transformedModel.value1());
 					
-					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), new ArrayList<Constant>(0));
+					PNMLWriter tapnWriter = new TimedArcPetriNetNetworkWriter(network, templates, new ArrayList<pipe.dataLayer.TAPNQuery>(0), tapnNetwork.constants());
 			
 					try {
 						FileFinder fileFinder = new FileFinderImpl();

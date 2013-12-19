@@ -127,6 +127,8 @@ public class OverApproximation implements ITAPNApproximation {
 
 		int placeInteger = 0;
 		int transitionInteger = 0;
+		TimedOutputArc next = null;
+		boolean traceHasTransitionStep = false;
 		
 		TAPNNetworkTrace trace = result.getTrace();
 		HashMap<String,String> reversedNameMap = reverseNameMapping(transformedModel.value2().getMappedToOrg());
@@ -138,13 +140,13 @@ public class OverApproximation implements ITAPNApproximation {
 				net.add(copyTransition);
 				net.add(new TimedInputArc(currentPlace, copyTransition, TimeInterval.ZERO_INF));
 				
-				currentPlace = new LocalTimedPlace("PTRACE" + Integer.toString(++placeInteger));
-				net.add(currentPlace);
-				
 				net.add(new TimedInputArc(blockPlace, copyTransition, TimeInterval.ZERO_INF));
 				net.add(new TimedOutputArc(copyTransition, blockPlace));
 				
-				net.add(new TimedOutputArc(copyTransition, currentPlace));
+				currentPlace = new LocalTimedPlace("PTRACE" + Integer.toString(++placeInteger));
+				net.add(currentPlace);
+				next = new TimedOutputArc(copyTransition, currentPlace);
+				net.add(next);
 				
 				for (TimedInputArc arc : originalInput) {
 					if (arc.destination() == firedTransition) {
@@ -166,7 +168,14 @@ public class OverApproximation implements ITAPNApproximation {
 						net.add(new TransportArc(arc.source(), copyTransition, arc.destination(), arc.interval(), arc.getWeight()));
 					}
 				}
+				
+				traceHasTransitionStep = true;
 			}
+		}
+		
+		if(traceHasTransitionStep){
+			net.remove(next);
+			net.remove(currentPlace);
 		}
 		
 		TCTLAbstractProperty topNode = query.getProperty();

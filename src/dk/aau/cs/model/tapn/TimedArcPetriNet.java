@@ -221,6 +221,9 @@ public class TimedArcPetriNet {
 	}
 
 	public TimedPlace getPlaceByName(String placeName) {
+		if (placeName == null) {
+			int i = 5;
+		}
 		for (TimedPlace p : places) {
 			if (p.name().toLowerCase().equals(placeName.toLowerCase())) {
 				return p;

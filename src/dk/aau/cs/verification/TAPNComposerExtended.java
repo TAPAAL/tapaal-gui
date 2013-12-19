@@ -446,7 +446,7 @@ public class TAPNComposerExtended implements ITAPNComposer {
 				
 				TimedPlace source = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.source().name()));
 				TimedTransition transition = constructedModel.getTransitionByName(mapping.map(transitionTemplate, arc.transition().name()));
-				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(sourceTemplate, arc.destination().name()));
+				TimedPlace destination = constructedModel.getPlaceByName(mapping.map(destinationTemplate, arc.destination().name()));
 				
 				TransportArc addedArc = new TransportArc(source, transition, destination, arc.interval(), arc.getWeight());
 				constructedModel.add(addedArc);
