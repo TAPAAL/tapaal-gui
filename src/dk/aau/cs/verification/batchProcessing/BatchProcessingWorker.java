@@ -401,10 +401,6 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			valueNetwork.setNameMapping(composedModel.value2());
 			
 			OverApproximation overaprx = new OverApproximation();
-			
-			// get the originalQueryType before a a potential AG query is rewritten to an EF query
-			QueryType originalQueryType = verificationResult.getQueryResult().queryType();
-
 
 			//Create trace TAPN from the trace
 			overaprx.makeTraceTAPN(transformedOriginalModel, valueNetwork, clonedQuery);
@@ -425,13 +421,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 			renameTraceTransitions(verificationResult.getTrace());
 			renameTraceTransitions(verificationResult.getSecondaryTrace());
 			QueryResult queryResult= verificationResult.getQueryResult();
-			
-			// The query were rewritten to an EF query, and since the topNode cannot be a not node we need to flip the result.
-			if(originalQueryType == QueryType.AG){
-				queryResult.flipResult();
-			}
-			
-			if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied()) || (originalQueryType == QueryType.AG && queryResult.isQuerySatisfied())) {
+			if ((queryResult.queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || (queryResult.queryType() == QueryType.AG && queryResult.isQuerySatisfied())) {
 				queryResult.setApproximationInconclusive(true);
 			}
 			value = new VerificationResult<TimedArcPetriNetTrace>(
