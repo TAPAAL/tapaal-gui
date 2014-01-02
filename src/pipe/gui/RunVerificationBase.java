@@ -162,9 +162,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						value.setNameMapping(transformedModel.value2());
 						
 						OverApproximation overaprx = new OverApproximation();
-						
-						// get the originalQueryType before a a potential AG query is rewritten to an EF query
-						QueryType originalQueryType = result.getQueryResult().queryType();
 			
 						//Create trace TAPN from the trace
 						Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
@@ -187,13 +184,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						renameTraceTransitions(result.getSecondaryTrace());
 						QueryResult queryResult = result.getQueryResult();
 						
-						// The query were rewritten to an EF query, and since the topNode cannot be a not node we need to flip the result.
-						if(originalQueryType == QueryType.AG){
-							queryResult.flipResult();
-						}
-						
 						// If (EG AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
-						if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied()) || originalQueryType == QueryType.AG && queryResult.isQuerySatisfied()){
+						if ((result.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied()) || result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied()){
 							queryResult.setApproximationInconclusive(true);
 						}
 						
@@ -299,8 +291,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						
 						OverApproximation overaprx = new OverApproximation();
 						
-						// get the originalQueryType before a a potential AG query is rewritten to an EF query
-						QueryType originalQueryType = result.getQueryResult().queryType();
 			
 						//Create trace TAPN from the trace
 						Tuple<TimedArcPetriNet, NameMapping> transformedOriginalModel = composer.transformModel(model);
@@ -323,14 +313,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						renameTraceTransitions(result.getSecondaryTrace());
 						QueryResult queryResult = result.getQueryResult();
 						
-						// The query were rewritten to an EF query, and since the topNode cannot be a not node we need to flip the result.
-						if(originalQueryType == QueryType.AG){
-							queryResult.flipResult();
-						}
 						
 						// If (EF AND not satisfied trace) OR (AG AND satisfied trace) -> inconclusive
-						if ((originalQueryType == QueryType.EF && !queryResult.isQuerySatisfied())
-							|| originalQueryType == QueryType.AG && queryResult.isQuerySatisfied()) {
+						if ((result.getQueryResult().queryType() == QueryType.EF && !queryResult.isQuerySatisfied())
+							|| result.getQueryResult().queryType() == QueryType.AG && queryResult.isQuerySatisfied()) {
 							queryResult.setApproximationInconclusive(true);
 						}
 						

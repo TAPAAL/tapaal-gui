@@ -16,6 +16,7 @@ import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
+import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.model.tapn.*;
 import dk.aau.cs.model.tapn.simulation.*;
@@ -179,20 +180,19 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		TCTLAbstractProperty topNode = query.getProperty();
-		TCTLAndListNode andList;
 		TCTLAtomicPropositionNode pBlock = new TCTLAtomicPropositionNode(blockPlace.name(), "=", 1);
 		
 		if(topNode instanceof TCTLEFNode)
 		{
-			andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pBlock);
+			TCTLAndListNode andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pBlock);
 			((TCTLEFNode) topNode).setProperty(andList);
 		}
-		else if(topNode instanceof TCTLAGNode) // Beware: if the function is called with a AG query - the caller needs to flip the result, because the topNode cannot be a NotNode!
+		else if(topNode instanceof TCTLAGNode)
 		{
-			TCTLNotNode notNode = new TCTLNotNode(((TCTLAGNode) topNode).getProperty());
-			andList = new TCTLAndListNode(notNode, pBlock);
-			TCTLEFNode newTopNode = new TCTLEFNode(andList);
-			query.setProperty(newTopNode);
+			TCTLNotNode notNode = new TCTLNotNode(pBlock);
+			TCTLOrListNode orList = new TCTLOrListNode(((TCTLAGNode) topNode).getProperty(), notNode);
+			((TCTLAGNode) topNode).setProperty(orList);
+
 		}
 		
 		
