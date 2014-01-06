@@ -15,6 +15,7 @@ import dk.aau.cs.TCTL.TCTLAbstractProperty;
 import dk.aau.cs.TCTL.TCTLAndListNode;
 import dk.aau.cs.TCTL.TCTLAtomicPropositionNode;
 import dk.aau.cs.TCTL.TCTLEFNode;
+import dk.aau.cs.TCTL.TCTLEGNode;
 import dk.aau.cs.TCTL.TCTLNotNode;
 import dk.aau.cs.TCTL.TCTLOrListNode;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
@@ -133,21 +134,38 @@ public class OverApproximation implements ITAPNApproximation {
 		
 		TAPNNetworkTrace trace = result.getTrace();
 		HashMap<String,String> reversedNameMap = reverseNameMapping(transformedModel.value2().getMappedToOrg());
+		LocalTimedPlace loopStep = null;
+		boolean delayIsLoopStep = false;
 		
 		for(TAPNNetworkTraceStep step : trace) {
+			if (step instanceof TAPNNetworkTimeDelayStep) {
+				if(step.isLoopStep())
+				{
+					delayIsLoopStep = true;
+				}				
+			}
 			if (step instanceof TAPNNetworkTimedTransitionStep) {
 				TimedTransition firedTransition = net.getTransitionByName(reversedNameMap.get(((TAPNNetworkTimedTransitionStep) step).getTransition().name()));
 				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent());
+				
 				net.add(copyTransition);
 				net.add(new TimedInputArc(currentPlace, copyTransition, TimeInterval.ZERO_INF));
 				
 				net.add(new TimedInputArc(blockPlace, copyTransition, TimeInterval.ZERO_INF));
 				net.add(new TimedOutputArc(copyTransition, blockPlace));
 				
+				// EG queries, where there is a loopStep, we need to store it for later use.
+				if(step.isLoopStep() || delayIsLoopStep)
+				{
+					loopStep = currentPlace;
+					delayIsLoopStep = false;
+				}
+				
 				currentPlace = new LocalTimedPlace("PTRACE" + Integer.toString(++placeInteger));
 				net.add(currentPlace);
 				next = new TimedOutputArc(copyTransition, currentPlace);
 				net.add(next);
+				
 				
 				for (TimedInputArc arc : originalInput) {
 					if (arc.destination() == firedTransition) {
@@ -174,6 +192,10 @@ public class OverApproximation implements ITAPNApproximation {
 			}
 		}
 		
+		if(loopStep != null){
+			net.add(new TimedOutputArc(next.source(), loopStep));
+		}
+		
 		if(traceHasTransitionStep){
 			net.remove(next);
 			net.remove(currentPlace);
@@ -184,8 +206,14 @@ public class OverApproximation implements ITAPNApproximation {
 		
 		if(topNode instanceof TCTLEFNode)
 		{
-			TCTLAndListNode andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pBlock);
-			((TCTLEFNode) topNode).setProperty(andList);
+			if(((TCTLEFNode) topNode).getProperty() instanceof TCTLAndListNode){
+				((TCTLAndListNode) ((TCTLEFNode) topNode).getProperty()).addConjunct(pBlock);
+			}
+			else{
+				TCTLAndListNode andList = new TCTLAndListNode((((TCTLEFNode) topNode).getProperty()), pBlock);
+				((TCTLEFNode) topNode).setProperty(andList);
+			}
+				
 		}
 		else if(topNode instanceof TCTLAGNode)
 		{
@@ -194,13 +222,23 @@ public class OverApproximation implements ITAPNApproximation {
 			((TCTLAGNode) topNode).setProperty(orList);
 
 		}
+		else if(topNode instanceof TCTLEGNode)
+		{
+			if(((TCTLEGNode) topNode).getProperty() instanceof TCTLAndListNode){
+				((TCTLAndListNode) ((TCTLEGNode) topNode).getProperty()).addConjunct(pBlock);
+			}
+			else{
+				TCTLAndListNode andList = new TCTLAndListNode((((TCTLEGNode) topNode).getProperty()), pBlock);
+				((TCTLEGNode) topNode).setProperty(andList);
+			}
+		}
 		
 		
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
 		}
 				
-		/*
+		
 		PrintStream modelStream;
 		try {
 			modelStream = new PrintStream(new File("C:\\Users\\Sine\\Documents\\Universitet\\test.xml"));
@@ -208,7 +246,7 @@ public class OverApproximation implements ITAPNApproximation {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
             
 	}
 	
@@ -220,7 +258,7 @@ public class OverApproximation implements ITAPNApproximation {
 		return newMap;
 	}
 	
-	/*
+	
 	private void outputModel(TimedArcPetriNet model, PrintStream modelStream) {
 		modelStream.append("<pnml>\n");
 		modelStream.append("<net id=\"" + model.name() + "\" type=\"P/T net\">\n");
@@ -319,5 +357,5 @@ public class OverApproximation implements ITAPNApproximation {
 		}
 		
 		modelStream.append("/>\n");
-	}*/
+	}
 }

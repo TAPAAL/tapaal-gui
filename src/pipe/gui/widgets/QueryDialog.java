@@ -2365,10 +2365,10 @@ public class QueryDialog extends JPanel {
 			useOverApproximation.setSelected(false);
 			useOverApproximation.setEnabled(false);
 			
-			noApproximationEnable.setEnabled(false);
+			/*noApproximationEnable.setEnabled(false);
 			overApproximationEnable.setEnabled(false);
 			underApproximationEnable.setEnabled(false);
-			overApproximationDenominator.setEnabled(false);
+			overApproximationDenominator.setEnabled(false);*/
 		}
 		else{
 			useOverApproximation.setVisible(true);

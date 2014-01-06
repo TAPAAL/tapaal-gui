@@ -149,9 +149,9 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				value.setNameMapping(transformedModel.value2());
 			} else {
 				// If r > 1
-				if ((result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied())
-					|| (result.getQueryResult().queryType() == QueryType.AG && !result.getQueryResult().isQuerySatisfied())) {
-						//Create the verification satisfied result for the approximation
+				if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG ) && result.getQueryResult().isQuerySatisfied())
+					|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && !result.getQueryResult().isQuerySatisfied())) {
+						// The results are inconclusive, but we get a trace and can use trace TAPN for verification.
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
 						value = new VerificationResult<TAPNNetworkTrace>(
 								approxResult.getQueryResult(),
@@ -171,7 +171,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						if (options instanceof VerifyTAPNOptions && oldInclusionPlaces != null)
 							((VerifyTAPNOptions) options).setInclusionPlaces(oldInclusionPlaces);
 			
-						//run model checker again for trace TAPN
+						// run model checker again for trace TAPN
 						result = modelChecker.verify(options, transformedOriginalModel, clonedQuery);
 						if (isCancelled()) {
 							firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
