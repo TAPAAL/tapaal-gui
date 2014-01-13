@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import javax.swing.JOptionPane;
 
+import dk.aau.cs.TCTL.TCTLAFNode;
 import dk.aau.cs.TCTL.TCTLAGNode;
 import dk.aau.cs.TCTL.TCTLAbstractPathProperty;
 import dk.aau.cs.TCTL.TCTLAbstractProperty;
@@ -218,8 +219,14 @@ public class OverApproximation implements ITAPNApproximation {
 		else if(topNode instanceof TCTLAGNode)
 		{
 			TCTLNotNode notNode = new TCTLNotNode(pBlock);
-			TCTLOrListNode orList = new TCTLOrListNode(((TCTLAGNode) topNode).getProperty(), notNode);
-			((TCTLAGNode) topNode).setProperty(orList);
+			
+			if(((TCTLAGNode) topNode).getProperty() instanceof TCTLOrListNode){
+				((TCTLOrListNode) ((TCTLAGNode) topNode).getProperty()).addDisjunct(notNode);;
+			}
+			else{
+				TCTLOrListNode orList = new TCTLOrListNode((((TCTLAGNode) topNode).getProperty()), notNode);
+				((TCTLAGNode) topNode).setProperty(orList);
+			}
 
 		}
 		else if(topNode instanceof TCTLEGNode)
@@ -232,7 +239,18 @@ public class OverApproximation implements ITAPNApproximation {
 				((TCTLEGNode) topNode).setProperty(andList);
 			}
 		}
-		
+		else if(topNode instanceof TCTLAFNode)
+		{
+			TCTLNotNode notNode = new TCTLNotNode(pBlock);
+			
+			if(((TCTLAFNode) topNode).getProperty() instanceof TCTLOrListNode){
+				((TCTLOrListNode) ((TCTLAFNode) topNode).getProperty()).addDisjunct(notNode);;
+			}
+			else{
+				TCTLOrListNode orList = new TCTLOrListNode((((TCTLAFNode) topNode).getProperty()), notNode);
+				((TCTLAFNode) topNode).setProperty(orList);
+			}
+		}
 		
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
