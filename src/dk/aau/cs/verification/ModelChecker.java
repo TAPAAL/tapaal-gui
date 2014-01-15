@@ -22,7 +22,7 @@ public interface ModelChecker {
 	void kill();
 
 	boolean supportsStats();
-	boolean supportsModel(TimedArcPetriNet model);
+	boolean supportsModel(TimedArcPetriNet model, VerificationOptions options);
 	boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options);
 	String getStatsExplanation();
 }

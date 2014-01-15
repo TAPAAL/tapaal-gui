@@ -93,7 +93,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				(query.queryType() == QueryType.EF || query.queryType() == QueryType.AG) &&
 				!query.hasDeadlock() && !(options instanceof VerifyPNOptions)){
 			VerifyPN verifypn = new VerifyPN(new FileFinderImpl(), new MessengerImpl());
-			if(!verifypn.supportsModel(transformedModel.value1())){
+			if(!verifypn.supportsModel(transformedModel.value1(), options)){
 				// Skip over-approximation if model is not supported.
 				// Prevents verification from displaying error.
 			}
@@ -103,7 +103,10 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				messenger.displayInfoMessage("Over-approximation check is skipped because VerifyPN is not available.", "VerifyPN unavailable");
 			}else{
 				VerificationResult<TimedArcPetriNetTrace> overapprox_result = verifypn.verify(new VerifyPNOptions(options.extraTokens(), options.traceOption(), SearchOption.OVERAPPROXIMATE, true), transformedModel, clonedQuery);
-				if(!overapprox_result.error() && !overapprox_result.getQueryResult().isQuerySatisfied()){
+				if(!overapprox_result.error() && (
+						(query.queryType() == QueryType.EF && !overapprox_result.getQueryResult().isQuerySatisfied()) ||
+						(query.queryType() == QueryType.AG && overapprox_result.getQueryResult().isQuerySatisfied()))
+						){
 					VerificationResult<TAPNNetworkTrace> value = new VerificationResult<TAPNNetworkTrace>(overapprox_result.getQueryResult(), 
 							decomposeTrace(overapprox_result.getTrace(), transformedModel.value2()), 
 							overapprox_result.verificationTime(), 
@@ -145,7 +148,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						decomposeTrace(result.getTrace(), transformedModel.value2()),
 						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 						result.verificationTime(),
-						result.stats());
+						result.stats(),
+						result.isOverApproximationResult());
 				value.setNameMapping(transformedModel.value2());
 			} else {
 				// If r > 1
@@ -158,7 +162,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
 								approxResult.verificationTime(),
-								approxResult.stats());
+								approxResult.stats(),
+								approxResult.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 						
 						OverApproximation overaprx = new OverApproximation();
@@ -196,7 +201,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								decomposeTrace(result.getTrace(), transformedModel.value2()),
 								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 								approxResult.verificationTime() + result.verificationTime(),
-								approxResult.stats());
+								approxResult.stats(),
+								approxResult.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 					} 
 					else if ((result.getQueryResult().queryType() == QueryType.EF && !result.getQueryResult().isQuerySatisfied())
@@ -216,7 +222,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
 								approxResult.verificationTime(),
-								approxResult.stats());
+								approxResult.stats(),
+								approxResult.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 					}
 			}
@@ -246,7 +253,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 						decomposeTrace(result.getTrace(), transformedModel.value2()),
 						decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 						result.verificationTime(),
-						result.stats());
+						result.stats(),
+						result.isOverApproximationResult());
 				value.setNameMapping(transformedModel.value2());
 			}
 			else {
@@ -261,7 +269,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 							decomposeTrace(result.getTrace(), transformedModel.value2()),
 							decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 							result.verificationTime(),
-							result.stats());
+							result.stats(),
+							result.isOverApproximationResult());
 					value.setNameMapping(transformedModel.value2());
 				} else if (result.getQueryResult().queryType() == QueryType.EF && result.getQueryResult().isQuerySatisfied()
 						|| (result.getQueryResult().queryType() == QueryType.AG && ! result.getQueryResult().isQuerySatisfied())) {
@@ -275,7 +284,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								decomposeTrace(result.getTrace(), transformedModel.value2()),
 								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 								result.verificationTime(),
-								result.stats());
+								result.stats(),
+								result.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 					} else {
 						// If query does have deadlock -> create trace TAPN
@@ -286,7 +296,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								decomposeTrace(approxResult.getTrace(), transformedModel.value2()),
 								decomposeTrace(approxResult.getSecondaryTrace(), transformedModel.value2()),
 								approxResult.verificationTime(),
-								approxResult.stats());
+								approxResult.stats(),
+								result.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 						
 						OverApproximation overaprx = new OverApproximation();
@@ -327,7 +338,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								decomposeTrace(result.getTrace(), transformedModel.value2()),
 								decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 								approxResult.verificationTime() + result.verificationTime(),
-								approxResult.stats());
+								approxResult.stats(),
+								approxResult.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 					}
 				}
@@ -339,7 +351,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 					decomposeTrace(result.getTrace(), transformedModel.value2()),
 					decomposeTrace(result.getSecondaryTrace(), transformedModel.value2()),
 					result.verificationTime(),
-					result.stats());
+					result.stats(),
+					result.isOverApproximationResult());
 			value.setNameMapping(transformedModel.value2());
 		}
 		
