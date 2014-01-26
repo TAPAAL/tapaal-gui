@@ -5,7 +5,7 @@
 <shared-transition name="collect" urgent="true"/>
 <constant name="Deadline" value="37"/>
 <net active="true" id="Registration" type="P/T net">
-<labels border="true" height="66" positionX="28" positionY="32" width="207">A complaint processing workflow from "Learning Workflow Petr Nets" by J. Esparza, M. Leucker and M. Schlund. Timing aspects are added.</labels>
+<labels border="true" height="52" positionX="29" positionY="33" width="208">A complaint processing workflow from "Learning Workflow Petri Nets" by J. Esparza, M. Leucker and M. Schlund. Timing aspects are added.</labels>
 <place id="in" initialMarking="1" invariant="&lt;= 2" markingOffsetX="0.0" markingOffsetY="0.0" name="in" nameOffsetX="-9.0" nameOffsetY="3.0" positionX="90.0" positionY="270.0"/>
 <place id="P1" initialMarking="0" invariant="&lt;= 30" markingOffsetX="0.0" markingOffsetY="0.0" name="P1" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="180.0" positionY="150.0"/>
 <place id="P2" initialMarking="0" invariant="&lt;= 15" markingOffsetX="0.0" markingOffsetY="0.0" name="P2" nameOffsetX="-5.0" nameOffsetY="35.0" positionX="180.0" positionY="390.0"/>
@@ -146,8 +146,9 @@
 <arcpath arcPointType="false" id="1" xCoord="207" yCoord="312"/>
 </arc>
 </net>
-<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Can workflow terminate?" pTrie="true" query="EF out=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
-<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Can workflow terminate by Deadline?" pTrie="true" query="EF Monitor.finished_in_time=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
-<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Proper termination" pTrie="true" query="AG (out=0 or (in=0 and Registration.P1=0 and Registration.P2=0 and Registration.P3=0 and Registration.P4=0 and Handling.P0=0 and Handling.P1=0 and Handling.P2=0 and Handling.P3=0 and Monitor.finished_in_time=0))" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
-<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="null" hashTableSize="null" inclusionPlaces="*NONE*" name="Strong Soundness" pTrie="true" query="AF out=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="SOME"/>
+<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Can workflow terminate?" overApproximation="true" pTrie="true" query="EF out=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
+<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Can workflow terminate by Deadline?" overApproximation="true" pTrie="true" query="EF Monitor.finished_in_time=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
+<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Proper termination" overApproximation="true" pTrie="true" query="AG (out=0 or (in=0 and Registration.P1=0 and Registration.P2=0 and Registration.P3=0 and Registration.P4=0 and Handling.P0=0 and Handling.P1=0 and Handling.P2=0 and Handling.P3=0 and Monitor.finished_in_time=0))" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="NONE"/>
+<query active="true" capacity="1" discreteInclusion="false" extrapolationOption="AUTOMATIC" gcd="true" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Strong Soundness" overApproximation="true" pTrie="true" query="AF out=1" reductionOption="VerifyTAPNdiscreteVerification" searchOption="HEURISTIC" symmetry="true" timeDarts="false" traceOption="SOME"/>
+<k-bound bound="3"/>
 </pnml>
