@@ -100,6 +100,7 @@ import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.VerifyPlaceNamesVisitor;
 import dk.aau.cs.approximation.OverApproximation;
 import dk.aau.cs.approximation.UnderApproximation;
+import dk.aau.cs.gui.TabContent;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.ConstantStore;
@@ -2563,7 +2564,10 @@ public class QueryDialog extends JPanel {
 			
 					try {
 						ByteArrayOutputStream outputStream = tapnWriter.savePNML();
-						CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), "Transformed composed model");
+						String composedName = "composed-" + CreateGui.getApp().getCurrentTabName();
+						composedName = composedName.replace(".xml", "");
+						CreateGui.getApp().createNewTabFromFile(new ByteArrayInputStream(outputStream.toByteArray()), composedName);
+						exit();
 					} catch (Exception e1) {
 						System.console().printf(e1.getMessage());
 					}
