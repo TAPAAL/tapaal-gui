@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -1208,14 +1209,14 @@ public class WorkflowDialog extends JDialog {
 								}
 							}else{
 								for(Tuple<Tuple<TAPNNetworkTraceStep, NetworkMarking>, Tuple<Integer, Integer>> checkStep : detectLoops){
-									if(checkStep.value1().value1().equals(step) && checkStep.value1().value2().equals(marking) && checkStep.value2().value1() < delay){
+									if(checkStep.value1().value1().equals(step) && checkStep.value1().value2().equals(marking.cut()) && checkStep.value2().value1() < delay){
 										loopIndex = checkStep.value2().value2();
 										setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
 										type = TraceType.EG_LOOP;
 										break outer;
 									}
 								}
-								detectLoops.add(new Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer,Integer>>(new Tuple<TAPNNetworkTraceStep,NetworkMarking>(step, marking.clone()), new Tuple<Integer, Integer>(delay, tmpTrace.length())));
+								detectLoops.add(new Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer,Integer>>(new Tuple<TAPNNetworkTraceStep,NetworkMarking>(step, marking.cut()), new Tuple<Integer, Integer>(delay, tmpTrace.length())));
 							}
 							tmpTrace.add(step);
 							marking = step.performStepFrom(marking);

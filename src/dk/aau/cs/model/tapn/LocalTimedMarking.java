@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
+import dk.aau.cs.model.tapn.TimedPlace.PlaceType;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 // This class must remain immutable wrt. delays and transition firings!
 public class LocalTimedMarking implements TimedMarking { // TODO: Consider removing the interface here?
@@ -188,10 +190,34 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		
 		if(placesToTokensMap.size() != other.placesToTokensMap.size())	return false;
 		for(TimedPlace key : placesToTokensMap.keySet()){
-			if(other.placesToTokensMap.get(key) == null || !other.placesToTokensMap.get(key).equals(placesToTokensMap.get(key)))	return false;
+			if(other.placesToTokensMap.get(key) == null)	return false;
+			if(other.placesToTokensMap.get(key).size() != placesToTokensMap.get(key).size())	return false;
+			int i = 0;
+			for(TimedToken t : other.placesToTokensMap.get(key)){
+				if(!t.equals(placesToTokensMap.get(key).get(i++)))	return false;
+			}
 		}
 		
 		return true;
+	}
+
+	public void cut() {
+		HashMap<TimedPlace, List<TimedToken>> newMap = new HashMap<TimedPlace, List<TimedToken>>();
+		for(TimedPlace p : placesToTokensMap.keySet()){
+			Tuple<PlaceType, Integer> extrapolation = p.extrapolate();
+			List<TimedToken> newList = new ArrayList<TimedToken>();
+			for(TimedToken t :  placesToTokensMap.get(p)){
+				if(t.age().intValue() > extrapolation.value2()){
+					if(extrapolation.value1() == PlaceType.Standard){
+						newList.add(new TimedToken(p, new BigDecimal(extrapolation.value2()+1)));
+					} 
+				}else{
+					newList.add(t.clone());
+				}
+			}
+			newMap.put(p, newList);
+		}
+		placesToTokensMap = newMap;
 	}
 	
 	

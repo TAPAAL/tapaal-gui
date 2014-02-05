@@ -6,10 +6,10 @@ import java.util.regex.Pattern;
 
 import pipe.dataLayer.Template;
 import pipe.gui.CreateGui;
-
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 public class SharedPlace extends TimedPlace{
 	private static final Pattern namePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
@@ -19,6 +19,7 @@ public class SharedPlace extends TimedPlace{
 	
 	private TimedArcPetriNetNetwork network;
 	private TimedMarking currentMarking;
+	private Tuple<PlaceType, Integer> extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
 	
 	private List<TimedPlaceListener> listeners = new ArrayList<TimedPlaceListener>();
 
@@ -183,5 +184,29 @@ public class SharedPlace extends TimedPlace{
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	public Tuple<PlaceType, Integer> extrapolate(){
+		if(extrapolation.value2() > -2)	return extrapolation;
+		
+		PlaceType type = PlaceType.Dead;
+		int cmax = -1;
+		
+		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
+		
+		for(Template t : CreateGui.getCurrentTab().activeTemplates()){
+			TimedPlace tp = t.model().getPlaceByName(SharedPlace.this.name);
+			if(tp != null){
+				cmax = Math.max(cmax, tp.extrapolate().value2());
+				if(tp.extrapolate().value1() == PlaceType.Invariant || (type == PlaceType.Dead && tp.extrapolate().value1() == PlaceType.Standard)){
+					type = tp.extrapolate().value1();
+				}
+				extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
+			}
+		}
+		
+		extrapolation = new Tuple<TimedPlace.PlaceType, Integer>(PlaceType.Dead, -2);
+		
+		return new Tuple<TimedPlace.PlaceType, Integer>(type, cmax);
 	}
 }

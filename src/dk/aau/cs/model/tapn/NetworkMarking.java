@@ -9,8 +9,10 @@ import java.util.Map.Entry;
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import pipe.gui.Animator;
 import pipe.gui.CreateGui;
+import dk.aau.cs.model.tapn.TimedPlace.PlaceType;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
+import dk.aau.cs.util.Tuple;
 
 public class NetworkMarking implements TimedMarking {
 	private HashMap<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
@@ -299,8 +301,34 @@ public class NetworkMarking implements TimedMarking {
 		}
 		if(sharedPlacesTokens.size() != other.sharedPlacesTokens.size())	return false;
 		for(TimedPlace key : sharedPlacesTokens.keySet()){
-			if(other.sharedPlacesTokens.get(key) == null || !other.sharedPlacesTokens.get(key).equals(sharedPlacesTokens.get(key)))	return false;
+			if(other.sharedPlacesTokens.get(key) == null)	return false;
+			for(TimedToken t : other.sharedPlacesTokens.get(key)){
+				if(!t.equals(sharedPlacesTokens.get(key)))	return false;
+			}
 		}
 		return true;
+	}
+	
+	public NetworkMarking cut(){
+		NetworkMarking copy = clone();
+		for(LocalTimedMarking marking : copy.markings.values()){
+			marking.cut();
+		}
+		for(TimedPlace p : sharedPlacesTokens.keySet()){
+			Tuple<PlaceType, Integer> extrapolation = p.extrapolate();
+			List<TimedToken> newList = new ArrayList<TimedToken>();
+			for(TimedToken t : copy.sharedPlacesTokens.get(p)){
+				if(t.age().intValue() > extrapolation.value2()){
+					if(extrapolation.value1() == PlaceType.Standard){
+						newList.add(new TimedToken(p, new BigDecimal(extrapolation.value2()+1)));
+					} 
+				}else{
+					newList.add(t.clone());
+				}
+			}
+			copy.sharedPlacesTokens.put(p, newList);
+		}
+		
+		return copy;
 	}
 }
