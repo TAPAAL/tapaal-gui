@@ -25,6 +25,7 @@ public class VerificationResult<TTrace> {
 	private Stats stats;
 	private NameMapping nameMapping;
 	private TTrace secondaryTrace;
+	private boolean isOverApproximationResult = false;
 	
 	public boolean isQuerySatisfied() {
 		return queryResult.isQuerySatisfied();
@@ -35,6 +36,11 @@ public class VerificationResult<TTrace> {
 		this.trace = trace;
 		this.verificationTime = verificationTime;
 		this.stats = stats;
+	}
+	
+	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime, Stats stats, boolean isOverApproximationResult){
+		this(queryResult, trace, verificationTime, stats);
+		this.isOverApproximationResult = isOverApproximationResult;
 	}
 
 	public VerificationResult(QueryResult queryResult, TTrace trace, long verificationTime) {
@@ -49,8 +55,9 @@ public class VerificationResult<TTrace> {
 	public VerificationResult(QueryResult value1,
 			TTrace tapnTrace,
 			TTrace secondaryTrace2, long runningTime,
-			Stats value2) {
-		this(value1, tapnTrace, runningTime, value2);
+			Stats value2,
+			boolean isOverApproximationResult) {
+		this(value1, tapnTrace, runningTime, value2, isOverApproximationResult);
 		this.secondaryTrace = secondaryTrace2;
 	}
 
@@ -151,5 +158,9 @@ public class VerificationResult<TTrace> {
 		}
 		
 		return m;
+	}
+	
+	public boolean isOverApproximationResult(){
+		return isOverApproximationResult;
 	}
 }

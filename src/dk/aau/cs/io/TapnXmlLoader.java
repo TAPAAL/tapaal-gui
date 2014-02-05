@@ -788,6 +788,7 @@ public class TapnXmlLoader {
 		ReductionOption reductionOption = getQueryReductionOption(queryElement);
 		int capacity = Integer.parseInt(queryElement.getAttribute("capacity"));
 		boolean symmetry = getReductionOption(queryElement, "symmetry", true);
+		boolean gcd = getReductionOption(queryElement, "gcd", true);
 		boolean timeDarts = getReductionOption(queryElement, "timeDarts", true);
 		boolean pTrie = getReductionOption(queryElement, "pTrie", true);
 		boolean overApproximation = getReductionOption(queryElement, "overApproximation", true);
@@ -800,7 +801,7 @@ public class TapnXmlLoader {
 
 		if (query != null) {
 			TAPNQuery parsedQuery = new TAPNQuery(comment, capacity, query, traceOption,
-					searchOption, reductionOption, symmetry, timeDarts, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces);
+					searchOption, reductionOption, symmetry, gcd, timeDarts, pTrie, overApproximation, hashTableSize, extrapolationOption, inclusionPlaces);
 			parsedQuery.setActive(active);
 			parsedQuery.setDiscreteInclusion(discreteInclusion);
 			return parsedQuery;

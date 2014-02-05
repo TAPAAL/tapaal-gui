@@ -76,7 +76,6 @@ public class VerifyPN implements ModelChecker{
 			buffer.append("<br/>");
 			buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
 			buffer.append("passed/waiting list at the end of verification.<br />");
-			buffer.append("<br />If the number of discovered, explored and stored markings are all 0<br />then the query was disproved by using the over-approximation<br />technique (while ignoring all the time intervals).<br />");
 			buffer.append("</html>");
 			return buffer.toString();
 		}
@@ -317,11 +316,13 @@ public class VerifyPN implements ModelChecker{
 				String standardOutput = readOutput(runner.standardOutput());
 
 				Tuple<QueryResult, Stats> queryResult = parseQueryResult(standardOutput, model.value1().marking().size() + query.getExtraTokens(), query.getExtraTokens(), query);
+				
 				if (queryResult == null || queryResult.value1() == null) {
 					return new VerificationResult<TimedArcPetriNetTrace>(errorOutput + System.getProperty("line.separator") + standardOutput, runner.getRunningTime());
 				} else {
+					boolean approximationResult = queryResult.value2().discoveredStates() == 0;	// Result is from over-approximation
 					TimedArcPetriNetTrace tapnTrace = parseTrace(errorOutput, options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2()); 
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, runner.getRunningTime(), queryResult.value2(), approximationResult); 
 				}
 			}
 		}
@@ -384,15 +385,10 @@ public class VerifyPN implements ModelChecker{
 		}
 		
 		
-		boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
-			return supportsModel(model) || options.searchOption() == SearchOption.OVERAPPROXIMATE;
+		public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
+			return model.isUntimed() || options.searchOption() == SearchOption.OVERAPPROXIMATE;
 		}
-		
-		@Override
-		public boolean supportsModel(TimedArcPetriNet model) {
-			return model.isUntimed();
-		}
-		
+	
 		public boolean supportsQuery(TimedArcPetriNet model, TAPNQuery query, VerificationOptions options) {
 			if(query.getProperty() instanceof TCTLEGNode || query.getProperty() instanceof TCTLAFNode) {
 				return false;

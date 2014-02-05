@@ -74,7 +74,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 			buffer.append("<br/>");
 			buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
 			buffer.append("passed/waiting list at the end of verification.<br />");
-			buffer.append("<br />If the number of discovered, explored and stored markings are all 0<br />then the query was disproved by using the over-approximation<br />technique (while ignoring all the time intervals).<br />");
 			buffer.append("</html>");
 			return buffer.toString();
 		}
@@ -261,12 +260,13 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 
 		public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
-			if(!supportsModel(model.value1()))
+			if(!supportsModel(model.value1(), options)){
 				throw new UnsupportedModelException("Verifydtapn does not support the given model.");
+			}
 			
-                        if(!supportsQuery(model.value1(), query, options)){
-                            throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
-                        }
+            if(!supportsQuery(model.value1(), query, options)){
+                throw new UnsupportedQueryException("Verifydtapn does not support the given query-option combination. ");
+            }
 			//if(!supportsQuery(model.value1(), query, options))
 				//throw new UnsupportedQueryException("Verifydtapn does not support the given query.");
 			
@@ -330,7 +330,7 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 					}
 					
 					TimedArcPetriNetTrace tapnTrace = parseTrace(!errorOutput.contains("Trace:")?errorOutput:(errorOutput.split("Trace:")[1]), options, model, exportedModel, query, queryResult.value1());
-					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2()); 
+					return new VerificationResult<TimedArcPetriNetTrace>(queryResult.value1(), tapnTrace, secondaryTrace, runner.getRunningTime(), queryResult.value2(), false); 
 				}
 			}
 		}
@@ -393,7 +393,11 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
 		}
 		
 		
-		public boolean supportsModel(TimedArcPetriNet model) {
+		public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
+			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
+				return false;
+			}
+			
 			return model.isNonStrict();
 		}
 		
@@ -404,10 +408,6 @@ public class VerifyTAPNDiscreteVerification implements ModelChecker{
                                 && ((VerifyDTAPNOptions)options).timeDarts()){
                 return false;
             }
-			
-			if(model.hasUrgentTransitions() && ((VerifyDTAPNOptions)options).timeDarts()){
-				return false;
-			}
 			
 			return true;
 		}

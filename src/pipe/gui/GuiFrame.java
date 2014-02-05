@@ -2255,17 +2255,17 @@ public class GuiFrame extends JFrame implements Observer {
 		buffer.append("Mathias Andersen, Joakim Byg, Louise Foshammer, Malte Neve-Graesboell,\n");
                 buffer.append("Lasse Jacobsen, Morten Jacobsen, Peter G. Jensen, ");
 		buffer.append("Kenneth Y. Joergensen,\nMikael H. Moeller, Jiri Srba, Mathias G. Soerensen and Jakob H. Taankvist\n");
-		buffer.append("Aalborg University 2009-2013\n\n");
+		buffer.append("Aalborg University 2009-2014\n\n");
 		buffer.append("TAPAAL Engine:\n");
 		buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-		buffer.append("Aalborg University 2011-2013\n\n");
+		buffer.append("Aalborg University 2011-2014\n\n");
 		buffer.append("TAPAAL Discrete Engine:\n");
                 buffer.append("Mathias Andersen, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
 		buffer.append("Mathias G. Soerensen and Jakob H. Taankvist\n");
-                buffer.append("Aalborg University 2012-2013\n\n");
+                buffer.append("Aalborg University 2012-2014\n\n");
 		buffer.append("TAPAAL Untimed Engine:\n");
                 buffer.append("Jonas F. Jensen, Thomas S. Nielsen, Lars K. Oestergaard and Jiri Srba\n");
-                buffer.append("Aalborg University 2013\n\n");
+                buffer.append("Aalborg University 2014\n\n");
 		buffer.append("\n");
 		JOptionPane.showMessageDialog(null, buffer.toString(), "About " + TAPAAL.getProgramName(),
 				JOptionPane.INFORMATION_MESSAGE, ResourceManager.appIcon());

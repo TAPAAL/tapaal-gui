@@ -74,7 +74,6 @@ public class VerifyTAPN implements ModelChecker {
 		buffer.append("<br/>");
 		buffer.append("<b>Stored markings:</b> The number of markings found in the<br />");
 		buffer.append("passed/waiting list at the end of verification.<br />");
-		buffer.append("<br />If the number of discovered, explored and stored markings are all 0<br />then the query was disproved by using the over-approximation<br />technique (while ignoring all the time intervals).<br />");
 		buffer.append("</html>");
 		return buffer.toString();
 	}
@@ -260,7 +259,7 @@ public class VerifyTAPN implements ModelChecker {
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> verify(VerificationOptions options, Tuple<TimedArcPetriNet, NameMapping> model, TAPNQuery query) throws Exception {	
-		if(!supportsModel(model.value1()))
+		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifytapn does not support the given model.");
 		
 		if(!supportsQuery(model.value1(), query, options))
@@ -376,7 +375,7 @@ public class VerifyTAPN implements ModelChecker {
 		return result;
 	}
 	
-	public boolean supportsModel(TimedArcPetriNet model) {
+	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		if(model.hasWeights() || 
 				model.hasUrgentTransitions()) {
 			return false;

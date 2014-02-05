@@ -251,7 +251,7 @@ public class Verifyta implements ModelChecker {
 	}
 	
 	@Override
-	public boolean supportsModel(TimedArcPetriNet model) {
+	public boolean supportsModel(TimedArcPetriNet model, VerificationOptions options) {
 		//The combi translation supports all models.
 		return true;
 	}
@@ -293,7 +293,7 @@ public class Verifyta implements ModelChecker {
 		if(!model.value1().isDegree2() && new HasDeadlockVisitor().hasDeadLock(query.getProperty()))
 			throw new UnsupportedModelException("\nBecause the query contains a deadlock proposition, the selected engine\nsupports only nets where transitions have at most two input places.");
 		
-		if(!supportsModel(model.value1()))
+		if(!supportsModel(model.value1(), options))
 			throw new UnsupportedModelException("Verifyta does not support the given model.");
 		
 		if(!supportsQuery(model.value1(), query, options))

@@ -1,8 +1,9 @@
 package dk.aau.cs.io;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +35,6 @@ import pipe.gui.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.graphicElements.tapn.TimedPlaceComponent;
 import pipe.gui.graphicElements.tapn.TimedTransitionComponent;
 import pipe.gui.graphicElements.tapn.TimedTransportArcComponent;
-import pipe.gui.widgets.WorkflowDialog;
 import pipe.gui.widgets.InclusionPlaces.InclusionPlacesOption;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.SharedPlace;
@@ -60,67 +60,70 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		this.queries = queries;
 		this.constants = constants;
 	}
-
-	// TODO: refactor this code to make it more readable
-	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
-		Require.that(file != null, "Error: file to save to was null");
-
+	
+	public ByteArrayOutputStream savePNML() throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
 		Document document = null;
 		Transformer transformer = null;
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		
+		// Build a Petri Net XML Document
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = builderFactory.newDocumentBuilder();
+		document = builder.newDocument();
+
+		Element pnmlRootNode = document.createElement("pnml"); // PNML Top Level
+		document.appendChild(pnmlRootNode);
+		Attr pnmlAttr = document.createAttribute("xmlns"); // PNML "xmlns"
+		pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
+		pnmlRootNode.setAttributeNode(pnmlAttr);
+
+		appendSharedPlaces(document, pnmlRootNode);
+		appendSharedTransitions(document, pnmlRootNode);
+		appendConstants(document, pnmlRootNode);
+		appendTemplates(document, pnmlRootNode);
+		appendQueries(document, pnmlRootNode);
+		appendDefaultBound(document, pnmlRootNode);
+
+		document.normalize();
+		// Create Transformer with XSL Source File
+		transformer = TransformerFactory.newInstance().newTransformer();
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		DOMSource source = new DOMSource(document);
+
+		StreamResult result = new StreamResult(os);
+		transformer.transform(source, result);
+		
+		return os;
+	}
+
+	public void savePNML(File file) throws IOException, ParserConfigurationException, DOMException, TransformerConfigurationException, TransformerException {
+		Require.that(file != null, "Error: file to save to was null");;
 		
 		try {
-			// Build a Petri Net XML Document
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			document = builder.newDocument();
-
-			Element pnmlRootNode = document.createElement("pnml"); // PNML Top Level
-			document.appendChild(pnmlRootNode);
-			Attr pnmlAttr = document.createAttribute("xmlns"); // PNML "xmlns"
-			pnmlAttr.setValue("http://www.informatik.hu-berlin.de/top/pnml/ptNetb");
-			pnmlRootNode.setAttributeNode(pnmlAttr);
-
-			appendSharedPlaces(document, pnmlRootNode);
-			appendSharedTransitions(document, pnmlRootNode);
-			appendConstants(document, pnmlRootNode);
-			appendTemplates(document, pnmlRootNode);
-			appendQueries(document, pnmlRootNode);
-			appendDefaultBound(document, pnmlRootNode);
-
-			document.normalize();
-			// Create Transformer with XSL Source File
-			transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			// Write file and do XSLT transformation to generate correct PNML
-			File outputObjectArrayList = file;
-			DOMSource source = new DOMSource(document);
-
-			StreamResult result = new StreamResult(outputObjectArrayList);
-			transformer.transform(source, result);
+			ByteArrayOutputStream os = savePNML();
+			FileOutputStream fs = new FileOutputStream(file);
+			fs.write(os.toByteArray());
+			fs.close();
 		} catch (ParserConfigurationException e) {
 			System.out
 					.println("ParserConfigurationException thrown in savePNML() "
-							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
-							+ file.getCanonicalPath() + "\" xslt=\"");
+							+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
 		} catch (DOMException e) {
 			System.out
 					.println("DOMException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
-							+ file.getCanonicalPath() + "\" transformer=\""
-							+ transformer.getURIResolver() + "\"");
+							+ file.getCanonicalPath() + "\" transformer=\"");
 		} catch (TransformerConfigurationException e) {
 			System.out
 					.println("TransformerConfigurationException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath()
-							+ "\" transformer=\""
-							+ transformer.getURIResolver() + "\"");
+							+ "\" transformer=\"");
 		} catch (TransformerException e) {
 			System.out
 					.println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath()
-							+ "\" transformer=\""
-							+ transformer.getURIResolver() + "\"" + e);
+							+ "\"" + e);
 		}
 	}
 	
@@ -257,6 +260,7 @@ public class TimedArcPetriNetNetworkWriter implements PNMLWriter {
 		queryElement.setAttribute("extrapolationOption", "" + query.getExtrapolationOption());
 		queryElement.setAttribute("reductionOption", ""	+ query.getReductionOption());
 		queryElement.setAttribute("symmetry", "" + query.useSymmetry());
+		queryElement.setAttribute("gcd", "" + query.useGCD());
 		queryElement.setAttribute("timeDarts", "" + query.useTimeDarts());
 		queryElement.setAttribute("pTrie", "" + query.usePTrie());
 		queryElement.setAttribute("discreteInclusion", String.valueOf(query.discreteInclusion()));
