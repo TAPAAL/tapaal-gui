@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -58,6 +59,7 @@ import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.model.tapn.TransportArc;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
@@ -1188,13 +1190,15 @@ public class WorkflowDialog extends JDialog {
 					}
 
 					private TimedTAPNNetworkTrace determineError(TAPNNetworkTrace trace){
+						NetworkMarking marking = CreateGui.getCurrentTab().network().marking();
 						TimedTAPNNetworkTrace tmpTrace = new TimedTAPNNetworkTrace(trace.length());
 						TraceType type = null;
-						ArrayList<Tuple<TAPNNetworkTraceStep, Tuple<Integer, Integer>>> detectLoops = new ArrayList<Tuple<TAPNNetworkTraceStep,Tuple<Integer,Integer>>>();
+						ArrayList<Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer, Integer>>> detectLoops = new ArrayList<Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>,Tuple<Integer,Integer>>>();
 						int loopIndex = -1;
 						int delay = 0;
 						int maxDelay = 0;
 						int divergentIndex = -1;
+						
 						// Get trace until bound violated						
 						outer: for(TAPNNetworkTraceStep step : trace){
 							if(step instanceof TAPNNetworkTimeDelayStep){
@@ -1204,17 +1208,18 @@ public class WorkflowDialog extends JDialog {
 									divergentIndex = tmpTrace.length();
 								}
 							}else{
-								for(Tuple<TAPNNetworkTraceStep, Tuple<Integer, Integer>> checkStep : detectLoops){
-									if(checkStep.value1().equals(step) && checkStep.value2().value1() < delay){
+								for(Tuple<Tuple<TAPNNetworkTraceStep, NetworkMarking>, Tuple<Integer, Integer>> checkStep : detectLoops){
+									if(checkStep.value1().value1().equals(step) && checkStep.value1().value2().equals(marking.cut()) && checkStep.value2().value1() < delay){
 										loopIndex = checkStep.value2().value2();
 										setStrongSoundnessResult(false, RESULT_ERROR_CYCLE);
 										type = TraceType.EG_LOOP;
 										break outer;
 									}
 								}
-								detectLoops.add(new Tuple<TAPNNetworkTraceStep, Tuple<Integer,Integer>>(step, new Tuple<Integer, Integer>(delay, tmpTrace.length())));
+								detectLoops.add(new Tuple<Tuple<TAPNNetworkTraceStep,NetworkMarking>, Tuple<Integer,Integer>>(new Tuple<TAPNNetworkTraceStep,NetworkMarking>(step, marking.cut()), new Tuple<Integer, Integer>(delay, tmpTrace.length())));
 							}
 							tmpTrace.add(step);
+							marking = step.performStepFrom(marking);
 						}
 
 						if(type == null){

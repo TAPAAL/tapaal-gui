@@ -6,8 +6,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
+import dk.aau.cs.util.Tuple;
 
 public abstract class TimedPlace {
+	public enum PlaceType{
+		Standard, Invariant, Dead
+	}
+	
 	public abstract void addTimedPlaceListener(TimedPlaceListener listener);
 	public abstract void removeTimedPlaceListener(TimedPlaceListener listener);
 
@@ -30,6 +35,8 @@ public abstract class TimedPlace {
 	public abstract void removeToken(TimedToken timedToken);
 	public abstract void removeToken();
 	
+	public abstract Tuple<PlaceType, Integer> extrapolate();
+	
 	public abstract TimedPlace copy();
 	
 	/**
@@ -44,6 +51,14 @@ public abstract class TimedPlace {
 		});
 		
 		return copy;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj)	return true;
+		if(!(obj instanceof TimedPlace))	return false;
+		TimedPlace other = (TimedPlace) obj;
+		return name() == other.name();
 	}
 	
 	
