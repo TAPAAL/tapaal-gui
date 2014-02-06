@@ -16,11 +16,17 @@ public class BatchProcessingVerificationOptions {
 		KeepQueryOption, Yes, No
 	};
 	
+	public enum ApproximationMethodOption {
+		KeepQueryOption, None, OverApproximation, UnderApproximation
+	}
+	
 	private List<ReductionOption> reductionOptions;
 	private ReductionOption reductionOption;
 	private SearchOption searchOption;
 	private QueryPropertyOption queryPropertyOption;
 	private SymmetryOption symmetryOption;
+	private ApproximationMethodOption approximationMethodOption;
+	private int approximationDenominator = 0;
 	private boolean keepQueryCapacity;
 	private int capacity;
 	private boolean discreteInclusion = false; // only for VerifyTAPN
@@ -29,7 +35,7 @@ public class BatchProcessingVerificationOptions {
 	private boolean usePTrie = false;
 	
 	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion,
-			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie, List<ReductionOption> reductionOptions) {
+			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie, ApproximationMethodOption approximationMethodOption, int approximationDenominator, List<ReductionOption> reductionOptions) {
 		Require.that(!(reductionOptions == null && reductionOption == ReductionOption.BatchProcessingUserDefinedReductions), "ReductionOption was given as userdefined but a list of reductionoptions was not given");
 		this.searchOption = searchOption;
 		this.reductionOption = reductionOption;
@@ -42,11 +48,13 @@ public class BatchProcessingVerificationOptions {
 		this.useTimeDart = useTimeDart;
 		this.usePTrie = usePTrie;
 		this.reductionOptions = reductionOptions;
+		this.approximationMethodOption = approximationMethodOption;
+		this.approximationDenominator = approximationDenominator;
 	}
 	
 	public BatchProcessingVerificationOptions(QueryPropertyOption queryPropertyOption, boolean keepQueryCapacity, int capacity, SearchOption searchOption, SymmetryOption symmetryOption, ReductionOption reductionOption, boolean discreteInclusion,
-			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie) {
-		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, reductionOption, discreteInclusion, useTimeDartPTrie, useTimeDart, usePTrie, null); 
+			boolean useTimeDartPTrie, boolean useTimeDart, boolean usePTrie, ApproximationMethodOption approximationMethodOption, int approximationRValue) {
+		this(queryPropertyOption, keepQueryCapacity, capacity, searchOption, symmetryOption, reductionOption, discreteInclusion, useTimeDartPTrie, useTimeDart, usePTrie, approximationMethodOption, approximationRValue, null); 
 	}
 	
 	public boolean isReductionOptionUserdefined(){
@@ -92,5 +100,13 @@ public class BatchProcessingVerificationOptions {
 	
 	public int capacity() {
 		return capacity;
+	}
+	
+	public ApproximationMethodOption approximationMethodOption() {
+		return approximationMethodOption;
+	}
+	
+	public int approximationDenominator() {
+		return approximationDenominator;
 	}
 }
