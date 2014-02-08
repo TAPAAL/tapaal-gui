@@ -1107,9 +1107,6 @@ public class GuiFrame extends JFrame implements Observer {
 
 		saveAction.setEnabled(enable);
 		saveAsAction.setEnabled(enable);
-
-		importMenu.setEnabled(enable);
-		importPNMLAction.setEnabled(enable);
 		
 		exportMenu.setEnabled(enable);
 		exportPNGAction.setEnabled(enable);
