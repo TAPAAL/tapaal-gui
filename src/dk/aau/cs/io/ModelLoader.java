@@ -13,7 +13,7 @@ public class ModelLoader {
 		this.drawingSurface = drawingSurface;
 	}
 	
-	public LoadedModel load(File file) throws Exception{
+	public LoadedModel load(File file) throws Exception{		
 		TapnXmlLoader newFormatLoader = new TapnXmlLoader(drawingSurface);
 		try{
 			LoadedModel loadedModel = newFormatLoader.load(file);

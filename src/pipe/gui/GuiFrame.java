@@ -62,7 +62,10 @@ import javax.swing.event.ChangeListener;
 
 import net.tapaal.Preferences;
 
+import com.sun.j3d.loaders.Loader;
 import com.sun.jna.Platform;
+
+
 
 
 
@@ -95,6 +98,7 @@ import dk.aau.cs.gui.undo.Command;
 import dk.aau.cs.gui.undo.DeleteQueriesCommand;
 import dk.aau.cs.io.LoadedModel;
 import dk.aau.cs.io.ModelLoader;
+import dk.aau.cs.io.PNMLoader;
 import dk.aau.cs.io.ResourceManager;
 import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
@@ -124,7 +128,7 @@ public class GuiFrame extends JFrame implements Observer {
 	private JComboBox zoomComboBox;
 
 	private FileAction createAction, openAction, closeAction, saveAction,
-	saveAsAction, exitAction, printAction, exportPNGAction,
+	saveAsAction, exitAction, printAction, importPNMLAction, exportPNGAction,
 	exportPSAction, exportToTikZAction, exportTraceAction, importTraceAction;
 
 	private VerificationAction runUppaalVerification;
@@ -175,7 +179,7 @@ public class GuiFrame extends JFrame implements Observer {
 
 
 	private GUIMode guiMode = GUIMode.noNet;
-	private JMenu exportMenu, zoomMenu;
+	private JMenu importMenu, exportMenu, zoomMenu;
 
 
 	public boolean isMac(){
@@ -342,6 +346,19 @@ public class GuiFrame extends JFrame implements Observer {
 				"Save as...", null));
 		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('S', (shortcutkey + InputEvent.SHIFT_MASK)));
 
+
+		// Import menu
+		importMenu = new JMenu("Import");
+
+		importMenu.setIcon(new ImageIcon(Thread.currentThread()
+				.getContextClassLoader().getResource(
+						CreateGui.imgPath + "Export.png")));
+		addMenuItem(importMenu, importPNMLAction = new FileAction("PNML",
+				"Import a net in the PNML format", ""));
+		//importPNMLAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke('G', shortcutkey));
+
+		fileMenu.add(importMenu);
+		
 		// Export menu
 		exportMenu = new JMenu("Export");
 
@@ -1091,6 +1108,9 @@ public class GuiFrame extends JFrame implements Observer {
 		saveAction.setEnabled(enable);
 		saveAsAction.setEnabled(enable);
 
+		importMenu.setEnabled(enable);
+		importPNMLAction.setEnabled(enable);
+		
 		exportMenu.setEnabled(enable);
 		exportPNGAction.setEnabled(enable);
 		exportPSAction.setEnabled(enable);
@@ -1420,7 +1440,7 @@ public class GuiFrame extends JFrame implements Observer {
 	 *            Filename of net to load, or <b>null</b> to create a new, empty
 	 *            tab
 	 */
-	public void createNewTabFromFile(File file) {
+	public void createNewTabFromFile(File file, boolean loadPNML) {
 		int freeSpace = CreateGui.getFreeSpace(NetType.TAPN);
 		String name = "";
 
@@ -1446,8 +1466,14 @@ public class GuiFrame extends JFrame implements Observer {
 					CreateGui.getApp().setMode(ElementType.CREATING);
 				}
 
-				ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
-				LoadedModel loadedModel = loader.load(file);
+				LoadedModel loadedModel;
+				if(loadPNML){
+					PNMLoader loader = new PNMLoader(currentTab.drawingSurface());
+					loadedModel = loader.load(file);
+				} else {
+					ModelLoader loader = new ModelLoader(currentTab.drawingSurface());
+					loadedModel = loader.load(file);
+				}
 
 				currentTab.setNetwork(loadedModel.network(), loadedModel.templates());
 				currentTab.setQueries(loadedModel.queries());
@@ -2355,7 +2381,7 @@ public class GuiFrame extends JFrame implements Observer {
 				for(File f : files){
 					if(f.exists() && f.isFile() && f.canRead()) {
 						CreateGui.userPath = f.getParent();
-						createNewTabFromFile(f);
+						createNewTabFromFile(f, false);
 					}
 				}
 			} else if (this == createAction) {
@@ -2370,7 +2396,15 @@ public class GuiFrame extends JFrame implements Observer {
 				int index = appTab.getSelectedIndex();
 				appTab.remove(index);
 				CreateGui.removeTab(index);
-
+			} else if (this == importPNMLAction){
+				File[] files = new FileBrowser(CreateGui.userPath, "pnml").openFiles();
+					for(File f : files){
+						if(f.exists() && f.isFile() && f.canRead()){
+							CreateGui.userPath = f.getParent();
+							createNewTabFromFile(f, true);
+						}
+					}
+				
 				// Disable all action not available when no net is opend
 			} else if (this == exportPNGAction) {
 				Export.exportGuiView(appView, Export.PNG, null);
