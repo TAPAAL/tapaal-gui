@@ -142,15 +142,11 @@ public class PNMLoader {
 		
 		//We parse the places and transitions first
 		while(node != null){
-			switch (node.getNodeName()) {
-			case "place":
+			String tag = node.getNodeName();
+			if(tag.equals("place")){
 				parsePlace(node, tapn, template);
-				break;
-			case "transition":
+			} else if(tag.equals("transition")){
 				parseTransition(node, tapn, template);
-				break;
-			default:
-				break;
 			}
 			node = node.getNextSibling();
 		}
@@ -158,13 +154,10 @@ public class PNMLoader {
 		//We parse the transitions last, as we need the places and transitions it refers to
 		node = first;
 		while(node != null){
-			switch (node.getNodeName()) {
-			case "arc":
+			String tag = node.getNodeName();
+			if(tag.equals("arc")){
 				parseArc(node, tapn, template);
-				break;
-			default:
-				break;
-			}
+			} 
 			node = node.getNextSibling();
 		}
 	}
