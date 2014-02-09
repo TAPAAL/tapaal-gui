@@ -205,8 +205,8 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 								approxResult.isOverApproximationResult());
 						value.setNameMapping(transformedModel.value2());
 					} 
-					else if ((result.getQueryResult().queryType() == QueryType.EF && !result.getQueryResult().isQuerySatisfied())
-							|| (result.getQueryResult().queryType() == QueryType.AG && result.getQueryResult().isQuerySatisfied())) {
+					else if (((result.getQueryResult().queryType() == QueryType.EF || result.getQueryResult().queryType() == QueryType.EG) && !result.getQueryResult().isQuerySatisfied())
+							|| ((result.getQueryResult().queryType() == QueryType.AG || result.getQueryResult().queryType() == QueryType.AF) && result.getQueryResult().isQuerySatisfied())) {
 						// If (EF AND not satisfied) OR (AG AND satisfied)
 						
 						QueryResult queryResult = result.getQueryResult();
