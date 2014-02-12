@@ -136,8 +136,8 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_SYMMETRY = "Yes";
 	private static final String name_NOSYMMETRY = "No";
 	private static final String name_NONE_APPROXIMATION = "None";
-	private static final String name_OVER_APPROXIMATION = "Over";
-	private static final String name_UNDER_APPROXIMATION = "Under";
+	private static final String name_OVER_APPROXIMATION = "Over-approximation";
+	private static final String name_UNDER_APPROXIMATION = "Under-approximation";
 
 	//Tool tip strings
 	//Tool tips for model panel
@@ -164,10 +164,13 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_OOMValue = "<html>Enter the maximum amount of available memory to the verification.<br>Verification is skipped as soon as it is detected that this amount of memory is exceeded.</html>";
 	private final static String TOOL_TIP_NoOOMCheckBox = "Choose whether to use memory restrictions";
 	private final static String TOOL_TIP_Approximation_method = null;
-	private final static String TOOL_TIP_Approximation_Method_Option = "Choose to override the approximation used";
+	private final static String TOOL_TIP_Approximation_Method_Option_Keep = "Use the original used approximation method, if any.";
+	private final static String TOOL_TIP_Approximation_Method_Option_None = "No approximation method is used.";
+	private final static String TOOL_TIP_Approximation_Method_Option_Over = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
+	private final static String TOOL_TIP_Approximation_Method_Option_Under = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_ApproximationDenominatorLabel = null;
-	private final static String TOOL_TIP_ApproximationRValue = "Choose to override the approximation R-value used";
-	private final static String TOOL_TIP_ApproximationDenominator = "Choose to override the R-value specified here";
+	private final static String TOOL_TIP_ApproximationDenominator = "Choose the approximation constant to override with.";
+	private final static String TOOL_TIP_ApproximationDenominatorCheckbox = "Check to override the original approximation constant.";
 	
 	//Tool tips for monitor panel
 	private final static String TOOL_TIP_FileLabel = "Currently verified net";
@@ -555,7 +558,21 @@ public class BatchProcessingDialog extends JDialog {
 				name_UNDER_APPROXIMATION
 				};
 		approximationMethodOption = new JComboBox(options);
-		approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option);
+		approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
+		approximationMethodOption.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (approximationMethodOption.getSelectedItem() == name_NONE_APPROXIMATION) {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_None);
+				} else if (approximationMethodOption.getSelectedItem() == name_OVER_APPROXIMATION) {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Over);
+				} else if (approximationMethodOption.getSelectedItem() == name_UNDER_APPROXIMATION) {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Under);
+				} else {
+					approximationMethodOption.setToolTipText(TOOL_TIP_Approximation_Method_Option_Keep);
+				}
+			}
+		});
 		
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -566,7 +583,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 0);
 		verificationOptionsPanel.add(approximationMethodOption, gbc);
 		
-		JLabel approximationDenominatorLabel = new JLabel("R-value: ");
+		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");
 		approximationDenominatorLabel.setToolTipText(TOOL_TIP_ApproximationDenominatorLabel);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -576,7 +593,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(approximationDenominatorLabel, gbc);
 
 		approximationDenominator = new CustomJSpinner(2, 1,Integer.MAX_VALUE);
-		approximationDenominator.setToolTipText(TOOL_TIP_ApproximationRValue);
+		approximationDenominator.setToolTipText(TOOL_TIP_ApproximationDenominator);
 		approximationDenominator.setMaximumSize(new Dimension(70, 30));
 		approximationDenominator.setMinimumSize(new Dimension(70, 30));
 		approximationDenominator.setPreferredSize(new Dimension(70, 30));
@@ -590,7 +607,7 @@ public class BatchProcessingDialog extends JDialog {
 		verificationOptionsPanel.add(approximationDenominator, gbc);
 		
 		approximationDenominatorCheckbox = new JCheckBox("Do not override R-value");
-		approximationDenominatorCheckbox.setToolTipText(TOOL_TIP_ApproximationDenominator);
+		approximationDenominatorCheckbox.setToolTipText(TOOL_TIP_ApproximationDenominatorCheckbox);
 		approximationDenominatorCheckbox.setSelected(true);
 		approximationDenominatorCheckbox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1545,6 +1562,19 @@ public class BatchProcessingDialog extends JDialog {
 				s.append(name_SEARCHWHOLESTATESPACE);
 			else
 				s.append(query.getProperty().toString());
+			
+			s.append("\n\n");
+			s.append("Approximation method: ");
+			if (query.isOverApproximationEnabled()) {
+				s.append(name_OVER_APPROXIMATION);
+			} else if (query.isUnderApproximationEnabled()) {
+				s.append(name_UNDER_APPROXIMATION);
+			} else {
+				s.append(name_NONE_APPROXIMATION);
+			}
+			s.append("\n");
+			s.append("Approximation Constant: ");
+			s.append(query.approximationDenominator());
 
 			return s.toString();
 		}

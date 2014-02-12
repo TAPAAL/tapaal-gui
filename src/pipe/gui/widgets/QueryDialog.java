@@ -340,6 +340,12 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SAVE_TAPAAL_BUTTON = "Export an xml file that can be used as input for the TAPAAL engine.";
 	private final static String TOOL_TIP_SAVE_PN_BUTTON = "Export an xml file that can be used as input for the untimed Petri net engine.";
 	
+	//Tool tips for approximation panel
+	private final static String TOOL_TIP_APPROXIMATION_METHOD_NONE = "No approximation method is used.";
+	private final static String TOOL_TIP_APPROXIMATION_METHOD_OVER = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
+	private final static String TOOL_TIP_APPROXIMATION_METHOD_UNDER = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
+	private final static String TOOL_TIP_APPROXIMATION_CONSTANT = "Choose approximation constant";
+	
 	public QueryDialog(EscapableDialog me, QueryDialogueOption option,
 			TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels) {
 		this.tapnNetwork = tapnNetwork;
@@ -2125,17 +2131,17 @@ public class QueryDialog extends JPanel {
 		overApproximationOptionsPanel.setBorder(BorderFactory.createTitledBorder("Approximation Options"));
 		approximationRadioButtonGroup = new ButtonGroup();
 		
-		noApproximationEnable = new JRadioButton("No approximation method");
+		noApproximationEnable = new JRadioButton("Exact analysis");
 		noApproximationEnable.setVisible(true);
-		noApproximationEnable.setToolTipText("Enable over-approximation");
+		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
 		
-		overApproximationEnable = new JRadioButton("Enable over-approximation");
+		overApproximationEnable = new JRadioButton("Over-approximation");
 		overApproximationEnable.setVisible(true);
-		overApproximationEnable.setToolTipText("Enable over-approximation");
+		overApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_OVER);
 		
-		underApproximationEnable = new JRadioButton("Enable under-approximation");
+		underApproximationEnable = new JRadioButton("Under-approximation");
 		underApproximationEnable.setVisible(true);
-		underApproximationEnable.setToolTipText("Enable under-approximation");
+		underApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_UNDER);
 
 		approximationRadioButtonGroup.add(noApproximationEnable);
 		approximationRadioButtonGroup.add(overApproximationEnable);
@@ -2146,15 +2152,18 @@ public class QueryDialog extends JPanel {
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.anchor = GridBagConstraints.WEST;
 		
+		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
+		
 		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
-		overApproximationDenominator.setToolTipText(TOOL_TIP_NUMBEROFEXTRATOKENSINNET);
+		overApproximationDenominator.setToolTipText(TOOL_TIP_APPROXIMATION_CONSTANT);
 		
 		overApproximationOptionsPanel.add(noApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationEnable, gridBagConstraints);
 		overApproximationOptionsPanel.add(underApproximationEnable, gridBagConstraints);
+		overApproximationOptionsPanel.add(approximationDenominatorLabel, gridBagConstraints);
 		overApproximationOptionsPanel.add(overApproximationDenominator);
 	
 		gridBagConstraints = new GridBagConstraints();
