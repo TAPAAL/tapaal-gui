@@ -100,7 +100,7 @@ public class BatchProcessingDialog extends JDialog {
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_UNTIMED = "VerifyPN: Untimed engine";
-	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with over-approximation";
+	private static final String name_UNTIMED_APPROX = "VerifyPN: Untimed engine, with linear over-approximation";
 	private static final String name_verifyTAPNWithLegend = "A: "
 			+ name_verifyTAPN;
 	private static final String name_verifyTAPNDiscreteInclusionWithLegend = "B: "
@@ -164,13 +164,13 @@ public class BatchProcessingDialog extends JDialog {
 	private final static String TOOL_TIP_OOMValue = "<html>Enter the maximum amount of available memory to the verification.<br>Verification is skipped as soon as it is detected that this amount of memory is exceeded.</html>";
 	private final static String TOOL_TIP_NoOOMCheckBox = "Choose whether to use memory restrictions";
 	private final static String TOOL_TIP_Approximation_method = null;
-	private final static String TOOL_TIP_Approximation_Method_Option_Keep = "Use the original used approximation method, if any.";
+	private final static String TOOL_TIP_Approximation_Method_Option_Keep = "Do not override the default approximation method.";
 	private final static String TOOL_TIP_Approximation_Method_Option_None = "No approximation method is used.";
 	private final static String TOOL_TIP_Approximation_Method_Option_Over = "Approximate by dividing all intervals with the approximation constant and enlarging the intervals.";
 	private final static String TOOL_TIP_Approximation_Method_Option_Under = "Approximate by dividing all intervals with the approximation constant and shrinking the intervals.";
 	private final static String TOOL_TIP_ApproximationDenominatorLabel = null;
-	private final static String TOOL_TIP_ApproximationDenominator = "Choose the approximation constant to override with.";
-	private final static String TOOL_TIP_ApproximationDenominatorCheckbox = "Check to override the original approximation constant.";
+	private final static String TOOL_TIP_ApproximationDenominator = "Choose the approximation constant.";
+	private final static String TOOL_TIP_ApproximationDenominatorCheckbox = "Check to override the default approximation constant.";
 	
 	//Tool tips for monitor panel
 	private final static String TOOL_TIP_FileLabel = "Currently verified net";
@@ -606,7 +606,7 @@ public class BatchProcessingDialog extends JDialog {
 		gbc.insets = new Insets(0, 0, 5, 10);
 		verificationOptionsPanel.add(approximationDenominator, gbc);
 		
-		approximationDenominatorCheckbox = new JCheckBox("Do not override R-value");
+		approximationDenominatorCheckbox = new JCheckBox("Do not override");
 		approximationDenominatorCheckbox.setToolTipText(TOOL_TIP_ApproximationDenominatorCheckbox);
 		approximationDenominatorCheckbox.setSelected(true);
 		approximationDenominatorCheckbox.addActionListener(new ActionListener() {
