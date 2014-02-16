@@ -69,7 +69,10 @@ public class Verifier {
 	public static void analyzeKBound(
 			TimedArcPetriNetNetwork tapnNetwork, int k, JSpinner tokensControl) {
 		ModelChecker modelChecker;
-		if(tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions()){
+		
+		if(tapnNetwork.isUntimed()){
+			modelChecker = getVerifyPN();
+		} else if(tapnNetwork.hasWeights() || tapnNetwork.hasUrgentTransitions()){
 			modelChecker = getVerifydTAPN();
 		} else {
 			modelChecker = getVerifyTAPN();
