@@ -1015,6 +1015,7 @@ public class QueryDialog extends JPanel {
 			underApproximationEnable.setSelected(true);
 		else
 			noApproximationEnable.setSelected(true);
+		
 		if (queryToCreateFrom.approximationDenominator() > 0) {
 			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
 		}
@@ -2133,6 +2134,7 @@ public class QueryDialog extends JPanel {
 		
 		noApproximationEnable = new JRadioButton("Exact analysis");
 		noApproximationEnable.setVisible(true);
+		noApproximationEnable.setSelected(true);
 		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
 		
 		overApproximationEnable = new JRadioButton("Over-approximation");
@@ -2154,7 +2156,7 @@ public class QueryDialog extends JPanel {
 		
 		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
 		
-		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
+		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
