@@ -35,7 +35,7 @@ public class NameMapping {
 		return originalToMappedNames.get(new Tuple<String, String>(templateName, objectName));
 	}
 	
-	public HashMap<String, Tuple<String, String>> getMappedToOrg(){
-		return mappedNamesToOriginalNames;
+	public HashMap<Tuple<String, String>, String> getOrgToMapped(){
+		return originalToMappedNames;
 	}
 }

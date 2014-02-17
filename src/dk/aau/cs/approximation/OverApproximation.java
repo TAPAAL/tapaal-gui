@@ -116,7 +116,7 @@ public class OverApproximation implements ITAPNApproximation {
 		boolean traceHasTransitionStep = false;
 		
 		TAPNNetworkTrace trace = result.getTrace();
-		HashMap<String,String> reversedNameMap = reverseNameMapping(transformedModel.value2().getMappedToOrg());
+		HashMap<Tuple<String, String>, String> nameMap = transformedModel.value2().getOrgToMapped();
 		LocalTimedPlace loopStep = null;
 		boolean delayIsLoopStep = false;
 		
@@ -128,7 +128,13 @@ public class OverApproximation implements ITAPNApproximation {
 				}				
 			}
 			if (step instanceof TAPNNetworkTimedTransitionStep) {
-				TimedTransition firedTransition = net.getTransitionByName(reversedNameMap.get(((TAPNNetworkTimedTransitionStep) step).getTransition().name()));
+				//TimedTransition firedTransition = net.getTransitionByName(reversedNameMap.get(((TAPNNetworkTimedTransitionStep) step).getTransition().name()));
+				TAPNNetworkTimedTransitionStep tmpStep = (TAPNNetworkTimedTransitionStep)step;
+				//If the transition in step is shared, use "" as model for lookup in namemap
+				Tuple<String, String> key = new Tuple<String, String>(
+						(((TAPNNetworkTimedTransitionStep) step).getTransition().sharedTransition() == null ? tmpStep.getTransition().model().name() : ""), 
+						tmpStep.getTransition().name()); 
+				TimedTransition firedTransition = net.getTransitionByName(nameMap.get(key));
 				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent());
 				
 				net.add(copyTransition);
@@ -237,13 +243,5 @@ public class OverApproximation implements ITAPNApproximation {
 		for (TimedTransition transition : originalTransitions) {
 			net.add(new TimedInputArc(blockPlace, transition, TimeInterval.ZERO_INF));	
 		}           
-	}
-	
-	public static HashMap<String,String> reverseNameMapping(HashMap<String,Tuple<String,String>> map) {
-		HashMap<String,String> newMap = new HashMap<String,String>();
-		for ( Entry<String, Tuple<String,String>> entry : map.entrySet() ) {
-		    newMap.put(entry.getValue().value2(), entry.getKey());
-		}
-		return newMap;
 	}
 }
