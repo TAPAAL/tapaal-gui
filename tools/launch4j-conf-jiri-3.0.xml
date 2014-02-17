@@ -1,0 +1,38 @@
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>lib/tapaal.jar</jar>
+  <outfile>/Users/srba/Dropbox/TAPAAL/Release-3.0/tapaal.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://www.tapaal.net</supportUrl>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>/Users/srba/Dropbox/TAPAAL/Icon/tapaal-3-0.ico</icon>
+  <classPath>
+    <mainClass>TAPAAL</mainClass>
+    <cp>lib/*</cp>
+  </classPath>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <minVersion>1.6.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+  </jre>
+  <versionInfo>
+    <fileVersion>3.0.0.0</fileVersion>
+    <txtFileVersion>3.0.0.0</txtFileVersion>
+    <fileDescription>TAPAAL</fileDescription>
+    <copyright>TAPAAL Team 2008-2014</copyright>
+    <productVersion>3.0.0.0</productVersion>
+    <txtProductVersion>3.0.0.0</txtProductVersion>
+    <productName>TAPAAL</productName>
+    <companyName></companyName>
+    <internalName>tapaal</internalName>
+    <originalFilename>tapaal.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>
