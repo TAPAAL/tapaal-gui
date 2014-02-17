@@ -234,6 +234,7 @@ public class QueryDialog extends JPanel {
 	private static Boolean advancedView = false;
 	
 	private static boolean hasForcedDisabledTimeDarts = false;
+	private static boolean hasForcedDisabledGCD = false;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -680,6 +681,14 @@ public class QueryDialog extends JPanel {
 				useTimeDarts.setSelected(true);
 			}
             useTimeDarts.setEnabled(true);     
+        }
+		
+		if(useGCD != null){
+			if(hasForcedDisabledGCD){
+				hasForcedDisabledGCD = false;
+				useGCD.setSelected(true);
+			}
+            useGCD.setEnabled(true);     
         }
 		
         if (queryHasDeadlock()) {
@@ -2280,6 +2289,11 @@ public class QueryDialog extends JPanel {
 			if(tapnNetwork.hasUrgentTransitions()){
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
+			}
+			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
+				useGCD.setSelected(false);
+				useGCD.setEnabled(false);
 			}
 		} else {
 			useGCD.setVisible(false);
