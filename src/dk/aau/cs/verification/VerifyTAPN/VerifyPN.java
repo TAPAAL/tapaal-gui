@@ -119,7 +119,7 @@ public class VerifyPN implements ModelChecker{
 				result = null;
 			}
 
-			Pattern pattern = Pattern.compile("^VerifyPN.*(\\d+\\.\\d+).*$", Pattern.DOTALL);
+			Pattern pattern = Pattern.compile("^VerifyPN.*(\\d+\\.\\d+\\.\\d+).*$", Pattern.DOTALL);
 			Matcher m = pattern.matcher(versioninfo);
 			m.find();
 			result = m.group(1);
