@@ -265,7 +265,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				approximationDenominator = batchProcessingVerificationOptions.approximationDenominator();
 			}
 			
-			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, true, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
+			pipe.dataLayer.TAPNQuery changedQuery = new pipe.dataLayer.TAPNQuery(name, capacity, property, TraceOption.NONE, search, option, symmetry, false, query.useTimeDarts(), query.usePTrie(), query.useOverApproximation(),  query.getHashTableSize(), query.getExtrapolationOption(), query.inclusionPlaces(), overApproximation, underApproximation, approximationDenominator);
 			
 			if(batchProcessingVerificationOptions.queryPropertyOption() == QueryPropertyOption.KeepQueryOption)
 				changedQuery.setActive(query.isActive());
@@ -425,8 +425,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 				value.setNameMapping(composedModel.value2());
 	        } else {
 	            // If r > 1
-	            if ((verificationResult.getQueryResult().queryType() == QueryType.EF && verificationResult.getQueryResult().isQuerySatisfied())
-	               || (verificationResult.getQueryResult().queryType() == QueryType.AG && !verificationResult.getQueryResult().isQuerySatisfied())) {
+				if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG ) && verificationResult.getQueryResult().isQuerySatisfied())
+						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && !verificationResult.getQueryResult().isQuerySatisfied())) {
 	                //Create the verification satisfied result for the approximation
 	                VerificationResult<TimedArcPetriNetTrace> approxResult = verificationResult;
 	                valueNetwork = new VerificationResult<TAPNNetworkTrace>(
@@ -476,8 +476,8 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	    					verificationResult.isOverApproximationResult());
 	                value.setNameMapping(composedModel.value2());
 	            }
-	            else if ((verificationResult.getQueryResult().queryType() == QueryType.EF && !verificationResult.getQueryResult().isQuerySatisfied())
-	                  || (verificationResult.getQueryResult().queryType() == QueryType.AG && verificationResult.getQueryResult().isQuerySatisfied())) {
+				else if (((verificationResult.getQueryResult().queryType() == QueryType.EF || verificationResult.getQueryResult().queryType() == QueryType.EG) && !verificationResult.getQueryResult().isQuerySatisfied())
+						|| ((verificationResult.getQueryResult().queryType() == QueryType.AG || verificationResult.getQueryResult().queryType() == QueryType.AF) && verificationResult.getQueryResult().isQuerySatisfied())) {
 	                // If (EF AND not satisfied) OR (AG AND satisfied)
 	               
 	                QueryResult queryResult = verificationResult.getQueryResult();

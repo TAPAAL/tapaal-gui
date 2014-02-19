@@ -13,6 +13,8 @@ import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.VerifyTAPN.VerifyDTAPNOptions;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPN;
+import dk.aau.cs.verification.VerifyTAPN.VerifyPNOptions;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPN;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNDiscreteVerification;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
@@ -47,7 +49,9 @@ public class KBoundAnalyzer {
 	}
 
 	protected VerifyTAPNOptions verificationOptions() {
-		if(modelChecker instanceof VerifyTAPN){
+		if(modelChecker instanceof VerifyPN){
+			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false);
+		} else if(modelChecker instanceof VerifyTAPN){
 			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true);
 		} else if(modelChecker instanceof VerifyTAPNDiscreteVerification){
 			return new VerifyDTAPNOptions(true, k, TraceOption.NONE, SearchOption.BFS, true, tapnNetwork.hasUrgentTransitions()?false:true, true);

@@ -264,6 +264,7 @@ public class QueryDialog extends JPanel {
 	private static Boolean advancedView = false;
 	
 	private static boolean hasForcedDisabledTimeDarts = false;
+	private static boolean hasForcedDisabledGCD = false;
 
 	//Strings for tool tips
 	//Tool tips for top panel
@@ -319,8 +320,8 @@ public class QueryDialog extends JPanel {
 	private final static String TOOL_TIP_SELECT_INCLUSION_PLACES = "Manually select places considered for the inclusion check.";
 	private final static String TOOL_TIP_TIME_DARTS = "Use the time dart optimization";
 	private final static String TOOL_TIP_PTRIE = "Use the PTrie memory optimization";
-	private final static String TOOL_TIP_GCD = "Calculate GCD to minimize constants in the model";
-	private final static String TOOL_TIP_OVERAPPROX = "Run over approximation check for EF and AG queries";	// TODO: write tooltip
+	private final static String TOOL_TIP_GCD = "Calculate greatest common divisor to minimize constants in the model";
+	private final static String TOOL_TIP_OVERAPPROX = "Run linear over-approximation check for EF and AG queries";	// TODO: write tooltip
 
 	//Tool tips for search options panel
 	private final static String TOOL_TIP_HEURISTIC_SEARCH = "<html>Uses a heuiristic method in state space exploration.<br />" +
@@ -735,6 +736,14 @@ public class QueryDialog extends JPanel {
             useTimeDarts.setEnabled(true);     
         }
 		
+		if(useGCD != null){
+			if(hasForcedDisabledGCD){
+				hasForcedDisabledGCD = false;
+				useGCD.setSelected(true);
+			}
+            useGCD.setEnabled(true);     
+        }
+		
         if (queryHasDeadlock()) {
             if (tapnNetwork.isNonStrict()) {
                 options.add(name_DISCRETE);
@@ -1021,6 +1030,7 @@ public class QueryDialog extends JPanel {
 			underApproximationEnable.setSelected(true);
 		else
 			noApproximationEnable.setSelected(true);
+		
 		if (queryToCreateFrom.approximationDenominator() > 0) {
 			overApproximationDenominator.setValue(queryToCreateFrom.approximationDenominator());
 		}
@@ -2138,6 +2148,7 @@ public class QueryDialog extends JPanel {
 		
 		noApproximationEnable = new JRadioButton("Exact analysis");
 		noApproximationEnable.setVisible(true);
+		noApproximationEnable.setSelected(true);
 		noApproximationEnable.setToolTipText(TOOL_TIP_APPROXIMATION_METHOD_NONE);
 		
 		overApproximationEnable = new JRadioButton("Over-approximation");
@@ -2159,7 +2170,7 @@ public class QueryDialog extends JPanel {
 		
 		JLabel approximationDenominatorLabel = new JLabel("Approximation constant: ");	
 		
-		overApproximationDenominator = new CustomJSpinner(10, 2, Integer.MAX_VALUE);	
+		overApproximationDenominator = new CustomJSpinner(2, 2, Integer.MAX_VALUE);	
 		overApproximationDenominator.setMaximumSize(new Dimension(55, 30));
 		overApproximationDenominator.setMinimumSize(new Dimension(55, 30));
 		overApproximationDenominator.setPreferredSize(new Dimension(55, 30));
@@ -2415,6 +2426,11 @@ public class QueryDialog extends JPanel {
 			if(tapnNetwork.hasUrgentTransitions()){
 				useTimeDarts.setSelected(false);
 				useTimeDarts.setEnabled(false);
+			}
+			if(queryHasDeadlock() || getQuantificationSelection().equals("E[]") || getQuantificationSelection().equals("A<>")){
+				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
+				useGCD.setSelected(false);
+				useGCD.setEnabled(false);
 			}
 		} else {
 			useGCD.setVisible(false);

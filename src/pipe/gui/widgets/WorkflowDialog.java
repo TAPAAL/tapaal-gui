@@ -138,7 +138,7 @@ public class WorkflowDialog extends JDialog {
 	private static final String LABEL_OUTPUT_PLACE = "Output place:";
 	private static final String LABEL_INHIBITOR_ARCS = "Inhibitor arcs:";
 	private static final String LABEL_URGENT_TRANSITIONS = "Urgent transitions:";
-	private static final String LABEL_INVARIANTS = "Age Invariants:";
+	private static final String LABEL_INVARIANTS = "Age invariants:";
 
 	private static final String LABEL_RESULT_SOUND = "Soundness:";
 	private static final String LABEL_RESULT_MIN = "Minimum duration:";
@@ -375,14 +375,14 @@ public class WorkflowDialog extends JDialog {
 			gbc.gridx = 0;
 			informationPanel.add(new JLabel(LABEL_INPUT_PLACE, SwingConstants.RIGHT), gbc);
 
-			JLabel inPlaceLabel = new JLabel(in.name());
+			JLabel inPlaceLabel = new JLabel(in.toString());
 			gbc.gridx = 1;
 			informationPanel.add(inPlaceLabel, gbc);
 
 			gbc.gridy = 2;
 			gbc.gridx = 0;
 			informationPanel.add(new JLabel(LABEL_OUTPUT_PLACE, SwingConstants.RIGHT), gbc);
-			JLabel outPlaceLabel = new JLabel(out.name());
+			JLabel outPlaceLabel = new JLabel(out.toString());
 			gbc.gridx = 1;
 			informationPanel.add(outPlaceLabel, gbc);
 
