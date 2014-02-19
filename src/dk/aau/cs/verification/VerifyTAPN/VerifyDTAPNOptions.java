@@ -70,7 +70,7 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
 		result.append(' ');
 		result.append(dontUseDeadPlaces ? "-d" : "");
 		result.append(' ');
-		result.append(gcd ? "" : "-c");
+		result.append(gcd ? "-c" : "");
 		return result.toString();
 	}
 
